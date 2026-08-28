@@ -2187,6 +2187,272 @@ impl UniversalPackageTranslator for SigmaPackageTranslator {
     }
 }
 
+// ============================================================================
+// Portage-style USE Flags & Dynamic Dependency Resolution
+// ============================================================================
+
+/// Portage-style USE flag representing compile-time option
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UseFlag {
+    pub name: String,
+    pub enabled: bool,
+    pub description: String,
+}
+
+/// Portage-style package extension interface
+pub trait IPortagePackage: IPackage {
+    fn use_flags(&self) -> &[UseFlag];
+    fn active_use_flags(&self) -> Vec<String>;
+    fn conditional_dependencies(&self) -> &[(String, Dependency)];
+    fn enable_use_flag(&mut self, flag: &str);
+    fn disable_use_flag(&mut self, flag: &str);
+    fn get_resolved_dependencies(&self) -> Vec<Dependency>;
+}
+
+pub struct PortagePackage {
+    pub base_package: StandardPackage,
+    pub use_flags: Vec<UseFlag>,
+    pub conditional_deps: Vec<(String, Dependency)>,
+    pub resolved_deps: Vec<Dependency>,
+}
+
+impl PortagePackage {
+    pub fn new(
+        base_package: StandardPackage,
+        use_flags: Vec<UseFlag>,
+        conditional_deps: Vec<(String, Dependency)>,
+    ) -> Self {
+        let mut pkg = Self {
+            base_package,
+            use_flags,
+            conditional_deps,
+            resolved_deps: Vec::new(),
+        };
+        pkg.update_resolved_dependencies();
+        pkg
+    }
+
+    fn update_resolved_dependencies(&mut self) {
+        let mut deps = self.base_package.dependencies.clone();
+        for (flag, dep) in &self.conditional_deps {
+            if self.use_flags.iter().any(|f| f.name == *flag && f.enabled) {
+                deps.push(dep.clone());
+            }
+        }
+        self.resolved_deps = deps;
+    }
+}
+
+impl IPackage for PortagePackage {
+    fn name(&self) -> &str {
+        self.base_package.name()
+    }
+    fn version(&self) -> &Version {
+        self.base_package.version()
+    }
+    fn dependencies(&self) -> &[Dependency] {
+        &self.resolved_deps
+    }
+    fn format(&self) -> PackageFormat {
+        self.base_package.format()
+    }
+    fn metadata(&self) -> &PackageMetadata {
+        self.base_package.metadata()
+    }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        self.base_package.metadata_mut()
+    }
+}
+
+impl IPortagePackage for PortagePackage {
+    fn use_flags(&self) -> &[UseFlag] {
+        &self.use_flags
+    }
+
+    fn active_use_flags(&self) -> Vec<String> {
+        self.use_flags
+            .iter()
+            .filter(|f| f.enabled)
+            .map(|f| f.name.clone())
+            .collect()
+    }
+
+    fn conditional_dependencies(&self) -> &[(String, Dependency)] {
+        &self.conditional_deps
+    }
+
+    fn enable_use_flag(&mut self, flag: &str) {
+        if let Some(f) = self.use_flags.iter_mut().find(|f| f.name == flag) {
+            f.enabled = true;
+            self.update_resolved_dependencies();
+        }
+    }
+
+    fn disable_use_flag(&mut self, flag: &str) {
+        if let Some(f) = self.use_flags.iter_mut().find(|f| f.name == flag) {
+            f.enabled = false;
+            self.update_resolved_dependencies();
+        }
+    }
+
+    fn get_resolved_dependencies(&self) -> Vec<Dependency> {
+        self.resolved_deps.clone()
+    }
+}
+
+// ============================================================================
+// NixOS-style Atomic Profiles & Generation Symlink Switching
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProfileGeneration {
+    pub generation_id: usize,
+    pub description: String,
+    pub active_symlink: String,
+    pub installed_packages: Vec<String>,
+    pub timestamp: u64,
+}
+
+pub struct SovereignProfileManager {
+    pub profile_name: String,
+    pub generations: Vec<ProfileGeneration>,
+    pub current_generation_id: usize,
+}
+
+impl SovereignProfileManager {
+    pub fn new(profile_name: &str) -> Self {
+        Self {
+            profile_name: profile_name.to_string(),
+            generations: Vec::new(),
+            current_generation_id: 0,
+        }
+    }
+
+    /// Creates and switches to a new profile generation atomically
+    pub fn create_generation(&mut self, desc: &str, packages: Vec<String>) -> usize {
+        let gen_id = self.generations.len() + 1;
+        let symlink = format!(
+            "/nix/var/nix/profiles/per-user/{}/profile-{}",
+            self.profile_name, gen_id
+        );
+
+        let gen = ProfileGeneration {
+            generation_id: gen_id,
+            description: desc.to_string(),
+            active_symlink: symlink,
+            installed_packages: packages,
+            timestamp: 1672531199 + (gen_id as u64 * 3600), // simulated timestamp
+        };
+
+        self.generations.push(gen);
+        self.current_generation_id = gen_id;
+        gen_id
+    }
+
+    /// Switches the symlink pointer back to a previously saved generation
+    pub fn switch_to_generation(&mut self, gen_id: usize) -> Result<String, &'static str> {
+        if self.generations.iter().any(|g| g.generation_id == gen_id) {
+            self.current_generation_id = gen_id;
+            let active_gen = &self.generations[gen_id - 1];
+            Ok(active_gen.active_symlink.clone())
+        } else {
+            Err("Profile generation not found")
+        }
+    }
+
+    /// Rollbacks to the previous generation
+    pub fn rollback(&mut self) -> Result<String, &'static str> {
+        if self.current_generation_id <= 1 {
+            return Err("No older generation available for rollback");
+        }
+        let prev_gen_id = self.current_generation_id - 1;
+        self.switch_to_generation(prev_gen_id)
+    }
+
+    /// Gets the list of installed packages for the current active generation
+    pub fn current_packages(&self) -> &[String] {
+        if self.current_generation_id == 0 || self.generations.is_empty() {
+            &[]
+        } else {
+            &self.generations[self.current_generation_id - 1].installed_packages
+        }
+    }
+}
+
+// ============================================================================
+// Debian-style Post-Transaction Triggers
+// ============================================================================
+
+/// Trait representing a Debian-style file trigger
+pub trait IFileTrigger: Send + Sync {
+    fn trigger_name(&self) -> &str;
+    fn target_pattern(&self) -> &str; // e.g. "usr/share/man" or "usr/lib/lib"
+    fn execute(&self, matched_paths: &[&str]) -> Result<(), String>;
+}
+
+/// Debian-style trigger manager that handles post-transaction interests and activations
+pub struct DebianTriggerManager {
+    pub triggers: Vec<Box<dyn IFileTrigger>>,
+    pub activated_triggers: HashMap<String, Vec<String>>, // Trigger name to matched paths
+}
+
+impl DebianTriggerManager {
+    pub fn new() -> Self {
+        Self {
+            triggers: Vec::new(),
+            activated_triggers: HashMap::new(),
+        }
+    }
+
+    /// Register interest in a specific path/pattern
+    pub fn register_trigger(&mut self, trigger: Box<dyn IFileTrigger>) {
+        self.triggers.push(trigger);
+    }
+
+    /// Scan installed file paths and activate registered triggers on matches
+    pub fn process_installed_files(&mut self, installed_files: &[&str]) -> usize {
+        let mut activated_count = 0;
+        for trigger in &self.triggers {
+            let mut matches = Vec::new();
+            for file in installed_files {
+                if file.contains(trigger.target_pattern()) {
+                    matches.push(file.to_string());
+                }
+            }
+
+            if !matches.is_empty() {
+                self.activated_triggers
+                    .entry(trigger.trigger_name().to_string())
+                    .or_default()
+                    .extend(matches);
+                activated_count += 1;
+            }
+        }
+        activated_count
+    }
+
+    /// Run all activated triggers post-transaction
+    pub fn run_activated_triggers(&mut self) -> Result<usize, String> {
+        let mut executed_count = 0;
+        for trigger in &self.triggers {
+            if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
+                trigger.execute(&paths_ref)?;
+                executed_count += 1;
+            }
+        }
+        // Clear activated triggers after execution
+        self.activated_triggers.clear();
+        Ok(executed_count)
+    }
+}
+
+impl Default for DebianTriggerManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2514,5 +2780,163 @@ Description: Hook test";
         assert_eq!(translated.name(), "test-lib");
         assert_eq!(translated.format(), PackageFormat::Rpm);
         assert!(translated.metadata().description.contains("Translated from Deb to Rpm"));
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let base_pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "dev-lang/python".to_string(),
+                version: Version::new(3, 11, 0),
+                description: "Python programming language".to_string(),
+                license: "PSF".to_string(),
+                maintainer: "gentoo-python".to_string(),
+                homepage: "python.org".to_string(),
+                architecture: "amd64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 25000000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: vec!["amd64".to_string(), "arm64".to_string()],
+            },
+            dependencies: vec![Dependency {
+                name: "sys-libs/readline".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
+            format: PackageFormat::Ebuild,
+        };
+
+        let use_flags = vec![
+            UseFlag {
+                name: "sqlite".to_string(),
+                enabled: false,
+                description: "Enable sqlite module".to_string(),
+            },
+            UseFlag {
+                name: "ssl".to_string(),
+                enabled: true,
+                description: "Enable SSL support".to_string(),
+            },
+        ];
+
+        let conditional_deps = vec![
+            (
+                "sqlite".to_string(),
+                Dependency {
+                    name: "dev-db/sqlite".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+            ),
+            (
+                "ssl".to_string(),
+                Dependency {
+                    name: "dev-libs/openssl".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+            ),
+        ];
+
+        let mut portage_pkg = PortagePackage::new(base_pkg, use_flags, conditional_deps);
+
+        // Under initial configuration, readline (base) and openssl (enabled 'ssl' USE flag) should be resolved. sqlite should not.
+        let deps = portage_pkg.get_resolved_dependencies();
+        assert_eq!(deps.len(), 2);
+        assert!(deps.iter().any(|d| d.name == "sys-libs/readline"));
+        assert!(deps.iter().any(|d| d.name == "dev-libs/openssl"));
+        assert!(!deps.iter().any(|d| d.name == "dev-db/sqlite"));
+
+        // Enable 'sqlite' USE flag, readline, openssl, and sqlite should all be resolved
+        portage_pkg.enable_use_flag("sqlite");
+        let deps = portage_pkg.get_resolved_dependencies();
+        assert_eq!(deps.len(), 3);
+        assert!(deps.iter().any(|d| d.name == "dev-db/sqlite"));
+
+        // Disable 'ssl' USE flag
+        portage_pkg.disable_use_flag("ssl");
+        let deps = portage_pkg.get_resolved_dependencies();
+        assert_eq!(deps.len(), 2);
+        assert!(!deps.iter().any(|d| d.name == "dev-libs/openssl"));
+    }
+
+    #[test]
+    fn test_nix_style_profile_atomic_rollback() {
+        let mut profile = SovereignProfileManager::new("developer");
+        assert_eq!(profile.current_generation_id, 0);
+
+        // Generation 1: Base utilities
+        let gen1 = profile.create_generation("Base core utilities", vec!["coreutils".to_string(), "bash".to_string()]);
+        assert_eq!(gen1, 1);
+        assert_eq!(profile.current_generation_id, 1);
+        assert_eq!(profile.current_packages().len(), 2);
+
+        // Generation 2: Enhanced tools
+        let gen2 = profile.create_generation("Developer tools", vec!["coreutils".to_string(), "bash".to_string(), "git".to_string(), "neovim".to_string()]);
+        assert_eq!(gen2, 2);
+        assert_eq!(profile.current_generation_id, 2);
+        assert_eq!(profile.current_packages().len(), 4);
+
+        // Rollback to Generation 1 atomically
+        let symlink_path = profile.rollback().unwrap();
+        assert_eq!(profile.current_generation_id, 1);
+        assert!(symlink_path.contains("profile-1"));
+        assert_eq!(profile.current_packages().len(), 2);
+
+        // Cannot rollback further as Generation 1 is the first generation
+        assert!(profile.rollback().is_err());
+    }
+
+    #[test]
+    fn test_debian_style_triggers() {
+        struct MockManTrigger {
+            name: String,
+            pattern: String,
+            executed_flag: Arc<std::sync::Mutex<bool>>,
+        }
+
+        impl IFileTrigger for MockManTrigger {
+            fn trigger_name(&self) -> &str {
+                &self.name
+            }
+            fn target_pattern(&self) -> &str {
+                &self.pattern
+            }
+            fn execute(&self, matched_paths: &[&str]) -> Result<(), String> {
+                assert_eq!(matched_paths.len(), 2);
+                assert!(matched_paths.contains(&"usr/share/man/man1/git.1"));
+                let mut flag = self.executed_flag.lock().unwrap();
+                *flag = true;
+                Ok(())
+            }
+        }
+
+        let executed = Arc::new(std::sync::Mutex::new(false));
+        let man_trigger = MockManTrigger {
+            name: "update-man-db".to_string(),
+            pattern: "usr/share/man".to_string(),
+            executed_flag: Arc::clone(&executed),
+        };
+
+        let mut trigger_manager = DebianTriggerManager::new();
+        trigger_manager.register_trigger(Box::new(man_trigger));
+
+        let installed_files = vec![
+            "usr/bin/git",
+            "usr/share/man/man1/git.1",
+            "usr/share/man/man5/gitconfig.5",
+            "etc/gitconfig",
+        ];
+
+        // Process installed files to check for trigger activation matches
+        let count = trigger_manager.process_installed_files(&installed_files);
+        assert_eq!(count, 1); // 1 trigger activated
+
+        // Execute all activated triggers
+        let executed_count = trigger_manager.run_activated_triggers().unwrap();
+        assert_eq!(executed_count, 1);
+
+        // Confirm executing logic was triggered successfully
+        let flag = executed.lock().unwrap();
+        assert!(*flag);
     }
 }
