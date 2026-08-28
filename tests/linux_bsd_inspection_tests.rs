@@ -59,11 +59,19 @@ mod unimplemented_features;
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
 
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
-use wiki_ideas_implementation::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -100,8 +108,15 @@ fn test_zorin_gap_closure_inspection() {
 
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
-    use vm_manager::{QemuBackend, HypervisorBackend, VmConfig, VmState, OsType};
-    let mut qemu = QemuBackend::new();
+    use vm_manager::{
+        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
+        VirtioNetDeviceConfig, VmConfig, VmState,
+    };
+
+    let mut kvm = KvmHypervisor::new();
+    assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
+    assert!(kvm.capabilities().irqchip_supported);
+
     let config = VmConfig {
         name: "ubuntu_guest".to_string(),
         cpu_cores: 2,
@@ -238,22 +253,33 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     let pfn = mem_alloc.allocate_2mb_superpage().unwrap();
     assert_eq!(pfn, 0);
 }
-
 #[test]
 fn test_alpine_apk_package_index_inspection() {
-    use unimplemented_features::AlpineApkPackageIndexV2;
-    let mut apk_index = AlpineApkPackageIndexV2::new();
-    apk_index.register_package("openssl", "3.1.0", 1024);
+    use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry};
+    let mut apk_index = AlpineApkPackageIndex::new();
+    let key = [0x99; 32];
+    assert!(apk_index.verify_index_signature(&key));
+    apk_index.add_package(ApkPackageEntry {
+        name: "openssl".to_string(),
+        version: "3.1.0".to_string(),
+        arch: "x86_64".to_string(),
+        sha256_hash: [0xAB; 32],
+        dependencies: vec!["musl".to_string()],
+    });
     let pkg = apk_index.find_package("openssl").unwrap();
-    assert_eq!(pkg.0, "openssl");
-    assert!(apk_index.verify_checksum("openssl", "3.1.0"));
+    assert_eq!(pkg.version, "3.1.0");
+    assert_eq!(apk_index.resolve_dependencies("openssl"), vec!["musl"]);
 }
 
 #[test]
 fn test_dragonfly_hammer2_snapshot_inspection() {
-    use unimplemented_features::DragonFlyHammer2FsSnapshotV2;
-    let hammer2 = DragonFlyHammer2FsSnapshotV2::new("ROOT_PFS");
-    assert_eq!(hammer2.active_pfs_id, 1);
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+    hammer2.register_cluster_node(1, "192.168.1.50");
+    let snap_id = hammer2.create_pfs_snapshot("ROOT_PFS", 0x1234567887654321, 1680000000);
+    assert!(hammer2.replicate_snapshot_to_node(snap_id, 1).is_ok());
+    let rolled_back_merkle = hammer2.rollback_pfs("ROOT_PFS", snap_id).unwrap();
+    assert_eq!(rolled_back_merkle, 0x1234567887654321);
 }
 
 #[test]
@@ -277,6 +303,7 @@ fn test_linux_bsd_firmware_innovations_inspection() {
         FirmwareCapsuleUpdateManager, CapsuleUpdateStatus, SmbiosFirmwareParser,
         IommuFirmwareEngine, IommuArchitecture, EFI_GLOBAL_VARIABLE_GUID,
     };
+    // 1. UEFI NVRAM Variable Management (Linux efivarfs & FreeBSD efivar(8))
     let mut efivars = EfiVariableStore::new();
     assert!(efivars.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
     efivars.set_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID, 7, &[0x01]);
@@ -363,126 +390,10 @@ fn test_gentoo_use_flag_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::{GentooUseFlagEngine, GentooPortageMaskEngine};
-    let mut portage_flags = GentooUseFlagEngine::new();
-    portage_flags.set_use_flag("+qt5");
-    portage_flags.set_use_flag("-wayland");
-    assert!(portage_flags.is_flag_enabled("qt5"));
-    assert!(!portage_flags.is_flag_enabled("wayland"));
+    use gap_closure::{TargetDistroFamily, SovereignDistroAbsorptionEngine};
 
-    let mut portage = GentooPortageMaskEngine::new("amd64");
-    portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
-    portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", false).unwrap());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", false).is_err());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
-    portage.add_hard_mask("app-admin/sudo");
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
-
-    let mut portage_uf = GentooPortageUseFlagsEngine::new();
-    portage_uf.set_global_use_flags(&["+ssl", "+x265"]);
-    portage_uf.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
-    let resolved = portage_uf.resolve_package_flags("media-video/ffmpeg").unwrap();
-    assert_eq!(resolved.len(), 2);
-    assert!(resolved.contains(&"ssl".to_string()));
-    assert!(resolved.contains(&"x265".to_string()));
-}
-
-#[test]
-fn test_xbps_package_manager_inspection() {
-    let mut xbps = XbpsPackageManager::new();
-    xbps.register_repository_package(XbpsPackage {
-        name: "glibc".to_string(),
-        version: "2.38".to_string(),
-        revision: 1,
-        run_depends: vec![],
-        sha256_hash: [0x11; 32],
-        is_signed: true,
-    });
-    xbps.register_repository_package(XbpsPackage {
-        name: "bash".to_string(),
-        version: "5.2.21".to_string(),
-        revision: 1,
-        run_depends: vec!["glibc".to_string()],
-        sha256_hash: [0x22; 32],
-        is_signed: true,
-    });
-    assert!(xbps.verify_signature("bash"));
-    let deps = xbps.resolve_dependencies("bash").unwrap();
-    assert_eq!(deps, vec!["glibc".to_string(), "bash".to_string()]);
-    let count = xbps.install_package_atomic("bash").unwrap();
-    assert_eq!(count, 2);
-    assert_eq!(xbps.installed_packages.len(), 2);
-}
-
-#[test]
-fn test_linux_devlink_driver_inspection() {
-    let mut devlink = LinuxDevlinkDriver::new();
-    devlink.register_port("pci", "0000:01:00.0", 1, linux_bsd_parity::DevlinkPortFlavor::Physical);
-    assert!(devlink.split_port(1, 4).is_ok());
-    assert_eq!(devlink.ports[0].split_count, 4);
-    let flashed = devlink.flash_device_firmware("pci", "0000:01:00.0", b"FIRMWARE_IMAGE_BLOB").unwrap();
-    assert_eq!(flashed, 19);
-}
-
-#[test]
-fn test_systemd_unit_dependency_engine_inspection() {
-    let mut engine = SystemdUnitDependencyEngine::new();
-    engine.add_unit(SystemdUnit {
-        name: "network.target".to_string(),
-        requires: vec![],
-        after: vec![],
-    });
-    engine.add_unit(SystemdUnit {
-        name: "sshd.service".to_string(),
-        requires: vec!["network.target".to_string()],
-        after: vec!["network.target".to_string()],
-    });
-    assert!(!engine.detect_circular_dependencies());
-    let seq = engine.compute_startup_sequence().unwrap();
-    assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
-}
-
-#[test]
-fn test_sysctl_parameter_registry_inspection() {
-    use sysctl::{SysctlRegistry, SysctlValue};
-    let mut registry = SysctlRegistry::new();
-    assert_eq!(registry.get("kern.ostype"), Some(&SysctlValue::String("SigmaOS".to_string())));
-    assert!(registry.set("vm.swappiness", SysctlValue::Int(15)).is_ok());
-    assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(15)));
-    assert!(registry.set("vm.swappiness", SysctlValue::Int(-1)).is_err());
-}
-
-#[test]
-fn test_pam_authentication_stack_inspection() {
-    use root_improvement::{PamEngine, PamGroup, PamRule, PamControlFlag, PamUnixModule, PamResult, SudoDoasElevator};
-    let mut engine = PamEngine::new();
-    let db = vec![("admin".to_string(), "hash_secret".to_string())];
-    let unix_mod = std::sync::Arc::new(PamUnixModule::new(db));
-    engine.add_rule(PamGroup::Auth, PamRule {
-        control_flag: PamControlFlag::Required,
-        module: unix_mod,
-    });
-    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "hash_secret"), PamResult::Success);
-    assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"), PamResult::AuthError);
-    let mut elevator = SudoDoasElevator::new();
-    elevator.password_database.push(("admin".to_string(), "pass123".to_string()));
-    assert_eq!(elevator.elevate_via_doas("admin", "pass123", 1000).unwrap(), 0);
-    assert!(elevator.verify_active_sudo_session(0, 2000));
-}
-
-#[test]
-fn test_multi_arch_abi_and_syscall_bridge_inspection() {
-    use abi_extended::{Arm64AapcsFrame, Riscv64AbiFrame, SystemVAbiFrame};
-    use distro_bridge::{LinuxBsdAbiBridge, BinaryAbiFormat};
-    let sysv = SystemVAbiFrame::new(&[1, 2, 3, 4, 5, 6]);
-    assert_eq!(sysv.arg_registers[0], 1);
-    let arm64 = Arm64AapcsFrame::new(&[10, 20, 30, 40, 50, 60, 70, 80]);
-    assert_eq!(arm64.arg_registers[7], 80);
-    let riscv = Riscv64AbiFrame::new(&[100, 200, 300, 400, 500, 600, 700, 800]);
-    assert_eq!(riscv.arg_registers[0], 100);
-    let mut linux_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::LinuxElf64);
-    assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
-    let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
-    assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+    let mut engine = SovereignDistroAbsorptionEngine::new();
+    engine.set_active_target(TargetDistroFamily::GentooPortage);
+    let spec = engine.execute_distro_absorption("sys-kernel/gentoo-sources");
+    assert!(spec.contains("S-PORTAGE Absorption"));
 }

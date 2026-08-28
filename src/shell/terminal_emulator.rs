@@ -755,6 +755,9 @@ pub struct TerminalPane {
     pub height: usize,
 }
 
+/// Tmux / BSD-style Terminal Multiplexer
+pub type TerminalMultiplexer = TerminalMultiplexerV1;
+
 #[derive(Debug, Clone)]
 pub struct TerminalMultiplexerV1 {
     pub panes: Vec<TerminalPane>,

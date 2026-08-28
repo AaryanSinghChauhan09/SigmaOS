@@ -336,6 +336,101 @@ impl FilePermissions {
     }
 }
 
+/// POSIX ACL Tag for fine-grained user and group access control (Linux POSIX 1003.1e)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PosixAclTag {
+    UserObj,
+    NamedUser(u64),
+    GroupObj,
+    NamedGroup(u64),
+    Mask,
+    Other,
+}
+
+/// POSIX ACL Entry
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PosixAclEntry {
+    pub tag: PosixAclTag,
+    pub permissions: u8, // Bit 2: Read, Bit 1: Write, Bit 0: Execute (0o7)
+}
+
+/// POSIX Access Control List (POSIX 1003.1e)
+#[derive(Debug, Clone, Default)]
+pub struct PosixAcl {
+    pub entries: Vec<PosixAclEntry>,
+}
+
+impl PosixAcl {
+    pub fn new() -> Self {
+        Self { entries: Vec::new() }
+    }
+
+    pub fn add_entry(&mut self, tag: PosixAclTag, permissions: u8) {
+        self.entries.push(PosixAclEntry {
+            tag,
+            permissions: permissions & 0o7,
+        });
+    }
+
+    /// Evaluates POSIX ACL access rights for a subject
+    pub fn evaluate_access(
+        &self,
+        uid: u64,
+        gid: u64,
+        owner_uid: u64,
+        group_gid: u64,
+        req_r: bool,
+        req_w: bool,
+        req_x: bool,
+    ) -> Option<bool> {
+        let req_mask = ((req_r as u8) << 2) | ((req_w as u8) << 1) | (req_x as u8);
+        if req_mask == 0 {
+            return Some(true);
+        }
+
+        let mask = self
+            .entries
+            .iter()
+            .find(|e| e.tag == PosixAclTag::Mask)
+            .map(|e| e.permissions)
+            .unwrap_or(0o7);
+
+        // 1. UserObj check
+        if uid == owner_uid {
+            if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::UserObj) {
+                return Some((entry.permissions & req_mask) == req_mask);
+            }
+        }
+
+        // 2. NamedUser check (subject to mask)
+        if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::NamedUser(uid)) {
+            let effective = entry.permissions & mask;
+            return Some((effective & req_mask) == req_mask);
+        }
+
+        // 3. NamedGroup check (subject to mask)
+        if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::NamedGroup(gid)) {
+            let effective = entry.permissions & mask;
+            return Some((effective & req_mask) == req_mask);
+        }
+
+        // 4. GroupObj check (subject to mask)
+        if gid == group_gid {
+            if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::GroupObj) {
+                let effective = entry.permissions & mask;
+                return Some((effective & req_mask) == req_mask);
+            }
+        }
+
+        // 5. Other check
+        if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::Other) {
+            return Some((entry.permissions & req_mask) == req_mask);
+        }
+
+        None
+    }
+}
+
 /// Inode (file/directory metadata)
 #[derive(Debug, Clone)]
 pub struct Inode {
@@ -349,6 +444,7 @@ pub struct Inode {
     pub modified: u64,
     pub link_count: u64,
     pub capabilities: CapabilityToken,
+    pub acl: Option<PosixAcl>,
 }
 
 impl Inode {
@@ -364,6 +460,7 @@ impl Inode {
             modified: 0,
             link_count: 1,
             capabilities: CapabilityToken::new(),
+            acl: None,
         }
     }
 
@@ -398,6 +495,7 @@ pub struct VirtualFilesystem {
     root_inode: u64,
     file_descriptors: HashMap<u64, FileDescriptor>,
     next_fd: u64,
+    pub securelevel: i32, // BSD securelevel (-1 to 3)
 }
 
 impl VirtualFilesystem {
@@ -408,6 +506,7 @@ impl VirtualFilesystem {
             root_inode: 0,
             file_descriptors: HashMap::new(),
             next_fd: 0,
+            securelevel: 0, // Insecure mode default
         };
 
         // Create root directory
@@ -416,6 +515,55 @@ impl VirtualFilesystem {
         fs.root_inode = 0;
 
         fs
+    }
+
+    /// Sets BSD securelevel (FreeBSD / OpenBSD securelevel model).
+    /// Once securelevel is raised > 0, it cannot be lowered without reboot.
+    pub fn set_securelevel(&mut self, level: i32) -> Result<(), FsError> {
+        if level < self.securelevel && self.securelevel > 0 {
+            return Err(FsError::SecureLevelViolation);
+        }
+        self.securelevel = level;
+        Ok(())
+    }
+
+    /// Sets POSIX ACL on an inode (Linux setfacl)
+    pub fn setfacl(&mut self, inode_id: u64, acl: PosixAcl) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        if inode.permissions.bsd_flags.immutable {
+            return Err(FsError::ImmutableFile);
+        }
+        inode.acl = Some(acl);
+        Ok(())
+    }
+
+    /// Gets POSIX ACL for an inode (Linux getfacl)
+    pub fn getfacl(&self, inode_id: u64) -> Option<&PosixAcl> {
+        self.inodes.get(&inode_id).and_then(|i| i.acl.as_ref())
+    }
+
+    /// Evaluates process credential transitions on executable binary invocation (Linux/BSD SUID & SGID)
+    pub fn evaluate_execution_credentials(
+        &self,
+        inode_id: u64,
+        subject_uid: u64,
+        subject_gid: u64,
+    ) -> Result<(u64, u64), FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+
+        let euid = if inode.permissions.suid {
+            inode.owner
+        } else {
+            subject_uid
+        };
+
+        let egid = if inode.permissions.sgid {
+            inode.group
+        } else {
+            subject_gid
+        };
+
+        Ok((euid, egid))
     }
 
     pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
@@ -514,7 +662,14 @@ impl VirtualFilesystem {
 
     pub fn chflags(&mut self, inode_id: u64, flags: u32) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-        inode.permissions.bsd_flags = BsdFileFlags::from_u32(flags);
+
+        let new_bsd_flags = BsdFileFlags::from_u32(flags);
+        // Under BSD securelevel > 0, clearing system immutable flags is forbidden
+        if self.securelevel > 0 && inode.permissions.bsd_flags.immutable && !new_bsd_flags.immutable {
+            return Err(FsError::SecureLevelViolation);
+        }
+
+        inode.permissions.bsd_flags = new_bsd_flags;
         Ok(())
     }
 
@@ -529,6 +684,31 @@ impl VirtualFilesystem {
         req_execute: bool,
     ) -> Result<(), FsError> {
         let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+
+        // Root (UID 0) bypasses standard ACL & DAC permission checks (except execution if no execute bit is set)
+        if subject_uid == 0 {
+            if req_execute && !inode.permissions.user_execute && !inode.permissions.group_execute && !inode.permissions.other_execute {
+                return Err(FsError::PermissionDenied);
+            }
+            return Ok(());
+        }
+
+        // 1. Evaluate POSIX ACL if attached to inode
+        if let Some(ref acl) = inode.acl {
+            if let Some(granted) = acl.evaluate_access(
+                subject_uid,
+                subject_gid,
+                inode.owner,
+                inode.group,
+                req_read,
+                req_write,
+                req_execute,
+            ) {
+                return if granted { Ok(()) } else { Err(FsError::PermissionDenied) };
+            }
+        }
+
+        // 2. Fall back to standard Linux/BSD DAC evaluation
         if inode.permissions.evaluate_dac_access(
             subject_uid,
             subject_gid,
@@ -629,6 +809,26 @@ impl VirtualFilesystem {
         Ok(())
     }
 
+    /// Deletes a file in a parent directory with Sticky bit (`S_ISVTX`) restriction enforcement (POSIX/BSD)
+    pub fn delete_child_file(
+        &mut self,
+        parent_dir_inode_id: u64,
+        child_inode_id: u64,
+        deleter_uid: u64,
+    ) -> Result<(), FsError> {
+        let parent_inode = self.inodes.get(&parent_dir_inode_id).ok_or(FsError::NotFound)?;
+        let child_inode = self.inodes.get(&child_inode_id).ok_or(FsError::NotFound)?;
+
+        // If directory has Sticky bit set, deleter must be root (0), dir owner, or child owner
+        if parent_inode.permissions.sticky && deleter_uid != 0 {
+            if deleter_uid != parent_inode.owner && deleter_uid != child_inode.owner {
+                return Err(FsError::PermissionDenied);
+            }
+        }
+
+        self.delete_file(child_inode_id)
+    }
+
     pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
         self.inodes.get(&inode_id)
     }
@@ -661,6 +861,7 @@ pub enum FsError {
     IsDirectory,
     NoSpace,
     ImmutableFile,
+    SecureLevelViolation,
 }
 
 #[cfg(test)]
@@ -820,5 +1021,64 @@ mod tests {
         // Clear immutable flag
         vfs.chflags(inode_id, 0).unwrap();
         assert!(vfs.write_file(fd, b"immutable test").is_ok());
+    }
+
+    #[test]
+    fn test_posix_acl_evaluation() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+
+        let mut acl = PosixAcl::new();
+        acl.add_entry(PosixAclTag::UserObj, 0o7); // UserObj rwx
+        acl.add_entry(PosixAclTag::NamedUser(1005), 0o4); // NamedUser 1005 read-only
+        acl.add_entry(PosixAclTag::Mask, 0o7);
+
+        vfs.setfacl(inode_id, acl).unwrap();
+        assert!(vfs.getfacl(inode_id).is_some());
+
+        // NamedUser 1005 attempting read -> Ok
+        assert!(vfs.evaluate_access(inode_id, 1005, 1000, &[], true, false, false).is_ok());
+        // NamedUser 1005 attempting write -> Err
+        assert_eq!(vfs.evaluate_access(inode_id, 1005, 1000, &[], false, true, false), Err(FsError::PermissionDenied));
+    }
+
+    #[test]
+    fn test_bsd_securelevels_immutable_protection() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+
+        vfs.chflags(inode_id, 0x0002).unwrap(); // Set immutable
+        vfs.set_securelevel(1).unwrap(); // Raise to secure mode
+
+        // Lowering securelevel -> Error
+        assert_eq!(vfs.set_securelevel(0), Err(FsError::SecureLevelViolation));
+
+        // Clearing immutable flag in securelevel 1 -> Forbidden
+        assert_eq!(vfs.chflags(inode_id, 0), Err(FsError::SecureLevelViolation));
+    }
+
+    #[test]
+    fn test_suid_sgid_and_sticky_bit_vfs() {
+        let mut vfs = VirtualFilesystem::new();
+
+        // 1. SUID execution transitions
+        let suid_bin_id = vfs.create_file(FileType::Regular, 0).unwrap(); // Owned by root (0)
+        vfs.chmod(suid_bin_id, 0o4755).unwrap(); // SUID set
+
+        let (euid, egid) = vfs.evaluate_execution_credentials(suid_bin_id, 1000, 1000).unwrap();
+        assert_eq!(euid, 0); // Promoted to root UID
+        assert_eq!(egid, 1000);
+
+        // 2. Sticky bit directory deletion restriction
+        let dir_id = vfs.create_file(FileType::Directory, 1000).unwrap();
+        vfs.chmod(dir_id, 0o1777).unwrap(); // Sticky bit set
+
+        let file_id = vfs.create_file(FileType::Regular, 2000).unwrap(); // Owned by UID 2000
+
+        // User 3000 trying to delete user 2000's file in sticky dir -> Denied
+        assert_eq!(vfs.delete_child_file(dir_id, file_id, 3000), Err(FsError::PermissionDenied));
+
+        // Owner (2000) deleting own file -> Ok
+        assert!(vfs.delete_child_file(dir_id, file_id, 2000).is_ok());
     }
 }

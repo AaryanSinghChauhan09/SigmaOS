@@ -46,7 +46,7 @@ pub use qubes_isolation::*;
 pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use capability::{CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,

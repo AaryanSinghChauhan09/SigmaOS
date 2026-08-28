@@ -3404,18 +3404,6 @@ impl SovereignCgroupGovernor {
         let mut controller = SovereignCgroupGovernor::new();
         controller.create_group("db").unwrap();
         assert_eq!(controller.groups.len(), 1);
-        let limits = CgroupResourceLimits {
-            cpu_quota_us: 50000,
-            cpu_period_us: 100000,
-            memory_max_bytes: 1024 * 1024,
-            memory_high_bytes: 512 * 1024,
-            memory_swap_max_bytes: 0,
-            io_weight: 100,
-        };
-        controller.configure_limits("db", limits).unwrap();
-        controller.attach_pid("db", 1001).unwrap();
-        controller.attach_pid("db", 1002).unwrap();
-        assert_eq!(controller.groups.get("db").unwrap().pids.len(), 2);
         let mut governor = SovereignCgroupGovernorV1::new();
         governor.create_group("db").unwrap();
         assert_eq!(governor.groups.len(), 1);

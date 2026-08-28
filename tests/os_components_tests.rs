@@ -171,7 +171,70 @@ pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
 }
+#[path = "../src/process/activity_manager.rs"]
+mod process_activity_manager;
+pub type ProcessActivityManager = process_activity_manager::ActivityManager;
+pub struct ResourceUsageMetrics;
+#[path = "../src/filesystem/sigma_fs.rs"]
+mod sigma_fs_extended;
+#[path = "../src/event/epoll.rs"]
+mod epoll;
+#[path = "../src/loader/elf/relocation.rs"]
+mod elf_relocation;
+#[path = "../src/device/manager.rs"]
+mod device_manager;
 
+use community_toolkit::{
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
+    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+};
+use statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
+    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use system_user::UserManager as TestUserManager;
+use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
+    SyscallTableRouter,
+};
+use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
+use low_level_memory::{
+    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
+use task_scheduler::{
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use fedora_compat::DnfPackageResolver;
+use geom::{BioRequest, GeomProvider, GeomTopology};
+use pipes::Pipe;
+use sigmatools::*;
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
+use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
+
+use unveil::{UnveilManager, UnveilPermission};
+use segmentation_paging::{
+    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
+    SegmentDescriptor, SegmentSelector,
+};
+
+use access_control::{
+    AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
+    MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
+};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {
