@@ -29,6 +29,12 @@ use std::collections::HashMap;
 #[cfg(target_os = "none")]
 use crate::klib::BTreeMap as HashMap;
 
+#[cfg(not(target_os = "none"))]
+use std::collections::HashMap;
+
+#[cfg(target_os = "none")]
+use crate::klib::BTreeMap as HashMap;
+
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {

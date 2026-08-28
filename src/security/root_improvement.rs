@@ -322,18 +322,11 @@ pub enum DoasAction {
 #[derive(Debug, Clone)]
 pub struct DoasRule {
     pub action: DoasAction,
-    pub identity: String,     // username or group (e.g. ":wheel" or "alice")
-    pub target_user: String,  // target user (e.g. "root")
+    pub identity: String, // username or group (e.g. ":wheel" or "alice")
+    pub target_user: String, // target user (e.g. "root")
     pub keepenv: bool,
     pub nopass: bool,
     pub command: Option<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct DoasEvaluationResult {
-    pub permitted: bool,
-    pub nopass_required: bool,
-    pub keepenv: bool,
 }
 
 pub struct DoasRuleEngine {
@@ -350,8 +343,8 @@ impl DoasRuleEngine {
         self.rules.push(rule);
     }
 
-    /// Evaluates rules returning Option<&DoasRule> using OpenBSD's last-matching-rule semantics.
-    pub fn evaluate_simple(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
+    /// Evaluates rules using OpenBSD's last-matching-rule semantics.
+    pub fn evaluate(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
         let mut last_match = None;
         for rule in &self.rules {
             let id_match = if rule.identity.starts_with(':') {
@@ -371,52 +364,6 @@ impl DoasRuleEngine {
             }
         }
         last_match
-    }
-
-    /// Evaluates doas command invocation following OpenBSD `last-matching-rule` semantics
-    pub fn evaluate(
-        &self,
-        username: &str,
-        user_groups: &[&str],
-        target_user: &str,
-        command: &str,
-    ) -> DoasEvaluationResult {
-        let mut last_matching: Option<&DoasRule> = None;
-
-        for rule in &self.rules {
-            let id_matches = rule.identity == username
-                || rule.identity == ":wheel" && user_groups.contains(&"wheel")
-                || rule.identity.starts_with(':') && user_groups.contains(&&rule.identity[1..]);
-
-            if !id_matches {
-                continue;
-            }
-
-            if rule.target_user != target_user && rule.target_user != "*" {
-                continue;
-            }
-
-            if let Some(ref cmd) = rule.command {
-                if cmd != command {
-                    continue;
-                }
-            }
-
-            last_matching = Some(rule);
-        }
-
-        match last_matching {
-            Some(rule) => DoasEvaluationResult {
-                permitted: rule.action == DoasAction::Permit,
-                nopass_required: rule.nopass,
-                keepenv: rule.keepenv,
-            },
-            None => DoasEvaluationResult {
-                permitted: false,
-                nopass_required: false,
-                keepenv: false,
-            },
-        }
     }
 }
 
@@ -462,7 +409,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered")
+            Err("securelevel can only be raised, not lowered");
         }
     }
 
@@ -484,77 +431,7 @@ impl BsdSecurelevelGuard {
 }
 
 // ==========================================
-// 7. BSD Securelevel Kernel Controller (OpenBSD / FreeBSD Parity)
-// ==========================================
-
-/// BSD Securelevels (-1, 0, 1, 2, 3) enforcing strict hardware/kernel restrictions even on root
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum BsdSecurelevel {
-    PermanentlyUnsecure = -1,
-    Insecure = 0,
-    Secure = 1,
-    HighlySecure = 2,
-    NetworkSecure = 3,
-}
-
-pub struct BsdSecurelevelController {
-    level: AtomicI32,
-}
-
-impl BsdSecurelevelController {
-    pub fn new(initial_level: BsdSecurelevel) -> Self {
-        Self {
-            level: AtomicI32::new(initial_level as i32),
-        }
-    }
-
-    pub fn current_level(&self) -> BsdSecurelevel {
-        match self.level.load(Ordering::SeqCst) {
-            -1 => BsdSecurelevel::PermanentlyUnsecure,
-            0 => BsdSecurelevel::Insecure,
-            1 => BsdSecurelevel::Secure,
-            2 => BsdSecurelevel::HighlySecure,
-            _ => BsdSecurelevel::NetworkSecure,
-        }
-    }
-
-    /// Raises the securelevel. Note: Once raised above 0, securelevel can NEVER be lowered without rebooting.
-    pub fn raise_level(&self, target_level: BsdSecurelevel) -> Result<(), &'static str> {
-        let cur = self.level.load(Ordering::SeqCst);
-        let target = target_level as i32;
-
-        if target < cur && cur > 0 {
-            return Err("securelevel: cannot lower securelevel once raised above 0");
-        }
-
-        self.level.store(target, Ordering::SeqCst);
-        Ok(())
-    }
-
-    /// Checks if raw disk write operations are permitted
-    pub fn check_raw_disk_write_allowed(&self) -> bool {
-        self.current_level() < BsdSecurelevel::Secure
-    }
-
-    /// Checks if kernel module loading/unloading is permitted
-    pub fn check_module_loading_allowed(&self) -> bool {
-        self.current_level() < BsdSecurelevel::Secure
-    }
-
-    /// Checks if firewall rule modifications are allowed
-    pub fn check_firewall_modification_allowed(&self) -> bool {
-        self.current_level() < BsdSecurelevel::NetworkSecure
-    }
-}
-
-impl Default for BsdSecurelevelController {
-    fn default() -> Self {
-        Self::new(BsdSecurelevel::Insecure)
-    }
-}
-
-// ==========================================
-// 8. Linux SubUid / SubGid Multi-Range Mapper
+// 7. Linux SubUid / SubGid Multi-Range Mapper
 // ==========================================
 
 #[derive(Debug, Clone)]
@@ -563,8 +440,6 @@ pub struct SubUidGidRange {
     pub start_id: u32,
     pub count: u32,
 }
-
-pub type SubUidRange = SubUidGidRange;
 
 pub struct SubUidGidMapper {
     pub subuid_ranges: Vec<SubUidGidRange>,
@@ -604,20 +479,6 @@ impl SubUidGidMapper {
         }
         false
     }
-
-    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidGidRange> {
-        self.subuid_ranges.iter().find(|r| r.username == username)
-    }
-
-    /// Map container internal UID to host subuid range
-    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
-        let range = self.get_subuid_range(username)?;
-        if container_uid < range.count {
-            Some(range.start_id + container_uid)
-        } else {
-            None
-        }
-    }
 }
 
 impl Default for SubUidGidMapper {
@@ -627,7 +488,7 @@ impl Default for SubUidGidMapper {
 }
 
 // ==========================================
-// 9. PAM MFA Pluggable Authenticator
+// 8. PAM MFA Pluggable Authenticator
 // ==========================================
 
 pub struct PamMfaAuthenticator {
@@ -1132,10 +993,10 @@ mod tests {
             command: Some("reboot".to_string()),
         });
 
-        let res1 = engine.evaluate_simple("alice", false, "root", "shutdown").unwrap();
+        let res1 = engine.evaluate("alice", false, "root", "shutdown").unwrap();
         assert_eq!(res1.action, DoasAction::Deny);
 
-        let res2 = engine.evaluate_simple("alice", false, "root", "reboot").unwrap();
+        let res2 = engine.evaluate("alice", false, "root", "reboot").unwrap();
         assert_eq!(res2.action, DoasAction::Permit);
         assert!(res2.keepenv);
         assert!(res2.nopass);

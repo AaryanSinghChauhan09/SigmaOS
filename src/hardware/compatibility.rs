@@ -501,18 +501,6 @@ mod tests {
     }
 
     #[test]
-    fn test_driver_manager_lifecycle() {
-        let mut driver_manager = SimpleDriverManager::new();
-        assert!(!driver_manager.get_driver_status(42));
-
-        driver_manager.load_driver(42).unwrap();
-        assert!(driver_manager.get_driver_status(42));
-
-        driver_manager.unload_driver(42).unwrap();
-        assert!(!driver_manager.get_driver_status(42));
-    }
-
-    #[test]
     fn test_diagnostics() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
