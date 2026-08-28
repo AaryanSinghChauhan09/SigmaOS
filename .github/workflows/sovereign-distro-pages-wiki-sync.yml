@@ -1,5 +1,8 @@
 name: Sovereign Distro Pages & Wiki Sync
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]

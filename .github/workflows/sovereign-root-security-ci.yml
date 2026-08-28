@@ -1,5 +1,8 @@
 name: Sovereign Root & Superuser Security Verification CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/*" ]
