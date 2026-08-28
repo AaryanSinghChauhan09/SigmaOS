@@ -1,7 +1,7 @@
+extern crate alloc;
 // NixOS Declarative Profile Generations & Content-Addressed Store Manager
 // Inspired by NixOS /nix/store generations, profiles, atomic rollbacks, and hash verification.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;

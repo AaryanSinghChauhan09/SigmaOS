@@ -20,6 +20,7 @@
 // A bump allocator with a simple recycle list, replacing std::alloc::System.
 // Designed to minimize dependency on predefined library allocators.
 
+extern crate alloc;
 #[allow(dead_code)]
 use core::alloc::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;

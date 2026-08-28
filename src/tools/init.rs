@@ -1,9 +1,7 @@
 //! Init System (systemd/OpenRC Inspiration)
 //! Service management, target units, and dependency resolution
 
-#![no_std]
 
-extern crate alloc;
 
 use crate::klib::{Vec, String};
 

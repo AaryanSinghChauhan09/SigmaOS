@@ -1,8 +1,8 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
-#[cfg(not(target_os = "none"))]
 extern crate alloc;
+#[cfg(not(target_os = "none"))]
 
 #[cfg(not(target_os = "none"))]
 use alloc::string::String;
@@ -102,7 +102,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::full(),
+            capability: ContainerCapability::default(),
         }
     }
 }
@@ -214,10 +214,17 @@ impl Default for NamespaceConfig {
 }
 
 /// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeccompProfile {
+    pub blocked_syscalls: Vec<u32>,
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        self.blocked_syscalls.contains(&syscall_id)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -335,7 +342,7 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompProfile { hardened: false, blocked_syscalls_mask: 0 },
+            seccomp: SeccompProfile { blocked_syscalls: Vec::new(), hardened: false, blocked_syscalls_mask: 0 },
         }
     }
 
@@ -510,10 +517,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,

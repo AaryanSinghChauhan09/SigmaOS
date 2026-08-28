@@ -22,6 +22,7 @@
 /// OOP-based Hardware Abstraction Layer for SigmaOS
 /// Based on Roadmap Item 2: Hardware abstraction layer
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

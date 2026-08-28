@@ -1,7 +1,6 @@
 // Sovereign Core Apps Shard (SigmaOffice, SigmaTasks, SigmaVault)
 // Zero-dependency, #![no_std] compliant
 
-extern crate alloc;
 
 const MAX_NODES: usize = 16;
 const MAX_TASKS: usize = 16;

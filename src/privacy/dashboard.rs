@@ -1,8 +1,8 @@
+extern crate alloc;
 /// OOP-based Privacy Dashboard and Self-Healing system for SigmaOS
 /// Implements transparent privacy management, telemetry, and automated self-healing.
 /// Inspired by Windows PC Reset, iOS Privacy Prompts, and BSD minimalism.
 
-extern crate alloc;
 use alloc::boxed::Box;
 
 use core::ptr::{self, NonNull};

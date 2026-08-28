@@ -1,6 +1,5 @@
-#![no_std]
-
 extern crate alloc;
+
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 

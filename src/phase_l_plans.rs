@@ -2492,3 +2492,5 @@ pub mod s_cosmos {
         }
     }
 }
+
+extern crate alloc;

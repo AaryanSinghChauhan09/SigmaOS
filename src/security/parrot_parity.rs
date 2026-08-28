@@ -2,7 +2,6 @@
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
 use core::cell::Cell;
-extern crate alloc;
 use crate::klib::SigmaString;
 
 /// Routing modes for network traffic

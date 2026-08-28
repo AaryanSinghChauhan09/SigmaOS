@@ -1,3 +1,4 @@
+extern crate alloc;
 /// Expanded Wiki & Distro Unimplemented Innovations Engine
 /// Implements planned wiki concepts inspired by Linux & BSD distributions:
 /// - Fedora Toolbox OCI dev container engine
@@ -9,7 +10,6 @@
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
 
-extern crate alloc;
 
 use alloc::format;
 use alloc::string::String;

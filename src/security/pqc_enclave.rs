@@ -1,11 +1,9 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
+extern crate alloc;
 
 /// Post-Quantum Cryptographic Secure Enclave and Token-Rotation IPC Bus
 /// Outclasses standard Linux/BSD security with rotatable, ephemeral post-quantum
 /// capability tokens and cryptographically gated microkernel transactions.
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

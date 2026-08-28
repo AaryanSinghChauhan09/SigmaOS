@@ -1,10 +1,10 @@
+extern crate alloc;
 // SigmaOS Linux-Parity Composable Networking Commands Engine
 // Zero-dependency, #![no_std] compliant, stateful iptables/netfilter, iproute2, ss, ping implementation
 
 use crate::network::TcpState;
 use core::sync::atomic::{AtomicBool, AtomicU16, AtomicU32, AtomicU8, Ordering};
 
-extern crate alloc;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 

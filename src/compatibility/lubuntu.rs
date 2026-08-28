@@ -1,7 +1,7 @@
+extern crate alloc;
 // Lubuntu-Inspired Lightweight System Configuration & Hardware Optimizer
 // Focuses on extreme memory conservation, diagnostics, and running flawlessly on legacy/low-end systems.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

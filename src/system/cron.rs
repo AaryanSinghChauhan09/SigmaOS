@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
-extern crate alloc;
 
 use crate::klib::{BTreeMap, Vec};
 use alloc::string::String;

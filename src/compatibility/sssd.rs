@@ -1,6 +1,6 @@
+extern crate alloc;
 /// Custom SSSD (System Security Services Daemon) Compatibility Subsystem for SigmaOS
 /// Implements offline credentials caching, NSS user/group resolution, multi-domain failover, and HBAC policy engine.
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

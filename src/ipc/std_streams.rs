@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Sovereign Standard Streams Controller
 // Linux & BSD inspired standard input, output, and error stream management.
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

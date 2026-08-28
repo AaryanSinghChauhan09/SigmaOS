@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer
 

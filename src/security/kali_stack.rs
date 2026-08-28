@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 use core::mem;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS

@@ -1,11 +1,9 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// OOP-based Performance Profiler for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 191
 /// Implements CPU and memory profiling
 
-extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::boxed::Box;

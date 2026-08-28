@@ -1,7 +1,7 @@
+extern crate alloc;
 // Interim OS and MNT Reform compatibility subsystem for SigmaOS
 // Implements a safe, zero-dependency Lisp interpreter VM and MNT LPC telemetry drivers.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

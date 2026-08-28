@@ -1,3 +1,4 @@
+extern crate alloc;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -538,7 +539,6 @@ pub trait CommandRegistry {
     fn list(&self) -> ShellVec<&[u8]>;
 }
 
-extern crate alloc;
 use alloc::boxed::Box;
 
 #[repr(C)]

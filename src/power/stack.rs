@@ -1,12 +1,10 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// OOP-based Power Management Stack for SigmaOS
 /// Implements power management using OOP principles with traits and structs
 /// No dependency on external power management frameworks
 /// Based on Roadmap Item 8: Power management stack
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

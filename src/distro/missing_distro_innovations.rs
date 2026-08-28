@@ -1,3 +1,5 @@
+extern crate alloc;
+use crate::klib::HashMap;
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)
@@ -10,7 +12,6 @@
 // - FreeBSD VNET Virtualized Network Stack Per-Jail Isolation
 // - OpenBSD Unveil Access Violation Audit Sentinel
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
@@ -172,11 +173,14 @@ impl Default for SolusEopkgManager {
 }
 
 /// 5. Mageia Linux urpmi Dependency Solver
-pub struct MageiaUrpmiEngine;
+pub struct MageiaUrpmiEngine {
+    pub urpmi_db: crate::klib::BTreeMap<String, Vec<String>>,
+    pub package_database: std::collections::HashMap<String, String>,
+}
 
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
-        let mut db = HashMap::new();
+        let mut db = crate::klib::BTreeMap::new();
         let mut kde_deps = Vec::new();
         kde_deps.push(String::from("plasma-workspace"));
         kde_deps.push(String::from("sddm"));
@@ -187,7 +191,7 @@ impl MageiaUrpmiEngine {
         plasma_deps.push(String::from("qtbase"));
         plasma_deps.push(String::from("kf5-kio"));
         db.insert(String::from("plasma-workspace"), plasma_deps);
-        Self { package_database: db }
+        Self { urpmi_db: db, package_database: std::collections::HashMap::new() }
     }
 
     pub fn resolve_urpmi(&self, target_pkg: &str) -> Vec<String> {

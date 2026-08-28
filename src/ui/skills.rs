@@ -19,8 +19,8 @@
 /// OOP-based Design Engineering and UI Animation Polish system for SigmaOS
 /// Fully absorbs and merges all functions, ideas, features, and principles from emilkowalski/skills.
 /// Eliminates any challenge or capability gap, establishing superior taste & design intelligence.
-extern crate alloc;
 
+extern crate alloc;
 use alloc::string::String;
 
 /// Custom square root helper for `// #![no_std]  // crate-root only` compatibility

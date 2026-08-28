@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 /// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
 /// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
-extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Gentoo Linux USE Flags Engine
 // Implements USE flag system for conditional compilation and feature selection
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use crate::klib::collections::HashMap;

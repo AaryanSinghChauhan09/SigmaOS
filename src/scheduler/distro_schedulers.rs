@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: MIT
-//! SigmaOS Comprehensive Multi-Distro CPU Schedulers
-//! Inspired by Linux kernel (EEVDF, CFS, BORE, PDS, MuQSS, BFS, CacULE, EAS, SCHED_DEADLINE, SCHED_EXT)
-//! and BSD OS distributions (FreeBSD ULE, 4.4BSD Decay, OpenBSD Fair Share FSS, DragonFly BSD LWKT Work-Stealing).
-
 extern crate alloc;
+// SPDX-License-Identifier: MIT
+// SigmaOS Comprehensive Multi-Distro CPU Schedulers
+// Inspired by Linux kernel (EEVDF, CFS, BORE, PDS, MuQSS, BFS, CacULE, EAS, SCHED_DEADLINE, SCHED_EXT)
+// and BSD OS distributions (FreeBSD ULE, 4.4BSD Decay, OpenBSD Fair Share FSS, DragonFly BSD LWKT Work-Stealing).
+
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

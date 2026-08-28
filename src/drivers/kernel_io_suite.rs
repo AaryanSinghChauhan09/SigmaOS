@@ -22,8 +22,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

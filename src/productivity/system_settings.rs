@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Unified System Settings and Preferences Manager (S-CONTROL)
 // Inspired by GNOME/KDE Control Centers, Windows Control Panel, and BSD rc.conf settings.
 // Manages accounts, network, bluetooth, backup, drivers, visual effects, firewall, font, input methods, and touch preferences.

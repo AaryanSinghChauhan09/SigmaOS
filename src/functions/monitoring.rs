@@ -1,9 +1,8 @@
 //! System Monitoring Functions (systemd-journalctl/htop Inspiration)
 //! System log viewer, system monitor, and system information tools
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use crate::klib::{Vec, String};
 use alloc::vec::Vec;

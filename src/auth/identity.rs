@@ -1,8 +1,8 @@
+extern crate alloc;
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543
 /// Implements decentralized identity and DID support
 
-extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

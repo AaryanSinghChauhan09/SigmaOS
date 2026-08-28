@@ -1,9 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 //! Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
 
-#![no_std]
 
-extern crate alloc;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

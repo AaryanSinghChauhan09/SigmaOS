@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Distro-Hopper Laboratory (Pillar 6 - Wave 3)
 // Implements experience, philosophy, and community parity features for Linux hoppers:
 // 1. Customizability Layer (KDE/GNOME/WM themes & Selectable service managers)
@@ -7,7 +8,6 @@
 // 5. Hopping Philosophy Guides & Migration Tutorials (Arch, Ubuntu, Fedora)
 // 6. WASM Runtime & Unikernel Execution Scheduler
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

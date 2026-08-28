@@ -1,7 +1,7 @@
+extern crate alloc;
 // Sovereign Podcast Recording & RSS Publishing Engine
 // Inspired by GarageBand and Anchor, providing multi-track recording, mastering filters, and iTunes XML feed generation.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

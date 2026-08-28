@@ -16,8 +16,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::string::String;
 use crate::klib::{BTreeMap, Vec, VecDeque};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
@@ -26,7 +26,6 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
-use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks

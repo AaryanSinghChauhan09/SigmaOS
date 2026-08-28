@@ -1,10 +1,10 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS OpenStack Cinder Parity Block Storage Engine
 // Provides enterprise-grade cloud block volume management, thin/thick provisioning,
 // volume lifecycle (create, attach, detach, snapshot, clone, backup), QoS rate limiting,
 // volume encryption at rest, and multi-attach capabilities.
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

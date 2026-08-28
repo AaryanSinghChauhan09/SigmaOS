@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Linux & BSD Distro Power & Network Tools Subsystem
 // Inspired by Linux TLP/Laptop Mode Tools, NetworkManager/nmtui, FreeBSD bhyve, and Tailscale/WireGuard
@@ -6,7 +7,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;

@@ -1,8 +1,8 @@
+extern crate alloc;
 
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561
 /// Implements secure boot chain with signature verification
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;

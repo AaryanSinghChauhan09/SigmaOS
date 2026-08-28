@@ -1,9 +1,8 @@
+extern crate alloc;
 // SigmaOS CPU Cache Subsystem Simulator
 // High-fidelity modeling of caches inspired by x86, x64, and ARM architectures
 
-#![no_std]
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;

@@ -3,8 +3,8 @@
 //! This module provides integration points between different SigmaOS subsystems,
 //! enabling features like HelenOS async IPC, Kuroko language runtime, and enhanced
 //! terminal tabs to work together seamlessly.
-
 extern crate alloc;
+
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::String;

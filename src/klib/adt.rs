@@ -4,7 +4,6 @@
 //! - RadixTree<T>: Linux kernel `lib/radix-tree.c` inspired page-cache / PID radix lookup tree
 //! - SovereignPriorityQueue<T>: BSD `sys/queue.h` and Linux scheduler binary heap priority queue
 
-extern crate alloc;
 use crate::klib::Vec;
 
 // =========================================================================

@@ -1,9 +1,8 @@
 //! Logging Functions (rsyslog/journald Inspiration)
 //! Log manager, journal manager, and log analyzer
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use crate::klib::{Vec, String};
 use alloc::vec::Vec;

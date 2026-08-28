@@ -1,16 +1,14 @@
+extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
 use std_alloc::boxed::Box;
 
-#![no_std]
-#![cfg_attr(not(test), no_main)]
 
 /// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
 /// Implements standard packet filtering, Snort-style signature checking,
 /// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
 
-extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::boxed::Box;

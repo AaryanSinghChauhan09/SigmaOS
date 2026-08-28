@@ -1,3 +1,4 @@
+extern crate alloc;
 /// Memory Descriptor Lists (MDL), physical-to-virtual memory descriptor tracking,
 /// locked-in-memory states, and ancient/historical hardware driver DMA buffer compatibility.
 ///
@@ -5,7 +6,6 @@
 /// where direct I/O address space, direct-memory access (DMA), page protection, and
 /// ISA 16MB memory boundaries required precise, contiguous/non-contiguous mapping trackers.
 
-extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::string::String;

@@ -5,8 +5,8 @@
 #![allow(clippy::new_without_default)]
 #![allow(dead_code)]
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use crate::ipc::ipc::{IPCError, IPCCapability};

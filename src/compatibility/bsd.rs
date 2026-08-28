@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS BSD Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of BSD (FreeBSD/OpenBSD) core tooling
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;

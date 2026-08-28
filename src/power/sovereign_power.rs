@@ -2,7 +2,6 @@
 // ACPI S0-S5, C0-C6, P-States, TLP/powerd frequency governors, Intel RAPL energy capping,
 // thermal throttling curves, and NVMe APST / PCIe ASPM link power management
 
-extern crate alloc;
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

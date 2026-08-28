@@ -1,5 +1,5 @@
-// SigmaOS Kernel Library
 extern crate alloc;
+// SigmaOS Kernel Library
 
 pub mod adt;
 pub mod arc;
@@ -46,7 +46,6 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-extern crate alloc;
 
 pub use vec::Vec;
 pub use alloc::collections::BTreeMap;

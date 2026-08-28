@@ -1,12 +1,11 @@
-#![no_std]
 #![cfg_attr(target_os = "none", no_main)]
 
 /// OOP-based Cloud Sync for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 936
 /// Implements cloud synchronization
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

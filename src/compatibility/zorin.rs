@@ -1,11 +1,9 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

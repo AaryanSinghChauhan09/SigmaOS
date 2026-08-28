@@ -1,12 +1,11 @@
+extern crate alloc;
 // SigmaOS Linux & BSD Inspired Advanced Drivers Subsystem
 // Zero-dependency, #![no_std] compliant, providing Linux evdev, FreeBSD DRM/KMS,
 // AMDGPU DCN, Intel Xe/i915 GuC, Intel iwlwifi / Realtek rtw89 Wi-Fi, USB4/Thunderbolt security,
 // UVC/UAC2 media drivers, LSI MegaRAID/SAS HBA storage, Wacom tablet & I2C precision touchpad,
 // Apple Silicon DART IOMMU, Raspberry Pi BCM2711/2712 SoC, and OpenBSD/NetBSD driver sandboxing.
 
-#![no_std]
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;

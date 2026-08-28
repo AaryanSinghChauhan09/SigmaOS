@@ -1,3 +1,4 @@
+extern crate alloc;
 use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
@@ -6,7 +7,6 @@ use core::mem;
 /// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 /// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};

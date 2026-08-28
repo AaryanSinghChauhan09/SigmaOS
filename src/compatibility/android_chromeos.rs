@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Android & ChromeOS Parity Subsystem Layer
 // Replicates key Android and ChromeOS subsystem capabilities:
 // 1. Android APK & AAB Manifest Parser & permission filter (ApkManifestParser)
@@ -16,7 +17,6 @@
 // 14. Binder IPC Hub & Looper Message Queue (AndroidBinderHub)
 // 15. Android Thread Scheduler & Linux CGroup Priority Mapper (AndroidThreadScheduler)
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;

@@ -2,10 +2,9 @@
 //! Unified driver interface abstraction and platform-specific shims (x86_64, AArch64/ARM64, RISC-V).
 //! Inspired by Linux (sysfs, eBPF/IRQ domains, device tree FDT, PCI ECAM, DMA pools)
 //! and BSD (FreeBSD newbus/bus_dma/nexus, OpenBSD pledge/unveil security, NetBSD rump hypercall driver model).
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;

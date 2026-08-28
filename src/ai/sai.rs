@@ -1,10 +1,9 @@
+extern crate alloc;
 // S-AI - Local AI engine and multi-agent automation
 // SovereignML tensor core, agent orchestrator, and local inference
 // Fully implements the 6-Phase AI & Automation Roadmap to differentiate SigmaOS from traditional distros.
 
-#![no_std]
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

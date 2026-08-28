@@ -1,10 +1,9 @@
+extern crate alloc;
 // Modern Wireless Network Interface Driver
 // Demonstrates how advanced modern wireless drivers implement the unified OOP architecture.
 // Enhanced with Linux/BSD-inspired wireless properties, security, scanning, and monitor mode support.
 
-#![no_std]
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::string::ToString;

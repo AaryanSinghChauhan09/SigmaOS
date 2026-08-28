@@ -1,8 +1,8 @@
+extern crate alloc;
 // Gentoo Portage-Inspired Advanced Dependency Resolution
 // Sophisticated dependency solver with USE flags, slot conflicts, and optimization
 
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::format;

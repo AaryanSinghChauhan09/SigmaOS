@@ -1,3 +1,4 @@
+extern crate alloc;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
@@ -8,7 +9,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 
 #[cfg(feature = "standalone_test")]
-extern crate alloc;
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 

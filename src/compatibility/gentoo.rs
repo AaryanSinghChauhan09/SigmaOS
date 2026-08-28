@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 /// Gentoo Linux & SysVinit runlevels Architecture Absorption for SigmaOS
 /// Implements Portage-grade ebuild compilation recipes, global & local compile-time USE Flags,
 /// and OpenRC runlevel dependency-resolved parallel process/daemon supervision.
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 

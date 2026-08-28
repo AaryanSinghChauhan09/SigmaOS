@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Advanced Debugger Subsystem
 //
 // Models and implements advanced debugger user interfaces, mathematical and bitwise expression
@@ -5,7 +6,6 @@
 // Highly inspired by low-level hardware debugging interfaces (x86 DR0-DR7, ARM EL registers)
 // and production kernels (Linux ptrace, Windows Dbgsrv/WinDbg).
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

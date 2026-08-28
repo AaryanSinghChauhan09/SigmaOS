@@ -1,7 +1,7 @@
+extern crate alloc;
 // OOP-based Hardware Compatibility Matrix for SigmaOS
 // Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

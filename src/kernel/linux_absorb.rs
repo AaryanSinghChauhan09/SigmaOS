@@ -1,10 +1,9 @@
+extern crate alloc;
 // SigmaOS Linux Driver Absorption Framework
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-#![no_std]
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::String;

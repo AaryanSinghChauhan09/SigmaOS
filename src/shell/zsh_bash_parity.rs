@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Advanced Zsh, Bash, Fish & BSD Shell Parity Engine
 // Zero-dependency, #![no_std] compliant, zero-allocation shell enhancements
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;

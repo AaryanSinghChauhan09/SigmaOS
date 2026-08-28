@@ -10,9 +10,9 @@
 pub mod control;
 pub mod append_rights;
 
+extern crate alloc;
 pub use crate::filesystem::ext4_ntfs_security::*;
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

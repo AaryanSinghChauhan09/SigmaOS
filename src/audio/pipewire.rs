@@ -1,10 +1,9 @@
 //! Professional Audio Pipeline inspired by PipeWire and JACK2
 //! Safe, zero-dependency `#![no_std]` audio graph, low-latency processing,
 //! spatial audio, and JACK client compatibility layer.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

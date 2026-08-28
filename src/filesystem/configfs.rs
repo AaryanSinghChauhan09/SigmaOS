@@ -1,7 +1,7 @@
+extern crate alloc;
 // Sovereign ConfigFS - "Everything is a File" and "Principle of Least Astonishment" (POLA) Implementation
 // Inspired by Linux sysfs/configfs and BSD sysctl, exposing kernel state, scheduler, and security configurations as virtual files.
 
-extern crate alloc;
 
 use crate::filesystem::vfs::FsError;
 use crate::kernel::bore::BoreScheduler;

@@ -1,4 +1,3 @@
-#![no_std]
 
 const MAX_ORDER: usize = 11;
 const MIN_BLOCK_SIZE: usize = 4096;

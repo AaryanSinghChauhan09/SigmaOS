@@ -2,10 +2,9 @@
 //! Zero-dependency #![no_std] implementation of AI orchestration, ML experiment tracking,
 //! safety policy engine, signed model marketplace, multi-device model scheduling,
 //! privacy prompt redaction, default-deny network policy, and OpenShell sandboxing.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

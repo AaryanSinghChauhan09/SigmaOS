@@ -1,4 +1,4 @@
-#![no_std]
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::String;

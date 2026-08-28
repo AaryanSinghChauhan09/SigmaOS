@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Advanced Driver & Hardware Shims Subsystem
 // Independent, zero-dependency implementations of Intel e1000, Intel HDA, and VirtIO hardware drivers
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;

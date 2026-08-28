@@ -22,6 +22,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
+extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

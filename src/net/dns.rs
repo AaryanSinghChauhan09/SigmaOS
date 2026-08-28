@@ -32,8 +32,8 @@
 /// 5. Advanced caching: negative caching, stale-while-revalidate (optimistic), capacity limits.
 /// 6. Redundant parallel querying with stagger delay.
 /// 7. Secure DoH / DoT transport channel fallbacks.
-extern crate alloc;
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

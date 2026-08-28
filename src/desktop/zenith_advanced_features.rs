@@ -4,8 +4,8 @@
 
 #![cfg_attr(not(test), no_std)]
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::String;

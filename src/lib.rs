@@ -1,7 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
 
 // Core working modules
 pub mod accessibility;
@@ -30,7 +29,6 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub mod process;
 pub use process::{
     ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
@@ -112,9 +110,6 @@ pub mod distro;
 //     pub mod paint;
 //     pub mod video;
 // }
-pub mod hardware {
-    pub mod compatibility;
-}
 // pub mod power {
 //     pub mod governor;
 // }

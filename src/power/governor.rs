@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS CPU Frequency Scaling & Advanced Power Governors (Linux Inspired)
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

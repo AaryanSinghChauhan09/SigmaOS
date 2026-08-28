@@ -19,6 +19,7 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
+extern crate alloc;
 use crate::klib::BTreeMap;
 
 /// Network security alert classification
@@ -38,7 +39,6 @@ pub enum AlertSeverity {
     High,
     Critical,
 }
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};

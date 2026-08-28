@@ -488,6 +488,14 @@ pub enum PinPriority {
     Hold = 1001,     // Force hold on version
 }
 
+impl PinPriority {
+    pub const NEVER: PinPriority = PinPriority::Exmittent;
+    pub const AUTOMATIC: PinPriority = PinPriority::Default;
+    pub const DEFAULT: PinPriority = PinPriority::Default;
+    pub const PREFERRED: PinPriority = PinPriority::Preferred;
+    pub const FORCE: PinPriority = PinPriority::Hold;
+}
+
 #[derive(Debug, Clone)]
 pub struct PackagePinRule {
     pub package_pattern: String,
@@ -641,61 +649,6 @@ pub enum RepoError {
     TransactionError(String),
 }
 
-/// Package pinning priority rules inspired by APT (apt_preferences) and DNF priority plugins.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PinPriority(pub i32);
-
-impl PinPriority {
-    pub const NEVER: PinPriority = PinPriority(-1);
-    pub const AUTOMATIC: PinPriority = PinPriority(100);
-    pub const DEFAULT: PinPriority = PinPriority(500);
-    pub const PREFERRED: PinPriority = PinPriority(990);
-    pub const FORCE: PinPriority = PinPriority(1001);
-}
-
-/// Dynamic Package Pinning Engine for package origin/version control.
-#[derive(Debug, Clone)]
-pub struct PackagePinRule {
-    pub package_pattern: String,
-    pub repo_origin: String,
-    pub version_pattern: String,
-    pub priority: PinPriority,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct PackagePinEngine {
-    pub rules: Vec<PackagePinRule>,
-}
-
-impl PackagePinEngine {
-    pub fn new() -> Self {
-        Self { rules: Vec::new() }
-    }
-
-    pub fn add_rule(&mut self, rule: PackagePinRule) {
-        self.rules.push(rule);
-    }
-
-    /// Determine calculated priority for a package from a specific repository
-    pub fn evaluate_priority(&self, package_name: &str, repo_name: &str, version: &str) -> PinPriority {
-        let mut highest_priority = PinPriority::DEFAULT;
-
-        for rule in &self.rules {
-            let pkg_match = rule.package_pattern == "*" || rule.package_pattern == package_name;
-            let repo_match = rule.repo_origin == "*" || rule.repo_origin == repo_name;
-            let ver_match = rule.version_pattern == "*" || rule.version_pattern == version;
-
-            if pkg_match && repo_match && ver_match {
-                if rule.priority > highest_priority || rule.priority == PinPriority::NEVER {
-                    highest_priority = rule.priority;
-                }
-            }
-        }
-
-        highest_priority
-    }
-}
-
 /// Mirror candidate with latency and reliability rating (Inspired by Arch Reflector & DNF fastestmirror)
 #[derive(Debug, Clone)]
 pub struct MirrorCandidate {
@@ -703,52 +656,6 @@ pub struct MirrorCandidate {
     pub latency_ms: u32,
     pub failure_count: u32,
     pub enabled: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct MirrorSyncEngine {
-    pub mirrors: Vec<MirrorCandidate>,
-}
-
-impl MirrorSyncEngine {
-    pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
-    }
-
-    pub fn add_mirror(&mut self, url: &str, latency_ms: u32) {
-        self.mirrors.push(MirrorCandidate {
-            url: String::from(url),
-            latency_ms,
-            failure_count: 0,
-            enabled: true,
-        });
-    }
-
-    pub fn rank_mirrors(&mut self) {
-        self.mirrors.sort_by(|a, b| {
-            let score_a = (a.latency_ms as u64) + (a.failure_count as u64 * 500);
-            let score_b = (b.latency_ms as u64) + (b.failure_count as u64 * 500);
-            score_a.cmp(&score_b)
-        });
-    }
-
-    pub fn mark_failure(&mut self, url: &str) {
-        if let Some(mirror) = self.mirrors.iter_mut().find(|m| m.url == url) {
-            mirror.failure_count += 1;
-            if mirror.failure_count >= 3 {
-                mirror.enabled = false;
-            }
-        }
-        self.rank_mirrors();
-    }
-
-    pub fn get_best_mirror(&self) -> Result<String, RepoError> {
-        self.mirrors
-            .iter()
-            .find(|m| m.enabled)
-            .map(|m| m.url.clone())
-            .ok_or_else(|| RepoError::MirrorError(String::from("No healthy mirror available")))
-    }
 }
 
 /// Transactional Package History & Rollback (Inspired by DNF history & FreeBSD pkg rollback)
@@ -765,68 +672,6 @@ pub struct PackageTransaction {
     pub timestamp: String,
     pub actions: Vec<TransactionAction>,
     pub status_completed: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct PackageTransactionJournal {
-    pub history: Vec<PackageTransaction>,
-    pub current_id: u64,
-}
-
-impl PackageTransactionJournal {
-    pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-            current_id: 1,
-        }
-    }
-
-    pub fn record_transaction(&mut self, timestamp: &str, actions: Vec<TransactionAction>) -> u64 {
-        let id = self.current_id;
-        self.current_id += 1;
-        self.history.push(PackageTransaction {
-            id,
-            timestamp: String::from(timestamp),
-            actions,
-            status_completed: true,
-        });
-        id
-    }
-
-    pub fn rollback_transaction(&mut self, transaction_id: u64) -> Result<Vec<TransactionAction>, RepoError> {
-        let tx = self
-            .history
-            .iter()
-            .find(|t| t.id == transaction_id)
-            .ok_or_else(|| RepoError::TransactionError(format!("Transaction ID {} not found", transaction_id)))?;
-
-        let mut rollback_actions = Vec::new();
-        for action in tx.actions.iter().rev() {
-            match action {
-                TransactionAction::Install { package, version } => {
-                    rollback_actions.push(TransactionAction::Remove {
-                        package: package.clone(),
-                        version: version.clone(),
-                    });
-                }
-                TransactionAction::Remove { package, version } => {
-                    rollback_actions.push(TransactionAction::Install {
-                        package: package.clone(),
-                        version: version.clone(),
-                    });
-                }
-                TransactionAction::Upgrade { package, old_version, new_version } => {
-                    rollback_actions.push(TransactionAction::Upgrade {
-                        package: package.clone(),
-                        old_version: new_version.clone(),
-                        new_version: old_version.clone(),
-                    });
-                }
-            }
-        }
-
-        Ok(rollback_actions)
-    }
 }
 
 #[cfg(test)]

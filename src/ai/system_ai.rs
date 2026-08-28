@@ -1,9 +1,7 @@
 //! AI/ML Integration (System Optimization)
 //! AI-driven system optimization, predictive scaling, and anomaly detection
 
-#![no_std]
 
-extern crate alloc;
 
 use crate::klib::{Vec, String};
 

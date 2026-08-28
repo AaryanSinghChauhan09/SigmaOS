@@ -1,11 +1,9 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// OOP-based Battery Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 251
 /// Implements battery monitoring and power management
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

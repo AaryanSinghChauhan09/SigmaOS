@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS CachyOS-inspired Performance and System Optimization Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-extern crate alloc;
 use alloc::collections::BTreeSet;
 use alloc::string::String;
 use alloc::vec::Vec;

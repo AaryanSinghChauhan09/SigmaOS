@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Kernel Security Framework
 // Inspired by SELinux, AppArmor, OpenBSD pledge/unveil, and PaX
 // Provides comprehensive kernel-level security policies and enforcement

@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Kernel-Mode Reverse Engineering & Hooking / Rootkit Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 

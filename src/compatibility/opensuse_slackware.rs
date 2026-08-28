@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS openSUSE & Slackware Competitor Parity Subsystem
 // Independent, zero-dependency implementations of openSUSE YaST and Slackware pkgtools
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;

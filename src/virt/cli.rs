@@ -1,3 +1,4 @@
+extern crate alloc;
 use core::mem;
 /// OOP-based Virtualization Management CLI for SigmaOS
 /// Implements virtualization CLI using OOP principles with traits and structs

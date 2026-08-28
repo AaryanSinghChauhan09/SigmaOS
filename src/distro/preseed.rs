@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Debian-style Automated Preseed Installer Subsystem (S-Preseed)
 // Zero-dependency, #![no_std] compliant, parses and executes automated installs.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::string::ToString;

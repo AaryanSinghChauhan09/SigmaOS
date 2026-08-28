@@ -1,8 +1,8 @@
+extern crate alloc;
 // AT&T System V, Linux & BSD Inspired Identification, Verification, ADT & Security Subsystem
 // Implements 5-step User Identification, Verification, Authenticity of Information,
 // Attributes Definition Table (ADT), and Automatic Allocation & Management Engine.
 
-extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;

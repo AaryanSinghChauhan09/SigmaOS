@@ -1,7 +1,6 @@
-// SPDX-License-Identifier: MIT
-#![no_std]
-
 extern crate alloc;
+// SPDX-License-Identifier: MIT
+
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

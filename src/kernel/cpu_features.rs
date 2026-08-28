@@ -3,7 +3,6 @@
 
 #![cfg_attr(target_os = "none", no_std)]
 
-extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuInstructionExtension {
@@ -343,3 +342,5 @@ mod tests {
         assert_eq!(cpu_arm.ring, CpuRing::Ring0);
     }
 }
+
+extern crate alloc;

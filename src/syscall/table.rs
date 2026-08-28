@@ -23,6 +23,7 @@
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 111
 /// Implements syscall registration and dispatch table
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

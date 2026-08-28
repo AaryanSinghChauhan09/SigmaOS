@@ -1,9 +1,9 @@
+extern crate alloc;
 // Debian Crusher Core for SigmaOS Package Management
 // Absorbs Debian .deb package control manifests, enforces zero-hook declarative
 // state updates (eliminating fragile dpkg maintainer scripts), and resolves
 // APT dependency trees via SAT constraint solving.
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

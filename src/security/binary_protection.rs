@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Linux / ELF Binary Protection Parity Subsystem
 // Stack Canaries (SSP), ASLR, NX/DEP, Full/Partial RELRO, PIE, and CFI Validation
 

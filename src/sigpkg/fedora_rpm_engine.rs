@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-extern crate alloc;
 use crate::klib::collections::HashMap;
 use alloc::string::String;
 use alloc::vec::Vec;

@@ -1,9 +1,7 @@
 //! Cron/Scheduler (cronie/cron Inspiration)
 //! Cron daemon, job scheduling, and job execution
 
-#![no_std]
 
-extern crate alloc;
 
 use crate::klib::{Vec, String};
 

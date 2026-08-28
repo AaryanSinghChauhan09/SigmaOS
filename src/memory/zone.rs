@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS BSD-inspired Zone / UMA (Universal Memory Allocator) Allocator
 // Implements type-stable object caching for kernel resources
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::string::ToString;

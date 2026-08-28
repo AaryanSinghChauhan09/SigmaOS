@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Media Audio Engine Shard
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

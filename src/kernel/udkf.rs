@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS User-Defined Kernel Functions (UDKF) Scripting Engine
 // Allows safe, in-kernel customization of allocators, scheduling algorithms, and filesystems without recompilation
 

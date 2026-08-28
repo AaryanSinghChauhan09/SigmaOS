@@ -1,10 +1,8 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
-extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

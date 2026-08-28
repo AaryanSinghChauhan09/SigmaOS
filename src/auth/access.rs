@@ -1,7 +1,7 @@
+extern crate alloc;
 /// OOP-based Access Control System for SigmaOS
 /// Based on Roadmap Item 14: Access control system
 
-extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::AtomicUsize;
 

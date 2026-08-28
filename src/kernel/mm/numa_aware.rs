@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 /// SigmaOS NUMA (Non-Uniform Memory Access) Topology manager
 /// Tracks NUMA nodes and handles node-local memory allocation preferences
 use crate::klib::BTreeMap;
-extern crate alloc;
 use alloc::vec;
 use alloc::vec::Vec;
 

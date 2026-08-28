@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Wiki & Distro Innovations Subsystem
 // Incorporates declarative system configurations (NixOS pattern),
 // Arch-style plaintext recipe sandbox compilation (Arch pattern),
@@ -6,7 +7,6 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
@@ -428,7 +428,13 @@ pub enum SystemdUnitActiveState {
     Deactivating,
 }
 
-#[derive(Debug, Clone)]
+/// Systemd journal entry
+pub struct SystemdJournalEntry {
+    pub id: u64,
+    pub message: String,
+    pub timestamp: u64,
+}
+
 pub struct SystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
@@ -447,7 +453,6 @@ pub enum SystemdUnitState {
     Failed,
 }
 
-#[derive(Debug, Clone)]
 pub struct SovereignSystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
@@ -495,7 +500,7 @@ impl SovereignSystemdParityEngine {
     pub fn start_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
-        unit.state = SystemdUnitState::Active;
+        unit.active_state = SystemdUnitActiveState::Active;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
     }
@@ -503,7 +508,7 @@ impl SovereignSystemdParityEngine {
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Inactive;
-        unit.state = SystemdUnitState::Inactive;
+        unit.active_state = SystemdUnitActiveState::Inactive;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
     }
@@ -540,35 +545,26 @@ pub enum DvfsPowerGovernor {
     OnDemand,
 }
 
-#[derive(Debug, Clone)]
 pub struct NumaNodeAffinity {
     pub node_id: usize,
     pub cpu_cores: Vec<usize>,
     pub total_memory_mb: u64,
 }
 
-#[derive(Debug, Clone)]
 pub struct RealtimeTask {
     pub pid: usize,
     pub class: SchedulerClass,
     pub deadline_us: u64,
-    pub wcet_us: u64, // Worst-Case Execution Time
+    pub wcet_us: u64,
     pub numa_node: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DvfsPowerGovernor {
+pub enum CpuFrequencyGovernor {
     Performance,
     Powersave,
     Schedutil,
     OnDemand,
-}
-
-#[derive(Debug, Clone)]
-pub struct NumaNodeAffinity {
-    pub node_id: usize,
-    pub cpu_cores: Vec<usize>,
-    pub total_memory_mb: u64,
 }
 
 pub type RtlaneRealtimeTask = RealtimeTask;

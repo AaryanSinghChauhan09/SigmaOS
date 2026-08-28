@@ -1,3 +1,4 @@
+extern crate alloc;
 /// OCI-Compliant Container Pod and Namespace Manager
 /// Manages pod configurations, limits, shared namespaces, and container orchestration
 /// to easily match and exceed Fedora's native Podman/Kubernetes setups.

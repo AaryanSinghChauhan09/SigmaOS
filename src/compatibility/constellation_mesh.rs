@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Constellation-and-Mesh Architecture
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.

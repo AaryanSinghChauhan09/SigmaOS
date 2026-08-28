@@ -1,9 +1,9 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Block Device Subsystem & High-Performance Block Management Architecture
 // Implements block-oriented devices, block operations, multi-type block classification,
 // record blocking (fixed, variable, permanent, spanned), and system block diagram topologies.
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

@@ -1,3 +1,4 @@
+extern crate alloc;
 // Linux/BSD Distro Inspirations Implementation
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS

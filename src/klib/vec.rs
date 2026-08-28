@@ -1,4 +1,4 @@
-#![no_std]
+extern crate alloc;
 
 use core::mem;
 use core::hash::{Hash, Hasher};

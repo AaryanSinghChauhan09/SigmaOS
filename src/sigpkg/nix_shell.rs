@@ -8,10 +8,10 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
+extern crate alloc;
 #[allow(unused_variables)]
 #[allow(unused_mut)]
 #[allow(unused_imports)]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -1,3 +1,4 @@
+extern crate alloc;
 /// Copy-on-Write (COW) Transactional Snapshot and Active Mount Engine
 /// Provides transactional filesystem rollback metadata to defeat Fedora's Btrfs.
 use core::sync::atomic::{AtomicUsize, Ordering};

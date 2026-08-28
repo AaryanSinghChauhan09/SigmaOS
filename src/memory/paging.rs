@@ -1,3 +1,4 @@
+extern crate alloc;
 // Virtual Memory & Paging Implementation
 // 4-level paging architecture (PML4 → PDPT → PD → PT)
 // Enhanced with Huge Pages (2MB/1GB), advanced page protection attributes,
@@ -9,7 +10,6 @@
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
 
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

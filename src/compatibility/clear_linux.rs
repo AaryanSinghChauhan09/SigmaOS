@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Clear Linux Stateless Architecture & Low-Latency Performance Engine
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Clear Linux features
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

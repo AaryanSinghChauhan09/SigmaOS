@@ -23,6 +23,7 @@
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 161
 /// Implements system snapshots and backup management
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

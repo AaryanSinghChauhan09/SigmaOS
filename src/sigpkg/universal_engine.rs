@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Universal OOP Package Manager Engine
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 
-extern crate alloc;
 use alloc::collections::BTreeMap as HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

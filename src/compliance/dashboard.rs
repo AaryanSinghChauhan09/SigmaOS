@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Compliance Dashboard Implementation
 // Implements comprehensive compliance dashboard as described in COMPLIANCE_DASHBOARD_MAPPING.md
 // Maps technical features to Indian legal compliance requirements

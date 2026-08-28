@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Ready-to-Use OS Usability Primitives
 // Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
-extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};

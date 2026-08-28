@@ -1,13 +1,11 @@
 #![allow(unused_variables)]
-#![no_std]
-#![cfg_attr(not(test), no_main)]
 
 /// Custom Syscall Dispatcher for SigmaOS
 /// Implements syscall handling without relying on Linux kernel syscalls
 /// Uses capability-based access control
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;

@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Sovereign Linux & BSD Distro Parity Subsystem for SigmaOS
 /// Clean-room implementation of NixOS Flakes, Arch Pacman Hooks, Void runit Supervision, and Gentoo Portage USE Flags
 /// Designed for bare-metal zero-dependency performance and zero-trust security
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

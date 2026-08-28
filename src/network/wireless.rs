@@ -1,11 +1,10 @@
-#![no_std]
 #![allow(warnings)]
 #![allow(clippy::all)]
 
+extern crate alloc;
 /// OOP-based Wireless Network Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 86
 /// Implements WiFi device management, connection, and Kali-inspired network auditing
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 

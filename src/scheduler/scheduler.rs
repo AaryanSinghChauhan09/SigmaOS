@@ -1,6 +1,6 @@
+extern crate alloc;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using Linux & BSD inspired task states and workload classifications.
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};

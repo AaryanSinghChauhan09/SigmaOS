@@ -23,10 +23,10 @@
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements CSPRNG with entropy collection
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
-extern crate alloc;
 
 pub type RNGID = usize;
 

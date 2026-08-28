@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Stable Linux Distro Parity Subsystem
 // Inspired by RHEL/Rocky/AlmaLinux, Debian dpkg, Alpine lbu/apk, and Enterprise systemd cgroupv2
@@ -6,7 +7,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;

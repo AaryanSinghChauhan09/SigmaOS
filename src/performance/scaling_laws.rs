@@ -2,7 +2,6 @@
 // Mathematical models for thread scaling, work growth, contention overhead, and queueing theory
 // Implements Amdahl's Law, Gustafson's Law, Gunther's Universal Scalability Law (USL), and Little's Law
 
-extern crate alloc;
 
 /// Amdahl's Law: Models maximum theoretical speedup for a fixed workload given N parallel cores and parallel fraction P
 /// Formula: Speedup(N) = 1 / ((1 - P) + (P / N))

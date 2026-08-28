@@ -5,8 +5,8 @@
 //! - OpenBSD: Security hardening, pledge/unveil-inspired capabilities
 //! - postmarketOS: Mainline kernel approach, mobile optimizations
 //! - Ubuntu: Modern installer patterns, accessibility
-
 extern crate alloc;
+
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::String;

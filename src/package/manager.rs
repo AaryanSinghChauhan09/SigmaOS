@@ -22,6 +22,7 @@
 /// OOP-based Package Management for SigmaOS
 /// Based on Roadmap Item: Package Management + Reproducible Builds
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

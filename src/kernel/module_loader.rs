@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Sovereign Kernel Module Loader Subsystem
 // Linux (insmod / rmmod / modprobe) and FreeBSD (kldload / kldunload / kldstat) parity:
 // - Dynamic ELF kernel module relocation and symbol resolution
@@ -6,7 +7,6 @@
 // - Module reference counting and safe unloading
 // - Kernel symbol export table (EXPORT_SYMBOL parity)
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;

@@ -1,12 +1,11 @@
+extern crate alloc;
 // SigmaOS Open-Source Dominance & Distro Inspiration Subsystem
 // Zero-dependency, #![no_std] compliant engine synthesizing architectural paradigms
 // from Linux (Debian, Arch, Gentoo, Fedora, Alpine, Void, CachyOS, NixOS),
 // FreeBSD (GEOM, Capsicum, Jail), OpenBSD (pledge, unveil, pf), DragonFly BSD (HAMMER2),
 // Haiku (BeOS Translators), SerenityOS, and ReactOS/Wine Win32 translation layers.
 
-#![no_std]
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

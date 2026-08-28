@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS FreeBSD GEOM-Inspired Storage Transformation Framework
 // Modular storage class, provider, consumer, and volume transformation topology
 // Inspired by FreeBSD's GEOM storage architecture (sys/geom)
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

@@ -1,7 +1,7 @@
+extern crate alloc;
 // OOP-based Unified Logging System and Diverse Targets for SigmaOS
 // Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::String;

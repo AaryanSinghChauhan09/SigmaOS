@@ -28,7 +28,6 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod missing_distro_innovations;
-pub mod ready_to_use;
 pub mod wiki_ideas_implementation;
 
 pub use arch_parity::{

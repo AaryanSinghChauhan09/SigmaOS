@@ -1,9 +1,8 @@
+extern crate alloc;
 // OpenRC-Inspired Service Management System
 // Dependency-based init system with runlevels, service supervision, and parallel startup
 
-#![no_std]
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaDev IDE: Zero-dependency, lightweight code editor optimized for
 // Rust, Zig, and Nim with sandboxed AI code completion assistants for SigmaOS.
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

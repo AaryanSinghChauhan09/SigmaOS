@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
-extern crate alloc;
 use alloc::vec::Vec;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {

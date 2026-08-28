@@ -1,10 +1,9 @@
-#![no_std]
+extern crate alloc;
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
 /// Implements minimal init system with service management, dependency resolution, parallel startup
 
-extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::vec::Vec;

@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging with zero std dependency
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::ptr::NonNull;

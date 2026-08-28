@@ -1,4 +1,5 @@
 //! BSD Pledge inspired security mechanism
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 

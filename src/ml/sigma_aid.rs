@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// Sigma-Aid Daemon: AI-Native LLM Orchestrator
 /// Provides an OOP interface for GGUF model execution and local inference

@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Sovereign QUIC / HTTP3 Next-Gen Protocol and Congestion Control
 /// Focuses on multiplexed streams, zero-RTT connection establishment, and post-quantum security.
 
-extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::String;

@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS elementaryOS Parity Subsystem: Granite UI, Switchboard, Contractor & ScreenTime
 // Inspired by elementaryOS Granite toolkit, Switchboard Control Center, Contractor Service, and Parental Controls
@@ -6,7 +7,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;

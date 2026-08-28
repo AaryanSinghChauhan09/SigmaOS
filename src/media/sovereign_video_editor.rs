@@ -3,8 +3,8 @@
 //! This module implements high-performance nonlinear video editing (NLE),
 //! keyframe automation, multitrack audio mixing, chroma keying, transition processing,
 //! time remapping / speed ramping, and professional export presets.
-
 extern crate alloc;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;

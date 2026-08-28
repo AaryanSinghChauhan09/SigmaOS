@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
 use crate::klib::BTreeMap;

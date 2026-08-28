@@ -1,7 +1,7 @@
+extern crate alloc;
 // Sovereign Debian Package (.deb) Translation and Validation Engine for SigmaOS
 // Inspired by Debian dpkg and apt system, allowing native absorption of Debian control files and maintainer scripts.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

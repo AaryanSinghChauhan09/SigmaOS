@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Access Control Matrix (ACM), Extended POSIX ACLs, Capability Bounding Sets,
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
 
-extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::format;

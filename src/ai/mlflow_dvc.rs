@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS MLflow & DVC Experiment Tracking and Data Version Control Engine
 // Binds model experiment tracking hooks into VFS and sigpkg to snapshot model states.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;

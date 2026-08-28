@@ -1,7 +1,7 @@
+extern crate alloc;
 // OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
 // Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT).
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

@@ -1,6 +1,6 @@
+extern crate alloc;
 /// Custom Penetration Assistant Compatibility Layer for SigmaOS
 /// Implements standard PenetrationAssistant trait, Assessment records, and DefaultAssistant no-ops
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

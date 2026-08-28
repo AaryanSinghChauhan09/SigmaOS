@@ -1,10 +1,10 @@
+extern crate alloc;
 /// Sovereign Process & System Accounting Subsystem (SigmaAccounting)
 /// Inspired by Linux Process Accounting (`acct_v3` / `/var/log/pacct`),
 /// BSD Resource Accounting (`getrusage` / `sa(8)` / `lastcomm`),
 /// BSD User Session Accounting (`utmp` / `wtmp` / `lastlog` / `btmp`),
 /// and Linux Netlink Taskstats & Delay Accounting.
 
-extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::String;

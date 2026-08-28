@@ -1,7 +1,7 @@
+extern crate alloc;
 /// OOP-based Thread Management for SigmaOS
 /// Based on Roadmap Item 12: Thread management
 /// Absorbing Linux interruptible/alertable state concepts, CPU affinity, and nice prioritization values
-extern crate alloc;
 
 use alloc::boxed::Box;
 use core::mem;

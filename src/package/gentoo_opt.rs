@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Gentoo-inspired Compilation Optimization and Portage Parity Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::cell::RefCell;

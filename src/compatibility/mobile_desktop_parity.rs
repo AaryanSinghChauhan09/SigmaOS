@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Mobile & Desktop Competitor Parity Subsystem
 // Independent, zero-dependency implementations of macOS, iOS, and Android core technologies
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;

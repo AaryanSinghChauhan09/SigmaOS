@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Local LLM & Whisper Speech-to-Text Integration
 // Native wrapper interfacing with llama.cpp and OpenAI Whisper GGUF models
 // for natural language CLI commands, offline desktop AI assistance, and voice input.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

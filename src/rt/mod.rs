@@ -1,9 +1,8 @@
 //! Real-Time Capabilities (PREEMPT_RT Inspiration)
 //! Real-time kernel, scheduling policies, and industrial support
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use crate::klib::{Vec, String};
 use alloc::vec::Vec;

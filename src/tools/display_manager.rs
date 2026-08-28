@@ -1,9 +1,7 @@
 //! Display Manager (GDM/LightDM Inspiration)
 //! Login screen, session management, and display server spawning
 
-#![no_std]
 
-extern crate alloc;
 
 use crate::klib::{Vec, String};
 

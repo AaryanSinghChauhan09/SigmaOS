@@ -1,9 +1,8 @@
 //! Bluetooth/Wireless Management (BlueZ/NetworkManager Inspiration)
 //! Bluetooth stack, WiFi management, and wireless profiles
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use crate::klib::{Vec, String};
 use alloc::vec::Vec;

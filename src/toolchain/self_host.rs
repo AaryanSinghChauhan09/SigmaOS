@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Native Self-Hosting Compilation & Assembly Suite (SigmaSelfHost)
 // Enables on-kernel compiler and toolchain bootstrapping to build/link
 // native development tooling, making the operating system fully self-hosting.

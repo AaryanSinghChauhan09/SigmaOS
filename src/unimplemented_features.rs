@@ -1,7 +1,7 @@
+extern crate alloc;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
@@ -50,10 +50,13 @@ impl LegacyController {
 
 #[derive(Debug, Clone)]
 pub struct PortageEbuildProfile {
+    pub atom_name: String,
     pub category_pkg: String,
     pub version: String,
+    pub slot: String,
     pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
     pub is_masked: bool,
+    pub is_ebuild_masked: bool,
 }
 
 /// Gentoo Portage Masking & Slotting Resolver Engine
@@ -71,16 +74,18 @@ impl GentooPortageMaskResolver {
             hard_masked_atoms: Vec::new(),
             unmasked_packages: Vec::new(),
             ebuilds: Vec::new(),
-            hard_masked_atoms: Vec::new(),
         }
     }
 
     pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
         self.ebuilds.push(PortageEbuildProfile {
             atom_name: format!("{}:{}", category_pkg, version),
+            category_pkg: category_pkg.to_string(),
+            version: version.to_string(),
             slot: "0".to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
             is_masked,
+            is_ebuild_masked: is_masked,
         });
     }
 

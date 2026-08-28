@@ -1,9 +1,8 @@
 //! GPU Driver Framework (Linux DRM & BSD drm-kmod Inspiration)
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

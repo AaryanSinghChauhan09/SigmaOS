@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 //! SigmaOS Security, Privacy & Governance (Items 61-80)
 //! Enterprise-grade security posture, MAC engine, secrets keyring, zero-trust network,
@@ -9,7 +10,6 @@
 //!
 //! Inspired by Linux kernel (SELinux/AppArmor/WireGuard/LUKS2) and BSD (Pledge/Unveil/Capsicum/Audit).
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;

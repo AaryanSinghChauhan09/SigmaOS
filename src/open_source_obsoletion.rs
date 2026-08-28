@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Open Source Obsoletion Subsystem (`src/open_source_obsoletion.rs`)
 // Comprehensive, zero-dependency, AI-native `#![no_std]` implementations designed
@@ -5,7 +6,6 @@
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
 
-extern crate alloc;
 
 use alloc::format;
 use alloc::string::{String, ToString};

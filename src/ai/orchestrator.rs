@@ -1,8 +1,8 @@
+extern crate alloc;
 // OOP-based AI Orchestrator for SigmaOS
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
 // and self-diagnosis capabilities for system optimization
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

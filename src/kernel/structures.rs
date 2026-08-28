@@ -1,8 +1,8 @@
+extern crate alloc;
 use core::cell::{Cell, RefCell};
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

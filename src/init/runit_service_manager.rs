@@ -1,9 +1,8 @@
+extern crate alloc;
 // SigmaOS Runit-Style Service Manager (Void Linux Inspiration)
 // Advanced service supervision with watchdog monitoring, dependency management, and logging
 
-#![no_std]
 
-extern crate alloc;
 
 use crate::klib::{Vec, String, BTreeMap, HashSet};
 use alloc::vec::Vec;

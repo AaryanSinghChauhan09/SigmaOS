@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Special Virtual and Loopback Device Drivers for SigmaOS
 /// Inspired by Linux and BSD distribution drivers (/dev/null, /dev/zero, /dev/urandom, /dev/loop).
 
-extern crate alloc;
 use crate::drivers::peripheral::{PeripheralDevice, DeviceGeneration, PowerState};
 use alloc::vec::Vec;
 

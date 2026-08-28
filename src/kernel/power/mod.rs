@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 /// SigmaOS Power Management Subsystem
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
 use core::sync::atomic::{AtomicUsize, Ordering};

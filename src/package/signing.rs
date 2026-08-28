@@ -1,7 +1,5 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
+
 
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10

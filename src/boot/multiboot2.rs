@@ -1,9 +1,8 @@
+extern crate alloc;
 // Multiboot2 Loader and Specification Parser
 // High-fidelity Multiboot2 specification validation and parsing inspired by Linux/BSD loaders
 
-#![no_std]
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

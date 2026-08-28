@@ -1,8 +1,7 @@
+extern crate alloc;
 // eBPF-based Scheduling System for SigmaOS
 // Inspired by Ubuntu 25.04 sched_ext integration
 
-#![no_std]
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

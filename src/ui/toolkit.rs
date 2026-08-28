@@ -1,7 +1,7 @@
+extern crate alloc;
 // OOP-based Native UI Toolkit for SigmaOS
 // Implements UI toolkit using OOP principles with traits and structs.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

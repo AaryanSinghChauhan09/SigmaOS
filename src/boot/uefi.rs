@@ -1,9 +1,9 @@
+extern crate alloc;
 
 use core::mem;
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-extern crate alloc;
 
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};

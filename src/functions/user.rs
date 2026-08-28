@@ -1,9 +1,8 @@
 //! User Management Functions (useradd/passwd Inspiration)
 //! User manager, password manager, and authentication manager
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use crate::klib::{Vec, String};
 use alloc::vec::Vec;

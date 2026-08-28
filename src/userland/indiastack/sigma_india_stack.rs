@@ -19,8 +19,8 @@
 // SigmaOS India Stack Integration
 // ABDM FHIR client, UPI payments, GST/IRN generation, e-RUPI voucher
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::format;

@@ -1,17 +1,17 @@
-// SPDX-License-Identifier: Apache-2.0
-//! Classic Operating System Algorithms & Subsystems
-//!
-//! Inspired by Linux, FreeBSD, and classic Operating System paradigms:
-//! - Memory Ballooning (VirtIO Memory Ballooning)
-//! - Banker's Algorithm (Deadlock Avoidance)
-//! - Sleeping Barber Synchronization Primitive
-//! - Bare Metal System Provisioning Supervisor
-//! - Buffer Overflow Protection & Guard Canaries
-//! - Basic Input/Output Supervisor (IOSupervisor)
-//! - Ticket Spinlock with Exponential Backoff
-//! - Simple & Multiprogrammed Batch Queue Processor
-
 extern crate alloc;
+// SPDX-License-Identifier: Apache-2.0
+// Classic Operating System Algorithms & Subsystems
+//
+// Inspired by Linux, FreeBSD, and classic Operating System paradigms:
+// - Memory Ballooning (VirtIO Memory Ballooning)
+// - Banker's Algorithm (Deadlock Avoidance)
+// - Sleeping Barber Synchronization Primitive
+// - Bare Metal System Provisioning Supervisor
+// - Buffer Overflow Protection & Guard Canaries
+// - Basic Input/Output Supervisor (IOSupervisor)
+// - Ticket Spinlock with Exponential Backoff
+// - Simple & Multiprogrammed Batch Queue Processor
+
 use alloc::vec::Vec;
 
 /// Memory Ballooning Manager (VirtIO / Hypervisor Ballooning)

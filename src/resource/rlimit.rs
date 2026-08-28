@@ -1,7 +1,7 @@
+extern crate alloc;
 // BSD-style Resource Limits (rlimits) for SigmaOS
 // Implements process-specific soft and hard limits on system resources.
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 

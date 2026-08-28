@@ -1,9 +1,9 @@
+extern crate alloc;
 // OOP-based Graphics Compositor for SigmaOS
 // Implements graphics composition using OOP principles with traits and structs
 // No dependency on external graphics frameworks
 // Improved with custom window animations, transition effects, and dynamic pixel-clipping.
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};

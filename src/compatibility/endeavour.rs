@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 // EndeavourOS Parity Engines for SigmaOS
 // This module implements user-centric distro utilities inspired by EndeavourOS,
@@ -6,7 +7,6 @@
 // Expanded with unimplemented Github Wiki items: Makepkg Sandboxed Compiler,
 // AUR CLI Downloader Helper, and ALPM Sync DB to defeat Endeavour/Arch Linux.
 
-extern crate alloc;
 
 use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;

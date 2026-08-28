@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
-extern crate alloc;
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use crate::klib::collections::HashMap;
 use alloc::string::String;

@@ -1,8 +1,8 @@
+extern crate alloc;
 // Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
 // Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
 // Enhanced with advanced GDB/WinDbg-inspired Predefined and User-Defined Pseudo Registers
 
-extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::boxed::Box;

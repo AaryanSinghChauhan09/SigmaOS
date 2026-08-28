@@ -1,7 +1,7 @@
+extern crate alloc;
 // Sovereign /proc Virtual Filesystem (procfs) for SigmaOS
 // Inspired by Linux procfs, providing a dynamic programmatic interface to kernel memory, hardware, and active processes.
 
-extern crate alloc;
 
 use crate::filesystem::vfs::FsError;
 use alloc::format;

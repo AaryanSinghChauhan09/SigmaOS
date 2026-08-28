@@ -3,7 +3,6 @@ extern crate alloc;
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -402,23 +401,7 @@ impl AlpmDatabase {
 
         Ok(())
     }
-
-    /// Resolve dependencies of a package and return the correct installation order.
-    /// Returns Err if a dependency is missing and cannot be resolved, or if a dependency cycle is detected.
-    pub fn resolve_dependencies(&self, root_pkgname: &str) -> Result<Vec<String>, String> {
-        let mut resolved = Vec::new();
-        let mut visiting = Vec::new();
-        let mut visited = Vec::new();
-
-        self.dfs_resolve(
-            &root_pkgname.to_string(),
-            &mut visiting,
-            &mut visited,
-            &mut resolved,
-        )?;
-
-        Ok(resolved)
-    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -545,13 +528,6 @@ sha256sums=('SKIP')
 
         assert!(pos_glibc < pos_pacman);
         assert!(pos_pacman < pos_yay);
-    }
-}
-}
-
-impl Default for AurClient {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

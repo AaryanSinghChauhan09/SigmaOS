@@ -1,12 +1,10 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation, BSD-style Socket Options, and network communication
 
 #[cfg(not(target_os = "none"))]
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::boxed::Box;
 #[cfg(not(target_os = "none"))]

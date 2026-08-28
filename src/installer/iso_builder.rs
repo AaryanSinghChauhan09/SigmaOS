@@ -1,10 +1,9 @@
+extern crate alloc;
 // SigmaOS Bootable ISO Builder
 // Finalizes the bootable ISO implementation with advanced features
 // Integrates with existing installer components
 
-#![no_std]
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;

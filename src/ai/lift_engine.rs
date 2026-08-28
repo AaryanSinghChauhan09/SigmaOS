@@ -1,9 +1,9 @@
+extern crate alloc;
 // SigmaOS AI-Native Structured Document Extraction Engine (SigmaLift)
 // Fully absorbs and implements all design philosophies of datalab-to/lift:
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
 // near-miss distraction filtering, citations/verification tracking, and high-performance single-pass execution.
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 
 /// Simple schema types supported by the extractor

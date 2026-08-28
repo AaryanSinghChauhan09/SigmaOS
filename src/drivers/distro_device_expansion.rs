@@ -15,8 +15,8 @@
 
 #![allow(clippy::all, warnings)]
 
-extern crate alloc;
 
+extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use alloc::boxed::Box;
 use alloc::string::String;

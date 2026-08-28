@@ -1,3 +1,4 @@
+extern crate alloc;
 // Distro-Crushing Benchmark Specification Engine for SigmaOS
 // Zero-dependency, safe Rust, no_std compatible architecture
 

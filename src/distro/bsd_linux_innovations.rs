@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS BSD & Linux Innovations Subsystem
 // Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
@@ -6,7 +7,6 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;

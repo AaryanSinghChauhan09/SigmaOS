@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS Crypto Subsystem
 /// Absorbs Linux crypto/ API: symmetric ciphers, hash functions, AEAD, RNG

@@ -1,10 +1,9 @@
 //! Advanced Power Management inspired by TLP, PowerTop, and Thermald
 //! Dynamic CPU/GPU frequency scaling, battery health calibration,
 //! thermal throttling, and process energy impact scoring.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

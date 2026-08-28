@@ -1,9 +1,7 @@
 // S-SIGNAL DISPATCHER (Capability-Gated Async Signals)
 // Asynchronous signal handling with capability-based access control
 
-#![no_std]
 
-extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignSignal {

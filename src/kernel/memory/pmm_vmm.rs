@@ -1,11 +1,10 @@
+extern crate alloc;
 // SigmaOS Physical + Virtual Memory Manager
 // Buddy allocator + Slab allocator + Paging
 // Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc
 // Formally verified with Kani
 
-#![no_std]
 
-extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 use core::ptr::null_mut;

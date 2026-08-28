@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Sovereign Multi-Distro Package Management Engine
 // Parity abstractions for APT, DNF, Pacman, Portage, and XBPS package systems.
 
-extern crate alloc;
 
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::format;

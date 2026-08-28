@@ -1,7 +1,5 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
+
 use alloc::boxed::Box;
 
 /// OOP-based Encryption Service for SigmaOS

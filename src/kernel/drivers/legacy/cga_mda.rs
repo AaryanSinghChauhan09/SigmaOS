@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };

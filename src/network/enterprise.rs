@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 use core::mem;
 /// Advanced Enterprise Networking Suite for SigmaOS

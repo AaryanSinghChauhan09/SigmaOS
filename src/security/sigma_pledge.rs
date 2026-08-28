@@ -118,7 +118,6 @@ macro_rules! sigma_pledge {
     };
 }
 
-extern crate alloc;
 
 /// Syscall filter that checks pledges
 pub struct SyscallFilter {

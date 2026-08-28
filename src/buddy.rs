@@ -14,7 +14,6 @@
 //! - FreeBSD `vm_phys_alloc_pages`
 //! - NetBSD `uvm_pglistalloc`
 
-#![no_std]
 
 use core::sync::atomic::{AtomicU64, Ordering};
 

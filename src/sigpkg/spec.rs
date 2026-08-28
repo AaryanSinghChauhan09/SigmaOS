@@ -1,9 +1,9 @@
+extern crate alloc;
 
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-extern crate alloc;
 use alloc::boxed::Box;
 
 use core::mem;

@@ -1,9 +1,8 @@
+extern crate alloc;
 // Btrfs-Inspired Advanced Filesystem Features
 // Combines Btrfs innovations: subvolumes, copy-on-write, RAID levels, compression
 
-#![no_std]
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

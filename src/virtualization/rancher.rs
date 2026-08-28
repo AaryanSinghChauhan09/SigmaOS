@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Daemonless Container & Micro-VM Orchestration Subsystem (S-RANCHER)
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
 // by executing daemonless OCI containers directly on microkernel capabilities.

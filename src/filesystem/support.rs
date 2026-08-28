@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS

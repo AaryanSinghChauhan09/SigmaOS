@@ -1,9 +1,9 @@
+extern crate alloc;
 // Burst-Oriented Response Enhancer (BORE) Scheduler for SigmaOS
 // Inspired by CachyOS BORE, Linux EEVDF/CFS, and FreeBSD ULE schedulers.
 // Implements starvation-avoidance (aging), nice-value weighting, sliding window burst score decay,
 // FreeBSD ULE interactivity ranking, CachyOS interactive wakeup boost, and Real-Time priority lanes.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

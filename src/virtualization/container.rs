@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use crate::klib::collections::HashMap;

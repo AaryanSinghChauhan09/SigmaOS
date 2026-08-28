@@ -770,8 +770,8 @@ impl SigmaDistroEngine {
     }
 }
 
-// Bring alloc into scope for format! and vec!
 extern crate alloc;
+// Bring alloc into scope for format! and vec!
 use alloc::format as alloc_format;
 
 #[cfg(test)]

@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Void Linux Parity Subsystem
 // Independent, zero-dependency implementations of Void Linux core tooling
 // Implements xbps package manager, runit init system, and musl-based toolchain
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

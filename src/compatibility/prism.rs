@@ -1,7 +1,7 @@
+extern crate alloc;
 // SigmaOS Kernel Personality Prism & Syscall Ledgerbook
 // Refracts workloads into different kernel behaviors and maintains historical syscall fallbacks
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 

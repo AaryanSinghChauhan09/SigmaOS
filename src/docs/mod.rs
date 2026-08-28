@@ -2,10 +2,9 @@
 //!
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;

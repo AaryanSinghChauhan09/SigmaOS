@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Windows/Linux/BSD-Inspired Advanced Object Manager (Obp)
 // Implements advanced Object Manager namespaces, symbolic link translation,
 // driver entry contexts, dynamic unloading, and Non-Paged Pool memory tracking.
 
-extern crate alloc;
 use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

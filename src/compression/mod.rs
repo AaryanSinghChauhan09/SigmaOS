@@ -8,11 +8,11 @@
 
 pub mod archive;
 
+extern crate alloc;
 pub use archive::{
     ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
 };
 
-extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::boxed::Box;

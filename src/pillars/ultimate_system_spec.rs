@@ -1,3 +1,4 @@
+extern crate alloc;
 // Sovereign SigmaOS Ultimate System Specification & Development Engine
 // Zero-dependency, safe Rust, no_std compatible architecture
 

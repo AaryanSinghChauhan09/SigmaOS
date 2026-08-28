@@ -1,10 +1,9 @@
 //! Wireless & Bluetooth Management inspired by BlueZ and NetworkManager
 //! WPA3 Wi-Fi connection profiles, DNS resolution, Bluetooth LE GATT services,
 //! and AP hotspot configuration.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

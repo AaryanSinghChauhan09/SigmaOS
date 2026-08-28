@@ -1,9 +1,9 @@
+extern crate alloc;
 // OOP-based Log Rotation for SigmaOS
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::boxed::Box;

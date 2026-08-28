@@ -1,7 +1,5 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
+
 
 /// OOP-based DMA for SigmaOS
 /// Based on Ideas-999-Structured: Embedded & Firmware Item 1146

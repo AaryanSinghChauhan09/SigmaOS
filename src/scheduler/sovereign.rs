@@ -1,8 +1,6 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 

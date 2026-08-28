@@ -1,7 +1,7 @@
+extern crate alloc;
 // Model-View-Intent (MVI) Reactive State Architecture for SigmaOS
 // Implements a generic Store<S, A> with Reducers and Subscribers under `#![no_std]`.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

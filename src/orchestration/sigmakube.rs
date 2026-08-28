@@ -1,9 +1,8 @@
 //! Cloud-Native Features (Kubernetes/OpenShift Inspiration)
 //! Container orchestration, service mesh, and cloud integration
-
-#![no_std]
-
 extern crate alloc;
+
+
 
 use alloc::string::String;
 use alloc::vec::Vec;

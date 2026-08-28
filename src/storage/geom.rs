@@ -1,9 +1,9 @@
+extern crate alloc;
 // SigmaOS FreeBSD-Inspired GEOM Storage Architecture
 // Provides a modular, layered storage transformation framework:
 // Partitioning (g_part), Mirroring (g_mirror), Striping (g_stripe),
 // GELI Encryption (g_eli), and Linear Concatenation (g_concat).
 
-extern crate alloc;
 
 use alloc::borrow::ToOwned;
 use alloc::format;

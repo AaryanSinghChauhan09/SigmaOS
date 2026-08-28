@@ -1,3 +1,4 @@
+extern crate alloc;
 pub mod huge_pages;
 pub mod numa_aware;
 pub mod oom_killer;

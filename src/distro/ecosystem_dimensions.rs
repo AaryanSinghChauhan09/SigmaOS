@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Ecosystem & Multi-Tiered Distribution Specification Suite
 // Implements the 12 New Comprehensive Ecosystem Dimensions:
 // 1. Distribution & Release Ecosystem
@@ -13,7 +14,6 @@
 // 11. Academic & Research Infrastructure
 // 12. Democratic Community Governance
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;

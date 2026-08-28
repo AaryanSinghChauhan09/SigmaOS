@@ -1,6 +1,5 @@
-#![no_std]
-
 extern crate alloc;
+
 
 #[cfg(not(feature = "standalone_test"))]
 use alloc::{

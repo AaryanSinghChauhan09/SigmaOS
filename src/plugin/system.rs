@@ -1,7 +1,7 @@
+extern crate alloc;
 // OOP-based Plugin System for SigmaOS
 // Implements plugin management using OOP principles with traits and structs.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::String;

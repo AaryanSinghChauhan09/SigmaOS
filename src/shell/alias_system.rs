@@ -4,9 +4,9 @@
 //! 1. **User-named aliases** (custom commands registered and manipulated by users)
 //! 2. **Fixed-named aliases** (standards-based package manager and utility mappings from Linux & BSD)
 //! 3. **Automatic aliases** (typo auto-correction and zsh-style suffix-based file extensions)
-
-
 extern crate alloc;
+
+
 
 use alloc::collections::BTreeMap;
 use alloc::format;

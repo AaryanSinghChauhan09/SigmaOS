@@ -1,9 +1,9 @@
+extern crate alloc;
 // SigmaOS Sovereign Process Management & Advanced IPC Engine
 // High-performance process execution, non-blocking stream I/O,
 // background process management, timeout waiting, process cancellation/termination,
 // and zero-copy IPC channels inspired by Linux and BSD distributions.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;

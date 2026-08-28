@@ -16,12 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
-extern crate alloc;
 use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
-extern crate alloc;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

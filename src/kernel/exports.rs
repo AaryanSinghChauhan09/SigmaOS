@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS Advanced Kernel Exports & Subsystems (Linux & BSD Inspired)
 // Implements Linux-style EXPORT_SYMBOL dynamic registries,
 // BSD-style SYSINIT boots, and Kernel Linker Daemon (KLD) modules.
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

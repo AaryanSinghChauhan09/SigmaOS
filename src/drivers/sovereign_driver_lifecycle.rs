@@ -1,9 +1,9 @@
+extern crate alloc;
 // SigmaOS Sovereign Universal Driver Lifecycle & Hardware Bring-Up Engine
 // Object-Oriented Driver Lifecycle State Machine (Factory, Observer, Adapter, Singleton),
 // 30-year ancient-to-modern hardware bring-up tier (BIOS shims, ISA DMA, ATA/IDE, PCIe Gen5/CXL 3.0, NVMe 2.0),
 // and lockless SPSC DMA ring queues under #![no_std] constraints.
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

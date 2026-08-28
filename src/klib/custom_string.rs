@@ -1,6 +1,7 @@
+extern crate alloc;
+use core::fmt;
 // Custom String and Allocator types for klib
 
-use core::fmt;
 
 pub mod custom_allocator {
     pub struct CustomAllocator;
@@ -37,10 +38,8 @@ pub mod uuid {
     }
 }
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::fmt;
 
 #[derive(Clone)]
 pub struct SigmaString {

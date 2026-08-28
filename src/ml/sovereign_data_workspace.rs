@@ -6,8 +6,8 @@
 //! 3. SovereignQuery: Data Analyst Console (static zero-allocation columnar database with SIMD data-walks over Merkle trees)
 //! 4. SovereignGuard: Data Security Guard (real-time DLP inspecting GDPR/HIPAA/PCI-DSS signature tables to compliance ledger)
 //! 5. SovereignCatalog: Data Manager System (unified memory-mapped Merkle tables across local SigmaFS and remote SigmaCloud)
-
 extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;

@@ -1,9 +1,9 @@
+extern crate alloc;
 // Sovereign Non-Linear Video Editor & Frame Compositor Engine (SigmaCut)
 // Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
 // Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.
 
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

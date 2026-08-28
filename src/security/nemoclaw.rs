@@ -1,5 +1,4 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 use core::mem;
 /// NVIDIA NemoClaw-inspired AI Agent Security Stack for SigmaOS

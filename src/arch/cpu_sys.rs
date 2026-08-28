@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Processor Initialisation, Memory Layout, and Fast System Call Engine
 // Fully absorbs and implements design philosophies of Linux (SMEP/SMAP, LSTAR) and BSD distros (Guard pages, strict GDT/IDT):
 // x86-64 GDT segment structures, IDT gates, hardened CR0/CR4 control registers, virtual memory maps, and fast SYSCALL/SYSRET.

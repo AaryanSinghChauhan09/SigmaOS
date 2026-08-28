@@ -19,8 +19,8 @@
 // SigmaOS Ancient Device Drivers
 // Implements OOP-based lightweight legacy drivers executing sandboxed UDFs
 
-extern crate alloc;
 
+extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use alloc::boxed::Box;
 use alloc::vec::Vec;

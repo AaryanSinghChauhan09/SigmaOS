@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

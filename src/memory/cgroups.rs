@@ -1,6 +1,6 @@
+extern crate alloc;
 // SigmaOS Linux-inspired Memory Control Groups (memcg) and OOM Killer Subsystem
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::String;

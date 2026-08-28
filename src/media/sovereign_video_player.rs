@@ -1,9 +1,8 @@
 //! Sovereign VLC and MPV Equivalent Video Player
 //! Natively optimized for SigmaOS content-addressed and virtual memory architectures.
-
-#![no_std]
-
 extern crate alloc;
+
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

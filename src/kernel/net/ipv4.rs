@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS IPv4 Network Stack
 /// ARP, IPv4 routing, ICMP echo, raw packet I/O
@@ -23,8 +24,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Types ────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 //! Pure Declarative Build System (Nix & Bazel Inspired) with Curated Ratings/Reviews Subsystem
 //! Implements deterministic build derivations, hermetic dependency graphs, and package reputation validation.
-
 extern crate alloc;
+
 use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

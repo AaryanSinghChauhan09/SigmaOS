@@ -1,9 +1,9 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-extern crate alloc;
 use crate::klib::{HashMap, SigmaString, Vec as KVec};
 use crate::klib;
 use alloc::format;
@@ -350,7 +350,7 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = crate::klib::vec::Vec::new();
+        let mut hooks = alloc::vec::Vec::new();
         hooks.push(crate::klib::string::SigmaString::from("base"));
         hooks.push(crate::klib::string::SigmaString::from("udev"));
         hooks.push(crate::klib::string::SigmaString::from("autodetect"));
@@ -378,7 +378,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        crate::klib::vec::Vec::from_iter(image_header)
+        alloc::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -532,7 +532,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, alloc::vec::Vec::from_iter(archive_content)))
     }
 }
 

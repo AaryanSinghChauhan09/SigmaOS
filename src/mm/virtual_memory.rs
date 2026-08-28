@@ -1,3 +1,4 @@
+extern crate alloc;
 // OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
 // Implements virtual memory management using OOP principles with traits and structs
 // No dependency on external memory management libraries
@@ -5,7 +6,6 @@
 // Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
 // and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
-extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::ptr::NonNull;

@@ -1,8 +1,8 @@
 //! ARM Thumb BX (Branch and Exchange) Instruction Decoder & Bytecode Data Word Formatter Subsystem
 //! Implements ARM Thumb Mode BX/BLX instruction decoding, standardized data word encodings (Byte, Word, Dword, Qword, Oword),
 //! and bytecode encryption primitives inspired by Linux & BSD kernel disassemblers/executors.
-
 extern crate alloc;
+
 use alloc::vec::Vec;
 
 // ==========================================

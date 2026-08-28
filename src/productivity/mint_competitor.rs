@@ -1,8 +1,8 @@
+extern crate alloc;
 // SigmaOS: Mint Competitor Suite
 // Fully-featured, zero-dependency, safe Rust implementation of standard-defeating
 // desktop features matching and crushing Linux Mint (Cinnamon, Software/Update/Driver Managers)
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;

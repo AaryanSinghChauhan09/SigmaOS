@@ -4,8 +4,8 @@
 
 #![cfg_attr(not(test), no_std)]
 
-extern crate alloc;
 
+extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;

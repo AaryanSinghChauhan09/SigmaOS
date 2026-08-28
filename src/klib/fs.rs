@@ -1,7 +1,7 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
-
 extern crate alloc;
+
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::ffi::c_char;

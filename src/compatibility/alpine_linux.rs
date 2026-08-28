@@ -1,7 +1,7 @@
 //! Alpine Linux & BusyBox-inspired Minimal Footprint Subsystems
 //! Implements APK database parser, busybox syslog circular logger, and multicall binary router.
-
 extern crate alloc;
+
 use alloc::collections::BTreeMap as HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

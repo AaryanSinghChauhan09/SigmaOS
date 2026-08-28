@@ -12,7 +12,6 @@
 //! - OpenBSD source: sys/kern/kern_pledge.c
 //! - Fuchsia job policy: fuchsia.dev/fuchsia-src/concepts/process/jobs
 
-#![no_std]
 
 use core::sync::atomic::{AtomicU64, Ordering};
 

@@ -1,10 +1,9 @@
+extern crate alloc;
 // ==========================================
 // Basic Driver Framework Implementation
 // ==========================================
 
-#![no_std]
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;

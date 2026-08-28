@@ -1,8 +1,8 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman Compatibility Engine
 // Inspired by Arch Linux package manager, ABS (Arch Build System), and AUR (Arch User Repository)
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

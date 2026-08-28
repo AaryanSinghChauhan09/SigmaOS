@@ -1,7 +1,7 @@
+extern crate alloc;
 // Zero-Copy AI Tensor Memory Manager for SigmaOS
 // Inspired by Linux TTM/GEM graphics translation memory and FreeBSD UMA / contigmalloc.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

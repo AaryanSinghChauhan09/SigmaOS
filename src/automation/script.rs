@@ -1,5 +1,5 @@
-extern crate alloc;
 
+extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]

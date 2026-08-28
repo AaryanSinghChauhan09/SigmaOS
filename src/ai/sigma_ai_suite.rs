@@ -1,9 +1,9 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS AI & Automation Suite - SigmaAI Agent Roadmap Implementation
 // Phases 1-5: Natural Language Translator, Workflow Automation, Adaptive CLI Suggestions,
 // Error Explanation Layer, and SigmaAI Assistant (Indic Languages & Voice Support).
 
-extern crate alloc;
 
 use alloc::format;
 use alloc::string::{String, ToString};

@@ -1,7 +1,7 @@
+extern crate alloc;
 /// Custom CPU Register Set and Thread Context Subsystems for SigmaOS
 /// Implements standard x86_64 Register Set context, FPU/SSE/AVX XSAVE Area state transitions,
 /// Control and Debug Registers (DR0-DR7) breakpoints, and context-switching governors.
-extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 

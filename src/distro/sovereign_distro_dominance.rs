@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Sovereign Distro Dominance Subsystem
 // Superiority capabilities uniting and outperforming Linux & BSD distributions:
 // 1. NixGuixZeroCopyStore: Functional transactional store with zero-copy memory-mapped package slices.
@@ -5,7 +6,6 @@
 // 3. OpenBsdHardenedCapsicumPledge: Unified FreeBSD Capsicum capability rights and OpenBSD pledge/unveil zero-overhead syscall sentinel.
 // 4. ZfsBtrfsHybridSelfHealingCoW: Merkle tree RAID self-healing CoW filesystem engine with instant Btrfs-style subvolumes.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;

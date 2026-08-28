@@ -1,8 +1,8 @@
+extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
 /// Implements a full Merkle-tree DAG structure for content addressing.
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::BTreeMap;

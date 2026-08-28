@@ -1,3 +1,4 @@
+extern crate alloc;
 // NVMe Solid-State Drive Storage Driver
 // Conforms to SigmaOS UnifiedPeripheral interface
 
@@ -5,7 +6,6 @@ use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState}
 use crate::security::CapabilityToken;
 use core::ptr::{read_volatile, write_volatile};
 
-extern crate alloc;
 use alloc::boxed::Box;
 
 // Register Offsets (NVMe Controller Registers)

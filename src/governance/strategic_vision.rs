@@ -1,9 +1,8 @@
+extern crate alloc;
 // SigmaOS Strategic Vision Roadmap & OKR Engine
 // Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
 
-#![no_std]
 
-extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
 use alloc::{

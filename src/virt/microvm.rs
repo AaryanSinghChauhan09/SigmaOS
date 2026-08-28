@@ -1,3 +1,4 @@
+extern crate alloc;
 use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
 /// Implements microVM sandboxing using OOP principles with traits and structs
