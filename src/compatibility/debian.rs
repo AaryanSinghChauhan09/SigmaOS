@@ -2,7 +2,6 @@
 //! Implements APT repositories, SysVinit runlevels, debian alternatives, and debootstrap logic.
 //! Zero external dependencies.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

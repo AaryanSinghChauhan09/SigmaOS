@@ -28,12 +28,6 @@ mod unveil;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 
@@ -46,40 +40,46 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
+#[path = "../src/distro/wiki_ideas_implementation.rs"]
+mod wiki_ideas_implementation;
+
+#[path = "../src/process/advanced_process_control.rs"]
+mod advanced_process_control;
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
 #[path = "../src/unimplemented_features.rs"]
 mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
+
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
+
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
+
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use unimplemented_features::{
-    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
-    NixOsDeclarativeConfigEngine,
-};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unimplemented_features::{
-    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
-};
 use unveil::{UnveilManager, UnveilPermission};
-use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -148,10 +148,9 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
+        KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
+        VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -240,14 +239,17 @@ fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitState,
+        SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
     };
+
     // 1. NixOS Declarative System State
     let mut nix = NixDeclarativeSystemState::new();
     let config = "[packages]\n- curl\n[services]\n- networkd";
     let gen = nix.parse_and_apply_config(config, 100).unwrap();
     assert_eq!(gen.id, 2);
     assert_eq!(nix.rollback().unwrap().id, 1);
+
     // 2. Arch Plaintext Recipe Sandbox Compiler
     let recipe_text = "pkgname=curl\npkgver=8.2.1\ndepends=(zlib openssl)";
     let recipe = ArchRecipeSandboxCompiler::parse_recipe(recipe_text).unwrap();
@@ -255,67 +257,71 @@ fn test_wiki_distro_innovations_inspection() {
     let compiler = ArchRecipeSandboxCompiler::new();
     let artifact = compiler.compile_in_sandbox(&recipe, "/tmp/sandbox").unwrap();
     assert!(!artifact.is_empty());
+
     // 3. openSUSE Snapper Pre/Post Transaction Guard
     let mut snapper = SnapperTransactionGuard::new();
     let pre_id = snapper.create_pre_snapshot("Pre update", 1000);
-    let post_id = snapper.create_post_snapshot(pre_id, "Post update", 1005).unwrap();
+    let _post_id = snapper.create_post_snapshot(pre_id, "Post update", 1005).unwrap();
     assert_eq!(snapper.snapshots.len(), 2);
+
     // 4. Zero-Copy Splice Pipeline
     let splice = SigmaZeroCopySpliceEngine::new();
     assert_eq!(splice.splice(1, 2, 4096).unwrap(), 4096);
+
     // 5. eBPF Syscall Policy Verifier
     let mut verifier = EbpfSyscallPolicyVerifier::new();
     verifier.block_syscall(59); // execve
     assert_eq!(verifier.evaluate_syscall(59), PolicyAction::Deny);
+
     // 6. FreeBSD Capsicum Descriptor Delegation
     let cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(3, CAP_READ | CAP_SEEK);
     assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
+
     // 7. Systemd Parity Engine
-        SystemdUnit, SystemdUnitType, SystemdUnitActiveState, SovereignSystemdParityEngine,
     let mut systemd = SovereignSystemdParityEngine::new();
-    systemd.register_unit(SystemdUnit {
-        name: "test.service".to_string(),
-        unit_type: SystemdUnitType::Service,
-        active_state: SystemdUnitActiveState::Inactive,
-        description: "Test".to_string(),
-        exec_start: vec!["/bin/true".to_string()],
-        dependencies: vec![],
-        memory_limit_bytes: None,
-        cpu_quota_pct: None,
-    });
-    assert_eq!(systemd.start_unit("test.service").unwrap(), SystemdUnitActiveState::Active);
+    systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
+    assert!(systemd.start_unit("test.service").is_ok());
+    assert_eq!(systemd.units.get("test.service").unwrap().state, SystemdUnitState::Active);
+
     // 8. Real-Time Hybrid Scheduler
-        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
-    let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
-    assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
+    let sched = SovereignHybridSchedulerInnovations::new();
+    assert!(sched.verify_rt_lane_preemption_latency());
 }
+
+#[test]
 fn test_advanced_process_control_inspection() {
     use advanced_process_control::{
         ProcessVmReadWriteEngine, JobControlLifecycleEngine, ProcessWaiterAndRusageCollector,
         ProcessCancellationAndTerminationManager, AdvancedIpcHub, JobState, CancellationType, BsdRusage,
+    };
+
     // 1. Process VM read/write
     let mut vm = ProcessVmReadWriteEngine::new();
     vm.register_process_memory(42, 0x1000, vec![1, 2, 3, 4]);
     assert_eq!(vm.process_vm_readv(42, 0x1000, 2).unwrap(), vec![1, 2]);
+
     // 2. Job control & daemonize
     let mut job = JobControlLifecycleEngine::new();
     job.spawn_job(42, 42, 42, true, "test_cmd");
     job.daemonize(42).unwrap();
     assert_eq!(job.jobs.get(&42).unwrap().state, JobState::Background);
+
     // 3. Process waiter & rusage
     let mut waiter = ProcessWaiterAndRusageCollector::new();
     waiter.record_rusage(42, BsdRusage { ru_utime_ms: 50, ..Default::default() });
     assert_eq!(waiter.get_rusage(42).unwrap().ru_utime_ms, 50);
+
     // 4. Cancellation & orphan reparenting
     let mut cancel = ProcessCancellationAndTerminationManager::new();
     cancel.register_process(10, 5, CancellationType::Deferred);
     cancel.reparent_orphans(5);
     assert_eq!(cancel.process_parents.get(&10), Some(&1));
+
     // 5. Advanced IPC Hub
     let mut ipc = AdvancedIpcHub::new();
     let efd = ipc.eventfd_create(10, false);
     assert_eq!(ipc.eventfd_read(efd).unwrap(), 10);
+}
 
 #[test]
 fn test_zenith_desktop_applets_and_themes_inspection() {
@@ -344,19 +350,6 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     use linux_bsd_innovations::{
@@ -365,6 +358,7 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
         InteractiveHybridScheduler, HybridTask,
         CowStorageEngine, MemoryCompactionSuperpagesAllocator,
     };
+
     // 1. Fast packet ring engine
     let mut packet_engine = KernelFastPacketEngine::new(10);
     packet_engine.enqueue_rx(FastPacketFrame {
@@ -382,6 +376,7 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     });
     assert_eq!(processed, 1);
     assert_eq!(packet_engine.pass_count, 1);
+
     // 2. Access Controller (Landlock & Pledge)
     let mut access_ctrl = KernelAccessController::new();
     access_ctrl.add_path_rule("/usr/bin", vec![LandlockAccessRight::Read, LandlockAccessRight::Execute]);
@@ -389,6 +384,7 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     assert!(access_ctrl.check_path_access("/usr/bin/cargo", LandlockAccessRight::Execute).is_ok());
     assert!(access_ctrl.check_pledge(PLEDGE_STDIO).is_ok());
     assert!(access_ctrl.check_pledge(PLEDGE_EXEC).is_err());
+
     // 3. Interactive Hybrid Scheduler
     let mut hybrid_sched = InteractiveHybridScheduler::new();
     let mut t1 = HybridTask::new(1, 10);
@@ -397,18 +393,22 @@ fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
     hybrid_sched.add_task(t1);
     let sched_pid = hybrid_sched.schedule_next().unwrap();
     assert_eq!(sched_pid, 1);
+
     // 4. CoW Storage Engine
     let mut cow = CowStorageEngine::new();
     let blk_id = cow.write_block(b"Kernel Data Block");
     assert!(cow.verify_block_integrity(blk_id).unwrap());
     let snap_id = cow.create_pfs_snapshot("PFS_SNAP_01", blk_id);
     assert_eq!(snap_id, 1);
+
     // 5. Memory Compaction Superpages Allocator
     let mut mem_alloc = MemoryCompactionSuperpagesAllocator::new(1024);
     assert_eq!(mem_alloc.compact_free_frames(), 1024);
     let pfn = mem_alloc.allocate_2mb_superpage().unwrap();
     assert_eq!(pfn, 0);
 }
+
+#[test]
 fn test_alpine_apk_package_index_inspection() {
     use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry};
     let mut apk_index = AlpineApkPackageIndex::new();
@@ -420,9 +420,13 @@ fn test_alpine_apk_package_index_inspection() {
         arch: "x86_64".to_string(),
         sha256_hash: [0xAB; 32],
         dependencies: vec!["musl".to_string()],
+    });
     let pkg = apk_index.find_package("openssl").unwrap();
     assert_eq!(pkg.version, "3.1.0");
     assert_eq!(apk_index.resolve_dependencies("openssl"), vec!["musl"]);
+}
+
+#[test]
 fn test_dragonfly_hammer2_snapshot_inspection() {
     use unimplemented_features::DragonFlyHammer2FsSnapshot;
     let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
@@ -431,6 +435,9 @@ fn test_dragonfly_hammer2_snapshot_inspection() {
     assert!(hammer2.replicate_snapshot_to_node(snap_id, 1).is_ok());
     let rolled_back_merkle = hammer2.rollback_pfs("ROOT_PFS", snap_id).unwrap();
     assert_eq!(rolled_back_merkle, 0x1234567887654321);
+}
+
+#[test]
 fn test_nixos_declarative_config_engine_inspection() {
     use unimplemented_features::NixOsDeclarativeConfigEngine;
     let mut nix_engine = NixOsDeclarativeConfigEngine::new();
@@ -442,19 +449,25 @@ fn test_nixos_declarative_config_engine_inspection() {
     let rolled_back = nix_engine.rollback_generation().unwrap();
     assert_eq!(rolled_back.gen_number, 1);
     assert_eq!(nix_engine.active_generation, 1);
+}
+
+#[test]
 fn test_linux_bsd_firmware_innovations_inspection() {
     use firmware::{
         EfiVariableStore, CpuMicrocodePatchEngine, MicrocodeVendor,
         FirmwareCapsuleUpdateManager, CapsuleUpdateStatus, SmbiosFirmwareParser,
         IommuFirmwareEngine, IommuArchitecture, EFI_GLOBAL_VARIABLE_GUID,
-    // 1. UEFI NVRAM Variable Management (Linux efivarfs & FreeBSD efivar(8))
+    };
+
+    // 1. UEFI NVRAM Variable Management
     let mut efivars = EfiVariableStore::new();
     assert!(efivars.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
     efivars.set_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID, 7, &[0x01]);
     assert_eq!(efivars.get_variable("FastBoot", EFI_GLOBAL_VARIABLE_GUID).unwrap().data, &[0x01]);
     let manifest = efivars.export_efivarfs_manifest();
     assert!(manifest.contains("BootOrder"));
-    // 2. CPU Microcode Patch Engine (Intel/AMD ucode & FreeBSD cpuctl(4))
+
+    // 2. CPU Microcode Patch Engine
     let mut ucode_engine = CpuMicrocodePatchEngine::new(2);
     let mut raw_intel = vec![0u8; 48];
     raw_intel[0..4].copy_from_slice(&1u32.to_le_bytes());
@@ -464,6 +477,7 @@ fn test_linux_bsd_firmware_innovations_inspection() {
     assert_eq!(intel_hdr.vendor, MicrocodeVendor::Intel);
     assert!(ucode_engine.apply_microcode_update(0, intel_hdr));
     assert_eq!(ucode_engine.get_core_patch_level(0), Some(0x000000B0));
+
     // 3. FWUPD / UEFI ESRT Capsule Manager
     let mut capsule_mgr = FirmwareCapsuleUpdateManager::new();
     let mut capsule_payload = vec![0u8; 32];
@@ -474,10 +488,12 @@ fn test_linux_bsd_firmware_innovations_inspection() {
     assert_eq!(capsule_mgr.current_status, CapsuleUpdateStatus::Staged);
     assert!(capsule_mgr.process_reboot_capsules());
     assert_eq!(capsule_mgr.current_status, CapsuleUpdateStatus::UpdateSuccess);
+
     // 4. SMBIOS / DMI Firmware Parser
     let mut smbios = SmbiosFirmwareParser::new();
     assert!(smbios.parse_smbios_entry_point(b"_SM_123456789012"));
     assert_eq!(smbios.bios_info.unwrap().vendor, "SigmaOS Sovereign Core UEFI");
+
     // 5. IOMMU ACPI DMAR / IVRS Controller
     let mut iommu = IommuFirmwareEngine::new();
     let mut dmar_header = vec![0u8; 40];
@@ -485,6 +501,9 @@ fn test_linux_bsd_firmware_innovations_inspection() {
     assert!(iommu.parse_acpi_dmar(&dmar_header));
     assert_eq!(iommu.architecture, IommuArchitecture::IntelVtD);
     assert!(iommu.is_preboot_dma_protected);
+}
+
+#[test]
 fn test_bgp_routing_table_manager_inspection() {
     use protocols::{BgpRoutingTableManager, BgpRoutePrefix};
     let mut bgp_mgr = BgpRoutingTableManager::new(65001, [10, 0, 0, 1], true);
@@ -497,11 +516,15 @@ fn test_bgp_routing_table_manager_inspection() {
         as_path: vec![65002],
         local_pref: 200,
         is_reflected: false,
+    };
     assert!(bgp_mgr.process_incoming_route(incoming, true));
     assert_eq!(bgp_mgr.routes.len(), 2);
     assert!(bgp_mgr.routes[1].is_reflected);
     let best = bgp_mgr.best_path_selection([192, 168, 1, 0], 24).unwrap();
     assert_eq!(best.local_pref, 200);
+}
+
+#[test]
 fn test_pam_authentication_policy_engine_inspection() {
     use hardening::{PamAuthenticationPolicyEngine, PamControlFlag, PamModuleType};
     let mut pam = PamAuthenticationPolicyEngine::new(true);
@@ -509,6 +532,9 @@ fn test_pam_authentication_policy_engine_inspection() {
     pam.add_rule(PamModuleType::Auth, PamControlFlag::Required, "pam_tpm2", true);
     assert!(pam.authenticate_pam_stack(PamModuleType::Auth, true).unwrap());
     assert!(pam.authenticate_pam_stack(PamModuleType::Auth, false).is_err());
+}
+
+#[test]
 fn test_gentoo_use_flag_engine_inspection() {
     use unimplemented_features::GentooUseFlagEngine;
     let mut gentoo = GentooUseFlagEngine::new();
@@ -520,12 +546,10 @@ fn test_gentoo_use_flag_engine_inspection() {
     assert!(!gentoo.is_flag_enabled("wayland"));
     gentoo.set_use_flag("wayland");
     assert!(gentoo.resolve_conflicts(("wayland", "x264")).is_err());
+}
+
+#[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    let mut portage = GentooUseFlagEngine::new();
-    portage.set_use_flag("+qt5");
-    portage.set_use_flag("-wayland");
-    assert!(portage.is_flag_enabled("qt5"));
-    assert!(!portage.is_flag_enabled("wayland"));
     use unimplemented_features::GentooPortageMaskEngine;
     let mut portage = GentooPortageMaskEngine::new("amd64");
     portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
@@ -535,14 +559,18 @@ fn test_gentoo_portage_mask_engine_inspection() {
     assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
     portage.add_hard_mask("app-admin/sudo");
     assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+
     use linux_bsd_parity::GentooPortageUseFlagsEngine;
-    let mut portage = GentooPortageUseFlagsEngine::new();
-    portage.set_global_use_flags(&["+ssl", "+x265"]);
-    portage.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
-    let resolved = portage.resolve_package_flags("media-video/ffmpeg").unwrap();
+    let mut portage_flags = GentooPortageUseFlagsEngine::new();
+    portage_flags.set_global_use_flags(&["+ssl", "+x265"]);
+    portage_flags.register_package("media-video/ffmpeg", &["ssl", "x265", "gtk"]);
+    let resolved = portage_flags.resolve_package_flags("media-video/ffmpeg").unwrap();
     assert_eq!(resolved.len(), 2);
     assert!(resolved.contains(&"ssl".to_string()));
     assert!(resolved.contains(&"x265".to_string()));
+}
+
+#[test]
 fn test_xbps_package_manager_inspection() {
     use linux_bsd_parity::{XbpsPackage, XbpsPackageManager};
     let mut xbps = XbpsPackageManager::new();
@@ -553,16 +581,24 @@ fn test_xbps_package_manager_inspection() {
         run_depends: vec![],
         sha256_hash: [0x11; 32],
         is_signed: true,
+    });
+    xbps.register_repository_package(XbpsPackage {
         name: "bash".to_string(),
         version: "5.2.21".to_string(),
+        revision: 1,
         run_depends: vec!["glibc".to_string()],
         sha256_hash: [0x22; 32],
+        is_signed: true,
+    });
     assert!(xbps.verify_signature("bash"));
     let deps = xbps.resolve_dependencies("bash").unwrap();
     assert_eq!(deps, vec!["glibc".to_string(), "bash".to_string()]);
     let count = xbps.install_package_atomic("bash").unwrap();
     assert_eq!(count, 2);
     assert_eq!(xbps.installed_packages.len(), 2);
+}
+
+#[test]
 fn test_linux_devlink_driver_inspection() {
     use linux_bsd_parity::{DevlinkPortFlavor, LinuxDevlinkDriver};
     let mut devlink = LinuxDevlinkDriver::new();
@@ -571,6 +607,9 @@ fn test_linux_devlink_driver_inspection() {
     assert_eq!(devlink.ports[0].split_count, 4);
     let flashed = devlink.flash_device_firmware("pci", "0000:01:00.0", b"FIRMWARE_IMAGE_BLOB").unwrap();
     assert_eq!(flashed, 19);
+}
+
+#[test]
 fn test_systemd_unit_dependency_engine_inspection() {
     use linux_bsd_parity::{SystemdUnit, SystemdUnitDependencyEngine};
     let mut engine = SystemdUnitDependencyEngine::new();
@@ -578,32 +617,49 @@ fn test_systemd_unit_dependency_engine_inspection() {
         name: "network.target".to_string(),
         requires: vec![],
         after: vec![],
+    });
+    engine.add_unit(SystemdUnit {
         name: "sshd.service".to_string(),
         requires: vec!["network.target".to_string()],
         after: vec!["network.target".to_string()],
+    });
     assert!(!engine.detect_circular_dependencies());
     let seq = engine.compute_startup_sequence().unwrap();
     assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
+}
+
+#[test]
 fn test_alpine_apk_v3_and_triggers_inspection() {
     use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, ApkTriggerScript};
     let mut apk = AlpineApkPackageIndex::new();
     apk.add_package(ApkPackageEntry {
         name: "musl".to_string(),
         version: "1.2.4".to_string(),
+        arch: "x86_64".to_string(),
         sha256_hash: [0x77; 32],
         dependencies: vec![],
+    });
     apk.add_trigger(ApkTriggerScript {
         trigger_path: "/lib/modules".to_string(),
         command: "depmod -a".to_string(),
+    });
     assert_eq!(apk.run_package_triggers(), 1);
     assert!(apk.verify_apk_v3_checksum("musl", &[0x77; 32]));
     assert!(apk.resolve_musl_abi_compat("1.2.4"));
+}
+
+#[test]
 fn test_dragonfly_hammer2_pfs_cluster_delta_inspection() {
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
     hammer2.register_cluster_node(5, "192.168.1.105");
     let snap_id = hammer2.create_pfs_snapshot("VAR_PFS", 0x12345678, 1700000000);
     let delta_hash = hammer2.sync_cluster_delta(snap_id, 5).unwrap();
     assert_ne!(delta_hash, 0);
     assert!(hammer2.verify_cluster_merkle_roots("VAR_PFS"));
+}
+
+#[test]
 fn test_sysctl_parameter_registry_inspection() {
     use sysctl::{SysctlRegistry, SysctlValue};
     let mut registry = SysctlRegistry::new();
@@ -611,6 +667,9 @@ fn test_sysctl_parameter_registry_inspection() {
     assert!(registry.set("vm.swappiness", SysctlValue::Int(15)).is_ok());
     assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(15)));
     assert!(registry.set("vm.swappiness", SysctlValue::Int(-1)).is_err());
+}
+
+#[test]
 fn test_pam_authentication_stack_inspection() {
     use root_improvement::{PamEngine, PamGroup, PamRule, PamControlFlag, PamUnixModule, PamResult, SudoDoasElevator};
     let mut engine = PamEngine::new();
@@ -619,12 +678,16 @@ fn test_pam_authentication_stack_inspection() {
     engine.add_rule(PamGroup::Auth, PamRule {
         control_flag: PamControlFlag::Required,
         module: unix_mod,
+    });
     assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "hash_secret"), PamResult::Success);
     assert_eq!(engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"), PamResult::AuthError);
     let mut elevator = SudoDoasElevator::new();
     elevator.password_database.push(("admin".to_string(), "pass123".to_string()));
     assert_eq!(elevator.elevate_via_doas("admin", "pass123", 1000).unwrap(), 0);
     assert!(elevator.verify_active_sudo_session(0, 2000));
+}
+
+#[test]
 fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     use abi_extended::{Arm64AapcsFrame, Riscv64AbiFrame, SystemVAbiFrame};
     use distro_bridge::{LinuxBsdAbiBridge, BinaryAbiFormat};
@@ -638,10 +701,4 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
-
-    portage.set_global_use_flags(&["+ssl", "-gtk"]);
-    portage.register_package("curl", &["ssl", "gtk"]);
-    let flags = portage.resolve_package_flags("curl").unwrap();
-    assert!(flags.contains(&"ssl".to_string()));
-    assert!(!flags.contains(&"gtk".to_string()));
 }
