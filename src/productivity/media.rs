@@ -327,4 +327,3 @@ mod tests {
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();

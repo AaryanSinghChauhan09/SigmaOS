@@ -3,6 +3,7 @@
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
 // near-miss distraction filtering, citations/verification tracking, and high-performance single-pass execution.
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 
 /// Simple schema types supported by the extractor

@@ -1,0 +1,18 @@
+name: Sovereign Distro Pages & Wiki Sync
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  pages-wiki-sync:
+    name: GitHub Pages & Wiki Sync Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify Wiki Sync Script
+        run: |
+          chmod +x ./scripts/sync_wiki.sh
+          ./scripts/sync_wiki.sh --check
