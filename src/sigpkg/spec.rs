@@ -638,10 +638,39 @@ pub struct XbpsPackageAdapter;
 pub struct CachyosPackageAdapter;
 
 pub trait UniversalPackage {}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum UniversalPackageType {
     Apt,
     Rpm,
     Pacman,
+    Air,
+    Bottle,
+    Ipa,
+    Ports,
+    Pkg,
+    Aab,
+    Apk,
+    Hap,
+    Pisi,
+    Pup,
+    Pet,
+    SuperDeb,
+    Lzm,
+    TarArchive,
+    NixPkg,
+    PortagePkg,
+    App,
+    Flatpak,
+    Snap,
+    AppImage,
+    Ebuild,
+    Nix,
+    Xbps,
+    Txz,
+    Eopkg,
+    Zypper,
+    Guix,
+    Sigma,
 }
 pub struct UserDefinedPackageHook;
 
