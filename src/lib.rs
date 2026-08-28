@@ -278,7 +278,9 @@ pub use tools::{
     SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
     SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
     SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
-    SovereignIsWebsiteDown,
+    SovereignIsWebsiteDown, SovereignSudo, ProcessTaskMetrics, SovereignTopHtop, FilesystemSpaceInfo,
+    SovereignDfDu, KernelDmesgEntry, SovereignDevDmesg, SovereignGccToolchain,
+    SovereignInitramfsSystemd,
 };
 
 pub mod open_source_obsoletion;

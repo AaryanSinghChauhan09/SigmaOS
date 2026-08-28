@@ -59,6 +59,9 @@ mod unified;
 #[path = "../src/filesystem/sovereign_link_engine.rs"]
 mod sovereign_link_engine;
 
+#[path = "../src/tools/sovereign_commands.rs"]
+mod sovereign_commands;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -355,7 +358,36 @@ fn test_wiki_distro_innovations_inspection() {
     link_eng.create_variant_symlink("/usr/lib/$ARCH/libm.so", "/lib/libm.so").unwrap();
     assert_eq!(link_eng.resolve_path("/lib/libm.so").unwrap(), "/usr/lib/x86_64/libm.so");
 
-    // 15. Advanced Kernel Module Loader (Taint Flags, Device Matching, Module Signatures)
+    // 15. Sovereign Commands Suite (Sudo, Top/Htop, Df/Du, Dev/Dmesg, GCC, Initramfs)
+    use sovereign_commands::{
+        SovereignSudo, SovereignTopHtop, ProcessTaskMetrics, SovereignDfDu, SovereignDevDmesg,
+        SovereignGccToolchain, SovereignInitramfsSystemd,
+    };
+    let mut sudo = SovereignSudo::new();
+    assert!(sudo.execute_as_root("root", "systemctl status", 100).unwrap().contains("authenticated"));
+
+    let mut top = SovereignTopHtop::new();
+    top.update_process_metrics(ProcessTaskMetrics {
+        pid: 1, command: "systemd".to_string(), cpu_usage_pct: 2.0, memory_rss_kb: 4096,
+        io_read_bytes_sec: 10, io_write_bytes_sec: 5, bore_interactivity_score: 100,
+    });
+    assert_eq!(top.get_sorted_by_cpu().len(), 1);
+
+    let df_du = SovereignDfDu::new();
+    assert_eq!(df_du.analyze_df().len(), 2);
+
+    let mut dmesg = SovereignDevDmesg::new();
+    dmesg.log_kernel_message("kernel", "info", "Boot complete", 200);
+    assert_eq!(dmesg.get_dmesg_log().len(), 1);
+
+    let gcc = SovereignGccToolchain::new();
+    assert!(gcc.compile_source("test.c", "test.so", "-O2").unwrap().contains("-march=native"));
+
+    let mut initramfs = SovereignInitramfsSystemd::new();
+    initramfs.register_post_install_hook("nginx");
+    assert_eq!(initramfs.package_post_install_hooks.len(), 1);
+
+    // 16. Advanced Kernel Module Loader (Taint Flags, Device Matching, Module Signatures)
     use module_loader::{TaintFlag, DeviceBusType, ModuleSignature};
     let mut adv_kmod = SovereignKernelModuleManager::new();
     adv_kmod.add_taint(TaintFlag::GPLIncompatible);
