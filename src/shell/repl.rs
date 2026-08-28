@@ -2,7 +2,7 @@
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use crate::klib::HashMap;
-use crate::klib::HashSet;
+use crate::klib::hashset::HashSet;
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
@@ -243,7 +243,7 @@ pub struct ShellRepl {
     pub fuzzy_completer: FuzzyCompletionEngine,
     pub highlighter: ZshSyntaxHighlighter,
     pub dir_stack: BsdDirectoryStack,
-    pub job_control: ShellJobControl,
+    pub job_manager: ShellJobControl,
 }
 
 impl ShellRepl {
@@ -284,7 +284,7 @@ impl ShellRepl {
             fuzzy_completer: FuzzyCompletionEngine::new(),
             highlighter: ZshSyntaxHighlighter::new(),
             dir_stack,
-            job_control: ShellJobControl::new(),
+            job_manager: ShellJobControl::new(),
         }
     }
 
@@ -1227,9 +1227,9 @@ impl ShellRepl {
                 monitor.running = true;
                 monitor.update_metrics(); // automatically update to capture values
 
-                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5);
-                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2);
-                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w| w.get_latest_value()).unwrap_or(75.0);
+                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5f64);
+                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2f64);
+                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w| w.get_latest_value()).unwrap_or(75.0f64);
 
                 Ok(format!(
                     "System Telemetry Dashboard:\n\
@@ -1375,17 +1375,13 @@ impl ShellRepl {
             }
 
             ShellCommand::Jobs => {
-                let jobs_list = self.job_manager.list_jobs();
-                if jobs_list.is_empty() {
-                    Ok("No active background or stopped jobs.".to_string())
-                } else {
-                    Ok(jobs_list.join("\n"))
-                }
+                Ok(self.job_manager.list_jobs())
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_manager.bring_to_foreground(job_id) {
-                    Ok(msg) => Ok(msg),
-                    Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
+                if self.job_manager.resume_job(job_id as usize) {
+                    Ok(format!("Job %{} brought to foreground.", job_id))
+                } else {
+                    Err(format!("fg: Job %{} not found.", job_id))
                 }
             }
 
@@ -1874,7 +1870,7 @@ mod tests {
         assert!(jobs_res.contains("No active background"));
 
         // Register job
-        repl.job_manager.add_job("sleep 100", 1234, true);
+        repl.job_manager.add_job(1234, "sleep 100");
         let jobs_res2 = repl.execute_command(ShellCommand::Jobs).unwrap();
         assert!(jobs_res2.contains("sleep 100"));
 

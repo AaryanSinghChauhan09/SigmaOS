@@ -24,6 +24,7 @@ pub use sovereign_apps::{
     TextNode,
 };
 
+pub mod tmux;
 pub use tmux::*;
 pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
 

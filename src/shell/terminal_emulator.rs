@@ -1085,8 +1085,6 @@ impl TerminalSession {
         suggestion_engine.register_builtin("apt");
         suggestion_engine.register_builtin("sigpkg");
 
-        let multiplexer = TerminalMultiplexer::new(width, height);
-
         Self {
             cursor_x: 0,
             cursor_y: 0,

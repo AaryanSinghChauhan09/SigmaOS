@@ -84,9 +84,9 @@ impl NixStore {
 
         let out_path = self
             .packages
-            .get_str(package)
-            .and_then(|pkg| pkg.outputs.get_str("out"))
-            .map(|path| path.to_string());
+            .get(package)
+            .and_then(|pkg| pkg.outputs.get("out"))
+            .cloned();
 
         if let Some(path) = out_path {
             self.add_to_profile(profile, &path);

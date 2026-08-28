@@ -235,27 +235,27 @@ mod tests {
         let mut solver = SatSolver::new();
 
         // Create circular dependency: A -> B -> A
-        let pkg_a = Package {
-            name: "A".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
+        let pkg_a = Package::new(
+            "A".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            checksum: "sha256-a".to_string(),
-        };
+            "sha256-a".to_string(),
+        );
 
-        let pkg_b = Package {
-            name: "B".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
+        let pkg_b = Package::new(
+            "B".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
                 name: "A".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            checksum: "sha256-b".to_string(),
-        };
+            "sha256-b".to_string(),
+        );
 
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);

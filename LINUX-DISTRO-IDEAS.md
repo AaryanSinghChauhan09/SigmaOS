@@ -10,6 +10,17 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 
 ---
 
+## 👑 Sovereign Distro Dominance (SigmaOS Exclusive Integrations)
+
+| Feature | Inspired By | Status | Implementation |
+|---------|-------------|--------|----------------|
+| **NixGuixZeroCopyStore** | NixOS / GNU Guix | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
+| **CachyBoreDynamicAiScheduler** | CachyOS / BORE Scheduler | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
+| **OpenBsdHardenedCapsicumPledge** | FreeBSD Capsicum / OpenBSD pledge | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
+| **ZfsBtrfsHybridSelfHealingCoW** | OpenZFS / openSUSE Btrfs | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
+
+---
+
 ## 🐧 Arch Linux Ideas
 
 | Idea | Description | Status | Implementation |

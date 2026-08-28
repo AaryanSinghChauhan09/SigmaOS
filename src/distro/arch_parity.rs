@@ -2,8 +2,6 @@ extern crate alloc;
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
-
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -288,11 +286,6 @@ impl AurClient {
     }
 }
 
-/// Sandboxed compiler for safe package building
-pub struct SandboxedCompiler {
-    pub sandbox_path: String,
-    pub is_isolated: Cell<bool>,
-}
 
 impl SandboxedCompiler {
     pub fn new() -> Self {
@@ -538,61 +531,3 @@ pub struct SandboxedCompiler {
     pub is_isolated: Cell<bool>,
 }
 
-impl SandboxedCompiler {
-    pub fn new() -> Self {
-        SandboxedCompiler {
-            sandbox_path: String::from("/sandbox/compiler"),
-            is_isolated: Cell::new(true),
-        }
-    }
-
-    pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), String> {
-        if self.is_isolated.get() {
-            Ok(())
-        } else {
-            Err(String::from("Compiler sandbox not enabled"))
-        }
-    }
-
-    pub fn enable_sandbox(&self) {
-        self.is_isolated.set(true);
-    }
-}
-
-impl Default for SandboxedCompiler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ALPM database for package metadata sync
-pub struct AlpmDatabase {
-    pub packages: BTreeMap<String, PkgBuild>,
-}
-
-impl AlpmDatabase {
-    pub fn new() -> Self {
-        AlpmDatabase {
-            packages: BTreeMap::new(),
-        }
-    }
-
-    pub fn add_package(&mut self, pkg: PkgBuild) {
-        let name = pkg.pkgname.clone();
-        self.packages.insert(name, pkg);
-    }
-
-    pub fn get_package(&self, name: &str) -> Option<&PkgBuild> {
-        self.packages.get(&String::from(name))
-    }
-
-    pub fn sync(&mut self) -> Result<(), String> {
-        Ok(())
-    }
-}
-
-impl Default for AlpmDatabase {
-    fn default() -> Self {
-        Self::new()
-    }
-}

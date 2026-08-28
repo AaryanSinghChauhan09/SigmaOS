@@ -2,8 +2,7 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::BTreeMap;
-use super::btreemap::BTreeMapIter;
+use crate::klib::hashmap::BTreeMap;
 
 pub struct HashSet<T>
 where
@@ -98,17 +97,29 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: BTreeMapIter<'a, T, ()>,
+    map_iter: crate::klib::hashmap::BTreeMapIter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: Eq + core::hash::Hash + Clone + Ord,
+    T: 'a + Eq + core::hash::Hash + Clone + Ord,
 {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.map_iter.next().map(|(key, _)| key)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a HashSet<T>
+where
+    T: 'a + Eq + core::hash::Hash + Clone + Ord,
+{
+    type Item = &'a T;
+    type IntoIter = HashSetIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

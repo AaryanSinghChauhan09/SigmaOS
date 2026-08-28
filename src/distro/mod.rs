@@ -1,5 +1,8 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch;
 pub mod arch_parity;
+pub mod bsd_linux_innovations;
+pub mod cachy;
 pub mod certification;
 pub mod community;
 pub mod compat_layers;
@@ -17,22 +20,20 @@ pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 pub mod linux_ideas;
 pub mod manjaro;
+pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod parity;
 pub mod power_network_tools;
 pub mod preseed;
 pub mod recovery;
+pub mod sovereign_distro_dominance;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod arch;
-pub mod cachy;
-pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
-pub mod missing_distro_innovations;
 
 pub use arch_parity::{
-    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -59,8 +60,8 @@ pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
     GuixFunctionalStore, NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, OstreeDeployment,
     OstreeDeploymentEngine, RumpKernelServer, ShepherdService, ShepherdServiceState,
-    SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot,
-    SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
+    SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperType,
+    SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
@@ -77,36 +78,35 @@ pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
+    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
+    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
 };
 pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+    AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine,
 };
 pub use bsd_linux_innovations::{
     BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
     PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-};
-pub use linux_bsd_parity_extended::{
-    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
-    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
-    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
-    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner, SovereignDeltaPatch,
+    TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
 pub use wiki_ideas_implementation::{
-    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
-    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
-    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
-    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
+    ArchRecipeSandboxCompiler, CapsicumCapability, EbpfSyscallPolicyVerifier,
+    FreeBsdCapsicumDescriptorDelegate, Generation, NixDeclarativeSystemState, PolicyAction,
+    RealtimeTask, SchedulerClass, SigmaZeroCopySpliceEngine, SigpkgRecipe,
+    SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
+    SovereignSystemdParityEngine, SystemdUnit, SystemdUnitActiveState, SystemdUnitType, CAP_FSTAT,
+    CAP_READ, CAP_SEEK, CAP_WRITE,
 };
 pub use missing_distro_innovations::{
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
-    VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
+    AlpineApkWorldEngine, ChimeraDinitSupervisor, ClearLinuxStatelessEngine, DinitService,
+    DinitServiceState, FreeBsdVnetStackEngine, MageiaUrpmiEngine, OpenBsdUnveilAuditor,
+    SolusEopkgManager, TailsAmnesicEngine, UnveilAuditViolation, VnetStack, VoidXbpsEngine,
+};
+pub use sovereign_distro_dominance::{
+    CachyBoreDynamicAiScheduler, CapsicumRight, CoWSubvolume, NixGuixZeroCopyStore,
+    OpenBsdHardenedCapsicumPledge, SchedTask, SovereignDistroDominanceSuite, StorePackageSlice,
+    TaskSchedState, ZfsBtrfsHybridSelfHealingCoW,
 };

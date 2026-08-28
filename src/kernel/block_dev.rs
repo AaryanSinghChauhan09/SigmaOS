@@ -24,8 +24,6 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
 
-extern crate alloc;
-use crate::klib::{BTreeMap, Vec, VecDeque};
 use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;
@@ -63,13 +61,17 @@ pub struct Bio {
 
 impl Bio {
     pub fn read(id: u64, sector: u64, count: u32) -> Self {
+        let mut data = Vec::with_capacity(count as usize * SECTOR_SIZE);
+        for _ in 0..(count as usize * SECTOR_SIZE) {
+            data.push(0u8);
+        }
         Bio {
             id,
             sector,
             count,
             op: BioOp::Read,
             priority: ReqPriority::Normal,
-            data: vec![0u8; count as usize * SECTOR_SIZE],
+            data,
         }
     }
     pub fn write(id: u64, sector: u64, data: Vec<u8>) -> Self {

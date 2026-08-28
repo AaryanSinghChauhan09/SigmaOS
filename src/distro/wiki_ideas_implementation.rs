@@ -428,17 +428,29 @@ pub enum SystemdUnitActiveState {
     Deactivating,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdUnitState {
+    Active,
+    Reloading,
+    Inactive,
+    Failed,
+    Activating,
+    Deactivating,
+}
+
 #[derive(Debug, Clone)]
-pub struct SystemdUnit {
+pub struct SovereignSystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
-    pub active_state: SystemdUnitActiveState,
-    pub description: String,
-    pub exec_start: Vec<String>,
+    pub state: SystemdUnitState,
     pub dependencies: Vec<String>,
-    pub memory_limit_bytes: Option<u64>,
-    pub cpu_quota_pct: Option<u32>,
+    pub memory_limit_mb: Option<u64>,
+    pub cpu_weight: u32,
+    pub is_sandboxed: bool,
 }
+
+pub type SystemdUnit = SovereignSystemdUnit;
+pub type JournalLogEntry = String;
 
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
@@ -472,16 +484,24 @@ impl SovereignSystemdParityEngine {
 
     pub fn start_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
-        unit.active_state = SystemdUnitActiveState::Active;
+        unit.state = SystemdUnitState::Active;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
-        unit.active_state = SystemdUnitActiveState::Inactive;
+        unit.state = SystemdUnitState::Inactive;
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
+    }
+
+    pub fn query_journal(&self, name: &str) -> Vec<String> {
+        self.journal_logs
+            .iter()
+            .filter(|log| log.contains(name))
+            .cloned()
+            .collect()
     }
 }
 
@@ -500,6 +520,21 @@ pub enum SchedulerClass {
     Idle,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    Ondemand,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: u64,
+}
+
 #[derive(Debug, Clone)]
 pub struct RealtimeTask {
     pub pid: usize,
@@ -508,6 +543,8 @@ pub struct RealtimeTask {
     pub wcet_us: u64, // Worst-Case Execution Time
     pub numa_node: u32,
 }
+
+pub type RtlaneRealtimeTask = RealtimeTask;
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
@@ -536,6 +573,7 @@ impl SovereignHybridSchedulerInnovations {
             numa_nodes: nodes,
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
+            rt_lane_latency_us: 4,
         }
     }
 
@@ -657,7 +695,7 @@ mod tests {
         engine.register_unit("httpd.service", SystemdUnitType::Service, &["network.target"]);
         assert_eq!(engine.units.len(), 1);
 
-        assert_eq!(engine.start_unit("httpd.service"), Ok(()));
+        assert_eq!(engine.start_unit("httpd.service"), Ok(SystemdUnitActiveState::Active));
         assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 

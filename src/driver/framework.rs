@@ -123,7 +123,7 @@ impl SimpleDriver {
         Self {
             id,
             driver_type,
-            state: DriverState::Unloaded,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
 }

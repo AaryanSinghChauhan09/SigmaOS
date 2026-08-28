@@ -124,13 +124,12 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
             crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
+            depends,
             crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
@@ -251,7 +250,7 @@ impl PacmanDbAdapter {
             crate::klib::string::SigmaString::from(name),
             parsed_ver,
             crate::klib::string::SigmaString::from(desc),
-            crate::klib::vec::Vec::new(),
+            alloc::vec::Vec::new(),
             crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -351,7 +350,7 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = crate::klib::vec::Vec::new();
+        let mut hooks = alloc::vec::Vec::new();
         hooks.push(crate::klib::string::SigmaString::from("base"));
         hooks.push(crate::klib::string::SigmaString::from("udev"));
         hooks.push(crate::klib::string::SigmaString::from("autodetect"));
@@ -371,7 +370,7 @@ impl MkinitcpioBuilder {
         }
     }
 
-    pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> alloc::vec::Vec<u8> {
         let mut image_header = SigmaString::from(format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
@@ -379,7 +378,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        crate::klib::vec::Vec::from_iter(image_header)
+        image_header.to_vec()
     }
 }
 
@@ -517,7 +516,7 @@ impl MakepkgBuilder {
     pub fn build_package_archive(
         &self,
         source_data: &[u8],
-    ) -> Result<(SigmaString, Vec<u8>), &'static str> {
+    ) -> Result<(SigmaString, alloc::vec::Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
@@ -533,7 +532,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, archive_content.to_vec()))
     }
 }
 
@@ -554,7 +553,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
+            build_depends: alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -567,11 +566,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
+            build_depends: alloc::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

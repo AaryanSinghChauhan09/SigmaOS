@@ -64,6 +64,9 @@ pub mod subsystem {
     pub enum IoOperation {
         Read { offset: u64, size: usize },
         Write { offset: u64, data: Vec<u8> },
+        Ioctl { cmd: u32, arg: u64 },
+        Mmap { addr: u64, len: usize },
+        Poll { events: u32 },
     }
 
     #[derive(Debug, Clone)]

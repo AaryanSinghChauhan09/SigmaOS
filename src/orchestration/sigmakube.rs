@@ -534,6 +534,6 @@ mod tests {
     fn test_sigmakube() {
         let mut kube = SigmaKube::new();
         let cluster_id = kube.create_cluster("test-cluster").unwrap();
-        assert_eq!(kube.list_clusters().len(), 1);
+        assert_eq!(kube.list_registered_clusters().len(), 1);
     }
 }
