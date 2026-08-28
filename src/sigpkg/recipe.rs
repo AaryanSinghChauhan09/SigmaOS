@@ -121,6 +121,11 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.build_commands.push(command);
+        self
+    }
+
     pub fn with_install_command(mut self, command: String) -> Self {
         self.install_commands.push(command);
         self

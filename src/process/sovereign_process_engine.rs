@@ -44,25 +44,109 @@ pub struct IpcChannelBuffer {
     pub capacity: usize,
 }
 
+// ================= Linux & FreeBSD ProcessID Allocation & Recycling Engine =================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PidNamespaceScope {
+    pub ns_id: u32,
+    pub name: String,
+    pub parent_ns_id: Option<u32>,
+}
+
+/// FreeBSD & Linux inspired bitmap ProcessID allocator with PID recycling and namespace isolation
+pub struct SovereignPidAllocator {
+    pub allocated_pids: BTreeMap<u64, u32>, // PID -> ns_id
+    pub recycled_pids: Vec<u64>,
+    pub max_pid: u64,
+    pub last_pid: u64,
+}
+
+impl SovereignPidAllocator {
+    pub fn new(max_pid: u64) -> Self {
+        Self {
+            allocated_pids: BTreeMap::new(),
+            recycled_pids: Vec::new(),
+            max_pid,
+            last_pid: 999, // Start PIDs at 1000
+        }
+    }
+
+    pub fn alloc_pid(&mut self, ns_id: u32) -> Result<u64, &'static str> {
+        // Reuse recycled PID if available (FreeBSD pid_alloc recycling parity)
+        if let Some(recycled) = self.recycled_pids.pop() {
+            self.allocated_pids.insert(recycled, ns_id);
+            return Ok(recycled);
+        }
+
+        if self.last_pid >= self.max_pid {
+            return Err("EAGAIN: Maximum ProcessID limit reached; no free PIDs available");
+        }
+
+        self.last_pid += 1;
+        let pid = self.last_pid;
+        self.allocated_pids.insert(pid, ns_id);
+        Ok(pid)
+    }
+
+    pub fn free_pid(&mut self, pid: u64) {
+        if self.allocated_pids.remove(&pid).is_some() {
+            if !self.recycled_pids.contains(&pid) {
+                self.recycled_pids.push(pid);
+            }
+        }
+    }
+
+    pub fn is_allocated(&self, pid: u64) -> bool {
+        self.allocated_pids.contains_key(&pid)
+    }
+}
+
+impl Default for SovereignPidAllocator {
+    fn default() -> Self {
+        Self::new(32768)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProcessTreeNode {
+    pub pid: u64,
+    pub ppid: u64,
+    pub pgid: u64,
+    pub sid: u64,
+    pub pdfork_fd: Option<i32>,
+    pub children_pids: Vec<u64>,
+}
+
 pub struct SovereignProcessManager {
     pub processes: BTreeMap<u64, ProcessHandle>,
+    pub process_tree: BTreeMap<u64, ProcessTreeNode>,
     pub ipc_channels: BTreeMap<String, IpcChannelBuffer>,
-    pub next_pid: u64,
+    pub pid_allocator: SovereignPidAllocator,
 }
 
 impl SovereignProcessManager {
     pub fn new() -> Self {
         Self {
             processes: BTreeMap::new(),
+            process_tree: BTreeMap::new(),
             ipc_channels: BTreeMap::new(),
-            next_pid: 1000,
+            pid_allocator: SovereignPidAllocator::new(32768),
         }
     }
 
-    /// Spawns a process handle into Ready state.
+    /// Spawns a process handle into Ready state with process group & session ID hierarchy tracking.
     pub fn spawn_process(&mut self, name: &str, parent_pid: u64) -> u64 {
-        let pid = self.next_pid;
-        self.next_pid += 1;
+        let pid = self.pid_allocator.alloc_pid(1).unwrap_or(1000);
+
+        let (pgid, sid) = if parent_pid != 0 {
+            if let Some(parent_node) = self.process_tree.get(&parent_pid) {
+                (parent_node.pgid, parent_node.sid)
+            } else {
+                (pid, pid)
+            }
+        } else {
+            (pid, pid)
+        };
 
         let handle = ProcessHandle {
             pid,
@@ -75,6 +159,22 @@ impl SovereignProcessManager {
             is_background: false,
         };
 
+        let node = ProcessTreeNode {
+            pid,
+            ppid: parent_pid,
+            pgid,
+            sid,
+            pdfork_fd: Some((pid % 1000) as i32 + 10), // FreeBSD process descriptor
+            children_pids: Vec::new(),
+        };
+
+        if parent_pid != 0 {
+            if let Some(parent_node) = self.process_tree.get_mut(&parent_pid) {
+                parent_node.children_pids.push(pid);
+            }
+        }
+
+        self.process_tree.insert(pid, node);
         self.processes.insert(pid, handle);
         pid
     }
@@ -174,6 +274,7 @@ impl SovereignProcessManager {
             proc.exit_code = Some(128 + 9); // SIGKILL status
             proc.input_buffer.clear();
             proc.output_buffer.clear();
+            self.pid_allocator.free_pid(pid);
             Ok(())
         } else {
             Err("SovereignProcess: Process ID not found")

@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,30 +85,33 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (jid, jail.config.clone())
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        // Create network namespace if IP specified
+        if let Some(ip) = &config.ip_address {
+            self.setup_jail_network(jid, ip)?;
         }
+
+        // Mount jail filesystem
+        self.mount_jail_fs(&config)?;
+
+        // Apply security restrictions
+        self.apply_jail_restrictions(jid, &config)?;
+
+        // Execute startup script
+        if let Some(exec_start) = &config.exec_start {
+            self.execute_in_jail(jid, &exec_start)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut(name) {
+            jail.state = JailState::Running;
+        }
+        println!("Jail '{}' started with JID {}", name, jid);
+
+        Ok(())
     }
 
     /// Stop a jail
@@ -191,7 +194,7 @@ impl SigmaJailManager {
 
     /// Get jail information
     pub fn jail_info(&self, name: &str) -> Option<JailInfo> {
-        if let Some(jail) = self.jails.get_str(name) {
+        if let Some(jail) = self.jails.get(name) {
             Some(JailInfo {
                 name: name.to_string(),
                 state: jail.state.clone(),
@@ -374,7 +377,7 @@ impl SigmaJailManager {
     fn apply_jail_restrictions(
         &self,
         jid: u32,
-        config: &JailConfig,
+        _config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Apply cgroup restrictions
         let cgroup_path = format!("/sys/fs/cgroup/sigma-jail-{}", jid);
@@ -394,18 +397,15 @@ impl SigmaJailManager {
         jid: u32,
         command: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
+        let root_path = match self.jails.values().find(|j| j.jid == Some(jid)) {
+            Some(j) => j.config.root_path.clone(),
+            None => return Err("Jail not found".into()),
+        };
+
         // Use chroot and namespaces to execute in jail context
         let output = Command::new("unshare")
             .args(["-p", "-f", "chroot"])
-            .arg(
-                &self
-                    .jails
-                    .values()
-                    .find(|j| j.jid == Some(jid))
-                    .unwrap()
-                    .config
-                    .root_path,
-            )
+            .arg(&root_path)
             .arg("sh")
             .arg("-c")
             .arg(command)

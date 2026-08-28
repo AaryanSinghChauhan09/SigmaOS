@@ -46,6 +46,18 @@ mod zenith_advanced;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
+#[path = "../src/filesystem/bsd_linux_innovations.rs"]
+mod fs_bsd_linux_innovations;
+
+#[path = "../src/process/sovereign_process_engine.rs"]
+mod sovereign_process_engine;
+
+#[path = "../src/sigpkg/sovereign_sigpkg.rs"]
+mod sovereign_sigpkg;
+
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
@@ -238,20 +250,14 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 
 #[path = "../src/security/hardening.rs"]
 mod hardening;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
 
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
@@ -469,4 +475,278 @@ fn test_gentoo_portage_mask_engine_inspection() {
 
     portage.add_hard_mask("app-admin/sudo");
     assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+}
+
+#[test]
+fn test_xbps_package_manager_inspection() {
+    use linux_bsd_parity::{XbpsPackage, XbpsPackageManager};
+
+    let mut xbps = XbpsPackageManager::new();
+    xbps.register_repository_package(XbpsPackage {
+        name: "glibc".to_string(),
+        version: "2.38".to_string(),
+        revision: 1,
+        run_depends: vec![],
+        sha256_hash: [0x11; 32],
+        is_signed: true,
+    });
+    xbps.register_repository_package(XbpsPackage {
+        name: "bash".to_string(),
+        version: "5.2.21".to_string(),
+        revision: 1,
+        run_depends: vec!["glibc".to_string()],
+        sha256_hash: [0x22; 32],
+        is_signed: true,
+    });
+
+    assert!(xbps.verify_signature("bash"));
+    let deps = xbps.resolve_dependencies("bash").unwrap();
+    assert_eq!(deps, vec!["glibc".to_string(), "bash".to_string()]);
+
+    let count = xbps.install_package_atomic("bash").unwrap();
+    assert_eq!(count, 2);
+    assert_eq!(xbps.installed_packages.len(), 2);
+}
+
+#[test]
+fn test_linux_devlink_driver_inspection() {
+    use linux_bsd_parity::{DevlinkPortFlavor, LinuxDevlinkDriver};
+
+    let mut devlink = LinuxDevlinkDriver::new();
+    devlink.register_port("pci", "0000:01:00.0", 1, DevlinkPortFlavor::Physical);
+
+    assert!(devlink.split_port(1, 4).is_ok());
+    assert_eq!(devlink.ports[0].split_count, 4);
+
+    let flashed = devlink.flash_device_firmware("pci", "0000:01:00.0", b"FIRMWARE_IMAGE_BLOB").unwrap();
+    assert_eq!(flashed, 19);
+}
+
+#[test]
+fn test_systemd_unit_dependency_engine_inspection() {
+    use linux_bsd_parity::{SystemdUnit, SystemdUnitDependencyEngine};
+
+    let mut engine = SystemdUnitDependencyEngine::new();
+    engine.add_unit(SystemdUnit {
+        name: "network.target".to_string(),
+        requires: vec![],
+        after: vec![],
+    });
+    engine.add_unit(SystemdUnit {
+        name: "sshd.service".to_string(),
+        requires: vec!["network.target".to_string()],
+        after: vec!["network.target".to_string()],
+    });
+
+    assert!(!engine.detect_circular_dependencies());
+    let seq = engine.compute_startup_sequence().unwrap();
+    assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
+}
+
+#[test]
+fn test_alpine_apk_v3_and_triggers_inspection() {
+    use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, ApkTriggerScript};
+
+    let mut apk = AlpineApkPackageIndex::new();
+    apk.add_package(ApkPackageEntry {
+        name: "musl".to_string(),
+        version: "1.2.4".to_string(),
+        arch: "x86_64".to_string(),
+        sha256_hash: [0x77; 32],
+        dependencies: vec![],
+    });
+
+    apk.add_trigger(ApkTriggerScript {
+        trigger_path: "/lib/modules".to_string(),
+        command: "depmod -a".to_string(),
+    });
+
+    assert_eq!(apk.run_package_triggers(), 1);
+    assert!(apk.verify_apk_v3_checksum("musl", &[0x77; 32]));
+    assert!(apk.resolve_musl_abi_compat("1.2.4"));
+}
+
+#[test]
+fn test_dragonfly_hammer2_pfs_cluster_delta_inspection() {
+    use unimplemented_features::DragonFlyHammer2FsSnapshot;
+
+    let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+    hammer2.register_cluster_node(5, "192.168.1.105");
+    let snap_id = hammer2.create_pfs_snapshot("VAR_PFS", 0x12345678, 1700000000);
+
+    let delta_hash = hammer2.sync_cluster_delta(snap_id, 5).unwrap();
+    assert_ne!(delta_hash, 0);
+    assert!(hammer2.verify_cluster_merkle_roots("VAR_PFS"));
+}
+
+#[test]
+fn test_kernel_parity_innovations_geom_devlink_unveil_vnet_inspection() {
+    use linux_bsd_innovations::{
+        FreeBsdGeomTopology, LinuxDevlinkHealthMonitor, OpenBsdUnveilEngine, FreeBsdVnetManager,
+    };
+
+    // 1. FreeBSD GEOM Topology
+    let mut geom = FreeBsdGeomTopology::new();
+    geom.register_class("DISK");
+    assert!(geom.add_provider("DISK", "ada0", 1_000_000_000, 512).is_ok());
+    let provider = geom.find_provider("ada0").unwrap();
+    assert_eq!(provider.mediasize_bytes, 1_000_000_000);
+    assert_eq!(provider.sectorsize, 512);
+
+    // 2. Linux Devlink Health Monitor
+    let mut devlink_health = LinuxDevlinkHealthMonitor::new();
+    devlink_health.register_reporter("pci/0000:00:1f.3/fw");
+    assert_eq!(devlink_health.get_state("pci/0000:00:1f.3/fw").unwrap(), "healthy");
+    assert!(devlink_health.report_error("pci/0000:00:1f.3/fw").is_ok());
+    assert_eq!(devlink_health.get_state("pci/0000:00:1f.3/fw").unwrap(), "error");
+    assert!(devlink_health.recover("pci/0000:00:1f.3/fw").is_ok());
+    assert_eq!(devlink_health.get_state("pci/0000:00:1f.3/fw").unwrap(), "recovered");
+
+    // 3. OpenBSD Unveil Engine
+    let mut unveil_engine = OpenBsdUnveilEngine::new();
+    assert!(unveil_engine.unveil("/usr/lib", "r").is_ok());
+    assert!(unveil_engine.unveil("/tmp", "rwc").is_ok());
+    unveil_engine.lock();
+    assert!(unveil_engine.unveil("/etc", "r").is_err()); // Locked engine rejects unveiling
+    assert!(unveil_engine.check_path("/usr/lib/libc.so", 'r').is_ok());
+    assert!(unveil_engine.check_path("/usr/lib/libc.so", 'w').is_err());
+    assert!(unveil_engine.check_path("/tmp/test.txt", 'w').is_ok());
+
+    // 4. FreeBSD VNET Virtualized Network Stack
+    let mut vnet_mgr = FreeBsdVnetManager::new();
+    assert!(vnet_mgr.create_vnet(10).is_ok());
+    assert!(vnet_mgr.assign_interface(10, "epair0b").is_ok());
+    assert!(vnet_mgr.assign_ip(10, "10.0.0.10/24").is_ok());
+    let vnet_stack = vnet_mgr.get_vnet(10).unwrap();
+    assert_eq!(vnet_stack.interfaces, vec!["epair0b".to_string()]);
+    assert_eq!(vnet_stack.ip_addresses, vec!["10.0.0.10/24".to_string()]);
+}
+
+#[test]
+fn test_sovereign_fhs_hierarchy_engine_inspection() {
+    use fs_bsd_linux_innovations::SovereignFhsHierarchyEngine;
+
+    let fhs = SovereignFhsHierarchyEngine::new();
+    assert_eq!(fhs.resolve_fhs_path("/bin/bash"), "/usr/bin/bash");
+    assert_eq!(fhs.resolve_fhs_path("/sbin/ip"), "/usr/sbin/ip");
+    assert_eq!(fhs.resolve_fhs_path("/lib/modules"), "/usr/lib/modules");
+    assert_eq!(fhs.resolve_fhs_path("/var/run/dbus/system_bus_socket"), "/run/dbus/system_bus_socket");
+    assert_eq!(fhs.resolve_fhs_path("/usr/local/bin/python"), "/usr/local/bin/python");
+}
+
+#[test]
+fn test_sovereign_pid_allocator_and_process_tree_inspection() {
+    use sovereign_process_engine::{SovereignPidAllocator, SovereignProcessManager};
+
+    // 1. PID Allocator & Bitmap Recycling
+    let mut pid_alloc = SovereignPidAllocator::new(1005);
+    let p1 = pid_alloc.alloc_pid(1).unwrap();
+    let p2 = pid_alloc.alloc_pid(1).unwrap();
+    assert_eq!(p1, 1000);
+    assert_eq!(p2, 1001);
+
+    pid_alloc.free_pid(p1);
+    let recycled_p = pid_alloc.alloc_pid(1).unwrap();
+    assert_eq!(recycled_p, 1000); // Recycled PID reused first!
+
+    // 2. Process Tree Hierarchy & FreeBSD pdfork handle
+    let mut pm = SovereignProcessManager::new();
+    let parent_pid = pm.spawn_process("parent_init", 0);
+    let child_pid = pm.spawn_process("child_worker", parent_pid);
+
+    let parent_node = pm.process_tree.get(&parent_pid).unwrap();
+    assert_eq!(parent_node.children_pids, vec![child_pid]);
+
+    let child_node = pm.process_tree.get(&child_pid).unwrap();
+    assert_eq!(child_node.ppid, parent_pid);
+    assert_eq!(child_node.pgid, parent_node.pgid); // Process group inherited
+    assert!(child_node.pdfork_fd.is_some());
+}
+
+#[test]
+fn test_sovereign_mirror_fallback_engine_inspection() {
+    use sovereign_sigpkg::{CentralRepositoryManager, SovereignMirrorFallbackEngine};
+
+    let mut repo_mgr = CentralRepositoryManager::new();
+    repo_mgr.add_mirror("https://slow-mirror.sigmaos.org", "US-West", 150);
+    repo_mgr.add_mirror("https://fast-mirror.sigmaos.org", "US-East", 20);
+
+    let mut fallback_engine = SovereignMirrorFallbackEngine::new(repo_mgr, 3);
+    let mock_payload = vec![0x10, 0x20, 0x30];
+    let mut expected_checksum = [0u8; 32];
+    for (i, &b) in mock_payload.iter().enumerate() {
+        expected_checksum[i % 32] ^= b;
+    }
+
+    let res = fallback_engine
+        .fetch_package_with_failover("openssl", &expected_checksum, |url: &str, _pkg: &str| {
+            if url.contains("slow") {
+                Err("Connection timeout")
+            } else {
+                Ok(vec![0x10, 0x20, 0x30])
+            }
+        })
+        .unwrap();
+
+    assert_eq!(res.mirror_url, "https://fast-mirror.sigmaos.org");
+    assert_eq!(res.payload, vec![0x10, 0x20, 0x30]);
+}
+
+#[test]
+fn test_systemd_unit_parser_watchdog_slice_inspection() {
+    use systemd_init::{SystemdCgroupSliceGovernor, SystemdServiceWatchdog, SystemdUnitFileParser};
+
+    // 1. INI Unit File Parsing
+    let unit_content = r#"
+[Unit]
+Description=Sovereign Web Server Service
+
+[Service]
+ExecStart=/usr/bin/nginx -g 'daemon off;'
+Restart=always
+WatchdogSec=10s
+Slice=system.slice
+
+[Install]
+WantedBy=multi-user.target
+"#;
+
+    let parsed = SystemdUnitFileParser::parse_unit_file(unit_content);
+    assert_eq!(parsed.unit_description, "Sovereign Web Server Service");
+    assert_eq!(parsed.exec_start, "/usr/bin/nginx -g 'daemon off;'");
+    assert_eq!(parsed.restart_policy, "always");
+    assert_eq!(parsed.watchdog_sec, 10);
+    assert_eq!(parsed.slice, "system.slice");
+    assert_eq!(parsed.wanted_by, "multi-user.target");
+
+    // 2. Watchdog Heartbeat Monitoring
+    let mut watchdog = SystemdServiceWatchdog::new("nginx", 10);
+    watchdog.ping_watchdog(100);
+    assert!(watchdog.check_health(105)); // Elapsed 5s <= 10s (healthy)
+    assert!(!watchdog.check_health(115)); // Elapsed 15s > 10s (unhealthy / timeout)
+
+    // 3. Cgroup v2 Slice Governor Quotas
+    let mut slice_gov = SystemdCgroupSliceGovernor::new("system.slice", 100, 1024 * 1024);
+    assert!(slice_gov.allocate_slice_memory(512 * 1024).is_ok());
+    assert!(slice_gov.allocate_slice_memory(600 * 1024).is_err()); // Quota exceeded
+}
+
+#[test]
+fn test_arch_wiki_knowledge_base_engine_inspection() {
+    use unimplemented_features::ArchWikiKnowledgeBaseEngine;
+
+    let mut wiki = ArchWikiKnowledgeBaseEngine::new();
+    let sysd = wiki.get_article("Systemd").unwrap();
+    assert_eq!(sysd.category, "System Administration");
+
+    wiki.add_article(
+        "ZFS",
+        "Filesystems",
+        &["zfs", "storage", "raid"],
+        "ZFS combines volume management and filesystem functionality...",
+    );
+
+    let zfs_matches = wiki.search_by_tag("zfs");
+    assert_eq!(zfs_matches.len(), 1);
+    assert_eq!(zfs_matches[0].title, "ZFS");
 }
