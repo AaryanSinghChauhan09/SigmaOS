@@ -55,6 +55,9 @@ mod sovereign_process_engine;
 #[path = "../src/sigpkg/sovereign_sigpkg.rs"]
 mod sovereign_sigpkg;
 
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
@@ -687,4 +690,43 @@ fn test_sovereign_mirror_fallback_engine_inspection() {
 
     assert_eq!(res.mirror_url, "https://fast-mirror.sigmaos.org");
     assert_eq!(res.payload, vec![0x10, 0x20, 0x30]);
+}
+
+#[test]
+fn test_systemd_unit_parser_watchdog_slice_inspection() {
+    use systemd_init::{SystemdCgroupSliceGovernor, SystemdServiceWatchdog, SystemdUnitFileParser};
+
+    // 1. INI Unit File Parsing
+    let unit_content = r#"
+[Unit]
+Description=Sovereign Web Server Service
+
+[Service]
+ExecStart=/usr/bin/nginx -g 'daemon off;'
+Restart=always
+WatchdogSec=10s
+Slice=system.slice
+
+[Install]
+WantedBy=multi-user.target
+"#;
+
+    let parsed = SystemdUnitFileParser::parse_unit_file(unit_content);
+    assert_eq!(parsed.unit_description, "Sovereign Web Server Service");
+    assert_eq!(parsed.exec_start, "/usr/bin/nginx -g 'daemon off;'");
+    assert_eq!(parsed.restart_policy, "always");
+    assert_eq!(parsed.watchdog_sec, 10);
+    assert_eq!(parsed.slice, "system.slice");
+    assert_eq!(parsed.wanted_by, "multi-user.target");
+
+    // 2. Watchdog Heartbeat Monitoring
+    let mut watchdog = SystemdServiceWatchdog::new("nginx", 10);
+    watchdog.ping_watchdog(100);
+    assert!(watchdog.check_health(105)); // Elapsed 5s <= 10s (healthy)
+    assert!(!watchdog.check_health(115)); // Elapsed 15s > 10s (unhealthy / timeout)
+
+    // 3. Cgroup v2 Slice Governor Quotas
+    let mut slice_gov = SystemdCgroupSliceGovernor::new("system.slice", 100, 1024 * 1024);
+    assert!(slice_gov.allocate_slice_memory(512 * 1024).is_ok());
+    assert!(slice_gov.allocate_slice_memory(600 * 1024).is_err()); // Quota exceeded
 }

@@ -98,6 +98,124 @@ impl InitSystemBridge {
     }
 }
 
+// ================= Systemd INI Unit Configuration Parser =================
+
+#[derive(Debug, Clone, Default)]
+pub struct ParsedSystemdUnitFile {
+    pub unit_description: String,
+    pub exec_start: String,
+    pub restart_policy: String,
+    pub wanted_by: String,
+    pub watchdog_sec: u32,
+    pub slice: String,
+}
+
+pub struct SystemdUnitFileParser;
+
+impl SystemdUnitFileParser {
+    pub fn parse_unit_file(content: &str) -> ParsedSystemdUnitFile {
+        let mut parsed = ParsedSystemdUnitFile::default();
+        let mut current_section = "";
+
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with(';') {
+                continue;
+            }
+
+            if trimmed.starts_with('[') && trimmed.ends_with(']') {
+                current_section = &trimmed[1..trimmed.len() - 1];
+                continue;
+            }
+
+            if let Some(pos) = trimmed.find('=') {
+                let key = trimmed[..pos].trim();
+                let val = trimmed[pos + 1..].trim();
+
+                match (current_section, key) {
+                    ("Unit", "Description") => parsed.unit_description = val.to_string(),
+                    ("Service", "ExecStart") => parsed.exec_start = val.to_string(),
+                    ("Service", "Restart") => parsed.restart_policy = val.to_string(),
+                    ("Service", "WatchdogSec") => {
+                        let sec_str = val.trim_end_matches('s');
+                        parsed.watchdog_sec = sec_str.parse::<u32>().unwrap_or(0);
+                    }
+                    ("Service", "Slice") => parsed.slice = val.to_string(),
+                    ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
+                    _ => {}
+                }
+            }
+        }
+
+        parsed
+    }
+}
+
+// ================= Systemd Watchdog Health Monitor =================
+
+#[derive(Debug, Clone)]
+pub struct SystemdServiceWatchdog {
+    pub service_name: String,
+    pub watchdog_interval_sec: u32,
+    pub last_ping_sec: u64,
+    pub is_healthy: bool,
+}
+
+impl SystemdServiceWatchdog {
+    pub fn new(service_name: &str, watchdog_sec: u32) -> Self {
+        Self {
+            service_name: service_name.to_string(),
+            watchdog_interval_sec: watchdog_sec,
+            last_ping_sec: 0,
+            is_healthy: true,
+        }
+    }
+
+    pub fn ping_watchdog(&mut self, now_sec: u64) {
+        self.last_ping_sec = now_sec;
+        self.is_healthy = true;
+    }
+
+    pub fn check_health(&mut self, now_sec: u64) -> bool {
+        if self.watchdog_interval_sec == 0 {
+            return true;
+        }
+        let elapsed = now_sec.saturating_sub(self.last_ping_sec);
+        if elapsed > (self.watchdog_interval_sec as u64) {
+            self.is_healthy = false;
+        }
+        self.is_healthy
+    }
+}
+
+// ================= Systemd Cgroup v2 Slice Governor =================
+
+pub struct SystemdCgroupSliceGovernor {
+    pub slice_name: String,
+    pub cpu_weight: u32,
+    pub memory_max_bytes: u64,
+    pub current_memory_bytes: u64,
+}
+
+impl SystemdCgroupSliceGovernor {
+    pub fn new(slice_name: &str, cpu_weight: u32, memory_max_bytes: u64) -> Self {
+        Self {
+            slice_name: slice_name.to_string(),
+            cpu_weight,
+            memory_max_bytes,
+            current_memory_bytes: 0,
+        }
+    }
+
+    pub fn allocate_slice_memory(&mut self, bytes: u64) -> Result<(), &'static str> {
+        if self.current_memory_bytes + bytes > self.memory_max_bytes {
+            return Err("Systemd Slice Cgroup: Memory quota exceeded for slice");
+        }
+        self.current_memory_bytes += bytes;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnitState {
     Active,
