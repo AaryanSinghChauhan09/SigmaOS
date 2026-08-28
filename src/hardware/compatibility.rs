@@ -514,50 +514,6 @@ impl CompatibilityCheck for SimpleDiagnostics {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AcpiPowerState {
-    D0,
-    D1,
-    D2,
-    D3,
-}
-
-use alloc::collections::BTreeMap as HashMap;
-
-pub struct SimpleAcpiManager {
-    pub irq_routing: HashMap<u8, u32>,
-    pub power_states: HashMap<u64, AcpiPowerState>,
-}
-
-impl SimpleAcpiManager {
-    pub fn new() -> Self {
-        Self {
-            irq_routing: HashMap::new(),
-            power_states: HashMap::new(),
-        }
-    }
-
-    pub fn balance_irq_routing(&mut self, irq: u8, cpu_core: u32) -> Result<(), &'static str> {
-        self.irq_routing.insert(irq, cpu_core);
-        Ok(())
-    }
-
-    pub fn set_device_power_state(&mut self, dev_id: u64, state: AcpiPowerState) -> Result<(), &'static str> {
-        self.power_states.insert(dev_id, state);
-        Ok(())
-    }
-
-    pub fn get_device_power_state(&self, dev_id: u64) -> Option<AcpiPowerState> {
-        self.power_states.get(&dev_id).copied()
-    }
-}
-
-impl Default for SimpleAcpiManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub type AcpiLoadBalancer = SimpleAcpiManager;
 
 #[cfg(test)]

@@ -1,6 +1,3 @@
-// SigmaOS Pledge - Process Privilege Reduction Mechanism
-// Inspired by OpenBSD pledge but capability-based
-
 extern crate alloc;
 
 use alloc::string::{String, ToString};

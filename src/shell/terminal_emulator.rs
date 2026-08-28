@@ -995,9 +995,6 @@ pub struct TerminalPaneV2 {
     pub is_focused: bool,
 }
 
-/// Tmux / BSD-style Terminal Multiplexer Engine
-pub type TerminalMultiplexer = TerminalMultiplexerV2;
-
 #[derive(Debug, Clone)]
 pub struct TerminalMultiplexerV2 {
     pub panes: Vec<TerminalPaneV2>,

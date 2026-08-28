@@ -666,7 +666,11 @@ impl TmuxSessionManager {
     /// Generates status bar using formatted placeholder renderer
     pub fn get_status_bar(&self) -> String {
         if let Some(ref name) = self.active_session_name {
-            self.sessions[name].render_formatted_status()
+            if let Some(session) = self.sessions.get(name) {
+                session.render_formatted_status()
+            } else {
+                "[No Session] | CPU: 0.0% | MEM: 0%".to_string()
+            }
         } else {
             "[No Session] | CPU: 0.0% | MEM: 0%".to_string()
         }
