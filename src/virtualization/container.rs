@@ -7,12 +7,63 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use crate::klib::collections::HashMap;
 
+/// FreeBSD VNET virtual network interface pair configuration (FreeBSD VNET/jails parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetEpairConfig {
+    pub epair_id: u32,
+    pub host_interface: String,    // e.g. epair0a
+    pub container_interface: String, // e.g. epair0b
+    pub bridge_name: String,       // e.g. bridge0
+    pub ipv4_address: String,
+    pub mac_address: [u8; 6],
+}
+
+impl VnetEpairConfig {
+    pub fn new(epair_id: u32, bridge_name: &str, ipv4_address: &str) -> Self {
+        Self {
+            epair_id,
+            host_interface: format!("epair{}a", epair_id),
+            container_interface: format!("epair{}b", epair_id),
+            bridge_name: bridge_name.to_string(),
+            ipv4_address: ipv4_address.to_string(),
+            mac_address: [0x02, 0x00, 0x00, 0x42, (epair_id >> 8) as u8, epair_id as u8],
+        }
+    }
+}
+
+/// Linux Unified Cgroups v2 Resource Controller
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CgroupV2Controller {
+    pub cgroup_path: String,
+    pub cpu_weight: u32,         // 1-10000 (default 100)
+    pub memory_high_bytes: u64,  // Throttle limit
+    pub memory_max_bytes: u64,   // OOM killer limit
+    pub io_max_rbps: u64,        // Max read bytes per second
+    pub io_max_wbps: u64,        // Max write bytes per second
+    pub pids_max: u32,           // Maximum process count
+}
+
+impl CgroupV2Controller {
+    pub fn new(cgroup_path: &str) -> Self {
+        Self {
+            cgroup_path: cgroup_path.to_string(),
+            cpu_weight: 100,
+            memory_high_bytes: u64::MAX,
+            memory_max_bytes: u64::MAX,
+            io_max_rbps: u64::MAX,
+            io_max_wbps: u64::MAX,
+            pids_max: 4096,
+        }
+    }
+}
+
 /// FreeBSD Jail-inspired security & network sandboxing configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignJailConfig {
     pub allow_raw_sockets: bool,
     pub sysv_ipc_isolated: bool,
     pub ip_address_bindings: Vec<String>,
+    pub vnet_epair: Option<VnetEpairConfig>,
 }
 
 impl SovereignJailConfig {
@@ -21,6 +72,7 @@ impl SovereignJailConfig {
             allow_raw_sockets: false,
             sysv_ipc_isolated: true,
             ip_address_bindings: Vec::new(),
+            vnet_epair: None,
         }
     }
 }
@@ -165,7 +217,7 @@ impl OverlayFsStorageDriver {
     }
 
     pub fn prepare_rw_overlay_dir(&self, container_id: &str) -> String {
-        self.base_dir.join("containers").join(container_id).join("diff")
+        format!("{}/containers/{}/diff", self.base_dir, container_id)
     }
 }
 
@@ -267,6 +319,7 @@ pub struct ResourceLimits {
     pub cpu_shares: u32,
     pub memory_mb: u64,
     pub memory_swap_mb: u64,
+    pub cgroup_v2: Option<CgroupV2Controller>,
 }
 
 /// Container state
@@ -944,6 +997,7 @@ mod tests {
                 cpu_shares: 1024,
                 memory_mb: 512,
                 memory_swap_mb: 1024,
+                cgroup_v2: None,
             },
             is_rootless: false,
             jail_config: None,
@@ -986,6 +1040,7 @@ mod tests {
                 cpu_shares: 1024,
                 memory_mb: 512,
                 memory_swap_mb: 1024,
+                cgroup_v2: None,
             },
             is_rootless: false,
             jail_config: None,
@@ -1011,6 +1066,7 @@ mod tests {
                 cpu_shares: 1024,
                 memory_mb: 512,
                 memory_swap_mb: 1024,
+                cgroup_v2: None,
             },
             is_rootless: false,
             jail_config: None,
@@ -1038,6 +1094,7 @@ mod tests {
                 cpu_shares: 512,
                 memory_mb: 256,
                 memory_swap_mb: 512,
+                cgroup_v2: None,
             },
             is_rootless: false,
             jail_config: None,
@@ -1068,11 +1125,24 @@ mod tests {
     }
 
     #[test]
+    fn test_vnet_epair_and_cgroups_v2() {
+        let epair = VnetEpairConfig::new(0, "bridge0", "192.168.1.50/24");
+        assert_eq!(epair.host_interface, "epair0a");
+        assert_eq!(epair.container_interface, "epair0b");
+        assert_eq!(epair.bridge_name, "bridge0");
+
+        let cgroup = CgroupV2Controller::new("/sys/fs/cgroup/container_app");
+        assert_eq!(cgroup.cpu_weight, 100);
+        assert_eq!(cgroup.pids_max, 4096);
+    }
+
+    #[test]
     fn test_freebsd_jails_and_podman_rootless() {
         let jail_cfg = SovereignJailConfig {
             allow_raw_sockets: true,
             sysv_ipc_isolated: false,
             ip_address_bindings: vec!["192.168.1.100".to_string()],
+            vnet_epair: None,
         };
 
         let config = ContainerConfig {
@@ -1088,6 +1158,7 @@ mod tests {
                 cpu_shares: 512,
                 memory_mb: 256,
                 memory_swap_mb: 512,
+                cgroup_v2: None,
             },
             is_rootless: true,
             jail_config: Some(jail_cfg.clone()),
@@ -1152,6 +1223,7 @@ mod tests {
                 cpu_shares: 1024,
                 memory_mb: 512,
                 memory_swap_mb: 1024,
+                cgroup_v2: None,
             },
             is_rootless: true,
             jail_config: None,

@@ -399,6 +399,95 @@ impl AppImageContainer {
     }
 }
 
+/// Server image / container formats supported by SigmaOS Packaging Universal Adapter
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServerImageFormat {
+    OciDockerContainer,
+    LxcContainerTarball,
+    OvfOvaAppliance,
+    Qcow2DiskImage,
+    VhdDiskImage,
+    VhdxDiskImage,
+    RescueLiveCdIso,
+    LiveServerIso,
+}
+
+/// Metadata extracted from server image formats
+#[derive(Debug, Clone)]
+pub struct ServerImageMetadata {
+    pub format: ServerImageFormat,
+    pub name: String,
+    pub version: String,
+    pub virtual_size_bytes: u64,
+    pub target_distro: String, // e.g. "RHEL", "Ubuntu", "SUSE", "Debian", "CentOS"
+    pub entry_cmd: Option<String>,
+}
+
+/// Adapter for parsing server image & container formats for SigmaOS Packaging System
+pub struct UniversalServerImageAdapter;
+
+impl UniversalServerImageAdapter {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Detects format and parses metadata for container/VM server images
+    pub fn parse_server_image_manifest(&self, format: ServerImageFormat, manifest_data: &str) -> Result<ServerImageMetadata, &'static str> {
+        let mut name = String::new();
+        let mut version = String::from("1.0.0");
+        let mut virtual_size_bytes = 0u64;
+        let mut target_distro = String::from("Generic Linux");
+        let mut entry_cmd = None;
+
+        for line in manifest_data.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "name" | "Name" | "image_name" => name = val.to_string(),
+                    "version" | "Version" | "tag" => version = val.to_string(),
+                    "virtual_size" | "size" => virtual_size_bytes = val.parse::<u64>().unwrap_or(0),
+                    "distro" | "OS" | "TargetDistro" => target_distro = val.to_string(),
+                    "cmd" | "Cmd" | "Entrypoint" => entry_cmd = Some(val.to_string()),
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() {
+            name = match format {
+                ServerImageFormat::OciDockerContainer => "docker-container".to_string(),
+                ServerImageFormat::LxcContainerTarball => "lxc-container".to_string(),
+                ServerImageFormat::OvfOvaAppliance => "ovf-appliance".to_string(),
+                ServerImageFormat::Qcow2DiskImage => "qcow2-image".to_string(),
+                ServerImageFormat::VhdDiskImage => "vhd-image".to_string(),
+                ServerImageFormat::VhdxDiskImage => "vhdx-image".to_string(),
+                ServerImageFormat::RescueLiveCdIso => "rescue-live-cd".to_string(),
+                ServerImageFormat::LiveServerIso => "live-server".to_string(),
+            };
+        }
+
+        Ok(ServerImageMetadata {
+            format,
+            name,
+            version,
+            virtual_size_bytes,
+            target_distro,
+            entry_cmd,
+        })
+    }
+}
+
+impl Default for UniversalServerImageAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UniversalPackageAdapter {
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
@@ -596,5 +685,24 @@ mod tests {
         let exec_path = appimage.mount_and_run("/tmp/.mount_vlc").unwrap();
         assert_eq!(exec_path, "/tmp/.mount_vlc/vlc");
         assert!(appimage.mounted);
+    }
+
+    #[test]
+    fn test_server_image_adapter() {
+        let adapter = UniversalServerImageAdapter::new();
+        let manifest_data = r#"
+            name: rhel-server-node
+            version: 9.2
+            virtual_size: 21474836480
+            distro: RHEL
+            cmd: /usr/sbin/init
+        "#;
+
+        let meta = adapter.parse_server_image_manifest(ServerImageFormat::Qcow2DiskImage, manifest_data).unwrap();
+        assert_eq!(meta.name, "rhel-server-node");
+        assert_eq!(meta.version, "9.2");
+        assert_eq!(meta.target_distro, "RHEL");
+        assert_eq!(meta.virtual_size_bytes, 21474836480);
+        assert_eq!(meta.entry_cmd, Some("/usr/sbin/init".to_string()));
     }
 }
