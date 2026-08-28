@@ -54,6 +54,16 @@ mod unveil;
 
 #[path = "../src/logging/unified.rs"]
 mod unified;
+#[path = "../src/process/sovereign_process_engine.rs"]
+mod sovereign_process_engine;
+#[path = "../src/shell/sovereign_shell_parity.rs"]
+mod sovereign_shell_parity;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
 
 use bsd_compat::*;
 
@@ -169,11 +179,12 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas::{
+    use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitActiveState,
         SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
+        RealtimeTask, SchedulerClass,
     };
 
     // 1. NixOS Declarative System State
@@ -214,10 +225,8 @@ fn test_wiki_distro_innovations_inspection() {
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
+
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
-    };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
@@ -259,7 +268,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(mir_eng.get_fastest_mirror(), Some("https://fast.repo.org".to_string()));
 
     let mut journal = PackageTransactionJournal::new();
-    let tx1 = journal.log_transaction("install", "bash", "5.2", 100);
+    let _tx1 = journal.log_transaction("install", "bash", "5.2", 100);
     let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
     assert_eq!(journal.rollback_transaction(tx2).len(), 1);
 
@@ -278,7 +287,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
     kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
-    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s| s.as_str()), Some("1"));
+    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);

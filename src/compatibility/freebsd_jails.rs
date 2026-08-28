@@ -3,9 +3,9 @@
 //! Lightweight OS-level virtualization with process isolation
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;

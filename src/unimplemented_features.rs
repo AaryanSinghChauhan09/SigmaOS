@@ -9,7 +9,7 @@ use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
@@ -234,8 +234,10 @@ impl Default for BareMetalPeripheralManager {
     }
 }
 
-// ==================================================================// 6.2 ZERO-ALLOCATION UDF BYTECODE INTERPRETER SPECIFICATION
-// ===========================================================pub const OP_READ: u8 = 0x10;
+// ==================================================================
+// 6.2 ZERO-ALLOCATION UDF BYTECODE INTERPRETER SPECIFICATION
+// ==================================================================
+pub const OP_READ: u8 = 0x10;
 pub const OP_WRITE: u8 = 0x20;
 pub const OP_ADD: u8 = 0x30;
 pub const OP_HALT: u8 = 0xF0;

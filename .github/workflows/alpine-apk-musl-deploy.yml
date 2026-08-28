@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Rust Toolchain (Musl Target)
-        uses: dtolnay/rust-toolchain@7bbf72382103ef808801d00d235be6b4b455c1ef
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           targets: x86_64-unknown-linux-musl

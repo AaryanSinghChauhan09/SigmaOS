@@ -1,7 +1,7 @@
 // Universal Distro Compatibility Bridge & ABI Translation Matrix for SigmaOS
 // Inspired by Linux Systemd/OpenRC, FreeBSD Jails, OpenBSD Pledge/Unveil, and Linux/BSD ELF rtld dynamic linkers
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Distro Service Init Manager Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
