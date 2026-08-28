@@ -867,11 +867,16 @@ impl ApkIndexVerifier {
     }
 
     pub fn verify_apk_index_hash(&self, index_bytes: &[u8], expected_hash: &[u8; 32]) -> bool {
+        if index_bytes.is_empty() {
+            return false;
+        }
+        // FNV-1a based 256-bit hashing over index bytes
         let mut computed = [0u8; 32];
-        let mut idx = 0;
-        for &b in index_bytes {
-            computed[idx % 32] ^= b;
-            idx += 1;
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in index_bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            computed[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
         }
         computed == *expected_hash
     }
@@ -921,11 +926,24 @@ impl OpenBsdPkgSignifyVerifier {
         });
     }
 
-    pub fn verify_signify_signature(&self, _pkg_bytes: &[u8], signature_header: &str) -> bool {
-        if !signature_header.starts_with("untrusted comment: verify with ") {
+    pub fn verify_signify_signature(&self, pkg_bytes: &[u8], signature_header: &str) -> bool {
+        if pkg_bytes.is_empty() || !signature_header.starts_with("untrusted comment: verify with ") {
             return false;
         }
-        !self.signify_pubkeys.is_empty()
+        // Extract key identifier from signify untrusted comment header
+        let key_id = signature_header
+            .split("untrusted comment: verify with ")
+            .nth(1)
+            .and_then(|s| s.lines().next())
+            .unwrap_or("")
+            .trim();
+
+        if key_id.is_empty() {
+            return false;
+        }
+
+        // Validate that key identifier matches one of registered trusted signify pubkeys
+        self.signify_pubkeys.iter().any(|k| k.contains(key_id) || key_id.contains(k.as_str()))
     }
 
     pub fn validate_path_unveiled(&self, path: &str, required_perm: &str) -> bool {
@@ -1135,8 +1153,17 @@ mod tests {
     fn test_alpine_apk_index_verifier() {
         let mut verifier = ApkIndexVerifier::new();
         verifier.add_trigger("/etc/ssl/certs", "c_rehash");
-        let hash = [0u8; 32];
-        assert!(verifier.verify_apk_index_hash(&[0u8; 64], &hash));
+        let sample_bytes = b"sample index content";
+        let mut expected_hash = [0u8; 32];
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in sample_bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            expected_hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
+        }
+
+        assert!(verifier.verify_apk_index_hash(sample_bytes, &expected_hash));
+        assert!(!verifier.verify_apk_index_hash(b"", &expected_hash));
 
         let triggers = verifier.match_triggers("/etc/ssl/certs/ca.pem");
         assert_eq!(triggers.len(), 1);
@@ -1149,7 +1176,9 @@ mod tests {
         verifier.add_signify_pubkey("RWT1234567890...");
         verifier.add_unveil_rule("/usr/local", "rx");
 
-        assert!(verifier.verify_signify_signature(b"data", "untrusted comment: verify with key"));
+        assert!(verifier.verify_signify_signature(b"data", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier.verify_signify_signature(b"", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier.verify_signify_signature(b"data", "untrusted comment: verify with unknown_key"));
         assert!(verifier.validate_path_unveiled("/usr/local/bin/git", "r"));
         assert!(!verifier.validate_path_unveiled("/etc/shadow", "r"));
     }
