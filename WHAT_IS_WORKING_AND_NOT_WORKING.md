@@ -1,6 +1,6 @@
 # WHAT'S WORKING & WHAT'S NOT WORKING IN SIGMAOS: AI AGENT ALGORITHM DIAGNOSTICS & FIX GUIDE
 
-This document is the master, definitive diagnostic guide for SigmaOS. It provides a comprehensive, technical inventory of all working OS subsystems, cataloged failure modes, root-cause analyses, and concrete safe Rust algorithm fix blueprints so that **any AI agent can easily inspect, diagnose, and fix algorithms and compilation errors across the codebase**.
+This document serves as the master, definitive diagnostic guide for SigmaOS. It provides a comprehensive, technical inventory of all working OS subsystems, cataloged failure modes, compiler error codes, root-cause analyses, and concrete safe Rust algorithm fix blueprints so that **any AI agent can easily inspect, diagnose, and fix algorithms and compilation errors across the codebase**.
 
 ---
 
@@ -19,11 +19,14 @@ SigmaOS features a zero-dependency, modular microkernel and OS suite written in 
   - `StackCanaryProtector`: XOR-seeded global stack canary for buffer overflow protection.
   - `BatchSystemQueue`: Multiprogrammed batch job queue processor with concurrency limits.
 - **Real-Time Scheduling (`src/kernel/structures.rs`):** Earliest Deadline First (EDF) real-time task scheduler, Lottery scheduling with probability-weighted ticket distribution, and APC (Asynchronous Procedure Call) queue delivery.
+- **Process Management & PID Allocator (`src/process/sovereign_process_engine.rs`):** FreeBSD PID bitmap recycling, Linux PID namespace isolation, and parent/child process tree tracking with process descriptor handle support (`pdfork`).
 
 ### 2. Hardware Abstraction Layer (HAL) & Memory Subsystem (`src/klib/`, `src/kernel/`)
 - **Paging & Virtual Memory (`src/klib/paging.rs`):** 4-level x86_64 page table mapping (`Standard4KB`, `Huge2MB`, `Giant1GB`), safe `.get_mut()` option chaining (panic-free boundary checking), and Copy-on-Write (CoW) page table snapping.
 - **HAL Multi-Arch Abstraction (`src/kernel/architecture.rs`):** Unified architecture interface supporting x86_64 (APIC/IOAPIC, CR0/CR4/EFER registers), AArch64 (GICv2/v3, TTBR page tables), and RISC-V 64 (PLIC/CLINT, satp S-mode paging).
 - **PCI/PCIe Bus Scanner (`src/kernel/pci_scanner.rs`):** PCIe ECAM memory-mapped configuration space addressing, 32-bit/64-bit MMIO & I/O BAR decoding, prefetchable memory flags, and Capabilities pointer parsing (MSI, MSI-X, PCIe, Power Management).
+- **Environment & XDG Spec Engine (`src/klib/env.rs`):** Linux XDG base directory specification (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME`, `XDG_RUNTIME_DIR`), POSIX/BSD defaults (`PATH`, `HOME`, `SHELL`, `PAGER`, `EDITOR`), OpenBSD `secure_getenv` privilege tainting, and dynamic variable expansion (`expand_vars`).
+- **Sysctl Parameter Registry (`src/kernel/sysctl.rs`):** Dynamic MIB parameter tree hierarchy with integer range bounds checking and net/vm parameter querying.
 
 ### 3. Linux & BSD Parity Layers (`src/compatibility/`, `src/distro/`, `src/sigpkg/`)
 - **Distro Parity Subsystems (`src/distro/linux_bsd_parity.rs`):**
@@ -32,23 +35,30 @@ SigmaOS features a zero-dependency, modular microkernel and OS suite written in 
   - Arch Linux AUR PKGBUILD verification (`AurPkgBuildVerifier`).
   - NixOS Flake Engine declarative generation rollback & garbage collection.
   - Void Linux Runit Supervisor service restarting and status querying.
-  - Gentoo Portage USE-flag dependency resolution engine.
+  - Gentoo Portage USE-flag dependency resolution engine & mask verifier.
 - **Linux Mint Compatibility (`src/compatibility/mint_linux.rs`):** `CinnamonDesktopEngine`, `MintUpdateManager`, `MintInstallSoftwareManager`, and `MintWarpinatorEngine` for local network file transfers.
-- **Universal IOCTL Decoder (`src/package/linux_translation.rs`):** Command layout translation for Windows NT, Linux DRM/KMS, and BSD ioctl calls.
+- **Extended ABI Execution Frame (`src/compatibility/abi_extended.rs`):** ARM64 AAPCS calling convention (`Arm64AapcsFrame`) and RISC-V 64-bit calling convention (`Riscv64AbiFrame`) translating ABI register frames.
 
 ### 4. Storage & Filesystem Subsystems (`src/fs/`, `src/filesystem/`)
 - **Ext4 Filesystem Engine (`src/filesystem/complete_filesystems.rs`):** Extent tree block allocation, JBD2 metadata journaling, and CRC32C checksum validation.
 - **Btrfs Subvolume Engine (`src/fs/btrfs.rs`):** Copy-on-Write (CoW) snapshotting, async TRIM/discard, subvolume property inheritance, and incremental send/receive streams.
 - **DragonFly BSD HAMMER2 PFS Engine (`src/unimplemented_features.rs`):** Cluster node replication, snapshot generation, and Merkle tree root rollback.
 - **Zero-Copy IPC Pipes (`src/kernel/pipes.rs`):** Page buffer ring `splice` zero-copy transfer and `tee` pipe duplication.
+- **FHS & Hier Path Translator (`src/filesystem/bsd_linux_innovations.rs`):** Linux FHS 3.0 merged-usr path resolution (`/bin` -> `/usr/bin`, `/lib` -> `/usr/lib`) and FreeBSD hier(7) `/usr/local` translation.
 
 ### 5. Cryptography & Security (`src/crypto/`, `src/security/`)
 - **Post-Quantum Cryptography (`src/crypto/`):** Dilithium-5 digital attestation signatures and Kyber-1024 key encapsulation mechanism.
 - **CSPRNG Entropy Engine (`src/crypto/random.rs`):** Hardware RDRAND/RDTSC entropy seeding mixed into ASLR pointer space.
 - **FreeBSD Securelevels & Jails (`src/security/securelevels.rs`, `src/security/jails.rs`):** System securelevels (-1 to 3) enforcing append-only files and immutable sysctls.
-- **eBPF Engine & Landlock VFS (`src/kernel/ebpf.rs` & `src/kernel/linux_bsd_innovations.rs`):** In-kernel eBPF static instruction verifier, division-by-zero checks, and Landlock/Pledge access path restrictions.
+- **Root Elevator & PAM Stack (`src/security/root_improvement.rs`):** Sudo/Doas privilege elevator with session TTL expiration, Polkit role-based permission checks, and PAM multi-factor authentication token validation.
+- **eBPF Engine & Landlock VFS (`src/kernel/ebpf.rs` & `src/kernel/linux_bsd_innovations.rs`):** In-kernel eBPF static instruction verifier, division-by-zero checks, and Landlock access path restrictions.
 
-### 6. Virtualization & Container Isolation (`src/virt/`, `src/open_source_obsoletion.rs`)
+### 6. Networking, Remote Sharing & Container Isolation (`src/network/`, `src/virt/`)
+- **Remote Protocol Suite (`src/network/sovereign_remote_sharing.rs`):**
+  - `SovereignSshEngine`: SSHv2 key exchange, session authentication, and encrypted tunnel establishment.
+  - `SovereignNfsEngine`: NFSv4 file handle lookup, rpcbind RPC registration, and remote file read/write operations.
+  - `SovereignSambaEngine`: SMB3 dialect negotiation, tree connect, and share access.
+  - `SovereignScpEngine` & `SovereignRsyncEngine`: Remote copy and delta file transfer synchronization.
 - **QEMU & KVM Virtual Machine Manager (`src/virt/mod.rs` & `src/virtualization/kvm_vcpu.rs`):** Qcow2 copy-on-write image overlays, KVM vCPU execution context (`KvmVcpuContext`), VFIO IOMMU PCI device passthrough, and VirtIO split ring buffers (`VirtqueueRing`).
 - **Sovereign OCI Container Runtime:** Isolated process namespaces, cgroup resource constraints, and layer image mounting.
 
@@ -56,11 +66,44 @@ SigmaOS features a zero-dependency, modular microkernel and OS suite written in 
 
 ## SECTION 2: WHAT IS NOT WORKING, WHY & HOW TO FIX IT
 
-Below is the exhaustive catalog of compilation errors, borrow checker conflicts, and architectural pitfalls encountered when compiling or expanding SigmaOS, along with exact root-cause analyses and safe Rust fix blueprints.
+Below is the exhaustive technical catalog of compilation errors, borrow checker conflicts, and scope resolution issues encountered in submodules or test suites, along with exact root-cause analyses and safe Rust fix blueprints.
 
 ---
 
-### Issue 1: Transmute Size Mismatch Error (`E0512`)
+### Issue 1: Unresolved Imports & Module Path Mismatches (`E0432` / `E0252` / `E0428`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0432]: unresolved import `package_repository`
+   --> tests/linux_bsd_inspection_tests.rs:293:9
+    |
+293 |     use package_repository::SovereignPackageRepositoryManager;
+    |         ^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `package_repository`
+
+error[E0252]: the name `SovereignPackageRepositoryManager` is defined multiple times
+error[E0428]: the name `test_kernel_classic_algorithms_inspection` is defined multiple times
+```
+
+#### **Why It Occurs:**
+1. Tests or submodules attempt to import modules directly (e.g., `use package_repository::*;` or `use module_loader::*;`) without referencing their declared module location (e.g. `crate::sigpkg::package_repository` or `crate::driver::module_loader`).
+2. Duplicate module aliases or duplicate function names exist inside `tests/linux_bsd_inspection_tests.rs` or `src/lib.rs`.
+
+#### **How to Fix It (Blueprint):**
+Prefix imports with full module paths and deduplicate module definitions in tests:
+
+```rust
+// BEFORE (Broken Unresolved Import):
+use package_repository::SovereignPackageRepositoryManager;
+use module_loader::{SovereignKernelModuleManager, ModuleState};
+
+// AFTER (Fixed Full-Path Import):
+use sigmaos::sigpkg::package_repository::SovereignPackageRepositoryManager;
+use sigmaos::driver::module_loader::{SovereignKernelModuleManager, ModuleState};
+```
+
+---
+
+### Issue 2: Transmute Size Mismatch Error (`E0512`)
 
 #### **Symptom / Compiler Output:**
 ```text
@@ -79,7 +122,6 @@ On 64-bit target architectures, loading an `AtomicUsize` yields an 8-byte intege
 
 #### **How to Fix It (Blueprint):**
 
-**Option A: Replace transmute with a type-safe `match` block (Recommended)**
 ```rust
 // BEFORE (Broken Transmute):
 pub fn model_type(&self) -> ModelType {
@@ -98,100 +140,40 @@ pub fn model_type(&self) -> ModelType {
 }
 ```
 
-**Option B: Annotate target enum with explicit representation**
-```rust
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModelType {
-    NeuralNetwork = 0,
-    DecisionTree = 1,
-    SVM = 2,
-    Transformer = 3,
-}
-```
-
 ---
 
-### Issue 2: Glob Import Scope Ambiguities (`E0659`)
+### Issue 3: Type Annotation & Type Inference Failures (`E0282` / `E0614`)
 
 #### **Symptom / Compiler Output:**
 ```text
-error[E0659]: `Irp` is ambiguous
-   --> src/driver/framework.rs:581:31
+error[E0282]: type annotations needed
+   --> src/kernel/linux_bsd_innovations.rs:126:35
     |
-581 |     let mut irp_direct = Irp::new(IrpMajorFunction::DeviceControl);
-    |                          ^^^ ambiguous name
-    |
-    = note: ambiguous because of multiple glob imports of a name in the same module
-note: `Irp` could refer to the struct imported here (`use crate::driver::irp_system::*;`)
-note: `Irp` could also refer to the struct imported here (`use super::*;`)
+126 |                 expired_keys.push(tuple.clone());
+    |                                   ^^^^^ cannot infer type
+
+error[E0614]: type `i32` cannot be dereferenced
+  --> src/kernel/sysctl.rs:90:24
+   |
+90 |                     if *v < 0 && mib == "vm.swappiness" {
+   |                        ^^ can't be dereferenced
 ```
 
 #### **Why It Occurs:**
-When test blocks or submodules import symbols via wildcard glob imports (e.g., `use super::*;` AND `use crate::driver::irp_system::*;`), symbol names exported by both modules (e.g. `Irp`, `DeviceObject`, `DriverObject`) collide, causing resolution failure.
+1. **E0282**: The compiler cannot infer vector element types when `.collect()` or `.push()` is invoked without explicit variable typing.
+2. **E0614**: Attempting to dereference a primitive integer value `v: i32` directly (instead of a reference `&i32`).
 
 #### **How to Fix It (Blueprint):**
-Replace wildcard glob imports with explicit, named imports:
 
 ```rust
-// BEFORE (Ambiguous Glob Imports):
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::driver::irp_system::*;
-}
+// FIX FOR E0282 (Explicit Vector Type Annotation):
+let mut expired_keys: Vec<(String, u64)> = Vec::new();
+expired_keys.push(tuple.clone());
 
-// AFTER (Disambiguated Named Imports):
-#[cfg(test)]
-mod tests {
-    use super::SimpleDriver;
-    use crate::driver::irp_system::{Irp, IrpMajorFunction, DeviceObject};
-}
-```
-
----
-
-### Issue 3: Duplicate Constructors & Missing Structural Fields (`E0034` / `E0063`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0034]: multiple applicable items in scope
-  --> src/sigpkg/mod.rs:120:18
-   |
-120| pub fn new(...)
-   |
-
-error[E0063]: missing fields `changelogs`, `licenses`, `maintainers` in initializer of `Package`
-```
-
-#### **Why It Occurs:**
-1. **E0034**: Duplicate `pub fn new(...)` method implementations exist within the same `impl` block or across multiple `impl` blocks for a single struct (e.g. `Package`, `DoasRuleEngine`, `SubUidGidMapper`).
-2. **E0063**: When new fields are added to a struct definition, any manual struct initializers (`Package { name, version, ... }`) that omit the new fields will fail to compile.
-
-#### **How to Fix It (Blueprint):**
-1. Maintain exactly **one** `pub fn new(...)` constructor method per struct by consolidating or removing duplicates.
-2. Ensure `new(...)` initializes all fields, providing sensible defaults (`Vec::new()`, `String::new()`, `None`) for optional fields:
-
-```rust
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-            changelogs: Vec::new(),   // Default empty vector
-            licenses: Vec::new(),     // Default empty vector
-            maintainers: Vec::new(),  // Default empty vector
-        }
-    }
+// FIX FOR E0614 (Remove Unnecessary Dereference):
+// Change `if *v < 0` to:
+if v < 0 && mib == "vm.swappiness" {
+    return Err("Sysctl value out of range");
 }
 ```
 
@@ -201,91 +183,70 @@ impl Package {
 
 #### **Symptom / Compiler Output:**
 ```text
-error[E0004]: non-exhaustive patterns: `Pwd`, `WhoAmI`, `Su` not covered
-  --> src/shell/repl.rs:85:11
-   |
-85 |     match cmd {
-   |           ^^^ patterns `Pwd`, `WhoAmI`, `Su` not covered
+error[E0004]: non-exhaustive patterns: `&vm_manager::KvmExitReason::Interrupt` not covered
+   --> src/virtualization/vm_manager.rs:201:10
+    |
+201 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |          ^^^^^ pattern `Interrupt` not covered
 ```
 
 #### **Why It Occurs:**
-When new variants are added to an enum (e.g. `ShellCommand`), any `match` expression over that enum without a fallback wildcard arm fails exhaustiveness verification.
+1. Enum definition `KvmExitReason` contains duplicate variant entries or a missing match arm in derive implementations.
+2. When new variants are added to an enum (e.g. `ShellCommand` or `KvmExitReason`), any `match` expression over that enum without a fallback arm fails exhaustiveness verification.
 
 #### **How to Fix It (Blueprint):**
-Add explicit match arms for the new variants or include a safe `_` wildcard arm:
+Remove duplicate enum variants and include a fallback match arm:
 
 ```rust
-match command {
-    ShellCommand::Ls => { /* handle ls */ },
-    ShellCommand::Cd(path) => { /* handle cd */ },
-    ShellCommand::Pwd => {
-        println!("{}", current_working_dir());
-    },
-    ShellCommand::WhoAmI => {
-        println!("{}", current_user());
-    },
-    _ => {
-        println!("Command executed or forwarded to target subsystem.");
-    }
+// Remove duplicate `Interrupt` entry in `KvmExitReason` enum definition.
+// Add explicit pattern handling or wildcard in match statements:
+match exit_reason {
+    KvmExitReason::IoIn => { /* ... */ },
+    KvmExitReason::IoOut => { /* ... */ },
+    KvmExitReason::MmioRead => { /* ... */ },
+    KvmExitReason::MmioWrite => { /* ... */ },
+    KvmExitReason::Hlt => { /* ... */ },
+    KvmExitReason::Interrupt => { /* handle interrupt exit */ },
+    _ => { /* fallback */ },
 }
 ```
 
 ---
 
-### Issue 5: Undeclared Types & Structural Field Mismatches (`E0433` / `E0560` / `E0609`)
+### Issue 5: Missing Methods & Trait Implementation Mismatches (`E0599` / `E0277`)
 
 #### **Symptom / Compiler Output:**
 ```text
-error[E0433]: failed to resolve: use of undeclared type `DvfsPowerGovernor`
-error[E0560]: struct `root_improvement::SubUidGidMapper` has no field named `subuid_database`
-error[E0609]: no field `subuid_database` on type `&mut root_improvement::SubUidGidMapper`
+error[E0599]: no method named `select_next_rt_task` found for struct `SovereignHybridSchedulerInnovations`
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/compatibility/freebsd_jails.rs:147:16
 ```
 
 #### **Why It Occurs:**
-1. Subsystem refactoring renamed legacy types (e.g. `SimpleStorageDriver` was consolidated into `SimpleDriver`; `SimpleVulnerabilityScanner` into `SecurityScanner`).
-2. Fields were renamed in struct definitions (e.g. `SubUidGidMapper` field renamed from `subuid_database` to `subuid_ranges`).
+1. **E0599**: Method `select_next_rt_task` was omitted during struct definition or renamed in `SovereignHybridSchedulerInnovations`.
+2. **E0277**: Matching or binding `Option<str>` directly instead of `Option<String>` or `Option<&str>`. Unsized types (`str`) cannot be moved or bound without a reference wrapper.
 
 #### **How to Fix It (Blueprint):**
-Update struct references and field accesses to match updated type declarations:
 
-| Deprecated / Misnamed Item | Canonical Updated Declaration | File Location |
-| :--- | :--- | :--- |
-| `SimpleStorageDriver` | `SimpleDriver` | `src/driver/framework.rs` |
-| `subuid_database` | `subuid_ranges` | `src/security/root_improvement.rs` |
-| `subgid_database` | `subgid_ranges` | `src/security/root_improvement.rs` |
-| `DvfsPowerGovernor` | `PowerGovernor` | `src/power/dvfs.rs` |
-
----
-
-### Issue 6: Missing Methods & Return Type Mismatches (`E0599` / `E0308`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0599]: no method named `query_journal` found for struct `SovereignSystemdParityEngine`
-error[E0308]: mismatched types: expected `Result<SystemdUnitActiveState, String>`, found `Result<(), _>`
-```
-
-#### **Why It Occurs:**
-1. A method referenced in integration tests was omitted during struct implementation or placed under a different name.
-2. Method return signatures evolved (e.g. `start_unit` returning `Result<SystemdUnitActiveState, String>` instead of `Result<(), String>`).
-
-#### **How to Fix It (Blueprint):**
-1. Implement missing methods directly on the targeted struct:
 ```rust
-impl SovereignSystemdParityEngine {
-    pub fn query_journal(&self, unit_name: &str) -> Vec<String> {
-        self.journal_logs
-            .get(unit_name)
-            .cloned()
-            .unwrap_or_default()
+// FIX FOR E0599 (Add Missing Method):
+impl SovereignHybridSchedulerInnovations {
+    pub fn select_next_rt_task(&mut self) -> Option<ProcessTask> {
+        self.rt_queue.pop_front()
     }
 }
+
+// FIX FOR E0277 (Use String or &str borrow):
+// BEFORE: if let Some(ref exec_stop_script) = exec_stop { ... } where exec_stop is Option<str>
+// AFTER: Use `Option<String>` or borrow `Option<&str>`:
+if let Some(exec_stop_script) = exec_stop.as_deref() {
+    // exec_stop_script is &str
+}
 ```
-2. Update assertion expectations in test files to match the declared return type.
 
 ---
 
-### Issue 7: Borrow Checker Move Errors in HashMaps (`E0382`)
+### Issue 6: Borrow Checker Move Errors in HashMaps (`E0382`)
 
 #### **Symptom / Compiler Output:**
 ```text
@@ -303,7 +264,6 @@ error[E0382]: borrow of moved value: `package`
 The variable `package` is moved into `self.installed_packages.insert(...)` on line 234, rendering `package` invalid for subsequent operations on line 236.
 
 #### **How to Fix It (Blueprint):**
-Clone key fields before moving the struct:
 
 ```rust
 // BEFORE (Value Moved):
@@ -318,7 +278,7 @@ self.status_database.insert(pkg_name, "install ok installed".to_string());
 
 ---
 
-### Issue 8: Immutable Self Borrow Conflict with Self Call (`E0502`)
+### Issue 7: Immutable Self Borrow Conflict with Self Call (`E0502`)
 
 #### **Symptom / Compiler Output:**
 ```text
@@ -334,10 +294,9 @@ error[E0502]: cannot borrow `*self` as mutable because it is also borrowed as im
 ```
 
 #### **Why It Occurs:**
-`self.dependency_graph.get_dependencies(name)` retains an immutable borrow on `self` during the loop iteration over `deps`. Invoking `self.start_service(dep)` inside the loop attempts a mutable borrow on `self`, causing a borrow conflict.
+`self.dependency_graph.get_dependencies(name)` retains an immutable borrow on `self` during loop iteration. Invoking `self.start_service(dep)` inside the loop attempts a mutable borrow on `self`, causing a borrow conflict.
 
 #### **How to Fix It (Blueprint):**
-Collect the dependency keys into an owned `Vec` to release the immutable borrow before mutating `self`:
 
 ```rust
 // BEFORE (Conflicting Borrow):
@@ -588,15 +547,15 @@ When an AI agent is tasked with fixing an algorithm or compilation error in Sigm
 |                                                                       |
 |  [ ] STEP 2: CLASSIFY ERROR                                           |
 |      Match compiler output to Section 2:                              |
-|      - E0512  => Replace transmute with match or #[repr(usize)].      |
-|      - E0659  => Replace glob imports with explicit named imports.    |
-|      - E0063  => Update struct initializer / use Package::new().      |
-|      - E0004  => Add missing match pattern or _ wildcard arm.         |
-|      - E0433  => Replace legacy type name with canonical type.        |
-|      - E0560/E0609 => Match struct field names to current struct impl. |
-|      - E0599/E0308 => Add missing struct methods or align return types.|
-|      - E0382  => Clone map key before moving value into hashmap.      |
-|      - E0502  => Collect query results into owned Vec before loop.    |
+|      - E0432/E0252 => Fix module import paths to use full crate path. |
+|      - E0512       => Replace transmute with match or #[repr(usize)]. |
+|      - E0282       => Add explicit type annotation to variable.       |
+|      - E0614       => Remove dereference operator `*` on value types. |
+|      - E0004       => Add missing match pattern or `_` fallback arm.  |
+|      - E0599       => Implement missing struct method.                |
+|      - E0277       => Use Option<String> or Option<&str> for unsized. |
+|      - E0382       => Clone map key before moving value into hashmap. |
+|      - E0502       => Collect query results into owned Vec.           |
 |                                                                       |
 |  [ ] STEP 3: APPLY SAFE CODE MODIFICATION                             |
 |      Use replace_with_git_merge_diff to apply targeted code changes. |
