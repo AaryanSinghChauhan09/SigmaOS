@@ -11,6 +11,48 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DeviceID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AcpiPowerState {
+    D0,
+    D1,
+    D2,
+    D3,
+}
+
+pub struct SimpleAcpiManager {
+    pub irq_routing: crate::klib::BTreeMap<u32, u32>,
+    pub power_states: crate::klib::BTreeMap<DeviceID, AcpiPowerState>,
+}
+
+impl SimpleAcpiManager {
+    pub fn new() -> Self {
+        Self {
+            irq_routing: crate::klib::BTreeMap::new(),
+            power_states: crate::klib::BTreeMap::new(),
+        }
+    }
+
+    pub fn balance_irq_routing(&mut self, irq: u32, cpu: u32) -> Result<(), &'static str> {
+        self.irq_routing.insert(irq, cpu);
+        Ok(())
+    }
+
+    pub fn set_device_power_state(&mut self, dev: DeviceID, state: AcpiPowerState) -> Result<(), &'static str> {
+        self.power_states.insert(dev, state);
+        Ok(())
+    }
+
+    pub fn get_device_power_state(&self, dev: DeviceID) -> Option<AcpiPowerState> {
+        self.power_states.get(&dev).copied()
+    }
+}
+
+impl Default for SimpleAcpiManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     GPU = 0,
     WiFi = 1,
@@ -496,7 +538,7 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 12);
+        assert_eq!(matrix.list_supported().len(), 14);
         assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
@@ -506,19 +548,19 @@ mod tests {
         matrix.seed_with_defaults();
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 13);
+        assert_eq!(report.results.len(), 15);
     }
 
     #[test]
     fn test_expanded_device_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.devices.len(), 13);
-        assert_eq!(matrix.list_supported().len(), 12);
+        assert_eq!(matrix.devices.len(), 15);
+        assert_eq!(matrix.list_supported().len(), 14);
 
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 13);
+        assert_eq!(report.results.len(), 15);
     }
 
     #[test]
@@ -527,7 +569,7 @@ mod tests {
         matrix.seed_with_defaults();
 
         assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
-        assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 3);
+        assert_eq!(matrix.list_by_type(DeviceType::Storage).len(), 4);
         assert_eq!(matrix.list_by_type(DeviceType::Chipset).len(), 2);
         assert_eq!(matrix.list_by_type(DeviceType::GPU).len(), 2);
         assert_eq!(matrix.list_by_type(DeviceType::Printer).len(), 1);

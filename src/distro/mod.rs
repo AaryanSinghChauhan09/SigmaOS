@@ -21,14 +21,13 @@ pub mod manjaro;
 pub mod nextgen;
 pub mod parity;
 pub mod power_network_tools;
+pub mod missing_distro_innovations;
 pub mod preseed;
 pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
-pub mod missing_distro_innovations;
-pub mod ready_to_use;
 pub mod wiki_ideas_implementation;
 
 pub use arch_parity::{
@@ -90,7 +89,7 @@ pub use wiki_ideas_implementation::{
     PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
     CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
     DvfsPowerGovernor, JournalLogEntry, NumaNodeAffinity, SovereignHybridSchedulerInnovations,
-    SovereignSystemdParityEngine, SovereignSystemdUnit, SystemdJournalEntry, SystemdUnitState, SystemdUnitType,
+    SovereignSystemdParityEngine, SovereignSystemdUnit, SystemdUnitState, SystemdUnitType,
     RtlaneRealtimeTask,
 };
 pub use ready_to_use::{

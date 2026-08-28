@@ -21,8 +21,6 @@ extern crate alloc;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
-
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
 

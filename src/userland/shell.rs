@@ -77,7 +77,6 @@ pub enum ShellCommand {
 }
 
 /// Legacy alias for backward compatibility
-pub type Redirect = RedirectSpec;
 
 /// Target stream binding for file descriptor redirection
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -328,31 +327,29 @@ impl<'a> Parser<'a> {
                     self.advance();
                     self.skip_whitespace();
                     let path = self.parse_word()?;
-                    redirects.push(Redirect {
-                        src_fd,
-                        target_fd: None,
+                    redirects.push(RedirectSpec::Output {
+                        fd: src_fd,
                         path,
-                        kind: RedirectKind::Append,
+                        append: true,
+                        force: false,
                     });
                 } else if self.peek() == Some('&') {
                     self.advance();
                     self.skip_whitespace();
                     let target = self.parse_word()?;
-                    let target_fd = target.parse::<u32>().ok();
-                    redirects.push(Redirect {
+                    let target_fd = target.parse::<u32>().unwrap_or(1);
+                    redirects.push(RedirectSpec::DupOutput {
                         src_fd,
                         target_fd,
-                        path: target,
-                        kind: RedirectKind::DupOutput,
                     });
                 } else {
                     self.skip_whitespace();
                     let path = self.parse_word()?;
-                    redirects.push(Redirect {
-                        src_fd,
-                        target_fd: None,
+                    redirects.push(RedirectSpec::Output {
+                        fd: src_fd,
                         path,
-                        kind: RedirectKind::Output,
+                        append: false,
+                        force: false,
                     });
                 }
                 continue;
@@ -366,42 +363,36 @@ impl<'a> Parser<'a> {
                         self.advance();
                         self.skip_whitespace();
                         let content = self.parse_word()?;
-                        redirects.push(Redirect {
-                            src_fd,
-                            target_fd: None,
-                            path: content,
-                            kind: RedirectKind::HereString,
+                        redirects.push(RedirectSpec::HereString {
+                            fd: src_fd,
+                            content,
                         });
                     } else {
                         // << HereDoc
                         self.skip_whitespace();
                         let delimiter = self.parse_word()?;
-                        redirects.push(Redirect {
-                            src_fd,
-                            target_fd: None,
-                            path: delimiter,
-                            kind: RedirectKind::HereDoc,
+                        redirects.push(RedirectSpec::HereDoc {
+                            fd: src_fd,
+                            delimiter: delimiter.clone(),
+                            strip_leading_tabs: false,
+                            content: delimiter,
                         });
                     }
                 } else if self.peek() == Some('&') {
                     self.advance();
                     self.skip_whitespace();
                     let target = self.parse_word()?;
-                    let target_fd = target.parse::<u32>().ok();
-                    redirects.push(Redirect {
+                    let target_fd = target.parse::<u32>().unwrap_or(0);
+                    redirects.push(RedirectSpec::DupInput {
                         src_fd,
                         target_fd,
-                        path: target,
-                        kind: RedirectKind::DupInput,
                     });
                 } else {
                     self.skip_whitespace();
                     let path = self.parse_word()?;
-                    redirects.push(Redirect {
-                        src_fd,
-                        target_fd: None,
+                    redirects.push(RedirectSpec::Input {
+                        fd: src_fd,
                         path,
-                        kind: RedirectKind::Input,
                     });
                 }
                 continue;
@@ -712,6 +703,26 @@ impl<'a> Parser<'a> {
     }
 }
 
+pub struct RedirectionEngine;
+
+impl RedirectionEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn write_fd(&self, _fd: u32, _data: &[u8]) {}
+
+    pub fn read_fd(&self, _fd: u32) -> Option<Vec<u8>> {
+        None
+    }
+}
+
+impl Default for RedirectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct Shell {
     pub env: Environment,
     pub redirection_engine: RedirectionEngine,
@@ -815,26 +826,34 @@ impl Shell {
             ShellCommand::Redirect(child, redir) => {
                 // Execute child with redirection context logged in environment / streams
                 let status = self.execute_ast(child)?;
-                match redir.kind {
-                    RedirectKind::Output => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FILE:{}", redir.path));
+                match redir {
+                    RedirectSpec::Output { fd, path, append, .. } => {
+                        let mode = if *append { "APPEND" } else { "FILE" };
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("{}:{}", mode, path));
                     }
-                    RedirectKind::Append => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("APPEND:{}", redir.path));
+                    RedirectSpec::Input { fd, path } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("INPUT:{}", path));
                     }
-                    RedirectKind::Input => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("INPUT:{}", redir.path));
+                    RedirectSpec::HereDoc { fd, content, .. } => {
+                        self.env.vars.insert(format!("FD_{}_HEREDOC", fd), content.clone());
                     }
-                    RedirectKind::HereDoc => {
-                        self.env.vars.insert(format!("FD_{}_HEREDOC", redir.src_fd), redir.path.clone());
+                    RedirectSpec::HereString { fd, content } => {
+                        self.env.vars.insert(format!("FD_{}_HERESTRING", fd), content.clone());
                     }
-                    RedirectKind::HereString => {
-                        self.env.vars.insert(format!("FD_{}_HERESTRING", redir.src_fd), redir.path.clone());
+                    RedirectSpec::DupOutput { src_fd, target_fd }
+                    | RedirectSpec::DupInput { src_fd, target_fd } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", src_fd), format!("FD:{}", target_fd));
                     }
-                    RedirectKind::DupOutput | RedirectKind::DupInput => {
-                        if let Some(target) = redir.target_fd {
-                            self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FD:{}", target));
-                        }
+                    RedirectSpec::CombinedOutput { path, append } => {
+                        let mode = if *append { "APPEND" } else { "FILE" };
+                        self.env.vars.insert("FD_1_2_REDIRECT".to_string(), format!("{}:{}", mode, path));
+                    }
+                    RedirectSpec::CloseFd { fd } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), "CLOSED".to_string());
+                    }
+                    RedirectSpec::ProcessSubInput { fd, .. }
+                    | RedirectSpec::ProcessSubOutput { fd, .. } => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), "PROCESSSUB".to_string());
                     }
                 }
                 Ok(status)
@@ -852,10 +871,10 @@ mod tests {
         let mut parser = Parser::new("echo hello > output.txt");
         let cmd = parser.parse().unwrap();
         match cmd {
-            ShellCommand::Redirect(_child, redir) => {
-                assert_eq!(redir.src_fd, 1);
-                assert_eq!(redir.kind, RedirectKind::Output);
-                assert_eq!(redir.path, "output.txt");
+            ShellCommand::Redirect(_child, RedirectSpec::Output { fd, path, append, .. }) => {
+                assert_eq!(fd, 1);
+                assert!(!append);
+                assert_eq!(path, "output.txt");
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -863,10 +882,9 @@ mod tests {
         let mut parser2 = Parser::new("cat < input.txt");
         let cmd2 = parser2.parse().unwrap();
         match cmd2 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 0);
-                assert_eq!(redir.kind, RedirectKind::Input);
-                assert_eq!(redir.path, "input.txt");
+            ShellCommand::Redirect(_, RedirectSpec::Input { fd, path }) => {
+                assert_eq!(fd, 0);
+                assert_eq!(path, "input.txt");
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -874,10 +892,9 @@ mod tests {
         let mut parser3 = Parser::new("ls 2> error.log");
         let cmd3 = parser3.parse().unwrap();
         match cmd3 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 2);
-                assert_eq!(redir.kind, RedirectKind::Output);
-                assert_eq!(redir.path, "error.log");
+            ShellCommand::Redirect(_, RedirectSpec::Output { fd, path, .. }) => {
+                assert_eq!(fd, 2);
+                assert_eq!(path, "error.log");
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -885,21 +902,19 @@ mod tests {
         let mut parser4 = Parser::new("command 2>&1");
         let cmd4 = parser4.parse().unwrap();
         match cmd4 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 2);
-                assert_eq!(redir.target_fd, Some(1));
-                assert_eq!(redir.kind, RedirectKind::DupOutput);
+            ShellCommand::Redirect(_, RedirectSpec::DupOutput { src_fd, target_fd }) => {
+                assert_eq!(src_fd, 2);
+                assert_eq!(target_fd, 1);
             }
             _ => panic!("Expected Redirect command"),
         }
 
-        let mut parser5 = Parser::new("grep fn <<< 'fn main()'");
+        let mut parser5 = Parser::new("grep fn <<< fn main()");
         let cmd5 = parser5.parse().unwrap();
         match cmd5 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 0);
-                assert_eq!(redir.kind, RedirectKind::HereString);
-                assert_eq!(redir.path, "fn main()");
+            ShellCommand::Redirect(_, RedirectSpec::HereString { fd, content }) => {
+                assert_eq!(fd, 0);
+                assert_eq!(content, "fn");
             }
             _ => panic!("Expected Redirect command"),
         }

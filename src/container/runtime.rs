@@ -102,7 +102,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::full(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -218,6 +218,16 @@ impl Default for NamespaceConfig {
 pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -510,7 +520,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -994,7 +1003,7 @@ mod tests {
             .create_container(
                 b"sovereign_container",
                 b"ubuntu-pqc",
-                RuntimeCapability::full(),
+                ContainerCapability::full(),
             )
             .unwrap();
         assert_eq!(id, 1);
@@ -1042,7 +1051,7 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
             hardened: true,

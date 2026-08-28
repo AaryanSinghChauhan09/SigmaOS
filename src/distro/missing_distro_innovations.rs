@@ -172,11 +172,13 @@ impl Default for SolusEopkgManager {
 }
 
 /// 5. Mageia Linux urpmi Dependency Solver
-pub struct MageiaUrpmiEngine;
+pub struct MageiaUrpmiEngine {
+    pub package_database: BTreeMap<String, Vec<String>>,
+}
 
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
-        let mut db = HashMap::new();
+        let mut db = BTreeMap::new();
         let mut kde_deps = Vec::new();
         kde_deps.push(String::from("plasma-workspace"));
         kde_deps.push(String::from("sddm"));
@@ -354,8 +356,9 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service(String::from("networking"), Vec::new());
+        dinit.register_service("networking", "/sbin/ip link set up dev eth0", Vec::new());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
+    }
 
     #[test]
     fn test_solus_eopkg_manager() {
@@ -380,5 +383,4 @@ mod tests {
         assert_eq!(auditor.violations.len(), 1);
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
     }
-}
 }

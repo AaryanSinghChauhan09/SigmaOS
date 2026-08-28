@@ -365,6 +365,30 @@ impl DoasRuleEngine {
         }
         last_match
     }
+
+    pub fn evaluate_groups(&self, user: &str, groups: &[&str], target: &str, cmd: &str) -> DoasEvalResult {
+        let is_wheel = groups.contains(&"wheel");
+        let rule = self.evaluate(user, is_wheel, target, cmd);
+        if let Some(r) = rule {
+            DoasEvalResult {
+                permitted: r.action == DoasAction::Permit,
+                nopass_required: r.nopass,
+                keepenv: r.keepenv,
+            }
+        } else {
+            DoasEvalResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            }
+        }
+    }
+}
+
+pub struct DoasEvalResult {
+    pub permitted: bool,
+    pub nopass_required: bool,
+    pub keepenv: bool,
 }
 
 impl Default for DoasRuleEngine {
@@ -409,7 +433,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
