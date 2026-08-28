@@ -51,11 +51,15 @@ impl LegacyController {
 pub struct PortageEbuildProfile {
     pub category_pkg: String,
     pub version: String,
+    pub atom_name: String,
+    pub slot: String,
     pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
     pub is_masked: bool,
 }
 
 /// Gentoo Portage Masking & Slotting Resolver Engine
+pub type GentooPortageMaskEngine = GentooPortageMaskResolver;
+
 pub struct GentooPortageMaskResolver {
     pub hard_masked_atoms: Vec<String>,
     pub unmasked_packages: Vec<String>,
@@ -70,12 +74,13 @@ impl GentooPortageMaskResolver {
             hard_masked_atoms: Vec::new(),
             unmasked_packages: Vec::new(),
             ebuilds: Vec::new(),
-            hard_masked_atoms: Vec::new(),
         }
     }
 
     pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
         self.ebuilds.push(PortageEbuildProfile {
+            category_pkg: category_pkg.to_string(),
+            version: version.to_string(),
             atom_name: format!("{}:{}", category_pkg, version),
             slot: "0".to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
@@ -96,7 +101,7 @@ impl GentooPortageMaskResolver {
         let ebuild = self.ebuilds.iter().find(|e| e.atom_name == target_atom || e.atom_name.starts_with(category_pkg))
             .ok_or("Ebuild not found")?;
 
-        if ebuild.is_ebuild_masked && !accept_keywords {
+        if ebuild.is_masked && !accept_keywords {
             return Err("Ebuild is masked by package.mask or keywords");
         }
 
