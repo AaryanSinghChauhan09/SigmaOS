@@ -386,6 +386,88 @@ impl Default for Compositor {
     }
 }
 
+/// Server Display Remote Protocol formats supported for headless/containerized server deployments
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServerDisplayProtocol {
+    HeadlessFramebuffer, // Raw Linux /dev/fb0 or DRM dumb buffer
+    Spice,               // QEMU/KVM SPICE protocol for virtual desktops
+    VncRfb,              // RFB 3.8 protocol for VNC remote desktop
+    WebRtcStream,        // WebRTC H.264/AV1 zero-latency browser streaming
+}
+
+/// Active remote server display session configuration
+#[derive(Debug, Clone)]
+pub struct ServerDisplaySession {
+    pub session_id: u32,
+    pub protocol: ServerDisplayProtocol,
+    pub width: u32,
+    pub height: u32,
+    pub fps: u32,
+    pub listen_port: u16,
+    pub active_clients: u32,
+}
+
+impl ServerDisplaySession {
+    pub fn new(session_id: u32, protocol: ServerDisplayProtocol, width: u32, height: u32, listen_port: u16) -> Self {
+        Self {
+            session_id,
+            protocol,
+            width,
+            height,
+            fps: 60,
+            listen_port,
+            active_clients: 0,
+        }
+    }
+}
+
+/// Multi-Format Server Display Protocol Engine for RHEL, Ubuntu, SUSE, Debian server deployments & containerized desktops
+pub struct ServerDisplayProtocolEngine {
+    pub active_sessions: Vec<ServerDisplaySession>,
+    pub next_session_id: u32,
+}
+
+impl ServerDisplayProtocolEngine {
+    pub fn new() -> Self {
+        Self {
+            active_sessions: Vec::new(),
+            next_session_id: 1,
+        }
+    }
+
+    pub fn start_session(&mut self, protocol: ServerDisplayProtocol, width: u32, height: u32, port: u16) -> u32 {
+        let id = self.next_session_id;
+        let session = ServerDisplaySession::new(id, protocol, width, height, port);
+        self.active_sessions.push(session);
+        self.next_session_id += 1;
+        id
+    }
+
+    pub fn stop_session(&mut self, session_id: u32) -> bool {
+        if let Some(pos) = self.active_sessions.iter().position(|s| s.session_id == session_id) {
+            self.active_sessions.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn connect_client(&mut self, session_id: u32) -> Result<(), &'static str> {
+        if let Some(s) = self.active_sessions.iter_mut().find(|s| s.session_id == session_id) {
+            s.active_clients = s.active_clients.saturating_add(1);
+            Ok(())
+        } else {
+            Err("Display session not found")
+        }
+    }
+}
+
+impl Default for ServerDisplayProtocolEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Accessibility features (GNOME/KDE inspiration)
 pub struct Accessibility {
     pub screen_reader_enabled: bool,
@@ -541,5 +623,19 @@ mod tests {
         desktop.initialize();
         let window_id = desktop.create_application_window("Test App");
         assert!(window_id > 0);
+    }
+
+    #[test]
+    fn test_server_display_protocol_engine() {
+        let mut engine = ServerDisplayProtocolEngine::new();
+        let session_id = engine.start_session(ServerDisplayProtocol::Spice, 1920, 1080, 5900);
+        assert_eq!(session_id, 1);
+        assert_eq!(engine.active_sessions.len(), 1);
+
+        engine.connect_client(session_id).unwrap();
+        assert_eq!(engine.active_sessions[0].active_clients, 1);
+
+        assert!(engine.stop_session(session_id));
+        assert_eq!(engine.active_sessions.len(), 0);
     }
 }
