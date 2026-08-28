@@ -437,10 +437,8 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        while self.pd_tables.len() <= pdpt_idx {
-            self.pd_tables.push(None);
-        }
-        while self.pt_tables.len() <= pd_idx {
+        let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
+        while self.pt_tables.len() <= pt_idx_in_vec {
             self.pt_tables.push(None);
         }
 

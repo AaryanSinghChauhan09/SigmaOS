@@ -46,47 +46,17 @@ mod wiki_ideas_implementation;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/filesystem/bsd_linux_innovations.rs"]
-mod fs_bsd_linux_innovations;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
 
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 
-#[path = "../src/sigpkg/sovereign_sigpkg.rs"]
-mod sovereign_sigpkg;
+#[path = "../src/shell/sovereign_shell_parity.rs"]
+mod sovereign_shell_parity;
 
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-
-#[path = "../src/compatibility/abi_extended.rs"]
-mod abi_extended;
-
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-
-#[path = "../src/security/hardening.rs"]
-mod hardening;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
@@ -159,10 +129,7 @@ fn test_zorin_gap_closure_inspection() {
 
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
-    use vm_manager::{
-        KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
-        VmConfig, VmState, HypervisorBackend,
-    };
+    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -247,8 +214,7 @@ fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
-        SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
+        PolicyAction, CAP_READ, CAP_SEEK,
     };
 
     // 1. NixOS Declarative System State
@@ -269,7 +235,7 @@ fn test_wiki_distro_innovations_inspection() {
     // 3. openSUSE Snapper Pre/Post Transaction Guard
     let mut snapper = SnapperTransactionGuard::new();
     let pre_id = snapper.create_pre_snapshot("Pre update", 1000);
-    let _post_id = snapper.create_post_snapshot(pre_id, "Post update", 1005).unwrap();
+    let post_id = snapper.create_post_snapshot(pre_id, "Post update", 1005).unwrap();
     assert_eq!(snapper.snapshots.len(), 2);
 
     // 4. Zero-Copy Splice Pipeline
@@ -286,12 +252,95 @@ fn test_wiki_distro_innovations_inspection() {
     assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
 
     // 7. Systemd Parity Engine
+    use wiki_ideas_implementation::{
+        SystemdUnit, SystemdUnitType, SystemdUnitActiveState, SovereignSystemdParityEngine,
+    };
     let mut systemd = SovereignSystemdParityEngine::new();
-    systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
-    assert_eq!(systemd.start_unit("test.service"), Ok(()));
+    systemd.register_unit(SystemdUnit {
+        name: "test.service".to_string(),
+        unit_type: SystemdUnitType::Service,
+        active_state: SystemdUnitActiveState::Inactive,
+        description: "Test".to_string(),
+        exec_start: vec!["/bin/true".to_string()],
+        dependencies: vec![],
+        memory_limit_bytes: None,
+        cpu_quota_pct: None,
+    });
+    assert_eq!(systemd.start_unit("test.service").unwrap(), SystemdUnitActiveState::Active);
+
     // 8. Real-Time Hybrid Scheduler
-    let sched = SovereignHybridSchedulerInnovations::new();
-    assert!(sched.verify_rt_lane_preemption_latency());
+    use wiki_ideas_implementation::{
+        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
+    };
+    let mut sched = SovereignHybridSchedulerInnovations::new();
+    sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
+
+    // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
+    use sovereign_process_engine::{SovereignProcessManager, SovereignProcessState};
+    let mut sov_mgr = SovereignProcessManager::new();
+    let s_pid = sov_mgr.sovereign_spawn("test_worker", 10);
+    sov_mgr.sovereign_run_background(s_pid).unwrap();
+    assert_eq!(sov_mgr.processes.get(&s_pid).unwrap().state, SovereignProcessState::BackgroundRunning);
+
+    let ch_id = sov_mgr.create_ipc_channel(s_pid, 2);
+    sov_mgr.sovereign_ipc_send(ch_id, b"data_pkt").unwrap();
+    assert_eq!(sov_mgr.sovereign_ipc_receive(ch_id).unwrap(), b"data_pkt");
+
+    // 10. Sovereign Shell Engine (Bash & Zsh Parity)
+    use sovereign_shell_parity::{SovereignBashZshParityShell, RedirectionType};
+    let mut shell = SovereignBashZshParityShell::new();
+    shell.variables.insert("MY_VAR".to_string(), "hello_world".to_string());
+    assert_eq!(shell.expand_variables("Value: $MY_VAR"), "Value: hello_world");
+
+    let pipe = shell.parse_pipeline("cat /var/log/syslog | grep error > /tmp/err.log &");
+    assert_eq!(pipe.len(), 2);
+    assert_eq!(pipe[0].program, "cat");
+    assert_eq!(pipe[1].program, "grep");
+    assert!(pipe[1].run_in_background);
+    assert_eq!(pipe[1].redirections, vec![RedirectionType::OutputTruncate("/tmp/err.log".to_string())]);
+
+    // 11. Package Repository Innovations (Pinning, Mirror Ranking, Transaction Journal)
+    use package_repository::{PackagePinEngine, PinPriority, MirrorSyncEngine, PackageTransactionJournal};
+    let mut pin_eng = PackagePinEngine::new();
+    pin_eng.add_pin_rule("sigmaos-kernel", "6.6.0", PinPriority::Hold);
+    assert_eq!(pin_eng.get_pin_priority("sigmaos-kernel"), PinPriority::Hold);
+
+    let mut mir_eng = MirrorSyncEngine::new();
+    mir_eng.add_mirror("https://slow.repo.org", "US", 300);
+    mir_eng.add_mirror("https://fast.repo.org", "US", 10);
+    mir_eng.rank_mirrors();
+    assert_eq!(mir_eng.get_fastest_mirror(), Some("https://fast.repo.org".to_string()));
+
+    let mut journal = PackageTransactionJournal::new();
+    let tx1 = journal.log_transaction("install", "bash", "5.2", 100);
+    let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
+    assert_eq!(journal.rollback_transaction(tx2).len(), 1);
+
+    // 12. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
+    use missing_distro_innovations::{
+        ClearLinuxStatelessEngine, TailsAmnesicEngine, ChimeraDinitSupervisor, DinitServiceState,
+        FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,
+    };
+    let mut clear = ClearLinuxStatelessEngine::new();
+    clear.set_vendor_default("/etc/issue", "SigmaOS Base");
+    assert_eq!(clear.resolve_configuration("/etc/issue").unwrap(), "SigmaOS Base");
+
+    let mut tails = TailsAmnesicEngine::new();
+    tails.allocate_session_page(&[0x12, 0x34]);
+    assert_eq!(tails.wipe_all_memory_on_shutdown(), 1);
+
+    let mut dinit = ChimeraDinitSupervisor::new();
+    dinit.register_service("syslogd", "/usr/sbin/syslogd", vec![]);
+    assert_eq!(dinit.start_service("syslogd").unwrap(), DinitServiceState::Started);
+
+    let mut vnet = FreeBsdVnetStackEngine::new();
+    let v_stack = vnet.create_vnet_stack(10, "192.168.1.50");
+    assert!(v_stack.loopback_up);
+
+    let mut auditor = OpenBsdUnveilAuditor::new();
+    auditor.log_violation(99, "/root/.ssh/id_rsa", "r", 500);
+    assert_eq!(auditor.violations.len(), 1);
 }
 
 #[test]
@@ -300,6 +349,7 @@ fn test_advanced_process_control_inspection() {
         ProcessVmReadWriteEngine, JobControlLifecycleEngine, ProcessWaiterAndRusageCollector,
         ProcessCancellationAndTerminationManager, AdvancedIpcHub, JobState, CancellationType, BsdRusage,
     };
+
     // 1. Process VM read/write
     let mut vm = ProcessVmReadWriteEngine::new();
     vm.register_process_memory(42, 0x1000, vec![1, 2, 3, 4]);

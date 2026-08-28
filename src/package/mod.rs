@@ -21,6 +21,8 @@ pub mod debian;
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
+pub mod debian;
+pub mod repository;
 
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
@@ -35,4 +37,15 @@ pub use store::{StoreApp, StoreError};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use debian::{
+    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
+};
+pub use store::{
+    StoreError, StoreApp,
+};
+pub use repository::{
+    PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
+    PackagePinEngine, MirrorEntry, MirrorSyncEngine, TransactionJournalEntry,
+    PackageTransactionJournal, RepoError,
 };
