@@ -365,6 +365,23 @@ impl DoasRuleEngine {
         }
         last_match
     }
+
+    pub fn evaluate_groups(&self, user: &str, groups: &[&str], target: &str, cmd: &str) -> DoasEvaluationResult {
+        let is_wheel = groups.contains(&"wheel");
+        if let Some(rule) = self.evaluate(user, is_wheel, target, cmd) {
+            DoasEvaluationResult {
+                permitted: rule.action == DoasAction::Permit,
+                nopass_required: rule.nopass,
+                keepenv: rule.keepenv,
+            }
+        } else {
+            DoasEvaluationResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            }
+        }
+    }
 }
 
 impl Default for DoasRuleEngine {

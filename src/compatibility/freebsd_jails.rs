@@ -2,7 +2,10 @@
 //!
 //! Lightweight OS-level virtualization with process isolation
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;
@@ -135,9 +138,9 @@ impl SigmaJailManager {
         }
 
         // Execute stop script
-        if let Some(exec_stop) = &exec_stop {
+        if let Some(stop_cmd) = exec_stop.as_ref() {
             if let Some(jid) = jid {
-                let _ = self.execute_in_jail(jid, exec_stop);
+                let _ = self.execute_in_jail(jid, stop_cmd);
             }
         }
 
