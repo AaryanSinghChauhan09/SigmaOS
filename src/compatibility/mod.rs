@@ -144,7 +144,6 @@ pub use mint_linux::{
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
 };
 pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
     LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 
