@@ -428,11 +428,29 @@ pub enum SystemdUnitActiveState {
     Deactivating,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdUnitState {
+    Active,
+    Inactive,
+    Activating,
+    Deactivating,
+    Failed,
+}
+
+pub type SystemdJournalEntry = JournalLogEntry;
+
+#[derive(Debug, Clone)]
+pub struct JournalLogEntry {
+    pub message: String,
+    pub timestamp: u64,
+}
+
 #[derive(Debug, Clone)]
 pub struct SystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
     pub active_state: SystemdUnitActiveState,
+    pub state: SystemdUnitState,
     pub description: String,
     pub exec_start: Vec<String>,
     pub dependencies: Vec<String>,
@@ -448,14 +466,14 @@ pub type SovereignSystemdUnit = SystemdUnit;
 
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
-    pub journal_logs: Vec<String>,
+    pub journal_logs: Vec<JournalLogEntry>,
 }
 
 impl SovereignSystemdParityEngine {
     pub fn new() -> Self {
         Self {
             units: BTreeMap::new(),
-            journal: Vec::new(),
+            journal_logs: Vec::new(),
         }
     }
 
@@ -468,11 +486,16 @@ impl SovereignSystemdParityEngine {
                 name: name.to_string(),
                 unit_type,
                 active_state: SystemdUnitActiveState::Inactive,
+                state: SystemdUnitState::Inactive,
                 description: name.to_string(),
                 exec_start: Vec::new(),
                 dependencies: deps_vec,
-                memory_limit_bytes: None,
-                cpu_quota_pct: None,
+                memory_limit_mb: None,
+                cpu_weight: 0,
+                is_sandboxed: false,
+                socket_activation_port: None,
+                pledge_promises: None,
+                unveil_paths: Vec::new(),
             },
         );
     }
@@ -481,24 +504,26 @@ impl SovereignSystemdParityEngine {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
         unit.state = SystemdUnitState::Active;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
+        self.journal_logs.push(JournalLogEntry {
+            message: format!("Unit {} transitioned to Active", name),
+            timestamp: 0,
+        });
         Ok(SystemdUnitActiveState::Active)
     }
 
-    pub fn query_journal(&self, name: &str) -> Vec<&String> {
-        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
+    pub fn query_journal(&self, name: &str) -> Vec<&JournalLogEntry> {
+        self.journal_logs.iter().filter(|log| log.message.contains(name)).collect()
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Inactive;
         unit.state = SystemdUnitState::Inactive;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
+        self.journal_logs.push(JournalLogEntry {
+            message: format!("Unit {} transitioned to Inactive", name),
+            timestamp: 0,
+        });
         Ok(SystemdUnitActiveState::Inactive)
-    }
-
-    pub fn query_journal(&self, name: &str) -> Vec<&JournalLogEntry> {
-        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
     }
 }
 
@@ -508,15 +533,6 @@ impl Default for SovereignSystemdParityEngine {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DvfsPowerGovernor {
-    Performance,
-    Powersave,
-    Schedutil,
-    Ondemand,
-    Conservative,
-}
-
 /// 8. Real-Time Hybrid Scheduler Innovations (<5µs RTLane Latency & NUMA/DVFS)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerClass {
@@ -524,31 +540,6 @@ pub enum SchedulerClass {
     Interactive,
     Normal,
     Idle,
-}
-
-#[derive(Debug, Clone)]
-pub struct NumaNodeAffinity {
-    pub node_id: usize,
-    pub cpu_cores: Vec<usize>,
-    pub total_memory_mb: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct RealtimeTask {
-    pub pid: usize,
-    pub class: SchedulerClass,
-    pub deadline_us: u64,
-    pub wcet_us: u64, // Worst-Case Execution Time
-    pub numa_node: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct RtlaneRealtimeTask {
-    pub task_id: usize,
-    pub max_latency_budget_us: u64,
-    pub priority: u8,
-    pub assigned_numa_node: usize,
-    pub ebpf_boost_score: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -566,12 +557,27 @@ pub struct NumaNodeAffinity {
     pub total_memory_mb: u64,
 }
 
-pub type RtlaneRealtimeTask = RealtimeTask;
+#[derive(Debug, Clone)]
+pub struct RealtimeTask {
+    pub pid: usize,
+    pub class: SchedulerClass,
+    pub deadline_us: u64,
+    pub wcet_us: u64,
+    pub numa_node: u32,
+}
+
+pub struct RtlaneRealtimeTask {
+    pub task_id: usize,
+    pub max_latency_budget_us: u64,
+    pub priority: u8,
+    pub assigned_numa_node: usize,
+    pub ebpf_boost_score: u32,
+}
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
     pub numa_nodes: Vec<NumaNodeAffinity>,
-    pub rt_tasks: BTreeMap<usize, RealtimeTask>,
+    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
     pub preemption_count: u64,
     pub rt_lane_latency_us: u64,
     pub ai_prediction_boost: bool,
@@ -597,6 +603,7 @@ impl SovereignHybridSchedulerInnovations {
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
             rt_lane_latency_us: 4,
+            ai_prediction_boost: false,
         }
     }
 
@@ -620,7 +627,7 @@ impl SovereignHybridSchedulerInnovations {
     }
 
     pub fn select_optimal_numa_node(&self, cpu_core: u32) -> Option<u32> {
-        self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&cpu_core)).map(|n| n.node_id as u32)
+        self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&(cpu_core as usize))).map(|n| n.node_id as u32)
     }
 
     pub fn set_governor(&mut self, gov: DvfsPowerGovernor) {

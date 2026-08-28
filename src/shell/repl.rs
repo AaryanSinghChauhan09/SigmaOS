@@ -868,7 +868,7 @@ impl ShellRepl {
                         .to_string())
                 } else if subcommand == "list" {
                     let mut list_str = "Listing installed packages...\n".to_string();
-                    for pkg in &self.installed_packages {
+                    for pkg in self.installed_packages.iter() {
                         list_str.push_str(&format!("{}/noble,now 1.0.0 amd64 [installed]\n", pkg));
                     }
                     Ok(list_str)

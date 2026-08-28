@@ -307,13 +307,6 @@ where
             idx: 0,
         }
     }
-
-    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
-        ValuesMut {
-            entries: &mut self.entries,
-            idx: 0,
-        }
-    }
 }
 
 pub struct Values<'a, K, V> {
@@ -339,31 +332,6 @@ where
     }
 }
 
-pub struct ValuesMut<'a, K, V> {
-    entries: &'a mut Vec<(K, V)>,
-    idx: usize,
-}
-
-impl<'a, K, V> Iterator for ValuesMut<'a, K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    type Item = &'a mut V;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.idx < self.entries.len() {
-            let ptr = self.entries.as_mut_ptr();
-            unsafe {
-                let item = &mut *ptr.add(self.idx);
-                self.idx += 1;
-                Some(&mut item.1)
-            }
-        } else {
-            None
-        }
-    }
-}
 
 pub struct BTreeMapIter<'a, K, V> {
     entries: &'a Vec<(K, V)>,

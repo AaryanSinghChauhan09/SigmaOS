@@ -44,12 +44,6 @@ impl Default for AnonsurfEngine {
     }
 }
 
-impl Default for AnonsurfEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct ForensicsAuditTool;
 
 impl ForensicsAuditTool {

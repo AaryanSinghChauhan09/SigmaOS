@@ -64,28 +64,23 @@ impl GentooPortageMaskResolver {
     pub fn new(target_arch: &str) -> Self {
         Self {
             target_arch: target_arch.to_string(),
-            arch: target_arch.to_string(),
-            ebuilds: Vec::new(),
-            hard_masked_pkgs: Vec::new(),
-            hard_masks: Vec::new(),
-            hard_masked_packages: Vec::new(),
+            hard_masked_atoms: Vec::new(),
             unmasked_packages: Vec::new(),
+            ebuilds: Vec::new(),
         }
     }
 
-    pub fn register_ebuild(&mut self, atom_name: &str, slot: &str, keywords: &[&str], is_masked: bool) {
+    pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
         self.ebuilds.push(PortageEbuildProfile {
-            atom_name: atom_name.to_string(),
-            slot: slot.to_string(),
+            category_pkg: category_pkg.to_string(),
+            version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
             is_masked,
         });
     }
 
     pub fn add_hard_mask(&mut self, category_pkg: &str) {
-        self.hard_masked_pkgs.push(category_pkg.to_string());
-        self.hard_masks.push(category_pkg.to_string());
-        self.hard_masked_packages.push(category_pkg.to_string());
+        self.hard_masked_atoms.push(category_pkg.to_string());
     }
 
     pub fn unmask_package(&mut self, package: &str) {
@@ -93,9 +88,7 @@ impl GentooPortageMaskResolver {
     }
 
     pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masked_pkgs.iter().any(|pkg| pkg == category_pkg)
-            || self.hard_masks.iter().any(|pkg| pkg == category_pkg)
-            || self.hard_masked_packages.iter().any(|pkg| pkg == category_pkg)
+        if self.hard_masked_atoms.iter().any(|pkg| pkg == category_pkg)
         {
             return Err("Package is hard-masked in package.mask");
         }
@@ -109,8 +102,8 @@ impl GentooPortageMaskResolver {
             return Err("Ebuild is masked by package.mask or keywords");
         }
 
-        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch || k == &self.arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && (&k[1..] == self.target_arch || &k[1..] == self.arch));
+        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
+        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
 
         if is_stable {
             Ok(true)

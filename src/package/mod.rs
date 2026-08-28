@@ -21,7 +21,6 @@ pub mod debian;
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
-pub mod debian;
 pub mod repository;
 
 pub use debian::{
@@ -32,20 +31,13 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
-pub use store::{StoreApp, StoreError};
+pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE, StoreApp, StoreError};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use debian::{
-    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
-};
-pub use store::{
-    StoreError, StoreApp,
-};
 pub use repository::{
     PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
-    PackagePinEngine, MirrorEntry, MirrorSyncEngine, TransactionJournalEntry,
+    PackagePinEngine, MirrorCandidate, MirrorSyncEngine, PackageTransaction,
     PackageTransactionJournal, RepoError,
 };

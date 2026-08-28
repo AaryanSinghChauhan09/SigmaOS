@@ -1,7 +1,9 @@
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_parity;
 pub mod bsd_linux_innovations;
+pub mod bsd_parity;
 pub mod certification;
+pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod debian_parity;
@@ -22,10 +24,12 @@ pub mod nextgen;
 pub mod parity;
 pub mod power_network_tools;
 pub mod preseed;
+pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
+pub mod transformation_engine;
 pub mod arch;
 pub mod cachy;
 pub mod wiki_ideas_implementation;

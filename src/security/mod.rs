@@ -35,11 +35,6 @@ pub use root_improvement::{
     RootlessNamespaceManager, SubUidGidMapper, SudoDoasElevator,
 };
 
-pub use root_improvement::{
-    BsdSecurelevelGuard, CapSplitter, DoasRuleEngine, PamEngine, PolkitEnforcer,
-    RootlessNamespaceManager, SubUidGidMapper, SudoDoasElevator,
-};
-
 pub use qubes_isolation::{
     DomainID, DomainType, IsolatedDomain, IsolationError,
     KataHypervisorType, KataMicroVmConfig, VirtualDomain,

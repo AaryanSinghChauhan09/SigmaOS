@@ -377,7 +377,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        crate::klib::vec::Vec::from_iter(image_header)
+        image_header.into_iter().collect::<Vec<u8>>()
     }
 }
 
@@ -531,7 +531,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, archive_content.into_iter().collect::<Vec<u8>>()))
     }
 }
 
@@ -569,7 +569,7 @@ mod tests {
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]).to_vec(),
+            ].to_vec(),
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }

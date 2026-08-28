@@ -401,6 +401,7 @@ impl AlpmDatabase {
 
         Ok(())
     }
+}
 
 impl Default for AlpmDatabase {
     fn default() -> Self {
@@ -412,6 +413,7 @@ impl Default for PkgBuild {
     fn default() -> Self {
         Self::new()
     }
+}
 
 #[cfg(test)]
 mod tests {
