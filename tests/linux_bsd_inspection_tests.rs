@@ -52,6 +52,9 @@ mod fs_bsd_linux_innovations;
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 
+#[path = "../src/sigpkg/sovereign_sigpkg.rs"]
+mod sovereign_sigpkg;
+
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
@@ -655,4 +658,33 @@ fn test_sovereign_pid_allocator_and_process_tree_inspection() {
     assert_eq!(child_node.ppid, parent_pid);
     assert_eq!(child_node.pgid, parent_node.pgid); // Process group inherited
     assert!(child_node.pdfork_fd.is_some());
+}
+
+#[test]
+fn test_sovereign_mirror_fallback_engine_inspection() {
+    use sovereign_sigpkg::{CentralRepositoryManager, SovereignMirrorFallbackEngine};
+
+    let mut repo_mgr = CentralRepositoryManager::new();
+    repo_mgr.add_mirror("https://slow-mirror.sigmaos.org", "US-West", 150);
+    repo_mgr.add_mirror("https://fast-mirror.sigmaos.org", "US-East", 20);
+
+    let mut fallback_engine = SovereignMirrorFallbackEngine::new(repo_mgr, 3);
+    let mock_payload = vec![0x10, 0x20, 0x30];
+    let mut expected_checksum = [0u8; 32];
+    for (i, &b) in mock_payload.iter().enumerate() {
+        expected_checksum[i % 32] ^= b;
+    }
+
+    let res = fallback_engine
+        .fetch_package_with_failover("openssl", &expected_checksum, |url: &str, _pkg: &str| {
+            if url.contains("slow") {
+                Err("Connection timeout")
+            } else {
+                Ok(vec![0x10, 0x20, 0x30])
+            }
+        })
+        .unwrap();
+
+    assert_eq!(res.mirror_url, "https://fast-mirror.sigmaos.org");
+    assert_eq!(res.payload, vec![0x10, 0x20, 0x30]);
 }
