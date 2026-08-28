@@ -3,6 +3,7 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -18,10 +19,22 @@ pub enum ShellCommand {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RedirectKind {
+    Output,        // >
+    Append,        // >>
+    Input,         // <
+    HereDoc,       // <<
+    HereString,    // <<<
+    DupOutput,     // >& or 2>&1
+    DupInput,      // <&
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Redirect {
-    pub fd: u32,
+    pub src_fd: u32,
+    pub target_fd: Option<u32>,
     pub path: String,
-    pub append: bool,
+    pub kind: RedirectKind,
 }
 
 pub struct Environment {
@@ -31,26 +44,115 @@ pub struct Environment {
 impl Environment {
     pub fn new() -> Self {
         let mut vars = BTreeMap::new();
-        vars.insert("PATH".to_string(), "/bin:/usr/bin".to_string());
+        vars.insert("PATH".to_string(), "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin".to_string());
         vars.insert("HOME".to_string(), "/home/user".to_string());
+        vars.insert("USER".to_string(), "sovereign".to_string());
+        vars.insert("SHELL".to_string(), "/bin/sigma_sh".to_string());
+        vars.insert("PWD".to_string(), "/home/user".to_string());
+        vars.insert("TMPDIR".to_string(), "/tmp".to_string());
+        vars.insert("LANG".to_string(), "en_US.UTF-8".to_string());
+        vars.insert("TERM".to_string(), "xterm-256color".to_string());
         Self { vars }
     }
 
-    pub fn expand(&self, input: &str) -> String {
+    pub fn get_path_entries(&self) -> Vec<String> {
+        if let Some(path_str) = self.vars.get("PATH") {
+            path_str.split(':').map(|s| s.to_string()).collect()
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn prepend_path(&mut self, new_path: &str) {
+        if let Some(current_path) = self.vars.get_mut("PATH") {
+            *current_path = format!("{}:{}", new_path, current_path);
+        } else {
+            self.vars.insert("PATH".to_string(), new_path.to_string());
+        }
+    }
+
+    pub fn append_path(&mut self, new_path: &str) {
+        if let Some(current_path) = self.vars.get_mut("PATH") {
+            *current_path = format!("{}:{}", current_path, new_path);
+        } else {
+            self.vars.insert("PATH".to_string(), new_path.to_string());
+        }
+    }
+
+    /// Resolve a binary executable across the PATH directories
+    pub fn resolve_binary(&self, binary_name: &str, exists_fn: impl Fn(&str) -> bool) -> Option<String> {
+        if binary_name.contains('/') {
+            if exists_fn(binary_name) {
+                return Some(binary_name.to_string());
+            } else {
+                return None;
+            }
+        }
+
+        for dir in self.get_path_entries() {
+            let candidate = if dir.ends_with('/') {
+                format!("{}{}", dir, binary_name)
+            } else {
+                format!("{}/{}", dir, binary_name)
+            };
+
+            if exists_fn(&candidate) {
+                return Some(candidate);
+            }
+        }
+
+        None
+    }
+
+    pub fn expand(&mut self, input: &str) -> String {
         let mut expanded = String::new();
         let mut chars = input.chars().peekable();
         while let Some(c) = chars.next() {
             if c == '$' {
-                let mut var_name = String::new();
-                while let Some(&next_c) = chars.peek() {
-                    if next_c.is_alphanumeric() || next_c == '_' {
-                        var_name.push(chars.next().unwrap());
-                    } else {
-                        break;
+                if chars.peek() == Some(&'{') {
+                    chars.next(); // Consume '{'
+                    let mut expr = String::new();
+                    while let Some(&next_c) = chars.peek() {
+                        if next_c == '}' {
+                            chars.next(); // Consume '}'
+                            break;
+                        }
+                        expr.push(chars.next().unwrap());
                     }
-                }
-                if let Some(val) = self.vars.get(&var_name) {
-                    expanded.push_str(val);
+
+                    // POSIX parameter expansion: ${VAR:-default} or ${VAR:=default} or simple ${VAR}
+                    if let Some(idx) = expr.find(":-") {
+                        let var_name = &expr[..idx];
+                        let default_val = &expr[idx + 2..];
+                        let val = self.vars.get(var_name).cloned().unwrap_or_else(|| default_val.to_string());
+                        expanded.push_str(&val);
+                    } else if let Some(idx) = expr.find(":=") {
+                        let var_name = &expr[..idx];
+                        let default_val = &expr[idx + 2..];
+                        let val = if let Some(v) = self.vars.get(var_name) {
+                            v.clone()
+                        } else {
+                            self.vars.insert(var_name.to_string(), default_val.to_string());
+                            default_val.to_string()
+                        };
+                        expanded.push_str(&val);
+                    } else {
+                        if let Some(val) = self.vars.get(&expr) {
+                            expanded.push_str(val);
+                        }
+                    }
+                } else {
+                    let mut var_name = String::new();
+                    while let Some(&next_c) = chars.peek() {
+                        if next_c.is_alphanumeric() || next_c == '_' {
+                            var_name.push(chars.next().unwrap());
+                        } else {
+                            break;
+                        }
+                    }
+                    if let Some(val) = self.vars.get(&var_name) {
+                        expanded.push_str(val);
+                    }
                 }
             } else {
                 expanded.push(c);
@@ -149,17 +251,116 @@ impl<'a> Parser<'a> {
         while self.pos < self.input.len() {
             self.skip_whitespace();
             let p = self.peek();
-            if p.is_none() || p == Some('|') || p == Some(';') || p == Some('&') {
+            if p.is_none() || p == Some('|') || p == Some(';') {
                 break;
             }
-            
-            if p == Some('>') {
+
+            // Check if there is an explicit FD number before redirection symbol (e.g., 2>, 1>)
+            let save_pos = self.pos;
+            let mut explicit_fd = None;
+            let mut digit_count = 0;
+            while let Some(c) = self.peek() {
+                if c.is_ascii_digit() {
+                    digit_count += 1;
+                    self.advance();
+                } else {
+                    break;
+                }
+            }
+
+            let next_p = self.peek();
+            if digit_count > 0 && (next_p == Some('>') || next_p == Some('<')) {
+                if let Ok(fd_val) = self.input[save_pos..self.pos].parse::<u32>() {
+                    explicit_fd = Some(fd_val);
+                }
+            } else {
+                self.pos = save_pos; // Restore if not redirection prefix
+            }
+
+            let cur_p = self.peek();
+            if cur_p == Some('>') {
                 self.advance();
-                let append = self.peek() == Some('>');
-                if append { self.advance(); }
-                self.skip_whitespace();
-                let path = self.parse_word()?;
-                redirects.push(Redirect { fd: 1, path, append });
+                let src_fd = explicit_fd.unwrap_or(1);
+                if self.peek() == Some('>') {
+                    self.advance();
+                    self.skip_whitespace();
+                    let path = self.parse_word()?;
+                    redirects.push(Redirect {
+                        src_fd,
+                        target_fd: None,
+                        path,
+                        kind: RedirectKind::Append,
+                    });
+                } else if self.peek() == Some('&') {
+                    self.advance();
+                    self.skip_whitespace();
+                    let target = self.parse_word()?;
+                    let target_fd = target.parse::<u32>().ok();
+                    redirects.push(Redirect {
+                        src_fd,
+                        target_fd,
+                        path: target,
+                        kind: RedirectKind::DupOutput,
+                    });
+                } else {
+                    self.skip_whitespace();
+                    let path = self.parse_word()?;
+                    redirects.push(Redirect {
+                        src_fd,
+                        target_fd: None,
+                        path,
+                        kind: RedirectKind::Output,
+                    });
+                }
+                continue;
+            } else if cur_p == Some('<') {
+                self.advance();
+                let src_fd = explicit_fd.unwrap_or(0);
+                if self.peek() == Some('<') {
+                    self.advance();
+                    if self.peek() == Some('<') {
+                        // <<< HereString
+                        self.advance();
+                        self.skip_whitespace();
+                        let content = self.parse_word()?;
+                        redirects.push(Redirect {
+                            src_fd,
+                            target_fd: None,
+                            path: content,
+                            kind: RedirectKind::HereString,
+                        });
+                    } else {
+                        // << HereDoc
+                        self.skip_whitespace();
+                        let delimiter = self.parse_word()?;
+                        redirects.push(Redirect {
+                            src_fd,
+                            target_fd: None,
+                            path: delimiter,
+                            kind: RedirectKind::HereDoc,
+                        });
+                    }
+                } else if self.peek() == Some('&') {
+                    self.advance();
+                    self.skip_whitespace();
+                    let target = self.parse_word()?;
+                    let target_fd = target.parse::<u32>().ok();
+                    redirects.push(Redirect {
+                        src_fd,
+                        target_fd,
+                        path: target,
+                        kind: RedirectKind::DupInput,
+                    });
+                } else {
+                    self.skip_whitespace();
+                    let path = self.parse_word()?;
+                    redirects.push(Redirect {
+                        src_fd,
+                        target_fd: None,
+                        path,
+                        kind: RedirectKind::Input,
+                    });
+                }
                 continue;
             }
 
@@ -284,10 +485,129 @@ impl Shell {
                 // Background execution logic
                 Ok(0)
             }
-            ShellCommand::Redirect(child, _) => {
-                // Redirection logic
-                self.execute_ast(child)
+            ShellCommand::Redirect(child, redir) => {
+                // Execute child with redirection context logged in environment / streams
+                let status = self.execute_ast(child)?;
+                match redir.kind {
+                    RedirectKind::Output => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FILE:{}", redir.path));
+                    }
+                    RedirectKind::Append => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("APPEND:{}", redir.path));
+                    }
+                    RedirectKind::Input => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("INPUT:{}", redir.path));
+                    }
+                    RedirectKind::HereDoc => {
+                        self.env.vars.insert(format!("FD_{}_HEREDOC", redir.src_fd), redir.path.clone());
+                    }
+                    RedirectKind::HereString => {
+                        self.env.vars.insert(format!("FD_{}_HERESTRING", redir.src_fd), redir.path.clone());
+                    }
+                    RedirectKind::DupOutput | RedirectKind::DupInput => {
+                        if let Some(target) = redir.target_fd {
+                            self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FD:{}", target));
+                        }
+                    }
+                }
+                Ok(status)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_shell_redirection_parsing() {
+        let mut parser = Parser::new("echo hello > output.txt");
+        let cmd = parser.parse().unwrap();
+        match cmd {
+            ShellCommand::Redirect(_child, redir) => {
+                assert_eq!(redir.src_fd, 1);
+                assert_eq!(redir.kind, RedirectKind::Output);
+                assert_eq!(redir.path, "output.txt");
+            }
+            _ => panic!("Expected Redirect command"),
+        }
+
+        let mut parser2 = Parser::new("cat < input.txt");
+        let cmd2 = parser2.parse().unwrap();
+        match cmd2 {
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 0);
+                assert_eq!(redir.kind, RedirectKind::Input);
+                assert_eq!(redir.path, "input.txt");
+            }
+            _ => panic!("Expected Redirect command"),
+        }
+
+        let mut parser3 = Parser::new("ls 2> error.log");
+        let cmd3 = parser3.parse().unwrap();
+        match cmd3 {
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 2);
+                assert_eq!(redir.kind, RedirectKind::Output);
+                assert_eq!(redir.path, "error.log");
+            }
+            _ => panic!("Expected Redirect command"),
+        }
+
+        let mut parser4 = Parser::new("command 2>&1");
+        let cmd4 = parser4.parse().unwrap();
+        match cmd4 {
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 2);
+                assert_eq!(redir.target_fd, Some(1));
+                assert_eq!(redir.kind, RedirectKind::DupOutput);
+            }
+            _ => panic!("Expected Redirect command"),
+        }
+
+        let mut parser5 = Parser::new("grep fn <<< 'fn main()'");
+        let cmd5 = parser5.parse().unwrap();
+        match cmd5 {
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 0);
+                assert_eq!(redir.kind, RedirectKind::HereString);
+                assert_eq!(redir.path, "fn main()");
+            }
+            _ => panic!("Expected Redirect command"),
+        }
+    }
+
+    #[test]
+    fn test_shell_redirection_execution() {
+        let mut shell = Shell::new();
+        assert!(shell.execute_line("echo hello 2>&1").is_ok());
+        assert_eq!(shell.env.vars.get("FD_2_REDIRECT").unwrap(), "FD:1");
+
+        assert!(shell.execute_line("cat << EOF").is_ok());
+        assert_eq!(shell.env.vars.get("FD_0_HEREDOC").unwrap(), "EOF");
+    }
+
+    #[test]
+    fn test_environment_path_and_parameter_expansion() {
+        let mut env = Environment::new();
+        assert_eq!(env.vars.get("USER").unwrap(), "sovereign");
+        assert_eq!(env.vars.get("SHELL").unwrap(), "/bin/sigma_sh");
+
+        env.prepend_path("/opt/bin");
+        assert!(env.vars.get("PATH").unwrap().starts_with("/opt/bin:"));
+
+        env.append_path("/usr/games");
+        assert!(env.vars.get("PATH").unwrap().ends_with(":/usr/games"));
+
+        // Binary resolution mock test
+        let resolved = env.resolve_binary("ls", |path| path == "/bin/ls").unwrap();
+        assert_eq!(resolved, "/bin/ls");
+
+        // POSIX expansion tests
+        assert_eq!(env.expand("Hello ${USER}"), "Hello sovereign");
+        assert_eq!(env.expand("Mode: ${MODE:-debug}"), "Mode: debug");
+        assert_eq!(env.expand("Set: ${NEW_VAR:=value123}"), "Set: value123");
+        assert_eq!(env.vars.get("NEW_VAR").unwrap(), "value123");
     }
 }

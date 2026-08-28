@@ -18,19 +18,87 @@ pub enum LinkState {
     Up = 1,
 }
 
+#[derive(Debug, Clone)]
+pub struct RouteEntry {
+    pub destination: u32,
+    pub netmask: u32,
+    pub gateway: u32,
+    pub interface: &'static str,
+    pub metric: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct NeighborEntry {
+    pub ip: u32,
+    pub mac: [u8; 6],
+    pub is_reachable: bool,
+}
+
 pub struct IpRoute2Command {
     pub interface_name: &'static str,
     pub active_state: AtomicU8,
     pub assigned_ip: AtomicU32, // IPv4 representation
+    pub mtu: AtomicU32,
+    pub mac_address: [u8; 6],
+    pub routes: Vec<RouteEntry>,
+    pub neighbors: Vec<NeighborEntry>,
 }
 
 impl IpRoute2Command {
-    pub const fn new(interface_name: &'static str) -> Self {
+    pub fn new(interface_name: &'static str) -> Self {
         Self {
             interface_name,
             active_state: AtomicU8::new(LinkState::Down as u8),
             assigned_ip: AtomicU32::new(0),
+            mtu: AtomicU32::new(1500),
+            mac_address: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            routes: Vec::new(),
+            neighbors: Vec::new(),
         }
+    }
+
+    pub fn set_mtu(&self, mtu_val: u32) {
+        self.mtu.store(mtu_val, Ordering::SeqCst);
+    }
+
+    pub fn add_route(&mut self, destination: u32, prefix: u8, gateway: u32, metric: u32) {
+        let netmask = if prefix >= 32 {
+            0xFFFFFFFFu32
+        } else {
+            !((1u64 << (32 - prefix)) - 1) as u32
+        };
+        self.routes.push(RouteEntry {
+            destination,
+            netmask,
+            gateway,
+            interface: self.interface_name,
+            metric,
+        });
+    }
+
+    pub fn add_neighbor(&mut self, ip: u32, mac: [u8; 6]) {
+        self.neighbors.push(NeighborEntry {
+            ip,
+            mac,
+            is_reachable: true,
+        });
+    }
+
+    pub fn lookup_route(&self, target_ip: u32) -> Option<&RouteEntry> {
+        let mut best_route = None;
+        let mut longest_prefix = 0;
+
+        for route in &self.routes {
+            if (target_ip & route.netmask) == (route.destination & route.netmask) {
+                let prefix_len = route.netmask.count_ones();
+                if prefix_len >= longest_prefix {
+                    longest_prefix = prefix_len;
+                    best_route = Some(route);
+                }
+            }
+        }
+
+        best_route
     }
 
     /// Toggles the hardware link status (ip link set up/down parity)
@@ -72,44 +140,50 @@ pub struct SocketStatsEntry {
     pub local_port: u16,
     pub remote_port: u16,
     pub state: TcpState,
+    pub pid: u32,
+    pub inode: u64,
 }
 
 pub struct SocketStatsCommand {
-    pub sockets: [Option<SocketStatsEntry>; 4],
+    pub sockets: Vec<SocketStatsEntry>,
 }
 
 impl SocketStatsCommand {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            sockets: [
-                Some(SocketStatsEntry {
+            sockets: vec![
+                SocketStatsEntry {
                     local_port: 80,
                     remote_port: 0,
                     state: TcpState::Listen,
-                }),
-                Some(SocketStatsEntry {
+                    pid: 1042,
+                    inode: 12048,
+                },
+                SocketStatsEntry {
                     local_port: 22,
                     remote_port: 52044,
                     state: TcpState::Established,
-                }),
-                None,
-                None,
+                    pid: 820,
+                    inode: 14092,
+                },
             ],
         }
     }
 
-    /// Dumps all currently active socket allocations (ss -tulpn / netstat parity)
+    pub fn filter_by_state(&self, filter_state: TcpState) -> Vec<&SocketStatsEntry> {
+        self.sockets.iter().filter(|s| s.state == filter_state).collect()
+    }
+
+    /// Dumps all currently active socket allocations with PID/Process association (`ss -tulpn`)
     pub fn dump_active_sockets(&self) -> usize {
         println!("ss: Dumping established and listening TCP socket connections...");
         let mut count = 0;
-        for socket_slot in &self.sockets {
-            if let Some(ref socket) = socket_slot {
-                println!(
-                    "  -> State: {:?}, Local Port: :{}, Remote Port: :{}",
-                    socket.state, socket.local_port, socket.remote_port
-                );
-                count += 1;
-            }
+        for socket in &self.sockets {
+            println!(
+                "  -> State: {:?}, Local Port: :{}, Remote Port: :{}, pid={}, inode={}",
+                socket.state, socket.local_port, socket.remote_port, socket.pid, socket.inode
+            );
+            count += 1;
         }
         count
     }
@@ -119,21 +193,32 @@ impl SocketStatsCommand {
 // 3. ping Parity ICMP Latency Checker
 // ==========================================
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PingStatistics {
+    pub transmitted: u16,
+    pub received: u16,
+    pub loss_percentage: f32,
+    pub min_rtt_ms: f32,
+    pub max_rtt_ms: f32,
+    pub avg_rtt_ms: f32,
+    pub jitter_ms: f32,
+}
+
 pub struct PingCommand {
     pub packets_sent: AtomicU16,
     pub packets_received: AtomicU16,
 }
 
 impl PingCommand {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             packets_sent: AtomicU16::new(0),
             packets_received: AtomicU16::new(0),
         }
     }
 
-    /// Simulates ICMP echo requests measuring sub-millisecond latencies
-    pub fn ping_host(&self, ip: u32, count: u16) -> u16 {
+    /// Simulates ICMP echo requests measuring sub-millisecond latencies, packet loss, and jitter stats
+    pub fn ping_host(&self, ip: u32, count: u16) -> PingStatistics {
         println!(
             "ping: Transmitting ICMP Echo request to {}.{}.{}.{} ({} packets)...",
             (ip >> 24) & 0xFF,
@@ -143,14 +228,48 @@ impl PingCommand {
             count
         );
 
-        for _ in 0..count {
+        let mut rtts = Vec::new();
+        for seq in 1..=count {
             self.packets_sent.fetch_add(1, Ordering::SeqCst);
-            // Simulate successful echo reply with 8ms latency
-            self.packets_received.fetch_add(1, Ordering::SeqCst);
-            println!("  -> Received 64 bytes: icmp_seq=1 ttl=64 time=8.24 ms");
+            // Simulate 95% delivery rate
+            if seq % 20 != 0 {
+                self.packets_received.fetch_add(1, Ordering::SeqCst);
+                let rtt = 4.0 + (seq as f32 * 0.2);
+                rtts.push(rtt);
+                println!("  -> Received 64 bytes: icmp_seq={} ttl=64 time={:.2} ms", seq, rtt);
+            } else {
+                println!("  -> Request timeout for icmp_seq={}", seq);
+            }
         }
 
-        8 // average simulated latency
+        let transmitted = count;
+        let received = rtts.len() as u16;
+        let loss_percentage = if transmitted > 0 {
+            ((transmitted - received) as f32 / transmitted as f32) * 100.0
+        } else {
+            0.0
+        };
+
+        let (min_rtt_ms, max_rtt_ms, avg_rtt_ms, jitter_ms) = if !rtts.is_empty() {
+            let min = rtts.iter().copied().fold(f32::INFINITY, f32::min);
+            let max = rtts.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+            let sum: f32 = rtts.iter().sum();
+            let avg = sum / rtts.len() as f32;
+            let variance: f32 = rtts.iter().map(|r| (r - avg) * (r - avg)).sum::<f32>() / rtts.len() as f32;
+            (min, max, avg, variance)
+        } else {
+            (0.0, 0.0, 0.0, 0.0)
+        };
+
+        PingStatistics {
+            transmitted,
+            received,
+            loss_percentage,
+            min_rtt_ms,
+            max_rtt_ms,
+            avg_rtt_ms,
+            jitter_ms,
+        }
     }
 }
 
@@ -544,4 +663,59 @@ impl FirewallCommand {
 // Global Static Instances
 pub static GLOBAL_UFW_RULE: UfwDefaultRule = UfwDefaultRule;
 pub static GLOBAL_FIREWALL: FirewallCommand = FirewallCommand::new(&GLOBAL_UFW_RULE);
-pub static GLOBAL_IP_COMMAND: IpRoute2Command = IpRoute2Command::new("eth0");
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_iproute2_routing_and_neighbor_table() {
+        let mut ip_cmd = IpRoute2Command::new("eth0");
+        ip_cmd.set_link_state(LinkState::Up);
+        ip_cmd.assign_ip_address(0xC0A8010A); // 192.168.1.10
+        ip_cmd.set_mtu(9000);
+
+        ip_cmd.add_route(0xC0A80100, 24, 0x00000000, 100); // 192.168.1.0/24 direct
+        ip_cmd.add_route(0x00000000, 0, 0xC0A80101, 200);  // 0.0.0.0/0 default via 192.168.1.1
+
+        ip_cmd.add_neighbor(0xC0A80101, [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+
+        let local_match = ip_cmd.lookup_route(0xC0A80114).unwrap(); // 192.168.1.20
+        assert_eq!(local_match.gateway, 0x00000000);
+
+        let default_match = ip_cmd.lookup_route(0x08080808).unwrap(); // 8.8.8.8
+        assert_eq!(default_match.gateway, 0xC0A80101);
+
+        assert_eq!(ip_cmd.neighbors.len(), 1);
+        assert_eq!(ip_cmd.neighbors[0].mac, [0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+    }
+
+    #[test]
+    fn test_socket_stats_filtering_and_pid() {
+        let ss_cmd = SocketStatsCommand::new();
+        assert_eq!(ss_cmd.dump_active_sockets(), 2);
+
+        let listening = ss_cmd.filter_by_state(TcpState::Listen);
+        assert_eq!(listening.len(), 1);
+        assert_eq!(listening[0].pid, 1042);
+        assert_eq!(listening[0].local_port, 80);
+
+        let established = ss_cmd.filter_by_state(TcpState::Established);
+        assert_eq!(established.len(), 1);
+        assert_eq!(established[0].pid, 820);
+        assert_eq!(established[0].remote_port, 52044);
+    }
+
+    #[test]
+    fn test_ping_statistics_and_rtt() {
+        let ping_cmd = PingCommand::new();
+        let stats = ping_cmd.ping_host(0x7F000001, 10); // 127.0.0.1 count=10
+
+        assert_eq!(stats.transmitted, 10);
+        assert_eq!(stats.received, 10);
+        assert_eq!(stats.loss_percentage, 0.0);
+        assert!(stats.min_rtt_ms > 0.0);
+        assert!(stats.max_rtt_ms >= stats.min_rtt_ms);
+        assert!(stats.avg_rtt_ms >= stats.min_rtt_ms);
+    }
+}
