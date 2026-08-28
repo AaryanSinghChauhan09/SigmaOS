@@ -611,6 +611,24 @@ impl SimpleCommandRegistry {
             self.commands.push(Some(Box::new(dirs)));
         }
     }
+
+    pub fn get_mut<'a>(&'a mut self, name: &[u8]) -> Option<&'a mut (dyn ShellCommand + 'a)> {
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let name_slice = &name[..name_len];
+        let idx = self.commands.iter().position(|cmd_opt| {
+            if let Some(ref cmd) = *cmd_opt {
+                cmd.name() == name_slice
+            } else {
+                false
+            }
+        });
+        if let Some(i) = idx {
+            if let Some(ref mut cmd_box) = self.commands[i] {
+                return Some(cmd_box.as_mut());
+            }
+        }
+        None
+    }
 }
 
 impl Default for SimpleCommandRegistry {
@@ -703,14 +721,13 @@ impl ShellSession for SimpleShellSession {
         let cmd_len = command_name.iter().position(|&b| b == 0).unwrap_or(32);
         let trimmed_name = &command_name[..cmd_len];
 
-        if let Some(command) = self.registry.get(trimmed_name) {
-            let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            let slice = if args.data.is_null() || args.len == 0 {
+        if let Some(command) = self.registry.get_mut(trimmed_name) {
+            let slice = if args.is_empty() {
                 &[]
             } else {
-                unsafe { core::slice::from_raw_parts(args.data, args.len) }
+                args.as_slice()
             };
-            cmd.execute(slice)
+            command.execute(slice)
         } else {
             Err(CommandError::NotFound)
         }

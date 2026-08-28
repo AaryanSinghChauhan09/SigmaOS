@@ -660,6 +660,10 @@ impl UniversalPackageManager {
             PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
         );
         self.adapters.insert(
+            PackageFormat::AppImage,
+            appimage_adapter,
+        );
+        self.adapters.insert(
             PackageFormat::SigmaPkg,
             PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
         );

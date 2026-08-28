@@ -58,11 +58,10 @@ mod tests {
 
     #[test]
     fn test_driver_archive_vault() {
-        let vault = DriverArchiveVault::new();
-        let entry = vault.query_driver(10).unwrap();
-        assert_eq!(entry.name, "ne2000_isa_nic");
-        assert_eq!(entry.lineage_version, "Linux 2.2 NIC");
-        assert_eq!(entry.dependencies[0], "isa_bus_device");
+        let mut vault = DriverArchiveVault::new(0x55);
+        vault.store_driver("ne2000_isa_nic", b"driver_binary_data");
+        let retrieved = vault.retrieve_driver("ne2000_isa_nic").unwrap();
+        assert_eq!(retrieved.as_slice(), b"driver_binary_data");
     }
 }
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)

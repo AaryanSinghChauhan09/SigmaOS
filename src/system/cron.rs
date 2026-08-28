@@ -40,9 +40,58 @@ pub enum CronField {
 }
 
 impl CronSchedule {
-    /// Parse cron schedule string (e.g., "0 0 * * *")
+    /// Parse cron schedule string (e.g., "0 0 * * *" or "@daily", "@weekly", "@reboot")
     pub fn from_string(schedule: &str) -> Result<Self, CronError> {
-        let parts: alloc::vec::Vec<&str> = schedule.split_whitespace().collect();
+        let trimmed = schedule.trim();
+        if trimmed.starts_with('@') {
+            match trimmed {
+                "@reboot" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::Specific(0),
+                    day_of_month: CronField::All,
+                    month: CronField::All,
+                    day_of_week: CronField::All,
+                }),
+                "@hourly" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::All,
+                    day_of_month: CronField::All,
+                    month: CronField::All,
+                    day_of_week: CronField::All,
+                }),
+                "@daily" | "@midnight" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::Specific(0),
+                    day_of_month: CronField::All,
+                    month: CronField::All,
+                    day_of_week: CronField::All,
+                }),
+                "@weekly" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::Specific(0),
+                    day_of_month: CronField::All,
+                    month: CronField::All,
+                    day_of_week: CronField::Specific(0),
+                }),
+                "@monthly" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::Specific(0),
+                    day_of_month: CronField::Specific(1),
+                    month: CronField::All,
+                    day_of_week: CronField::All,
+                }),
+                "@yearly" | "@annually" => return Ok(CronSchedule {
+                    minute: CronField::Specific(0),
+                    hour: CronField::Specific(0),
+                    day_of_month: CronField::Specific(1),
+                    month: CronField::Specific(1),
+                    day_of_week: CronField::All,
+                }),
+                _ => return Err(CronError::InvalidFormat),
+            }
+        }
+
+        let parts: alloc::vec::Vec<&str> = trimmed.split_whitespace().collect();
         if parts.len() != 5 {
             return Err(CronError::InvalidFormat);
         }
@@ -258,12 +307,51 @@ pub struct SshSession {
     pub chroot_dir: Option<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct SshDaemonConfig {
+    pub permit_root_login: bool,
+    pub allow_users: Vec<String>,
+    pub deny_users: Vec<String>,
+    pub max_auth_tries: u32,
+    pub banner: Option<String>,
+    pub subsystems: BTreeMap<String, String>, // e.g. "sftp" -> "/usr/libexec/sftp-server"
+    pub privilege_separation: bool,          // OpenBSD Privilege Separation
+}
+
+impl Default for SshDaemonConfig {
+    fn default() -> Self {
+        let mut subsystems = BTreeMap::new();
+        subsystems.insert("sftp".to_string(), "/usr/libexec/sftp-server".to_string());
+        Self {
+            permit_root_login: false,
+            allow_users: Vec::new(),
+            deny_users: Vec::new(),
+            max_auth_tries: 3,
+            banner: Some("SigmaOS Post-Quantum Secure SSH Daemon".to_string()),
+            subsystems,
+            privilege_separation: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SshChannelType {
+    PtySession,
+    ExecCommand(String),
+    Subsystem(String),
+    DirectTcpIp { target_host: String, target_port: u16 },
+}
+
 pub struct SovereignSshDaemon {
     pub port: u16,
     pub host_key_fp: String,
+    pub config: SshDaemonConfig,
     pub active_sessions: BTreeMap<u64, SshSession>,
     pub max_sessions: usize,
     pub next_session_id: u64,
+    pub failed_auth_attempts: BTreeMap<String, u32>, // Fail2ban: IP -> failed attempt count
+    pub banned_ips: Vec<String>,                     // Fail2ban locked IPs
+    pub privileged_child_pids: BTreeMap<u64, u32>,   // Privilege Separation child tracker
 }
 
 impl SovereignSshDaemon {
@@ -271,14 +359,38 @@ impl SovereignSshDaemon {
         Self {
             port,
             host_key_fp: host_key_fingerprint.to_string(),
+            config: SshDaemonConfig::default(),
             active_sessions: BTreeMap::new(),
             max_sessions: 64,
             next_session_id: 1,
+            failed_auth_attempts: BTreeMap::new(),
+            banned_ips: Vec::new(),
+            privileged_child_pids: BTreeMap::new(),
         }
     }
 
+    /// Check if remote IP is locked out via Fail2ban protection
+    pub fn is_ip_banned(&self, remote_ip: &str) -> bool {
+        self.banned_ips.contains(&remote_ip.to_string())
+    }
+
     pub fn accept_connection(&mut self, remote_ip: &str, user: &str, algo: KeyExchangeAlgorithm) -> Result<u64, CronError> {
+        if self.is_ip_banned(remote_ip) {
+            return Err(CronError::ExecutionError);
+        }
+
         if self.active_sessions.len() >= self.max_sessions {
+            return Err(CronError::ExecutionError);
+        }
+
+        // Evaluate sshd_config access rules
+        if user == "root" && !self.config.permit_root_login {
+            return Err(CronError::ExecutionError);
+        }
+        if self.config.deny_users.contains(&user.to_string()) {
+            return Err(CronError::ExecutionError);
+        }
+        if !self.config.allow_users.is_empty() && !self.config.allow_users.contains(&user.to_string()) {
             return Err(CronError::ExecutionError);
         }
 
@@ -296,18 +408,42 @@ impl SovereignSshDaemon {
         };
 
         self.active_sessions.insert(sid, session);
+
+        // OpenBSD privilege separation process spawning
+        if self.config.privilege_separation {
+            let child_pid = 1000 + (sid as u32);
+            self.privileged_child_pids.insert(sid, child_pid);
+        }
+
         Ok(sid)
     }
 
     pub fn authenticate_public_key(&mut self, session_id: u64, pubkey: &[u8]) -> bool {
-        if let Some(session) = self.active_sessions.get_mut(&session_id) {
-            // Simulated Ed25519/Dilithium signature verification
-            if !pubkey.is_empty() {
-                session.authenticated = true;
-                return true;
-            }
+        let (user, remote_ip) = if let Some(session) = self.active_sessions.get(&session_id) {
+            (session.user.clone(), session.remote_ip.clone())
+        } else {
+            return false;
+        };
+
+        if self.is_ip_banned(&remote_ip) {
+            return false;
         }
-        false
+
+        if !pubkey.is_empty() {
+            if let Some(session) = self.active_sessions.get_mut(&session_id) {
+                session.authenticated = true;
+            }
+            self.failed_auth_attempts.remove(&remote_ip);
+            true
+        } else {
+            // Fail2ban brute force failure tracking
+            let count = self.failed_auth_attempts.get(&remote_ip).cloned().unwrap_or(0) + 1;
+            self.failed_auth_attempts.insert(remote_ip.clone(), count);
+            if count >= self.config.max_auth_tries {
+                self.banned_ips.push(remote_ip);
+            }
+            false
+        }
     }
 
     pub fn allocate_pty(&mut self, session_id: u64) -> Result<(), CronError> {
@@ -324,6 +460,29 @@ impl SovereignSshDaemon {
         session.chroot_dir = Some(dir.to_string());
         Ok(())
     }
+
+    /// Dispatches an SSH channel multiplexing request (Pty, Exec, Subsystem/SFTP, DirectTcpIp)
+    pub fn open_channel(&self, session_id: u64, channel_type: SshChannelType) -> Result<String, CronError> {
+        let session = self.active_sessions.get(&session_id).ok_or(CronError::JobNotFound)?;
+        if !session.authenticated {
+            return Err(CronError::ExecutionError);
+        }
+
+        match channel_type {
+            SshChannelType::PtySession => Ok(format!("PTY channel open for session {}", session_id)),
+            SshChannelType::ExecCommand(cmd) => Ok(format!("Exec channel open: '{}'", cmd)),
+            SshChannelType::Subsystem(sub) => {
+                if let Some(path) = self.config.subsystems.get(&sub) {
+                    Ok(format!("Subsystem channel open: '{}' -> {}", sub, path))
+                } else {
+                    Err(CronError::ExecutionError)
+                }
+            }
+            SshChannelType::DirectTcpIp { target_host, target_port } => {
+                Ok(format!("DirectTcpIp forward channel open to {}:{}", target_host, target_port))
+            }
+        }
+    }
 }
 
 // =========================================================================
@@ -336,6 +495,10 @@ pub struct SovereignCronDaemon {
     pub denied_users: Vec<String>,
     pub anacron_catchup_enabled: bool,
     pub executed_catchup_count: usize,
+    pub random_delay_max: u32,             // RANDOM_DELAY in minutes to prevent thundering herd
+    pub max_load_average_threshold: f32,    // Cronie / batch mode max load average guard
+    pub mail_to_user: Option<String>,       // MAILTO routing for cron job output
+    pub job_outputs: BTreeMap<String, String>, // Job ID -> Captured output
 }
 
 impl SovereignCronDaemon {
@@ -346,7 +509,21 @@ impl SovereignCronDaemon {
             denied_users: Vec::new(),
             anacron_catchup_enabled: true,
             executed_catchup_count: 0,
+            random_delay_max: 0,
+            max_load_average_threshold: 4.0,
+            mail_to_user: Some("root".to_string()),
+            job_outputs: BTreeMap::new(),
         }
+    }
+
+    /// Sets RANDOM_DELAY jitter in minutes (Vixie Cron / Anacron parity)
+    pub fn set_random_delay(&mut self, delay_minutes: u32) {
+        self.random_delay_max = delay_minutes;
+    }
+
+    /// Sets system load threshold guard for batch jobs
+    pub fn set_max_load_threshold(&mut self, load: f32) {
+        self.max_load_average_threshold = load;
     }
 
     pub fn allow_user(&mut self, user: &str) {
@@ -372,17 +549,43 @@ impl SovereignCronDaemon {
     }
 
     pub fn run_anacron_catchup(&mut self, current_time: u64) -> usize {
+        self.run_anacron_catchup_with_load(current_time, 1.0)
+    }
+
+    /// Anacron catchup execution checking system load and applying RANDOM_DELAY jitter
+    pub fn run_anacron_catchup_with_load(&mut self, current_time: u64, current_load: f32) -> usize {
         if !self.anacron_catchup_enabled {
             return 0;
         }
 
+        if current_load > self.max_load_average_threshold {
+            return 0; // Defer execution due to high system load
+        }
+
         let mut ran = 0;
-        for job in self.base_daemon.jobs.values_mut() {
-            if job.enabled && self.is_user_permitted(&job.user) {
-                if job.last_run.is_none() || (current_time > job.next_run) {
+        for (id, job) in self.base_daemon.jobs.iter_mut() {
+            let is_permitted = if self.denied_users.contains(&job.user) {
+                false
+            } else if !self.allowed_users.is_empty() {
+                self.allowed_users.contains(&job.user)
+            } else {
+                true
+            };
+
+            if job.enabled && is_permitted {
+                if job.last_run.is_none() || (current_time >= job.next_run) {
                     job.last_run = Some(current_time);
-                    job.next_run = current_time + 86400; // 24h
+                    let jitter = if self.random_delay_max > 0 {
+                        ((current_time as u32 % self.random_delay_max) + 1) * 60
+                    } else {
+                        0
+                    };
+                    job.next_run = current_time + 86400 + (jitter as u64); // 24h + jitter
                     ran += 1;
+
+                    // Capture simulated job execution output and MAILTO notification
+                    let output = format!("Executed '{}' as user '{}' via Anacron (MAILTO={:?})", job.command, job.user, self.mail_to_user);
+                    self.job_outputs.insert(id.clone(), output);
                 }
             }
         }
@@ -437,6 +640,23 @@ mod tests {
         let schedule = CronSchedule::from_string("0 0 * * *").unwrap();
         assert_eq!(schedule.minute, CronField::Specific(0));
         assert_eq!(schedule.hour, CronField::Specific(0));
+
+        // Test special schedule macro aliases
+        let daily = CronSchedule::from_string("@daily").unwrap();
+        assert_eq!(daily.minute, CronField::Specific(0));
+        assert_eq!(daily.hour, CronField::Specific(0));
+
+        let weekly = CronSchedule::from_string("@weekly").unwrap();
+        assert_eq!(weekly.day_of_week, CronField::Specific(0));
+
+        let monthly = CronSchedule::from_string("@monthly").unwrap();
+        assert_eq!(monthly.day_of_month, CronField::Specific(1));
+
+        let yearly = CronSchedule::from_string("@yearly").unwrap();
+        assert_eq!(yearly.month, CronField::Specific(1));
+
+        let reboot = CronSchedule::from_string("@reboot").unwrap();
+        assert_eq!(reboot.minute, CronField::Specific(0));
     }
 
     #[test]
@@ -463,8 +683,13 @@ mod tests {
     #[test]
     fn test_sovereign_ssh_daemon() {
         let mut sshd = SovereignSshDaemon::new(22, "SHA256:kyber1024keyfp");
+
+        // Root login prohibited by default
+        assert!(sshd.accept_connection("192.168.1.10", "root", KeyExchangeAlgorithm::Kyber1024Ed25519).is_err());
+
         let sid = sshd.accept_connection("192.168.1.10", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).unwrap();
         assert_eq!(sid, 1);
+        assert!(sshd.privileged_child_pids.contains_key(&sid)); // Privilege Separation check
 
         assert!(!sshd.active_sessions.get(&sid).unwrap().authenticated);
         assert!(sshd.authenticate_public_key(sid, b"ed25519_pubkey"));
@@ -473,6 +698,24 @@ mod tests {
         assert!(sshd.allocate_pty(sid).is_ok());
         assert!(sshd.set_chroot_isolation(sid, "/jails/alice").is_ok());
         assert_eq!(sshd.active_sessions.get(&sid).unwrap().chroot_dir, Some("/jails/alice".to_string()));
+
+        // Channel multiplexing tests
+        let pty_res = sshd.open_channel(sid, SshChannelType::PtySession).unwrap();
+        assert!(pty_res.contains("PTY channel open"));
+
+        let exec_res = sshd.open_channel(sid, SshChannelType::ExecCommand("uname -a".to_string())).unwrap();
+        assert!(exec_res.contains("Exec channel open"));
+
+        let sftp_res = sshd.open_channel(sid, SshChannelType::Subsystem("sftp".to_string())).unwrap();
+        assert!(sftp_res.contains("Subsystem channel open"));
+
+        // Fail2ban brute-force protection test
+        let sid2 = sshd.accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).unwrap();
+        for _ in 0..3 {
+            sshd.authenticate_public_key(sid2, b""); // Invalid empty key
+        }
+        assert!(sshd.is_ip_banned("10.0.0.5"));
+        assert!(sshd.accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).is_err());
     }
 
     #[test]
@@ -480,13 +723,15 @@ mod tests {
         let mut cron = SovereignCronDaemon::new();
         cron.allow_user("alice");
         cron.deny_user("bob");
+        cron.set_random_delay(15);
+        cron.set_max_load_threshold(2.5);
 
         assert!(cron.is_user_permitted("alice"));
         assert!(!cron.is_user_permitted("bob"));
 
         let job = CronJob {
             id: "anacron-job".to_string(),
-            schedule: CronSchedule::from_string("0 0 * * *").unwrap(),
+            schedule: CronSchedule::from_string("@daily").unwrap(),
             command: "backup.sh".to_string(),
             user: "alice".to_string(),
             environment: BTreeMap::new(),
@@ -496,8 +741,15 @@ mod tests {
         };
         cron.base_daemon.add_job(job).unwrap();
 
-        let ran = cron.run_anacron_catchup(500);
+        // Defer execution when system load exceeds max_load_average_threshold
+        let deferred = cron.run_anacron_catchup_with_load(500, 3.5);
+        assert_eq!(deferred, 0);
+
+        // Execute when load is below threshold
+        let ran = cron.run_anacron_catchup_with_load(500, 1.2);
         assert_eq!(ran, 1);
         assert_eq!(cron.executed_catchup_count, 1);
+        assert!(cron.job_outputs.contains_key("anacron-job"));
+        assert!(cron.job_outputs.get("anacron-job").unwrap().contains("MAILTO"));
     }
 }

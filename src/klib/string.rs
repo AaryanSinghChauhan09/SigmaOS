@@ -429,10 +429,11 @@ where
     type Item = SigmaString;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let haystack = self.string.as_str();
-        let start = 0;
-
-        if let Some(idx) = self.pat.find_in(self.string) {
+        if self.finished {
+            return None;
+        }
+        let temp_string = SigmaString::from_str(self.haystack);
+        if let Some(idx) = self.pat.find_in(&temp_string) {
             let end = idx + self.pat.pattern_len();
             let result = SigmaString::from_str(&self.haystack[..idx]);
             self.haystack = &self.haystack[end..];
