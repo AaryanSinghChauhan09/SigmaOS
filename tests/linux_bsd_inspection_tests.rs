@@ -703,3 +703,56 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
 }
+
+#[test]
+fn test_sovereign_remote_sharing_inspection() {
+    use sigmaos::network::sovereign_remote_sharing::*;
+
+    // 1. SSH Engine
+    let mut ssh = SovereignSshEngine::new(22, "SHA256:hostkey_fp");
+    ssh.add_trusted_ca("SHA256:ca_key_fp");
+    let cert = SshCertificate {
+        key_type: "ssh-ed25519-cert-v01@openssh.com".to_string(),
+        serial: 1,
+        key_id: "user1".to_string(),
+        valid_principals: vec!["user1".to_string()],
+        valid_until_epoch: 2000000000,
+        ca_fingerprint: "SHA256:ca_key_fp".to_string(),
+    };
+    assert!(ssh.verify_certificate(&cert, "user1", 1700000000));
+
+    // 2. NFS Engine
+    let mut nfs = SovereignNfsEngine::new();
+    nfs.add_export(NfsExportRule {
+        export_path: "/data".to_string(),
+        client_network: "*".to_string(),
+        read_only: false,
+        no_root_squash: true,
+        anonuid: 65534,
+        anongid: 65534,
+        sec_flavor: "sys".to_string(),
+    });
+    assert_eq!(nfs.check_export_access("10.0.0.1", "/data/a.txt", false, true).unwrap(), 0);
+
+    // 3. Samba Engine
+    let mut samba = SovereignSambaEngine::new("WORKGROUP", "SIGMA");
+    samba.add_share(SmbShareConfig {
+        share_name: "share1".to_string(),
+        local_path: "/share1".to_string(),
+        read_only: false,
+        guest_ok: true,
+        valid_users: vec![],
+        encryption_required: false,
+    });
+    let sid = samba.authenticate_user("guest", "", SmbDialect::Smb3_11).unwrap();
+    assert!(samba.tree_connect(sid, "share1").is_ok());
+
+    // 4. SCP Engine
+    let header = SovereignScpEngine::format_file_header(0o644, 512, "test.txt");
+    assert!(header.contains("512 test.txt"));
+
+    // 5. Rsync Engine
+    let rsync = SovereignRsyncEngine::new(128);
+    let checksums = rsync.compute_block_checksums(b"Hello world!");
+    assert_eq!(checksums.len(), 1);
+}
