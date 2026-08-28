@@ -68,6 +68,21 @@ mod linux_bsd_innovations;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -201,6 +216,37 @@ fn test_advanced_process_control_inspection() {
     let efd = ipc.eventfd_create(10, false);
     assert_eq!(ipc.eventfd_read(efd).unwrap(), 10);
 }
+
+#[test]
+fn test_zenith_desktop_applets_and_themes_inspection() {
+    use zenith_advanced::{
+        AppletCategory, DesktopApplet, DesktopAppletEngine, ZenithThemePreset,
+        ZenithThemePresetManager,
+    };
+
+    let mut applet_engine = DesktopAppletEngine::new();
+    assert_eq!(applet_engine.get_active_applets().len(), 3);
+
+    applet_engine.register_applet(DesktopApplet {
+        id: "battery".to_string(),
+        name: "Battery & Power".to_string(),
+        category: AppletCategory::PowerBattery,
+        enabled: true,
+        position_index: 3,
+    });
+    assert_eq!(applet_engine.get_active_applets().len(), 4);
+
+    let mut theme_mgr = ZenithThemePresetManager::new();
+    assert_eq!(theme_mgr.current_preset, ZenithThemePreset::CinnamonModern);
+
+    theme_mgr.apply_preset(ZenithThemePreset::PantheonGranite);
+    assert_eq!(theme_mgr.current_preset, ZenithThemePreset::PantheonGranite);
+    assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
+}
+
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
 
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {

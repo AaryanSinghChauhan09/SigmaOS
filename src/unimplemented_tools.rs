@@ -2731,6 +2731,16 @@ impl TimeMachineBackup {
 }
 
 /// Real-time process & file system event monitor [Sysinternals ProcMon, LTTng Parity]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcMonEventType {
+    FileSystemRead,
+    FileSystemWrite,
+    RegistryAccess,
+    NetworkAccess,
+    ProcessStart,
+    ThreadCreate,
+}
+
 #[derive(Debug, Clone)]
 pub struct ProcMonEvent {
     pub sequence_id: u64,
@@ -2739,10 +2749,12 @@ pub struct ProcMonEvent {
     pub operation: String,
     pub path_or_detail: String,
     pub result: String,
+    pub event_type: Option<ProcMonEventType>,
 }
 
 pub struct SysinternalsProcMon {
     pub events: Vec<ProcMonEvent>,
+    pub captured_events: Vec<ProcMonEvent>,
     pub sequence_counter: u64,
     pub is_capturing: bool,
 }
@@ -2751,9 +2763,40 @@ impl SysinternalsProcMon {
     pub fn new() -> Self {
         Self {
             events: Vec::new(),
+            captured_events: Vec::new(),
             sequence_counter: 1,
-            is_capturing: true,
+            is_capturing: false,
         }
+    }
+
+    pub fn start_capture(&mut self) {
+        self.is_capturing = true;
+    }
+
+    pub fn stop_capture(&mut self) {
+        self.is_capturing = false;
+    }
+
+    pub fn record_event(&mut self, pid: u32, proc_name: &str, event_type: ProcMonEventType, detail: &str) {
+        if self.is_capturing {
+            let seq = self.sequence_counter;
+            self.sequence_counter += 1;
+            let event = ProcMonEvent {
+                sequence_id: seq,
+                process_name: proc_name.to_string(),
+                pid,
+                operation: format!("{:?}", event_type),
+                path_or_detail: detail.to_string(),
+                result: "SUCCESS".to_string(),
+                event_type: Some(event_type),
+            };
+            self.captured_events.push(event.clone());
+            self.events.push(event);
+        }
+    }
+
+    pub fn filter_events_by_pid(&self, pid: u32) -> Vec<ProcMonEvent> {
+        self.captured_events.iter().filter(|e| e.pid == pid).cloned().collect()
     }
 
     pub fn record_operation(&mut self, process: &str, pid: u32, op: &str, path: &str, res: &str) {
@@ -2762,14 +2805,17 @@ impl SysinternalsProcMon {
         }
         let seq = self.sequence_counter;
         self.sequence_counter += 1;
-        self.events.push(ProcMonEvent {
+        let event = ProcMonEvent {
             sequence_id: seq,
             process_name: process.to_string(),
             pid,
             operation: op.to_string(),
             path_or_detail: path.to_string(),
             result: res.to_string(),
-        });
+            event_type: None,
+        };
+        self.events.push(event.clone());
+        self.captured_events.push(event);
     }
 
     pub fn filter_by_process(&self, process_name: &str) -> Vec<ProcMonEvent> {
@@ -3683,53 +3729,6 @@ impl Default for ClearLinuxStatelessEngine {
         Self::new()
     }
 }
-
-/// macOS Time Machine Parity - Continuous Snapshot & Point-In-Time Restore Engine
-pub struct TimeMachineSnapshot {
-    pub id: u64,
-    pub timestamp_sec: u64,
-    pub volume_label: String,
-    pub files_changed: Vec<String>,
-}
-
-pub struct TimeMachineBackup {
-    pub snapshots: Vec<TimeMachineSnapshot>,
-    pub max_retention_days: u32,
-}
-
-impl TimeMachineBackup {
-    pub fn new(retention_days: u32) -> Self {
-        Self {
-            snapshots: Vec::new(),
-            max_retention_days: retention_days,
-        }
-    }
-
-    pub fn create_snapshot(&mut self, timestamp: u64, volume: &str, changed: &[&str]) -> u64 {
-        let id = self.snapshots.len() as u64 + 1;
-        self.snapshots.push(TimeMachineSnapshot {
-            id,
-            timestamp_sec: timestamp,
-            volume_label: volume.to_string(),
-            files_changed: changed.iter().map(|&f| f.to_string()).collect(),
-        });
-        id
-    }
-
-    pub fn restore_file_at_timestamp(&self, filename: &str, target_time: u64) -> Result<&'static str, &'static str> {
-        let matching = self.snapshots.iter()
-            .filter(|s| s.timestamp_sec <= target_time && s.files_changed.iter().any(|f| f == filename))
-            .max_by_key(|s| s.timestamp_sec);
-
-        if matching.is_some() {
-            Ok("Restored successfully from snapshot")
-        } else {
-            Err("No snapshot found containing requested file before timestamp")
-        }
-    }
-}
-
-
 
 // =========================================================================
 // UNIT TESTS

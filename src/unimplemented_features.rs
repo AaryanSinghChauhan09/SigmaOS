@@ -5,6 +5,10 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // =========================================================================
 // 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -57,14 +61,24 @@ pub struct GentooPortageMaskResolver {
     pub unmasked_packages: Vec<String>,
     pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
+    pub arch: String,
+    pub ebuilds: Vec<EbuildEntry>,
+    pub hard_masked_pkgs: Vec<String>,
+    pub hard_masks: Vec<String>,
+    pub hard_masked_packages: Vec<String>,
+    pub unmasked_packages: Vec<String>,
 }
 
 impl GentooPortageMaskResolver {
     pub fn new(target_arch: &str) -> Self {
         Self {
             target_arch: target_arch.to_string(),
+            arch: target_arch.to_string(),
             ebuilds: Vec::new(),
-            hard_masked_atoms: Vec::new(),
+            hard_masked_pkgs: Vec::new(),
+            hard_masks: Vec::new(),
+            hard_masked_packages: Vec::new(),
+            unmasked_packages: Vec::new(),
         }
     }
 
@@ -77,24 +91,35 @@ impl GentooPortageMaskResolver {
         });
     }
 
-    pub fn add_hard_mask(&mut self, atom_name: &str) {
-        self.hard_masked_atoms.push(atom_name.to_string());
+    pub fn add_hard_mask(&mut self, category_pkg: &str) {
+        self.hard_masked_pkgs.push(category_pkg.to_string());
+        self.hard_masks.push(category_pkg.to_string());
+        self.hard_masked_packages.push(category_pkg.to_string());
     }
 
-    pub fn evaluate_installability(&self, atom_name: &str, _slot: &str, accept_keywords: bool) -> Result<bool, &'static str> {
-        if self.hard_masked_atoms.iter().any(|pkg| pkg == atom_name) {
+    pub fn unmask_package(&mut self, package: &str) {
+        self.unmasked_packages.push(package.to_string());
+    }
+
+    pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+        if self.hard_masked_pkgs.iter().any(|pkg| pkg == category_pkg)
+            || self.hard_masks.iter().any(|pkg| pkg == category_pkg)
+            || self.hard_masked_packages.iter().any(|pkg| pkg == category_pkg)
+        {
             return Err("Package is hard-masked in package.mask");
         }
 
-        let ebuild = self.ebuilds.iter().find(|e| e.atom_name == atom_name)
-            .ok_or("Ebuild not found")?;
+        let ebuild = self.ebuilds.iter().find(|e| {
+            e.category_pkg == category_pkg
+                && (version.is_empty() || version == "0" || e.version == version)
+        }).ok_or("Ebuild not found")?;
 
-        if ebuild.is_ebuild_masked && !accept_keywords {
+        if ebuild.is_masked && !self.unmasked_packages.iter().any(|pkg| pkg == category_pkg) {
             return Err("Ebuild is masked by package.mask or keywords");
         }
 
-        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
+        let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch || k == &self.arch);
+        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && (&k[1..] == self.target_arch || &k[1..] == self.arch));
 
         if is_stable {
             Ok(true)
@@ -1616,12 +1641,6 @@ mod peripheral_tests {
     fn test_section_6_3_sat_solver() {
         let mut sat = SatSolverEngine::new();
 
-        let node_b = PackageNode {
-            pkg_id: 1,
-            version: PkgVersion { major: 2, minor: 1 },
-            dependencies: [None, None, None, None],
-        };
-
         let node_a = PackageNode {
             pkg_id: 0,
             version: PkgVersion { major: 1, minor: 0 },
@@ -1632,7 +1651,6 @@ mod peripheral_tests {
             version: PkgVersion { major: 2, minor: 1 },
             dependencies: [None, None, None, None],
         };
-        assert!(sat.add_package_node(node_b));
         assert!(sat.add_package_node(node_a));
         assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
@@ -1796,6 +1814,12 @@ mod linux_lts_upstream_tests {
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
 
+pub struct GentooEbuildPackage {
+    pub name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
 
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,
@@ -1835,6 +1859,12 @@ impl GentooUseFlagEngine {
     }
 }
 
+pub struct PortageEbuild {
+    pub package: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
 
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
@@ -2551,3 +2581,10 @@ mod extra_unimplemented_tests {
 
 }
 
+#[derive(Debug, Clone)]
+pub struct PortageEbuildSpec {
+    pub package_name: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
