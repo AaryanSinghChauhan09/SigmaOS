@@ -5,6 +5,7 @@ extern crate alloc;
 use crate::klib::{BTreeMap, HashMap};
 use alloc::string::String;
 use alloc::vec::Vec;
+use crate::klib::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {

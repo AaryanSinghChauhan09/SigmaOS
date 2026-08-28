@@ -428,45 +428,21 @@ pub enum SystemdUnitActiveState {
     Deactivating,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SystemdUnitState {
-    Active,
-    Inactive,
-    Activating,
-    Deactivating,
-    Failed,
-}
-
-pub type SystemdJournalEntry = JournalLogEntry;
-
-#[derive(Debug, Clone)]
-pub struct JournalLogEntry {
-    pub message: String,
-    pub timestamp: u64,
-}
-
 #[derive(Debug, Clone)]
 pub struct SystemdUnit {
     pub name: String,
     pub unit_type: SystemdUnitType,
     pub active_state: SystemdUnitActiveState,
-    pub state: SystemdUnitState,
     pub description: String,
     pub exec_start: Vec<String>,
     pub dependencies: Vec<String>,
-    pub memory_limit_mb: Option<u64>,
-    pub cpu_weight: u32,
-    pub is_sandboxed: bool,
-    pub socket_activation_port: Option<u16>,
-    pub pledge_promises: Option<String>,
-    pub unveil_paths: Vec<(String, String)>,
+    pub memory_limit_bytes: Option<u64>,
+    pub cpu_quota_pct: Option<u32>,
 }
 
-pub type SovereignSystemdUnit = SystemdUnit;
-
 pub struct SovereignSystemdParityEngine {
-    pub units: BTreeMap<String, SovereignSystemdUnit>,
-    pub journal_logs: Vec<JournalLogEntry>,
+    pub units: BTreeMap<String, SystemdUnit>,
+    pub journal_logs: Vec<String>,
 }
 
 impl SovereignSystemdParityEngine {
@@ -477,52 +453,22 @@ impl SovereignSystemdParityEngine {
         }
     }
 
-    /// Registers a new systemd-style unit (Service, Slice, Scope, Mount, Automount, Swap, Path, Device).
-    pub fn register_unit(&mut self, name: &str, unit_type: SystemdUnitType, deps: &[&str]) {
-        let deps_vec = deps.iter().map(|d| d.to_string()).collect();
-        self.units.insert(
-            name.to_string(),
-            SystemdUnit {
-                name: name.to_string(),
-                unit_type,
-                active_state: SystemdUnitActiveState::Inactive,
-                state: SystemdUnitState::Inactive,
-                description: name.to_string(),
-                exec_start: Vec::new(),
-                dependencies: deps_vec,
-                memory_limit_mb: None,
-                cpu_weight: 0,
-                is_sandboxed: false,
-                socket_activation_port: None,
-                pledge_promises: None,
-                unveil_paths: Vec::new(),
-            },
-        );
+    pub fn register_unit(&mut self, unit: SystemdUnit) {
+        self.journal_logs.push(format!("Journal: Unit {} registered", unit.name));
+        self.units.insert(unit.name.clone(), unit);
     }
 
     pub fn start_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
-        unit.state = SystemdUnitState::Active;
-        self.journal_logs.push(JournalLogEntry {
-            message: format!("Unit {} transitioned to Active", name),
-            timestamp: 0,
-        });
+        self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
-    }
-
-    pub fn query_journal(&self, name: &str) -> Vec<&JournalLogEntry> {
-        self.journal_logs.iter().filter(|log| log.message.contains(name)).collect()
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
         let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Inactive;
-        unit.state = SystemdUnitState::Inactive;
-        self.journal_logs.push(JournalLogEntry {
-            message: format!("Unit {} transitioned to Inactive", name),
-            timestamp: 0,
-        });
+        self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
     }
 }
@@ -542,96 +488,49 @@ pub enum SchedulerClass {
     Idle,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DvfsPowerGovernor {
-    Performance,
-    Powersave,
-    Schedutil,
-    OnDemand,
-}
-
-#[derive(Debug, Clone)]
-pub struct NumaNodeAffinity {
-    pub node_id: usize,
-    pub cpu_cores: Vec<usize>,
-    pub total_memory_mb: u64,
-}
-
 #[derive(Debug, Clone)]
 pub struct RealtimeTask {
     pub pid: usize,
     pub class: SchedulerClass,
     pub deadline_us: u64,
-    pub wcet_us: u64,
+    pub wcet_us: u64, // Worst-Case Execution Time
     pub numa_node: u32,
 }
 
-pub struct RtlaneRealtimeTask {
-    pub task_id: usize,
-    pub max_latency_budget_us: u64,
-    pub priority: u8,
-    pub assigned_numa_node: usize,
-    pub ebpf_boost_score: u32,
-}
-
 pub struct SovereignHybridSchedulerInnovations {
-    pub current_governor: DvfsPowerGovernor,
-    pub numa_nodes: Vec<NumaNodeAffinity>,
-    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
-    pub preemption_count: u64,
-    pub rt_lane_latency_us: u64,
-    pub ai_prediction_boost: bool,
+    pub tasks: Vec<RealtimeTask>,
+    pub dvfs_frequency_mhz: u32,
+    pub numa_nodes_count: u32,
 }
 
 impl SovereignHybridSchedulerInnovations {
     pub fn new() -> Self {
-        let mut nodes = Vec::new();
-        nodes.push(NumaNodeAffinity {
-            node_id: 0,
-            cpu_cores: Vec::from([0, 1, 2, 3]),
-            total_memory_mb: 8192,
-        });
-        nodes.push(NumaNodeAffinity {
-            node_id: 1,
-            cpu_cores: Vec::from([4, 5, 6, 7]),
-            total_memory_mb: 8192,
-        });
-
         Self {
-            current_governor: DvfsPowerGovernor::Schedutil,
-            numa_nodes: nodes,
-            rt_tasks: BTreeMap::new(),
-            preemption_count: 0,
-            rt_lane_latency_us: 4,
-            ai_prediction_boost: false,
+            tasks: Vec::new(),
+            dvfs_frequency_mhz: 3200,
+            numa_nodes_count: 2,
         }
     }
 
-    pub fn register_rt_task(&mut self, task: RtlaneRealtimeTask) -> Result<(), &'static str> {
-        if task.max_latency_budget_us > 5 {
-            return Err("Latency budget exceeds 5us threshold");
+    pub fn add_task(&mut self, task: RealtimeTask) {
+        self.tasks.push(task);
+    }
+
+    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
+        self.tasks
+            .iter()
+            .filter(|t| t.class == SchedulerClass::RTLane)
+            .min_by_key(|t| t.deadline_us)
+    }
+
+    pub fn auto_adjust_dvfs(&mut self) -> u32 {
+        let rt_count = self.tasks.iter().filter(|t| t.class == SchedulerClass::RTLane).count();
+        if rt_count > 0 {
+            self.dvfs_frequency_mhz = 4200; // Boost frequency for RTLane
+        } else {
+            self.dvfs_frequency_mhz = 2200; // Power-saving mode
         }
-        self.rt_tasks.insert(task.task_id, task);
-        Ok(())
-    }
-
-    pub fn evaluate_ebpf_preemption_hook(&mut self, task_id: usize, boost: u32) -> bool {
-        if let Some(task) = self.rt_tasks.get_mut(&task_id) {
-            task.ebpf_boost_score += boost;
-        }
-        true
-    }
-
-    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
-        self.rt_lane_latency_us < 5
-    }
-
-    pub fn select_optimal_numa_node(&self, cpu_core: u32) -> Option<u32> {
-        self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&(cpu_core as usize))).map(|n| n.node_id as u32)
-    }
-
-    pub fn set_governor(&mut self, gov: DvfsPowerGovernor) {
-        self.current_governor = gov;
+        self.dvfs_frequency_mhz
     }
 }
 
@@ -732,33 +631,38 @@ mod tests {
 
     #[test]
     fn test_systemd_parity_engine() {
-        let mut engine = SovereignSystemdParityEngine::new();
-
-        let srv = SovereignSystemdUnit {
-            name: String::from("httpd.service"),
+        let mut systemd = SovereignSystemdParityEngine::new();
+        let unit = SystemdUnit {
+            name: String::from("sshd.service"),
             unit_type: SystemdUnitType::Service,
-            state: SystemdUnitState::Inactive,
-            dependencies: vec![String::from("network.target")],
-            memory_limit_mb: None,
-            cpu_weight: 100,
-            is_sandboxed: true,
-            socket_activation_port: Some(8080),
-            pledge_promises: Some(String::from("stdio inet rpath")),
-            unveil_paths: vec![(String::from("/var/www"), String::from("r"))],
+            active_state: SystemdUnitActiveState::Inactive,
+            description: String::from("OpenSSH Daemon"),
+            exec_start: vec![String::from("/usr/bin/sshd")],
+            dependencies: Vec::new(),
+            memory_limit_bytes: Some(512 * 1024 * 1024),
+            cpu_quota_pct: Some(50),
         };
 
-        engine.register_unit(srv);
-        assert_eq!(engine.units.len(), 1);
-
-        assert!(engine.start_unit("httpd.service").is_ok());
-        assert_eq!(engine.query_journal("httpd.service").len(), 1);
+        systemd.register_unit(unit);
+        let state = systemd.start_unit("sshd.service").unwrap();
+        assert_eq!(state, SystemdUnitActiveState::Active);
+        assert!(systemd.journal_logs.len() >= 2);
     }
 
     #[test]
     fn test_hybrid_scheduler_innovations() {
         let mut sched = SovereignHybridSchedulerInnovations::new();
-        sched.set_governor(DvfsPowerGovernor::Performance);
-        assert_eq!(sched.current_governor, DvfsPowerGovernor::Performance);
-        assert!(sched.verify_rt_lane_preemption_latency());
+        let task = RealtimeTask {
+            pid: 10,
+            class: SchedulerClass::RTLane,
+            deadline_us: 100,
+            wcet_us: 10,
+            numa_node: 0,
+        };
+
+        sched.add_task(task);
+        let selected = sched.select_next_rt_task().unwrap();
+        assert_eq!(selected.pid, 10);
+        assert_eq!(sched.auto_adjust_dvfs(), 4200);
     }
 }

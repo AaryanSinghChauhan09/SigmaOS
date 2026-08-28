@@ -32,9 +32,9 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod arch;
 pub mod cachy;
+pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
-pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
@@ -96,38 +96,22 @@ pub use bsd_linux_innovations::{
     RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
     SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
+pub use linux_bsd_parity_extended::{
+    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
+    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
+    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
+    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
+    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
+};
 pub use wiki_ideas_implementation::{
     Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
     PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
-    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
-    DvfsPowerGovernor, JournalLogEntry, NumaNodeAffinity, SovereignHybridSchedulerInnovations,
-    SovereignSystemdParityEngine, SovereignSystemdUnit, SystemdJournalEntry, SystemdUnitState, SystemdUnitType,
-    RtlaneRealtimeTask,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
+    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
 };
-pub use ready_to_use::{
-    DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
-    UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
-    HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
-};
-
 pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
-};
-
-pub use linux_bsd_inspirations::{
-    SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
-    NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
-    SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
-    BsdCapsicumRights, Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
-    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, SovereignDTraceEngine, SovereignRaidSelfHealer,
-    SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
-    FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
-    SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
-};
-pub use sovereign_distro_dominance::{
-    StorePackageSlice, NixGuixZeroCopyStore, TaskSchedState, SchedTask,
-    CachyBoreDynamicAiScheduler, CapsicumRight, OpenBsdHardenedCapsicumPledge,
-    CoWSubvolume, ZfsBtrfsHybridSelfHealingCoW, SovereignDistroDominanceSuite,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
+    VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
 };

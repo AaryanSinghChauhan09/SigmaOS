@@ -42,6 +42,7 @@ pub mod structures;
 pub mod subsystem;
 pub mod virtual_cpu;
 pub mod vmm_paging;
+pub mod module_loader;
 
 pub use architecture::*;
 pub use bus::*;
@@ -75,28 +76,6 @@ pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use linux_bsd_innovations::{
-    ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
-    LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,
-    AlpineHardenedEnv, OpenBsdPledge, BoundedBufferProducerConsumer,
-    BottomHalfKernelThread, SoftIrqType, AndroidBroadcastReceiverRegistry, BroadcastReceiver,
-    MultikernelMessagePassing, MultikernelMessage, NinePProtocolTranslator, NinePResource,
-    MicrokernelTranslatorRegistry, HurdTranslator, NanokernelHardwareBroker, NanokernelIrq,
-    SovereignZonesManager, SovereignZone, KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
-    AndroidBinderIpc, BinderNode, GcdDispatchQueue, GcdPriority, GcdTask, EbpfRuntime, EbpfInstruction,
-    HammerHistoryFilesystem, HammerBlockTransaction, CarpSecurityRouter, SovereignSwapEngine, SwapPage,
-    SovereignNamespaceContainer, NamespaceType, SovereignEventReactor, ReactorRegistration, ReactorEvent,
-    HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
-    NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
-    FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    FreeBsdGeomTopology, GeomClass, GeomProvider,
-    LinuxDevlinkHealthMonitor, DevlinkHealthReporter,
-    OpenBsdUnveilEngine, UnveilPathRule,
-    FreeBsdVnetManager, VnetNetworkStack,
-    SovereignCgroupGovernor, CgroupResourceLimits,
-    KernelFastPacketEngine, FastPacketFrame, XdpAction,
-    KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,
-    InteractiveHybridScheduler, HybridTask,
-    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
-    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
+pub use module_loader::{
+    ModuleState, KernelSymbol, KernelModule, SovereignKernelModuleManager,
 };

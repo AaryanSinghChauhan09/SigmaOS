@@ -42,6 +42,7 @@ pub use qubes_isolation::{
     QrexecRule, QrexecPolicyEngine, TemplateVmManager, SQrexecChannel,
 };
 pub use qubes_isolation::*;
+pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission};

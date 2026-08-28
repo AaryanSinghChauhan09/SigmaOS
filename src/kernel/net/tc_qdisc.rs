@@ -24,6 +24,10 @@ use crate::klib::VecDeque;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
+use crate::klib::VecDeque;
+use std::string::{String, ToString};
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// A network packet in the qdisc layer (simplified)
 #[derive(Debug, Clone)]

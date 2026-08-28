@@ -21,6 +21,7 @@ pub mod debian;
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
+pub mod debian;
 pub mod repository;
 
 pub use debian::{
@@ -39,5 +40,10 @@ pub use universal::{
 pub use repository::{
     PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
     PackagePinEngine, MirrorCandidate, MirrorSyncEngine, PackageTransaction,
+    PackageTransactionJournal, RepoError,
+};
+pub use repository::{
+    PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
+    PackagePinEngine, MirrorEntry, MirrorSyncEngine, TransactionJournalEntry,
     PackageTransactionJournal, RepoError,
 };

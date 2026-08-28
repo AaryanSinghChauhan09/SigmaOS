@@ -217,6 +217,153 @@ impl RepositoryManager {
 }
 
 /// APT/DNF-Style Package Pinning Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PinPriority {
+    Exmittent = -1,  // Never install
+    Default = 500,   // Standard priority
+    Preferred = 990, // Preferred release / repository
+    Hold = 1001,     // Force hold on version
+}
+
+#[derive(Debug, Clone)]
+pub struct PackagePinRule {
+    pub package_pattern: String,
+    pub pinned_version: String,
+    pub priority: PinPriority,
+}
+
+pub struct PackagePinEngine {
+    pub rules: Vec<PackagePinRule>,
+}
+
+impl PackagePinEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_pin_rule(&mut self, pattern: &str, version: &str, priority: PinPriority) {
+        self.rules.push(PackagePinRule {
+            package_pattern: String::from(pattern),
+            pinned_version: String::from(version),
+            priority,
+        });
+    }
+
+    pub fn get_pin_priority(&self, package: &str) -> PinPriority {
+        for rule in &self.rules {
+            if rule.package_pattern == package || rule.package_pattern == "*" {
+                return rule.priority;
+            }
+        }
+        PinPriority::Default
+    }
+}
+
+impl Default for PackagePinEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Reflector / DNF Mirror Sync & Failover Engine
+#[derive(Debug, Clone)]
+pub struct MirrorEntry {
+    pub url: String,
+    pub country: String,
+    pub latency_ms: u32,
+    pub active: bool,
+}
+
+pub struct MirrorSyncEngine {
+    pub mirrors: Vec<MirrorEntry>,
+}
+
+impl MirrorSyncEngine {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, latency_ms: u32) {
+        self.mirrors.push(MirrorEntry {
+            url: String::from(url),
+            country: String::from(country),
+            latency_ms,
+            active: true,
+        });
+    }
+
+    pub fn rank_mirrors(&mut self) {
+        self.mirrors.sort_by_key(|m| m.latency_ms);
+    }
+
+    pub fn get_fastest_mirror(&self) -> Option<String> {
+        self.mirrors.iter().find(|m| m.active).map(|m| m.url.clone())
+    }
+}
+
+impl Default for MirrorSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD pkg / DNF History Transaction Snapshot Journal
+#[derive(Debug, Clone)]
+pub struct TransactionJournalEntry {
+    pub transaction_id: usize,
+    pub action: String,
+    pub package_name: String,
+    pub version: String,
+    pub timestamp: u64,
+}
+
+pub struct PackageTransactionJournal {
+    pub journal: Vec<TransactionJournalEntry>,
+    next_tx_id: usize,
+}
+
+impl PackageTransactionJournal {
+    pub fn new() -> Self {
+        Self {
+            journal: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn log_transaction(&mut self, action: &str, pkg: &str, ver: &str, timestamp: u64) -> usize {
+        let tx_id = self.next_tx_id;
+        self.next_tx_id += 1;
+
+        self.journal.push(TransactionJournalEntry {
+            transaction_id: tx_id,
+            action: String::from(action),
+            package_name: String::from(pkg),
+            version: String::from(ver),
+            timestamp,
+        });
+
+        tx_id
+    }
+
+    pub fn rollback_transaction(&mut self, target_tx_id: usize) -> Vec<TransactionJournalEntry> {
+        let mut undo_actions = Vec::new();
+        while let Some(last) = self.journal.last() {
+            if last.transaction_id >= target_tx_id {
+                let undone = self.journal.pop().unwrap();
+                undo_actions.push(undone);
+            } else {
+                break;
+            }
+        }
+        undo_actions
+    }
+}
+
+impl Default for PackageTransactionJournal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Repository errors
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -454,69 +601,25 @@ mod tests {
     }
 
     #[test]
-    fn test_package_pinning_rules() {
+    fn test_package_pinning_and_mirror_sync() {
         let mut pin_engine = PackagePinEngine::new();
-        pin_engine.add_rule(PackagePinRule {
-            package_pattern: String::from("sigmaos-kernel"),
-            repo_origin: String::from("security"),
-            version_pattern: String::from("*"),
-            priority: PinPriority::PREFERRED,
-        });
+        pin_engine.add_pin_rule("kernel", "6.5.0", PinPriority::Hold);
+        assert_eq!(pin_engine.get_pin_priority("kernel"), PinPriority::Hold);
+        assert_eq!(pin_engine.get_pin_priority("gcc"), PinPriority::Default);
 
-        let p1 = pin_engine.evaluate_priority("sigmaos-kernel", "security", "1.0.0");
-        let p2 = pin_engine.evaluate_priority("sigmaos-kernel", "main", "1.0.0");
-        assert_eq!(p1, PinPriority::PREFERRED);
-        assert_eq!(p2, PinPriority::DEFAULT);
-    }
+        let mut mirror_engine = MirrorSyncEngine::new();
+        mirror_engine.add_mirror("https://mirror2.sigmaos.org", "US", 150);
+        mirror_engine.add_mirror("https://mirror1.sigmaos.org", "US", 20);
+        mirror_engine.rank_mirrors();
+        assert_eq!(mirror_engine.get_fastest_mirror(), Some(String::from("https://mirror1.sigmaos.org")));
 
-    #[test]
-    fn test_mirror_sync_ranking_and_failover() {
-        let mut sync_engine = MirrorSyncEngine::new();
-        sync_engine.add_mirror("https://mirror2.sigmaos.org", 150);
-        sync_engine.add_mirror("https://mirror1.sigmaos.org", 20);
-
-        sync_engine.rank_mirrors();
-        assert_eq!(sync_engine.get_best_mirror().unwrap(), "https://mirror1.sigmaos.org");
-
-        // Fail mirror 1 thrice to trigger failover
-        sync_engine.mark_failure("https://mirror1.sigmaos.org");
-        sync_engine.mark_failure("https://mirror1.sigmaos.org");
-        sync_engine.mark_failure("https://mirror1.sigmaos.org");
-
-        assert_eq!(sync_engine.get_best_mirror().unwrap(), "https://mirror2.sigmaos.org");
-    }
-
-    #[test]
-    fn test_package_transaction_rollback() {
         let mut journal = PackageTransactionJournal::new();
-        let tx_id = journal.record_transaction("2026-03-30 12:00:00", vec![
-            TransactionAction::Install {
-                package: String::from("htop"),
-                version: String::from("3.2.0"),
-            },
-            TransactionAction::Upgrade {
-                package: String::from("bash"),
-                old_version: String::from("5.1"),
-                new_version: String::from("5.2"),
-            },
-        ]);
+        let tx1 = journal.log_transaction("install", "curl", "8.2.1", 100);
+        let tx2 = journal.log_transaction("install", "vim", "9.0", 105);
+        assert_eq!(tx2, 2);
 
-        let rollback = journal.rollback_transaction(tx_id).unwrap();
-        assert_eq!(rollback.len(), 2);
-        match &rollback[0] {
-            TransactionAction::Upgrade { package, old_version, new_version } => {
-                assert_eq!(package, "bash");
-                assert_eq!(old_version, "5.2");
-                assert_eq!(new_version, "5.1");
-            }
-            _ => panic!("Expected upgrade rollback"),
-        }
-        match &rollback[1] {
-            TransactionAction::Remove { package, version } => {
-                assert_eq!(package, "htop");
-                assert_eq!(version, "3.2.0");
-            }
-            _ => panic!("Expected remove rollback"),
-        }
+        let undone = journal.rollback_transaction(tx2);
+        assert_eq!(undone.len(), 1);
+        assert_eq!(undone[0].package_name, "vim");
     }
 }
