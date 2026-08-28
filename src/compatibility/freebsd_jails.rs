@@ -5,7 +5,7 @@
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;

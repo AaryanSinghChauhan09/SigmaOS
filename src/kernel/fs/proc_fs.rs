@@ -20,7 +20,7 @@ extern crate alloc;
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
 use crate::klib::BTreeMap;
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 pub struct ProcEntry {

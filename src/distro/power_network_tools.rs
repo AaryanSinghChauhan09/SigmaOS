@@ -4,7 +4,7 @@ extern crate alloc;
 // Inspired by Linux TLP/Laptop Mode Tools, NetworkManager/nmtui, FreeBSD bhyve, and Tailscale/WireGuard
 
 #[cfg(not(target_os = "none"))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(target_os = "none")]
 

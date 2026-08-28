@@ -4,7 +4,7 @@ extern crate alloc;
 // Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
 
 #[cfg(not(target_os = "none"))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(target_os = "none")]
 

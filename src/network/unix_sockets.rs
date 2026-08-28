@@ -1,7 +1,7 @@
 // UNIX Domain Sockets (AF_UNIX / PF_LOCAL IPC)
 // Native path-based and abstract inter-process socket communication inspired by Linux and BSD.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnixSocketState {

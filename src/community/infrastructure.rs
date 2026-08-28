@@ -1,7 +1,7 @@
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Contributor onboarding stages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

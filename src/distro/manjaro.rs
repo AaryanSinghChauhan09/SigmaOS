@@ -20,7 +20,7 @@
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(not(target_os = "none"))]
 

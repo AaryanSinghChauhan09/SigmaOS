@@ -1,7 +1,7 @@
 // Asynchronous I/O Ring Subsystem for SigmaOS
 // Inspired by Linux io_uring, Linux POSIX AIO, FreeBSD kqueue EVFILT_AIO, and Windows IOCP.
 
-use std::collections::VecDeque;
+use crate::klib::VecDeque;
 
 /// Asynchronous I/O Operation Opcodes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

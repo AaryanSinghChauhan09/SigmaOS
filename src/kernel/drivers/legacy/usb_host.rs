@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux USB stack (linux/drivers/usb/): OHCI, UHCI, EHCI, xHCI
 /// USB HID (keyboards, mice, gamepads), USB Mass Storage (BBB protocol)
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// USB speed

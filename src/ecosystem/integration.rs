@@ -3,7 +3,7 @@
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::klib::HashMap;
 

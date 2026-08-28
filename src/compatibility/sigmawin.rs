@@ -2,7 +2,7 @@
 // Implementing complete Windows 11 Gap Closure & PE Loading / Registry / USER32/GDI32 Emulation
 // Enhanced with standard NT Kernel object management and advanced PE Section parsing.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// PE execution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

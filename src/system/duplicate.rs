@@ -19,7 +19,7 @@
 // SigmaOS Duplicate File Finder
 // OOP-based duplicate file detection with hash comparison
 
-use std::collections::BTreeMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// OOP trait for hash algorithms

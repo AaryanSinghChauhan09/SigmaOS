@@ -5,7 +5,7 @@
 // 3. debdelta binary diff patch generation
 // 4. APT mirror latency ranking and GPG signature verification
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Alternative Link Candidate (Debian update-alternatives equivalent)
 #[derive(Debug, Clone, PartialEq, Eq)]

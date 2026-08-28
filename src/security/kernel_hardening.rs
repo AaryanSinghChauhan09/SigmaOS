@@ -11,7 +11,7 @@ extern crate alloc;
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(not(test))]
 #[cfg(not(test))]

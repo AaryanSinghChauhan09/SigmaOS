@@ -17,7 +17,7 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Professional support levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

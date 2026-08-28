@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux 0.01–2.6 ISA bus support: I/O port space, DMA, IRQs
 /// Supports ISA, EISA, and LPC bridge legacy devices
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// Classic ISA I/O port ranges (from PC architecture spec)

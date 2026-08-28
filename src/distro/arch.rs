@@ -16,7 +16,7 @@ use alloc::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Pacman sync database repository types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

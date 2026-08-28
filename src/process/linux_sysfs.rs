@@ -1,7 +1,7 @@
 // Sovereign Sysfs (/sys) and Loopback Device Subsystem
 // Dynamic hardware attribute representation and loopback block overlay mounting inspired by Linux.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct SysfsAttribute {

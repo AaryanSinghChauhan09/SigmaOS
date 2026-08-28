@@ -1,7 +1,7 @@
 // BSD-style sysctl interface for dynamic kernel parameters.
 // Supports safe querying and mutation of kernel variables under hierarchical MIB nodes.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SysctlValue {

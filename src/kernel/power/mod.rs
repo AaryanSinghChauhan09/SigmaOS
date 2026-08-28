@@ -20,7 +20,7 @@ extern crate alloc;
 /// SigmaOS Power Management Subsystem
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // ── CPUfreq ───────────────────────────────────────────────────────────────

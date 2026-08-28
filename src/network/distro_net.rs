@@ -1,7 +1,7 @@
 // Distro Network Enhancements for SigmaOS
 // Inspired by Linux SYN Cookies (syncookies), WireGuard Noise protocol, Netfilter iptables, and eBPF SO_ATTACH_FILTER.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// SYN Cookie Generator & Validator for TCP SYN Flood DoS Defense (Linux syncookies parity)
 pub struct SynCookieEngine {

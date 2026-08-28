@@ -2,7 +2,7 @@
 // Features Multi-core SMP Topology, NUMA Affinity Mapping, Hardware SMEP/SMAP Execution Protection,
 // and Hardware Performance Monitoring Counters (PMC)
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// CPU Architecture Instruction Set & Extensions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

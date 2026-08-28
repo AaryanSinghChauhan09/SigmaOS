@@ -95,7 +95,7 @@ pub static GLOBAL_SOFTWARE_STORE: SigmaSoftwareStore = SigmaSoftwareStore::new()
 // Only available on hosted targets (requires std)
 
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(not(target_os = "none"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -10,7 +10,7 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 use crate::security::selinux::{
     SeLinuxMode, SelinuxEngine, SecurityContext

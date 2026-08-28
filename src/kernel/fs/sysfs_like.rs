@@ -19,7 +19,7 @@
 /// SigmaOS sysfs-like device tree implementation
 /// Exposes devices, drivers, and attributes in a structured tree
 use crate::klib::BTreeMap;
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 pub struct SysfsAttribute {
     pub name: String,

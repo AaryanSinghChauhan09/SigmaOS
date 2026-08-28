@@ -1,5 +1,5 @@
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(target_os = "none")]
 use crate::klib::BTreeMap as HashMap;

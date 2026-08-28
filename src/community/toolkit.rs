@@ -1,7 +1,7 @@
 // Community Handbook, Reproducible Package Recipes & Blueprint Toolkit for SigmaOS
 // Inspired by Arch Wiki, FreeBSD Handbook, Gentoo Portage, Void XBPS-src, and OpenBSD ports.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Article categories for the Community Handbook
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -10,7 +10,7 @@ pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
 };
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Foundation committee member profile

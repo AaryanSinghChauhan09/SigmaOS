@@ -2,7 +2,7 @@
 // Linux distro-inspired system configuration management
 // Handles system-wide configuration files, service configs, and runtime settings
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 

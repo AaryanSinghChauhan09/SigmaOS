@@ -4,7 +4,7 @@
 
 use crate::klib::HashMap;
 use crate::klib::Vec;
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceClass {

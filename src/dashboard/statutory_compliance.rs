@@ -1,7 +1,7 @@
 // Statutory Governance & Compliance Overlay Dashboard for SigmaOS
 // Integrates global statutory frameworks (GDPR, ISO 27001, Indian DPDP Act 2023, HIPAA, PCI-DSS).
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Statutory regulatory frameworks
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

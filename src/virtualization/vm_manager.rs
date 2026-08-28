@@ -4,7 +4,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use alloc::format;
 
 /// VM configuration

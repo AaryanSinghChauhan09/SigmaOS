@@ -19,7 +19,7 @@
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 #[cfg(test)]
-use std::collections::BTreeMap;
+use crate::klib::BTreeMap;
 
 /// Represents an AI SysAdmin Recommendation or Action
 #[derive(Debug, Clone, PartialEq, Eq)]

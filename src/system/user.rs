@@ -2,7 +2,7 @@
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 

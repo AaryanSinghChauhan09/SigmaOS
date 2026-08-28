@@ -4,7 +4,7 @@
 #[cfg(target_os = "none")]
 use crate::klib::HashMap;
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct SovereignSelfHealingKernel {
     pub integrity_hashes: HashMap<String, String>, // file paths -> baseline hashes

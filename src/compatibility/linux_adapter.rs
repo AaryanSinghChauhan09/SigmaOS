@@ -17,7 +17,7 @@ use alloc::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxKernelVersion {

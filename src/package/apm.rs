@@ -1,7 +1,7 @@
 // Sovereign APM (Agent Package Manager)
 // Core native package manager for isolated, reproducible sovereign application deployments.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

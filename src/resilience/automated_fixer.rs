@@ -2,7 +2,7 @@
 // Inspired by Linux watchdogs, systemd service recovery, and Solaris Fault Management Architecture (FMA).
 
 use crate::resilience::self_healing::{SelfHealingModule, RecoveryEventType, RecoveryAction};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProblemType {

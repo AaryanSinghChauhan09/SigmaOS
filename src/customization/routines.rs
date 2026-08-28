@@ -20,7 +20,7 @@
 // Samsung Modes & Routines-style automation and theming
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;

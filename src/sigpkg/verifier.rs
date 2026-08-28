@@ -3,7 +3,7 @@
 // Includes Debian APT-style release signature keyring verification engine
 
 use crate::sigpkg::Package;
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// FreeBSD/Debian GPG-style Keychain Keyring containing trusted archive signing keys
 #[derive(Debug, Clone, Default)]

@@ -3,7 +3,7 @@
 //! This module implements a reproducible, deterministic package management system
 //! inspired by NixOS's functional package management approach.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 #[derive(Debug, Clone)]
 pub struct PackageDerivation {
@@ -278,7 +278,7 @@ impl NixLikeStore {
         let mut removed = Vec::new();
 
         // Find all packages referenced by profiles
-        let mut referenced = std::collections::HashSet::new();
+        let mut referenced: std::collections::HashSet<String> = std::collections::HashSet::new();
         let profiles_dir = self.store_path.join("profiles");
 
         if profiles_dir.exists() {
@@ -291,8 +291,8 @@ impl NixLikeStore {
         }
 
         // Remove unreferenced packages
-        for (hash, derivation) in self.derivations.clone() {
-            if !referenced.contains(&hash) {
+        for (hash, derivation) in self.derivations.clone().into_iter() {
+            if !referenced.iter().any(|h| h == hash) {
                 let package_path = self.store_path.join(format!(
                     "{}-{}-{}",
                     hash[..8].to_string(),
@@ -303,7 +303,7 @@ impl NixLikeStore {
                 if package_path.exists() {
                     std::fs::remove_dir_all(&package_path)?;
                     removed.push(hash.clone());
-                    self.derivations.remove(&hash);
+                    self.derivations.remove::<String>(&hash);
                 }
             }
         }

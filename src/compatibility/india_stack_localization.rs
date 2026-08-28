@@ -16,12 +16,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
 use crate::klib::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum IndianLanguage {

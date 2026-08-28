@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs full ATA-1 through ATA-7 specification support
 /// PIO modes 0-4, MWDMA, UDMA/133, LBA28/LBA48, master/slave topology
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 pub const ATA_SECTOR_SIZE: usize = 512;

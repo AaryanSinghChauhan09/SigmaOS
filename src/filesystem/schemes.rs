@@ -2,7 +2,7 @@
 // Replaces standard Unix pathnames with URL-based resources (e.g., "shm://buffer", "log://kernel", "rand://stream")
 // where "everything is a URL resource".
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub trait Scheme {
     fn open(&mut self, path: &str) -> Result<usize, &'static str>;

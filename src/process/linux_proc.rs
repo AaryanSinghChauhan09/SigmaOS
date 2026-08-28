@@ -1,7 +1,7 @@
 // Linux-inspired Process & ProcFS Emulation for SigmaOS
 // Implements advanced process hierarchies, PID namespace isolation, nice priorities, cgroups, signal handling, and dynamic /proc pseudo-filesystem.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

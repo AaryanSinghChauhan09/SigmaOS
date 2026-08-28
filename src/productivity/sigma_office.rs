@@ -5,7 +5,7 @@
 //! - **SigmaWrite (Document Editor)**: Lightweight WYSIWYG, markdown support, LaTeX math rendering, SigmaNet mesh co-authoring.
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Document type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

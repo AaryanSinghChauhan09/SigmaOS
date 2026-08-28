@@ -18,7 +18,7 @@ use core::time::Duration;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(test)]
 pub(crate) mod mock_scheduler {

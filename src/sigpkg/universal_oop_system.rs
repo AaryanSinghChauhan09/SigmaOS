@@ -28,7 +28,7 @@ use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]

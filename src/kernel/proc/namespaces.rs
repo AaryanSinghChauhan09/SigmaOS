@@ -18,7 +18,7 @@
 
 /// SigmaOS Linux-style Namespaces for process isolation
 /// Supports: PID, Net, Mount, UTS, IPC, User, Cgroup namespaces
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NamespaceType {

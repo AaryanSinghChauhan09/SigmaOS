@@ -1,7 +1,7 @@
 // Dynamic Kernel Module Support (DKMS) & Hardware Autoloader Subsystem for SigmaOS
 // Inspired by Linux DKMS, udev hardware autoprobing, and Arch Linux / Gentoo module builders.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// PCI Hardware Identification Match Rule
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -16,7 +16,7 @@ use alloc::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// x86-64 Microarchitecture Level (CachyOS / Arch Linux parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

@@ -1,6 +1,8 @@
 // Sovereign Jail and Syscall Sandboxing Isolation Subsystem
 // Inspired by FreeBSD Jails, Linux Namespaces, and Linux seccomp-BPF filters.
 
+extern crate alloc;
+
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -4,7 +4,7 @@ extern crate alloc;
 // Inspired by RHEL/Rocky/AlmaLinux, Debian dpkg, Alpine lbu/apk, and Enterprise systemd cgroupv2
 
 #[cfg(not(target_os = "none"))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(target_os = "none")]
 

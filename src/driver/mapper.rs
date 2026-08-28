@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MapperCategory {

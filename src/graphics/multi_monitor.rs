@@ -2,7 +2,7 @@
 // Supports multi-display layout positioning, scaling, refresh rates, bezel compensation,
 // independent monitor taskbars, wallpaper profiles, and ultra-wide virtual monitor splits.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DisplayRotation {

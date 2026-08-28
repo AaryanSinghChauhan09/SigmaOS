@@ -23,7 +23,7 @@
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 use std::net::IpAddr;
 use std::time::Instant;

@@ -19,7 +19,7 @@
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
 use crate::klib::BTreeMap;
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ResourceLimits {

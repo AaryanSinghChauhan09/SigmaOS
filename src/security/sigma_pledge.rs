@@ -30,6 +30,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 use sigma_types::{CapabilityToken, Result};
 
 use std::collections::HashSet;

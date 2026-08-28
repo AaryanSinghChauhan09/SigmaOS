@@ -1,7 +1,7 @@
 // Distro Sandbox & Container Isolation Engine for SigmaOS
 // Inspired by Linux namespaces (unshare), Landlock LSM, Seccomp BPF, and cgroups v2.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Linux-inspired Namespace Flags for process isolation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 // SigmaOS UI/UX Accessibility Overlay & Gamification Engine
 // Implements accessibility presets (high contrast, color filters) and gamified task/achievement tracking to boost user engagement and operational compliance.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Accessibility color filters for users with visual impairments
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

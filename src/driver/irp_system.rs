@@ -4,7 +4,7 @@
 // Enhanced with advanced paradigms from Linux (io_uring), FreeBSD (Uio scatter-gather, kqueue),
 // and iOS/macOS (Power state validation, Sandboxed Entitlements clearance).
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::atomic::{AtomicU8, Ordering};
 
 pub const IRP_MJ_CREATE: u8 = 0x00;

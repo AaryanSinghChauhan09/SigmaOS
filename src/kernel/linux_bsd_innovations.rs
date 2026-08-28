@@ -6,7 +6,7 @@ use alloc::string::String;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {

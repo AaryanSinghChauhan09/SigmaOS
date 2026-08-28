@@ -3,7 +3,7 @@
 // Provides ultra-fast PID 1 process supervision, parallel runlevel targets, dependency tracking,
 // and automatic crash-recovery process restarts.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Runlevel targets inspired by SysVInit / OpenRC
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

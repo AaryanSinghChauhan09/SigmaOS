@@ -4,7 +4,7 @@ extern crate alloc;
 // Inspired by elementaryOS Granite toolkit, Switchboard Control Center, Contractor Service, and Parental Controls
 
 #[cfg(not(target_os = "none"))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(target_os = "none")]
 
