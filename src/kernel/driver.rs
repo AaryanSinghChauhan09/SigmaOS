@@ -233,7 +233,6 @@ mod tests {
     use crate::kernel::object::{KObject, ObjectError};
 
     struct MockDriver {
-        base: crate::kernel::object::KObject,
         owner: Option<String>,
         debug_level: String,
         base: KObject,

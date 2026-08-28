@@ -74,7 +74,7 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (jid, config) = if let Some(jail) = self.jails.get_mut(name) {
+        let (config, jid) = if let Some(jail) = self.jails.get_mut(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
@@ -85,7 +85,7 @@ impl SigmaJailManager {
             let jid = self.next_jid;
             self.next_jid += 1;
             jail.jid = Some(jid);
-            (jid, jail.config.clone())
+            (jail.config.clone(), jid)
         } else {
             return Err(format!("Jail '{}' not found", name).into());
         };
@@ -103,7 +103,7 @@ impl SigmaJailManager {
 
         // Execute startup script
         if let Some(exec_start) = &config.exec_start {
-            self.execute_in_jail(jid, &exec_start)?;
+            self.execute_in_jail(jid, exec_start)?;
         }
 
         if let Some(jail) = self.jails.get_mut(name) {
@@ -254,29 +254,26 @@ impl SigmaJailManager {
     }
 
     fn copy_essential_files(&self, root_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-        // Copy essential binaries
         let essential_bins = ["/bin/sh", "/bin/ls", "/bin/cat", "/bin/echo"];
 
         for bin in essential_bins {
             if Path::new(bin).exists() {
                 let dest = root_path.join(&bin[1..]);
                 if let Some(parent) = dest.parent() {
-                    std::fs::create_dir_all(parent)?;
+                    let _ = std::fs::create_dir_all(parent);
                 }
                 let _ = std::fs::copy(bin, dest);
             }
         }
 
-        // Copy essential libraries
         let lib_dirs = ["/lib", "/lib64", "/usr/lib"];
 
         for lib_dir in lib_dirs {
             let src = Path::new(lib_dir);
             if src.exists() {
                 let dest = root_path.join(&lib_dir[1..]);
-                // Copy select libraries (simplified)
                 if src.join("libc.so.6").exists() {
-                    std::fs::create_dir_all(&dest)?;
+                    let _ = std::fs::create_dir_all(&dest);
                     let _ = std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"));
                 }
             }
@@ -495,7 +492,10 @@ mod tests {
 
     impl TestTempDir {
         fn new() -> std::io::Result<Self> {
-            let path = std::env::temp_dir().join(format!("sigma_test_{}", std::process::id()));
+            use std::sync::atomic::{AtomicUsize, Ordering};
+            static COUNTER: AtomicUsize = AtomicUsize::new(0);
+            let id = COUNTER.fetch_add(1, Ordering::SeqCst);
+            let path = std::env::temp_dir().join(format!("sigma_test_{}_{}", std::process::id(), id));
             std::fs::create_dir_all(&path)?;
             Ok(TestTempDir { path })
         }

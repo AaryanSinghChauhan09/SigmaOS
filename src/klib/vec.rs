@@ -372,6 +372,7 @@ impl<T> Drop for VecIntoIter<T> {
             for i in self.index..self.vec.len {
                 core::ptr::drop_in_place(self.vec.data.add(i));
             }
+            self.vec.len = 0;
         }
     }
 }

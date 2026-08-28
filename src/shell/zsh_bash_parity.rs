@@ -146,12 +146,12 @@ impl Default for PowerlinePromptBuilder {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CandidateCategory {
-    History = 0,
-    Alias = 1,
-    Builtin = 2,
-    Executable = 3,
-    File = 4,
-    OptionFlag = 5,
+    Alias = 0,
+    Builtin = 1,
+    Executable = 2,
+    File = 3,
+    OptionFlag = 4,
+    History = 5,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -271,7 +271,7 @@ impl FuzzyCompletionEngine {
                 });
             } else {
                 let dist = Self::levenshtein_distance(prefix, builtin);
-                if dist <= 2 && prefix.len() >= 3 {
+                if dist <= 4 && prefix.len() >= 3 {
                     candidates.push(CompletionCandidate {
                         text: builtin.clone(),
                         description: format!("Fuzzy match (dist {})", dist),
@@ -737,6 +737,15 @@ impl ShellJobControl {
             out.push_str(&format!("[{}] PID {}  {}  {}\n", job.id, job.pid, state_str, job.command));
         }
         out
+    }
+
+    pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {
+        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
+            job.state = JobState::Running;
+            Ok(format!("[{}] Job '{}' (PID {}) brought to foreground.", job.id, job.command, job.pid))
+        } else {
+            Err(format!("Job %{} not found", id))
+        }
     }
 
     pub fn stop_job(&mut self, id: usize) -> bool {

@@ -94,7 +94,7 @@ pub mod memory {
 
     /// Move memory
     pub unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
-        if dest < src {
+        if (dest as *const u8) < src {
             let mut i = 0;
             while i < n {
                 *dest.add(i) = *src.add(i);

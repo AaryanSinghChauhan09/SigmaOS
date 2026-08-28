@@ -5,6 +5,7 @@
 use super::Vec;
 use core::fmt;
 use core::cmp::PartialEq;
+use core::borrow::Borrow;
 
 pub struct BTreeMap<K, V>
 where
@@ -26,6 +27,45 @@ where
     }
 }
 
+pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
+    Occupied(OccupiedEntry<'a, K, V>),
+    Vacant(VacantEntry<'a, K, V>),
+}
+
+pub struct OccupiedEntry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
+    map: &'a mut BTreeMap<K, V>,
+    index: usize,
+}
+
+pub struct VacantEntry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
+    map: &'a mut BTreeMap<K, V>,
+    key: K,
+}
+
+impl<'a, K: PartialEq + Clone + Ord, V: Clone> Entry<'a, K, V> {
+    pub fn or_insert(self, default: V) -> &'a mut V {
+        match self {
+            Entry::Occupied(entry) => &mut entry.map.entries[entry.index].1,
+            Entry::Vacant(entry) => {
+                let key = entry.key.clone();
+                entry.map.insert(key.clone(), default);
+                entry.map.get_mut(&key).unwrap()
+            }
+        }
+    }
+
+    pub fn or_insert_with<F: FnOnce() -> V>(self, default: F) -> &'a mut V {
+        match self {
+            Entry::Occupied(entry) => &mut entry.map.entries[entry.index].1,
+            Entry::Vacant(entry) => {
+                let key = entry.key.clone();
+                let val = default();
+                entry.map.insert(key.clone(), val);
+                entry.map.get_mut(&key).unwrap()
+            }
+        }
+    }
+}
 
 impl<K, V> BTreeMap<K, V>
 where
@@ -55,13 +95,23 @@ where
         self.entries.insert(insert_idx, (key, value));
     }
 
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
+        for i in 0..self.entries.len() {
+            if self.entries[i].0 == key {
+                return Entry::Occupied(OccupiedEntry { map: self, index: i });
+            }
+        }
+        Entry::Vacant(VacantEntry { map: self, key })
+    }
+
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
-        K: core::borrow::Borrow<Q>,
+        K: Borrow<Q>,
         Q: PartialEq,
     {
         for (k, v) in self.entries.iter() {
-            if k.borrow() == key {
+            let b: &Q = k.borrow();
+            if b == key {
                 return Some(v);
             }
         }
@@ -70,11 +120,12 @@ where
 
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
-        K: core::borrow::Borrow<Q>,
+        K: Borrow<Q>,
         Q: PartialEq,
     {
         for (k, v) in self.entries.iter_mut() {
-            if (k as &K).borrow() == key {
+            let b: &Q = (*k).borrow();
+            if b == key {
                 return Some(v);
             }
         }
@@ -83,11 +134,12 @@ where
 
     pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
-        K: core::borrow::Borrow<Q>,
+        K: Borrow<Q>,
         Q: PartialEq,
     {
         for i in 0..self.entries.len() {
-            if self.entries[i].0.borrow() == key {
+            let b: &Q = self.entries[i].0.borrow();
+            if b == key {
                 return Some(self.entries.remove(i).1);
             }
         }
@@ -108,7 +160,7 @@ where
 
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
-        K: core::borrow::Borrow<Q>,
+        K: Borrow<Q>,
         Q: PartialEq,
     {
         self.get(key).is_some()
@@ -267,6 +319,13 @@ where
             idx: 0,
         }
     }
+
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
+        ValuesMut {
+            entries: &mut self.entries,
+            idx: 0,
+        }
+    }
 }
 
 pub struct Values<'a, K, V> {
@@ -286,6 +345,32 @@ where
             let item = &self.entries[self.idx].1;
             self.idx += 1;
             Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct ValuesMut<'a, K, V> {
+    entries: &'a mut Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for ValuesMut<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a mut V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let ptr = self.entries.as_mut_ptr();
+            unsafe {
+                let item = &mut *ptr.add(self.idx);
+                self.idx += 1;
+                Some(&mut item.1)
+            }
         } else {
             None
         }

@@ -93,6 +93,7 @@ pub enum DriverError {
     ShutdownFailed,
     CapabilityDenied,
     AlreadyRegistered,
+    NotFound,
 }
 
 pub struct DeviceBinding {

@@ -96,7 +96,7 @@ impl AurRecipeCompiler {
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
-        let mut depends = AllocVec::new();
+        let mut depends = alloc::vec::Vec::new();
 
         for line in pkgbuild_content.lines() {
             let line = line.trim();
@@ -124,13 +124,12 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = crate::klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
             crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
+            depends,
             crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
@@ -251,7 +250,7 @@ impl PacmanDbAdapter {
             crate::klib::string::SigmaString::from(name),
             parsed_ver,
             crate::klib::string::SigmaString::from(desc),
-            crate::klib::vec::Vec::new(),
+            alloc::vec::Vec::<Dependency>::new(),
             crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -554,7 +553,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")]),
+            build_depends: alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
@@ -567,11 +566,11 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: crate::klib::vec::Vec::from_iter(alloc::vec![
+            build_depends: alloc::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),
-            ]),
+            ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
     }
@@ -586,10 +585,10 @@ mod tests {
         "#;
 
         let package = compiler.compile_pkgbuild(pkgbuild).unwrap();
-        assert_eq!(package.name, SigmaString::from("neo-vim"));
+        assert_eq!(package.name.as_str(), "neo-vim");
         assert_eq!(package.version, Version::new(0, 9, 1));
         assert_eq!(package.dependencies.len(), 3);
-        assert_eq!(package.dependencies[0].name, SigmaString::from("libc"));
+        assert_eq!(package.dependencies[0].name.as_str(), "libc");
     }
 
     #[test]
@@ -603,7 +602,7 @@ mod tests {
 
         let pending = sync.list_pending_rolling_updates();
         assert_eq!(pending.len(), 1);
-        assert_eq!(pending[0].0, SigmaString::from("bash"));
+        assert_eq!(pending[0].0.as_str(), "bash");
         assert_eq!(pending[0].1, Version::new(5, 1, 0));
         assert_eq!(pending[0].2, Version::new(5, 2, 0));
     }
@@ -623,11 +622,11 @@ mod tests {
         "#;
 
         let imported = adapter.import_legacy_pacman_package(desc).unwrap();
-        assert_eq!(imported.name, SigmaString::from("pacman-contrib"));
+        assert_eq!(imported.name.as_str(), "pacman-contrib");
         assert_eq!(imported.version, Version::new(1, 8, 0));
         assert_eq!(
-            imported.description,
-            SigmaString::from("Contrib utilities for pacman package manager")
+            imported.description.as_str(),
+            "Contrib utilities for pacman package manager"
         );
     }
 
@@ -649,7 +648,7 @@ mod tests {
             .is_ok());
         let triggered = manager.trigger_hooks(HookWhen::PostTransaction, "usr/bin/bash");
         assert_eq!(triggered.len(), 1);
-        assert_eq!(triggered[0], SigmaString::from("/usr/bin/mkinitcpio -p linux"));
+        assert_eq!(triggered[0].as_str(), "/usr/bin/mkinitcpio -p linux");
     }
 
     #[test]
@@ -671,7 +670,7 @@ mod tests {
         let source_bytes = b"cargo build --release";
 
         let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
-        assert_eq!(pkg_file, SigmaString::from("ripgrep-13.0.0-x86_64.pkg.tar.zst"));
+        assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
 

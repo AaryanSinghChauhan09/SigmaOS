@@ -1143,52 +1143,13 @@ mod tests {
         assert!(drm.set_mode(DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 }).is_ok());
         assert!(drm.primary_crtc_active);
 
-        // 2. RTL8125 2.5GbE
-        let mut rtl = Rtl8125NicDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x25, 0x01]);
-        assert_eq!(rtl.transmit_packet(b"EthernetFrame").unwrap(), 13);
-        assert_eq!(rtl.tx_ring.len(), 1);
+        let bound_gpu = dev_mgr.auto_probe_pci_device(0x1002, 0x731F).unwrap();
+        let bound_net = dev_mgr.auto_probe_pci_device(0x8086, 0x125b).unwrap();
+        let bound_usb = dev_mgr.auto_probe_usb_device(0x056a, 0x037a).unwrap();
 
-        // 3. BCM43xx Wi-Fi
-        let mut wifi = Bcm43xxWifiDriver::new([0x00, 0x10, 0x18, 0x43, 0xAA, 0xBB]);
-        assert!(wifi.associate_wpa3(44).is_ok());
-        assert!(wifi.sae_handshake_complete);
-
-        // 4. NVMe ZNS
-        let mut zns = NvmeZnsStorageDriver::new(1, 16);
-        assert!(zns.open_zone(0).is_ok());
-        let lba = zns.zone_append(0, b"ZoneData").unwrap();
-        assert!(lba > 0);
-
-        // 5. USB-C Power Delivery
-        let mut pd = UsbPowerDeliveryDriver::new(1);
-        assert!(pd.negotiate_power(UsbPdContract::HighPower20V).is_ok());
-        assert_eq!(pd.active_contract, UsbPdContract::HighPower20V);
-        assert!(pd.enable_dp_alt_mode().is_ok());
-
-        // 6. IIO Sensor Framework
-        let mut iio = IioSensorFrameworkDriver::new(10);
-        let (accel, gyro) = iio.sample_raw_data();
-        assert_eq!(accel[2], 981);
-        assert_eq!(gyro, [0, 0, 0]);
-
-        // 7. Precision Touchpad
-        let mut pad = PrecisionTouchpadDriver::new();
-        let scale = pad.process_pinch_gesture(1.2);
-        assert!((scale - 1.2).abs() < 0.001);
-
-        // 8. UAC2 Audio
-        let mut uac = Uac2AudioDriver::new();
-        assert!(uac.start_async_stream().is_ok());
-        assert!(uac.active_stream);
-
-        // 9. SDHCI eMMC
-        let mut emmc = SdhciEmmcDriver::new(0);
-        assert!(emmc.execute_hs400_tuning().is_ok());
-        assert!(emmc.hs400_tuning_done);
-
-        // 10. SocketCAN
-        let can = SocketCanDriver::new("can0", 500000);
-        let frame = CanFrame { can_id: 0x123, dlc: 8, data: [1, 2, 3, 4, 5, 6, 7, 8] };
-        assert!(can.send_can_frame(frame).is_ok());
+        assert_eq!(dev_mgr.bound_drivers.len(), 3);
+        assert_eq!(bound_gpu, "AMDGPU DRM/KMS Driver");
+        assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
+        assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
     }
 }

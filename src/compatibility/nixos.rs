@@ -82,11 +82,9 @@ impl NixStore {
             return Err(NixError::EvaluationError);
         }
 
-        let out_path = self
-            .packages
-            .get_str(package)
+        let out_path = self.packages.get_str(package)
             .and_then(|pkg| pkg.outputs.get_str("out"))
-            .map(|path| path.to_string());
+            .cloned();
 
         if let Some(path) = out_path {
             self.add_to_profile(profile, &path);
@@ -445,7 +443,7 @@ mod tests {
 
         // Remove one package from GC roots
         store.gc_roots.clear();
-        let root_path = store
+        let out_path = store
             .packages
             .get("hello")
             .unwrap()
@@ -453,7 +451,7 @@ mod tests {
             .get("out")
             .unwrap()
             .clone();
-        store.add_gc_root(&root_path);
+        store.add_gc_root(&out_path);
 
         let deleted = store.garbage_collect(true).unwrap();
         assert!(deleted >= 1);

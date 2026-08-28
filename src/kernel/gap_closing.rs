@@ -480,13 +480,13 @@ impl X86RootkitAuditor {
 
     pub fn audit_driver_dispatch_table(
         &self,
-        driver: &crate::driver::framework::DriverObject,
+        driver: &RootkitDriverObject,
         lower_bound: usize,
         upper_bound: usize,
     ) -> Result<(), &'static str> {
         for handler in &driver.major_function {
             if let Some(f) = handler {
-                let addr = *f as usize;
+                let addr = *f;
                 if addr < lower_bound || addr > upper_bound {
                     return Err(
                         "Rootkit hook detected in DriverObject major function dispatch table!",
@@ -1133,8 +1133,7 @@ mod tests {
         }
         let handler = IrpHandler::new(|_| 0, |_| 0, mock_ioctl_dispatch);
 
-        let mut irp = Irp::new(IrpMajorFunction::DeviceControl, vec![0x11, 0x22]);
-        irp.ioctl_code = 0x222000;
+        let mut irp = Irp::new(IrpMajorFunction::DeviceControl, 0x222000, vec![0x11, 0x22]);
 
         let res = handler.process_irp(irp);
         assert_eq!(res, 0);

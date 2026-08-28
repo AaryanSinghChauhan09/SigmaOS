@@ -321,8 +321,16 @@ impl UniversalPackageAdapter {
             version_str
         };
 
+        let mut semver_str = cleaned_ver.to_string();
+        let dot_count = semver_str.chars().filter(|&c| c == '.').count();
+        if dot_count == 0 {
+            semver_str.push_str(".0.0");
+        } else if dot_count == 1 {
+            semver_str.push_str(".0");
+        }
+
         let parsed_ver =
-            Version::parse(cleaned_ver).map_err(|_| "Failed to parse semver representation")?;
+            Version::parse(&semver_str).map_err(|_| "Failed to parse semver representation")?;
 
         let mut dependencies = Vec::new();
         for dep in raw_deps {
