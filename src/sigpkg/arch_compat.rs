@@ -353,7 +353,7 @@ pub struct MkinitcpioBuilder {
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = crate::klib::vec::Vec::new();
+        let mut hooks = alloc::vec::Vec::new();
         hooks.push(crate::klib::string::SigmaString::from("base"));
         hooks.push(crate::klib::string::SigmaString::from("udev"));
         hooks.push(crate::klib::string::SigmaString::from("autodetect"));
