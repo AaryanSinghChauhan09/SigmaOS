@@ -42,6 +42,7 @@ pub trait Container {
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub state: AtomicUsize,
     pub pid: AtomicUsize,
 }
@@ -56,6 +57,7 @@ impl SimpleContainer {
         SimpleContainer {
             id,
             name: name_array,
+            name_len: name_len as u8,
             state: AtomicUsize::new(ContainerState::Created as usize),
             pid: AtomicUsize::new(0),
         }
@@ -67,8 +69,8 @@ impl Container for SimpleContainer {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt performance optimization: explicit stored byte length replaces O(N) zero-byte linear scan
+        &self.name[..self.name_len as usize]
     }
     fn state(&self) -> ContainerState {
         match self.state.load(Ordering::SeqCst) {
