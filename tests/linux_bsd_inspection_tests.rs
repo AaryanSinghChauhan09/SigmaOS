@@ -7,6 +7,19 @@ mod linux_bsd_innovations;
 mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
+
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
+
+#[path = "../src/compatibility/abi_extended.rs"]
+mod abi_extended;
+
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 #[path = "../src/security/hardening.rs"]
@@ -40,12 +53,17 @@ mod wiki_ideas;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
 
-use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall};
-use linux_bsd_parity::{
-    SystemdUnit, SystemdUnitDependencyEngine, LinuxDevlinkDriver, XbpsPackage, XbpsPackageManager,
-    GentooPortageUseFlagsEngine,
-};
-use wiki_ideas::{FreeBsdCapsicumDescriptorDelegate, CAP_READ, CAP_SEEK};
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
+use bsd::*;
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unveil::{UnveilManager, UnveilPermission};
+use wiki_ideas_implementation::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -131,13 +149,13 @@ fn test_wiki_distro_innovations_inspection() {
     let cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(5, CAP_READ | CAP_SEEK);
     assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_READ));
 
-    let mut engine = SystemdUnitDependencyEngine::new();
-    engine.add_unit(SystemdUnit {
-        name: "test.service".to_string(),
-        requires: vec![],
-        after: vec![],
-    });
-    assert!(!engine.detect_circular_dependencies());
+    // 7. Systemd Parity Engine
+    let mut systemd = SovereignSystemdParityEngine::new();
+    systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
+    assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
+    // 8. Real-Time Hybrid Scheduler
+    let sched = SovereignHybridSchedulerInnovations::new();
+    assert!(sched.verify_rt_lane_preemption_latency());
 }
 
 #[test]

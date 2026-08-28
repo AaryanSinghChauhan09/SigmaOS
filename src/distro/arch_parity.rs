@@ -3,7 +3,6 @@ extern crate alloc;
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -148,6 +147,12 @@ impl PkgBuild {
     }
 }
 
+impl Default for PkgBuild {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// AUR client helper for package management
 pub struct AurClient {
     pub aur_url: String,
@@ -164,7 +169,17 @@ impl AurClient {
     pub fn search(&self, query: &str) -> Vec<String> {
         let mut results = Vec::new();
         let query_lower = query.to_string();
-        for &pkg in &["neovim-git", "luajit", "msgpack", "glibc", "pacman", "yay", "git", "curl", "openssl"] {
+        for &pkg in &[
+            "neovim-git",
+            "luajit",
+            "msgpack",
+            "glibc",
+            "pacman",
+            "yay",
+            "git",
+            "curl",
+            "openssl",
+        ] {
             if pkg.contains(&query_lower) {
                 results.push(pkg.to_string());
             }
@@ -180,7 +195,8 @@ impl AurClient {
         match pkgname {
             "neovim-git" => {
                 pkg.pkgver = String::from("0.10.0");
-                pkg.pkgdesc = String::from("Vim-fork focused on extensibility and usability (AUR git)");
+                pkg.pkgdesc =
+                    String::from("Vim-fork focused on extensibility and usability (AUR git)");
                 pkg.depends.push(String::from("luajit"));
                 pkg.depends.push(String::from("msgpack"));
                 Some(pkg)
@@ -246,9 +262,9 @@ impl AurClient {
         compiler: &SandboxedCompiler,
         db: &mut AlpmDatabase,
     ) -> Result<(), String> {
-        let pkg = self.get_info(pkgname).ok_or_else(|| {
-            format!("Package not found in AUR: {}", pkgname)
-        })?;
+        let pkg = self
+            .get_info(pkgname)
+            .ok_or_else(|| format!("Package not found in AUR: {}", pkgname))?;
 
         let mut temp_db = AlpmDatabase::new();
         for (_, v) in db.packages.iter() {
@@ -285,6 +301,12 @@ impl AurClient {
         }
 
         Ok(())
+    }
+}
+
+impl Default for AurClient {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -364,7 +386,12 @@ impl AlpmDatabase {
         let mut visiting = Vec::new();
         let mut visited = Vec::new();
 
-        self.dfs_resolve(&root_pkgname.to_string(), &mut visiting, &mut visited, &mut resolved)?;
+        self.dfs_resolve(
+            &root_pkgname.to_string(),
+            &mut visiting,
+            &mut visited,
+            &mut resolved,
+        )?;
 
         Ok(resolved)
     }
@@ -404,7 +431,7 @@ impl AlpmDatabase {
     }
 }
 
-impl Default for PkgBuild {
+impl Default for AlpmDatabase {
     fn default() -> Self {
         Self::new()
     }
@@ -433,7 +460,10 @@ sha256sums=('SKIP')
         assert_eq!(pkg.pkgname, "neovim-git");
         assert_eq!(pkg.pkgver, "0.10.0");
         assert_eq!(pkg.pkgrel, 2);
-        assert_eq!(pkg.pkgdesc, "Vim-fork focused on extensibility and usability");
+        assert_eq!(
+            pkg.pkgdesc,
+            "Vim-fork focused on extensibility and usability"
+        );
         assert_eq!(pkg.url, "https://neovim.io");
 
         assert_eq!(pkg.license.len(), 2);
@@ -450,7 +480,10 @@ sha256sums=('SKIP')
         assert_eq!(pkg.makedepends[1], "git");
 
         assert_eq!(pkg.source.len(), 1);
-        assert_eq!(pkg.source[0], "https://github.com/neovim/neovim/archive/v0.10.0.tar.gz");
+        assert_eq!(
+            pkg.source[0],
+            "https://github.com/neovim/neovim/archive/v0.10.0.tar.gz"
+        );
 
         assert_eq!(pkg.sha256sums.len(), 1);
         assert_eq!(pkg.sha256sums[0], "SKIP");
@@ -519,7 +552,9 @@ sha256sums=('SKIP')
         let compiler = SandboxedCompiler::new();
         let mut db = AlpmDatabase::new();
 
-        assert!(client.download_and_compile_aur_package("yay", &compiler, &mut db).is_ok());
+        assert!(client
+            .download_and_compile_aur_package("yay", &compiler, &mut db)
+            .is_ok());
 
         assert!(db.get_package("yay").is_some());
         assert!(db.get_package("pacman").is_some());
@@ -535,11 +570,5 @@ sha256sums=('SKIP')
 
         assert!(pos_glibc < pos_pacman);
         assert!(pos_pacman < pos_yay);
-    }
-}
-
-impl Default for AurClient {
-    fn default() -> Self {
-        Self::new()
     }
 }

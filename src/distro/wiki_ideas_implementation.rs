@@ -452,6 +452,27 @@ pub struct JournalLogEntry {
     pub message: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdUnitState {
+    Active,
+    Inactive,
+    Failed,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSystemdUnit {
+    pub name: String,
+    pub unit_type: SystemdUnitType,
+    pub active_state: SystemdUnitActiveState,
+    pub state: SystemdUnitState,
+    pub dependencies: Vec<String>,
+    pub memory_limit_mb: Option<u64>,
+    pub cpu_weight: u32,
+    pub is_sandboxed: bool,
+}
+
+pub type JournalLogEntry = String;
+
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
     pub journal: Vec<JournalLogEntry>,
@@ -465,39 +486,42 @@ impl SovereignSystemdParityEngine {
         }
     }
 
-    pub fn register_unit(&mut self, unit: SovereignSystemdUnit) {
-        self.units.insert(unit.name.clone(), unit);
+    /// Registers a new systemd-style unit (Service, Slice, Scope, Mount, Automount, Swap, Path, Device).
+    pub fn register_unit(&mut self, name: &str, unit_type: SystemdUnitType, deps: &[&str]) {
+        let deps_vec = deps.iter().map(|d| d.to_string()).collect();
+        self.units.insert(
+            name.to_string(),
+            SovereignSystemdUnit {
+                name: name.to_string(),
+                unit_type,
+                active_state: SystemdUnitActiveState::Inactive,
+                state: SystemdUnitState::Inactive,
+                dependencies: deps_vec,
+                memory_limit_mb: None,
+                cpu_weight: 100,
+                is_sandboxed: true,
+            },
+        );
     }
 
-    pub fn trigger_socket_activation(&mut self, port: u16, timestamp: u64) -> Result<String, &'static str> {
-        for (name, unit) in self.units.iter_mut() {
-            if unit.socket_activation_port == Some(port) {
-                unit.state = SystemdUnitState::Active;
-                self.journal.push(JournalLogEntry {
-                    timestamp_ns: timestamp,
-                    unit_name: name.clone(),
-                    priority: 6,
-                    message: format!("Socket activation triggered on port {}", port),
-                });
-                return Ok(name.clone());
-            }
-        }
-        Err("No unit listening on socket port")
+    pub fn start_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
+        let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
+        unit.active_state = SystemdUnitActiveState::Active;
+        unit.state = SystemdUnitState::Active;
+        self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
+        Ok(SystemdUnitActiveState::Active)
     }
 
-    pub fn start_unit(&mut self, name: &str) -> Result<(), &'static str> {
-        if let Some(unit) = self.units.get_mut(name) {
-            unit.state = SystemdUnitState::Active;
-            self.journal.push(JournalLogEntry {
-                timestamp_ns: 1_000_000,
-                unit_name: name.to_string(),
-                priority: 6,
-                message: format!("Started unit {}", name),
-            });
-            Ok(())
-        } else {
-            Err("SystemdParity: Unit not found")
-        }
+    pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
+        let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
+        unit.active_state = SystemdUnitActiveState::Inactive;
+        unit.state = SystemdUnitState::Inactive;
+        self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
+        Ok(SystemdUnitActiveState::Inactive)
+    }
+
+    pub fn query_journal(&self, name: &str) -> Vec<&JournalLogEntry> {
+        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
     }
 }
 
@@ -532,6 +556,23 @@ pub struct RtlaneRealtimeTask {
     pub ebpf_boost_score: u32,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    OnDemand,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: u64,
+}
+
+pub type RtlaneRealtimeTask = RealtimeTask;
+
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
     pub numa_nodes: Vec<NumaNodeTopology>,
@@ -560,8 +601,7 @@ impl SovereignHybridSchedulerInnovations {
             numa_nodes: nodes,
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
-            rt_lane_latency_us: 3,
-            ai_prediction_boost: true,
+            rt_lane_latency_us: 4,
         }
     }
 
@@ -708,9 +748,8 @@ mod tests {
         engine.register_unit(srv);
         assert_eq!(engine.units.len(), 1);
 
-        assert!(engine.start_unit("httpd.service").is_ok());
-        assert_eq!(engine.units.get("httpd.service").unwrap().state, SystemdUnitState::Active);
-        assert_eq!(engine.journal_logs.len(), 1);
+        assert_eq!(engine.start_unit("httpd.service"), Ok(SystemdUnitActiveState::Active));
+        assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 
     #[test]

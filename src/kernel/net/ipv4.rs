@@ -23,7 +23,6 @@ extern crate alloc;
 /// Absorbs Linux net/ipv4/: arp.c, ip_input.c, ip_output.c, icmp.c
 use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-extern crate alloc;
 use alloc::vec::Vec;
 
 // ── Types ────────────────────────────────────────────────────────────────
