@@ -138,12 +138,9 @@ impl SigmaJailManager {
         }
 
         // Execute stop script
-        if let Some(stop_cmd) = exec_stop.as_ref() {
+        if let Some(exec_stop_script) = &exec_stop {
             if let Some(jid) = jid {
-                let _ = self.execute_in_jail(jid, stop_cmd);
-        if let Some(ref exec_stop_script) = exec_stop {
-            if let Some(jid) = jid {
-                let _ = self.execute_in_jail(jid, exec_stop_script);
+                let _ = self.execute_in_jail(jid, exec_stop_script.as_str());
             }
         }
 

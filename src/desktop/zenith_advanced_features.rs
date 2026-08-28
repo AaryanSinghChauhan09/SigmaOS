@@ -595,7 +595,8 @@ impl Default for ProfileManager {
 }
 
 // =======================================================================// KWin & Hyprland Inspired Window Rules Engine
-// =======================================================================#[derive(Debug, Clone)]
+// =======================================================================
+#[derive(Debug, Clone)]
 pub struct WindowRuleMatch {
     pub app_id: Option<String>,
     pub title_pattern: Option<String>,
@@ -664,7 +665,8 @@ impl Default for ZenithWindowRuleEngine {
 }
 
 // =======================================================================// Sway & Hyprland Inspired Scratchpad Manager (Dropdown terminals & floating tools)
-// =======================================================================#[derive(Debug, Clone)]
+// =======================================================================
+#[derive(Debug, Clone)]
 pub struct ScratchpadWindow {
     pub window_id: u64,
     pub app_id: String,
@@ -713,7 +715,8 @@ impl Default for ZenithScratchpadManager {
 }
 
 // =======================================================================// KDE Plasma Inspired Desktop Activity Manager (Contextual workspace environments)
-// =======================================================================#[derive(Debug, Clone)]
+// =======================================================================
+#[derive(Debug, Clone)]
 pub struct DesktopActivity {
     pub id: String,
     pub name: String,
@@ -777,7 +780,8 @@ impl Default for ZenithActivityManager {
 }
 
 // =======================================================================// OpenBSD cwm & FreeBSD Lumina Inspired Desktop Security Guard
-// =======================================================================pub struct ZenithDesktopSecurityGuard {
+// =======================================================================
+pub struct ZenithDesktopSecurityGuard {
     pub lock_screen_on_idle: bool,
     pub idle_timeout_seconds: u32,
     pub disable_screen_capture: bool,
