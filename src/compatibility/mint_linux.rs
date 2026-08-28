@@ -725,7 +725,7 @@ mod tests {
 
     #[test]
     fn test_mint_cinnamon_styling_options() {
-        let style = MintCinnamonStyling::default();
+        let mut style = MintCinnamonStyling::default();
         assert_eq!(style.panel_height, 40);
         assert!(style.window_effects_enabled);
 

@@ -56,8 +56,6 @@ pub struct GentooPortageMaskEngine {
     pub unmasked_packages: Vec<String>,
     pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
-    pub ebuilds: Vec<EbuildEntry>,
-    pub hard_masked_pkgs: Vec<String>,
 }
 
 impl GentooPortageMaskEngine {
@@ -75,7 +73,7 @@ impl GentooPortageMaskEngine {
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_ebuild_masked: is_masked,
+            is_masked,
         });
     }
 
@@ -1857,6 +1855,8 @@ pub struct PortageEbuild {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
+
+use alloc::collections::BTreeMap as HashMap;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,

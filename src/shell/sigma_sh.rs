@@ -894,25 +894,18 @@ mod tests {
         shell.execute_line(b"spy $SECRET_KEY").unwrap();
 
         // Inspect captured variable inside spy command
-        if let Some(ref cmd_box) = shell.commands[0] {
-            // Unsafe cast to access captured properties (extract data pointer from trait object)
-            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
-            unsafe {
-                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
-                assert_eq!(captured, b"sovereign_pass_123");
-            }
+        unsafe {
+            let captured = &CAPTURED_BUF[..CAPTURED_LEN];
+            assert_eq!(captured, b"sovereign_pass_123");
         }
 
         // 3. Setup and verify alias resolution
         shell.set_alias(b"reveal", b"spy");
         shell.execute_line(b"reveal $USER").unwrap();
 
-        if let Some(ref cmd_box) = shell.commands[0] {
-            let spy_ptr = (&**cmd_box) as *const dyn ShellCommand as *const () as *const SpyCommand;
-            unsafe {
-                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
-                assert_eq!(captured, b"sovereign");
-            }
+        unsafe {
+            let captured = &CAPTURED_BUF[..CAPTURED_LEN];
+            assert_eq!(captured, b"sovereign");
         }
 
         // 4. Remove alias

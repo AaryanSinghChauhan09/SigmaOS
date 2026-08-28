@@ -1,6 +1,4 @@
 extern crate alloc;
-
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -831,5 +829,357 @@ impl LegacyPackageMigrator {
             "[sigpkg]\nname = \"{}\"\nversion = \"{}\"\nconverted_from = \"fedora\"\n",
             name, version
         ))
+    }
+}
+
+// =========================================================================
+// 21. ALPINE APK INDEX VERIFICATION & CONTAINER TRIGGERS
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApkPackageTrigger {
+    pub trigger_path: String,
+    pub target_script: String,
+}
+
+pub struct ApkIndexVerifier {
+    pub trusted_keys: Vec<[u8; 32]>,
+    pub triggers: Vec<ApkPackageTrigger>,
+}
+
+impl ApkIndexVerifier {
+    pub fn new() -> Self {
+        Self {
+            trusted_keys: Vec::new(),
+            triggers: Vec::new(),
+        }
+    }
+
+    pub fn add_key(&mut self, key: [u8; 32]) {
+        self.trusted_keys.push(key);
+    }
+
+    pub fn add_trigger(&mut self, path: &str, script: &str) {
+        self.triggers.push(ApkPackageTrigger {
+            trigger_path: path.to_string(),
+            target_script: script.to_string(),
+        });
+    }
+
+    pub fn verify_apk_index_hash(&self, index_bytes: &[u8], expected_hash: &[u8; 32]) -> bool {
+        if index_bytes.is_empty() {
+            return false;
+        }
+        // FNV-1a based 256-bit hashing over index bytes
+        let mut computed = [0u8; 32];
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in index_bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            computed[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
+        }
+        computed == *expected_hash
+    }
+
+    pub fn match_triggers(&self, path: &str) -> Vec<String> {
+        let mut matched = Vec::new();
+        for trigger in &self.triggers {
+            if path.starts_with(&trigger.trigger_path) || trigger.trigger_path == "*" {
+                matched.push(trigger.target_script.clone());
+            }
+        }
+        matched
+    }
+}
+
+// =========================================================================
+// 22. OPENBSD PKG SIGNIFY & UNVEIL SANDBOX
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PkgUnveilPolicy {
+    pub path: String,
+    pub permissions: String, // e.g. "r", "rw", "rx", "rwc"
+}
+
+pub struct OpenBsdPkgSignifyVerifier {
+    pub signify_pubkeys: Vec<String>,
+    pub unveil_policies: Vec<PkgUnveilPolicy>,
+}
+
+impl OpenBsdPkgSignifyVerifier {
+    pub fn new() -> Self {
+        Self {
+            signify_pubkeys: Vec::new(),
+            unveil_policies: Vec::new(),
+        }
+    }
+
+    pub fn add_signify_pubkey(&mut self, pubkey_b64: &str) {
+        self.signify_pubkeys.push(pubkey_b64.to_string());
+    }
+
+    pub fn add_unveil_rule(&mut self, path: &str, permissions: &str) {
+        self.unveil_policies.push(PkgUnveilPolicy {
+            path: path.to_string(),
+            permissions: permissions.to_string(),
+        });
+    }
+
+    pub fn verify_signify_signature(&self, pkg_bytes: &[u8], signature_header: &str) -> bool {
+        if pkg_bytes.is_empty() || !signature_header.starts_with("untrusted comment: verify with ") {
+            return false;
+        }
+        // Extract key identifier from signify untrusted comment header
+        let key_id = signature_header
+            .split("untrusted comment: verify with ")
+            .nth(1)
+            .and_then(|s| s.lines().next())
+            .unwrap_or("")
+            .trim();
+
+        if key_id.is_empty() {
+            return false;
+        }
+
+        // Validate that key identifier matches one of registered trusted signify pubkeys
+        self.signify_pubkeys.iter().any(|k| k.contains(key_id) || key_id.contains(k.as_str()))
+    }
+
+    pub fn validate_path_unveiled(&self, path: &str, required_perm: &str) -> bool {
+        for policy in &self.unveil_policies {
+            if path.starts_with(&policy.path) && policy.permissions.contains(required_perm) {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+// =========================================================================
+// UNIT TESTS FOR ALL SUB-COMPONENTS
+// =========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sigpkg_header() {
+        let header = SigpkgHeader::new(1024, 2048, [1u8; 32], [2u8; 64]);
+        assert!(header.verify_magic());
+        assert_eq!(header.compression, SigpkgCompression::Zstd);
+    }
+
+    #[test]
+    fn test_central_repository_manager() {
+        let mut repo = CentralRepositoryManager::new();
+        repo.add_mirror("https://us.sigmaos.org/pkg", "us", 45);
+        repo.add_mirror("https://eu.sigmaos.org/pkg", "eu", 20);
+
+        let fastest = repo.select_fastest_mirror().unwrap();
+        assert_eq!(fastest.region, "eu");
+    }
+
+    #[test]
+    fn test_reproducible_build_context() {
+        let ctx = ReproducibleBuildContext::new(1700000000);
+        let mut env = BTreeMap::new();
+        env.insert("CC".to_string(), "gcc".to_string());
+        let hash = ctx.compute_derivation_hash(&[0u8; 32], &env);
+        assert_ne!(hash, [0u8; 32]);
+    }
+
+    #[test]
+    fn test_source_first_builder() {
+        let mut builder = SourceFirstBuilder::new(BuildPreference::BinaryCachePreferred);
+        let hash = [5u8; 32];
+        builder.store_binary_cache(hash, vec![1, 2, 3]);
+
+        let res = builder.fetch_or_build(&hash, || Ok(vec![4, 5, 6])).unwrap();
+        assert_eq!(res, vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_deterministic_dependency_resolver() {
+        let mut resolver = DeterministicDependencyResolver::new();
+        resolver.add_package_spec(
+            "nginx",
+            PackageRequirement {
+                name: "nginx".to_string(),
+                version_min: (1, 24, 0),
+                conflicts_with: vec!["apache2".to_string()],
+            },
+        );
+        resolver.add_package_spec(
+            "apache2",
+            PackageRequirement {
+                name: "apache2".to_string(),
+                version_min: (2, 4, 0),
+                conflicts_with: vec!["nginx".to_string()],
+            },
+        );
+
+        let res = resolver.resolve_dependencies(&["nginx"]);
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), vec!["nginx"]);
+    }
+
+    #[test]
+    fn test_atomic_transaction_engine() {
+        let mut engine = AtomicTransactionEngine::new();
+        let gen_id = engine.commit_transaction(vec!["curl".to_string()], 100);
+        assert_eq!(gen_id, 2);
+
+        let rolled = engine.rollback_generation(1).unwrap();
+        assert_eq!(rolled.generation_id, 1);
+    }
+
+    #[test]
+    fn test_binary_delta_generator() {
+        let old_b = b"hello world";
+        let new_b = b"hello sigma";
+        let diff = BinaryDeltaGenerator::create_diff(old_b, new_b);
+        let patched = BinaryDeltaGenerator::apply_patch(old_b, &diff);
+        assert_eq!(&patched[..new_b.len()], new_b);
+    }
+
+    #[test]
+    fn test_build_sandbox_engine() {
+        let policy = SandboxPolicy {
+            isolate_network: true,
+            isolate_pid: true,
+            isolate_ipc: true,
+            read_only_root: true,
+        };
+        let sandbox = BuildSandboxEngine::new(policy);
+        let res = sandbox.execute_sandboxed_build(|| true);
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_cross_compile_toolchain() {
+        let toolchain = CrossCompileToolchain::new(
+            TargetArchitecture::X86_64,
+            TargetArchitecture::AArch64,
+            "/sysroot/aarch64",
+        );
+        assert_eq!(toolchain.get_target_triple(), "aarch64-sigmaos-linux-gnu");
+    }
+
+    #[test]
+    fn test_slsa_provenance_attestation() {
+        let att = SlsaProvenanceAttestation::new("builder-01", "github.com/org/repo", "abc1234", 1000);
+        assert!(att.verify_provenance());
+    }
+
+    #[test]
+    fn test_local_package_proxy_cache() {
+        let mut cache = LocalPackageProxyCache::new();
+        let bytes = cache.get_or_download("https://pkg.org/a.spkg", || Ok(vec![9, 9, 9])).unwrap();
+        assert_eq!(bytes, vec![9, 9, 9]);
+
+        // Second call should hit cache
+        let cached_bytes = cache.get_or_download("https://pkg.org/a.spkg", || Err("should not run")).unwrap();
+        assert_eq!(cached_bytes, vec![9, 9, 9]);
+        assert_eq!(cache.total_hits, 1);
+    }
+
+    #[test]
+    fn test_vulnerability_scanner() {
+        let mut scanner = VulnerabilityScanner::new();
+        scanner.add_cve("CVE-2024-0001", "openssl", 9);
+        let cves = scanner.scan_package("openssl");
+        assert_eq!(cves.len(), 1);
+        assert_eq!(cves[0].cve_id, "CVE-2024-0001");
+    }
+
+    #[test]
+    fn test_build_farm_manager() {
+        let mut farm = BuildFarmManager::new();
+        farm.register_worker(101, TargetArchitecture::RiscV64);
+        let w_id = farm.schedule_build(TargetArchitecture::RiscV64).unwrap();
+        assert_eq!(w_id, 101);
+    }
+
+    #[test]
+    fn test_unified_runtime_manager() {
+        let mut mgr = UnifiedRuntimeManager::new();
+        mgr.set_runtime_version(LanguageRuntime::Rust, "1.78.0");
+        assert_eq!(mgr.get_runtime_version(LanguageRuntime::Rust), Some("1.78.0"));
+    }
+
+    #[test]
+    fn test_flatpak_container_integration() {
+        let mut flatpak = FlatpakContainerIntegration::new("org.gimp.GIMP", ApplicationType::FlatpakSandbox);
+        flatpak.add_permission("--socket=x11");
+        assert_eq!(flatpak.sandbox_flags.len(), 1);
+    }
+
+    #[test]
+    fn test_package_quality_checker() {
+        let res = PackageQualityChecker::check_quality("my-app", "MIT", true);
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_binary_compatibility_layer() {
+        let compat = BinaryCompatibilityLayer::new(CRuntimeProvider::Glibc);
+        assert_eq!(compat.resolve_symbol_shim("malloc"), Some("sovereign_malloc"));
+    }
+
+    #[test]
+    fn test_developer_package_template_manager() {
+        let spec = DeveloperPackageTemplateManager::generate_spec_template("ripgrep", TemplateKind::RustCargo);
+        assert!(spec.contains("cargo"));
+    }
+
+    #[test]
+    fn test_package_analytics_dashboard() {
+        let mut dash = PackageAnalyticsDashboard::new();
+        dash.record_download("bash", 2048);
+        assert_eq!(dash.get_total_downloads("bash"), 1);
+        assert_eq!(dash.bandwidth_bytes_served, 2048);
+    }
+
+    #[test]
+    fn test_legacy_package_migrator() {
+        let deb_ctrl = "Package: htop\nVersion: 3.2.2\n";
+        let sigpkg_spec = LegacyPackageMigrator::convert_deb_control(deb_ctrl).unwrap();
+        assert!(sigpkg_spec.contains("name = \"htop\""));
+    }
+
+    #[test]
+    fn test_alpine_apk_index_verifier() {
+        let mut verifier = ApkIndexVerifier::new();
+        verifier.add_trigger("/etc/ssl/certs", "c_rehash");
+        let sample_bytes = b"sample index content";
+        let mut expected_hash = [0u8; 32];
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in sample_bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            expected_hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
+        }
+
+        assert!(verifier.verify_apk_index_hash(sample_bytes, &expected_hash));
+        assert!(!verifier.verify_apk_index_hash(b"", &expected_hash));
+
+        let triggers = verifier.match_triggers("/etc/ssl/certs/ca.pem");
+        assert_eq!(triggers.len(), 1);
+        assert_eq!(triggers[0], "c_rehash");
+    }
+
+    #[test]
+    fn test_openbsd_pkg_signify_verifier() {
+        let mut verifier = OpenBsdPkgSignifyVerifier::new();
+        verifier.add_signify_pubkey("RWT1234567890...");
+        verifier.add_unveil_rule("/usr/local", "rx");
+
+        assert!(verifier.verify_signify_signature(b"data", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier.verify_signify_signature(b"", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier.verify_signify_signature(b"data", "untrusted comment: verify with unknown_key"));
+        assert!(verifier.validate_path_unveiled("/usr/local/bin/git", "r"));
+        assert!(!verifier.validate_path_unveiled("/etc/shadow", "r"));
     }
 }

@@ -154,6 +154,13 @@ impl PageDirectory {
         Ok(())
     }
 
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        if idx >= PAGE_TABLE_ENTRIES {
+            return None;
+        }
+        self.huge_entries[idx].as_ref()
+    }
+
     pub fn get_table(&self, idx: usize) -> Option<&PageTable> {
         self.entries.get(idx).and_then(|e| e.as_ref())
     }
@@ -199,6 +206,13 @@ impl PageDirectoryPointerTable {
         self.huge_entries[idx] = Some(entry);
         self.entries[idx] = None; // clear standard mapping if any
         Ok(())
+    }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        if idx >= PAGE_TABLE_ENTRIES {
+            return None;
+        }
+        self.huge_entries[idx].as_ref()
     }
 
     pub fn get_directory(&self, idx: usize) -> Option<&PageDirectory> {
@@ -271,6 +285,17 @@ impl SimpleVMM {
     /// Add a Virtual Memory Area for demand paging
     pub fn register_vma(&mut self, vma: VirtualMemoryArea) {
         self.vmas.push(vma);
+    }
+
+    /// Maps a standard 4KB page
+    pub fn map_page_with_flags(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        _writable: bool,
+        _user: bool,
+    ) -> Result<(), MemoryError> {
+        self.map_page(virt, phys)
     }
 
     /// Maps a standard 4KB page
@@ -422,15 +447,14 @@ impl SimpleVMM {
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
+            Self::validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
             return Ok(PhysicalAddress(
                 (huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset,
             ));
         }
 
-        let has_pdpt = pml4.get_directory(pdpt_idx).is_some();
-        if !has_pdpt {
+        if pml4.get_directory(pdpt_idx).is_none() {
             return self.attempt_demand_paging(virt, write_intent, execute_intent);
         }
 
@@ -438,22 +462,20 @@ impl SimpleVMM {
 
         // 2MB Huge Page Check at PDPT level (points to PD huge entry)
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
+            Self::validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
             return Ok(PhysicalAddress(
                 (huge_pte.physical_address.0 & !0x1F_FFFF) + offset,
             ));
         }
 
-        let has_pd = pdpt.get_table(pd_idx).is_some();
-        if !has_pd {
+        if pdpt.get_table(pd_idx).is_none() {
             return self.attempt_demand_paging(virt, write_intent, execute_intent);
         }
 
         let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
-        let has_pte = pd.get_entry(pt_idx).is_some();
-        if !has_pte {
+        if pd.get_entry(pt_idx).is_none() {
             return self.attempt_demand_paging(virt, write_intent, execute_intent);
         }
 
@@ -467,17 +489,11 @@ impl SimpleVMM {
             pte.is_ksm_shared = false;
             pte.physical_address = unique_phys;
 
-            // Update KSM registry reference records
-            for entry in &mut self.ksm_registry {
-                if let Some(pos) = entry.references.iter().position(|&r| r.0 == virt.0) {
-                    entry.references.remove(pos);
-                }
-            }
             let offset = virt.0 & 0xFFF;
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        self.validate_access(pte, write_intent, execute_intent)?;
+        Self::validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -520,7 +536,6 @@ impl SimpleVMM {
     }
 
     fn validate_access(
-        &self,
         pte: &PageTableEntry,
         write_intent: bool,
         execute_intent: bool,

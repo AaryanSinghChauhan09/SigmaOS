@@ -18,15 +18,13 @@
 
 extern crate alloc;
 
-use crate::klib::{BTreeMap, Vec, VecDeque};
+use alloc::collections::{BTreeMap, VecDeque};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use alloc::string::String;
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
-
-extern crate alloc;
-use crate::klib::{BTreeMap, Vec, VecDeque};
-use alloc::string::String;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
@@ -195,7 +193,7 @@ pub trait BlockDevice: Send + Sync {
 /// RAM-backed block device (for testing / ramdisk)
 pub struct RamDisk {
     name: String,
-    data: crate::klib::Vec<u8>,
+    data: Vec<u8>,
     sector_count: u64,
     reads: AtomicU64,
     writes: AtomicU64,
@@ -207,7 +205,7 @@ unsafe impl Sync for RamDisk {}
 impl RamDisk {
     pub fn new(name: &str, size_bytes: usize) -> Self {
         let sectors = (size_bytes / SECTOR_SIZE) as u64;
-        let mut data = crate::klib::Vec::with_capacity(size_bytes);
+        let mut data = Vec::with_capacity(size_bytes);
         for _ in 0..size_bytes {
             data.push(0);
         }

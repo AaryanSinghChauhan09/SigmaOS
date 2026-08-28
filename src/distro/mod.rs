@@ -27,7 +27,6 @@ pub mod stable_components;
 pub mod tiny_core;
 pub mod arch;
 pub mod cachy;
-pub mod linux_bsd_parity_extended;
 pub mod wiki_ideas_implementation;
 pub mod missing_distro_innovations;
 
@@ -59,7 +58,7 @@ pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
     GuixFunctionalStore, NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, OstreeDeployment,
     OstreeDeploymentEngine, RumpKernelServer, ShepherdService, ShepherdServiceState,
-    SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot,
+    SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot as ExtSnapperSnapshot,
     SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
@@ -83,20 +82,6 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use bsd_linux_innovations::{
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-};
-pub use linux_bsd_parity_extended::{
-    SlackPackage, SlackwarePkgTools, SlackBuildCompiler, GuixDerivation, GuixFunctionalStore,
-    ShepherdServiceState, ShepherdService, GNUGuixShepherdSupervisor, OstreeDeployment,
-    OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
-    NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
-    YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot as ExtSnapperSnapshot, SnapperBtrfsEngine,
 };
 pub use wiki_ideas_implementation::{
     Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,

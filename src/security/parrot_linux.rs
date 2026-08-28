@@ -1,5 +1,4 @@
 // SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
-// SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
 // Fully absorbs and implements all security, forensics, and anonymity systems of Parrot Linux:
 // Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,
 // Password Auditor, Secure Wiper (7-pass shredder), and Sigma IDS (Intrusion Detection).
@@ -19,30 +18,114 @@ pub struct SniffedPacket {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AnonymityMode { Tor, I2p, Clearnet }
+pub enum AnonymityMode {
+    Tor,
+    I2p,
+    I2P,
+    Clearnet,
+    Direct,
+}
 
 pub struct AnonsurfEngine {
     pub mode: AnonymityMode,
 }
 
 impl AnonsurfEngine {
-    pub fn new() -> Self { AnonsurfEngine { mode: AnonymityMode::Clearnet } }
-    pub fn start_anonsurf(&mut self) { self.mode = AnonymityMode::Tor; }
-    pub fn stop_anonsurf(&mut self) { self.mode = AnonymityMode::Clearnet; }
+    pub fn new() -> Self {
+        AnonsurfEngine { mode: AnonymityMode::Direct }
+    }
+    pub fn start_anonsurf(&mut self) {
+        self.mode = AnonymityMode::Tor;
+    }
+    pub fn stop_anonsurf(&mut self) {
+        self.mode = AnonymityMode::Clearnet;
+    }
+}
+
+impl Default for AnonsurfEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct ForensicsAuditTool;
-#[derive(Debug, Clone)]
-pub struct RecoveredFile { pub name: String }
 
-pub struct KaliSniffer;
+impl ForensicsAuditTool {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for ForensicsAuditTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RecoveredFile {
+    pub name: String,
+    pub path: String,
+    pub size: usize,
+}
+
 pub struct PentestAssistant;
+
+impl PentestAssistant {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for PentestAssistant {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SecureWipeTool;
 
-pub struct SigmaIDS;
+impl SecureWipeTool {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for SecureWipeTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntrusionSeverity { Low, Medium, High, Critical }
-pub struct IntrusionAlert { pub severity: IntrusionSeverity }
+pub enum IntrusionSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct IntrusionAlert {
+    pub severity: IntrusionSeverity,
+    pub message: String,
+}
+
+pub struct SigmaIDS {
+    pub alerts: Vec<IntrusionAlert>,
+}
+
+impl SigmaIDS {
+    pub fn new() -> Self {
+        Self { alerts: Vec::new() }
+    }
+}
+
+impl Default for SigmaIDS {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 pub struct ParrotSniffer {
     pub is_sniffing: bool,
@@ -72,66 +155,10 @@ impl ParrotSniffer {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AnonymityMode {
-    Tor,
-    I2P,
-    Direct,
-}
-
-pub struct AnonsurfEngine {
-    pub mode: AnonymityMode,
-}
-
-impl AnonsurfEngine {
-    pub fn new() -> Self {
-        Self { mode: AnonymityMode::Direct }
+impl Default for ParrotSniffer {
+    fn default() -> Self {
+        Self::new()
     }
-}
-
-pub struct ForensicsAuditTool;
-impl ForensicsAuditTool {
-    pub fn new() -> Self { Self }
-}
-
-#[derive(Debug, Clone)]
-pub struct RecoveredFile {
-    pub path: String,
-    pub size: usize,
 }
 
 pub type KaliSniffer = ParrotSniffer;
-
-pub struct PentestAssistant;
-impl PentestAssistant {
-    pub fn new() -> Self { Self }
-}
-
-pub struct SecureWipeTool;
-impl SecureWipeTool {
-    pub fn new() -> Self { Self }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
-#[derive(Debug, Clone)]
-pub struct IntrusionAlert {
-    pub severity: IntrusionSeverity,
-    pub message: String,
-}
-
-pub struct SigmaIDS {
-    pub alerts: Vec<IntrusionAlert>,
-}
-
-impl SigmaIDS {
-    pub fn new() -> Self {
-        Self { alerts: Vec::new() }
-    }
-}

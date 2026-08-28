@@ -156,6 +156,9 @@ impl FilePermissions {
             suid,
             sgid,
             sticky,
+            owner_mask,
+            group_mask,
+            other_mask,
             bsd_flags: BsdFileFlags::new(),
         }
     }

@@ -1,8 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use crate::klib::HashMap;
-use crate::klib::HashSet;
+use alloc::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
 use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
@@ -40,7 +39,7 @@ use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPack
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    ZshSyntaxHighlighter,
+    ShellJob, JobState, ZshSyntaxHighlighter,
 };
 use crate::virtualization::{
     Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
@@ -217,17 +216,17 @@ pub enum ShellCommand {
 /// Shell REPL
 pub struct ShellRepl {
     pub running: bool,
-    pub variables: crate::klib::HashMap<String, String>,
-    pub aliases: crate::klib::HashMap<String, String>,
+    pub variables: HashMap<String, String>,
+    pub aliases: HashMap<String, String>,
     pub prompt: String,
     pub agent_engine: AgentAutomationEngine,
     pub current_user: String,
     pub current_dir: String,
-    pub services: crate::klib::HashMap<String, String>,
+    pub services: HashMap<String, String>,
     pub installed_packages: HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
-    pub a11y_features: crate::klib::HashMap<String, bool>,
+    pub a11y_features: HashMap<String, bool>,
     pub command_history: Vec<String>,
 
     // Keep internal instances of engines for persistent state during shell interaction
@@ -255,15 +254,15 @@ impl ShellRepl {
         prompt_builder.home_dir = "/home/ubuntu".to_string();
 
         let dir_stack = BsdDirectoryStack::new(&current_dir);
-        let mut services = crate::klib::HashMap::new();
+        let mut services = HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
-            variables: crate::klib::HashMap::new(),
-            aliases: crate::klib::HashMap::new(),
+            variables: HashMap::new(),
+            aliases: HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
@@ -272,7 +271,7 @@ impl ShellRepl {
             installed_packages: HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: crate::klib::HashMap::new(),
+            a11y_features: HashMap::new(),
             command_history: Vec::new(),
             customization: CustomizationEngine::new(),
             accessibility: AccessibilityFramework::new(),
@@ -1375,17 +1374,14 @@ impl ShellRepl {
             }
 
             ShellCommand::Jobs => {
-                let jobs_list = self.job_manager.list_jobs();
-                if jobs_list.is_empty() {
-                    Ok("No active background or stopped jobs.".to_string())
-                } else {
-                    Ok(jobs_list.join("\n"))
-                }
+                Ok(self.job_control.list_jobs())
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_manager.bring_to_foreground(job_id) {
-                    Ok(msg) => Ok(msg),
-                    Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
+                if let Some(job) = self.job_control.jobs.iter_mut().find(|j| j.id == job_id as usize) {
+                    job.state = JobState::Running;
+                    Ok(format!("[{}] brought to foreground: {}", job.id, job.command))
+                } else {
+                    Err(format!("fg: Job %{} not found.", job_id))
                 }
             }
 
@@ -1871,10 +1867,10 @@ mod tests {
         let jobs_cmd = repl.parse_command("jobs");
         assert!(matches!(jobs_cmd, ShellCommand::Jobs));
         let jobs_res = repl.execute_command(jobs_cmd).unwrap();
-        assert!(jobs_res.contains("No active background"));
+        assert!(jobs_res.contains("No active jobs"));
 
         // Register job
-        repl.job_manager.add_job("sleep 100", 1234, true);
+        repl.job_control.add_job(1234, "sleep 100");
         let jobs_res2 = repl.execute_command(ShellCommand::Jobs).unwrap();
         assert!(jobs_res2.contains("sleep 100"));
 

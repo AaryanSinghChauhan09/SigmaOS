@@ -440,6 +440,19 @@ pub struct SystemdUnit {
     pub cpu_quota_pct: Option<u32>,
 }
 
+#[derive(Debug, Clone)]
+pub struct SovereignSystemdUnit {
+    pub name: String,
+    pub unit_type: SystemdUnitType,
+    pub active_state: SystemdUnitActiveState,
+    pub dependencies: Vec<String>,
+    pub memory_limit_mb: Option<u64>,
+    pub cpu_weight: u32,
+    pub is_sandboxed: bool,
+}
+
+pub type JournalLogEntry = String;
+
 pub struct SovereignSystemdParityEngine {
     pub units: BTreeMap<String, SovereignSystemdUnit>,
     pub journal_logs: Vec<JournalLogEntry>,
@@ -461,7 +474,7 @@ impl SovereignSystemdParityEngine {
             SovereignSystemdUnit {
                 name: name.to_string(),
                 unit_type,
-                state: SystemdUnitState::Inactive,
+                active_state: SystemdUnitActiveState::Inactive,
                 dependencies: deps_vec,
                 memory_limit_mb: None,
                 cpu_weight: 100,
@@ -483,6 +496,10 @@ impl SovereignSystemdParityEngine {
         self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
     }
+
+    pub fn query_journal(&self, name: &str) -> Vec<JournalLogEntry> {
+        self.journal_logs.iter().filter(|entry| entry.contains(name)).cloned().collect()
+    }
 }
 
 impl Default for SovereignSystemdParityEngine {
@@ -500,6 +517,20 @@ pub enum SchedulerClass {
     Idle,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Schedutil,
+    Performance,
+    Powersave,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: usize,
+}
+
 #[derive(Debug, Clone)]
 pub struct RealtimeTask {
     pub pid: usize,
@@ -508,6 +539,8 @@ pub struct RealtimeTask {
     pub wcet_us: u64, // Worst-Case Execution Time
     pub numa_node: u32,
 }
+
+pub type RtlaneRealtimeTask = RealtimeTask;
 
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
@@ -536,6 +569,7 @@ impl SovereignHybridSchedulerInnovations {
             numa_nodes: nodes,
             rt_tasks: BTreeMap::new(),
             preemption_count: 0,
+            rt_lane_latency_us: 4,
         }
     }
 
@@ -657,7 +691,7 @@ mod tests {
         engine.register_unit("httpd.service", SystemdUnitType::Service, &["network.target"]);
         assert_eq!(engine.units.len(), 1);
 
-        assert_eq!(engine.start_unit("httpd.service"), Ok(()));
+        assert_eq!(engine.start_unit("httpd.service"), Ok(SystemdUnitActiveState::Active));
         assert_eq!(engine.query_journal("httpd.service").len(), 1);
     }
 

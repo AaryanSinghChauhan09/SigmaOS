@@ -102,7 +102,7 @@ impl PledgeManager {
         Self {
             pledge: None,
             exec_pledge: None,
-            gate: CapabilityGate::new(0),
+            gate: CapabilityGate::new(),
             unveiled_paths: Vec::new(),
             thread_sub_pledges: BTreeMap::new(),
         }
@@ -211,14 +211,14 @@ impl PledgeManager {
                 match perm {
                     Permission::NetworkTcp => token = token.allow_network("tcp", 0),
                     Permission::NetworkUdp => token = token.allow_network("udp", 0),
-                    Permission::FileRead => token = token.allow_read(),
-                    Permission::FileWrite => token = token.allow_write(),
+                    Permission::FileRead => token = token.allow_read(""),
+                    Permission::FileWrite => token = token.allow_write(""),
                     Permission::ProcessExec => token = token.allow_exec(),
                     Permission::Ipc => token = token.allow_ipc(),
                     _ => {}
                 }
             }
-            self.gate.set_capability(token.bits());
+            self.gate.set_capability(token);
         }
 
         Ok(())

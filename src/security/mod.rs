@@ -25,11 +25,11 @@ pub mod secrets;
 pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
+pub use sigma_unveil as unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
-pub mod root_improvement;
 
 pub use root_improvement::{
     BsdSecurelevelGuard, CapSplitter, DoasRuleEngine, PamEngine, PolkitEnforcer,

@@ -2,8 +2,8 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::BTreeMap;
-use super::btreemap::BTreeMapIter;
+use super::hashmap::BTreeMap;
+use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where

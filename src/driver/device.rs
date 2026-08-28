@@ -815,7 +815,7 @@ mod legacy_tests {
         }
         pub fn read(&mut self, buf: &mut [u8]) -> Result<usize, DeviceError> {
             let len = buf.len().min(self.buffer.len());
-            buf[..len].copy_from_slice(&self.buffer.deref()[..len]);
+            buf[..len].copy_from_slice(&self.buffer.as_slice()[..len]);
             Ok(len)
         }
         pub fn ioctl(&mut self, _cmd: u32, _arg: usize) -> Result<usize, DeviceError> {
@@ -1435,9 +1435,6 @@ impl<T> Vec<T> {
 
     pub fn len(&self) -> usize {
         self.len
-    }
-
-        }
     }
 
     pub fn clear(&mut self) {

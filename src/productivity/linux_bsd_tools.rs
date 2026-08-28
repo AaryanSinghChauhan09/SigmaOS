@@ -1,11 +1,11 @@
-extern crate alloc;
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
 // Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 // =========================================================================
 // 1. TOP / HTOP (System Resource & Process Task Monitor)

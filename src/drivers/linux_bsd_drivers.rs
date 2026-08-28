@@ -968,6 +968,28 @@ pub struct SocketCanDriver {
     pub rx_filter_id: u32,
 }
 
+pub struct SovereignDeviceManager;
+
+impl SovereignDeviceManager {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn auto_probe_pci_device(&mut self, vendor_id: u16, device_id: u16) -> Result<&'static str, &'static str> {
+        match (vendor_id, device_id) {
+            (0x1002, 0x731F) => Ok("AMDGPU DRM/KMS Driver"),
+            (0x1af4, 0x1050) => Ok("VirtIO GPU 3D Display Driver"),
+            _ => Err("Unknown device"),
+        }
+    }
+}
+
+impl Default for SovereignDeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SocketCanDriver {
     pub fn new(name: &str, bitrate: u32) -> Self {
         Self {
@@ -1086,15 +1108,12 @@ mod tests {
         let mut vsound = VirtioSoundDriver::new(2);
         assert!(vsound.start_playback().is_ok());
 
-        let mut r8169 = RealtekR8169EthernetDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
-        assert_eq!(r8169.transmit_frame(&[0xFF; 64]).unwrap(), 64);
+        let mut rtl = Rtl8125NicDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
+        assert_eq!(rtl.transmit_packet(&[0xFF; 64]).unwrap(), 64);
 
-        let mut igc = IntelIgcEthernetDriver::new([0x00, 0x1B, 0x21, 0x00, 0x12, 0x5B]);
-        assert_eq!(igc.transmit_queue(0, &[0xAA; 128]).unwrap(), 128);
-
-        let mut imu = LinuxIioImuSensorDriver::new("InvenSense MPU6050");
-        let read = imu.read_sensor_data(10, -20, 980);
-        assert_eq!(read.accel_z_m_s2, 980);
+        let mut iio = IioSensorFrameworkDriver::new(10);
+        let (accel, _gyro) = iio.sample_raw_data();
+        assert_eq!(accel[2], 981);
     }
 
     #[test]
@@ -1137,11 +1156,13 @@ mod tests {
     #[test]
     fn test_expanded_distro_device_drivers() {
         // 1. DRM/KMS
-        let mut drm = DrmKmsDisplayDriver::new(0);
-        let gem = drm.alloc_gem_buffer(8192);
-        assert_eq!(gem, 2);
-        assert!(drm.set_mode(DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 }).is_ok());
-        assert!(drm.primary_crtc_active);
+        let mut drm = FreeBsdDrmConnector::new(1, DrmConnectorType::HdmiA);
+        assert!(drm.commit_atomic_state(DrmAtomicKmsState {
+            crtc_id: 1,
+            framebuffer_id: 1,
+            active_mode: DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 },
+            is_enabled: true,
+        }).is_ok());
 
         // 2. RTL8125 2.5GbE
         let mut rtl = Rtl8125NicDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x25, 0x01]);
@@ -1177,9 +1198,9 @@ mod tests {
         assert!((scale - 1.2).abs() < 0.001);
 
         // 8. UAC2 Audio
-        let mut uac = Uac2AudioDriver::new();
-        assert!(uac.start_async_stream().is_ok());
-        assert!(uac.active_stream);
+        let mut uac = Uac2AudioDriver::new("UAC2 USB Audio");
+        uac.set_volume(90);
+        assert_eq!(uac.volume_percent, 90);
 
         // 9. SDHCI eMMC
         let mut emmc = SdhciEmmcDriver::new(0);

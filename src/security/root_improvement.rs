@@ -310,71 +310,7 @@ impl Default for RootlessNamespaceManager {
 }
 
 // ==========================================
-// 5. OpenBSD doas.conf Rule Engine
-// ==========================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DoasAction {
-    Permit,
-    Deny,
-}
-
-#[derive(Debug, Clone)]
-pub struct DoasRule {
-    pub action: DoasAction,
-    pub identity: String, // username or group (e.g. ":wheel" or "alice")
-    pub target_user: String, // target user (e.g. "root")
-    pub keepenv: bool,
-    pub nopass: bool,
-    pub command: Option<String>,
-}
-
-pub struct DoasRuleEngine {
-    pub rules: Vec<DoasRule>,
-}
-
-impl DoasRuleEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self { rules: Vec::new() }
-    }
-
-    pub fn add_rule(&mut self, rule: DoasRule) {
-        self.rules.push(rule);
-    }
-
-    /// Evaluates rules using OpenBSD's last-matching-rule semantics.
-    pub fn evaluate(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
-        let mut last_match = None;
-        for rule in &self.rules {
-            let id_match = if rule.identity.starts_with(':') {
-                rule.identity == ":wheel" && is_wheel
-            } else {
-                rule.identity == user || rule.identity == "*"
-            };
-
-            let target_match = rule.target_user == "*" || rule.target_user == target;
-            let cmd_match = match &rule.command {
-                Some(c) => c == cmd,
-                None => true,
-            };
-
-            if id_match && target_match && cmd_match {
-                last_match = Some(rule);
-            }
-        }
-        last_match
-    }
-}
-
-impl Default for DoasRuleEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 6. FreeBSD Kernel Securelevel Guard
+// 5. FreeBSD Kernel Securelevel Guard
 // ==========================================
 
 /// FreeBSD kernel securelevel states (-1 to 3)
@@ -409,7 +345,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
@@ -427,63 +363,6 @@ impl BsdSecurelevelGuard {
 
     pub fn allow_firewall_modification(&self) -> bool {
         self.current_level < SecureLevel::NetworkSecure
-    }
-}
-
-// ==========================================
-// 7. Linux SubUid / SubGid Multi-Range Mapper
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct SubUidGidRange {
-    pub username: String,
-    pub start_id: u32,
-    pub count: u32,
-}
-
-pub struct SubUidGidMapper {
-    pub subuid_ranges: Vec<SubUidGidRange>,
-    pub subgid_ranges: Vec<SubUidGidRange>,
-}
-
-impl SubUidGidMapper {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            subuid_ranges: Vec::new(),
-            subgid_ranges: Vec::new(),
-        }
-    }
-
-    pub fn add_subuid_range(&mut self, username: &str, start_id: u32, count: u32) {
-        self.subuid_ranges.push(SubUidGidRange {
-            username: username.to_string(),
-            start_id,
-            count,
-        });
-    }
-
-    pub fn add_subgid_range(&mut self, username: &str, start_id: u32, count: u32) {
-        self.subgid_ranges.push(SubUidGidRange {
-            username: username.to_string(),
-            start_id,
-            count,
-        });
-    }
-
-    pub fn is_subuid_valid(&self, username: &str, mapped_uid: u32) -> bool {
-        for range in &self.subuid_ranges {
-            if range.username == username && mapped_uid >= range.start_id && mapped_uid < range.start_id + range.count {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for SubUidGidMapper {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -1010,6 +889,28 @@ impl DoasRuleEngine {
             },
         }
     }
+
+    pub fn evaluate_legacy(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
+        let mut last_match = None;
+        for rule in &self.rules {
+            let id_match = if rule.identity.starts_with(':') {
+                rule.identity == ":wheel" && is_wheel
+            } else {
+                rule.identity == user || rule.identity == "*"
+            };
+
+            let target_match = rule.target_user == "*" || rule.target_user == target;
+            let cmd_match = match &rule.command {
+                Some(c) => c == cmd,
+                None => true,
+            };
+
+            if id_match && target_match && cmd_match {
+                last_match = Some(rule);
+            }
+        }
+        last_match
+    }
 }
 
 impl Default for DoasRuleEngine {
@@ -1030,28 +931,45 @@ pub struct SubUidRange {
 }
 
 pub struct SubUidGidMapper {
-    pub subuid_database: Vec<SubUidRange>,
-    pub subgid_database: Vec<SubUidRange>,
+    pub subuid_ranges: Vec<SubUidRange>,
+    pub subgid_ranges: Vec<SubUidRange>,
 }
 
 impl SubUidGidMapper {
     pub fn new() -> Self {
         Self {
-            subuid_database: Vec::new(),
-            subgid_database: Vec::new(),
+            subuid_ranges: Vec::new(),
+            subgid_ranges: Vec::new(),
         }
     }
 
     pub fn add_subuid_range(&mut self, username: &str, start_id: u32, count: u32) {
-        self.subuid_database.push(SubUidRange {
+        self.subuid_ranges.push(SubUidRange {
             username: username.to_string(),
             start_id,
             count,
         });
     }
 
+    pub fn add_subgid_range(&mut self, username: &str, start_id: u32, count: u32) {
+        self.subgid_ranges.push(SubUidRange {
+            username: username.to_string(),
+            start_id,
+            count,
+        });
+    }
+
+    pub fn is_subuid_valid(&self, username: &str, mapped_uid: u32) -> bool {
+        for range in &self.subuid_ranges {
+            if range.username == username && mapped_uid >= range.start_id && mapped_uid < range.start_id + range.count {
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidRange> {
-        self.subuid_database.iter().find(|r| r.username == username)
+        self.subuid_ranges.iter().find(|r| r.username == username)
     }
 
     /// Map container internal UID to host subuid range
@@ -1213,10 +1131,10 @@ mod tests {
             command: Some("reboot".to_string()),
         });
 
-        let res1 = engine.evaluate("alice", false, "root", "shutdown").unwrap();
+        let res1 = engine.evaluate_legacy("alice", false, "root", "shutdown").unwrap();
         assert_eq!(res1.action, DoasAction::Deny);
 
-        let res2 = engine.evaluate("alice", false, "root", "reboot").unwrap();
+        let res2 = engine.evaluate_legacy("alice", false, "root", "reboot").unwrap();
         assert_eq!(res2.action, DoasAction::Permit);
         assert!(res2.keepenv);
         assert!(res2.nopass);
@@ -1410,7 +1328,7 @@ mod tests {
     }
 
     #[test]
-    fn test_subuid_gid_mapping() {
+    fn test_subuid_gid_mapping_container() {
         let mut mapper = SubUidGidMapper::new();
         mapper.add_subuid_range("alice", 100000, 65536);
 

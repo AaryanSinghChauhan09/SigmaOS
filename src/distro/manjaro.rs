@@ -21,13 +21,7 @@ extern crate alloc;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
-
-#[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
-
-#[cfg(target_os = "none")]
-use crate::klib::BTreeMap as HashMap;
+use alloc::collections::BTreeMap as HashMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -149,7 +143,7 @@ impl Default for ManjaroHardwareDetection {
 }
 
 /// Represents different available kernel releases to switch dynamically
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ManjaroKernelRelease {
     LinuxStable,
     LinuxLts,
