@@ -30,6 +30,12 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
+pub mod root_improvement;
+
+pub use root_improvement::{
+    BsdSecurelevelGuard, CapSplitter, DoasRuleEngine, PamEngine, PolkitEnforcer,
+    RootlessNamespaceManager, SubUidGidMapper, SudoDoasElevator,
+};
 
 pub use qubes_isolation::*;
 pub use root_improvement::*;
