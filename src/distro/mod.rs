@@ -26,8 +26,7 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod missing_distro_innovations;
-pub mod ready_to_use;
-pub mod wiki_ideas_implementation;
+pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
@@ -111,4 +110,9 @@ pub use linux_bsd_inspirations::{
     SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
     FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
     SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
+};
+pub use sovereign_distro_dominance::{
+    StorePackageSlice, NixGuixZeroCopyStore, TaskSchedState, SchedTask,
+    CachyBoreDynamicAiScheduler, CapsicumRight, OpenBsdHardenedCapsicumPledge,
+    CoWSubvolume, ZfsBtrfsHybridSelfHealingCoW, SovereignDistroDominanceSuite,
 };
