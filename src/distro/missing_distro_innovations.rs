@@ -381,3 +381,4 @@ mod tests {
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
     }
 }
+}

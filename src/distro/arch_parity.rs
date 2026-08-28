@@ -547,6 +547,7 @@ sha256sums=('SKIP')
         assert!(pos_pacman < pos_yay);
     }
 }
+}
 
 impl Default for AurClient {
     fn default() -> Self {
@@ -554,29 +555,6 @@ impl Default for AurClient {
     }
 }
 
-        if visiting.contains(pkgname) {
-            return Err(format!("Dependency cycle detected: {}", pkgname));
-        }
-
-        visiting.push(pkgname.clone());
-
-        if let Some(pkg) = self.packages.get(pkgname) {
-            for dep in &pkg.depends {
-                self.dfs_resolve(dep, visiting, visited, resolved)?;
-            }
-        } else {
-            return Err(format!("Missing dependency: {}", pkgname));
-        }
-
-        if let Some(pos) = visiting.iter().position(|x| x == pkgname) {
-            visiting.remove(pos);
-        }
-        visited.push(pkgname.clone());
-        resolved.push(pkgname.clone());
-
-        Ok(())
-    }
-}
 
 impl Default for AlpmDatabase {
     fn default() -> Self {
