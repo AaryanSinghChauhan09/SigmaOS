@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 // Core working modules
 pub mod kernel;
 pub mod klib;
@@ -26,7 +28,7 @@ pub mod security {
 // pub mod network;
 // pub mod observability;
 // pub mod orchestration;
-// pub mod distro;
+pub mod distro;
 // pub mod package;
 // pub mod performance;
 // pub mod productivity;
@@ -40,10 +42,9 @@ pub mod security {
 //     pub mod paint;
 //     pub mod video;
 // }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
+pub mod hardware {
+    pub mod compatibility;
+}
 // pub mod power {
 //     pub mod governor;
 // }
