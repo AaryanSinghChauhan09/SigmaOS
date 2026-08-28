@@ -23,6 +23,7 @@
 // Designed to obsolete Microsoft's APM by providing native OS-level container isolation,
 // transitive trust boundaries, cryptographic pinning, and hidden Unicode threat scanners.
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 
 /// Standard NT-style status for APM operations

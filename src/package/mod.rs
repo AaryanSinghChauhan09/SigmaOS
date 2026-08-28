@@ -21,6 +21,7 @@ pub mod linux_translation;
 pub mod store;
 pub mod universal;
 pub mod debian;
+pub mod repository;
 
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
@@ -37,4 +38,9 @@ pub use debian::{
 };
 pub use store::{
     StoreError, StoreApp,
+};
+pub use repository::{
+    PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
+    PackagePinEngine, MirrorEntry, MirrorSyncEngine, TransactionJournalEntry,
+    PackageTransactionJournal, RepoError,
 };

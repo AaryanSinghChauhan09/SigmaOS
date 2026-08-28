@@ -289,7 +289,6 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use crate::klib::custom_string::SigmaString;
 
     #[test]

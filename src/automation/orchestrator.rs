@@ -16,7 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::collections::HashMap;
 // SigmaOS AI Orchestrator for System Optimization
 // OOP-based AI system optimization with predictive modeling
 

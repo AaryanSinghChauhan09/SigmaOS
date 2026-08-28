@@ -7,6 +7,7 @@ pub mod manager;
 pub mod support;
 pub mod vfs;
 pub mod ext4_ntfs_security;
+pub mod sovereign_link_engine;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -26,3 +27,6 @@ pub use support::{
     FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sovereign_link_engine::{
+    LinkType, InodeRecord, DirectoryEntry as LinkDirectoryEntry, SovereignLinkEngine, AT_FDCWD, MAX_SYMLINK_DEPTH,
+};
