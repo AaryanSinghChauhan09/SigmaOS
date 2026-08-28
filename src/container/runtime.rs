@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -169,18 +170,10 @@ impl NamespaceConfig {
 }
 
 /// Container seccomp profiles
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
 }
 
 impl SeccompProfile {
@@ -458,6 +451,8 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
+pub type ContainerCapability = RuntimeCapability;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct RuntimeCapability {
@@ -669,6 +664,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 
 pub mod oci {
+    extern crate alloc;
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::String;

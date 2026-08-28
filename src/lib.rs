@@ -28,6 +28,14 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub mod process;
+pub use process::{
+    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
+    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
+    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
+    SigQueuePayload, AdvancedIpcHub, SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel,
+    SovereignProcessManager,
+};
 pub mod community;
 pub mod memory;
 pub mod access;
@@ -120,18 +128,21 @@ pub use filesystem::{
 pub use governance::{
     MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
+pub mod distro;
+
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    ApsrFlags, ArmExecutionState, SovereignSystemBus, IoModuleController,
+    ModuleState as KernelModuleState, KernelSymbol, KernelModule, SovereignKernelModuleManager,
+    Apc, ApcMode, ApcQueue, ArchitectureEngine,
     BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
     AndroidBroadcastReceiverRegistry,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
     CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
+    InstructionCyclePhase, InterruptClass, IpcError, IpcManager, Irql,
+    LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyManager, PolicyError, FastPathIpc, InterruptMechanism,
+    ProtectionDomain, ResourceBroker, PrivilegeLevel, PoolType, Priority, Process,
     ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    RoundRobinSchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SystemThread,
     Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use kernel::io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
@@ -172,6 +183,14 @@ pub use distro::{
     OstreeDeploymentEngine, CrossbowVnic, SolarisCrossbowVnicEngine, RumpKernelServer,
     NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, CloudInitBootstrapEngine,
     YastSetting, Yast2ControlCenter, SnapperType, SnapperSnapshot, SnapperBtrfsEngine,
+    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
+    SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
+    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
+    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, SystemdUnitType, SystemdUnitActiveState, SystemdUnit,
+    SovereignSystemdParityEngine, SchedulerClass, RealtimeTask, SovereignHybridSchedulerInnovations,
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
+    VoidXbpsEngine, VnetStack, FreeBsdVnetStackEngine, UnveilAuditViolation, OpenBsdUnveilAuditor,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -180,7 +199,8 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, PinPriority, PackagePinEngine,
+    MirrorSyncEngine, PackageTransactionJournal,
 };
 pub use remote::{
     FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
@@ -205,11 +225,14 @@ pub use security::{
     ForensicStorageFilter, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy,
 };
-pub use shell::{ShellCommand, SimpleShellSession as ShellRepl};
+pub use shell::{
+    ShellCommand, SimpleShellSession as ShellRepl, RedirectionType, ParsedPipelineCommand,
+    SovereignBashZshParityShell,
+};
 pub use sigpkg::{
     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
     PackageRecipe, RecipeError, RecipeManager, SatSolver,
-    Transaction, UniversalPackageAdapterManager,
+    Transaction, UniversalPackageAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
@@ -222,7 +245,7 @@ pub use unimplemented_tools::{
     DocumentScanner, CodeProfiler, StaticAnalyzer, PackagePublishingHub, AdaptiveUxAgent,
     AiSearchAssistant, NaturalLanguageShell, AiCodeAssistant, AiFileOrganizer, SmartNotificationManager,
     MeshNetworking, IotDeviceManager, CloudBackupUtility, SecureFileSharing,
-    AiScheduler, GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
+    GuiAppStore, MultiMonitorManager, GestureControl, VoiceControl, AiTaskbar,
     CrossDeviceSync, FlatpakSnapLayer, DeclarativeBuildSystem, AiDependencyResolver, AiAnomalyFirewall,
     SecureContainer, PrivacyDashboard, OfflinePackageInstaller, AppSandboxing, CrossLanguageBuildTool,
     PluginMarketplace, MusicLibraryManager,

@@ -14,6 +14,7 @@ pub mod mind_map;
 pub mod mint_competitor;
 pub mod tmux;
 pub mod sovereign_apps;
+pub mod subtitle_editor;
 
 pub use tmux::*;
 pub use gamification::{
