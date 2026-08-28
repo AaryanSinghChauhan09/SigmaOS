@@ -409,7 +409,7 @@ impl BsdSecurelevelGuard {
             self.current_level = new_level;
             Ok(())
         } else {
-            Err("securelevel can only be raised, not lowered");
+            Err("securelevel can only be raised, not lowered")
         }
     }
 
@@ -922,7 +922,7 @@ impl Default for BsdSecurelevelController {
 }
 
 // ==========================================
-// 8. OpenBSD doas.conf Parity Rule Engine
+// 8. OpenBSD doas.conf Parity Extensions
 // ==========================================
 
 #[derive(Debug, Clone)]
@@ -932,15 +932,49 @@ pub struct DoasEvaluationResult {
     pub keepenv: bool,
 }
 
+impl DoasRuleEngine {
+    /// Evaluates doas command invocation following OpenBSD `last-matching-rule` semantics
+    pub fn evaluate_extended(
+        &self,
+        username: &str,
+        user_groups: &[&str],
+        target_user: &str,
+        command: &str,
+    ) -> DoasEvaluationResult {
+        let is_wheel = user_groups.contains(&"wheel");
+        match self.evaluate(username, is_wheel, target_user, command) {
+            Some(rule) => DoasEvaluationResult {
+                permitted: rule.action == DoasAction::Permit,
+                nopass_required: rule.nopass,
+                keepenv: rule.keepenv,
+            },
+            None => DoasEvaluationResult {
+                permitted: false,
+                nopass_required: false,
+                keepenv: false,
+            },
+        }
+    }
+}
+
 // ==========================================
-// 9. Subordinate UID/GID Mapping Engine (SubUid / SubGid Parity)
+// 9. Subordinate UID/GID Mapping Extensions
 // ==========================================
 
-#[derive(Debug, Clone)]
-pub struct SubUidRange {
-    pub username: String,
-    pub start_id: u32,
-    pub count: u32,
+impl SubUidGidMapper {
+    pub fn get_subuid_range(&self, username: &str) -> Option<&SubUidGidRange> {
+        self.subuid_ranges.iter().find(|r| r.username == username)
+    }
+
+    /// Map container internal UID to host subuid range
+    pub fn map_container_uid(&self, username: &str, container_uid: u32) -> Option<u32> {
+        let range = self.get_subuid_range(username)?;
+        if container_uid < range.count {
+            Some(range.start_id + container_uid)
+        } else {
+            None
+        }
+    }
 }
 
 // ==========================================
@@ -1266,19 +1300,29 @@ mod tests {
         });
 
         // Evaluate reboot for alice
-        let res1 = engine.evaluate_groups("alice", &["wheel"], "root", "/sbin/reboot");
+        let res1 = engine.evaluate_extended("alice", &["wheel"], "root", "/sbin/reboot");
         assert!(res1.permitted);
         assert!(res1.nopass_required);
 
         // Evaluate general command for bob in wheel group
-        let res2 = engine.evaluate_groups("bob", &["wheel"], "root", "/usr/bin/htop");
+        let res2 = engine.evaluate_extended("bob", &["wheel"], "root", "/usr/bin/htop");
         assert!(res2.permitted);
         assert!(!res2.nopass_required);
         assert!(res2.keepenv);
 
         // Evaluate unauthorized user charlie
-        let res3 = engine.evaluate_groups("charlie", &["users"], "root", "/sbin/reboot");
+        let res3 = engine.evaluate_extended("charlie", &["users"], "root", "/sbin/reboot");
         assert!(!res3.permitted);
+    }
+
+    #[test]
+    fn test_subuid_gid_mapping_extended() {
+        let mut mapper = SubUidGidMapper::new();
+        mapper.add_subuid_range("alice", 100000, 65536);
+
+        assert_eq!(mapper.map_container_uid("alice", 0), Some(100000));
+        assert_eq!(mapper.map_container_uid("alice", 1000), Some(101000));
+        assert_eq!(mapper.map_container_uid("alice", 70000), None); // Exceeds count
     }
 
     #[test]

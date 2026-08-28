@@ -114,6 +114,7 @@ mod unimplemented_features;
 mod linux_bsd_parity;
 
 use bsd::*;
+use wiki_ideas_implementation::SystemdUnitActiveState;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};

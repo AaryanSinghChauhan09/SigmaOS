@@ -3,6 +3,7 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
@@ -1914,14 +1915,14 @@ pub const CAP_SEEK: u64 = 1 << 2;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
-    pub descriptor_rights: alloc::collections::BTreeMap<u32, u64>,
+    pub descriptor_rights: BTreeMap<u32, u64>,
 }
 
 impl FreeBsdCapsicumEngine {
     pub fn new() -> Self {
         Self {
             is_capability_mode: false,
-            descriptor_rights: alloc::collections::BTreeMap::new(),
+            descriptor_rights: BTreeMap::new(),
         }
     }
 

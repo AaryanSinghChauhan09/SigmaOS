@@ -462,8 +462,8 @@ pub struct SovereignSystemdUnit {
 pub type JournalLogEntry = String;
 
 pub struct SovereignSystemdParityEngine {
-    pub units: BTreeMap<String, SovereignSystemdUnit>,
-    pub journal_logs: Vec<JournalLogEntry>,
+    pub units: BTreeMap<String, SystemdUnit>,
+    pub journal_logs: Vec<String>,
 }
 
 impl SovereignSystemdParityEngine {
@@ -479,15 +479,15 @@ impl SovereignSystemdParityEngine {
         let deps_vec = deps.iter().map(|d| d.to_string()).collect();
         self.units.insert(
             name.to_string(),
-            SovereignSystemdUnit {
+            SystemdUnit {
                 name: name.to_string(),
                 unit_type,
                 active_state: SystemdUnitActiveState::Inactive,
-                state: SystemdUnitState::Inactive,
+                description: format!("Unit {}", name),
+                exec_start: Vec::new(),
                 dependencies: deps_vec,
-                memory_limit_mb: None,
-                cpu_weight: 100,
-                is_sandboxed: true,
+                memory_limit_bytes: None,
+                cpu_quota_pct: None,
             },
         );
     }
@@ -508,8 +508,12 @@ impl SovereignSystemdParityEngine {
         Ok(SystemdUnitActiveState::Inactive)
     }
 
-    pub fn query_journal(&self, name: &str) -> Vec<&JournalLogEntry> {
-        self.journal_logs.iter().filter(|log| log.contains(name)).collect()
+    pub fn query_journal(&self, name: &str) -> Vec<String> {
+        self.journal_logs
+            .iter()
+            .filter(|log| log.contains(name))
+            .cloned()
+            .collect()
     }
 }
 
@@ -526,6 +530,21 @@ pub enum SchedulerClass {
     Interactive,
     Normal,
     Idle,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DvfsPowerGovernor {
+    Performance,
+    Powersave,
+    Schedutil,
+    OnDemand,
+}
+
+#[derive(Debug, Clone)]
+pub struct NumaNodeAffinity {
+    pub node_id: usize,
+    pub cpu_cores: Vec<usize>,
+    pub total_memory_mb: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -557,7 +576,7 @@ pub type RtlaneRealtimeTask = RealtimeTask;
 pub struct SovereignHybridSchedulerInnovations {
     pub current_governor: DvfsPowerGovernor,
     pub numa_nodes: Vec<NumaNodeAffinity>,
-    pub rt_tasks: BTreeMap<usize, RtlaneRealtimeTask>,
+    pub rt_tasks: BTreeMap<usize, RealtimeTask>,
     pub preemption_count: u64,
     pub rt_lane_latency_us: u64,
 }
@@ -585,8 +604,9 @@ impl SovereignHybridSchedulerInnovations {
         }
     }
 
-    pub fn add_task(&mut self, task: RealtimeTask) {
-        self.tasks.push(task);
+    /// Evaluates real-time preemption gate timing.
+    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
+        self.rt_lane_latency_us < 5
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.
