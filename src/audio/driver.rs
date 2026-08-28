@@ -35,6 +35,7 @@ pub trait AudioDevice {
 pub struct SimpleAudioDevice {
     pub id: AudioDeviceID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub audio_type: AtomicUsize,
     pub sample_rate: AtomicUsize,
 }
@@ -49,6 +50,7 @@ impl SimpleAudioDevice {
         SimpleAudioDevice {
             id,
             name: name_array,
+            name_len: name_len as u8,
             audio_type: AtomicUsize::new(audio_type as usize),
             sample_rate: AtomicUsize::new(sample_rate as usize),
         }
@@ -60,8 +62,10 @@ impl AudioDevice for SimpleAudioDevice {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every AudioDevice name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
     fn audio_type(&self) -> AudioType {
         match self.audio_type.load(Ordering::SeqCst) {
