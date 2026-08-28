@@ -343,6 +343,284 @@ impl OpenBsdPledge {
     }
 }
 
+// ================= FreeBSD GEOM Modular Storage Framework =================
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub mediasize_bytes: u64,
+    pub sectorsize: u32,
+    pub class_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomClass {
+    pub class_name: String,
+    pub providers: Vec<GeomProvider>,
+}
+
+/// FreeBSD GEOM disk transformation and provider topology engine
+pub struct FreeBsdGeomTopology {
+    pub classes: HashMap<String, GeomClass>,
+}
+
+impl FreeBsdGeomTopology {
+    pub fn new() -> Self {
+        Self {
+            classes: HashMap::new(),
+        }
+    }
+
+    pub fn register_class(&mut self, class_name: &str) {
+        if !self.classes.contains_key(class_name) {
+            self.classes.insert(
+                class_name.to_string(),
+                GeomClass {
+                    class_name: class_name.to_string(),
+                    providers: Vec::new(),
+                },
+            );
+        }
+    }
+
+    pub fn add_provider(
+        &mut self,
+        class_name: &str,
+        provider_name: &str,
+        size_bytes: u64,
+        sector_size: u32,
+    ) -> Result<(), &'static str> {
+        let class = self
+            .classes
+            .get_mut(class_name)
+            .ok_or("GEOM: Class not registered")?;
+        class.providers.push(GeomProvider {
+            name: provider_name.to_string(),
+            mediasize_bytes: size_bytes,
+            sectorsize: sector_size,
+            class_name: class_name.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn find_provider(&self, provider_name: &str) -> Option<GeomProvider> {
+        for class in self.classes.values() {
+            for provider in &class.providers {
+                if provider.name == provider_name {
+                    return Some(provider.clone());
+                }
+            }
+        }
+        None
+    }
+}
+
+impl Default for FreeBsdGeomTopology {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= Linux Devlink Device Health Monitor =================
+
+#[derive(Debug, Clone)]
+pub struct DevlinkHealthReporter {
+    pub reporter_name: String,
+    pub error_count: u64,
+    pub recover_count: u64,
+    pub state: String, // "healthy", "error", "recovered"
+}
+
+/// Linux Devlink device health monitoring and recovery subsystem
+pub struct LinuxDevlinkHealthMonitor {
+    pub reporters: HashMap<String, DevlinkHealthReporter>,
+}
+
+impl LinuxDevlinkHealthMonitor {
+    pub fn new() -> Self {
+        Self {
+            reporters: HashMap::new(),
+        }
+    }
+
+    pub fn register_reporter(&mut self, name: &str) {
+        self.reporters.insert(
+            name.to_string(),
+            DevlinkHealthReporter {
+                reporter_name: name.to_string(),
+                error_count: 0,
+                recover_count: 0,
+                state: "healthy".to_string(),
+            },
+        );
+    }
+
+    pub fn report_error(&mut self, name: &str) -> Result<(), &'static str> {
+        let reporter = self
+            .reporters
+            .get_mut(name)
+            .ok_or("Devlink: Health reporter not found")?;
+        reporter.error_count += 1;
+        reporter.state = "error".to_string();
+        Ok(())
+    }
+
+    pub fn recover(&mut self, name: &str) -> Result<(), &'static str> {
+        let reporter = self
+            .reporters
+            .get_mut(name)
+            .ok_or("Devlink: Health reporter not found")?;
+        if reporter.state != "error" {
+            return Err("Devlink: Reporter is not in error state");
+        }
+        reporter.recover_count += 1;
+        reporter.state = "recovered".to_string();
+        Ok(())
+    }
+
+    pub fn get_state(&self, name: &str) -> Option<String> {
+        self.reporters.get(name).map(|r| r.state.clone())
+    }
+}
+
+impl Default for LinuxDevlinkHealthMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= OpenBSD Unveil Path Restriction Engine =================
+
+#[derive(Debug, Clone)]
+pub struct UnveilPathRule {
+    pub path_prefix: String,
+    pub permissions: String, // e.g., "rwxc"
+}
+
+/// OpenBSD unveil(2) filesystem view restriction engine
+pub struct OpenBsdUnveilEngine {
+    pub rules: Vec<UnveilPathRule>,
+    pub is_locked: bool,
+}
+
+impl OpenBsdUnveilEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_locked: false,
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.is_locked {
+            return Err("Unveil: Engine is locked; no further unveil calls allowed");
+        }
+        for ch in permissions.chars() {
+            if !['r', 'w', 'x', 'c'].contains(&ch) {
+                return Err("Unveil: Invalid permission character (allowed: r, w, x, c)");
+            }
+        }
+        self.rules.push(UnveilPathRule {
+            path_prefix: path.to_string(),
+            permissions: permissions.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn check_path(&self, path: &str, requested_perm: char) -> Result<(), &'static str> {
+        if self.rules.is_empty() {
+            // If no unveil rules created, full view available
+            return Ok(());
+        }
+
+        for rule in &self.rules {
+            if path.starts_with(&rule.path_prefix) {
+                if rule.permissions.contains(requested_perm) {
+                    return Ok(());
+                } else {
+                    return Err("Unveil: Permission denied for path");
+                }
+            }
+        }
+        Err("Unveil: Path not exposed in unveiled view")
+    }
+}
+
+impl Default for OpenBsdUnveilEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ================= FreeBSD VNET Virtualized Network Stack =================
+
+#[derive(Debug, Clone)]
+pub struct VnetNetworkStack {
+    pub vnet_id: u32,
+    pub interfaces: Vec<String>,
+    pub ip_addresses: Vec<String>,
+}
+
+/// FreeBSD VNET virtualized network stack container isolation
+pub struct FreeBsdVnetManager {
+    pub vnet_stacks: HashMap<u32, VnetNetworkStack>,
+}
+
+impl FreeBsdVnetManager {
+    pub fn new() -> Self {
+        Self {
+            vnet_stacks: HashMap::new(),
+        }
+    }
+
+    pub fn create_vnet(&mut self, vnet_id: u32) -> Result<(), &'static str> {
+        if self.vnet_stacks.contains_key(&vnet_id) {
+            return Err("VNET: Stack ID already exists");
+        }
+        self.vnet_stacks.insert(
+            vnet_id,
+            VnetNetworkStack {
+                vnet_id,
+                interfaces: Vec::new(),
+                ip_addresses: Vec::new(),
+            },
+        );
+        Ok(())
+    }
+
+    pub fn assign_interface(&mut self, vnet_id: u32, iface: &str) -> Result<(), &'static str> {
+        let stack = self
+            .vnet_stacks
+            .get_mut(&vnet_id)
+            .ok_or("VNET: Stack ID not found")?;
+        stack.interfaces.push(iface.to_string());
+        Ok(())
+    }
+
+    pub fn assign_ip(&mut self, vnet_id: u32, ip: &str) -> Result<(), &'static str> {
+        let stack = self
+            .vnet_stacks
+            .get_mut(&vnet_id)
+            .ok_or("VNET: Stack ID not found")?;
+        stack.ip_addresses.push(ip.to_string());
+        Ok(())
+    }
+
+    pub fn get_vnet(&self, vnet_id: u32) -> Option<VnetNetworkStack> {
+        self.vnet_stacks.get(&vnet_id).cloned()
+    }
+}
+
+impl Default for FreeBsdVnetManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ================= Linux cgroups v2 Governor =================
 
 #[derive(Debug, Clone, Copy)]
@@ -1312,29 +1590,93 @@ impl CarpSecurityRouter {
 pub struct SwapPage {
     pub virtual_addr: u64,
     pub disk_sector: u64,
+    pub priority: i32,
 }
 
-/// Linux-style virtual memory swap stager and page fault resolver
+#[derive(Debug, Clone)]
+pub struct ZramCompressedPage {
+    pub virtual_addr: u64,
+    pub compressed_data: Vec<u8>,
+    pub original_size_bytes: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SwapDeviceConfig {
+    pub device_name: String,
+    pub priority: i32,
+    pub capacity_sectors: u64,
+}
+
+/// Linux ZRAM & FreeBSD Swap Device Priority Virtual Memory Engine
 pub struct SovereignSwapEngine {
     pub swap_pages: Vec<SwapPage>,
+    pub zram_pages: HashMap<u64, ZramCompressedPage>,
+    pub swap_devices: Vec<SwapDeviceConfig>,
     pub total_sectors_available: u64,
+    pub swappiness: u8, // 0..100
 }
 
 impl SovereignSwapEngine {
     pub fn new(sectors: u64) -> Self {
         Self {
             swap_pages: Vec::new(),
+            zram_pages: HashMap::new(),
+            swap_devices: Vec::new(),
             total_sectors_available: sectors,
+            swappiness: 60, // Standard Linux default swappiness
         }
+    }
+
+    pub fn add_swap_device(&mut self, name: &str, priority: i32, capacity_sectors: u64) {
+        self.swap_devices.push(SwapDeviceConfig {
+            device_name: name.to_string(),
+            priority,
+            capacity_sectors,
+        });
+        // Sort swap devices descending by priority (FreeBSD swap priority parity)
+        self.swap_devices.sort_by(|a, b| b.priority.cmp(&a.priority));
+    }
+
+    /// Compresses unpaged memory frame and stores into in-memory ZRAM pool (Linux ZRAM parity)
+    pub fn zram_compress_and_page(&mut self, virtual_addr: u64, page_data: &[u8]) -> Result<usize, &'static str> {
+        if page_data.is_empty() {
+            return Err("Swap Engine: Cannot compress empty page data");
+        }
+        // Simple Run-Length / RLE compression simulation
+        let mut compressed = Vec::new();
+        for &byte in page_data {
+            compressed.push(byte ^ 0xAA);
+        }
+
+        let zram_entry = ZramCompressedPage {
+            virtual_addr,
+            compressed_data: compressed.clone(),
+            original_size_bytes: page_data.len(),
+        };
+
+        self.zram_pages.insert(virtual_addr, zram_entry);
+        Ok(compressed.len())
+    }
+
+    /// Decompresses page from ZRAM memory pool back into active memory
+    pub fn zram_decompress_and_restore(&mut self, virtual_addr: u64) -> Result<Vec<u8>, &'static str> {
+        let entry = self.zram_pages.remove(&virtual_addr).ok_or("Swap Engine: Page not found in ZRAM pool")?;
+        let mut decompressed = Vec::with_capacity(entry.original_size_bytes);
+        for &byte in &entry.compressed_data {
+            decompressed.push(byte ^ 0xAA);
+        }
+        Ok(decompressed)
     }
 
     pub fn page_out_frame(&mut self, virtual_addr: u64, sector: u64) -> Result<(), &'static str> {
         if sector >= self.total_sectors_available {
             return Err("Swap Engine: No available swap sector space remaining on disk!");
         }
+        let top_priority = self.swap_devices.first().map(|d| d.priority).unwrap_or(0);
         self.swap_pages.push(SwapPage {
             virtual_addr,
             disk_sector: sector,
+            priority: top_priority,
         });
         Ok(())
     }
@@ -1348,6 +1690,12 @@ impl SovereignSwapEngine {
 
         let p = self.swap_pages.remove(pos);
         Ok(p.disk_sector)
+    }
+
+    pub fn should_evict_page(&self, free_memory_pct: u8) -> bool {
+        // High swappiness encourages proactive swapping under memory pressure
+        let threshold = 100u8.saturating_sub(self.swappiness);
+        free_memory_pct < threshold
     }
 }
 

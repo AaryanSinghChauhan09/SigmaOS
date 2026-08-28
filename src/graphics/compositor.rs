@@ -598,7 +598,7 @@ impl Compositor for SimpleCompositor {
         }
 
         let id = window.id();
-        self.windows.push(Some(window));
+        self.windows.push(window);
         self.window_order.push(id);
         self.stats.total_windows += 1;
         Ok(id)
@@ -612,7 +612,7 @@ impl Compositor for SimpleCompositor {
         if let Some(pos) = self
             .windows
             .iter()
-            .position(|w| w.as_ref().map_or(false, |win| win.id() == id))
+            .position(|w| w.id() == id)
         {
             self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
@@ -624,11 +624,9 @@ impl Compositor for SimpleCompositor {
     }
 
     fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>> {
-        for slot in &mut self.windows {
-            if let Some(ref mut win) = *slot {
-                if win.id() == id {
-                    return Some(win);
-                }
+        for win in &mut self.windows {
+            if win.id() == id {
+                return Some(win);
             }
         }
         None
@@ -777,11 +775,9 @@ impl Compositor for SimpleCompositor {
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats.clone();
         let mut visible = 0;
-        for slot in &self.windows {
-            if let Some(ref win) = *slot {
-                if win.info().visible {
-                    visible += 1;
-                }
+        for win in &self.windows {
+            if win.info().visible {
+                visible += 1;
             }
         }
         stats.visible_windows = visible;

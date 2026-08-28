@@ -347,6 +347,254 @@ impl Default for GentooPortageUseFlagsEngine {
 }
 
 // ============================================================================
+// 5. Void Linux XBPS Package Manager Parity (XbpsPackageManager)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsPackage {
+    pub name: String,
+    pub version: String,
+    pub revision: u32,
+    pub run_depends: Vec<String>,
+    pub sha256_hash: [u8; 32],
+    pub is_signed: bool,
+}
+
+pub struct XbpsPackageManager {
+    pub repository_packages: Vec<XbpsPackage>,
+    pub installed_packages: Vec<XbpsPackage>,
+}
+
+impl XbpsPackageManager {
+    pub fn new() -> Self {
+        Self {
+            repository_packages: Vec::new(),
+            installed_packages: Vec::new(),
+        }
+    }
+
+    pub fn register_repository_package(&mut self, pkg: XbpsPackage) {
+        self.repository_packages.push(pkg);
+    }
+
+    pub fn verify_signature(&self, pkg_name: &str) -> bool {
+        if let Some(pkg) = self.repository_packages.iter().find(|p| p.name == pkg_name) {
+            pkg.is_signed
+        } else {
+            false
+        }
+    }
+
+    pub fn resolve_dependencies(&self, pkg_name: &str) -> Result<Vec<String>, &'static str> {
+        let mut order = Vec::new();
+        self.resolve_deps_recursive(pkg_name, &mut order)?;
+        Ok(order)
+    }
+
+    fn resolve_deps_recursive(&self, pkg_name: &str, order: &mut Vec<String>) -> Result<(), &'static str> {
+        if order.contains(&String::from(pkg_name)) {
+            return Ok(());
+        }
+        let pkg = self
+            .repository_packages
+            .iter()
+            .find(|p| p.name == pkg_name)
+            .ok_or("XBPS package not found in repository")?;
+
+        for dep in &pkg.run_depends {
+            self.resolve_deps_recursive(dep, order)?;
+        }
+        order.push(String::from(pkg_name));
+        Ok(())
+    }
+
+    pub fn install_package_atomic(&mut self, pkg_name: &str) -> Result<usize, &'static str> {
+        if !self.verify_signature(pkg_name) {
+            return Err("XBPS package signature verification failed");
+        }
+        let deps = self.resolve_dependencies(pkg_name)?;
+        let mut installed_count = 0;
+
+        for dep in deps {
+            if !self.installed_packages.iter().any(|p| p.name == dep) {
+                if let Some(pkg) = self.repository_packages.iter().find(|p| p.name == dep) {
+                    self.installed_packages.push(pkg.clone());
+                    installed_count += 1;
+                }
+            }
+        }
+        Ok(installed_count)
+    }
+}
+
+impl Default for XbpsPackageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. Linux Kernel Devlink Netlink Device Management Engine (LinuxDevlinkDriver)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevlinkPortFlavor {
+    Physical,
+    Cpu,
+    Dsa,
+    PciPf,
+    PciVf,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DevlinkPort {
+    pub bus_name: String,
+    pub dev_name: String,
+    pub port_index: u32,
+    pub split_count: u32,
+    pub flavor: DevlinkPortFlavor,
+}
+
+pub struct LinuxDevlinkDriver {
+    pub ports: Vec<DevlinkPort>,
+    pub flash_in_progress: bool,
+}
+
+impl LinuxDevlinkDriver {
+    pub fn new() -> Self {
+        Self {
+            ports: Vec::new(),
+            flash_in_progress: false,
+        }
+    }
+
+    pub fn register_port(&mut self, bus: &str, dev: &str, port_index: u32, flavor: DevlinkPortFlavor) {
+        self.ports.push(DevlinkPort {
+            bus_name: String::from(bus),
+            dev_name: String::from(dev),
+            port_index,
+            split_count: 1,
+            flavor,
+        });
+    }
+
+    pub fn split_port(&mut self, port_index: u32, count: u32) -> Result<(), &'static str> {
+        if count == 0 || (count & (count - 1)) != 0 {
+            return Err("Devlink port split count must be power of 2");
+        }
+        if let Some(port) = self.ports.iter_mut().find(|p| p.port_index == port_index) {
+            port.split_count = count;
+            Ok(())
+        } else {
+            Err("Devlink port not found")
+        }
+    }
+
+    pub fn flash_device_firmware(&mut self, _bus: &str, _dev: &str, image: &[u8]) -> Result<usize, &'static str> {
+        if image.is_empty() {
+            return Err("Empty firmware image buffer");
+        }
+        self.flash_in_progress = true;
+        let flashed_len = image.len();
+        self.flash_in_progress = false;
+        Ok(flashed_len)
+    }
+}
+
+impl Default for LinuxDevlinkDriver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Systemd Unit Dependency & Cycle Detection Engine (SystemdUnitDependencyEngine)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemdUnit {
+    pub name: String,
+    pub requires: Vec<String>,
+    pub after: Vec<String>,
+}
+
+pub struct SystemdUnitDependencyEngine {
+    pub units: Vec<SystemdUnit>,
+}
+
+impl SystemdUnitDependencyEngine {
+    pub fn new() -> Self {
+        Self { units: Vec::new() }
+    }
+
+    pub fn add_unit(&mut self, unit: SystemdUnit) {
+        self.units.push(unit);
+    }
+
+    pub fn detect_circular_dependencies(&self) -> bool {
+        for unit in &self.units {
+            let mut visited = Vec::new();
+            if self.has_cycle(&unit.name, &mut visited) {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn has_cycle(&self, current: &str, visited: &mut Vec<String>) -> bool {
+        if visited.contains(&String::from(current)) {
+            return true;
+        }
+        visited.push(String::from(current));
+
+        if let Some(unit) = self.units.iter().find(|u| u.name == current) {
+            for req in &unit.requires {
+                let mut branch_visited = visited.clone();
+                if self.has_cycle(req, &mut branch_visited) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    pub fn compute_startup_sequence(&self) -> Result<Vec<String>, &'static str> {
+        if self.detect_circular_dependencies() {
+            return Err("Circular dependency detected in systemd units");
+        }
+
+        let mut sequence = Vec::new();
+        for unit in &self.units {
+            self.topological_sort(&unit.name, &mut sequence);
+        }
+        Ok(sequence)
+    }
+
+    fn topological_sort(&self, current: &str, sequence: &mut Vec<String>) {
+        if sequence.contains(&String::from(current)) {
+            return;
+        }
+        if let Some(unit) = self.units.iter().find(|u| u.name == current) {
+            for dep in &unit.after {
+                self.topological_sort(dep, sequence);
+            }
+            for req in &unit.requires {
+                self.topological_sort(req, sequence);
+            }
+        }
+        if !sequence.contains(&String::from(current)) {
+            sequence.push(String::from(current));
+        }
+    }
+}
+
+impl Default for SystemdUnitDependencyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Tests
 // ============================================================================
 

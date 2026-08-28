@@ -46,6 +46,7 @@ pub use config::{
 };
 pub use cron::{
     CronJob, CronSchedule, CronDaemon, CronError, CronField,
+    SovereignCronDaemon, CronSpoolDirectory, CronSpoolFile, InotifyCrontabWatcher,
 };
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,

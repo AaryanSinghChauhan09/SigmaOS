@@ -64,11 +64,13 @@ impl RepositoryManager {
 
     /// Add mirror for a repository (Arch mirrorlist inspiration)
     pub fn add_mirror(&mut self, repo_name: &str, mirror_url: &str) {
-        let mirrors = self
-            .mirrors
-            .entry(repo_name.to_string())
-            .or_insert_with(Vec::new);
-        mirrors.push(mirror_url.to_string());
+        if let Some(mirrors) = self.mirrors.get_mut(repo_name) {
+            mirrors.push(mirror_url.to_string());
+        } else {
+            let mut mirrors = Vec::new();
+            mirrors.push(mirror_url.to_string());
+            self.mirrors.insert(repo_name.to_string(), mirrors);
+        }
     }
 
     /// Select best mirror (Arch rankmirrors inspiration)

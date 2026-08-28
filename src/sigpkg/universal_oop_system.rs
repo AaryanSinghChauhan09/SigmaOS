@@ -17,6 +17,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // Universal OOP Package System for SigmaOS
 // Supports all Linux distro package formats with user-defined functions

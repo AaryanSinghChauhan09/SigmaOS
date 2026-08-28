@@ -1,5 +1,6 @@
 // SigmaOS Filesystem Module
 pub mod archive;
+pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
@@ -7,6 +8,7 @@ pub mod ext4_ntfs_security;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+pub use bsd_linux_innovations::*;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,

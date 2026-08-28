@@ -3,7 +3,12 @@
 
 extern crate alloc;
 
+#[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec};
+#[cfg(test)]
+use alloc::vec::Vec;
+#[cfg(test)]
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 
 /// Cron job specification
@@ -330,8 +335,78 @@ impl SovereignSshDaemon {
 // Enhanced Sovereign Cron Daemon (Anacron & Cronie Inspired)
 // =========================================================================
 
+#[derive(Debug, Clone)]
+pub struct CronSpoolFile {
+    pub username: String,
+    pub crontab_path: String,
+    pub raw_content: String,
+}
+
+pub struct CronSpoolDirectory {
+    pub spool_path: String,
+    pub spool_files: BTreeMap<String, CronSpoolFile>,
+}
+
+impl CronSpoolDirectory {
+    pub fn new(spool_path: &str) -> Self {
+        Self {
+            spool_path: spool_path.to_string(),
+            spool_files: BTreeMap::new(),
+        }
+    }
+
+    pub fn load_crontab(&mut self, username: &str, content: &str) {
+        let spool_file = CronSpoolFile {
+            username: username.to_string(),
+            crontab_path: alloc::format!("{}/{}", self.spool_path, username),
+            raw_content: content.to_string(),
+        };
+        self.spool_files.insert(username.to_string(), spool_file);
+    }
+}
+
+pub struct InotifyCrontabWatcher {
+    pub watched_paths: Vec<String>,
+    pub pending_reloads: Vec<String>,
+}
+
+impl InotifyCrontabWatcher {
+    pub fn new() -> Self {
+        Self {
+            watched_paths: Vec::new(),
+            pending_reloads: Vec::new(),
+        }
+    }
+
+    pub fn watch_path(&mut self, path: &str) {
+        if !self.watched_paths.contains(&path.to_string()) {
+            self.watched_paths.push(path.to_string());
+        }
+    }
+
+    pub fn notify_modification(&mut self, path: &str) {
+        if self.watched_paths.contains(&path.to_string()) && !self.pending_reloads.contains(&path.to_string()) {
+            self.pending_reloads.push(path.to_string());
+        }
+    }
+
+    pub fn process_reloads(&mut self) -> Vec<String> {
+        let reloads = self.pending_reloads.clone();
+        self.pending_reloads.clear();
+        reloads
+    }
+}
+
+impl Default for InotifyCrontabWatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignCronDaemon {
     pub base_daemon: CronDaemon,
+    pub spool_directory: CronSpoolDirectory,
+    pub inotify_watcher: InotifyCrontabWatcher,
     pub allowed_users: Vec<String>,
     pub denied_users: Vec<String>,
     pub anacron_catchup_enabled: bool,
@@ -342,6 +417,8 @@ impl SovereignCronDaemon {
     pub fn new() -> Self {
         Self {
             base_daemon: CronDaemon::new(),
+            spool_directory: CronSpoolDirectory::new("/var/spool/cron/crontabs"),
+            inotify_watcher: InotifyCrontabWatcher::new(),
             allowed_users: Vec::new(),
             denied_users: Vec::new(),
             anacron_catchup_enabled: true,
@@ -378,7 +455,14 @@ impl SovereignCronDaemon {
 
         let mut ran = 0;
         for job in self.base_daemon.jobs.values_mut() {
-            if job.enabled && self.is_user_permitted(&job.user) {
+            let permitted = if self.denied_users.contains(&job.user) {
+                false
+            } else if !self.allowed_users.is_empty() {
+                self.allowed_users.contains(&job.user)
+            } else {
+                true
+            };
+            if job.enabled && permitted {
                 if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);
                     job.next_run = current_time + 86400; // 24h
