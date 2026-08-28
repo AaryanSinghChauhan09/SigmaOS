@@ -42,7 +42,7 @@ pub struct SyscallTable {
 #[derive(Clone, Copy)]
 pub struct SyscallEntry {
     pub number: u32,
-    pub handler: unsafe extern "C" fn(),
+    pub handler: Option<unsafe extern "C" fn()>,
     pub persona: KernelPersona,
 }
 
@@ -133,7 +133,7 @@ impl Default for SyscallEntry {
     fn default() -> Self {
         Self {
             number: 0,
-            handler: unsafe { core::mem::transmute(0usize) },
+            handler: None,
             persona: KernelPersona::Linux6X,
         }
     }

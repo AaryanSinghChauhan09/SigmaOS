@@ -231,17 +231,18 @@ static mut GLOBAL_CONSOLE: Option<KernelConsole> = None;
 
 pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static str> {
     unsafe {
-        if GLOBAL_CONSOLE.is_none() {
+        let console_ptr = &raw mut GLOBAL_CONSOLE;
+        if (*console_ptr).is_none() {
             let mut console = KernelConsole::new();
             console.initialize(backend)?;
-            GLOBAL_CONSOLE = Some(console);
+            *console_ptr = Some(console);
         }
         Ok(())
     }
 }
 
 pub fn get_kernel_console() -> Option<&'static mut KernelConsole> {
-    unsafe { GLOBAL_CONSOLE.as_mut() }
+    unsafe { (*(&raw mut GLOBAL_CONSOLE)).as_mut() }
 }
 
 pub fn kernel_panic(message: &str) -> ! {
