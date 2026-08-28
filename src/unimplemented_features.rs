@@ -3,6 +3,7 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
@@ -56,8 +57,6 @@ pub struct GentooPortageMaskEngine {
     pub unmasked_packages: Vec<String>,
     pub ebuilds: Vec<PortageEbuildProfile>,
     pub target_arch: String,
-    pub ebuilds: Vec<EbuildEntry>,
-    pub hard_masked_pkgs: Vec<String>,
 }
 
 impl GentooPortageMaskEngine {
@@ -75,7 +74,7 @@ impl GentooPortageMaskEngine {
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
             keywords: keywords.iter().map(|k| k.to_string()).collect(),
-            is_ebuild_masked: is_masked,
+            is_masked,
         });
     }
 
@@ -1860,14 +1859,14 @@ pub const CAP_SEEK: u64 = 1 << 2;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
-    pub descriptor_rights: HashMap<u32, u64>,
+    pub descriptor_rights: BTreeMap<u32, u64>,
 }
 
 impl FreeBsdCapsicumEngine {
     pub fn new() -> Self {
         Self {
             is_capability_mode: false,
-            descriptor_rights: HashMap::new(),
+            descriptor_rights: BTreeMap::new(),
         }
     }
 

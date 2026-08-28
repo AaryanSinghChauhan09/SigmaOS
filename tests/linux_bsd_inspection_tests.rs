@@ -52,12 +52,6 @@ mod linux_bsd_innovations;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
 
@@ -76,7 +70,14 @@ mod protocols;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
 
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+
 use bsd::*;
+use wiki_ideas_implementation::SystemdUnitActiveState;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
@@ -276,7 +277,7 @@ fn test_wiki_distro_innovations_inspection() {
     // 7. Systemd Parity Engine
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
-    assert_eq!(systemd.start_unit("test.service"), Ok(()));
+    assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     let sched = SovereignHybridSchedulerInnovations::new();
     assert!(sched.verify_rt_lane_preemption_latency());
