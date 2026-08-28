@@ -9,7 +9,25 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
+#[cfg(not(feature = "standalone_test"))]
 use super::structures::{CpuArchitectureClass, ThreadState};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThreadState {
+    Ready,
+    Running,
+    Blocked,
+    Terminated,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86_64,
+    AArch64,
+    RiscV64,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
