@@ -51,7 +51,6 @@ pub struct PortageEbuildProfile {
     pub atom_name: String,
     pub category_pkg: String,
     pub version: String,
-    pub atom_name: String,
     pub slot: String,
     pub keywords: Vec<String>, // e.g. "amd64", "~amd64"
     pub is_masked: bool,
@@ -80,8 +79,6 @@ impl GentooPortageMaskResolver {
 
     pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
         self.ebuilds.push(PortageEbuildProfile {
-            category_pkg: category_pkg.to_string(),
-            version: version.to_string(),
             atom_name: format!("{}:{}", category_pkg, version),
             category_pkg: category_pkg.to_string(),
             version: version.to_string(),
