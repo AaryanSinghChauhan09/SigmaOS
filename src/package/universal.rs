@@ -5,7 +5,7 @@
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -46,6 +46,117 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        if name.ends_with(".deb") || name.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::Xz)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::App)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else {
+            None
+        }
+    }
+}
+
+/// User-defined hook timing
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookTiming {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+/// Dynamic user-defined package hook trait (OOP approach for package system lifecycle)
+pub trait PackageHook: Send + Sync {
+    fn name(&self) -> &str;
+    fn timing(&self) -> HookTiming;
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
+/// Custom closure-based user-defined hook
+pub struct CustomPackageHook {
+    pub name: String,
+    pub timing: HookTiming,
+    pub handler: std::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+}
+
+impl CustomPackageHook {
+    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
+    where
+        F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
+    {
+        Self {
+            name: name.to_string(),
+            timing,
+            handler: std::sync::Arc::new(handler),
+        }
+    }
+}
+
+impl PackageHook for CustomPackageHook {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn timing(&self) -> HookTiming {
+        self.timing
+    }
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        (self.handler)(package)
+    }
 }
 
 /// Package source
@@ -629,6 +740,7 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub user_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
 }
 
 impl UniversalPackageManager {
@@ -640,10 +752,42 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            user_hooks: Vec::new(),
         };
 
         manager.add_default_adapters();
         manager
+    }
+
+    /// Registers a user-defined lifecycle hook
+    pub fn add_user_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
+        self.user_hooks.push(hook);
+    }
+
+    /// Triggers user-defined hooks matching the requested lifecycle stage
+    pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
+        for hook in &self.user_hooks {
+            if hook.timing() == timing {
+                hook.execute(package)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Installs a package file directly by inferring format from filename
+    pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
+        let format = PackageFormat::from_filename(filepath).ok_or_else(|| {
+            PackageError::InstallationFailed(format!("Unsupported file format extension for file: {}", filepath))
+        })?;
+
+        let file_name = filepath.split('/').last().unwrap_or(filepath);
+        let pkg_name = file_name.split('.').next().unwrap_or(file_name);
+
+        let package = UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string())
+            .with_format(format);
+
+        self.add_package(package);
+        self.install(pkg_name)
     }
 
     fn add_default_adapters(&mut self) {
@@ -757,6 +901,9 @@ impl UniversalPackageManager {
         for dep_name in dependencies {
             let package_opt = self.packages.get(&dep_name).cloned();
             if let Some(package) = package_opt {
+                // Trigger PreInstall user defined hooks
+                self.trigger_user_hooks(HookTiming::PreInstall, &package)?;
+
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
@@ -768,7 +915,10 @@ impl UniversalPackageManager {
 
                 let mut installed = package.clone();
                 installed.installed = true;
-                self.installed_packages.insert(dep_name.clone(), installed);
+                self.installed_packages.insert(dep_name.clone(), installed.clone());
+
+                // Trigger PostInstall user defined hooks
+                self.trigger_user_hooks(HookTiming::PostInstall, &installed)?;
             }
         }
 
@@ -778,6 +928,9 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
+            // Trigger PreRemove user defined hooks
+            self.trigger_user_hooks(HookTiming::PreRemove, &package)?;
+
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
@@ -786,6 +939,9 @@ impl UniversalPackageManager {
                 }
             }
             self.installed_packages.remove(package_name);
+
+            // Trigger PostRemove user defined hooks
+            self.trigger_user_hooks(HookTiming::PostRemove, &package)?;
         }
         Ok(())
     }
@@ -920,6 +1076,35 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_user_defined_hooks_and_extension_install() {
+        let mut manager = UniversalPackageManager::new();
+
+        let hook_ran = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let hook_ran_clone = hook_ran.clone();
+
+        let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
+            hook_ran_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
+        manager.add_user_hook(std::sync::Arc::new(custom_hook));
+
+        // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
+        assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::from_filename("nginx.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::from_filename("alpine.apk"), Some(PackageFormat::Apk));
+        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::from_filename("tool.appimage"), Some(PackageFormat::AppImage));
+
+        // Install from file
+        assert!(manager.install_from_file("/tmp/htop.deb").is_ok());
+        assert!(manager.get_package("htop").is_some());
+
+        // Verify pre-install user defined hook executed
+        assert!(hook_ran.load(std::sync::atomic::Ordering::SeqCst));
     }
 
     #[test]
