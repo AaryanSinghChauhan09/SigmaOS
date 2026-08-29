@@ -768,25 +768,6 @@ impl<'a> Parser<'a> {
     }
 }
 
-pub struct RedirectionEngine;
-
-impl RedirectionEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn write_fd(&self, _fd: u32, _data: &[u8]) {}
-
-    pub fn read_fd(&self, _fd: u32) -> Option<Vec<u8>> {
-        None
-    }
-}
-
-impl Default for RedirectionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 pub struct Shell {
     pub env: Environment,

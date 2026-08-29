@@ -8,6 +8,11 @@ use alloc::vec::Vec;
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
 /// Implements reproducible cross builds for multiple architectures
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

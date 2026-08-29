@@ -471,12 +471,12 @@ impl DriverManager for SimpleDriverManager {
     }
 
     fn get_driver_status(&self, device_id: DeviceID) -> bool {
-        self.loaded_drivers.contains(&device_id)
+            self.loaded_drivers.contains(&device_id)
     }
 }
 
 pub trait CompatibilityCheck {
-    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
+    fn check_component(&self, name: &str) -> bool;
     fn run_full_scan(&self) -> CompatibilityReport;
 }
 
