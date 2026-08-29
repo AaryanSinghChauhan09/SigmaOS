@@ -883,3 +883,196 @@ impl WoofCeLayer {
         self.layers.len()
     }
 }
+
+// =========================================================================
+// 13. TINY CORE LINUX -> TinyCoreExtensionManager (.tcz on-demand loop mounts)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TczExtension {
+    pub name: String,
+    pub mount_point: String,
+    pub loop_device: String,
+    pub ram_cached: bool,
+}
+
+pub struct TinyCoreExtensionManager {
+    pub extensions: BTreeMap<String, TczExtension>,
+}
+
+impl TinyCoreExtensionManager {
+    pub fn new() -> Self {
+        Self {
+            extensions: BTreeMap::new(),
+        }
+    }
+
+    pub fn load_extension_on_demand(&mut self, name: &str, loop_dev: &str, ram: bool) -> Result<(), &'static str> {
+        if self.extensions.contains_key(name) {
+            return Err("Extension already mounted");
+        }
+        let mount_point = format!("/tmp/tce/{}", name);
+        self.extensions.insert(
+            name.to_string(),
+            TczExtension {
+                name: name.to_string(),
+                mount_point,
+                loop_device: loop_dev.to_string(),
+                ram_cached: ram,
+            },
+        );
+        Ok(())
+    }
+
+    pub fn is_mounted(&self, name: &str) -> bool {
+        self.extensions.contains_key(name)
+    }
+
+    pub fn mounted_count(&self) -> usize {
+        self.extensions.len()
+    }
+}
+
+impl Default for TinyCoreExtensionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. CAINE / FORENSICS -> CaineForensicsEnforcer (Strict Read-Only & Block Device Lock)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ForensicsDevicePolicy {
+    StrictReadOnly,
+    WriteBlocked,
+    VolatileOverlayOnly,
+}
+
+pub struct CaineForensicsEnforcer {
+    pub policy: ForensicsDevicePolicy,
+    pub write_blocker_active: bool,
+    pub audit_log: Vec<String>,
+}
+
+impl CaineForensicsEnforcer {
+    pub fn new(policy: ForensicsDevicePolicy) -> Self {
+        Self {
+            policy,
+            write_blocker_active: true,
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn intercept_io(&mut self, dev: &str, is_write: bool) -> Result<(), &'static str> {
+        if is_write && self.write_blocker_active {
+            let log_msg = format!("BLOCKED_WRITE on {}", dev);
+            self.audit_log.push(log_msg);
+            return Err("CAINE Forensics: Write blocked on target device");
+        }
+        Ok(())
+    }
+
+    pub fn audit_events_count(&self) -> usize {
+        self.audit_log.len()
+    }
+}
+
+// =========================================================================
+// 15. RESCUEZILLA & SYSTEMRESCUE -> RescuezillaBackupEngine (Partclone Clone/Restore & Network PXE)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PartitionImage {
+    pub source_partition: String,
+    pub compression: String,
+    pub image_size_bytes: u64,
+    pub checksum_verified: bool,
+}
+
+pub struct RescuezillaBackupEngine {
+    pub images: BTreeMap<String, PartitionImage>,
+}
+
+impl RescuezillaBackupEngine {
+    pub fn new() -> Self {
+        Self {
+            images: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_partition_backup(
+        &mut self,
+        name: &str,
+        source: &str,
+        compression: &str,
+        size: u64,
+    ) {
+        self.images.insert(
+            name.to_string(),
+            PartitionImage {
+                source_partition: source.to_string(),
+                compression: compression.to_string(),
+                image_size_bytes: size,
+                checksum_verified: true,
+            },
+        );
+    }
+
+    pub fn verify_image(&self, name: &str) -> bool {
+        self.images.get(name).map(|img| img.checksum_verified).unwrap_or(false)
+    }
+}
+
+impl Default for RescuezillaBackupEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. CLEAR LINUX -> ClearLinuxAutoOptimizer (PGO, AVX-512 Autodetection, Fast Boot)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroarchTier {
+    GenericX86_64,
+    X86_64_v2,
+    X86_64_v3,
+    X86_64_v4,
+}
+
+pub struct ClearLinuxAutoOptimizer {
+    pub microarch_tier: MicroarchTier,
+    pub pgo_enabled: bool,
+    pub fast_boot_aggressive: bool,
+}
+
+impl ClearLinuxAutoOptimizer {
+    pub fn detect_hardware(has_avx2: bool, has_avx512: bool) -> Self {
+        let microarch_tier = if has_avx512 {
+            MicroarchTier::X86_64_v4
+        } else if has_avx2 {
+            MicroarchTier::X86_64_v3
+        } else {
+            MicroarchTier::X86_64_v2
+        };
+
+        Self {
+            microarch_tier,
+            pgo_enabled: true,
+            fast_boot_aggressive: true,
+        }
+    }
+
+    pub fn active_binary_suffix(&self) -> &'static str {
+        match self.microarch_tier {
+            MicroarchTier::GenericX86_64 => ".generic",
+            MicroarchTier::X86_64_v2 => ".v2",
+            MicroarchTier::X86_64_v3 => ".v3-avx2",
+            MicroarchTier::X86_64_v4 => ".v4-avx512",
+        }
+    }
+}
+

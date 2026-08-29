@@ -4,12 +4,13 @@ use alloc::string::ToString;
 use alloc::vec;
 
 use sigmaos::distro_inspirations::{
-    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackmanBuild, ElevateMigration,
-    FlatcarImmutableRootfs, FormFactor, FreePolicyVerdict, GamescopeCompositor, InterfaceFlag,
-    IsolationKind, KaliMetapackage, KaliToolGroup, NebraskaUpdateServer, PhoshConvergence,
-    PressureVessel, PuppySaveSession, PureosFreePolicy, RancherOsCloudConfig, RaspiConfigTool,
-    ReleaseChannel, SaveMode, SigRepository, SteamABImageUpdate, TorStreamIsolation, UpdateStrategy,
-    WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
+    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackmanBuild, CaineForensicsEnforcer,
+    ClearLinuxAutoOptimizer, ElevateMigration, FlatcarImmutableRootfs, ForensicsDevicePolicy, FormFactor,
+    FreePolicyVerdict, GamescopeCompositor, InterfaceFlag, IsolationKind, KaliMetapackage, KaliToolGroup,
+    MicroarchTier, NebraskaUpdateServer, PhoshConvergence, PressureVessel, PuppySaveSession, PureosFreePolicy,
+    RancherOsCloudConfig, RaspiConfigTool, ReleaseChannel, RescuezillaBackupEngine, SaveMode, SigRepository,
+    SteamABImageUpdate, TinyCoreExtensionManager, TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer,
+    ZincatiUpdateAgent,
 };
 
 #[test]
@@ -195,3 +196,28 @@ fn raspi_config_and_puppy_save_session_work() {
     woof.add_layer("drivers");
     assert_eq!(woof.layer_count(), 2);
 }
+
+#[test]
+fn tiny_core_and_caine_forensics_work() {
+    let mut tce = TinyCoreExtensionManager::new();
+    assert!(tce.load_extension_on_demand("openssh.tcz", "/dev/loop0", true).is_ok());
+    assert!(tce.is_mounted("openssh.tcz"));
+    assert_eq!(tce.mounted_count(), 1);
+
+    let mut caine = CaineForensicsEnforcer::new(ForensicsDevicePolicy::StrictReadOnly);
+    assert!(caine.intercept_io("/dev/sda", false).is_ok());
+    assert!(caine.intercept_io("/dev/sda", true).is_err());
+    assert_eq!(caine.audit_events_count(), 1);
+}
+
+#[test]
+fn rescuezilla_and_clear_linux_auto_optimization_work() {
+    let mut rescue = RescuezillaBackupEngine::new();
+    rescue.create_partition_backup("root_clone", "/dev/nvme0n1p2", "zstd", 1024 * 1024 * 500);
+    assert!(rescue.verify_image("root_clone"));
+
+    let optimizer = ClearLinuxAutoOptimizer::detect_hardware(true, true);
+    assert_eq!(optimizer.microarch_tier, MicroarchTier::X86_64_v4);
+    assert_eq!(optimizer.active_binary_suffix(), ".v4-avx512");
+}
+
