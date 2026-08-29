@@ -4,7 +4,9 @@ use alloc::format;
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use core::sync::atomic::{AtomicPtr, Ordering}; // Atomic primitives are kept as they are fundamental
+use alloc::boxed::Box;
+use alloc::vec;
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 pub struct NumaNode {
     pub node_id: u32,
@@ -68,8 +70,8 @@ impl<T> Default for MichaelScottQueue<T> {
 impl<T> MichaelScottQueue<T> {
     pub fn new() -> Self {
         let dummy = Box::into_raw(Box::new(Node {
-            value: unsafe { std::mem::zeroed() },
-            next: AtomicPtr::new(std::ptr::null_mut()),
+            value: unsafe { core::mem::zeroed() },
+            next: AtomicPtr::new(core::ptr::null_mut()),
         }));
         MichaelScottQueue {
             head: AtomicPtr::new(dummy),
@@ -80,7 +82,7 @@ impl<T> MichaelScottQueue<T> {
     pub fn enqueue(&self, val: T) {
         let new_node = Box::into_raw(Box::new(Node {
             value: val,
-            next: AtomicPtr::new(std::ptr::null_mut()),
+            next: AtomicPtr::new(core::ptr::null_mut()),
         }));
         loop {
             let tail = self.tail.load(Ordering::Acquire);
@@ -90,7 +92,7 @@ impl<T> MichaelScottQueue<T> {
                     (*tail)
                         .next
                         .compare_exchange(
-                            std::ptr::null_mut(),
+                            core::ptr::null_mut(),
                             new_node,
                             Ordering::Release,
                             Ordering::Relaxed,
@@ -127,14 +129,14 @@ impl<T> Default for TreiberStack<T> {
 impl<T> TreiberStack<T> {
     pub fn new() -> Self {
         TreiberStack {
-            top: AtomicPtr::new(std::ptr::null_mut()),
+            top: AtomicPtr::new(core::ptr::null_mut()),
         }
     }
 
     pub fn push(&self, val: T) {
         let new_node = Box::into_raw(Box::new(Node {
             value: val,
-            next: AtomicPtr::new(std::ptr::null_mut()),
+            next: AtomicPtr::new(core::ptr::null_mut()),
         }));
         loop {
             let top = self.top.load(Ordering::Acquire);

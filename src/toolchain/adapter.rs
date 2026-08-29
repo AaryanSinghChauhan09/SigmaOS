@@ -5,6 +5,10 @@ use alloc::format;
 // Wraps legacy compilation profiles (GCC 2.x, early LLVM, and assembly) natively without source patching
 // Enhanced with Gentoo / Clear Linux optimization matrices and Fedora / NixOS-style compiler hardening injections.
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainProfile {
     LegacyC,
