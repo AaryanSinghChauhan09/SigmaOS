@@ -1,6 +1,11 @@
 // SigmaOS Ancient Build Replay Capsules (BuildCapsule)
 // Encapsulates legacy build environments (GCC 2.x, libc5) to compile ancient source code natively without patching
 
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapsuleProfile {
     LegacyCReplay,

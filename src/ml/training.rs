@@ -1,8 +1,9 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
-//! OOP-based ML Training for SigmaOS
-//! Based on Ideas-999-Structured: AI & Machine Learning Item 936
-//! Implements model training and optimization
+// OOP-based ML Training for SigmaOS
+// Based on Ideas-999-Structured: AI & Machine Learning Item 936
+// Implements model training and optimization
+
+extern crate alloc;
 
 
 
