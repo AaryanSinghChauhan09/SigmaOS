@@ -241,7 +241,11 @@ mod tests {
 
     #[test]
     fn test_single_user_runlevel_boot() {
-        let root_hash = b"my_secure_root_password_hash_val";
+        let mut root_hash_buf = [0u8; 32];
+        for (i, b) in root_hash_buf.iter_mut().enumerate() {
+            *b = (i as u8).wrapping_add(17);
+        }
+        let root_hash = &root_hash_buf[..];
         let mut engine = SovereignSingleUserEngine::new(root_hash);
         assert!(engine.is_networking_enabled);
         assert_eq!(engine.maintenance_state, MaintenanceState::Locked);

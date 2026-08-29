@@ -265,7 +265,10 @@ mod tests {
 
     #[test]
     fn test_secure_zeroization() {
-        let mut key = [13u8, 37u8, 42u8, 100u8];
+        let mut key = [0u8; 4];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((i + 1) * 7) as u8;
+        }
         assert_ne!(key, [0u8; 4]);
 
         secure_zeroize(&mut key);

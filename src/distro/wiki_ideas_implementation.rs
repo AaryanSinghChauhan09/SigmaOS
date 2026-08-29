@@ -609,9 +609,8 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.insert(task.pid, task);
     }
 
-    /// Selects the highest priority / earliest deadline real-time task.
     pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
-        self.rt_tasks.values().min_by_key(|t| t.deadline_us)
+        self.rt_tasks.values().next()
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.

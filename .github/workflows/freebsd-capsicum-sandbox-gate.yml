@@ -1,5 +1,8 @@
 name: FreeBSD Capsicum Sandbox Gate
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master, "feat/*" ]

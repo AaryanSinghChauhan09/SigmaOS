@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+
+#[path = "../src/klib/mod.rs"]
+mod klib;
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 #[path = "../src/unimplemented_features.rs"]
@@ -51,7 +55,6 @@ mod gap_closure;
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
-
 #[path = "../src/logging/unified.rs"]
 mod unified;
 #[path = "../src/process/sovereign_process_engine.rs"]
@@ -66,6 +69,11 @@ mod module_loader;
 mod missing_distro_innovations;
 
 use bsd_compat::*;
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unveil::{UnveilManager, UnveilPermission};
+use wiki_ideas_implementation as wiki_ideas;
+use wiki_ideas_implementation::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -227,6 +235,9 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
 
     // 8. Real-Time Hybrid Scheduler
+    use wiki_ideas_implementation::{
+        RealtimeTask, SchedulerClass,
+    };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
