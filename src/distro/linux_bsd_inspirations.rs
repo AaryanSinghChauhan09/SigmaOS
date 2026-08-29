@@ -1099,6 +1099,283 @@ impl Default for SovereignLandlockLsm {
 }
 
 // ==========================================
+// 31. ALPINE / VOID LINUX CHROOT BUILD SANDBOX ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ApkChrootBuildSandboxEngine {
+    pub sandbox_id: String,
+    pub root_path: String,
+    pub isolate_network: bool,
+    pub allowed_bind_mounts: Vec<String>,
+    pub environment_vars: Vec<(String, String)>,
+    pub is_active: bool,
+}
+
+impl ApkChrootBuildSandboxEngine {
+    pub fn new(sandbox_id: &str, root_path: &str, isolate_network: bool) -> Self {
+        Self {
+            sandbox_id: sandbox_id.to_string(),
+            root_path: root_path.to_string(),
+            isolate_network,
+            allowed_bind_mounts: Vec::new(),
+            environment_vars: Vec::new(),
+            is_active: false,
+        }
+    }
+
+    pub fn add_bind_mount(&mut self, source_path: &str) -> Result<(), &'static str> {
+        if self.is_active {
+            return Err("Cannot add bind mounts while build sandbox is active");
+        }
+        self.allowed_bind_mounts.push(source_path.to_string());
+        Ok(())
+    }
+
+    pub fn set_env(&mut self, key: &str, val: &str) {
+        if let Some(pos) = self.environment_vars.iter().position(|(k, _)| k == key) {
+            self.environment_vars[pos].1 = val.to_string();
+        } else {
+            self.environment_vars.push((key.to_string(), val.to_string()));
+        }
+    }
+
+    pub fn enter_chroot(&mut self) -> Result<(), &'static str> {
+        if self.is_active {
+            return Err("Build sandbox chroot is already active");
+        }
+        self.is_active = true;
+        Ok(())
+    }
+
+    pub fn exit_chroot(&mut self) -> Result<(), &'static str> {
+        if !self.is_active {
+            return Err("Build sandbox chroot is not active");
+        }
+        self.is_active = false;
+        Ok(())
+    }
+
+    pub fn compile_package(&mut self, pkg_name: &str, build_cmd: &str) -> Result<String, &'static str> {
+        if !self.is_active {
+            return Err("Must enter chroot before compiling package in sandbox");
+        }
+        Ok(format!(
+            "Successfully compiled {} inside isolated chroot {} (cmd: {})",
+            pkg_name, self.sandbox_id, build_cmd
+        ))
+    }
+}
+
+// ==========================================
+// 32. OPENBSD FD PLEDGE GATE ENGINE
+// ==========================================
+
+pub const FD_RIGHT_READ: u32 = 0x01;
+pub const FD_RIGHT_WRITE: u32 = 0x02;
+pub const FD_RIGHT_SEEK: u32 = 0x04;
+pub const FD_RIGHT_IOCTL: u32 = 0x08;
+pub const FD_RIGHT_DUP: u32 = 0x10;
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdFdPledgeGate {
+    pub fd_rights: Vec<(i32, u32)>,
+    pub locked: bool,
+}
+
+impl OpenBsdFdPledgeGate {
+    pub fn new() -> Self {
+        Self {
+            fd_rights: Vec::new(),
+            locked: false,
+        }
+    }
+
+    pub fn set_fd_rights(&mut self, fd: i32, rights_mask: u32) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("FD Pledge gate is locked permanently");
+        }
+        if let Some(pos) = self.fd_rights.iter().position(|(f, _)| *f == fd) {
+            // Rights can only be restricted (subset), never expanded
+            let existing = self.fd_rights[pos].1;
+            if (rights_mask & !existing) != 0 {
+                return Err("Cannot expand descriptor rights mask under pledge");
+            }
+            self.fd_rights[pos].1 = rights_mask;
+        } else {
+            self.fd_rights.push((fd, rights_mask));
+        }
+        Ok(())
+    }
+
+    pub fn check_fd_right(&self, fd: i32, required_right: u32) -> bool {
+        if let Some((_, rights)) = self.fd_rights.iter().find(|(f, _)| *f == fd) {
+            (rights & required_right) == required_right
+        } else {
+            false
+        }
+    }
+
+    pub fn lock_gate(&mut self) {
+        self.locked = true;
+    }
+}
+
+impl Default for OpenBsdFdPledgeGate {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 33. FREEBSD GEOM / ZFS VDEV TOPOLOGY ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GeomVdevNode {
+    pub name: String,
+    pub vdev_type: String, // "disk", "mirror", "raidz", "stripe"
+    pub children: Vec<GeomVdevNode>,
+    pub online: bool,
+}
+
+impl GeomVdevNode {
+    pub fn leaf_disk(name: &str, online: bool) -> Self {
+        Self {
+            name: name.to_string(),
+            vdev_type: "disk".to_string(),
+            children: Vec::new(),
+            online,
+        }
+    }
+
+    pub fn mirror(name: &str, children: Vec<GeomVdevNode>) -> Self {
+        Self {
+            name: name.to_string(),
+            vdev_type: "mirror".to_string(),
+            children,
+            online: true,
+        }
+    }
+
+    pub fn is_degraded(&self) -> bool {
+        match self.vdev_type.as_str() {
+            "disk" => !self.online,
+            "mirror" => {
+                let online_count = self.children.iter().filter(|c| !c.is_degraded()).count();
+                online_count < self.children.len() && online_count > 0
+            }
+            _ => self.children.iter().any(|c| c.is_degraded()),
+        }
+    }
+
+    pub fn is_faulted(&self) -> bool {
+        match self.vdev_type.as_str() {
+            "disk" => !self.online,
+            "mirror" => self.children.iter().all(|c| c.is_faulted()),
+            _ => self.children.iter().any(|c| c.is_faulted()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdGeomVdevTopology {
+    pub pool_name: String,
+    pub root_vdevs: Vec<GeomVdevNode>,
+}
+
+impl FreeBsdGeomVdevTopology {
+    pub fn new(pool_name: &str) -> Self {
+        Self {
+            pool_name: pool_name.to_string(),
+            root_vdevs: Vec::new(),
+        }
+    }
+
+    pub fn add_vdev(&mut self, vdev: GeomVdevNode) {
+        self.root_vdevs.push(vdev);
+    }
+
+    pub fn evaluate_topology_health(&self) -> &'static str {
+        if self.root_vdevs.iter().any(|v| v.is_faulted()) {
+            "FAULTED"
+        } else if self.root_vdevs.iter().any(|v| v.is_degraded()) {
+            "DEGRADED"
+        } else {
+            "ONLINE"
+        }
+    }
+}
+
+// ==========================================
+// 34. HERMETIC STORE CLOSURE ENGINE (NixOS / Guix Parity)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct StoreClosurePackage {
+    pub hash_path: String,
+    pub name: String,
+    pub deps: Vec<String>,
+    pub sha256: [u8; 32],
+}
+
+#[derive(Debug, Clone)]
+pub struct HermeticStoreClosureEngine {
+    pub store_path: String,
+    pub pinned_closures: Vec<StoreClosurePackage>,
+}
+
+impl HermeticStoreClosureEngine {
+    pub fn new(store_path: &str) -> Self {
+        Self {
+            store_path: store_path.to_string(),
+            pinned_closures: Vec::new(),
+        }
+    }
+
+    pub fn pin_closure(&mut self, pkg: StoreClosurePackage) {
+        if !self.pinned_closures.iter().any(|p| p.hash_path == pkg.hash_path) {
+            self.pinned_closures.push(pkg);
+        }
+    }
+
+    pub fn verify_closure_hermeticity(&self, target_hash_path: &str) -> Result<bool, &'static str> {
+        let pkg = self
+            .pinned_closures
+            .iter()
+            .find(|p| p.hash_path == target_hash_path)
+            .ok_or("Package not found in store closure")?;
+
+        for dep in &pkg.deps {
+            if !self.pinned_closures.iter().any(|p| &p.hash_path == dep) {
+                return Ok(false); // Unclosed dependency found!
+            }
+        }
+        Ok(true)
+    }
+
+    pub fn compute_closure_size(&self, target_hash_path: &str) -> usize {
+        let mut visited = Vec::new();
+        let mut stack = vec![target_hash_path.to_string()];
+
+        while let Some(curr) = stack.pop() {
+            if visited.contains(&curr) {
+                continue;
+            }
+            visited.push(curr.clone());
+            if let Some(pkg) = self.pinned_closures.iter().find(|p| p.hash_path == curr) {
+                for dep in &pkg.deps {
+                    if !visited.contains(dep) {
+                        stack.push(dep.clone());
+                    }
+                }
+            }
+        }
+        visited.len()
+    }
+}
+
+// ==========================================
 // 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
 // ==========================================
 
@@ -4513,6 +4790,86 @@ mod tests {
         assert!(retguard.verify_exit_function("kernel_sys_write", canary2, 0x10000000).is_err());
         assert_eq!(retguard.violations.len(), 1);
         assert!(retguard.violations[0].contains("MAP_STACK Violation"));
+    }
+
+    #[test]
+    fn test_apk_chroot_build_sandbox() {
+        let mut sandbox = ApkChrootBuildSandboxEngine::new("sbx_alpine_01", "/var/chroot/build", true);
+        assert!(sandbox.add_bind_mount("/usr/include").is_ok());
+        sandbox.set_env("CC", "gcc");
+
+        assert!(sandbox.compile_package("curl", "make").is_err()); // Must enter chroot first
+        assert!(sandbox.enter_chroot().is_ok());
+        assert!(sandbox.add_bind_mount("/lib").is_err()); // Cannot add bind mount while active
+
+        let res = sandbox.compile_package("curl", "make").unwrap();
+        assert!(res.contains("Successfully compiled curl"));
+        assert!(sandbox.exit_chroot().is_ok());
+    }
+
+    #[test]
+    fn test_openbsd_fd_pledge_gate() {
+        let mut gate = OpenBsdFdPledgeGate::new();
+        assert!(gate.set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE | FD_RIGHT_SEEK).is_ok());
+
+        assert!(gate.check_fd_right(3, FD_RIGHT_READ));
+        assert!(gate.check_fd_right(3, FD_RIGHT_WRITE));
+        assert!(!gate.check_fd_right(3, FD_RIGHT_DUP));
+
+        // Restricting rights
+        assert!(gate.set_fd_rights(3, FD_RIGHT_READ).is_ok());
+        assert!(!gate.check_fd_right(3, FD_RIGHT_WRITE));
+
+        // Attempting to expand rights mask is blocked
+        assert!(gate.set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE).is_err());
+
+        gate.lock_gate();
+        assert!(gate.set_fd_rights(3, FD_RIGHT_READ).is_err());
+    }
+
+    #[test]
+    fn test_freebsd_geom_vdev_topology() {
+        let d1 = GeomVdevNode::leaf_disk("ada0", true);
+        let d2 = GeomVdevNode::leaf_disk("ada1", true);
+        let mirror = GeomVdevNode::mirror("mirror0", vec![d1, d2]);
+
+        let mut topo = FreeBsdGeomVdevTopology::new("zpool0");
+        topo.add_vdev(mirror);
+        assert_eq!(topo.evaluate_topology_health(), "ONLINE");
+
+        // Simulate disk degradation
+        let d1_fail = GeomVdevNode::leaf_disk("ada0", false);
+        let d2_ok = GeomVdevNode::leaf_disk("ada1", true);
+        let mirror_deg = GeomVdevNode::mirror("mirror0", vec![d1_fail, d2_ok]);
+
+        let mut topo_deg = FreeBsdGeomVdevTopology::new("zpool0");
+        topo_deg.add_vdev(mirror_deg);
+        assert_eq!(topo_deg.evaluate_topology_health(), "DEGRADED");
+    }
+
+    #[test]
+    fn test_hermetic_store_closure() {
+        let mut store = HermeticStoreClosureEngine::new("/sigma/store");
+        let pkg_glibc = StoreClosurePackage {
+            hash_path: "/sigma/store/hash1-glibc".to_string(),
+            name: "glibc".to_string(),
+            deps: vec![],
+            sha256: [0x11; 32],
+        };
+        let pkg_bash = StoreClosurePackage {
+            hash_path: "/sigma/store/hash2-bash".to_string(),
+            name: "bash".to_string(),
+            deps: vec!["/sigma/store/hash1-glibc".to_string()],
+            sha256: [0x22; 32],
+        };
+
+        store.pin_closure(pkg_bash);
+        // Initially hermeticity check fails because glibc isn't in closure
+        assert_eq!(store.verify_closure_hermeticity("/sigma/store/hash2-bash"), Ok(false));
+
+        store.pin_closure(pkg_glibc);
+        assert_eq!(store.verify_closure_hermeticity("/sigma/store/hash2-bash"), Ok(true));
+        assert_eq!(store.compute_closure_size("/sigma/store/hash2-bash"), 2);
     }
 }
 

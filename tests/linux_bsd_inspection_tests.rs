@@ -72,6 +72,8 @@ mod package_repository;
 mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod linux_bsd_inspirations;
 
 use bsd_compat::*;
 
@@ -781,6 +783,50 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+}
+
+#[test]
+fn test_linux_bsd_subsystem_innovations_inspection() {
+    use linux_bsd_inspirations::{
+        ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+        HermeticStoreClosureEngine, StoreClosurePackage, FD_RIGHT_READ, FD_RIGHT_WRITE,
+    };
+
+    // 1. Alpine / Void Chroot Build Sandbox Engine
+    let mut sbx = ApkChrootBuildSandboxEngine::new("sbx_test", "/chroot", true);
+    assert!(sbx.add_bind_mount("/usr").is_ok());
+    sbx.set_env("OPT", "-O3");
+    assert!(sbx.enter_chroot().is_ok());
+    let compile_res = sbx.compile_package("zlib", "make").unwrap();
+    assert!(compile_res.contains("zlib"));
+    assert!(sbx.exit_chroot().is_ok());
+
+    // 2. OpenBSD FD Pledge Gate Engine
+    let mut gate = OpenBsdFdPledgeGate::new();
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_ok());
+    assert!(gate.check_fd_right(4, FD_RIGHT_READ));
+    assert!(!gate.check_fd_right(4, 0x10)); // FD_RIGHT_DUP
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ).is_ok());
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_err()); // Cannot expand
+
+    // 3. FreeBSD GEOM & ZFS VDEV Topology Engine
+    let d1 = GeomVdevNode::leaf_disk("sda", true);
+    let d2 = GeomVdevNode::leaf_disk("sdb", true);
+    let mirror = GeomVdevNode::mirror("mirror0", vec![d1, d2]);
+    let mut geom = FreeBsdGeomVdevTopology::new("tank");
+    geom.add_vdev(mirror);
+    assert_eq!(geom.evaluate_topology_health(), "ONLINE");
+
+    // 4. NixOS / Guix Hermetic Store Closure Engine
+    let mut store = HermeticStoreClosureEngine::new("/sigma/store");
+    let libc = StoreClosurePackage {
+        hash_path: "/sigma/store/h1-libc".to_string(),
+        name: "libc".to_string(),
+        deps: vec![],
+        sha256: [0xAA; 32],
+    };
+    store.pin_closure(libc);
+    assert_eq!(store.compute_closure_size("/sigma/store/h1-libc"), 1);
 }
 
 #[test]
