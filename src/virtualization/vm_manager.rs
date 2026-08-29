@@ -208,8 +208,10 @@ pub enum KvmExitReason {
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
     Hlt,
+    Interrupt,
     Shutdown,
     InternalError,
+    Interrupt,
 }
 
 /// KVM vCPU register state

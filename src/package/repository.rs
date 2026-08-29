@@ -711,32 +711,67 @@ mod tests {
     #[test]
     fn test_package_pinning_rules() {
         let mut pin_engine = PackagePinEngine::new();
-        pin_engine.add_pin_rule("sigmaos-kernel", "1.0.0", PinPriority::PREFERRED);
+        pin_engine.add_rule(PackagePinRule {
+            package_pattern: String::from("sigmaos-kernel"),
+            repo_origin: String::from("security"),
+            version_pattern: String::from("*"),
+            priority: PinPriority::PREFERRED,
+        });
 
-        let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
-        let p2 = pin_engine.get_pin_priority("other");
+        let p1 = pin_engine.evaluate_priority("sigmaos-kernel", "security", "1.0.0");
+        let p2 = pin_engine.evaluate_priority("sigmaos-kernel", "main", "1.0.0");
         assert_eq!(p1, PinPriority::PREFERRED);
-        assert_eq!(p2, PinPriority::Default);
+        assert_eq!(p2, PinPriority::DEFAULT);
     }
 
     #[test]
     fn test_mirror_sync_ranking_and_failover() {
         let mut sync_engine = MirrorSyncEngine::new();
-        sync_engine.add_mirror("https://mirror2.sigmaos.org", "US", 150);
-        sync_engine.add_mirror("https://mirror1.sigmaos.org", "US", 20);
+        sync_engine.add_mirror("https://mirror2.sigmaos.org", 150);
+        sync_engine.add_mirror("https://mirror1.sigmaos.org", 20);
 
         sync_engine.rank_mirrors();
-        assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
+        assert_eq!(sync_engine.get_best_mirror().unwrap(), "https://mirror1.sigmaos.org");
+
+        // Fail mirror 1 thrice to trigger failover
+        sync_engine.mark_failure("https://mirror1.sigmaos.org");
+        sync_engine.mark_failure("https://mirror1.sigmaos.org");
+        sync_engine.mark_failure("https://mirror1.sigmaos.org");
+
+        assert_eq!(sync_engine.get_best_mirror().unwrap(), "https://mirror2.sigmaos.org");
     }
 
     #[test]
     fn test_package_transaction_rollback() {
         let mut journal = PackageTransactionJournal::new();
-        let _tx1 = journal.log_transaction("install", "htop", "3.2.0", 100);
-        let tx2 = journal.log_transaction("upgrade", "bash", "5.2", 200);
+        let tx_id = journal.record_transaction("2026-03-30 12:00:00", vec![
+            TransactionAction::Install {
+                package: String::from("htop"),
+                version: String::from("3.2.0"),
+            },
+            TransactionAction::Upgrade {
+                package: String::from("bash"),
+                old_version: String::from("5.1"),
+                new_version: String::from("5.2"),
+            },
+        ]);
 
-        let rollback = journal.rollback_transaction(tx2);
-        assert_eq!(rollback.len(), 1);
-        assert_eq!(rollback[0].package_name, "bash");
+        let rollback = journal.rollback_transaction(tx_id).unwrap();
+        assert_eq!(rollback.len(), 2);
+        match &rollback[0] {
+            TransactionAction::Upgrade { package, old_version, new_version } => {
+                assert_eq!(package, "bash");
+                assert_eq!(old_version, "5.2");
+                assert_eq!(new_version, "5.1");
+            }
+            _ => panic!("Expected upgrade rollback"),
+        }
+        match &rollback[1] {
+            TransactionAction::Remove { package, version } => {
+                assert_eq!(package, "htop");
+                assert_eq!(version, "3.2.0");
+            }
+            _ => panic!("Expected remove rollback"),
+        }
     }
 }
