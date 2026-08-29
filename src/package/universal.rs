@@ -1030,13 +1030,15 @@ pub struct UniversalPackageManifestParser;
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
         let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
+        if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".deb") || name.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if name.ends_with(".rpm") {
             Some(PackageFormat::Rpm)
         } else if name.ends_with(".apk") {
             Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
+        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.gz") {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".snap") {
             Some(PackageFormat::Snap)
@@ -1044,6 +1046,8 @@ impl UniversalPackageManifestParser {
             Some(PackageFormat::Flatpak)
         } else if name.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::SigmaPkg)
         } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
             Some(PackageFormat::Ebuild)
         } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
@@ -1056,6 +1060,10 @@ impl UniversalPackageManifestParser {
             Some(PackageFormat::Pkg)
         } else if name.ends_with(".ipa") {
             Some(PackageFormat::Ipa)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
         } else if name.ends_with(".aab") {
             Some(PackageFormat::Aab)
         } else if name.ends_with(".hap") {
@@ -1361,5 +1369,65 @@ mod tests {
         let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_all_supported_package_formats_matrix() {
+        let test_cases = [
+            ("app.air", PackageFormat::Air),
+            ("homebrew.bottle", PackageFormat::Bottle),
+            ("ios.ipa", PackageFormat::Ipa),
+            ("freebsd.ports", PackageFormat::Ports),
+            ("macos.pkg", PackageFormat::Pkg),
+            ("android.aab", PackageFormat::Aab),
+            ("alpine.apk", PackageFormat::Apk),
+            ("tool.appimage", PackageFormat::AppImage),
+            ("solus.eopkg", PackageFormat::Eopkg),
+            ("nix.nixpkg", PackageFormat::Nixpkg),
+            ("gentoo.ebuild", PackageFormat::Ebuild),
+            ("debian.deb", PackageFormat::Deb),
+            ("archive.tar.gz", PackageFormat::TarGz),
+            ("compressed.xz", PackageFormat::Xz),
+            ("fedora.rpm", PackageFormat::Rpm),
+            ("arch.pkg.tar.xz", PackageFormat::Pacman),
+            ("app.flatpak", PackageFormat::Flatpak),
+            ("macos.app", PackageFormat::App),
+            ("harmony.hap", PackageFormat::Hap),
+            ("pardus.pisi", PackageFormat::Pisi),
+            ("archive.tgz", PackageFormat::TarGz),
+            ("deepin.superdeb", PackageFormat::Superdeb),
+            ("slax.lzm", PackageFormat::Lzm),
+            ("puppy.pup", PackageFormat::Pup),
+            ("canonical.snap", PackageFormat::Snap),
+            ("plain.tar", PackageFormat::Tar),
+            ("puppy.pet", PackageFormat::Pet),
+            ("native.sigpkg", PackageFormat::SigmaPkg),
+        ];
+
+        let manager = UniversalPackageManager::new();
+
+        for (filename, expected_fmt) in test_cases {
+            let detected = PackageFormat::from_filename(filename);
+            assert_eq!(
+                detected,
+                Some(expected_fmt),
+                "Failed extension detection for {}",
+                filename
+            );
+
+            let manifest_detected = UniversalPackageManifestParser::detect_format_from_filename(filename);
+            assert_eq!(
+                manifest_detected,
+                Some(expected_fmt),
+                "Failed manifest extension detection for {}",
+                filename
+            );
+
+            assert!(
+                manager.adapters.contains_key(&expected_fmt),
+                "Missing adapter in UniversalPackageManager for format {:?}",
+                expected_fmt
+            );
+        }
     }
 }
