@@ -238,7 +238,7 @@ fn u64_from_le(slice: &[u8]) -> u64 {
 
 fn parse_null_terminated_string(bytes: &[u8]) -> Option<String> {
     let len = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
-    let s = core::str::from_utf8(&bytes[..len]).ok()?;
+    let s = core:: String::from_utf8(&bytes[..len]).ok()?;
     Some(s.to_string())
 }
 

@@ -1,8 +1,9 @@
+#![cfg_attr(not(test), no_std)]
+use alloc::vec;
 // SigmaOS Zenith Advanced Desktop Features
 // Advanced window management, multi-monitor support, gesture control, AI suggestions
 // Implements missing desktop features from 100-Improvement-Ideas.md
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;

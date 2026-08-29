@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -404,7 +406,7 @@ impl UserManager {
 
     /// Save shadow entries to /etc/shadow
     pub fn save_shadow(&self) -> Result<(), UserError> {
-        let shadow_path = self.etc_dir.join("shadow");
+        let shadow_path = self.format!("{}/{}", etc_dir, "shadow");
         let mut content = String::new();
 
         for shadow in self.shadow_entries.values() {
@@ -428,7 +430,7 @@ impl UserManager {
 
     /// Load shadow entries from /etc/shadow
     pub fn load_shadow(&mut self) -> Result<(), UserError> {
-        let shadow_path = self.etc_dir.join("shadow");
+        let shadow_path = self.format!("{}/{}", etc_dir, "shadow");
         if !shadow_path.exists() {
             return Ok(());
         }
@@ -462,7 +464,7 @@ impl UserManager {
 
     /// Save users to passwd file
     pub fn save_passwd(&self) -> Result<(), UserError> {
-        let passwd_path = self.etc_dir.join("passwd");
+        let passwd_path = self.format!("{}/{}", etc_dir, "passwd");
         let mut content = String::new();
 
         let mut users: Vec<_> = self.users.values().collect();
@@ -494,14 +496,14 @@ impl UserManager {
 
     /// Save groups to group file
     pub fn save_group(&self) -> Result<(), UserError> {
-        let group_path = self.etc_dir.join("group");
+        let group_path = self.format!("{}/{}", etc_dir, "group");
         let mut content = String::new();
 
         let mut groups: Vec<_> = self.groups.values().collect();
         groups.sort_by_key(|g| g.gid);
 
         for group in groups {
-            let members_str = group.members.join(",");
+            let members_str = group.format!("{}/{}", members, ",");
             content.push_str(&format!(
                 "{}:{}:{}:{}\n",
                 group.groupname, "x", group.gid, members_str
@@ -515,7 +517,7 @@ impl UserManager {
 
     /// Load users from passwd file
     pub fn load_passwd(&mut self) -> Result<(), UserError> {
-        let passwd_path = self.etc_dir.join("passwd");
+        let passwd_path = self.format!("{}/{}", etc_dir, "passwd");
 
         if !passwd_path.exists() {
             return Ok(());
@@ -555,7 +557,7 @@ impl UserManager {
 
     /// Load groups from group file
     pub fn load_group(&mut self) -> Result<(), UserError> {
-        let group_path = self.etc_dir.join("group");
+        let group_path = self.format!("{}/{}", etc_dir, "group");
 
         if !group_path.exists() {
             return Ok(());

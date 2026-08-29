@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -505,7 +507,7 @@ impl PerformanceEnhancer {
         }
 
         if let Some(last) = self.last_optimization {
-            if last.elapsed() < self.optimization_interval {
+            if core::time::Duration::from_millis(0) < self.optimization_interval {
                 return None;
             }
         }

@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // SigmaOS Sovereign Replacement System Utilities Suite (sigma-core-utils)
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.

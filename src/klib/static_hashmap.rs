@@ -3,7 +3,7 @@ use core::hash::{Hash, Hasher};
 use core::mem::MaybeUninit;
 
 /// A lightweight, allocation-free, fixed-size association grid map.
-/// Replaces std::collections::HashMap inside the kernel.
+/// Replaces alloc::collections::BTreeMap inside the kernel.
 pub struct StaticHashMap<K, V, const N: usize> {
     entries: [MaybeUninit<Option<(K, V)>>; N],
     len: usize,

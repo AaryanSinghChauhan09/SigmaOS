@@ -1,7 +1,7 @@
+#![allow(dead_code)]
 // SigmaOS Random Number Generation
 // Eliminates dependency on external rand crate
 
-#![allow(dead_code)]
 
 /// Fill buffer with cryptographically secure random bytes
 ///

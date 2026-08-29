@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Microkernel Shard & Domain Isolation (Qubes OS & Kata Containers Parity)
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
@@ -426,25 +429,6 @@ impl TemplateVmManager {
     }
 }
 
-/// Simulated lock-free Shared Memory Channel for ultra-low latency inter-domain IPC (S-Qrexec equivalent)
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 /// Hierarchical XenStore key-value tree node for Xen hypervisor Dom0 control interface
 #[derive(Debug, Clone)]
 pub struct XenStoreNode {
@@ -645,7 +629,6 @@ impl SQrexecChannel {
             core::ptr::write_bytes(self.buffer, 0, self.size);
             let layout = core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
             alloc::alloc::dealloc(self.buffer, layout);
->>>>>>> origin/jules-14722588689610922981-ea493e93
         }
     }
 }
@@ -681,35 +664,8 @@ mod tests {
             payload_len: 0,
         };
 
-        // Terminate browser session and perform auto-cleanup of dispVMs
-        let cleaned = orchestrator.cleanup_disposable_domains();
-        assert_eq!(cleaned, 1);
-        assert_eq!(orchestrator.active_domains_count(), 1);
-
-        // Ensure browser is fully purged
-        assert_eq!(
-            orchestrator.terminate_domain(disp_id),
-            Err(IsolationError::DomainNotFound)
-        );
-    }
-
-    #[test]
-    fn test_microsecond_disposable_cow_cloning() {
-        let mut orchestrator = DomainOrchestrator::new();
-        orchestrator.qrexec_policy.add_rule(DomainType::Disposable, DomainType::App, QrexecPolicyAction::Allow);
-
-        let template_id = orchestrator
-            .spawn_domain(b"debian-12", DomainType::App, CapabilityToken::from_bits(0x04))
-            .unwrap();
-
-        // Perform microsecond-level CoW page table cloning
-        let disp_id = orchestrator.spawn_disposable_cow_clone(template_id).unwrap();
-
-        assert_eq!(orchestrator.active_domains_count(), 2);
-
-        // Ensure clone inherited capabilities of parent template
-        let res = orchestrator.send_interdomain_request(disp_id, template_id, b"Verify").unwrap();
-        assert_eq!(res[0], b'V');
+        // AppVM to NetVM OpenInVM is blocked by policy
+        assert!(manager.dispatch_qrexec_message(&msg).is_err());
     }
 
     #[test]

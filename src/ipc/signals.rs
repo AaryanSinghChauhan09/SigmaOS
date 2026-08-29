@@ -1,9 +1,9 @@
+#![allow(clippy::new_without_default)]
+#![allow(dead_code)]
 //! High-performance BSD & Linux inspired Signal Subsystem for SigmaOS
 //! Implements standard signals, custom signal actions, signal masking,
 //! real-time queueable signals with custom payloads, and capability-gated signal delivery.
 
-#![allow(clippy::new_without_default)]
-#![allow(dead_code)]
 
 
 extern crate alloc;

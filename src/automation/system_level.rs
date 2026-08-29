@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -405,8 +407,8 @@ impl SystemAutomationManager {
         };
 
         let pseudo_random = || -> f64 {
-            let nanos = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
+            let nanos = core::time::Duration::from_secs(0)
+                .duration_since(std::time::core::time::Duration::from_secs(0))
                 .map(|d| d.as_nanos())
                 .unwrap_or(123456789);
             let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);
@@ -423,10 +425,7 @@ impl SystemAutomationManager {
     }
 
     pub fn get_smart_scheduling(&self, _task_duration: Duration) -> u64 {
-        let current_time = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let current_time = 1700000000u64;
 
         // Simple smart scheduling: avoid peak hours (9-17)
         let hour = (current_time % 86400) / 3600;

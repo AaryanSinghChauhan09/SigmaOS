@@ -6,8 +6,6 @@ use alloc::format;
 // Enhanced with Gentoo / Clear Linux optimization matrices and Fedora / NixOS-style compiler hardening injections.
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainProfile {

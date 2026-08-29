@@ -1,5 +1,5 @@
 //! Custom VecDeque implementation for SigmaOS
-//! Reduces dependency on std::collections::VecDeque
+//! Reduces dependency on alloc::collections::VecDeque
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -17,6 +17,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 extern crate alloc;
 use super::Vec;

@@ -4,7 +4,6 @@ use alloc::format;
 // SigmaOS Wireshark Parity Implementation
 // Implements network packet capture, analysis, and protocol dissection
 
-use crate::klib::{String, Vec};
 use core::cell::Cell;
 
 /// Packet capture interface

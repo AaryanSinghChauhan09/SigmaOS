@@ -1,15 +1,15 @@
+#![cfg_attr(not(test), no_std)]
 // SigmaOS Package Repository Management
 // Linux & BSD distro-inspired package repository handling
 // Manages package repositories, sources, APT/DNF-style pinning, signature verification,
 // rankmirrors/reflector mirror failover, drpm delta indexes, and Nix/Guix content-addressed stores.
 
-#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -733,13 +733,11 @@ mod tests {
 
         sync_engine.rank_mirrors();
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
-=======
 
         // Fail mirror 1 to trigger failover
         sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror2.sigmaos.org");
->>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
     }
 
     #[test]
@@ -751,6 +749,5 @@ mod tests {
         let rollback = journal.rollback_transaction(tx2);
         assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
-<<<<<<< HEAD
     }
 }

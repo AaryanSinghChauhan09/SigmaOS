@@ -292,7 +292,6 @@ impl SimpleVMM {
         Err(PageFaultError::NotPresent)
     }
 
-=======
     /// FreeBSD Superpages inspired 2MB contiguous physical frame allocation
     pub fn allocate_superpage_2mb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Huge2MB, user, writable)
@@ -302,8 +301,6 @@ impl SimpleVMM {
     pub fn allocate_superpage_1gb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Giant1GB, user, writable)
     }
-
->>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
     pub fn map_large_page(
         &mut self,
         virt: VirtualAddress,
@@ -464,7 +461,6 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-<<<<<<< HEAD
         while self.pt_tables.len() <= pd_idx {
             self.pt_tables.push(None);
         }

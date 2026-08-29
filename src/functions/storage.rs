@@ -1,12 +1,12 @@
 //! Storage Management Functions (lsblk/parted Inspiration)
 //! Block device management, partition manager, and filesystem tools
+use alloc::format;
 extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Block device
 #[derive(Debug, Clone)]

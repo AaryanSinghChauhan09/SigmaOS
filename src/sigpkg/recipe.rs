@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
@@ -5,7 +7,7 @@ extern crate alloc;
 
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use crate::klib::collections::HashMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::default::Default;
 use core::option::Option::{self, Some, None};
@@ -288,7 +290,7 @@ impl KernelHeaderSysroot {
     pub fn validate_sysroot_headers(&self) -> bool {
         self.active_headers.iter().all(|hdr| {
             let path = format!("{}{}", self.include_path, hdr);
-            std::path::Path::new(&path).exists()
+            str::new(&path).exists()
         })
     }
 

@@ -1,13 +1,13 @@
+#![cfg_attr(not(test), no_std)]
 // SigmaOS Syslog System
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// Log levels

@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // Virtual Memory & Paging Implementation
 // 4-level paging architecture (PML4 → PDPT → PD → PT)

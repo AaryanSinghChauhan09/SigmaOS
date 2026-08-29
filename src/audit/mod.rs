@@ -1,8 +1,8 @@
+#![allow(dead_code)]
 // SigmaOS Defensive Auditing & Sandbox Checking System (SigmaAudit)
 // Implements capability-gated logging, memory auditing, and PQC attestation
 // Enhanced with real enforcement capabilities for Linux/BSD parity
 
-#![allow(dead_code)]
 
 use core::cell::Cell;
 use core::sync::atomic::{AtomicU64, Ordering};

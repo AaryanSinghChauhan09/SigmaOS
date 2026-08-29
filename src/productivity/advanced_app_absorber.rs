@@ -1,10 +1,15 @@
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 // SigmaOS Multi-Application Parity Integration Layer (advanced_app_absorber)
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
 use alloc::collections::{BTreeMap, VecDeque};
 use crate::klib::HashMap;
-// Path/PathBuf not in no_std
+// str/String not in no_std
 
 // =========================================================================
 // 1. FLAMESHOT & SHAREX PARITY: ADVANCED SCREENSHOT ENGINE
@@ -95,7 +100,7 @@ pub struct PotPlayerVlcEngine {
     pub equalizer_presets: BTreeMap<String, Vec<f32>>, // Frequency gain settings
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
-    pub playlist: Vec<PathBuf>,
+    pub playlist: Vec<String>,
 }
 
 impl PotPlayerVlcEngine {
@@ -117,7 +122,7 @@ impl PotPlayerVlcEngine {
         self.playback_speed = speed.max(0.25).min(4.0);
     }
 
-    pub fn add_to_playlist(&mut self, file: PathBuf) {
+    pub fn add_to_playlist(&mut self, file: String) {
         self.playlist.push(file);
     }
 
@@ -133,7 +138,7 @@ impl PotPlayerVlcEngine {
 #[derive(Debug, Clone)]
 pub struct IndexedFile {
     pub name: String,
-    pub path: PathBuf,
+    pub path: String,
     pub size_bytes: u64,
     pub last_modified: u64,
 }
@@ -149,11 +154,11 @@ impl EverythingSearchEngine {
         }
     }
 
-    pub fn index_directory(&mut self, base_path: &Path) {
+    pub fn index_directory(&mut self, base_path: &str) {
         // Populates instant database mapping
         let file_record = IndexedFile {
             name: "kernel_signing_key.pem".to_string(),
-            path: base_path.join("kernel_signing_key.pem"),
+            path: format!("{}/{}", base_path, "kernel_signing_key.pem"),
             size_bytes: 4096,
             last_modified: 1700000000,
         };
@@ -385,32 +390,32 @@ impl NotepadPlusWorkspace {
 // =========================================================================
 
 pub struct OneCommanderPane {
-    pub current_directory: PathBuf,
-    pub selected_files: Vec<PathBuf>,
+    pub current_directory: String,
+    pub selected_files: Vec<String>,
 }
 
 pub struct OneCommanderDualPane {
     pub left_pane: OneCommanderPane,
     pub right_pane: OneCommanderPane,
-    pub tags_colors: HashMap<PathBuf, String>, // Color-coded system file tagging
+    pub tags_colors: HashMap<String, String>, // Color-coded system file tagging
 }
 
 impl OneCommanderDualPane {
     pub fn new() -> Self {
         Self {
             left_pane: OneCommanderPane {
-                current_directory: PathBuf::from("/"),
+                current_directory: String::from("/"),
                 selected_files: Vec::new(),
             },
             right_pane: OneCommanderPane {
-                current_directory: PathBuf::from("/home"),
+                current_directory: String::from("/home"),
                 selected_files: Vec::new(),
             },
             tags_colors: HashMap::new(),
         }
     }
 
-    pub fn tag_file_with_color(&mut self, path: PathBuf, color: &str) {
+    pub fn tag_file_with_color(&mut self, path: String, color: &str) {
         self.tags_colors.insert(path, color.to_string());
     }
 }
@@ -486,7 +491,7 @@ mod tests {
 
         // Everything engine instant index search verification
         let mut indexer = EverythingSearchEngine::new();
-        indexer.index_directory(Path::new("/usr/bin"));
+        indexer.index_directory(str::new("/usr/bin"));
         let results = indexer.query_everything("kernel_signing_key.pem");
         assert_eq!(results.len(), 1);
 
@@ -521,9 +526,9 @@ mod tests {
 
         // OneCommander visual color tags labeling
         let mut explorer = OneCommanderDualPane::new();
-        explorer.tag_file_with_color(PathBuf::from("/etc/fstab"), "Red");
+        explorer.tag_file_with_color(String::from("/etc/fstab"), "Red");
         assert_eq!(
-            explorer.tags_colors.get(&PathBuf::from("/etc/fstab")),
+            explorer.tags_colors.get(&String::from("/etc/fstab")),
             Some(&"Red".to_string())
         );
 

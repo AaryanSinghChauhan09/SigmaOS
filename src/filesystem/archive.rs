@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -5,7 +8,7 @@ use alloc::format;
 // OOP-based archive creation and extraction with multiple formats
 
 use crate::klib::HashMap;
-// Path/PathBuf not in no_std
+// str/String not in no_std
 
 /// Archive format
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -53,19 +56,19 @@ pub trait ArchiveHandler {
     /// Create archive
     fn create_archive(
         &mut self,
-        files: &[PathBuf],
-        output: &Path,
+        files: &[String],
+        output: &str,
         format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError>;
     /// Extract archive
     fn extract_archive(
         &mut self,
-        archive: &Path,
-        destination: &Path,
+        archive: &str,
+        destination: &str,
     ) -> Result<ArchiveResult, ArchiveError>;
     /// List archive contents
-    fn list_contents(&self, archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError>;
+    fn list_contents(&self, archive: &str) -> Result<Vec<ArchiveEntry>, ArchiveError>;
     /// Get handler name
     fn name(&self) -> &str;
 }
@@ -76,12 +79,12 @@ pub struct ZipArchiveHandler;
 impl ArchiveHandler for ZipArchiveHandler {
     fn create_archive(
         &mut self,
-        files: &[PathBuf],
-        _output: &Path,
+        files: &[String],
+        _output: &str,
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
         let original_size: u64 = files
             .iter()
             .filter_map(|f| f.metadata().ok())
@@ -104,16 +107,16 @@ impl ArchiveHandler for ZipArchiveHandler {
             original_size_bytes: original_size,
             compressed_size_bytes: compressed_size,
             compression_ratio,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
     fn extract_archive(
         &mut self,
-        _archive: &Path,
-        _destination: &Path,
+        _archive: &str,
+        _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -121,11 +124,11 @@ impl ArchiveHandler for ZipArchiveHandler {
             original_size_bytes: 1024 * 1024,
             compressed_size_bytes: 512 * 1024,
             compression_ratio: 2.0,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
-    fn list_contents(&self, _archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
+    fn list_contents(&self, _archive: &str) -> Result<Vec<ArchiveEntry>, ArchiveError> {
         Ok(vec![
             ArchiveEntry {
                 name: "file1.txt".to_string(),
@@ -155,12 +158,12 @@ pub struct TarArchiveHandler;
 impl ArchiveHandler for TarArchiveHandler {
     fn create_archive(
         &mut self,
-        files: &[PathBuf],
-        _output: &Path,
+        files: &[String],
+        _output: &str,
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
         let original_size: u64 = files
             .iter()
             .filter_map(|f| f.metadata().ok())
@@ -182,16 +185,16 @@ impl ArchiveHandler for TarArchiveHandler {
             original_size_bytes: original_size,
             compressed_size_bytes: compressed_size,
             compression_ratio,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
     fn extract_archive(
         &mut self,
-        _archive: &Path,
-        _destination: &Path,
+        _archive: &str,
+        _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -199,11 +202,11 @@ impl ArchiveHandler for TarArchiveHandler {
             original_size_bytes: 2 * 1024 * 1024,
             compressed_size_bytes: 1024 * 1024,
             compression_ratio: 2.0,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
-    fn list_contents(&self, _archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
+    fn list_contents(&self, _archive: &str) -> Result<Vec<ArchiveEntry>, ArchiveError> {
         Ok(vec![
             ArchiveEntry {
                 name: "dir1/".to_string(),
@@ -233,12 +236,12 @@ pub struct SevenZipArchiveHandler;
 impl ArchiveHandler for SevenZipArchiveHandler {
     fn create_archive(
         &mut self,
-        files: &[PathBuf],
-        _output: &Path,
+        files: &[String],
+        _output: &str,
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
         let original_size: u64 = files
             .iter()
             .filter_map(|f| f.metadata().ok())
@@ -261,16 +264,16 @@ impl ArchiveHandler for SevenZipArchiveHandler {
             original_size_bytes: original_size,
             compressed_size_bytes: compressed_size,
             compression_ratio,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
     fn extract_archive(
         &mut self,
-        _archive: &Path,
-        _destination: &Path,
+        _archive: &str,
+        _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -278,11 +281,11 @@ impl ArchiveHandler for SevenZipArchiveHandler {
             original_size_bytes: 4 * 1024 * 1024,
             compressed_size_bytes: 1024 * 1024,
             compression_ratio: 4.0,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
         })
     }
 
-    fn list_contents(&self, _archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
+    fn list_contents(&self, _archive: &str) -> Result<Vec<ArchiveEntry>, ArchiveError> {
         Ok(vec![ArchiveEntry {
             name: "file_7z.txt".to_string(),
             size_bytes: 4096,
@@ -335,8 +338,8 @@ impl ArchiveManager {
     /// Create archive
     pub fn create_archive(
         &mut self,
-        files: &[PathBuf],
-        output: &Path,
+        files: &[String],
+        output: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
         let handler = self
             .handlers
@@ -349,8 +352,8 @@ impl ArchiveManager {
     /// Create archive with specific format
     pub fn create_archive_with_format(
         &mut self,
-        files: &[PathBuf],
-        output: &Path,
+        files: &[String],
+        output: &str,
         format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
@@ -365,8 +368,8 @@ impl ArchiveManager {
     /// Extract archive
     pub fn extract_archive(
         &mut self,
-        archive: &Path,
-        destination: &Path,
+        archive: &str,
+        destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
         let format = self.detect_format(archive)?;
         let handler = self
@@ -378,7 +381,7 @@ impl ArchiveManager {
     }
 
     /// List archive contents
-    pub fn list_contents(&self, archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
+    pub fn list_contents(&self, archive: &str) -> Result<Vec<ArchiveEntry>, ArchiveError> {
         let format = self.detect_format(archive)?;
         let handler = self
             .handlers
@@ -389,7 +392,7 @@ impl ArchiveManager {
     }
 
     /// Detect archive format from file extension
-    fn detect_format(&self, path: &Path) -> Result<ArchiveFormat, ArchiveError> {
+    fn detect_format(&self, path: &str) -> Result<ArchiveFormat, ArchiveError> {
         let extension = path
             .extension()
             .and_then(|e| e.to_str())
@@ -495,10 +498,10 @@ mod tests {
     fn test_create_archive() {
         let mut manager = ArchiveManager::default();
         let files = vec![
-            PathBuf::from("/test/file1.txt"),
-            PathBuf::from("/test/file2.txt"),
+            String::from("/test/file1.txt"),
+            String::from("/test/file2.txt"),
         ];
-        let path = PathBuf::from("/test/archive.zip");
+        let path = String::from("/test/archive.zip");
         let result = manager.create_archive(&files, &path).unwrap();
         assert!(result.success);
     }
@@ -506,7 +509,7 @@ mod tests {
     #[test]
     fn test_list_contents() {
         let manager = ArchiveManager::default();
-        let path = PathBuf::from("/test/archive.zip");
+        let path = String::from("/test/archive.zip");
         let entries = manager.list_contents(&path).unwrap();
         assert!(!entries.is_empty());
     }
@@ -515,9 +518,9 @@ mod tests {
     fn test_seven_zip_handler() {
         let mut manager = ArchiveManager::default();
         manager.set_default_format(ArchiveFormat::SevenZip);
-        let files = vec![PathBuf::from("/test/file1.txt")];
+        let files = vec![String::from("/test/file1.txt")];
         let res = manager
-            .create_archive(&files, &PathBuf::from("/test/archive.7z"))
+            .create_archive(&files, &String::from("/test/archive.7z"))
             .unwrap();
         assert!(res.success);
         assert_eq!(res.compression_ratio, 0.4); // default normal compression

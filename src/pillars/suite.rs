@@ -1,18 +1,3 @@
-// ============================================================================
-// SigmaOS — Disruptive Pillars Suite
-// ============================================================================
-//
-// 1. Adaptive AI-Driven Installer & Gamified Onboarding
-// 2. SigmaHub Unified Marketplace & Security Engine
-// 3. Universal Convergence Shell & WCAG Accessibility Stack
-// 4. Predictive Self-Healing Transactional Update System
-// 5. Native AI Orchestrator & Containerless Cloud Engine
-// 6. SigmaOps Enterprise Sysadmin & Monitoring Suite
-// 7. SigmaDAO Decentralized Governance & Contributor Rewards
-//
-// All code is // #![no_std]  // crate-root only-compatible and zero-allocation hot-path capable.
-// ============================================================================
-
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
@@ -31,6 +16,21 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// ============================================================================
+// SigmaOS — Disruptive Pillars Suite
+// ============================================================================
+//
+// 1. Adaptive AI-Driven Installer & Gamified Onboarding
+// 2. SigmaHub Unified Marketplace & Security Engine
+// 3. Universal Convergence Shell & WCAG Accessibility Stack
+// 4. Predictive Self-Healing Transactional Update System
+// 5. Native AI Orchestrator & Containerless Cloud Engine
+// 6. SigmaOps Enterprise Sysadmin & Monitoring Suite
+// 7. SigmaDAO Decentralized Governance & Contributor Rewards
+//
+// All code is // #![no_std]  // crate-root only-compatible and zero-allocation hot-path capable.
+// ============================================================================
+
 
 
 extern crate alloc;

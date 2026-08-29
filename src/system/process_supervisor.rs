@@ -1,8 +1,9 @@
+#![cfg_attr(not(test), no_std)]
+use alloc::vec;
 // SigmaOS Process Supervisor
 // Linux/BSD distro-inspired process management
 // Handles process supervision, monitoring, and lifecycle management
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;

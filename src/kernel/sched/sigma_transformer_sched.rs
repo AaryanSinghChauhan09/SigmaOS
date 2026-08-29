@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 
 use alloc::vec::Vec;

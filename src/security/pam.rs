@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.

@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -6,8 +9,6 @@ use alloc::format;
 //! APT-compatible package management with PPA support
 
 use crate::klib::HashMap;
-use std::fs;
-use std::path::{Path, PathBuf};
 use std::process::Command;
 #[derive(Debug, Clone)]
 pub struct DebianPackage {
@@ -376,7 +377,7 @@ impl SigmaApt {
         fs::create_dir_all(&self.cache_dir)?;
         
         // Mock download (in reality, would download .deb file)
-        let package_file = self.cache_dir.join(format!("{}_{}.deb", package.name, package.version));
+        let package_file = self.format!("{}/{}", cache_dir, format!("{}_{}.deb", package.name, package.version));
         fs::write(package_file, "mock package data")?;
         
         Ok(())
@@ -392,8 +393,8 @@ impl SigmaApt {
         fs::create_dir_all(&install_dir)?;
         
         // Create mock installed files
-        fs::write(install_dir.join("binary"), "mock binary")?;
-        fs::write(install_dir.join("config"), "mock config")?;
+        fs::write(format!("{}/{}", install_dir, "binary"), "mock binary")?;
+        fs::write(format!("{}/{}", install_dir, "config"), "mock config")?;
         
         Ok(())
     }
@@ -466,7 +467,7 @@ impl SigmaAptCli {
                     println!("Version: {}", package.version);
                     println!("Description: {}", package.description);
                     println!("Maintainer: {}", package.maintainer);
-                    println!("Depends: {}", package.depends.join(", "));
+                    println!("Depends: {}", package.format!("{}/{}", depends, ", "));
                 } else {
                     println!("Package {} not found", args[1]);
                 }

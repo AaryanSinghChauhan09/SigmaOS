@@ -6,7 +6,6 @@ use alloc::format;
 
 extern crate alloc;
 use alloc::vec;
-use alloc::vec::Vec;
 
 pub struct VectorizedPqcEngine {
     pub simd_extension_detected: bool,

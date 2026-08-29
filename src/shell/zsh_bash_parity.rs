@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Advanced Zsh, Bash, Fish & BSD Shell Parity Engine
 // Zero-dependency, #![no_std] compliant, zero-allocation shell enhancements

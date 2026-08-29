@@ -1,16 +1,3 @@
-// ============================================================================
-// SigmaOS — Phase L: Plan Implementation Suite
-// Implements all remaining plan-document specifications in // #![no_std]  // crate-root only Rust.
-//
-// Covers:
-//   1. ZenithNet — Zero-Copy Networking Stack (NETWORK_DEVELOPMENT_PLAN.md)
-//   2. SovereignVMM — Type-1 Hypervisor & Container Sandbox (VIRTUALIZATION_CONTAINER_PLAN.md)
-//   3. SovereignBrowser — Capability-Gated Native Browser (BROWSER_DEVELOPMENT_PLAN.md)
-//   4. SovereignSched / S-INIT — AMP Scheduler & Process Supervisor (SCHEDULING_RESOURCING_PLAN.md)
-//   5. SigmaFS Extended — Merkle-CoW Journal & Polymorphic Storage (FILESYSTEM_STORAGE_PLAN.md)
-//   6. S-AI Engine — SovereignML Tensor Core & Agent Orchestrator (AI_AUTOMATION_PLAN.md)
-//   7. S-COSMOS — Cross-Platform Binary Translator (CROSS_PLATFORM_COMPATIBILITY_PLAN.md)
-// ============================================================================
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
@@ -29,6 +16,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+// ============================================================================
+// SigmaOS — Phase L: Plan Implementation Suite
+// Implements all remaining plan-document specifications in // #![no_std]  // crate-root only Rust.
+//
+// Covers:
+//   1. ZenithNet — Zero-Copy Networking Stack (NETWORK_DEVELOPMENT_PLAN.md)
+//   2. SovereignVMM — Type-1 Hypervisor & Container Sandbox (VIRTUALIZATION_CONTAINER_PLAN.md)
+//   3. SovereignBrowser — Capability-Gated Native Browser (BROWSER_DEVELOPMENT_PLAN.md)
+//   4. SovereignSched / S-INIT — AMP Scheduler & Process Supervisor (SCHEDULING_RESOURCING_PLAN.md)
+//   5. SigmaFS Extended — Merkle-CoW Journal & Polymorphic Storage (FILESYSTEM_STORAGE_PLAN.md)
+//   6. S-AI Engine — SovereignML Tensor Core & Agent Orchestrator (AI_AUTOMATION_PLAN.md)
+//   7. S-COSMOS — Cross-Platform Binary Translator (CROSS_PLATFORM_COMPATIBILITY_PLAN.md)
+// ============================================================================
 
 
 // ============================================================================

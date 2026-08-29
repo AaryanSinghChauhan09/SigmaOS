@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer

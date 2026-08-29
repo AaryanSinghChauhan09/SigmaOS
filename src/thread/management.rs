@@ -263,7 +263,7 @@ extern crate std;
 
 #[cfg(test)]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
+    alloc::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
 }
 
 #[cfg(test)]

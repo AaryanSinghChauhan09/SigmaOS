@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 //! # Zenith Compositor - SigmaOS Wayland Display Server
 //!
 //! Zenith is SigmaOS's sovereign Wayland-compatible display compositor,
@@ -14,16 +15,21 @@
 //!     → KMS/DRM (vsync atomic commit)
 //!     → Display
 //! ```
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
-#![allow(dead_code)]
 
-use sigma_types::{CapabilityToken, Result};
-
-#[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(test)]
-use crate::klib::HashMap;
+/// Stub capability token for security-aware windowing
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub id: u64,
+}
+
+type Result<T> = core::result::Result<T, &'static str>;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -552,7 +558,7 @@ impl ZenithCompositor {
 
 impl Default for ZenithCompositor {
     fn default() -> Self {
-        Self::new(sigma_types::CapabilityToken { id: 0 })
+        Self::new(CapabilityToken { id: 0 })
     }
 }
 
@@ -562,7 +568,7 @@ mod tests {
 
     #[test]
     fn test_window_creation() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         let geometry = WindowGeometry::new(100, 100, 800, 600);
@@ -571,7 +577,7 @@ mod tests {
                 "Test Window".to_string(),
                 "test.app".to_string(),
                 geometry,
-                sigma_types::CapabilityToken { id: 2 },
+                CapabilityToken { id: 2 },
             )
             .unwrap();
 
@@ -591,7 +597,7 @@ mod tests {
 
     #[test]
     fn test_window_state() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         let geometry = WindowGeometry::new(0, 0, 800, 600);
@@ -600,7 +606,7 @@ mod tests {
                 "Test".to_string(),
                 "test.app".to_string(),
                 geometry,
-                sigma_types::CapabilityToken { id: 2 },
+                CapabilityToken { id: 2 },
             )
             .unwrap();
 
@@ -614,7 +620,7 @@ mod tests {
 
     #[test]
     fn test_find_window_at_point() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         let geometry1 = WindowGeometry::new(0, 0, 400, 400);
@@ -625,7 +631,7 @@ mod tests {
                 "Window 1".to_string(),
                 "app1".to_string(),
                 geometry1,
-                sigma_types::CapabilityToken { id: 2 },
+                CapabilityToken { id: 2 },
             )
             .unwrap();
 
@@ -634,7 +640,7 @@ mod tests {
                 "Window 2".to_string(),
                 "app2".to_string(),
                 geometry2,
-                sigma_types::CapabilityToken { id: 3 },
+                CapabilityToken { id: 3 },
             )
             .unwrap();
 
@@ -661,7 +667,7 @@ mod tests {
 
     #[test]
     fn test_zenith_profile_system() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         // Switch to Gamer profile (overclock, tight 10ms scheduler slice, VRR active)
@@ -679,7 +685,7 @@ mod tests {
 
     #[test]
     fn test_handoff_encrypted_vault() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         compositor.update_handoff_state("https://sigmaos.dev/workspace", "Shared clipboard data");
@@ -691,7 +697,7 @@ mod tests {
 
     #[test]
     fn test_unified_design_system_tokens() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
+        let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);
 
         // Dark theme tokens check (Material Design 3)

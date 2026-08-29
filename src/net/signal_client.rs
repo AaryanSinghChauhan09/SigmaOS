@@ -1,4 +1,3 @@
-// SigmaOS Network Protocol Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 
@@ -45,21 +45,22 @@ impl DoubleRatchetState {
     /// Simulates a ratchet step for sending a message
     pub fn ratchet_encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
         self.message_number += 1;
-        // In a real implementation, KDF(chain_key) would produce a message key.
-        // For this // #![no_std]  // crate-root only placeholder, we simply XOR with a fixed byte for demonstration.
+        let mut msg_key = self.send_chain_key;
         let mut ciphertext = Vec::with_capacity(plaintext.len());
-        for &byte in plaintext {
-            ciphertext.push(byte ^ 0x42);
+        for (i, &byte) in plaintext.iter().enumerate() {
+            let key_byte = msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
+            ciphertext.push(byte ^ key_byte);
         }
         ciphertext
     }
 
     /// Simulates a ratchet step for receiving a message
     pub fn ratchet_decrypt(&mut self, ciphertext: &[u8]) -> Vec<u8> {
-        // Real implementation would try to derive the message key from receive_chain_key.
+        let mut msg_key = self.receive_chain_key;
         let mut plaintext = Vec::with_capacity(ciphertext.len());
-        for &byte in ciphertext {
-            plaintext.push(byte ^ 0x42);
+        for (i, &byte) in ciphertext.iter().enumerate() {
+            let key_byte = msg_key[i % msg_key.len()] ^ ((self.message_number as u8).wrapping_mul(31));
+            plaintext.push(byte ^ key_byte);
         }
         plaintext
     }

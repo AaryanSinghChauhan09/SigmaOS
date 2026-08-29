@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 extern crate alloc;
 
 // SigmaOS klib: Slab Allocator (like Linux SLUB/SLAB, FreeBSD UMA)

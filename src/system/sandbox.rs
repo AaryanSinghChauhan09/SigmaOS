@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -311,7 +314,7 @@ impl ProcessSandboxManager {
         self.active_processes.push(SandboxProcess {
             pid,
             profile_name: profile_name.to_string(),
-            start_time: std::time::Instant::now(),
+            start_time: 0u64,
             is_active: true,
             resource_usage: ResourceUsage {
                 memory_mb: 0,

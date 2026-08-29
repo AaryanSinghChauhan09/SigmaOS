@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SPDX-License-Identifier: MIT
 
 // SigmaOS Storage Module
 // Database engines, block storage systems, and data management

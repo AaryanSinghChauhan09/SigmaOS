@@ -15,10 +15,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
 
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use crate::klib::{BTreeMap, Vec, VecDeque};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 

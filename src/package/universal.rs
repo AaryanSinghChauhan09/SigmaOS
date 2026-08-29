@@ -8,7 +8,7 @@ use alloc::format;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -134,7 +134,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: std::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -145,7 +145,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: std::sync::Arc::new(handler),
+            handler: alloc::sync::Arc::new(handler),
         }
     }
 }
@@ -565,9 +565,9 @@ impl DependencyResolver {
     pub fn resolve_dependencies(
         &self,
         package_name: &str,
-    ) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+    ) -> Result<alloc::vec::Vec<String>, PackageError> {
+        let mut resolved: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+        let mut to_visit: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         to_visit.push(package_name.to_string());
         let mut visited = std::collections::HashSet::<String>::new();
 
@@ -705,7 +705,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut keys: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());
@@ -743,7 +743,7 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
-    pub user_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
+    pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
 }
 
 impl UniversalPackageManager {
@@ -763,7 +763,7 @@ impl UniversalPackageManager {
     }
 
     /// Registers a user-defined lifecycle hook
-    pub fn add_user_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
+    pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
     }
 
@@ -1161,15 +1161,15 @@ mod tests {
     fn test_user_defined_hooks_and_extension_install() {
         let mut manager = UniversalPackageManager::new();
 
-        let hook_ran = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let hook_ran = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
         let hook_ran_clone = hook_ran.clone();
 
         let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
-            hook_ran_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+            hook_ran_clone.store(true, core::sync::atomic::Ordering::SeqCst);
             Ok(())
         });
 
-        manager.add_user_hook(std::sync::Arc::new(custom_hook));
+        manager.add_user_hook(alloc::sync::Arc::new(custom_hook));
 
         // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
         assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
@@ -1183,7 +1183,7 @@ mod tests {
         assert!(manager.get_package("htop").is_some());
 
         // Verify pre-install user defined hook executed
-        assert!(hook_ran.load(std::sync::atomic::Ordering::SeqCst));
+        assert!(hook_ran.load(core::sync::atomic::Ordering::SeqCst));
     }
 
     #[test]

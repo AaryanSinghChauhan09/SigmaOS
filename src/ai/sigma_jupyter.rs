@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Embedded Jupyter Notebook & Data Science Interface
 // Provides an embedded, lightweight interactive notebook execution engine

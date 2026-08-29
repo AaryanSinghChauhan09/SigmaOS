@@ -1,6 +1,3 @@
-// SigmaOS nix-shell equivalent - Isolated development environments
-// Provides NixOS-style isolated development environments for SigmaOS
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -8,6 +5,9 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
+// SigmaOS nix-shell equivalent - Isolated development environments
+// Provides NixOS-style isolated development environments for SigmaOS
+
 extern crate alloc;
 #[allow(unused_variables)]
 #[allow(unused_mut)]

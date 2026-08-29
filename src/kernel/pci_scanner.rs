@@ -7,7 +7,6 @@ use alloc::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 #[cfg(feature = "standalone_test")]
-use alloc::vec::Vec;
 
 pub const PCI_MAX_BUS: usize = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;

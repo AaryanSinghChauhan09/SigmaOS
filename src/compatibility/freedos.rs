@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaOS FreeDOS Emulation & Integration Engine (SigmaDOS Layer)
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
@@ -7,7 +9,7 @@ extern crate alloc;
 
 use crate::klib::path::PathBuf as Path;
 use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// Represents CONFIG.SYS driver or parameter settings

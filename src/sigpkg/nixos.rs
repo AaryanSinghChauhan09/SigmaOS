@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // NixOS Declarative Profile Generations & Content-Addressed Store Manager
 // Inspired by NixOS /nix/store generations, profiles, atomic rollbacks, and hash verification.

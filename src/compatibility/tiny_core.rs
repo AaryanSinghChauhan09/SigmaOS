@@ -5,7 +5,6 @@ use crate::filesystem::FileType;
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,
 /// boot code parsing (base, norestore, etc.), and filetool-style (mydata.tgz) user backup/restore.
-use crate::klib::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TinyCoreBootConfig {

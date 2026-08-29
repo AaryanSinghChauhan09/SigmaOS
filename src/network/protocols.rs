@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -364,7 +366,7 @@ pub struct SshDaemon {
     pub config: SshdConfig,
     pub active_sessions: usize,
     pub max_sessions: usize,
-    pub failed_attempts: std::collections::HashMap<String, u32>, // IP -> Count
+    pub failed_attempts: alloc::collections::BTreeMap<String, u32>, // IP -> Count
     pub blocklisted_ips: Vec<String>,
 }
 
@@ -374,7 +376,7 @@ impl SshDaemon {
             config,
             active_sessions: 0,
             max_sessions,
-            failed_attempts: std::collections::HashMap::new(),
+            failed_attempts: alloc::collections::BTreeMap::new(),
             blocklisted_ips: Vec::new(),
         }
     }
@@ -971,7 +973,7 @@ impl SnclLedgerProtocol {
 
 /// OpenBSD sshd Fail2ban brute-force protection registry
 pub struct SshdFail2banRegistry {
-    pub failed_attempts: std::collections::HashMap<String, u32>,
+    pub failed_attempts: alloc::collections::BTreeMap<String, u32>,
     pub max_attempts: u32,
     pub blocklisted_ips: Vec<String>,
 }
@@ -979,7 +981,7 @@ pub struct SshdFail2banRegistry {
 impl SshdFail2banRegistry {
     pub fn new(max_attempts: u32) -> Self {
         Self {
-            failed_attempts: std::collections::HashMap::new(),
+            failed_attempts: alloc::collections::BTreeMap::new(),
             max_attempts,
             blocklisted_ips: Vec::new(),
         }

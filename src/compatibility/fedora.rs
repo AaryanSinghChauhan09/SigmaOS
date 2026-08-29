@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 // Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
@@ -7,8 +10,8 @@
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
-use alloc::string::String;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.

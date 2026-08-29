@@ -120,7 +120,7 @@ impl SovereignKernelModuleSystem {
             if dep_name_len > 0 {
                 // Dependency is non-empty, must verify it is active
                 let dep_str =
-                    unsafe { core::str::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
+                    unsafe { core:: String::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
                 let mut dep_active = false;
                 for j in 0..self.modules.len {
                     let dm = unsafe { &*self.modules.data.add(j) };
@@ -396,7 +396,6 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
-    extern crate alloc;
     use alloc::boxed::Box;
 
     #[test]

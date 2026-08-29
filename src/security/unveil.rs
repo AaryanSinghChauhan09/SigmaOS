@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Unveil & Landlock - Filesystem Visibility & Sandboxing Subsystem
 // Inspired by OpenBSD unveil and Linux Landlock, providing fine-grained path restrictions.

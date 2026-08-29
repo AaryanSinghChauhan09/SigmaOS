@@ -7,7 +7,6 @@ use alloc::format;
 /// Darktable & GIMP (layer composition, non-destructive exposure filters), Kdenlive (timeline slice),
 /// Jellyfin (metadata streaming), PowerToys (FancyZones tiling), Everything (instant path indexer),
 /// and the Sysinternals Suite (Procexp handle tracking, Procmon transaction sniffer).
-use crate::klib::Vec;
 
 // =========================================================================
 // 1. EVERY-SEARCH (Everything-grade Instant Filename Indexer)

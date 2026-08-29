@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -23,13 +26,13 @@ use alloc::format;
 // OOP-based code editor with syntax highlighting and LSP integration
 
 use crate::klib::BTreeMap;
-// PathBuf not in no_std
+// String not in no_std
 
 /// Document
 #[derive(Debug, Clone)]
 pub struct Document {
     pub id: String,
-    pub path: PathBuf,
+    pub path: String,
     pub content: String,
     pub language: Language,
     pub is_modified: bool,
@@ -290,7 +293,7 @@ impl CodeEditor {
         let doc_id = format!("doc_{}", self.documents.len());
         let document = Document {
             id: doc_id.clone(),
-            path: PathBuf::from("untitled"),
+            path: String::from("untitled"),
             content: String::new(),
             language,
             is_modified: false,
@@ -303,8 +306,8 @@ impl CodeEditor {
     }
 
     /// Open document
-    pub fn open_document(&mut self, path: PathBuf, content: String, language: Language) -> String {
-        let doc_id = path.to_string_lossy().to_string();
+    pub fn open_document(&mut self, path: String, content: String, language: Language) -> String {
+        let doc_id = path.as_str().to_string();
         let document = Document {
             id: doc_id.clone(),
             path: path.clone(),
@@ -515,7 +518,7 @@ mod tests {
     fn test_open_document() {
         let mut editor = CodeEditor::default();
         let doc_id = editor.open_document(
-            PathBuf::from("/test/main.rs"),
+            String::from("/test/main.rs"),
             "fn main() {}".to_string(),
             Language::Rust,
         );

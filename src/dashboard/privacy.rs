@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // Privacy Dashboard & Telemetry Control (O&O ShutUp10 & Privacy Badger Parity)
 // Zero-dependency, #![no_std] compliant, OOP-centric privacy subsystem for SigmaOS

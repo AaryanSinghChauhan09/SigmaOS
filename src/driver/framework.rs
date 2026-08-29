@@ -1,3 +1,4 @@
+use alloc::string::{String, ToString};
 extern crate alloc;
 // ==========================================
 // Basic Driver Framework Implementation

@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Distro-Hopper Laboratory (Pillar 6 - Wave 3)
 // Implements experience, philosophy, and community parity features for Linux hoppers:

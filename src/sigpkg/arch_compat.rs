@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
@@ -637,7 +638,7 @@ mod tests {
             [Trigger]
             Operation = Install
             Operation = Upgrade
-            Type = Path
+            Type = str
             Target = usr/bin/*
             When = PostTransaction
             Exec = /usr/bin/mkinitcpio -p linux

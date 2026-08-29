@@ -1,9 +1,11 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // Enhanced AUR Integration for SigmaOS
 // Inspired by Arch Linux AUR with modern security features
 
 
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::boxed::Box;

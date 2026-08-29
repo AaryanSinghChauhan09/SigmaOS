@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery

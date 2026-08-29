@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -120,7 +123,7 @@ impl SnapshotStorage for FileSnapshotStorage {
         metadata: SnapshotMetadata,
         data: &[u8],
     ) -> Result<SnapshotResult, SnapshotError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         // Check max snapshots limit
         if self.snapshots.len() >= self.config.max_snapshots {
@@ -130,22 +133,22 @@ impl SnapshotStorage for FileSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.base_path.join(&metadata.id);
-        std::fs::create_dir_all(&snapshot_path)
+        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
-        let metadata_path = snapshot_path.join("metadata.json");
+        let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
         let metadata_json = format!(
             "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
             metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
         );
-        std::fs::write(&metadata_path, metadata_json)
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write snapshot data
-        let data_path = snapshot_path.join("snapshot.bin");
-        std::fs::write(&data_path, data).map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         self.snapshots.insert(metadata.id.clone(), metadata.clone());
 
@@ -153,13 +156,13 @@ impl SnapshotStorage for FileSnapshotStorage {
             success: true,
             snapshot_id: Some(metadata.id.clone()),
             bytes_written: data.len() as u64,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
             message: format!("Snapshot created: {}", metadata.name),
         })
     }
 
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         let key = snapshot_id.to_string();
         let metadata = self
@@ -167,15 +170,15 @@ impl SnapshotStorage for FileSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.base_path.join(snapshot_id);
-        let data_path = snapshot_path.join("snapshot.bin");
+        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
 
         if !data_path.exists() {
-            return Err(SnapshotError::FileNotFound(data_path.display().to_string()));
+            return Err(SnapshotError::FileNotFound(data_path.to_string()));
         }
 
         // Simulate restore process
-        let data = std::fs::read(&data_path).map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data = Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // In real implementation, this would restore files to their original locations
         let files_restored = (data.len() / 4096).max(1); // Estimate based on 4KB blocks
@@ -184,7 +187,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             success: true,
             snapshot_id: snapshot_id.to_string(),
             files_restored,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
             message: format!("Restored from snapshot: {}", metadata.name),
         })
     }
@@ -201,8 +204,8 @@ impl SnapshotStorage for FileSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.base_path.join(snapshot_id);
-        std::fs::remove_dir_all(snapshot_path)
+        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
@@ -245,7 +248,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
         metadata: SnapshotMetadata,
         data: &[u8],
     ) -> Result<SnapshotResult, SnapshotError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         if self.snapshots.len() >= self.config.max_snapshots {
             if let Some(oldest_id) = self.find_oldest_snapshot() {
@@ -253,29 +256,29 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.base_path.join(&metadata.id);
-        std::fs::create_dir_all(&snapshot_path)
+        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
-        let metadata_path = snapshot_path.join("metadata.json");
+        let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
         let metadata_json = format!(
             "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
             metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
         );
-        std::fs::write(&metadata_path, metadata_json)
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Compute Merkle root hash
         let merkle_root = self.compute_merkle_root(data);
 
         // Write snapshot data with Merkle tree
-        let data_path = snapshot_path.join("snapshot.bin");
-        std::fs::write(&data_path, data).map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write Merkle root
-        let merkle_path = snapshot_path.join("merkle_root.txt");
-        std::fs::write(&merkle_path, &merkle_root)
+        let merkle_path = format!("{}/{}", snapshot_path, "merkle_root.txt");
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         self.snapshots.insert(metadata.id.clone(), metadata.clone());
@@ -284,7 +287,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             success: true,
             snapshot_id: Some(metadata.id.clone()),
             bytes_written: data.len() as u64,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
             message: format!(
                 "Merkle snapshot created: {} (root: {})",
                 metadata.name, merkle_root
@@ -293,7 +296,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     }
 
     fn restore_snapshot(&mut self, snapshot_id: &str) -> Result<RestoreResult, SnapshotError> {
-        let start = std::time::Instant::now();
+        let start = 0u64;
 
         let key = snapshot_id.to_string();
         let metadata = self
@@ -301,18 +304,18 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.base_path.join(snapshot_id);
-        let data_path = snapshot_path.join("snapshot.bin");
-        let merkle_path = snapshot_path.join("merkle_root.txt");
+        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
+        let merkle_path = format!("{}/{}", snapshot_path, "merkle_root.txt");
 
         if !data_path.exists() {
-            return Err(SnapshotError::FileNotFound(data_path.display().to_string()));
+            return Err(SnapshotError::FileNotFound(data_path.to_string()));
         }
 
         // Verify Merkle root
-        let data = std::fs::read(&data_path).map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let data = Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
         let computed_root = self.compute_merkle_root(&data);
-        let stored_root = std::fs::read_to_string(&merkle_path)
+        let stored_root = Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         if computed_root != stored_root.trim() {
@@ -327,7 +330,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             success: true,
             snapshot_id: snapshot_id.to_string(),
             files_restored,
-            duration_seconds: start.elapsed().as_secs(),
+            duration_seconds: 0u64,
             message: format!(
                 "Restored from Merkle snapshot: {} (verified)",
                 metadata.name
@@ -347,8 +350,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.base_path.join(snapshot_id);
-        std::fs::remove_dir_all(snapshot_path)
+        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())

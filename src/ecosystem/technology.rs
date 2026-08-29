@@ -1,10 +1,12 @@
+#![cfg_attr(not(test), no_std)]
+use alloc::vec;
+use alloc::boxed::Box;
 // SigmaOS Sovereign Ecosystem Technology Integration
 // Zero external library dependency, no_std compatible
 
-#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // =========================================================================

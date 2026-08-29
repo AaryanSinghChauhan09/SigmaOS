@@ -1,10 +1,3 @@
-// SigmaOS Linux Network Concepts
-// Implements Linux networking best practices and standards
-
-//! Network interface management
-//! Routing and firewall concepts
-//! Network namespace isolation
-//! Advanced networking features
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -22,6 +15,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Linux Network Concepts
+// Implements Linux networking best practices and standards
+
+//! Network interface management
+//! Routing and firewall concepts
+//! Network namespace isolation
+//! Advanced networking features
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

@@ -1,8 +1,9 @@
+use alloc::vec::Vec;
 extern crate alloc;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub type ShellVec<T> = std::vec::Vec<T>;
+pub type ShellVec<T> = alloc::vec::Vec<T>;
 pub type CommandID = usize;
 
 #[repr(C)]

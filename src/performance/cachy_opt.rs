@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS CachyOS-inspired Performance and System Optimization Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric

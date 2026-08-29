@@ -1,3 +1,5 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 extern crate alloc;
 // SigmaOS Unified System Settings and Preferences Manager (S-CONTROL)
 // Inspired by GNOME/KDE Control Centers, Windows Control Panel, and BSD rc.conf settings.

@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -71,7 +74,7 @@ impl TempFileStrategy {
 
 impl CleanupStrategy for TempFileStrategy {
     fn should_clean(&self, path: &Path) -> bool {
-        let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let filename = Some(path.as_str()).and_then(|n| n.to_str()).unwrap_or("");
 
         for pattern in &self.patterns {
             if self.matches_pattern(filename, pattern) {
@@ -80,7 +83,7 @@ impl CleanupStrategy for TempFileStrategy {
         }
 
         // Check if in temp directory
-        if let Some(parent) = path.parent() {
+        if let Some(parent) = None::<&str> {
             if parent.ends_with("tmp") || parent.ends_with("temp") {
                 return true;
             }
@@ -131,7 +134,7 @@ impl LogFileStrategy {
 
 impl CleanupStrategy for LogFileStrategy {
     fn should_clean(&self, path: &Path) -> bool {
-        if let Some(filename) = path.file_name() {
+        if let Some(filename) = Some(path.as_str()) {
             if let Some(name) = filename.to_str() {
                 if name.ends_with(".log") || name.ends_with(".log.gz") {
                     return true;
@@ -162,7 +165,7 @@ impl CacheStrategy {
 
 impl CleanupStrategy for CacheStrategy {
     fn should_clean(&self, path: &Path) -> bool {
-        if let Some(parent) = path.parent() {
+        if let Some(parent) = None::<&str> {
             if parent.ends_with("cache") || parent.ends_with(".cache") {
                 return true;
             }
@@ -218,7 +221,7 @@ impl SystemCleanupManager {
         self.stats = CleanupStats::default();
 
         if !base_path.exists() {
-            return Err(CleanupError::PathNotFound(base_path.to_path_buf()));
+            return Err(CleanupError::PathNotFound(base_path.clone()));
         }
 
         self.scan_directory(base_path)?;
@@ -228,7 +231,7 @@ impl SystemCleanupManager {
 
     /// Recursively scan directory
     fn scan_directory(&mut self, path: &Path) -> Result<(), CleanupError> {
-        let entries = std::fs::read_dir(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
+        let entries = Err("fs not available").map_err(|e| CleanupError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| CleanupError::IoError(e.to_string()))?;
@@ -251,15 +254,15 @@ impl SystemCleanupManager {
         for strategy in &self.strategies {
             if strategy.should_clean(path) {
                 let metadata =
-                    std::fs::metadata(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
+                    Err("fs not available").map_err(|e| CleanupError::IoError(e.to_string()))?;
 
                 let size = metadata.len();
 
                 if self.dry_run {
-                    println!("Would clean: {} ({} bytes)", path.display(), size);
+                    println!("Would clean: {} ({} bytes)", path, size);
                 } else {
-                    std::fs::remove_file(path).map_err(|e| CleanupError::IoError(e.to_string()))?;
-                    println!("Cleaned: {} ({} bytes)", path.display(), size);
+                    Err("fs not available").map_err(|e| CleanupError::IoError(e.to_string()))?;
+                    println!("Cleaned: {} ({} bytes)", path, size);
                 }
 
                 self.stats.files_cleaned += 1;

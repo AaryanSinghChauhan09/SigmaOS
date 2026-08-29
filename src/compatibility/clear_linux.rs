@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Clear Linux Stateless Architecture & Low-Latency Performance Engine
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Clear Linux features

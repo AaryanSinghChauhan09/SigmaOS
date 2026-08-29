@@ -1,11 +1,11 @@
-// SigmaOS Network Protocol Layer
 #![allow(unused_variables)]
+// SigmaOS Network Protocol Layer
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing
 
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 

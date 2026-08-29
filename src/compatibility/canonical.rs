@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 extern crate alloc;
 // SigmaOS Canonical Ecosystem, Snapshots, Security Jails, App Store, Continuity, Desktop Switcher, and AI Scheduler
@@ -6,7 +8,7 @@ extern crate alloc;
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 use alloc::boxed::Box;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // ==========================================

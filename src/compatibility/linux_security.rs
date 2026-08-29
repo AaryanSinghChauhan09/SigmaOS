@@ -1,10 +1,3 @@
-// SigmaOS Linux Security Concepts
-// Implements Linux security best practices and standards
-
-//! Mandatory Access Control (MAC) concepts
-//! Security-Enhanced Linux (SELinux) concepts
-//! AppArmor security framework concepts
-//! Linux capabilities and privilege concepts
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -22,6 +15,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Linux Security Concepts
+// Implements Linux security best practices and standards
+
+//! Mandatory Access Control (MAC) concepts
+//! Security-Enhanced Linux (SELinux) concepts
+//! AppArmor security framework concepts
+//! Linux capabilities and privilege concepts
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

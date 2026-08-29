@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+use alloc::format;
 
 // SigmaFS CAS + PQC Engine
 // Content-Addressed Storage & Post-Quantum Cryptography

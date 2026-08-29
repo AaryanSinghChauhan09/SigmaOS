@@ -1,8 +1,10 @@
+use alloc::vec;
+use alloc::boxed::Box;
 extern crate alloc;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::HashMap;
 use alloc::format;
@@ -1519,10 +1521,7 @@ impl VmManager {
             VmSnapshot {
                 id: snapshot_id.clone(),
                 name: name.to_string(),
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1700000000u64,
                 snapshot_path: format!("/var/lib/vm/snapshots/{}", snapshot_id),
             },
         );

@@ -1,8 +1,8 @@
+#![allow(dead_code)]
 //! SigmaOS Debian Linux Compatibility Adapter
 //! Implements APT repositories, SysVinit runlevels, debian alternatives, and debootstrap logic.
 //! Zero external dependencies.
 
-#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::string::String;

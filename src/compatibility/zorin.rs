@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 
 /// Zorin OS Compatibility Subsystem for SigmaOS

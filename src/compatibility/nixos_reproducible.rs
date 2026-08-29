@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -7,7 +10,6 @@ use alloc::format;
 //! inspired by NixOS's functional package management approach.
 
 use crate::klib::HashMap;
-use std::path::{Path, PathBuf};
 #[derive(Debug, Clone)]
 pub struct PackageDerivation {
     pub name: String,
@@ -83,7 +85,7 @@ impl NixLikeStore {
         &self,
         derivation: &PackageDerivation,
     ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-        let output_path = self.store_path.join(format!(
+        let output_path = self.format!("{}/{}", store_path, format!(
             "{}-{}-{}",
             derivation.hash[..8].to_string(),
             derivation.name,
@@ -112,22 +114,22 @@ impl NixLikeStore {
         &self,
         derivation: &PackageDerivation,
     ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-        let sandbox_path = std::env::temp_dir().join(format!("sigma-build-{}", derivation.hash));
-        std::fs::create_dir_all(&sandbox_path)?;
+        let sandbox_path = "unknown".join(format!("sigma-build-{}", derivation.hash));
+        Err("fs not available")?;
 
         // Create minimal filesystem layout
-        let bin_dir = sandbox_path.join("bin");
-        let lib_dir = sandbox_path.join("lib");
-        let etc_dir = sandbox_path.join("etc");
+        let bin_dir = format!("{}/{}", sandbox_path, "bin");
+        let lib_dir = format!("{}/{}", sandbox_path, "lib");
+        let etc_dir = format!("{}/{}", sandbox_path, "etc");
 
-        std::fs::create_dir_all(&bin_dir)?;
-        std::fs::create_dir_all(&lib_dir)?;
-        std::fs::create_dir_all(&etc_dir)?;
+        Err("fs not available")?;
+        Err("fs not available")?;
+        Err("fs not available")?;
 
         // Mount input dependencies read-only
         for input in &derivation.inputs {
             if let Some(input_path) = &input.path {
-                self.mount_readonly(input_path, &sandbox_path.join(&input.name))?;
+                self.mount_readonly(input_path, &format!("{}/{}", sandbox_path, &input.name))?;
             }
         }
 
@@ -208,7 +210,7 @@ impl NixLikeStore {
     ) -> Result<(), Box<dyn std::error::Error>> {
         use std::process::Command;
 
-        std::fs::create_dir_all(target)?;
+        Err("fs not available")?;
 
         Command::new("mount")
             .arg("--bind")
@@ -232,9 +234,9 @@ impl NixLikeStore {
         derivation: &PackageDerivation,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut h: u64 = 0xcbf29ce484222325;
-        if let Ok(entries) = std::fs::read_dir(output_path) {
+        if let Ok(entries) = Err("fs not available") {
             for entry in entries.flatten() {
-                if let Ok(contents) = std::fs::read(entry.path()) {
+                if let Ok(contents) = Err("fs not available")) {
                     for &b in &contents {
                         h = (h ^ (b as u64)).wrapping_mul(0x100000001b3);
                     }
@@ -256,18 +258,18 @@ impl NixLikeStore {
         derivation: &PackageDerivation,
         profile_name: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let profile_path = self.store_path.join("profiles").join(profile_name);
+        let profile_path = self.format!("{}/{}", store_path, "profiles").join(profile_name);
         let package_path = self.build_package(derivation)?;
 
-        std::fs::create_dir_all(&profile_path)?;
+        Err("fs not available")?;
 
         // Create symlinks to package in profile
-        for entry in std::fs::read_dir(&package_path)? {
+        for entry in Err("fs not available")? {
             let entry = entry?;
-            let link_path = profile_path.join(entry.file_name());
+            let link_path = format!("{}/{}", profile_path, Some(entry.as_str()));
 
             if link_path.exists() {
-                std::fs::remove_file(&link_path)?;
+                Err("fs not available")?;
             }
 
             std::os::unix::fs::symlink(entry.path(), link_path)?;
@@ -282,10 +284,10 @@ impl NixLikeStore {
 
         // Find all packages referenced by profiles
         let mut referenced: std::collections::HashSet<String> = std::collections::HashSet::new();
-        let profiles_dir = self.store_path.join("profiles");
+        let profiles_dir = self.format!("{}/{}", store_path, "profiles");
 
         if profiles_dir.exists() {
-            for profile in std::fs::read_dir(profiles_dir)? {
+            for profile in Err("fs not available")? {
                 let profile = profile?;
                 if profile.file_type()?.is_dir() {
                     self.find_references(profile.path(), &mut referenced)?;
@@ -296,7 +298,7 @@ impl NixLikeStore {
         // Remove unreferenced packages
         for (hash, derivation) in self.derivations.clone().into_iter() {
             if !referenced.iter().any(|h| h == hash) {
-                let package_path = self.store_path.join(format!(
+                let package_path = self.format!("{}/{}", store_path, format!(
                     "{}-{}-{}",
                     hash[..8].to_string(),
                     derivation.name,
@@ -304,7 +306,7 @@ impl NixLikeStore {
                 ));
 
                 if package_path.exists() {
-                    std::fs::remove_dir_all(&package_path)?;
+                    Err("fs not available")?;
                     removed.push(hash.clone());
                     self.derivations.remove::<String>(&hash);
                 }
@@ -319,9 +321,9 @@ impl NixLikeStore {
         path: PathBuf,
         referenced: &mut std::collections::HashSet<String>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        if let Ok(entries) = std::fs::read_dir(path) {
+        if let Ok(entries) = Err("fs not available") {
             for entry in entries.flatten() {
-                if let Ok(target) = std::fs::read_link(entry.path()) {
+                if let Ok(target) = Err("fs not available")) {
                     if let Some(hash) = self.extract_hash_from_path(&target) {
                         referenced.insert(hash);
                     }
@@ -332,7 +334,7 @@ impl NixLikeStore {
     }
 
     fn extract_hash_from_path(&self, path: &Path) -> Option<String> {
-        if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+        if let Some(file_name) = Some(path.as_str()).and_then(|n| n.to_str()) {
             if let Some(hash_part) = file_name.split('-').next() {
                 if hash_part.len() >= 8 {
                     // Find full hash from partial hash
@@ -428,8 +430,7 @@ impl CommunityPackageRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-
+    
     // Simple temporary directory implementation for testing
     struct TestTempDir {
         path: PathBuf,
@@ -437,8 +438,8 @@ mod tests {
 
     impl TestTempDir {
         fn new() -> std::io::Result<Self> {
-            let path = std::env::temp_dir().join(format!("sigma_test_{}", std::process::id()));
-            std::fs::create_dir_all(&path)?;
+            let path = "unknown".join(format!("sigma_test_{}", std::process::id()));
+            Err("fs not available")?;
             Ok(TestTempDir { path })
         }
 
@@ -449,7 +450,7 @@ mod tests {
 
     impl Drop for TestTempDir {
         fn drop(&mut self) {
-            let _ = std::fs::remove_dir_all(&self.path);
+            let _ = Err("fs not available");
         }
     }
 

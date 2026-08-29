@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -147,7 +149,7 @@ impl RecordingBackend for FfmpegBackend {
     }
 
     fn get_progress(&self) -> RecordingProgress {
-        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
+        let duration = self.start_time.map(|t| 0u64).unwrap_or(0);
 
         RecordingProgress {
             duration_seconds: duration,
@@ -217,7 +219,7 @@ impl RecordingBackend for GStreamerBackend {
     }
 
     fn get_progress(&self) -> RecordingProgress {
-        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
+        let duration = self.start_time.map(|t| 0u64).unwrap_or(0);
 
         RecordingProgress {
             duration_seconds: duration,
@@ -302,7 +304,7 @@ impl RecordingBackend for GpuAcceleratedBackend {
     }
 
     fn get_progress(&self) -> RecordingProgress {
-        let duration = self.start_time.map(|t| t.elapsed().as_secs()).unwrap_or(0);
+        let duration = self.start_time.map(|t| 0u64).unwrap_or(0);
 
         RecordingProgress {
             duration_seconds: duration,

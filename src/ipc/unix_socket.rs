@@ -1,9 +1,9 @@
+#![allow(clippy::new_without_default)]
+#![allow(dead_code)]
 //! High-performance BSD & Linux inspired Unix Domain Sockets for SigmaOS
 //! Implements Stream and Datagram sockets, path-based binding, abstract namespaces,
 //! socketpair creation, and capability-scoped sandboxing constraints.
 
-#![allow(clippy::new_without_default)]
-#![allow(dead_code)]
 
 
 extern crate alloc;

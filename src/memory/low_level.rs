@@ -1,10 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 //! Low-Level Memory Management & Fast System Calls Subsystem for SigmaOS
 //! Implements Two-Tier Allocation (Buddy + Slab), Recursive Page Tables,
 //! Copy-on-Write (COW) Forking, x86_64 Fast Syscalls (IA32_LSTAR MSR),
 //! and Minimal POSIX Syscall Matrix.
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

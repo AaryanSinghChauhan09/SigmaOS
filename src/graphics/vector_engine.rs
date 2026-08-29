@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // Vector Graphics Engine (SigmaDraw)
 // Defines 2D paths, Bézier curves, layers, groups, masks, SVG import/export, and real-time path manipulation.

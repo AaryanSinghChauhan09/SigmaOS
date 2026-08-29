@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: Apache-2.0
 // Classic Operating System Algorithms & Subsystems

@@ -1,10 +1,3 @@
-// SigmaOS Linux Standards Implementation
-// Implements Linux distro best practices and standards for compatibility
-
-//! Linux Standards Base (LSB) compatibility
-//! Filesystem Hierarchy Standard (FHS) compliance
-//! Systemd-style service management concepts
-//! Package management best practices
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -22,6 +15,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Linux Standards Implementation
+// Implements Linux distro best practices and standards for compatibility
+
+//! Linux Standards Base (LSB) compatibility
+//! Filesystem Hierarchy Standard (FHS) compliance
+//! Systemd-style service management concepts
+//! Package management best practices
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

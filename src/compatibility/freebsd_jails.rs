@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -8,10 +10,9 @@ use alloc::format;
 #[cfg(target_os = "none")]
 use crate::klib::HashMap;
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use alloc::collections::BTreeMap;
 use std::process::Command;
-use std::str::FromStr;
+use std:: String::FromStr;
 #[derive(Debug, Clone)]
 pub struct JailConfig {
     pub name: String,
@@ -223,7 +224,7 @@ impl SigmaJailManager {
 
         // Validate root path
         if !config.root_path.exists() {
-            std::fs::create_dir_all(&config.root_path)?;
+            Err("fs not available")?;
         }
 
         // Validate IP address format
@@ -247,7 +248,7 @@ impl SigmaJailManager {
         ];
 
         for dir in dirs {
-            std::fs::create_dir_all(root_path.join(dir))?;
+            Err("fs not available"))?;
         }
 
         // Copy essential binaries and libraries
@@ -264,11 +265,11 @@ impl SigmaJailManager {
 
         for bin in essential_bins {
             if Path::new(bin).exists() {
-                let dest = root_path.join(&bin[1..]);
-                if let Some(parent) = dest.parent() {
-                    let _ = std::fs::create_dir_all(parent);
+                let dest = format!("{}/{}", root_path, &bin[1..]);
+                if let Some(parent) = None::<&str> {
+                    let _ = Err("fs not available");
                 }
-                let _ = std::fs::copy(bin, dest);
+                let _ = Err("fs not available");
             }
         }
 
@@ -277,10 +278,10 @@ impl SigmaJailManager {
         for lib_dir in lib_dirs {
             let src = Path::new(lib_dir);
             if src.exists() {
-                let dest = root_path.join(&lib_dir[1..]);
-                if src.join("libc.so.6").exists() {
-                    let _ = std::fs::create_dir_all(&dest);
-                    let _ = std::fs::copy(src.join("libc.so.6"), dest.join("libc.so.6"));
+                let dest = format!("{}/{}", root_path, &lib_dir[1..]);
+                if format!("{}/{}", src, "libc.so.6").exists() {
+                    let _ = Err("fs not available");
+                    let _ = Err("fs not available"), format!("{}/{}", dest, "libc.so.6"));
                 }
             }
         }
@@ -292,11 +293,11 @@ impl SigmaJailManager {
         &self,
         config: &JailConfig,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let etc_path = config.root_path.join("etc");
-        std::fs::create_dir_all(&etc_path)?;
+        let etc_path = config.format!("{}/{}", root_path, "etc");
+        Err("fs not available")?;
 
         // Create hostname file
-        let _ = std::fs::write(etc_path.join("hostname"), &config.hostname);
+        let _ = Err("fs not available"), &config.hostname);
 
         // Create hosts file
         let mut hosts_content = String::new();
@@ -304,10 +305,10 @@ impl SigmaJailManager {
         if let Some(ip) = &config.ip_address {
             hosts_content.push_str(&format!("{}\t{}\n", ip, config.hostname));
         }
-        let _ = std::fs::write(etc_path.join("hosts"), hosts_content);
+        let _ = Err("fs not available"), hosts_content);
 
         // Create resolv.conf
-        let _ = std::fs::write(etc_path.join("resolv.conf"), "nameserver 8.8.8.8\n");
+        let _ = Err("fs not available"), "nameserver 8.8.8.8\n");
 
         Ok(())
     }
@@ -351,7 +352,7 @@ impl SigmaJailManager {
                 "-t",
                 "proc",
                 "proc",
-                &root_path.join("proc").to_string_lossy(),
+                &format!("{}/{}", root_path, "proc").to_string_lossy(),
             ])
             .output()?;
 
@@ -361,7 +362,7 @@ impl SigmaJailManager {
                 "-t",
                 "sysfs",
                 "sysfs",
-                &root_path.join("sys").to_string_lossy(),
+                &format!("{}/{}", root_path, "sys").to_string_lossy(),
             ])
             .output()?;
 
@@ -371,7 +372,7 @@ impl SigmaJailManager {
                 "-t",
                 "devtmpfs",
                 "devtmpfs",
-                &root_path.join("dev").to_string_lossy(),
+                &format!("{}/{}", root_path, "dev").to_string_lossy(),
             ])
             .output()?;
 
@@ -385,13 +386,13 @@ impl SigmaJailManager {
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Apply cgroup restrictions
         let cgroup_path = format!("/sys/fs/cgroup/sigma-jail-{}", jid);
-        std::fs::create_dir_all(&cgroup_path)?;
+        Err("fs not available")?;
 
         // Limit memory (example: 512MB)
-        std::fs::write(format!("{}/memory.max", cgroup_path), "536870912")?;
+        Err("fs not available"), "536870912")?;
 
         // Limit CPU (example: 50%)
-        std::fs::write(format!("{}/cpu.max", cgroup_path), "50000 100000")?;
+        Err("fs not available"), "50000 100000")?;
 
         Ok(())
     }
@@ -436,7 +437,7 @@ impl SigmaJailManager {
         }
 
         // Wait and force kill if necessary
-        std::thread::sleep(std::time::Duration::from_secs(5));
+        std::thread::sleep(core::time::Duration::from_secs(5));
 
         for pid in processes {
             let _ = Command::new("kill")
@@ -456,9 +457,9 @@ impl SigmaJailManager {
         let root_path = &config.root_path;
 
         // Unmount filesystems
-        let _ = Command::new("umount").arg(root_path.join("proc")).output();
-        let _ = Command::new("umount").arg(root_path.join("sys")).output();
-        let _ = Command::new("umount").arg(root_path.join("dev")).output();
+        let _ = Command::new("umount").arg(format!("{}/{}", root_path, "proc")).output();
+        let _ = Command::new("umount").arg(format!("{}/{}", root_path, "sys")).output();
+        let _ = Command::new("umount").arg(format!("{}/{}", root_path, "dev")).output();
 
         Ok(())
     }
@@ -489,8 +490,7 @@ pub struct JailInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-
+    
     // Simple temporary directory implementation for testing
     struct TestTempDir {
         path: PathBuf,
@@ -498,11 +498,11 @@ mod tests {
 
     impl TestTempDir {
         fn new() -> std::io::Result<Self> {
-            use std::sync::atomic::{AtomicUsize, Ordering};
+            use core::sync::atomic::{AtomicUsize, Ordering};
             static COUNTER: AtomicUsize = AtomicUsize::new(0);
             let id = COUNTER.fetch_add(1, Ordering::SeqCst);
-            let path = std::env::temp_dir().join(format!("sigma_test_{}_{}", std::process::id(), id));
-            std::fs::create_dir_all(&path)?;
+            let path = "unknown".join(format!("sigma_test_{}_{}", std::process::id(), id));
+            Err("fs not available")?;
             Ok(TestTempDir { path })
         }
 
@@ -513,7 +513,7 @@ mod tests {
 
     impl Drop for TestTempDir {
         fn drop(&mut self) {
-            let _ = std::fs::remove_dir_all(&self.path);
+            let _ = Err("fs not available");
         }
     }
 

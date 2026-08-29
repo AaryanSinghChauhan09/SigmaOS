@@ -4,7 +4,6 @@ use alloc::format;
 /// SigmaOS Binary Analysis, Deobfuscation, and Semantic Inversion Engine
 /// Implements advanced abstract interpretation, transformation inversion,
 /// opaque predicate resolution, and a continuum of static/dynamic disassembler callbacks.
-use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArch {
@@ -302,7 +301,7 @@ mod tests {
         assert_eq!(sum, AbstractValue::Constant(30));
 
         let interval = AbstractValue::Interval(1, 5);
-        let join = v1.join(&interval);
+        let join = format!("{}/{}", v1, &interval);
         assert_eq!(join, AbstractValue::Interval(1, 10));
     }
 

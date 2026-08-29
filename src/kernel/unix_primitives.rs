@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
 //! SigmaOS Unix Kernel Primitives
 //!
 //! Production-oriented reimplementations of foundational Linux and BSD kernel
@@ -25,9 +27,9 @@
 //! - Capsicum capability rights on FDs
 //! - GEOM-style I/O transform chains
 //! - SMR (safe memory reclamation epochs)
+extern crate alloc;
+use alloc::vec;
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -1419,7 +1421,7 @@ impl Sbuf {
             return Err("sbuf overflow");
         }
         self.finished = true;
-        core::str::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
+        core:: String::from_utf8(&self.buf).map_err(|_| "sbuf invalid utf8")
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -1434,7 +1436,7 @@ impl Sbuf {
 fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
     if v == 0 {
         buf[0] = b'0';
-        return core::str::from_utf8(&buf[..1]).unwrap();
+        return core:: String::from_utf8(&buf[..1]).unwrap();
     }
     let neg = v < 0;
     if neg {
@@ -1450,7 +1452,7 @@ fn int_to_str(mut v: i64, buf: &mut [u8; 32]) -> &str {
         i -= 1;
         buf[i] = b'-';
     }
-    core::str::from_utf8(&buf[i..]).unwrap()
+    core:: String::from_utf8(&buf[i..]).unwrap()
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

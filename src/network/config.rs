@@ -1,8 +1,9 @@
+#![cfg_attr(not(test), no_std)]
+use alloc::vec;
 // SigmaOS Network Configuration Management
 // Linux distro-inspired network configuration
 // Handles network interfaces, routing, DNS, and network settings
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;

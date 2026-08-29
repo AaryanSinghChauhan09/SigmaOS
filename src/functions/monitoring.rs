@@ -1,12 +1,12 @@
 //! System Monitoring Functions (systemd-journalctl/htop Inspiration)
 //! System log viewer, system monitor, and system information tools
+use alloc::format;
 extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Log priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

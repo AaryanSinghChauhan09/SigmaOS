@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -68,7 +70,7 @@ impl IoStackLocation {
             major_function: 0,
             minor_function: 0,
             flags: 0,
-            device_object: std::ptr::null(),
+            device_object: core::ptr::null(),
             completion_routine: None,
             completion_context: 0,
         }
@@ -99,8 +101,8 @@ impl Irp {
                 status: IoStatus::Pending,
                 information: 0,
             },
-            user_buffer: std::ptr::null_mut(),
-            system_buffer: std::ptr::null_mut(),
+            user_buffer: core::ptr::null_mut(),
+            system_buffer: core::ptr::null_mut(),
             buffer_length,
             io_control_code: 0,
             stack_locations: [IoStackLocation::new(); 10],
@@ -310,7 +312,7 @@ impl IrpManager {
         status
     }
 
-    // --- Windows-style FAST_IO Execution Path ---
+    // --- Windows-style FAST_IO Execution str ---
     pub fn try_fast_io_read(&self, device: &DeviceObject, buffer: &mut [u8]) -> bool {
         if device.get_power_state() != PowerState::D0Active {
             return false;
@@ -506,10 +508,10 @@ impl Uio {
             let seg_ptr = seg.buffer;
             let seg_len = seg.len;
 
-            let to_copy = std::cmp::min(seg_len, src.len() - src_offset);
+            let to_copy = core::cmp::min(seg_len, src.len() - src_offset);
             if to_copy > 0 {
                 unsafe {
-                    std::ptr::copy_nonoverlapping(src.as_ptr().add(src_offset), seg_ptr, to_copy);
+                    core::ptr::copy_nonoverlapping(src.as_ptr().add(src_offset), seg_ptr, to_copy);
                 }
                 src_offset += to_copy;
                 bytes_copied += to_copy;
@@ -533,10 +535,10 @@ impl Uio {
             let seg_ptr = seg.buffer;
             let seg_len = seg.len;
 
-            let to_copy = std::cmp::min(seg_len, dest.len() - dest_offset);
+            let to_copy = core::cmp::min(seg_len, dest.len() - dest_offset);
             if to_copy > 0 {
                 unsafe {
-                    std::ptr::copy_nonoverlapping(
+                    core::ptr::copy_nonoverlapping(
                         seg_ptr,
                         dest.as_mut_ptr().add(dest_offset),
                         to_copy,
@@ -810,7 +812,7 @@ mod tests {
 
         unsafe {
             assert!(COMPLETION_ROUTINE_CALLED);
-            assert_eq!(std::ptr::addr_of!(COMPLETION_CONTEXT_VAL).read(), 1337);
+            assert_eq!(core::ptr::addr_of!(COMPLETION_CONTEXT_VAL).read(), 1337);
         }
     }
 

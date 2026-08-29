@@ -1,6 +1,7 @@
 //! FreeBSD-style & Linux Container (OCI/cgroups) Hybrid Jails Isolation System for SigmaOS
 //! Implements advanced OS-level virtualization by isolating directory subtrees, hostnames,
 //! VNET network stacks, User/Mount namespaces, and resource quotas (FreeBSD rctl / cgroups v2).
+use alloc::format;
 extern crate alloc;
 
 use alloc::string::{String, ToString};

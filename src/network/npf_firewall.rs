@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS NetBSD NPF & Linux Netfilter/PF Parity Subsystem - NPF Firewall Engine
 // Stateful Connection Tracking (Conntrack), NAPT/NAT64 Engine, BPF Rule Inspection, & IP Sets

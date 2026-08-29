@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
@@ -6,7 +7,7 @@ extern crate alloc;
 
 
 use alloc::boxed::Box;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::any::Any;
 

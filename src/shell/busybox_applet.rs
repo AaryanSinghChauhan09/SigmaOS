@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // SigmaOS Alpine Linux BusyBox-Inspired Multi-Call Applet Command Dispatcher
 // Zero-dependency, safe, robust command multiplexing for sovereign userland shell

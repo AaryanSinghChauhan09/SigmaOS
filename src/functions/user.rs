@@ -1,12 +1,12 @@
 //! User Management Functions (useradd/passwd Inspiration)
 //! User manager, password manager, and authentication manager
+use alloc::format;
 extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// User
 #[derive(Debug, Clone)]

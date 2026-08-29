@@ -1,6 +1,3 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 //! # sigma_unveil - Path Narrowing Framework
 //!
 //! Inspired by OpenBSD's unveil(), sigma_unveil allows processes to restrict
@@ -15,11 +12,15 @@ use alloc::format;
 //! sigma_unveil!(nullptr, nullptr); // Lock the veil
 //! ```
 
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
+
 use sigma_types::Result;
 use crate::klib::HashMap;
 // Path/PathBuf not in no_std; using alloc::string::String as path
-type PathBuf = alloc::string::String;
-type Path = str;
+pub type PathBuf = alloc::string::String;
+pub type Path = str;
 
 /// Access permissions for unveiled paths
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

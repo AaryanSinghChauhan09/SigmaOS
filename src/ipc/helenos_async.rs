@@ -1,14 +1,3 @@
-//! HelenOS-style Async IPC with Interrupt Handlers for SigmaOS
-//!
-//! Implements fully asynchronous messaging system with interrupt-driven notifications,
-//! inspired by HelenOS IPC architecture. Features:
-//! - Answerbox-based message routing with four queues (incoming, dispatched, answer, notification)
-//! - Phone-based connection management
-//! - Asynchronous message forwarding
-//! - IRQ notification framework with top-half handlers
-//! - Fibril-based async framework for pseudo-thread management
-//! - Capability-based security for IPC operations
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -26,6 +15,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+//! HelenOS-style Async IPC with Interrupt Handlers for SigmaOS
+//!
+//! Implements fully asynchronous messaging system with interrupt-driven notifications,
+//! inspired by HelenOS IPC architecture. Features:
+//! - Answerbox-based message routing with four queues (incoming, dispatched, answer, notification)
+//! - Phone-based connection management
+//! - Asynchronous message forwarding
+//! - IRQ notification framework with top-half handlers
+//! - Fibril-based async framework for pseudo-thread management
+//! - Capability-based security for IPC operations
+
 
 extern crate alloc;
 use alloc::vec::Vec;

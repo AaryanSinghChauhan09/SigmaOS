@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 // SigmaFS - Next-gen crash-consistent filesystem
 // Merkle tree layout, CoW, and transactional journal

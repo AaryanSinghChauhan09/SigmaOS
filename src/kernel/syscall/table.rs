@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
@@ -231,7 +232,7 @@ impl SyscallHandler for ExitHandler {
 }
 
 struct BrkHandler {
-    heap_end: std::sync::Mutex<u64>,
+    heap_end: crate::thread::Mutex<u64>,
 }
 impl SyscallHandler for BrkHandler {
     fn handle(&self, args: &SyscallArgs) -> SyscallResult {
@@ -273,7 +274,7 @@ impl SyscallTable {
         table.register(Box::new(GetpidHandler { pid: 1 }));
         table.register(Box::new(ExitHandler));
         table.register(Box::new(BrkHandler {
-            heap_end: std::sync::Mutex::new(0xA000_0000),
+            heap_end: crate::thread::Mutex::new(0xA000_0000),
         }));
         table
     }

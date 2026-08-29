@@ -2,6 +2,7 @@
 //! 
 //! This module provides secure random number generation and cryptographic utilities.
 //! In production, these should use hardware RNG or properly vetted cryptographic libraries.
+use alloc::vec;
 extern crate alloc;
 
 use alloc::vec::Vec;

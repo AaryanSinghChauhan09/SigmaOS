@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // S-AI - Local AI engine and multi-agent automation
 // SovereignML tensor core, agent orchestrator, and local inference

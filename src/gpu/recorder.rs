@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -113,8 +115,8 @@ impl GpuScreenRecorder {
             }
         }
 
-        // 2. Lock-free swap active and back buffers (simulated via std::mem::swap)
-        std::mem::swap(&mut self.active_buffer, &mut self.back_buffer);
+        // 2. Lock-free swap active and back buffers (simulated via core::mem::swap)
+        core::mem::swap(&mut self.active_buffer, &mut self.back_buffer);
 
         // 3. Update stats
         let frame_id = self.next_frame_id.fetch_add(1, Ordering::SeqCst);

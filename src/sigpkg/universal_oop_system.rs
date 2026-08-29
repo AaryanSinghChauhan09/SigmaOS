@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -33,7 +34,7 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::klib::HashMap;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 use alloc::sync::Arc;
 
@@ -46,8 +47,8 @@ pub struct Version {
 }
 
 #[cfg(feature = "standalone_test")]
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
@@ -395,7 +396,7 @@ impl IPackageParser for DebAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&dep_names.join(", "));
+            output.push_str(&format!("{}/{}", dep_names, ", "));
             output.push('\n');
         }
 
@@ -647,7 +648,7 @@ impl IPackageParser for RpmAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&dep_names.join(" "));
+            output.push_str(&format!("{}/{}", dep_names, " "));
             output.push('\n');
         }
 
@@ -863,7 +864,7 @@ impl IPackageParser for EbuildAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("RDEPEND=\"{}\"\n", dep_names.join(" ")));
+            output.push_str(&format!("RDEPEND=\"{}\"\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -970,7 +971,7 @@ impl IPackageParser for ApkAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("D:{}\n", dep_names.join(" ")));
+            output.push_str(&format!("D:{}\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -1088,7 +1089,7 @@ impl IPackageParser for NixAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("  buildInputs = [ {} ];\n", dep_names.join(" ")));
+            output.push_str(&format!("  buildInputs = [ {} ];\n", format!("{}/{}", dep_names, " ")));
         }
         output.push_str("}\n");
 
@@ -1319,7 +1320,7 @@ impl IPackageParser for SnapAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("requires: {}\n", dep_names.join(" ")));
+            output.push_str(&format!("requires: {}\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -1437,7 +1438,7 @@ impl IPackageParser for AppImageAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Depends={}\n", dep_names.join(" ")));
+            output.push_str(&format!("Depends={}\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -1544,7 +1545,7 @@ impl IPackageParser for XbpsAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("depends=\"{}\"\n", dep_names.join(" ")));
+            output.push_str(&format!("depends=\"{}\"\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -1654,7 +1655,7 @@ impl IPackageParser for TxzAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("PACKAGE_REQUIRED={}\n", dep_names.join(",")));
+            output.push_str(&format!("PACKAGE_REQUIRED={}\n", format!("{}/{}", dep_names, ",")));
         }
 
         Ok(output.into_bytes())
@@ -1875,7 +1876,7 @@ impl IPackageParser for ZypperAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Requires: {}\n", dep_names.join(" ")));
+            output.push_str(&format!("Requires: {}\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -1997,7 +1998,7 @@ impl IPackageParser for GuixAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("  (inputs `({}))\n", dep_names.join(" ")));
+            output.push_str(&format!("  (inputs `({}))\n", format!("{}/{}", dep_names, " ")));
         }
         output.push_str(")\n");
 
@@ -2105,7 +2106,7 @@ impl IPackageParser for SigmaAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Depends: {}\n", dep_names.join(" ")));
+            output.push_str(&format!("Depends: {}\n", format!("{}/{}", dep_names, " ")));
         }
 
         Ok(output.into_bytes())
@@ -3364,7 +3365,7 @@ Description: Hook test";
         struct MockManTrigger {
             name: String,
             pattern: String,
-            executed_flag: Arc<std::sync::Mutex<bool>>,
+            executed_flag: Arc<crate::thread::Mutex<bool>>,
         }
 
         impl IFileTrigger for MockManTrigger {
@@ -3383,7 +3384,7 @@ Description: Hook test";
             }
         }
 
-        let executed = Arc::new(std::sync::Mutex::new(false));
+        let executed = Arc::new(crate::thread::Mutex::new(false));
         let man_trigger = MockManTrigger {
             name: "update-man-db".to_string(),
             pattern: "usr/share/man".to_string(),

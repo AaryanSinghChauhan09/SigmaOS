@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+use alloc::format;
 
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
@@ -41,8 +43,6 @@ pub enum AlertSeverity {
 }
 use alloc::string::String;
 use alloc::vec::Vec;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::time::{Duration, Instant};
 
 pub trait AnalysisStrategy {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;

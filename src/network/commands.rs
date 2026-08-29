@@ -1,3 +1,5 @@
+use alloc::string::String;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Linux-Parity Composable Networking Commands Engine
 // Zero-dependency, #![no_std] compliant, stateful iptables/netfilter, iproute2, ss, ping implementation

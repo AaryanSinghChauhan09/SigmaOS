@@ -8,7 +8,6 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
-
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -16,6 +15,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -36,7 +39,7 @@ pub struct SystemState {
     pub network_throughput_mbps: f64,
     pub temperature_celsius: f64,
     pub power_consumption_watts: f64,
-    pub timestamp: Instant,
+    pub timestamp: u64,
 }
 
 /// System action
@@ -365,7 +368,7 @@ pub struct AiOrchestrator {
     optimization_history: Vec<OptimizationRecommendation>,
     auto_optimize_enabled: bool,
     optimization_interval: Duration,
-    last_optimization: Option<Instant>,
+    last_optimization: Option<u64>,
 }
 
 impl AiOrchestrator {
@@ -439,7 +442,7 @@ impl AiOrchestrator {
             }
         }
 
-        self.last_optimization = Some(Instant::now());
+        self.last_optimization = Some(0u64);
         Ok(())
     }
 
@@ -450,7 +453,7 @@ impl AiOrchestrator {
         }
 
         if let Some(last) = self.last_optimization {
-            if last.elapsed() < self.optimization_interval {
+            if core::time::Duration::from_millis(0) < self.optimization_interval {
                 return None;
             }
         }
@@ -490,7 +493,7 @@ impl Default for AiOrchestrator {
             network_throughput_mbps: 100.0,
             temperature_celsius: 65.0,
             power_consumption_watts: 45.0,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         }]);
 
         Self::new()
@@ -522,7 +525,7 @@ mod tests {
             network_throughput_mbps: 100.0,
             temperature_celsius: 65.0,
             power_consumption_watts: 45.0,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
         assert_eq!(state.cpu_usage_percent, 75.0);
     }
@@ -557,7 +560,7 @@ mod tests {
             network_throughput_mbps: 150.0,
             temperature_celsius: 80.0,
             power_consumption_watts: 55.0,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
         orchestrator.update_state(state);
         let recommendations = orchestrator.analyze();

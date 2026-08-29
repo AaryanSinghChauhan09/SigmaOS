@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -23,13 +26,13 @@ use alloc::format;
 // OOP-based file management with advanced features
 
 use crate::klib::BTreeMap;
-// Path/PathBuf not in no_std
+// str/String not in no_std
 
 /// File item
 #[derive(Debug, Clone)]
 pub struct FileItem {
     pub name: String,
-    pub path: PathBuf,
+    pub path: String,
     pub size_bytes: u64,
     pub is_directory: bool,
     pub is_hidden: bool,
@@ -79,13 +82,13 @@ pub enum ClipboardOperation {
 /// OOP trait for file operations
 pub trait FileOperation {
     /// Copy file
-    fn copy(&self, source: &Path, destination: &Path) -> Result<(), FileManagerError>;
+    fn copy(&self, source: &str, destination: &str) -> Result<(), FileManagerError>;
     /// Move file
-    fn move_file(&self, source: &Path, destination: &Path) -> Result<(), FileManagerError>;
+    fn move_file(&self, source: &str, destination: &str) -> Result<(), FileManagerError>;
     /// Delete file
-    fn delete(&self, path: &Path) -> Result<(), FileManagerError>;
+    fn delete(&self, path: &str) -> Result<(), FileManagerError>;
     /// Create directory
-    fn create_directory(&self, path: &Path) -> Result<(), FileManagerError>;
+    fn create_directory(&self, path: &str) -> Result<(), FileManagerError>;
     /// Get operation name
     fn name(&self) -> &str;
 }
@@ -94,25 +97,25 @@ pub trait FileOperation {
 pub struct StandardFileOperation;
 
 impl FileOperation for StandardFileOperation {
-    fn copy(&self, _source: &Path, _destination: &Path) -> Result<(), FileManagerError> {
+    fn copy(&self, _source: &str, _destination: &str) -> Result<(), FileManagerError> {
         // Simulated copy operation
         // In real implementation, would use std::fs::copy
         Ok(())
     }
 
-    fn move_file(&self, _source: &Path, _destination: &Path) -> Result<(), FileManagerError> {
+    fn move_file(&self, _source: &str, _destination: &str) -> Result<(), FileManagerError> {
         // Simulated move operation
         // In real implementation, would use std::fs::rename
         Ok(())
     }
 
-    fn delete(&self, _path: &Path) -> Result<(), FileManagerError> {
+    fn delete(&self, _path: &str) -> Result<(), FileManagerError> {
         // Simulated delete operation
         // In real implementation, would use std::fs::remove_file or remove_dir_all
         Ok(())
     }
 
-    fn create_directory(&self, _path: &Path) -> Result<(), FileManagerError> {
+    fn create_directory(&self, _path: &str) -> Result<(), FileManagerError> {
         // Simulated directory creation
         // In real implementation, would use std::fs::create_dir_all
         Ok(())
@@ -125,18 +128,18 @@ impl FileOperation for StandardFileOperation {
 
 /// OOP-based File Manager
 pub struct FileManager {
-    current_path: PathBuf,
+    current_path: String,
     view_mode: ViewMode,
     sort_order: SortOrder,
     show_hidden: bool,
     file_operation: Box<dyn FileOperation>,
-    clipboard: Vec<(PathBuf, ClipboardOperation)>,
-    bookmarks: BTreeMap<String, PathBuf>,
-    recent_paths: Vec<PathBuf>,
+    clipboard: Vec<(String, ClipboardOperation)>,
+    bookmarks: BTreeMap<String, String>,
+    recent_paths: Vec<String>,
 }
 
 impl FileManager {
-    pub fn new(current_path: PathBuf, file_operation: Box<dyn FileOperation>) -> Self {
+    pub fn new(current_path: String, file_operation: Box<dyn FileOperation>) -> Self {
         Self {
             current_path,
             view_mode: ViewMode::List,
@@ -168,7 +171,7 @@ impl FileManager {
     }
 
     /// List directory contents
-    pub fn list_directory(&self, path: &Path) -> Result<Vec<FileItem>, FileManagerError> {
+    pub fn list_directory(&self, path: &str) -> Result<Vec<FileItem>, FileManagerError> {
         let mut items = Vec::new();
 
         // Simulated directory listing
@@ -189,19 +192,13 @@ impl FileManager {
 
             items.push(FileItem {
                 name: name.to_string(),
-                path: path.join(name),
+                path: format!("{}/{}", path, name),
                 size_bytes: size,
                 is_directory: is_dir,
                 is_hidden: name.starts_with('.'),
                 is_readonly: false,
-                modified_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                modified_at: 1700000000u64,
+                created_at: 1700000000u64,
                 file_type: if is_dir {
                     FileType::Directory
                 } else {
@@ -231,20 +228,20 @@ impl FileManager {
     }
 
     /// Navigate to path
-    pub fn navigate(&mut self, path: &Path) -> Result<(), FileManagerError> {
-        if !path.is_absolute() {
-            return Err(FileManagerError::InvalidPath(path.display().to_string()));
+    pub fn navigate(&mut self, path: &str) -> Result<(), FileManagerError> {
+        if !path.starts_with("/") {
+            return Err(FileManagerError::InvalidPath(path.to_string()));
         }
 
-        self.current_path = path.to_path_buf();
+        self.current_path = path.clone();
         self.add_to_recent(path);
         Ok(())
     }
 
     /// Navigate up
     pub fn navigate_up(&mut self) -> Result<(), FileManagerError> {
-        if let Some(parent) = self.current_path.parent() {
-            self.current_path = parent.to_path_buf();
+        if let Some(parent) = self.None::<&str> {
+            self.current_path = parent.clone();
             Ok(())
         } else {
             Err(FileManagerError::AlreadyAtRoot)
@@ -253,28 +250,28 @@ impl FileManager {
 
     /// Navigate to home
     pub fn navigate_home(&mut self) {
-        self.current_path = PathBuf::from("/home/user");
+        self.current_path = String::from("/home/user");
     }
 
     /// Get current path
-    pub fn current_path(&self) -> &Path {
+    pub fn current_path(&self) -> &str {
         &self.current_path
     }
 
     /// Copy file to clipboard
-    pub fn copy_to_clipboard(&mut self, path: PathBuf) {
+    pub fn copy_to_clipboard(&mut self, path: String) {
         self.clipboard.push((path, ClipboardOperation::Copy));
     }
 
     /// Cut file to clipboard
-    pub fn cut_to_clipboard(&mut self, path: PathBuf) {
+    pub fn cut_to_clipboard(&mut self, path: String) {
         self.clipboard.push((path, ClipboardOperation::Cut));
     }
 
     /// Paste from clipboard
     pub fn paste(&mut self) -> Result<(), FileManagerError> {
         for (path, operation) in self.clipboard.drain(..) {
-            let destination = self.current_path.join(path.file_name().unwrap());
+            let destination = self.format!("{}/{}", current_path, Some(path.as_str()).unwrap());
 
             match operation {
                 ClipboardOperation::Copy => {
@@ -294,24 +291,24 @@ impl FileManager {
     }
 
     /// Delete file
-    pub fn delete(&self, path: &Path) -> Result<(), FileManagerError> {
+    pub fn delete(&self, path: &str) -> Result<(), FileManagerError> {
         self.file_operation.delete(path)
     }
 
     /// Create directory
     pub fn create_directory(&self, name: &str) -> Result<(), FileManagerError> {
-        let path = self.current_path.join(name);
+        let path = self.format!("{}/{}", current_path, name);
         self.file_operation.create_directory(&path)
     }
 
     /// Rename file
-    pub fn rename(&self, old_path: &Path, new_name: &str) -> Result<(), FileManagerError> {
-        let new_path = old_path.parent().unwrap().join(new_name);
+    pub fn rename(&self, old_path: &str, new_name: &str) -> Result<(), FileManagerError> {
+        let new_path = None::<&str>.unwrap().join(new_name);
         self.file_operation.move_file(old_path, &new_path)
     }
 
     /// Add bookmark
-    pub fn add_bookmark(&mut self, name: String, path: PathBuf) {
+    pub fn add_bookmark(&mut self, name: String, path: String) {
         self.bookmarks.insert(name, path);
     }
 
@@ -321,7 +318,7 @@ impl FileManager {
     }
 
     /// Get bookmarks
-    pub fn bookmarks(&self) -> Vec<(&String, &PathBuf)> {
+    pub fn bookmarks(&self) -> Vec<(&String, &String)> {
         self.bookmarks.iter().collect()
     }
 
@@ -335,8 +332,8 @@ impl FileManager {
     }
 
     /// Add to recent paths
-    fn add_to_recent(&mut self, path: &Path) {
-        let path = path.to_path_buf();
+    fn add_to_recent(&mut self, path: &str) {
+        let path = path.clone();
         if !self.recent_paths.contains(&path) {
             self.recent_paths.push(path.clone());
             if self.recent_paths.len() > 10 {
@@ -346,7 +343,7 @@ impl FileManager {
     }
 
     /// Get recent paths
-    pub fn recent_paths(&self) -> &[PathBuf] {
+    pub fn recent_paths(&self) -> &[String] {
         &self.recent_paths
     }
 
@@ -367,7 +364,7 @@ impl FileManager {
     }
 
     /// Get file info
-    pub fn get_file_info(&self, path: &Path) -> Result<FileItem, FileManagerError> {
+    pub fn get_file_info(&self, path: &str) -> Result<FileItem, FileManagerError> {
         // Simulated file info
         Ok(FileItem {
             name: path
@@ -375,19 +372,13 @@ impl FileManager {
                 .and_then(|n| n.to_str())
                 .unwrap_or("unknown")
                 .to_string(),
-            path: path.to_path_buf(),
+            path: path.clone(),
             size_bytes: 1024,
             is_directory: false,
             is_hidden: false,
             is_readonly: false,
-            modified_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            modified_at: 1700000000u64,
+            created_at: 1700000000u64,
             file_type: FileType::Regular,
         })
     }
@@ -425,7 +416,7 @@ impl FileManager {
 
 impl Default for FileManager {
     fn default() -> Self {
-        Self::new(PathBuf::from("/home/user"), Box::new(StandardFileOperation))
+        Self::new(String::from("/home/user"), Box::new(StandardFileOperation))
             .with_view_mode(ViewMode::List)
             .with_sort_order(SortOrder::Name)
             .with_show_hidden(false)
@@ -451,7 +442,7 @@ mod tests {
     fn test_file_item() {
         let item = FileItem {
             name: "test.txt".to_string(),
-            path: PathBuf::from("/test/test.txt"),
+            path: String::from("/test/test.txt"),
             size_bytes: 1024,
             is_directory: false,
             is_hidden: false,
@@ -472,13 +463,13 @@ mod tests {
     #[test]
     fn test_file_manager() {
         let manager = FileManager::default();
-        assert_eq!(manager.current_path(), PathBuf::from("/home/user"));
+        assert_eq!(manager.current_path(), String::from("/home/user"));
     }
 
     #[test]
     fn test_list_directory() {
         let manager = FileManager::default();
-        let path = PathBuf::from("/home/user");
+        let path = String::from("/home/user");
         let items = manager.list_directory(&path).unwrap();
         assert!(!items.is_empty());
     }
@@ -486,11 +477,11 @@ mod tests {
     #[test]
     fn test_navigate() {
         let mut manager = FileManager::default();
-        let path = PathBuf::from("/home/user/Documents");
+        let path = String::from("/home/user/Documents");
         manager.navigate(&path).unwrap();
         assert_eq!(
             manager.current_path(),
-            PathBuf::from("/home/user/Documents")
+            String::from("/home/user/Documents")
         );
     }
 
@@ -499,7 +490,7 @@ mod tests {
         let mut manager = FileManager::default();
         manager.add_bookmark(
             "Documents".to_string(),
-            PathBuf::from("/home/user/Documents"),
+            String::from("/home/user/Documents"),
         );
         assert_eq!(manager.bookmarks().len(), 1);
     }

@@ -1,10 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
 // SigmaOS RuntimeIo Module
 // I/O runtime layer
 // Zero-dependency implementation - no external libraries required
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 
 extern crate alloc;
 use alloc::vec::Vec;

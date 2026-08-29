@@ -2,6 +2,7 @@
 //!
 //! This module provides optimized local large language model inference,
 //! including quantization, batching, and hardware acceleration.
+use alloc::format;
 extern crate alloc;
 
 use alloc::string::String;

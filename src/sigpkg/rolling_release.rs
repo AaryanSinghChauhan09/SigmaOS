@@ -5,7 +5,7 @@ use alloc::format;
 // Rolling Release System - Arch Linux Inspired
 // Provides continuous updates without major version bumps
 
-use crate::klib::{hashmap::HashMap, string::SigmaString, vec::Vec};
+use crate::klib::{hashmap::HashMap, string::SigmaString};
 use crate::sigpkg::{Version, VersionConstraint};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

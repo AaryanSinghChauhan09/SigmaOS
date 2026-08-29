@@ -7,7 +7,7 @@ use alloc::format;
 use super::vec::SigmaVec;
 use core::ops::{Deref, DerefMut};
 use core::slice;
-use core::str;
+use core:: String;
 use core::fmt;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions

@@ -125,8 +125,8 @@ impl SigmaTimeshiftManager {
         label: String,
         system_files: HashMap<String, String>,
     ) -> Result<String, BackupError> {
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
+        let timestamp = core::time::Duration::from_secs(0)
+            .duration_since(core::time::Duration::from_secs(0))
             .map(|d| d.as_secs())
             .unwrap_or(0);
 

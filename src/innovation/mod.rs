@@ -5,11 +5,13 @@
 //! - OpenBSD: Security hardening, pledge/unveil-inspired capabilities
 //! - postmarketOS: Mainline kernel approach, mobile optimizations
 //! - Ubuntu: Modern installer patterns, accessibility
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

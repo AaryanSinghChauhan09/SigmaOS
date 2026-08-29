@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Linux Open vSwitch & BSD if_bridge Virtual Ethernet Switch Engine
 // MAC Forwarding Database (FDB), 802.1Q VLAN Tagging/Trunking, STP Spanning Tree, SPAN Mirroring, & LACP

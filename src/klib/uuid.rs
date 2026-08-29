@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // Simple UUID implementation for SigmaOS
 // Reduces dependency on external uuid crate

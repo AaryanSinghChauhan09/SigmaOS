@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaBootC - Bootable Container System
 // Inspired by RHEL Image Mode (bootc) and Fedora Atomic Desktops
@@ -5,7 +7,7 @@ extern crate alloc;
 
 
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 
 /// Container image descriptor for SigmaOS bootable containers

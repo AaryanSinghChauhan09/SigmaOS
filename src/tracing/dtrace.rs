@@ -1,7 +1,8 @@
+#![allow(dead_code)]
+use alloc::format;
 // Kernel-level Illumos/Solaris DTrace D-Language bytecode interpreter and probe engine for SigmaOS
 // Enables dynamic tracing, DIF (DTrace Intermediate Format) execution, and aggregation buffers
 
-#![allow(dead_code)]
 
 extern crate alloc;
 

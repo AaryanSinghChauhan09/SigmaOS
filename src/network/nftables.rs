@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // nftables-Inspired Modern Firewall Framework
 // Linux nftables provides a modern, flexible packet filtering framework with tables, chains, and rules

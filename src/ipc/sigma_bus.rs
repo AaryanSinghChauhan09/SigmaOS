@@ -1,9 +1,9 @@
+#![allow(dead_code)]
 // SPDX-License-Identifier: MIT OR Apache-2.0
 // SigmaOS SigmaBus - Zero-dependency message bus (D-Bus inspired)
 // Provides inter-process communication without any external library dependencies
 // Inspired by D-Bus, HeLin IPC (HeliOS), and Mach ports (macOS/GNU Mach)
 
-#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::vec::Vec;

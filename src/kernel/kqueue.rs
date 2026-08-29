@@ -15,8 +15,6 @@ use alloc::format;
 //
 // This implementation is purely custom — no std, no libc, no external crates.
 
-use crate::klib::vec::Vec;
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Filter types (EVFILT_*)
 // ─────────────────────────────────────────────────────────────────────────────

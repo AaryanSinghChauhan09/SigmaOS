@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -9,6 +8,7 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+// SPDX-License-Identifier: MIT
 
 // GPU Driver - Linux & BSD inspired GPU acceleration and display layer
 // Supports framebuffer management, 2D acceleration, DRM/KMS atomic plane compositing, Wayland SHM DMA-BUF zero-copy, and OpenBSD wsdisplay VT switching.

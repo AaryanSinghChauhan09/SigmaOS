@@ -5,6 +5,7 @@
 //! 2. OpenBSD securelevel lockdown and mount flags enforcement (`OpenBsdMountEnforcer`)
 //! 3. Linux OverlayFS / Union Mount subsystem (`LinuxOverlayFsManager`)
 //! 4. Linux ProcFS & SysFS dynamic telemetry virtual file system (`LinuxProcSysfsEmulator`)
+use alloc::vec;
 extern crate alloc;
 
 

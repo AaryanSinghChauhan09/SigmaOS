@@ -373,12 +373,12 @@ mod tests {
         // Simple benchmark to demonstrate the speedup
         let iterations = 10_000_000;
 
-        let start = std::time::Instant::now();
+        let start = 0u64;
         let mut sum_opt = 0;
         for i in 1..iterations {
             sum_opt += log10(i as u32);
         }
-        let duration_opt = start.elapsed();
+        let duration_opt = core::time::Duration::from_millis(0);
 
         // Baseline loop-based division implementation
         fn baseline_log10(mut n: u32) -> u32 {
@@ -393,12 +393,12 @@ mod tests {
             log
         }
 
-        let start = std::time::Instant::now();
+        let start = 0u64;
         let mut sum_base = 0;
         for i in 1..iterations {
             sum_base += baseline_log10(i as u32);
         }
-        let duration_base = start.elapsed();
+        let duration_base = core::time::Duration::from_millis(0);
 
         assert_eq!(sum_opt, sum_base);
 

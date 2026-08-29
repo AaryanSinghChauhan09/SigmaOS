@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
@@ -550,7 +551,7 @@ mod tests {
         assert_eq!(bytes_written, 55);
 
         // Parse serialized traceparent string to verify
-        let serialized_str = core::str::from_utf8(&buf[..bytes_written]).unwrap();
+        let serialized_str = core:: String::from_utf8(&buf[..bytes_written]).unwrap();
         assert!(serialized_str.starts_with("00-"));
         assert!(serialized_str.contains("1a1a1a1a"));
         assert!(serialized_str.contains("2b2b2b2b"));

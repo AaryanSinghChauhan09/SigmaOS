@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -182,7 +184,7 @@ impl SigmaPkg {
     }
 
     fn load_local_database(&mut self) -> Result<(), String> {
-        let db_path = self.database_dir.join("local");
+        let db_path = self.format!("{}/{}", database_dir, "local");
         
         if !db_path.exists() {
             return Ok(());
@@ -205,7 +207,7 @@ impl SigmaPkg {
             
             // Download repository database
             let db_url = format!("{}/{}.db", repo.url, repo.name);
-            let db_path = self.cache_dir.join(format!("{}.db", repo.name));
+            let db_path = self.format!("{}/{}", cache_dir, format!("{}.db", repo.name));
             
             // Simulate database download
             // In real implementation, would use HTTP client to download
@@ -351,7 +353,7 @@ impl SigmaPkg {
         // Download package
         let package_url = format!("{}/{}-{}.sigmpkg", 
             package.repository, package.name, package.version);
-        let package_path = self.cache_dir.join(format!("{}-{}.sigmpkg", 
+        let package_path = self.format!("{}/{}", cache_dir, format!("{}-{}.sigmpkg", 
             package.name, package.version));
         
         // Simulate download

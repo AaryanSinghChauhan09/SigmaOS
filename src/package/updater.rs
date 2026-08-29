@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -157,7 +160,7 @@ impl AutoInstallProvisioner {
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
-            profile.extra_packages.join(", ")
+            profile.format!("{}/{}", extra_packages, ", ")
         ))
     }
 }
@@ -329,7 +332,7 @@ impl SoftwareUpdater {
         }
 
         if let Some(last) = self.last_check {
-            if last.elapsed() < self.auto_check_interval {
+            if core::time::Duration::from_millis(0) < self.auto_check_interval {
                 return None;
             }
         }
@@ -412,10 +415,7 @@ impl SoftwareUpdater {
         let snapshot = RollbackSnapshot {
             id: format!("snapshot_{}", self.rollback_snapshots.len()),
             version: self.current_version.clone(),
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            created_at: 1700000000u64,
             snapshot_path: format!("/var/backups/sigmaos_{}", self.current_version),
         };
 

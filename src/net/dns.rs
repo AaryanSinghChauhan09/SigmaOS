@@ -1,4 +1,3 @@
-// SigmaOS Network Protocol Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+// SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only

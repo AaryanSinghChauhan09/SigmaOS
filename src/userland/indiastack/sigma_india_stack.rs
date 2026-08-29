@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 // SigmaOS India Stack Integration
 // ABDM FHIR client, UPI payments, GST/IRN generation, e-RUPI voucher

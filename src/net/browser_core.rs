@@ -1,4 +1,3 @@
-// SigmaOS Network Protocol Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+use alloc::format;
+// SigmaOS Network Protocol Layer
 
 // Browser Core - High-performance, memory-safe browser implementation
 // Parses HTML5, CSS3, ES2022+, and SVG with integrated security
@@ -23,7 +25,7 @@
 // (no_std only applicable at crate root - removed)
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

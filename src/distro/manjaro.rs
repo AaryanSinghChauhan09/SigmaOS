@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -290,7 +292,7 @@ impl PamacPackageManager {
             let score_b = (b.latency_ms as f64) / (b.reliability_score as f64);
             score_a
                 .partial_cmp(&score_b)
-                .unwrap_or(std::cmp::Ordering::Equal)
+                .unwrap_or(core::cmp::Ordering::Equal)
         });
     }
 

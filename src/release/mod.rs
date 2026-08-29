@@ -1,12 +1,12 @@
 //! Release Management System (Debian/Arch Release Cycle Inspiration)
 //! Manages versioning, release channels, and release processes
+use alloc::format;
 extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Release types (Debian/Arch inspiration)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

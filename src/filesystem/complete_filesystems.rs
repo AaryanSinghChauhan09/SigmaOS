@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 // SigmaOS Complete Filesystems Suite
 // High-fidelity implementation of FAT (12, 16, 32), NTFS, exFAT, Btrfs, HFS+, and ext (2, 3, 4) filesystems

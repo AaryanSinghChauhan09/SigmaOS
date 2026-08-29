@@ -1,9 +1,3 @@
-//! smoltcp Integration for SigmaOS
-//! 
-//! This module provides integration with smoltcp, a standalone, high-performance
-//! TCP/IP stack for embedded systems. It enables SigmaOS to leverage smoltcp's
-//! proven networking capabilities while maintaining custom extensions.
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -13,11 +7,17 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+//! smoltcp Integration for SigmaOS
+//! 
+//! This module provides integration with smoltcp, a standalone, high-performance
+//! TCP/IP stack for embedded systems. It enables SigmaOS to leverage smoltcp's
+//! proven networking capabilities while maintaining custom extensions.
+
 
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// smoltcp interface identifier
 pub type InterfaceId = usize;

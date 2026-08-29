@@ -4,9 +4,8 @@ extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// SDN controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

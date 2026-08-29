@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Mobile & Desktop Competitor Parity Subsystem
 // Independent, zero-dependency implementations of macOS, iOS, and Android core technologies

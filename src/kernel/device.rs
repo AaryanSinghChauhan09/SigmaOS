@@ -1,6 +1,7 @@
+use alloc::boxed::Box;
 extern crate alloc;
 
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::any::Any;
 

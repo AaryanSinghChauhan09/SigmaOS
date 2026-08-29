@@ -1,9 +1,10 @@
+use alloc::format;
 extern crate alloc;
 /// Transaction Log System (Debian APT dpkg inspiration)
 /// Provides atomic transactions and rollback capabilities
 use crate::klib::Vec;
 use crate::sigpkg::Package;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Transaction entry type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

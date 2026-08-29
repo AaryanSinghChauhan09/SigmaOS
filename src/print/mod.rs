@@ -1,10 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
 // SigmaOS Print Module
 // Printing and spooling subsystem
 // Zero-dependency implementation - no external libraries required
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 
 extern crate alloc;
 use alloc::vec::Vec;

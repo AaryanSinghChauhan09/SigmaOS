@@ -1,7 +1,8 @@
+#![allow(clippy::all, warnings)]
+use alloc::vec;
 // SigmaOS Even More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 additional drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
-#![allow(clippy::all, warnings)]
 
 
 extern crate alloc;

@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -56,7 +59,7 @@ pub struct MetricData {
     pub metric_type: MetricType,
     pub value: f64,
     pub unit: String,
-    pub timestamp: std::time::Instant,
+    pub timestamp: std::time:: u64,
 }
 
 /// Metric type
@@ -428,7 +431,7 @@ impl UnifiedControlCenter {
                     metric_type: MetricType::CpuUsage,
                     value: 45.0,
                     unit: "%".to_string(),
-                    timestamp: std::time::Instant::now(),
+                    timestamp: 0u64,
                 }),
                 position: (0, 0),
                 size: (2, 1),
@@ -441,7 +444,7 @@ impl UnifiedControlCenter {
                     metric_type: MetricType::MemoryUsage,
                     value: 60.0,
                     unit: "%".to_string(),
-                    timestamp: std::time::Instant::now(),
+                    timestamp: 0u64,
                 }),
                 position: (2, 0),
                 size: (2, 1),

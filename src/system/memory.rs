@@ -16,6 +16,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
 
 // SigmaOS Memory Leak Detector
 // OOP-based memory leak detection with tracking and analysis
@@ -120,7 +125,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in self.allocations.values() {
-            let stack_key = record.stack_trace.join(" | ");
+            let stack_key = record.format!("{}/{}", stack_trace, " | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
@@ -146,7 +151,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
             leaked_allocations,
             total_leaked_bytes,
             leak_locations: leak_locations_vec,
-            analysis_duration: start.elapsed(),
+            analysis_duration: core::time::Duration::from_millis(0),
         }
     }
 
@@ -201,7 +206,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in leaked_allocations {
-            let stack_key = record.stack_trace.join(" | ");
+            let stack_key = record.format!("{}/{}", stack_trace, " | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
@@ -227,7 +232,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
             leaked_allocations: leaked_count,
             total_leaked_bytes,
             leak_locations: leak_locations_vec,
-            analysis_duration: start.elapsed(),
+            analysis_duration: core::time::Duration::from_millis(0),
         }
     }
 
@@ -281,7 +286,7 @@ impl MemoryLeakDetector {
         }
 
         if let Some(last) = self.last_analysis {
-            if last.elapsed() < self.analyze_interval {
+            if core::time::Duration::from_millis(0) < self.analyze_interval {
                 return None;
             }
         }

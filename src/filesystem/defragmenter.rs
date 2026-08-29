@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Disk Defragmenter (SigmaDefrag Engine)
 // Fully absorbs and implements all features, systems, and philosophies of Defraggler & Windows Defrag:

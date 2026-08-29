@@ -1,8 +1,3 @@
-// SigmaOS Distro Compatibility Layer
-// SigmaOS LocalSend Protocol Compatibility Bridge
-// Implements the LocalSend REST/UDP v2.1 protocol format
-// to enable offline peer-to-peer secure file transfer within local networks.
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -20,6 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
+// SigmaOS Distro Compatibility Layer
+// SigmaOS LocalSend Protocol Compatibility Bridge
+// Implements the LocalSend REST/UDP v2.1 protocol format
+// to enable offline peer-to-peer secure file transfer within local networks.
+
 
 extern crate alloc;
 use crate::security::capability::CapabilityToken;

@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Unified Peripheral Device Architecture
 // Implements OOP principles for robust, low footprint device management

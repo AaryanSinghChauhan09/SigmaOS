@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Block Device Subsystem & High-Performance Block Management Architecture

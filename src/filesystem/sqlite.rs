@@ -1,8 +1,3 @@
-//! SQLite Database Integration for SigmaOS
-//! 
-//! This module provides SQLite database functionality for SigmaOS,
-//! enabling efficient local data storage and SQL query capabilities.
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -12,6 +7,14 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+//! SQLite Database Integration for SigmaOS
+//! 
+//! This module provides SQLite database functionality for SigmaOS,
+//! enabling efficient local data storage and SQL query capabilities.
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 
 use crate::klib::HashMap;
 use alloc::sync::Arc;

@@ -1,3 +1,4 @@
+use alloc::string::{String, ToString};
 extern crate alloc;
 // SigmaOS Glary Utilities & Advanced SystemCare Parity Resource Optimizer
 // Zero-dependency, #![no_std] compliant, zero-allocation

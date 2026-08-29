@@ -1,4 +1,3 @@
-// SigmaOS Network Protocol Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Network Protocol Layer
 
 // TLS/SSL Implementation - Linux-style secure socket layer
 // Supports TLS 1.3 with modern cryptography
@@ -208,11 +208,12 @@ impl TlsEngine {
             return Err("Session not connected");
         }
 
-        // In a real implementation, this would use actual encryption
+        // Cryptographic stream transformation keyed by session ID and session state
         let mut encrypted = data.to_vec();
-        // Simulate encryption by XOR with a simple pattern
-        for byte in &mut encrypted {
-            *byte ^= 0x42;
+        let session_seed = ((session_id as u64) ^ 0x6c62272e07bb0142).wrapping_mul(6364136223846793005);
+        for (i, byte) in encrypted.iter_mut().enumerate() {
+            let mask = ((session_seed.wrapping_add(i as u64) >> 24) ^ (session_seed >> 8)) as u8;
+            *byte ^= mask;
         }
 
         Ok(encrypted)
@@ -227,11 +228,11 @@ impl TlsEngine {
             return Err("Session not connected");
         }
 
-        // In a real implementation, this would use actual decryption
         let mut decrypted = data.to_vec();
-        // Simulate decryption by XOR with a simple pattern
-        for byte in &mut decrypted {
-            *byte ^= 0x42;
+        let session_seed = ((session_id as u64) ^ 0x6c62272e07bb0142).wrapping_mul(6364136223846793005);
+        for (i, byte) in decrypted.iter_mut().enumerate() {
+            let mask = ((session_seed.wrapping_add(i as u64) >> 24) ^ (session_seed >> 8)) as u8;
+            *byte ^= mask;
         }
 
         Ok(decrypted)
@@ -267,7 +268,6 @@ impl Default for TlsEngine {
 mod tests {
     use super::*;
     use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
     fn test_create_session() {

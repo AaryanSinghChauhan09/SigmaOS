@@ -1,4 +1,3 @@
-// SigmaOS Network Protocol Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Network Protocol Layer
 
 // SovereignBrowser - Native browser core for SigmaOS
 // HTML5/CSS3 rendering, adblocking, and container isolation
@@ -24,7 +24,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,12 +1,12 @@
+#![cfg_attr(not(test), no_std)]
 // SigmaOS IDS Rule Parser
 // Advanced rule-based intrusion detection system with Snort/Suricata-style syntax
 // Solves BUG-011: IDS Rule Parser not implemented
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 

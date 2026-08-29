@@ -17,16 +17,18 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::format;
 
 // SigmaOS Secure VPN Client
 // OOP-based VPN with WireGuard and OpenVPN support
 
 // IpAddr not in no_std; using u32 for addresses
-type PathBuf = alloc::string::String;
-type IpAddr = u32;
+pub type PathBuf = alloc::string::String;
+pub type IpAddr = u32;
 #[allow(non_snake_case)]
-fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 { ((a as u32) << 24) | ((b as u32) << 16) | ((c as u32) << 8) | d as u32 }
+pub fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 { ((a as u32) << 24) | ((b as u32) << 16) | ((c as u32) << 8) | d as u32 }
 // PathBuf not in no_std
 
 /// VPN protocol
@@ -141,7 +143,6 @@ impl VpnProtocolHandler for WireGuardHandler {
 
         // Simulated WireGuard handshake
         // In real implementation, perform actual WireGuard handshake
-        std::thread::sleep(std::time::Duration::from_millis(500));
 
         let assigned_ip = Some(Ipv4Addr_new(10, 0, 0, 2));
 
@@ -152,10 +153,7 @@ impl VpnProtocolHandler for WireGuardHandler {
             success: true,
             connection_id: format!(
                 "wg_{}",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs()
+                1700000000u64
             ),
             assigned_ip,
             message: "WireGuard connection established".to_string(),
@@ -170,7 +168,6 @@ impl VpnProtocolHandler for WireGuardHandler {
         self.state = ConnectionState::Disconnecting;
 
         // Simulated disconnection
-        std::thread::sleep(std::time::Duration::from_millis(200));
 
         self.state = ConnectionState::Disconnected;
         self.statistics = VpnStatistics {
@@ -251,7 +248,6 @@ impl VpnProtocolHandler for OpenVpnHandler {
 
         // Simulated OpenVPN connection
         // In real implementation, load config file and connect
-        std::thread::sleep(std::time::Duration::from_millis(1000));
 
         let assigned_ip = Some(Ipv4Addr_new(10, 1, 0, 2));
 
@@ -262,10 +258,7 @@ impl VpnProtocolHandler for OpenVpnHandler {
             success: true,
             connection_id: format!(
                 "ovpn_{}",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs()
+                1700000000u64
             ),
             assigned_ip,
             message: "OpenVPN connection established".to_string(),
@@ -280,7 +273,6 @@ impl VpnProtocolHandler for OpenVpnHandler {
         self.state = ConnectionState::Disconnecting;
 
         // Simulated disconnection
-        std::thread::sleep(std::time::Duration::from_millis(300));
 
         self.state = ConnectionState::Disconnected;
         self.statistics = VpnStatistics {

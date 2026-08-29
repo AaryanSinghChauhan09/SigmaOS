@@ -10,7 +10,6 @@ use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::format;
 use alloc::string::ToString;
 
 /// Safely escapes HTML special characters to prevent DOM text reinterpretation / XSS

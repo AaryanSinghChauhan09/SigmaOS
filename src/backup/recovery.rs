@@ -1,5 +1,6 @@
 //! Comprehensive System Recovery & Backup inspired by Timeshift and Borg
 //! Incremental backups, deduplicated chunks, point-in-time recovery, and instant snapshot rollbacks.
+use alloc::vec;
 extern crate alloc;
 
 

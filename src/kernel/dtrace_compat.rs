@@ -12,9 +12,7 @@ use alloc::format;
 //   USENIX ATC 2004.
 //   Linux eBPF documentation — https://ebpf.io/
 //
-// No std, no libc, no external crates — purely custom SigmaOS implementation.
-
-use crate::klib::vec::Vec;
+// This implementation is purely custom — no std, no libc, no external crates.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Probe type (mirrors DTrace probe naming: provider:module:function:name)

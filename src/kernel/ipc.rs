@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -183,7 +185,7 @@ impl SovereignPipe {
 
     /// Reads raw byte stream from pipe (returns number of bytes read into buffer)
     pub fn read_bytes(&mut self, buf: &mut [u8]) -> usize {
-        let to_read = std::cmp::min(buf.len(), self.byte_stream.len());
+        let to_read = core::cmp::min(buf.len(), self.byte_stream.len());
         if to_read == 0 {
             return 0;
         }
@@ -240,7 +242,7 @@ impl SovereignTeeEngine {
         destination: &mut SovereignPipe,
         max_elements: usize,
     ) -> Result<usize, IpcError> {
-        let count = std::cmp::min(max_elements, source.ring_buffer.len());
+        let count = core::cmp::min(max_elements, source.ring_buffer.len());
         let mut duplicated = 0;
         for i in 0..count {
             let chunk = source.ring_buffer[i].clone();
@@ -345,7 +347,7 @@ impl SovereignSendfileEngine {
         if offset >= file_cache.len() {
             return Ok(0);
         }
-        let limit = std::cmp::min(offset + count, file_cache.len());
+        let limit = core::cmp::min(offset + count, file_cache.len());
         let mut bytes_moved = 0;
         for i in offset..limit {
             let chunk = &file_cache[i];

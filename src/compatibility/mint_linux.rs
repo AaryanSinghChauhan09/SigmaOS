@@ -3,14 +3,10 @@ extern crate alloc;
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
-
-#[cfg(feature = "standalone_test")]
-#[cfg(feature = "standalone_test")]
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {

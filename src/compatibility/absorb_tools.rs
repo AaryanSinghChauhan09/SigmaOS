@@ -1,7 +1,6 @@
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use crate::klib::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.

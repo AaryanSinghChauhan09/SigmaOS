@@ -304,9 +304,8 @@ impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
-    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
+impl<T: PartialEq<U>, U> PartialEq<alloc::vec::Vec<U>> for Vec<T> {
+    fn eq(&self, other: &alloc::vec::Vec<U>) -> bool {
         self.as_slice() == other.as_slice()
     }
 }

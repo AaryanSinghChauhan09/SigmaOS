@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // BusyBox-Style: Multi-Call `sigma-sh` Command Parser
 // Combining utilities into a single executable reduces binary overhead by up to 90%
@@ -45,7 +46,7 @@ impl MultiCallShell {
     pub fn execute_command(command: SysCommandType, args: &[&str]) -> Result<String, &'static str> {
         match command {
             SysCommandType::Echo => {
-                let output = args.join(" ");
+                let output = format!("{}/{}", args, " ");
                 Ok(output)
             }
             SysCommandType::WhoAmI => Ok("sigma".to_string()),

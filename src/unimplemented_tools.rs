@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 // Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.

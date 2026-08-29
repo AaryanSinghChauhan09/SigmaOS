@@ -95,7 +95,7 @@ pub struct PomodoroTimer {
     pub elapsed: Duration,
     pub pomodoros_completed: u32,
     pub running: bool,
-    pub start_time: Option<Instant>,
+    pub start_time: Option<u64>,
 }
 
 impl PomodoroTimer {
@@ -118,7 +118,7 @@ impl PomodoroTimer {
         self.current_duration = self.work_duration;
         self.elapsed = Duration::from_secs(0);
         self.running = true;
-        self.start_time = Some(Instant::now());
+        self.start_time = Some(0u64);
     }
 
     pub fn start_short_break(&mut self) {
@@ -126,7 +126,7 @@ impl PomodoroTimer {
         self.current_duration = self.short_break_duration;
         self.elapsed = Duration::from_secs(0);
         self.running = true;
-        self.start_time = Some(Instant::now());
+        self.start_time = Some(0u64);
     }
 
     pub fn start_long_break(&mut self) {
@@ -134,7 +134,7 @@ impl PomodoroTimer {
         self.current_duration = self.long_break_duration;
         self.elapsed = Duration::from_secs(0);
         self.running = true;
-        self.start_time = Some(Instant::now());
+        self.start_time = Some(0u64);
     }
 
     pub fn pause(&mut self) {
@@ -145,7 +145,7 @@ impl PomodoroTimer {
     pub fn resume(&mut self) {
         if self.state == PomodoroState::Paused {
             self.running = true;
-            self.start_time = Some(Instant::now());
+            self.start_time = Some(0u64);
         }
     }
 
@@ -162,7 +162,7 @@ impl PomodoroTimer {
         }
 
         if let Some(start) = self.start_time {
-            self.elapsed = start.elapsed();
+            self.elapsed = core::time::Duration::from_millis(0);
 
             if self.elapsed >= self.current_duration {
                 self.complete_pomodoro();

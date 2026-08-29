@@ -5,7 +5,7 @@ extern crate alloc;
 
 
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Audio node type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

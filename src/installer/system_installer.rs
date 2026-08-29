@@ -1,8 +1,9 @@
+#![cfg_attr(not(test), no_std)]
+use alloc::vec;
 // SigmaOS System Installer
 // Linux distro-inspired installation framework
 // Handles system installation, bootloader configuration, and system setup
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;

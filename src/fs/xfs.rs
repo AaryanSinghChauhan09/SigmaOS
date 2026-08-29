@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 // XFS - Linux-style high-performance journaling filesystem
 // Supports allocation groups, extent-based allocation, realtime subsystem, and journaling

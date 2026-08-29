@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -190,7 +193,7 @@ pub struct PasswordManager {
     biometric_auth: Option<Box<dyn BiometricAuth>>,
     biometric_enabled: bool,
     auto_lock_timeout_seconds: u64,
-    last_access: Option<std::time::Instant>,
+    last_access: Option<std::time:: u64>,
 }
 
 impl PasswordManager {
@@ -236,7 +239,7 @@ impl PasswordManager {
         let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
 
         Ok(PasswordManagerResult {
             success: true,
@@ -260,7 +263,7 @@ impl PasswordManager {
         let mut decrypted_entry = entry.clone();
         decrypted_entry.encrypted_password = decrypted_password;
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
         Ok(decrypted_entry)
     }
 
@@ -279,8 +282,8 @@ impl PasswordManager {
 
         let encrypted_entry = PasswordEntry {
             encrypted_password,
-            last_modified: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
+            last_modified: core::time::Duration::from_secs(0)
+                .duration_since(std::time::core::time::Duration::from_secs(0))
                 .map(|d| d.as_secs())
                 .unwrap_or(0),
             ..entry
@@ -289,7 +292,7 @@ impl PasswordManager {
         let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
 
         Ok(PasswordManagerResult {
             success: true,
@@ -307,7 +310,7 @@ impl PasswordManager {
             .remove(&key)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
 
         Ok(PasswordManagerResult {
             success: true,
@@ -329,7 +332,7 @@ impl PasswordManager {
             })
             .collect();
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
         Ok(entries)
     }
 
@@ -347,7 +350,7 @@ impl PasswordManager {
             })
             .collect();
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
         Ok(results)
     }
 
@@ -368,7 +371,7 @@ impl PasswordManager {
         let result = auth.authenticate(biometric_type)?;
 
         if result.success {
-            self.last_access = Some(std::time::Instant::now());
+            self.last_access = Some(0u64);
         }
 
         Ok(result)
@@ -390,13 +393,13 @@ impl PasswordManager {
 
     /// Unlock the password manager
     pub fn unlock(&mut self) {
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(0u64);
     }
 
     /// Check if locked
     pub fn is_locked(&self) -> bool {
         if let Some(last) = self.last_access {
-            last.elapsed() > std::time::Duration::from_secs(self.auto_lock_timeout_seconds)
+            core::time::Duration::from_millis(0) > core::time::Duration::from_secs(self.auto_lock_timeout_seconds)
         } else {
             true
         }
@@ -461,8 +464,8 @@ impl PasswordManager {
 
         let mut password = String::new();
         // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
-        let mut seed = (std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
+        let mut seed = (core::time::Duration::from_secs(0)
+            .duration_since(std::time::core::time::Duration::from_secs(0))
             .map(|d| d.as_millis())
             .unwrap_or(0) as u64)
             * 1_000_000;
@@ -483,8 +486,8 @@ impl Default for PasswordManager {
     fn default() -> Self {
         let mut key = vec![0u8; 32];
         // Generate a non-hardcoded key dynamically using system time entropy
-        let mut seed = (std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
+        let mut seed = (core::time::Duration::from_secs(0)
+            .duration_since(std::time::core::time::Duration::from_secs(0))
             .map(|d| d.as_nanos())
             .unwrap_or(0)
             ^ 0x5a5a5a5a5a5a5a5a) as u64;

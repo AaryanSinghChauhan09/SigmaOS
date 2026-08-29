@@ -6,7 +6,6 @@ use alloc::format;
 
 use crate::klib::HashMap;
 use crate::klib::hashset::HashSet;
-use std::io::{self, BufRead, Write};
 
 /// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
 /// Provides a placeholder so the shell REPL compiles while orchestrator is being built
@@ -911,7 +910,7 @@ impl ShellRepl {
                         if results.is_empty() {
                             Ok("No matching packages found.".to_string())
                         } else {
-                            Ok(results.join("\n"))
+                            Ok(format!("{}/{}", results, "\n"))
                         }
                     }
                 } else if subcommand == "install" {

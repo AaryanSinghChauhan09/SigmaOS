@@ -1,7 +1,7 @@
+#![allow(dead_code)]
 // OpenBSD KARL (Kernel Address Randomized Link) engine for SigmaOS
 // Randomizes kernel section order, function alignments, and symbol offsets on boot
 
-#![allow(dead_code)]
 
 extern crate alloc;
 

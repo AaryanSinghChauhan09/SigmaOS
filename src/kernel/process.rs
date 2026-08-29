@@ -1,9 +1,9 @@
+#![allow(dead_code)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Comprehensive Process Model
 // Includes POSIX threads, complete states, signals, ELF loading stubs, context switching,
 // and advanced blocked process states (BlockedWaiting, BlockedSuspended, WaitChannels).
 
-#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::collections::{BTreeMap, VecDeque};

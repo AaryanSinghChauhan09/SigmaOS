@@ -1,8 +1,3 @@
-/// SigmaOS: =============================================================================
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
-
-// (no_std only applicable at crate root - removed)
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
@@ -21,6 +16,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+/// SigmaOS: =============================================================================
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
+
+// (no_std only applicable at crate root - removed)
 
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────

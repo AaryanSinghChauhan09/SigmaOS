@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -5,12 +8,12 @@ use alloc::format;
 // OOP-based disk space analysis with visualization
 
 use crate::klib::HashMap;
-// Path/PathBuf not in no_std
+// str/String not in no_std
 
 /// Disk usage info
 #[derive(Debug, Clone)]
 pub struct DiskUsageInfo {
-    pub path: PathBuf,
+    pub path: String,
     pub total_bytes: u64,
     pub used_bytes: u64,
     pub free_bytes: u64,
@@ -20,7 +23,7 @@ pub struct DiskUsageInfo {
 /// Directory size info
 #[derive(Debug, Clone)]
 pub struct DirectorySizeInfo {
-    pub path: PathBuf,
+    pub path: String,
     pub size_bytes: u64,
     pub file_count: u64,
     pub directory_count: u64,
@@ -30,7 +33,7 @@ pub struct DirectorySizeInfo {
 /// File size info
 #[derive(Debug, Clone)]
 pub struct FileSizeInfo {
-    pub path: PathBuf,
+    pub path: String,
     pub size_bytes: u64,
     pub modified_at: u64,
 }
@@ -46,7 +49,7 @@ pub enum AnalysisMode {
 /// OOP trait for analysis strategies
 pub trait AnalysisStrategy {
     /// Analyze directory
-    fn analyze(&self, path: &Path) -> Result<DirectorySizeInfo, DiskUsageError>;
+    fn analyze(&self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError>;
     /// Get strategy name
     fn name(&self) -> &str;
 }
@@ -63,15 +66,15 @@ impl QuickAnalysisStrategy {
 }
 
 impl AnalysisStrategy for QuickAnalysisStrategy {
-    fn analyze(&self, path: &Path) -> Result<DirectorySizeInfo, DiskUsageError> {
+    fn analyze(&self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError> {
         // Simulated quick analysis
         Ok(DirectorySizeInfo {
-            path: path.to_path_buf(),
+            path: path.clone(),
             size_bytes: 1024 * 1024 * 1024, // 1GB
             file_count: 100,
             directory_count: 10,
             largest_files: vec![FileSizeInfo {
-                path: path.join("large_file.bin"),
+                path: format!("{}/{}", path, "large_file.bin"),
                 size_bytes: 512 * 1024 * 1024, // 512MB
                 modified_at: 1234567890,
             }],
@@ -95,21 +98,21 @@ impl DeepAnalysisStrategy {
 }
 
 impl AnalysisStrategy for DeepAnalysisStrategy {
-    fn analyze(&self, path: &Path) -> Result<DirectorySizeInfo, DiskUsageError> {
+    fn analyze(&self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError> {
         // Simulated deep analysis
         Ok(DirectorySizeInfo {
-            path: path.to_path_buf(),
+            path: path.clone(),
             size_bytes: 2 * 1024 * 1024 * 1024, // 2GB
             file_count: 500,
             directory_count: 50,
             largest_files: vec![
                 FileSizeInfo {
-                    path: path.join("large_file1.bin"),
+                    path: format!("{}/{}", path, "large_file1.bin"),
                     size_bytes: 512 * 1024 * 1024,
                     modified_at: 1234567890,
                 },
                 FileSizeInfo {
-                    path: path.join("large_file2.bin"),
+                    path: format!("{}/{}", path, "large_file2.bin"),
                     size_bytes: 256 * 1024 * 1024,
                     modified_at: 1234567890,
                 },
@@ -125,7 +128,7 @@ impl AnalysisStrategy for DeepAnalysisStrategy {
 /// OOP-based Disk Usage Analyzer
 pub struct DiskUsageAnalyzer {
     strategy: Box<dyn AnalysisStrategy>,
-    cache: HashMap<PathBuf, DirectorySizeInfo>,
+    cache: HashMap<String, DirectorySizeInfo>,
     cache_enabled: bool,
 }
 
@@ -145,7 +148,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Analyze directory
-    pub fn analyze(&mut self, path: &Path) -> Result<DirectorySizeInfo, DiskUsageError> {
+    pub fn analyze(&mut self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError> {
         if self.cache_enabled {
             if let Some(cached) = self.cache.get(path) {
                 return Ok(cached.clone());
@@ -155,17 +158,17 @@ impl DiskUsageAnalyzer {
         let result = self.strategy.analyze(path)?;
 
         if self.cache_enabled {
-            self.cache.insert(path.to_path_buf(), result.clone());
+            self.cache.insert(path.clone(), result.clone());
         }
 
         Ok(result)
     }
 
     /// Get disk usage
-    pub fn get_disk_usage(&self, path: &Path) -> Result<DiskUsageInfo, DiskUsageError> {
+    pub fn get_disk_usage(&self, path: &str) -> Result<DiskUsageInfo, DiskUsageError> {
         // Simulated disk usage
         Ok(DiskUsageInfo {
-            path: path.to_path_buf(),
+            path: path.clone(),
             total_bytes: 500 * 1024 * 1024 * 1024, // 500GB
             used_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
             free_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
@@ -174,12 +177,12 @@ impl DiskUsageAnalyzer {
     }
 
     /// Find large files
-    pub fn find_large_files(&self, path: &Path, min_size_bytes: u64) -> Vec<FileSizeInfo> {
+    pub fn find_large_files(&self, path: &str, min_size_bytes: u64) -> Vec<FileSizeInfo> {
         let dir_info = self
             .strategy
             .analyze(path)
             .unwrap_or_else(|_| DirectorySizeInfo {
-                path: path.to_path_buf(),
+                path: path.clone(),
                 size_bytes: 0,
                 file_count: 0,
                 directory_count: 0,
@@ -194,16 +197,16 @@ impl DiskUsageAnalyzer {
     }
 
     /// Find duplicate files (simulated)
-    pub fn find_duplicates(&self, path: &Path) -> Vec<Vec<FileSizeInfo>> {
+    pub fn find_duplicates(&self, path: &str) -> Vec<Vec<FileSizeInfo>> {
         // Simulated duplicate detection
         vec![vec![
             FileSizeInfo {
-                path: path.join("duplicate1.txt"),
+                path: format!("{}/{}", path, "duplicate1.txt"),
                 size_bytes: 1024,
                 modified_at: 1234567890,
             },
             FileSizeInfo {
-                path: path.join("duplicate2.txt"),
+                path: format!("{}/{}", path, "duplicate2.txt"),
                 size_bytes: 1024,
                 modified_at: 1234567890,
             },
@@ -211,7 +214,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
+    pub fn get_size_by_type(&self, path: &str) -> HashMap<String, u64> {
         let mut sizes = HashMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
@@ -257,7 +260,7 @@ pub struct FilesystemDiskUsage {
     pub used_inodes: u64,
     pub free_inodes: u64,
     pub inode_use_percent: f64,
-    pub mounted_on: PathBuf,
+    pub mounted_on: String,
 }
 
 /// Sovereign Disk Free (df) Engine implementing multi-filesystem reporting,
@@ -350,7 +353,7 @@ impl Default for SovereignDfEngine {
             used_inodes: 1_200_000,
             free_inodes: 8_800_000,
             inode_use_percent: 12.0,
-            mounted_on: PathBuf::from("/"),
+            mounted_on: String::from("/"),
         });
         engine.add_mount_entry(FilesystemDiskUsage {
             filesystem: "tmpfs".to_string(),
@@ -363,7 +366,7 @@ impl Default for SovereignDfEngine {
             used_inodes: 5_000,
             free_inodes: 495_000,
             inode_use_percent: 1.0,
-            mounted_on: PathBuf::from("/dev/shm"),
+            mounted_on: String::from("/dev/shm"),
         });
         engine
     }
@@ -470,7 +473,7 @@ mod tests {
     #[test]
     fn test_disk_usage_info() {
         let info = DiskUsageInfo {
-            path: PathBuf::from("/"),
+            path: String::from("/"),
             total_bytes: 500 * 1024 * 1024 * 1024,
             used_bytes: 250 * 1024 * 1024 * 1024,
             free_bytes: 250 * 1024 * 1024 * 1024,
@@ -500,14 +503,14 @@ mod tests {
     #[test]
     fn test_analyze() {
         let mut analyzer = DiskUsageAnalyzer::default();
-        let result = analyzer.analyze(&PathBuf::from("/home/user")).unwrap();
+        let result = analyzer.analyze(&String::from("/home/user")).unwrap();
         assert_eq!(result.file_count, 100);
     }
 
     #[test]
     fn test_get_disk_usage() {
         let analyzer = DiskUsageAnalyzer::default();
-        let usage = analyzer.get_disk_usage(&PathBuf::from("/")).unwrap();
+        let usage = analyzer.get_disk_usage(&String::from("/")).unwrap();
         assert_eq!(usage.usage_percent, 50.0);
     }
 
@@ -551,7 +554,7 @@ mod tests {
             used_inodes: 200_000,
             free_inodes: 800_000,
             inode_use_percent: 20.0,
-            mounted_on: PathBuf::from("/mnt/data"),
+            mounted_on: String::from("/mnt/data"),
         };
         engine.add_mount_entry(entry);
 

@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // AT&T System V, Linux & BSD Inspired Identification, Verification, ADT & Security Subsystem
 // Implements 5-step User Identification, Verification, Authenticity of Information,

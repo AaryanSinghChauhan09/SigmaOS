@@ -1,10 +1,11 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+use alloc::format;
 // SigmaOS Workflow Module
 // Workflow automation engine
 // Zero-dependency implementation - no external libraries required
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 
 extern crate alloc;
 use alloc::vec::Vec;

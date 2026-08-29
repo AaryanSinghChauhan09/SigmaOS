@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543

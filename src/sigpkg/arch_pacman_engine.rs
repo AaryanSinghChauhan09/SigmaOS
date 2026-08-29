@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman Compatibility Engine
@@ -183,7 +185,7 @@ impl ArchBuildSystem {
             }
         }
 
-        self.srcinfo = srcinfo_lines.join("\n");
+        self.srcinfo = format!("{}/{}", srcinfo_lines, "\n");
         Ok(())
     }
 

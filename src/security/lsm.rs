@@ -19,7 +19,7 @@
 // (no_std only applicable at crate root - removed)
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 use crate::filesystem::vfs::{FsError, Inode};

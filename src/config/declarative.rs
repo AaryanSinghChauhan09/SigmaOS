@@ -1,5 +1,6 @@
 //! Declarative System Configuration Management inspired by NixOS and Guix
 //! Atomic upgrades, system generation tracking, configuration modules, and instant rollbacks.
+use alloc::vec;
 extern crate alloc;
 
 

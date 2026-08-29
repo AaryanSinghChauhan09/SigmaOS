@@ -1,4 +1,3 @@
-extern crate alloc;
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -16,6 +15,7 @@ extern crate alloc;
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
 
 /// SigmaOS Linux-style Namespaces for process isolation
 /// Supports: PID, Net, Mount, UTS, IPC, User, Cgroup namespaces

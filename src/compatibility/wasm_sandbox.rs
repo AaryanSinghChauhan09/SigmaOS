@@ -1,7 +1,6 @@
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use crate::klib::Vec;
 /// WebAssembly (WASM) Sandbox and Secure Runtime Execution Engine
 /// Provides isolated module runtimes, memory sandboxing, and pledge security checks
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.

@@ -1,7 +1,8 @@
+#![cfg_attr(target_os = "none", no_std)]
+use alloc::vec::Vec;
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 
-#![cfg_attr(target_os = "none", no_std)]
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

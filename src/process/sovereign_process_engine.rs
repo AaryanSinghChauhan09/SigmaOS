@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Sovereign Process Management & Advanced IPC Engine
 // High-performance process execution, non-blocking stream I/O,

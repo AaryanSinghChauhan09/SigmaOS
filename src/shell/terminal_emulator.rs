@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 
 
@@ -857,7 +858,7 @@ impl UserDefinedFunction {
     /// Interpolates positional parameters ($1, $2, $@, $#) inside function body lines.
     pub fn interpolate(&self, args: &[&str]) -> Vec<String> {
         let mut expanded = Vec::new();
-        let joined_args = args.join(" ");
+        let joined_args = format!("{}/{}", args, " ");
         let arg_count_str = args.len().to_string();
 
         for line in &self.body_lines {

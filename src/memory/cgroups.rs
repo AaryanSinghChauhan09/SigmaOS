@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Linux-inspired Memory Control Groups (memcg) and OOM Killer Subsystem
 

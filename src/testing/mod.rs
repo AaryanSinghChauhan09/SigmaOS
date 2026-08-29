@@ -1,5 +1,6 @@
 //! Testing Infrastructure (Gentoo Test Frameworks + BSD Test Suites Inspiration)
 //! Comprehensive testing framework for SigmaOS
+use alloc::vec;
 extern crate alloc;
 
 

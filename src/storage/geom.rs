@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS FreeBSD-Inspired GEOM Storage Architecture
 // Provides a modular, layered storage transformation framework:

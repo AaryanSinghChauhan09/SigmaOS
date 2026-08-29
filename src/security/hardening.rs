@@ -1,3 +1,4 @@
+use alloc::string::{String, ToString};
 extern crate alloc;
 /// Security Hardening & Cryptographic Intrusion Detection Suite for SigmaOS
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,

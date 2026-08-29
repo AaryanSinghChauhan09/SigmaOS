@@ -106,14 +106,14 @@ impl DebPackage {
                 break;
             }
 
-            let size_str = core::str::from_utf8(&header[48..58])
+            let size_str = core:: String::from_utf8(&header[48..58])
                 .map_err(|_| "Invalid size encoding in ar header")?
                 .trim();
             let size = size_str
                 .parse::<usize>()
                 .map_err(|_| "Failed to parse ar member size")?;
 
-            let name = core::str::from_utf8(&header[0..16])
+            let name = core:: String::from_utf8(&header[0..16])
                 .map_err(|_| "Invalid name encoding in ar header")?
                 .trim();
 
@@ -123,7 +123,7 @@ impl DebPackage {
             let member_data = &data[offset + 60..offset + 60 + size];
 
             if name.starts_with("debian-binary") {
-                let clean_ver = core::str::from_utf8(member_data)
+                let clean_ver = core:: String::from_utf8(member_data)
                     .map_err(|_| "debian-binary contains invalid characters")?
                     .trim();
                 if clean_ver != "2.0" {
@@ -131,7 +131,7 @@ impl DebPackage {
                 }
             } else if name.starts_with("control") {
                 control_text = Some(
-                    core::str::from_utf8(member_data).map_err(|_| "Control file must be UTF-8")?,
+                    core:: String::from_utf8(member_data).map_err(|_| "Control file must be UTF-8")?,
                 );
             } else if name.starts_with("data") {
                 data_size = size;

@@ -1,3 +1,7 @@
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // Fedora-inspired SELinux (Security-Enhanced Linux) Mandatory Access Control Subsystem.
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,

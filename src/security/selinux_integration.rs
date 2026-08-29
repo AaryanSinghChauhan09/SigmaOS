@@ -1,8 +1,8 @@
+#![cfg_attr(not(test), no_std)]
 // SigmaOS SELinux-System Call Integration
 // Bridges SELinux policy engine with syscall dispatcher for real MAC enforcement
 // Solves the gap: SELinux engine exists but not integrated with actual syscalls
 
-#![cfg_attr(not(test), no_std)]
 
 
 extern crate alloc;

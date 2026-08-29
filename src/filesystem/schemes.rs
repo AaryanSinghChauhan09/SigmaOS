@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -112,7 +114,7 @@ impl Scheme for LogScheme {
     }
 
     fn read(&mut self, _handle: usize, buf: &mut [u8]) -> Result<usize, &'static str> {
-        let merged_logs = self.logs.join("\n");
+        let merged_logs = self.format!("{}/{}", logs, "\n");
         let bytes = merged_logs.as_bytes();
         let len = buf.len().min(bytes.len());
         buf[..len].copy_from_slice(&bytes[..len]);
@@ -120,7 +122,7 @@ impl Scheme for LogScheme {
     }
 
     fn write(&mut self, _handle: usize, buf: &[u8]) -> Result<usize, &'static str> {
-        if let Ok(s) = std::str::from_utf8(buf) {
+        if let Ok(s) = std:: String::from_utf8(buf) {
             self.logs.push(s.to_string());
             Ok(buf.len())
         } else {
@@ -335,7 +337,7 @@ mod tests {
 
         let mut log_buf = [0u8; 200];
         let log_len = registry.read(h_log, &mut log_buf).unwrap();
-        let log_str = std::str::from_utf8(&log_buf[..log_len]).unwrap();
+        let log_str = std:: String::from_utf8(&log_buf[..log_len]).unwrap();
         assert!(log_str.contains("New Kernel Warning!"));
 
         registry.close(h_shm).unwrap();

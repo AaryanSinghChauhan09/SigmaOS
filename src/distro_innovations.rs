@@ -1,3 +1,4 @@
+#![no_std]
 //! # 🌐 SigmaOS Next-Gen Linux & BSD Distro Innovations Engine
 //!
 //! Pure safe-Rust implementation of breakthrough architectural concepts from across
@@ -12,8 +13,8 @@
 //! 8. **Void Linux**: XBPS Transaction Graph & Circular Dependency Resolver
 //! 9. **openSUSE / Fedora**: Snapper-style Btrfs/ZFS Snapshot Timeline Manager & RPM Spec Macro Expander
 //! 10. **Clear Linux**: Stateless OS Root Verification & Bundle Telemetry Analyzer
+use alloc::format;
 
-#![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

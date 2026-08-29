@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -6,7 +8,6 @@ use alloc::format;
 /// Establishes an on-device, vendor-neutral semantic layer and metric language interpreter.
 /// Enables AI agents, microservices, and databases to parse, define, and evaluate identical business metrics,
 /// dimensions, and relationships without loss of semantic meaning.
-use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MetricAggregation {

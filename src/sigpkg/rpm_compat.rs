@@ -105,7 +105,7 @@ mod tests {
 
         // Success translation
         let native_pkg = translator.translate_to_sigpkg().unwrap();
-        let name_str = core::str::from_utf8(&native_pkg).unwrap();
+        let name_str = core:: String::from_utf8(&native_pkg).unwrap();
         assert!(name_str.contains("kernel-core-converted-sigpkg"));
     }
 }

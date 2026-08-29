@@ -1,7 +1,7 @@
+#![cfg_attr(not(test), no_std)]
 // SigmaOS Memory Manager Performance Allocator Stack
 // Implements Slab Cache (<512B), Buddy Allocator (>=512B), and ACPI SRAT NUMA Topology Page Allocator.
 
-#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 use alloc::vec::Vec;

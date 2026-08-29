@@ -1,5 +1,6 @@
-extern crate alloc;
 #![allow(unused, dead_code)]
+use alloc::boxed::Box;
+extern crate alloc;
 
 /// OOP-Based Cluster Orchestration for SigmaOS (Rancher, k3s, and Harvester Parity)
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),
@@ -372,7 +373,7 @@ impl Consensus for SimpleConsensus {
 /// Creates encrypted overlay bridges between containers across physical network hosts.
 pub struct CniOverlayBridge {
     pub subnet: [u8; 16],
-    pub port_routing: std::collections::HashMap<u32, NodeID>,
+    pub port_routing: alloc::collections::BTreeMap<u32, NodeID>,
 }
 
 impl CniOverlayBridge {
@@ -382,7 +383,7 @@ impl CniOverlayBridge {
         subnet_arr[..len].copy_from_slice(&subnet[..len]);
         Self {
             subnet: subnet_arr,
-            port_routing: std::collections::HashMap::new(),
+            port_routing: alloc::collections::BTreeMap::new(),
         }
     }
 

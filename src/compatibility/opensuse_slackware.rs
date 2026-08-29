@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS openSUSE & Slackware Competitor Parity Subsystem
 // Independent, zero-dependency implementations of openSUSE YaST and Slackware pkgtools

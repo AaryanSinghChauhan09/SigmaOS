@@ -5,7 +5,7 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap as HashMap;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

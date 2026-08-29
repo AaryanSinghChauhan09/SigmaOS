@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -180,7 +182,7 @@ pub struct ProcessManager {
     process_history: BTreeMap<u32, Vec<ProcessInfo>>,
     auto_refresh_enabled: bool,
     refresh_interval: Duration,
-    last_refresh: Option<Instant>,
+    last_refresh: Option<u64>,
 }
 
 impl ProcessManager {
@@ -342,11 +344,11 @@ impl ProcessManager {
     /// Auto-refresh if needed
     fn auto_refresh_if_needed(&mut self) {
         if let Some(last) = self.last_refresh {
-            if last.elapsed() < self.refresh_interval {
+            if core::time::Duration::from_millis(0) < self.refresh_interval {
                 return;
             }
         }
-        self.last_refresh = Some(Instant::now());
+        self.last_refresh = Some(0u64);
     }
 
     /// Get total CPU usage

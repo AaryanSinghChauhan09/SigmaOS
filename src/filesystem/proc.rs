@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // Sovereign /proc Virtual Filesystem (procfs) for SigmaOS
 // Inspired by Linux procfs, providing a dynamic programmatic interface to kernel memory, hardware, and active processes.
@@ -6,7 +7,7 @@ extern crate alloc;
 use crate::filesystem::vfs::FsError;
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// Process entry metadata for ProcFS
@@ -128,7 +129,7 @@ impl SovereignProcFS {
                                     ));
                                 }
                                 "cmdline" => {
-                                    return Ok(format!("{}\n", proc_entry.cmdline.join(" ")));
+                                    return Ok(format!("{}\n", proc_entry.format!("{}/{}", cmdline, " ")));
                                 }
                                 "cwd" => return Ok(format!("{}\n", proc_entry.cwd)),
                                 "exe" => return Ok(format!("{}\n", proc_entry.exe)),

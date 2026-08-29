@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 
 // SigmaOS Distro Improvements - Inspired by leading Linux distributions
 // Each section implements concepts adapted from a specific distribution's innovations.

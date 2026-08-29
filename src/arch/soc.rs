@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 // Polymorphic SoC Abstract Framework for SigmaOS
 // Absorbs legacy mainline SoC forks (Xiaomi SM8250, HiSilicon Hi6250, Mediatek MTK, clk-meson)
 // Maps clock routing and pin multiplexing under Unified Pin/Clock Controller Traits

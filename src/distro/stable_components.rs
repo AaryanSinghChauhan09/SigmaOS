@@ -9,7 +9,6 @@ use alloc::vec::Vec;
 #[cfg(target_os = "none")]
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
 
 // ============================================================================
 // 1. RHEL / Rocky / AlmaLinux Subscription & Entitlement Manager

@@ -1,7 +1,6 @@
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use crate::klib::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
@@ -362,7 +361,7 @@ impl SovereignResearchLattice {
                 let mut found = false;
                 // Check title
                 let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
-                if let Ok(t) = core::str::from_utf8(&doc.title[..title_len]) {
+                if let Ok(t) = core:: String::from_utf8(&doc.title[..title_len]) {
                     if t.to_lowercase().contains(&query_lower) {
                         found = true;
                     }
@@ -370,7 +369,7 @@ impl SovereignResearchLattice {
                 // Check content
                 if !found {
                     let content_len = doc.content.iter().position(|&b| b == 0).unwrap_or(512);
-                    if let Ok(c) = core::str::from_utf8(&doc.content[..content_len]) {
+                    if let Ok(c) = core:: String::from_utf8(&doc.content[..content_len]) {
                         if c.to_lowercase().contains(&query_lower) {
                             found = true;
                         }

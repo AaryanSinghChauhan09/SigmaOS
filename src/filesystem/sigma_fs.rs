@@ -1,3 +1,7 @@
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
@@ -5,7 +9,7 @@
 use crate::klib::HashMap;
 #[cfg(test)]
 use crate::klib::HashMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Standardized next-generation hierarchy (SigmaFS)
 /// Compatible with Linux FHS, Windows NTFS, and BSD structures.

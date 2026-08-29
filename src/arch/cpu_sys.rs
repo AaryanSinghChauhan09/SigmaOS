@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Processor Initialisation, Memory Layout, and Fast System Call Engine
 // Fully absorbs and implements design philosophies of Linux (SMEP/SMAP, LSTAR) and BSD distros (Guard pages, strict GDT/IDT):

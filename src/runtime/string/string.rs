@@ -176,7 +176,7 @@ impl SigmaString {
         }
 
         let bytes = &self.as_bytes()[self.length - len..];
-        let c = core::str::from_utf8_unchecked(bytes).chars().next();
+        let c = core:: String::from_utf8_unchecked(bytes).chars().next();
         self.length -= len;
         c
     }

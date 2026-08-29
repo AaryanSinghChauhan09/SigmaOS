@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Mandatory Access Control (MAC) System
 // Inspired by SELinux and AppArmor
@@ -5,7 +6,7 @@ extern crate alloc;
 
 
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 
 /// SELinux-style security context for processes and objects

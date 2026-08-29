@@ -1,6 +1,3 @@
-// SigmaOS makepkg - Arch Linux PKGBUILD compilation sandbox
-// Provides safe, isolated compilation of Arch Linux packages
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -11,6 +8,9 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+// SigmaOS makepkg - Arch Linux PKGBUILD compilation sandbox
+// Provides safe, isolated compilation of Arch Linux packages
+
 
 extern crate alloc;
 use crate::sigpkg::{Package, Version};

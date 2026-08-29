@@ -1,3 +1,4 @@
+#![no_std]
 //! # 🐧 SigmaOS Extended Distro & Unix Subsystem Matrix
 //!
 //! Provides native Safe-Rust execution, parsing, and policy abstractions for 15+ Unix/Linux/BSD paradigms:
@@ -9,8 +10,8 @@
 //! - **Qubes OS**: Dom0 Qrexec inter-VM RPC message dispatcher & policy evaluator
 //! - **Solaris / illumos**: ZFS pool status evaluator & SMF (Service Management Facility) state machine
 //! - **DragonFly BSD**: HAMMER2 filesystem snapshot transaction log model
+use alloc::vec;
 
-#![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;

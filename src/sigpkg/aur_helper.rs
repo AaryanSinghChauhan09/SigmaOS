@@ -1,6 +1,4 @@
 #![allow(unused_variables)]
-// SigmaOS AUR Helper - Arch User Repository integration
-// Provides high-speed CLI helpers for AUR metadata parsing and package management
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -11,6 +9,10 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+use alloc::vec;
+use alloc::format;
+// SigmaOS AUR Helper - Arch User Repository integration
+// Provides high-speed CLI helpers for AUR metadata parsing and package management
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

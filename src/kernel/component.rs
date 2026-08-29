@@ -1,9 +1,3 @@
-//! Genode-style Component Tree Architecture for SigmaOS
-//!
-//! Implements recursive component ownership with parent-child resource delegation,
-//! inspired by Genode OS framework. Provides hierarchical security isolation and
-//! fine-grained privilege scoping through capability-based security.
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::type_complexity)]
@@ -20,6 +14,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+//! Genode-style Component Tree Architecture for SigmaOS
+//!
+//! Implements recursive component ownership with parent-child resource delegation,
+//! inspired by Genode OS framework. Provides hierarchical security isolation and
+//! fine-grained privilege scoping through capability-based security.
+
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

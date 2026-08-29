@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
 
 // POST (Power-On Self-Test) Diagnostics
 // BIOS/UEFI firmware POST implementation

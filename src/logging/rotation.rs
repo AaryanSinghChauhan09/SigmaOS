@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // OOP-based Log Rotation for SigmaOS
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
@@ -198,7 +200,7 @@ impl LogRotator for SimpleLogRotator {
                     log_file.reset_size();
                     // Use standard alloc::string::ToString
                     use alloc::string::ToString;
-                    let path_str = core::str::from_utf8(log_file.path()).unwrap_or("log").to_string();
+                    let path_str = core:: String::from_utf8(log_file.path()).unwrap_or("log").to_string();
                     path_to_shift = Some(path_str);
                     break;
                 }

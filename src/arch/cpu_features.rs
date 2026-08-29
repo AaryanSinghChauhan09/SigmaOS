@@ -8,6 +8,7 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+use alloc::vec::Vec;
 
 // SigmaOS CPU Feature Detection and Optimization
 // Implements Gentoo-like compiler-assisted target optimizations
@@ -727,7 +728,6 @@ impl Default for SovereignXcr0State {
 #[cfg(test)]
 mod tests {
     use super::*;
-    extern crate alloc;
     use alloc::vec;
 
     #[test]

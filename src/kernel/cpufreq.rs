@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 // CPUFreq - Linux-style CPU frequency scaling governor
 // Supports performance, powersave, ondemand, conservative, and schedutil governors

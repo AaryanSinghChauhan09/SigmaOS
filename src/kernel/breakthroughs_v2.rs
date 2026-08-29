@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS Breakthrough Operating System Tools & Engines (Pillar 2 - Wave 2)
 // Implements the next eight revolutionary, unexplored OS breakthrough engines:

@@ -1,7 +1,8 @@
+#![allow(dead_code)]
+use alloc::boxed::Box;
 // Purely functional Nix DSL parser and derivation evaluator for SigmaOS
 // Enables content-addressed store derivations, deterministic hashes, and Nix expressions
 
-#![allow(dead_code)]
 
 extern crate alloc;
 

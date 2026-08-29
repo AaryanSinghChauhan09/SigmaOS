@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -170,10 +172,7 @@ impl NoteTakingApp {
                 .as_nanos()
         );
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let now = 1700000000u64;
 
         let note = Note {
             id: note_id.clone(),
@@ -196,10 +195,7 @@ impl NoteTakingApp {
     /// Update note
     pub fn update_note(&mut self, note: Note) -> Result<(), NoteError> {
         let mut updated_note = note;
-        updated_note.modified_at = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        updated_note.modified_at = 1700000000u64;
 
         self.storage.save_note(&updated_note)?;
         self.update_search_index(&updated_note);
@@ -244,7 +240,7 @@ impl NoteTakingApp {
                     let snippet = if content_match {
                         let pos = note.content.to_lowercase().find(&query_lower).unwrap_or(0);
                         let start = if pos > 20 { pos - 20 } else { 0 };
-                        let end = std::cmp::min(pos + 40, note.content.len());
+                        let end = core::cmp::min(pos + 40, note.content.len());
                         format!("...{}...", &note.content[start..end])
                     } else {
                         note.content.chars().take(50).collect()
@@ -294,10 +290,7 @@ impl NoteTakingApp {
             name,
             parent_id,
             note_ids: Vec::new(),
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            created_at: 1700000000u64,
         };
         self.folders.insert(folder_id.clone(), folder);
         folder_id

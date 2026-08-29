@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec::Vec;
 
 // Content-Addressed Store for SigmaPkg
 // Stores packages by SHA3-256 hash for reproducibility
@@ -23,7 +24,7 @@ extern crate alloc;
 use crate::sigpkg::Package;
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 /// PathBuf-like alias using String for no_std compatibility
 type PathBuf = alloc::string::String;
 
@@ -53,7 +54,7 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = self.base_path.join(format!("{}-{}", hash, package.name));
+        let package_path = self.format!("{}/{}", base_path, format!("{}-{}", hash, package.name));
 
         let stored = StoredPackage {
             package: package.clone(),
@@ -282,7 +283,7 @@ impl NixOsHermeticCasStore {
         let hash_str = alloc::format!("{:016x}", hash_val);
 
         let folder_name = alloc::format!("{}-{}-{}", hash_str, pkg_name, version);
-        let store_path = self.store_dir.join(folder_name);
+        let store_path = self.format!("{}/{}", store_dir, folder_name);
         self.store_paths
             .insert(pkg_name.to_string(), store_path.clone());
         store_path

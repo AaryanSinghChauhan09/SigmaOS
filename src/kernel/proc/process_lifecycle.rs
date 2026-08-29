@@ -23,7 +23,6 @@ use crate::klib::HashMap;
 #[cfg(test)]
 pub(crate) mod mock_scheduler {
     use core::time::Duration;
-    use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     pub enum Priority {
         Idle = 0,

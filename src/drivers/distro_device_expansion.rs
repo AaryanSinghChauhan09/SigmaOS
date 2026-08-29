@@ -1,3 +1,5 @@
+#![allow(clippy::all, warnings)]
+use alloc::vec;
 // SigmaOS Distro Device Expansion Subsystem
 // Linux & BSD inspired drivers for broad hardware support:
 // - Broadcom LSI SAS/SATA Controller (Linux mpt3sas / FreeBSD mpr(4))
@@ -13,7 +15,6 @@
 // - Intel SMBus / I2C Host Controller (Linux i2c-i801 / FreeBSD ichsmb(4))
 // - Controller Area Network SocketCAN (Linux SocketCAN / FreeBSD can(4))
 
-#![allow(clippy::all, warnings)]
 
 
 extern crate alloc;

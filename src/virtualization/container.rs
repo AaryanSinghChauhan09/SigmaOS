@@ -1,9 +1,12 @@
+use alloc::vec;
+use alloc::boxed::Box;
+use alloc::format;
 extern crate alloc;
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::collections::HashMap;
 
@@ -451,7 +454,7 @@ impl ContainerRuntime for DockerRuntime {
         }
         self.container_states
             .insert(container_id.to_string(), ContainerState::Restarting);
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(core::time::Duration::from_millis(100));
         self.container_states
             .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
@@ -481,16 +484,7 @@ impl ContainerRuntime for DockerRuntime {
             name: config.name.clone(),
             image: config.image.clone(),
             state,
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            started_at: if state == ContainerState::Running {
-                Some(
-                    std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
+            created_at: 1700000000u64,
                 )
             } else {
                 None
@@ -528,10 +522,7 @@ impl ContainerRuntime for DockerRuntime {
                 name: config.name.clone(),
                 image: config.image.clone(),
                 state,
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1700000000u64,
                 started_at: None,
             });
         }
@@ -614,7 +605,7 @@ impl ContainerRuntime for PodmanRuntime {
         }
         self.container_states
             .insert(container_id.to_string(), ContainerState::Restarting);
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(core::time::Duration::from_millis(100));
         self.container_states
             .insert(container_id.to_string(), ContainerState::Running);
         Ok(())
@@ -644,16 +635,7 @@ impl ContainerRuntime for PodmanRuntime {
             name: config.name.clone(),
             image: config.image.clone(),
             state,
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            started_at: if state == ContainerState::Running {
-                Some(
-                    std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
+            created_at: 1700000000u64,
                 )
             } else {
                 None
@@ -691,10 +673,7 @@ impl ContainerRuntime for PodmanRuntime {
                 name: config.name.clone(),
                 image: config.image.clone(),
                 state,
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1700000000u64,
                 started_at: None,
             });
         }

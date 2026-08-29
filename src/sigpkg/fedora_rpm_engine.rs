@@ -1,10 +1,12 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
 use crate::klib::collections::HashMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// RPM package metadata structure
@@ -94,7 +96,7 @@ impl RpmSpecParser {
 
         // Extract from %description section
         if let Some(desc_lines) = self.sections.get("%description") {
-            package.description = desc_lines.join("\n");
+            package.description = format!("{}/{}", desc_lines, "\n");
         }
 
         // Extract from %files section (usually contains some metadata)

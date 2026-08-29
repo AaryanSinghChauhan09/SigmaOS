@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 
 /// OOP-based Remote Shell for SigmaOS

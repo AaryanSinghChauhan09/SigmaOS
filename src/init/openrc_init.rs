@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // OpenRC-Inspired Service Management System
 // Dependency-based init system with runlevels, service supervision, and parallel startup

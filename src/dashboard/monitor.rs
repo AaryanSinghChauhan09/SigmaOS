@@ -25,7 +25,7 @@ pub struct MetricData {
     pub metric_type: MetricType,
     pub value: f64,
     pub unit: String,
-    pub timestamp: Instant,
+    pub timestamp: u64,
 }
 
 /// Dashboard widget type
@@ -220,8 +220,8 @@ impl SystemMonitor {
         }
 
         let pseudo_random = || -> f64 {
-            let nanos = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
+            let nanos = core::time::Duration::from_secs(0)
+                .duration_since(std::time::core::time::Duration::from_secs(0))
                 .map(|d| d.as_nanos())
                 .unwrap_or(123456789);
             let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);
@@ -234,21 +234,21 @@ impl SystemMonitor {
             metric_type: MetricType::CPU,
             value: 45.0 + (pseudo_random() * 20.0),
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
 
         let memory_data = MetricData {
             metric_type: MetricType::Memory,
             value: 60.0 + (pseudo_random() * 15.0),
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
 
         let disk_data = MetricData {
             metric_type: MetricType::Disk,
             value: 75.0,
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
 
         self.dashboard.update_widget("cpu", cpu_data);
@@ -299,7 +299,7 @@ mod tests {
             metric_type: MetricType::CPU,
             value: 50.0,
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         };
         widget.add_data_point(data.clone());
         assert_eq!(widget.data.len(), 1);
@@ -316,13 +316,13 @@ mod tests {
             metric_type: MetricType::CPU,
             value: 40.0,
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         });
         widget.add_data_point(MetricData {
             metric_type: MetricType::CPU,
             value: 60.0,
             unit: "%".to_string(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
         });
         assert_eq!(widget.get_average(), 50.0);
     }

@@ -1,3 +1,4 @@
+use alloc::format;
 extern crate alloc;
 // SigmaOS CPU Frequency Scaling & Advanced Power Governors (Linux Inspired)
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,

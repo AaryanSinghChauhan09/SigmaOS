@@ -476,6 +476,7 @@ impl DriverManager for SimpleDriverManager {
 }
 
 pub trait CompatibilityCheck {
+    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
     fn check_component(&self, name: &str) -> bool;
     fn run_full_scan(&self) -> CompatibilityReport;
 }
@@ -502,6 +503,10 @@ impl CompatibilityCheck for SimpleDiagnostics {
         } else {
             CompatibilityResult::Unknown
         }
+    }
+
+    fn check_component(&self, name: &str) -> bool {
+        self.matrix.devices.iter().any(|d| (**d).name() == name)
     }
 
     fn run_full_scan(&self) -> CompatibilityReport {

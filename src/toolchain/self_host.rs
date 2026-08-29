@@ -9,9 +9,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use alloc::format;
 
-#[cfg(not(target_os = "none"))]
-use std::path::{Path, PathBuf};
-
 /// Error types thrown during compilation and toolchain initialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainError {

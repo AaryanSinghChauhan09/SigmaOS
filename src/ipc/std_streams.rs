@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Sovereign Standard Streams Controller

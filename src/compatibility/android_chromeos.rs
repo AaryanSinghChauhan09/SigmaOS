@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaOS Android & ChromeOS Parity Subsystem Layer
 // Replicates key Android and ChromeOS subsystem capabilities:

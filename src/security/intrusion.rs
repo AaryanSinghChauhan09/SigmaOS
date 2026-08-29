@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -38,7 +41,7 @@ pub struct SecurityEvent {
     pub event_type: EventType,
     pub source_ip: Option<IpAddr>,
     pub target_ip: Option<IpAddr>,
-    pub timestamp: Instant,
+    pub timestamp: u64,
     pub severity: Severity,
     pub description: String,
     pub metadata: HashMap<String, String>,
@@ -92,9 +95,9 @@ pub trait DetectionStrategy {
     /// Get strategy name
     fn name(&self) -> &str;
     /// Convert to Any for downcasting
-    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any(&self) -> &dyn core::any::Any;
     /// Convert to mutable Any for downcasting
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
+    fn as_any_mut(&mut self) -> &mut dyn core::any::Any;
 }
 
 /// Detection result
@@ -151,11 +154,11 @@ impl DetectionStrategy for SignatureDetection {
         "SignatureDetection"
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+    fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
         self
     }
 }
@@ -187,7 +190,7 @@ impl DetectionStrategy for AnomalyDetection {
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
-            let deviation: f64 = (event.timestamp.elapsed().as_secs() as f64 - *baseline).abs();
+            let deviation: f64 = (event.0u64 as f64 - *baseline).abs();
 
             if deviation > self.threshold {
                 return Some(DetectionResult {
@@ -207,11 +210,11 @@ impl DetectionStrategy for AnomalyDetection {
         "AnomalyDetection"
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+    fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
         self
     }
 }
@@ -507,7 +510,7 @@ mod tests {
             event_type: EventType::PortScan,
             source_ip: None,
             target_ip: None,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             severity: Severity::High,
             description: "Port scan detected".to_string(),
             metadata: HashMap::new(),
@@ -532,7 +535,7 @@ mod tests {
             event_type: EventType::PortScan,
             source_ip: None,
             target_ip: None,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             severity: Severity::High,
             description: "Port scan detected".to_string(),
             metadata: HashMap::new(),
@@ -552,7 +555,7 @@ mod tests {
             event_type: EventType::PortScan,
             source_ip: None,
             target_ip: None,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             severity: Severity::High,
             description: "Port scan detected".to_string(),
             metadata: HashMap::new(),
@@ -576,7 +579,7 @@ mod tests {
             event_type: EventType::PortScan,
             source_ip: None,
             target_ip: None,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             severity: Severity::High,
             description: "Port scan detected".to_string(),
             metadata: HashMap::new(),

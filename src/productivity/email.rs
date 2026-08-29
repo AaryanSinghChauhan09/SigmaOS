@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -259,8 +262,8 @@ impl EmailClient {
         EmailMessage {
             id: format!(
                 "email_{}",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
+                core::time::Duration::from_secs(0)
+                    .duration_since(std::time::core::time::Duration::from_secs(0))
                     .unwrap()
                     .as_nanos()
             ),
@@ -279,10 +282,7 @@ impl EmailClient {
             body,
             body_html: None,
             attachments: Vec::new(),
-            sent_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            sent_at: 1700000000u64,
             received_at: 0,
             read: true,
             starred: false,

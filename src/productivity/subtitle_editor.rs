@@ -168,7 +168,7 @@ impl SubtitleEditEngine {
                     translated_words.push(word.to_string());
                 }
             }
-            entry.text = translated_words.join(" ");
+            entry.text = format!("{}/{}", translated_words, " ");
         }
     }
 

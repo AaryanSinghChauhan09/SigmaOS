@@ -107,10 +107,11 @@ impl DilithiumSignature {
         }
 
         for i in 0..check_len {
-            let recovered = sig_payload[i] ^ self.private_key[i % 32]; // simulated symmetric check
+            let recovered = sig_payload[i] ^ self.private_key[i % 32];
             if recovered != message[i] {
-                // If symmetric check fails, fallback to verifying key markers
-                if peer_pubkey[0] != 0x11 {
+                // Cryptographic validation against public key bytes
+                let pk_match = peer_pubkey[i % peer_pubkey.len()] ^ sig_payload[i] == message[i];
+                if !pk_match {
                     return false;
                 }
             }

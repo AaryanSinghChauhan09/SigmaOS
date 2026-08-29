@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaOS Bootable ISO Builder
 // Finalizes the bootable ISO implementation with advanced features

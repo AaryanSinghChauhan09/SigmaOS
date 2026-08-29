@@ -4,9 +4,8 @@ extern crate alloc;
 
 
 
-use crate::klib::{Vec, String};
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 /// Device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

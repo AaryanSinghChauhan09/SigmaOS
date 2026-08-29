@@ -1,15 +1,3 @@
-//! ToaruOS-style Built-in Dynamic Language for SigmaOS
-//!
-//! Implements a Kuroko-inspired dynamic bytecode-compiled programming language,
-//! similar to Python but designed for OS integration. Features:
-//! - Single-pass bytecode compiler with backtracking
-//! - Virtual machine with register-based execution
-//! - Dynamic typing with garbage collection
-//! - Module system for OS integration
-//! - FFI (Foreign Function Interface) for calling SigmaOS syscalls
-//! - REPL (Read-Eval-Print Loop) for interactive use
-//! - Async/await support for OS operations
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -27,11 +15,24 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+//! ToaruOS-style Built-in Dynamic Language for SigmaOS
+//!
+//! Implements a Kuroko-inspired dynamic bytecode-compiled programming language,
+//! similar to Python but designed for OS integration. Features:
+//! - Single-pass bytecode compiler with backtracking
+//! - Virtual machine with register-based execution
+//! - Dynamic typing with garbage collection
+//! - Module system for OS integration
+//! - FFI (Foreign Function Interface) for calling SigmaOS syscalls
+//! - REPL (Read-Eval-Print Loop) for interactive use
+//! - Async/await support for OS operations
+use alloc::format;
+
 
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -1168,11 +1169,11 @@ impl KurokoVM {
             KurokoValue::String(s) => s.clone(),
             KurokoValue::List(l) => {
                 let items: Vec<String> = l.iter().map(|v| self.value_to_string(v)).collect();
-                format!("[{}]", items.join(", "))
+                format!("[{}]", format!("{}/{}", items, ", "))
             }
             KurokoValue::Dict(d) => {
                 let items: Vec<String> = d.iter().map(|(k, v)| format!("{}: {}", k, self.value_to_string(v))).collect();
-                format!("{{{}}}", items.join(", "))
+                format!("{{{}}}", format!("{}/{}", items, ", "))
             }
             KurokoValue::Function(_) => "<function>".to_string(),
             KurokoValue::BuiltinFunction(_) => "<builtin>".to_string(),

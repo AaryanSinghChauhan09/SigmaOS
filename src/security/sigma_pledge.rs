@@ -29,6 +29,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
 
 extern crate alloc;
 
@@ -91,11 +92,7 @@ impl PledgePromise {
     /// Mark as pledged (can only be done once)
     pub fn pledge(&mut self) -> Result<()> {
         if self.is_pledged {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::PermissionDenied,
-                "Already pledged",
-            )
-            .into());
+            return Err("Already pledged");
         }
         self.is_pledged = true;
         Ok(())
@@ -123,7 +120,7 @@ macro_rules! sigma_pledge {
 
 /// Syscall filter that checks pledges
 pub struct SyscallFilter {
-    process_promises: std::collections::BTreeMap<u64, PledgePromise>,
+    process_promises: alloc::collections::BTreeMap<u64, PledgePromise>,
 }
 
 impl SyscallFilter {
@@ -131,7 +128,7 @@ impl SyscallFilter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SyscallFilter {
-            process_promises: std::collections::BTreeMap::new(),
+            process_promises: alloc::collections::BTreeMap::new(),
         }
     }
 
@@ -147,20 +144,12 @@ impl SyscallFilter {
                 if promise.allows(namespace) {
                     Ok(())
                 } else {
-                    Err(std::io::Error::new(
-                        std::io::ErrorKind::PermissionDenied,
-                        "Syscall not pledged",
-                    )
-                    .into())
+                    Err("Syscall not pledged")
                 }
             }
             None => {
                 // Process hasn't pledged - deny by default
-                Err(std::io::Error::new(
-                    std::io::ErrorKind::PermissionDenied,
-                    "Process not pledged",
-                )
-                .into())
+                Err("Process not pledged")
             }
         }
     }

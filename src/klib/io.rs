@@ -1,9 +1,11 @@
+extern crate alloc;
+use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::format;
 // SigmaOS Custom I/O Implementation
 // Reduces dependency on std::io by providing custom implementations
 
-use crate::klib::{SigmaString, Vec};
+use crate::klib::SigmaString;
 
 /// Custom buffer for I/O operations
 pub struct SigmaBuffer {

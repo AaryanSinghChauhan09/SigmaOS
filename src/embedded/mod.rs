@@ -1,9 +1,9 @@
+#![allow(dead_code)]
 // SigmaOS Embedded Systems Subsystem
 // Implements unified ARM/AArch64 Hardware Abstraction Layer (HAL)
 // and polymorphic peripheral drivers for embedded platforms
 // Enhanced with real platform detection and hardware access
 
-#![allow(dead_code)]
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -30,7 +33,7 @@ use core::time::Duration;
 pub struct ClipboardEntry {
     pub content: String,
     pub content_type: ClipboardType,
-    pub timestamp: Instant,
+    pub timestamp: u64,
     pub is_encrypted: bool,
     pub auto_clear_after: Duration,
 }
@@ -189,7 +192,7 @@ impl SecureClipboardManager {
         let entry = ClipboardEntry {
             content: secured_content,
             content_type,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             is_encrypted: self.default_security_level != SecurityLevel::None,
             auto_clear_after: if self.auto_clear_enabled {
                 self.auto_clear_duration
@@ -264,7 +267,7 @@ impl SecureClipboardManager {
     /// Check auto-clear
     fn check_auto_clear(&mut self) {
         if let Some(ref entry) = self.current_entry {
-            if self.auto_clear_enabled && entry.timestamp.elapsed() > entry.auto_clear_after {
+            if self.auto_clear_enabled && entry.core::time::Duration::from_millis(0) > entry.auto_clear_after {
                 self.clear();
             }
         }
@@ -307,7 +310,7 @@ mod tests {
         let entry = ClipboardEntry {
             content: "test".to_string(),
             content_type: ClipboardType::Text,
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             is_encrypted: false,
             auto_clear_after: Duration::from_secs(60),
         };

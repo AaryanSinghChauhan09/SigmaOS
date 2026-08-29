@@ -1,10 +1,11 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 //! Gaming Performance & Advanced Distro SMP Extensions for SigmaOS
 //! Inspired by SteamOS GameMode, Pop!_OS System76 Scheduler, CachyOS UKSM, and DragonFly BSD LWKT.
 
-use crate::klib::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// CPU Power Governor Profiles for Dynamic Performance Switching

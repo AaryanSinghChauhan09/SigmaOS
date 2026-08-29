@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity

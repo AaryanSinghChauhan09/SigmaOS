@@ -121,7 +121,7 @@ impl PackageBuildService {
 
     /// Simulates executing compilation of all queued jobs.
     pub fn process_jobs(&mut self) {
-        let mut queued = std::mem::take(&mut self.active_jobs);
+        let mut queued = core::mem::take(&mut self.active_jobs);
         for job in &mut queued {
             job.status = BuildStatus::Compiling;
             // Simulate compilation success or failure

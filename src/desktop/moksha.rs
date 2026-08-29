@@ -1,6 +1,3 @@
-// Moksha Desktop and EFL Engine for SigmaOS
-// Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
-
 #![allow(unused)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
@@ -19,6 +16,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::vec;
+use alloc::format;
+// Moksha Desktop and EFL Engine for SigmaOS
+// Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
+
 
 
 extern crate alloc;

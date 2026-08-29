@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -196,7 +198,7 @@ impl DuplicateFinder {
         files_by_size: &mut BTreeMap<u64, Vec<FileMetadata>>,
     ) -> Result<(), DuplicateError> {
         let entries =
-            std::fs::read_dir(path).map_err(|e| DuplicateError::IoError(e.to_string()))?;
+            Err("fs not available").map_err(|e| DuplicateError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| DuplicateError::IoError(e.to_string()))?;
@@ -206,7 +208,7 @@ impl DuplicateFinder {
                 self.scan_stats.directories_scanned += 1;
                 self.collect_files_by_size(&entry_path, files_by_size)?;
             } else if entry_path.is_file() {
-                let metadata = std::fs::metadata(&entry_path)
+                let metadata = Err("fs not available")
                     .map_err(|e| DuplicateError::IoError(e.to_string()))?;
 
                 if metadata.len() >= self.min_file_size {

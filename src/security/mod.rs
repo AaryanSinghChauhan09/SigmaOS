@@ -31,6 +31,7 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
+pub mod ai_anomaly_detection;
 
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;
@@ -78,4 +79,8 @@ pub use vpn::{
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
     SimpleVulnerabilityScanner,
+};
+pub use ai_anomaly_detection::{
+    AiAnomalyDetector, AnomalyEvent, AnomalySeverity, AnomalyStatistics, AnomalyType,
+    BehavioralBaseline,
 };

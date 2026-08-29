@@ -4,6 +4,8 @@
 //! - SysVinit runlevels and systemd target management (`LinuxRunlevelGovernor`)
 //! - `/etc/fstab` filesystem mount table entry parsing (`LinuxFstabEngine`)
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
+use alloc::vec::Vec;
+use alloc::vec;
 extern crate alloc;
 
 use crate::klib::{HashMap, Vec};

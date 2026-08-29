@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Zero-Allocation Data Science Algorithms (Scikit-Learn & mlpack Parity)
 // Rewritten in safe, zero-allocation Rust for native availability to all Sovereign applications.

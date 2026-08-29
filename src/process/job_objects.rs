@@ -1,3 +1,4 @@
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Job Objects Subsystem (src/process/job_objects.rs)
 // Integrates Windows Job Objects with Linux cgroups v2 resource controllers, FreeBSD rctl limits,

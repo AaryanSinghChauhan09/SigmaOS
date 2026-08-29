@@ -1,3 +1,8 @@
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 // Sovereign Remote Sharing & Protocol Enhancements for SigmaOS
 // Inspired by Linux & BSD distributions: OpenSSH, dropbear, NFSv4, Samba (smbd/ksmbd), SCP, and rsync.
 

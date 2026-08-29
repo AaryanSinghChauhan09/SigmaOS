@@ -1,6 +1,6 @@
 extern crate alloc;
 // SigmaOS Custom Arc (Atomic Reference Counting)
-// Reduces dependency on std::sync::Arc
+// Reduces dependency on alloc::sync::Arc
 
 
 use alloc::boxed::Box;

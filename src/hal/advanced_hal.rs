@@ -1,6 +1,7 @@
 //! Advanced Hardware Abstraction Layer & udev Integration
 //! Automatic device discovery, rich device properties, udev rule matching,
 //! hotplug events, and device tree enumeration.
+use alloc::vec;
 extern crate alloc;
 
 

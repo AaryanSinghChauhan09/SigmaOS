@@ -1,10 +1,3 @@
-// SigmaOS Linux Init System Concepts
-// Implements init system concepts inspired by systemd and SysVinit
-
-//! Runlevel management
-//! Service dependency resolution
-//! Process supervision
-//! System state management
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -22,6 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+//! Runlevel management
+//! Service dependency resolution
+//! Process supervision
+//! System state management
+
+extern crate alloc;
+use alloc::vec;
+// SigmaOS Linux Init System Concepts
+// Implements init system concepts inspired by systemd and SysVinit
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

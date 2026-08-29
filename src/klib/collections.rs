@@ -1,7 +1,7 @@
+#![allow(dead_code)]
 // SigmaOS Kernel Library Collections
 // Eliminates dependency on std::collections
 
-#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::collections::BTreeMap as AllocBTreeMap;

@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 
 use alloc::boxed::Box;
@@ -162,6 +163,38 @@ impl From<RedirectSpec> for Redirect {
     }
 }
 
+
+pub struct RedirectionEngine {
+    pub streams: BTreeMap<u32, Vec<u8>>,
+    pub redirection_log: Vec<String>,
+}
+
+impl RedirectionEngine {
+    pub fn new() -> Self {
+        Self {
+            streams: BTreeMap::new(),
+            redirection_log: Vec::new(),
+        }
+    }
+
+    pub fn write_fd(&mut self, fd: u32, data: &[u8]) {
+        self.streams.entry(fd).or_default().extend_from_slice(data);
+    }
+
+    pub fn read_fd(&self, fd: u32) -> Option<&[u8]> {
+        self.streams.get(&fd).map(|v| v.as_slice())
+    }
+
+    pub fn get_captured_output(&self, fd: u32) -> Option<&[u8]> {
+        self.read_fd(fd)
+    }
+}
+
+impl Default for RedirectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 pub struct Environment {
     pub vars: BTreeMap<String, String>,

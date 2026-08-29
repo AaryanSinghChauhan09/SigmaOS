@@ -1,9 +1,10 @@
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Alpine Linux APK Compatibility Engine
 // Implements APK package management, APKINDEX parsing, and musl libc compatibility
 
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use crate::klib::collections::HashMap;
 

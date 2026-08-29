@@ -255,9 +255,7 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    extern crate alloc;
     use super::{Permission, PledgePromise};
-    use alloc::vec;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

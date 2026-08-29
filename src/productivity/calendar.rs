@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -175,10 +178,7 @@ pub struct CalendarApp {
 
 impl CalendarApp {
     pub fn new(storage: Box<dyn CalendarStorage>) -> Self {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let now = 1700000000u64;
 
         Self {
             storage,
@@ -254,10 +254,7 @@ impl CalendarApp {
 
     /// Get upcoming events
     pub fn get_upcoming_events(&self, count: usize) -> Vec<CalendarEvent> {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let now = 1700000000u64;
 
         let mut events: Vec<CalendarEvent> = self
             .storage
@@ -336,10 +333,7 @@ impl CalendarApp {
 
     /// Go to today
     pub fn go_to_today(&mut self) {
-        self.current_date = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        self.current_date = 1700000000u64;
     }
 }
 

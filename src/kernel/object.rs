@@ -228,7 +228,7 @@ impl KernelObject for DeviceObject {
         self.base.set_name(name);
     }
     fn parent(&self) -> Option<&dyn KernelObject> {
-        self.base.parent()
+        self.None::<&str>
     }
     fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
         self.base.set_parent(parent);
@@ -325,7 +325,7 @@ impl KernelObject for ObpDirectory {
         self.base.set_name(name);
     }
     fn parent(&self) -> Option<&dyn KernelObject> {
-        self.base.parent()
+        self.None::<&str>
     }
     fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
         self.base.set_parent(parent);

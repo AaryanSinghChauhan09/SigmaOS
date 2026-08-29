@@ -1,20 +1,6 @@
 extern crate alloc;
-
-
-#[cfg(not(feature = "standalone_test"))]
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
-
-#[cfg(feature = "standalone_test")]
-extern crate std;
-
-#[cfg(feature = "standalone_test")]
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -218,10 +221,7 @@ impl TaskManager {
             status: TaskStatus::Todo,
             priority,
             due_date: None,
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            created_at: 1700000000u64,
             completed_at: None,
             tags: Vec::new(),
             subtasks: Vec::new(),
@@ -284,10 +284,7 @@ impl TaskManager {
         let mut task = self.storage.load_task(task_id)?;
         task.status = TaskStatus::Done;
         task.completed_at = Some(
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            1700000000u64,
         );
         self.storage.save_task(&task)
     }
@@ -413,10 +410,7 @@ impl TaskManager {
 
     /// Check reminders
     pub fn check_reminders(&mut self) -> Vec<Reminder> {
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let now = 1700000000u64;
 
         let due_reminders: Vec<Reminder> = self
             .reminders
@@ -450,10 +444,7 @@ impl TaskManager {
         tasks.retain(|task| {
             if task.status == TaskStatus::Done {
                 if let Some(completed_at) = task.completed_at {
-                    let now = std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs();
+                    let now = 1700000000u64;
 
                     // Archive tasks completed more than 30 days ago
                     if now - completed_at > 30 * 24 * 3600 {

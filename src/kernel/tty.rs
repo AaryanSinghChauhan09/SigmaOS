@@ -1,6 +1,6 @@
+#![allow(dead_code)]
 // SigmaOS Comprehensive TTY/PTY Subsystem
 // Includes full Termios line discipline, signaling, and ANSI buffering
-#![allow(dead_code)]
 
 extern crate alloc;
 use alloc::collections::VecDeque;

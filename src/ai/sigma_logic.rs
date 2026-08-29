@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Native AI Logic & Model Inference Bindings (PyTorch/TensorFlow Parity)
 // Provides zero-allocation C/Rust inference bindings allowing OS daemons

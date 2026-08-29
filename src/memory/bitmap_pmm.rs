@@ -1,8 +1,8 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 //! Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Fast x86_64 Assembly Syscall Dispatcher.
 //! Implements bottom-up kernel primitives as described in Step 1, Step 2, and Step 3 specifications.
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
 
 extern crate alloc;
 use alloc::vec;

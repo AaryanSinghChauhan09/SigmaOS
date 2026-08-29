@@ -1,3 +1,5 @@
+use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 // EndeavourOS Parity Engines for SigmaOS
@@ -185,7 +187,7 @@ impl EosLogTool {
             })
             .collect();
 
-        sanitized = words.join(" ");
+        sanitized = format!("{}/{}", words, " ");
 
         // 2. Redact sensitive keywords
         for keyword in &self.sensitive_keywords {

@@ -1,7 +1,8 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use crate::klib::Vec;
 use core::ops::{Deref, DerefMut};
 
 use core::mem;

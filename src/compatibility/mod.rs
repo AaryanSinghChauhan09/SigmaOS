@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec::Vec;
 // SigmaOS Compatibility Module
 pub mod abi_extended;
 pub mod abi_translator;

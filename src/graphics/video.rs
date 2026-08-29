@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -5,9 +6,6 @@ use alloc::format;
 // Designed for high-performance timeline composition, YUV translation, and overlay effects
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use crate::klib::HashMap;
 
 /// Video processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

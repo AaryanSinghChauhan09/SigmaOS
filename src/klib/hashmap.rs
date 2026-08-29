@@ -1,5 +1,6 @@
 //! Custom BTreeMap implementation for SigmaOS
 //! Reduces dependency on alloc::collections::BTreeMap
+use alloc::string::{String, ToString};
 extern crate alloc;
 
 use crate::klib::hash::SimpleHasher;

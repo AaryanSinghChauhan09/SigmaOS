@@ -1,6 +1,7 @@
 //! Virtualization Enhancements (KVM/QEMU/Libvirt Inspiration)
 //! KVM acceleration, Qcow2 image overlays, VFIO IOMMU device assignment,
 //! VirtIO virtqueues, live migration, and nested virtualization
+use alloc::vec;
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]

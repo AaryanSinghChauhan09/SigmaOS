@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::vec;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -81,7 +84,7 @@ impl ShreddingStrategy for ZeroPassShredder {
         let mut bytes_written = 0u64;
 
         while bytes_written < file_size {
-            let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
+            let write_size = core::cmp::min(8192, (file_size - bytes_written) as usize);
             file.write_all(&zero_buffer[..write_size])
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
             bytes_written += write_size as u64;
@@ -91,7 +94,7 @@ impl ShreddingStrategy for ZeroPassShredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 1,
             bytes_overwritten: bytes_written,
@@ -127,7 +130,7 @@ impl ShreddingStrategy for RandomPassShredder {
         let mut bytes_written = 0u64;
 
         while bytes_written < file_size {
-            let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
+            let write_size = core::cmp::min(8192, (file_size - bytes_written) as usize);
             let random_buffer: Vec<u8> = (0..write_size).map(|_| rng.next_u8()).collect();
             file.write_all(&random_buffer)
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
@@ -138,7 +141,7 @@ impl ShreddingStrategy for RandomPassShredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 1,
             bytes_overwritten: bytes_written,
@@ -185,7 +188,7 @@ impl ShreddingStrategy for Dod5220Shredder {
         let mut rng = SigmaRng::new();
         let mut bytes_written = 0u64;
         while bytes_written < file_size {
-            let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
+            let write_size = core::cmp::min(8192, (file_size - bytes_written) as usize);
             let random_buffer: Vec<u8> = (0..write_size).map(|_| rng.next_u8()).collect();
             file.write_all(&random_buffer)
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
@@ -197,7 +200,7 @@ impl ShreddingStrategy for Dod5220Shredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 3,
             bytes_overwritten: total_bytes_written,
@@ -226,7 +229,7 @@ impl Dod5220Shredder {
         let mut bytes_written = 0u64;
 
         while bytes_written < file_size {
-            let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
+            let write_size = core::cmp::min(8192, (file_size - bytes_written) as usize);
             file.write_all(&buffer[..write_size])
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
             bytes_written += write_size as u64;
@@ -262,7 +265,7 @@ impl ShreddingStrategy for GutmannShredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 7,
             bytes_overwritten: total_bytes_written,
@@ -291,7 +294,7 @@ impl GutmannShredder {
         let mut bytes_written = 0u64;
 
         while bytes_written < file_size {
-            let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
+            let write_size = core::cmp::min(8192, (file_size - bytes_written) as usize);
             file.write_all(&buffer[..write_size])
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
             bytes_written += write_size as u64;
@@ -324,7 +327,7 @@ impl FileShredder {
     /// Shred a file
     pub fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         if !path.exists() {
-            return Err(ShredderError::FileNotFound(path.display().to_string()));
+            return Err(ShredderError::FileNotFound(path.to_string()));
         }
 
         let result = self.strategy.shred(path)?;

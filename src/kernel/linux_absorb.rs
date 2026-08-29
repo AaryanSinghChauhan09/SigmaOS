@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Linux Driver Absorption Framework
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening

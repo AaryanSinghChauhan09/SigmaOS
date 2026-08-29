@@ -1,10 +1,13 @@
+use alloc::vec;
+use alloc::boxed::Box;
+use alloc::format;
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 extern crate alloc;
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
 use crate::klib::{BTreeMap, HashMap};
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// OOP-based Superset Application Capability matching
@@ -261,7 +264,7 @@ impl ApplicationBinary {
 /// Polymorphic trait to verify matching capabilities for equivalent third-party software.
 pub trait SovereignAppCapability {
     fn capability_name(&self) -> &str;
-    fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any(&self) -> &dyn core::any::Any;
     fn is_compatible_with(&self, required: &dyn SovereignAppCapability) -> bool;
 }
 
@@ -288,7 +291,7 @@ impl SovereignAppCapability for StandardMediaCapability {
         &self.name
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
@@ -341,7 +344,7 @@ impl SovereignAppCapability for StandardHtmlCapability {
         &self.name
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn core::any::Any {
         self
     }
 
@@ -827,7 +830,7 @@ impl SovereignSysctlManager {
                     SysctlValue::Boolean(b) => Ok(format!("{} = {}", path, b)),
                     SysctlValue::String(s) => {
                         let len = s.iter().position(|&b| b == 0).unwrap_or(64);
-                        if let Ok(st) = core::str::from_utf8(&s[..len]) {
+                        if let Ok(st) = core:: String::from_utf8(&s[..len]) {
                             Ok(format!("{} = {}", path, st))
                         } else {
                             Err("Invalid string value")

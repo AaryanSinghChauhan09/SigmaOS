@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::boxed::Box;
 
 extern crate alloc;
 use crate::kernel::subsystems::registry::{

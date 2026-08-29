@@ -1,11 +1,13 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+use alloc::vec;
+use alloc::format;
 // SigmaOS Access Module
 // Access control management, LDAP, Wireless Access, Remote File & Tool Access, Process Migration
 // Inspired by Linux (credentials/cgroups/sec) & BSD (ucred/capsicum)
 // Zero-dependency implementation - no external libraries required
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 
 pub mod control;
 pub mod append_rights;

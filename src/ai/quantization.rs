@@ -1,3 +1,4 @@
+use alloc::vec;
 // Dynamic Matrix Quantization & Multi-Device Execution Fallback for SigmaOS
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 
@@ -7,17 +8,17 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TensorDtype {
-    FP32,
-    FP16,
-    BF16,
-    INT8,
-    INT4,
+    Fp32,
+    Fp16,
+    Bf16,
+    Int8,
+    Int4,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComputeDeviceTarget {
     CPU,
-    CPU_SIMD,
+    CpuSimd,
     GPU,
     DiscreteGpu,
     IntegratedGpu,

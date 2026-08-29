@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -43,7 +45,7 @@ pub struct ClipboardItem {
     pub item_type: ClipboardItemType,
     pub content: Vec<u8>,
     pub metadata: BTreeMap<String, String>,
-    pub timestamp: Instant,
+    pub timestamp: u64,
     pub source_app: Option<String>,
 }
 
@@ -118,7 +120,7 @@ pub struct ClipboardManager {
     history_config: ClipboardHistoryConfig,
     auto_clear_enabled: bool,
     auto_clear_delay: Duration,
-    last_copy_time: Option<Instant>,
+    last_copy_time: Option<u64>,
 }
 
 impl ClipboardManager {
@@ -146,7 +148,7 @@ impl ClipboardManager {
 
         // Add to history
         self.history.insert(0, item);
-        self.last_copy_time = Some(Instant::now());
+        self.last_copy_time = Some(0u64);
 
         // Trim history
         self.trim_history();
@@ -164,8 +166,8 @@ impl ClipboardManager {
         let item = ClipboardItem {
             id: format!(
                 "item_{}",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
+                core::time::Duration::from_secs(0)
+                    .duration_since(std::time::core::time::Duration::from_secs(0))
                     .unwrap()
                     .as_nanos()
             ),
@@ -176,7 +178,7 @@ impl ClipboardManager {
                 meta.insert("text_length".to_string(), text_len.to_string());
                 meta
             },
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             source_app,
         };
         self.copy(item)
@@ -237,12 +239,12 @@ impl ClipboardManager {
                     }
                 }
                 if let Some(min_age) = filter.min_age {
-                    if item.timestamp.elapsed() < min_age {
+                    if item.core::time::Duration::from_millis(0) < min_age {
                         return false;
                     }
                 }
                 if let Some(max_age) = filter.max_age {
-                    if item.timestamp.elapsed() > max_age {
+                    if item.core::time::Duration::from_millis(0) > max_age {
                         return false;
                     }
                 }
@@ -283,7 +285,7 @@ impl ClipboardManager {
 
         // Trim by max age
         self.history
-            .retain(|item| item.timestamp.elapsed() < self.history_config.max_age);
+            .retain(|item| item.core::time::Duration::from_millis(0) < self.history_config.max_age);
     }
 
     /// Auto-clear if needed
@@ -293,7 +295,7 @@ impl ClipboardManager {
         }
 
         if let Some(last_copy) = self.last_copy_time {
-            if last_copy.elapsed() >= self.auto_clear_delay {
+            if core::time::Duration::from_millis(0) >= self.auto_clear_delay {
                 self.clear()?;
             }
         }
@@ -364,7 +366,7 @@ mod tests {
             item_type: ClipboardItemType::Text,
             content: b"Hello".to_vec(),
             metadata: BTreeMap::new(),
-            timestamp: Instant::now(),
+            timestamp: 0u64,
             source_app: None,
         };
         assert_eq!(item.item_type, ClipboardItemType::Text);

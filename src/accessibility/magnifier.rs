@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 extern crate alloc;
 use alloc::vec::Vec;
 /// OOP-based Screen Magnifier for SigmaOS

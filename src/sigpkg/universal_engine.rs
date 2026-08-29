@@ -39,6 +39,8 @@ pub enum PackageFormat {
     Lzm,
     Pup,
     Pet,
+    Flatpak,
+    Snap,
 }
 
 #[derive(Debug, Clone)]
@@ -411,39 +413,41 @@ fn hex_encode(bytes: &[u8; 32]) -> String {
 pub struct PackageAdapterFactory;
 
 impl PackageAdapterFactory {
-    pub fn get_adapter(format: PackageFormat) -> std::boxed::Box<dyn IPackageAdapter> {
+    pub fn get_adapter(format: PackageFormat) -> Box<dyn IPackageAdapter> {
         match format {
-            PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
-            PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
-            PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
+            PackageFormat::Apt => Box::new(AptPackageAdapter),
+            PackageFormat::Yum => Box::new(YumPackageAdapter),
+            PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
             PackageFormat::Portage => {
-                std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new()))
+                Box::new(EbuildPackageAdapter::new(Vec::new()))
             }
-            PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
-            PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
-            PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
-            PackageFormat::Xbps => std::boxed::Box::new(XbpsPackageAdapter::new(None)),
-            PackageFormat::Air => std::boxed::Box::new(AirPackageAdapter),
-            PackageFormat::Bottle => std::boxed::Box::new(BottlePackageAdapter),
-            PackageFormat::Ipa => std::boxed::Box::new(IpaPackageAdapter),
-            PackageFormat::Ports => std::boxed::Box::new(PortsPackageAdapter),
-            PackageFormat::Pkg => std::boxed::Box::new(PkgPackageAdapter),
-            PackageFormat::Aab => std::boxed::Box::new(AabPackageAdapter),
-            PackageFormat::TarGz => std::boxed::Box::new(TarGzPackageAdapter),
-            PackageFormat::TarXz => std::boxed::Box::new(TarXzPackageAdapter),
-            PackageFormat::Tar => std::boxed::Box::new(TarPackageAdapter),
-            PackageFormat::AppBundle => std::boxed::Box::new(AppBundlePackageAdapter),
-            PackageFormat::Hap => std::boxed::Box::new(HapPackageAdapter),
-            PackageFormat::Pisi => std::boxed::Box::new(PisiPackageAdapter),
-            PackageFormat::Superdeb => std::boxed::Box::new(SuperdebPackageAdapter),
-            PackageFormat::Lzm => std::boxed::Box::new(LzmPackageAdapter),
-            PackageFormat::Pup => std::boxed::Box::new(PupPackageAdapter),
-            PackageFormat::Pet => std::boxed::Box::new(PetPackageAdapter),
-            PackageFormat::Flatpak => std::boxed::Box::new(FlatpakPackageAdapter),
-            PackageFormat::Snap => std::boxed::Box::new(SnapPackageAdapter),
+            PackageFormat::Sovereign => Box::new(SovereignPackageAdapter),
+            PackageFormat::Nix => Box::new(NixPackageAdapter),
+            PackageFormat::Apk => Box::new(ApkPackageAdapter),
+            PackageFormat::Xbps => Box::new(XbpsPackageAdapter::new(None)),
+            PackageFormat::Air => Box::new(AirPackageAdapter),
+            PackageFormat::Bottle => Box::new(BottlePackageAdapter),
+            PackageFormat::Ipa => Box::new(IpaPackageAdapter),
+            PackageFormat::Ports => Box::new(PortsPackageAdapter),
+            PackageFormat::Pkg => Box::new(PkgPackageAdapter),
+            PackageFormat::Aab => Box::new(AabPackageAdapter),
+            PackageFormat::TarGz => Box::new(TarGzPackageAdapter),
+            PackageFormat::TarXz => Box::new(TarXzPackageAdapter),
+            PackageFormat::Tar => Box::new(TarPackageAdapter),
+            PackageFormat::AppBundle => Box::new(AppBundlePackageAdapter),
+            PackageFormat::Hap => Box::new(HapPackageAdapter),
+            PackageFormat::Pisi => Box::new(PisiPackageAdapter),
+            PackageFormat::Superdeb => Box::new(SuperdebPackageAdapter),
+            PackageFormat::Lzm => Box::new(LzmPackageAdapter),
+            PackageFormat::Pup => Box::new(PupPackageAdapter),
+            PackageFormat::Pet => Box::new(PetPackageAdapter),
+            PackageFormat::Flatpak => Box::new(FlatpakPackageAdapter),
+            PackageFormat::Snap => Box::new(SnapPackageAdapter),
         }
     }
 }
+
+pub struct FlatpakPackageAdapter;
 
 pub struct AirPackageAdapter;
 impl IPackageAdapter for AirPackageAdapter {

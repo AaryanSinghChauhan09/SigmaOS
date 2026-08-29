@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 extern crate alloc;
 // SigmaOS BSD Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of BSD (FreeBSD/OpenBSD) core tooling

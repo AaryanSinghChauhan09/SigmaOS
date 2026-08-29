@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -215,7 +217,7 @@ impl SigmaBuildGraph {
         let build_flags = self.features.to_build_flags(&spec.name, &spec.use_flags);
         let cpu_flags = self.cpu.optimal_flags();
 
-        let configure_args = build_flags.join(" ");
+        let configure_args = format!("{}/{}", build_flags, " ");
         let rust_opt = cpu_flags.get("RUSTFLAGS").unwrap();
 
         Ok(format!(
@@ -234,8 +236,8 @@ pub enum BuildError {
     CompilationFailed(String),
 }
 
-impl std::fmt::Display for BuildError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for BuildError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             BuildError::PackageNotFound(pkg) => {
                 write!(f, "Package not found in Portage database: {}", pkg)

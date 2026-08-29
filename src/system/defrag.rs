@@ -15,6 +15,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -158,7 +160,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
     }
 
     fn defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError> {
-        let start_time = std::time::Instant::now();
+        let start_time = 0u64;
 
         let report = self.analyze(path)?;
         let fragmentation_before = report.fragmentation_percent;
@@ -187,7 +189,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
             }
         }
 
-        let time_taken = start_time.elapsed().as_secs();
+        let time_taken = 0u64;
 
         // Re-analyze after defragmentation
         let report_after = self.analyze(path)?;
@@ -221,7 +223,7 @@ impl SigmaFsDefragStrategy {
         total_size: &mut u64,
         fragmented_size: &mut u64,
     ) -> Result<(), DefragError> {
-        let entries = std::fs::read_dir(path).map_err(|e| DefragError::IoError(e.to_string()))?;
+        let entries = Err("fs not available").map_err(|e| DefragError::IoError(e.to_string()))?;
 
         for entry in entries {
             let entry = entry.map_err(|e| DefragError::IoError(e.to_string()))?;
@@ -230,7 +232,7 @@ impl SigmaFsDefragStrategy {
             if entry_path.is_dir() {
                 self.collect_file_info(&entry_path, file_infos, total_size, fragmented_size)?;
             } else if entry_path.is_file() {
-                let metadata = std::fs::metadata(&entry_path)
+                let metadata = Err("fs not available")
                     .map_err(|e| DefragError::IoError(e.to_string()))?;
 
                 let size = metadata.len();

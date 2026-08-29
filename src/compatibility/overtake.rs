@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::format;
 
 // SigmaOS Distro Clean-Room Overtake & Absorption Engines
 // Absorbing top-tier innovations from Starling, Pop!_OS, Ubuntu Budgie, Rhino Linux,

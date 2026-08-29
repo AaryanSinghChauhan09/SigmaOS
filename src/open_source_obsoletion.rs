@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Open Source Obsoletion Subsystem (`src/open_source_obsoletion.rs`)

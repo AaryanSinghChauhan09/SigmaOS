@@ -1,3 +1,4 @@
+use alloc::vec;
 extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
@@ -53,8 +54,14 @@ impl SigmaFS {
     }
 
     fn encrypt_mock(&self, data: &[u8]) -> Vec<u8> {
-        // Mock encryption
-        data.iter().map(|b| b ^ 0x42).collect()
+        let mut key_state: u64 = 0x517cc1b727220a95;
+        let mut encrypted = Vec::with_capacity(data.len());
+        for (i, &b) in data.iter().enumerate() {
+            key_state = key_state.wrapping_mul(6364136223846793005).wrapping_add((i as u64) + 1);
+            let mask = ((key_state >> 33) ^ (key_state >> 11)) as u8;
+            encrypted.push(b ^ mask);
+        }
+        encrypted
     }
 
     /// Stores a node in the CAS, optionally encrypting data blocks

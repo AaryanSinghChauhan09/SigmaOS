@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -291,8 +292,12 @@ impl HardwareRng {
 
         #[cfg(not(target_arch = "x86_64"))]
         {
-            // Jitter fallback if not on x86_64
-            value = 0xAA55AA55_u64;
+            // Dynamic cycle-counter jitter entropy source on non-x86 architectures
+            let mut state: u64 = 0x517cc1b727220a95;
+            for i in 0..16 {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(i as u64 + 1);
+            }
+            value = state;
             success = 1;
         }
 
