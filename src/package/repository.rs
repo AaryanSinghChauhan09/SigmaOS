@@ -756,7 +756,7 @@ mod tests {
             },
         ]);
 
-        let rollback = journal.rollback_transaction(tx_id);
+        let rollback = journal.rollback_transaction(tx_id).unwrap();
         assert_eq!(rollback.len(), 2);
         match &rollback[0] {
             TransactionAction::Upgrade { package, old_version, new_version } => {
