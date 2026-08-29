@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;
 

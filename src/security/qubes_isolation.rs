@@ -8,7 +8,7 @@ extern crate alloc;
 use core::cell::RefCell;
 
 #[cfg(test)]
-use std::cell::RefCell;
+use core::cell::RefCell;
 
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
@@ -31,7 +31,7 @@ impl CapabilityToken {
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 
 pub type DomainID = usize;

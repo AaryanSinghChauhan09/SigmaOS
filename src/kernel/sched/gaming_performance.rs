@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Gaming Performance & Advanced Distro SMP Extensions for SigmaOS
 //! Inspired by SteamOS GameMode, Pop!_OS System76 Scheduler, CachyOS UKSM, and DragonFly BSD LWKT.
 

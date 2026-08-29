@@ -1,8 +1,11 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
 use crate::klib::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
+// SystemTime not in no_std; using u64 timestamps
 
 /// Recovery event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

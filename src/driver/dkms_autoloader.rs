@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Dynamic Kernel Module Support (DKMS) & Hardware Autoloader Subsystem for SigmaOS
 // Inspired by Linux DKMS, udev hardware autoprobing, and Arch Linux / Gentoo module builders.
 

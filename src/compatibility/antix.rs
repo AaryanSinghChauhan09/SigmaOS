@@ -1,8 +1,11 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.
 
-use std::sync::atomic::{AtomicU8, Ordering};
+use core::sync::atomic::{AtomicU8, Ordering};
 
 // ==========================================
 // 1. Systemd-Free Init Manager (Runit/SysV Parity)

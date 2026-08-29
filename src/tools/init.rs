@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Init System (systemd/OpenRC Inspiration)
 //! Service management, target units, and dependency resolution
 

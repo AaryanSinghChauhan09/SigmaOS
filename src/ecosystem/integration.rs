@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Ecosystem Integration Framework
 // Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.

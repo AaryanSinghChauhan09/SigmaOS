@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Sovereign Self-Healing Kernel
 // Deploys active system integrity checkers, memory quarantine, and AI-generated hot patches
 

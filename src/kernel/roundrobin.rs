@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Round-Robin Scheduler
 // Enhanced priority-aware round-robin with process yielding and context tracking
 

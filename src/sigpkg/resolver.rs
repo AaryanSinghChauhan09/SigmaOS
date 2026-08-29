@@ -2,7 +2,8 @@
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
 use crate::sigpkg::{Package, Version, VersionConstraint};
-use std::collections::{HashMap, HashSet};
+use crate::klib::HashMap;
+use alloc::collections::BTreeSet as HashSet;
 
 /// Debian-style APT Pinning Rule representing release and priority weighting
 #[derive(Debug, Clone)]

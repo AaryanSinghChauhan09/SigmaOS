@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 

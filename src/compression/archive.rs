@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Archive Subsystem for SigmaOS
 // Inspired by BSD libarchive, Linux GNU tar, zip/unzip, cpio, and ISO-9660 image tools.
 

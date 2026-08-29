@@ -15,12 +15,19 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Secure VPN Client
 // OOP-based VPN with WireGuard and OpenVPN support
 
-use std::net::{IpAddr, Ipv4Addr};
-use std::path::PathBuf;
+// IpAddr not in no_std; using u32 for addresses
+type PathBuf = alloc::string::String;
+type IpAddr = u32;
+#[allow(non_snake_case)]
+fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 { ((a as u32) << 24) | ((b as u32) << 16) | ((c as u32) << 8) | d as u32 }
+// PathBuf not in no_std
 
 /// VPN protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -136,7 +143,7 @@ impl VpnProtocolHandler for WireGuardHandler {
         // In real implementation, perform actual WireGuard handshake
         std::thread::sleep(std::time::Duration::from_millis(500));
 
-        let assigned_ip = Some(IpAddr::V4(Ipv4Addr::new(10, 0, 0, 2)));
+        let assigned_ip = Some(Ipv4Addr_new(10, 0, 0, 2));
 
         self.state = ConnectionState::Connected;
         self.statistics.connection_duration_seconds = 0;
@@ -246,7 +253,7 @@ impl VpnProtocolHandler for OpenVpnHandler {
         // In real implementation, load config file and connect
         std::thread::sleep(std::time::Duration::from_millis(1000));
 
-        let assigned_ip = Some(IpAddr::V4(Ipv4Addr::new(10, 1, 0, 2)));
+        let assigned_ip = Some(Ipv4Addr_new(10, 1, 0, 2));
 
         self.state = ConnectionState::Connected;
         self.statistics.connection_duration_seconds = 0;
@@ -419,7 +426,7 @@ impl Default for SecureVpnClient {
             port: 51820,
             protocol: VpnProtocol::WireGuard,
             local_ip: None,
-            dns_servers: vec![IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1))],
+            dns_servers: vec![Ipv4Addr_new(1, 1, 1, 1)],
             mtu: 1420,
             keepalive_interval: 25,
         };
@@ -451,7 +458,7 @@ mod tests {
             port: 51820,
             protocol: VpnProtocol::WireGuard,
             local_ip: None,
-            dns_servers: vec![IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1))],
+            dns_servers: vec![Ipv4Addr_new(1, 1, 1, 1)],
             mtu: 1420,
             keepalive_interval: 25,
         };

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Debian Innovations Subsystem (sigpkg-debian)
 // Parity features inspired by Debian GNU/Linux:
 // 1. update-alternatives dynamic command link management

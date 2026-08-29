@@ -20,13 +20,15 @@
 // SigmaOS Memory Leak Detector
 // OOP-based memory leak detection with tracking and analysis
 
-use std::collections::{BTreeMap, HashSet};
+use alloc::collections::{BTreeMap, BTreeSet as HashSet};
 
 #[cfg(not(feature = "standalone_test"))]
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 #[cfg(feature = "standalone_test")]
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// Memory allocation record
 #[derive(Debug, Clone)]

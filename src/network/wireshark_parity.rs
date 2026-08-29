@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Wireshark Parity Implementation
 // Implements network packet capture, analysis, and protocol dissection
 

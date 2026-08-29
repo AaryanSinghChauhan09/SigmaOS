@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -24,11 +27,11 @@
 /// Implements cloud storage integration
 
 #[cfg(not(target_os = "none"))]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(not(target_os = "none"))]
-use std::mem;
+use core::mem;
 #[cfg(not(target_os = "none"))]
-use std::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut};
 
 #[cfg(target_os = "none")]
 use core::sync::atomic::{AtomicUsize, Ordering};

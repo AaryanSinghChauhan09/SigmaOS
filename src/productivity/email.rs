@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Email Client
 // OOP-based email client with IMAP/SMTP support and organization

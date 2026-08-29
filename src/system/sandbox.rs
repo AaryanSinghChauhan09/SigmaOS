@@ -15,12 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Process Sandbox Manager
 // OOP-based process sandboxing with capability-based security
 
 use crate::klib::BTreeMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std
 
 /// Sandbox profile
 #[derive(Debug, Clone)]

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS BSD Parity Implementation
 // Implements OpenBSD/FreeBSD security features and system management
 

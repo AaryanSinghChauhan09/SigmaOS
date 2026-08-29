@@ -8,6 +8,7 @@ pub mod bitmap;
 pub mod btreemap;
 pub mod buddy_allocator;
 pub mod collections;
+#[macro_use]
 pub mod console;
 pub mod conversion;
 pub mod custom_allocator;

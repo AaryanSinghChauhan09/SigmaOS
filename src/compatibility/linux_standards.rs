@@ -22,6 +22,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// Linux Standard Base init script locations
 pub const LSB_INIT_SCRIPTS: &str = "/etc/init.d/";

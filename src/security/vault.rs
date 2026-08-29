@@ -15,19 +15,24 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Encrypted File Vault
 // OOP-based encrypted file storage with post-quantum cryptography
 
 use crate::klib::HashMap;
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
+// Path/PathBuf not in no_std; using alloc::string::String as path
+type PathBuf = alloc::string::String;
+type Path = str;
+// SystemTime not in no_std; using u64 timestamps
 
 /// Helper function to generate random bytes
 fn generate_random_bytes(len: usize) -> Vec<u8> {
     let mut bytes = vec![0u8; len];
-    let seed = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
+    let seed = core::time::Duration::from_secs(0)
+        
         .unwrap()
         .as_nanos() as u64;
 
@@ -270,10 +275,10 @@ impl EncryptedFileVault {
             name: name.clone(),
             path: vault_path.clone(),
             algorithm: EncryptionAlgorithm::Aes256Gcm, // Will be updated based on encryption
-            created_at: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
+            created_at: 0u64
+                
                 .unwrap()
-                .as_secs(),
+                ,
             file_count: 0,
             total_size_bytes: 0,
         };
@@ -497,7 +502,7 @@ mod tests {
     fn test_vault_metadata() {
         let metadata = VaultMetadata {
             name: "test".to_string(),
-            path: PathBuf::from("/vault"),
+            path: alloc::string::String::from("/vault"),
             algorithm: EncryptionAlgorithm::Aes256Gcm,
             created_at: 1234567890,
             file_count: 0,

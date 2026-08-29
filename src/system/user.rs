@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS User Management System
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
@@ -5,9 +8,9 @@
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
-use std::fs;
-use std::path::{Path, PathBuf};
+use crate::klib::HashMap;
+// std::fs not in no_std
+// Path/PathBuf not in no_std
 
 /// User account information
 #[derive(Debug, Clone)]

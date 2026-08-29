@@ -1,5 +1,5 @@
 extern crate alloc;
-use std::collections::HashMap;
+use crate::klib::HashMap;
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)

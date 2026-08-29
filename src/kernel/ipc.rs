@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 

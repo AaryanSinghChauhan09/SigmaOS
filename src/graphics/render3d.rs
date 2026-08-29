@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Sovereign AI-Native 3D Graphics & Rendering Engine
 // Designed for Blender-parity modeling, transforms, shaders, and raytracing
 

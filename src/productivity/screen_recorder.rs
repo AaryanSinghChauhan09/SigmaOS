@@ -1,8 +1,12 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Screen Recorder
 // OOP-based screen recording with multiple formats and quality settings
 
-use std::path::PathBuf;
-use std::time::{Duration, Instant};
+// PathBuf not in no_std
+use core::time::Duration;
+// Instant not in no_std
 
 /// Recording format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

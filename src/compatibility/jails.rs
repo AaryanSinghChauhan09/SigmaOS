@@ -3,7 +3,10 @@
 
 extern crate alloc;
 
-use std::collections::HashSet;
+use alloc::collections::BTreeSet;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NamespaceType {
@@ -16,7 +19,7 @@ pub enum NamespaceType {
 
 #[derive(Debug, Clone)]
 pub struct NamespaceIsolation {
-    pub active_types: HashSet<NamespaceType>,
+    pub active_types: BTreeSet<NamespaceType>,
     pub virtual_hostname: String,
     pub virtual_ip: String,
     pub mapped_root: String,
@@ -25,7 +28,7 @@ pub struct NamespaceIsolation {
 impl NamespaceIsolation {
     pub fn new() -> Self {
         Self {
-            active_types: HashSet::new(),
+            active_types: BTreeSet::new(),
             virtual_hostname: "sigma-node".to_string(),
             virtual_ip: "127.0.0.1".to_string(),
             mapped_root: "/".to_string(),
@@ -44,14 +47,14 @@ impl NamespaceIsolation {
 /// Linux seccomp-BPF inspired syscall filter whitelist.
 #[derive(Debug, Clone)]
 pub struct SeccompFilter {
-    pub allowed_syscalls: HashSet<u32>,
+    pub allowed_syscalls: BTreeSet<u32>,
     pub default_action_kill: bool,
 }
 
 impl SeccompFilter {
     pub fn new() -> Self {
         let mut filter = Self {
-            allowed_syscalls: HashSet::new(),
+            allowed_syscalls: BTreeSet::new(),
             default_action_kill: true,
         };
         // By default, allow standard base lifecycle syscalls: read (3), write (4), exit (1)

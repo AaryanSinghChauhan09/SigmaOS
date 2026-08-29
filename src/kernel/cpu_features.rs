@@ -137,8 +137,7 @@ impl CpuState {
         self.lr = self.pc + 4;
         self.r[0] = svc_number;
 
-        #[cfg(not(target_os = "none"))]
-        std::println!(
+        crate::println!(
             "ARM: SVC software interrupt triggered (SVC #{}). System transitioned to SVC mode.",
             svc_number
         );
@@ -149,8 +148,7 @@ impl CpuState {
     pub fn trigger_undefined_instruction_abort(&mut self) {
         self.arm_mode = ArmPrivilegeMode::Undefined;
         self.ring = CpuRing::Ring0;
-        #[cfg(not(target_os = "none"))]
-        std::println!(
+        crate::println!(
             "ARM: Undefined Instruction Abort vector triggered! Kernel entered panic state."
         );
     }

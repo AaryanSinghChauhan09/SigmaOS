@@ -15,11 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Battery Saver Mode
 // OOP-based power management with adaptive profiles
 
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// Power mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

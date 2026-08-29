@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 

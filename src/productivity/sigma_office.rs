@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! # SigmaOffice - Sovereign Office Suite (SigmaCalc, SigmaWrite)
 //!
 //! This module implements SigmaOffice:
@@ -830,9 +833,7 @@ impl Default for VersionHistoryManager {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::io;
-
-    pub type Result<T> = std::result::Result<T, io::Error>;
+    pub type Result<T> = core::result::Result<T, &'static str>;
 
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {

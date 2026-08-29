@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Text Processing Tools (sed/awk/grep Inspiration)
 //! Stream editor, text processor, and pattern search
 

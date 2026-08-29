@@ -34,7 +34,7 @@ extern crate alloc;
 
 use sigma_types::{CapabilityToken, Result};
 
-use std::collections::HashSet;
+use alloc::collections::BTreeSet as HashSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -225,9 +225,7 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::io;
-
-    pub type Result<T> = std::result::Result<T, io::Error>;
+    pub type Result<T> = core::result::Result<T, &'static str>;
 
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {

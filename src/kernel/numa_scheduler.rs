@@ -1,8 +1,11 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // NUMA-Aware Scheduler with Lock-free Synchronization Primitives
 // Optimizes multi-core scalability, limits cache line bouncing, and prevents socket bus saturation.
 
-use std::ptr;
-use std::sync::atomic::{AtomicPtr, Ordering};
+use core::ptr;
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 #[derive(Debug, Clone)]
 pub struct NumaTask {

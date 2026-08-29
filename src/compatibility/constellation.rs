@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Constellation & Museum Architecture for Legacy Compatibility (SigmaConstellation)
 // Implements Kernel Constellations, Syscall Chronicles, Driver Museums, Firmware Pavilions, Build Archives, Security Pavilions, and Peripheral Museums.

@@ -1,8 +1,11 @@
-//! Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
-//! Implements high-performance kernel data structures:
-//! - SplayTree<K, V>: FreeBSD `sys/tree.h` inspired self-balancing binary search tree
-//! - RadixTree<T>: Linux kernel `lib/radix-tree.c` inspired page-cache / PID radix lookup tree
-//! - SovereignPriorityQueue<T>: BSD `sys/queue.h` and Linux scheduler binary heap priority queue
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
+// Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
+// Implements high-performance kernel data structures:
+// - SplayTree<K, V>: FreeBSD `sys/tree.h` inspired self-balancing binary search tree
+// - RadixTree<T>: Linux kernel `lib/radix-tree.c` inspired page-cache / PID radix lookup tree
+// - SovereignPriorityQueue<T>: BSD `sys/queue.h` and Linux scheduler binary heap priority queue
 
 use crate::klib::Vec;
 

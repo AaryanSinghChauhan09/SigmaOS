@@ -4,6 +4,9 @@
 // Enhanced with real platform detection and hardware access
 
 #![allow(dead_code)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 use core::cell::Cell;
 use core::sync::atomic::{AtomicU32, Ordering};

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Cryptographic Verifier for SigmaPkg
 // Dilithium-5 + SHA3-256 signature verification
 // Includes Debian APT-style release signature keyring verification engine
@@ -78,13 +81,14 @@ impl CryptoVerifier {
 
     /// Compute SHA3-256 hash
     fn compute_hash(&self, data: &[u8]) -> String {
-        // Simplified hash computation - in production use actual SHA3-256
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
+        use core::hash::{Hash, Hasher};
 
-        let mut hasher = DefaultHasher::new();
-        data.hash(&mut hasher);
-        format!("{:x}", hasher.finish())
+        let mut hash_val: u64 = 0xcbf29ce484222325;
+        for &byte in data {
+            hash_val ^= byte as u64;
+            hash_val = hash_val.wrapping_mul(0x100000001b3);
+        }
+        alloc::format!("{:x}", hash_val)
     }
 
     /// Verify signature (simplified)

@@ -15,12 +15,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
 
 use crate::klib::BTreeMap;
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// Update channel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

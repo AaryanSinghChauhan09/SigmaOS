@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Legacy Filesystem Adaptation Layer (LegacyFSAdapter)
 // Designed for FAT32, Minix, and ReiserFS filesystem mounting and translations
 

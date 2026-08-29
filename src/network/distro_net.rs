@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Distro Network Enhancements for SigmaOS
 // Inspired by Linux SYN Cookies (syncookies), WireGuard Noise protocol, Netfilter iptables, and eBPF SO_ATTACH_FILTER.
 

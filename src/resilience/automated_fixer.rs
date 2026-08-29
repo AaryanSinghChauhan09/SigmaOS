@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Sovereign Automated Fixer and Self-Healing Daemon
 // Inspired by Linux watchdogs, systemd service recovery, and Solaris Fault Management Architecture (FMA).
 

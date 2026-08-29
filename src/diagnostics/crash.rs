@@ -32,13 +32,13 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 
 #[cfg(test)]
-use std::ptr::{self, NonNull};
+use core::ptr::{self, NonNull};
 #[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test)]
-use std::mem;
+use core::mem;
 #[cfg(test)]
-use std::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut};
 
 /// Report ID
 pub type ReportID = usize;
@@ -668,7 +668,7 @@ extern "C" {
 
 #[cfg(test)]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
+    use alloc::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align_unchecked(size, 8);
     std_alloc(layout)
 }

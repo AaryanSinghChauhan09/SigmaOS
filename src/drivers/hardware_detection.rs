@@ -1,10 +1,13 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Hardware Detection and Device Manager
 // Inspired by Linux udev, DevFS, and BSD device management
 // Supports automatic device detection, hot-plug events, and device abstraction
 
 use crate::klib::HashMap;
-use std::fs;
-use std::path::{Path, PathBuf};
+// std::fs not in no_std
+// Path/PathBuf not in no_std
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {

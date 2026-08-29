@@ -4,7 +4,7 @@
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Processor execution rings
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

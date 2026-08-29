@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Display Manager (GDM/LightDM Inspiration)
 //! Login screen, session management, and display server spawning
 

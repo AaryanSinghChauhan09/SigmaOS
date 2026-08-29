@@ -409,7 +409,7 @@ impl ZenithCompositor {
     pub fn destroy_window(&mut self, window_id: u64) -> Result<()> {
         self.windows
             .remove(&window_id)
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
+            .ok_or("Window not found")?;
         self.surfaces.remove(&window_id);
 
         if self.active_window == Some(window_id) {
@@ -424,7 +424,7 @@ impl ZenithCompositor {
         let window = self
             .windows
             .get_mut(&window_id)
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
+            .ok_or("Window not found")?;
 
         window.state = state;
         Ok(())
@@ -435,7 +435,7 @@ impl ZenithCompositor {
         let window = self
             .windows
             .get_mut(&window_id)
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found"))?;
+            .ok_or("Window not found")?;
 
         window.geometry = geometry;
         self.damage_regions.push(DamageRegion::new(
@@ -450,9 +450,7 @@ impl ZenithCompositor {
     /// Activate a window (bring to front)
     pub fn activate_window(&mut self, window_id: u64) -> Result<()> {
         if !self.windows.contains_key(&window_id) {
-            return Err(
-                std::io::Error::new(std::io::ErrorKind::NotFound, "Window not found").into(),
-            );
+            return Err("Window not found");
         }
         self.active_window = Some(window_id);
         Ok(())
@@ -711,9 +709,9 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::io;
+    use alloc::string::String;
 
-    pub type Result<T> = std::result::Result<T, io::Error>;
+    pub type Result<T> = core::result::Result<T, &'static str>;
 
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {

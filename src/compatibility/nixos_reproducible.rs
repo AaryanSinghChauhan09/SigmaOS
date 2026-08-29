@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! NixOS-Inspired Reproducible Package System
 //!
 //! This module implements a reproducible, deterministic package management system

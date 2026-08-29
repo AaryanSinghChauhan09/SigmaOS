@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Lightweight Init System for SigmaOS
 // Inspired by Void Linux `runit`, Alpine Linux `OpenRC`, and `s6` systemd alternatives
 // Provides ultra-fast PID 1 process supervision, parallel runlevel targets, dependency tracking,

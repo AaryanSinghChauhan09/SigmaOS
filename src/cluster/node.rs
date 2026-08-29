@@ -455,7 +455,7 @@ impl<T> Default for Vec<T> {
 // Allocator shims: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
+    use alloc::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).expect("Failed to create memory layout");
     std_alloc(layout)
 }

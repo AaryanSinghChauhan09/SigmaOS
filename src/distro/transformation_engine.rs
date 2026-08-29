@@ -2,7 +2,8 @@
 // Implements accessibility overlays, automation routines, forensic audit trails,
 // global legal compliance dashboards, cross-language developer tools, and IoT mesh orchestration.
 
-use std::collections::{HashMap, HashSet};
+use crate::klib::HashMap;
+use alloc::collections::BTreeSet as HashSet;
 
 /// 1. Accessibility Overlay Manager
 pub struct AccessibilityOverlayManager {

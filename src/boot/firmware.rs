@@ -1,6 +1,6 @@
 extern crate alloc;
 
-use std::convert::TryInto;
+use core::convert::TryInto;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

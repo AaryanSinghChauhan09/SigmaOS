@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! System Installer (Ubiquity/Calamares Inspiration)
 //! Graphical installer with partitioning and user setup
 

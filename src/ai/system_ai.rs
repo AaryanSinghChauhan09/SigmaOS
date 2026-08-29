@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! AI/ML Integration (System Optimization)
 //! AI-driven system optimization, predictive scaling, and anomaly detection
 

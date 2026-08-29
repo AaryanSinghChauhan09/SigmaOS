@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Governance & Transparency enhancements
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
@@ -11,7 +14,7 @@ pub use rfc::{
     VotingSystem, RFC, RFCID,
 };
 use crate::klib::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Foundation committee member profile
 #[derive(Debug, Clone)]

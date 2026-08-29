@@ -1,7 +1,10 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Screenshot Tool
 // OOP-based screenshot capture with multiple modes and formats
 
-use std::path::PathBuf;
+// PathBuf not in no_std
 
 /// Screenshot mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -13,10 +13,13 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
-use std::ffi::CStr;
-use std::os::raw::{c_char, c_int, c_void};
-use std::ptr;
+use core::ffi::CStr;
+use core::ffi::{c_char, c_int, c_void};
+use core::ptr;
 
 /// Sodium initialization status
 static mut SODIUM_INITIALIZED: bool = false;

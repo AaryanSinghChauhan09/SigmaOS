@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS India-First Finance Module (sigma_finance)
 // OOP-based GST, TDS, UPI, and Income Tax engine

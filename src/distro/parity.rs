@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Sovereign Linux Parity & Maturity Blueprint Implementation
 // Implements Live Installer, Update Channel Broker, Sandboxed App Bundle, and Multi-Arch HAL
 

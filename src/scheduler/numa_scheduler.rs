@@ -1,7 +1,10 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use std::sync::atomic::{AtomicPtr, Ordering}; // Atomic primitives are kept as they are fundamental
+use core::sync::atomic::{AtomicPtr, Ordering}; // Atomic primitives are kept as they are fundamental
 
 pub struct NumaNode {
     pub node_id: u32,

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS — DTrace/eBPF-Inspired Kernel Tracing Engine
 //
 // Provides static probe points (like DTrace's USDT/SDT probes) and a

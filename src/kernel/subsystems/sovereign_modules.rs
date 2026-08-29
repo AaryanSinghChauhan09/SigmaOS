@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Sovereign Core Modules & Subsystems
 // Implements missing enterprise, gaming, accessibility, mobile, localization,
 // and sovereign sector integrations (Healthcare, Education, Agriculture, Finance)

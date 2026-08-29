@@ -15,6 +15,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
@@ -25,8 +28,8 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use crate::klib::HashMap;
 
-use std::net::IpAddr;
-use std::time::Instant;
+// IpAddr not in no_std; using u32/u128 for addresses
+// Instant not in no_std; using u64 tick counters
 
 /// Security event
 #[derive(Debug, Clone)]

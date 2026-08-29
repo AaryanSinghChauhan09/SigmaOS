@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS — kqueue Event-Notification Subsystem
 //
 // Inspired by BSD kqueue(2) — a unified kernel event notification interface.

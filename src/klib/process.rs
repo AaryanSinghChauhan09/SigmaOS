@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Process management module for SigmaOS
 // Replaces std::process functionality
 

@@ -24,7 +24,8 @@ use crate::sigpkg::Package;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
-use std::path::PathBuf;
+/// PathBuf-like alias using String for no_std compatibility
+type PathBuf = alloc::string::String;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -95,13 +96,12 @@ impl ContentAddressedStore {
 
     /// Compute SHA3-256 hash
     fn compute_hash(&self, data: &[u8]) -> String {
-        // Simplified hash computation - in production use actual SHA3-256
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-
-        let mut hasher = DefaultHasher::new();
-        data.hash(&mut hasher);
-        format!("{:x}", hasher.finish())
+        let mut hash_val: u64 = 0xcbf29ce484222325;
+        for &byte in data {
+            hash_val ^= byte as u64;
+            hash_val = hash_val.wrapping_mul(0x100000001b3);
+        }
+        alloc::format!("{:x}", hash_val)
     }
 
     /// Get package path
@@ -202,11 +202,12 @@ impl BsdPkgRepositoryMirror {
 
     pub fn update_index(&mut self, index_bytes: &[u8], signature_valid: bool) -> bool {
         if signature_valid {
-            use std::collections::hash_map::DefaultHasher;
-            use std::hash::{Hash, Hasher};
-            let mut hasher = DefaultHasher::new();
-            index_bytes.hash(&mut hasher);
-            self.index_hash = format!("{:x}", hasher.finish());
+            let mut hash_val: u64 = 0xcbf29ce484222325;
+            for &byte in index_bytes {
+                hash_val ^= byte as u64;
+                hash_val = hash_val.wrapping_mul(0x100000001b3);
+            }
+            self.index_hash = alloc::format!("{:x}", hash_val);
             self.is_trusted = true;
             self.packages_count = index_bytes.len() / 32;
             true
@@ -273,13 +274,14 @@ impl NixOsHermeticCasStore {
     }
 
     pub fn compute_store_path(&mut self, pkg_name: &str, version: &str, payload: &[u8]) -> PathBuf {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        let mut hasher = DefaultHasher::new();
-        payload.hash(&mut hasher);
-        let hash_str = format!("{:016x}", hasher.finish());
+        let mut hash_val: u64 = 0xcbf29ce484222325;
+        for &byte in payload {
+            hash_val ^= byte as u64;
+            hash_val = hash_val.wrapping_mul(0x100000001b3);
+        }
+        let hash_str = alloc::format!("{:016x}", hash_val);
 
-        let folder_name = format!("{}-{}-{}", hash_str, pkg_name, version);
+        let folder_name = alloc::format!("{}-{}-{}", hash_str, pkg_name, version);
         let store_path = self.store_dir.join(folder_name);
         self.store_paths
             .insert(pkg_name.to_string(), store_path.clone());

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 /// Custom ELF Loader for SigmaOS
 /// Implements ELF binary loading without relying on ld.so
 /// Supports ELF32/ELF64 formats, glibc symbol resolution, and Auxiliary Vectors (auxv)

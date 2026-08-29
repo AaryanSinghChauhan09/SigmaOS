@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(feature = "standalone_test")]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. DEBUGGER WINDOWS MANAGEMENT

@@ -8,6 +8,8 @@
 use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.

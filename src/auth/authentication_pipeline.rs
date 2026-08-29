@@ -1,6 +1,9 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Linux & BSD Inspired User Identification, Multi-Step Authentication & Computer Security Pipeline for SigmaOS
 
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Steps of User Identification & Multi-Factor Verification Pipeline
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

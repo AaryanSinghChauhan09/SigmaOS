@@ -1,8 +1,12 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
 use crate::klib::HashMap;
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// System metric type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

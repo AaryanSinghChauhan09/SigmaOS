@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Windows/Linux-Inspired Advanced I/O and Driver subsystem (S-IRP)
 // Implements highly-flexible Windows-style IRPs, APCs, DPCs, Buffering Methods,
 // Driver & Device Objects, File System Minifilters, and Kernel Callbacks.
@@ -5,7 +8,7 @@
 // and iOS/macOS (Power state validation, Sandboxed Entitlements clearance).
 
 use crate::klib::HashMap;
-use std::sync::atomic::{AtomicU8, Ordering};
+use core::sync::atomic::{AtomicU8, Ordering};
 
 pub const IRP_MJ_CREATE: u8 = 0x00;
 pub const IRP_MJ_CLOSE: u8 = 0x02;

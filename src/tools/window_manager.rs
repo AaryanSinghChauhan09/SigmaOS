@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Window Manager (i3/sway Inspiration)
 //! Tiling window manager with workspaces and containers
 

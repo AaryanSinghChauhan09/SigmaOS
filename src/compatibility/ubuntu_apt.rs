@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Ubuntu/Debian-Inspired Package Management Integration
 //! 
 //! APT-compatible package management with PPA support

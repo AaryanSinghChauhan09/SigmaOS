@@ -1,10 +1,13 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS System Configuration Manager
 // Linux distro-inspired system configuration management
 // Handles system-wide configuration files, service configs, and runtime settings
 
 use crate::klib::HashMap;
-use std::fs;
-use std::path::{Path, PathBuf};
+// std::fs not in no_std
+// Path/PathBuf not in no_std
 
 /// System configuration file types
 #[derive(Debug, Clone, PartialEq, Eq)]

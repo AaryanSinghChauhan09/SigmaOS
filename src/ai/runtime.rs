@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS AI-Native Model Process Runtime (IModelRuntime)
 // Treats neural network models (LLMs, computer-vision, TTS) as first-class, scheduled OS processes
 

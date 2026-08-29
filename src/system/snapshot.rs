@@ -15,13 +15,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS System Restore Snapshots
 // OOP-based system snapshot and restore functionality
 
 use crate::klib::BTreeMap;
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
+// Path/PathBuf not in no_std
+// SystemTime not in no_std
 
 /// Snapshot metadata
 #[derive(Debug, Clone)]
@@ -358,12 +361,12 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
 impl MerkleSnapshotStorage {
     fn compute_merkle_root(&self, data: &[u8]) -> String {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-
-        let mut hasher = DefaultHasher::new();
-        data.hash(&mut hasher);
-        format!("{:x}", hasher.finish())
+        let mut hash_val: u64 = 0xcbf29ce484222325;
+        for &byte in data {
+            hash_val ^= byte as u64;
+            hash_val = hash_val.wrapping_mul(0x100000001b3);
+        }
+        alloc::format!("{:x}", hash_val)
     }
 
     fn find_oldest_snapshot(&self) -> Option<String> {

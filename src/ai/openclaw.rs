@@ -24,7 +24,7 @@
 // 3. ClawChatIntegrator (Chat webhook alert triggers and GitHub triage)
 
 use core::sync::atomic::{AtomicBool, Ordering};
-use std::collections::{BTreeMap, VecDeque};
+use alloc::collections::{BTreeMap, VecDeque};
 
 // ==========================================
 // 1. ClawBackgroundDaemon

@@ -1,6 +1,9 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
-//! Custom HashSet implementation for SigmaOS
-//! Reduces dependency on std::collections::HashSet
+// Custom HashSet implementation for SigmaOS
+// Reduces dependency on std::collections::HashSet
 
 use crate::klib::btreemap::BTreeMap;
 use crate::klib::btreemap::BTreeMapIter;

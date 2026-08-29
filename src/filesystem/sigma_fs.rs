@@ -4,8 +4,8 @@
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
-use std::path::PathBuf;
+use crate::klib::HashMap;
+use alloc::string::String;
 
 /// Standardized next-generation hierarchy (SigmaFS)
 /// Compatible with Linux FHS, Windows NTFS, and BSD structures.

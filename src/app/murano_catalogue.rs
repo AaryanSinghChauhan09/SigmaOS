@@ -1,6 +1,9 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // OpenStack Murano Inspired Application Catalogue for SigmaOS
 
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Application Topology / Environment Requirements
 #[derive(Debug, Clone)]

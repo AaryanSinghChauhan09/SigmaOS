@@ -1,6 +1,9 @@
-//! Custom BTreeMap implementation for SigmaOS
-//! Reduces dependency on std::collections::BTreeMap
-//! Simple implementation using sorted Vec for now
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
+// Custom BTreeMap implementation for SigmaOS
+// Reduces dependency on std::collections::BTreeMap
+// Simple implementation using sorted Vec for now
 
 use super::Vec;
 use core::fmt;

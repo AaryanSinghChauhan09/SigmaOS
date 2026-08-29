@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // 1. LINUX FILE TYPE AND METADATA COMPATIBILITY LAYER
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

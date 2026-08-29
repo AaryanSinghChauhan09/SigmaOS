@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Console I/O module for SigmaOS
 // Replaces std::io functionality for terminal I/O
 
@@ -76,3 +79,42 @@ impl SigmaConsole {
 
 // Global console instance
 pub static CONSOLE: SigmaConsole = SigmaConsole::new();
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => {
+        let msg = alloc::format!($($arg)*);
+        $crate::klib::console::CONSOLE.print(&msg);
+    };
+}
+
+#[macro_export]
+macro_rules! println {
+    () => {
+        $crate::klib::console::CONSOLE.print("\n");
+    };
+    ($($arg:tt)*) => {
+        let msg = alloc::format!($($arg)*);
+        $crate::klib::console::CONSOLE.println(&msg);
+    };
+}
+
+#[macro_export]
+macro_rules! eprint {
+    ($($arg:tt)*) => {
+        let msg = alloc::format!($($arg)*);
+        $crate::klib::console::CONSOLE.eprint(&msg);
+    };
+}
+
+#[macro_export]
+macro_rules! eprintln {
+    () => {
+        $crate::klib::console::CONSOLE.eprint("\n");
+    };
+    ($($arg:tt)*) => {
+        let msg = alloc::format!($($arg)*);
+        $crate::klib::console::CONSOLE.eprintln(&msg);
+    };
+}
+

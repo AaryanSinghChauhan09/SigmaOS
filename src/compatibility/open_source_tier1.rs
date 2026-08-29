@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Open Source Tier 1 Projects Integration Layer
 // Implements clean-room, high-fidelity integration wrappers for Wasmer, smoltcp, libsodium, and SQLite
 

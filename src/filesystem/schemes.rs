@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Redox OS-inspired URL Scheme subsystem for SigmaOS.
 // Replaces standard Unix pathnames with URL-based resources (e.g., "shm://buffer", "log://kernel", "rand://stream")
 // where "everything is a URL resource".

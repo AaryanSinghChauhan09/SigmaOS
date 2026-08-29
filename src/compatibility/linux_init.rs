@@ -22,6 +22,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// Runlevel definitions (SysVinit-style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

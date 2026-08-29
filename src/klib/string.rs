@@ -1,5 +1,8 @@
-//! Custom string implementation for SigmaOS
-//! This module provides no_std alternatives to std::string and reduces dependency on predefined functions
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
+// Custom string implementation for SigmaOS
+// This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 
 use super::vec::SigmaVec;
 use core::ops::{Deref, DerefMut};

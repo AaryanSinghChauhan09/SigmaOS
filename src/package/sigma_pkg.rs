@@ -1,11 +1,14 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Package Manager (sigma-pkg)
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
 use crate::klib::HashMap;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::process::Command;
+// std::fs not in no_std
+// Path/PathBuf not in no_std
+// std::process not in no_std
 
 #[derive(Debug, Clone)]
 pub struct Package {

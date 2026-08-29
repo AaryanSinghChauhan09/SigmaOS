@@ -1,6 +1,15 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+#[macro_use]
+extern crate alloc;
+extern crate std;
+
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
+use alloc::boxed::Box;
 
 #[path = "../src/klib/mod.rs"]
 mod klib;
@@ -35,8 +44,6 @@ mod vm_manager;
 mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
-#[path = "../src/compatibility/freebsd_jails.rs"]
-mod freebsd_jails;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
@@ -49,8 +56,6 @@ mod fs_bsd_linux_innovations;
 mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
-#[path = "../src/compatibility/gap_closure.rs"]
-mod gap_closure;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]

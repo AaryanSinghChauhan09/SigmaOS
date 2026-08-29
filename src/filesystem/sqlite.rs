@@ -14,12 +14,13 @@
 #![allow(unused_imports)]
 
 use crate::klib::HashMap;
-use std::sync::{Arc, Mutex};
+use alloc::sync::Arc;
+use core::cell::RefCell;
 
 /// SQLite database connection
 pub struct Connection {
     path: String,
-    tables: Arc<Mutex<HashMap<String, Table>>>,
+    tables: Arc<RefCell<HashMap<String, Table>>>,
 }
 
 /// Table schema
@@ -100,12 +101,12 @@ impl Connection {
         
         match parsed {
             SQLStatement::CreateTable(table) => {
-                let mut tables = self.tables.lock().unwrap();
+                let mut tables = self.tables.borrow_mut();
                 tables.insert(table.name.clone(), table);
                 Ok(1)
             }
             SQLStatement::Insert { table_name, values } => {
-                let mut tables = self.tables.lock().unwrap();
+                let mut tables = self.tables.borrow_mut();
                 if let Some(table) = tables.get_mut(&table_name) {
                     table.rows.push(values);
                     Ok(1)
@@ -114,7 +115,7 @@ impl Connection {
                 }
             }
             SQLStatement::Update { table_name, updates, condition } => {
-                let mut tables = self.tables.lock().unwrap();
+                let mut tables = self.tables.borrow_mut();
                 if let Some(table) = tables.get_mut(&table_name) {
                     let mut count = 0;
                     for row in &mut table.rows {
@@ -133,7 +134,7 @@ impl Connection {
                 }
             }
             SQLStatement::Delete { table_name, condition } => {
-                let mut tables = self.tables.lock().unwrap();
+                let mut tables = self.tables.borrow_mut();
                 if let Some(table) = tables.get_mut(&table_name) {
                     let original_len = table.rows.len();
                     table.rows.retain(|row| !self.evaluate_condition(row, &condition));
@@ -152,7 +153,7 @@ impl Connection {
         
         match parsed {
             SQLStatement::Select { table_name, columns, condition } => {
-                let tables = self.tables.lock().unwrap();
+                let tables = self.tables.borrow_mut();
                 if let Some(table) = tables.get(&table_name) {
                     let mut result_columns = Vec::new();
                     let mut col_indices = Vec::new();
@@ -410,7 +411,7 @@ impl Connection {
 
 /// Prepared statement
 pub struct Statement {
-    connection: Arc<Mutex<HashMap<String, Table>>>,
+    connection: Arc<RefCell<HashMap<String, Table>>>,
     statement: SQLStatement,
 }
 
@@ -433,7 +434,7 @@ impl Statement {
 
 /// Transaction
 pub struct Transaction {
-    connection: Arc<Mutex<HashMap<String, Table>>>,
+    connection: Arc<RefCell<HashMap<String, Table>>>,
 }
 
 impl Transaction {
@@ -505,7 +506,7 @@ mod tests {
         let sql = "CREATE TABLE users (id INTEGER, name TEXT, email TEXT)";
         conn.execute(sql).unwrap();
         
-        let tables = conn.tables.lock().unwrap();
+        let tables = conn.tables.borrow_mut();
         assert!(tables.contains_key("users"));
     }
     

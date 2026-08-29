@@ -15,12 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS File Manager
 // OOP-based file management with advanced features
 
 use crate::klib::BTreeMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std
 
 /// File item
 #[derive(Debug, Clone)]

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Sovereign AI-Native Video Editing Suite (SigmaCut)
 // Designed for high-performance timeline composition, YUV translation, and overlay effects
 

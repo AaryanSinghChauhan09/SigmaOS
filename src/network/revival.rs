@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Legacy Networking Protocols Revival (NetRevival)
 // Revives obsolete LAN network stacks (Novell IPX/SPX, IBM NetBEUI) decorated behind a secure zero-trust envelope
 

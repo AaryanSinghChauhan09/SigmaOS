@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 use crate::filesystem::FileType;
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,

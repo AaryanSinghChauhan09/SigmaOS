@@ -1,4 +1,7 @@
 #![allow(clippy::large_enum_variant)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
@@ -332,7 +335,7 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 mod tests {
     use super::*;
     use crate::klib::custom_string::SigmaString;
-    use std::path::PathBuf;
+    type PathBuf = alloc::string::String;
 
     #[test]
     fn test_transaction_creation() {

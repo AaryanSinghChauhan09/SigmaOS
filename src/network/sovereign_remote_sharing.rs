@@ -1,7 +1,8 @@
 // Sovereign Remote Sharing & Protocol Enhancements for SigmaOS
 // Inspired by Linux & BSD distributions: OpenSSH, dropbear, NFSv4, Samba (smbd/ksmbd), SCP, and rsync.
 
-use std::collections::{BTreeMap, HashMap};
+use alloc::collections::BTreeMap;
+use crate::klib::HashMap;
 
 // =========================================================================
 // 1. SSH ENHANCEMENTS: OpenSSH / Dropbear / OpenBSD PrivSep & ControlMaster

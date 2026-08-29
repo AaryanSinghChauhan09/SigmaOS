@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Shell/Command Interpreter (bash/zsh Inspiration)
 //! Advanced shell with history, completion, aliases, and job control
 

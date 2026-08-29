@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Custom I/O Implementation
 // Reduces dependency on std::io by providing custom implementations
 

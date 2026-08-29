@@ -15,14 +15,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS File Shredder
 // OOP-based secure file deletion with multiple overwrite passes
 
 use crate::klib::rng::{Rng, SigmaRng};
-use std::fs::{self, File, OpenOptions};
-use std::io::{self, Seek, SeekFrom, Write};
-use std::path::Path;
+// std::fs not in no_std
+// std::io not in no_std
+// Path not in no_std
 
 /// Shredding algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

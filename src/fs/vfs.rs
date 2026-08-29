@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// OOP-based Virtual Filesystem for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 41

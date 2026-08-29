@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502

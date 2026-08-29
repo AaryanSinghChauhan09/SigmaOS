@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 //! BSD-Inspired Graphics & Display Subsystem Innovations
 //! Clean-room implementations of FreeBSD vt(4)/wscons, OpenBSD drm(4)/KMS, DragonFly LWKT SMP rendering rings, and FreeBSD kqueue-backed Compositors.

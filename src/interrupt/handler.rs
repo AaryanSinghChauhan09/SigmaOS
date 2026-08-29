@@ -8,8 +8,7 @@ use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
-use alloc::string::ToString;
-use std::sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 pub type InterruptNumber = u32;
 

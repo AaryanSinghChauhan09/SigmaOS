@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! # sigma_unveil - Path Narrowing Framework
 //!
 //! Inspired by OpenBSD's unveil(), sigma_unveil allows processes to restrict
@@ -14,7 +17,9 @@
 
 use sigma_types::Result;
 use crate::klib::HashMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std; using alloc::string::String as path
+type PathBuf = alloc::string::String;
+type Path = str;
 
 /// Access permissions for unveiled paths
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -116,11 +121,7 @@ impl UnveilState {
     /// Add an unveil entry
     pub fn unveil(&mut self, path: PathBuf, permissions: &str) -> Result<()> {
         if self.is_locked {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::PermissionDenied,
-                "Unveil is locked",
-            )
-            .into());
+            return Err("Unveil is locked");
         }
 
         let perms = UnveilPermissions::from_str(permissions);
@@ -131,11 +132,7 @@ impl UnveilState {
     /// Lock the veil (no more unveil calls allowed)
     pub fn lock(&mut self) -> Result<()> {
         if self.is_locked {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::PermissionDenied,
-                "Already locked",
-            )
-            .into());
+            return Err("Already locked");
         }
         self.is_locked = true;
         Ok(())
@@ -144,13 +141,9 @@ impl UnveilState {
     /// Check if a path is accessible with given permission
     pub fn check_access(&self, path: &Path, required_perm: UnveilPermissions) -> Result<()> {
         // Mitigate directory traversal: reject paths containing parent directory segments
-        for component in path.components() {
-            if let std::path::Component::ParentDir = component {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    "Directory traversal sequence detected",
-                )
-                .into());
+        for component in path.split("/") {
+            if component == ".." {
+                return Err("Directory traversal sequence detected");
             }
         }
 
@@ -160,7 +153,7 @@ impl UnveilState {
 
         for entry in &self.entries {
             if entry.covers(path) {
-                let entry_len = entry.path().as_os_str().len();
+                let entry_len = entry.path().len();
                 if entry_len > best_len {
                     best_len = entry_len;
                     best_entry = Some(entry);
@@ -180,19 +173,12 @@ impl UnveilState {
                 if has_perm {
                     Ok(())
                 } else {
-                    Err(std::io::Error::new(
-                        std::io::ErrorKind::PermissionDenied,
-                        "Permission not granted",
-                    )
-                    .into())
+                    Err("Permission not granted")
                 }
             }
             None => {
                 // No matching entry - deny
-                Err(
-                    std::io::Error::new(std::io::ErrorKind::PermissionDenied, "Path not unveiled")
-                        .into(),
-                )
+                Err("Path not unveiled")
             }
         }
     }
@@ -246,7 +232,7 @@ impl UnveilManager {
         match self.process_states.get_mut(&process_id) {
             Some(state) => state.lock(),
             None => {
-                Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Process not found").into())
+                Err("Process not found")
             }
         }
     }
@@ -261,7 +247,7 @@ impl UnveilManager {
         match self.process_states.get(&process_id) {
             Some(state) => state.check_access(path, required_perm),
             None => {
-                Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Process not found").into())
+                Err("Process not found")
             }
         }
     }
@@ -282,7 +268,7 @@ impl Default for UnveilManager {
 #[macro_export]
 macro_rules! sigma_unveil {
     ($path:expr, $perms:expr) => {{
-        let path = std::path::PathBuf::from($path);
+        let path = alloc::string::String::from($path);
         // In real implementation, this would call the global unveil manager
         // For now, we'll just create the state
         let mut state = $crate::security::sigma_unveil::UnveilState::new();
@@ -315,8 +301,8 @@ mod tests {
     fn test_unveil_state() {
         let mut state = UnveilState::new();
 
-        state.unveil(PathBuf::from("/etc"), "r").unwrap();
-        state.unveil(PathBuf::from("/tmp"), "rw").unwrap();
+        state.unveil(alloc::string::String::from("/etc"), "r").unwrap();
+        state.unveil(alloc::string::String::from("/tmp"), "rw").unwrap();
 
         assert!(!state.is_locked());
         state.lock().unwrap();
@@ -330,37 +316,37 @@ mod tests {
     fn test_access_check() {
         let mut state = UnveilState::new();
 
-        state.unveil(PathBuf::from("/etc"), "r").unwrap();
-        state.unveil(PathBuf::from("/tmp"), "rw").unwrap();
+        state.unveil(alloc::string::String::from("/etc"), "r").unwrap();
+        state.unveil(alloc::string::String::from("/tmp"), "rw").unwrap();
 
         // Read access to /etc should be allowed
         assert!(state
-            .check_access(Path::new("/etc/passwd"), UnveilPermissions::Read)
+            .check_access("/etc/passwd", UnveilPermissions::Read)
             .is_ok());
 
         // Write access to /etc should be denied
         assert!(state
-            .check_access(Path::new("/etc/passwd"), UnveilPermissions::Write)
+            .check_access("/etc/passwd", UnveilPermissions::Write)
             .is_err());
 
         // Read access to /tmp should be allowed
         assert!(state
-            .check_access(Path::new("/tmp/file"), UnveilPermissions::Read)
+            .check_access("/tmp/file", UnveilPermissions::Read)
             .is_ok());
 
         // Write access to /tmp should be allowed
         assert!(state
-            .check_access(Path::new("/tmp/file"), UnveilPermissions::Write)
+            .check_access("/tmp/file", UnveilPermissions::Write)
             .is_ok());
 
         // Access to /var should be denied (not unveiled)
         assert!(state
-            .check_access(Path::new("/var/log"), UnveilPermissions::Read)
+            .check_access("/var/log", UnveilPermissions::Read)
             .is_err());
 
         // Traversal sequences should be immediately blocked and return Err
         assert!(state
-            .check_access(Path::new("/etc/../tmp/file"), UnveilPermissions::Read)
+            .check_access("/etc/../tmp/file", UnveilPermissions::Read)
             .is_err());
     }
 
@@ -368,26 +354,24 @@ mod tests {
     fn test_unveil_manager() {
         let mut manager = UnveilManager::new();
 
-        manager.unveil(1, PathBuf::from("/home"), "rw").unwrap();
+        manager.unveil(1, alloc::string::String::from("/home"), "rw").unwrap();
         manager.lock(1).unwrap();
 
         // Check access
         assert!(manager
-            .check_access(1, Path::new("/home/user/file"), UnveilPermissions::Read)
+            .check_access(1, "/home/user/file", UnveilPermissions::Read)
             .is_ok());
 
         // Unregistered process
         assert!(manager
-            .check_access(2, Path::new("/home/user/file"), UnveilPermissions::Read)
+            .check_access(2, "/home/user/file", UnveilPermissions::Read)
             .is_err());
     }
 }
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::io;
-
-    pub type Result<T> = std::result::Result<T, io::Error>;
+    pub type Result<T> = core::result::Result<T, &'static str>;
 
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {

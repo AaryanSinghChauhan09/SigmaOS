@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Unified Control Center
 // OOP-based centralized settings panel with modular architecture
 

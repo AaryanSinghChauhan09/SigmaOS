@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Cutting-Edge Terminal Multiplexer (SigmaTmux Engine)
 // Implements robust OOP principles with custom split, zoom, broadcast, copy registers,
 // control mode (-C) protocol parsing, copy-mode scrollback search, pane synchronization,
@@ -5,7 +8,7 @@
 // Built to outperform and exceed standard tmux capabilities of Linux distributions.
 
 use crate::klib::HashMap;
-use std::ops::Range;
+use core::ops::Range;
 
 /// Direction for splitting terminal panes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

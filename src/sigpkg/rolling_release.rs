@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // Rolling Release System - Arch Linux Inspired
 // Provides continuous updates without major version bumps

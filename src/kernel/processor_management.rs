@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Linux & BSD Inspired Comprehensive Processor Management Subsystem for SigmaOS
 // Features Multi-core SMP Topology, NUMA Affinity Mapping, Hardware SMEP/SMAP Execution Protection,
 // and Hardware Performance Monitoring Counters (PMC)

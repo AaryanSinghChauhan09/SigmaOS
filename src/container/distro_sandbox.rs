@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Distro Sandbox & Container Isolation Engine for SigmaOS
 // Inspired by Linux namespaces (unshare), Landlock LSM, Seccomp BPF, and cgroups v2.
 

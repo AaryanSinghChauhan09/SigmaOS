@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS — ZFS-Compatible Filesystem Features
 //
 // Inspired by Sun/OpenZFS: copy-on-write semantics, per-block checksumming,

@@ -15,12 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Code Editor
 // OOP-based code editor with syntax highlighting and LSP integration
 
 use crate::klib::BTreeMap;
-use std::path::PathBuf;
+// PathBuf not in no_std
 
 /// Document
 #[derive(Debug, Clone)]

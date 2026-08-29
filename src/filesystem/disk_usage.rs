@@ -1,8 +1,11 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Disk Usage Analyzer
 // OOP-based disk space analysis with visualization
 
 use crate::klib::HashMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std
 
 /// Disk usage info
 #[derive(Debug, Clone)]

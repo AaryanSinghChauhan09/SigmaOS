@@ -188,7 +188,7 @@ impl Default for PawAgentCommunicationProtocol {
 // ============================================================================
 
 use crate::klib::HashMap;
-use std::sync::Arc;
+use alloc::sync::Arc;
 
 pub struct SemanticSkillFunction {
     pub name: String,

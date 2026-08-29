@@ -15,12 +15,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS System Cleanup Utility
 // Smart temporary file remover with OOP-based design
 
 use crate::klib::BTreeMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std
 
 /// OOP trait for cleanup strategies
 pub trait CleanupStrategy {

@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Source-Build Layer / USE Flag System (Gentoo/Portage Parity Shard)
 // This module provides a complete implementation of Gentoo's Portage-style source package compilation,
 // fine-grained USE flag feature toggles, target-specific CPU hardware optimization,

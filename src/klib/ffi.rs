@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Custom FFI Library
 // Reduces dependency on std::ffi by providing custom implementations
 

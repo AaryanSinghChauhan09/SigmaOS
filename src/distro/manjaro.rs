@@ -15,13 +15,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Manjaro Distro Integration Module
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[cfg(target_os = "none")]
 use crate::klib::BTreeMap as HashMap;

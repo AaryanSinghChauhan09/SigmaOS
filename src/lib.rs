@@ -1,8 +1,14 @@
 #![no_std]
 #![allow(clippy::all, unused)]
 
+#[macro_use]
+extern crate alloc;
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
+
+#[macro_use]
+pub mod klib;
 
 pub mod accessibility;
 pub mod ai;
@@ -20,7 +26,6 @@ pub mod distro;
 pub mod driver;
 pub mod filesystem;
 pub mod kernel;
-pub mod klib;
 pub mod memory;
 pub mod network;
 pub mod observability;

@@ -18,7 +18,7 @@ use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 
 #[cfg(test)]
-use std::string::ToString;
+use alloc::string::ToString;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

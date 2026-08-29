@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Session Manager (systemd-logind Inspiration)
 //! Session tracking, seat management, and device assignment
 

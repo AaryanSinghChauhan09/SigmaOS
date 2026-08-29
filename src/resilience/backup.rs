@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Timeshift-Parity Recovery & Snapshot Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Permitting instant system-wide rollbacks of the root file system hierarchy if user updates damage any system file.
@@ -85,7 +88,7 @@ pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift::new();
 // Designed for automated, transaction-safe snapshots and system recovery
 
 use crate::klib::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
+// SystemTime not in no_std; using u64 timestamps
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackupError {

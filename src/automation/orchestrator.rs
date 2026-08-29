@@ -16,12 +16,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS AI Orchestrator for System Optimization
 // OOP-based AI system optimization with predictive modeling
 
 use crate::klib::{BTreeMap, HashMap};
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// System state
 #[derive(Debug, Clone)]

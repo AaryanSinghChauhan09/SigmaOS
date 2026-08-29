@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS USB HID Keyboard Driver
 // Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
 

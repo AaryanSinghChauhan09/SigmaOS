@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Terminal Emulator (gnome-terminal/konsole Inspiration)
 //! Terminal sessions, profiles, and PTY management
 

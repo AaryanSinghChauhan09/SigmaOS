@@ -1,7 +1,10 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // GPU Screen Recorder Integration for SigmaOS
 // Real-time GPU-accelerated screen capture and sandbox security controls for benchmarking and visualization.
 
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

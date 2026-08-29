@@ -15,12 +15,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS AI-Powered System-Level Automation
 // Extended Samsung Modes & Routines for system-level workflows
 
 use crate::klib::BTreeMap;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use core::time::Duration;
+// SystemTime not in no_std
 
 /// System event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

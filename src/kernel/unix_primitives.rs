@@ -28,6 +28,9 @@
 
 #![allow(dead_code)]
 #![allow(unused_imports)]
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 use core::cmp::Ordering as CmpOrdering;
 use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, AtomicU64, AtomicUsize, Ordering};

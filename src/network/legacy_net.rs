@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Legacy Network Protocols Adaptation Layer (LegacyProtocolAdapter)
 // Designed for ancient serial/modem encapsulation protocols (SLIP, PPP, and legacy IPv4-only stack)
 

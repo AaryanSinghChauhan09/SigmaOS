@@ -108,7 +108,7 @@ pub struct ProcessExtendedContext {
 }
 
 #[cfg(test)]
-use std::collections::HashMap as StdHashMap;
+use crate::klib::HashMap as StdHashMap;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;

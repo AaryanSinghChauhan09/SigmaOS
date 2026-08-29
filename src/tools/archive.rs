@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! Archive Tools (tar/zip Inspiration)
 //! Archive manager, compression tools, and archive operations
 

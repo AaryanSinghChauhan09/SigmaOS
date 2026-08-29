@@ -1,8 +1,11 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
 use crate::klib::HashMap;
-use std::path::{Path, PathBuf};
+// Path/PathBuf not in no_std
 
 /// Archive format
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

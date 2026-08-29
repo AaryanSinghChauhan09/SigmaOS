@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Asynchronous I/O Ring Subsystem for SigmaOS
 // Inspired by Linux io_uring, Linux POSIX AIO, FreeBSD kqueue EVFILT_AIO, and Windows IOCP.
 

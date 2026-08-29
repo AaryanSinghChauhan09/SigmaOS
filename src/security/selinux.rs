@@ -3,7 +3,8 @@
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,
 // an Access Vector Cache (AVC) for performance, policy rules, SELinux booleans, AppArmor profiles and detailed audit logging.
 
-use std::collections::{HashMap, HashSet};
+use crate::klib::HashMap;
+use alloc::collections::BTreeSet as HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ObjectType {

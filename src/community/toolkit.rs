@@ -1,10 +1,13 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Community Handbook, Reproducible Package Recipes & Blueprint Toolkit for SigmaOS
 // Inspired by Arch Wiki, FreeBSD Handbook, Gentoo Portage, Void XBPS-src, and OpenBSD ports.
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Article categories for the Community Handbook
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

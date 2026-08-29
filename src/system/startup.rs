@@ -27,7 +27,8 @@ use crate::klib::BTreeMap;
 #[cfg(test)]
 use alloc::collections::BTreeMap;
 
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// Startup item classification (inspired by Sysinternals Autoruns)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

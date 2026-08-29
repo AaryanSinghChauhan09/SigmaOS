@@ -8,7 +8,7 @@ use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 #[cfg(not(test))]
 use alloc::collections::BTreeMap as HashMap;
 

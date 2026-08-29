@@ -1,8 +1,12 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Performance Enhancer
 // Auto resource optimizer with OOP-based design
 // Enhanced with Fedora/Linux-inspired systemd-analyze, Autoruns, and Soluto startup boot-delay optimizers.
 
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// OOP trait for optimization strategies
 pub trait OptimizationStrategy {

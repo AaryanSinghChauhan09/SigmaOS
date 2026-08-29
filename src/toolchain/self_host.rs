@@ -7,7 +7,6 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-use std::path::{Path, PathBuf};
 
 /// Error types thrown during compilation and toolchain initialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -58,19 +57,16 @@ impl SelfHostingManager {
         self.installed_tools.insert("git".to_string(), "2.45.0".to_string());
     }
 
-    /// Compiles high-level source code (C/Rust) into optimized machine binaries
-    pub fn compile_source(&self, source_path: &Path, output_binary: &Path) -> Result<bool, ToolchainError> {
+/// Compiles high-level source code (C/Rust) into optimized machine binaries
+    pub fn compile_source(&self, source_path: &str, _output_binary: &str) -> Result<bool, ToolchainError> {
         if !self.installed_tools.contains_key("rustc") {
             return Err(ToolchainError::CompilerNotFound);
         }
 
-        if source_path.extension().and_then(|s| s.to_str()) != Some("rs") &&
-           source_path.extension().and_then(|s| s.to_str()) != Some("c") {
+        if !source_path.ends_with(".rs") && !source_path.ends_with(".c") {
             return Err(ToolchainError::InvalidOutput);
         }
 
-        // Simulate compiling and output mapping
-        let _out = output_binary.to_path_buf();
         Ok(true)
     }
 
@@ -100,9 +96,9 @@ impl SelfHostingManager {
     }
 
     /// Verifies self-hosting by recompiling the kernel using the on-disk source and the native compilers
-    pub fn self_host_verify(&mut self, src: &Path, dest: &Path) -> bool {
-        let kernel_source = src.join("src/kernel/main.rs");
-        let output_kernel = dest.join("sigma_kernel");
+    pub fn self_host_verify(&mut self, src: &str, dest: &str) -> bool {
+        let kernel_source = alloc::format!("{}/src/kernel/main.rs", src);
+        let output_kernel = alloc::format!("{}/sigma_kernel", dest);
 
         let compilation = self.compile_source(&kernel_source, &output_kernel);
         if let Ok(true) = compilation {
@@ -151,7 +147,7 @@ mod tests {
         assert!(!manager.verified_self_host);
 
         // Run self hosting verification loop
-        let success = manager.self_host_verify(Path::new("/usr/src/sigmaos"), Path::new("/boot"));
+        let success = manager.self_host_verify("/usr/src/sigmaos", "/boot");
         assert!(success);
         assert!(manager.verified_self_host);
     }

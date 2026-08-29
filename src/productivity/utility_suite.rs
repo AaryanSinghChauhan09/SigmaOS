@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.

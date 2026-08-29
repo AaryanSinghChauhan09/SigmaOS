@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// OOP-based Filesystem Support for SigmaOS
 /// Implements filesystem using OOP principles with traits and structs

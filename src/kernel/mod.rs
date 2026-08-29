@@ -43,6 +43,7 @@ pub mod subsystem;
 pub mod virtual_cpu;
 pub mod vmm_paging;
 pub mod module_loader;
+pub mod performance;
 
 pub use architecture::*;
 pub use bus::*;

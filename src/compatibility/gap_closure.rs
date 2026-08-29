@@ -33,6 +33,9 @@
 
 extern crate alloc;
 use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 // ==========================================
 // 1. Kernel Module Management

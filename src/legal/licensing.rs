@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Legal & Licensing Framework
 // Clear licensing policies, patent/IP strategy, and compliance certification metrics
 

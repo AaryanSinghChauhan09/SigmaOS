@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 //! FreeBSD-Inspired Jail Containerization System
 //!
 //! Lightweight OS-level virtualization with process isolation

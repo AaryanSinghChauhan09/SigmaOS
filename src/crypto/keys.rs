@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 
 /// OOP-based Key Management for SigmaOS
 /// Based on Roadmap Item 16: Key management

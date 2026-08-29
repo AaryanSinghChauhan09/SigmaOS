@@ -1,3 +1,6 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS PKGBUILD Parser and AUR Sandbox Orchestration Shunts
 // Zero-dependency, safe, and OOP-centric
 

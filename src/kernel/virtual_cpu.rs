@@ -4,7 +4,7 @@ extern crate alloc;
 
 
 use alloc::vec::Vec;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuError {

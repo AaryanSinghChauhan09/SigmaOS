@@ -1,8 +1,12 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Gamified Productivity System
 // Built-in goal trackers, Pomodoro timers, and progress dashboards
 
 use crate::klib::HashMap;
-use std::time::{Duration, Instant};
+use core::time::Duration;
+// Instant not in no_std
 
 /// Achievement type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

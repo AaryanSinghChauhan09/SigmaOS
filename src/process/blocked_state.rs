@@ -1,6 +1,9 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // Linux & BSD Inspired Blocked Process States & Process Control Block (PCB) Management for SigmaOS
 
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Detailed Blocked / Suspended Process State (Linux D / S / T / t states & BSD SSLEEP / SSTOP parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
