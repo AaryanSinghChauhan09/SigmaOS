@@ -1,3 +1,4 @@
+#[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 // SigmaOS Distro Compatibility Layer
 use core::sync::atomic::{AtomicUsize, Ordering};
 

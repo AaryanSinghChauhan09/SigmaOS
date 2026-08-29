@@ -36,6 +36,7 @@ pub mod freedos;
 pub mod gap_closure;
 pub mod garuda_zen;
 pub mod gentoo;
+pub use gentoo::*;
 pub mod gentoo_useflags;
 pub mod historic_linux;
 pub mod hopper_lab;
