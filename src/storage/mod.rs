@@ -28,6 +28,7 @@ pub mod search;
 pub mod sql_engine;
 pub mod volume;
 pub mod block_device_extended;
+pub mod sovereign_disk_manager;
 
 pub use block::{
     BlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,

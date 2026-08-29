@@ -40,6 +40,7 @@ pub mod uuid {
 
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::fmt;
 
 #[derive(Clone)]
 pub struct SigmaString {

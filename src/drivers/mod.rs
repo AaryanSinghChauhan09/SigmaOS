@@ -15,6 +15,7 @@ pub mod modern_nvme;
 pub mod modern_usb;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
+pub mod printing;
 pub mod network;
 pub mod peripheral;
 pub mod storage;
