@@ -14,6 +14,7 @@ pub mod integrity;
 pub mod intrusion;
 pub mod mac;
 pub mod password;
+pub mod openbsd_karl;
 pub mod pki;
 pub mod pledge;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
@@ -36,6 +37,7 @@ pub use root_improvement::{
     RootlessNamespaceManager, SubUidGidMapper, SudoDoasElevator,
 };
 
+pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 

@@ -37,6 +37,69 @@ impl JailCapabilities {
     }
 }
 
+/// Route entry in VNET isolated routing table
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetRouteEntry {
+    pub destination_cidr: String,
+    pub gateway_ip: String,
+    pub interface_name: String,
+}
+
+/// Virtual Interface Pair (epair - veth equivalent in FreeBSD VNET)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetEpairPair {
+    pub host_side_if: String,
+    pub jail_side_if: String,
+    pub mac_host: [u8; 6],
+    pub mac_jail: [u8; 6],
+}
+
+/// Fully virtualized FreeBSD VNET Network Stack (independent routing, sockets, ARP, epairs)
+#[derive(Debug, Clone)]
+pub struct VnetStack {
+    pub vnet_id: u32,
+    pub epairs: Vec<VnetEpairPair>,
+    pub routing_table: Vec<VnetRouteEntry>,
+    pub arp_cache: Vec<(String, [u8; 6])>,
+    pub bound_sockets: Vec<(String, u16)>, // (IP, port)
+}
+
+impl VnetStack {
+    pub fn new(vnet_id: u32) -> Self {
+        Self {
+            vnet_id,
+            epairs: Vec::new(),
+            routing_table: Vec::new(),
+            arp_cache: Vec::new(),
+            bound_sockets: Vec::new(),
+        }
+    }
+
+    pub fn attach_epair(&mut self, epair: VnetEpairPair) {
+        self.epairs.push(epair);
+    }
+
+    pub fn add_route(&mut self, cidr: &str, gateway: &str, if_name: &str) {
+        self.routing_table.push(VnetRouteEntry {
+            destination_cidr: cidr.to_string(),
+            gateway_ip: gateway.to_string(),
+            interface_name: if_name.to_string(),
+        });
+    }
+
+    pub fn is_port_available(&self, ip: &str, port: u16) -> bool {
+        !self.bound_sockets.iter().any(|(s_ip, s_port)| s_ip == ip && *s_port == port)
+    }
+
+    pub fn bind_socket(&mut self, ip: &str, port: u16) -> Result<(), &'static str> {
+        if !self.is_port_available(ip, port) {
+            return Err("Port already bound in VNET stack");
+        }
+        self.bound_sockets.push((ip.to_string(), port));
+        Ok(())
+    }
+}
+
 /// FreeBSD VNET / Linux Network Namespace Virtual Network Config
 #[derive(Debug, Clone)]
 pub struct JailVnetConfig {
@@ -44,6 +107,7 @@ pub struct JailVnetConfig {
     pub virtual_interface_name: String,
     pub bridge_name: String,
     pub isolated_gateway: String,
+    pub stack: Option<VnetStack>,
 }
 
 impl JailVnetConfig {
@@ -53,6 +117,7 @@ impl JailVnetConfig {
             virtual_interface_name: String::new(),
             bridge_name: String::new(),
             isolated_gateway: String::new(),
+            stack: None,
         }
     }
 
@@ -62,6 +127,7 @@ impl JailVnetConfig {
             virtual_interface_name: if_name.to_string(),
             bridge_name: bridge.to_string(),
             isolated_gateway: gateway.to_string(),
+            stack: Some(VnetStack::new(1)),
         }
     }
 }
