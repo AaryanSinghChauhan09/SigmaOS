@@ -112,4 +112,6 @@ pub use linux_bsd_inspirations::{
     SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
     FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
     SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
 };
