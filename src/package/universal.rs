@@ -1023,6 +1023,82 @@ pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
 
+/// Universal multi-format package metadata parser and handler supporting
+/// Linux, BSD, macOS, Android, and HarmonyOS package formats
+pub struct UniversalPackageManifestParser;
+
+impl UniversalPackageManifestParser {
+    pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
+        let name = filename.to_lowercase();
+        if name.ends_with(".deb") || name.ends_with(".superdeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::Xz)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::App)
+        } else {
+            None
+        }
+    }
+
+    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        let fmt = Self::detect_format_from_filename(filename)
+            .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
+
+        let pkg_name = filename
+            .split('.')
+            .next()
+            .unwrap_or("unknown")
+            .to_string();
+
+        let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
+        if !raw_data.is_empty() {
+            pkg = pkg.with_provides("universal_binary".to_string());
+        }
+        Ok(pkg)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1269,5 +1345,21 @@ mod tests {
             enabled: true,
         };
         assert!(dnf_adapter.query_dnf_repository(&dnf_config));
+    }
+
+    #[test]
+    fn test_universal_package_manifest_parser() {
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("nginx.deb"),
+            Some(PackageFormat::Deb)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("app.flatpak"),
+            Some(PackageFormat::Flatpak)
+        );
+
+        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        assert_eq!(pkg.name, "tool");
+        assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }
 }

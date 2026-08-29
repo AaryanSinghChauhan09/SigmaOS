@@ -192,7 +192,7 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let waiters_len = waiters.len();
+            let waiters_len: usize = waiters.len();
             let count = val_wake.min(waiters_len);
             for _ in 0..count {
                 if !waiters.is_empty() {

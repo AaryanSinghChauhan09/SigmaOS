@@ -54,6 +54,8 @@ pub struct ScheduledProcess {
     pub voluntary_yields: u64,
     pub interactive_score: i32,
     pub posix_rt_priority: u8, // POSIX SCHED_RR real-time priority (1..99, 99 highest)
+    pub sleep_time_ms: u64,
+    pub run_time_ms: u64,
 }
 
 impl ScheduledProcess {
@@ -75,7 +77,19 @@ impl ScheduledProcess {
             voluntary_yields: 0,
             interactive_score: 0,
             posix_rt_priority,
+            sleep_time_ms: 0,
+            run_time_ms: 0,
         }
+    }
+
+    /// FreeBSD ULE inspired interactivity ratio score (0..100)
+    /// Higher ratio indicates interactive (sleep-heavy) tasks that receive scheduling priority boost
+    pub fn calculate_ule_interactivity_score(&self) -> u32 {
+        let total = self.sleep_time_ms + self.run_time_ms;
+        if total == 0 {
+            return 100;
+        }
+        ((self.sleep_time_ms * 100) / total) as u32
     }
 
     /// Request this process to yield the CPU voluntarily
@@ -200,12 +214,24 @@ impl RoundRobinScheduler {
         }
     }
 
+    /// Linux CFS/EEVDF inspired dynamic time slice scaling based on active task load
+    /// Scales time slice quantum down when ready task count increases, bounded by min granularity (1 tick)
+    pub fn dynamic_time_slice(&self, base_slice: u64) -> u64 {
+        let ready_count = self.get_ready_process_count();
+        if ready_count <= 1 {
+            base_slice
+        } else {
+            let target_latency = base_slice * 4;
+            (target_latency / ready_count as u64).max(1)
+        }
+    }
+
     /// POSIX sched_rr_get_interval(2) parity: returns time quantum in ticks for a given PID
     pub fn sched_rr_get_interval(&self, pid: u64) -> Option<u64> {
         self.processes
             .iter()
             .find(|e| e.process.pid == pid)
-            .map(|e| e.time_slice_ticks(self.config.time_slice))
+            .map(|e| e.time_slice_ticks(self.dynamic_time_slice(self.config.time_slice)))
     }
 
     /// FreeBSD ULE/4BSD style interactivity score decay over time
@@ -392,7 +418,34 @@ impl SovereignMultiQueueRoundRobin {
         }
     }
 
+    /// Linux SCHED_RR / POSIX parity dynamic time quantum calculation (10ms to 100ms)
+    pub fn calculate_sched_rr_quantum(priority: u8) -> u32 {
+        if priority < 100 {
+            10 + ((priority as u32) * 90 / 99)
+        } else {
+            20
+        }
+    }
+
+    /// FreeBSD ULE inspired dynamic queue migration based on interactivity score
+    pub fn auto_balance_interactivity(&mut self) {
+        let mut to_promote = Vec::new();
+        for (i, task) in self.normal_queue.iter().enumerate() {
+            if task.rr_time_slice_ms <= 10 {
+                to_promote.push(i);
+            }
+        }
+        for idx in to_promote.into_iter().rev() {
+            let mut task = self.normal_queue.remove(idx);
+            task.priority = 110; // Promoted to high priority queue
+            self.high_queue.push(task);
+        }
+    }
+
     pub fn enqueue_task(&mut self, mut task: MultiQueueTask) {
+        if task.rr_time_slice_ms == 0 {
+            task.rr_time_slice_ms = Self::calculate_sched_rr_quantum(task.priority);
+        }
         task.time_slice_remaining_ms = task.rr_time_slice_ms;
         if task.priority < 100 {
             self.realtime_queue.push(task);
@@ -655,5 +708,57 @@ mod tests {
         let picked = mq_rr.pick_next_task(0).unwrap();
         assert_eq!(picked.pid, 10);
         assert_eq!(picked.policy, SchedPolicy::SchedRr);
+    }
+
+    #[test]
+    fn test_dynamic_time_slice_scaling() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "task1".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+
+        // Single process ready -> base slice
+        assert_eq!(scheduler.dynamic_time_slice(10), 10);
+
+        // Add 3 more processes -> ready count = 4
+        scheduler.add_process(Process::new(2, "task2".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(3, "task3".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(4, "task4".to_string(), Priority::Normal)).unwrap();
+
+        // 4 ready tasks -> target_latency (40) / 4 = 10
+        assert_eq!(scheduler.dynamic_time_slice(10), 10);
+    }
+
+    #[test]
+    fn test_ule_interactivity_score_and_quantum() {
+        let mut process = Process::new(1, "interactive_gui".to_string(), Priority::Normal);
+        let mut scheduled = ScheduledProcess::new(process);
+        scheduled.sleep_time_ms = 90;
+        scheduled.run_time_ms = 10;
+
+        // 90% sleep ratio -> 90 interactivity score
+        assert_eq!(scheduled.calculate_ule_interactivity_score(), 90);
+
+        // Check Linux SCHED_RR quantum calculation
+        let rt_quantum = SovereignMultiQueueRoundRobin::calculate_sched_rr_quantum(50);
+        assert!(rt_quantum > 10 && rt_quantum < 100);
+
+        // Test auto balance interactivity queue promotion
+        let mut mq_rr = SovereignMultiQueueRoundRobin::new(1);
+        let normal_task = MultiQueueTask {
+            pid: 101,
+            name: "quick_response".to_string(),
+            policy: SchedPolicy::SchedOther,
+            priority: 125,
+            rr_time_slice_ms: 10,
+            time_slice_remaining_ms: 10,
+            cpu_id: 0,
+            state: ProcessState::Ready,
+        };
+        mq_rr.enqueue_task(normal_task);
+        assert_eq!(mq_rr.normal_queue.len(), 1);
+
+        mq_rr.auto_balance_interactivity();
+        assert_eq!(mq_rr.normal_queue.len(), 0);
+        assert_eq!(mq_rr.high_queue.len(), 1);
     }
 }

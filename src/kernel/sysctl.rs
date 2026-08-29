@@ -93,7 +93,7 @@ impl SysctlRegistry {
                     if *v < 0 && mib == "vm.swappiness" {
                         return Err("Swappiness cannot be negative!");
                     }
-                    node.value = new_value;
+                    node.value = SysctlValue::Int(*v);
                 }
                 (SysctlValue::String(_), SysctlValue::String(_)) => {
                     node.value = new_value;

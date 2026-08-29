@@ -783,11 +783,11 @@ mod tests {
         // Start transaction
         let tx1 = journal.start_transaction("write", "/etc/resolv.conf", b"nameserver 1.1.1.1");
         assert_eq!(tx1, 1);
-        assert_eq!(journal.transactions[&1].state, JournalState::Pending);
+        assert_eq!(journal.transactions.get(&1).unwrap().state, JournalState::Pending);
 
         // Commit transaction
         journal.commit_transaction(1).unwrap();
-        assert_eq!(journal.transactions[&1].state, JournalState::Committed);
+        assert_eq!(journal.transactions.get(&1).unwrap().state, JournalState::Committed);
 
         // Start another transaction that gets abandoned (Pending)
         let tx2 = journal.start_transaction("write", "/home/user/test.txt", b"important data");
@@ -798,8 +798,8 @@ mod tests {
         // Trigger AI self-heal recovery (aborts empty, commits filled pending)
         let healed = journal.ai_self_heal_recovery();
         assert_eq!(healed, 2);
-        assert_eq!(journal.transactions[&2].state, JournalState::Committed);
-        assert_eq!(journal.transactions[&3].state, JournalState::Aborted);
+        assert_eq!(journal.transactions.get(&2).unwrap().state, JournalState::Committed);
+        assert_eq!(journal.transactions.get(&3).unwrap().state, JournalState::Aborted);
     }
 
     #[test]

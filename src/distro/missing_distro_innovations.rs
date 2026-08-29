@@ -174,6 +174,10 @@ impl Default for SolusEopkgManager {
 
 /// 5. Mageia Linux urpmi Dependency Solver
 pub struct MageiaUrpmiEngine {
+<<<<<<< HEAD
+=======
+    pub urpmi_db: BTreeMap<String, Vec<String>>,
+>>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
     pub package_database: BTreeMap<String, Vec<String>>,
 }
 

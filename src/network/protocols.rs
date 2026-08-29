@@ -969,6 +969,94 @@ impl SnclLedgerProtocol {
     }
 }
 
+/// OpenBSD sshd Fail2ban brute-force protection registry
+pub struct SshdFail2banRegistry {
+    pub failed_attempts: std::collections::HashMap<String, u32>,
+    pub max_attempts: u32,
+    pub blocklisted_ips: Vec<String>,
+}
+
+impl SshdFail2banRegistry {
+    pub fn new(max_attempts: u32) -> Self {
+        Self {
+            failed_attempts: std::collections::HashMap::new(),
+            max_attempts,
+            blocklisted_ips: Vec::new(),
+        }
+    }
+
+    pub fn record_failure(&mut self, ip: &str) -> bool {
+        let count = self.failed_attempts.get(ip).cloned().unwrap_or(0) + 1;
+        self.failed_attempts.insert(ip.to_string(), count);
+        if count >= self.max_attempts {
+            if !self.blocklisted_ips.contains(&ip.to_string()) {
+                self.blocklisted_ips.push(ip.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_blocked(&self, ip: &str) -> bool {
+        self.blocklisted_ips.contains(&ip.to_string())
+    }
+}
+
+/// BSD/Linux vixie-cron inspired scheduled daemon engine
+#[derive(Debug, Clone)]
+pub struct CronJob {
+    pub id: u32,
+    pub minute_pattern: String,
+    pub hour_pattern: String,
+    pub command: String,
+    pub last_run_timestamp: u64,
+}
+
+pub struct SovereignCronDaemon {
+    pub jobs: Vec<CronJob>,
+    pub next_job_id: u32,
+}
+
+impl SovereignCronDaemon {
+    pub fn new() -> Self {
+        Self {
+            jobs: Vec::new(),
+            next_job_id: 1,
+        }
+    }
+
+    pub fn add_crontab_entry(&mut self, minute: &str, hour: &str, command: &str) -> u32 {
+        let id = self.next_job_id;
+        self.next_job_id += 1;
+        self.jobs.push(CronJob {
+            id,
+            minute_pattern: minute.to_string(),
+            hour_pattern: hour.to_string(),
+            command: command.to_string(),
+            last_run_timestamp: 0,
+        });
+        id
+    }
+
+    pub fn tick_scheduler(&mut self, current_time: u64) -> Vec<String> {
+        let mut executed = Vec::new();
+        for job in &mut self.jobs {
+            if current_time >= job.last_run_timestamp + 60 {
+                job.last_run_timestamp = current_time;
+                executed.push(job.command.clone());
+            }
+        }
+        executed
+    }
+}
+
+impl Default for SovereignCronDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DnsError {
     InvalidDomain,
@@ -1245,5 +1333,21 @@ mod tests {
         bgp.send_keepalive();
         assert_eq!(bgp.state, BgpState::Established);
         assert_eq!(bgp.keepalive_sent, 1);
+    }
+
+    #[test]
+    fn test_sshd_fail2ban_and_cron_daemon() {
+        let mut fail2ban = SshdFail2banRegistry::new(2);
+        assert!(!fail2ban.is_blocked("10.0.0.1"));
+        assert!(!fail2ban.record_failure("10.0.0.1"));
+        assert!(fail2ban.record_failure("10.0.0.1"));
+        assert!(fail2ban.is_blocked("10.0.0.1"));
+
+        let mut cron = SovereignCronDaemon::new();
+        let id = cron.add_crontab_entry("*", "*", "echo hello");
+        assert_eq!(id, 1);
+        let run = cron.tick_scheduler(100);
+        assert_eq!(run.len(), 1);
+        assert_eq!(run[0], "echo hello");
     }
 }
