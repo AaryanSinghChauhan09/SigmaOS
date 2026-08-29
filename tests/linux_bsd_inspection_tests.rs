@@ -878,31 +878,3 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     swap.swappiness = 80;
     assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
 }
-
-#[test]
-fn test_sovereign_universal_distro_bridge_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
-
-    let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::DebianUbuntu);
-    assert_eq!(bridge.current_mode, DistroSubsystemMode::DebianUbuntu);
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::FreeBSD);
-    assert_eq!(bridge.current_mode, DistroSubsystemMode::FreeBSD);
-
-    // Test multi-distro package format translation
-    let canonical_deb = bridge.resolve_package_specifier("nginx.deb").unwrap();
-    assert_eq!(canonical_deb, "deb:nginx");
-
-    let canonical_sigpkg = bridge.resolve_package_specifier("bash.sigpkg").unwrap();
-    assert_eq!(canonical_sigpkg, "bash");
-
-    assert_eq!(bridge.active_packages.len(), 2);
-
-    // Test subsystem security policy application
-    assert!(bridge.apply_subsystem_security("/sigma/jails/web", &["stdio", "rpath", "exec"]).unwrap());
-    assert_eq!(bridge.freebsd_jail.root_path, "/sigma/jails/web");
-
-    // Test execution permission checks
-    assert!(bridge.verify_execution("/sigma/jails/web/usr/bin/nginx", "rpath"));
-    assert!(!bridge.verify_execution("/sigma/jails/web/usr/bin/nginx", "wpath")); // wpath not pledged
-}

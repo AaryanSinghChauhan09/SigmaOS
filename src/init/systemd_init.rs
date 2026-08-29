@@ -420,17 +420,12 @@ impl SystemdEngine {
         let mut visiting = SystemdVec::new();
         let mut visited = SystemdVec::new();
 
-        let mut slice_buf = Vec::new();
-        for &id in unit_ids.iter() {
-            slice_buf.push(id);
-        }
-
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
-                self.topo_visit(id, &slice_buf, &mut sorted, &mut visiting, &mut visited)?;
+                self.topo_visit(id, unit_ids.as_slice(), &mut sorted, &mut visiting, &mut visited)?;
             }
         }
-        Ok(sorted)
+        Ok(SystemdVec::from(sorted.as_slice()))
     }
 
     fn topo_visit(
