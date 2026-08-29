@@ -241,6 +241,25 @@ pub struct SimpleVMM {
 }
 
 impl SimpleVMM {
+    pub fn mark_cow(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+        let pt_idx = self.get_pt_index(virt);
+
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx_in_vec).and_then(|opt| opt.as_mut()) {
+            let entry = &mut pt.entries[pt_idx];
+            entry.set_writable(false);
+            entry.set_cow(true);
+            Ok(())
+        } else {
+            Err(PageFaultError::NotPresent)
+        }
+    }
+
     pub fn new() -> Self {
         let pml4 = SimplePageTable::new(0x1000);
         SimpleVMM {
@@ -654,7 +673,7 @@ mod tests {
         let mut vmm = SimpleVMM::new();
         assert!(vmm.map_page(0x1000, 0x2000000, true, true).is_ok());
         assert_eq!(vmm.get_physical(0x1000).unwrap(), 0x2000000);
-        assert!(vmm.mark_copy_on_write(0x1000).is_ok());
+        assert!(vmm.mark_cow(0x1000).is_ok());
         assert!(vmm.handle_page_fault(0x1000, 2).is_ok());
         assert_ne!(vmm.get_physical(0x1000).unwrap(), 0x2000000);
     }

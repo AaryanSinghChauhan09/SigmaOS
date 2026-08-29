@@ -202,7 +202,6 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-    Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
     MmioRead { addr: u64, len: u8 },
@@ -211,7 +210,6 @@ pub enum KvmExitReason {
     Interrupt,
     Shutdown,
     InternalError,
-    Interrupt,
 }
 
 /// KVM vCPU register state

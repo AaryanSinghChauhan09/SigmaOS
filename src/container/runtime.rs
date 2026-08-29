@@ -994,7 +994,7 @@ mod tests {
             .create_container(
                 b"sovereign_container",
                 b"ubuntu-pqc",
-                RuntimeCapability::full(),
+                ContainerCapability::full(),
             )
             .unwrap();
         assert_eq!(id, 1);
@@ -1042,9 +1042,10 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
+            blocked_syscalls: alloc::vec![0],
             hardened: true,
             blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
         };
