@@ -102,6 +102,18 @@ impl PledgePromise {
     pub fn is_pledged(&self) -> bool {
         self.is_pledged
     }
+
+    /// Progressively narrow/restrict the allowed namespaces (cannot expand privileges)
+    pub fn restrict(&mut self, new_namespaces: &[PledgeNamespace]) -> Result<()> {
+        let requested_set: HashSet<PledgeNamespace> = new_namespaces.iter().cloned().collect();
+        for ns in &requested_set {
+            if !self.allowed_namespaces.contains(ns) {
+                return Err("Namespace not permitted");
+            }
+        }
+        self.allowed_namespaces = requested_set;
+        Ok(())
+    }
 }
 
 /// sigma_pledge macro for easy pledge declaration
