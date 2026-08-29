@@ -4,6 +4,8 @@
 //! Deeply inspects core algorithms across scheduling, memory management,
 //! cryptographic key exchanges, network state machines, and filesystem journaling.
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 

@@ -62,8 +62,6 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
-#[path = "../src/klib/mod.rs"]
-mod klib;
 
 use pipes::Pipe;
 use unveil::{UnveilManager, UnveilPermission};

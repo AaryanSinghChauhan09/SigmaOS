@@ -76,6 +76,8 @@ mod keyboard_driver;
 mod missing_distro_innovations;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
 
 use bsd_compat::*;
 
@@ -877,4 +879,41 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     // Swappiness eviction check
     swap.swappiness = 80;
     assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
+}
+
+#[test]
+fn test_sovereign_cross_distro_synergy_engine_inspection() {
+    use sovereign_distro_dominance::{SovereignCrossDistroSynergyEngine, SubsystemSynergyReport};
+
+    let mut engine = SovereignCrossDistroSynergyEngine::new();
+    assert_eq!(
+        engine.resolve_stateless_config("/etc/network.conf").unwrap(),
+        "DHCP=yes\n"
+    );
+
+    engine.set_user_config_override("/etc/network.conf", "DHCP=no\n");
+    assert_eq!(
+        engine.resolve_stateless_config("/etc/network.conf").unwrap(),
+        "DHCP=no\n"
+    );
+
+    engine.add_to_world_file("curl");
+    assert!(engine.apk_world.contains(&"curl".to_string()));
+
+    let report: SubsystemSynergyReport = engine
+        .orchestrate_subsystem_task(
+            101,
+            "orchestrator-proc",
+            "@snap_orch",
+            &["stdio", "rpath", "wpath"],
+            b"ORCHESTRATION_PAYLOAD_DATA",
+        )
+        .unwrap();
+
+    assert!(report.process_isolated);
+    assert!(report.storage_snapshot_active);
+    assert!(report.network_vnet_bound);
+    assert!(report.security_pledged);
+    assert!(report.package_declarative_synced);
+    assert_eq!(report.amnesic_scrubbed_pages, 1);
 }

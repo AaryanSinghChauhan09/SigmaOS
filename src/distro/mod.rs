@@ -26,6 +26,7 @@ pub mod preseed;
 pub mod ready_to_use;
 pub mod recovery;
 pub mod specialized;
+pub mod sovereign_distro_dominance;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod wiki_ideas_implementation;
@@ -114,4 +115,10 @@ pub use linux_bsd_inspirations::{
     SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage,
+};
+
+pub use sovereign_distro_dominance::{
+    StorePackageSlice, NixGuixZeroCopyStore, TaskSchedState, SchedTask, CachyBoreDynamicAiScheduler,
+    CapsicumRight, OpenBsdHardenedCapsicumPledge, CoWSubvolume, ZfsBtrfsHybridSelfHealingCoW,
+    SubsystemSynergyReport, SovereignCrossDistroSynergyEngine, SovereignDistroDominanceSuite,
 };

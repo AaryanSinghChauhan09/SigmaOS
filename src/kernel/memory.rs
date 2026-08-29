@@ -91,7 +91,7 @@ impl KernelPoolManager {
 
         println!(
             "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
-            pool_type, size, core:: String::from_utf8(tag).unwrap_or("????"), addr
+            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
         );
 
         Ok(block)
