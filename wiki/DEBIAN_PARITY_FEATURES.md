@@ -42,82 +42,82 @@ impl SigmaAPT {
             if self.database.installed.contains_key(&package) {
                 continue;
             }
-
+            
             // Get package information
             let pkg_info = self.database.available.get(&package)
                 .ok_or(AptError::PackageNotFound)?;
-
+            
             // Resolve dependencies
             let dependencies = self.resolve_dependencies(pkg_info)?;
-
+            
             // Install dependencies first
             for dep in dependencies {
                 self.install(vec![dep])?;
             }
-
+            
             // Download package
             let deb_file = self.download_package(pkg_info)?;
-
+            
             // Verify package signature
             self.verify_signature(&deb_file)?;
-
+            
             // Install package using dpkg
             self.dpkg.install(&deb_file)?;
-
+            
             // Update database
             self.database.installed.insert(package.clone(), pkg_info.clone());
         }
-
+        
         Ok(())
     }
-
+    
     pub fn remove(&mut self, packages: Vec<String>, purge: bool) -> Result<(), AptError> {
         for package in packages {
             // Check if package is installed
             if !self.database.installed.contains_key(&package) {
                 return Err(AptError::PackageNotInstalled);
             }
-
+            
             // Check for reverse dependencies
             let dependents = self.find_reverse_dependencies(&package);
             if !dependents.is_empty() {
                 return Err(AptError::PackageIsRequired(dependents));
             }
-
+            
             // Remove or purge package
             if purge {
                 self.dpkg.purge(&package)?;
             } else {
                 self.dpkg.remove(&package)?;
             }
-
+            
             // Update database
             self.database.installed.remove(&package);
         }
-
+        
         Ok(())
     }
-
+    
     pub fn update(&mut self) -> Result<(), AptError> {
         // Update package lists
         self.update_package_lists()?;
-
+        
         // Get upgradable packages
         let upgradable = self.get_upgradable_packages()?;
-
+        
         // Perform upgrade
         self.upgrade_packages(upgradable)?;
-
+        
         Ok(())
     }
-
+    
     pub fn full_upgrade(&mut self) -> Result<(), AptError> {
         // Full upgrade may install/remove packages
         let upgrade_plan = self.calculate_full_upgrade()?;
-
+        
         // Execute upgrade plan
         self.execute_upgrade_plan(upgrade_plan)?;
-
+        
         Ok(())
     }
 }
@@ -155,35 +155,35 @@ impl DebianSecurity {
             distribution: "stable".to_string(),
             components: vec!["main".to_string(), "contrib".to_string(), "non-free".to_string()],
         });
-
+        
         // Update apt configuration
         self.update_apt_security_config()?;
-
+        
         Ok(())
     }
-
+    
     pub fn scan_vulnerabilities(&mut self) -> Result<Vec<Vulnerability>, SecurityError> {
         // Use debsecan to scan for vulnerabilities
         let vulnerabilities = self.debsecan.scan()?;
-
+        
         // Filter by severity
         let critical_vulns: Vec<_> = vulnerabilities.iter()
             .filter(|v| v.severity == Severity::Critical)
             .cloned()
             .collect();
-
+        
         Ok(critical_vulns)
     }
-
+    
     pub fn apply_security_updates(&mut self) -> Result<(), SecurityError> {
         // Get security updates
         let security_updates = self.security_updates.get_security_updates()?;
-
+        
         // Install security updates
         for update in security_updates {
             self.install_security_update(update)?;
         }
-
+        
         Ok(())
     }
 }

@@ -53,5 +53,21 @@ Operating systems traditionally inherit decades of bloated POSIX assumptions, ca
 | **`Aospa-raphael-unofficial`** | Real-time sensor polling & instant wake | `src/drivers/kernel_releases.rs` (`Stable6_22_SensorDriver`), `more_devices.rs` (`Wifi7Adapter`) |
 | **`AMDESE/linux-kvm`** | Cryptographic enclaves & Capability Gates | `src/security/capability.rs` & `FUTURE-DEVELOPMENT-ROADMAP.md` |
 | **`cminyard/linux-ipmi`** | Low-latency out-of-band hardware telemetry | `src/drivers/more_devices.rs` (`Thunderbolt4Controller`, `CxlMemoryDriver`) |
+| **Redox OS** | URL Scheme Routing (`file:`, `net:`, `proc:`, `sys:`) | `src/open_source_obsoletion.rs` (`SovereignSchemeRouter`) |
+| **Fuchsia OS** | Zircon Handle Capability Tokens & FIDL IPC | `src/open_source_obsoletion.rs` (`SovereignZirconHandleManager`) |
+| **SerenityOS** | LibCore Ring-Buffered Async EventLoop Pipelines | `src/open_source_obsoletion.rs` (`SovereignSerenityAsyncEngine`) |
+| **illumos / Solaris** | Dynamic Probes & Tenant Zone Isolation | `src/open_source_obsoletion.rs` (`SovereignSolarisZoneEngine`) |
+| **NixOS / Guix** | Functional Declarative Merkle Store Paths | `src/open_source_obsoletion.rs` (`SovereignNixDeclarativeEngine`) |
+| **Qubes OS** | Xen Hardware Micro-Domain Isolation & Inter-VM Clipboard | `src/open_source_obsoletion.rs` (`SovereignQubesIsolationEngine`) |
+| **Linux eBPF / Landlock** | Sandboxed Access Mask & BPF Bytecode Verification | `src/open_source_obsoletion.rs` (`SovereignLinuxSecurityLsmEngine`) |
+| **Haiku OS** | BeAPI Desktop Kits & Zero-Copy Format Translators | `src/open_source_obsoletion.rs` (`SovereignHaikuInterfaceEngine`) |
+| **Firecracker / Qubes** | Lightweight MicroVM Isolation & Lifecycle | `src/open_source_obsoletion.rs` (`SovereignFirecrackerMicroVmManager`) |
+| **Fedora / TPM 2.0** | Remote Hardware Attestation & PCR Measurement | `src/open_source_obsoletion.rs` (`SovereignTpmAttestationWorkflow`) |
+| **NixOS / SPDX / CycloneDX** | Software Bill of Materials (SBOM) Pipeline | `src/open_source_obsoletion.rs` (`SovereignSbomGeneratorPipeline`) |
+| **Calamares / Arch** | Declarative System Installation Framework | `src/open_source_obsoletion.rs` (`SovereignCalamaresInstallerFramework`) |
+| **PipeWire / SPA** | Low-Latency Multimedia Graph Audio Engine | `src/open_source_obsoletion.rs` (`SovereignPipeWireAudioEngine`) |
+| **IPFS / Web3FS** | Decentralized Content-Addressed Block Storage | `src/open_source_obsoletion.rs` (`SovereignWeb3FsIpfsEngine`) |
+| **Wasmtime / Cranelift** | Sandboxed WASI Micro-Runtime Engine | `src/open_source_obsoletion.rs` (`SovereignWasmCraneliftEngine`) |
+| **NixOS Hydra / Debian** | Deterministic Reproducible Build Farm Auditor | `src/open_source_obsoletion.rs` (`SovereignReproducibleBuildFarm`) |
 
 By moving these heavy, procedural subsystems into lightweight, polymorphic, and memory-safe abstractions, **SigmaOS** delivers a far more scalable, unified, and performant operating system core.

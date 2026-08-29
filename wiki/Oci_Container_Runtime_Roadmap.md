@@ -53,6 +53,6 @@ Standard Linux containers rely on a monolithic kernel with shared namespaces and
 
 ## 📅 5. Step-by-Step Implementation Roadmap
 
-- [x] **Phase 1 (Validation)**: Complete networking, volume, user namespace, and seccomp structs inside `src/container/runtime.rs`.
-- [x] **Phase 2 (Parity Integration)**: Bridge FHS paths and seccomp filters with the `SigmaSEC` kernel shard.
-- [x] **Phase 3 (Self-Healing Runtime)**: Support auto-rollbacks and AI telemetry-driven container policy generations.
+- [ ] **Phase 1 (Validation)**: Complete networking, volume, user namespace, and seccomp structs inside `src/container/runtime.rs`.
+- [ ] **Phase 2 (Parity Integration)**: Bridge FHS paths and seccomp filters with the `SigmaSEC` kernel shard.
+- [ ] **Phase 3 (Self-Healing Runtime)**: Support auto-rollbacks and AI telemetry-driven container policy generations.

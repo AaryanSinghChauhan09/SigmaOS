@@ -45,45 +45,45 @@ impl SigmaSnap {
     pub fn install(&mut self, snap_name: &str) -> Result<(), SnapError> {
         // Get snap information
         let snap = self.store.get_snap(snap_name)?;
-
+        
         // Check confinement
         self.check_confinement(&snap)?;
-
+        
         // Download snap
         let snap_file = self.download_snap(&snap)?;
-
+        
         // Verify snap signature
         self.verify_signature(&snap_file)?;
-
+        
         // Install snap
         self.install_snap(&snap_file)?;
-
+        
         // Update database
         self.database.add_installed(&snap);
-
+        
         Ok(())
     }
-
+    
     pub fn list(&self) -> Result<Vec<Snap>, SnapError> {
         let installed = self.database.get_installed_snaps()?;
         Ok(installed)
     }
-
+    
     pub fn remove(&mut self, snap_name: &str) -> Result<(), SnapError> {
         // Check if snap is installed
         if !self.database.is_installed(snap_name) {
             return Err(SnapError::NotInstalled);
         }
-
+        
         // Stop snap services
         self.stop_snap_services(snap_name)?;
-
+        
         // Remove snap
         self.remove_snap(snap_name)?;
-
+        
         // Update database
         self.database.remove_installed(snap_name);
-
+        
         Ok(())
     }
 }
@@ -132,15 +132,15 @@ impl SigmaSoftwareCenter {
             })
             .cloned()
             .collect();
-
+        
         Ok(results)
     }
-
+    
     pub fn install_application(&mut self, app_name: &str) -> Result<(), SoftwareError> {
         let app = self.applications.iter()
             .find(|a| a.name == app_name)
             .ok_or(SoftwareError::ApplicationNotFound)?;
-
+        
         // Try snap first
         if app.package_types.contains(&PackageType::Snap) {
             match self.install_snap(app_name) {
@@ -148,7 +148,7 @@ impl SigmaSoftwareCenter {
                 Err(_) => {}
             }
         }
-
+        
         // Try deb next
         if app.package_types.contains(&PackageType::Deb) {
             match self.install_deb(app_name) {
@@ -156,7 +156,7 @@ impl SigmaSoftwareCenter {
                 Err(_) => {}
             }
         }
-
+        
         // Try flatpak
         if app.package_types.contains(&PackageType::Flatpak) {
             match self.install_flatpak(app_name) {
@@ -164,7 +164,7 @@ impl SigmaSoftwareCenter {
                 Err(_) => {}
             }
         }
-
+        
         Err(SoftwareError::InstallationFailed)
     }
 }
@@ -209,21 +209,21 @@ impl SigmaUnity {
             pinned: true,
             running: false,
         };
-
+        
         self.launcher.items.push(item);
         self.update_launcher();
-
+        
         Ok(())
     }
-
+    
     pub fn pin_to_launcher(&mut self, application: &str) -> Result<(), UnityError> {
         let item = self.launcher.items.iter_mut()
             .find(|i| i.application == application)
             .ok_or(UnityError::ItemNotFound)?;
-
+        
         item.pinned = true;
         self.update_launcher();
-
+        
         Ok(())
     }
 }
@@ -260,30 +260,30 @@ impl SigmaCloudInit {
     pub fn apply_config(&mut self, config: CloudConfig) -> Result<(), CloudInitError> {
         // Set hostname
         self.set_hostname(&config.hostname)?;
-
+        
         // Create users
         for user in &config.users {
             self.create_user(user)?;
         }
-
+        
         // Configure SSH
         self.configure_ssh(&config.ssh_keys)?;
-
+        
         // Install packages
         for package in &config.packages {
             self.install_package(package)?;
         }
-
+        
         // Write files
         for file in &config.write_files {
             self.write_file(file)?;
         }
-
+        
         // Run commands
         for cmd in &config.runcmd {
             self.run_command(cmd)?;
         }
-
+        
         Ok(())
     }
 }
@@ -328,34 +328,34 @@ impl SigmaServerManager {
     pub fn configure_firewall(&mut self, rules: Vec<FirewallRule>) -> Result<(), ServerError> {
         // Clear existing rules
         self.firewall.rules.clear();
-
+        
         // Apply new rules
         for rule in rules {
             self.firewall.rules.push(rule);
         }
-
+        
         // Enable firewall
         self.firewall.enabled = true;
-
+        
         // Apply rules to system
         self.apply_firewall_rules()?;
-
+        
         Ok(())
     }
-
+    
     pub fn enable_service(&mut self, service_name: &str) -> Result<(), ServerError> {
         let service = self.services.get_mut(service_name)
             .ok_or(ServerError::ServiceNotFound)?;
-
+        
         // Enable service
         self.enable_systemd_service(service_name)?;
-
+        
         // Start service
         self.start_systemd_service(service_name)?;
-
+        
         service.enabled = true;
         service.running = true;
-
+        
         Ok(())
     }
 }
@@ -400,27 +400,27 @@ impl SigmaAppArmor {
     pub fn load_profile(&mut self, profile: AppArmorProfile) -> Result<(), AppArmorError> {
         // Parse profile
         let parsed = self.parser.parse(&profile)?;
-
+        
         // Load into kernel
         self.load_into_kernel(&parsed)?;
-
+        
         // Update profile status
         let profile = self.profiles.get_mut(&profile.name)
             .ok_or(AppArmorError::ProfileNotFound)?;
-
+        
         profile.status = ProfileStatus::Loaded;
         profile.mode = if self.enforcement {
             ProfileMode::Enforce
         } else {
             ProfileMode::Complain
         };
-
+        
         Ok(())
     }
-
+    
     pub fn set_enforcement(&mut self, enabled: bool) -> Result<(), AppArmorError> {
         self.enforcement = enabled;
-
+        
         // Update all loaded profiles
         for profile in self.profiles.values_mut() {
             if profile.status == ProfileStatus::Loaded {
@@ -432,7 +432,7 @@ impl SigmaAppArmor {
                 self.update_profile_mode(&profile.name, profile.mode)?;
             }
         }
-
+        
         Ok(())
     }
 }
@@ -475,41 +475,41 @@ pub enum UpgradeState {
 impl SigmaReleaseManager {
     pub fn check_upgrades(&self) -> Result<Vec<Release>, UpgradeError> {
         let mut upgrades = Vec::new();
-
+        
         for release in &self.available_releases {
             if self.can_upgrade_to(release)? {
                 upgrades.push(release.clone());
             }
         }
-
+        
         Ok(upgrades)
     }
-
+    
     pub fn perform_upgrade(&mut self, target_release: &str) -> Result<(), UpgradeError> {
         let target = self.available_releases.iter()
             .find(|r| r.version == target_release)
             .ok_or(UpgradeError::ReleaseNotFound)?;
-
+        
         // Prepare upgrade
         self.upgrade_manager.upgrade_state = UpgradeState::Preparing;
         self.prepare_upgrade(target)?;
-
+        
         // Download packages
         self.upgrade_manager.upgrade_state = UpgradeState::Downloading;
         self.download_upgrade_packages(target)?;
-
+        
         // Install packages
         self.upgrade_manager.upgrade_state = UpgradeState::Installing;
         self.install_upgrade_packages(target)?;
-
+        
         // Cleanup
         self.upgrade_manager.upgrade_state = UpgradeState::Cleanup;
         self.cleanup_upgrade()?;
-
+        
         // Complete
         self.upgrade_manager.upgrade_state = UpgradeState::Complete;
         self.current_release = target.clone();
-
+        
         Ok(())
     }
 }
@@ -546,39 +546,39 @@ impl SigmaDevTools {
         let toolchain = self.toolchains.iter()
             .find(|t| t.name == toolchain_name)
             .ok_or(DevToolsError::ToolchainNotFound)?;
-
+        
         // Install packages
         for package in &toolchain.packages {
             self.install_package(package)?;
         }
-
+        
         // Set up environment
         for (key, value) in &toolchain.environment {
             self.set_environment_variable(key, value)?;
         }
-
+        
         Ok(())
     }
-
+    
     pub fn setup_development_environment(&mut self, languages: Vec<String>) -> Result<(), DevToolsError> {
         for language in languages {
             // Install language-specific toolchain
             let toolchain = self.get_toolchain_for_language(&language)?;
             self.install_toolchain(&toolchain.name)?;
-
+            
             // Install IDE plugins
             let plugins = self.get_ide_plugins_for_language(&language)?;
             for plugin in plugins {
                 self.install_ide_plugin(&plugin)?;
             }
-
+            
             // Install debugging tools
             let debug_tools = self.get_debugging_tools_for_language(&language)?;
             for tool in debug_tools {
                 self.install_debugging_tool(&tool)?;
             }
         }
-
+        
         Ok(())
     }
 }
@@ -611,22 +611,22 @@ impl UbuntuMigrationAssistant {
             _ => Err(MigrationError::UnsupportedDistro),
         }
     }
-
+    
     fn migrate_from_debian(&self) -> Result<MigrationStatus, MigrationError> {
         // Map Debian packages to Ubuntu equivalents
         let packages = self.package_mapper.map_debian_to_ubuntu();
-
+        
         // Install mapped packages
         for pkg in packages {
             self.install_package(&pkg)?;
         }
-
+        
         // Configure Ubuntu repositories
         self.configure_ubuntu_repos()?;
-
+        
         // Install Ubuntu-specific tools
         self.install_ubuntu_tools()?;
-
+        
         Ok(MigrationStatus::Success)
     }
 }

@@ -278,12 +278,3 @@ impl AdvancedAlgorithmsManager {
     }
 }
 ```
-
----
-
-## 🧪 Test Harness Verification
-
-The algorithms in this shard are verified via standalone inspection unit tests in [`tests/os_algorithms_inspection_tests.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/tests/os_algorithms_inspection_tests.rs):
-- **Earliest Deadline First (EDF) Scheduling**: Verifies deadline sorting priority.
-- **Lottery Scheduling**: Verifies ticket weight distribution and LCG random draws.
-- **Process Audit Ledger**: Verifies cryptographic hash chain integrity and tamper detection.

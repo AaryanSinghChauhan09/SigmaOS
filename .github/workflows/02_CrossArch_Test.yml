@@ -17,7 +17,7 @@ jobs:
         arch: [aarch64-linux-gnu, riscv64-linux-gnu]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Install Toolchain
       run: |

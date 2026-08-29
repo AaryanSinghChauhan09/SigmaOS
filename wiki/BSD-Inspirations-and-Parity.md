@@ -28,7 +28,7 @@ SigmaOS absorbs foundational, high-reliability concepts from the BSD family (**F
 ## Implementations in SigmaOS
 
 ### 1. OpenBSD `pledge` and `unveil` Equivalents
-Integrated into [`src/distro/linux_bsd_inspirations.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/distro/linux_bsd_inspirations.rs) and [`src/system/sandbox.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/system/sandbox.rs):
+Integrated into [`src/distro/linux_bsd_inspirations.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/distro/linux_bsd_inspirations.rs) and [`src/system/sandbox.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/system/sandbox.rs):
 - Restricted system call subsets declared per process.
 - Hierarchical filesystem view restricted via `unveil` before entering event loops.
 
@@ -36,12 +36,4 @@ Integrated into [`src/distro/linux_bsd_inspirations.rs`](https://github.com/Aary
 Integrated alongside `io_uring` to provide scalable event dispatching for file descriptors, signals, timers, and userspace notifications.
 
 ### 3. Capsicum-Style Capability Rights
-Integrated into [`src/security/capability.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/capability.rs) and [`src/security/capability_enforcer.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/capability_enforcer.rs), assigning explicit rights matrices directly to descriptors.
-
-### 4. FreeBSD `bhyve` Hypervisor Model Backend
-Integrated into [`src/virtualization/vm_manager.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/virtualization/vm_manager.rs):
-- `BhyveBsdBackend`: Full FreeBSD bhyve virtualization model with PCI passthrough (`attach_ppt_passthrough`).
-- `BsdVirtualNetworkInterface`: Integrated BSD tap and vmnet virtual bridge networking.
-
-### 5. Sovereign Subsystems Inspection Test Coverage
-Fully verified in [`tests/sovereign_subsystems_inspection_tests.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/tests/sovereign_subsystems_inspection_tests.rs), validating Open Source Obsoletion, Sovereign Data Workspace, POSIX capabilities, and OpenBSD pledge/unveil functionality.
+Integrated into [`src/security/capability.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/security/capability.rs) and [`src/security/capability_enforcer.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/security/capability_enforcer.rs), assigning explicit rights matrices directly to descriptors.

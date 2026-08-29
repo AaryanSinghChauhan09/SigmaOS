@@ -12,7 +12,7 @@ jobs:
   kernel-stress-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Memory Lattice Stability Audit
         run: |
@@ -37,7 +37,7 @@ jobs:
   pqc-fuzz-matrix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: CRYSTALS-Kyber/Dilithium Fuzzing
         run: |
           echo "[*] Running PQC routine fuzzing..."

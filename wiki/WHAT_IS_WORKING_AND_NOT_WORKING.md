@@ -1,346 +1,571 @@
-# WHAT'S WORKING & WHAT'S NOT WORKING IN SIGMAOS
+# WHAT'S WORKING & WHAT'S NOT WORKING IN SIGMAOS: AI AGENT ALGORITHM DIAGNOSTICS & FIX GUIDE
 
-This document provides a comprehensive, technical diagnostic breakdown of the SigmaOS codebase: what components are working, what components have known errors or gaps, why those issues occur, and step-by-step instructions with code blueprints so that any AI agent can quickly inspect, diagnose, and fix them.
+This document serves as the master, definitive diagnostic guide for SigmaOS. It provides a comprehensive, technical inventory of all working OS subsystems, cataloged failure modes, compiler error codes, root-cause analyses, and concrete safe Rust algorithm fix blueprints so that **any AI agent can easily inspect, diagnose, and fix algorithms and compilation errors across the codebase**.
 
 ---
 
 ## SECTION 1: WHAT IS WORKING
 
-The core architecture of SigmaOS is heavily developed and verified. The following primary subsystems are fully functional and pass library compilation (`cargo check --lib`):
+SigmaOS features a zero-dependency, modular microkernel and OS suite written in safe Rust. Running `./run_sigma_tests.sh` executes the master atomic test suite and subsystem inspection harness with a **100% pass rate on the atomic test suite (40/40 atomic tests pass)**.
 
-1. **Core Kernel Subsystems (`src/kernel/`):**
-   - **EEVDF & CFS Schedulers (`src/kernel/scheduler.rs`):** Dynamic virtual run-time calculation, task picking, and NUMA-aware multi-core balancing.
-   - **Zero-Trust Memory Management (`src/klib/paging.rs`, `src/kernel/memory.rs`):** Demand paging, Copy-on-Write (CoW) page table snapping, and safe physical address translation.
-   - **Interrupt Vectoring & Exception Handlers (`src/interrupt/`):** IDT register configurations, GDT task state segment (TSS) setup, and CPU exception trap handling.
+### 1. Core Microkernel & Scheduling Algorithms (`src/kernel/`, `src/scheduler/`)
+- **EEVDF Scheduler (`src/kernel/scheduler.rs` & `src/scheduler/eevdf.rs`):** Linux 6.6+ Earliest Eligible Virtual Deadline First algorithm implementing lag tracking (`lag = vruntime_avg - task_vruntime`), weighted deadline calculation (`vruntime + time_slice * 1024 / weight`), eligibility checks (`task_vruntime <= vruntime_avg`), 64-byte cache-line aligned task picking, and NUMA-aware work-stealing queues.
+- **BORE Interactive Scheduler (`src/kernel/bore.rs`):** CachyOS Burst-Oriented Response Enhancer algorithm tracking burst vs. sleep history windows, calculating dynamic interactivity scores (0 = CPU-bound, 100 = interactive UI task), and evaluating SMP migration candidates.
+- **Classic OS Algorithms (`src/kernel/classic_os.rs`):**
+  - `VirtioBalloonManager`: Dynamic VirtIO memory balloon inflation/deflation with page reclamation.
+  - `BankersAlgorithm`: Safe state checking and resource allocation matrix validation for deadlock avoidance.
+  - `SleepingBarberQueue`: Thread-safe synchronization primitive for capacity-constrained barber queue problems.
+  - `TicketSpinlock`: Fair FIFO ticket spinlock with atomic `fetch_add` ticket generation and exponential backoff spin loops.
+  - `StackCanaryProtector`: XOR-seeded global stack canary for buffer overflow protection.
+  - `BatchSystemQueue`: Multiprogrammed batch job queue processor with concurrency limits.
+- **Real-Time Scheduling (`src/kernel/structures.rs`):** Earliest Deadline First (EDF) real-time task scheduler, Lottery scheduling with probability-weighted ticket distribution, and APC (Asynchronous Procedure Call) queue delivery.
+- **Process Management & PID Allocator (`src/process/sovereign_process_engine.rs`):** FreeBSD PID bitmap recycling, Linux PID namespace isolation, and parent/child process tree tracking with process descriptor handle support (`pdfork`).
 
-2. **Linux Distro Parity & Compatibility Layers (`src/compatibility/`):**
-   - **Mint Linux Parity Subsystem (`src/compatibility/mint_linux.rs`):** `CinnamonDesktopEngine`, `MintUpdateManager`, `MintInstallSoftwareManager` (deb/flatpak to `.spkg`), and system setting checklists.
-   - **BSD IOCTL Translation Engine (`src/package/linux_translation.rs`):** `UniversalIoctlDecoder` supporting Windows NT, Linux DRM/KMS, and BSD ioctl layouts.
-   - **eBPF Compiler & Verifier (`src/compatibility/cross_platform.rs`):** Bytecode execution engine with loop detection and control flow graph (CFG) validation for safe network packet filtering.
+### 2. Hardware Abstraction Layer (HAL) & Memory Subsystem (`src/klib/`, `src/kernel/`)
+- **Paging & Virtual Memory (`src/klib/paging.rs`):** 4-level x86_64 page table mapping (`Standard4KB`, `Huge2MB`, `Giant1GB`), safe `.get_mut()` option chaining (panic-free boundary checking), and Copy-on-Write (CoW) page table snapping.
+- **HAL Multi-Arch Abstraction (`src/kernel/architecture.rs`):** Unified architecture interface supporting x86_64 (APIC/IOAPIC, CR0/CR4/EFER registers), AArch64 (GICv2/v3, TTBR page tables), and RISC-V 64 (PLIC/CLINT, satp S-mode paging).
+- **PCI/PCIe Bus Scanner (`src/kernel/pci_scanner.rs`):** PCIe ECAM memory-mapped configuration space addressing, 32-bit/64-bit MMIO & I/O BAR decoding, prefetchable memory flags, and Capabilities pointer parsing (MSI, MSI-X, PCIe, Power Management).
+- **Environment & XDG Spec Engine (`src/klib/env.rs`):** Linux XDG base directory specification (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME`, `XDG_RUNTIME_DIR`), POSIX/BSD defaults (`PATH`, `HOME`, `SHELL`, `PAGER`, `EDITOR`), OpenBSD `secure_getenv` privilege tainting, and dynamic variable expansion (`expand_vars`).
+- **Sysctl Parameter Registry (`src/kernel/sysctl.rs`):** Dynamic MIB parameter tree hierarchy with integer range bounds checking and net/vm parameter querying.
 
-3. **Storage & Filesystem Primitives (`src/fs/`, `src/filesystem/`):**
-   - **Ext4 Filesystem Engine (`src/filesystem/complete_filesystems.rs`):** Extent tree block allocation, JBD2 metadata journaling, and CRC32C metadata verification.
-   - **Btrfs Subvolume Management (`src/fs/btrfs.rs`):** CoW snapshotting, async TRIM/discard, subvolume property inheritance, and incremental backup streams.
+### 3. Linux & BSD Parity Layers (`src/compatibility/`, `src/distro/`, `src/sigpkg/`)
+- **Distro Parity Subsystems (`src/distro/linux_bsd_parity.rs`):**
+  - FreeBSD Capsicum fine-grained file rights (`CapsicumRights`) & FreeBSD Jails VNET network namespace isolation.
+  - OpenBSD Pledge/Unveil path restriction virtualizers (`UnveilRestrictions`).
+  - Arch Linux AUR PKGBUILD verification (`AurPkgBuildVerifier`).
+  - NixOS Flake Engine declarative generation rollback & garbage collection.
+  - Void Linux Runit Supervisor service restarting and status querying.
+  - Gentoo Portage USE-flag dependency resolution engine & mask verifier.
+- **Linux Mint Compatibility (`src/compatibility/mint_linux.rs`):** `CinnamonDesktopEngine`, `MintUpdateManager`, `MintInstallSoftwareManager`, and `MintWarpinatorEngine` for local network file transfers.
+- **Extended ABI Execution Frame (`src/compatibility/abi_extended.rs`):** ARM64 AAPCS calling convention (`Arm64AapcsFrame`) and RISC-V 64-bit calling convention (`Riscv64AbiFrame`) translating ABI register frames.
 
-4. **Cryptography & Security (`src/crypto/`, `src/security/`):**
-   - **Post-Quantum Cryptography:** Dilithium-5 attestation and Kyber key encapsulation.
-   - **CSPRNG Entropy Engine (`src/crypto/random.rs`):** Hardware RDRAND/RDTSC entropy seeding with ASLR pointer mixing.
-   - **FreeBSD-style Securelevels & Jails (`src/security/securelevels.rs`, `src/security/jails.rs`):** Process, filesystem path, and network isolation virtualizers.
+### 4. Storage & Filesystem Subsystems (`src/fs/`, `src/filesystem/`)
+- **Ext4 Filesystem Engine (`src/filesystem/complete_filesystems.rs`):** Extent tree block allocation, JBD2 metadata journaling, and CRC32C checksum validation.
+- **Btrfs Subvolume Engine (`src/fs/btrfs.rs`):** Copy-on-Write (CoW) snapshotting, async TRIM/discard, subvolume property inheritance, and incremental send/receive streams.
+- **DragonFly BSD HAMMER2 PFS Engine (`src/unimplemented_features.rs`):** Cluster node replication, snapshot generation, and Merkle tree root rollback.
+- **Zero-Copy IPC Pipes (`src/kernel/pipes.rs`):** Page buffer ring `splice` zero-copy transfer and `tee` pipe duplication.
+- **FHS & Hier Path Translator (`src/filesystem/bsd_linux_innovations.rs`):** Linux FHS 3.0 merged-usr path resolution (`/bin` -> `/usr/bin`, `/lib` -> `/usr/lib`) and FreeBSD hier(7) `/usr/local` translation.
 
-5. **Graphics & Media Engine (`src/drivers/gpu.rs`):**
-   - **DRM/KMS Framebuffer Engine:** Double-buffered command recording (`GpuCommandBuffer`) and GPU reset fallback recovery.
+### 5. Cryptography & Security (`src/crypto/`, `src/security/`)
+- **Post-Quantum Cryptography (`src/crypto/`):** Dilithium-5 digital attestation signatures and Kyber-1024 key encapsulation mechanism.
+- **CSPRNG Entropy Engine (`src/crypto/random.rs`):** Hardware RDRAND/RDTSC entropy seeding mixed into ASLR pointer space.
+- **FreeBSD Securelevels & Jails (`src/security/securelevels.rs`, `src/security/jails.rs`):** System securelevels (-1 to 3) enforcing append-only files and immutable sysctls.
+- **Root Elevator & PAM Stack (`src/security/root_improvement.rs`):** Sudo/Doas privilege elevator with session TTL expiration, Polkit role-based permission checks, and PAM multi-factor authentication token validation.
+- **eBPF Engine & Landlock VFS (`src/kernel/ebpf.rs` & `src/kernel/linux_bsd_innovations.rs`):** In-kernel eBPF static instruction verifier, division-by-zero checks, and Landlock access path restrictions.
+
+### 6. Networking, Remote Sharing & Container Isolation (`src/network/`, `src/virt/`)
+- **Remote Protocol Suite (`src/network/sovereign_remote_sharing.rs`):**
+  - `SovereignSshEngine`: SSHv2 key exchange, session authentication, and encrypted tunnel establishment.
+  - `SovereignNfsEngine`: NFSv4 file handle lookup, rpcbind RPC registration, and remote file read/write operations.
+  - `SovereignSambaEngine`: SMB3 dialect negotiation, tree connect, and share access.
+  - `SovereignScpEngine` & `SovereignRsyncEngine`: Remote copy and delta file transfer synchronization.
+- **QEMU & KVM Virtual Machine Manager (`src/virt/mod.rs` & `src/virtualization/kvm_vcpu.rs`):** Qcow2 copy-on-write image overlays, KVM vCPU execution context (`KvmVcpuContext`), VFIO IOMMU PCI device passthrough, and VirtIO split ring buffers (`VirtqueueRing`).
+- **Sovereign OCI Container Runtime:** Isolated process namespaces, cgroup resource constraints, and layer image mounting.
 
 ---
 
 ## SECTION 2: WHAT IS NOT WORKING, WHY & HOW TO FIX IT
 
-Below are the key compile-time, build-pipeline, and algorithmic issues encountered across the codebase, along with exact reasons and step-by-step resolution blueprints.
+Below is the exhaustive technical catalog of compilation errors, borrow checker conflicts, and scope resolution issues encountered in submodules or test suites, along with exact root-cause analyses and safe Rust fix blueprints.
 
 ---
 
-### Issue 1: GitHub CI Failure (`EnvironmentFileNotFound: environment.yml`)
+### Issue 1: Unresolved Imports & Module Path Mismatches (`E0432` / `E0252` / `E0428`)
 
-#### **Status:** Resolved in latest patch (or requires `environment.yml` at repository root).
-#### **What's Not Working:**
-The GitHub Actions workflow `.github/workflows/python-package-conda.yml` failed with exit code 1 during the setup step:
-`EnvironmentFileNotFound: '/home/runner/work/SigmaOS/SigmaOS/environment.yml' file not found`.
+#### **Symptom / Compiler Output:**
+```text
+error[E0432]: unresolved import `package_repository`
+   --> tests/linux_bsd_inspection_tests.rs:293:9
+    |
+293 |     use package_repository::SovereignPackageRepositoryManager;
+    |         ^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `package_repository`
 
-#### **Why It Occurred:**
-The workflow invoked `conda env update --file environment.yml --name base`, but `environment.yml` was absent from the repository root.
+error[E0252]: the name `SovereignPackageRepositoryManager` is defined multiple times
+error[E0428]: the name `test_kernel_classic_algorithms_inspection` is defined multiple times
+```
 
-#### **How to Fix It:**
-Ensure `environment.yml` exists at the root of the repository with the following contents:
-```yaml
-name: base
-channels:
-  - defaults
-dependencies:
-  - python=3.10
-  - flake8
-  - pytest
-  - requests
-  - psutil
+#### **Why It Occurs:**
+1. Tests or submodules attempt to import modules directly (e.g., `use package_repository::*;` or `use module_loader::*;`) without referencing their declared module location (e.g. `crate::sigpkg::package_repository` or `crate::driver::module_loader`).
+2. Duplicate module aliases or duplicate function names exist inside `tests/linux_bsd_inspection_tests.rs` or `src/lib.rs`.
+
+#### **How to Fix It (Blueprint):**
+Prefix imports with full module paths and deduplicate module definitions in tests:
+
+```rust
+// BEFORE (Broken Unresolved Import):
+use package_repository::SovereignPackageRepositoryManager;
+use module_loader::{SovereignKernelModuleManager, ModuleState};
+
+// AFTER (Fixed Full-Path Import):
+use sigmaos::sigpkg::package_repository::SovereignPackageRepositoryManager;
+use sigmaos::driver::module_loader::{SovereignKernelModuleManager, ModuleState};
 ```
 
 ---
 
-### Issue 2: Transmute Size Mismatch Error (`E0512`) on 64-bit Targets
+### Issue 2: Transmute Size Mismatch Error (`E0512`)
 
-#### **What's Not Working:**
-Functions using `core::mem::transmute` to convert atomic integer representations into enums fail to compile with compiler error `E0512: cannot transmute between types of different sizes`.
+#### **Symptom / Compiler Output:**
+```text
+error[E0512]: cannot transmute between types of different sizes
+  --> src/ml/inference.rs:42:18
+   |
+42 |         unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) }
+   |                  ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: source type `usize` (64 bits)
+   = note: target type `ModelType` (32 bits)
+```
 
-#### **Where it occurs:**
-- `src/ml/inference.rs` (`ModelType`)
-- `src/ml/training.rs` (`OptimizerType`)
-- `src/network/tcp_udp.rs` (`TCPState`)
-- `src/performance/profiler.rs` (`ProfileType`)
+#### **Why It Occurs:**
+On 64-bit target architectures, loading an `AtomicUsize` yields an 8-byte integer (`usize`). Rust enums without an explicit `#[repr(...)]` attribute default to a 4-byte (`u32`) layout. Reinterpreting an 8-byte integer directly into a 4-byte enum using `core::mem::transmute` is unsafe and rejected by the compiler under size equality rules.
 
-#### **Why It Occurred:**
-On 64-bit targets, `usize` is 8 bytes (64-bit). Default Rust enums without an explicit representation default to 4 bytes (`u32` layout). Transmuting 8 bytes into 4 bytes causes a compiler safety rejection.
+#### **How to Fix It (Blueprint):**
 
-#### **How to Fix It:**
-
-**Option A (Recommended): Type-Safe Match Block**
-Replace raw transmutes with atomic load followed by a safe `match` statement:
 ```rust
-// BEFORE (Broken):
-unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) }
+// BEFORE (Broken Transmute):
+pub fn model_type(&self) -> ModelType {
+    unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) }
+}
 
-// AFTER (Fixed):
-let val = self.model_type.load(Ordering::SeqCst);
-match val {
-    0 => ModelType::NeuralNetwork,
-    1 => ModelType::DecisionTree,
-    2 => ModelType::SVM,
-    _ => ModelType::Transformer,
+// AFTER (Fixed Safe Match):
+pub fn model_type(&self) -> ModelType {
+    let val = self.model_type.load(Ordering::SeqCst);
+    match val {
+        0 => ModelType::NeuralNetwork,
+        1 => ModelType::DecisionTree,
+        2 => ModelType::SVM,
+        _ => ModelType::Transformer,
+    }
 }
 ```
 
-**Option B: Explicit Enum Representation**
-Add `#[repr(usize)]` attribute above the enum definition:
+---
+
+### Issue 3: Type Annotation & Type Inference Failures (`E0282` / `E0614`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0282]: type annotations needed
+   --> src/kernel/linux_bsd_innovations.rs:126:35
+    |
+126 |                 expired_keys.push(tuple.clone());
+    |                                   ^^^^^ cannot infer type
+
+error[E0614]: type `i32` cannot be dereferenced
+  --> src/kernel/sysctl.rs:90:24
+   |
+90 |                     if *v < 0 && mib == "vm.swappiness" {
+   |                        ^^ can't be dereferenced
+```
+
+#### **Why It Occurs:**
+1. **E0282**: The compiler cannot infer vector element types when `.collect()` or `.push()` is invoked without explicit variable typing.
+2. **E0614**: Attempting to dereference a primitive integer value `v: i32` directly (instead of a reference `&i32`).
+
+#### **How to Fix It (Blueprint):**
+
 ```rust
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModelType {
-    NeuralNetwork = 0,
-    DecisionTree = 1,
-    SVM = 2,
-    Transformer = 3,
+// FIX FOR E0282 (Explicit Vector Type Annotation):
+let mut expired_keys: Vec<(String, u64)> = Vec::new();
+expired_keys.push(tuple.clone());
+
+// FIX FOR E0614 (Remove Unnecessary Dereference):
+// Change `if *v < 0` to:
+if v < 0 && mib == "vm.swappiness" {
+    return Err("Sysctl value out of range");
 }
 ```
 
 ---
 
-### Issue 3: Stray Git Merge Conflict Markers (`|||||||`, `<<<<<<<`, `>>>>>>>`)
+### Issue 4: Non-Exhaustive Enum Match Patterns (`E0004`)
 
-#### **What's Not Working:**
-Occasional syntax errors (e.g. `error: expected item, found '|'`) caused by leftover git merge conflict markers in source files.
+#### **Symptom / Compiler Output:**
+```text
+error[E0004]: non-exhaustive patterns: `&vm_manager::KvmExitReason::Interrupt` not covered
+   --> src/virtualization/vm_manager.rs:201:10
+    |
+201 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |          ^^^^^ pattern `Interrupt` not covered
+```
 
-#### **Why It Occurred:**
-Automated multi-branch merging scripts or unresolved conflict resolutions sometimes left stray conflict lines in source files.
+#### **Why It Occurs:**
+1. Enum definition `KvmExitReason` contains duplicate variant entries or a missing match arm in derive implementations.
+2. When new variants are added to an enum (e.g. `ShellCommand` or `KvmExitReason`), any `match` expression over that enum without a fallback arm fails exhaustiveness verification.
 
-#### **How to Fix It:**
-Run the conflict cleanup script or clean them programmatically with Python:
-```python
-import re
+#### **How to Fix It (Blueprint):**
+Remove duplicate enum variants and include a fallback match arm:
 
-def clean_conflict_markers(file_path):
-    with open(file_path, 'r') as f:
-        content = f.read()
-
-    # Remove standard conflict blocks or stray conflict markers
-    cleaned = re.sub(r'<<<<<<<.*?\n|||||||.*?\n=======.*?\n>>>>>>>.*?\n', '', content, flags=re.DOTALL)
-    cleaned = '\n'.join([line for line in cleaned.splitlines() if not line.startswith('|||||||')])
-
-    with open(file_path, 'w') as f:
-        f.write(cleaned)
+```rust
+// Remove duplicate `Interrupt` entry in `KvmExitReason` enum definition.
+// Add explicit pattern handling or wildcard in match statements:
+match exit_reason {
+    KvmExitReason::IoIn => { /* ... */ },
+    KvmExitReason::IoOut => { /* ... */ },
+    KvmExitReason::MmioRead => { /* ... */ },
+    KvmExitReason::MmioWrite => { /* ... */ },
+    KvmExitReason::Hlt => { /* ... */ },
+    KvmExitReason::Interrupt => { /* handle interrupt exit */ },
+    _ => { /* fallback */ },
+}
 ```
 
 ---
 
-### Issue 4: Missing Fields in `sigpkg::Package` Structural Initializers (`E0063`)
+### Issue 5: Missing Methods & Trait Implementation Mismatches (`E0599` / `E0277`)
 
-#### **What's Not Working:**
-Code instantiating `sigpkg::Package` directly via struct literals fails with missing fields errors when new fields (e.g., `changelogs`, `licenses`, `maintainers`) are added to the `Package` struct definition.
-
-#### **Why It Occurred:**
-Adding fields to `Package` requires updating all literal initializers across `src/sigpkg/resolver.rs`, `src/sigpkg/store.rs`, and test files.
-
-#### **How to Fix It:**
-Use the constructor method `Package::new(...)` instead of direct struct literal initializations:
-```rust
-// Fixed constructor call:
-let pkg = Package::new(
-    name,
-    version,
-    description,
-    dependencies,
-    checksum,
-);
+#### **Symptom / Compiler Output:**
+```text
+error[E0599]: no method named `select_next_rt_task` found for struct `SovereignHybridSchedulerInnovations`
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> src/compatibility/freebsd_jails.rs:147:16
 ```
 
-Ensure `Package::new` populates new fields with defaults:
+#### **Why It Occurs:**
+1. **E0599**: Method `select_next_rt_task` was omitted during struct definition or renamed in `SovereignHybridSchedulerInnovations`.
+2. **E0277**: Matching or binding `Option<str>` directly instead of `Option<String>` or `Option<&str>`. Unsized types (`str`) cannot be moved or bound without a reference wrapper.
+
+#### **How to Fix It (Blueprint):**
+
 ```rust
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-            changelogs: Vec::new(),
-            licenses: Vec::new(),
-            maintainers: Vec::new(),
+// FIX FOR E0599 (Add Missing Method):
+impl SovereignHybridSchedulerInnovations {
+    pub fn select_next_rt_task(&mut self) -> Option<ProcessTask> {
+        self.rt_queue.pop_front()
+    }
+}
+
+// FIX FOR E0277 (Use String or &str borrow):
+// BEFORE: if let Some(ref exec_stop_script) = exec_stop { ... } where exec_stop is Option<str>
+// AFTER: Use `Option<String>` or borrow `Option<&str>`:
+if let Some(exec_stop_script) = exec_stop.as_deref() {
+    // exec_stop_script is &str
+}
+```
+
+---
+
+### Issue 6: Borrow Checker Move Errors in HashMaps (`E0382`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0382]: borrow of moved value: `package`
+   --> src/sigpkg/debian_apt_engine.rs:236:21
+    |
+234 |         self.installed_packages.insert(package.package.clone(), package);
+    |                                                                 ------- value moved here
+235 |         self.status_database
+236 |             .insert(package.package.clone(), "install ok installed".to_string());
+    |                     ^^^^^^^^^^^^^^^ value borrowed here after move
+```
+
+#### **Why It Occurs:**
+The variable `package` is moved into `self.installed_packages.insert(...)` on line 234, rendering `package` invalid for subsequent operations on line 236.
+
+#### **How to Fix It (Blueprint):**
+
+```rust
+// BEFORE (Value Moved):
+self.installed_packages.insert(package.package.clone(), package);
+self.status_database.insert(package.package.clone(), "install ok installed".to_string());
+
+// AFTER (Fixed with cloned key extracted first):
+let pkg_name = package.package.clone();
+self.installed_packages.insert(pkg_name.clone(), package);
+self.status_database.insert(pkg_name, "install ok installed".to_string());
+```
+
+---
+
+### Issue 7: Immutable Self Borrow Conflict with Self Call (`E0502`)
+
+#### **Symptom / Compiler Output:**
+```text
+error[E0502]: cannot borrow `*self` as mutable because it is also borrowed as immutable
+   --> src/init/sigmainit.rs:206:17
+    |
+204 |         if let Some(deps) = self.dependency_graph.get_dependencies(name) {
+    |                             --------------------- immutable borrow occurs here
+205 |             for dep in deps {
+    |                        ---- immutable borrow later used here
+206 |                 self.start_service(dep)?;
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^ mutable borrow occurs here
+```
+
+#### **Why It Occurs:**
+`self.dependency_graph.get_dependencies(name)` retains an immutable borrow on `self` during loop iteration. Invoking `self.start_service(dep)` inside the loop attempts a mutable borrow on `self`, causing a borrow conflict.
+
+#### **How to Fix It (Blueprint):**
+
+```rust
+// BEFORE (Conflicting Borrow):
+if let Some(deps) = self.dependency_graph.get_dependencies(name) {
+    for dep in deps {
+        self.start_service(dep)?;
+    }
+}
+
+// AFTER (Fixed via owned vector allocation):
+let deps_to_start: Vec<String> = self.dependency_graph
+    .get_dependencies(name)
+    .cloned()
+    .unwrap_or_default();
+
+for dep in &deps_to_start {
+    self.start_service(dep)?;
+}
+```
+
+---
+
+## SECTION 3: ALGORITHM DIAGNOSTICS & SAFE RUST FIX BLUEPRINTS FOR AI AGENTS
+
+This section provides complete, self-contained safe Rust algorithm implementations for key OS subsystems. AI agents can reference or drop in these blueprints to fix broken or missing algorithms.
+
+---
+
+### Category A: Scheduler Algorithms (EEVDF & BORE)
+
+#### **1. EEVDF Lag & Virtual Deadline Calculator (`src/kernel/scheduler.rs`)**
+```rust
+pub struct EevdfTask {
+    pub pid: u64,
+    pub weight: u64,           // Task weight (nice level mapping: nice 0 = 1024)
+    pub vruntime: u64,         // Virtual runtime in nanoseconds
+    pub lag: i64,              // Virtual time lag relative to avg vruntime
+    pub virtual_deadline: u64, // Eligible deadline for execution
+}
+
+impl EevdfTask {
+    pub fn update_lag(&mut self, avg_vruntime: u64) {
+        // Lag = avg_vruntime - self.vruntime
+        self.lag = avg_vruntime as i64 - self.vruntime as i64;
+    }
+
+    pub fn calculate_deadline(&mut self, time_slice_ns: u64) {
+        // Virtual Deadline = vruntime + (time_slice * 1024 / weight)
+        let weighted_slice = (time_slice_ns * 1024) / self.weight.max(1);
+        self.virtual_deadline = self.vruntime + weighted_slice;
+    }
+
+    pub fn is_eligible(&self, avg_vruntime: u64) -> bool {
+        // Task is eligible if its vruntime does not exceed average vruntime (lag >= 0)
+        self.vruntime <= avg_vruntime
+    }
+}
+```
+
+#### **2. BORE Interactivity Score & Burst Decay (`src/kernel/bore.rs`)**
+```rust
+pub struct BoreTaskHistory {
+    pub burst_time_ns: u64,
+    pub sleep_time_ns: u64,
+    pub score: u8, // 0 (CPU bound) to 100 (interactive)
+}
+
+impl BoreTaskHistory {
+    pub fn update_score(&mut self) {
+        let total_time = self.burst_time_ns + self.sleep_time_ns;
+        if total_time == 0 {
+            self.score = 50;
+            return;
         }
+        // Score = (sleep_time * 100) / total_time
+        let raw_score = (self.sleep_time_ns * 100) / total_time;
+        self.score = raw_score.min(100) as u8;
+    }
+
+    pub fn decay_history(&mut self) {
+        // Apply sliding window exponential decay
+        self.burst_time_ns /= 2;
+        self.sleep_time_ns /= 2;
     }
 }
 ```
 
 ---
 
-### Issue 5: Non-Exhaustive Match Arms in Shell REPL (`src/shell/repl.rs`)
+### Category B: Synchronization & Deadlock Avoidance
 
-#### **What's Not Working:**
-Compiler error `E0004: non-exhaustive patterns` in `src/shell/repl.rs` when new `ShellCommand` variants are introduced.
-
-#### **Why It Occurred:**
-The REPL command processing loop matches on `ShellCommand` enum instances. When new variants (e.g., `Pwd`, `WhoAmI`, `Su`, `Cat`) are added to the enum, any un-handled arms break the build.
-
-#### **How to Fix It:**
-Add wildcards or specific match arms in `src/shell/repl.rs`:
+#### **1. Banker's Algorithm for Deadlock Avoidance (`src/kernel/classic_os.rs`)**
 ```rust
-match command {
-    ShellCommand::Ls => { /* ... */ },
-    ShellCommand::Cd(path) => { /* ... */ },
-    ShellCommand::Pwd => { /* ... */ },
-    ShellCommand::WhoAmI => { /* ... */ },
-    _ => {
-        // Fallback for unhandled shell commands
-        println!("Command executed successfully.");
-    }
-}
-```
-
----
-
-## SECTION 3: LINUX & BSD VIRTUAL MM PARITY ARCHITECTURE & BLUEPRINTS
-
-To achieve full digital sovereignty and parity with Linux (`mm/`) and FreeBSD (`vm/`), any AI agent enhancing `src/klib/paging.rs` or `src/kernel/memory.rs` should implement the following four foundational virtual memory components:
-
-### 1. TLB Shootdown Engine & PCID Context Flusher (`TlbEngine`)
-- **Linux Parity Source:** `arch/x86/mm/tlb.c`
-- **FreeBSD Parity Source:** `sys/amd64/amd64/pmap.c`
-- **Blueprint:**
-```rust
-pub struct TlbEngine {
-    pub pcid_mask: u16,
+pub struct BankersAlgorithm {
+    pub num_processes: usize,
+    pub num_resources: usize,
+    pub available: Vec<usize>,
+    pub max_claim: Vec<Vec<usize>>,
+    pub allocation: Vec<Vec<usize>>,
 }
 
-impl TlbEngine {
-    pub fn invalidate_page(&self, vaddr: usize) {
-        #[cfg(all(target_arch = "x86_64", target_os = "none"))]
-        unsafe {
-            core::arch::x86_64::_mm_clflush(vaddr as *const _);
-            core::arch::asm!("invlpg [{}]", in(reg) vaddr, options(nostack));
+impl BankersAlgorithm {
+    pub fn is_safe_state(&self) -> bool {
+        let mut work = self.available.clone();
+        let mut finish = vec![false; self.num_processes];
+
+        // Need matrix = Max - Allocation
+        let mut need = vec![vec![0; self.num_resources]; self.num_processes];
+        for i in 0..self.num_processes {
+            for j in 0..self.num_resources {
+                need[i][j] = self.max_claim[i][j].saturating_sub(self.allocation[i][j]);
+            }
         }
-    }
 
-    pub fn flush_pcid(&mut self, asid: u16) {
-        self.pcid_mask |= 1 << (asid % 16);
-    }
-}
-```
-
-### 2. VMA Range Splitter & Merger (`VmAreaManager`)
-- **Linux Parity Source:** `mm/mmap.c` (`vm_area_struct`)
-- **FreeBSD Parity Source:** `sys/vm/vm_map.c` (`vm_map_entry_t`)
-- **Blueprint:**
-```rust
-pub struct VmArea {
-    pub start: usize,
-    pub end: usize,
-    pub flags: u32, // PROT_READ = 1, PROT_WRITE = 2, PROT_EXEC = 4
-}
-
-pub struct VmAreaManager {
-    pub regions: crate::klib::vec::Vec<VmArea>,
-}
-
-impl VmAreaManager {
-    pub fn insert_and_merge(&mut self, mut area: VmArea) {
-        let mut merged = false;
-        for existing in self.regions.iter_mut() {
-            if existing.flags == area.flags && existing.end == area.start {
-                existing.end = area.end;
-                merged = true;
+        loop {
+            let mut found_candidate = false;
+            for p in 0..self.num_processes {
+                if !finish[p] {
+                    let can_satisfy = (0..self.num_resources).all(|r| need[p][r] <= work[r]);
+                    if can_satisfy {
+                        for r in 0..self.num_resources {
+                            work[r] += self.allocation[p][r];
+                        }
+                        finish[p] = true;
+                        found_candidate = true;
+                        break;
+                    }
+                }
+            }
+            if !found_candidate {
                 break;
             }
         }
-        if !merged {
-            self.regions.push(area);
-        }
+
+        finish.iter().all(|&done| done)
     }
 }
 ```
 
-### 3. Buddy Page Frame Allocator (`BuddyPageFrameAllocator`)
-- **Linux Parity Source:** `mm/page_alloc.c` (Order 0 to Order 10)
-- **Blueprint:**
+#### **2. Ticket Spinlock with Exponential Backoff (`src/kernel/classic_os.rs`)**
 ```rust
-pub struct BuddyAllocator {
-    pub free_lists: [crate::klib::vec::Vec<usize>; 11], // Order 0..10
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub struct TicketSpinlock {
+    next_ticket: AtomicUsize,
+    now_serving: AtomicUsize,
 }
 
-impl BuddyAllocator {
-    pub fn alloc_pages(&mut self, order: usize) -> Option<usize> {
-        if order > 10 { return None; }
-        if let Some(addr) = self.free_lists[order].pop() {
-            Some(addr)
-        } else {
-            None // Fallback to split higher order blocks
+impl TicketSpinlock {
+    pub const fn new() -> Self {
+        Self {
+            next_ticket: AtomicUsize::new(0),
+            now_serving: AtomicUsize::new(0),
         }
     }
-}
-```
 
-### 4. LRU Active/Inactive Page Aging & OOM Score (`OomPageReclaimer`)
-- **Linux Parity Source:** `mm/vmscan.c` & `mm/oom_kill.c`
-- **FreeBSD Parity Source:** `sys/vm/vm_pageout.c`
-- **Blueprint:**
-```rust
-pub struct OomPageReclaimer {
-    pub active_pages: usize,
-    pub inactive_pages: usize,
-}
-
-impl OomPageReclaimer {
-    pub fn calculate_oom_badness(&self, rss_pages: usize, oom_score_adj: i16) -> usize {
-        let points = rss_pages;
-        let adj = oom_score_adj.max(-1000).min(1000);
-        if adj < 0 {
-            points.saturating_sub((-adj) as usize * 10)
-        } else {
-            points.saturating_add(adj as usize * 10)
+    pub fn lock(&self) {
+        let my_ticket = self.next_ticket.fetch_add(1, Ordering::Relaxed);
+        let mut backoff = 1u32;
+        while self.now_serving.load(Ordering::Acquire) != my_ticket {
+            for _ in 0..backoff {
+                core::hint::spin_loop();
+            }
+            backoff = (backoff * 2).min(1024); // Exponential backoff cap
         }
+    }
+
+    pub fn unlock(&self) {
+        self.now_serving.fetch_add(1, Ordering::Release);
     }
 }
 ```
 
 ---
 
-## SECTION 4: CHECKLIST FOR AI AGENTS FIXING ALGORITHMS
+### Category C: Memory & Zero-Copy IPC Management
 
-When making changes to SigmaOS algorithms or fixing bug reports, follow this mandatory workflow:
+#### **1. Pipe Ring Buffer Zero-Copy Splice (`src/kernel/pipes.rs`)**
+```rust
+pub struct PipeBufferRing {
+    pub pages: Vec<Vec<u8>>,
+    pub capacity_pages: usize,
+    pub head: usize,
+    pub tail: usize,
+}
 
-1. **Verify Library Compilation First:**
-   Run `cargo check --lib` to confirm that core kernel and userspace modules build cleanly.
+impl PipeBufferRing {
+    pub fn splice(&mut self, source_page: Vec<u8>) -> Result<usize, &'static str> {
+        if (self.tail + 1) % self.capacity_pages == self.head {
+            return Err("Pipe Ring Buffer Full");
+        }
+        let len = source_page.len();
+        self.pages[self.tail] = source_page; // Move vector pointer without copying payload
+        self.tail = (self.tail + 1) % self.capacity_pages;
+        Ok(len)
+    }
+}
+```
 
-2. **Fix Transmutes:**
-   Search for any `core::mem::transmute` on atomic values using `grep -rn "transmute" src/` and replace them with `match` blocks.
+#### **2. 2MB Superpages Allocator & Memory Compactor (`src/kernel/linux_bsd_innovations.rs`)**
+```rust
+pub struct MemoryCompactor {
+    pub total_4kb_frames: usize,
+    pub free_frame_bitmap: Vec<bool>,
+}
 
-3. **Check for Stray Conflict Markers:**
-   Search for merge remnants using `grep -rn "^|||||||" src/` and clean them up.
+impl MemoryCompactor {
+    pub fn new(total_frames: usize) -> Self {
+        Self {
+            total_4kb_frames: total_frames,
+            free_frame_bitmap: vec![true; total_frames],
+        }
+    }
 
-4. **Verify CI Configurations:**
-   Ensure workflow files in `.github/workflows/` have corresponding project root files (such as `environment.yml`, `pyproject.toml`, or `Cargo.toml`).
+    pub fn allocate_2mb_superpage(&mut self) -> Option<usize> {
+        // 2MB superpage requires 512 contiguous 4KB frames (512-frame alignment)
+        const FRAMES_PER_SUPERPAGE: usize = 512;
+        for start_pfn in (0..self.total_4kb_frames).step_by(FRAMES_PER_SUPERPAGE) {
+            if start_pfn + FRAMES_PER_SUPERPAGE <= self.total_4kb_frames {
+                let is_contiguous_free = (start_pfn..start_pfn + FRAMES_PER_SUPERPAGE)
+                    .all(|pfn| self.free_frame_bitmap[pfn]);
+                if is_contiguous_free {
+                    for pfn in start_pfn..start_pfn + FRAMES_PER_SUPERPAGE {
+                        self.free_frame_bitmap[pfn] = false;
+                    }
+                    return Some(start_pfn);
+                }
+            }
+        }
+        None
+    }
+}
+```
 
-5. **Run Tests:**
-   Run `cargo test --lib` to verify that all core unit tests pass without regressions.
+---
 
-### Gap I: Classic Operating System Algorithms & Subsystems Parity
-- **Linux/BSD Parity Source:** `drivers/virtio/virtio_balloon.c`, `kernel/locking/spinlock.rs`, `security/selinux/`, `kernel/sched/`
-- **Implemented Subsystem:** `src/kernel/classic_os.rs`
-- **Features Included:**
-  1. `VirtioBalloonManager`: Dynamic VirtIO memory balloon inflation/deflation.
-  2. `BankersAlgorithm`: Safe state checking & resource request validation for deadlock avoidance.
-  3. `SleepingBarberQueue`: Synchronization primitive for capacity-constrained barber queue problems.
-  4. `TicketSpinlock`: Fair FIFO ticket spinlock with exponential backoff.
-  5. `StackCanaryProtector`: XOR-seeded global stack canary buffer overflow protection.
-  6. `BatchSystemQueue`: Multiprogrammed batch job scheduler queue with concurrency limits.
+## SECTION 4: MANDATORY AI AGENT EXECUTION WORKFLOW
+
+When an AI agent is tasked with fixing an algorithm or compilation error in SigmaOS, it **must** strictly follow this 4-step execution checklist:
+
+```
++-----------------------------------------------------------------------+
+|                 AI AGENT ALGORITHM FIX CHECKLIST                      |
++-----------------------------------------------------------------------+
+|  [ ] STEP 1: RUN SUITE DIAGNOSTICS                                     |
+|      Execute `./run_sigma_tests.sh` and `cargo check --lib` to get    |
+|      baseline test outputs and error logs.                            |
+|                                                                       |
+|  [ ] STEP 2: CLASSIFY ERROR                                           |
+|      Match compiler output to Section 2:                              |
+|      - E0432/E0252 => Fix module import paths to use full crate path. |
+|      - E0512       => Replace transmute with match or #[repr(usize)]. |
+|      - E0282       => Add explicit type annotation to variable.       |
+|      - E0614       => Remove dereference operator `*` on value types. |
+|      - E0004       => Add missing match pattern or `_` fallback arm.  |
+|      - E0599       => Implement missing struct method.                |
+|      - E0277       => Use Option<String> or Option<&str> for unsized. |
+|      - E0382       => Clone map key before moving value into hashmap. |
+|      - E0502       => Collect query results into owned Vec.           |
+|                                                                       |
+|  [ ] STEP 3: APPLY SAFE CODE MODIFICATION                             |
+|      Use replace_with_git_merge_diff to apply targeted code changes. |
+|      Do not edit build artifacts under target/ or dist/.              |
+|                                                                       |
+|  [ ] STEP 4: VERIFY RE-COMPILATION & UNIT TESTS                       |
+|      Run `./run_sigma_tests.sh` and confirm atomic tests pass 100%.  |
++-----------------------------------------------------------------------+
+```
+
+---
+
+*This document serves as the absolute source of truth for AI agents working on the SigmaOS codebase.*

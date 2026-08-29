@@ -1,8 +1,5 @@
 name: NixOS Declarative Generation & Rollback Deploy Verification
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [ main, master, "feat/*" ]

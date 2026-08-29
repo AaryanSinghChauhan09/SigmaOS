@@ -1,8 +1,5 @@
 name: eBPF & Zero-Copy Splice Subsystem CI
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [ main, master, "feat/*" ]

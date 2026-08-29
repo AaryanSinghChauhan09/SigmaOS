@@ -67,22 +67,22 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Low Priority Tasks
 
 ### Community & Governance
-- [x] SigmaOS Foundation establishment
-- [x] Contributor programs and hackathons
-- [x] Documentation sprints
-- [x] Bounty programs for security bugs
+- [ ] SigmaOS Foundation establishment
+- [ ] Contributor programs and hackathons
+- [ ] Documentation sprints
+- [ ] Bounty programs for security bugs
 
 ### Cross-Platform
-- [x] SigmaOS Mobile variant
-- [x] IoT/embedded device support
-- [x] Cloud orchestration layer
-- [x] Gaming layer (Vulkan/DirectX compatibility)
+- [ ] SigmaOS Mobile variant
+- [ ] IoT/embedded device support
+- [ ] Cloud orchestration layer
+- [ ] Gaming layer (Vulkan/DirectX compatibility)
 
 ## Known Issues
 
 ### Build System
-- [x] Bootloader integration in progress (see INSTALL.md) - UEFI/BIOS bootloader implemented in `src/boot/`
-- [x] Justfile commands need testing on all platforms - Build commands verified
+- [ ] Bootloader integration in progress (see INSTALL.md)
+- [ ] Justfile commands need testing on all platforms
 
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference

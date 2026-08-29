@@ -1,8 +1,5 @@
 name: Arch Recipe Sandbox Packaging Pipeline
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: [ main, master, "feat/*" ]

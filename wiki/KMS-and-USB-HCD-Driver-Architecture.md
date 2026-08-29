@@ -8,10 +8,10 @@ SigmaOS features native clean-room driver architectures for **Direct Rendering M
 
 ## Key Modules
 
-- [`drivers/graphics/sigma_kms.cpp`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/drivers/graphics/sigma_kms.cpp): Hardware-level KMS pipeline, plane composition, and atomic display state swaps.
-- [`drivers/usb/sigma_usb_hcd.cpp`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/drivers/usb/sigma_usb_hcd.cpp): Extensible Host Controller (XHCI) transfer rings, command rings, and event ring interrupt handler.
-- [`kernel/drivers/sigma_driver_manager.cpp`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/kernel/drivers/sigma_driver_manager.cpp): High-performance C++ / Rust FFI driver lifecycle manager.
-- [`include/sigma_driver_codes.h`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/include/sigma_driver_codes.h): Unified status codes and IOCTL command definitions.
+- [`drivers/graphics/sigma_kms.cpp`](file:///home/aaryansinghchauhan/SigmaOS/drivers/graphics/sigma_kms.cpp): Hardware-level KMS pipeline, plane composition, and atomic display state swaps.
+- [`drivers/usb/sigma_usb_hcd.cpp`](file:///home/aaryansinghchauhan/SigmaOS/drivers/usb/sigma_usb_hcd.cpp): Extensible Host Controller (XHCI) transfer rings, command rings, and event ring interrupt handler.
+- [`kernel/drivers/sigma_driver_manager.cpp`](file:///home/aaryansinghchauhan/SigmaOS/kernel/drivers/sigma_driver_manager.cpp): High-performance C++ / Rust FFI driver lifecycle manager.
+- [`include/sigma_driver_codes.h`](file:///home/aaryansinghchauhan/SigmaOS/include/sigma_driver_codes.h): Unified status codes and IOCTL command definitions.
 
 ---
 
@@ -21,5 +21,4 @@ SigmaOS features native clean-room driver architectures for **Direct Rendering M
 |-----------|------------------|--------------|
 | **Sigma KMS** | Linux DRM/KMS | Zero-flicker boot transition, hardware cursor planes, gamma LUTs |
 | **Sigma USB HCD** | USB 3.2 Gen 2 (XHCI) | 64-byte TRB ring buffers, asynchronous endpoint scheduling, power suspend/resume |
-| **USB HID Keyboard** | USB HID 1.11 | NKRO rollover tracking, typematic auto-repeat, multi-layout translation (US, UK, DE, FR) |
 | **Driver Manager** | Sigma Unified Model | Hotplug detection, automatic driver binding via PCI class/vendor table |

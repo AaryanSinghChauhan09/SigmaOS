@@ -1,48 +1,89 @@
-# Getting Started with SigmaOS
-
-Welcome! This guide will walk you through building and running SigmaOS from source.
+# Getting Started
 
 ## Prerequisites
-To build SigmaOS, you will need:
-- Linux, macOS, or WSL2 on Windows
-- Rust toolchain (`rustup`)
-- QEMU (`qemu-system-x86_64` for running the OS)
-- `nasm` (for bootloader assembly)
-- `xorriso` and `grub-mkrescue` (for ISO generation)
 
-### Installing Rust
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustup default nightly
-rustup component add rust-src llvm-tools-preview
-```
+- Rust nightly toolchain (`rustup install nightly`)
+- `x86_64-unknown-none` target (`rustup target add x86_64-unknown-none`)
+- QEMU (`apt install qemu-system-x86` or equivalent)
+- Optional: `grub-mkrescue`, `xorriso` for ISO creation
 
-## Building SigmaOS from Source
-1. Clone the repository:
+## Clone & Build
+
 ```bash
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
+
+# Check compilation (no_std library)
+cargo check
+
+# Run tests
+cargo test
+
+# Build release
+cargo build --release
 ```
 
-2. Build the kernel:
+## Run in QEMU
+
 ```bash
-make build
-```
-This will compile the kernel and user-space components and bundle them into an ISO image (`build/sigmaos.iso`).
+# Smoke test via QEMU emulation
+python3 scripts/qemu_smoke_test.py --arch x86_64
 
-## Running in QEMU
-To run the generated ISO in QEMU, simply use:
+# Or manually:
+qemu-system-x86_64 -kernel target/release/sigma_kernel \
+    -m 512M -nographic -serial stdio
+```
+
+## Build ISO
+
 ```bash
-make run
+bash scripts/build-iso.sh
+# Output: build/sigmaos.iso
 ```
-You should see the SigmaOS bootloader, followed by the kernel initialization and a basic shell prompt.
 
-## Package Management with `sigpkg`
-Once booted into SigmaOS, you can use the built-in package manager `sigpkg` to install software:
+## Project Layout
+
+| Directory | Purpose |
+|---|---|
+| `src/` | Main SigmaOS Rust source |
+| `src/kernel/` | Microkernel (scheduler, memory, IRQ, crypto) |
+| `src/klib/` | Zero-stdlib collections |
+| `src/security/` | Security subsystems |
+| `src/distro/` | Linux distro-inspired implementations |
+| `kernel/` | Low-level kernel modules |
+| `bootloader/` | UEFI bootloader |
+| `crypto/` | Cryptographic primitives |
+| `tools/` | Native Unix tool replacements |
+| `scripts/` | Build and test automation |
+| `docs/` | Developer documentation |
+| `WIKI/` | Wiki pages (synced to GitHub Wiki) |
+
+## Key Commands
+
 ```bash
-sigpkg update
-sigpkg install htop
+# Run all tests
+cargo test --workspace 2>&1 | tail -20
+
+# Check for security issues
+cargo clippy -- -D warnings
+
+# Build for bare metal target
+cargo build --target x86_64-unknown-none --release
+
+# Sync wiki to GitHub
+bash scripts/sync_wiki.sh
+
+# Run integration tests
+cargo test --test integration_test
 ```
 
-## Contributing Guidelines
-We welcome contributions! Please see our [CONTRIBUTING.md](../docs/CONTRIBUTING.md) for details on our coding standards, PR process, and community guidelines.
+## Common Issues
+
+**`error[E0463]: can't find crate for 'std'`**
+→ You're building a `#[no_std]` crate. Use `cargo check` first; some sub-crates have std enabled for testing.
+
+**`error[E0277]: the trait bound is not satisfied`**
+→ Use `src/klib/` types instead of `std::collections`.
+
+**`CONFLICT` during git merge**
+→ All conflicts in SigmaOS should be resolved by keeping the more complete/improved version. Run `git add -A && git commit`.

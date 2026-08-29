@@ -44,56 +44,56 @@ impl SigmaPortage {
     pub fn emerge(&mut self, package: &str) -> Result<(), PortageError> {
         // Find ebuild
         let ebuild = self.tree.find_ebuild(package)?;
-
+        
         // Parse USE flags
         let use_flags = self.use_flags.resolve_for_package(&ebuild)?;
-
+        
         // Calculate dependencies
         let dependencies = self.calculate_dependencies(&ebuild, &use_flags)?;
-
+        
         // Emerge dependencies first
         for dep in dependencies {
             self.emerge(&dep)?;
         }
-
+        
         // Fetch sources
         self.fetch_sources(&ebuild)?;
-
+        
         // Unpack sources
         self.unpack_sources(&ebuild)?;
-
+        
         // Compile with USE flags
         self.compile_package(&ebuild, &use_flags)?;
-
+        
         // Install package
         self.install_package(&ebuild)?;
-
+        
         // Update database
         self.database.add_installed(&ebuild)?;
-
+        
         Ok(())
     }
-
+    
     pub fn update_use_flags(&mut self, package: &str, flags: Vec<String>) -> Result<(), PortageError> {
         // Update package.use
         self.update_package_use(package, flags)?;
-
+        
         // Rebuild package with new USE flags
         self.rebuild_package(package)?;
-
+        
         Ok(())
     }
-
+    
     pub fn set_profile(&mut self, profile: &str) -> Result<(), PortageError> {
         // Validate profile
         self.profiles.validate_profile(profile)?;
-
+        
         // Set system profile
         self.profiles.set_profile(profile)?;
-
+        
         // Rebuild system with new profile
         self.rebuild_system()?;
-
+        
         Ok(())
     }
 }
@@ -130,10 +130,10 @@ impl SigmaUseFlags {
         if !self.is_valid_flag(flag)? {
             return Err(UseFlagError::InvalidFlag(flag.to_string()));
         }
-
+        
         // Determine flag type
         let flag_type = self.get_flag_type(flag)?;
-
+        
         match flag_type {
             UseFlagType::Global => {
                 self.global_flags.insert(flag.to_string(), true);
@@ -146,36 +146,36 @@ impl SigmaUseFlags {
                 self.global_flags.insert(flag.to_string(), true);
             }
         }
-
+        
         Ok(())
     }
-
+    
     pub fn enable_flag_for_package(&mut self, package: &str, flag: &str) -> Result<(), UseFlagError> {
         let package_flags = self.package_flags.entry(package.to_string())
             .or_insert_with(HashMap::new);
-
+        
         package_flags.insert(flag.to_string(), true);
-
+        
         Ok(())
     }
-
+    
     pub fn get_effective_flags(&self, package: &str) -> Result<Vec<String>, UseFlagError> {
         let mut effective = Vec::new();
-
+        
         // Add global flags
         for (flag, enabled) in &self.global_flags {
             if *enabled {
                 effective.push(flag.clone());
             }
         }
-
+        
         // Add profile flags
         for (flag, enabled) in &self.profile_flags {
             if *enabled {
                 effective.push(flag.clone());
             }
         }
-
+        
         // Add package-specific flags
         if let Some(package_flags) = self.package_flags.get(package) {
             for (flag, enabled) in package_flags {
@@ -184,7 +184,7 @@ impl SigmaUseFlags {
                 }
             }
         }
-
+        
         Ok(effective)
     }
 }
@@ -214,36 +214,36 @@ impl SigmaProfiles {
     pub fn get_profile_chain(&self) -> Result<Vec<Profile>, ProfileError> {
         let mut chain = Vec::new();
         let mut current = self.current_profile.clone();
-
+        
         loop {
             let profile = self.available_profiles.iter()
                 .find(|p| p.name == current)
                 .ok_or(ProfileError::ProfileNotFound(current.clone()))?;
-
+            
             chain.push(profile.clone());
-
+            
             if let Some(ref parent) = profile.parent {
                 current = parent.clone();
             } else {
                 break;
             }
         }
-
+        
         Ok(chain)
     }
-
+    
     pub fn get_effective_settings(&self) -> Result<ProfileSettings, ProfileError> {
         let chain = self.get_profile_chain()?;
-
+        
         let mut settings = ProfileSettings::default();
-
+        
         // Merge settings from profile chain
         for profile in chain.iter().rev() {
             settings.use_flags.extend(profile.use_flags.clone());
             settings.package_mask.extend(profile.package_mask.clone());
             settings.package_unmask.extend(profile.package_unmask.clone());
         }
-
+        
         Ok(settings)
     }
 }
@@ -271,36 +271,36 @@ impl SigmaCompiler {
     pub fn optimize_for_system(&mut self) -> Result<(), CompilerError> {
         // Detect CPU features
         let cpu_features = self.detect_cpu_features()?;
-
+        
         // Generate optimal CFLAGS
         self.cflags = self.generate_cflags(&cpu_features)?;
-
+        
         // Set MAKEOPTS based on CPU cores
         let cores = self.get_cpu_cores()?;
         self.makeopts = format!("-j{}", cores);
-
+        
         Ok(())
     }
-
+    
     pub fn optimize_for_size(&mut self) -> Result<(), CompilerError> {
         // Set size optimization flags
         self.cflags = "-Os -pipe".to_string();
         self.cxxflags = self.cflags.clone();
-
+        
         // Enable link-time optimization
         self.ldflags = "-Wl,--as-needed -Wl,--strip-all".to_string();
-
+        
         Ok(())
     }
-
+    
     pub fn optimize_for_performance(&mut self) -> Result<(), CompilerError> {
         // Set performance optimization flags
         self.cflags = "-O3 -march=native -pipe".to_string();
         self.cxxflags = self.cflags.clone();
-
+        
         // Enable link-time optimization
         self.ldflags = "-Wl,--as-needed -Wl,--sort-common".to_string();
-
+        
         Ok(())
     }
 }
@@ -333,38 +333,38 @@ impl SigmaKernel {
     pub fn configure_kernel(&mut self, config: KernelConfig) -> Result<(), KernelError> {
         // Generate .config file
         self.generate_config(&config)?;
-
+        
         // Build kernel
         self.build_kernel()?;
-
+        
         // Build modules
         self.build_modules()?;
-
+        
         // Install kernel
         self.install_kernel()?;
-
+        
         Ok(())
     }
-
+    
     pub fn build_custom_kernel(&mut self, options: HashMap<String, bool>) -> Result<(), KernelError> {
         // Download kernel sources
         self.sources.download()?;
-
+        
         // Apply patches
         for patch in &self.sources.patches {
             self.apply_patch(patch)?;
         }
-
+        
         // Configure kernel
         self.config.options = options;
         self.configure_kernel(self.config.clone())?;
-
+        
         // Build initramfs
         self.initramfs.build()?;
-
+        
         // Update bootloader
         self.update_bootloader()?;
-
+        
         Ok(())
     }
 }
@@ -399,37 +399,37 @@ impl SigmaHardened {
         // Enable PIE
         self.pie_enabled = true;
         self.toolchain.features.push(HardenedFeature::PIE);
-
+        
         // Enable SSP
         self.ssp_enabled = true;
         self.toolchain.features.push(HardenedFeature::SSP);
-
+        
         // Enable RELRO
         self.toolchain.features.push(HardenedFeature::RELRO);
-
+        
         // Enable FORTIFY_SOURCE
         self.toolchain.features.push(HardenedFeature::FORTIFY_SOURCE);
-
+        
         // Enable ASLR
         self.aslr_enabled = true;
         self.enable_aslr()?;
-
+        
         // Update compiler flags
         self.update_hardened_cflags()?;
-
+        
         Ok(())
     }
-
+    
     pub fn apply_hardened_profile(&mut self) -> Result<(), HardenedError> {
         // Switch to hardened profile
         self.switch_profile("hardened/linux/amd64")?;
-
+        
         // Apply hardened USE flags
         self.apply_hardened_useflags()?;
-
+        
         // Rebuild system with hardened toolchain
         self.rebuild_system_hardened()?;
-
+        
         Ok(())
     }
 }
@@ -464,28 +464,28 @@ impl SigmaOverlays {
         let overlay_info = self.layman.overlay_list.iter()
             .find(|o| o.name == overlay)
             .ok_or(OverlayError::OverlayNotFound)?;
-
+        
         // Add overlay
         self.layman.add_overlay(overlay)?;
-
+        
         // Update Portage tree
         self.update_portage_tree()?;
-
+        
         // Add to active overlays
         self.active_overlays.push(overlay.to_string());
-
+        
         Ok(())
     }
-
+    
     pub fn sync_overlays(&mut self) -> Result<(), OverlayError> {
         // Sync all active overlays
         for overlay_name in &self.active_overlays {
             self.sync_single_overlay(overlay_name)?;
         }
-
+        
         // Update Portage cache
         self.update_portage_cache()?;
-
+        
         Ok(())
     }
 }
@@ -518,31 +518,31 @@ impl GentooMigrationAssistant {
             _ => Err(MigrationError::UnsupportedDistro),
         }
     }
-
+    
     fn migrate_from_arch(&self) -> Result<MigrationStatus, MigrationError> {
         // Analyze Arch system
         let analysis = self.analyze_arch_system()?;
-
+        
         // Map Arch packages to Gentoo equivalents
         let packages = self.package_mapper.map_arch_to_gentoo(analysis.packages)?;
-
+        
         // Determine appropriate USE flags
         let use_flags = self.recommend_use_flags(&analysis)?;
-
+        
         // Select profile
         let profile = self.recommend_profile(&analysis)?;
-
+        
         // Set up Gentoo system
         self.setup_gentoo_base(profile)?;
-
+        
         // Apply USE flags
         self.apply_use_flags(use_flags)?;
-
+        
         // Emerge packages
         for package in packages {
             self.emerge_package(&package)?;
         }
-
+        
         Ok(MigrationStatus::Success)
     }
 }

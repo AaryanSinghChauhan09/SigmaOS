@@ -1,6 +1,6 @@
 # 🐧 Linux Distro Ideas — Implementation in SigmaOS
 
-> **Wiki page** — This is the GitHub Wiki version.
+> **Wiki page** — This is the GitHub Wiki version.  
 > Source: [LINUX_DISTRO_IDEAS_IMPLEMENTATION.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LINUX_DISTRO_IDEAS_IMPLEMENTATION.md)
 
 ---

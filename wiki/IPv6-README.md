@@ -15,8 +15,8 @@ the Linux networking subsystem.
 
 ## Roadmap
 
-- [x] ICMPv6 core
+- [ ] ICMPv6 core
 
-- [x] DHCPv6 client
+- [ ] DHCPv6 client
 
-- [x] Multicast routing
+- [ ] Multicast routing
