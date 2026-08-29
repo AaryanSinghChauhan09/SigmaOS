@@ -1,125 +1,55 @@
-# 🏗️ SigmaOS Architecture
+# SigmaOS Architecture
 
-## System Layer Model
+SigmaOS is designed around a modern, capability-based microkernel architecture, taking inspiration from various operating systems while implementing strict memory safety through Rust.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    USER APPLICATIONS                     │
-│              (Native, Flatpak, AppImage, AUR)           │
-├─────────────────────────────────────────────────────────┤
-│                   DESKTOP ENVIRONMENT                    │
-│          Zenith Compositor + Sigma Shell + Wayland      │
-├─────────────────────────────────────────────────────────┤
-│                    SYSTEM SERVICES                       │
-│    sigma-init │ D-Bus │ Polkit │ sigma-journal │ NTP    │
-├─────────────────────────────────────────────────────────┤
-│                     S-AI LAYER                          │
-│      Orchestrator │ LLM Router │ Sigma Copilot │ NLU   │
-├─────────────────────────────────────────────────────────┤
-│                   SECURITY LAYER                        │
-│    SELinux │ AppArmor │ Sentinel │ pledge │ Seccomp    │
-├─────────────────────────────────────────────────────────┤
-│                    SIGMA KERNEL                         │
-│   EEVDF/BORE │ Memory │ IPC │ VFS │ Drivers │ eBPF    │
-├─────────────────────────────────────────────────────────┤
-│                     HARDWARE                            │
-│     x86_64 │ ARM64 │ RISC-V │ UEFI │ ACPI │ PCIe     │
-└─────────────────────────────────────────────────────────┘
+## Overall Architecture (Microkernel Design)
+
+Unlike monolithic kernels (like Linux or FreeBSD) where device drivers, filesystems, and the networking stack all run in a single privileged address space, SigmaOS isolates these components into separate, unprivileged user-space processes (servers). The microkernel itself is minimal and only handles:
+- Inter-Process Communication (IPC)
+- Thread scheduling
+- Basic memory management and paging
+- Hardware interrupt routing
+
+## Component Interaction Diagram
+
+```mermaid
+graph TD
+    A[User Applications] --> B[System Libraries libc/std]
+    B --> C[IPC System]
+    C --> D[Microkernel]
+    
+    E[Filesystem Server] --> C
+    F[Network Server] --> C
+    G[Device Drivers] --> C
+    
+    D --> H[Hardware]
 ```
 
-## Kernel Architecture
+## How the Kernel Boots
+1. **Bootloader**: The system is booted using a standard UEFI bootloader (or BIOS fallback) which loads the kernel and initial ramdisk into memory.
+2. **Early Init**: Architecture-specific initialization (GDT, IDT, basic paging on x86_64).
+3. **Kernel Main**: The Rust environment is established, memory allocators are initialized.
+4. **Driver Startup**: The kernel spawns the critical driver processes.
+5. **Init Process**: The first user-space process (PID 1) is started, which then orchestrates the rest of the system initialization (similar to runit or systemd).
 
-SigmaOS uses a **hybrid kernel** design — combining the performance of a monolithic kernel with the modularity of a microkernel:
+## Comparison to Linux Kernel Architecture
+- **Linux** is monolithic, meaning a crash in a device driver can panic the entire kernel.
+- **SigmaOS** isolates drivers. If a network driver crashes, the microkernel restarts it without halting the system.
 
-- **Critical path** (scheduler, memory, IPC) runs in kernel space for speed
-- **Drivers and subsystems** can be loaded as kernel modules
-- **eBPF** allows safe user-defined kernel extensions without recompilation
+## Comparison to FreeBSD Architecture
+- **FreeBSD** provides an integrated base system (kernel + userland). SigmaOS adopts this model, maintaining core utilities alongside the kernel in the same repository.
+- Unlike FreeBSD's monolithic kernel, SigmaOS isolates components for enhanced security.
 
-## Memory Architecture
+## Memory Layout
+SigmaOS uses standard higher-half kernel mapping:
+- Lower half: User-space applications.
+- Higher half: Kernel space (mapped in every process for fast syscalls, but protected via page permissions).
 
-### Paging Model
-- **x86_64**: 4-level page tables (PML4 → PDPT → PD → PT)
-- **ARM64**: 4-level translation tables (TTBRx)
-- **Page sizes**: 4KB, 2MB (huge pages), 1GB (giant pages)
+## Security Model
+- **Capabilities**: Access to resources (files, network ports) requires explicit capabilities passed via IPC, rather than global ambient authority (like root privileges).
+- **Namespaces**: Built-in support for mount, network, and PID namespaces for OCI container runtimes.
 
-### Memory Zones
-| Zone | Purpose |
-|------|---------|
-| DMA Zone | < 16MB, for legacy DMA hardware |
-| DMA32 Zone | < 4GB, for 32-bit DMA devices |
-| Normal Zone | > 4GB, general purpose |
-| High Zone | Temporary mappings (x86_32 legacy) |
-
-### Key Algorithms
-- **Buddy Allocator**: Power-of-2 block allocation for physical pages
-- **Slab Allocator**: Object caches for frequently allocated kernel structures
-- **kswapd**: Background daemon for memory reclamation using LRU lists
-- **KSM**: Kernel Same-page Merging for VM/container memory deduplication
-- **CoW**: Fork uses copy-on-write; pages only duplicated on first write
-
-## Scheduler Architecture
-
-SigmaOS implements multiple scheduler classes in priority order:
-
-1. **Stop class** — per-CPU stop tasks (highest priority)
-2. **Deadline class** — EDF for real-time periodic tasks
-3. **Realtime class** — FIFO/RR for soft real-time
-4. **Fair class (EEVDF+BORE)** — normal interactive and batch tasks
-5. **Idle class** — runs only when nothing else is ready
-
-### EEVDF Algorithm
-> Picks the **eligible** process with the **earliest virtual deadline**
-
-- **Eligible**: process whose `virtual_runtime ≤ system_vtime`
-- **Virtual deadline**: `vruntime + (time_slice / weight)`
-- **BORE enhancement**: CPU-burst penalty increases virtual deadline for batch tasks
-
-### NUMA-Aware Scheduling
-- Each NUMA node has its own run queue
-- Work-stealing balances load across CPUs
-- CPU cache affinity respected where possible
-
-## IPC Mechanisms
-
-| Mechanism | Use Case | Performance |
-|-----------|----------|-------------|
-| Shared Memory | Large data transfer | ~0 copy overhead |
-| Pipes | Sequential data streams | Low latency |
-| Unix Sockets | Local service communication | Low latency |
-| D-Bus | System service APIs | Moderate |
-| io_uring | Async I/O submission | Very high throughput |
-| eBPF Maps | Kernel ↔ userspace data | Near-zero overhead |
-
-## Security Architecture
-
-### Defence in Depth
-```
-Application Level:  pledge() + unveil() + Seccomp-BPF
-MAC Level:         SELinux policies + AppArmor profiles  
-Kernel Level:       KSPP hardening + W^X + KASLR + SMEP/SMAP
-Boot Level:         UEFI Secure Boot + TPM PCR sealing
-Network Level:      eBPF firewall + Zero-Trust + WireGuard
-Crypto Level:       Post-quantum (Kyber + Dilithium) + TLS 1.3
-```
-
-## S-AI Architecture
-
-```
-User Request
-     ↓
-Orchestrator (task decomposition + agent routing)
-     ↓
-LLM Router (selects best local model for subtask)
-     ↓
-Specialist Agents (code, analysis, system, security)
-     ↓
-Response Aggregation
-     ↓
-User
-```
-
-**Local LLM Backends**:
-- llama.cpp (GGUF models)
-- Ollama
-- LM Studio
-- vLLM (GPU-accelerated)
+## Inspiration
+- **Arch Linux / Gentoo**: Rolling release model and source-based customization options.
+- **NixOS**: Reproducible builds and declarative configuration.
+- **FreeBSD / OpenBSD**: Cohesive base system and aggressive security auditing (like OpenBSD's `pledge`/`unveil`).
