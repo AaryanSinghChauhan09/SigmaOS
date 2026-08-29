@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
-//! SigmaOS Algorithm & Subsystem Component Inspection Test Suite
-//!
-//! Deeply inspects core algorithms across scheduling, memory management,
-//! cryptographic key exchanges, network state machines, and filesystem journaling.
+// SigmaOS Algorithm & Subsystem Component Inspection Test Suite
+//
+// Deeply inspects core algorithms across scheduling, memory management,
+// cryptographic key exchanges, network state machines, and filesystem journaling.
+
+extern crate alloc;
 
 #[path = "../src/klib/mod.rs"]
 pub mod klib;

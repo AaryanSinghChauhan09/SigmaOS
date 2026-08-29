@@ -645,7 +645,6 @@ impl SQrexecChannel {
             core::ptr::write_bytes(self.buffer, 0, self.size);
             let layout = core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
             alloc::alloc::dealloc(self.buffer, layout);
->>>>>>> origin/jules-14722588689610922981-ea493e93
         }
     }
 }

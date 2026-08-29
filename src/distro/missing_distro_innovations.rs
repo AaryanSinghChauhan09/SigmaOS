@@ -174,10 +174,7 @@ impl Default for SolusEopkgManager {
 
 /// 5. Mageia Linux urpmi Dependency Solver
 pub struct MageiaUrpmiEngine {
-<<<<<<< HEAD
-=======
     pub urpmi_db: BTreeMap<String, Vec<String>>,
->>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
     pub package_database: BTreeMap<String, Vec<String>>,
 }
 
@@ -194,7 +191,7 @@ impl MageiaUrpmiEngine {
         plasma_deps.push(String::from("qtbase"));
         plasma_deps.push(String::from("kf5-kio"));
         db.insert(String::from("plasma-workspace"), plasma_deps);
-        Self { package_database: db }
+        Self { urpmi_db: db.clone(), package_database: db }
     }
 
     pub fn resolve_urpmi(&self, target_pkg: &str) -> Vec<String> {

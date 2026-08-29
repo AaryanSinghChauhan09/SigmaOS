@@ -733,13 +733,11 @@ mod tests {
 
         sync_engine.rank_mirrors();
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
-=======
 
         // Fail mirror 1 to trigger failover
         sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror2.sigmaos.org");
->>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
     }
 
     #[test]
@@ -751,6 +749,5 @@ mod tests {
         let rollback = journal.rollback_transaction(tx2);
         assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
-<<<<<<< HEAD
     }
 }
