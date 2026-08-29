@@ -10,7 +10,7 @@ use alloc::format;
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use alloc::collections::BTreeMap as HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

@@ -1,8 +1,11 @@
-// SPDX-License-Identifier: MIT
-//! SigmaOS Algorithm & Subsystem Component Inspection Test Suite
-//!
-//! Deeply inspects core algorithms across scheduling, memory management,
-//! cryptographic key exchanges, network state machines, and filesystem journaling.
+#[macro_use]
+extern crate alloc;
+extern crate std;
+
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
