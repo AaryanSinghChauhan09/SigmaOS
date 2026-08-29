@@ -103,6 +103,7 @@ pub mod crypto {
 pub mod distro_innovations;
 pub mod extended_distro_matrix;
 pub mod linuxmint_inspirations;
+pub mod arch_kernel_inspirations;
 
 pub use linuxmint_inspirations::{
     AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
@@ -111,4 +112,12 @@ pub use linuxmint_inspirations::{
     ProviderType, RenameRule, TransferOutcome, TvChannel, WebEngineKind, Webapp, WebappManager,
     XAppThemeEngine, ThingyEntry, ThingyKind, ThingyRecentDocs, WelcomeStep,
     WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
+};
+
+pub use arch_kernel_inspirations::{
+    AdvisorySeverity, AlpmAction, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
+    AlpmTransactionItem, Expectation, ExpectationKind, HookAction, InitramfsHook, KUnitEngine,
+    KUnitSuiteResult, KUnitTestCase, MkinitcpioHookFramework, PackageSignoff, RebuildOrderSolver,
+    ReproducibleBuildVerdict, ReproducibleStatus, SecurityAdvisory, SecurityAdvisoryTracker,
+    Signer, SignerPolicy, SignoffCount, SignoffEntry, SignstarService,
 };
