@@ -1,3 +1,6 @@
+use core::option::Option::{self, Some, None};
+use core::result::Result::{self, Ok, Err};
+use core::default::Default;
 extern crate alloc;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using Linux & BSD inspired task states and workload classifications.

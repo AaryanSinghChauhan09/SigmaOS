@@ -55,16 +55,22 @@ mod gap_closure;
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
-
-
 #[path = "../src/logging/unified.rs"]
 mod unified;
+#[path = "../src/process/sovereign_process_engine.rs"]
+mod sovereign_process_engine;
+#[path = "../src/shell/sovereign_shell_parity.rs"]
+mod sovereign_shell_parity;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
+#[path = "../src/klib/mod.rs"]
+mod klib;
 
-use wiki_ideas_implementation::SystemdUnitActiveState;
 use bsd_compat::*;
-use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unveil::{UnveilManager, UnveilPermission};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -178,7 +184,7 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas::{
+    use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitActiveState,

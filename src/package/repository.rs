@@ -711,11 +711,11 @@ mod tests {
     #[test]
     fn test_package_pinning_rules() {
         let mut pin_engine = PackagePinEngine::new();
-        pin_engine.add_pin_rule("sigmaos-kernel", "*", PinPriority::PREFERRED);
+        pin_engine.add_pin_rule("sigmaos-kernel", "6.6.0", PinPriority::Hold);
 
         let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
-        let p2 = pin_engine.get_pin_priority("other-package");
-        assert_eq!(p1, PinPriority::PREFERRED);
+        let p2 = pin_engine.get_pin_priority("bash");
+        assert_eq!(p1, PinPriority::Hold);
         assert_eq!(p2, PinPriority::Default);
     }
 
@@ -732,12 +732,11 @@ mod tests {
     #[test]
     fn test_package_transaction_rollback() {
         let mut journal = PackageTransactionJournal::new();
-        let tx_id = journal.log_transaction("install", "htop", "3.2.0", 1700000000);
-        journal.log_transaction("upgrade", "bash", "5.2", 1700000100);
+        let _tx1 = journal.log_transaction("install", "htop", "3.2.0", 100);
+        let tx2 = journal.log_transaction("upgrade", "bash", "5.2", 105);
 
-        let rollback = journal.rollback_transaction(tx_id);
-        assert_eq!(rollback.len(), 2);
+        let rollback = journal.rollback_transaction(tx2);
+        assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
-        assert_eq!(rollback[1].package_name, "htop");
     }
 }

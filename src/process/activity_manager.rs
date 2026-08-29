@@ -2,6 +2,9 @@
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
 
+#[cfg(not(test))]
+use crate::klib::HashMap;
+#[cfg(test)]
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 

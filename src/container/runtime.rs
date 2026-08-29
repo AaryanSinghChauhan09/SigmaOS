@@ -1052,7 +1052,7 @@ mod tests {
             ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
-            blocked_syscalls: Vec::new(),
+            blocked_syscalls: vec![0],
             hardened: true,
             blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
         };

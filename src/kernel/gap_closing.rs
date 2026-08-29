@@ -1217,7 +1217,7 @@ mod tests {
         fn mock_dispatch(_dev: &RootkitDeviceObject, _irp: &mut Irp) -> u32 {
             0
         }
-        let addr = mock_dispatch as usize;
+        let addr = mock_dispatch as *const () as usize;
         major_function[0] = Some(addr);
 
         let driver = RootkitDriverObject {
