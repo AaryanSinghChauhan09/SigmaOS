@@ -17,6 +17,7 @@ pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
+pub mod nix_dsl;
 pub mod nix_shell;
 pub mod pacman;
 pub mod portage;
@@ -72,6 +73,7 @@ pub use multi_distro::{
     StagedTransaction, TransactionRollbackHandler, XbpsCasExtractor,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use nix_dsl::{NixDerivationSpec, NixDslEvaluator, NixExpr};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};

@@ -14,6 +14,7 @@ pub mod integrity;
 pub mod intrusion;
 pub mod mac;
 pub mod password;
+pub mod openbsd_karl;
 pub mod pki;
 pub mod pledge;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
@@ -31,12 +32,9 @@ pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
 
+pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;
-pub use root_improvement::{
-    BsdSecurelevelGuard, CapSplitter, DoasRuleEngine, PamEngine, PolkitEnforcer,
-    RootlessNamespaceManager, SubUidGidMapper, SudoDoasElevator,
-};
-
+pub use root_improvement::*;
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
