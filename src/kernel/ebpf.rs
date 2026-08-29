@@ -267,6 +267,106 @@ impl EbpfVm {
 }
 
 // =========================================================================
+// IN-KERNEL TRACEPROBES & PERF EVENT RING BUFFER (DTrace/ftrace Style)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ProbeType {
+    Kprobe,
+    Kretprobe,
+    Tracepoint,
+    PerfEvent,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PerfEvent {
+    pub timestamp_nanos: u64,
+    pub cpu_id: u32,
+    pub pid: u32,
+    pub probe_type: ProbeType,
+    pub sample_value: u64,
+}
+
+pub struct PerfEventRingBuffer {
+    events: Vec<PerfEvent>,
+    max_capacity: usize,
+}
+
+impl PerfEventRingBuffer {
+    pub fn new(max_capacity: usize) -> Self {
+        Self {
+            events: Vec::new(),
+            max_capacity,
+        }
+    }
+
+    pub fn push_event(&mut self, event: PerfEvent) {
+        if self.events.len() >= self.max_capacity {
+            self.events.remove(0);
+        }
+        self.events.push(event);
+    }
+
+    pub fn pop_event(&mut self) -> Option<PerfEvent> {
+        if self.events.is_empty() {
+            None
+        } else {
+            Some(self.events.remove(0))
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.events.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.events.is_empty()
+    }
+}
+
+pub struct TraceprobeManager {
+    probes: BTreeMap<ProbeType, EbpfVm>,
+    pub perf_ring_buffer: PerfEventRingBuffer,
+}
+
+impl TraceprobeManager {
+    pub fn new(ring_buffer_capacity: usize) -> Self {
+        Self {
+            probes: BTreeMap::new(),
+            perf_ring_buffer: PerfEventRingBuffer::new(ring_buffer_capacity),
+        }
+    }
+
+    pub fn attach_probe(&mut self, probe_type: ProbeType, vm: EbpfVm) {
+        self.probes.insert(probe_type, vm);
+    }
+
+    pub fn trigger_probe(
+        &mut self,
+        probe_type: ProbeType,
+        context: &[u8],
+        timestamp: u64,
+        cpu_id: u32,
+        pid: u32,
+    ) -> Result<u64, &'static str> {
+        if let Some(vm) = self.probes.get_mut(&probe_type) {
+            let result = vm.run(context)?;
+            let event = PerfEvent {
+                timestamp_nanos: timestamp,
+                cpu_id,
+                pid,
+                probe_type,
+                sample_value: result,
+            };
+            self.perf_ring_buffer.push_event(event);
+            Ok(result)
+        } else {
+            Err("Traceprobe: Probe type not attached")
+        }
+    }
+}
+
+// =========================================================================
 // TESTS
 // =========================================================================
 
@@ -400,5 +500,33 @@ mod tests {
             assert!(map.delete_elem(&key).is_ok());
             assert!(map.lookup_elem(&key).is_none());
         }
+    }
+
+    #[test]
+    fn test_traceprobe_and_perf_event_ring_buffer() {
+        let bytecode = vec![
+            // R0 = 100 (simulated probe metric output)
+            EbpfInstruction {
+                opcode: BPF_LD,
+                dst_reg: 0,
+                src_reg: 0,
+                offset: 0,
+                imm: 100,
+            },
+        ];
+
+        let vm = EbpfVm::new(bytecode);
+        let mut manager = TraceprobeManager::new(5);
+
+        manager.attach_probe(ProbeType::Kprobe, vm);
+
+        let res = manager.trigger_probe(ProbeType::Kprobe, &[], 1718900000, 0, 1001);
+        assert_eq!(res.unwrap(), 100);
+
+        assert_eq!(manager.perf_ring_buffer.len(), 1);
+        let event = manager.perf_ring_buffer.pop_event().unwrap();
+        assert_eq!(event.sample_value, 100);
+        assert_eq!(event.pid, 1001);
+        assert_eq!(event.probe_type, ProbeType::Kprobe);
     }
 }

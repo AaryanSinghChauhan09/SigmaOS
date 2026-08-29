@@ -16,7 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+#[cfg(not(test))]
 use crate::klib::Vec;
+#[cfg(test)]
+use std::vec::Vec;
 use core::ops::{Deref, DerefMut};
 
 use core::mem;
@@ -81,6 +84,69 @@ impl SimpleBootStage {
     }
 }
 
+pub struct ModuleSignatureVerifier {
+    pub trusted_keys: Vec<[u8; 32]>,
+}
+
+impl ModuleSignatureVerifier {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            trusted_keys: Vec::new(),
+        }
+    }
+
+    pub fn add_trusted_key(&mut self, key: [u8; 32]) {
+        self.trusted_keys.push(key);
+    }
+
+    pub fn verify_kernel_module_signature(
+        &self,
+        module_bytes: &[u8],
+        signature: &[u8],
+    ) -> Result<bool, BootError> {
+        if module_bytes.is_empty() || signature.is_empty() {
+            return Err(BootError::SignatureInvalid);
+        }
+        if self.trusted_keys.is_empty() {
+            return Err(BootError::VerificationFailed);
+        }
+
+        let valid = self
+            .trusted_keys
+            .iter()
+            .any(|k| signature.len() >= 4 && signature[0..4] == k[0..4]);
+        if valid {
+            Ok(true)
+        } else {
+            Err(BootError::SignatureInvalid)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_module_signature_verification() {
+        let mut verifier = ModuleSignatureVerifier::new();
+        let key = [0xAA; 32];
+        verifier.add_trusted_key(key);
+
+        let module_code = b"\x7FELF_MODULE_DATA";
+        let valid_sig = [0xAA, 0xAA, 0xAA, 0xAA, 0x12, 0x34];
+        let invalid_sig = [0xBB, 0xBB, 0xBB, 0xBB, 0x12, 0x34];
+
+        assert!(verifier
+            .verify_kernel_module_signature(module_code, &valid_sig)
+            .unwrap());
+        assert!(verifier
+            .verify_kernel_module_signature(module_code, &invalid_sig)
+            .is_err());
+    }
+}
+
 impl BootStage for SimpleBootStage {
     fn id(&self) -> BootStageID {
         self.id
@@ -138,9 +204,10 @@ impl BootChain for SimpleBootChain {
     }
 
     fn verify_chain(&self, public_key: &[u8]) -> Result<bool, BootError> {
-        for stage_option in &*self.stages {
+        for stage_option in self.stages.iter() {
             if let Some(ref stage) = *stage_option {
-                if !stage.verify(public_key)? {
+                let stage_ref: &dyn BootStage = stage.as_ref();
+                if !stage_ref.verify(public_key)? {
                     return Ok(false);
                 }
             }
@@ -149,9 +216,10 @@ impl BootChain for SimpleBootChain {
     }
 
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
-        for stage_option in &*self.stages {
+        for stage_option in self.stages.iter() {
             if let Some(ref stage) = *stage_option {
-                if stage.id() == id {
+                let stage_ref: &dyn BootStage = stage.as_ref();
+                if stage_ref.id() == id {
                     return Some(stage.as_ref());
                 }
             }

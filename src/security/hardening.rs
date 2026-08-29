@@ -2,8 +2,17 @@
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
 
+#[cfg(not(test))]
 use crate::klib::Vec;
-use crate::security::Permission;
+#[cfg(test)]
+use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+    NetworkTcp,
+}
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -134,7 +143,7 @@ impl HardenedAuditTrail {
             }
 
             let payload = log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1 } else { 0 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211);
+            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211u64);
 
             if log.entry_hash != calculated_hash {
                 return false; // Entry hash mismatch! Tampering detected!
@@ -150,6 +159,86 @@ impl HardenedAuditTrail {
 impl Default for HardenedAuditTrail {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub struct KaslrEntropyGenerator {
+    pub current_entropy: core::sync::atomic::AtomicU64,
+}
+
+impl KaslrEntropyGenerator {
+    pub const fn new(initial_seed: u64) -> Self {
+        Self {
+            current_entropy: core::sync::atomic::AtomicU64::new(initial_seed),
+        }
+    }
+
+    pub fn generate_page_offset(&self) -> u64 {
+        let val = self.current_entropy.fetch_add(0x9E37_79B9_7F4A_7C15, Ordering::SeqCst);
+        val & 0x0000_3FFF_FFFF_F000
+    }
+}
+
+pub struct SmepSmapGuard {
+    pub smep_active: core::sync::atomic::AtomicBool,
+    pub smap_active: core::sync::atomic::AtomicBool,
+}
+
+impl SmepSmapGuard {
+    #[allow(clippy::new_without_default)]
+    pub const fn new() -> Self {
+        Self {
+            smep_active: core::sync::atomic::AtomicBool::new(true),
+            smap_active: core::sync::atomic::AtomicBool::new(true),
+        }
+    }
+
+    pub fn validate_kernel_access_to_user(&self, user_addr: usize) -> bool {
+        if self.smap_active.load(Ordering::SeqCst) {
+            user_addr >= 0x0000_7FFF_FFFF_FFFF
+        } else {
+            true
+        }
+    }
+}
+
+pub struct StackCanaryValidator {
+    pub global_canary: u64,
+}
+
+impl StackCanaryValidator {
+    pub const fn new(canary_secret: u64) -> Self {
+        Self {
+            global_canary: canary_secret,
+        }
+    }
+
+    pub fn verify_canary(&self, frame_canary: u64) -> bool {
+        frame_canary == self.global_canary
+    }
+}
+
+pub struct KptiPageTableGate {
+    pub user_pml4_root: usize,
+    pub kernel_pml4_root: usize,
+    pub kpti_active: core::sync::atomic::AtomicBool,
+}
+
+impl KptiPageTableGate {
+    pub fn new(user_root: usize, kernel_root: usize) -> Self {
+        Self {
+            user_pml4_root: user_root,
+            kernel_pml4_root: kernel_root,
+            kpti_active: core::sync::atomic::AtomicBool::new(true),
+        }
+    }
+
+    pub fn active_page_table_for_privilege(&self, is_user_mode: bool) -> usize {
+        if self.kpti_active.load(Ordering::SeqCst) && is_user_mode {
+            self.user_pml4_root
+        } else {
+            self.kernel_pml4_root
+        }
     }
 }
 
@@ -204,5 +293,26 @@ mod tests {
 
         // Integrity verification must detect this modification instantly!
         assert!(!audit.verify_integrity());
+    }
+
+    #[test]
+    fn test_kernel_hardening_mitigations() {
+        let kaslr = KaslrEntropyGenerator::new(0xDEAD_BEEF);
+        let offset1 = kaslr.generate_page_offset();
+        let offset2 = kaslr.generate_page_offset();
+        assert_ne!(offset1, offset2);
+        assert_eq!(offset1 % 4096, 0);
+
+        let smep_smap = SmepSmapGuard::new();
+        assert!(smep_smap.validate_kernel_access_to_user(0x0000_8000_0000_0000));
+
+        let canary_val = 0x1337_7331;
+        let validator = StackCanaryValidator::new(canary_val);
+        assert!(validator.verify_canary(canary_val));
+        assert!(!validator.verify_canary(0xBAD));
+
+        let kpti = KptiPageTableGate::new(0x1000, 0x2000);
+        assert_eq!(kpti.active_page_table_for_privilege(true), 0x1000);
+        assert_eq!(kpti.active_page_table_for_privilege(false), 0x2000);
     }
 }

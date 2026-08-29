@@ -5,6 +5,12 @@ pub mod memory;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod ebpf;
+
+pub use ebpf::{
+    EbpfInstruction, EbpfMap, EbpfMapRegistry, EbpfMapType, EbpfVm, PerfEvent,
+    PerfEventRingBuffer, ProbeType, TraceprobeManager,
+};
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,

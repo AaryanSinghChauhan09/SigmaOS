@@ -84,10 +84,13 @@ impl Process {
     }
 }
 
-/// EEVDF & EDF Hybrid Real-Time Scheduler
+/// EEVDF & EDF Hybrid Real-Time Scheduler with FreeBSD ULE Interactivity Tunables
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
+    pub interactivity_threshold: u64,
+    pub interactive_quantum_ms: u64,
+    pub batch_quantum_ms: u64,
 }
 
 impl Scheduler {
@@ -95,6 +98,18 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
+            interactivity_threshold: 30,
+            interactive_quantum_ms: 1,
+            batch_quantum_ms: 10,
+        }
+    }
+
+    /// Calculates FreeBSD ULE / CFS interactive workload-adaptive dynamic time-slice
+    pub fn calculate_dynamic_time_slice(&self, process: &Process) -> Duration {
+        if process.burst_score < self.interactivity_threshold {
+            Duration::from_millis(self.interactive_quantum_ms)
+        } else {
+            Duration::from_millis(self.batch_quantum_ms)
         }
     }
 
@@ -260,5 +275,26 @@ mod tests {
         scheduler.decay_process_bursts();
         let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
         assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
+    }
+
+    #[test]
+    fn test_ule_scheduler_tunables() {
+        let mut scheduler = Scheduler::new();
+        scheduler.interactivity_threshold = 20;
+        scheduler.interactive_quantum_ms = 2;
+        scheduler.batch_quantum_ms = 15;
+
+        let interactive_proc = Process::new(10, "gui".to_string(), Priority::Normal);
+        let mut batch_proc = Process::new(11, "compile".to_string(), Priority::Normal);
+        batch_proc.burst_score = 50;
+
+        assert_eq!(
+            scheduler.calculate_dynamic_time_slice(&interactive_proc),
+            Duration::from_millis(2)
+        );
+        assert_eq!(
+            scheduler.calculate_dynamic_time_slice(&batch_proc),
+            Duration::from_millis(15)
+        );
     }
 }
