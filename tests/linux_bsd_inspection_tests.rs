@@ -70,6 +70,8 @@ mod sovereign_shell_parity;
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
+#[path = "../src/input/keyboard.rs"]
+mod keyboard_driver;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 
@@ -781,6 +783,29 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+}
+
+#[test]
+fn test_usb_hid_keyboard_driver_linux_bsd_parity_inspection() {
+    use keyboard_driver::{UsbHidKeyboardDriver, HID_MODIFIER_LSHIFT, HID_LED_CAPS_LOCK, HID_LED_NUM_LOCK};
+
+    let mut driver = UsbHidKeyboardDriver::new();
+    driver.set_repeat_rate(500, 25);
+    assert_eq!(driver.repeat_delay_ms, 500);
+    assert_eq!(driver.repeat_rate_hz, 25);
+
+    let leds = driver.update_led_state(true, true, false);
+    assert_eq!(leds, HID_LED_NUM_LOCK | HID_LED_CAPS_LOCK);
+
+    // Simulate pressing key 'b' (HID 0x05) with Shift modifier
+    let report = [HID_MODIFIER_LSHIFT, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00];
+    let pressed = driver.process_input_report(&report).unwrap();
+    assert_eq!(pressed, 1);
+    assert_eq!(driver.key_press_events[0], 0x05);
+
+    // CapsLock (on) + Shift (pressed) -> lowercase 'b'
+    let ascii = driver.decode_hid_key_to_ascii(0x05);
+    assert_eq!(ascii, 'b');
 }
 
 #[test]

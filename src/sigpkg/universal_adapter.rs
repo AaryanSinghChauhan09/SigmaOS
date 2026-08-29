@@ -23,6 +23,7 @@ pub struct PacmanPkgbuild {
 }
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use crate::sigpkg::universal_engine::PackageFormat;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
 
@@ -305,6 +306,90 @@ impl UniversalPackageAdapter {
             }
         }
         permissions
+    }
+
+    /// Detects package format based on file extension
+    pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
+        let f = filename.to_lowercase();
+        if f.ends_with(".deb") || f.ends_with(".udeb") {
+            Some(PackageFormat::Apt)
+        } else if f.ends_with(".rpm") {
+            Some(PackageFormat::Yum)
+        } else if f.ends_with(".pkg.tar.zst") || f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.gz") {
+            Some(PackageFormat::Pacman)
+        } else if f.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if f.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if f.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if f.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if f.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if f.ends_with(".ports") || f.ends_with(".portage") {
+            Some(PackageFormat::Ports)
+        } else if f.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if f.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if f.ends_with(".tar.xz") || f.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if f.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if f.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if f.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if f.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if f.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if f.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if f.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if f.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if f.ends_with(".ebuild") {
+            Some(PackageFormat::Portage)
+        } else if f.ends_with(".eopkg") {
+            Some(PackageFormat::Pisi)
+        } else if f.ends_with(".flatpak") {
+            Some(PackageFormat::Apt)
+        } else if f.ends_with(".snap") {
+            Some(PackageFormat::Apt)
+        } else if f.ends_with(".appimage") {
+            Some(PackageFormat::Sovereign)
+        } else {
+            None
+        }
+    }
+
+    /// Detects package format based on header byte signatures (magic bytes)
+    pub fn detect_format_by_header(&self, data: &[u8]) -> Option<PackageFormat> {
+        if data.len() < 4 {
+            return None;
+        }
+        if data.starts_with(b"!<arch>\n") {
+            Some(PackageFormat::Apt) // .deb AR archive
+        } else if data[0] == 0xED && data[1] == 0xAB && data[2] == 0xEE && data[3] == 0xDB {
+            Some(PackageFormat::Yum) // .rpm magic
+        } else if data.starts_with(b"\x1f\x8b") {
+            Some(PackageFormat::TarGz) // gzip magic
+        } else if data.starts_with(b"\xfd7zXZ\x00") {
+            Some(PackageFormat::TarXz) // xz magic
+        } else if data.starts_with(b"PK\x03\x04") {
+            Some(PackageFormat::Aab) // zip-based (.apk, .ipa, .aab, .hap, .air)
+        } else if data.len() >= 265 && &data[257..262] == b"ustar" {
+            Some(PackageFormat::Tar) // POSIX tar archive magic
+        } else if data.starts_with(b"SPKG") {
+            Some(PackageFormat::Sovereign) // Native SigPkg magic
+        } else {
+            None
+        }
     }
 
     /// Standardizes any foreign parsed manifest into SigmaOS native Package models
@@ -704,5 +789,35 @@ mod tests {
         assert_eq!(meta.target_distro, "RHEL");
         assert_eq!(meta.virtual_size_bytes, 21474836480);
         assert_eq!(meta.entry_cmd, Some("/usr/sbin/init".to_string()));
+    }
+
+    #[test]
+    fn test_multi_format_extension_and_header_detection() {
+        let adapter = UniversalPackageAdapter::new();
+
+        // Check format detection by extension
+        assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
+        assert_eq!(adapter.detect_format_by_extension("lib.bottle"), Some(PackageFormat::Bottle));
+        assert_eq!(adapter.detect_format_by_extension("game.ipa"), Some(PackageFormat::Ipa));
+        assert_eq!(adapter.detect_format_by_extension("custom.ports"), Some(PackageFormat::Ports));
+        assert_eq!(adapter.detect_format_by_extension("base.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(adapter.detect_format_by_extension("mobile.aab"), Some(PackageFormat::Aab));
+        assert_eq!(adapter.detect_format_by_extension("alpine.apk"), Some(PackageFormat::Apk));
+        assert_eq!(adapter.detect_format_by_extension("app.appimage"), Some(PackageFormat::Sovereign));
+        assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Pisi));
+        assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+        assert_eq!(adapter.detect_format_by_extension("ubuntu.deb"), Some(PackageFormat::Apt));
+        assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
+        assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
+        assert_eq!(adapter.detect_format_by_extension("harmony.hap"), Some(PackageFormat::Hap));
+        assert_eq!(adapter.detect_format_by_extension("slax.lzm"), Some(PackageFormat::Lzm));
+        assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(PackageFormat::Pup));
+        assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
+
+        // Check format detection by header signature magic
+        assert_eq!(adapter.detect_format_by_header(b"!<arch>\ncontrol.tar.xz"), Some(PackageFormat::Apt));
+        assert_eq!(adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]), Some(PackageFormat::Yum));
+        assert_eq!(adapter.detect_format_by_header(b"PK\x03\x04payload"), Some(PackageFormat::Aab));
+        assert_eq!(adapter.detect_format_by_header(b"SPKG0001header"), Some(PackageFormat::Sovereign));
     }
 }
