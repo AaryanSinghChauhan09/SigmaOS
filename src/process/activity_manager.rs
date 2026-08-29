@@ -2,7 +2,7 @@
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Process activity state classification

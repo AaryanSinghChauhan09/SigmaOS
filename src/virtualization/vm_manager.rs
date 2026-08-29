@@ -4,7 +4,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use alloc::format;
 
 /// VM configuration
@@ -208,10 +208,8 @@ pub enum KvmExitReason {
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
     Hlt,
-    Interrupt,
     Shutdown,
     InternalError,
-    Interrupt,
 }
 
 /// KVM vCPU register state

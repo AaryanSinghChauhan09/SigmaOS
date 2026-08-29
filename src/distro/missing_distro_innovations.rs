@@ -1,5 +1,5 @@
 extern crate alloc;
-use crate::klib::HashMap;
+use std::collections::HashMap;
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)
@@ -174,7 +174,7 @@ impl Default for SolusEopkgManager {
 
 /// 5. Mageia Linux urpmi Dependency Solver
 pub struct MageiaUrpmiEngine {
-    pub urpmi_db: crate::klib::BTreeMap<String, Vec<String>>,
+    pub urpmi_db: BTreeMap<String, Vec<String>>,
     pub package_database: BTreeMap<String, Vec<String>>,
 }
 

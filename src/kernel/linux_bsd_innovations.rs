@@ -6,7 +6,7 @@ use alloc::string::String;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
@@ -123,7 +123,7 @@ impl BsdPfStateTable {
                     .last_seen_timestamp_sec
                     .saturating_add(state.timeout_sec)
             {
-                expired_keys.push(tuple.clone());
+                expired_keys.push((*tuple).clone());
             }
         }
         let count = expired_keys.len();

@@ -609,6 +609,11 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.insert(task.pid, task);
     }
 
+    /// Selects the highest priority / earliest deadline real-time task.
+    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
+        self.rt_tasks.values().min_by_key(|t| t.deadline_us)
+    }
+
     /// Selects optimal NUMA node for memory and thread affinity binding.
     pub fn select_optimal_numa_node(&self, cpu_core: usize) -> Option<usize> {
         self.numa_nodes.iter().find(|n| n.cpu_cores.contains(&cpu_core)).map(|n| n.node_id)

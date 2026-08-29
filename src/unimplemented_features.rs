@@ -9,7 +9,7 @@ use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
