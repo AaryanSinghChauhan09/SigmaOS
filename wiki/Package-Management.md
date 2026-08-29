@@ -1,86 +1,23 @@
-# SigmaOS Package Management
+# Package Management (`sigpkg`)
 
-## Universal Package Manager (sigma-pkg)
+`sigpkg` is the universal package management system for SigmaOS. It handles dependency resolution, atomic upgrades, and source-based compilation.
 
-```
-sigma-pkg (Universal Frontend)
-  ↓
-Native sigma | .deb bridge | .rpm bridge | AUR | Flatpak | AppImage
-  ↓
-Content-Addressed Package Store (hash-indexed)
-```
+## Package Format (`.spkg`)
+The `.spkg` format is a compressed tarball containing:
+- Compiled binaries / shared libraries
+- System configuration defaults
+- A manifest file (JSON/TOML) defining dependencies, capabilities required, and metadata.
 
-## sigma-pkg Commands
+## Dependency Resolution
+`sigpkg` uses a SAT solver-based approach (similar to DNF and Zypper) to ensure dependency graphs are correctly evaluated without conflicts.
 
-```bash
-sigma-pkg search firefox
-sigma-pkg install firefox
-sigma-pkg remove firefox
-sigma-pkg upgrade         # update all packages
-sigma-pkg info firefox
-sigma-pkg list --installed
-sigma-pkg verify firefox  # integrity check
-sigma-pkg rollback        # undo last transaction
-sigma-pkg history
-sigma-pkg audit           # CVE scan
-```
+## USE Flags Support
+Inspired by Gentoo's Portage, `sigpkg` allows users to compile packages from source with specific `USE` flags to enable or disable features (e.g., `+wayland`, `-x11`, `+alsa`).
 
-## Package Security
+## OCI Container Integration
+`sigpkg` can pull and extract standard OCI container images directly into SigmaOS namespaces, functioning both as a system package manager and a container image manager.
 
-All packages signed with **Dilithium-5** (post-quantum signature).
-
-Verification:
-1. Verify Dilithium-5 signature against keyring
-2. Verify SHA-512 archive hash
-3. Verify individual file hashes
-4. Check dependency satisfiability
-
-## AUR Compatibility
-
-```bash
-sigma-aur install visual-studio-code-bin
-sigma-aur search yay
-sigma-aur upgrade
-```
-
-Build process: PKGBUILD clone → source download → checksum verify → build → package → install
-
-## Flatpak Integration
-
-```bash
-sigma-flatpak install flathub org.mozilla.firefox
-sigma-flatpak run org.mozilla.firefox
-sigma-flatpak update
-```
-
-## AppImage Support
-
-```bash
-./application.AppImage           # run directly
-sigma-appimage install app.AppImage  # integrate into system
-```
-
-## Content-Addressed Store
-
-```
-/var/sigma/store/
-├── sha512-a1b2c3.../  firefox 128.0
-├── sha512-d4e5f6.../  libgtk3 3.24
-└── sha512-g7h8i9.../  libglib 2.78
-```
-
-Benefits: Multi-version install, atomic rollback, deduplication.
-
-## Declarative Packages (NixOS-style)
-
-```nix
-{
-  packages = ["firefox" "vim" "git"];
-  sigma.enableAUR = true;
-  flatpak.packages = ["org.videolan.VLC"];
-}
-```
-
-```bash
-sigma-nix apply /etc/sigma/packages.nix
-```
+## Comparison to Legacy Tools
+- **APT / DPKG (Debian)**: `sigpkg` is faster and supports atomic rollbacks.
+- **Pacman (Arch)**: `sigpkg` borrows the simplicity and speed of pacman, while adding source-compilation capabilities.
+- **Nix**: While not fully declarative like Nix, `sigpkg` supports isolated package profiles to prevent dependency hell.
