@@ -113,5 +113,5 @@ pub use linux_bsd_inspirations::{
     FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
     SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage,
+    HermeticStoreClosureEngine, StoreClosurePackage, SovereignUniversalDistroBridge, DistroSubsystemMode,
 };

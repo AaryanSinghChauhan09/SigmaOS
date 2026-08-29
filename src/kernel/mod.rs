@@ -10,6 +10,7 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
+pub mod crashdump_netconsole;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
@@ -77,6 +78,10 @@ pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+pub use crashdump_netconsole::{
+    CpuRegisterState, KdumpConfig, KdumpHeader, NetconsoleConfig, PersistentCrashDump,
+    SovereignKdumpManager, SovereignNetconsole,
+};
 pub use linux_bsd_innovations::{
     ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
     LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,

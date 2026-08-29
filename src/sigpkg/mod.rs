@@ -18,6 +18,8 @@ pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
 pub mod nix_dsl;
+pub mod package_snapshot_rollback;
+pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod pacman;
 pub mod portage;
@@ -86,6 +88,14 @@ pub use spec::{
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 pub use verifier::CryptoVerifier;
+pub use package_snapshot_rollback::{
+    SovereignPackageSnapshotRollbackEngine, PackageSnapshotState, PackageSnapshotDiff,
+    InstalledPackageRecord,
+};
+pub use sovereign_package_innovations::{
+    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
+    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
