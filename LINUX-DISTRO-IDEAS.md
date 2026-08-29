@@ -1,171 +1,60 @@
-# SigmaOS Linux Distro Ideas & Inspirations
+# SigmaOS Linux & BSD Distro Ideas Implementation Guide
 
-> A comprehensive collection of ideas, features, and philosophies absorbed from leading Linux distributions into SigmaOS.
+This document tracks ideas adopted from major Linux distributions and BSDs into SigmaOS.
 
----
+## Implementation Status
 
-## 🌊 Overview
-
-SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD systems, and beyond. This document catalogs those inspirations and tracks their implementation status.
-
----
-
-## 👑 Sovereign Distro Dominance (SigmaOS Exclusive Integrations)
-
-| Feature | Inspired By | Status | Implementation |
-|---------|-------------|--------|----------------|
-| **NixGuixZeroCopyStore** | NixOS / GNU Guix | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
-| **CachyBoreDynamicAiScheduler** | CachyOS / BORE Scheduler | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
-| **OpenBsdHardenedCapsicumPledge** | FreeBSD Capsicum / OpenBSD pledge | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
-| **ZfsBtrfsHybridSelfHealingCoW** | OpenZFS / openSUSE Btrfs | ✅ Implemented | `src/distro/sovereign_distro_dominance.rs` |
-
----
-
-## 🐧 Arch Linux Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Rolling Release** | Continuous updates without version bumps | ✅ Implemented | `src/sigpkg/mod.rs` |
-| **AUR-Style UPS** | User Package Store (SigmaOS equivalent) | ✅ Implemented | `src/sigpkg/arch_compat.rs` |
-| **pacman Philosophy** | Simple, fast package manager | ✅ Implemented | `src/sigpkg/mod.rs` |
-| **makepkg equivalent** | Source-based package building | 🚧 In Progress | `src/sigpkg/build.rs` |
-| **Arch Wiki quality docs** | Comprehensive, accurate documentation | ✅ Implemented | This Wiki |
-| **KISS Philosophy** | Keep It Simple, Stupid | ✅ Core Design | All components |
-| **Initramfs customization** | Custom early userspace | 🚧 In Progress | `scripts/initramfs/` |
-
-## 🎉 Ubuntu/Debian Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **snap-like containment** | Application sandboxing | ✅ Implemented | `src/package/universal.rs` |
-| **apt-like dependency resolution** | Smart dep solving | ✅ Implemented | `src/sigpkg/solver.rs` |
-| **Ubuntu HWE** | Hardware Enablement Stack | 🚧 In Progress | `src/driver/hwe.rs` |
-| **Ubuntu Pro features** | Extended security maintenance | ✅ Implemented | `src/unimplemented_tools.rs` |
-| **Netplan networking** | YAML-based network config | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-| **cloud-init** | Cloud instance initialization | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-
-## 🐾 Fedora/RHEL Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **rpm-ostree** | Image-based OS updates | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-| **Silverblue immutability** | Immutable OS design | ✅ Implemented | `src/distro/linux_bsd_parity_extended.rs` |
-| **SELinux policies** | Mandatory access control | ✅ Implemented | `src/security/mod.rs` |
-| **systemd-boot** | UEFI boot manager | ✅ Implemented | `src/boot/mod.rs` |
-| **Fedora Toolbox** | Container-based dev envs | ✅ Implemented | `src/unimplemented_tools.rs` |
-| **DNF4/5 features** | Fast package management | 🚧 In Progress | `src/sigpkg/mod.rs` |
-
-## 🐍 Gentoo Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **USE flags system** | Fine-grained feature control | 🚧 In Progress | `src/sigpkg/use_flags.rs` |
-| **Portage philosophy** | Source-based package system | 📌 Planned | - |
-| **Hardened profile** | Security-hardened by default | ✅ Implemented | `src/security/mod.rs` |
-| **Musl libc support** | Alternative C library | ✅ Implemented | Core |
-| **LLVM toolchain** | LLVM-based build system | ✅ Implemented | `Cargo.toml` |
-
-## 🔵 NixOS Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Declarative config** | System-as-code | 📌 Planned | - |
-| **Atomic rollbacks** | Instant system rollback | ✅ Implemented | `src/sigpkg/transaction.rs` |
-| **Nix store concept** | Immutable package store | 📌 Planned | - |
-| **Reproducible builds** | Bit-for-bit reproducibility | 📌 Planned | - |
-| **Home Manager** | User environment management | ✅ Implemented | `src/unimplemented_tools.rs` |
-
-## 🟢 Alpine Linux Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **musl libc** | Lightweight C library | ✅ Implemented | Core |
-| **OpenRC init** | SigmaOS uses custom init | ✅ Implemented | `src/init/mod.rs` |
-| **apk speed** | Ultra-fast package operations | ✅ Implemented | `src/sigpkg/mod.rs` |
-| **Minimal footprint** | Small base system | ✅ Implemented | Core design |
-| **Docker-first design** | Container-optimized | ✅ Implemented | `src/containers/` |
-
-## 🐡 Kali/Parrot OS Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Penetration testing tools** | Security auditing suite | ✅ Implemented | `src/security/parrot_kali.rs` |
-| **Live USB persistence** | Persistent live mode | 🚧 In Progress | `scripts/build-iso.sh` |
-| **Forensics mode** | Write-protected boot | ✅ Implemented | `src/distro/transformation_engine.rs` |
-| **Aircrack-ng stack** | Wireless security tools | ✅ Implemented | `src/unimplemented_tools.rs` |
-
-## 🧊 Elementary OS / Pantheon Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Pantheon desktop** | Beautiful, cohesive DE | ✅ Implemented | `src/desktop/pantheon.rs` |
-| **AppCenter** | Curated app store | 📌 Planned | - |
-| **HIG design language** | Consistent UI design | 📌 Planned | - |
-| **Sideload protection** | Safe app installation | 📌 Planned | - |
-
-## 🌵 Void Linux Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **runit init system** | Fast, minimal init | ✅ Inspired design | `src/init/mod.rs` |
-| **xbps package manager** | Binary+source hybrid | ✅ Implemented | `src/sigpkg/mod.rs` |
-| **glibc/musl choice** | Multiple libc options | 📌 Planned | - |
-| **Musl bootstrap** | Complete musl userland | ✅ Implemented | Core |
-
-## 🦊 AntiX / MX Linux Ideas  
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Legacy hardware support** | Works on old machines | 🚧 In Progress | `src/driver/legacy.rs` |
-| **antiX-core** | Minimal base system | ✅ Inspired | Core design |
-| **apt-get parity** | Debian compatibility | ✅ Implemented | `src/compatibility/` |
-
-## 🦉 Zorin OS Ideas
-
-| Idea | Description | Status | Implementation |
-|------|-------------|--------|----------------|
-| **Windows/macOS look** | Familiar layouts | 📌 Planned | - |
-| **Gaming optimization** | Game mode | 🚧 In Progress | `src/performance/gaming.rs` |
-| **Education layout** | Student-focused UI | 📌 Planned | - |
-
----
-
-## 🐡 BSD System Ideas
-
-| Idea | Source | Status | Implementation |
-|------|--------|--------|----------------|
-| **Capsicum capabilities** | FreeBSD | ✅ Implemented | `src/security/capability.rs` |
-| **pledge/unveil** | OpenBSD | ✅ Implemented | `src/security/pledge.rs` |
-| **ZFS integration** | FreeBSD/OpenZFS | 🚧 In Progress | `src/filesystem/` |
-| **Jails** | FreeBSD | ✅ Implemented | `src/security/jails.rs` |
-| **pf firewall** | OpenBSD | ✅ Implemented | `src/network/` |
-| **W^X enforcement** | OpenBSD | ✅ Implemented | `src/security/` |
-| **Secure Levels** | FreeBSD | ✅ Implemented | `src/security/` |
-| **bhyve hypervisor** | FreeBSD | ✅ Inspired VMM | `src/virt/mod.rs` |
-| **Ports system** | FreeBSD/NetBSD | 🚧 In Progress | `src/sigpkg/ports.rs` |
-| **DTrace** | Solaris/FreeBSD | ✅ Implemented | `src/kernel/dtrace_compat.rs` |
-
----
-
-## 💡 Innovation Ideas from Distro Survey
-
-### Performance
-- **Zstd everywhere** (Arch): Zstd compression for packages, initramfs, and filesystem - ✅ Implemented
-- **io_uring networking** (Fedora/kernel): Zero-copy I/O - 🚧 In Progress
-- **Btrfs CoW snapshots** (openSUSE): Automatic pre-update snapshots - ✅ Implemented
-- **Transparent huge pages** (RHEL): Automatic memory optimization - ✅ Implemented
-
-### Security  
-- **Unprivileged user namespaces OFF by default** (Debian): Reduce attack surface - ✅ Implemented
-- **ASLR+PIE everywhere** (Hardened Gentoo): Memory randomization - ✅ Implemented
-- **Stack canaries** (OpenBSD): Buffer overflow protection - ✅ Implemented
-- **FORTIFY_SOURCE=3** (Ubuntu): Stricter source fortification - ✅ Implemented
-
-### Developer Experience
-- **devenv.sh** (NixOS community): Reproducible dev environments - ✅ Implemented (`src/unimplemented_tools.rs`)
-- **mise (asdf replacement)**: Universal version manager - ✅ Implemented (`src/unimplemented_tools.rs`)
-- **Flatpak SDK** (Fedora/GNOME): Portable development kit - ✅ Implemented (`src/unimplemented_tools.rs`)
-
----
-
-*Part of SigmaOS Documentation | Updated: 2026-08-23*
+| # | Idea | Source Distro | Status | Implementation Path | Description |
+|---|------|--------------|--------|---------------------|-------------|
+| 1 | Portage USE Flags | Gentoo | ✅ Implemented | src/sigpkg/universal_oop_system.rs | Conditional dependency resolution |
+| 2 | Nix Profiles & Generations | NixOS | ✅ Implemented | src/sigpkg/universal_oop_system.rs | Atomic rollbacks and reproducible environments |
+| 3 | dpkg File Triggers | Debian | ✅ Implemented | src/sigpkg/universal_oop_system.rs | Deferred execution of post-install hooks |
+| 4 | AUR Helper Integration | Arch / Manjaro | ✅ Implemented | src/sigpkg/arch_compat.rs | Transparent building of source packages |
+| 5 | RPM SELinux Policies | Fedora / RHEL | ✅ Implemented | src/security/mac.rs | Mandatory Access Control integration |
+| 6 | pkg(8) Jail Support | FreeBSD | ✅ Implemented | src/compatibility/freebsd_jails.rs | Installing packages into isolated environments |
+| 7 | signify Package Signing | OpenBSD | ✅ Implemented | src/security/crypto.rs | Cryptographic verification of packages |
+| 8 | APK Minimal Footprint | Alpine | ✅ Implemented | src/container/runtime.rs | Optimized binary sizes and memory footprint |
+| 9 | Runit Service Supervision | Void Linux | 🚧 In Progress | src/process/init.rs | Fast, parallel service startup |
+| 10 | Btrfs/ZFS Subvolumes | Ubuntu / Solaris | 🚧 In Progress | src/filesystem/sigma_fs.rs | Snapshotting and copy-on-write functionality |
+| 11 | Pacman Parallel Downloads | Arch Linux | ✅ Implemented | src/package/repository.rs | Concurrent package retrieval |
+| 12 | AppArmor Profiles | Ubuntu | 🚧 In Progress | src/security/apparmor.rs | Path-based access control |
+| 13 | OSTree Atomic Updates | Fedora Silverblue | 📅 Planned | src/sigpkg/ostree.rs | Immutable base OS |
+| 14 | Emerge Source Compilation | Gentoo | ✅ Implemented | src/sigpkg/source_build.rs | On-device compilation of all dependencies |
+| 15 | SlackBuilds Scripts | Slackware | 📅 Planned | src/compatibility/slackware.rs | Simple shell-based packaging |
+| 16 | Guix Scheme Definitions | GNU Guix | 📅 Planned | src/sigpkg/guix.rs | Lisp-based package definitions |
+| 17 | xbps-src Templates | Void Linux | 📅 Planned | src/sigpkg/xbps.rs | Template-based package building |
+| 18 | DNF History & Rollback | Fedora | ✅ Implemented | src/sigpkg/history.rs | Transactional package management |
+| 19 | Zypper Vendor Stickiness | openSUSE | 🚧 In Progress | src/sigpkg/vendor.rs | Repository priority and vendor lock |
+| 20 | APT Pinning | Debian | ✅ Implemented | src/sigpkg/pinning.rs | Version holding and repository preferences |
+| 21 | Portage Masking | Gentoo | ✅ Implemented | src/sigpkg/masking.rs | Hard-blocking specific package versions |
+| 22 | Nix Flakes | NixOS | 🚧 In Progress | src/sigpkg/flakes.rs | Pure evaluation of dependencies |
+| 23 | Pacman Hooks | Arch Linux | ✅ Implemented | src/sigpkg/hooks.rs | Event-driven scripts during transactions |
+| 24 | FreeBSD Ports Tree | FreeBSD | 🚧 In Progress | src/compatibility/ports.rs | Massive collection of source packages |
+| 25 | OpenBSD pledge/unveil | OpenBSD | ✅ Implemented | src/security/sandbox.rs | Fine-grained process restrictions |
+| 26 | NetBSD rump kernels | NetBSD | 📅 Planned | src/virtualization/rump.rs | Userspace drivers and subsystems |
+| 27 | DragonFly BSD HAMMER fs | DragonFly BSD | 📅 Planned | src/filesystem/hammer.rs | High-availability clustered filesystem |
+| 28 | illumos Zones | illumos | ✅ Implemented | src/container/zones.rs | Lightweight virtual environments |
+| 29 | macOS Homebrew | macOS | 📅 Planned | src/compatibility/homebrew.rs | User-local package management |
+| 30 | Alpine musl compatibility | Alpine | ✅ Implemented | src/compatibility/musl.rs | Lightweight standard C library support |
+| 31 | Clear Linux AutoFDO | Clear Linux | 🚧 In Progress | src/kernel/profiling.rs | Profile-guided optimizations across the OS |
+| 32 | CoreOS Ignition | CoreOS | 📅 Planned | src/system/ignition.rs | Declarative first-boot provisioning |
+| 33 | Pop!_OS Tiling Window | Pop!_OS | ✅ Implemented | src/desktop/zenith.rs | Keyboard-driven window management |
+| 34 | elementary OS Pantheon | elementary OS | 🚧 In Progress | src/desktop/theme.rs | Consistent, high-quality UI guidelines |
+| 35 | Linux Mint Timeshift | Linux Mint | ✅ Implemented | src/filesystem/snapshot.rs | System restore points |
+| 36 | Kali Linux Toolset | Kali Linux | 📅 Planned | src/security/tools.rs | Penetration testing utilities integration |
+| 37 | Tails Amnesic OS | Tails | 📅 Planned | src/security/amnesia.rs | RAM-only execution mode |
+| 38 | Qubes OS Isolation | Qubes OS | ✅ Implemented | src/security/qubes_isolation.rs | Strong VM-based compartmentalization |
+| 39 | ChromeOS Verified Boot | ChromeOS | 🚧 In Progress | src/security/boot.rs | Cryptographic chain of trust |
+| 40 | Android Binder IPC | Android | 📅 Planned | src/kernel/ipc/binder.rs | High-performance object-oriented IPC |
+| 41 | SteamOS Gamescope | SteamOS | 🚧 In Progress | src/desktop/gamescope.rs | Micro-compositor for gaming |
+| 42 | SUSE YaST | openSUSE | 📅 Planned | src/system/config.rs | Comprehensive system configuration tool |
+| 43 | EndeavourOS Calamares | EndeavourOS | ✅ Implemented | src/desktop/installer.rs | Modular graphical installer |
+| 44 | NixOS Modules | NixOS | 🚧 In Progress | src/system/modules.rs | Declarative system configuration |
+| 45 | Gentoo eclasses | Gentoo | 📅 Planned | src/sigpkg/eclass.rs | Reusable build logic for packages |
+| 46 | Arch Build System (ABS) | Arch Linux | ✅ Implemented | src/sigpkg/abs.rs | Ports-like system for Arch |
+| 47 | Debian debconf | Debian | 🚧 In Progress | src/sigpkg/debconf.rs | Configuration management system |
+| 48 | Fedora Modularity | Fedora | 📅 Planned | src/sigpkg/modularity.rs | Parallel availability of different versions |
+| 49 | Void xbps-query | Void Linux | ✅ Implemented | src/sigpkg/query.rs | Fast package metadata querying |
+| 50 | FreeBSD dtrace | FreeBSD | 🚧 In Progress | src/kernel/dtrace.rs | Dynamic tracing framework |
+| 51 | OpenBSD sndio | OpenBSD | 📅 Planned | src/audio/sndio.rs | Minimalist audio server |
+| 52 | NetBSD pkgsrc | NetBSD | 📅 Planned | src/compatibility/pkgsrc.rs | Cross-platform package management |
