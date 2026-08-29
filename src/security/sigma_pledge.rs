@@ -34,7 +34,7 @@ extern crate alloc;
 
 use sigma_types::{CapabilityToken, Result};
 
-use std::collections::HashSet;
+use alloc::collections::BTreeSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -70,7 +70,7 @@ pub enum PledgeNamespace {
 /// Pledge promise - a set of allowed namespaces
 #[derive(Debug, Clone)]
 pub struct PledgePromise {
-    allowed_namespaces: HashSet<PledgeNamespace>,
+    allowed_namespaces: BTreeSet<PledgeNamespace>,
     is_pledged: bool,
 }
 
@@ -91,11 +91,7 @@ impl PledgePromise {
     /// Mark as pledged (can only be done once)
     pub fn pledge(&mut self) -> Result<()> {
         if self.is_pledged {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::PermissionDenied,
-                "Already pledged",
-            )
-            .into());
+            return Err(sigma_types::Error::PermissionDenied);
         }
         self.is_pledged = true;
         Ok(())
@@ -104,6 +100,18 @@ impl PledgePromise {
     /// Check if pledged
     pub fn is_pledged(&self) -> bool {
         self.is_pledged
+    }
+
+    /// Progressively narrow/restrict allowed pledge namespaces (cannot expand privileges)
+    pub fn restrict(&mut self, new_namespaces: &[PledgeNamespace]) -> Result<()> {
+        let requested_set: BTreeSet<PledgeNamespace> = new_namespaces.iter().cloned().collect();
+        for ns in &requested_set {
+            if !self.allowed_namespaces.contains(ns) {
+                return Err(sigma_types::Error::PermissionDenied);
+            }
+        }
+        self.allowed_namespaces = requested_set;
+        Ok(())
     }
 }
 
@@ -147,20 +155,12 @@ impl SyscallFilter {
                 if promise.allows(namespace) {
                     Ok(())
                 } else {
-                    Err(std::io::Error::new(
-                        std::io::ErrorKind::PermissionDenied,
-                        "Syscall not pledged",
-                    )
-                    .into())
+                    Err(sigma_types::Error::PermissionDenied)
                 }
             }
             None => {
                 // Process hasn't pledged - deny by default
-                Err(std::io::Error::new(
-                    std::io::ErrorKind::PermissionDenied,
-                    "Process not pledged",
-                )
-                .into())
+                Err(sigma_types::Error::PermissionDenied)
             }
         }
     }
@@ -205,6 +205,24 @@ mod tests {
     }
 
     #[test]
+    fn test_pledge_restriction_narrowing() {
+        let namespaces = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath, PledgeNamespace::Wpath];
+        let mut promise = PledgePromise::new(&namespaces);
+        promise.pledge().unwrap();
+
+        // Narrowing permissions is allowed
+        let restricted = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath];
+        assert!(promise.restrict(&restricted).is_ok());
+        assert!(promise.allows(PledgeNamespace::Inet));
+        assert!(promise.allows(PledgeNamespace::Rpath));
+        assert!(!promise.allows(PledgeNamespace::Wpath));
+
+        // Attempting to re-grant Wpath should fail
+        let expanded = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath, PledgeNamespace::Wpath];
+        assert!(promise.restrict(&expanded).is_err());
+    }
+
+    #[test]
     fn test_syscall_filter() {
         let mut filter = SyscallFilter::new();
         let namespaces = vec![PledgeNamespace::Inet, PledgeNamespace::Rpath];
@@ -225,9 +243,12 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::io;
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Error {
+        PermissionDenied,
+    }
 
-    pub type Result<T> = std::result::Result<T, io::Error>;
+    pub type Result<T> = core::result::Result<T, Error>;
 
     #[derive(Debug, Clone)]
     pub struct CapabilityToken {

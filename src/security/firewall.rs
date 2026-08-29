@@ -118,6 +118,40 @@ pub struct NatRule {
     pub nat_type: NatType,
 }
 
+/// Token-Bucket Quality of Service (QoS) Traffic Shaper
+#[derive(Debug, Clone)]
+pub struct QosTrafficShaper {
+    pub rate_bytes_per_sec: u64,
+    pub burst_capacity_bytes: u64,
+    pub available_tokens: u64,
+    pub last_refill_timestamp: u64,
+}
+
+impl QosTrafficShaper {
+    pub fn new(rate_bytes_per_sec: u64, burst_capacity_bytes: u64) -> Self {
+        Self {
+            rate_bytes_per_sec,
+            burst_capacity_bytes,
+            available_tokens: burst_capacity_bytes,
+            last_refill_timestamp: 0,
+        }
+    }
+
+    pub fn shape_packet_bandwidth(&mut self, packet_size_bytes: u64, now_secs: u64) -> bool {
+        let elapsed = now_secs.saturating_sub(self.last_refill_timestamp);
+        let refill_amount = elapsed.saturating_mul(self.rate_bytes_per_sec);
+        self.available_tokens = (self.available_tokens.saturating_add(refill_amount)).min(self.burst_capacity_bytes);
+        self.last_refill_timestamp = now_secs;
+
+        if self.available_tokens >= packet_size_bytes {
+            self.available_tokens -= packet_size_bytes;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 pub struct Firewall {
     pub input_rules: Vec<Rule>,
     pub output_rules: Vec<Rule>,
@@ -126,6 +160,7 @@ pub struct Firewall {
     pub default_action: Action,
     pub conntrack: BTreeMap<ConnectionTuple, ConnectionEntry>,
     pub rate_limiter: RateLimiter,
+    pub qos_shaper: Option<QosTrafficShaper>,
 }
 
 impl Firewall {
@@ -138,6 +173,7 @@ impl Firewall {
             default_action: Action::Drop,
             conntrack: BTreeMap::new(),
             rate_limiter: RateLimiter { tokens: 100, capacity: 100, fill_rate: 10, last_update: 0 },
+            qos_shaper: Some(QosTrafficShaper::new(10_000_000, 1_000_000)), // 10MB/s rate, 1MB burst
         }
     }
 
@@ -278,5 +314,23 @@ mod tests {
         assert_eq!(new_pkt.dest_ip, Ipv4Address(0xC0A80164));
         assert_eq!(new_pkt.dest_port, 80);
         assert_eq!(nat_type, NatType::Dnat { new_dst_ip: 0xC0A80164, new_dst_port: 80 });
+    }
+
+    #[test]
+    fn test_qos_traffic_shaper() {
+        let mut shaper = QosTrafficShaper::new(1000, 5000);
+        assert!(shaper.shape_packet_bandwidth(1500, 0));
+        assert_eq!(shaper.available_tokens, 3500);
+
+        // Consume remaining burst
+        assert!(shaper.shape_packet_bandwidth(3500, 0));
+        assert_eq!(shaper.available_tokens, 0);
+
+        // Exceeds tokens without time passing
+        assert!(!shaper.shape_packet_bandwidth(100, 0));
+
+        // Refill 1 second later (1000 bytes)
+        assert!(shaper.shape_packet_bandwidth(800, 1));
+        assert_eq!(shaper.available_tokens, 200);
     }
 }
