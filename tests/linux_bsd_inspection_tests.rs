@@ -338,10 +338,11 @@ fn test_wiki_distro_innovations_inspection() {
     };
     assert!(adv_kmod.verify_signature(&mod_sig));
 
-    // 14. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor)
+    // 14. Missing Distro Innovations (Clear Linux, Tails, Chimera, FreeBsd VNET, OpenBSD Unveil Auditor, Bedrock, SmartOS)
     use missing_distro_innovations::{
         ClearLinuxStatelessEngine, TailsAmnesicEngine, ChimeraDinitSupervisor, DinitServiceState,
-        FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,
+        FreeBsdVnetStackEngine, OpenBsdUnveilAuditor, BedrockLinuxStrataEngine, BedrockStratum,
+        SmartOsZoneEngine, SmartOsVmBrand, SmartOsVmState,
     };
     let mut clear = ClearLinuxStatelessEngine::new();
     clear.set_vendor_default("/etc/issue", "SigmaOS Base");
@@ -362,6 +363,21 @@ fn test_wiki_distro_innovations_inspection() {
     let mut auditor = OpenBsdUnveilAuditor::new();
     auditor.log_violation(99, "/root/.ssh/id_rsa", "r", 500);
     assert_eq!(auditor.violations.len(), 1);
+
+    let mut bedrock = BedrockLinuxStrataEngine::new("sigma");
+    bedrock.register_stratum(BedrockStratum {
+        name: "arch".to_string(),
+        root_path: "/bedrock/strata/arch".to_string(),
+        is_enabled: true,
+        provided_binaries: vec!["pacman".to_string()],
+    });
+    assert_eq!(bedrock.strat("arch", "pacman", &["-Syy"]).unwrap(), "Executed 'pacman -Syy' from stratum 'arch' at '/bedrock/strata/arch/bin/pacman'");
+
+    let mut smartos = SmartOsZoneEngine::new();
+    smartos.imgadm_import("img-100", "base64", "23.4", "smartos");
+    assert!(smartos.vmadm_create("vm-100", "zone1", SmartOsVmBrand::JoyentZone, 10, 1024, "img-100", &["vnic0"]).is_ok());
+    assert!(smartos.vmadm_start("vm-100").is_ok());
+    assert_eq!(smartos.vms.get("vm-100").unwrap().state, SmartOsVmState::Running);
 }
 
 #[test]
