@@ -1,6 +1,10 @@
 // Community Handbook, Reproducible Package Recipes & Blueprint Toolkit for SigmaOS
 // Inspired by Arch Wiki, FreeBSD Handbook, Gentoo Portage, Void XBPS-src, and OpenBSD ports.
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]

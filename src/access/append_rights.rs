@@ -1,5 +1,8 @@
 // Appending Access Rights & Immutable Journal Stream Enforcement for SigmaOS
 
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Appending Access Rights Stream Flags
