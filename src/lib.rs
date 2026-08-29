@@ -65,7 +65,8 @@ pub use unimplemented_features::{
 };
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage,
+    HermeticStoreClosureEngine, StoreClosurePackage, BedrockStratum, BedrockLinuxStrataEngine,
+    SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig, SmartOsZoneEngine,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,

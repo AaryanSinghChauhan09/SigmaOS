@@ -362,6 +362,37 @@ fn test_wiki_distro_innovations_inspection() {
     let mut auditor = OpenBsdUnveilAuditor::new();
     auditor.log_violation(99, "/root/.ssh/id_rsa", "r", 500);
     assert_eq!(auditor.violations.len(), 1);
+
+    // 15. Bedrock & SmartOS distro innovations
+    use missing_distro_innovations::{
+        BedrockStratum, BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsZoneEngine,
+    };
+    let mut bedrock = BedrockLinuxStrataEngine::new("sigma");
+    bedrock.register_stratum(BedrockStratum {
+        name: "ubuntu".to_string(),
+        root_path: "/bedrock/strata/ubuntu".to_string(),
+        is_enabled: true,
+        provided_binaries: vec!["apt".to_string(), "dpkg".to_string()],
+    });
+    assert_eq!(
+        bedrock.resolve_strata_path("ubuntu", "/etc/apt/sources.list").unwrap(),
+        "/bedrock/strata/ubuntu/etc/apt/sources.list"
+    );
+    assert!(bedrock.strat("ubuntu", "apt", &["update"]).is_ok());
+    assert!(bedrock.disable_stratum("ubuntu").is_ok());
+    assert!(bedrock.strat("ubuntu", "apt", &["update"]).is_err());
+
+    let mut smartos = SmartOsZoneEngine::new();
+    smartos.imgadm_import("601c726a-939b-11ee-b9d1-00151712a2a0", "base-64", "23.4.0", "smartos");
+    let vm_uuid = "a1b2c3d4-0000-1111-2222-333344445555";
+    assert!(smartos
+        .vmadm_create(vm_uuid, "web_zone_1", SmartOsVmBrand::JoyentZone, 20, 2048,
+            "601c726a-939b-11ee-b9d1-00151712a2a0", &["vnic0"])
+        .is_ok());
+    assert!(smartos.vmadm_start(vm_uuid).is_ok());
+    assert_eq!(smartos.vms.get(vm_uuid).unwrap().state, SmartOsVmState::Running);
+    assert!(smartos.vmadm_stop(vm_uuid).is_ok());
+    assert!(smartos.vmadm_delete(vm_uuid).is_ok());
 }
 
 #[test]
