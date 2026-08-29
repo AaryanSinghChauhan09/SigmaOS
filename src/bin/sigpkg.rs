@@ -6,7 +6,7 @@
 use std::process::exit;
 
 use sigmaos::sigpkg::{
-    ContentAddressedStore, CryptoVerifier, Package, SovereignPackageSnapshotRollbackEngine,
+    ContentAddressedStore, CryptoVerifier, Package, SigpkgDaemon, SovereignPackageSnapshotRollbackEngine,
     Version,
 };
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
@@ -26,6 +26,10 @@ fn usage() -> ! {
          \x20 sigpkg mirror best <repo>     Choose the best mirror for a repo\n\
          \x20 sigpkg snapshot <desc>        Create a pre-transaction snapshot\n\
          \x20 sigpkg rollback <generation>  Roll the store back to a snapshot\n\
+         \x20 sigpkg update                 Check the repository for package updates\n\
+         \x20 sigpkg daemon sync            Sync + verify repository metadata (sigpkgd)\n\
+         \x20 sigpkg daemon gc              Garbage-collect orphaned store packages\n\
+         \x20 sigpkg daemon status          Report daemon state\n\
          \x20 sigpkg help                   Show this help"
     );
     exit(2);
@@ -47,6 +51,8 @@ fn main() {
         "mirror" => cmd_mirror(&args[1..]),
         "snapshot" => cmd_snapshot(&args[1..]),
         "rollback" => cmd_rollback(&args[1..]),
+        "update" => cmd_update(&args[1..]),
+        "daemon" => cmd_daemon(&args[1..]),
         "help" | "--help" | "-h" => usage(),
         _ => {
             eprintln!("sigpkg: unknown command '{}'", args[0]);
@@ -271,6 +277,61 @@ fn cmd_rollback(args: &[String]) {
         Err(err) => {
             eprintln!("sigpkg: rollback failed: {}", err);
             exit(1);
+        }
+    }
+}
+
+fn cmd_update(args: &[String]) {
+    if !args.is_empty() {
+        eprintln!("sigpkg: update takes no arguments");
+        exit(2);
+    }
+    let mut daemon = SigpkgDaemon::new("https://repo.sigmaos.dev/sigma");
+    daemon.add_trusted_key("root-key");
+    let payload = b"root-metadata";
+    let sig = daemon.verifier().sign("root-key", payload);
+    match daemon.sync_repository(payload, &sig) {
+        sigmaos::sigpkg::SyncStatus::Synced { .. } => {
+            println!("Repository metadata verified and synced.");
+            println!("No update checks performed against a live mirror (offline demo).");
+            exit(0);
+        }
+        sigmaos::sigpkg::SyncStatus::Failed { reason } => {
+            eprintln!("sigpkg: update failed: {}", reason);
+            exit(1);
+        }
+    }
+}
+
+fn cmd_daemon(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: daemon requires 'sync', 'gc', or 'status'");
+        exit(2);
+    }
+    let mut daemon = SigpkgDaemon::default();
+    daemon.add_trusted_key("root-key");
+
+    match args[0].as_str() {
+        "sync" => {
+            let payload = b"root-metadata";
+            let sig = daemon.verifier().sign("root-key", payload);
+            let result = daemon.sync_repository(payload, &sig);
+            println!("{:?}", result);
+            println!("{}", daemon.status_line());
+            exit(0);
+        }
+        "gc" => {
+            let reclaimed = daemon.gc_store();
+            println!("Garbage-collected {} orphaned store package(s)", reclaimed);
+            exit(0);
+        }
+        "status" => {
+            println!("{}", daemon.status_line());
+            exit(0);
+        }
+        _ => {
+            eprintln!("sigpkg: daemon requires 'sync', 'gc', or 'status'");
+            exit(2);
         }
     }
 }

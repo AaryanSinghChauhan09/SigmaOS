@@ -79,3 +79,83 @@ fn test_sigpkg_manifest_roundtrip() {
     let sig = verifier.sign("some-key", b"meta");
     assert!(!sig.is_empty());
 }
+
+#[test]
+fn test_sigpkg_daemon_sync_verify_and_gc() {
+    let mut daemon = sigmaos::sigpkg::SigpkgDaemon::new("https://repo.sigmaos.dev/sigma");
+    daemon.add_trusted_key("root-key");
+    let payload: &[u8] = b"root-metadata";
+    let sig = daemon.verifier().sign("root-key", payload);
+
+    assert!(matches!(
+        daemon.sync_repository(payload, &sig),
+        sigmaos::sigpkg::SyncStatus::Synced { .. }
+    ));
+    // Unsigned must fail all-or-nothing.
+    assert!(matches!(
+        daemon.sync_repository(payload, &[]),
+        sigmaos::sigpkg::SyncStatus::Failed { .. }
+    ));
+
+    // Deploy two packages; keep one referenced and GC the other.
+    let installed = std::collections::BTreeMap::new();
+    let p1: &[u8] = b"keep-bytes";
+    let mut h1: u64 = 0xcbf29ce484222325;
+    for &b in p1.iter() {
+        h1 ^= b as u64;
+        h1 = h1.wrapping_mul(0x100000001b3);
+    }
+    let m1 = sigmaos::sigpkg::parse_manifest(&format!(
+        "name: keep\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        h1
+    ))
+    .unwrap();
+    daemon.deploy(&m1, p1, &installed).unwrap();
+
+    let p2: &[u8] = b"orphan-bytes";
+    let mut h2: u64 = 0xcbf29ce484222325;
+    for &b in p2.iter() {
+        h2 ^= b as u64;
+        h2 = h2.wrapping_mul(0x100000001b3);
+    }
+    let m2 = sigmaos::sigpkg::parse_manifest(&format!(
+        "name: orphan\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        h2
+    ))
+    .unwrap();
+    daemon.deploy(&m2, p2, &installed).unwrap();
+
+    daemon.mark_referenced("keep");
+    assert_eq!(daemon.gc_store(), 1);
+    assert!(daemon.client.store.get("keep").is_some());
+    assert!(daemon.client.store.get("orphan").is_none());
+}
+
+#[test]
+fn test_sigpkg_daemon_update_check() {
+    let mut daemon = sigmaos::sigpkg::SigpkgDaemon::default();
+    let installed = std::collections::BTreeMap::new();
+    let p: &[u8] = b"hello-bytes";
+    let mut h: u64 = 0xcbf29ce484222325;
+    for &b in p.iter() {
+        h ^= b as u64;
+        h = h.wrapping_mul(0x100000001b3);
+    }
+    let m = sigmaos::sigpkg::parse_manifest(&format!(
+        "name: hello\nversion: 1.0.0\ndescription: x\nchecksum: {:x}\ndependencies:\n",
+        h
+    ))
+    .unwrap();
+    daemon.deploy(&m, p, &installed).unwrap();
+
+    let mut repo = std::collections::BTreeMap::new();
+    repo.insert(
+        "hello".to_string(),
+        sigmaos::sigpkg::Manifest::new("hello", sigmaos::sigpkg::Version::new(2, 0, 0), "x", "dead"),
+    );
+    let updates = daemon.check_updates(&repo);
+    assert_eq!(updates.len(), 1);
+    assert_eq!(updates[0].name, "hello");
+    assert_eq!(updates[0].installed, sigmaos::sigpkg::Version::new(1, 0, 0));
+    assert_eq!(updates[0].available, sigmaos::sigpkg::Version::new(2, 0, 0));
+}

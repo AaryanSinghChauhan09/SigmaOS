@@ -8,6 +8,7 @@ pub mod arch_compat;
 pub mod alpine_apk_engine;
 pub mod arch_pacman_engine;
 pub mod client;
+pub mod daemon;
 pub mod aur;
 pub mod aur_helper;
 pub mod debian_apt_engine;
@@ -104,6 +105,7 @@ pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
 pub use client::{
     SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
 };
+pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
