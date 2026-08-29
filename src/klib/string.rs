@@ -7,7 +7,6 @@ use alloc::format;
 use super::vec::SigmaVec;
 use core::ops::{Deref, DerefMut};
 use core::slice;
-use core:: String;
 use core::fmt;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
@@ -53,8 +52,8 @@ impl SigmaString {
     }
 
     /// Create a SigmaString from a byte slice
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self, str::Utf8Error> {
-        str::from_utf8(bytes)?;
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, core::str::Utf8Error> {
+        core::str::from_utf8(bytes)?;
         let mut data = SigmaVec::with_capacity(bytes.len());
         for &byte in bytes {
             data.push(byte);
