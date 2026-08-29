@@ -87,3 +87,4 @@ pub mod crypto {
     pub mod vectorized_pqc;
 }
 pub mod distro_innovations;
+pub mod extended_distro_matrix;
