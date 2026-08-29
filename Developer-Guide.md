@@ -1,40 +1,34 @@
-# SigmaOS Microkernel Architecture
+# Developer Guide
 
-Welcome to the official documentation for SigmaOS Microkernel Architecture.
+Welcome to the official documentation for Developer Guide.
 
-## Microkernel vs Monolithic
+## Environment
 
-The SigmaOS kernel takes a microkernel approach...
-
-This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
-
-## Components
-
-Scheduler (EEVDF), IPC, Memory Management, HAL...
+Setting up development environment with Rust nightly.
 
 This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-## EEVDF & BORE Scheduler
+## Building
 
-Earliest Eligible Virtual Deadline First (EEVDF) with Burst-Oriented Response Enhancer (BORE) scoring.
-
-This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
-
-## Ticket Spinlock
-
-Ticket spinlock implementation ensuring fairness.
+Building SigmaOS and running tests.
 
 This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-## Zero-copy IPC
+## Organization
 
-Zero-copy pipe ring buffer for IPC.
+Code organization and module structure.
 
 This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-## Comparison
+## CI/CD
 
-Compared to Linux (monolithic), seL4, and Mach.
+CI/CD pipeline overview.
+
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
+
+## Debugging
+
+Code review process and debugging tips.
 
 This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
