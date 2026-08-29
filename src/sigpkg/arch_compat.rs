@@ -378,7 +378,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        alloc::vec::Vec::from_iter(image_header)
+        image_header.to_vec()
     }
 }
 
@@ -532,7 +532,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, alloc::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, archive_content.to_vec()))
     }
 }
 

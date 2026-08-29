@@ -4,8 +4,8 @@ pub mod blocked_state;
 pub mod kernel_data;
 pub mod linux_proc;
 pub mod linux_sysfs;
-pub mod spawn;
 pub mod sovereign_process_engine;
+pub mod spawn;
 
 pub use spawn::{Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter};
 pub use sovereign_process_engine::{

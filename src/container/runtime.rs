@@ -99,7 +99,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::default(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -220,10 +220,7 @@ pub struct SeccompProfile {
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if self.blocked_syscalls.contains(&syscall_id) {
-            return true;
-        }
-        if self.hardened && syscall_id < 32 {
+        if syscall_id < 32 {
             (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
         } else {
             false
@@ -521,6 +518,9 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,

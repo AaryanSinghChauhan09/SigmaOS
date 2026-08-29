@@ -49,31 +49,8 @@ mod fs_bsd_linux_innovations;
 mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
-#[path = "../src/compatibility/gap_closure.rs"]
-mod gap_closure;
-#[path = "../src/virtualization/kvm_vcpu.rs"]
-mod kvm_vcpu;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/logging/unified.rs"]
-mod unified;
-#[path = "../src/process/sovereign_process_engine.rs"]
-mod sovereign_process_engine;
-#[path = "../src/shell/sovereign_shell_parity.rs"]
-mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-
+use wiki_ideas::SystemdUnitActiveState;
 use bsd_compat::*;
-use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unveil::{UnveilManager, UnveilPermission};
-use wiki_ideas_implementation as wiki_ideas;
-use wiki_ideas_implementation::SystemdUnitActiveState;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -187,7 +164,7 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitActiveState,
@@ -625,7 +602,7 @@ fn test_gentoo_use_flag_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooPortageMaskEngine;
+    use unimplemented_features::GentooPortageMaskResolver as GentooPortageMaskEngine;
     let mut portage = GentooPortageMaskEngine::new("amd64");
     portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
     portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);

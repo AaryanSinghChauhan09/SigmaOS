@@ -17,8 +17,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
-extern crate alloc;
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use crate::klib::VecDeque;
 

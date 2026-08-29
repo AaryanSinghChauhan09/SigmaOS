@@ -174,7 +174,6 @@ impl Default for SolusEopkgManager {
 
 /// 5. Mageia Linux urpmi Dependency Solver
 pub struct MageiaUrpmiEngine {
-    pub urpmi_db: BTreeMap<String, Vec<String>>,
     pub package_database: BTreeMap<String, Vec<String>>,
 }
 
@@ -358,7 +357,7 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
+        dinit.register_service("networking", "/sbin/ip link set up dev eth0", Vec::new());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
     }
 

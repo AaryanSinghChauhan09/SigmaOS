@@ -600,17 +600,9 @@ impl SovereignHybridSchedulerInnovations {
         }
     }
 
-    /// Evaluates real-time preemption gate timing.
-    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
-        self.rt_lane_latency_us < 5
-    }
-
-    pub fn add_task(&mut self, task: RealtimeTask) {
-        self.rt_tasks.insert(task.pid, task);
-    }
-
-    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
-        self.rt_tasks.values().next()
+    pub fn add_task(&mut self, task: RtlaneRealtimeTask) {
+        let tid = task.pid;
+        self.rt_tasks.insert(tid, task);
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.
@@ -621,6 +613,11 @@ impl SovereignHybridSchedulerInnovations {
     /// Adjusts CPU DVFS P-state governor mode dynamically.
     pub fn set_governor(&mut self, gov: DvfsPowerGovernor) {
         self.current_governor = gov;
+    }
+
+    /// Verifies that real-time lane preemption latency is under 5 microseconds.
+    pub fn verify_rt_lane_preemption_latency(&self) -> bool {
+        self.rt_lane_latency_us < 5
     }
 }
 

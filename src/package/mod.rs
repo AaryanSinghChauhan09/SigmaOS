@@ -19,9 +19,9 @@
 // SigmaOS Package Module
 pub mod debian;
 pub mod linux_translation;
+pub mod repository;
 pub mod store;
 pub mod universal;
-pub mod repository;
 
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
@@ -31,13 +31,13 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE, StoreApp, StoreError};
+pub use repository::{
+    MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule,
+    PackageRepository, PackageTransactionJournal, PinPriority, RepoError,
+    RepositoryManager, RepositoryMetadata, TransactionJournalEntry,
+};
+pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, StoreApp, StoreError, GLOBAL_SOFTWARE_STORE};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use repository::{
-    PackageRepository, RepositoryMetadata, RepositoryManager, PinPriority, PackagePinRule,
-    PackagePinEngine, MirrorCandidate, MirrorEntry, MirrorSyncEngine, PackageTransaction,
-    TransactionJournalEntry, PackageTransactionJournal, RepoError,
 };
