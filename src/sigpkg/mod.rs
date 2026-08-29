@@ -5,6 +5,7 @@ use alloc::format;
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod alpine_apk_engine;
 pub mod arch_pacman_engine;
 pub mod aur;
 pub mod aur_helper;
@@ -18,6 +19,7 @@ pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
 pub mod nix_dsl;
+pub mod gentoo_use_flags;
 pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
@@ -96,6 +98,8 @@ pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
     ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
 };
+pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
+pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
