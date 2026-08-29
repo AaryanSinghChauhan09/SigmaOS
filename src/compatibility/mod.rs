@@ -21,6 +21,7 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
+pub mod community_foundation;
 pub mod constellation;
 pub mod constellation_mesh;
 pub mod cross_platform;
@@ -152,6 +153,9 @@ pub use legacy_adapters::{
 
 pub use chimera_linux::{
     ApkPackageMetadata, ApkPackageStore,
+};
+pub use community_foundation::{
+    BountySeverity, FoundationRole, HackathonEvent, SecurityBounty, SovereignFoundationManager,
 };
 
 pub use relay_nexus::{

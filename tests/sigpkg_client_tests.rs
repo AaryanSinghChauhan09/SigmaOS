@@ -159,3 +159,37 @@ fn test_sigpkg_daemon_update_check() {
     assert_eq!(updates[0].installed, sigmaos::sigpkg::Version::new(1, 0, 0));
     assert_eq!(updates[0].available, sigmaos::sigpkg::Version::new(2, 0, 0));
 }
+
+#[test]
+fn test_foundation_governance_and_bounties() {
+    use sigmaos::compatibility::{
+        BountySeverity, FoundationRole, SovereignFoundationManager,
+    };
+    let mut foundation = SovereignFoundationManager::new("SigmaOS Foundation");
+    foundation.register_member("alice", FoundationRole::BoardMember);
+    foundation.register_member("bob", FoundationRole::SecurityAuditor);
+    assert_eq!(foundation.members.len(), 2);
+    // Re-registration updates the role in place.
+    foundation.register_member("alice", FoundationRole::CoreMaintainer);
+    assert_eq!(foundation.members.len(), 2);
+    assert_eq!(foundation.members[0].1, FoundationRole::CoreMaintainer);
+
+    let bounty_id = foundation.submit_security_bounty(
+        "Kernel heap overflow in VFS",
+        "bob_security",
+        BountySeverity::Critical,
+    );
+    assert_eq!(bounty_id, 1);
+    assert_eq!(foundation.bounties[0].reward_usd, 15000);
+    assert_eq!(foundation.resolve_bounty(1).unwrap(), 15000);
+    assert!(foundation.resolve_bounty(1).is_err());
+
+    foundation.organize_hackathon("Global Kernel Hackathon 2026", "Zero-Copy IPC");
+    assert!(foundation
+        .register_hackathon_participant("Global Kernel Hackathon 2026", "charlie")
+        .is_ok());
+    assert!(foundation
+        .submit_hackathon_project("Global Kernel Hackathon 2026", "SovereignRingFS")
+        .is_ok());
+    assert_eq!(foundation.hackathons[0].projects_submitted.len(), 1);
+}
