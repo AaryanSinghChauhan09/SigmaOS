@@ -1,6 +1,9 @@
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use crate::klib::collections::HashMap;
 
 /// Win32 processing error states

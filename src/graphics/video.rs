@@ -1,6 +1,9 @@
 // SigmaOS Sovereign AI-Native Video Editing Suite (SigmaCut)
 // Designed for high-performance timeline composition, YUV translation, and overlay effects
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use crate::klib::HashMap;
 
 /// Video processing error states
