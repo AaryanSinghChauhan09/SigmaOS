@@ -27,6 +27,7 @@ pub mod nosql_engine;
 pub mod search;
 pub mod sql_engine;
 pub mod volume;
+pub mod sovereign_disk_manager;
 
 pub use block::{
     BlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,
@@ -42,6 +43,11 @@ pub use cinder::{
 pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,
+};
+
+pub use sovereign_disk_manager::{
+    FdiskPartedEngine, SovereignLvmEngine, PhysicalVolume, VolumeGroup, LogicalVolume,
+    PartitionTableScheme, DiskPartitionRecord, partition_guids,
 };
 
 pub use sql_engine::{

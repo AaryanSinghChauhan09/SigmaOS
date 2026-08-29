@@ -20,6 +20,7 @@ pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
 pub mod sandbox;
 pub mod qubes_isolation;
+pub mod root_improvement;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -30,6 +31,7 @@ pub mod vpn;
 pub mod vulnerability;
 
 pub use qubes_isolation::*;
+pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};

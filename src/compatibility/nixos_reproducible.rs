@@ -307,7 +307,7 @@ pub struct CommunityPackageRegistry {
     packages: HashMap<String, CommunityPackage>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CommunityPackage {
     pub name: String,
     pub maintainer: String,

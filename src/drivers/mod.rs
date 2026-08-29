@@ -17,6 +17,9 @@ pub mod network;
 pub mod peripheral;
 pub mod storage;
 pub mod touch_jingos;
+pub mod usb_hid;
+pub mod vesa;
+pub mod printing;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
@@ -32,3 +35,4 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJobState, PrintJob};
