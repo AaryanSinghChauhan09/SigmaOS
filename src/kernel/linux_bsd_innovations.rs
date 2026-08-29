@@ -123,7 +123,8 @@ impl BsdPfStateTable {
                     .last_seen_timestamp_sec
                     .saturating_add(state.timeout_sec)
             {
-                expired_keys.push(tuple.clone());
+                let k: PfFiveTuple = tuple.clone();
+                expired_keys.push(k);
             }
         }
         let count = expired_keys.len();
@@ -192,7 +193,7 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let waiters_len = waiters.len();
+            let waiters_len: usize = waiters.len();
             let count = val_wake.min(waiters_len);
             for _ in 0..count {
                 if !waiters.is_empty() {
