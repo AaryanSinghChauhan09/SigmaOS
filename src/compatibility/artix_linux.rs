@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 extern crate alloc;
 // SigmaOS Artix Linux Parity Subsystem
 // Independent, zero-dependency implementations of Artix Linux core tooling

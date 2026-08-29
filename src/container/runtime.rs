@@ -738,7 +738,7 @@ impl SimpleContainerRuntime {
 unsafe fn alloc(size: usize) -> *mut u8 {
     use alloc::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    unsafe { alloc::alloc::alloc(layout) }
+    unsafe { std_alloc(layout) }
 }
 
 
@@ -825,7 +825,8 @@ impl Default for FlatpakSnapCompatLayer {
 pub mod oci {
     use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
-    use alloc::string::ToString;
+    use alloc::string::{String, ToString};
+    use alloc::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,

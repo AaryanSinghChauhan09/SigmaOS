@@ -1,11 +1,11 @@
 use alloc::string::{String, ToString};
+use core::str::Chars;
 use alloc::vec::Vec;
 use alloc::format;
 // SigmaOS Custom String Parser
 // Reduces dependency on std string parsing functions
 
 use core::iter::Iterator;
-use core:: String::Chars;
 
 /// Custom string parser for common operations
 pub struct StringParser<'a> {

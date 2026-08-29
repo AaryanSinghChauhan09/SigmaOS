@@ -6,8 +6,6 @@
 //! 1. `SovereignKaslrEngine`: Entropy-based virtual address space slide, region layout randomization, and W^X memory page audits.
 //! 2. `SmepSmapEnforcer`: Control register (CR4) hardware protection management, AC flag STAC/CLAC primitives, and boundary-checked safe user space copies (`copy_from_user`, `copy_to_user`).
 //! 3. `HardenedSyscallDispatcher`: Multi-layered syscall security filtering (pledge/unveil, Capsicum rights, seccomp rules), argument pointer sanity checks, rate-limiting, and anomaly detection.
-use alloc::vec::Vec;
-use alloc::vec;
 extern crate alloc;
 
 #[cfg(not(test))]

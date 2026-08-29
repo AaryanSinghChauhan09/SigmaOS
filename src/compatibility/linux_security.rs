@@ -22,6 +22,7 @@
 //! Security-Enhanced Linux (SELinux) concepts
 //! AppArmor security framework concepts
 //! Linux capabilities and privilege concepts
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;

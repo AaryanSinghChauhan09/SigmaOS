@@ -203,10 +203,10 @@ impl AliasManager {
             "apk" => {
                 if args.first() == Some(&"add") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg install {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"del") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg remove {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"update") {
                     "sigpkg update".to_string()
                 } else {
@@ -217,10 +217,10 @@ impl AliasManager {
             "apt" | "apt-get" => {
                 if args.first() == Some(&"install") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg install {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"remove") || args.first() == Some(&"purge") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg remove {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"update") {
                     "sigpkg update".to_string()
                 } else {
@@ -237,10 +237,10 @@ impl AliasManager {
                         if pkg_args.is_empty() {
                             "sigpkg update".to_string()
                         } else {
-                            format!("sigpkg update && sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                            format!("sigpkg update && sigpkg install {}", pkg_args.join(" "))
                         }
                     } else if flag == "-S" {
-                        format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                        format!("sigpkg install {}", pkg_args.join(" "))
                     } else {
                         trimmed.to_string()
                     }
@@ -249,7 +249,7 @@ impl AliasManager {
                     if pkg_args.is_empty() {
                         trimmed.to_string()
                     } else {
-                        format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                        format!("sigpkg remove {}", pkg_args.join(" "))
                     }
                 } else {
                     trimmed.to_string()
@@ -259,10 +259,10 @@ impl AliasManager {
             "dnf" | "yum" => {
                 if args.first() == Some(&"install") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg install {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"remove") || args.first() == Some(&"erase") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg remove {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"check-update") || args.first() == Some(&"update") {
                     "sigpkg update".to_string()
                 } else {
@@ -277,7 +277,7 @@ impl AliasManager {
                         .filter(|&&a| a != "--unmerge" && a != "-C")
                         .cloned()
                         .collect();
-                    format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg remove {}", pkg_args.join(" "))
                 } else {
                     // Filtering options to get package name
                     let pkg_args: Vec<&str> = args
@@ -288,7 +288,7 @@ impl AliasManager {
                     if pkg_args.is_empty() {
                         "sigpkg update".to_string()
                     } else {
-                        format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                        format!("sigpkg install {}", pkg_args.join(" "))
                     }
                 }
             }
@@ -296,10 +296,10 @@ impl AliasManager {
             "pkg" => {
                 if args.first() == Some(&"install") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg install {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg install {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"delete") || args.first() == Some(&"remove") {
                     let pkg_args = &args[1..];
-                    format!("sigpkg remove {}", format!("{}/{}", pkg_args, " "))
+                    format!("sigpkg remove {}", pkg_args.join(" "))
                 } else if args.first() == Some(&"update") {
                     "sigpkg update".to_string()
                 } else {

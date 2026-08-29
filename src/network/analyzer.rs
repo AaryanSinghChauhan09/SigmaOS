@@ -17,6 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use alloc::vec;
 use alloc::format;
+use core::net::IpAddr;
 
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis

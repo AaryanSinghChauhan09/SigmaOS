@@ -216,6 +216,58 @@ impl AiExecutionDispatcher {
                     }
                 }
             }
+            ComputeDeviceTarget::GPU | ComputeDeviceTarget::IntegratedGpu => {
+                if self.discrete_gpu_available {
+                    DeviceFallbackRoute {
+                        primary_device: requested,
+                        active_device: ComputeDeviceTarget::GPU,
+                        is_fallback_active: false,
+                        fallback_reason: String::new(),
+                    }
+                } else if self.integrated_npu_available {
+                    self.fallback_count += 1;
+                    DeviceFallbackRoute {
+                        primary_device: requested,
+                        active_device: ComputeDeviceTarget::IntegratedNpu,
+                        is_fallback_active: true,
+                        fallback_reason: "GPU unavailable, falling back to Integrated NPU"
+                            .to_string(),
+                    }
+                } else {
+                    self.fallback_count += 1;
+                    DeviceFallbackRoute {
+                        primary_device: requested,
+                        active_device: ComputeDeviceTarget::CpuSimd,
+                        is_fallback_active: true,
+                        fallback_reason: "GPU and NPU unavailable, falling back to CPU SIMD"
+                            .to_string(),
+                    }
+                }
+            }
+            ComputeDeviceTarget::NPU => {
+                if self.integrated_npu_available {
+                    DeviceFallbackRoute {
+                        primary_device: requested,
+                        active_device: ComputeDeviceTarget::IntegratedNpu,
+                        is_fallback_active: false,
+                        fallback_reason: String::new(),
+                    }
+                } else {
+                    self.fallback_count += 1;
+                    DeviceFallbackRoute {
+                        primary_device: requested,
+                        active_device: ComputeDeviceTarget::CpuSimd,
+                        is_fallback_active: true,
+                        fallback_reason: "NPU unavailable, falling back to CPU SIMD".to_string(),
+                    }
+                }
+            }
+            ComputeDeviceTarget::CPU | ComputeDeviceTarget::TPU => DeviceFallbackRoute {
+                primary_device: requested,
+                active_device: ComputeDeviceTarget::CPU,
+                is_fallback_active: false,
+                fallback_reason: String::new(),
+            },
             ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => DeviceFallbackRoute {
                 primary_device: requested,
                 active_device: ComputeDeviceTarget::CpuSimd,
@@ -233,9 +285,11 @@ impl AiExecutionDispatcher {
     ) -> (usize, u64) {
         let ops = matrix.rows * matrix.cols * 2;
         let exec_time_us = match route.active_device {
-            ComputeDeviceTarget::DiscreteGpu => ops as u64 / 10_000,
-            ComputeDeviceTarget::IntegratedNpu => ops as u64 / 5_000,
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => ops as u64 / 1_000,
+            ComputeDeviceTarget::DiscreteGpu | ComputeDeviceTarget::GPU
+            | ComputeDeviceTarget::IntegratedGpu => ops as u64 / 10_000,
+            ComputeDeviceTarget::IntegratedNpu | ComputeDeviceTarget::NPU => ops as u64 / 5_000,
+            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect | ComputeDeviceTarget::CPU
+            | ComputeDeviceTarget::TPU => ops as u64 / 1_000,
         };
 
         (ops, exec_time_us.max(1))

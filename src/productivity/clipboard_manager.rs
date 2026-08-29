@@ -164,13 +164,7 @@ impl ClipboardManager {
     ) -> Result<(), ClipboardError> {
         let text_len = text.len();
         let item = ClipboardItem {
-            id: format!(
-                "item_{}",
-                core::time::Duration::from_secs(0)
-                    .duration_since(std::time::core::time::Duration::from_secs(0))
-                    .unwrap()
-                    .as_nanos()
-            ),
+            id: format!("item_{}", 0u128),
             item_type: ClipboardItemType::Text,
             content: text.into_bytes(),
             metadata: {
@@ -239,12 +233,12 @@ impl ClipboardManager {
                     }
                 }
                 if let Some(min_age) = filter.min_age {
-                    if item.core::time::Duration::from_millis(0) < min_age {
+                    if Duration::from_millis(item.timestamp) < min_age {
                         return false;
                     }
                 }
                 if let Some(max_age) = filter.max_age {
-                    if item.core::time::Duration::from_millis(0) > max_age {
+                    if Duration::from_millis(item.timestamp) > max_age {
                         return false;
                     }
                 }
@@ -285,7 +279,7 @@ impl ClipboardManager {
 
         // Trim by max age
         self.history
-            .retain(|item| item.core::time::Duration::from_millis(0) < self.history_config.max_age);
+            .retain(|item| Duration::from_millis(item.timestamp) < self.history_config.max_age);
     }
 
     /// Auto-clear if needed
@@ -295,7 +289,7 @@ impl ClipboardManager {
         }
 
         if let Some(last_copy) = self.last_copy_time {
-            if core::time::Duration::from_millis(0) >= self.auto_clear_delay {
+            if Duration::from_millis(last_copy) >= self.auto_clear_delay {
                 self.clear()?;
             }
         }

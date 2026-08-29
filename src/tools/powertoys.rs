@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 //! Sovereign Microsoft PowerToys replication suite for SigmaOS
 //! Implements a rich suite of system and workspace utilities:

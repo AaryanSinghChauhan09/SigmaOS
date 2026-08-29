@@ -6,10 +6,6 @@ extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
-
 // ============================================================================
 // 1. Linux TLP / Laptop Mode Tools Power Governor
 // ============================================================================

@@ -16,7 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 
 use core::sync::atomic::{AtomicU32, Ordering};
 /// SigmaOS Softirq and tasklets deferred execution engine

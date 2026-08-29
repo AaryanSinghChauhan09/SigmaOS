@@ -4,8 +4,6 @@
 //! - FreeBSD GEOM Storage Partitioning & Disk Labeling (`FreeBsdGeomDiskEngine`)
 //! - OpenBSD DRM/KMS Mode-setting & Framebuffer Controller (`OpenBsdDrmKmsController`)
 //! - Universal USB xHCI Transfer Ring Buffer Manager (`UniversalXhciRingEngine`)
-use alloc::vec::Vec;
-use alloc::vec;
 extern crate alloc;
 
 use alloc::string::String;

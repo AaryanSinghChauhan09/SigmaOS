@@ -85,11 +85,7 @@ impl ArchiveHandler for ZipArchiveHandler {
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
         let start = 0u64;
-        let original_size: u64 = files
-            .iter()
-            .filter_map(|f| f.metadata().ok())
-            .map(|m| m.len())
-            .sum();
+        let original_size: u64 = files.iter().map(|f| f.len() as u64).sum();
 
         // Simulated compression based on level
         let compression_ratio = match level {
@@ -164,11 +160,7 @@ impl ArchiveHandler for TarArchiveHandler {
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
         let start = 0u64;
-        let original_size: u64 = files
-            .iter()
-            .filter_map(|f| f.metadata().ok())
-            .map(|m| m.len())
-            .sum();
+        let original_size: u64 = files.iter().map(|f| f.len() as u64).sum();
 
         let compression_ratio = match level {
             CompressionLevel::None => 1.0,
@@ -242,11 +234,7 @@ impl ArchiveHandler for SevenZipArchiveHandler {
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
         let start = 0u64;
-        let original_size: u64 = files
-            .iter()
-            .filter_map(|f| f.metadata().ok())
-            .map(|m| m.len())
-            .sum();
+        let original_size: u64 = files.iter().map(|f| f.len() as u64).sum();
 
         // 7zip LZMA2 superior compression ratios
         let compression_ratio = match level {
@@ -394,8 +382,8 @@ impl ArchiveManager {
     /// Detect archive format from file extension
     fn detect_format(&self, path: &str) -> Result<ArchiveFormat, ArchiveError> {
         let extension = path
-            .extension()
-            .and_then(|e| e.to_str())
+            .rsplit_once('.')
+            .map(|(_, ext)| ext)
             .ok_or_else(|| ArchiveError::UnknownFormat)?;
 
         match extension.to_lowercase().as_str() {

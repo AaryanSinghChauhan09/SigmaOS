@@ -233,15 +233,24 @@ impl FileManager {
             return Err(FileManagerError::InvalidPath(path.to_string()));
         }
 
-        self.current_path = path.clone();
+        self.current_path = path.to_string();
         self.add_to_recent(path);
         Ok(())
     }
 
     /// Navigate up
     pub fn navigate_up(&mut self) -> Result<(), FileManagerError> {
-        if let Some(parent) = self.None::<&str> {
+        let parent = self.current_path.rfind('/').map(|idx| {
+            let prefix = &self.current_path[..idx];
+            if prefix.is_empty() {
+                "/".to_string()
+            } else {
+                prefix.to_string()
+            }
+        });
+        if let Some(parent) = parent {
             self.current_path = parent.clone();
+            self.add_to_recent(&parent);
             Ok(())
         } else {
             Err(FileManagerError::AlreadyAtRoot)
@@ -271,7 +280,7 @@ impl FileManager {
     /// Paste from clipboard
     pub fn paste(&mut self) -> Result<(), FileManagerError> {
         for (path, operation) in self.clipboard.drain(..) {
-            let destination = self.format!("{}/{}", current_path, Some(path.as_str()).unwrap());
+            let destination = format!("{}/{}", self.current_path, path);
 
             match operation {
                 ClipboardOperation::Copy => {
@@ -297,13 +306,24 @@ impl FileManager {
 
     /// Create directory
     pub fn create_directory(&self, name: &str) -> Result<(), FileManagerError> {
-        let path = self.format!("{}/{}", current_path, name);
+        let path = format!("{}/{}", self.current_path, name);
         self.file_operation.create_directory(&path)
     }
 
     /// Rename file
     pub fn rename(&self, old_path: &str, new_name: &str) -> Result<(), FileManagerError> {
-        let new_path = None::<&str>.unwrap().join(new_name);
+        let parent = old_path
+            .rfind('/')
+            .map(|idx| {
+                let prefix = &old_path[..idx];
+                if prefix.is_empty() {
+                    "/"
+                } else {
+                    prefix
+                }
+            })
+            .unwrap_or("/");
+        let new_path = format!("{}/{}", parent, new_name);
         self.file_operation.move_file(old_path, &new_path)
     }
 
@@ -333,7 +353,7 @@ impl FileManager {
 
     /// Add to recent paths
     fn add_to_recent(&mut self, path: &str) {
-        let path = path.clone();
+        let path = path.to_string();
         if !self.recent_paths.contains(&path) {
             self.recent_paths.push(path.clone());
             if self.recent_paths.len() > 10 {
@@ -368,11 +388,12 @@ impl FileManager {
         // Simulated file info
         Ok(FileItem {
             name: path
-                .file_name()
-                .and_then(|n| n.to_str())
+                .rsplit('/')
+                .next()
+                .filter(|s| !s.is_empty())
                 .unwrap_or("unknown")
                 .to_string(),
-            path: path.clone(),
+            path: path.to_string(),
             size_bytes: 1024,
             is_directory: false,
             is_hidden: false,

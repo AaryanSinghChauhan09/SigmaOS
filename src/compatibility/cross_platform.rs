@@ -830,7 +830,7 @@ impl SovereignSysctlManager {
                     SysctlValue::Boolean(b) => Ok(format!("{} = {}", path, b)),
                     SysctlValue::String(s) => {
                         let len = s.iter().position(|&b| b == 0).unwrap_or(64);
-                        if let Ok(st) = core:: String::from_utf8(&s[..len]) {
+                        if let Ok(st) = core::str::from_utf8(&s[..len]) {
                             Ok(format!("{} = {}", path, st))
                         } else {
                             Err("Invalid string value")

@@ -6,7 +6,6 @@ extern crate alloc;
 
 use crate::klib::{Vec, String, ToString};
 use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::format;
 
 /// Target Operating System Type for Dual-Boot Chainloading

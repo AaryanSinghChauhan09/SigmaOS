@@ -15,7 +15,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 
 extern crate alloc;
 use crate::kernel::subsystems::registry::{
@@ -27,7 +26,6 @@ use crate::kernel::subsystems::registry::{
 /// Also covers RTL8139 PCI NIC and Intel e1000 Gigabit
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::VecDeque;
-use alloc::vec::Vec;
 
 /// Ethernet frame constants
 pub const ETH_ALEN: usize = 6; // MAC address length

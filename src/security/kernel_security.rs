@@ -1,5 +1,3 @@
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
 extern crate alloc;
 // SigmaOS Kernel Security Framework

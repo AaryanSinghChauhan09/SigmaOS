@@ -125,10 +125,7 @@ impl SigmaTimeshiftManager {
         label: String,
         system_files: HashMap<String, String>,
     ) -> Result<String, BackupError> {
-        let timestamp = core::time::Duration::from_secs(0)
-            .duration_since(core::time::Duration::from_secs(0))
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
+        let timestamp = 0u64;
 
         let id = format!("timeshift-snap-{}", timestamp);
         let snapshot = BackupSnapshot {

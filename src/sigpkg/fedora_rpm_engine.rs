@@ -96,7 +96,7 @@ impl RpmSpecParser {
 
         // Extract from %description section
         if let Some(desc_lines) = self.sections.get("%description") {
-            package.description = format!("{}/{}", desc_lines, "\n");
+            package.description = desc_lines.join("\n");
         }
 
         // Extract from %files section (usually contains some metadata)

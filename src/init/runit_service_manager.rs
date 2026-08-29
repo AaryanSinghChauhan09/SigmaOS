@@ -1,4 +1,3 @@
-use alloc::vec;
 use alloc::format;
 extern crate alloc;
 // SigmaOS Runit-Style Service Manager (Void Linux Inspiration)
@@ -7,7 +6,6 @@ extern crate alloc;
 
 
 use crate::klib::{Vec, String, BTreeMap, HashSet};
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use core::time::Duration;
 

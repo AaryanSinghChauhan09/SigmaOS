@@ -6,7 +6,6 @@ extern crate alloc;
 
 use crate::klib::{String, Vec, ToString};
 use alloc::string::String;
-use alloc::vec::Vec;
 
 // ============================================================================
 // 61. Default Secure Posture

@@ -15,7 +15,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 
 extern crate alloc;
 use crate::kernel::subsystems::registry::{
@@ -26,7 +25,6 @@ use crate::kernel::subsystems::registry::{
 /// Handles: scancode sets 1/2/3, XT compatibility, PS/2 mouse Intellimouse protocol
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::VecDeque;
-use alloc::vec::Vec;
 
 /// i8042 PS/2 controller I/O ports
 pub const I8042_DATA_PORT: u16 = 0x60;

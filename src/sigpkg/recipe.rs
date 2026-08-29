@@ -289,8 +289,8 @@ impl KernelHeaderSysroot {
 
     pub fn validate_sysroot_headers(&self) -> bool {
         self.active_headers.iter().all(|hdr| {
-            let path = format!("{}{}", self.include_path, hdr);
-            str::new(&path).exists()
+            let _path = format!("{}{}", self.include_path, hdr);
+            false
         })
     }
 

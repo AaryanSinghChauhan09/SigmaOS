@@ -569,7 +569,7 @@ impl DependencyResolver {
         let mut resolved: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         let mut to_visit: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+        let mut visited = alloc::collections::BTreeSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;

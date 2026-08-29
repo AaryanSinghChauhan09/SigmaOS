@@ -59,7 +59,7 @@ pub struct MetricData {
     pub metric_type: MetricType,
     pub value: f64,
     pub unit: String,
-    pub timestamp: std::time:: u64,
+    pub timestamp: u64,
 }
 
 /// Metric type

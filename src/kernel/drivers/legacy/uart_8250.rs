@@ -15,7 +15,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 
 extern crate alloc;
 use crate::kernel::subsystems::registry::{
@@ -27,7 +26,6 @@ use crate::kernel::subsystems::registry::{
 /// COM1–COM4, baud rates 50–4,000,000, 5–8 data bits, 1–2 stop bits, parity
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::VecDeque;
-use alloc::vec::Vec;
 
 /// Standard COM port I/O bases and IRQs
 pub const COM1_BASE: u16 = 0x3F8;

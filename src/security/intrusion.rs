@@ -25,10 +25,6 @@ use alloc::format;
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 // IpAddr not in no_std; using u32/u128 for addresses
@@ -39,8 +35,8 @@ use crate::klib::HashMap;
 pub struct SecurityEvent {
     pub id: String,
     pub event_type: EventType,
-    pub source_ip: Option<IpAddr>,
-    pub target_ip: Option<IpAddr>,
+    pub source_ip: Option<u32>,
+    pub target_ip: Option<u32>,
     pub timestamp: u64,
     pub severity: Severity,
     pub description: String,
@@ -190,7 +186,7 @@ impl DetectionStrategy for AnomalyDetection {
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
-            let deviation: f64 = (event.0u64 as f64 - *baseline).abs();
+            let deviation: f64 = (event.timestamp as f64 - *baseline).abs();
 
             if deviation > self.threshold {
                 return Some(DetectionResult {

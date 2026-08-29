@@ -1,6 +1,5 @@
 //! Sovereign BSD/Linux-style System Administration and Diagnostics Tools (sys_tools)
 //! Implements high-fidelity tcpdump, ncdu disk analysis, and kernel sysctl runtime tuners.
-use alloc::vec::Vec;
 use alloc::format;
 extern crate alloc;
 

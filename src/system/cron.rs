@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 use alloc::format;
 extern crate alloc;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler

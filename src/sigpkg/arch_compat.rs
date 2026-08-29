@@ -1,4 +1,3 @@
-use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
@@ -6,6 +5,7 @@ extern crate alloc;
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
 use crate::klib::{HashMap, SigmaString, Vec as KVec};
+use crate::klib::Vec;
 use crate::klib;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -379,7 +379,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header.to_vec()
+        image_header
     }
 }
 
@@ -533,7 +533,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content.to_vec()))
+        Ok((archive_name, archive_content))
     }
 }
 

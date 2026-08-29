@@ -3,12 +3,7 @@ extern crate alloc;
 // SigmaOS Stable Linux Distro Parity Subsystem
 // Inspired by RHEL/Rocky/AlmaLinux, Debian dpkg, Alpine lbu/apk, and Enterprise systemd cgroupv2
 
-#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
-
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
 
 // ============================================================================
 // 1. RHEL / Rocky / AlmaLinux Subscription & Entitlement Manager

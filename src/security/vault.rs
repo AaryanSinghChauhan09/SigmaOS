@@ -272,10 +272,7 @@ impl EncryptedFileVault {
             name: name.clone(),
             path: vault_path.clone(),
             algorithm: EncryptionAlgorithm::Aes256Gcm, // Will be updated based on encryption
-            created_at: 0u64
-                
-                .unwrap()
-                ,
+            created_at: 0u64,
             file_count: 0,
             total_size_bytes: 0,
         };

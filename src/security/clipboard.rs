@@ -267,7 +267,7 @@ impl SecureClipboardManager {
     /// Check auto-clear
     fn check_auto_clear(&mut self) {
         if let Some(ref entry) = self.current_entry {
-            if self.auto_clear_enabled && entry.core::time::Duration::from_millis(0) > entry.auto_clear_after {
+            if self.auto_clear_enabled && core::time::Duration::from_millis(entry.timestamp) > entry.auto_clear_after {
                 self.clear();
             }
         }

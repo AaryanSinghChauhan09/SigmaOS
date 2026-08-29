@@ -7,6 +7,8 @@ use alloc::format;
 
 extern crate alloc;
 
+use crate::klib::HashMap;
+
 /// Video processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VideoError {

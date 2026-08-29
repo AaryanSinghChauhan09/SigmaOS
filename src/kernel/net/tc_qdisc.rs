@@ -19,9 +19,8 @@
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 use crate::klib::VecDeque;
+use alloc::vec::Vec;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
