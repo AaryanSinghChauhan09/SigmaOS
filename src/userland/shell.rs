@@ -162,31 +162,6 @@ impl From<RedirectSpec> for Redirect {
     }
 }
 
-pub struct RedirectionEngine {
-    pub streams: BTreeMap<u32, Vec<u8>>,
-}
-
-impl RedirectionEngine {
-    pub fn new() -> Self {
-        Self {
-            streams: BTreeMap::new(),
-        }
-    }
-
-    pub fn write_fd(&mut self, fd: u32, data: &[u8]) {
-        self.streams.entry(fd).or_default().extend_from_slice(data);
-    }
-
-    pub fn read_fd(&self, fd: u32) -> Option<&[u8]> {
-        self.streams.get(&fd).map(|v| v.as_slice())
-    }
-}
-
-impl Default for RedirectionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 pub struct Environment {
     pub vars: BTreeMap<String, String>,
