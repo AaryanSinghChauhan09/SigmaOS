@@ -49,8 +49,22 @@ mod fs_bsd_linux_innovations;
 mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
-use wiki_ideas::SystemdUnitActiveState;
+#[path = "../src/compatibility/gap_closure.rs"]
+mod gap_closure;
+#[path = "../src/virtualization/kvm_vcpu.rs"]
+mod kvm_vcpu;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+
+
+#[path = "../src/logging/unified.rs"]
+mod unified;
+
+use wiki_ideas_implementation::SystemdUnitActiveState;
 use bsd_compat::*;
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unveil::{UnveilManager, UnveilPermission};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

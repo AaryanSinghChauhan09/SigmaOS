@@ -974,10 +974,10 @@ mod tests {
         let mut parser = Parser::new("echo hello > output.txt");
         let cmd = parser.parse().unwrap();
         match cmd {
-            ShellCommand::Redirect(_child, RedirectSpec::Output { fd, path, append, .. }) => {
-                assert_eq!(fd, 1);
-                assert!(!append);
-                assert_eq!(path, "output.txt");
+            ShellCommand::Redirect(_child, redir) => {
+                assert_eq!(redir.src_fd, 1);
+                assert_eq!(redir.path, "output.txt");
+                assert_eq!(redir.kind, RedirectKind::Output);
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -985,9 +985,10 @@ mod tests {
         let mut parser2 = Parser::new("cat < input.txt");
         let cmd2 = parser2.parse().unwrap();
         match cmd2 {
-            ShellCommand::Redirect(_, RedirectSpec::Input { fd, path }) => {
-                assert_eq!(fd, 0);
-                assert_eq!(path, "input.txt");
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 0);
+                assert_eq!(redir.path, "input.txt");
+                assert_eq!(redir.kind, RedirectKind::Input);
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -995,9 +996,10 @@ mod tests {
         let mut parser3 = Parser::new("ls 2> error.log");
         let cmd3 = parser3.parse().unwrap();
         match cmd3 {
-            ShellCommand::Redirect(_, RedirectSpec::Output { fd, path, .. }) => {
-                assert_eq!(fd, 2);
-                assert_eq!(path, "error.log");
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 2);
+                assert_eq!(redir.path, "error.log");
+                assert_eq!(redir.kind, RedirectKind::Output);
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -1005,9 +1007,10 @@ mod tests {
         let mut parser4 = Parser::new("command 2>&1");
         let cmd4 = parser4.parse().unwrap();
         match cmd4 {
-            ShellCommand::Redirect(_, RedirectSpec::DupOutput { src_fd, target_fd }) => {
-                assert_eq!(src_fd, 2);
-                assert_eq!(target_fd, 1);
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 2);
+                assert_eq!(redir.target_fd, Some(1));
+                assert_eq!(redir.kind, RedirectKind::DupOutput);
             }
             _ => panic!("Expected Redirect command"),
         }
@@ -1015,9 +1018,10 @@ mod tests {
         let mut parser5 = Parser::new("grep fn <<< fn main()");
         let cmd5 = parser5.parse().unwrap();
         match cmd5 {
-            ShellCommand::Redirect(_, RedirectSpec::HereString { fd, content }) => {
-                assert_eq!(fd, 0);
-                assert_eq!(content, "fn");
+            ShellCommand::Redirect(_, redir) => {
+                assert_eq!(redir.src_fd, 0);
+                assert_eq!(redir.path, "fn main()");
+                assert_eq!(redir.kind, RedirectKind::HereString);
             }
             _ => panic!("Expected Redirect command"),
         }

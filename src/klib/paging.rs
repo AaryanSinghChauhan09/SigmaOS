@@ -200,7 +200,7 @@ impl PageTable for SimplePageTable {
             &mut self.entries[index]
         } else {
             static mut MUT_DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            unsafe { &mut MUT_DUMMY }
+            unsafe { &mut *(&raw mut MUT_DUMMY) }
         }
     }
 
