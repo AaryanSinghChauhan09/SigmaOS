@@ -237,7 +237,7 @@ mod tests {
         };
 
         allocator.add_node(node).unwrap();
-        allocator.set_current_node(0);
+        let _ = allocator.set_current_node(0);
 
         let selected = allocator.select_node(Some(AllocationPolicy::Local));
         assert_eq!(selected, Some(0));
