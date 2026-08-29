@@ -104,6 +104,7 @@ pub mod distro_innovations;
 pub mod extended_distro_matrix;
 pub mod linuxmint_inspirations;
 pub mod arch_kernel_inspirations;
+pub mod distro_inspirations;
 
 pub use linuxmint_inspirations::{
     AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
@@ -120,4 +121,13 @@ pub use arch_kernel_inspirations::{
     KUnitSuiteResult, KUnitTestCase, MkinitcpioHookFramework, PackageSignoff, RebuildOrderSolver,
     ReproducibleBuildVerdict, ReproducibleStatus, SecurityAdvisory, SecurityAdvisoryTracker,
     Signer, SignerPolicy, SignoffCount, SignoffEntry, SignstarService,
+};
+
+pub use distro_inspirations::{
+    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackarchTool, BlackmanBuild,
+    ElevateMigration, FlatcarImmutableRootfs, FormFactor, FreePolicyVerdict, GamescopeCompositor,
+    InterfaceFlag, IsolationKind, KaliMetapackage, KaliToolGroup, NebraskaInstance,
+    NebraskaUpdateServer, PhoshConvergence, PressureVessel, PuppySaveSession, PureosFreePolicy,
+    RancherOsCloudConfig, RaspiConfigTool, ReleaseChannel, SaveMode, SigRepository, SteamABImageUpdate,
+    TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
 };
