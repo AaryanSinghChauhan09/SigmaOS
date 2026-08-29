@@ -26,6 +26,8 @@ This guide outlines actionable steps and architectural patterns designed to sust
     Upgrade dependency `brace-expansion` inside `package.json` to `^2.0.1` and run lockfile synchronization to eliminate GHSA-mh99-v99m-4gvg.
 *   **Add Pre-Commit Credentials Scanners:**
     Deploy a standard pre-commit hook targeting hardcoded credentials, test private keys, and API tokens to prevent accidental exposure of secret assets.
+*   **Enforce Comprehensive Compliance Frameworks:**
+    Incorporate regulatory frameworks (GDPR zero-out RAM dumps, ISO 27001 access control audits, HIPAA log encryption, and WCAG 2.1 AA screen reader/keyboard navigation controls).
 
 ---
 
