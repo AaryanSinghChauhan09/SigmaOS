@@ -63,6 +63,14 @@ pub use unimplemented_features::{
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
 };
+pub use distro::{
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+};
+pub use security::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+};
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
 

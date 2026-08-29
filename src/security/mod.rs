@@ -2,6 +2,7 @@
 pub mod audit;
 pub mod capability;
 pub mod hardening;
+pub mod kernel_hardening;
 
 pub mod bridge;
 pub mod capability_enforcer;
@@ -51,6 +52,11 @@ pub use clipboard::{
 pub use forensics::*;
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
+pub use kernel_hardening::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine,
+    SmepSmapEnforcer, SovereignKaslrEngine, SyscallCategory,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,

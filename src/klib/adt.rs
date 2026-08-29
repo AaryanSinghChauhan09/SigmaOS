@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 // Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
 // Implements high-performance kernel data structures:
