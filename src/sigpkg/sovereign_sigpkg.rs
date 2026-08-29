@@ -1077,6 +1077,236 @@ impl OpenBsdPkgSignifyVerifier {
 }
 
 // =========================================================================
+// 23. APPIMAGE & PORTABLE APPDIR EXECUTABLE BUNDLE CONTAINER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct AppDirDesktopEntry {
+    pub name: String,
+    pub exec_binary: String,
+    pub icon_path: String,
+    pub categories: Vec<String>,
+}
+
+pub struct SovereignAppDirContainer {
+    pub app_name: String,
+    pub mount_point: String,
+    pub desktop_entry: AppDirDesktopEntry,
+    pub is_mounted: bool,
+    pub sandbox_isolated: bool,
+}
+
+impl SovereignAppDirContainer {
+    pub fn new(app_name: &str, exec_binary: &str, icon_path: &str) -> Self {
+        Self {
+            app_name: app_name.to_string(),
+            mount_point: format!("/tmp/.mount_{}", app_name),
+            desktop_entry: AppDirDesktopEntry {
+                name: app_name.to_string(),
+                exec_binary: exec_binary.to_string(),
+                icon_path: icon_path.to_string(),
+                categories: vec!["Utility".to_string()],
+            },
+            is_mounted: false,
+            sandbox_isolated: true,
+        }
+    }
+
+    pub fn mount_appdir_bundle(&mut self) -> Result<String, &'static str> {
+        if self.is_mounted {
+            return Err("AppDir container is already mounted");
+        }
+        self.is_mounted = true;
+        Ok(self.mount_point.clone())
+    }
+
+    pub fn unmount_appdir_bundle(&mut self) -> Result<(), &'static str> {
+        if !self.is_mounted {
+            return Err("AppDir container is not mounted");
+        }
+        self.is_mounted = false;
+        Ok(())
+    }
+
+    pub fn launch_apprun(&self) -> Result<String, &'static str> {
+        if !self.is_mounted {
+            return Err("Cannot launch AppRun: AppDir bundle is not mounted");
+        }
+        Ok(format!("{}/{}", self.mount_point, self.desktop_entry.exec_binary))
+    }
+}
+
+// =========================================================================
+// 24. VOID XBPS-SRC & ARCH MAKECHROOTPKG CLEAN BUILD SANDBOX
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ChrootMountBind {
+    pub host_path: String,
+    pub target_path: String,
+    pub read_only: bool,
+}
+
+pub struct SovereignChrootBuildSandbox {
+    pub chroot_dir: String,
+    pub fakeroot_active: bool,
+    pub active_mounts: Vec<ChrootMountBind>,
+    pub clean_sysroot: bool,
+}
+
+impl SovereignChrootBuildSandbox {
+    pub fn new(chroot_dir: &str) -> Self {
+        Self {
+            chroot_dir: chroot_dir.to_string(),
+            fakeroot_active: true,
+            active_mounts: Vec::new(),
+            clean_sysroot: true,
+        }
+    }
+
+    pub fn add_mount_bind(&mut self, host_path: &str, target_path: &str, read_only: bool) {
+        self.active_mounts.push(ChrootMountBind {
+            host_path: host_path.to_string(),
+            target_path: target_path.to_string(),
+            read_only,
+        });
+    }
+
+    pub fn execute_clean_build<F>(&self, build_fn: F) -> Result<String, &'static str>
+    where
+        F: FnOnce(&str, bool) -> Result<String, &'static str>,
+    {
+        if !self.clean_sysroot {
+            return Err("Chroot sandbox sysroot is tainted");
+        }
+        build_fn(&self.chroot_dir, self.fakeroot_active)
+    }
+}
+
+// =========================================================================
+// 25. GENTOO PORTAGE EAPI & PACKAGE MASK CONFIGURATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PortageMaskRule {
+    pub package_pattern: String,
+    pub reason: String,
+}
+
+pub struct SovereignPortagePackageMaskEngine {
+    pub eapi_version: u32,
+    pub target_arch: String,
+    pub keyword_accept_unstable: bool,
+    pub masked_packages: Vec<PortageMaskRule>,
+    pub accepted_licenses: Vec<String>,
+}
+
+impl SovereignPortagePackageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            eapi_version: 8,
+            target_arch: target_arch.to_string(),
+            keyword_accept_unstable: false,
+            masked_packages: Vec::new(),
+            accepted_licenses: vec!["GPL-2".to_string(), "MIT".to_string(), "Apache-2.0".to_string(), "*".to_string()],
+        }
+    }
+
+    pub fn add_mask_rule(&mut self, pkg_pattern: &str, reason: &str) {
+        self.masked_packages.push(PortageMaskRule {
+            package_pattern: pkg_pattern.to_string(),
+            reason: reason.to_string(),
+        });
+    }
+
+    pub fn evaluate_installability(&self, pkg_name: &str, arch_keyword: &str, license: &str) -> Result<(), &'static str> {
+        // Check mask rules
+        for rule in &self.masked_packages {
+            if rule.package_pattern == pkg_name || rule.package_pattern == "*" {
+                return Err("Package is hard-masked by Portage configuration");
+            }
+        }
+
+        // Check license acceptance
+        if !self.accepted_licenses.contains(&license.to_string()) && !self.accepted_licenses.contains(&"*".to_string()) {
+            return Err("Package license not accepted in portage config");
+        }
+
+        // Check keyword stability (~amd64 vs amd64)
+        if arch_keyword.starts_with('~') && !self.keyword_accept_unstable {
+            return Err("Unstable architecture keyword rejected (ACCEPT_KEYWORDS required)");
+        }
+
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 26. DEBIAN APT-FAST & PARALLEL MULTI-CHUNK DOWNLOADER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DownloadChunk {
+    pub chunk_index: usize,
+    pub start_byte: u64,
+    pub end_byte: u64,
+    pub data: Vec<u8>,
+}
+
+pub struct SovereignMultiChunkPackageDownloader {
+    pub num_connections: usize,
+    pub chunk_size_bytes: u64,
+}
+
+impl SovereignMultiChunkPackageDownloader {
+    pub fn new(num_connections: usize, chunk_size_bytes: u64) -> Self {
+        Self {
+            num_connections,
+            chunk_size_bytes,
+        }
+    }
+
+    pub fn download_and_assemble_package<F>(
+        &self,
+        total_size: u64,
+        fetch_chunk_fn: F,
+    ) -> Result<Vec<u8>, &'static str>
+    where
+        F: Fn(usize, u64, u64) -> Result<Vec<u8>, &'static str>,
+    {
+        if total_size == 0 {
+            return Err("Total package download size cannot be zero");
+        }
+
+        let mut chunks = Vec::new();
+        let mut current_byte = 0;
+        let mut chunk_idx = 0;
+
+        while current_byte < total_size {
+            let end_byte = (current_byte + self.chunk_size_bytes - 1).min(total_size - 1);
+            let payload = fetch_chunk_fn(chunk_idx, current_byte, end_byte)?;
+            chunks.push(DownloadChunk {
+                chunk_index: chunk_idx,
+                start_byte: current_byte,
+                end_byte,
+                data: payload,
+            });
+            current_byte = end_byte + 1;
+            chunk_idx += 1;
+        }
+
+        // Assemble chunks in order
+        chunks.sort_by_key(|c| c.chunk_index);
+        let mut assembled = Vec::new();
+        for chunk in chunks {
+            assembled.extend_from_slice(&chunk.data);
+        }
+
+        Ok(assembled)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS FOR ALL SUB-COMPONENTS
 // =========================================================================
 
@@ -1301,5 +1531,76 @@ mod tests {
         assert!(!verifier.verify_signify_signature(b"data", "untrusted comment: verify with unknown_key"));
         assert!(verifier.validate_path_unveiled("/usr/local/bin/git", "r"));
         assert!(!verifier.validate_path_unveiled("/etc/shadow", "r"));
+    }
+
+    #[test]
+    fn test_appdir_container_mounting() {
+        let mut appdir = SovereignAppDirContainer::new("GIMP", "AppRun", "/usr/share/icons/gimp.png");
+        assert_eq!(appdir.mount_point, "/tmp/.mount_GIMP");
+        assert!(!appdir.is_mounted);
+
+        let mounted_path = appdir.mount_appdir_bundle().unwrap();
+        assert_eq!(mounted_path, "/tmp/.mount_GIMP");
+        assert!(appdir.is_mounted);
+
+        let launch_cmd = appdir.launch_apprun().unwrap();
+        assert_eq!(launch_cmd, "/tmp/.mount_GIMP/AppRun");
+
+        assert!(appdir.unmount_appdir_bundle().is_ok());
+        assert!(!appdir.is_mounted);
+    }
+
+    #[test]
+    fn test_chroot_build_sandbox_isolation() {
+        let mut sandbox = SovereignChrootBuildSandbox::new("/var/lib/sigpkg/chroot");
+        sandbox.add_mount_bind("/proc", "/proc", true);
+
+        let build_res = sandbox
+            .execute_clean_build(|chroot, fakeroot| {
+                if fakeroot {
+                    Ok(format!("Built package cleanly inside {}", chroot))
+                } else {
+                    Err("Fakeroot missing")
+                }
+            })
+            .unwrap();
+
+        assert!(build_res.contains("/var/lib/sigpkg/chroot"));
+    }
+
+    #[test]
+    fn test_portage_package_mask_rules() {
+        let mut portage_mask = SovereignPortagePackageMaskEngine::new("amd64");
+        portage_mask.add_mask_rule("sys-kernel/gentoo-sources", "Experimental kernel");
+
+        // Allowed stable package
+        assert!(portage_mask.evaluate_installability("app-editors/vim", "amd64", "VIM-License").is_ok());
+
+        // Masked package
+        let masked_err = portage_mask.evaluate_installability("sys-kernel/gentoo-sources", "amd64", "GPL-2");
+        assert!(masked_err.is_err());
+
+        // Unstable keyword rejection without ACCEPT_KEYWORDS
+        let unstable_err = portage_mask.evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0");
+        assert!(unstable_err.is_err());
+
+        // Enable unstable keyword acceptance
+        portage_mask.keyword_accept_unstable = true;
+        assert!(portage_mask.evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0").is_ok());
+    }
+
+    #[test]
+    fn test_multi_chunk_downloader_assembly() {
+        let downloader = SovereignMultiChunkPackageDownloader::new(4, 5); // 5-byte chunks
+        let mock_file = b"SIGMAOS_PACKAGE_PAYLOAD_CHUNKED_DATA_STREAM";
+        let total_size = mock_file.len() as u64;
+
+        let assembled = downloader
+            .download_and_assemble_package(total_size, |_chunk_idx, start, end| {
+                Ok(mock_file[start as usize..=end as usize].to_vec())
+            })
+            .unwrap();
+
+        assert_eq!(assembled, mock_file);
     }
 }

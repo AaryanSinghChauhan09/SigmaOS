@@ -1,6 +1,8 @@
 // SigmaOS Ancient Build Replay Codex (BuildCodex)
 // Formulates compiler build codex logs for legacy reproducible tooling
 
+extern crate alloc;
+use alloc::string::{String, ToString};
 use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

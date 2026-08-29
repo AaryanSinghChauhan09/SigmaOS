@@ -480,48 +480,6 @@ pub trait CompatibilityCheck {
     fn run_full_scan(&self) -> CompatibilityReport;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AcpiPowerState {
-    D0,
-    D1,
-    D2,
-    D3,
-}
-
-pub struct SimpleAcpiManager {
-    pub irq_routing: alloc::collections::BTreeMap<u32, u32>,
-    pub power_states: alloc::collections::BTreeMap<u32, AcpiPowerState>,
-}
-
-impl SimpleAcpiManager {
-    pub fn new() -> Self {
-        Self {
-            irq_routing: alloc::collections::BTreeMap::new(),
-            power_states: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn balance_irq_routing(&mut self, irq: u32, cpu_core: u32) -> Result<(), &'static str> {
-        self.irq_routing.insert(irq, cpu_core);
-        Ok(())
-    }
-
-    pub fn set_device_power_state(&mut self, device_id: u32, state: AcpiPowerState) -> Result<(), &'static str> {
-        self.power_states.insert(device_id, state);
-        Ok(())
-    }
-
-    pub fn get_device_power_state(&self, device_id: u32) -> Option<AcpiPowerState> {
-        self.power_states.get(&device_id).copied()
-    }
-}
-
-impl Default for SimpleAcpiManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct SimpleDiagnostics {
     pub matrix: SimpleCompatibilityMatrix,
 }

@@ -42,6 +42,11 @@ pub use universal_adapter::{
     RpmSpecManifest, AppImageContainer,
 };
 pub use sovereign_sigpkg::*;
+pub use sovereign_sigpkg::{
+    AppDirDesktopEntry, ChrootMountBind, DownloadChunk, PortageMaskRule,
+    SovereignAppDirContainer, SovereignChrootBuildSandbox, SovereignMultiChunkPackageDownloader,
+    SovereignPortagePackageMaskEngine,
+};
 
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
