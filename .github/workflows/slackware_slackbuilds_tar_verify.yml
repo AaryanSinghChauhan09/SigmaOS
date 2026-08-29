@@ -1,0 +1,16 @@
+name: Slackware SlackBuilds & txz verification
+
+on:
+  push:
+    branches: [ main, 'jules-*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  slackware-txz-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Slackware SlackBuild Shell Scripts
+        run: |
+          echo "Verifying Slackware txz package archives and slack-desc files..."

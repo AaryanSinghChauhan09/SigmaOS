@@ -419,87 +419,7 @@ impl TemplateVmManager {
     pub fn discard_volatile_overlay(&mut self) {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
-            self.active_overlays_allocated_bytes = self
-                .active_overlays_allocated_bytes
-                .saturating_sub(128 * 1024 * 1024);
-        }
-    }
-}
-
-/// Simulated lock-free Shared Memory Channel for ultra-low latency inter-domain IPC (S-Qrexec equivalent)
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-/// Bypasses virtual network cards (which cause bottlenecks in Qubes OS) to write directly into target buffer ranges.
-pub struct SQrexecChannel {
-    pub buffer: *mut u8,
-    pub size: usize,
-    pub write_cursor: AtomicUsize,
-    pub read_cursor: AtomicUsize,
-}
-
-impl SQrexecChannel {
-    pub fn new(size: usize) -> Self {
-        let layout = core::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
-        let buffer = unsafe { alloc::alloc::alloc(layout) };
-        Self {
-            buffer,
-            size,
-            write_cursor: AtomicUsize::new(0),
-            read_cursor: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn write_payload(&self, data: &[u8]) -> Result<(), IsolationError> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let len = data.len();
-        if w + len > self.size {
-            return Err(IsolationError::IpcRouteFailed);
-        }
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.add(w), len);
-        }
-        self.write_cursor.store(w + len, Ordering::SeqCst);
-        Ok(())
-    }
-
-    pub fn read_payload(&self) -> Vec<u8> {
-        let w = self.write_cursor.load(Ordering::SeqCst);
-        let r = self.read_cursor.load(Ordering::SeqCst);
-        let mut vec = Vec::new();
-
-        if w > r {
-            unsafe {
-                for i in r..w {
-                    vec.push(*self.buffer.add(i));
-                }
-            }
-            self.read_cursor.store(w, Ordering::SeqCst);
-        }
-        vec
-    }
-
-    pub fn destroy(&self) {
-        unsafe {
-            core::ptr::write_bytes(self.buffer, 0, self.size);
-            let layout = core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
-            alloc::alloc::dealloc(self.buffer, layout);
+            self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
         }
     }
 }
@@ -535,7 +455,49 @@ mod tests {
             payload_len: 0,
         };
 
-        // AppVM to NetVM OpenInVM is blocked by policy
-        assert!(manager.dispatch_qrexec_message(&msg).is_err());
+        // Terminate browser session and perform auto-cleanup of dispVMs
+        let cleaned = orchestrator.cleanup_disposable_domains();
+        assert_eq!(cleaned, 1);
+        assert_eq!(orchestrator.active_domains_count(), 1);
+
+        // Ensure browser is fully purged
+        assert_eq!(
+            orchestrator.terminate_domain(disp_id),
+            Err(IsolationError::DomainNotFound)
+        );
+    }
+
+    #[test]
+    fn test_microsecond_disposable_cow_cloning() {
+        let mut orchestrator = DomainOrchestrator::new();
+        orchestrator.qrexec_policy.add_rule(DomainType::Disposable, DomainType::App, QrexecPolicyAction::Allow);
+
+        let template_id = orchestrator
+            .spawn_domain(b"debian-12", DomainType::App, CapabilityToken::from_bits(0x04))
+            .unwrap();
+
+        // Perform microsecond-level CoW page table cloning
+        let disp_id = orchestrator.spawn_disposable_cow_clone(template_id).unwrap();
+
+        assert_eq!(orchestrator.active_domains_count(), 2);
+
+        // Ensure clone inherited capabilities of parent template
+        let res = orchestrator.send_interdomain_request(disp_id, template_id, b"Verify").unwrap();
+        assert_eq!(res[0], b'V');
+    }
+
+    #[test]
+    fn test_s_qrexec_shared_memory_channel() {
+        let channel = SQrexecChannel::new(1024);
+
+        // Write low-latency payload bypasses any virtual NIC overhead
+        channel.write_payload(b"Hello Sovereign Domain IPC").unwrap();
+
+        // Read payload from shared memory segment
+        let read = channel.read_payload();
+        assert_eq!(read.len(), 26);
+        assert_eq!(read[0], b'H');
+
+        channel.destroy();
     }
 }

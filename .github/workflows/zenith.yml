@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Scan for Host Header Leakage
         run: |
           echo "[CI] Auditing shards for unauthorized host headers..."
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lattice_audit]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Verify 33-Suite Lattice
         run: |
           echo "[CI] Verifying Sovereign Suite materialization..."

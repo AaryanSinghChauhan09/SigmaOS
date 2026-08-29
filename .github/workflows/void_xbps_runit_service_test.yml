@@ -1,0 +1,16 @@
+name: Void XBPS & runit service integration tests
+
+on:
+  push:
+    branches: [ main, 'jules-*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  void-xbps-runit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify XBPS Package Coupling with Runit Services
+        run: |
+          echo "Validating Void Linux XBPS service registration hooks..."

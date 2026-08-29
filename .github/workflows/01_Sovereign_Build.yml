@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Purge Legacy Artifacts (Unix)
         if: runner.os != 'Windows'
@@ -93,7 +93,7 @@ jobs:
 
       - name: Upload Kernel Binary & Logs
         if: always()
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@v4
         with:
           name: sigmaos-${{ matrix.profile }}-${{ matrix.os }}
           path: |
