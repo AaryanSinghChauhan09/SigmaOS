@@ -49,6 +49,7 @@ pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod open_source_obsoletion;
 
 pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
