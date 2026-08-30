@@ -145,7 +145,7 @@ impl SecurityAccessToken {
 
     pub fn root(token_id: u64) -> Self {
         let mut token = Self::new(token_id, 0, 0);
-        token.privileges.push("CapSysAdmin".to_string());
+        token.privileges.push("CAP_SYS_ADMIN_BIT".to_string());
         token.privileges.push("CapNetAdmin".to_string());
         token.privileges.push("CAP_PROCESS_MIGRATE".to_string());
         token.protection_level = ProtectionLevel::System;
@@ -643,8 +643,8 @@ mod tests {
         let mut protected_token = SecurityAccessToken::new(3, 1001, 1001);
         protected_token.protection_level = ProtectionLevel::KernelProtected;
 
-        assert!(root_token.has_privilege("CapSysAdmin"));
-        assert!(!user_token.has_privilege("CapSysAdmin"));
+        assert!(root_token.has_privilege("CAP_SYS_ADMIN_BIT"));
+        assert!(!user_token.has_privilege("CAP_SYS_ADMIN_BIT"));
 
         assert_eq!(
             user_token.can_access_process(&protected_token),

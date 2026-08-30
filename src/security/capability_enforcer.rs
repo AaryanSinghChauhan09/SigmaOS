@@ -27,10 +27,10 @@ pub const PORT_ALLOW_SSL: u16 = 443;
 pub const MAX_TOKENS: usize = 32;
 
 // Standard Linux-style POSIX Capability bit positions
-pub const CapNetBindService: u32 = 10; // Allow binding to ports < 1024
-pub const CapSysAdmin: u32 = 21; // Full administrator privileges
-pub const CapSysChroot: u32 = 18; // Allow chroot system call
-pub const CapSysPtrace: u32 = 19; // Allow debugging/tracing other processes
+pub const CAP_NET_BIND_SERVICE_BIT: u32 = 10; // Allow binding to ports < 1024
+pub const CAP_SYS_ADMIN_BIT: u32 = 21; // Full administrator privileges
+pub const CAP_SYS_CHROOT_BIT: u32 = 18; // Allow chroot system call
+pub const CAP_SYS_PTRACE_BIT: u32 = 19; // Allow debugging/tracing other processes
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
@@ -92,7 +92,7 @@ impl CapabilityToken {
         false
     }
 
-    /// Linux-style: Grants specific POSIX capability (e.g. CapNetBindService)
+    /// Linux-style: Grants specific POSIX capability (e.g. CAP_NET_BIND_SERVICE_BIT)
     pub fn grant_posix_capability(mut self, cap: u32) -> Self {
         if cap < 64 {
             self.posix_capabilities |= 1 << cap;
@@ -190,8 +190,8 @@ impl SecurityEnforcer {
             if !token.validate_pledge_operation("inet") {
                 return false;
             }
-            if port < 1024 && !token.has_posix_capability(CapNetBindService) {
-                return false; // Guard standard privileged ports unless CapNetBindService is set
+            if port < 1024 && !token.has_posix_capability(CAP_NET_BIND_SERVICE_BIT) {
+                return false; // Guard standard privileged ports unless CAP_NET_BIND_SERVICE_BIT is set
             }
             if token.is_network_allowed {
                 // Check if port is in allowed list or is standard HTTP/HTTPS
@@ -262,9 +262,9 @@ mod tests {
         // 1. Process 101 - Sandboxed web application (restricted read, allowed network)
         let web_app_token = CapabilityToken::new(101)
             .allow_network()
-            .grant_posix_capability(CapNetBindService)
+            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT)
             .allow_fs_read()
-            .grant_posix_capability(CapNetBindService)
+            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT)
             .add_port(80)
             .add_port(443);
 
@@ -286,7 +286,7 @@ mod tests {
 
         let token = CapabilityToken::new(101)
             .allow_network()
-            .grant_posix_capability(CapNetBindService);
+            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT);
         enforcer.assign_token(token).unwrap();
 
         assert!(enforcer.validate_network_access(101, 80));
@@ -325,17 +325,17 @@ mod tests {
         enforcer.assign_token(token).unwrap();
         assert!(!enforcer.validate_network_access(201, 80));
 
-        // Adding CapNetBindService grants port 80 access
+        // Adding CAP_NET_BIND_SERVICE_BIT grants port 80 access
         enforcer.revoke_token(201).unwrap();
         token = CapabilityToken::new(201)
             .allow_network()
-            .grant_posix_capability(CapNetBindService);
+            .grant_posix_capability(CAP_NET_BIND_SERVICE_BIT);
         enforcer.assign_token(token).unwrap();
         assert!(enforcer.validate_network_access(201, 80));
         assert!(enforcer
             .find_token(201)
             .unwrap()
-            .has_posix_capability(CapNetBindService));
+            .has_posix_capability(CAP_NET_BIND_SERVICE_BIT));
     }
 
     #[test]

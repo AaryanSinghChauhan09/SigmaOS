@@ -311,7 +311,7 @@ pub struct ContainerSecurityPolicyEngine {
 impl ContainerSecurityPolicyEngine {
     pub fn new() -> Self {
         let mut caps = Vec::new();
-        caps.push("CapSysAdmin".to_string());
+        caps.push("CAP_SYS_ADMIN_BIT".to_string());
         caps.push("CapNetRaw".to_string());
 
         Self {

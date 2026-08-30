@@ -171,7 +171,7 @@ mod tests {
             .validate_operation(LinuxCapability::CapSysAdmin)
             .is_ok());
 
-        // Raise securelevel to Secure (1) -> CapSysAdmin is instantly blocked!
+        // Raise securelevel to Secure (1) -> CAP_SYS_ADMIN_BIT is instantly blocked!
         manager.raise_securelevel(Securelevel::Secure).unwrap();
         assert!(manager
             .validate_operation(LinuxCapability::CapSysAdmin)

@@ -728,7 +728,7 @@ impl ContainerSecurityPolicyEngine {
             return Err("Mutable rootfs container rejected");
         }
         if self.drop_cap_sys_admin && has_sys_admin {
-            return Err("Container with CapSysAdmin rejected");
+            return Err("Container with CAP_SYS_ADMIN_BIT rejected");
         }
         Ok(())
     }

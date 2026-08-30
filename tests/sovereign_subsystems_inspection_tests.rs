@@ -112,7 +112,7 @@ fn test_sovereign_data_workspace_inspection() {
 #[test]
 fn test_posix_capabilities_and_pledge_inspection() {
     let token = CapabilityToken::new(1001)
-        .grant_posix_capability(21) // CapSysAdmin bit 21
+        .grant_posix_capability(21) // CAP_SYS_ADMIN_BIT bit 21
         .allow_fs_read();
     assert!(token.has_posix_capability(21));
 

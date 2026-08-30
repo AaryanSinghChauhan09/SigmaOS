@@ -944,7 +944,7 @@ mod tests {
     #[test]
     fn test_cap_bounding_set() {
         let mut bounds = CapBoundingSet::new(0xFFFF_FFFF);
-        assert!(bounds.is_capability_permitted(21)); // CapSysAdmin
+        assert!(bounds.is_capability_permitted(21)); // CAP_SYS_ADMIN_BIT
 
         bounds.drop_capability(21);
         assert!(!bounds.is_capability_permitted(21)); // Dropped

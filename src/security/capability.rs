@@ -338,11 +338,11 @@ mod tests {
         assert!(caps.has_cap(LinuxCapability::SysAdmin));
         assert!(caps.has_cap(LinuxCapability::NetAdmin));
 
-        // Drop CapSysAdmin from bounding set
+        // Drop CAP_SYS_ADMIN_BIT from bounding set
         caps.drop_bounding(LinuxCapability::SysAdmin);
         assert!(!caps.has_cap(LinuxCapability::SysAdmin));
 
-        // Trying to raise CapSysAdmin effective when not permitted fails
+        // Trying to raise CAP_SYS_ADMIN_BIT effective when not permitted fails
         assert!(caps.raise_effective(LinuxCapability::SysAdmin).is_err());
 
         // Ambient capability requirements test
