@@ -4,7 +4,7 @@ This document outlines 100 comprehensive improvement ideas organized into catego
 
 ## 🎥 Multimedia Tools
 
-1. **Native video editor (timeline + effects)** [Adobe Premiere Pro, Final Cut Pro] ✅ **IMPLEMENTED** - `src/media/sovereign_video_editor.rs`
+1. **Native video editor (timeline + effects)** [Adobe Premiere Pro, Final Cut Pro]
 2. **Lightweight screen recorder with GPU acceleration** [OBS Studio, Bandicam] ✅ **IMPLEMENTED** - `src/productivity/screen_recorder.rs`
 3. **Screenshot tool with annotation features** [Snagit, Lightshot] ✅ **IMPLEMENTED** - `src/productivity/screenshot.rs`
 4. **Audio editor (multi-track, filters)** [Audacity, Adobe Audition] ✅ **IMPLEMENTED** - `src/audio/editor.rs` & `src/unimplemented_tools.rs`
