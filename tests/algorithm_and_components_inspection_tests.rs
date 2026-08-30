@@ -2,26 +2,10 @@
 extern crate alloc;
 extern crate std;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
-
-extern crate alloc;
-
-#[macro_use]
-extern crate alloc;
-extern crate std;
-
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec;
-
-#[path = "../src/klib/mod.rs"]
-pub mod klib;
-
-#[macro_use]
-extern crate alloc;
-extern crate std;
+use alloc::vec::Vec;
 
 #[path = "../src/klib/mod.rs"]
 mod klib;
