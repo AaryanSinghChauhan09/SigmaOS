@@ -35,3 +35,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-28 - Heading Focus Shifts in Multi-Step Wizard Panels
 **Learning:** When navigating panels in multi-step wizard applications, focus remains trapped on footer navigation controls ("Next"/"Back") unless explicitly shifted to the active panel title (`<h2 tabindex="-1">`). Automatically focusing panel headings on step transition announces the new step context immediately to screen reader users and establishes keyboard orientation.
 **Action:** Assign `tabindex="-1"` to section panel headings and call `.focus()` on the active step title during wizard step transitions.
+
+## 2026-08-29 - Arrow Key Navigation for Custom WAI-ARIA Radio Group Cards
+**Learning:** Custom selection card components with `role="radio"` and `tabindex="0"` inside a `role="radiogroup"` are incomplete without arrow key focus and selection navigation (`ArrowDown`, `ArrowRight`, `ArrowUp`, `ArrowLeft`). Enabling circular wrap-around arrow key navigation aligns custom card radios with standard WAI-ARIA radio group keyboard interaction expectations.
+**Action:** Extend card keydown handlers on `role="radio"` elements to handle arrow keys by cycling selection and focus within the parent `role="radiogroup"`.
