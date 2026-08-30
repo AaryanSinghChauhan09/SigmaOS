@@ -9,6 +9,67 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 // ==========================================
+// 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroSubsystemMode {
+    LinuxArch,
+    LinuxDebian,
+    LinuxAlpine,
+    LinuxNix,
+    FreeBsd,
+    OpenBsd,
+}
+
+pub struct SovereignUniversalDistroBridge {
+    pub mode: DistroSubsystemMode,
+    pub active_jail: Option<FreeBSDJail>,
+    pub pledge_sentinel: OpenBsdPledgeUnveilSentinel,
+}
+
+impl SovereignUniversalDistroBridge {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self {
+            mode,
+            active_jail: None,
+            pledge_sentinel: OpenBsdPledgeUnveilSentinel::new(),
+        }
+    }
+
+    pub fn set_subsystem_mode(&mut self, mode: DistroSubsystemMode) {
+        self.mode = mode;
+    }
+
+    pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
+        match self.mode {
+            DistroSubsystemMode::LinuxDebian => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
+            DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
+            DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
+            DistroSubsystemMode::FreeBsd => format!("{}.pkg", input_pkg),
+            DistroSubsystemMode::OpenBsd => format!("{}.tgz", input_pkg),
+        }
+    }
+
+    pub fn enforce_security_isolation(&mut self, pid: u64, root_path: &str) -> Result<(), &'static str> {
+        match self.mode {
+            DistroSubsystemMode::FreeBsd => {
+                let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
+                self.active_jail = Some(jail);
+                Ok(())
+            }
+            DistroSubsystemMode::OpenBsd => {
+                self.pledge_sentinel.pledge_process(pid, &["stdio", "rpath", "wpath"])?;
+                self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
+}
+
+// ==========================================
 // 1. LINUX EBPF VM SIMULATOR (SovereignEbpfEngine)
 // ==========================================
 

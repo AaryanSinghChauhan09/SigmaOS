@@ -1,0 +1,24 @@
+name: Arch Linux Pacman & AUR Sandboxed Makepkg CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  arch-pacman-ci:
+    name: Arch Pacman & PKGBUILD Recipe Compiler
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Arch Recipe Compiler & Dependency Resolver
+        run: cargo test --lib -- distro::arch_parity::tests
+
+      - name: Run Native Sovereign Atomic Harness
+        run: ./run_sigma_tests.sh

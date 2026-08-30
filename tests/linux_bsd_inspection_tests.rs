@@ -76,12 +76,51 @@ mod keyboard_driver;
 mod missing_distro_innovations;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
+#[path = "../src/compatibility/community_foundation.rs"]
+mod community_foundation;
 
 use bsd_compat::*;
+
+#[test]
+fn test_sovereign_community_foundation_inspection() {
+    use community_foundation::{SovereignFoundationManager, FoundationRole, BountySeverity};
+
+    let mut foundation = SovereignFoundationManager::new("SigmaOS Foundation");
+    foundation.register_member("alice", FoundationRole::BoardMember);
+    assert_eq!(foundation.members.len(), 1);
+
+    let bounty_id = foundation.submit_security_bounty(
+        "VFS Buffer Overflow",
+        "bob_auditor",
+        BountySeverity::High,
+    );
+    assert_eq!(bounty_id, 1);
+    assert_eq!(foundation.resolve_bounty(bounty_id).unwrap(), 5000);
+
+    foundation.organize_hackathon("Kernel Hack 2026", "Subsystem Interop");
+    assert!(foundation.register_hackathon_participant("Kernel Hack 2026", "dev_charlie").is_ok());
+    assert!(foundation.submit_hackathon_project("Kernel Hack 2026", "SovereignBridge").is_ok());
+}
+
+#[test]
+fn test_sovereign_universal_distro_bridge_inspection() {
+    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
+
+    let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxAlpine);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.apk");
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
+    assert!(bridge.enforce_security_isolation(101, "/jails/app").is_ok());
+    assert!(bridge.active_jail.is_some());
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
+    assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
+}
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

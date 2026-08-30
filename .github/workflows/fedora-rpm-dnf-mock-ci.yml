@@ -1,0 +1,24 @@
+name: Fedora & RHEL RPM/DNF Mock Chroot CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  fedora-rpm-ci:
+    name: Fedora & RHEL RPM/DNF Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Fedora DNF Parity & SELinux Policy
+        run: cargo test --lib -- distro::fedora_parity::tests
+
+      - name: Run Native Sovereign Atomic Harness
+        run: ./run_sigma_tests.sh

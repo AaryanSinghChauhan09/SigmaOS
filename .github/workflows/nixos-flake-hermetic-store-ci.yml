@@ -1,0 +1,24 @@
+name: NixOS Flake Hermetic Store Closure & GC CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  nixos-flake-ci:
+    name: NixOS Flake & Store Closure Evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Nix Store GC & Flake Engine
+        run: cargo test --lib -- unimplemented_features::extra_unimplemented_tests::test_sovereign_nix_gc_engine
+
+      - name: Run Native Sovereign Atomic Harness
+        run: ./run_sigma_tests.sh

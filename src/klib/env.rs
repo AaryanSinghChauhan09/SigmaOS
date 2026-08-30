@@ -250,7 +250,7 @@ impl SigmaEnv {
                     in_pos += 1;
                 }
 
-                let var_name = str::from_utf8(&bytes[var_start..in_pos])
+                let var_name = core::str::from_utf8(&bytes[var_start..in_pos])
                     .map_err(EnvError::Utf8Error)?;
 
                 if is_braced && in_pos < bytes.len() && bytes[in_pos] == b'}' {
@@ -323,7 +323,7 @@ impl SigmaEnv {
         loop {
             if *ptr.add(len) == 0 {
                 let bytes = core::slice::from_raw_parts(ptr as *const u8, len);
-                return str::from_utf8(bytes).map_err(EnvError::Utf8Error);
+                return core::str::from_utf8(bytes).map_err(EnvError::Utf8Error);
             }
             len += 1;
         }
@@ -546,7 +546,7 @@ mod tests {
         let mut out = [0u8; 128];
 
         let len = SigmaEnv::expand_vars("Blocksize is $BLOCKSIZE and editor is ${EDITOR}", &mut out).unwrap();
-        let expanded = str::from_utf8(&out[..len]).unwrap();
+        let expanded = core::str::from_utf8(&out[..len]).unwrap();
 
         assert_eq!(
             expanded,
