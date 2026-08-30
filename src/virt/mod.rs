@@ -3,13 +3,15 @@
 //! VirtIO virtqueues, live migration, and nested virtualization
 extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(test))]
 use crate::klib::{String, ToString, Vec};
 
-#[cfg(feature = "standalone_test")]
-#[cfg(feature = "standalone_test")]
+#[cfg(test)]
 use alloc::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
+#[cfg(test)]
+use alloc::vec::Vec;
+#[cfg(test)]
+use alloc::vec;
 
 /// Hypervisor type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

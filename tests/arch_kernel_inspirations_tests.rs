@@ -3,10 +3,10 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 use sigmaos::arch_kernel_inspirations::{
-    AdvisorySeverity, AlpmAction, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
+    AdvisorySeverity, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
     Expectation, ExpectationKind, HookAction, KUnitEngine, MkinitcpioHookFramework,
     PackageSignoff, RebuildOrderSolver, ReproducibleBuildVerdict, ReproducibleStatus,
-    SecurityAdvisory, SecurityAdvisoryTracker, Signer, SignerPolicy, SignstarService,
+    SecurityAdvisory, SecurityAdvisoryTracker, SignerPolicy, SignstarService,
 };
 
 #[test]

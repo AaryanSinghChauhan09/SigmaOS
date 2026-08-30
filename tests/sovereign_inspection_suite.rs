@@ -1,4 +1,12 @@
+#![allow(warnings, unused, dead_code, non_camel_case_types, non_snake_case, unexpected_cfgs, mismatched_lifetime_syntaxes, static_mut_refs)]
 // SigmaOS Sovereign System Inspection & Open Source Parity Test Suite
+
+#[macro_use]
+extern crate alloc;
+extern crate std;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
 // Inspects and verifies advanced subsystem mechanisms inspired by Linux, FreeBSD, OpenBSD, NetBSD, QEMU/KVM:
 // - FreeBSD Capsicum & Jails VNET
 // - OpenBSD Pledge/Unveil Sandboxing
@@ -11,8 +19,13 @@
 #[path = "../src/kernel/pci_scanner.rs"]
 mod pci_scanner;
 
-#[path = "../src/sigpkg/transaction.rs"]
-mod transaction;
+#[path = "../src/security/mod.rs"]
+pub mod security;
+
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
+
+use sigpkg::transaction::*;
 
 #[path = "../src/virt/mod.rs"]
 mod virt;
@@ -34,7 +47,7 @@ use classic_os::*;
 use jails::*;
 use pci_scanner::*;
 use securelevels::*;
-use transaction::*;
+pub use sigpkg::transaction::*;
 use virt::*;
 
 #[test]

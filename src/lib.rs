@@ -1,5 +1,5 @@
 #![no_std]
-#![allow(clippy::all, unused)]
+#![allow(clippy::all, unused, warnings, non_camel_case_types, non_snake_case, unexpected_cfgs, mismatched_lifetime_syntaxes, static_mut_refs)]
 
 #[macro_use]
 extern crate alloc;

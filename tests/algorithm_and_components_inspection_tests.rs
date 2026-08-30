@@ -1,8 +1,13 @@
+#![allow(warnings, unused, dead_code, non_camel_case_types, non_snake_case, unexpected_cfgs, mismatched_lifetime_syntaxes, static_mut_refs)]
 // SPDX-License-Identifier: MIT
 //! SigmaOS Algorithm & Subsystem Component Inspection Test Suite
 //!
 //! Deeply inspects core algorithms across scheduling, memory management,
 //! cryptographic key exchanges, network state machines, and filesystem journaling.
+
+#[macro_use]
+extern crate alloc;
+extern crate std;
 
 #[path = "../src/klib/mod.rs"]
 pub mod klib;

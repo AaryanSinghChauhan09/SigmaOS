@@ -83,14 +83,19 @@ impl BehavioralBaseline {
     }
 
     pub fn update_cpu_baseline(&mut self, process: &str, usage: f32) {
-        let entry = self.process_normal_cpu_usage.entry(process.to_string()).or_insert(0.0);
-        // Exponential moving average
-        *entry = *entry * 0.9 + usage * 0.1;
+        if let Some(entry) = self.process_normal_cpu_usage.get_mut(process) {
+            *entry = *entry * 0.9 + usage * 0.1;
+        } else {
+            self.process_normal_cpu_usage.insert(process.to_string(), usage);
+        }
     }
 
     pub fn update_memory_baseline(&mut self, process: &str, usage: f32) {
-        let entry = self.process_normal_memory_usage.entry(process.to_string()).or_insert(0.0);
-        *entry = *entry * 0.9 + usage * 0.1;
+        if let Some(entry) = self.process_normal_memory_usage.get_mut(process) {
+            *entry = *entry * 0.9 + usage * 0.1;
+        } else {
+            self.process_normal_memory_usage.insert(process.to_string(), usage);
+        }
     }
 
     pub fn add_allowed_path(&mut self, process: &str, path: &str) {

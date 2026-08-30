@@ -244,6 +244,148 @@ impl Default for PacmanDatabase {
     }
 }
 
+// =========================================================================
+// Additional Arch Linux Subsystems
+// =========================================================================
+
+/// Arch Linux Pacman ALPM Hook Engine (alpm-hooks)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AlpmHookWhen {
+    PreTransaction,
+    PostTransaction,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlpmHook {
+    pub name: String,
+    pub when: AlpmHookWhen,
+    pub target_pattern: String,
+    pub exec_cmd: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchHookEngine {
+    pub hooks: Vec<AlpmHook>,
+}
+
+impl ArchHookEngine {
+    pub fn new() -> Self {
+        Self { hooks: Vec::new() }
+    }
+
+    pub fn register_hook(&mut self, name: &str, when: AlpmHookWhen, pattern: &str, exec: &str) {
+        self.hooks.push(AlpmHook {
+            name: name.to_string(),
+            when,
+            target_pattern: pattern.to_string(),
+            exec_cmd: exec.to_string(),
+        });
+    }
+
+    pub fn evaluate_hooks(&self, when: AlpmHookWhen, target_files: &[String]) -> Vec<&AlpmHook> {
+        self.hooks
+            .iter()
+            .filter(|h| {
+                h.when == when
+                    && target_files.iter().any(|f| f.contains(&h.target_pattern))
+            })
+            .collect()
+    }
+}
+
+impl Default for ArchHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Linux reflector Mirror Selection Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchMirror {
+    pub url: String,
+    pub country: String,
+    pub score_ms: u64,
+    pub is_https: bool,
+    pub completion_percent: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchReflectorMirrorEngine {
+    pub mirrors: Vec<ArchMirror>,
+}
+
+impl ArchReflectorMirrorEngine {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, score_ms: u64, is_https: bool, completion: u32) {
+        self.mirrors.push(ArchMirror {
+            url: url.to_string(),
+            country: country.to_string(),
+            score_ms,
+            is_https,
+            completion_percent: completion,
+        });
+    }
+
+    pub fn filter_optimal_mirrors(&self, require_https: bool, min_completion: u32, limit: usize) -> Vec<String> {
+        let mut valid: Vec<&ArchMirror> = self
+            .mirrors
+            .iter()
+            .filter(|m| (!require_https || m.is_https) && m.completion_percent >= min_completion)
+            .collect();
+
+        valid.sort_by_key(|m| m.score_ms);
+        valid.into_iter().take(limit).map(|m| m.url.clone()).collect()
+    }
+}
+
+impl Default for ArchReflectorMirrorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Linux mkinitcpio Modular Initramfs Hook Manager
+#[derive(Debug, Clone)]
+pub struct ArchMkinitcpioHooksManager {
+    pub active_hooks: Vec<String>,
+}
+
+impl ArchMkinitcpioHooksManager {
+    pub fn new() -> Self {
+        Self {
+            active_hooks: vec![
+                "base".to_string(),
+                "udev".to_string(),
+                "autodetect".to_string(),
+                "modconf".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
+                "fsck".to_string(),
+            ],
+        }
+    }
+
+    pub fn add_hook(&mut self, hook_name: &str) {
+        let name = hook_name.to_string();
+        if !self.active_hooks.contains(&name) {
+            self.active_hooks.push(name);
+        }
+    }
+
+    pub fn generate_initramfs_manifest(&self) -> String {
+        format!("HOOKS=({})", self.active_hooks.join(" "))
+    }
+}
+
+impl Default for ArchMkinitcpioHooksManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -361,5 +503,51 @@ depends=('glibc')
         let results = aur.search_aur("test");
         // Since aur_packages is empty, this should return empty
         assert!(results.is_empty());
+    }
+
+    #[test]
+    fn test_arch_alpm_hooks_execution() {
+        let mut hook_engine = ArchHookEngine::new();
+        hook_engine.register_hook(
+            "90-mkinitcpio.hook",
+            AlpmHookWhen::PostTransaction,
+            "/usr/lib/modules/",
+            "/usr/bin/mkinitcpio -P",
+        );
+
+        let files = vec![
+            "/usr/lib/modules/6.6.0-arch/vmlinuz".to_string(),
+            "/usr/bin/ls".to_string(),
+        ];
+
+        let matched_hooks = hook_engine.evaluate_hooks(AlpmHookWhen::PostTransaction, &files);
+        assert_eq!(matched_hooks.len(), 1);
+        assert_eq!(matched_hooks[0].name, "90-mkinitcpio.hook");
+
+        let pre_hooks = hook_engine.evaluate_hooks(AlpmHookWhen::PreTransaction, &files);
+        assert!(pre_hooks.is_empty());
+    }
+
+    #[test]
+    fn test_arch_reflector_mirror_ranking() {
+        let mut reflector = ArchReflectorMirrorEngine::new();
+        reflector.add_mirror("https://slow-http.arch.org", "US", 150, false, 100);
+        reflector.add_mirror("https://fast-mirror.arch.org", "DE", 25, true, 100);
+        reflector.add_mirror("https://medium-mirror.arch.org", "US", 60, true, 99);
+
+        let optimal = reflector.filter_optimal_mirrors(true, 95, 2);
+        assert_eq!(optimal.len(), 2);
+        assert_eq!(optimal[0], "https://fast-mirror.arch.org");
+        assert_eq!(optimal[1], "https://medium-mirror.arch.org");
+    }
+
+    #[test]
+    fn test_arch_mkinitcpio_hook_pipeline() {
+        let mut mkinit = ArchMkinitcpioHooksManager::new();
+        mkinit.add_hook("encrypt");
+        mkinit.add_hook("lvm2");
+
+        let manifest = mkinit.generate_initramfs_manifest();
+        assert!(manifest.contains("base udev autodetect modconf block filesystems fsck encrypt lvm2"));
     }
 }

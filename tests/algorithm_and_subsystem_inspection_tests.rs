@@ -1,3 +1,4 @@
+#![allow(warnings, unused, dead_code, non_camel_case_types, non_snake_case, unexpected_cfgs, mismatched_lifetime_syntaxes, static_mut_refs)]
 // SigmaOS Algorithm & OS Component Inspection Test Suite
 // Verifies internal kernel algorithms, scheduling models, memory allocators, and security mechanisms.
 

@@ -273,17 +273,17 @@ static mut INSTANCE: EditionTarget = EditionTarget::new();
 
 #[no_mangle]
 pub unsafe extern "C" fn init() {
-    INSTANCE.init();
+    unsafe { (*core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn setTorDefault() {
-    INSTANCE.setTorDefault(1, true);
+    unsafe { (*core::ptr::addr_of_mut!(INSTANCE)).setTorDefault(1, true); }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn setMinimalGUI() {
-    INSTANCE.setMinimalGUI(1, true);
+    unsafe { (*core::ptr::addr_of_mut!(INSTANCE)).setMinimalGUI(1, true); }
 }
 
 #[no_mangle]
@@ -291,12 +291,12 @@ pub unsafe extern "C" fn printStatus() {}
 
 #[no_mangle]
 pub unsafe extern "C" fn edition_init() {
-    INSTANCE.init();
+    unsafe { (*core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn edition_build() {
-    let _ = INSTANCE.buildEdition(1);
+    unsafe { let _ = (*core::ptr::addr_of_mut!(INSTANCE)).buildEdition(1); }
 }
 
 #[no_mangle]
