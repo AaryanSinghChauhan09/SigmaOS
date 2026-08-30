@@ -50,7 +50,10 @@ pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
-pub use structures::*;
+pub use structures::{
+    Apc, ApcMode, CircularDoublyLinkedList, CpuContext, IrqlLevel,
+    IrqlState, SinglyLinkedList, SystemThread,
+};
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,

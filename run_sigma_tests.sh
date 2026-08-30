@@ -46,8 +46,7 @@ rustc --edition 2021 --test tests/compat_harness.rs -o build/compat_harness_test
 ./build/compat_harness_test
 
 echo -e "${CYAN}:: Running Comprehensive OS Subsystems & Components Unit Tests...${RESET}"
-rustc --edition 2021 --test tests/os_components_tests.rs -o build/os_components_test
-./build/os_components_test
+cargo test --test os_components_tests
 
 echo -e "${CYAN}:: Running Sovereign Subsystems Inspection Unit Tests...${RESET}"
 rustc --edition 2021 --test tests/sovereign_subsystems_inspection_tests.rs -o build/sovereign_subsystems_test
