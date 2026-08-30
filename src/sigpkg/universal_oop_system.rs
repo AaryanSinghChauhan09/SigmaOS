@@ -3365,7 +3365,7 @@ Description: Hook test";
         struct MockManTrigger {
             name: String,
             pattern: String,
-            executed_flag: Arc<crate::thread::Mutex<bool>>,
+            executed_flag: Arc<core::sync::atomic::AtomicBool>,
         }
 
         impl IFileTrigger for MockManTrigger {
@@ -3378,13 +3378,12 @@ Description: Hook test";
             fn execute(&self, matched_paths: &[&str]) -> Result<(), String> {
                 assert_eq!(matched_paths.len(), 2);
                 assert!(matched_paths.contains(&"usr/share/man/man1/git.1"));
-                let mut flag = self.executed_flag.lock().unwrap();
-                *flag = true;
+                self.executed_flag.store(true, core::sync::atomic::Ordering::SeqCst);
                 Ok(())
             }
         }
 
-        let executed = Arc::new(crate::thread::Mutex::new(false));
+        let executed = Arc::new(core::sync::atomic::AtomicBool::new(false));
         let man_trigger = MockManTrigger {
             name: "update-man-db".to_string(),
             pattern: "usr/share/man".to_string(),
@@ -3410,7 +3409,6 @@ Description: Hook test";
         assert_eq!(executed_count, 1);
 
         // Confirm executing logic was triggered successfully
-        let flag = executed.lock().unwrap();
-        assert!(*flag);
+        assert!(executed.load(core::sync::atomic::Ordering::SeqCst));
     }
 }

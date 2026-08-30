@@ -89,9 +89,10 @@ impl KernelPoolManager {
             }
         }
 
+        let tag_str = String::from_utf8(tag.to_vec()).unwrap_or_else(|_| String::from("????"));
         println!(
             "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
-            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
+            pool_type, size, tag_str, addr
         );
 
         Ok(block)

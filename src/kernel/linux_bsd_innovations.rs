@@ -345,6 +345,145 @@ impl OpenBsdPledge {
     }
 }
 
+// =========================================================================
+// Linux XDP (eXpress Data Path) Extended Packet Filter Engine
+// =========================================================================
+
+pub struct LinuxXdpExtendedFilter {
+    pub blocked_ports: Vec<u16>,
+    pub drop_count: u64,
+    pub pass_count: u64,
+}
+
+impl LinuxXdpExtendedFilter {
+    pub fn new() -> Self {
+        Self {
+            blocked_ports: Vec::new(),
+            drop_count: 0,
+            pass_count: 0,
+        }
+    }
+
+    pub fn block_port(&mut self, port: u16) {
+        if !self.blocked_ports.contains(&port) {
+            self.blocked_ports.push(port);
+        }
+    }
+
+    pub fn filter_packet_at_rx_ring(&mut self, dst_port: u16) -> XdpAction {
+        if self.blocked_ports.contains(&dst_port) {
+            self.drop_count += 1;
+            XdpAction::Drop
+        } else {
+            self.pass_count += 1;
+            XdpAction::Pass
+        }
+    }
+}
+
+impl Default for LinuxXdpExtendedFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// FreeBSD VFS Vnode Shared/Exclusive Locking Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VnodeLockState {
+    Unlocked,
+    Shared(u32),
+    Exclusive(u64),
+}
+
+pub struct FreeBsdVfsVnodeLock {
+    pub vnode_id: u64,
+    pub state: VnodeLockState,
+}
+
+impl FreeBsdVfsVnodeLock {
+    pub fn new(vnode_id: u64) -> Self {
+        Self {
+            vnode_id,
+            state: VnodeLockState::Unlocked,
+        }
+    }
+
+    pub fn acquire_shared(&mut self) -> Result<(), &'static str> {
+        match self.state {
+            VnodeLockState::Unlocked => {
+                self.state = VnodeLockState::Shared(1);
+                Ok(())
+            }
+            VnodeLockState::Shared(count) => {
+                self.state = VnodeLockState::Shared(count + 1);
+                Ok(())
+            }
+            VnodeLockState::Exclusive(_) => Err("Vnode locked exclusively"),
+        }
+    }
+
+    pub fn acquire_exclusive(&mut self, thread_id: u64) -> Result<(), &'static str> {
+        match self.state {
+            VnodeLockState::Unlocked => {
+                self.state = VnodeLockState::Exclusive(thread_id);
+                Ok(())
+            }
+            _ => Err("Vnode lock busy"),
+        }
+    }
+
+    pub fn release(&mut self) -> Result<(), &'static str> {
+        match self.state {
+            VnodeLockState::Unlocked => Err("Vnode is not locked"),
+            VnodeLockState::Shared(count) => {
+                if count > 1 {
+                    self.state = VnodeLockState::Shared(count - 1);
+                } else {
+                    self.state = VnodeLockState::Unlocked;
+                }
+                Ok(())
+            }
+            VnodeLockState::Exclusive(_) => {
+                self.state = VnodeLockState::Unlocked;
+                Ok(())
+            }
+        }
+    }
+}
+
+// =========================================================================
+// Kernel Memory Page Pool Allocation Engine
+// =========================================================================
+
+pub struct KernelMemoryPagePool {
+    pub free_frame_pfns: Vec<u64>,
+    pub pool_size: usize,
+}
+
+impl KernelMemoryPagePool {
+    pub fn new(initial_capacity: usize) -> Self {
+        let mut free_frames = Vec::with_capacity(initial_capacity);
+        for i in 0..initial_capacity {
+            free_frames.push(i as u64 + 0x10000); // Frame numbers above 0x10000
+        }
+        Self {
+            free_frame_pfns: free_frames,
+            pool_size: initial_capacity,
+        }
+    }
+
+    pub fn alloc_page_frame(&mut self) -> Option<u64> {
+        self.free_frame_pfns.pop()
+    }
+
+    pub fn free_page_frame(&mut self, pfn: u64) {
+        self.free_frame_pfns.push(pfn);
+    }
+}
+
 // ================= FreeBSD GEOM Modular Storage Framework =================
 
 #[derive(Debug, Clone)]

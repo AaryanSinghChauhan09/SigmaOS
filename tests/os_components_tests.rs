@@ -60,6 +60,8 @@ mod sigma_fs_extended;
 mod epoll;
 #[path = "../src/loader/elf/relocation.rs"]
 mod elf_relocation;
+#[path = "../src/sigpkg/mod.rs"]
+mod sigpkg;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
 
@@ -749,6 +751,39 @@ fn test_sovereign_ostree_and_io_uring_inspection() {
         })
         .is_ok());
     assert_eq!(io_ring.submit_and_wait(), 1);
+}
+
+#[test]
+fn test_universal_server_image_adapter_flatpak_appimage() {
+    use sigpkg::universal_adapter::{ServerImageFormat, UniversalServerImageAdapter};
+
+    let adapter = UniversalServerImageAdapter::new();
+    let flatpak_manifest = r#"
+        name: org.kde.kdenlive
+        version: 23.08.4
+        distro: Flatpak
+        cmd: kdenlive
+    "#;
+
+    let meta_flatpak = adapter
+        .parse_server_image_manifest(ServerImageFormat::FlatpakBundleRef, flatpak_manifest)
+        .unwrap();
+    assert_eq!(meta_flatpak.name, "org.kde.kdenlive");
+    assert_eq!(meta_flatpak.version, "23.08.4");
+    assert_eq!(meta_flatpak.target_distro, "Flatpak");
+
+    let appimage_manifest = r#"
+        name: GIMP-AppImage
+        version: 2.10.36
+        distro: AppImage
+        cmd: AppRun
+    "#;
+
+    let meta_appimage = adapter
+        .parse_server_image_manifest(ServerImageFormat::AppImageSquashFs, appimage_manifest)
+        .unwrap();
+    assert_eq!(meta_appimage.name, "GIMP-AppImage");
+    assert_eq!(meta_appimage.entry_cmd, Some("AppRun".to_string()));
 }
 
 #[test]

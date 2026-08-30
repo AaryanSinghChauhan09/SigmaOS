@@ -7,6 +7,8 @@ use alloc::vec::Vec;
 use alloc::vec;
 use alloc::format;
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 

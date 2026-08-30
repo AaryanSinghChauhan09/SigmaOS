@@ -995,29 +995,43 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
 }
 
 #[test]
-fn test_sovereign_universal_distro_bridge_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
+fn test_new_kernel_subsystem_innovations_inspection() {
+    use linux_bsd_innovations::{
+        LinuxXdpExtendedFilter, XdpAction,
+        FreeBsdVfsVnodeLock, VnodeLockState,
+        KernelMemoryPagePool,
+    };
 
-    let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::DebianUbuntu);
-    assert_eq!(bridge.current_mode, DistroSubsystemMode::DebianUbuntu);
+    // 1. Linux XDP Extended Packet Filter
+    let mut xdp = LinuxXdpExtendedFilter::new();
+    xdp.block_port(8080);
+    assert_eq!(xdp.filter_packet_at_rx_ring(8080), XdpAction::Drop);
+    assert_eq!(xdp.filter_packet_at_rx_ring(443), XdpAction::Pass);
+    assert_eq!(xdp.drop_count, 1);
+    assert_eq!(xdp.pass_count, 1);
 
-    bridge.set_subsystem_mode(DistroSubsystemMode::FreeBSD);
-    assert_eq!(bridge.current_mode, DistroSubsystemMode::FreeBSD);
+    // 2. FreeBSD VFS Vnode Lock
+    let mut vnode = FreeBsdVfsVnodeLock::new(101);
+    assert_eq!(vnode.state, VnodeLockState::Unlocked);
+    assert!(vnode.acquire_shared().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(1));
+    assert!(vnode.acquire_shared().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(2));
+    assert!(vnode.release().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(1));
+    assert!(vnode.release().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Unlocked);
 
-    // Test multi-distro package format translation
-    let canonical_deb = bridge.resolve_package_specifier("nginx.deb").unwrap();
-    assert_eq!(canonical_deb, "deb:nginx");
+    assert!(vnode.acquire_exclusive(42).is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Exclusive(42));
+    assert!(vnode.acquire_shared().is_err());
+    assert!(vnode.release().is_ok());
 
-    let canonical_sigpkg = bridge.resolve_package_specifier("bash.sigpkg").unwrap();
-    assert_eq!(canonical_sigpkg, "bash");
-
-    assert_eq!(bridge.active_packages.len(), 2);
-
-    // Test subsystem security policy application
-    assert!(bridge.apply_subsystem_security("/sigma/jails/web", &["stdio", "rpath", "exec"]).unwrap());
-    assert_eq!(bridge.freebsd_jail.root_path, "/sigma/jails/web");
-
-    // Test execution permission checks
-    assert!(bridge.verify_execution("/sigma/jails/web/usr/bin/nginx", "rpath"));
-    assert!(!bridge.verify_execution("/sigma/jails/web/usr/bin/nginx", "wpath")); // wpath not pledged
+    // 3. Kernel Memory Page Pool
+    let mut pool = KernelMemoryPagePool::new(16);
+    assert_eq!(pool.free_frame_pfns.len(), 16);
+    let frame_pfn = pool.alloc_page_frame().unwrap();
+    assert_eq!(pool.free_frame_pfns.len(), 15);
+    pool.free_page_frame(frame_pfn);
+    assert_eq!(pool.free_frame_pfns.len(), 16);
 }

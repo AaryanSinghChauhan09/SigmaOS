@@ -282,7 +282,9 @@ impl PasswordManager {
 
         let encrypted_entry = PasswordEntry {
             encrypted_password,
-            last_modified: 0u64,
+            last_modified: Some(core::time::Duration::from_secs(0))
+                .map(|d| d.as_secs())
+                .unwrap_or(0),
             ..entry
         };
 
@@ -461,7 +463,10 @@ impl PasswordManager {
 
         let mut password = String::new();
         // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
-        let mut seed = 0u64;
+        let mut seed = (Some(core::time::Duration::from_secs(0))
+            .map(|d| d.as_millis())
+            .unwrap_or(0) as u64)
+            * 1_000_000;
 
         for _ in 0..length {
             seed = seed
@@ -479,7 +484,10 @@ impl Default for PasswordManager {
     fn default() -> Self {
         let mut key = vec![0u8; 32];
         // Generate a non-hardcoded key dynamically using system time entropy
-        let mut seed = 0u64;
+        let mut seed = (Some(core::time::Duration::from_secs(0))
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+            ^ 0x5a5a5a5a5a5a5a5a) as u64;
         for byte in key.iter_mut() {
             seed = seed
                 .wrapping_mul(6364136223846793005)

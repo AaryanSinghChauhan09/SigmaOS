@@ -1,8 +1,9 @@
 extern crate alloc;
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
-use crate::klib::{BTreeMap, Vec};
+use crate::klib::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use alloc::format;
 use core::default::Default;
 use core::option::Option::{self, Some, None};

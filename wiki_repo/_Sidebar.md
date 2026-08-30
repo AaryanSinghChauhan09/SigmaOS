@@ -1,96 +1,80 @@
-## 🖥️ SigmaOS Wiki
+## 🛠️ SigmaOS Documentation Wiki
 
-**[Home](Home)**
+**[Home](Home)** | **[Installation Guide](Installation-Guide)** | **[Package Management](Package-Management-Arch-Parity)** | **[System Administration](System-Administration)**
 
 ---
 
 ### 🚀 Getting Started
 - [Getting Started](Getting-Started)
-- [Building SigmaOS](Building-SigmaOS)
-- [Quick Start Guide](Quick-Start-Guide)
 - [Installation Guide](Installation-Guide)
+- [Quick Start Guide](Quick-Start-Guide)
 - [FAQ](FAQ)
+- [What Is Working and What Is Not](What-Is-Working-and-What-Is-Not)
 
-### 🔩 Components
-- [**Components Master Table**](Components-Master-Table) 🆕
-- [Components & Inspirations](Components-and-Inspirations)
-
-### 🧠 Architecture
-- [Architecture](Architecture)
-- [Architecture Overview](Architecture-Overview)
-- [Kernel Internals](Kernel-Internals)
-- [Boot Process](Boot-Process-Architecture)
-- [Filesystem Spec](Filesystem-Spec-and-Virtual-FS)
-- [AI Subsystem](AI-Subsystem)
-- [AI Daemon Arch](AI_DAEMON_ARCH)
+---
 
 ### 📦 Package Management
-- [Package Management](Package-Management)
+- [Package Management & Arch Parity](Package-Management-Arch-Parity)
 - [Universal Package Manager](Universal-Package-Manager)
-- [AUR Helper](AUR-Helper)
+- [Arch Linux and AUR Parity](Arch-Linux-and-AUR-Parity)
+- [Gentoo Portage & USE Flags](GENTOO_PARITY_FEATURES)
+- [Debian & Ubuntu Parity](DEBIAN_PARITY_FEATURES)
+- [Fedora & RPM Parity](FEDORA_PARITY_FEATURES)
 
-### 🔌 Hardware & Drivers
+---
+
+### ⚙️ System Administration
+- [System Administration](System-Administration)
+- [Systemd Parity Implementation](SYSTEMD-PARITY-IMPLEMENTATION)
+- [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE)
+- [Resource Management & Cgroups](Resource-Management-and-Cgroups)
+- [Storage & Filesystems](Storage-Subsystem)
+- [Observability & Tracing](OBSERVABILITY_TRACING_ROADMAP)
+
+---
+
+### 🔩 Kernel & Hardware
+- [Kernel Architecture](Kernel-Architecture)
+- [Scheduler Architecture](Scheduler-Architecture)
+- [Hardware Abstraction Layer](Hardware-Abstraction-Layer)
+- [Hardware Compatibility Matrix](HARDWARE-COMPATIBILITY-MATRIX)
 - [Driver Development Guide](Driver-Development-Guide)
-- [Hardware Compatibility](Hardware-Compatibility)
-- [Universal Driver Support](UNIVERSAL_DRIVER_SUPPORT_PLAN)
-- [Driver Management Roadmap](Driver_Management_Roadmap)
+- [KMS & USB Driver Architecture](KMS-and-USB-HCD-Driver-Architecture)
 
-### 🌐 Networking
-- [Networking](Networking)
+---
+
+### 🔒 Security & Hardening
+- [Security Policy](Security-Policy)
+- [Security Architecture](Security-Architecture)
+- [Security Hardening Guide](Security-Hardening-Guide)
+- [Post-Quantum Cryptography](Post-Quantum-Cryptography)
+- [SELinux MAC Implementation](SELINUX_MAC_IMPLEMENTATION)
+- [FreeBSD Capsicum Integration](FreeBSD-Capsicum-Integration)
+- [Qubes Isolation Roadmap](QUBES_ISOLATION_ROADMAP)
+
+---
+
+### 🌐 Networking & Cloud
+- [Networking Stack](Networking)
 - [Enterprise Networking](Enterprise-Networking)
 - [Zero Trust Network](zero_trust_network)
-- [TCP/UDP Stack](TCP-UDP-Stack)
+- [Constellation Mesh Roadmap](Constellation_Mesh_Roadmap)
 
-### 🔒 Security
-- [Security Policy](SECURITY)
-- [Security Hardening Guide](Security-Hardening-Guide)
-- [Security Scanning Fixes](Security-Scanning-Fixes)
-- [Defensive Audit Systems](DEFENSIVE_AUDIT_SYSTEMS_BLUEPRINT)
-- [Parrot Security Parity](PARROT_SECURITY_PARITY_BLUEPRINT)
-- [Qubes Isolation](QUBES_ISOLATION_ROADMAP)
+---
 
-### 🐧 Linux/BSD Inspirations
-- [**Linux Distro Ideas**](Linux-Distro-Ideas-Implementation) 🆕
-- [Linux BSD Inspirations](LINUX_BSD_INSPIRATIONS)
-- [Arch Linux Parity](Arch_Linux_Parity_Roadmap)
-- [Linux Distro Guide](LINUX_DISTRO_GUIDE)
-- [BSD Distros Analysis](BSD_DISTROS_ANALYSIS)
-- [Distro Absorption Blueprint](Distro-Absorption-Blueprint)
-- [Debian Innovation](DebianInnovation)
+### 🖥️ Desktop & User Interface
+- [Zenith Desktop System Plan](Zenith-System-Improvement-Plan)
+- [Window Managers](Window-Managers)
+- [CLI Power Blueprint](CLI-Power-Blueprint)
+- [Win32 Compatibility Plans](WIN32_COMPATIBILITY_PLANS)
 
-### 🗺️ Roadmaps
-- [Future Development Roadmap](Future_Development_Roadmap)
+---
+
+### 🗺️ Roadmaps & Governance
 - [3-Year Strategic Vision](3-Year-Strategic-Vision)
-- [Gap Closing Roadmap](Gap_Closing_Roadmap)
-- [Breakthrough OS Tools](Breakthrough_Os_Tools_Roadmap)
-- [CLI Power Blueprint](Cli_Power_Blueprint)
-- [Realtime HPC Scheduling](REALTIME_HPC_SCHEDULING_ROADMAP)
-- [OCI Container Runtime](OCI_CONTAINER_RUNTIME_ROADMAP)
-- [Constellation Mesh](Constellation_Mesh_Roadmap)
-
-### 🖥️ Desktop & UI
-- [Zenith Desktop Improvement](Zenith-System-Improvement-Plan)
-- [Win32 Compatibility](WIN32_COMPATIBILITY_PLANS)
-- [Accessibility & Localization](ACCESSIBILITY_LOCALIZATION_GUIDE)
-
-### 🧪 Testing & Quality
-- [Testing Guide](Testing-Guide)
-- [What Is Working](What-Is-Working-and-What-Is-Not)
-- [Algorithms Diagnostics](ALGORITHMS_DIAGNOSTICS_MASTER_GUIDE)
-
-### 📈 Development
-- [Contributing](Contributing)
-- [Contributor FAQ](CONTRIBUTOR_FAQ)
-- [Code of Conduct](Code-of-Conduct)
-- [Changelog](CHANGELOG)
-- [Release Governance](RELEASE_GOVERNANCE_CI_CD)
-- [Branch History](Branch-Consolidation-History)
-
-### 🌍 Advanced
-- [Virtualization & Containers](Virtualization-and-Containers)
-- [Observability & Tracing](OBSERVABILITY_TRACING_ROADMAP)
-- [Policy Mechanism](Policy_Mechanism_Roadmap)
-- [Sovereign Self-Sufficiency](SOVEREIGN_OS_OMNIPRESENT_SUPREME_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA)
+- [Future Development Roadmap](FUTURE-DEVELOPMENT-ROADMAP)
+- [Gap Closing Roadmap](SigmaOS_Gap_Closing_Roadmap)
+- [Governance & Contributions](GOVERNANCE)
 
 ---
 *[SigmaOS on GitHub](https://github.com/AaryanSinghChauhan09/SigmaOS)*

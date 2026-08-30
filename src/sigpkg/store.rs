@@ -54,7 +54,7 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = format!("{}/{}", self.base_path, format!("{}-{}", hash, package.name));
+        let package_path = alloc::format!("{}/{}-{}", self.base_path, hash, package.name);
 
         let stored = StoredPackage {
             package: package.clone(),
@@ -283,7 +283,7 @@ impl NixOsHermeticCasStore {
         let hash_str = alloc::format!("{:016x}", hash_val);
 
         let folder_name = alloc::format!("{}-{}-{}", hash_str, pkg_name, version);
-        let store_path = format!("{}/{}", self.store_dir, folder_name);
+        let store_path = alloc::format!("{}/{}", self.store_dir, folder_name);
         self.store_paths
             .insert(pkg_name.to_string(), store_path.clone());
         store_path
@@ -326,7 +326,7 @@ mod distro_pkg_tests {
     fn test_nix_cas_hermetic_store() {
         let mut cas = NixOsHermeticCasStore::new(PathBuf::from("/sigma/store"));
         let path = cas.compute_store_path("zenith-compositor", "1.0.0", b"binary_data");
-        assert!(path.to_str().unwrap().contains("zenith-compositor"));
+        assert!(path.contains("zenith-compositor"));
         assert!(cas.verify_closure("zenith-compositor"));
     }
 }

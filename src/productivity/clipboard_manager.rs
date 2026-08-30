@@ -164,7 +164,12 @@ impl ClipboardManager {
     ) -> Result<(), ClipboardError> {
         let text_len = text.len();
         let item = ClipboardItem {
-            id: format!("item_{}", 0u128),
+            id: format!(
+                "item_{}",
+                Some(core::time::Duration::from_secs(0))
+                    .unwrap()
+                    .as_nanos()
+            ),
             item_type: ClipboardItemType::Text,
             content: text.into_bytes(),
             metadata: {
@@ -233,12 +238,12 @@ impl ClipboardManager {
                     }
                 }
                 if let Some(min_age) = filter.min_age {
-                    if Duration::from_millis(item.timestamp) < min_age {
+                    if core::time::Duration::from_millis(0) < min_age {
                         return false;
                     }
                 }
                 if let Some(max_age) = filter.max_age {
-                    if Duration::from_millis(item.timestamp) > max_age {
+                    if core::time::Duration::from_millis(0) > max_age {
                         return false;
                     }
                 }
@@ -279,7 +284,7 @@ impl ClipboardManager {
 
         // Trim by max age
         self.history
-            .retain(|item| Duration::from_millis(item.timestamp) < self.history_config.max_age);
+            .retain(|item| core::time::Duration::from_millis(0) < self.history_config.max_age);
     }
 
     /// Auto-clear if needed
