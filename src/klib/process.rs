@@ -53,7 +53,7 @@ impl SigmaProcess {
             .map(|s| Self::to_cstring(s))
             .collect::<Result<Vec<_>, _>>()?;
 
-        let args_ptrs: Vec<*const u8> = args_cstr.iter().map(|s| s.as_ptr()).collect();
+        let args_ptrs: Vec<*const u8> = args_cstr.iter().map(|s: &Vec<u8>| s.as_ptr()).collect();
 
         let pid = unsafe { Self::syscall_fork() };
 
