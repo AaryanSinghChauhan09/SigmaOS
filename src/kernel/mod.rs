@@ -46,11 +46,11 @@ pub mod vmm_paging;
 pub mod module_loader;
 pub mod performance;
 
-pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
 pub use structures::*;
+pub use architecture::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
