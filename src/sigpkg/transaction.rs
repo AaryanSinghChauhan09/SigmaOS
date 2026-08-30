@@ -14,11 +14,11 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: crate::klib::path::PathBuf,
+    pub path: alloc::string::String,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: crate::klib::path::PathBuf) -> Self {
+    pub fn new(path: alloc::string::String) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {
@@ -337,7 +337,7 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 mod tests {
     use super::*;
     use crate::klib::custom_string::SigmaString;
-    use crate::klib::path::PathBuf;
+    type PathBuf = alloc::string::String;
 
     #[test]
     fn test_transaction_creation() {
