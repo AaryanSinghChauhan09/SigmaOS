@@ -26,10 +26,10 @@ SigmaOS utilizes a sovereign, zero-external-dependency cryptographic suite writt
 
 ## Key Modules
 
-- [`src/crypto/libsodium.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/crypto/libsodium.rs): Pure-Rust libsodium-compatible API (BoxCipher, SecretBox, Sign, Scalarmult).
-- [`kernel/crypto/chacha20.rs`](file:///home/aaryansinghchauhan/SigmaOS/kernel/crypto/chacha20.rs): In-kernel ChaCha20 engine for fast disk & network packet encryption.
-- [`crypto/sigma_key_derive.rs`](file:///home/aaryansinghchauhan/SigmaOS/crypto/sigma_key_derive.rs): Argon2id password-based key derivation engine.
-- [`src/crypto/pqc_dilithium.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/crypto/pqc_dilithium.rs): Post-quantum lattice signature engine.
+- [`src/crypto/libsodium.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/crypto/libsodium.rs): Pure-Rust libsodium-compatible API (BoxCipher, SecretBox, Sign, Scalarmult).
+- [`kernel/crypto/chacha20.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/kernel/crypto/chacha20.rs): In-kernel ChaCha20 engine for fast disk & network packet encryption.
+- [`crypto/sigma_key_derive.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/crypto/sigma_key_derive.rs): Argon2id password-based key derivation engine.
+- [`src/crypto/pqc_dilithium.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/crypto/pqc_dilithium.rs): Post-quantum lattice signature engine.
 
 ---
 

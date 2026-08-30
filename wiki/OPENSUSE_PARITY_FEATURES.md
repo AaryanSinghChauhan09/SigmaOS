@@ -40,52 +40,52 @@ impl SigmaZypper {
     pub fn install(&mut self, packages: Vec<String>) -> Result<(), ZypperError> {
         // Create transaction
         let mut transaction = self.transaction.create()?;
-        
+
         // Add install operations
         for package in packages {
             transaction.add_install(package)?;
         }
-        
+
         // Solve dependencies
         self.solver.solve(&mut transaction)?;
-        
+
         // Execute transaction
         self.transaction.execute(transaction)?;
-        
+
         Ok(())
     }
-    
+
     pub fn patch(&mut self, categories: Vec<PatchCategory>) -> Result<(), ZypperError> {
         // Get available patches
         let patches = self.get_patches(categories)?;
-        
+
         // Create patch transaction
         let mut transaction = self.transaction.create()?;
-        
+
         // Add patch operations
         for patch in patches {
             transaction.add_patch(patch)?;
         }
-        
+
         // Solve dependencies
         self.solver.solve(&mut transaction)?;
-        
+
         // Execute transaction
         self.transaction.execute(transaction)?;
-        
+
         Ok(())
     }
-    
+
     pub fn dist_upgrade(&mut self) -> Result<(), ZypperError> {
         // Create distribution upgrade transaction
         let mut transaction = self.transaction.create_dist_upgrade()?;
-        
+
         // Solve dependencies
         self.solver.solve(&mut transaction)?;
-        
+
         // Execute transaction
         self.transaction.execute(transaction)?;
-        
+
         Ok(())
     }
 }
@@ -121,39 +121,39 @@ impl SigmaYaST {
     pub fn load_module(&mut self, module_name: &str) -> Result<(), YaSTError> {
         let module = self.modules.get(module_name)
             .ok_or(YaSTError::ModuleNotFound)?;
-        
+
         // Load module configuration
         self.load_module_config(module)?;
-        
+
         // Initialize module
         self.initialize_module(module)?;
-        
+
         Ok(())
     }
-    
+
     pub fn configure_network(&mut self, config: NetworkConfig) -> Result<(), YaSTError> {
         // Load network module
         self.load_module("lan")?;
-        
+
         // Apply network configuration
         self.apply_network_config(config)?;
-        
+
         // Restart network services
         self.restart_network_services()?;
-        
+
         Ok(())
     }
-    
+
     pub fn configure_firewall(&mut self, config: FirewallConfig) -> Result<(), YaSTError> {
         // Load firewall module
         self.load_module("firewall")?;
-        
+
         // Apply firewall configuration
         self.apply_firewall_config(config)?;
-        
+
         // Enable firewall
         self.enable_firewall()?;
-        
+
         Ok(())
     }
 }
@@ -188,30 +188,30 @@ impl SigmaOBS {
         // Get project
         let project_obj = self.projects.get(project)
             .ok_or(OBSError::ProjectNotFound)?;
-        
+
         // Get package
         let pkg = self.packages.get(package)
             .ok_or(OBSError::PackageNotFound)?;
-        
+
         // Submit build request
         self.submit_build_request(project_obj, pkg)?;
-        
+
         // Monitor build status
         self.monitor_build(package)?;
-        
+
         Ok(())
     }
-    
+
     pub fn create_package(&mut self, project: &str, package: &str) -> Result<(), OBSError> {
         // Create package directory structure
         self.create_package_structure(project, package)?;
-        
+
         // Generate spec file template
         self.generate_spec_template(package)?;
-        
+
         // Commit to OBS
         self.commit_to_obs(project, package)?;
-        
+
         Ok(())
     }
 }
@@ -240,31 +240,31 @@ impl OpenSUSESecurity {
         // Enable ASLR
         self.hardening.aslr_enabled = true;
         self.enable_aslr()?;
-        
+
         // Enable stack protection
         self.hardening.stack_protection = true;
         self.enable_stack_protection()?;
-        
+
         // Enable FORTIFY_SOURCE
         self.hardening.fortify_source = true;
         self.enable_fortify_source()?;
-        
+
         // Enable RELRO
         self.hardening.relro = true;
         self.enable_relro()?;
-        
+
         Ok(())
     }
-    
+
     pub fn configure_apparmor(&mut self, profiles: Vec<AppArmorProfile>) -> Result<(), SecurityError> {
         for profile in profiles {
             // Load profile
             self.apparmor.load_profile(profile)?;
-            
+
             // Set mode to enforce
             self.apparmor.set_mode(&profile.name, EnforceMode::Enforce)?;
         }
-        
+
         Ok(())
     }
 }
