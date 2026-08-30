@@ -206,6 +206,7 @@ impl KeyboardHandler for SimpleKeyboardHandler {
 }
 
 
+
 // =========================================================================
 // Linux & BSD Inspired USB HID Keyboard Driver Engine
 // (Parity with Linux hid-input.c & FreeBSD ukbd.c)
@@ -389,3 +390,4 @@ mod tests {
         assert!(driver.process_input_report(&phantom_report).is_err());
     }
 }
+
