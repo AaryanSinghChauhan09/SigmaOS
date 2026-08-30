@@ -9,6 +9,7 @@ use alloc::format;
 use crate::klib::HashMap;
 #[cfg(test)]
 use crate::klib::HashMap;
+use crate::klib::path::PathBuf;
 use alloc::string::{String, ToString};
 
 /// Standardized next-generation hierarchy (SigmaFS)

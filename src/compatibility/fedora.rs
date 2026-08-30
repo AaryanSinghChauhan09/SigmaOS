@@ -7,10 +7,7 @@ use alloc::format;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
