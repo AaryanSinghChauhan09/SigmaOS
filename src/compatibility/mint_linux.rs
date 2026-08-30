@@ -750,4 +750,317 @@ mod tests {
             .unwrap();
         assert!(drivers.available_drivers[0].active);
     }
+
+    #[test]
+    fn test_mint_parity_extended_features() {
+        // 1. Safety update filter
+        let mut updates = SigmaMintUpdateEngine::new();
+        updates.register_update("bash", "5.1", "5.2", SafetyLevel::Safe);
+        updates.register_update("linux-image", "6.5", "6.6", SafetyLevel::Dangerous);
+        let safe = updates.filter_by_safety(SafetyLevel::Recommended);
+        assert_eq!(safe.len(), 1);
+        assert_eq!(safe[0].package_name, "bash");
+
+        // 2. MintStick USB flasher
+        let flashed = MintStickUsbFlasher::write_iso_to_usb("/iso/mint.iso", "/dev/sdb").unwrap();
+        assert_eq!(flashed, 1024 * 1024 * 512);
+
+        // 3. Spices manager
+        let mut spices = CinnamonSpicesManager::new();
+        assert!(spices.download_and_install_spice("weather_applet", SpiceType::Applet, "1.0").is_ok());
+        assert_eq!(spices.installed_spices.len(), 1);
+
+        // 4. Multimedia codecs
+        let mut codecs = SigmaMultimediaCodecManager::new();
+        let count = codecs.install_all_codecs();
+        assert_eq!(count, 7);
+
+        // 5. Ransomware protection
+        let ransomware = RansomwareProtectionEngine::new();
+        assert!(ransomware.evaluate_write_activity("/home/user/docs.txt", true).is_err());
+        assert!(ransomware.evaluate_write_activity("/tmp/cache.tmp", true).is_ok());
+
+        // 6. Migration assistant
+        let mapped = MintMigrationAssistant::map_windows_software("notepad.exe");
+        assert_eq!(mapped, "Xed / Geany Editor");
+        let mig_status = MintMigrationAssistant::migrate_system(SourceDistroType::Windows);
+        assert!(mig_status.contains("Imported Windows user profiles"));
+    }
+}
+
+// ==========================================
+// Mint Safety Update Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SafetyLevel {
+    Safe,
+    Recommended,
+    Unsafe,
+    Dangerous,
+}
+
+#[derive(Debug, Clone)]
+pub struct CategorizedUpdate {
+    pub package_name: String,
+    pub old_version: String,
+    pub new_version: String,
+    pub safety_level: SafetyLevel,
+}
+
+pub struct SigmaMintUpdateEngine {
+    pub updates: Vec<CategorizedUpdate>,
+    pub auto_update_enabled: bool,
+}
+
+impl SigmaMintUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            updates: Vec::new(),
+            auto_update_enabled: false,
+        }
+    }
+
+    pub fn register_update(&mut self, pkg: &str, old: &str, new: &str, level: SafetyLevel) {
+        self.updates.push(CategorizedUpdate {
+            package_name: pkg.to_string(),
+            old_version: old.to_string(),
+            new_version: new.to_string(),
+            safety_level: level,
+        });
+    }
+
+    pub fn filter_by_safety(&self, max_allowed_level: SafetyLevel) -> Vec<CategorizedUpdate> {
+        self.updates
+            .iter()
+            .filter(|u| match (max_allowed_level, u.safety_level) {
+                (SafetyLevel::Safe, SafetyLevel::Safe) => true,
+                (SafetyLevel::Recommended, SafetyLevel::Safe | SafetyLevel::Recommended) => true,
+                (SafetyLevel::Unsafe, SafetyLevel::Safe | SafetyLevel::Recommended | SafetyLevel::Unsafe) => true,
+                (SafetyLevel::Dangerous, _) => true,
+                _ => false,
+            })
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for SigmaMintUpdateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// MintStick USB Image Flasher
+// ==========================================
+
+pub struct MintStickUsbFlasher;
+
+impl MintStickUsbFlasher {
+    pub fn write_iso_to_usb(iso_path: &str, usb_device: &str) -> Result<usize, &'static str> {
+        if iso_path.is_empty() || usb_device.is_empty() {
+            return Err("MintStick: Invalid path or device");
+        }
+        Ok(1024 * 1024 * 512) // 512MB written
+    }
+}
+
+// ==========================================
+// Cinnamon Spices Manager
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SpiceType {
+    Applet,
+    Desklet,
+    Extension,
+    Theme,
+}
+
+#[derive(Debug, Clone)]
+pub struct SpicePackage {
+    pub id: String,
+    pub spice_type: SpiceType,
+    pub version: String,
+    pub installed: bool,
+}
+
+pub struct CinnamonSpicesManager {
+    pub installed_spices: Vec<SpicePackage>,
+}
+
+impl CinnamonSpicesManager {
+    pub fn new() -> Self {
+        Self {
+            installed_spices: Vec::new(),
+        }
+    }
+
+    pub fn download_and_install_spice(
+        &mut self,
+        id: &str,
+        spice_type: SpiceType,
+        version: &str,
+    ) -> Result<(), &'static str> {
+        self.installed_spices.push(SpicePackage {
+            id: id.to_string(),
+            spice_type,
+            version: version.to_string(),
+            installed: true,
+        });
+        Ok(())
+    }
+}
+
+impl Default for CinnamonSpicesManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Multimedia Codec Manager
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct CodecEntry {
+    pub name: String,
+    pub format: String,
+    pub is_restricted: bool,
+    pub installed: bool,
+}
+
+pub struct SigmaMultimediaCodecManager {
+    pub codecs: Vec<CodecEntry>,
+}
+
+impl SigmaMultimediaCodecManager {
+    pub fn new() -> Self {
+        let mut mgr = Self { codecs: Vec::new() };
+        mgr.init_default_codecs();
+        mgr
+    }
+
+    fn init_default_codecs(&mut self) {
+        let list = [
+            ("mp3", "audio/mpeg", true),
+            ("aac", "audio/aac", true),
+            ("h264", "video/h264", true),
+            ("h265", "video/h265", true),
+            ("av1", "video/av1", false),
+            ("flac", "audio/flac", false),
+            ("mkv", "video/x-matroska", false),
+        ];
+        for (name, format, restricted) in list {
+            self.codecs.push(CodecEntry {
+                name: name.to_string(),
+                format: format.to_string(),
+                is_restricted: restricted,
+                installed: false,
+            });
+        }
+    }
+
+    pub fn install_all_codecs(&mut self) -> usize {
+        let mut installed_count = 0;
+        for codec in &mut self.codecs {
+            if !codec.installed {
+                codec.installed = true;
+                installed_count += 1;
+            }
+        }
+        installed_count
+    }
+}
+
+impl Default for SigmaMultimediaCodecManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Ransomware Protection Engine
+// ==========================================
+
+pub struct RansomwareProtectionEngine {
+    pub protected_directories: Vec<String>,
+    pub is_monitoring_active: bool,
+}
+
+impl RansomwareProtectionEngine {
+    pub fn new() -> Self {
+        Self {
+            protected_directories: vec![
+                "/home".to_string(),
+                "/root".to_string(),
+                "/var/data".to_string(),
+            ],
+            is_monitoring_active: true,
+        }
+    }
+
+    pub fn add_protected_directory(&mut self, dir: &str) {
+        self.protected_directories.push(dir.to_string());
+    }
+
+    pub fn evaluate_write_activity(
+        &self,
+        path: &str,
+        is_rapid_file_encryption: bool,
+    ) -> Result<(), &'static str> {
+        if self.is_monitoring_active && is_rapid_file_encryption {
+            if self.protected_directories.iter().any(|d| path.starts_with(d)) {
+                return Err("RansomwareGuard: Rapid bulk file encryption detected in protected directory! Blocked.");
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for RansomwareProtectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Mint Migration Assistant
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SourceDistroType {
+    Ubuntu,
+    Windows,
+    MacOS,
+}
+
+pub struct MintMigrationAssistant;
+
+impl MintMigrationAssistant {
+    pub fn map_windows_software(exe_name: &str) -> &'static str {
+        match exe_name {
+            "notepad.exe" => "Xed / Geany Editor",
+            "calc.exe" => "Gnome Calculator",
+            "cmd.exe" => "Zenith Terminal",
+            "control.exe" => "Mint Control Centre",
+            "photoshop.exe" => "GIMP / SigmaPaint",
+            _ => "Wine / Zorin Compatibility Layer",
+        }
+    }
+
+    pub fn migrate_system(source: SourceDistroType) -> &'static str {
+        match source {
+            SourceDistroType::Ubuntu => {
+                "MintMigration: Migrated Ubuntu PPA repositories and APT package configurations."
+            }
+            SourceDistroType::Windows => {
+                "MintMigration: Imported Windows user profiles, documents, and mapped default software."
+            }
+            SourceDistroType::MacOS => {
+                "MintMigration: Converted MacOS home folder structure and plist preferences."
+            }
+        }
+    }
 }

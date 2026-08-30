@@ -1,6 +1,12 @@
 extern crate alloc;
 
-use sigmaos::linuxmint_inspirations::{
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/linuxmint_inspirations.rs"]
+mod linuxmint_inspirations;
+
+use linuxmint_inspirations::{
     BulkyRenamer, CaptainInstaller, DebPackage, FsFormat, HypnotixIptvPlayer, IsolationMode,
     LanWarpEngine, MintNannyFilter, NannyDecision, ProviderType, RenameRule, ThingyRecentDocs,
     WebappManager, WebEngineKind, WARP_AUTH_PORT, WARP_TRANSFER_PORT,
@@ -24,7 +30,7 @@ fn warpinator_secure_lan_transfer() {
     let payload = [0u8; 1000];
     let out = w.send_file("192.168.1.20", "report.txt", &payload);
     match out {
-        sigmaos::linuxmint_inspirations::TransferOutcome::Completed { bytes } => {
+        linuxmint_inspirations::TransferOutcome::Completed { bytes } => {
             assert!(bytes < 1000, "compression should shrink payload");
         }
         _ => panic!("expected completed transfer"),
@@ -108,8 +114,8 @@ fn mint_nanny_allowlist_wins() {
 
 #[test]
 fn mint_stick_formats_and_restores() {
-    let mut f = sigmaos::linuxmint_inspirations::MintStickFormatter::new();
-    let dev = sigmaos::linuxmint_inspirations::UsbDevice {
+    let mut f = linuxmint_inspirations::MintStickFormatter::new();
+    let dev = linuxmint_inspirations::UsbDevice {
         path: "/dev/sdb".into(),
         label: "BOOT".into(),
         size_mb: 8192,
@@ -117,7 +123,7 @@ fn mint_stick_formats_and_restores() {
     };
     assert!(f.format(&dev, FsFormat::Fat32).is_ok());
     assert_eq!(f.format_history.len(), 1);
-    let ro = sigmaos::linuxmint_inspirations::UsbDevice {
+    let ro = linuxmint_inspirations::UsbDevice {
         path: "/dev/sdc".into(),
         label: "LOCKED".into(),
         size_mb: 1024,
@@ -130,12 +136,12 @@ fn mint_stick_formats_and_restores() {
 
 #[test]
 fn mint_welcome_and_config_hub_flow() {
-    let mut w = sigmaos::linuxmint_inspirations::MintWelcomeFlow::new();
+    let mut w = linuxmint_inspirations::MintWelcomeFlow::new();
     w.mark_done("update");
     assert_eq!(w.remaining().len(), 3);
     assert!(!w.is_complete());
 
-    let mut hub = sigmaos::linuxmint_inspirations::MintConfigHub::new();
+    let mut hub = linuxmint_inspirations::MintConfigHub::new();
     assert!(hub.set("update", "auto-refresh", "off"));
     assert_eq!(hub.get("update", "auto-refresh"), Some("off"));
     assert_eq!(hub.get("welcome", "onboarding-version"), Some("1"));
@@ -143,8 +149,8 @@ fn mint_welcome_and_config_hub_flow() {
 
 #[test]
 fn xapp_theme_engine_follows_system() {
-    let theme = sigmaos::linuxmint_inspirations::XAppThemeEngine::new();
-    use sigmaos::linuxmint_inspirations::AppTheme;
+    let theme = linuxmint_inspirations::XAppThemeEngine::new();
+    use linuxmint_inspirations::AppTheme;
     assert_eq!(theme.effective_theme(true), AppTheme::Dark);
     assert_eq!(theme.effective_theme(false), AppTheme::Light);
 }
