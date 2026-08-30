@@ -1,9 +1,15 @@
 // SigmaTools Module
 // System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
 
+pub mod data_engine;
 pub mod sigmatools;
 pub mod sovereign_commands;
+pub mod textproc;
 
+pub use data_engine::{
+    AggregateOp, ColumnType, DataFrame, DataRecord, DataSchema, DataValue, JoinType,
+    SigmaDataEngine,
+};
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
     SigmaIdentity, SigmaToolError, SovereignAptDuo, SovereignDpkgEtcher, SovereignImageToDataUri,
@@ -11,6 +17,7 @@ pub use sigmatools::{
     SovereignTableConverter, SovereignTextFixer, SovereignWordCounter, UserIdentity,
 };
 pub use sovereign_commands::{
-    SovereignSudo, ProcessTaskMetrics, SovereignTopHtop, FilesystemSpaceInfo, SovereignDfDu,
-    KernelDmesgEntry, SovereignDevDmesg, SovereignGccToolchain, SovereignInitramfsSystemd,
+    FilesystemSpaceInfo, KernelDmesgEntry, ProcessTaskMetrics, SovereignDevDmesg, SovereignDfDu,
+    SovereignGccToolchain, SovereignInitramfsSystemd, SovereignSudo, SovereignTopHtop,
 };
+pub use textproc::{AwkPattern, PatternSearch, SedPattern, StreamEditor, TextProcessor};
