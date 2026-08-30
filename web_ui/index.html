@@ -275,6 +275,21 @@
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 element.click();
+            } else if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(event.key)) {
+                event.preventDefault();
+                const group = element.closest('[role="radiogroup"]');
+                if (!group) return;
+                const cards = Array.from(group.querySelectorAll('[role="radio"]'));
+                const index = cards.indexOf(element);
+                if (index === -1) return;
+                let nextIndex = index;
+                if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+                    nextIndex = (index + 1) % cards.length;
+                } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+                    nextIndex = (index - 1 + cards.length) % cards.length;
+                }
+                cards[nextIndex].click();
+                cards[nextIndex].focus();
             }
         }
 
