@@ -26,6 +26,10 @@ mod linux_bsd_parity;
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/compatibility/distro_bridge.rs"]

@@ -99,6 +99,10 @@ pub use package_snapshot_rollback::{
 pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
     ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+    SlackBuildScript, SlackwarePackageArchive, SlackwareBuildPackageEngine,
+    ZypperPackageSpec, ZypperSatDependencyResolver,
+    MossStatelessPackage, MossStateTransaction, SolusMossStatelessTransactionEngine,
+    BsdPkgManifestSpec, BsdPkgManifestSignatureAuditor,
 };
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
 pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
