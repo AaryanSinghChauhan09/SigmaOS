@@ -325,12 +325,158 @@ impl Default for ZfsBtrfsHybridSelfHealingCoW {
     }
 }
 
+/// 5. SovereignMicrovmHypervisorGateway
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicrovmState {
+    Stopped,
+    Booting,
+    Running,
+    Paused,
+}
+
+#[derive(Debug, Clone)]
+pub struct VirtioConfig {
+    pub vcpus: u32,
+    pub memory_mb: u64,
+    pub net_interface: String,
+    pub block_device_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignMicrovmInstance {
+    pub vm_id: u64,
+    pub name: String,
+    pub state: MicrovmState,
+    pub config: VirtioConfig,
+    pub boot_time_ms: u64,
+    pub ballooned_memory_mb: u64,
+}
+
+pub struct SovereignMicrovmHypervisorGateway {
+    pub instances: BTreeMap<u64, SovereignMicrovmInstance>,
+    pub next_vm_id: u64,
+}
+
+impl SovereignMicrovmHypervisorGateway {
+    pub fn new() -> Self {
+        Self {
+            instances: BTreeMap::new(),
+            next_vm_id: 1,
+        }
+    }
+
+    pub fn launch_microvm(&mut self, name: &str, vcpus: u32, memory_mb: u64, net: &str, blk: &str) -> u64 {
+        let vm_id = self.next_vm_id;
+        self.next_vm_id += 1;
+
+        let instance = SovereignMicrovmInstance {
+            vm_id,
+            name: name.to_string(),
+            state: MicrovmState::Running,
+            config: VirtioConfig {
+                vcpus,
+                memory_mb,
+                net_interface: net.to_string(),
+                block_device_path: blk.to_string(),
+            },
+            boot_time_ms: 3,
+            ballooned_memory_mb: memory_mb,
+        };
+
+        self.instances.insert(vm_id, instance);
+        vm_id
+    }
+
+    pub fn set_memory_balloon(&mut self, vm_id: u64, target_memory_mb: u64) -> Result<(), String> {
+        let vm = self.instances.get_mut(&vm_id).ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
+        if vm.state != MicrovmState::Running {
+            return Err(format!("MicroVM ID {} is not running", vm_id));
+        }
+        vm.ballooned_memory_mb = target_memory_mb;
+        Ok(())
+    }
+
+    pub fn pause_microvm(&mut self, vm_id: u64) -> Result<(), String> {
+        let vm = self.instances.get_mut(&vm_id).ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
+        vm.state = MicrovmState::Paused;
+        Ok(())
+    }
+}
+
+impl Default for SovereignMicrovmHypervisorGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 6. SovereignPqcWireguardVpnEngine
+#[derive(Debug, Clone)]
+pub struct WireguardPeer {
+    pub peer_id: String,
+    pub endpoint_ip: String,
+    pub kyber_public_key: [u8; 32],
+    pub allowed_ips: Vec<String>,
+    pub rx_bytes: u64,
+    pub tx_bytes: u64,
+}
+
+pub struct SovereignPqcWireguardVpnEngine {
+    pub interface_name: String,
+    pub local_private_key: [u8; 32],
+    pub peers: BTreeMap<String, WireguardPeer>,
+    pub is_up: bool,
+}
+
+impl SovereignPqcWireguardVpnEngine {
+    pub fn new(interface_name: &str) -> Self {
+        Self {
+            interface_name: interface_name.to_string(),
+            local_private_key: [0x42; 32],
+            peers: BTreeMap::new(),
+            is_up: false,
+        }
+    }
+
+    pub fn bring_up(&mut self) {
+        self.is_up = true;
+    }
+
+    pub fn add_peer(&mut self, peer_id: &str, endpoint_ip: &str, allowed_ips: &[&str]) {
+        let peer = WireguardPeer {
+            peer_id: peer_id.to_string(),
+            endpoint_ip: endpoint_ip.to_string(),
+            kyber_public_key: [0x77; 32],
+            allowed_ips: allowed_ips.iter().map(|s| s.to_string()).collect(),
+            rx_bytes: 0,
+            tx_bytes: 0,
+        };
+        self.peers.insert(peer_id.to_string(), peer);
+    }
+
+    pub fn transmit_pqc_packet(&mut self, peer_id: &str, packet_len: usize) -> Result<(), String> {
+        if !self.is_up {
+            return Err("VPN Interface is down".to_string());
+        }
+        let peer = self.peers.get_mut(peer_id).ok_or_else(|| format!("Peer {} not registered", peer_id))?;
+        peer.tx_bytes += packet_len as u64;
+        Ok(())
+    }
+}
+
+impl Default for SovereignPqcWireguardVpnEngine {
+    fn default() -> Self {
+        Self::new("wg-sovereign0")
+    }
+}
+
 /// Sovereign Distro Dominance Master Engine
 pub struct SovereignDistroDominanceSuite {
     pub nix_store: NixGuixZeroCopyStore,
     pub scheduler: CachyBoreDynamicAiScheduler,
     pub security_sentinel: OpenBsdHardenedCapsicumPledge,
     pub filesystem_cow: ZfsBtrfsHybridSelfHealingCoW,
+    pub microvm_gateway: SovereignMicrovmHypervisorGateway,
+    pub pqc_vpn: SovereignPqcWireguardVpnEngine,
 }
 
 impl SovereignDistroDominanceSuite {
@@ -340,6 +486,8 @@ impl SovereignDistroDominanceSuite {
             scheduler: CachyBoreDynamicAiScheduler::new(),
             security_sentinel: OpenBsdHardenedCapsicumPledge::new(),
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
+            microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
+            pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
         }
     }
 }
@@ -353,6 +501,31 @@ impl Default for SovereignDistroDominanceSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_microvm_hypervisor_gateway() {
+        let mut gateway = SovereignMicrovmHypervisorGateway::new();
+        let vm_id = gateway.launch_microvm("sovereign-node-1", 4, 2048, "eth0", "/dev/vda");
+        assert_eq!(vm_id, 1);
+        assert_eq!(gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Running);
+
+        assert!(gateway.set_memory_balloon(vm_id, 1024).is_ok());
+        assert_eq!(gateway.instances.get(&vm_id).unwrap().ballooned_memory_mb, 1024);
+
+        assert!(gateway.pause_microvm(vm_id).is_ok());
+        assert_eq!(gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Paused);
+    }
+
+    #[test]
+    fn test_sovereign_pqc_wireguard_vpn_engine() {
+        let mut vpn = SovereignPqcWireguardVpnEngine::new("wg-sovereign0");
+        vpn.add_peer("peer-node-alpha", "192.168.10.50", &["10.0.0.0/24"]);
+        assert!(vpn.transmit_pqc_packet("peer-node-alpha", 128).is_err()); // Interface is down
+
+        vpn.bring_up();
+        assert!(vpn.transmit_pqc_packet("peer-node-alpha", 128).is_ok());
+        assert_eq!(vpn.peers.get("peer-node-alpha").unwrap().tx_bytes, 128);
+    }
 
     #[test]
     fn test_nix_guix_zero_copy_store() {

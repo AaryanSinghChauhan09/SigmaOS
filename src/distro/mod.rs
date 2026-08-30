@@ -29,6 +29,7 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod wiki_ideas_implementation;
+pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
@@ -118,7 +119,13 @@ pub use linux_bsd_inspirations::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
     GpuSwitchMode, Hammer2PfsClusterQuorumEngine, PfsNodeVote, HardenedBsdPaxGuardEngine,
-    PaxViolationType, PaxViolationLog,
+    PaxViolationType, PaxViolationLog, ApkXbpsHookEngine, OpenBsdRetguardEngine,
+};
+
+pub use sovereign_distro_dominance::{
+    SovereignDistroDominanceSuite, NixGuixZeroCopyStore, CachyBoreDynamicAiScheduler,
+    OpenBsdHardenedCapsicumPledge, ZfsBtrfsHybridSelfHealingCoW, SovereignMicrovmHypervisorGateway,
+    SovereignPqcWireguardVpnEngine, MicrovmState, VirtioConfig, WireguardPeer,
 };
 
 pub mod universal_distro_super_matrix;

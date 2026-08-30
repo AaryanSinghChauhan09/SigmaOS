@@ -183,9 +183,9 @@ impl UserManager {
 
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
-        let std_path = std::path::Path::new(self.etc_dir.as_str());
+        let std_path = std::path::Path::new(&self.etc_dir);
         fs::create_dir_all(std_path)
-            .map_err(|_| UserError::InitError(self.etc_dir.clone(), "Failed to create directory"))?;
+            .map_err(|_| UserError::InitError(self.etc_dir.clone(), "failed to create etc dir"))?;
         Ok(())
     }
 
@@ -423,21 +423,21 @@ impl UserManager {
             ));
         }
 
-        fs::write(&shadow_path, content).map_err(|_| UserError::WriteError(shadow_path.clone(), "Failed to write shadow"))?;
+        fs::write(&shadow_path, content).map_err(|_| UserError::WriteError(shadow_path, "failed to write shadow file"))?;
 
         Ok(())
     }
 
     /// Load shadow entries from /etc/shadow
     pub fn load_shadow(&mut self) -> Result<(), UserError> {
-        let shadow_path_str = format!("{}/shadow", self.etc_dir);
-        let std_path = std::path::Path::new(shadow_path_str.as_str());
+        let shadow_path = format!("{}/shadow", self.etc_dir);
+        let std_path = std::path::Path::new(&shadow_path);
         if !std_path.exists() {
             return Ok(());
         }
 
         let content =
-            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(shadow_path_str, "Failed to read shadow"))?;
+            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(shadow_path, "failed to read shadow file"))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -490,7 +490,7 @@ impl UserManager {
             ));
         }
 
-        fs::write(&passwd_path, content).map_err(|_| UserError::WriteError(passwd_path.clone(), "Failed to write passwd"))?;
+        fs::write(&passwd_path, content).map_err(|_| UserError::WriteError(passwd_path, "failed to write passwd file"))?;
 
         Ok(())
     }
@@ -511,22 +511,22 @@ impl UserManager {
             ));
         }
 
-        fs::write(&group_path, content).map_err(|_| UserError::WriteError(group_path.clone(), "Failed to write group"))?;
+        fs::write(&group_path, content).map_err(|_| UserError::WriteError(group_path, "failed to write group file"))?;
 
         Ok(())
     }
 
     /// Load users from passwd file
     pub fn load_passwd(&mut self) -> Result<(), UserError> {
-        let passwd_path_str = format!("{}/passwd", self.etc_dir);
-        let std_path = std::path::Path::new(passwd_path_str.as_str());
+        let passwd_path = format!("{}/passwd", self.etc_dir);
+        let std_path = std::path::Path::new(&passwd_path);
 
         if !std_path.exists() {
             return Ok(());
         }
 
         let content =
-            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(passwd_path_str, "Failed to read passwd"))?;
+            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(passwd_path, "failed to read passwd file"))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -559,15 +559,15 @@ impl UserManager {
 
     /// Load groups from group file
     pub fn load_group(&mut self) -> Result<(), UserError> {
-        let group_path_str = format!("{}/group", self.etc_dir);
-        let std_path = std::path::Path::new(group_path_str.as_str());
+        let group_path = format!("{}/group", self.etc_dir);
+        let std_path = std::path::Path::new(&group_path);
 
         if !std_path.exists() {
             return Ok(());
         }
 
         let content =
-            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(group_path_str, "Failed to read group"))?;
+            fs::read_to_string(std_path).map_err(|_| UserError::ReadError(group_path, "failed to read group file"))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
