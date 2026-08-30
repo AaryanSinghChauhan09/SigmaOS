@@ -20,6 +20,8 @@ mod linux_bsd_innovations;
 mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
+#[path = "../src/graphics/country_flags_svg.rs"]
+mod country_flags_svg;
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
 #[path = "../src/kernel/sysctl.rs"]
@@ -1068,7 +1070,7 @@ fn test_sovereign_distro_dominance_suite_inspection() {
 
 #[test]
 fn test_sovereign_iso_country_flags_svg_collection_inspection() {
-    use sigmaos::graphics::country_flags_svg::{
+    use country_flags_svg::{
         DistroEmblemKind, FlagRenderMode, IsoCountryFlagsSvgCollection, WorldRegion,
     };
 
