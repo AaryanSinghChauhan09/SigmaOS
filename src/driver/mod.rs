@@ -15,6 +15,8 @@ pub mod shims;
 pub mod universal_support;
 pub mod vault;
 
+pub use shims::*;
+pub use gpu_framework::*;
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
 pub use pci_bus::{

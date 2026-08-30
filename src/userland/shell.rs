@@ -996,7 +996,7 @@ mod tests {
             _ => panic!("Expected Redirect command"),
         }
 
-        let mut parser5 = Parser::new("grep fn <<< fn main()");
+        let mut parser5 = Parser::new("grep fn <<< \"fn main()\"");
         let cmd5 = parser5.parse().unwrap();
         match cmd5 {
             ShellCommand::Redirect(_, redir) => {

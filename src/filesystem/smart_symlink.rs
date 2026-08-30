@@ -166,4 +166,26 @@ impl SmartSymlink {
             }
         }
     }
+
+    pub fn expand_environment_context(&self, target_path: &str, user: &str, lang: &str) -> alloc::string::String {
+        if target_path.contains("$USER") {
+            alloc::format!("/home/{}/libs", user)
+        } else if target_path.contains("$LANG") {
+            let prefix = if lang.len() >= 2 { &lang[..2] } else { lang };
+            alloc::format!("/usr/share/locale/{}", prefix)
+        } else {
+            alloc::string::String::from(target_path)
+        }
+    }
+
+    pub fn is_sandbox_escape_safe(&self, path: &str, sandbox_subpath: &str) -> bool {
+        !path.contains("..") && path.starts_with(sandbox_subpath)
+    }
+
+    pub fn resolve_multi_lib_routing(&self, abi: crate::compatibility::SyscallAbi) -> &'static str {
+        match abi {
+            crate::compatibility::SyscallAbi::Oabi_32 => "/lib32/libc.so",
+            _ => "/lib64/libc.so",
+        }
+    }
 }

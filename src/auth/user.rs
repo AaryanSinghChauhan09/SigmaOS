@@ -97,23 +97,17 @@ impl AuthService for SimpleAuthService {
         Ok(id)
     }
     fn authenticate_user(&mut self, username: &[u8], password: &[u8]) -> Result<bool, AuthError> {
-        for i in 0..self.users.len {
-            unsafe {
-                let user_option = &mut *self.users.data.add(i);
-                if let Some(ref mut user) = *user_option {
-                    if user.username() == username { return user.authenticate(password); }
-                }
+        for user_opt in &mut self.users {
+            if let Some(ref mut user) = user_opt {
+                if user.username() == username { return user.authenticate(password); }
             }
         }
         Err(AuthError::InvalidCredentials)
     }
     fn get_user(&self, id: UserID) -> Option<&dyn User> {
-        for i in 0..self.users.len {
-            unsafe {
-                let user_option = &*self.users.data.add(i);
-                if let Some(ref user) = *user_option {
-                    if user.id() == id { return Some(user.as_ref()); }
-                }
+        for user_opt in &self.users {
+            if let Some(ref user) = user_opt {
+                if user.id() == id { return Some(user.as_ref()); }
             }
         }
         None
@@ -204,32 +198,6 @@ impl Default for SovereignSingleUserEngine {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {

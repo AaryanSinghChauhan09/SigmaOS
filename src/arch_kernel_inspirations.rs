@@ -813,12 +813,13 @@ impl Default for ReproducibleBuildVerdict {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::boxed::Box;
 
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases = vec![
-            ("test_ok".to_string(), |e: &mut Vec<Expectation>| {
+        let cases: Vec<(String, Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+            ("test_ok".to_string(), Box::new(|e: &mut Vec<Expectation>| {
                 e.push(Expectation {
                     kind: ExpectationKind::Eq,
                     left: "1".into(),
@@ -827,8 +828,8 @@ mod tests {
                     line: 10,
                     passed: true,
                 });
-            }),
-            ("test_bad".to_string(), |e: &mut Vec<Expectation>| {
+            })),
+            ("test_bad".to_string(), Box::new(|e: &mut Vec<Expectation>| {
                 e.push(Expectation {
                     kind: ExpectationKind::True,
                     left: "false".into(),
@@ -837,7 +838,7 @@ mod tests {
                     line: 12,
                     passed: false,
                 });
-            }),
+            })),
         ];
         let r = eng.run_suite("foo", cases);
         assert_eq!(r.failed, 1);

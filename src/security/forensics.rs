@@ -337,6 +337,14 @@ impl AppSandboxEngine {
     }
 }
 
+unsafe impl Sync for AnonSurfShunt {}
+unsafe impl Sync for AppSandboxEngine {}
+unsafe impl Sync for ForensicStorageFilter {}
+
+pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt::new();
+pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();
+pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();
+
 pub struct ForensicStorageFilter {
     pub is_write_blocked: core::cell::Cell<bool>,
 }

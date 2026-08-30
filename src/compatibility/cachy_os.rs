@@ -555,6 +555,7 @@ mod tests {
 
     #[test]
     fn test_cachy_microarch_compiler_tuner() {
+        use alloc::string::ToString;
         let tuner_v4 = CachyMicroarchCompilerTuner::new(4);
         let flags_v4 = tuner_v4.inject_optimal_compilation_flags();
         assert!(flags_v4.contains(&"-march=x86-64-v4".to_string()));
@@ -567,6 +568,7 @@ mod tests {
 
     #[test]
     fn test_cachyos_repo_mirror_selector() {
+        use alloc::string::ToString;
         let mut selector = CachyosRepoMirrorSelector::new(3); // x86-64-v3 host
         selector.add_mirror(CachyosMirror {
             url: "https://mirror.cachyos.org/v3".to_string(),

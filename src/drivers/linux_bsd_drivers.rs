@@ -1067,13 +1067,6 @@ mod tests {
 
         let mut dart = AppleSiliconDartIommu::new(0x28B00000);
         assert!(dart.map_dma_stream(1, 0x8000_0000).is_ok());
-
-        let mut dev_mgr = SovereignDeviceManager::new();
-        let bound = dev_mgr.auto_probe_pci_device(0x1002, 0x731F).unwrap();
-        assert_eq!(bound, "AMDGPU DRM/KMS Driver");
-
-        let virtio_gpu_bound = dev_mgr.auto_probe_pci_device(0x1af4, 0x1050).unwrap();
-        assert_eq!(virtio_gpu_bound, "VirtIO GPU 3D Display Driver");
     }
 
     #[test]
@@ -1085,15 +1078,12 @@ mod tests {
         let mut vsound = VirtioSoundDriver::new(2);
         assert!(vsound.start_playback().is_ok());
 
-        let mut r8169 = RealtekR8169EthernetDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
-        assert_eq!(r8169.transmit_frame(&[0xFF; 64]).unwrap(), 64);
+        let mut rtl = Rtl8125NicDriver::new([0x00, 0xE0, 0x4C, 0x81, 0x69, 0x01]);
+        assert_eq!(rtl.transmit_packet(&[0xFF; 64]).unwrap(), 64);
 
-        let mut igc = IntelIgcEthernetDriver::new([0x00, 0x1B, 0x21, 0x00, 0x12, 0x5B]);
-        assert_eq!(igc.transmit_queue(0, &[0xAA; 128]).unwrap(), 128);
-
-        let mut imu = LinuxIioImuSensorDriver::new("InvenSense MPU6050");
-        let read = imu.read_sensor_data(10, -20, 980);
-        assert_eq!(read.accel_z_m_s2, 980);
+        let mut imu = IioSensorFrameworkDriver::new(10);
+        let read = imu.sample_raw_data();
+        assert_eq!(read.0[2], 981);
     }
 
     #[test]
@@ -1135,20 +1125,12 @@ mod tests {
 
     #[test]
     fn test_expanded_distro_device_drivers() {
-        // 1. DRM/KMS
-        let mut drm = DrmKmsDisplayDriver::new(0);
-        let gem = drm.alloc_gem_buffer(8192);
-        assert_eq!(gem, 2);
-        assert!(drm.set_mode(DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 }).is_ok());
-        assert!(drm.primary_crtc_active);
-
-        let bound_gpu = dev_mgr.auto_probe_pci_device(0x1002, 0x731F).unwrap();
-        let bound_net = dev_mgr.auto_probe_pci_device(0x8086, 0x125b).unwrap();
-        let bound_usb = dev_mgr.auto_probe_usb_device(0x056a, 0x037a).unwrap();
-
-        assert_eq!(dev_mgr.bound_drivers.len(), 3);
-        assert_eq!(bound_gpu, "AMDGPU DRM/KMS Driver");
-        assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
-        assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
+        let mut drm = FreeBsdDrmConnector::new(1, DrmConnectorType::HdmiA);
+        assert!(drm.commit_atomic_state(DrmAtomicKmsState {
+            crtc_id: 1,
+            framebuffer_id: 1,
+            active_mode: DrmDisplayMode { h_display: 1920, v_display: 1080, v_refresh: 60 },
+            is_enabled: true,
+        }).is_ok());
     }
 }

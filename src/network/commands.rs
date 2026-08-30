@@ -47,7 +47,7 @@ pub struct IpRoute2Command {
 }
 
 impl IpRoute2Command {
-    pub fn new(interface_name: &'static str) -> Self {
+    pub const fn new(interface_name: &'static str) -> Self {
         Self {
             interface_name,
             active_state: AtomicU8::new(LinkState::Down as u8),
@@ -665,6 +665,7 @@ impl FirewallCommand {
 // Global Static Instances
 pub static GLOBAL_UFW_RULE: UfwDefaultRule = UfwDefaultRule;
 pub static GLOBAL_FIREWALL: FirewallCommand = FirewallCommand::new(&GLOBAL_UFW_RULE);
+pub static GLOBAL_IP_COMMAND: IpRoute2Command = IpRoute2Command::new("eth0");
 
 #[cfg(test)]
 mod tests {

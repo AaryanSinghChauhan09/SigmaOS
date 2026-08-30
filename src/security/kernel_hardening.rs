@@ -8,17 +8,9 @@
 //! 3. `HardenedSyscallDispatcher`: Multi-layered syscall security filtering (pledge/unveil, Capsicum rights, seccomp rules), argument pointer sanity checks, rate-limiting, and anomaly detection.
 extern crate alloc;
 
-#[cfg(not(test))]
-use crate::klib::{HashMap, Vec};
-#[cfg(test)]
 use crate::klib::HashMap;
-
-#[cfg(not(test))]
-#[cfg(not(test))]
 use alloc::string::{String, ToString};
-
-#[cfg(test)]
-use alloc::string::ToString;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
@@ -320,7 +312,7 @@ impl HardenedSyscallDispatcher {
 
     /// Verifies if the requested syscall category is allowed under the process's active pledges
     pub fn check_pledge(&self, pid: u64, sys_nr: u32) -> bool {
-        let pledges = match self.process_pledges.get(&pid) {
+        let pledges: &Vec<PledgePromise> = match self.process_pledges.get(&pid) {
             Some(p) => p,
             None => return true, // No pledge restrictions applied
         };

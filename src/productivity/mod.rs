@@ -26,3 +26,4 @@ pub use sovereign_apps::{
 };
 
 pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use media::*;

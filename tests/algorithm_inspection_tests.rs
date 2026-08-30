@@ -6,10 +6,11 @@
 // - Cryptographic & Security algorithms (Post-Quantum Kyber/Dilithium, Unveil, SELinux)
 
 use sigmaos::ai::{
-    KMeansClustering, LocalLlmWrapper, LocalQuantizationType, PrincipalComponentAnalysis,
+    KMeansClustering, LocalLlmWrapper, PrincipalComponentAnalysis,
 };
+use sigmaos::ai::local_llm::QuantizationType as LocalQuantizationType;
 use sigmaos::security::selinux::SelinuxEngine;
-use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
+use sigmaos::security::unveil::{UnveilManager, UnveilPermissions};
 use sigmaos::virtualization::kvm_vcpu::{KvmExitCode, KvmVcpu, RAX_HLT_SIGNAL};
 
 #[test]
@@ -36,12 +37,12 @@ fn test_ml_data_science_algorithms_inspection() {
 #[test]
 fn test_security_sandboxing_algorithms_inspection() {
     let mut unveil = UnveilManager::new();
-    unveil.unveil("/etc/nginx", "r").unwrap();
+    unveil.unveil(1, "/etc/nginx".to_string(), "r").unwrap();
     assert!(unveil
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
+        .check_access(1, "/etc/nginx/nginx.conf", UnveilPermissions::Read)
         .is_ok());
     assert!(unveil
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
+        .check_access(1, "/etc/nginx/nginx.conf", UnveilPermissions::Write)
         .is_err());
 
     let mut selinux = SelinuxEngine::new();

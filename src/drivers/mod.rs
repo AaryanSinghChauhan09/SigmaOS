@@ -1,4 +1,8 @@
 // SigmaOS Drivers Module
+pub mod ch340_usb;
+pub mod e1000_nic;
+pub mod intel_hda;
+pub mod nvme_storage;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
@@ -23,7 +27,11 @@ pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
 
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
+pub use ch340_usb::*;
+pub use e1000_nic::*;
+pub use intel_hda::*;
+pub use nvme_storage::*;
+pub use gpu::*;
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;

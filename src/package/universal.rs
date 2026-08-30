@@ -4,11 +4,7 @@ use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-
-#[cfg(test)]
-use alloc::collections::BTreeMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -1023,6 +1019,80 @@ pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
 
+// =========================================================================
+// ACT-05: Abstract PackageTranslator Factory Pattern
+// =========================================================================
+
+pub trait PackageTranslator: Send + Sync {
+    fn format(&self) -> PackageFormat;
+    fn translate(&self, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str>;
+}
+
+pub struct DebPackageTranslatorAdapter;
+impl PackageTranslator for DebPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Deb }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_deb".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Deb))
+    }
+}
+
+pub struct RpmPackageTranslatorAdapter;
+impl PackageTranslator for RpmPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Rpm }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_rpm".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Rpm))
+    }
+}
+
+pub struct PacmanPackageTranslatorAdapter;
+impl PackageTranslator for PacmanPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Pacman }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_pacman".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Pacman))
+    }
+}
+
+pub struct ApkPackageTranslatorAdapter;
+impl PackageTranslator for ApkPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Apk }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_apk".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+    }
+}
+
+pub struct FlatpakPackageTranslatorAdapter;
+impl PackageTranslator for FlatpakPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Flatpak }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_flatpak".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Flatpak))
+    }
+}
+
+pub struct EbuildPackageTranslatorAdapter;
+impl PackageTranslator for EbuildPackageTranslatorAdapter {
+    fn format(&self) -> PackageFormat { PackageFormat::Ebuild }
+    fn translate(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        Ok(UnifiedPackage::new("translated_ebuild".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Ebuild))
+    }
+}
+
+/// Factory pattern for dynamically instantiating package format translators
+pub struct PackageTranslatorFactory;
+
+impl PackageTranslatorFactory {
+    pub fn create_translator(format: PackageFormat) -> Option<alloc::boxed::Box<dyn PackageTranslator>> {
+        match format {
+            PackageFormat::Deb => Some(alloc::boxed::Box::new(DebPackageTranslatorAdapter)),
+            PackageFormat::Rpm => Some(alloc::boxed::Box::new(RpmPackageTranslatorAdapter)),
+            PackageFormat::Pacman => Some(alloc::boxed::Box::new(PacmanPackageTranslatorAdapter)),
+            PackageFormat::Apk => Some(alloc::boxed::Box::new(ApkPackageTranslatorAdapter)),
+            PackageFormat::Flatpak => Some(alloc::boxed::Box::new(FlatpakPackageTranslatorAdapter)),
+            PackageFormat::Ebuild => Some(alloc::boxed::Box::new(EbuildPackageTranslatorAdapter)),
+            _ => None,
+        }
+    }
+}
+
 /// Universal multi-format package metadata parser and handler supporting
 /// Linux, BSD, macOS, Android, and HarmonyOS package formats
 pub struct UniversalPackageManifestParser;
@@ -1102,6 +1172,20 @@ impl UniversalPackageManifestParser {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_package_translator_factory() {
+        let deb_tr = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
+        assert_eq!(deb_tr.format(), PackageFormat::Deb);
+        let pkg = deb_tr.translate(b"dummy").unwrap();
+        assert_eq!(pkg.name, "translated_deb");
+
+        let rpm_tr = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
+        assert_eq!(rpm_tr.format(), PackageFormat::Rpm);
+
+        let none_tr = PackageTranslatorFactory::create_translator(PackageFormat::Air);
+        assert!(none_tr.is_none());
+    }
 
     #[test]
     fn test_manager_creation() {

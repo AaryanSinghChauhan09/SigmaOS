@@ -560,7 +560,16 @@ pub enum ZorinLayoutPreset {
     MacOsLike,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopMode {
+    ClassicDE,
+    TilingWM,
+    TouchTabletMode,
+}
+
 pub struct ZorinAppearanceSwitcher {
+    pub active_mode: DesktopMode,
+    pub compositor_animations_enabled: bool,
     pub panel_height_pixels: u32,
 }
 
@@ -568,9 +577,21 @@ impl ZorinAppearanceSwitcher {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
+            active_mode: DesktopMode::ClassicDE,
+            compositor_animations_enabled: true,
             panel_height_pixels: 40,
         }
     }
+
+    pub fn switch_mode(&mut self, mode: DesktopMode) {
+        self.active_mode = mode;
+        if mode == DesktopMode::TouchTabletMode {
+            self.compositor_animations_enabled = false;
+        } else {
+            self.compositor_animations_enabled = true;
+        }
+    }
+
     pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
         if preset == ZorinLayoutPreset::MacOsLike {
             self.panel_height_pixels = 64;

@@ -2,6 +2,8 @@
 pub mod archive;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
+pub mod smart_symlink;
+pub use smart_symlink::*;
 pub mod defragmenter;
 pub mod disk_usage;
 pub mod ext4_ntfs_security;

@@ -33,6 +33,12 @@ pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
 pub mod ai_anomaly_detection;
+pub mod defensive_audit;
+
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
 
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;
@@ -49,6 +55,7 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use forensics::*;
+pub use forensics::{GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };

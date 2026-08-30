@@ -16,9 +16,9 @@ use alloc::string::{String, ToString};
 /// Introduces native directory trees for AI models, agents, and cryptographic keys.
 pub struct SovereignFhsHierarchy {
     pub directories: HashMap<String, Vec<String>>, // Directory path -> children
-    pub ai_agents_path: PathBuf,
-    pub ai_models_path: PathBuf,
-    pub pqc_keys_path: PathBuf,
+    pub ai_agents_path: String,
+    pub ai_models_path: String,
+    pub pqc_keys_path: String,
 }
 
 impl SovereignFhsHierarchy {
@@ -39,9 +39,9 @@ impl SovereignFhsHierarchy {
 
         SovereignFhsHierarchy {
             directories: dirs,
-            ai_agents_path: PathBuf::from("/agents"),
-            ai_models_path: PathBuf::from("/models"),
-            pqc_keys_path: PathBuf::from("/keys"),
+            ai_agents_path: "/agents".to_string(),
+            ai_models_path: "/models".to_string(),
+            pqc_keys_path: "/keys".to_string(),
         }
     }
 
@@ -764,7 +764,7 @@ mod tests {
     fn test_sovereign_fhs_hierarchy_and_translation() {
         let hierarchy = SovereignFhsHierarchy::new();
         assert_eq!(hierarchy.directories.len(), 9); // 5 FHS + 4 AI-native
-        assert_eq!(hierarchy.ai_agents_path, PathBuf::from("/agents"));
+        assert_eq!(hierarchy.ai_agents_path, "/agents");
 
         // Windows path translation to standard FHS
         let win_bin = hierarchy.translate_cross_platform_path("C:\\Windows\\System32\\cmd.exe");

@@ -7,10 +7,7 @@ use alloc::format;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -774,7 +771,8 @@ impl SeLinuxEnforcer {
         }
 
         let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
-            allowed.contains(&target_type.to_string())
+            let target_str = target_type.to_string();
+            allowed.contains(&target_str as &String)
         } else {
             false
         };
@@ -1006,7 +1004,8 @@ impl SovereignSeLinuxEngine {
 
         let is_allowed = if let Some(classes) = self.domain_permissions.get(src_domain) {
             if let Some(perms) = classes.get("file") {
-                perms.contains(&permission.to_string())
+                let perm_str = permission.to_string();
+                perms.contains(&perm_str as &String)
                     && file_ctx.domain_type == "httpd_sys_content_t"
             } else {
                 false
@@ -1033,7 +1032,8 @@ impl SovereignSeLinuxEngine {
         }
 
         if let Some(allowed) = self.allowed_transitions.get(current_domain) {
-            allowed.contains(&target_domain.to_string())
+            let target_str = target_domain.to_string();
+            allowed.contains(&target_str as &String)
         } else {
             false
         }
@@ -1083,7 +1083,7 @@ impl SovereignFirewalldManager {
         }
 
         for interfaces in self.active_zones.values_mut() {
-            interfaces.retain(|i| i != interface);
+            interfaces.retain(|i: &String| i.as_str() != interface);
         }
 
         self.active_zones
@@ -1104,14 +1104,15 @@ impl SovereignFirewalldManager {
     pub fn is_packet_allowed(&self, interface: &str, destination_port: u16) -> bool {
         let mut matched_zone = &self.default_zone;
         for (zone, interfaces) in &self.active_zones {
-            if interfaces.contains(&interface.to_string()) {
+        let iface_str = interface.to_string();
+        if interfaces.contains(&iface_str as &String) {
                 matched_zone = zone;
                 break;
             }
         }
 
         if let Some(ports) = self.zone_allowed_ports.get(matched_zone) {
-            ports.contains(&destination_port)
+            ports.contains(&destination_port as &u16)
         } else {
             false
         }

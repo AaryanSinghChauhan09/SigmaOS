@@ -19,6 +19,27 @@ cargo test
 - 🔧 **Code**: See open issues labeled `good first issue`
 - 🔒 **Security**: See [SECURITY.md](SECURITY.md)
 
+## Cross-Compilation & Target Architecture Setups (ACT-08)
+
+SigmaOS is zero-dependency and `#![no_std]` compliant at its core. It supports cross-compilation across multiple hardware target triples:
+
+### Target Architectures
+- **x86_64 Bare-Metal**: `x86_64-unknown-none`
+- **ARM64 / AArch64**: `aarch64-unknown-none`
+- **RISC-V 64-Bit**: `riscv64gc-unknown-none-elf`
+
+### Setting up Cross-Compilation Toolchains
+```bash
+# Add rustup target triples
+rustup target add x86_64-unknown-none aarch64-unknown-none riscv64gc-unknown-none-elf
+
+# Build for bare-metal ARM64 target
+cargo build --target aarch64-unknown-none
+
+# Build for bare-metal RISC-V target
+cargo build --target riscv64gc-unknown-none-elf
+```
+
 ## Development Process
 
 1. Fork the repository

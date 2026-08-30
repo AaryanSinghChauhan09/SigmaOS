@@ -19,6 +19,8 @@ pub mod bsd;
 pub mod cachy_os;
 pub mod canonical;
 pub mod chakra;
+pub use canonical::*;
+pub use chakra::*;
 pub mod chimera_linux;
 pub mod clear_linux;
 pub mod community_foundation;
@@ -100,7 +102,7 @@ pub use gap_closure::{
     FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
     PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
     HidGraphicsDriver, AiTaskOrchestrator, SovereignDistroAbsorptionEngine,
-    OpenSourceCompetitorOrchestrator, TargetDistroFamily,
+    OpenSourceCompetitorOrchestrator, TargetDistroFamily, ZorinAppearanceSwitcher,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,

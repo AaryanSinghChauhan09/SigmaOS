@@ -12,6 +12,8 @@ pub mod klib;
 
 pub mod accessibility;
 pub mod ai;
+pub mod app;
+pub mod auth;
 pub mod arch;
 pub mod audio;
 pub mod automation;
@@ -24,6 +26,7 @@ pub mod desktop;
 pub mod device;
 pub mod distro;
 pub mod driver;
+pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod memory;

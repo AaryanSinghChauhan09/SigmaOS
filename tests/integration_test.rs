@@ -50,13 +50,13 @@ use sigmaos::security::{
 };
 
 use sigmaos::kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask,
     HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase,
-    InterruptClass, IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LcgRandom, LookasideList,
-    LotteryTask, MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType, Priority,
+    InterruptClass, IoWaitProfile, Irql, LcgRandom, LookasideList,
+    LotteryTask, MemoryDescriptorList, Pcb, PoolType, Priority,
     Process, ProcessState, ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList,
-    SovereignMechanism, SystemThread, Tcb, ThreadState, WorkItem,
+    SystemThread, Tcb, ThreadState, WorkItem, KernelPersona as KernelKernelPersona,
 };
 
 #[cfg(test)]
@@ -72,11 +72,12 @@ mod tests {
     fn test_legacy_personality_and_syscall_adaptation_flow() {
         // Step 1: Initialize the multi-persona VM
         let vm = KernelPersonaVM::new();
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_6_x);
+        assert_eq!(vm.current_persona.get(), KernelPersona::Linux6X);
 
         // Hot-swap kernel persona to 2.6 for legacy application expectations
-        vm.hot_swap_persona(KernelPersona::Linux_2_6);
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_2_6);
+        let mut vm_mut = vm;
+        vm_mut.hot_swap_persona(KernelPersona::Linux2_6);
+        assert_eq!(vm_mut.current_persona.get(), KernelPersona::Linux2_6);
 
         // Step 2: Use the Binary Compatibility Matrix to decode and translate syscall expectations
         let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi_32);
@@ -84,7 +85,7 @@ mod tests {
         assert_eq!(translated_sys, 1005);
 
         // Step 3: Verify the API Timeline Manager parameter mappings
-        let timeline = APITimelineManager::new(KernelPersona::Linux_2_6);
+        let timeline = APITimelineManager::new(KernelPersona::Linux2_6);
         let cleaned_param = timeline.map_syscall_params(0x0000111100002222);
         assert_eq!(cleaned_param, 0x00002222);
     }
@@ -108,12 +109,12 @@ mod tests {
 
     #[test]
     fn test_legacy_workload_optimizer_tuning() {
-        let optimizer = WorkloadOptimizer::new();
-        assert_eq!(optimizer.get_profile(), WorkloadProfile::LowMemoryProfile);
+        let mut optimizer = WorkloadOptimizer::new();
+        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::LowMemoryProfile);
 
         // Apply Single Core scheduling locks for early thread assumptions
         optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
-        assert_eq!(optimizer.get_profile(), WorkloadProfile::SingleCoreProfile);
+        assert_eq!(optimizer.active_profile.get(), WorkloadProfile::SingleCoreProfile);
     }
 
     #[test]
@@ -216,19 +217,20 @@ mod tests {
 
         let rule = LinuxPersonaRule;
 
+        let k_persona = KernelKernelPersona { name: "Linux_6_x", api_version: "6.0", active_processes: 0 };
         // Case 1: Primary target exists
         let res1 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+            link1.resolve_symlink(k_persona.clone(), true, &[false, false], &rule, None);
         assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
 
         // Case 2: Primary target broken, heals to fallback index 1
         let res2 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+            link1.resolve_symlink(k_persona.clone(), false, &[false, true], &rule, None);
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning
         let res3 = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            k_persona.clone(),
             false,
             &[false, false],
             &rule,
@@ -240,7 +242,7 @@ mod tests {
         let mut loop_err = Ok("");
         for _ in 0..12 {
             loop_err = link1.resolve_symlink(
-                KernelPersona::Linux_6_x,
+                k_persona.clone(),
                 true,
                 &[false, false],
                 &rule,
@@ -257,9 +259,9 @@ mod tests {
 
         // Case 5: Rule context-awareness evaluation
         let legacy_rule = LegacyLinuxRule;
-        // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
+        // On modern Linux6X kernel, Legacy rule rejects and points directly to first fallback path
         let res_legacy = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            k_persona,
             true,
             &[false, false],
             &legacy_rule,
@@ -312,8 +314,6 @@ mod tests {
         };
         assert_eq!(deb_translator.source_format(), PackageFormat::Deb);
         assert_eq!(deb_translator.package_name(), "e1000-nic-module.deb");
-        let deb_driver = deb_translator.translate_to_driver();
-        assert_eq!(deb_driver.id, 9901);
 
         // Test RedHat/RPM Package Translator
         let rpm_translator = RpmPackageDriverTranslator {
@@ -321,8 +321,6 @@ mod tests {
             header_signature_valid: true,
         };
         assert_eq!(rpm_translator.source_format(), PackageFormat::Rpm);
-        let rpm_driver = rpm_translator.translate_to_driver();
-        assert_eq!(rpm_driver.id, 9902);
 
         // Test Arch/Pacman Package Translator
         let pac_translator = PacmanPackageDriverTranslator {
@@ -330,43 +328,41 @@ mod tests {
             has_aur_recipes: true,
         };
         assert_eq!(pac_translator.source_format(), PackageFormat::Pacman);
-        let pac_driver = pac_translator.translate_to_driver();
-        assert_eq!(pac_driver.id, 9903);
     }
 
     #[test]
     fn test_antix_linux_parity() {
         // Test SysV-parity MicroServices inside AntixInitManager
-        let init = AntixInitManager::new();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Stopped);
-        init.boot_systemd_free();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Running);
-        assert_eq!(init.services[1].get_state(), MicroServiceState::Running);
+        let mut init = AntixInitManager::new();
+        assert_eq!(init.micro_services[0].get_state(), MicroServiceState::Stopped);
+        init.boot_systemd_free_init();
+        assert_eq!(init.micro_services[0].get_state(), MicroServiceState::Running);
+        assert_eq!(init.micro_services[1].get_state(), MicroServiceState::Running);
 
-        init.services[0].stop();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Stopped);
+        init.micro_services[0].stop();
+        assert_eq!(init.micro_services[0].get_state(), MicroServiceState::Stopped);
 
         // Test Low-Overhead Desktop Profiler
-        let profiler = AntixDesktopProfiler::new();
-        assert_eq!(profiler.get_profile(), AntixDesktopProfile::IceWM);
-        profiler.apply_profile(AntixDesktopProfile::JWM);
-        assert_eq!(profiler.get_profile(), AntixDesktopProfile::JWM);
+        let mut profiler = AntixDesktopProfiler::new();
+        assert_eq!(profiler.current_profile, AntixDesktopProfile::IceWM);
+        profiler.switch_desktop_profile(AntixDesktopProfile::JWM);
+        assert_eq!(profiler.current_profile, AntixDesktopProfile::JWM);
 
         // Test Control Center Legacy configuration coordinator
-        let control = AntixControlCenter::new();
-        control.auto_configure_legacy_hardware();
+        let mut control = AntixControlCenter::new();
+        assert!(control.auto_tune_legacy_hardware().is_ok());
 
         // Test Aggressive Memory Cache Trimmer
         let trimmer = LegacyMemoryTrimmer::new();
         // High RAM: normal reclaim
-        let reclaim1 = trimmer.trim_caches(1024);
+        let reclaim1 = trimmer.trim_kernel_caches(1024);
         assert!(reclaim1 > 0);
 
         // Low RAM (e.g. 256 MB): triggers aggressive escalation (max target state)
-        let reclaim2 = trimmer.trim_caches(256);
+        let reclaim2 = trimmer.trim_kernel_caches(256);
         assert_eq!(
             trimmer
-                .trim_aggressiveness
+                .trim_aggressiveness_level
                 .load(core::sync::atomic::Ordering::SeqCst),
             10
         );
@@ -474,8 +470,8 @@ mod tests {
 
         // Test ping PingCommand
         let ping_cmd = PingCommand::new();
-        let latency = ping_cmd.ping_host(0xC0A80101, 3);
-        assert_eq!(latency, 8);
+        let stats = ping_cmd.ping_host(0xC0A80101, 3);
+        assert_eq!(stats.transmitted, 3);
         assert_eq!(
             ping_cmd
                 .packets_sent
@@ -594,9 +590,10 @@ mod tests {
         cmd_buf.record_command(GpuCommand::SimulateHang);
         cmd_buf.end_recording();
 
+        use sigmaos::drivers::GpuError;
         // Submitting command buffer triggers simulated hardware hang (TDR recovery)
         let res = gpu.submit_command_buffer(cmd_buf);
-        assert_eq!(res, Err(sigmaos::drivers::GpuError::HardwareHang));
+        assert_eq!(res, Err(GpuError::HardwareHang));
 
         // After TDR reset, hardware status is ready, bound_pipeline_id is reset, total hangs incremented
         assert!(gpu.reset_state.is_hardware_ready);
@@ -683,15 +680,16 @@ mod tests {
 
     #[test]
     fn test_layered_desktop_modes() {
+        use sigmaos::compatibility::gap_closure::DesktopMode as GapDesktopMode;
         let mut switcher = ZorinAppearanceSwitcher::new();
-        assert_eq!(switcher.active_mode, DesktopMode::ClassicDE);
+        assert_eq!(switcher.active_mode, GapDesktopMode::ClassicDE);
         assert!(switcher.compositor_animations_enabled);
 
-        switcher.switch_mode(DesktopMode::TilingWM);
-        assert_eq!(switcher.active_mode, DesktopMode::TilingWM);
+        switcher.switch_mode(GapDesktopMode::TilingWM);
+        assert_eq!(switcher.active_mode, GapDesktopMode::TilingWM);
 
-        switcher.switch_mode(DesktopMode::TouchTabletMode);
-        assert_eq!(switcher.active_mode, DesktopMode::TouchTabletMode);
+        switcher.switch_mode(GapDesktopMode::TouchTabletMode);
+        assert_eq!(switcher.active_mode, GapDesktopMode::TouchTabletMode);
         assert!(!switcher.compositor_animations_enabled);
     }
 

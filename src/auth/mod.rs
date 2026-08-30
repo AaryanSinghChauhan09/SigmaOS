@@ -25,3 +25,5 @@ pub use att_security::{
     AdtAttributeRecord, AttributesDefinitionTable, AuthenticityVerifier,
     AllocatedUserSession, AutomaticResourceManager, AttSecurityEngine,
 };
+
+pub use authentication_pipeline::*;

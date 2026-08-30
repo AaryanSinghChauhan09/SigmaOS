@@ -73,14 +73,14 @@ pub enum HdaSampleRate {
     Rate96000Hz,
 }
 
-pub struct IntelHdaDriver {
+pub struct ShimIntelHdaDriver {
     pub active_stream_id: Option<u32>,
     pub sample_rate: HdaSampleRate,
     pub stream_buffers: BTreeMap<u32, Vec<u8>>, // stream_id -> audio buffer
     pub volume_level: u8,                       // 0 to 100
 }
 
-impl IntelHdaDriver {
+impl ShimIntelHdaDriver {
     pub fn new() -> Self {
         Self {
             active_stream_id: None,
@@ -116,7 +116,7 @@ impl IntelHdaDriver {
     }
 }
 
-impl Default for IntelHdaDriver {
+impl Default for ShimIntelHdaDriver {
     fn default() -> Self {
         Self::new()
     }
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_intel_hda_audio_driver() {
-        let mut hda = IntelHdaDriver::new();
+        let mut hda = ShimIntelHdaDriver::new();
         hda.configure_audio_stream(5, HdaSampleRate::Rate96000Hz);
         assert_eq!(hda.sample_rate, HdaSampleRate::Rate96000Hz);
 

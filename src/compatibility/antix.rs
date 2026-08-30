@@ -181,26 +181,116 @@ impl Default for AntiXControlCentre {
     }
 }
 
-pub struct AntixInitManager;
-impl AntixInitManager {
-    pub const fn new() -> Self {
-        Self
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroServiceState {
+    Stopped,
+    Running,
+}
+
+#[derive(Debug, Clone)]
+pub struct AntixMicroService {
+    pub name: String,
+    pub state: MicroServiceState,
+}
+
+impl AntixMicroService {
+    pub fn get_state(&self) -> MicroServiceState {
+        self.state
+    }
+    pub fn stop(&mut self) {
+        self.state = MicroServiceState::Stopped;
     }
 }
 
-pub struct AntixDesktopProfiler;
+pub struct AntixInitManager {
+    pub micro_services: Vec<AntixMicroService>,
+}
+
+impl AntixInitManager {
+    pub const fn new() -> Self {
+        Self {
+            micro_services: Vec::new(),
+        }
+    }
+
+    pub fn boot_systemd_free_init(&mut self) {
+        for svc in &mut self.micro_services {
+            svc.state = MicroServiceState::Running;
+        }
+    }
+}
+
+impl Default for AntixInitManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopProfile {
+    IceWM,
+    JWM,
+    Fluxbox,
+}
+
+pub struct AntixDesktopProfiler {
+    pub current_profile: DesktopProfile,
+}
+
 impl AntixDesktopProfiler {
     pub const fn new() -> Self {
-        Self
+        Self {
+            current_profile: DesktopProfile::IceWM,
+        }
+    }
+
+    pub fn switch_desktop_profile(&mut self, profile: DesktopProfile) {
+        self.current_profile = profile;
+    }
+}
+
+impl Default for AntixDesktopProfiler {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 pub type AntixControlCenter = AntiXControlCentre;
+pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntiXControlCentre::new();
+pub type MicroService = AntixMicroService;
 
-pub struct LegacyMemoryTrimmer;
+impl AntiXControlCentre {
+    pub fn auto_tune_legacy_hardware(&mut self) -> Result<(), &'static str> {
+        self.enable_ultra_low_memory_profile();
+        Ok(())
+    }
+}
+
+pub struct LegacyMemoryTrimmer {
+    pub trim_aggressiveness_level: core::sync::atomic::AtomicU8,
+}
+
 impl LegacyMemoryTrimmer {
     pub const fn new() -> Self {
-        Self
+        Self {
+            trim_aggressiveness_level: core::sync::atomic::AtomicU8::new(1),
+        }
+    }
+
+    pub fn trim_kernel_caches(&self, available_ram_mb: usize) -> usize {
+        if available_ram_mb < 512 {
+            self.trim_aggressiveness_level.store(10, Ordering::SeqCst);
+            256
+        } else {
+            self.trim_aggressiveness_level.store(1, Ordering::SeqCst);
+            64
+        }
+    }
+}
+
+impl Default for LegacyMemoryTrimmer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

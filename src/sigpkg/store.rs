@@ -326,7 +326,7 @@ mod distro_pkg_tests {
     fn test_nix_cas_hermetic_store() {
         let mut cas = NixOsHermeticCasStore::new(PathBuf::from("/sigma/store"));
         let path = cas.compute_store_path("zenith-compositor", "1.0.0", b"binary_data");
-        assert!(path.to_str().unwrap().contains("zenith-compositor"));
+        assert!(path.contains("zenith-compositor"));
         assert!(cas.verify_closure("zenith-compositor"));
     }
 }

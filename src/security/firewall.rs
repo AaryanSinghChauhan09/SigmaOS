@@ -250,6 +250,38 @@ impl Firewall {
         count
     }
 
+    pub fn evaluate_input(&mut self, packet: &PacketInfo, now: u64) -> Action {
+        let state = self.track_connection(packet, now);
+        for rule in &self.input_rules {
+            if rule.criteria.matches(packet, state) {
+                if rule.action == Action::Log {
+                    if self.rate_limiter.allow(now) {
+                        // Log packet logically
+                    }
+                    continue;
+                }
+                return rule.action;
+            }
+        }
+        self.default_action
+    }
+
+    pub fn evaluate_output(&mut self, packet: &PacketInfo, now: u64) -> Action {
+        let state = self.track_connection(packet, now);
+        for rule in &self.output_rules {
+            if rule.criteria.matches(packet, state) {
+                if rule.action == Action::Log {
+                    if self.rate_limiter.allow(now) {
+                        // Log packet logically
+                    }
+                    continue;
+                }
+                return rule.action;
+            }
+        }
+        self.default_action
+    }
+
     pub fn evaluate_forward(&mut self, packet: &PacketInfo, now: u64) -> Action {
         let state = self.track_connection(packet, now);
         for rule in &self.forward_rules {
@@ -270,6 +302,36 @@ impl Firewall {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_firewall_rule_evaluator_default_deny() {
+        let mut fw = Firewall::new();
+        let pkt = PacketInfo {
+            source_ip: Ipv4Address(0x0A000001),
+            dest_ip: Ipv4Address(0x0A000002),
+            source_port: 1234,
+            dest_port: 80,
+            protocol: Protocol::Tcp,
+        };
+
+        // Unmatched packet falls back to default deny (Drop)
+        assert_eq!(fw.evaluate_input(&pkt, 100), Action::Drop);
+
+        // Add explicit permit rule
+        fw.input_rules.push(Rule {
+            criteria: MatchCriteria {
+                source_ip: None,
+                dest_ip: None,
+                source_port: None,
+                dest_port: Some(80),
+                protocol: Protocol::Tcp,
+                state: None,
+            },
+            action: Action::Accept,
+        });
+
+        assert_eq!(fw.evaluate_input(&pkt, 101), Action::Accept);
+    }
 
     #[test]
     fn test_ufw_application_profile() {
