@@ -8,9 +8,9 @@ SigmaOS implements a native, pure-Rust **TLS 1.3** network transport stack with 
 
 ## Key Modules
 
-- [`src/crypto/pqc_dilithium.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/crypto/pqc_dilithium.rs): Post-quantum digital signatures (ML-DSA).
-- [`src/docs/PQC-TLS13-0RTT-Network-Spec.md`](file:///home/aaryansinghchauhan/SigmaOS/src/docs/PQC-TLS13-0RTT-Network-Spec.md): Protocol state machine and cryptographic handshake specification.
-- [`src/net/tls.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/net/tls.rs): Native zero-copy TLS record layer.
+- [`src/crypto/pqc_dilithium.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/crypto/pqc_dilithium.rs): Post-quantum digital signatures (ML-DSA).
+- [`src/docs/PQC-TLS13-0RTT-Network-Spec.md`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/docs/PQC-TLS13-0RTT-Network-Spec.md): Protocol state machine and cryptographic handshake specification.
+- [`src/net/tls.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/net/tls.rs): Native zero-copy TLS record layer.
 
 ---
 
