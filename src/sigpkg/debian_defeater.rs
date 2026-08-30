@@ -76,6 +76,190 @@ impl Default for SovereignAlternativesSystem {
     }
 }
 
+// =========================================================================
+// Additional Debian Linux Subsystems
+// =========================================================================
+
+/// Debian dpkg-divert File Diversion Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Diversion {
+    pub original_path: String,
+    pub diverted_path: String,
+    pub package: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DpkgDivertEngine {
+    pub diversions: HashMap<String, Diversion>,
+}
+
+impl DpkgDivertEngine {
+    pub fn new() -> Self {
+        Self {
+            diversions: HashMap::new(),
+        }
+    }
+
+    pub fn add_diversion(&mut self, original: &str, diverted: &str, package: &str) {
+        self.diversions.insert(
+            original.to_string(),
+            Diversion {
+                original_path: original.to_string(),
+                diverted_path: diverted.to_string(),
+                package: package.to_string(),
+            },
+        );
+    }
+
+    pub fn remove_diversion(&mut self, original: &str) -> bool {
+        self.diversions.remove(original).is_some()
+    }
+
+    pub fn resolve_path<'a>(&'a self, path: &'a str) -> &'a str {
+        if let Some(div) = self.diversions.get(path) {
+            &div.diverted_path
+        } else {
+            path
+        }
+    }
+}
+
+impl Default for DpkgDivertEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Debian debconf Pre-Configuration Template & Response Database
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum DebconfPriority {
+    Low = 1,
+    Medium = 2,
+    High = 3,
+    Critical = 4,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DebconfQuestion {
+    pub name: String,
+    pub question_type: String,
+    pub default_value: String,
+    pub answer: Option<String>,
+    pub priority: DebconfPriority,
+}
+
+#[derive(Debug, Clone)]
+pub struct DebconfConfigDatabase {
+    pub questions: HashMap<String, DebconfQuestion>,
+    pub frontend_priority: DebconfPriority,
+}
+
+impl DebconfConfigDatabase {
+    pub fn new(frontend_priority: DebconfPriority) -> Self {
+        Self {
+            questions: HashMap::new(),
+            frontend_priority,
+        }
+    }
+
+    pub fn register_question(
+        &mut self,
+        name: &str,
+        qtype: &str,
+        default_val: &str,
+        priority: DebconfPriority,
+    ) {
+        self.questions.insert(
+            name.to_string(),
+            DebconfQuestion {
+                name: name.to_string(),
+                question_type: qtype.to_string(),
+                default_value: default_val.to_string(),
+                answer: None,
+                priority,
+            },
+        );
+    }
+
+    pub fn set_answer(&mut self, name: &str, answer: &str) -> bool {
+        if let Some(q) = self.questions.get_mut(name) {
+            q.answer = Some(answer.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_effective_answer(&self, name: &str) -> Option<String> {
+        let q = self.questions.get(name)?;
+        if let Some(ref ans) = q.answer {
+            Some(ans.clone())
+        } else {
+            Some(q.default_value.clone())
+        }
+    }
+
+    pub fn should_prompt_user(&self, name: &str) -> bool {
+        if let Some(q) = self.questions.get(name) {
+            q.priority >= self.frontend_priority && q.answer.is_none()
+        } else {
+            false
+        }
+    }
+}
+
+/// Debian Multi-Arch Co-Installation Policy Evaluator
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MultiArchPolicy {
+    Same,
+    Foreign,
+    Allowed,
+    No,
+}
+
+#[derive(Debug, Clone)]
+pub struct DebianMultiArchResolver {
+    pub primary_arch: String,
+    pub foreign_architectures: Vec<String>,
+}
+
+impl DebianMultiArchResolver {
+    pub fn new(primary_arch: &str) -> Self {
+        Self {
+            primary_arch: primary_arch.to_string(),
+            foreign_architectures: Vec::new(),
+        }
+    }
+
+    pub fn add_foreign_arch(&mut self, arch: &str) {
+        let a = arch.to_string();
+        if !self.foreign_architectures.contains(&a) {
+            self.foreign_architectures.push(a);
+        }
+    }
+
+    pub fn is_architecture_supported(&self, arch: &str) -> bool {
+        arch == "all" || arch == self.primary_arch || self.foreign_architectures.iter().any(|a| a == arch)
+    }
+
+    pub fn can_satisfy_dependency(
+        &self,
+        pkg_arch: &str,
+        policy: MultiArchPolicy,
+        requester_arch: &str,
+    ) -> bool {
+        if !self.is_architecture_supported(pkg_arch) {
+            return false;
+        }
+        match policy {
+            MultiArchPolicy::Same => pkg_arch == requester_arch || pkg_arch == "all",
+            MultiArchPolicy::Foreign => true,
+            MultiArchPolicy::Allowed => pkg_arch == requester_arch || pkg_arch == "all",
+            MultiArchPolicy::No => pkg_arch == self.primary_arch || pkg_arch == "all",
+        }
+    }
+}
+
 /// Maintainer Lifecycle Scripts (dpkg)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MaintainerScriptPhase {
@@ -305,5 +489,56 @@ mod tests {
             selector.select_optimal_mirror().unwrap(),
             "http://mirror2.debian.org"
         );
+    }
+
+    #[test]
+    fn test_dpkg_divert_override_paths() {
+        let mut divert_engine = DpkgDivertEngine::new();
+        divert_engine.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "custom-compiler");
+
+        assert_eq!(divert_engine.resolve_path("/usr/bin/gcc"), "/usr/bin/gcc.real");
+        assert_eq!(divert_engine.resolve_path("/usr/bin/clang"), "/usr/bin/clang");
+
+        assert!(divert_engine.remove_diversion("/usr/bin/gcc"));
+        assert_eq!(divert_engine.resolve_path("/usr/bin/gcc"), "/usr/bin/gcc");
+    }
+
+    #[test]
+    fn test_debconf_preconfig_lookup() {
+        let mut debconf = DebconfConfigDatabase::new(DebconfPriority::Medium);
+        debconf.register_question("tzdata/zones", "select", "UTC", DebconfPriority::High);
+        debconf.register_question("debug/enable", "boolean", "false", DebconfPriority::Low);
+
+        // Effective answer before explicit response -> returns default value
+        assert_eq!(debconf.get_effective_answer("tzdata/zones"), Some("UTC".to_string()));
+
+        // High priority question exceeds frontend threshold (Medium) and has no answer -> prompt user
+        assert!(debconf.should_prompt_user("tzdata/zones"));
+
+        // Low priority question below frontend threshold (Medium) -> do not prompt
+        assert!(!debconf.should_prompt_user("debug/enable"));
+
+        // Set answer -> effective answer updated
+        assert!(debconf.set_answer("tzdata/zones", "Asia/Kolkata"));
+        assert_eq!(debconf.get_effective_answer("tzdata/zones"), Some("Asia/Kolkata".to_string()));
+        assert!(!debconf.should_prompt_user("tzdata/zones"));
+    }
+
+    #[test]
+    fn test_multi_arch_policy_resolver() {
+        let mut multiarch = DebianMultiArchResolver::new("amd64");
+        multiarch.add_foreign_arch("arm64");
+
+        assert!(multiarch.is_architecture_supported("amd64"));
+        assert!(multiarch.is_architecture_supported("arm64"));
+        assert!(multiarch.is_architecture_supported("all"));
+        assert!(!multiarch.is_architecture_supported("riscv64"));
+
+        // Same policy requires matching architecture
+        assert!(multiarch.can_satisfy_dependency("amd64", MultiArchPolicy::Same, "amd64"));
+        assert!(!multiarch.can_satisfy_dependency("arm64", MultiArchPolicy::Same, "amd64"));
+
+        // Foreign policy allows satisfies dependency across architectures
+        assert!(multiarch.can_satisfy_dependency("arm64", MultiArchPolicy::Foreign, "amd64"));
     }
 }
