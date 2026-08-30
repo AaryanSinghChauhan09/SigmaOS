@@ -1374,15 +1374,15 @@ impl ShellRepl {
             }
 
             ShellCommand::Jobs => {
-                let jobs_list = self.job_manager.list_jobs();
+                let jobs_list = self.job_control.list_jobs();
                 if jobs_list.is_empty() {
                     Ok("No active background or stopped jobs.".to_string())
                 } else {
-                    Ok(jobs_list.join("\n"))
+                    Ok(jobs_list)
                 }
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_manager.bring_to_foreground(job_id) {
+                match self.job_control.bring_to_foreground(job_id) {
                     Ok(msg) => Ok(msg),
                     Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
                 }
@@ -1873,7 +1873,7 @@ mod tests {
         assert!(jobs_res.contains("No active background"));
 
         // Register job
-        repl.job_manager.add_job("sleep 100", 1234, true);
+        repl.job_control.add_job("sleep 100", 1234, true);
         let jobs_res2 = repl.execute_command(ShellCommand::Jobs).unwrap();
         assert!(jobs_res2.contains("sleep 100"));
 

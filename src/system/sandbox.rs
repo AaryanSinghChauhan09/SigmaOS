@@ -299,7 +299,7 @@ impl ProcessSandboxManager {
     ) -> Result<SandboxResult, SandboxError> {
         let profile = self
             .profiles
-            .get(profile_name)
+            .get_str(profile_name)
             .ok_or_else(|| SandboxError::ProfileNotFound(profile_name.to_string()))?;
 
         let result = self.enforcer.apply_sandbox(pid, profile)?;

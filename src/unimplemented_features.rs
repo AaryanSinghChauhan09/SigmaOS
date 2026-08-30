@@ -1580,9 +1580,6 @@ impl GamifiedProductivityLayer {
     }
 }
 
-#[cfg(test)]
-
-
 // =========================================================================
 // 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
 // =========================================================================
@@ -1678,6 +1675,79 @@ mod linux_lts_upstream_tests {
 // =========================================================================
 // 38. DISTRO PARITY INSPIRATIONS (GENTOO, FREEBSD, OPENBSD, ARCH/AUR)
 // =========================================================================
+
+pub struct GentooEbuildEntry {
+    pub package_atom: String,
+    pub version: String,
+    pub keywords: Vec<String>,
+    pub is_masked: bool,
+}
+
+pub struct GentooPortageMaskEngine {
+    pub target_arch: String,
+    pub ebuilds: Vec<GentooEbuildEntry>,
+    pub hard_masked_packages: Vec<String>,
+}
+
+impl GentooPortageMaskEngine {
+    pub fn new(target_arch: &str) -> Self {
+        Self {
+            target_arch: target_arch.to_string(),
+            ebuilds: Vec::new(),
+            hard_masked_packages: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild(&mut self, atom: &str, ver: &str, keywords: &[&str], is_masked: bool) {
+        self.ebuilds.push(GentooEbuildEntry {
+            package_atom: atom.to_string(),
+            version: ver.to_string(),
+            keywords: keywords.iter().map(|k| k.to_string()).collect(),
+            is_masked,
+        });
+    }
+
+    pub fn add_hard_mask(&mut self, atom: &str) {
+        if !self.hard_masked_packages.contains(&atom.to_string()) {
+            self.hard_masked_packages.push(atom.to_string());
+        }
+    }
+
+    pub fn evaluate_installability(
+        &self,
+        atom: &str,
+        ver: &str,
+        accept_testing_keywords: bool,
+    ) -> Result<bool, &'static str> {
+        if self.hard_masked_packages.contains(&atom.to_string()) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let ebuild = self
+            .ebuilds
+            .iter()
+            .find(|e| e.package_atom == atom && e.version == ver)
+            .ok_or("Ebuild atom/version not found in Portage tree")?;
+
+        if ebuild.is_masked {
+            return Err("Ebuild is explicitly masked");
+        }
+
+        let testing_kw = format!("~{}", self.target_arch);
+        let stable_kw = self.target_arch.clone();
+
+        let has_stable = ebuild.keywords.contains(&stable_kw);
+        let has_testing = ebuild.keywords.contains(&testing_kw);
+
+        if has_stable {
+            Ok(true)
+        } else if has_testing && accept_testing_keywords {
+            Ok(true)
+        } else {
+            Err("Package keyword unaccepted for current architecture configuration")
+        }
+    }
+}
 
 pub struct GentooUseFlagEngine {
     pub enabled_flags: Vec<String>,

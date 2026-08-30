@@ -40,7 +40,7 @@ impl LanguagePack {
     }
 
     pub fn translate(&self, key: &str) -> Option<&str> {
-        self.translations.get(key).map(|s: &String| s.as_str())
+        self.translations.get_str(key).map(|s: &String| s.as_str())
     }
 
     /// Formats the translation by replacing placeholders like `{0}`, `{1}` with arguments.
@@ -92,12 +92,12 @@ impl InputMethodEngine {
     }
 
     pub fn get_candidates(&self, input: &str) -> Vec<ImeCandidate> {
-        self.dictionary.get(input).cloned().unwrap_or_default()
+        self.dictionary.get_str(input).cloned().unwrap_or_default()
     }
 
     /// Automatically converts input if a single perfect candidate exists, or returns the original.
     pub fn convert_auto(&self, input: &str) -> String {
-        if let Some(candidates) = self.dictionary.get(input) {
+        if let Some(candidates) = self.dictionary.get_str(input) {
             let candidates: &Vec<ImeCandidate> = candidates;
             if !candidates.is_empty() {
                 return candidates[0].text.clone();
@@ -213,8 +213,8 @@ impl LocaleManager {
 
     pub fn set_locale(&mut self, locale: &str) -> Result<(), &'static str> {
         let locale_str = locale.to_string();
-        if self.language_packs.contains_key(&locale_str)
-            || self.regional_settings.contains_key(&locale_str)
+        if self.language_packs.contains_key_str(&locale_str)
+            || self.regional_settings.contains_key_str(&locale_str)
         {
             self.current_locale = locale.to_string();
             Ok(())
@@ -224,7 +224,7 @@ impl LocaleManager {
     }
 
     pub fn translate(&self, key: &str) -> String {
-        if let Some(pack) = self.language_packs.get(&self.current_locale) {
+        if let Some(pack) = self.language_packs.get_str(&self.current_locale) {
             let pack: &LanguagePack = pack;
             if let Some(translation) = pack.translate(key) {
                 let translation: &str = translation;

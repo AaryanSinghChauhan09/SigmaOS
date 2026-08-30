@@ -230,10 +230,11 @@ impl DpkgDatabase {
 
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
+        let pkg_name = package.package.clone();
         self.installed_packages
-            .insert(package.package.clone(), package);
+            .insert(pkg_name.clone(), package);
         self.status_database
-            .insert(package.package.clone(), "install ok installed".to_string());
+            .insert(pkg_name, "install ok installed".to_string());
         Ok(())
     }
 
@@ -246,12 +247,12 @@ impl DpkgDatabase {
 
     /// Get package status
     pub fn get_package_status(&self, package_name: &str) -> Option<&str> {
-        self.status_database.get(package_name)
+        self.status_database.get_str(package_name).map(|s| s.as_str())
     }
 
     /// Get installed package
     pub fn get_package(&self, package_name: &str) -> Option<&DebPackage> {
-        self.installed_packages.get(package_name)
+        self.installed_packages.get_str(package_name)
     }
 
     /// List all installed packages

@@ -162,8 +162,17 @@ pub struct MageiaUrpmiEngine {
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
         let mut db = HashMap::new();
-        db.insert(String::from("mageia-kde-desktop"), vec![String::from("plasma-workspace"), String::from("sddm"), String::from("kwin")]);
-        db.insert(String::from("plasma-workspace"), vec![String::from("qtbase"), String::from("kf5-kio")]);
+        let mut kde_deps = Vec::new();
+        kde_deps.push(String::from("plasma-workspace"));
+        kde_deps.push(String::from("sddm"));
+        kde_deps.push(String::from("kwin"));
+        db.insert(String::from("mageia-kde-desktop"), kde_deps);
+
+        let mut plasma_deps = Vec::new();
+        plasma_deps.push(String::from("qtbase"));
+        plasma_deps.push(String::from("kf5-kio"));
+        db.insert(String::from("plasma-workspace"), plasma_deps);
+
         Self { package_database: db }
     }
 
@@ -211,7 +220,7 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service(String::from("networking"), vec![]);
+        dinit.register_service(String::from("networking"), Vec::new());
         assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
 
         assert!(dinit.start_service("networking").is_ok());

@@ -64,16 +64,18 @@ impl RepositoryManager {
 
     /// Add mirror for a repository (Arch mirrorlist inspiration)
     pub fn add_mirror(&mut self, repo_name: &str, mirror_url: &str) {
-        let mirrors = self
-            .mirrors
-            .entry(repo_name.to_string())
-            .or_insert_with(Vec::new);
-        mirrors.push(mirror_url.to_string());
+        if let Some(mirrors) = self.mirrors.get_mut_str(repo_name) {
+            mirrors.push(mirror_url.to_string());
+        } else {
+            let mut mirrors = Vec::new();
+            mirrors.push(mirror_url.to_string());
+            self.mirrors.insert(repo_name.to_string(), mirrors);
+        }
     }
 
     /// Select best mirror (Arch rankmirrors inspiration)
     pub fn select_best_mirror(&mut self, repo_name: &str) -> Result<String, String> {
-        if let Some(mirrors) = self.mirrors.get(repo_name) {
+        if let Some(mirrors) = self.mirrors.get_str(repo_name) {
             // Simple selection - in production would test latency
             if let Some(first) = mirrors.first() {
                 self.current_mirror
@@ -89,7 +91,7 @@ impl RepositoryManager {
 
     /// Get repository URL with mirror substitution
     pub fn get_repository_url(&self, repo_name: &str) -> Result<String, String> {
-        if let Some(mirror) = self.current_mirror.get(repo_name) {
+        if let Some(mirror) = self.current_mirror.get_str(repo_name) {
             if let Some(repo) = self.repositories.iter().find(|r| r.name == repo_name) {
                 return Ok(format!("{}/{}", mirror, repo.name));
             }

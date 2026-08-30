@@ -99,6 +99,10 @@ pub struct FilePermissions {
     pub sgid: bool,      // SGID bit (set-group-ID)
     pub sticky: bool,    // Sticky bit
 
+    pub owner_mask: u8,
+    pub group_mask: u8,
+    pub other_mask: u8,
+
     pub bsd_flags: BsdFileFlags,
 }
 
@@ -121,6 +125,9 @@ impl FilePermissions {
             suid: false,
             sgid: false,
             sticky: false,
+            owner_mask: mask,
+            group_mask: ((read as u8) << 2) | (execute as u8),
+            other_mask: ((read as u8) << 2) | (execute as u8),
             bsd_flags: BsdFileFlags::new(),
         }
     }
@@ -137,12 +144,22 @@ impl FilePermissions {
             read: (owner_mask & 0o4) != 0,
             write: (owner_mask & 0o2) != 0,
             execute: (owner_mask & 0o1) != 0,
+            user_read: (owner_mask & 0o4) != 0,
+            user_write: (owner_mask & 0o2) != 0,
+            user_execute: (owner_mask & 0o1) != 0,
+            group_read: (group_mask & 0o4) != 0,
+            group_write: (group_mask & 0o2) != 0,
+            group_execute: (group_mask & 0o1) != 0,
+            other_read: (other_mask & 0o4) != 0,
+            other_write: (other_mask & 0o2) != 0,
+            other_execute: (other_mask & 0o1) != 0,
             suid,
             sgid,
             sticky,
             owner_mask,
             group_mask,
             other_mask,
+            bsd_flags: BsdFileFlags::new(),
         }
     }
 
@@ -182,6 +199,14 @@ impl FilePermissions {
         let user_w = (mode & mode_bits::S_IWUSR) != 0;
         let user_x = (mode & mode_bits::S_IXUSR) != 0;
 
+        let group_r = (mode & mode_bits::S_IRGRP) != 0;
+        let group_w = (mode & mode_bits::S_IWGRP) != 0;
+        let group_x = (mode & mode_bits::S_IXGRP) != 0;
+
+        let other_r = (mode & mode_bits::S_IROTH) != 0;
+        let other_w = (mode & mode_bits::S_IWOTH) != 0;
+        let other_x = (mode & mode_bits::S_IXOTH) != 0;
+
         Self {
             read: user_r,
             write: user_w,
@@ -191,17 +216,21 @@ impl FilePermissions {
             user_write: user_w,
             user_execute: user_x,
 
-            group_read: (mode & mode_bits::S_IRGRP) != 0,
-            group_write: (mode & mode_bits::S_IWGRP) != 0,
-            group_execute: (mode & mode_bits::S_IXGRP) != 0,
+            group_read: group_r,
+            group_write: group_w,
+            group_execute: group_x,
 
-            other_read: (mode & mode_bits::S_IROTH) != 0,
-            other_write: (mode & mode_bits::S_IWOTH) != 0,
-            other_execute: (mode & mode_bits::S_IXOTH) != 0,
+            other_read: other_r,
+            other_write: other_w,
+            other_execute: other_x,
 
             suid: (mode & mode_bits::S_ISUID) != 0,
             sgid: (mode & mode_bits::S_ISGID) != 0,
             sticky: (mode & mode_bits::S_ISVTX) != 0,
+
+            owner_mask: ((user_r as u8) << 2) | ((user_w as u8) << 1) | (user_x as u8),
+            group_mask: ((group_r as u8) << 2) | ((group_w as u8) << 1) | (group_x as u8),
+            other_mask: ((other_r as u8) << 2) | ((other_w as u8) << 1) | (other_x as u8),
 
             bsd_flags: BsdFileFlags::new(),
         }

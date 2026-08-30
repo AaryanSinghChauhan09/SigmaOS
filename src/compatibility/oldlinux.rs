@@ -138,7 +138,7 @@ impl OldLinuxCompatManager {
     }
 
     pub fn set_active_personality(&mut self, version: &'static str) -> Result<(), &'static str> {
-        if self.releases.contains_key(version) {
+        if self.releases.contains_key(&version) {
             self.active_version = version;
             Ok(())
         } else {
@@ -150,7 +150,7 @@ impl OldLinuxCompatManager {
     pub fn emulate_syscall(&self, num: u32, args: &[u64]) -> Result<String, &'static str> {
         let release = self
             .releases
-            .get(self.active_version)
+            .get(&self.active_version)
             .ok_or("No active release loaded")?;
 
         match num {

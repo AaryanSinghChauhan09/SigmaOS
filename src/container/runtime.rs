@@ -121,7 +121,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::full(),
+            capability: RuntimeCapability::full(),
         }
     }
 }

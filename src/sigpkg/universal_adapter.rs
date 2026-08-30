@@ -150,7 +150,11 @@ impl UniversalPackageAdapter {
     pub fn parse_pacman_pkgbuild(&self, text: &str) -> Result<PacmanPkgbuild, &'static str> {
         let mut pkgname = String::new();
         let mut pkgver = String::new();
+        let mut pkgdesc = String::new();
+        let mut arch = Vec::new();
         let mut depends = Vec::new();
+        let mut makedepends = Vec::new();
+        let mut source_urls = Vec::new();
 
         for line in text.lines() {
             let line = line.trim();
@@ -165,12 +169,37 @@ impl UniversalPackageAdapter {
                 pkgver = line["pkgver=".len()..]
                     .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
                     .to_string();
+            } else if line.starts_with("pkgdesc=") {
+                pkgdesc = line["pkgdesc=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
+                    .to_string();
+            } else if line.starts_with("arch=") {
+                let arch_content =
+                    line["arch=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for a in arch_content.split_whitespace() {
+                    let cleaned = a.trim_matches(|c| c == '\'' || c == '"');
+                    arch.push(cleaned.to_string());
+                }
             } else if line.starts_with("depends=") {
                 let dep_content =
                     line["depends=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
                 for dep in dep_content.split_whitespace() {
                     let cleaned = dep.trim_matches(|c| c == '\'' || c == '"');
                     depends.push(cleaned.to_string());
+                }
+            } else if line.starts_with("makedepends=") {
+                let makedep_content =
+                    line["makedepends=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for dep in makedep_content.split_whitespace() {
+                    let cleaned = dep.trim_matches(|c| c == '\'' || c == '"');
+                    makedepends.push(cleaned.to_string());
+                }
+            } else if line.starts_with("source=") {
+                let src_content =
+                    line["source=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for src in src_content.split_whitespace() {
+                    let cleaned = src.trim_matches(|c| c == '\'' || c == '"');
+                    source_urls.push(cleaned.to_string());
                 }
             }
         }
@@ -182,7 +211,11 @@ impl UniversalPackageAdapter {
         Ok(PacmanPkgbuild {
             pkgname,
             pkgver,
+            pkgdesc,
+            arch,
             depends,
+            makedepends,
+            source_urls,
         })
     }
 
@@ -328,13 +361,13 @@ impl UniversalPackageAdapter {
             });
         }
 
-        Ok(Package {
-            name: name.to_string(),
-            version: parsed_ver,
-            description: desc.to_string(),
+        Ok(Package::new(
+            name.to_string(),
+            parsed_ver,
+            desc.to_string(),
             dependencies,
-            checksum: format!("SHA256:{}", name),
-        })
+            format!("SHA256:{}", name),
+        ))
     }
 }
 

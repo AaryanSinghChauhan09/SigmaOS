@@ -705,12 +705,7 @@ impl ShellSession for SimpleShellSession {
 
         if let Some(command) = self.registry.get(trimmed_name) {
             let mut cmd = SimpleShellCommand::new(command.name(), command.help());
-            let slice = if args.data.is_null() || args.len == 0 {
-                &[]
-            } else {
-                unsafe { core::slice::from_raw_parts(args.data, args.len) }
-            };
-            cmd.execute(slice)
+            cmd.execute(args.as_slice())
         } else {
             Err(CommandError::NotFound)
         }

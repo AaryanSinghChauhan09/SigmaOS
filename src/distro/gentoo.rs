@@ -33,13 +33,13 @@ impl FeatureSet {
     /// Check if a specific USE flag/feature is enabled for a given package
     pub fn is_enabled(&self, package_name: &str, feature: &str) -> bool {
         // Check per-package overrides first
-        if let Some(overrides) = self.per_package_features.get(package_name) {
-            if let Some(&enabled) = overrides.get(feature) {
+        if let Some(overrides) = self.per_package_features.get_str(package_name) {
+            if let Some(&enabled) = overrides.get_str(feature) {
                 return enabled;
             }
         }
         // Fallback to global setting, defaulting to false
-        *self.global_features.get(feature).unwrap_or(&false)
+        *self.global_features.get_str(feature).unwrap_or(&false)
     }
 
     /// Generate build/configure arguments derived from active USE flags for a package
@@ -185,7 +185,7 @@ impl SigmaBuildGraph {
 
         let spec = self
             .packages
-            .get(node)
+            .get_str(node)
             .ok_or_else(|| BuildError::PackageNotFound(node.to_string()))?;
 
         // Resolve build dependencies (bdeps) and runtime dependencies (deps)
@@ -204,7 +204,7 @@ impl SigmaBuildGraph {
     pub fn build(&self, spec: &BuildSpec) -> Result<String, BuildError> {
         // Enforce dependencies present in build graph
         for dep in spec.bdeps.iter().chain(spec.deps.iter()) {
-            if !self.packages.contains_key(dep) {
+            if !self.packages.contains_key_str(dep) {
                 return Err(BuildError::MissingDependency(dep.clone()));
             }
         }
@@ -213,7 +213,7 @@ impl SigmaBuildGraph {
         let cpu_flags = self.cpu.optimal_flags();
 
         let configure_args = build_flags.join(" ");
-        let rust_opt = cpu_flags.get("RUSTFLAGS").unwrap();
+        let rust_opt = cpu_flags.get_str("RUSTFLAGS").unwrap();
 
         Ok(format!(
             "Compiled package {} {} with flags [{}] and target CPU optimization [{}]",
@@ -260,7 +260,7 @@ mod tests {
         assert!(detector.features.contains(&"avx2".to_string()));
         let flags = detector.optimal_flags();
         assert_eq!(
-            flags.get("RUSTFLAGS").unwrap(),
+            flags.get_str("RUSTFLAGS").unwrap(),
             "-C target-cpu=native -C opt-level=3"
         );
     }

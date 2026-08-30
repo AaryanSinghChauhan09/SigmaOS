@@ -610,7 +610,7 @@ impl SigmaSoundscape {
 
     pub fn trigger_sound_event(&self, event_name: &str) -> Option<&str> {
         self.mapped_sounds
-            .get(event_name)
+            .get_str(event_name)
             .map(|s: &String| s.as_str())
     }
 }

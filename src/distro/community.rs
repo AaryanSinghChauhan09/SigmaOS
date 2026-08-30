@@ -326,7 +326,7 @@ impl HelpSystem {
     }
 
     pub fn search_man(&self, query: &str) -> Option<&ManPage> {
-        self.man_pages.get(query)
+        self.man_pages.get_str(query)
     }
 
     pub fn search_wiki(&self, keyword: &str) -> Vec<&WikiPage> {
@@ -345,10 +345,10 @@ impl HelpSystem {
         query: &str,
         locale_dictionary: &BTreeMap<String, String>,
     ) -> String {
-        if let Some(page) = self.man_pages.get(query) {
+        if let Some(page) = self.man_pages.get_str(query) {
             let key = format!("man_{}_summary", query);
             locale_dictionary
-                .get(&key)
+                .get_str(&key)
                 .cloned()
                 .unwrap_or(page.synopsis.clone())
         } else {

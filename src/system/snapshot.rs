@@ -160,7 +160,7 @@ impl SnapshotStorage for FileSnapshotStorage {
 
         let metadata = self
             .snapshots
-            .get(snapshot_id)
+            .get_str(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -193,7 +193,7 @@ impl SnapshotStorage for FileSnapshotStorage {
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
         self.snapshots
-            .remove(snapshot_id)
+            .remove_str(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -292,7 +292,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
         let metadata = self
             .snapshots
-            .get(snapshot_id)
+            .get_str(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);
@@ -337,7 +337,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError> {
         self.snapshots
-            .remove(snapshot_id)
+            .remove_str(snapshot_id)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = self.base_path.join(snapshot_id);

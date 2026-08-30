@@ -75,16 +75,17 @@ impl NixStore {
 
     /// Install package to profile (nix-env -i)
     pub fn install(&mut self, package: &str, profile: &str) -> Result<(), NixError> {
-        if !self.packages.contains_key_str(package) {
-            return Err(NixError::EvaluationError);
-        }
+        let out_path = self
+            .packages
+            .get_str(package)
+            .and_then(|pkg| pkg.outputs.get_str("out").cloned());
 
-        let pkg = self.packages.get_str(package).unwrap();
-        if let Some(out_path) = pkg.outputs.get_str("out") {
-            self.add_to_profile(profile, out_path);
+        if let Some(path) = out_path {
+            self.add_to_profile(profile, &path);
+            Ok(())
+        } else {
+            Err(NixError::EvaluationError)
         }
-
-        Ok(())
     }
 
     /// Garbage collection (nix-collect-garbage)
@@ -205,7 +206,7 @@ impl NixosConfig {
     }
 
     pub fn get_option(&self, key: &str) -> Option<&ConfigOption> {
-        self.options.get(key)
+        self.options.get_str(key)
     }
 
     pub fn enable_service(&mut self, service: &str) {
@@ -215,7 +216,7 @@ impl NixosConfig {
     }
 
     pub fn disable_service(&mut self, service: &str) {
-        if let Some(config) = self.services.get_mut(service) {
+        if let Some(config) = self.services.get_mut_str(service) {
             config.insert(String::from("enable"), ConfigOption::Boolean(false));
         }
     }
@@ -369,7 +370,7 @@ impl NixChannels {
     }
 
     pub fn set_channel(&mut self, name: &str) -> Result<(), &'static str> {
-        if self.channels.contains_key(name) {
+        if self.channels.contains_key_str(name) {
             self.current_channel = name.to_string();
             Ok(())
         } else {
@@ -378,7 +379,7 @@ impl NixChannels {
     }
 
     pub fn get_current_channel(&self) -> Option<&NixChannel> {
-        self.channels.get(&self.current_channel)
+        self.channels.get_str(&self.current_channel)
     }
 
     pub fn update_channels(&mut self) -> Result<usize, &'static str> {

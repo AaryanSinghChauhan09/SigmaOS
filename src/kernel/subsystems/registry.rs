@@ -140,7 +140,7 @@ impl SubsystemRegistry {
     /// Register a subsystem — analogous to module_init()
     pub fn register(&mut self, subsystem: Box<dyn KernelSubsystem>) -> Result<(), SubsystemError> {
         let name = subsystem.name().to_string();
-        if self.states.contains_key(&name) {
+        if self.states.contains_key_str(&name) {
             return Err(SubsystemError::AlreadyRegistered(name));
         }
         self.states.insert(name, SubsystemState::Registered);
@@ -169,7 +169,7 @@ impl SubsystemRegistry {
             for dep in self.subsystems[i].dependencies() {
                 let dep_state = self
                     .states
-                    .get(dep)
+                    .get_str(dep)
                     .copied()
                     .unwrap_or(SubsystemState::Unregistered);
                 if dep_state != SubsystemState::Initialized && dep_state != SubsystemState::Running
@@ -217,7 +217,7 @@ impl SubsystemRegistry {
 
     pub fn get_state(&self, name: &str) -> SubsystemState {
         self.states
-            .get(name)
+            .get_str(name)
             .copied()
             .unwrap_or(SubsystemState::Unregistered)
     }

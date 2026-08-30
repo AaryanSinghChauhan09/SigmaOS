@@ -305,7 +305,7 @@ impl Ipv4Stack {
             if icmp_type == 8 {
                 // Echo request
                 self.icmp_replies_sent.fetch_add(1, Ordering::Relaxed);
-                return Some(IcmpMessage::echo_reply(id, seq, payload[8..].to_vec()));
+                return Some(IcmpMessage::echo_reply(id, seq, Vec::from_iter(payload[8..].iter().copied())));
             }
         }
         None

@@ -1,37 +1,14 @@
-use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
-    SegmentDescriptor, SegmentSelector,
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
 extern crate alloc;
+
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-use sigmaos::ipc::pipes::Pipe;
-use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
-use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
-use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use sigmaos::graphics::video::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
-use sigmaos::scheduler::scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
-
-use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
-use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
-use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
-use sigmaos::tools::sigmatools::*;
-
+#[path = "../src/security/sigma_unveil.rs"]
+mod sigma_unveil;
 #[path = "../src/storage/geom.rs"]
 mod geom;
-
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
 #[path = "../src/graphics/video_editor.rs"]
@@ -62,23 +39,8 @@ mod low_level_memory;
 mod access_control;
 #[path = "../src/filesystem/ext4_ntfs_security.rs"]
 mod ext4_ntfs_security;
-pub enum AclTag {
-    User(u32),
-    Group(u32),
-    Other,
-}
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
-pub enum BreachSeverity {
-    Minor,
-    Major,
-    Critical,
-}
-pub enum StatutoryAuthority {
-    Gdpr,
-    Hipaa,
-    ISO27001,
-}
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
 #[path = "../src/system/user.rs"]
@@ -87,74 +49,8 @@ mod system_user;
 mod sigmatools;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
-pub enum CpuPrivilegeMode {
-    KernelRing0,
-    UserRing3,
-}
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn insert_descriptor(
-        &mut self,
-        _desc: segmentation_paging::SegmentDescriptor,
-    ) -> SegmentSelector {
-        SegmentSelector {
-            index: 1,
-            rpl: segmentation_paging::CpuRing::Ring0Kernel,
-            is_ldt: false,
-        }
-    }
-    pub fn translate_address(
-        &self,
-        seg_addr: SegmentedAddress,
-        _mode: CpuPrivilegeMode,
-    ) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn map_page(
-        _v: u64,
-        _p: u64,
-        _r: bool,
-        _w: bool,
-        _x: bool,
-    ) -> Result<(), &'static str> {
-        Ok(())
-    }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
-        Ok(PageTableEntry)
-    }
-}
-pub struct PageTableEntry;
-impl PageTableEntry {
-    pub fn get_physical_address(&self) -> u64 {
-        0x0000000100000000
-    }
-}
-pub enum ProtectionLevel {
-    Normal,
-    High,
-}
-pub enum ProtectionViolationType {
-    ReadViolation,
-    WriteViolation,
-}
-pub enum SegmentType {
-    Code,
-    Data,
-}
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
-pub type ProcessActivityManager = ActivityManager;
-pub struct ResourceUsageMetrics;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
 #[path = "../src/event/epoll.rs"]
@@ -163,56 +59,56 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
-use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
-};
-use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
-};
-use system_user::UserManager as TestUserManager;
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
-    SyscallTableRouter,
-};
-use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
-use low_level_memory::{
-    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
-    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
-};
-use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
-};
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use pipes::Pipe;
-use sigmatools::*;
-use unveil::{UnveilManager, UnveilPermission};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
-use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
-use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
     MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
 };
+use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
+    SyscallTableRouter,
+};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
+use community_toolkit::{
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
+    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+};
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use fedora_compat::DnfPackageResolver;
+use geom::{BioRequest, GeomProvider, GeomTopology};
+use low_level_memory::{
+    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
+use pipes::Pipe;
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
+use segmentation_paging::{
+    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
+    SegmentDescriptor, SegmentSelector, SegmentationPagingEngine, SpaceProtectionFlags,
+};
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use sigma_unveil::{UnveilManager, UnveilPermissions};
+use sigmatools::*;
+use statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
+    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use system_user::UserManager as TestUserManager;
+use task_scheduler::{
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
+
 #[test]
 fn test_segmentation_paging_and_aslr() {
     let code_desc = SegmentDescriptor::code_segment_ring0();
@@ -221,9 +117,7 @@ fn test_segmentation_paging_and_aslr() {
     let selector = SegmentSelector::new(1, false, SegCpuPrivilegeMode::Ring0Kernel);
     assert_eq!(selector.index, 1);
 
-    let engine = segmentation_paging::SegmentationPagingEngine::new(
-        segmentation_paging::SpaceProtectionFlags::strict_hardening(),
-    );
+    let engine = SegmentationPagingEngine::new(SpaceProtectionFlags::strict_hardening());
     let linear = engine
         .translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel)
         .unwrap();
@@ -240,12 +134,22 @@ fn test_segmentation_paging_and_aslr() {
 #[test]
 fn test_regex_unveil_and_glob_matching() {
     let mut unveil_mgr = UnveilManager::new();
-    unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
+    unveil_mgr
+        .unveil(1, std::path::PathBuf::from("/var/log"), "r")
+        .unwrap();
     assert!(unveil_mgr
-        .validate_path("/var/log/syslog.log", UnveilPermission::Read)
+        .check_access(
+            1,
+            std::path::Path::new("/var/log/syslog.log"),
+            UnveilPermissions::Read
+        )
         .is_ok());
     assert!(unveil_mgr
-        .validate_path("/var/log/syslog.txt", UnveilPermission::Read)
+        .check_access(
+            1,
+            std::path::Path::new("/etc/syslog.txt"),
+            UnveilPermissions::Read
+        )
         .is_err());
 }
 
@@ -274,8 +178,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
-    pam.register_thread(500, 501, "render_main").unwrap();
+    pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();
@@ -326,24 +229,46 @@ fn test_zero_copy_ipc_pipes() {
 #[test]
 fn test_unveil_sandboxing_and_landlock() {
     let mut mgr = UnveilManager::new();
-    mgr.unveil("/usr/bin", "rx").unwrap();
-    mgr.unveil_at("/etc", "nginx", "r").unwrap();
+    mgr.unveil(1, std::path::PathBuf::from("/usr/bin"), "rx")
+        .unwrap();
+    mgr.unveil(1, std::path::PathBuf::from("/etc/nginx"), "r")
+        .unwrap();
 
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Read)
+        .check_access(
+            1,
+            std::path::Path::new("/usr/bin/cargo"),
+            UnveilPermissions::Read
+        )
         .is_ok());
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Execute)
+        .check_access(
+            1,
+            std::path::Path::new("/usr/bin/cargo"),
+            UnveilPermissions::Execute
+        )
         .is_ok());
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Write)
+        .check_access(
+            1,
+            std::path::Path::new("/usr/bin/cargo"),
+            UnveilPermissions::Write
+        )
         .is_err());
 
     assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
+        .check_access(
+            1,
+            std::path::Path::new("/etc/nginx/nginx.conf"),
+            UnveilPermissions::Read
+        )
         .is_ok());
     assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
+        .check_access(
+            1,
+            std::path::Path::new("/etc/nginx/nginx.conf"),
+            UnveilPermissions::Write
+        )
         .is_err());
 }
 

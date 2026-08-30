@@ -346,7 +346,7 @@ pub struct SELinuxProxy {
 
 impl SecurityModel for SELinuxProxy {
     fn authorize_action(&self, app_id: &str, action: &str) -> bool {
-        if let Some(ctx) = self.context_mapping.get(app_id) {
+        if let Some(ctx) = self.context_mapping.get_str(app_id) {
             ctx == "unconfined_t" || action == "read"
         } else {
             false

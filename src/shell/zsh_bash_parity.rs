@@ -748,6 +748,16 @@ impl ShellJobControl {
         }
     }
 
+    pub fn bring_to_foreground(&mut self, job_id: u32) -> Result<String, String> {
+        let id = job_id as usize;
+        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
+            job.state = JobState::Running;
+            Ok(format!("Job %{} ({}) brought to foreground.", job.id, job.command))
+        } else {
+            Err(format!("Job %{} not found.", job_id))
+        }
+    }
+
     pub fn resume_job(&mut self, id: usize) -> bool {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.state = JobState::Running;

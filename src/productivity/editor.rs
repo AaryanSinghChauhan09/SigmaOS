@@ -318,7 +318,7 @@ impl CodeEditor {
 
     /// Close document
     pub fn close_document(&mut self, doc_id: &str) -> Result<(), EditorError> {
-        if let Some(doc) = self.documents.get(doc_id) {
+        if let Some(doc) = self.documents.get_str(doc_id) {
             if doc.is_modified {
                 return Err(EditorError::UnsavedChanges(doc_id.to_string()));
             }
@@ -328,13 +328,13 @@ impl CodeEditor {
             self.active_document = None;
         }
 
-        self.documents.remove(doc_id);
+        self.documents.remove_str(doc_id);
         Ok(())
     }
 
     /// Save document
     pub fn save_document(&mut self, doc_id: &str) -> Result<(), EditorError> {
-        if let Some(doc) = self.documents.get_mut(doc_id) {
+        if let Some(doc) = self.documents.get_mut_str(doc_id) {
             doc.is_modified = false;
             self.unsaved_changes = false;
             Ok(())
@@ -347,12 +347,12 @@ impl CodeEditor {
     pub fn active_document(&self) -> Option<&Document> {
         self.active_document
             .as_ref()
-            .and_then(|id| self.documents.get(id))
+            .and_then(|id| self.documents.get_str(id))
     }
 
     /// Get document by ID
     pub fn get_document(&self, doc_id: &str) -> Option<&Document> {
-        self.documents.get(doc_id)
+        self.documents.get_str(doc_id)
     }
 
     /// Insert text
@@ -362,7 +362,7 @@ impl CodeEditor {
         text: String,
         position: CursorPosition,
     ) -> Result<(), EditorError> {
-        if let Some(doc) = self.documents.get_mut(doc_id) {
+        if let Some(doc) = self.documents.get_mut_str(doc_id) {
             // Simple insertion (in real implementation, would handle position properly)
             doc.content.push_str(&text);
             doc.is_modified = true;
@@ -380,7 +380,7 @@ impl CodeEditor {
         doc_id: &str,
         _selection: TextSelection,
     ) -> Result<(), EditorError> {
-        if let Some(doc) = self.documents.get_mut(doc_id) {
+        if let Some(doc) = self.documents.get_mut_str(doc_id) {
             // Simple deletion (in real implementation, would handle selection properly)
             doc.is_modified = true;
             self.unsaved_changes = true;
@@ -392,7 +392,7 @@ impl CodeEditor {
 
     /// Get syntax highlighting
     pub fn get_syntax_highlighting(&self, doc_id: &str) -> Vec<SyntaxToken> {
-        if let Some(doc) = self.documents.get(doc_id) {
+        if let Some(doc) = self.documents.get_str(doc_id) {
             self.highlighter.highlight(&doc.content, doc.language)
         } else {
             Vec::new()
@@ -405,7 +405,7 @@ impl CodeEditor {
         doc_id: &str,
         position: CursorPosition,
     ) -> Vec<CompletionItem> {
-        if let (Some(doc), Some(lsp)) = (self.documents.get(doc_id), self.lsp_client.as_ref()) {
+        if let (Some(doc), Some(lsp)) = (self.documents.get_str(doc_id), self.lsp_client.as_ref()) {
             lsp.request_completion(doc, position)
         } else {
             Vec::new()
@@ -414,7 +414,7 @@ impl CodeEditor {
 
     /// Request diagnostics
     pub fn request_diagnostics(&self, doc_id: &str) -> Vec<Diagnostic> {
-        if let (Some(doc), Some(lsp)) = (self.documents.get(doc_id), self.lsp_client.as_ref()) {
+        if let (Some(doc), Some(lsp)) = (self.documents.get_str(doc_id), self.lsp_client.as_ref()) {
             lsp.request_diagnostics(doc)
         } else {
             Vec::new()
@@ -428,7 +428,7 @@ impl CodeEditor {
 
     /// Switch document
     pub fn switch_document(&mut self, doc_id: &str) -> Result<(), EditorError> {
-        if self.documents.contains_key(doc_id) {
+        if self.documents.contains_key_str(doc_id) {
             self.active_document = Some(doc_id.to_string());
             Ok(())
         } else {

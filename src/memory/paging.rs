@@ -161,6 +161,10 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
 }
 
 impl Default for PageDirectory {
@@ -207,6 +211,10 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
+    }
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 }
 
@@ -271,6 +279,46 @@ impl SimpleVMM {
     /// Add a Virtual Memory Area for demand paging
     pub fn register_vma(&mut self, vma: VirtualMemoryArea) {
         self.vmas.push(vma);
+    }
+
+    pub fn map_page_with_flags(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        writable: bool,
+        execute_disable: bool,
+    ) -> Result<(), MemoryError> {
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+
+        if self.pml4_table[pml4_idx].is_none() {
+            self.pml4_table[pml4_idx] = Some(PageDirectoryPointerTable::new());
+        }
+        let pml4 = self.pml4_table[pml4_idx].as_mut().unwrap();
+
+        if pml4.get_directory(pdpt_idx).is_none() {
+            pml4.set_directory(pdpt_idx, PageDirectory::new())?;
+        }
+        let pdpt = pml4.get_directory_mut(pdpt_idx).unwrap();
+
+        if pdpt.get_table(pd_idx).is_none() {
+            pdpt.set_table(pd_idx, PageTable::new())?;
+        }
+        let pd = pdpt.get_table_mut(pd_idx).unwrap();
+
+        let pte = PageTableEntry::with_attributes(phys, writable, false, execute_disable);
+        pd.set_entry(pt_idx, pte)?;
+
+        if !self.active_pages_for_clock.contains(&virt) {
+            self.active_pages_for_clock.push(virt);
+        }
+        Ok(())
     }
 
     /// Maps a standard 4KB page
@@ -422,7 +470,7 @@ impl SimpleVMM {
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
+            Self::validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
             return Ok(PhysicalAddress(
                 (huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset,
@@ -438,7 +486,7 @@ impl SimpleVMM {
 
         // 2MB Huge Page Check at PDPT level (points to PD huge entry)
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
+            Self::validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
             return Ok(PhysicalAddress(
                 (huge_pte.physical_address.0 & !0x1F_FFFF) + offset,
@@ -477,7 +525,7 @@ impl SimpleVMM {
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        self.validate_access(pte, write_intent, execute_intent)?;
+        Self::validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -520,7 +568,6 @@ impl SimpleVMM {
     }
 
     fn validate_access(
-        &self,
         pte: &PageTableEntry,
         write_intent: bool,
         execute_intent: bool,

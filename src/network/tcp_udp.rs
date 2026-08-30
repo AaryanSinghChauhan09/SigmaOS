@@ -159,11 +159,11 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::ConnectionFailed);
         }
 
-        self.remote_port.store(remote_port as u32, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
 
         // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
-        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
+        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
@@ -632,6 +632,20 @@ pub struct SimpleNetworkStack {
     pub netfilter: NetfilterFirewall,
     pub routing_table: RoutingTable,
     pub interfaces: Vec<NetworkInterface>,
+}
+
+impl SimpleNetworkStack {
+    pub fn new() -> Self {
+        SimpleNetworkStack {
+            sockets: Vec::new(),
+            next_id: AtomicUsize::new(1),
+            firewall: SimpleFirewall::new(),
+            congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
+        }
+    }
 }
 
 impl Default for SimpleNetworkStack {

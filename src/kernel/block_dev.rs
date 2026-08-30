@@ -57,13 +57,18 @@ pub struct Bio {
 
 impl Bio {
     pub fn read(id: u64, sector: u64, count: u32) -> Self {
+        let len = count as usize * SECTOR_SIZE;
+        let mut data = Vec::with_capacity(len);
+        for _ in 0..len {
+            data.push(0);
+        }
         Bio {
             id,
             sector,
             count,
             op: BioOp::Read,
             priority: ReqPriority::Normal,
-            data: vec![0u8; count as usize * SECTOR_SIZE],
+            data,
         }
     }
     pub fn write(id: u64, sector: u64, data: Vec<u8>) -> Self {
@@ -288,7 +293,11 @@ impl BlockDeviceManager {
             if let Some(dev) = self.devices.get_mut(&"ram0".to_string()) {
                 match bio.op {
                     BioOp::Read => {
-                        let mut buf = vec![0u8; bio.byte_len()];
+                        let len = bio.byte_len();
+                        let mut buf = Vec::with_capacity(len);
+                        for _ in 0..len {
+                            buf.push(0);
+                        }
                         let _ = dev.read_sectors(bio.sector, &mut buf);
                     }
                     BioOp::Write => {

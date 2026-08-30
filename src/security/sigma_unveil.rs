@@ -29,6 +29,10 @@ pub enum UnveilPermissions {
     ReadWrite,
     /// Execute access
     Execute,
+    /// Read and execute access
+    ReadExecute,
+    /// Write and execute access
+    WriteExecute,
     /// Full access (read, write, execute)
     Full,
 }
@@ -36,12 +40,18 @@ pub enum UnveilPermissions {
 impl UnveilPermissions {
     /// Parse permission string
     pub fn from_str(s: &str) -> Self {
-        match s {
-            "r" => UnveilPermissions::Read,
-            "w" => UnveilPermissions::Write,
-            "rw" | "wr" => UnveilPermissions::ReadWrite,
-            "x" => UnveilPermissions::Execute,
-            "rwx" | "rxw" | "xrw" | "xwr" | "wxr" | "wrx" => UnveilPermissions::Full,
+        let has_r = s.contains('r');
+        let has_w = s.contains('w');
+        let has_x = s.contains('x');
+
+        match (has_r, has_w, has_x) {
+            (true, true, true) => UnveilPermissions::Full,
+            (true, true, false) => UnveilPermissions::ReadWrite,
+            (true, false, true) => UnveilPermissions::ReadExecute,
+            (true, false, false) => UnveilPermissions::Read,
+            (false, true, true) => UnveilPermissions::WriteExecute,
+            (false, true, false) => UnveilPermissions::Write,
+            (false, false, true) => UnveilPermissions::Execute,
             _ => UnveilPermissions::None,
         }
     }
@@ -50,7 +60,10 @@ impl UnveilPermissions {
     pub fn allows_read(&self) -> bool {
         matches!(
             self,
-            UnveilPermissions::Read | UnveilPermissions::ReadWrite | UnveilPermissions::Full
+            UnveilPermissions::Read
+                | UnveilPermissions::ReadWrite
+                | UnveilPermissions::ReadExecute
+                | UnveilPermissions::Full
         )
     }
 
@@ -58,13 +71,22 @@ impl UnveilPermissions {
     pub fn allows_write(&self) -> bool {
         matches!(
             self,
-            UnveilPermissions::Write | UnveilPermissions::ReadWrite | UnveilPermissions::Full
+            UnveilPermissions::Write
+                | UnveilPermissions::ReadWrite
+                | UnveilPermissions::WriteExecute
+                | UnveilPermissions::Full
         )
     }
 
     /// Check if execute is allowed
     pub fn allows_execute(&self) -> bool {
-        matches!(self, UnveilPermissions::Execute | UnveilPermissions::Full)
+        matches!(
+            self,
+            UnveilPermissions::Execute
+                | UnveilPermissions::ReadExecute
+                | UnveilPermissions::WriteExecute
+                | UnveilPermissions::Full
+        )
     }
 }
 

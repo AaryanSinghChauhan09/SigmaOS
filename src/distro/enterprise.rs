@@ -68,14 +68,14 @@ impl DirectoryService {
     }
 
     pub fn authenticate(&self, username: &str, hash: &str) -> bool {
-        if let Some(user) = self.users.get(username) {
+        if let Some(user) = self.users.get_str(username) {
             return user.password_hash == hash;
         }
         false
     }
 
     pub fn is_member_of(&self, username: &str, group: &str) -> bool {
-        if let Some(user) = self.users.get(username) {
+        if let Some(user) = self.users.get_str(username) {
             return user.groups.iter().any(|g| g == group);
         }
         false
@@ -123,7 +123,7 @@ impl ComplianceAuditor {
     pub fn perform_audit(&self, system_state: &BTreeMap<String, String>) -> Vec<AuditResult> {
         let mut results = Vec::new();
         for rule in &self.rules {
-            let actual = system_state.get(&rule.rule_id).cloned().unwrap_or_default();
+            let actual = system_state.get_str(&rule.rule_id).cloned().unwrap_or_default();
             let success = actual == rule.passing_value;
             results.push(AuditResult {
                 rule_id: rule.rule_id.clone(),
@@ -145,8 +145,8 @@ mod tests {
         hook.set_var("mtu", "1500");
         hook.set_var("enable_dhcp", "true");
 
-        assert_eq!(hook.variables.get("mtu").unwrap(), "1500");
-        assert_eq!(hook.variables.get("enable_dhcp").unwrap(), "true");
+        assert_eq!(hook.variables.get_str("mtu").unwrap(), "1500");
+        assert_eq!(hook.variables.get_str("enable_dhcp").unwrap(), "true");
     }
 
     #[test]
