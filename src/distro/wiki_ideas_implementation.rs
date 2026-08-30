@@ -125,6 +125,10 @@ impl NixDeclarativeSystemState {
         }
         Err(String::from("Rollback target unavailable"))
     }
+
+    pub fn active_generation(&self) -> Option<&Generation> {
+        self.generations.iter().find(|g| g.id == self.active_generation_id)
+    }
 }
 
 impl Default for NixDeclarativeSystemState {
@@ -142,6 +146,12 @@ pub struct SigpkgRecipe {
     pub arch: String,
     pub depends: Vec<String>,
     pub build_cmd: String,
+}
+
+impl SigpkgRecipe {
+    pub fn is_valid(&self) -> bool {
+        !self.pkgname.is_empty() && !self.pkgver.is_empty() && self.pkgrel > 0
+    }
 }
 
 pub struct ArchRecipeSandboxCompiler;
@@ -736,5 +746,26 @@ mod tests {
         sched.set_governor(DvfsPowerGovernor::Performance);
         assert_eq!(sched.current_governor, DvfsPowerGovernor::Performance);
         assert!(sched.verify_rt_lane_preemption_latency());
+    }
+
+    #[test]
+    fn test_nix_declarative_active_generation() {
+        let nix = NixDeclarativeSystemState::new();
+        let active = nix.active_generation();
+        assert!(active.is_some());
+        assert_eq!(active.unwrap().id, 1);
+    }
+
+    #[test]
+    fn test_sigpkg_recipe_validation() {
+        let recipe = SigpkgRecipe {
+            pkgname: String::from("htop"),
+            pkgver: String::from("3.2.0"),
+            pkgrel: 1,
+            arch: String::from("x86_64"),
+            depends: Vec::new(),
+            build_cmd: String::from("make"),
+        };
+        assert!(recipe.is_valid());
     }
 }

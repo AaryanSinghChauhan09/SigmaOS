@@ -157,6 +157,10 @@ impl SovereignPackageSnapshotRollbackEngine {
         }
         removed
     }
+
+    pub fn active_package_count(&self) -> usize {
+        self.active_installed_packages.len()
+    }
 }
 
 impl Default for SovereignPackageSnapshotRollbackEngine {
@@ -207,5 +211,12 @@ mod tests {
         let pruned = engine.prune_snapshots(2);
         assert_eq!(pruned, 2);
         assert_eq!(engine.snapshots.len(), 2);
+    }
+
+    #[test]
+    fn test_active_package_count() {
+        let mut engine = SovereignPackageSnapshotRollbackEngine::new();
+        engine.install_package_record("bash", "5.2", "chk1", vec!["/bin/bash".to_string()]);
+        assert_eq!(engine.active_package_count(), 1);
     }
 }
