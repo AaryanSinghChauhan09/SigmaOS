@@ -55,6 +55,14 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 pub mod open_source_obsoletion;
+pub mod open_source_os_gap_closure;
+
+pub use open_source_os_gap_closure::{
+    BfsAttribute, BfsIndexedFile, CrossbowVnic, DriverHealthState, HaikuBfsAttributeEngine,
+    ManagedDriverUnit, Minix3ReincarnationServer, NetBsdRumpKernelEngine, Plan9Message,
+    Plan9MessageType, Plan9P2000ProtocolEngine, Plan9RforkFlags, RumpDeviceNode,
+    SmartOsCrossbowVnicEngine,
+};
 
 pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,

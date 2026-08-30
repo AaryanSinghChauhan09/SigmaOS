@@ -26,6 +26,11 @@ To maintain strict clean-room implementation standards and prevent copyright or 
 | **SerenityOS** | Unified event-driven IPC, LibCore pipelines | `SerenityIpcManager` | Lightweight lock-free circular ring buffers for inter-process message passing and typed IPC endpoints. |
 | **Fuchsia OS** | Zircon capability handles, FIDL contracts | `FuchsiaZirconHandleManager` | Rights-restricted object handles, post-quantum signed token capabilities, schema-driven IPC definitions. |
 | **illumos / Solaris**| DTrace dynamic tracing, Zones isolation | `SovereignDTraceEngine`, `ZoneIsolationContainer` | Zero-overhead static/dynamic probes, lightweight kernel-enclosed tenant execution boundaries. |
+| **Plan 9 / 9front** | 9P2000 RPC protocol, `rfork` namespace isolation | `Plan9P2000ProtocolEngine` | Synthetic device filesystem messages, FID tree walks, and granular process namespace cloning. |
+| **Minix 3** | Reincarnation Server (RS) driver self-healing | `Minix3ReincarnationServer` | Heartbeat-monitored userland driver supervisor with automated crash recovery & PID reallocation. |
+| **NetBSD** | Rump Kernels & autoconf framework | `NetBsdRumpKernelEngine` | Userland virtualized NetBSD driver execution and hypercall interface isolation. |
+| **Haiku OS / BeOS** | BFS file attributes & query indexing | `HaikuBfsAttributeEngine` | Live key-value file metadata indexing and query evaluation. |
+| **SmartOS / Illumos**| Crossbow virtual networking (VNICs, Etherstubs) | `SmartOsCrossbowVnicEngine` | Virtual network interface controllers, bandwidth caps, and software etherstub switches. |
 
 ---
 
@@ -69,3 +74,8 @@ To maintain strict clean-room implementation standards and prevent copyright or 
 - [x] Integration of IPFS / Web3FS decentralized content-addressed block storage engine (`SovereignWeb3FsIpfsEngine`).
 - [x] Integration of Wasmtime / Cranelift sandboxed WASI micro-runtime engine (`SovereignWasmCraneliftEngine`).
 - [x] Integration of NixOS Hydra / Debian deterministic reproducible build farm auditor (`SovereignReproducibleBuildFarm`).
+- [x] Integration of Plan 9 9P2000 RPC protocol & `rfork` namespace isolation (`Plan9P2000ProtocolEngine`).
+- [x] Integration of Minix 3 Reincarnation Server self-healing driver supervisor (`Minix3ReincarnationServer`).
+- [x] Integration of NetBSD Rump Kernel userland driver isolation engine (`NetBsdRumpKernelEngine`).
+- [x] Integration of Haiku OS BFS attributed file system indexing engine (`HaikuBfsAttributeEngine`).
+- [x] Integration of SmartOS Crossbow VNIC & etherstub virtual network engine (`SmartOsCrossbowVnicEngine`).
