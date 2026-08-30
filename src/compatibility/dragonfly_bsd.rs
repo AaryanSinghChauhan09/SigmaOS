@@ -7,6 +7,7 @@
 extern crate alloc;
 
 use crate::klib::HashMap;
+use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -118,21 +119,16 @@ impl LwktScheduler {
             payload_code,
         };
 
-        if let Some(queue) = self.thread_queues.get_mut(&target_tid) {
-            queue.push(msg);
-        } else {
-            let mut new_queue: Vec<LwktMessage> = Vec::new();
-            new_queue.push(msg);
-            self.thread_queues.insert(target_tid, new_queue);
-        }
+        let queue: &mut Vec<LwktMessage> = self.thread_queues.entry(target_tid).or_insert_with(Vec::new);
+        queue.push(msg);
     }
 
     /// Pops next lockless message for given thread ID
     pub fn receive_message(&mut self, tid: u32) -> Option<LwktMessage> {
         if let Some(queue) = self.thread_queues.get_mut(&tid) {
-            let queue_slice: &mut [LwktMessage] = queue.as_mut_slice();
-            if !queue_slice.is_empty() {
-                return Some(queue.remove(0));
+            let q: &mut Vec<LwktMessage> = queue;
+            if !q.is_empty() {
+                return Some(q.remove(0));
             }
         }
         None
