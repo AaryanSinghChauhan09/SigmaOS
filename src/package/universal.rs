@@ -45,12 +45,18 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
+    Xbps,     // Void Linux (.xbps)
+    Zypper,   // openSUSE (.zypper)
+    Guix,     // GNU Guix (.guix)
+    Txz,      // Slackware (.txz)
 }
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".udeb") {
+        if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".deb") || name.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if name.ends_with(".rpm") {
             Some(PackageFormat::Rpm)
@@ -86,10 +92,16 @@ impl PackageFormat {
             Some(PackageFormat::Ebuild)
         } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+        } else if name.ends_with(".txz") {
+            Some(PackageFormat::Txz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
             Some(PackageFormat::Xz)
         } else if name.ends_with(".xbps") {
-            Some(PackageFormat::SigmaPkg)
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") {
+            Some(PackageFormat::Guix)
         } else if name.ends_with(".cachy") {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".app") {
@@ -98,8 +110,6 @@ impl PackageFormat {
             Some(PackageFormat::Hap)
         } else if name.ends_with(".pisi") {
             Some(PackageFormat::Pisi)
-        } else if name.ends_with(".superdeb") {
-            Some(PackageFormat::Superdeb)
         } else if name.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
         } else if name.ends_with(".pup") {
@@ -854,6 +864,10 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
         self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
         self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
+        self.adapters.insert(PackageFormat::Xbps, PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()));
+        self.adapters.insert(PackageFormat::Zypper, PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()));
+        self.adapters.insert(PackageFormat::Guix, PackageAdapter::new(PackageFormat::Guix, "guix".to_string()));
+        self.adapters.insert(PackageFormat::Txz, PackageAdapter::new(PackageFormat::Txz, "txz".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -1033,56 +1047,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
@@ -1433,15 +1398,74 @@ mod tests {
 
     #[test]
     fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
+        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Txz));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
         assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("system.guix"), Some(PackageFormat::Guix));
+        assert_eq!(PackageFormat::from_filename("open.zypper"), Some(PackageFormat::Zypper));
+    }
+
+    #[test]
+    fn test_all_distro_package_formats_supported() {
+        let formats_and_filenames = vec![
+            ("app.air", PackageFormat::Air),
+            ("homebrew.bottle", PackageFormat::Bottle),
+            ("ios.ipa", PackageFormat::Ipa),
+            ("freebsd.ports", PackageFormat::Ports),
+            ("mac.pkg", PackageFormat::Pkg),
+            ("android.aab", PackageFormat::Aab),
+            ("mobile.apk", PackageFormat::Apk),
+            ("portable.appimage", PackageFormat::AppImage),
+            ("solus.eopkg", PackageFormat::Eopkg),
+            ("nix.nixpkg", PackageFormat::Nixpkg),
+            ("nix.nix", PackageFormat::Nixpkg),
+            ("gentoo.portage", PackageFormat::Ebuild),
+            ("gentoo.ebuild", PackageFormat::Ebuild),
+            ("debian.deb", PackageFormat::Deb),
+            ("archive.tar.gz", PackageFormat::TarGz),
+            ("archive.tgz", PackageFormat::TarGz),
+            ("archive.xz", PackageFormat::Xz),
+            ("archive.tar.xz", PackageFormat::Xz),
+            ("fedora.rpm", PackageFormat::Rpm),
+            ("arch.pkg.tar.xz", PackageFormat::Pacman),
+            ("arch.pkg.tar.zst", PackageFormat::Pacman),
+            ("sandboxed.flatpak", PackageFormat::Flatpak),
+            ("bundle.app", PackageFormat::App),
+            ("harmony.hap", PackageFormat::Hap),
+            ("pardus.PiSi", PackageFormat::Pisi),
+            ("deepin.superdeb", PackageFormat::Superdeb),
+            ("slax.lzm", PackageFormat::Lzm),
+            ("puppy.pup", PackageFormat::Pup),
+            ("canonical.snap", PackageFormat::Snap),
+            ("plain.tar", PackageFormat::Tar),
+            ("puppy.pet", PackageFormat::Pet),
+            ("void.xbps", PackageFormat::Xbps),
+            ("opensuse.zypper", PackageFormat::Zypper),
+            ("gnu.guix", PackageFormat::Guix),
+            ("slack.txz", PackageFormat::Txz),
+        ];
+
+        let mut manager = UniversalPackageManager::new();
+
+        for (filename, expected_format) in formats_and_filenames {
+            let detected = PackageFormat::from_filename(filename);
+            assert_eq!(detected, Some(expected_format), "Failed for filename: {}", filename);
+
+            let manifest_detected = UniversalPackageManifestParser::detect_format_from_filename(filename);
+            assert_eq!(manifest_detected, Some(expected_format), "Manifest parser failed for filename: {}", filename);
+
+            let pkg = UnifiedPackage::new(filename.to_string(), "1.0.0".to_string()).with_format(expected_format);
+            manager.add_package(pkg);
+            assert!(manager.install(filename).is_ok(), "Installation failed for format: {:?}", expected_format);
+        }
+
+        assert!(manager.registered_adapter_count() >= 30);
     }
 
     #[test]
     fn test_universal_package_manager_adapter_count() {
         let manager = UniversalPackageManager::new();
-        assert!(manager.registered_adapter_count() >= 20);
+        assert!(manager.registered_adapter_count() >= 30);
     }
 
     #[test]
