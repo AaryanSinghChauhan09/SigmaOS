@@ -40,6 +40,8 @@ mod protocols;
 mod hardening;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
+#[path = "../src/distro/specialized.rs"]
+mod specialized;
 #[path = "../src/compatibility/garuda_zen.rs"]
 mod garuda_zen;
 #[path = "../src/virtualization/vm_manager.rs"]
@@ -138,6 +140,20 @@ fn test_sovereign_universal_distro_bridge_inspection() {
     bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
     assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
+}
+
+#[test]
+fn test_sovereign_troubleshooting_inspection() {
+    use specialized::DiagnosticLogTool;
+
+    let mut diag = DiagnosticLogTool::new();
+    diag.record_log_entry("kernel", "out of memory: OOM-killer killed process 981 (mysqld)");
+    diag.record_log_entry("init", "Failed to start OpenSSH server daemon");
+
+    let report = diag.analyze_system_issues();
+    assert_eq!(report.detected_issues.len(), 2);
+    let guide = diag.generate_auto_remediation_guide();
+    assert!(guide.contains("journalctl"));
 }
 
 #[test]

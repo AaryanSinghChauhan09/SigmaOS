@@ -80,6 +80,8 @@ pub use specialized::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
     ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    DiagnosticLogTool, SovereignTroubleshootingReport, SovereignTroubleshootingIssue,
+    TroubleshootingCategory, TroubleshootingSeverity,
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
