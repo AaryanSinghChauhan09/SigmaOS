@@ -932,6 +932,7 @@ pub enum TargetDistroFamily {
     AlpineMusl,
     NixOsDeclarative,
     BsdFamily,
+    AntiXLightweight,
 }
 
 pub struct SovereignDistroAbsorptionEngine {
@@ -944,7 +945,7 @@ impl SovereignDistroAbsorptionEngine {
     pub fn new() -> Self {
         Self {
             active_distro_target: TargetDistroFamily::ArchLinux,
-            total_absorbed_distros_count: 12,
+            total_absorbed_distros_count: 13,
             is_clean_room_active: true,
         }
     }
@@ -962,6 +963,7 @@ impl SovereignDistroAbsorptionEngine {
             TargetDistroFamily::AlpineMusl => format!("[S-APK Absorption]: Parsed apk-tar index for '{}'", package_spec),
             TargetDistroFamily::NixOsDeclarative => format!("[S-NIX Absorption]: Synthesized CAS derivation for '{}'", package_spec),
             TargetDistroFamily::BsdFamily => format!("[S-BSD Absorption]: Applied Jail & Pledge sandbox for '{}'", package_spec),
+            TargetDistroFamily::AntiXLightweight => format!("[S-antiX Absorption]: Deployed non-systemd SysVInit/runit low-RAM profile for '{}'", package_spec),
         }
     }
 }

@@ -10,7 +10,8 @@ use alloc::vec::Vec;
 use crate::klib::HashMap;
 #[cfg(test)]
 use crate::klib::HashMap;
-use core::fmt;
+use crate::klib::path::PathBuf;
+use std::fs;
 
 /// User account information
 #[derive(Debug, Clone)]
@@ -182,6 +183,9 @@ impl UserManager {
 
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
+        let std_path = std::path::Path::new(self.etc_dir.to_str().unwrap_or("/etc"));
+        fs::create_dir_all(std_path)
+            .map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
         Ok(())
     }
 
@@ -402,31 +406,192 @@ impl UserManager {
 
     /// Save shadow entries to /etc/shadow
     pub fn save_shadow(&self) -> Result<(), UserError> {
+        let shadow_path = format!("{}/shadow", self.etc_dir.to_str().unwrap_or("/etc"));
+        let mut content = String::new();
+
+        for shadow in self.shadow_entries.values() {
+            content.push_str(&format!(
+                "{}:{}:{}:{}:{}:{}:{}:{}\n",
+                shadow.username,
+                shadow.password_hash,
+                shadow.last_change_days,
+                shadow.min_days,
+                shadow.max_days,
+                shadow.warn_days,
+                shadow.inactive_days,
+                shadow.expire_days
+            ));
+        }
+
+        fs::write(&shadow_path, content).map_err(|e| UserError::WriteError(PathBuf::from(shadow_path.as_str()), e))?;
+
         Ok(())
     }
 
     /// Load shadow entries from /etc/shadow
     pub fn load_shadow(&mut self) -> Result<(), UserError> {
+        let shadow_path_str = format!("{}/shadow", self.etc_dir.to_str().unwrap_or("/etc"));
+        let shadow_path = PathBuf::from(shadow_path_str.as_str());
+        let std_path = std::path::Path::new(shadow_path_str.as_str());
+        if !std_path.exists() {
+            return Ok(());
+        }
+
+        let content =
+            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(shadow_path, e))?;
+
+        for line in content.lines() {
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() >= 8 {
+                let shadow = ShadowEntry {
+                    username: parts[0].to_string(),
+                    password_hash: parts[1].to_string(),
+                    last_change_days: parts[2].parse().unwrap_or(0),
+                    min_days: parts[3].parse().unwrap_or(0),
+                    max_days: parts[4].parse().unwrap_or(99999),
+                    warn_days: parts[5].parse().unwrap_or(7),
+                    inactive_days: parts[6].parse().unwrap_or(-1),
+                    expire_days: parts[7].parse().unwrap_or(-1),
+                };
+                self.shadow_entries.insert(shadow.username.clone(), shadow);
+            }
+        }
+
         Ok(())
     }
 
     /// Save users to passwd file
     pub fn save_passwd(&self) -> Result<(), UserError> {
+        let passwd_path = format!("{}/passwd", self.etc_dir.to_str().unwrap_or("/etc"));
+        let mut content = String::new();
+
+        let mut users: Vec<_> = self.users.values().collect();
+        users.sort_by_key(|u| u.uid);
+
+        for user in users {
+            let password = if self.shadow_entries.contains_key(&user.username) {
+                "x"
+            } else {
+                user.password_hash.as_deref().unwrap_or("x")
+            };
+
+            content.push_str(&format!(
+                "{}:{}:{}:{}:{}:{}:{}\n",
+                user.username,
+                password,
+                user.uid,
+                user.gid,
+                user.full_name,
+                user.home_dir,
+                user.shell
+            ));
+        }
+
+        fs::write(&passwd_path, content).map_err(|e| UserError::WriteError(PathBuf::from(passwd_path.as_str()), e))?;
+
         Ok(())
     }
 
     /// Save groups to group file
     pub fn save_group(&self) -> Result<(), UserError> {
+        let group_path = format!("{}/group", self.etc_dir.to_str().unwrap_or("/etc"));
+        let mut content = String::new();
+
+        let mut groups: Vec<_> = self.groups.values().collect();
+        groups.sort_by_key(|g| g.gid);
+
+        for group in groups {
+            let members_str = group.members.join(",");
+            content.push_str(&format!(
+                "{}:{}:{}:{}\n",
+                group.groupname, "x", group.gid, members_str
+            ));
+        }
+
+        fs::write(&group_path, content).map_err(|e| UserError::WriteError(PathBuf::from(group_path.as_str()), e))?;
+
         Ok(())
     }
 
     /// Load users from passwd file
     pub fn load_passwd(&mut self) -> Result<(), UserError> {
+        let passwd_path_str = format!("{}/passwd", self.etc_dir.to_str().unwrap_or("/etc"));
+        let passwd_path = PathBuf::from(passwd_path_str.as_str());
+        let std_path = std::path::Path::new(passwd_path_str.as_str());
+
+        if !std_path.exists() {
+            return Ok(());
+        }
+
+        let content =
+            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(passwd_path, e))?;
+
+        for line in content.lines() {
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() >= 7 {
+                let user = User {
+                    username: parts[0].to_string(),
+                    uid: parts[2].parse().unwrap_or(0),
+                    gid: parts[3].parse().unwrap_or(0),
+                    full_name: parts[4].to_string(),
+                    home_dir: parts[5].to_string(),
+                    shell: parts[6].to_string(),
+                    password_hash: if parts[1] == "x" {
+                        None
+                    } else {
+                        Some(parts[1].to_string())
+                    },
+                    is_root: parts[0] == "root",
+                    is_locked: false,
+                };
+                self.users.insert(user.username.clone(), user);
+            }
+        }
+
         Ok(())
     }
 
     /// Load groups from group file
     pub fn load_group(&mut self) -> Result<(), UserError> {
+        let group_path_str = format!("{}/group", self.etc_dir.to_str().unwrap_or("/etc"));
+        let group_path = PathBuf::from(group_path_str.as_str());
+        let std_path = std::path::Path::new(group_path_str.as_str());
+
+        if !std_path.exists() {
+            return Ok(());
+        }
+
+        let content =
+            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(group_path, e))?;
+
+        for line in content.lines() {
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            let parts: Vec<&str> = line.split(':').collect();
+            if parts.len() >= 3 {
+                let group = Group {
+                    groupname: parts[0].to_string(),
+                    gid: parts[2].parse().unwrap_or(0),
+                    members: if parts.len() > 3 && !parts[3].is_empty() {
+                        parts[3].split(',').map(|s| s.to_string()).collect()
+                    } else {
+                        Vec::new()
+                    },
+                };
+                self.groups.insert(group.groupname.clone(), group);
+            }
+        }
+
         Ok(())
     }
 

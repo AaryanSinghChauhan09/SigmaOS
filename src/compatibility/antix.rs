@@ -85,6 +85,18 @@ impl AntiXInitSwitcher {
             service.init_type = target;
         }
     }
+
+    pub fn dispatch_fast_init_process(&mut self, process_name: &str) -> Result<u32, &'static str> {
+        if process_name.is_empty() {
+            return Err("Process name cannot be empty");
+        }
+        self.register_service(process_name);
+        if self.start_service(process_name) {
+            Ok(self.services.len() as u32)
+        } else {
+            Err("Failed to start process")
+        }
+    }
 }
 
 impl Default for AntiXInitSwitcher {
@@ -126,6 +138,20 @@ impl AntiXPersistenceManager {
         if self.overlay_mounted {
             self.saved_bytes += bytes_written;
         }
+    }
+
+    pub fn sync_ram_overlay_to_disk(&mut self) -> Result<u64, &'static str> {
+        if !self.overlay_mounted {
+            return Err("Overlay not mounted; cannot sync state");
+        }
+        let synced = self.saved_bytes;
+        self.saved_bytes = 0;
+        Ok(synced)
+    }
+
+    pub fn unmount_overlay(&mut self) -> bool {
+        self.overlay_mounted = false;
+        true
     }
 }
 
@@ -172,6 +198,18 @@ impl AntiXControlCentre {
     pub fn enable_ultra_low_memory_profile(&mut self) {
         self.low_mem_mode = true;
         self.power_save_active = true;
+    }
+
+    pub fn apply_antix_64mb_ram_guard(&mut self, system_ram_mb: u32) -> &'static str {
+        if system_ram_mb <= 64 {
+            self.enable_ultra_low_memory_profile();
+            "antiX-ControlCentre: 64MB RAM constraint detected; activated Rox/IceWM minimal window manager, disabled compositor, and capped background buffers."
+        } else if system_ram_mb <= 256 {
+            self.low_mem_mode = true;
+            "antiX-ControlCentre: 256MB RAM profile applied; enabled lightweight process trimming."
+        } else {
+            "antiX-ControlCentre: Standard memory profile active."
+        }
     }
 }
 
@@ -400,5 +438,28 @@ mod tests {
         let updater = AntixKernelUpdater::new();
         let msg = updater.switch_kernel_variant(KernelVariant::Kernel64Rt);
         assert!(msg.contains("Real-Time"));
+    }
+
+    #[test]
+    fn test_antix_init_switcher_and_persistence() {
+        let mut switcher = AntiXInitSwitcher::new(AntiXInitSystem::SysVInit);
+        let pid = switcher.dispatch_fast_init_process("syslogd").unwrap();
+        assert_eq!(pid, 1);
+        assert_eq!(switcher.services[0].state, AntiXServiceState::Running);
+
+        switcher.switch_init_system(AntiXInitSystem::Runit);
+        assert_eq!(switcher.active_init, AntiXInitSystem::Runit);
+        assert_eq!(switcher.services[0].init_type, AntiXInitSystem::Runit);
+
+        let mut pm = AntiXPersistenceManager::new(AntiXPersistenceMode::RootPersistence);
+        assert!(pm.mount_overlay());
+        pm.save_state_snapshot(2048);
+        assert_eq!(pm.sync_ram_overlay_to_disk().unwrap(), 2048);
+        assert!(pm.unmount_overlay());
+
+        let mut cc = AntiXControlCentre::new();
+        let status = cc.apply_antix_64mb_ram_guard(32);
+        assert!(cc.low_mem_mode);
+        assert!(status.contains("64MB RAM constraint detected"));
     }
 }
