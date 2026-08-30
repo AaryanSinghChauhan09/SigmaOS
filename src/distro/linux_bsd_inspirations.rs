@@ -18,8 +18,21 @@ pub enum DistroSubsystemMode {
     LinuxDebian,
     LinuxAlpine,
     LinuxNix,
+    LinuxGentoo,
+    LinuxFedora,
     FreeBsd,
     OpenBsd,
+    NetBsd,
+    DragonFlyBsd,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceSupervisorType {
+    Systemd,
+    OpenRc,
+    Runit,
+    Dinit,
+    BsdRcD,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -51,14 +64,52 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
+            DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
+            DistroSubsystemMode::LinuxFedora => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::FreeBsd => format!("{}.pkg", input_pkg),
             DistroSubsystemMode::OpenBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
+        }
+    }
+
+    pub fn translate_vfs_path(&self, relative_path: &str) -> String {
+        let clean = relative_path.trim_start_matches('/');
+        match self.mode {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                if clean.starts_with("bin/") || clean.starts_with("lib/") || clean.starts_with("share/") {
+                    format!("/usr/local/{}", clean)
+                } else if clean.starts_with("etc/") {
+                    format!("/usr/local/etc/{}", clean.trim_start_matches("etc/"))
+                } else {
+                    format!("/{}", clean)
+                }
+            }
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFedora => {
+                if clean.starts_with("bin/") {
+                    format!("/usr/bin/{}", clean.trim_start_matches("bin/"))
+                } else if clean.starts_with("lib/") {
+                    format!("/usr/lib/{}", clean.trim_start_matches("lib/"))
+                } else {
+                    format!("/{}", clean)
+                }
+            }
+            DistroSubsystemMode::LinuxNix => format!("/nix/store/sigmaos-current/{}", clean),
+        }
+    }
+
+    pub fn query_preferred_supervisor(&self) -> ServiceSupervisorType {
+        match self.mode {
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxGentoo => ServiceSupervisorType::OpenRc,
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::BsdRcD,
+            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Systemd,
         }
     }
 
     pub fn enforce_security_isolation(&mut self, pid: u64, root_path: &str) -> Result<(), &'static str> {
         match self.mode {
-            DistroSubsystemMode::FreeBsd => {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
                 Ok(())
@@ -5317,133 +5368,7 @@ mod tests {
     }
 }
 
-// ==========================================
-// 38. ALPINE / VOID APK & XBPS TRANSACTIONAL HOOK ENGINE
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct ApkXbpsHookEntry {
-    pub name: String,
-    pub trigger_pattern: String,
-    pub pre_action: String,
-    pub post_action: String,
-}
-
-pub struct ApkXbpsHookEngine {
-    pub hooks: Vec<ApkXbpsHookEntry>,
-    pub executed_actions: Vec<String>,
-}
-
-impl ApkXbpsHookEngine {
-    pub fn new() -> Self {
-        Self {
-            hooks: Vec::new(),
-            executed_actions: Vec::new(),
-        }
-    }
-
-    pub fn register_hook(&mut self, name: &str, trigger_pattern: &str, pre_action: &str, post_action: &str) {
-        self.hooks.push(ApkXbpsHookEntry {
-            name: name.to_string(),
-            trigger_pattern: trigger_pattern.to_string(),
-            pre_action: pre_action.to_string(),
-            post_action: post_action.to_string(),
-        });
-    }
-
-    pub fn run_pre_hooks(&mut self, pkg_name: &str) -> usize {
-        let mut count = 0;
-        for hook in &self.hooks {
-            if pkg_name.contains(&hook.trigger_pattern) {
-                self.executed_actions.push(hook.pre_action.clone());
-                count += 1;
-            }
-        }
-        count
-    }
-
-    pub fn run_post_hooks(&mut self, pkg_name: &str) -> usize {
-        let mut count = 0;
-        for hook in &self.hooks {
-            if pkg_name.contains(&hook.trigger_pattern) {
-                self.executed_actions.push(hook.post_action.clone());
-                count += 1;
-            }
-        }
-        count
-    }
-
-    pub fn rollback_transaction(&mut self) -> usize {
-        let count = self.executed_actions.len();
-        self.executed_actions.clear();
-        count
-    }
-}
-
-impl Default for ApkXbpsHookEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 39. OPENBSD RETGUARD & MAP_STACK HARDENING ENGINE
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct MapStackRegion {
-    pub base_addr: u64,
-    pub size: usize,
-}
-
-pub struct OpenBsdRetguardEngine {
-    pub map_stack_regions: Vec<MapStackRegion>,
-    pub active_canaries: Vec<(String, u64)>,
-    pub violations: Vec<String>,
-}
-
-impl OpenBsdRetguardEngine {
-    pub fn new() -> Self {
-        Self {
-            map_stack_regions: Vec::new(),
-            active_canaries: Vec::new(),
-            violations: Vec::new(),
-        }
-    }
-
-    pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
-        self.map_stack_regions.push(MapStackRegion { base_addr, size });
-    }
-
-    pub fn enter_function(&mut self, fn_name: &str, secret_key: u64, sp: u64) -> u64 {
-        let canary = secret_key ^ sp;
-        self.active_canaries.push((fn_name.to_string(), canary));
-        canary
-    }
-
-    pub fn verify_exit_function(&mut self, fn_name: &str, expected_canary: u64, sp: u64) -> Result<(), &'static str> {
-        let is_sp_valid = self.map_stack_regions.iter().any(|r| sp >= r.base_addr && sp < r.base_addr + r.size as u64);
-        if !is_sp_valid {
-            self.violations.push(format!("MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region in {}", sp, fn_name));
-            return Err("Stack pointer outside MAP_STACK region");
-        }
-
-        if let Some(pos) = self.active_canaries.iter().position(|(f, _)| f == fn_name) {
-            let (_, canary) = self.active_canaries.remove(pos);
-            if canary != expected_canary {
-                self.violations.push(format!("Retguard Canary Mismatch in {}", fn_name));
-                return Err("Retguard canary mismatch");
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Default for OpenBsdRetguardEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// Section 38 & 39 duplicates removed - defined above in Section 10 & 11.
 
 // ==========================================
 // 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
@@ -5604,145 +5529,7 @@ impl Default for ShepherdServiceManager {
     }
 }
 
-// ==========================================
-// 29. ALPINE APK & VOID XBPS TRANSACTIONAL HOOK ENGINE
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct ApkXbpsHook {
-    pub name: String,
-    pub trigger_pattern: String,
-    pub run_cmd: String,
-    pub undo_cmd: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct ApkXbpsHookEngine {
-    pub hooks: Vec<ApkXbpsHook>,
-    pub executed_actions: Vec<String>,
-}
-
-impl ApkXbpsHookEngine {
-    pub fn new() -> Self {
-        Self {
-            hooks: Vec::new(),
-            executed_actions: Vec::new(),
-        }
-    }
-
-    pub fn register_hook(&mut self, name: &str, trigger_pattern: &str, run_cmd: &str, undo_cmd: &str) {
-        self.hooks.push(ApkXbpsHook {
-            name: name.to_string(),
-            trigger_pattern: trigger_pattern.to_string(),
-            run_cmd: run_cmd.to_string(),
-            undo_cmd: undo_cmd.to_string(),
-        });
-    }
-
-    pub fn run_pre_hooks(&mut self, pkg_name: &str) -> usize {
-        let mut executed = 0;
-        for hook in &self.hooks {
-            if pkg_name.contains(&hook.trigger_pattern) {
-                self.executed_actions.push(format!("PRE: {}", hook.run_cmd));
-                executed += 1;
-            }
-        }
-        executed
-    }
-
-    pub fn run_post_hooks(&mut self, pkg_name: &str) -> usize {
-        let mut executed = 0;
-        for hook in &self.hooks {
-            if pkg_name.contains(&hook.trigger_pattern) {
-                self.executed_actions.push(format!("POST: {}", hook.run_cmd));
-                executed += 1;
-            }
-        }
-        executed
-    }
-
-    pub fn rollback_transaction(&mut self) -> usize {
-        let count = self.executed_actions.len();
-        self.executed_actions.clear();
-        count
-    }
-}
-
-impl Default for ApkXbpsHookEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==========================================
-// 30. OPENBSD RETGUARD & MAP_STACK PROTECTION ENGINE
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct MapStackRegion {
-    pub base_addr: u64,
-    pub size: usize,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdRetguardEngine {
-    pub map_stack_regions: Vec<MapStackRegion>,
-    pub active_canaries: Vec<(String, u64)>,
-    pub violations: Vec<String>,
-}
-
-impl OpenBsdRetguardEngine {
-    pub fn new() -> Self {
-        Self {
-            map_stack_regions: Vec::new(),
-            active_canaries: Vec::new(),
-            violations: Vec::new(),
-        }
-    }
-
-    pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
-        self.map_stack_regions.push(MapStackRegion { base_addr, size });
-    }
-
-    pub fn enter_function(&mut self, fn_name: &str, secret_key: u64, stack_ptr: u64) -> u64 {
-        let mut fn_hash: u64 = 0xcbf29ce484222325;
-        for &b in fn_name.as_bytes() {
-            fn_hash ^= b as u64;
-            fn_hash = fn_hash.wrapping_mul(0x100000001b3);
-        }
-        let canary = fn_hash ^ secret_key ^ stack_ptr;
-        self.active_canaries.push((fn_name.to_string(), canary));
-        canary
-    }
-
-    pub fn verify_exit_function(&mut self, fn_name: &str, expected_canary: u64, stack_ptr: u64) -> Result<(), &'static str> {
-        let in_map_stack = self.map_stack_regions.iter().any(|r| {
-            stack_ptr >= r.base_addr && stack_ptr < r.base_addr + (r.size as u64)
-        });
-
-        if !in_map_stack {
-            self.violations.push(format!(
-                "MAP_STACK Violation: Stack pointer {:#X} outside allowed stack regions for {}",
-                stack_ptr, fn_name
-            ));
-            return Err("MAP_STACK Violation: Invalid stack pointer");
-        }
-
-        if let Some(pos) = self.active_canaries.iter().position(|(name, c)| name == fn_name && *c == expected_canary) {
-            self.active_canaries.remove(pos);
-            Ok(())
-        } else {
-            self.violations.push(format!("RETGUARD Violation: Corrupted canary for function {}", fn_name));
-            Err("RETGUARD Violation: Stack canary mismatch")
-        }
-    }
-}
-
-impl Default for OpenBsdRetguardEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// Section 29 & 30 duplicates removed.
 
 // ==========================================
 // 35. SOVEREIGN UNIVERSAL DISTRO BRIDGE

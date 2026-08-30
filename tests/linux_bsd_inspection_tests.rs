@@ -38,10 +38,6 @@ mod distro_bridge;
 mod protocols;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/compatibility/garuda_zen.rs"]
@@ -86,10 +82,6 @@ mod missing_distro_innovations;
 mod linux_bsd_inspirations;
 #[path = "../src/compatibility/community_foundation.rs"]
 mod community_foundation;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 
@@ -118,16 +110,28 @@ fn test_sovereign_community_foundation_inspection() {
 
 #[test]
 fn test_sovereign_universal_distro_bridge_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
+    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
 
     let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
+    assert_eq!(bridge.translate_vfs_path("bin/nginx"), "/usr/bin/nginx");
+    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::Systemd);
 
     bridge.set_subsystem_mode(DistroSubsystemMode::LinuxAlpine);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.apk");
+    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::OpenRc);
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxGentoo);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.ebuild");
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxFedora);
+    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.rpm");
 
     bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
+    assert_eq!(bridge.translate_vfs_path("bin/nginx"), "/usr/local/bin/nginx");
+    assert_eq!(bridge.translate_vfs_path("etc/nginx.conf"), "/usr/local/etc/nginx.conf");
+    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::BsdRcD);
     assert!(bridge.enforce_security_isolation(101, "/jails/app").is_ok());
     assert!(bridge.active_jail.is_some());
 

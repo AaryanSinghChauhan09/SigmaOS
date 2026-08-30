@@ -403,7 +403,7 @@ impl HardenedSyscallDispatcher {
 
     /// Verifies if the requested syscall category is allowed under the process's active pledges
     pub fn check_pledge(&self, pid: u64, sys_nr: u32) -> bool {
-        let pledges = match self.process_pledges.get(&pid) {
+        let pledges: &Vec<PledgePromise> = match self.process_pledges.get(&pid) {
             Some(p) => p,
             None => return true, // No pledge restrictions applied
         };
