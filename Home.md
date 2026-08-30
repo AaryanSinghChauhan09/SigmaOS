@@ -107,6 +107,18 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING) for guidelines.
 
 ***
 
+## 🔐 Consolidation & Security
+
+All active branches have been merged into a single `main` branch and redundant
+branches deleted. GitHub code-scanning alerts (action pinning, least-privilege
+permissions, Rust lints) are resolved and `cargo clippy --lib` is clean. See
+[Branch Consolidation & Security Hardening](Branch-Consolidation-and-Security-Hardening)
+for the full breakdown, including the new self-hosted (`no_std`, zero-crate)
+primitives (base64, INI/TOML parsers, Merkle accumulator, UTF-8 utils, PQC
+measurement engine) and the critical RCU kernel-hang fix.
+
+Test status: `cargo test --lib` → 2675 passed; `cargo clippy --lib` → 0 warnings.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
