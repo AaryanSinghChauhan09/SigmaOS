@@ -19,6 +19,7 @@ pub mod password;
 pub mod openbsd_karl;
 pub mod pki;
 pub mod pledge;
+pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod prism;
 pub mod qubes_isolation;
@@ -37,6 +38,7 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod kali_stack;
+pub mod pqc_measurement;
 
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;

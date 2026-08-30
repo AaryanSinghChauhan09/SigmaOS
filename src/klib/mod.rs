@@ -46,6 +46,11 @@ pub mod time_impl;
 pub mod uuid;
 pub mod uvm;
 pub mod vec;
+pub mod base64;
+pub mod config_parser;
+pub mod utf8_utils;
+pub mod merkle;
+pub mod toml;
 
 pub use vec::Vec;
 pub use alloc::collections::BTreeMap;
