@@ -294,12 +294,12 @@ impl DataFrame {
 
         let mut new_records: Vec<DataRecord> = Vec::new();
 
-        for (key, vals) in groups {
+        for (key, vals) in &groups {
             let agg_result: f64 = match op {
                 AggregateOp::Count => vals.len() as f64,
-                AggregateOp::Sum => vals.iter().filter_map(|v| v.as_f64()).sum(),
+                AggregateOp::Sum => vals.iter().filter_map(|v: &DataValue| v.as_f64()).sum(),
                 AggregateOp::Mean => {
-                    let nums: Vec<f64> = vals.iter().filter_map(|v| v.as_f64()).collect();
+                    let nums: Vec<f64> = vals.iter().filter_map(|v: &DataValue| v.as_f64()).collect();
                     if nums.is_empty() {
                         0.0
                     } else {
@@ -308,16 +308,16 @@ impl DataFrame {
                 }
                 AggregateOp::Min => vals
                     .iter()
-                    .filter_map(|v| v.as_f64())
+                    .filter_map(|v: &DataValue| v.as_f64())
                     .fold(f64::INFINITY, f64::min),
                 AggregateOp::Max => vals
                     .iter()
-                    .filter_map(|v| v.as_f64())
+                    .filter_map(|v: &DataValue| v.as_f64())
                     .fold(f64::NEG_INFINITY, f64::max),
             };
 
             new_records.push(DataRecord::new(vec![
-                DataValue::Text(key),
+                DataValue::Text(key.clone()),
                 DataValue::Float(agg_result),
             ]));
         }

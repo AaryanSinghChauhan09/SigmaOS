@@ -101,9 +101,8 @@ pub use ready_to_use::{
 
 pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
-    BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
-    SmartOsZoneEngine,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, AlpineApkWorldEngine,
+    VoidXbpsEngine, FreeBsdVnetStackEngine, OpenBsdUnveilAuditor,
 };
 
 pub use linux_bsd_inspirations::{
