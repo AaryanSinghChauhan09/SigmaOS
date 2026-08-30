@@ -260,12 +260,7 @@ impl EmailClient {
         body: String,
     ) -> EmailMessage {
         EmailMessage {
-            id: format!(
-                "email_{}",
-                Some(core::time::Duration::from_secs(0))
-                    .unwrap()
-                    .as_nanos()
-            ),
+            id: format!("email_{}", to.len()),
             from: EmailAddress {
                 name: "User".to_string(),
                 address: self

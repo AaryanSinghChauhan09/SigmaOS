@@ -67,7 +67,7 @@ impl SigmaString {
 
     /// Convert to string slice
     pub fn as_str(&self) -> &str {
-        unsafe { str::from_utf8_unchecked(self.data.as_slice()) }
+        unsafe { core::str::from_utf8_unchecked(self.data.as_slice()) }
     }
 
     /// Convert to byte slice

@@ -55,222 +55,138 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
-/// 10. Bedrock Linux Strata Virtualization Engine
-/// Allows combining multiple Linux distributions into a single cohesive operating system
-/// with transparent path resolution and cross-stratum binary execution (`strat`).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BedrockStratum {
-    pub name: String,
-    pub root_path: String,
-    pub is_enabled: bool,
-    pub provided_binaries: Vec<String>,
+/// 10. Linux & BSD Sysctl Kernel MIB Parameter Management Engine
+#[derive(Debug, Clone)]
+pub struct SysctlNode {
+    pub mib_name: String,
+    pub value: String,
+    pub is_read_only: bool,
 }
 
-pub struct BedrockLinuxStrataEngine {
-    pub strata: BTreeMap<String, BedrockStratum>,
-    pub default_stratum: String,
+pub struct LinuxBsdSysctlEngine {
+    pub mib_tree: BTreeMap<String, SysctlNode>,
 }
 
-impl BedrockLinuxStrataEngine {
-    pub fn new(default_stratum_name: &str) -> Self {
+impl LinuxBsdSysctlEngine {
+    pub fn new() -> Self {
         let mut engine = Self {
-            strata: BTreeMap::new(),
-            default_stratum: default_stratum_name.to_string(),
+            mib_tree: BTreeMap::new(),
         };
-
-        // Register default stratum (e.g. "bedrock" or "sigma")
-        engine.register_stratum(BedrockStratum {
-            name: default_stratum_name.to_string(),
-            root_path: format!("/bedrock/strata/{}", default_stratum_name),
-            is_enabled: true,
-            provided_binaries: vec!["sh".to_string(), "strat".to_string()],
-        });
-
+        engine.register_defaults();
         engine
     }
 
-    pub fn register_stratum(&mut self, stratum: BedrockStratum) {
-        self.strata.insert(stratum.name.clone(), stratum);
+    fn register_defaults(&mut self) {
+        let defaults = [
+            ("kernel.ostype", "SigmaOS", true),
+            ("kernel.osrelease", "1.0.0-sovereign", true),
+            ("vm.swappiness", "60", false),
+            ("net.ipv4.ip_forward", "0", false),
+            ("net.ipv6.conf.all.forwarding", "0", false),
+            ("hw.ncpu", "8", true),
+            ("hw.physmem", "17179869184", true),
+        ];
+
+        for (name, val, ro) in defaults {
+            self.mib_tree.insert(
+                name.to_string(),
+                SysctlNode {
+                    mib_name: name.to_string(),
+                    value: val.to_string(),
+                    is_read_only: ro,
+                },
+            );
+        }
     }
 
-    pub fn enable_stratum(&mut self, name: &str) -> Result<(), &'static str> {
-        let stratum = self.strata.get_mut(name).ok_or("Stratum not found")?;
-        stratum.is_enabled = true;
-        Ok(())
+    pub fn get_value(&self, mib_name: &str) -> Option<String> {
+        self.mib_tree.get(mib_name).map(|node| node.value.clone())
     }
 
-    pub fn disable_stratum(&mut self, name: &str) -> Result<(), &'static str> {
-        if name == self.default_stratum {
-            return Err("Cannot disable default stratum");
+    pub fn set_value(&mut self, mib_name: &str, new_value: &str) -> Result<(), &'static str> {
+        if let Some(node) = self.mib_tree.get_mut(mib_name) {
+            if node.is_read_only {
+                return Err("Sysctl error: MIB parameter is read-only");
+            }
+            node.value = new_value.to_string();
+            Ok(())
+        } else {
+            Err("Sysctl error: MIB entry not found")
         }
-        let stratum = self.strata.get_mut(name).ok_or("Stratum not found")?;
-        stratum.is_enabled = false;
-        Ok(())
-    }
-
-    /// Resolve virtual path across strata (e.g., `/bedrock/strata/<stratum>/<path>`)
-    pub fn resolve_strata_path(&self, stratum_name: &str, relative_path: &str) -> Result<String, &'static str> {
-        let stratum = self.strata.get(stratum_name).ok_or("Stratum not found")?;
-        if !stratum.is_enabled {
-            return Err("Stratum is disabled");
-        }
-        let clean_path = relative_path.trim_start_matches('/');
-        Ok(format!("{}/{}", stratum.root_path, clean_path))
-    }
-
-    /// Simulates the Bedrock `strat` command to execute a binary from a specific stratum
-    pub fn strat(&self, target_stratum: &str, binary: &str, args: &[&str]) -> Result<String, &'static str> {
-        let stratum = self.strata.get(target_stratum).ok_or("Target stratum not found")?;
-        if !stratum.is_enabled {
-            return Err("Target stratum is currently disabled");
-        }
-
-        if !stratum.provided_binaries.contains(&binary.to_string()) && !stratum.provided_binaries.contains(&"*".to_string()) {
-            return Err("Binary not available in specified stratum");
-        }
-
-        let formatted_args = args.join(" ");
-        Ok(format!(
-            "Executed '{} {}' from stratum '{}' at '{}/bin/{}'",
-            binary, formatted_args, target_stratum, stratum.root_path, binary
-        ))
     }
 }
 
-impl Default for BedrockLinuxStrataEngine {
+impl Default for LinuxBsdSysctlEngine {
     fn default() -> Self {
-        Self::new("sigma")
+        Self::new()
     }
 }
 
-/// 11. SmartOS ZFS-Backed Zone & Image Management Engine (`vmadm` & `imgadm`)
-/// Implements Joyent SmartOS hypervisor parity for ephemeral containerized OS Zones,
-/// KVM/bhyve VMs, ZFS dataset snapshots, and VNIC resource capping.
+/// 11. Linux io_uring Asynchronous Submission/Completion Queue Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SmartOsVmBrand {
-    JoyentZone,   // Native OS-level Zone
-    JoyentMinimal,// Lightweight minimal Zone
-    KvmGuest,     // Hardware-assisted KVM VM
-    BhyveGuest,   // BSD Bhyve VM
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SmartOsVmState {
-    Configured,
-    Running,
-    Stopped,
-    Destroyed,
+pub enum IoUringOp {
+    Nop,
+    Readv,
+    Writev,
+    Fsync,
+    Timeout,
 }
 
 #[derive(Debug, Clone)]
-pub struct SmartOsImage {
-    pub uuid: String,
-    pub name: String,
-    pub version: String,
-    pub os_type: String,
-    pub zfs_snapshot: String,
+pub struct SubmissionQueueEntry {
+    pub opcode: IoUringOp,
+    pub fd: usize,
+    pub len: usize,
+    pub user_data: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct SmartOsVmConfig {
-    pub uuid: String,
-    pub alias: String,
-    pub brand: SmartOsVmBrand,
-    pub state: SmartOsVmState,
-    pub quota_gb: u64,
-    pub max_physical_memory_mb: u64,
-    pub vnic_interfaces: Vec<String>,
-    pub image_uuid: String,
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub res: i32,
+    pub flags: u32,
 }
 
-pub struct SmartOsZoneEngine {
-    pub images: BTreeMap<String, SmartOsImage>,
-    pub vms: BTreeMap<String, SmartOsVmConfig>,
+pub struct IoUringEngine {
+    pub sq_entries: Vec<SubmissionQueueEntry>,
+    pub cq_entries: Vec<CompletionQueueEntry>,
 }
 
-impl SmartOsZoneEngine {
+impl IoUringEngine {
     pub fn new() -> Self {
         Self {
-            images: BTreeMap::new(),
-            vms: BTreeMap::new(),
+            sq_entries: Vec::new(),
+            cq_entries: Vec::new(),
         }
     }
 
-    /// `imgadm import`: Imports a ZFS-backed SmartOS image
-    pub fn imgadm_import(&mut self, uuid: &str, name: &str, version: &str, os_type: &str) -> String {
-        let image = SmartOsImage {
-            uuid: uuid.to_string(),
-            name: name.to_string(),
-            version: version.to_string(),
-            os_type: os_type.to_string(),
-            zfs_snapshot: format!("zones/{}@final", uuid),
-        };
-        self.images.insert(uuid.to_string(), image);
-        format!("Imported image {} ({}-{})", uuid, name, version)
+    pub fn submit_sqe(&mut self, entry: SubmissionQueueEntry) {
+        self.sq_entries.push(entry);
     }
 
-    /// `vmadm create`: Provisions a new Zone or VM from an imported image with ZFS datasets and VNIC limits
-    pub fn vmadm_create(
-        &mut self,
-        uuid: &str,
-        alias: &str,
-        brand: SmartOsVmBrand,
-        quota_gb: u64,
-        max_physical_memory_mb: u64,
-        image_uuid: &str,
-        vnics: &[&str],
-    ) -> Result<String, &'static str> {
-        if !self.images.contains_key(image_uuid) {
-            return Err("Image UUID not found in imgadm dataset store");
+    pub fn process_ring(&mut self) -> Vec<CompletionQueueEntry> {
+        let mut processed = Vec::new();
+        for sqe in self.sq_entries.drain(..) {
+            let res = match sqe.opcode {
+                IoUringOp::Nop => 0,
+                IoUringOp::Readv => sqe.len as i32,
+                IoUringOp::Writev => sqe.len as i32,
+                IoUringOp::Fsync => 0,
+                IoUringOp::Timeout => 0,
+            };
+            let cqe = CompletionQueueEntry {
+                user_data: sqe.user_data,
+                res,
+                flags: 0,
+            };
+            processed.push(cqe.clone());
+            self.cq_entries.push(cqe);
         }
-
-        let vm = SmartOsVmConfig {
-            uuid: uuid.to_string(),
-            alias: alias.to_string(),
-            brand,
-            state: SmartOsVmState::Stopped,
-            quota_gb,
-            max_physical_memory_mb,
-            vnic_interfaces: vnics.iter().map(|s| s.to_string()).collect(),
-            image_uuid: image_uuid.to_string(),
-        };
-
-        self.vms.insert(uuid.to_string(), vm);
-        Ok(format!("Successfully created SmartOS VM {} ({})", uuid, alias))
-    }
-
-    /// `vmadm start`: Boots the Zone / VM
-    pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), &'static str> {
-        let vm = self.vms.get_mut(uuid).ok_or("VM UUID not found")?;
-        if vm.state == SmartOsVmState::Running {
-            return Err("VM is already running");
-        }
-        vm.state = SmartOsVmState::Running;
-        Ok(())
-    }
-
-    /// `vmadm stop`: Halts the Zone / VM
-    pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), &'static str> {
-        let vm = self.vms.get_mut(uuid).ok_or("VM UUID not found")?;
-        if vm.state != SmartOsVmState::Running {
-            return Err("VM is not running");
-        }
-        vm.state = SmartOsVmState::Stopped;
-        Ok(())
-    }
-
-    /// `vmadm delete`: Destroys the Zone / VM and frees ZFS dataset quota
-    pub fn vmadm_delete(&mut self, uuid: &str) -> Result<(), &'static str> {
-        let vm = self.vms.get(uuid).ok_or("VM UUID not found")?;
-        if vm.state == SmartOsVmState::Running {
-            return Err("Cannot delete a running VM. Stop it first.");
-        }
-        self.vms.remove(uuid);
-        Ok(())
+        processed
     }
 }
 
-impl Default for SmartOsZoneEngine {
+impl Default for IoUringEngine {
     fn default() -> Self {
         Self::new()
     }

@@ -288,10 +288,7 @@ impl NixosConfig {
                     item.push_str("\"");
                     items_str.push(item);
                 }
-                let mut result = String::from("[ ");
-                result.push_str(&items_str.join(", "));
-                result.push_str(" ]");
-                result
+                format!("[ {} ]", items_str.join(" "))
             }
             ConfigOption::Attrs(attrs) => {
                 let attrs_str: Vec<String> = attrs

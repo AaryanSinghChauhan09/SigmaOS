@@ -6,7 +6,7 @@
 //! - Concurrent Slate Lock NUMA synchronization primitives
 extern crate alloc;
 
-use crate::klib::{HashMap, Vec};
+use crate::klib::HashMap;
 use alloc::string::String;
 use alloc::string::ToString;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};

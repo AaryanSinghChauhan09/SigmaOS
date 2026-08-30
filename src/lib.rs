@@ -73,8 +73,8 @@ pub use unimplemented_features::{
 };
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
-    GpuSwitchMode, Hammer2PfsClusterQuorumEngine, HardenedBsdPaxGuardEngine, PaxViolationType,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,

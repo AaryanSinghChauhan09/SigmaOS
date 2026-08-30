@@ -3,7 +3,6 @@ extern crate alloc;
 // SigmaOS Linux & BSD Distro Power & Network Tools Subsystem
 // Inspired by Linux TLP/Laptop Mode Tools, NetworkManager/nmtui, FreeBSD bhyve, and Tailscale/WireGuard
 
-#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 
 // ============================================================================

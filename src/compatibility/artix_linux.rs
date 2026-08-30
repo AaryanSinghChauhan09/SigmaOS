@@ -3,7 +3,8 @@ extern crate alloc;
 // Independent, zero-dependency implementations of Artix Linux core tooling
 // Implements OpenRC, Runit, and S6 init systems (systemd-free Arch Linux fork)
 
-use crate::klib::{BTreeMap, Vec};
+use crate::klib::BTreeMap;
+use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 
 // =========================================================================

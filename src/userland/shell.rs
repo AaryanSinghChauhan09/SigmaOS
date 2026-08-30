@@ -506,7 +506,7 @@ impl<'a> Parser<'a> {
             let peek_c = self.peek();
             if peek_c == Some('>') || peek_c == Some('<') || self.starts_with("&>") || self.starts_with(">&") {
                 if let Some(spec) = self.parse_redirect_operator(explicit_fd) {
-                    redirects.push(Redirect::from(spec));
+                    redirects.push(spec);
                     continue;
                 } else {
                     self.pos = current_pos;
@@ -530,7 +530,7 @@ impl<'a> Parser<'a> {
 
         let mut cmd = ShellCommand::Simple(args);
         for redir in redirects {
-            cmd = ShellCommand::Redirect(Box::new(cmd), redir);
+            cmd = ShellCommand::Redirect(Box::new(cmd), redir.into());
         }
         Some(cmd)
     }
@@ -851,7 +851,6 @@ impl Shell {
                         Ok(0)
                     }
                     "cat" => {
-                        let stdin_bytes = self.redirection_engine.read_fd(0);
                         let stdin_bytes = self.redirection_engine.read_fd(0).map(|b: &[u8]| b.to_vec());
                         if let Some(bytes) = stdin_bytes {
                             self.redirection_engine.write_fd(1, &bytes);
@@ -905,38 +904,32 @@ impl Shell {
             }
             ShellCommand::Redirect(child, redir) => {
                 let status = self.execute_ast(child)?;
-                match redir {
-                    Redirect { kind: RedirectKind::Append, src_fd: fd, path, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("APPEND:{}", path));
+                match redir.kind {
+                    RedirectKind::Output => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FILE:{}", redir.path));
                     }
-                    Redirect { kind: RedirectKind::Output, src_fd: fd, path, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("FILE:{}", path));
+                    RedirectKind::Append => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("APPEND:{}", redir.path));
                     }
-                    Redirect { kind: RedirectKind::Input, src_fd: fd, path, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), format!("INPUT:{}", path));
+                    RedirectKind::Input => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("INPUT:{}", redir.path));
                     }
-                    Redirect { kind: RedirectKind::HereDoc, src_fd: fd, path: content, .. } => {
-                        self.env.vars.insert(format!("FD_{}_HEREDOC", fd), content.clone());
+                    RedirectKind::HereDoc => {
+                        self.env.vars.insert(format!("FD_{}_HEREDOC", redir.src_fd), redir.path.clone());
                     }
-                    Redirect { kind: RedirectKind::DupOutput | RedirectKind::DupInput, src_fd, target_fd, .. } => {
-                        if let Some(tfd) = target_fd {
-                            self.env.vars.insert(format!("FD_{}_REDIRECT", src_fd), format!("FD:{}", tfd));
+                    RedirectKind::HereString => {
+                        self.env.vars.insert(format!("FD_{}_HERESTRING", redir.src_fd), redir.path.clone());
+                    }
+                    RedirectKind::DupOutput | RedirectKind::DupInput => {
+                        if let Some(target) = redir.target_fd {
+                            self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), format!("FD:{}", target));
                         }
                     }
-                    Redirect { kind: RedirectKind::CloseFd, src_fd: fd, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), "CLOSED".to_string());
+                    RedirectKind::CloseFd => {
+                        self.env.vars.insert(format!("FD_{}_REDIRECT", redir.src_fd), "CLOSED".to_string());
                     }
-                    Redirect { kind: RedirectKind::HereString, src_fd: fd, path: content, .. } => {
-                        self.env.vars.insert(format!("FD_{}_HERESTRING", fd), content.clone());
-                    }
-                    Redirect { kind: RedirectKind::CombinedOutput, path, .. } => {
-                        self.env.vars.insert("FD_COMBINED_REDIRECT".to_string(), format!("FILE:{}", path));
-                    }
-                    Redirect { kind: RedirectKind::ProcessSubInput, src_fd: fd, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), "PROCSUB_IN".to_string());
-                    }
-                    Redirect { kind: RedirectKind::ProcessSubOutput, src_fd: fd, .. } => {
-                        self.env.vars.insert(format!("FD_{}_REDIRECT", fd), "PROCSUB_OUT".to_string());
+                    RedirectKind::CombinedOutput => {
+                        self.env.vars.insert("FD_COMBINED_REDIRECT".to_string(), format!("FILE:{}", redir.path));
                     }
                     _ => {}
                 }

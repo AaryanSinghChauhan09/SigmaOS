@@ -771,6 +771,7 @@ impl SeLinuxEnforcer {
         }
 
         let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
+            let allowed: &Vec<String> = allowed;
             allowed.contains(&target_type.to_string())
         } else {
             false
@@ -1002,7 +1003,9 @@ impl SovereignSeLinuxEngine {
         };
 
         let is_allowed = if let Some(classes) = self.domain_permissions.get(src_domain) {
+            let classes: &HashMap<String, Vec<String>> = classes;
             if let Some(perms) = classes.get("file") {
+                let perms: &Vec<String> = perms;
                 perms.contains(&permission.to_string())
                     && file_ctx.domain_type == "httpd_sys_content_t"
             } else {
@@ -1030,6 +1033,7 @@ impl SovereignSeLinuxEngine {
         }
 
         if let Some(allowed) = self.allowed_transitions.get(current_domain) {
+            let allowed: &Vec<String> = allowed;
             allowed.contains(&target_domain.to_string())
         } else {
             false
@@ -1080,6 +1084,7 @@ impl SovereignFirewalldManager {
         }
 
         for interfaces in self.active_zones.values_mut() {
+            let interfaces: &mut Vec<String> = interfaces;
             interfaces.retain(|i| i != interface);
         }
 
@@ -1101,6 +1106,7 @@ impl SovereignFirewalldManager {
     pub fn is_packet_allowed(&self, interface: &str, destination_port: u16) -> bool {
         let mut matched_zone = &self.default_zone;
         for (zone, interfaces) in &self.active_zones {
+            let interfaces: &Vec<String> = interfaces;
             if interfaces.contains(&interface.to_string()) {
                 matched_zone = zone;
                 break;
@@ -1108,6 +1114,7 @@ impl SovereignFirewalldManager {
         }
 
         if let Some(ports) = self.zone_allowed_ports.get(matched_zone) {
+            let ports: &Vec<u16> = ports;
             ports.contains(&destination_port)
         } else {
             false

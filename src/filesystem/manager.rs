@@ -240,17 +240,12 @@ impl FileManager {
 
     /// Navigate up
     pub fn navigate_up(&mut self) -> Result<(), FileManagerError> {
-        if self.current_path != "/" {
-            let parent = if let Some(last_slash) = self.current_path.rfind('/') {
-                if last_slash == 0 {
-                    "/".to_string()
-                } else {
-                    self.current_path[..last_slash].to_string()
-                }
+        if let Some(idx) = self.current_path.rfind('/') {
+            if idx == 0 {
+                self.current_path = String::from("/");
             } else {
-                "/".to_string()
-            };
-            self.current_path = parent;
+                self.current_path = self.current_path[..idx].to_string();
+            }
             Ok(())
         } else {
             Err(FileManagerError::AlreadyAtRoot)
@@ -279,10 +274,14 @@ impl FileManager {
 
     /// Paste from clipboard
     pub fn paste(&mut self) -> Result<(), FileManagerError> {
-        let clipboard = self.clipboard.clone();
-        for (path, operation) in clipboard {
-            let file_name = path.split('/').last().unwrap_or("file");
-            let destination = format!("{}/{}", self.current_path, file_name);
+        let current_path = self.current_path.clone();
+        for (path, operation) in self.clipboard.drain(..) {
+            let filename = if let Some(idx) = path.rfind('/') {
+                &path[idx + 1..]
+            } else {
+                &path
+            };
+            let destination = format!("{}/{}", current_path, filename);
 
             match operation {
                 ClipboardOperation::Copy => {
@@ -315,7 +314,11 @@ impl FileManager {
 
     /// Rename file
     pub fn rename(&self, old_path: &str, new_name: &str) -> Result<(), FileManagerError> {
-        let parent = old_path.rfind('/').map(|i| &old_path[..i]).unwrap_or("");
+        let parent = if let Some(idx) = old_path.rfind('/') {
+            &old_path[..idx]
+        } else {
+            "."
+        };
         let new_path = format!("{}/{}", parent, new_name);
         self.file_operation.move_file(old_path, &new_path)
     }
@@ -378,13 +381,17 @@ impl FileManager {
 
     /// Get file info
     pub fn get_file_info(&self, path: &str) -> Result<FileItem, FileManagerError> {
-        let file_name = path.split('/').last().unwrap_or("unknown");
+        let filename = if let Some(idx) = path.rfind('/') {
+            &path[idx + 1..]
+        } else {
+            path
+        };
         Ok(FileItem {
-            name: file_name.to_string(),
+            name: filename.to_string(),
             path: path.to_string(),
             size_bytes: 1024,
             is_directory: false,
-            is_hidden: false,
+            is_hidden: filename.starts_with('.'),
             is_readonly: false,
             modified_at: 1700000000u64,
             created_at: 1700000000u64,
