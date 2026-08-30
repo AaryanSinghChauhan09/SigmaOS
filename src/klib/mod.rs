@@ -58,6 +58,7 @@ pub use hashmap::HashMap;
 pub use collections::VecDeque;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub use path::PathBuf;
 
 pub const fn is_zero_dependency_build() -> bool {
     true
