@@ -380,7 +380,7 @@ pub unsafe fn free(ptr: *mut u8, size: usize) {
 // ============================================================================
 
 /// Called by the Rust runtime when allocation fails (requires nightly/alloc_error_handler).
-#[cfg(feature = "custom_alloc_error_handler")]
+#[cfg(all(target_os = "none", not(test), feature = "custom_alloc_error_handler"))]
 #[alloc_error_handler]
 fn sigma_oom(layout: Layout) -> ! {
     // In a real kernel this would trigger a kernel panic with diagnostics.

@@ -67,7 +67,7 @@ fn cmd_install(args: &[String]) {
         exit(2);
     }
     let name = &args[0];
-    let mut store = ContentAddressedStore::new(format!("/var/lib/sigpkg/store"));
+    let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     let pkg = Package::new(
         name.clone(),
         Version::parse("1.0.0").unwrap(),
@@ -93,7 +93,7 @@ fn cmd_remove(args: &[String]) {
         exit(2);
     }
     let name = &args[0];
-    let mut store = ContentAddressedStore::new(format!("/var/lib/sigpkg/store"));
+    let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     match store.remove(name) {
         Ok(()) => {
             println!("Removed {}", name);
@@ -112,7 +112,7 @@ fn cmd_search(args: &[String]) {
         exit(2);
     }
     let name = &args[0];
-    let store = ContentAddressedStore::new(format!("/var/lib/sigpkg/store"));
+    let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     match store.get(name) {
         Some(pkg) => {
             for dep in &pkg.dependencies {
@@ -153,7 +153,7 @@ fn cmd_status(args: &[String]) {
         eprintln!("sigpkg: status takes no arguments");
         exit(2);
     }
-    let store = ContentAddressedStore::new(format!("/var/lib/sigpkg/store"));
+    let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     let packages = store.list();
     println!("SigmaPkg store: {} package(s)", packages.len());
     for pkg in packages {
@@ -168,7 +168,7 @@ fn cmd_verify(args: &[String]) {
         exit(2);
     }
     let name = &args[0];
-    let store = ContentAddressedStore::new(format!("/var/lib/sigpkg/store"));
+    let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     let pkg = match store.get(name) {
         Some(p) => p.clone(),
         None => {
