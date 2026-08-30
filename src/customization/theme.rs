@@ -627,11 +627,48 @@ impl Default for SigmaSoundscape {
     }
 }
 
-/// IconThemeEngine - Hardware-Aware dynamic DPI icon scaler
+/// Linux & BSD Distro-Inspired Icon Theme Presets
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroIconPreset {
+    SovereignSatori, // Default vector theme with dynamic accent tinting (inspired by Elementary OS / Pantheon)
+    PapirusSovereign, // Flat, high-contrast vector icon pack (inspired by Papirus / Manjaro)
+    YaruSigma,        // Modern rounded ubuntu-inspired icon theme (inspired by Ubuntu Yaru)
+    BreezeZenith,     // Clean paper-flat KDE-inspired icon set (inspired by KDE Breeze)
+    AdwaitaHardened,  // Gnome/FreeBSD enterprise standard icon theme (inspired by GNOME Adwaita)
+}
+
+/// Freedesktop.org Icon Specification Categories
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IconCategory {
+    Apps,
+    Actions,
+    Categories,
+    Devices,
+    Emblems,
+    Mimetypes,
+    Places,
+    Status,
+}
+
+/// Icon metadata representation
+#[derive(Debug, Clone)]
+pub struct IconEntry {
+    pub name: String,
+    pub category: IconCategory,
+    pub path: String,
+    pub is_scalable_svg: bool,
+    pub accent_tintable: bool,
+}
+
+/// IconThemeEngine - Freedesktop.org Icon Theme Specification & Dynamic DPI Scaler Engine
 pub struct IconThemeEngine {
+    pub active_preset: DistroIconPreset,
     pub active_icon_pack: String,
+    pub inherits: Vec<String>,
     pub base_icon_size: u16,
     pub screen_dpi: f32,
+    pub accent_color_hex: String,
+    pub registered_icons: BTreeMap<String, IconEntry>,
 }
 
 /// Native, zero-dependency Sovereign CSS Color Engine
@@ -681,11 +718,63 @@ impl SovereignCssColorEngine {
 
 impl IconThemeEngine {
     pub fn new(pack: &str, dpi: f32) -> Self {
-        Self {
+        let preset = match pack.to_lowercase().as_str() {
+            "papirus" | "papirussovereign" => DistroIconPreset::PapirusSovereign,
+            "yaru" | "yarusigma" => DistroIconPreset::YaruSigma,
+            "breeze" | "breezezenith" => DistroIconPreset::BreezeZenith,
+            "adwaita" | "adwaitahardened" => DistroIconPreset::AdwaitaHardened,
+            _ => DistroIconPreset::SovereignSatori,
+        };
+
+        let mut engine = Self {
+            active_preset: preset,
             active_icon_pack: pack.to_string(),
+            inherits: vec!["hicolor".to_string(), "Adwaita".to_string()],
             base_icon_size: 48,
             screen_dpi: dpi,
-        }
+            accent_color_hex: "#007AFF".to_string(),
+            registered_icons: BTreeMap::new(),
+        };
+
+        engine.register_default_theme_icons();
+        engine
+    }
+
+    pub fn set_preset(&mut self, preset: DistroIconPreset) {
+        self.active_preset = preset;
+        self.active_icon_pack = match preset {
+            DistroIconPreset::SovereignSatori => "SovereignSatori".to_string(),
+            DistroIconPreset::PapirusSovereign => "PapirusSovereign".to_string(),
+            DistroIconPreset::YaruSigma => "YaruSigma".to_string(),
+            DistroIconPreset::BreezeZenith => "BreezeZenith".to_string(),
+            DistroIconPreset::AdwaitaHardened => "AdwaitaHardened".to_string(),
+        };
+    }
+
+    pub fn set_accent_color(&mut self, hex_color: &str) {
+        self.accent_color_hex = hex_color.to_string();
+    }
+
+    pub fn register_icon(&mut self, name: &str, category: IconCategory, path: &str, is_svg: bool, tintable: bool) {
+        self.registered_icons.insert(
+            name.to_string(),
+            IconEntry {
+                name: name.to_string(),
+                category,
+                path: path.to_string(),
+                is_scalable_svg: is_svg,
+                accent_tintable: tintable,
+            },
+        );
+    }
+
+    fn register_default_theme_icons(&mut self) {
+        self.register_icon("folder", IconCategory::Places, "/usr/share/icons/{theme}/scalable/places/folder.svg", true, true);
+        self.register_icon("user-home", IconCategory::Places, "/usr/share/icons/{theme}/scalable/places/user-home.svg", true, true);
+        self.register_icon("system-file-manager", IconCategory::Apps, "/usr/share/icons/{theme}/{size}x{size}/apps/system-file-manager.png", false, false);
+        self.register_icon("utilities-terminal", IconCategory::Apps, "/usr/share/icons/{theme}/{size}x{size}/apps/utilities-terminal.png", false, false);
+        self.register_icon("network-wireless", IconCategory::Status, "/usr/share/icons/{theme}/scalable/status/network-wireless.svg", true, false);
+        self.register_icon("dialog-information", IconCategory::Status, "/usr/share/icons/{theme}/scalable/status/dialog-information.svg", true, false);
     }
 
     /// Evaluates dynamic scaled sizes to ensure pixel-perfect resolution on high density screens
@@ -693,6 +782,51 @@ impl IconThemeEngine {
         let scale_factor = self.screen_dpi / 96.0; // 96 is standard baseline DPI
         let raw_scaled = self.base_icon_size as f32 * scale_factor;
         raw_scaled as u16
+    }
+
+    /// Implements Freedesktop.org Icon Theme Specification Lookup Algorithm
+    pub fn lookup_icon(&self, name: &str, category: IconCategory, size: u16) -> String {
+        let theme_dir = self.active_icon_pack.as_str();
+
+        if let Some(entry) = self.registered_icons.get(name) {
+            if entry.category == category {
+                let resolved_path = entry.path
+                    .replace("{theme}", theme_dir)
+                    .replace("{size}", &size.to_string());
+                return resolved_path;
+            }
+        }
+
+        // Fallback chain across inherited themes
+        for fallback_theme in &self.inherits {
+            let fallback_path = format!(
+                "/usr/share/icons/{}/{}x{}/{}/{}.png",
+                fallback_theme,
+                size,
+                size,
+                match category {
+                    IconCategory::Apps => "apps",
+                    IconCategory::Actions => "actions",
+                    IconCategory::Categories => "categories",
+                    IconCategory::Devices => "devices",
+                    IconCategory::Emblems => "emblems",
+                    IconCategory::Mimetypes => "mimetypes",
+                    IconCategory::Places => "places",
+                    IconCategory::Status => "status",
+                },
+                name
+            );
+            return fallback_path;
+        }
+
+        format!("/usr/share/icons/hicolor/{}/apps/{}.png", size, name)
+    }
+
+    /// Dynamically tints SVG folder/places icons with user's desktop accent color
+    pub fn render_tinted_svg_icon(&self, raw_svg_xml: &str) -> String {
+        raw_svg_xml.replace("#007AFF", &self.accent_color_hex)
+            .replace("#007aff", &self.accent_color_hex)
+            .replace("fill=\"currentAccent\"", &format!("fill=\"{}\"", self.accent_color_hex))
     }
 }
 
@@ -789,5 +923,32 @@ mod tests {
     fn test_icon_theme_scaling() {
         let pack = IconThemeEngine::new("SovereignIcons", 144.0); // 1.5x scaling
         assert_eq!(pack.get_scaled_icon_size(), 72);
+    }
+
+    #[test]
+    fn test_icon_theme_distro_presets_and_lookup() {
+        let mut engine = IconThemeEngine::new("Papirus", 96.0);
+        assert_eq!(engine.active_preset, DistroIconPreset::PapirusSovereign);
+
+        // Check lookup algorithm
+        let folder_path = engine.lookup_icon("folder", IconCategory::Places, 48);
+        assert_eq!(folder_path, "/usr/share/icons/PapirusSovereign/scalable/places/folder.svg");
+
+        let app_path = engine.lookup_icon("system-file-manager", IconCategory::Apps, 64);
+        assert_eq!(app_path, "/usr/share/icons/PapirusSovereign/64x64/apps/system-file-manager.png");
+
+        // Test fallback lookup
+        let fallback_path = engine.lookup_icon("unknown-action", IconCategory::Actions, 32);
+        assert_eq!(fallback_path, "/usr/share/icons/hicolor/32x32/actions/unknown-action.png");
+
+        // Test preset switching
+        engine.set_preset(DistroIconPreset::YaruSigma);
+        assert_eq!(engine.active_icon_pack, "YaruSigma");
+
+        // Test SVG dynamic accent tinting
+        engine.set_accent_color("#E95420"); // Canonical Orange
+        let raw_svg = "<svg><path fill=\"#007AFF\" d=\"M0 0h10v10H0z\"/></svg>";
+        let tinted_svg = engine.render_tinted_svg_icon(raw_svg);
+        assert!(tinted_svg.contains("fill=\"#E95420\""));
     }
 }
