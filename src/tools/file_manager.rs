@@ -68,9 +68,152 @@ impl Default for ClipboardBuffer {
     }
 }
 
+/// Freedesktop & BSD Compliant Thumbnail Size Specification
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThumbnailSpecSize {
+    Normal = 128,  // 128x128 (Normal)
+    Large = 256,   // 256x256 (Large)
+    XLarge = 512,  // 512x512 (X-Large)
+    XXLarge = 1024 // 1024x1024 (XX-Large)
+}
+
+/// Thumbnail Media Format / Handler Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThumbnailFormat {
+    RasterImage,   // PNG, JPEG, WEBP, GIF (Linux gdk-pixbuf / BSD imlib2)
+    VectorSvg,     // SVG (Linux librsvg / BSD resvg)
+    VideoFrame,    // MP4, MKV, AVI, WEBM (Linux Tumbler / BSD ffmpegthumbnailer)
+    PdfDocument,   // PDF, PS, EPS (Linux Poppler / BSD libgs)
+    FontPreview,   // TTF, OTF, WOFF (Linux fontconfig / BSD freetype2)
+    AudioAlbumArt, // MP3, FLAC, OGG (Linux TagLib / BSD id3lib)
+    Unknown,
+}
+
+/// Cached Thumbnail Entry with PNG metadata
+#[derive(Debug, Clone)]
+pub struct ThumbnailEntry {
+    pub source_uri: String,
+    pub source_mtime: u64,
+    pub size_spec: ThumbnailSpecSize,
+    pub cache_path: String,
+    pub format: ThumbnailFormat,
+    pub width: u32,
+    pub height: u32,
+}
+
+/// Cache Store for Desktop File Manager Thumbnails (~/.cache/thumbnails)
+#[derive(Debug, Clone)]
+pub struct ThumbnailCache {
+    pub cached_entries: Vec<ThumbnailEntry>,
+    pub base_cache_dir: String,
+}
+
+impl ThumbnailCache {
+    pub fn new() -> Self {
+        Self {
+            cached_entries: Vec::new(),
+            base_cache_dir: "/home/user/.cache/thumbnails".to_string(),
+        }
+    }
+
+    pub fn get_cache_path(&self, uri: &str, size: ThumbnailSpecSize) -> String {
+        let size_folder = match size {
+            ThumbnailSpecSize::Normal => "normal",
+            ThumbnailSpecSize::Large => "large",
+            ThumbnailSpecSize::XLarge => "x-large",
+            ThumbnailSpecSize::XXLarge => "xx-large",
+        };
+        // Simple hash calculation simulating MD5/SHA256 URL hashing
+        let mut hash: u64 = 5381;
+        for byte in uri.bytes() {
+            hash = ((hash << 5).wrapping_add(hash)).wrapping_add(byte as u64);
+        }
+        alloc::format!("{}/{}/{:x}.png", self.base_cache_dir, size_folder, hash)
+    }
+
+    pub fn lookup(&self, uri: &str, mtime: u64, size: ThumbnailSpecSize) -> Option<&ThumbnailEntry> {
+        self.cached_entries.iter().find(|entry| {
+            entry.source_uri == uri && entry.source_mtime == mtime && entry.size_spec == size
+        })
+    }
+
+    pub fn store(&mut self, entry: ThumbnailEntry) {
+        self.cached_entries.retain(|e| !(e.source_uri == entry.source_uri && e.size_spec == entry.size_spec));
+        self.cached_entries.push(entry);
+    }
+}
+
+impl Default for ThumbnailCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Linux (Tumbler/Freedesktop) & BSD (ffmpegthumbnailer) Inspired Thumbnailer Engine
+pub struct ThumbnailerEngine {
+    pub cache: ThumbnailCache,
+}
+
+impl ThumbnailerEngine {
+    pub fn new() -> Self {
+        Self {
+            cache: ThumbnailCache::new(),
+        }
+    }
+
+    pub fn detect_format(&self, file_path: &str) -> ThumbnailFormat {
+        if file_path.ends_with(".png") || file_path.ends_with(".jpg") || file_path.ends_with(".jpeg") || file_path.ends_with(".webp") {
+            ThumbnailFormat::RasterImage
+        } else if file_path.ends_with(".svg") {
+            ThumbnailFormat::VectorSvg
+        } else if file_path.ends_with(".mp4") || file_path.ends_with(".mkv") || file_path.ends_with(".webm") || file_path.ends_with(".avi") {
+            ThumbnailFormat::VideoFrame
+        } else if file_path.ends_with(".pdf") || file_path.ends_with(".ps") {
+            ThumbnailFormat::PdfDocument
+        } else if file_path.ends_with(".ttf") || file_path.ends_with(".otf") {
+            ThumbnailFormat::FontPreview
+        } else if file_path.ends_with(".mp3") || file_path.ends_with(".flac") || file_path.ends_with(".ogg") {
+            ThumbnailFormat::AudioAlbumArt
+        } else {
+            ThumbnailFormat::Unknown
+        }
+    }
+
+    pub fn generate_thumbnail(&mut self, file_path: &str, mtime: u64, size: ThumbnailSpecSize) -> ThumbnailEntry {
+        let uri = alloc::format!("file://{}", file_path);
+        if let Some(cached) = self.cache.lookup(&uri, mtime, size) {
+            return cached.clone();
+        }
+
+        let format = self.detect_format(file_path);
+        let cache_path = self.cache.get_cache_path(&uri, size);
+        let max_dim = size as u32;
+
+        let entry = ThumbnailEntry {
+            source_uri: uri,
+            source_mtime: mtime,
+            size_spec: size,
+            cache_path,
+            format,
+            width: max_dim,
+            height: max_dim,
+        };
+
+        self.cache.store(entry.clone());
+        entry
+    }
+}
+
+impl Default for ThumbnailerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignFileManager {
     pub active_pane: Pane,
     pub clipboard: ClipboardBuffer,
+    pub thumbnailer: ThumbnailerEngine,
 }
 
 impl SovereignFileManager {
@@ -78,6 +221,7 @@ impl SovereignFileManager {
         Self {
             active_pane: Pane::new(0),
             clipboard: ClipboardBuffer::new(),
+            thumbnailer: ThumbnailerEngine::new(),
         }
     }
 }
@@ -254,6 +398,26 @@ mod tests {
         assert_eq!(sfm.active_pane.current_directory_inode, 0);
         sfm.clipboard.is_cut = true;
         assert!(sfm.clipboard.is_cut);
+
+        let thumb = sfm.thumbnailer.generate_thumbnail("/home/user/video.mp4", 1700000000, ThumbnailSpecSize::Normal);
+        assert_eq!(thumb.format, ThumbnailFormat::VideoFrame);
+        assert_eq!(thumb.width, 128);
+    }
+
+    #[test]
+    fn test_thumbnailer_engine_formats_and_cache() {
+        let mut engine = ThumbnailerEngine::new();
+        assert_eq!(engine.detect_format("/home/user/pic.png"), ThumbnailFormat::RasterImage);
+        assert_eq!(engine.detect_format("/home/user/doc.pdf"), ThumbnailFormat::PdfDocument);
+        assert_eq!(engine.detect_format("/home/user/font.ttf"), ThumbnailFormat::FontPreview);
+        assert_eq!(engine.detect_format("/home/user/song.mp3"), ThumbnailFormat::AudioAlbumArt);
+
+        let t1 = engine.generate_thumbnail("/home/user/pic.png", 100, ThumbnailSpecSize::Large);
+        assert_eq!(t1.size_spec, ThumbnailSpecSize::Large);
+        assert_eq!(t1.width, 256);
+
+        let t2 = engine.generate_thumbnail("/home/user/pic.png", 100, ThumbnailSpecSize::Large);
+        assert_eq!(t2.cache_path, t1.cache_path);
     }
 
     #[test]
