@@ -5163,6 +5163,30 @@ mod tests {
     }
 
     #[test]
+    fn test_guix_and_shepherd_service_manager() {
+        let mut guix = GuixDerivationEngine::new("/gnu/store");
+        let glibc_out = guix.register_derivation("glibc", "gcc-builder", &[]);
+        let _hello_out = guix.register_derivation("hello", "gcc-builder", &[&glibc_out]);
+
+        // Build glibc first
+        assert!(guix.build_derivation("glibc").is_ok());
+
+        // Now build hello
+        let hello_built = guix.build_derivation("hello");
+        assert!(hello_built.is_ok());
+        assert!(hello_built.unwrap().contains("/gnu/store/"));
+
+        let mut shepherd = ShepherdServiceManager::new();
+        shepherd.register_service("networking", &["net"], &[], true);
+        shepherd.register_service("sshd", &["ssh"], &["net"], true);
+
+        assert!(!shepherd.is_provisioned("net"));
+        assert!(shepherd.start_service("sshd").is_ok());
+        assert!(shepherd.is_provisioned("net"));
+        assert!(shepherd.is_provisioned("ssh"));
+    }
+
+
     #[test]
     fn test_apk_chroot_build_sandbox() {
         let mut sandbox = ApkChrootBuildSandboxEngine::new("sbx_alpine_01", "/var/chroot/build", true);
