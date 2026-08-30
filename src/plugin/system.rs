@@ -521,6 +521,127 @@ impl Default for PluginMarketplace {
     }
 }
 
+// ==========================================
+// LINUX & BSD DISTRO-INSPIRED EXTENSION INNOVATIONS
+// ==========================================
+
+/// OpenBSD Pledge/Unveil & Linux eBPF Security Policy for Plugins
+#[derive(Debug, Clone)]
+pub struct SovereignExtensionSandbox {
+    pub plugin_id: PluginID,
+    pub pledged_promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions "r", "rw", "w")
+    pub allowed_syscalls: Vec<u32>,
+    pub is_active: bool,
+}
+
+impl SovereignExtensionSandbox {
+    pub fn new(plugin_id: PluginID) -> Self {
+        Self {
+            plugin_id,
+            pledged_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+            allowed_syscalls: Vec::new(),
+            is_active: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &[&str]) {
+        for promise in promises {
+            if !self.pledged_promises.iter().any(|p| p == promise) {
+                self.pledged_promises.push(promise.to_string());
+            }
+        }
+        self.is_active = true;
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+        self.is_active = true;
+    }
+
+    pub fn allow_syscall(&mut self, syscall_num: u32) {
+        if !self.allowed_syscalls.contains(&syscall_num) {
+            self.allowed_syscalls.push(syscall_num);
+        }
+    }
+
+    pub fn validate_access(&self, requested_path: &str, req_perm: &str) -> bool {
+        if !self.is_active {
+            return true;
+        }
+        for (path, perm) in &self.unveiled_paths {
+            if requested_path.starts_with(path) && perm.contains(req_perm) {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// FreeBSD Jail-inspired Plugin Isolation Shard
+#[derive(Debug, Clone)]
+pub struct FreeBsdJailPluginIso {
+    pub jail_id: u32,
+    pub plugin_id: PluginID,
+    pub hostname: String,
+    pub root_vfs_path: String,
+    pub is_isolated: bool,
+}
+
+impl FreeBsdJailPluginIso {
+    pub fn new(jail_id: u32, plugin_id: PluginID, hostname: &str, root_vfs_path: &str) -> Self {
+        Self {
+            jail_id,
+            plugin_id,
+            hostname: hostname.to_string(),
+            root_vfs_path: root_vfs_path.to_string(),
+            is_isolated: true,
+        }
+    }
+
+    pub fn resolve_jail_path(&self, rel_path: &str) -> String {
+        format!("{}/{}", self.root_vfs_path.trim_end_matches('/'), rel_path.trim_start_matches('/'))
+    }
+}
+
+/// Multi-Distro Universal Extension Adapter (GNOME, VSCode, Flatpak, AUR Hooks)
+#[derive(Debug, Clone)]
+pub struct MultiDistroExtensionAdapter {
+    pub source_format: ExtensionType,
+    pub adapted_plugins: Vec<PluginID>,
+}
+
+impl MultiDistroExtensionAdapter {
+    pub fn new(source_format: ExtensionType) -> Self {
+        Self {
+            source_format,
+            adapted_plugins: Vec::new(),
+        }
+    }
+
+    pub fn adapt_extension(
+        &mut self,
+        ext_id: PluginID,
+        ext_name: &str,
+        manager: &mut SimplePluginManager,
+    ) -> Result<PluginID, PluginError> {
+        let mut name_buf = String::from("ext-");
+        name_buf.push_str(ext_name);
+
+        let plugin = SimplePlugin::new(
+            ext_id,
+            name_buf.as_bytes(),
+            (1, 0, 0),
+            PluginCapability::full(),
+        );
+
+        let loaded_id = manager.load_plugin(Box::new(plugin))?;
+        self.adapted_plugins.push(loaded_id);
+        Ok(loaded_id)
+    }
+}
+
 #[cfg(test)]
 mod marketplace_tests {
     use super::*;
@@ -570,5 +691,27 @@ mod marketplace_tests {
 
         let loaded_plugin = manager.get_plugin(101).unwrap();
         assert_eq!(loaded_plugin.name(), b"rust-analyzer-sigma");
+    }
+
+    #[test]
+    fn test_sovereign_extension_sandbox_and_isolation() {
+        let mut sandbox = SovereignExtensionSandbox::new(501);
+        sandbox.pledge(&["stdio", "rpath"]);
+        sandbox.unveil("/usr/share/extensions", "r");
+
+        assert!(sandbox.validate_access("/usr/share/extensions/theme", "r"));
+        assert!(!sandbox.validate_access("/etc/shadow", "r"));
+        assert!(!sandbox.validate_access("/usr/share/extensions/theme", "w"));
+
+        let jail = FreeBsdJailPluginIso::new(1, 501, "plugin-jail", "/vfs/jail_1");
+        assert_eq!(jail.resolve_jail_path("/lib/ext.so"), "/vfs/jail_1/lib/ext.so");
+
+        let mut adapter = MultiDistroExtensionAdapter::new(ExtensionType::GnomeExtension);
+        let mut manager = SimplePluginManager::new(ManagerCapability::full());
+        let adapted_id = adapter.adapt_extension(701, "dash-to-dock", &mut manager).unwrap();
+
+        assert_eq!(adapted_id, 701);
+        let plugin = manager.get_plugin(701).unwrap();
+        assert_eq!(plugin.name(), b"ext-dash-to-dock");
     }
 }
