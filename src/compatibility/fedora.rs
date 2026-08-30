@@ -1167,6 +1167,126 @@ impl SovereignCockpitConsole {
     }
 }
 
+/// Fedora Crypto Policies Profile levels system-wide.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CryptoPolicyLevel {
+    Default,
+    Legacy,
+    Future,
+    Fips,
+}
+
+/// Fedora System-Wide Crypto Policies Engine (crypto-policies)
+/// Enforces system-wide TLS, SSH, and IPsec cryptographic security profiles.
+pub struct FedoraCryptoPoliciesEngine {
+    pub current_policy: CryptoPolicyLevel,
+    pub min_rsa_key_size: usize,
+    pub allow_sha1: bool,
+    pub require_quantum_resistant: bool,
+}
+
+impl FedoraCryptoPoliciesEngine {
+    pub fn new() -> Self {
+        FedoraCryptoPoliciesEngine {
+            current_policy: CryptoPolicyLevel::Default,
+            min_rsa_key_size: 2048,
+            allow_sha1: false,
+            require_quantum_resistant: false,
+        }
+    }
+
+    pub fn set_policy(&mut self, policy: CryptoPolicyLevel) {
+        match policy {
+            CryptoPolicyLevel::Legacy => {
+                self.min_rsa_key_size = 1024;
+                self.allow_sha1 = true;
+                self.require_quantum_resistant = false;
+            }
+            CryptoPolicyLevel::Default => {
+                self.min_rsa_key_size = 2048;
+                self.allow_sha1 = false;
+                self.require_quantum_resistant = false;
+            }
+            CryptoPolicyLevel::Future => {
+                self.min_rsa_key_size = 3072;
+                self.allow_sha1 = false;
+                self.require_quantum_resistant = true;
+            }
+            CryptoPolicyLevel::Fips => {
+                self.min_rsa_key_size = 2048;
+                self.allow_sha1 = false;
+                self.require_quantum_resistant = true;
+            }
+        }
+        self.current_policy = policy;
+    }
+
+    pub fn validate_cipher_suite(&self, cipher: &str, rsa_bits: usize) -> bool {
+        if rsa_bits < self.min_rsa_key_size {
+            return false;
+        }
+        if cipher.contains("SHA1") && !self.allow_sha1 {
+            return false;
+        }
+        if self.require_quantum_resistant && !cipher.contains("Kyber") && !cipher.contains("Dilithium") {
+            return false;
+        }
+        true
+    }
+}
+
+/// Fedora Silverblue / Atomic Desktop rpm-ostree Staging and Layering Engine
+/// Manages atomic filesystem trees, layered RPM overlays, and system rollbacks.
+pub struct FedoraSilverblueRpmOstreeEngine {
+    pub active_commit: String,
+    pub staged_commit: Option<String>,
+    pub layered_packages: Vec<String>,
+    pub pending_reboot: bool,
+}
+
+impl FedoraSilverblueRpmOstreeEngine {
+    pub fn new(initial_commit: &str) -> Self {
+        FedoraSilverblueRpmOstreeEngine {
+            active_commit: initial_commit.to_string(),
+            staged_commit: None,
+            layered_packages: Vec::new(),
+            pending_reboot: false,
+        }
+    }
+
+    pub fn stage_upgrade(&mut self, new_commit: &str) {
+        self.staged_commit = Some(new_commit.to_string());
+        self.pending_reboot = true;
+    }
+
+    pub fn overlay_layer_package(&mut self, pkg: &str) {
+        if !self.layered_packages.contains(&pkg.to_string()) {
+            self.layered_packages.push(pkg.to_string());
+            self.pending_reboot = true;
+        }
+    }
+
+    pub fn apply_staged_deployment(&mut self) -> Result<String, &'static str> {
+        if let Some(staged) = self.staged_commit.take() {
+            let previous = self.active_commit.clone();
+            self.active_commit = staged;
+            self.pending_reboot = false;
+            Ok(format!("Successfully deployed commit {}. Previous: {}", self.active_commit, previous))
+        } else if self.pending_reboot {
+            self.pending_reboot = false;
+            Ok(format!("Re-assembled tree with layered packages: {:?}", self.layered_packages))
+        } else {
+            Err("No staged deployment or overlay changes pending")
+        }
+    }
+
+    pub fn rollback_deployment(&mut self, previous_commit: &str) {
+        self.active_commit = previous_commit.to_string();
+        self.staged_commit = None;
+        self.pending_reboot = false;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1435,5 +1555,47 @@ mod tests {
         let res = installer.execute_automated_installation().unwrap();
         assert!(res.contains(" Automated OS provisioning completed"));
         assert!(installer.installation_successful);
+    }
+
+    #[test]
+    fn test_fedora_crypto_policies_engine() {
+        let mut engine = FedoraCryptoPoliciesEngine::new();
+        assert_eq!(engine.current_policy, CryptoPolicyLevel::Default);
+        assert!(engine.validate_cipher_suite("ECDHE-RSA-AES256-GCM-SHA384", 2048));
+        assert!(!engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 2048)); // SHA1 disabled in DEFAULT
+
+        // Switch to LEGACY
+        engine.set_policy(CryptoPolicyLevel::Legacy);
+        assert!(engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 1024));
+
+        // Switch to FUTURE
+        engine.set_policy(CryptoPolicyLevel::Future);
+        assert!(!engine.validate_cipher_suite("ECDHE-RSA-AES256-GCM-SHA384", 2048)); // Needs RSA >= 3072 & Kyber/Dilithium
+        assert!(engine.validate_cipher_suite("Kyber1024-Dilithium5-AES256-SHA384", 4096));
+    }
+
+    #[test]
+    fn test_fedora_silverblue_rpm_ostree_engine() {
+        let mut ostree = FedoraSilverblueRpmOstreeEngine::new("commit-v1.0.0");
+        assert_eq!(ostree.active_commit, "commit-v1.0.0");
+        assert!(!ostree.pending_reboot);
+
+        ostree.stage_upgrade("commit-v1.1.0");
+        assert!(ostree.pending_reboot);
+
+        let res = ostree.apply_staged_deployment().unwrap();
+        assert!(res.contains("commit-v1.1.0"));
+        assert_eq!(ostree.active_commit, "commit-v1.1.0");
+        assert!(!ostree.pending_reboot);
+
+        // Layering package
+        ostree.overlay_layer_package("htop");
+        assert!(ostree.pending_reboot);
+        assert_eq!(ostree.layered_packages.len(), 1);
+
+        // Rollback
+        ostree.rollback_deployment("commit-v1.0.0");
+        assert_eq!(ostree.active_commit, "commit-v1.0.0");
+        assert!(!ostree.pending_reboot);
     }
 }
