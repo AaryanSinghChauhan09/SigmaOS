@@ -120,3 +120,6 @@ pub use linux_bsd_inspirations::{
     GpuSwitchMode, Hammer2PfsClusterQuorumEngine, PfsNodeVote, HardenedBsdPaxGuardEngine,
     PaxViolationType, PaxViolationLog,
 };
+
+pub mod universal_distro_super_matrix;
+pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
