@@ -217,6 +217,6 @@ mod tests {
     fn test_active_package_count() {
         let mut engine = SovereignPackageSnapshotRollbackEngine::new();
         engine.install_package_record("bash", "5.2", "chk1", vec!["/bin/bash".to_string()]);
-        assert_eq!(engine.active_package_count(), 1);
+        assert_eq!(engine.active_package_count(), 3); // sigma-base + sigma-libc + bash
     }
 }

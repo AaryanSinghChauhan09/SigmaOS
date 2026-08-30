@@ -78,6 +78,12 @@ mod missing_distro_innovations;
 mod linux_bsd_inspirations;
 #[path = "../src/compatibility/community_foundation.rs"]
 mod community_foundation;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
 
 use bsd_compat::*;
 
@@ -1034,4 +1040,28 @@ fn test_new_kernel_subsystem_innovations_inspection() {
     assert_eq!(pool.free_frame_pfns.len(), 15);
     pool.free_page_frame(frame_pfn);
     assert_eq!(pool.free_frame_pfns.len(), 16);
+}
+
+#[test]
+fn test_sovereign_distro_dominance_suite_inspection() {
+    use sovereign_distro_dominance::{
+        SovereignDistroDominanceSuite, MicrovmState,
+    };
+
+    let mut suite = SovereignDistroDominanceSuite::new();
+
+    // 1. Nix / Guix Zero-Copy Package Store
+    let pkg_hash = suite.nix_store.add_package("libcrypto", "3.1.0", vec![], b"BINARY_PAYLOAD_CRYPTO");
+    assert!(suite.nix_store.zero_copy_read_slice(&pkg_hash).is_some());
+
+    // 2. MicroVM Hypervisor Gateway
+    let vm_id = suite.microvm_gateway.launch_microvm("micro-worker-01", 2, 1024, "eth0", "/dev/vdb");
+    assert_eq!(vm_id, 1);
+    assert_eq!(suite.microvm_gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Running);
+
+    // 3. PQC WireGuard VPN Engine
+    suite.pqc_vpn.bring_up();
+    suite.pqc_vpn.add_peer("datacenter-east", "10.100.0.1", &["10.100.0.0/16"]);
+    assert!(suite.pqc_vpn.transmit_pqc_packet("datacenter-east", 512).is_ok());
+    assert_eq!(suite.pqc_vpn.peers.get("datacenter-east").unwrap().tx_bytes, 512);
 }
