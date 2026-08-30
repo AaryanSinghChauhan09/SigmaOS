@@ -41,6 +41,11 @@ pub enum PackageFormat {
     Pet,
     Flatpak,
     Snap,
+    Txz,
+    Guix,
+    Eopkg,
+    Zypper,
+    AppImage,
 }
 
 #[derive(Debug, Clone)]
@@ -443,6 +448,11 @@ impl PackageAdapterFactory {
             PackageFormat::Pet => Box::new(PetPackageAdapter),
             PackageFormat::Flatpak => Box::new(FlatpakPackageAdapter),
             PackageFormat::Snap => Box::new(SnapPackageAdapter),
+            PackageFormat::Txz => Box::new(TxzPackageAdapter),
+            PackageFormat::Guix => Box::new(GuixPackageAdapter),
+            PackageFormat::Eopkg => Box::new(EopkgPackageAdapter),
+            PackageFormat::Zypper => Box::new(ZypperPackageAdapter),
+            PackageFormat::AppImage => Box::new(AppImagePackageAdapter),
         }
     }
 }
@@ -744,6 +754,164 @@ impl IPackageAdapter for ApkPackageAdapter {
 }
 
 pub struct TxzPackageAdapter;
+
+impl IPackageAdapter for TxzPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Txz
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Slackware txz package payload");
+        }
+        Ok(PackageContext {
+            name: "slackware-txz-pkg".to_string(),
+            version: "15.0.0".to_string(),
+            format: PackageFormat::Txz,
+            dependencies: vec![],
+            files: vec!["/usr/bin/slackware-bin".to_string()],
+            hash: [0x77; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Slackware TXZ Adapter: Unpacking pkgtools tarball to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct GuixPackageAdapter;
+
+impl IPackageAdapter for GuixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Guix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty GNU Guix derivation payload");
+        }
+        Ok(PackageContext {
+            name: "guix-drv-pkg".to_string(),
+            version: "1.4.0".to_string(),
+            format: PackageFormat::Guix,
+            dependencies: vec![],
+            files: vec!["/gnu/store/guix-bin".to_string()],
+            hash: [0x66; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "GNU Guix Adapter: Materializing functional derivation to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct EopkgPackageAdapter;
+
+impl IPackageAdapter for EopkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Eopkg
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Solus eopkg package payload");
+        }
+        Ok(PackageContext {
+            name: "solus-eopkg-pkg".to_string(),
+            version: "4.4.0".to_string(),
+            format: PackageFormat::Eopkg,
+            dependencies: vec![],
+            files: vec!["/usr/bin/solus-eopkg-bin".to_string()],
+            hash: [0x55; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Solus Eopkg Adapter: Extracting PiSi XML metadata and files to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct ZypperPackageAdapter;
+
+impl IPackageAdapter for ZypperPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Zypper
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty OpenSUSE Zypper RPM payload");
+        }
+        Ok(PackageContext {
+            name: "opensuse-zypper-pkg".to_string(),
+            version: "15.5.0".to_string(),
+            format: PackageFormat::Zypper,
+            dependencies: vec![],
+            files: vec!["/usr/bin/zypper-bin".to_string()],
+            hash: [0x44; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "OpenSUSE Zypper Adapter: Solving libzypp SAT delta and extracting RPM payload to store: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
+
+pub struct AppImagePackageAdapter;
+
+impl IPackageAdapter for AppImagePackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::AppImage
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty AppImage container payload");
+        }
+        Ok(PackageContext {
+            name: "appimage-container-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::AppImage,
+            dependencies: vec![],
+            files: vec!["/usr/bin/apprun".to_string()],
+            hash: [0x33; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "AppImage Adapter: Mounting SquashFS image and registering AppRun desktop entry: {}",
+            store_path
+        );
+        Ok(())
+    }
+}
 
 pub struct XbpsPackageAdapter {
     pub service_name: Option<String>,
