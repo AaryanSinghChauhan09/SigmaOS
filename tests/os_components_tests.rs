@@ -62,6 +62,8 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
+#[path = "../src/compatibility/antix.rs"]
+mod antix_compat;
 
 use pipes::Pipe;
 use unveil::{UnveilManager, UnveilPermission};
@@ -768,4 +770,36 @@ fn test_device_manager_and_simple_device() {
     assert_eq!(id, 42);
     let registered_dev = mgr.get_device(42).unwrap();
     assert_eq!(registered_dev.name(), b"sovereign_nvme_drive");
+}
+
+#[test]
+fn test_antix_linux_parity_and_lightweight_init() {
+    use antix_compat::{
+        AntiXControlCentre, AntiXInitSwitcher, AntiXInitSystem, AntiXPersistenceManager,
+        AntiXPersistenceMode, AntixCliToolsSuite, AntixKernelUpdater, AntixPackageInstallerShim,
+        CliTool, KernelVariant, LightweightApp,
+    };
+
+    let mut switcher = AntiXInitSwitcher::new(AntiXInitSystem::Runit);
+    let process_id = switcher.dispatch_fast_init_process("runsvdir").unwrap();
+    assert_eq!(process_id, 1);
+
+    let mut pm = AntiXPersistenceManager::new(AntiXPersistenceMode::HomePersistence);
+    assert!(pm.mount_overlay());
+    pm.save_state_snapshot(1024);
+    assert_eq!(pm.sync_ram_overlay_to_disk().unwrap(), 1024);
+
+    let mut cc = AntiXControlCentre::new();
+    let ram_msg = cc.apply_antix_64mb_ram_guard(64);
+    assert!(ram_msg.contains("64MB RAM constraint detected"));
+
+    let pkg_msg = AntixPackageInstallerShim::install_app(LightweightApp::DilloBrowser);
+    assert!(pkg_msg.contains("Dillo"));
+
+    let cli_msg = AntixCliToolsSuite::execute_cli_tool(CliTool::CliApti);
+    assert!(cli_msg.contains("cli-apti"));
+
+    let kernel_updater = AntixKernelUpdater::new();
+    let k_msg = kernel_updater.switch_kernel_variant(KernelVariant::Kernel486NonPae);
+    assert!(k_msg.contains("non-PAE"));
 }
