@@ -491,7 +491,7 @@ mod tests {
 
         // Everything engine instant index search verification
         let mut indexer = EverythingSearchEngine::new();
-        indexer.index_directory(str::new("/usr/bin"));
+        indexer.index_directory("/usr/bin");
         let results = indexer.query_everything("kernel_signing_key.pem");
         assert_eq!(results.len(), 1);
 

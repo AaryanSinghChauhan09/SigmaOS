@@ -450,6 +450,29 @@ impl<'a, K, V> Iterator for BTreeMapIterMut<'a, K, V> {
     }
 }
 
+pub struct IntoIter<K, V> {
+    map: BTreeMap<K, V>,
+}
+
+impl<K, V> Iterator for IntoIter<K, V> {
+    type Item = (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.map.capacity == 0 || self.map.buckets.is_empty() {
+            return None;
+        }
+        for bucket in self.map.buckets.iter_mut() {
+            if let Some(ref mut entries) = bucket {
+                if let Some((k, v)) = entries.pop() {
+                    self.map.len -= 1;
+                    return Some((k, v));
+                }
+            }
+        }
+        None
+    }
+}
+
 impl<'a, K, V> IntoIterator for &'a BTreeMap<K, V>
 where
     K: Eq + Hash,

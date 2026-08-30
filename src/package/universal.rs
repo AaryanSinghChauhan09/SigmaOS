@@ -7,11 +7,7 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-
-#[cfg(test)]
-use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

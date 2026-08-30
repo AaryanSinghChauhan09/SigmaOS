@@ -4,11 +4,7 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-
-#[cfg(test)]
-use std::collections::HashMap;
 
 /// Datatype enumeration for tabular data columns
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

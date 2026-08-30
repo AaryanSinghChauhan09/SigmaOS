@@ -9,17 +9,9 @@
 //! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
 extern crate alloc;
 
-#[cfg(not(test))]
-use crate::klib::{HashMap, Vec};
-#[cfg(test)]
 use crate::klib::HashMap;
-
-#[cfg(not(test))]
-#[cfg(not(test))]
 use alloc::string::{String, ToString};
-
-#[cfg(test)]
-use alloc::string::ToString;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
@@ -403,7 +395,7 @@ impl HardenedSyscallDispatcher {
 
     /// Verifies if the requested syscall category is allowed under the process's active pledges
     pub fn check_pledge(&self, pid: u64, sys_nr: u32) -> bool {
-        let pledges = match self.process_pledges.get(&pid) {
+        let pledges: &Vec<PledgePromise> = match self.process_pledges.get(&pid) {
             Some(p) => p,
             None => return true, // No pledge restrictions applied
         };

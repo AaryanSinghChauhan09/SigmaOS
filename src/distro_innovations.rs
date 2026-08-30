@@ -296,7 +296,7 @@ impl DebianUnattendedUpgradesEngine {
 }
 
 #[cfg(test)]
-mod tests {
+mod debian_tests {
     use super::*;
 
     #[test]
