@@ -1,10 +1,17 @@
+extern crate alloc;
+
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
+use alloc::vec;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -2,7 +2,13 @@
 // Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
 // and execution over standard in-kernel maps.
 
+extern crate alloc;
+
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
+
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
