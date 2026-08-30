@@ -101,9 +101,8 @@ pub use ready_to_use::{
 
 pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
-    BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
-    SmartOsZoneEngine,
+    BedrockStratum, BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig, SmartOsZoneEngine,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine,
 };
 
 pub use linux_bsd_inspirations::{
@@ -116,6 +115,7 @@ pub use linux_bsd_inspirations::{
     SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
     FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
     SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
+    GuixDerivationEngine, ShepherdServiceManager,
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
     GpuSwitchMode, Hammer2PfsClusterQuorumEngine, PfsNodeVote, HardenedBsdPaxGuardEngine,
