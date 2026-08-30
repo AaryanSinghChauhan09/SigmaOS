@@ -2,9 +2,9 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code, non_snake_case)]
 
-/// SigmaOS: SovereignEditionBuilder.rs
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
+// SigmaOS: SovereignEditionBuilder.rs
+// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+// All types hand-defined. OOP via struct + impl + trait patterns.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -82,9 +82,7 @@ impl EditionPackage {
     pub fn new(name_str: &[u8], required: bool) -> Self {
         let mut name = [0u8; 48];
         let len = name_str.len().min(47);
-        for i in 0..len {
-            name[i] = name_str[i];
-        }
+        name[..len].copy_from_slice(&name_str[..len]);
         Self { name, required }
     }
 
@@ -119,15 +117,11 @@ impl Edition {
     ) -> Self {
         let mut name = [0u8; 48];
         let name_len = name_str.len().min(47);
-        for i in 0..name_len {
-            name[i] = name_str[i];
-        }
+        name[..name_len].copy_from_slice(&name_str[..name_len]);
 
         let mut make_target = [0u8; 32];
         let make_len = make_str.len().min(31);
-        for i in 0..make_len {
-            make_target[i] = make_str[i];
-        }
+        make_target[..make_len].copy_from_slice(&make_str[..make_len]);
 
         Self {
             id,
@@ -269,36 +263,61 @@ impl EditionTarget {
     }
 }
 
+impl Default for EditionTarget {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 static mut INSTANCE: EditionTarget = EditionTarget::new();
 
+/// # Safety
+/// Standard C FFI init function
 #[no_mangle]
+#[allow(static_mut_refs)]
 pub unsafe extern "C" fn init() {
     INSTANCE.init();
 }
 
+/// # Safety
+/// Standard C FFI configuration function
 #[no_mangle]
+#[allow(static_mut_refs)]
 pub unsafe extern "C" fn setTorDefault() {
     INSTANCE.setTorDefault(1, true);
 }
 
+/// # Safety
+/// Standard C FFI configuration function
 #[no_mangle]
+#[allow(static_mut_refs)]
 pub unsafe extern "C" fn setMinimalGUI() {
     INSTANCE.setMinimalGUI(1, true);
 }
 
+/// # Safety
+/// Standard C FFI status printer
 #[no_mangle]
 pub unsafe extern "C" fn printStatus() {}
 
+/// # Safety
+/// Standard C FFI edition init function
 #[no_mangle]
+#[allow(static_mut_refs)]
 pub unsafe extern "C" fn edition_init() {
     INSTANCE.init();
 }
 
+/// # Safety
+/// Standard C FFI edition build function
 #[no_mangle]
+#[allow(static_mut_refs)]
 pub unsafe extern "C" fn edition_build() {
     let _ = INSTANCE.buildEdition(1);
 }
 
+/// # Safety
+/// Standard C FFI edition status function
 #[no_mangle]
 pub unsafe extern "C" fn edition_status() {}
 

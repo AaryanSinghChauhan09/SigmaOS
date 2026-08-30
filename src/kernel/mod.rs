@@ -46,7 +46,11 @@ pub mod vmm_paging;
 pub mod module_loader;
 pub mod performance;
 
-pub use architecture::*;
+pub use architecture::{
+    AArch64Hal, ArchitectureEngine, HardwareException, InstructionCyclePhase, InterruptClass,
+    IoWaitProfile, Irql, LookasideList, MemoryDescriptorList, Pcb, PoolType, ProcessorInitState,
+    RiscV64Hal, SyscallHandler, SystemServiceDescriptorTable, Tcb, X86_64Hal,
+};
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;

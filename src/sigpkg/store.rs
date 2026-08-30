@@ -26,7 +26,7 @@ use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 /// PathBuf-like alias using String for no_std compatibility
-type PathBuf = alloc::string::String;
+pub type PathBuf = alloc::string::String;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
