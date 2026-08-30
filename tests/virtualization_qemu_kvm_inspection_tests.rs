@@ -1,6 +1,10 @@
 // SigmaOS Virtualization, QEMU & KVM Inspection Unit Test Suite
 // Inspired by QEMU, KVM, Firecracker, and Cloud-Hypervisor test harnesses.
 
+mod klib {
+    pub use sigmaos::klib::*;
+}
+
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 

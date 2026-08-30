@@ -2,7 +2,6 @@
 // Conforms to Sovereign Driver Framework (SDF) and PeripheralDevice interface
 
 use core::ptr::{read_volatile, write_volatile};
-use crate::driver::framework::{SdfDriver, DeviceId, SdfResult};
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use crate::security::CapabilityToken;
 
@@ -95,32 +94,32 @@ impl E1000Driver {
     }
 
     pub unsafe fn read_reg(&self, offset: u32) -> u32 {
-        if self.mmio_base == 0 {
-            return 0;
+        #[cfg(target_os = "none")]
+        {
+            if self.mmio_base == 0 {
+                return 0;
+            }
+            read_volatile((self.mmio_base + offset as usize) as *const u32)
         }
-        read_volatile((self.mmio_base + offset as usize) as *const u32)
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = offset;
+            0
+        }
     }
 
     pub unsafe fn write_reg(&self, offset: u32, value: u32) {
-        if self.mmio_base == 0 {
-            return;
+        #[cfg(target_os = "none")]
+        {
+            if self.mmio_base == 0 {
+                return;
+            }
+            write_volatile((self.mmio_base + offset as usize) as *mut u32, value);
         }
-        write_volatile((self.mmio_base + offset as usize) as *mut u32, value);
-    }
-}
-
-impl SdfDriver for E1000Driver {
-    fn probe(dev: &DeviceId) -> bool {
-        dev.vendor == 0x8086 && dev.device == 0x100E // Intel e1000 PCI ID
-    }
-
-    fn init(&mut self) -> SdfResult<()> {
-        self.power_state = PowerState::On;
-        Ok(())
-    }
-
-    fn shutdown(&mut self) {
-        self.power_state = PowerState::Off;
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = (offset, value);
+        }
     }
 }
 

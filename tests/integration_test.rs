@@ -16,7 +16,7 @@ use sigmaos::compatibility::{
     ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
     SyscallAbi, TribeInstaller, TtsSynthesizer, UnifiedAppStore, WorkloadOptimizer,
     WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 use sigmaos::drivers::{
@@ -26,8 +26,8 @@ use sigmaos::drivers::{
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+    SocketStatsCommand,     SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_UFW_RULE,
 };
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
@@ -44,10 +44,11 @@ use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE}
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
-    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, SandboxPolicy,
+    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
     SIGNATURE_LEN,
 };
+use sigmaos::security::parrot::SandboxPolicy;
 
 use sigmaos::kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
@@ -72,11 +73,11 @@ mod tests {
     fn test_legacy_personality_and_syscall_adaptation_flow() {
         // Step 1: Initialize the multi-persona VM
         let vm = KernelPersonaVM::new();
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_6_x);
+        assert_eq!(vm.get_persona(), KernelPersona::Linux6X);
 
         // Hot-swap kernel persona to 2.6 for legacy application expectations
-        vm.hot_swap_persona(KernelPersona::Linux_2_6);
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_2_6);
+        vm.hot_swap_persona(KernelPersona::Linux2_6);
+        assert_eq!(vm.get_persona(), KernelPersona::Linux2_6);
 
         // Step 2: Use the Binary Compatibility Matrix to decode and translate syscall expectations
         let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi_32);
@@ -84,7 +85,7 @@ mod tests {
         assert_eq!(translated_sys, 1005);
 
         // Step 3: Verify the API Timeline Manager parameter mappings
-        let timeline = APITimelineManager::new(KernelPersona::Linux_2_6);
+        let timeline = APITimelineManager::new(KernelPersona::Linux2_6);
         let cleaned_param = timeline.map_syscall_params(0x0000111100002222);
         assert_eq!(cleaned_param, 0x00002222);
     }
@@ -218,17 +219,17 @@ mod tests {
 
         // Case 1: Primary target exists
         let res1 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+            link1.resolve_symlink(KernelPersona::Linux6X, true, &[false, false], &rule, None);
         assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
 
         // Case 2: Primary target broken, heals to fallback index 1
         let res2 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+            link1.resolve_symlink(KernelPersona::Linux6X, false, &[false, true], &rule, None);
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning
         let res3 = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            KernelPersona::Linux6X,
             false,
             &[false, false],
             &rule,
@@ -240,7 +241,7 @@ mod tests {
         let mut loop_err = Ok("");
         for _ in 0..12 {
             loop_err = link1.resolve_symlink(
-                KernelPersona::Linux_6_x,
+                KernelPersona::Linux6X,
                 true,
                 &[false, false],
                 &rule,
@@ -259,7 +260,7 @@ mod tests {
         let legacy_rule = LegacyLinuxRule;
         // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
         let res_legacy = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            KernelPersona::Linux6X,
             true,
             &[false, false],
             &legacy_rule,
@@ -337,7 +338,7 @@ mod tests {
     #[test]
     fn test_antix_linux_parity() {
         // Test SysV-parity MicroServices inside AntixInitManager
-        let init = AntixInitManager::new();
+        let mut init = AntixInitManager::new();
         assert_eq!(init.services[0].get_state(), MicroServiceState::Stopped);
         init.boot_systemd_free();
         assert_eq!(init.services[0].get_state(), MicroServiceState::Running);
@@ -353,7 +354,7 @@ mod tests {
         assert_eq!(profiler.get_profile(), AntixDesktopProfile::JWM);
 
         // Test Control Center Legacy configuration coordinator
-        let control = AntixControlCenter::new();
+        let mut control = AntixControlCenter::new();
         control.auto_configure_legacy_hardware();
 
         // Test Aggressive Memory Cache Trimmer
@@ -474,8 +475,10 @@ mod tests {
 
         // Test ping PingCommand
         let ping_cmd = PingCommand::new();
-        let latency = ping_cmd.ping_host(0xC0A80101, 3);
-        assert_eq!(latency, 8);
+        let stats = ping_cmd.ping_host(0xC0A80101, 3);
+        assert_eq!(stats.transmitted, 3);
+        assert!(stats.received >= 3);
+        assert!(stats.avg_rtt_ms > 0.0);
         assert_eq!(
             ping_cmd
                 .packets_sent

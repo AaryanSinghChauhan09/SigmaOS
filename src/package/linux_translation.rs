@@ -45,7 +45,7 @@ impl PackageTranslationUdf for GenericLinuxTranslationUdf {
 pub trait LinuxDriverPackageTranslator {
     fn source_format(&self) -> PackageFormat;
     fn package_name(&self) -> &'static str;
-    fn translate_to_driver(&self) -> DriverID;
+    fn translate_to_driver(&self) -> SimpleDriver;
 }
 
 /// Concrete .deb (Debian/Ubuntu/Parrot/Mint) package translator
@@ -64,13 +64,13 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> DriverID {
+    fn translate_to_driver(&self) -> SimpleDriver {
         println!(
             "PackageTranslator: Converting Debian Package '{}' ({} bytes) to SigmaOS system driver.",
             self.name, self.payload_size
         );
-        // Return a simple driver ID for the translated package
-        9901
+        // Return a provisioned driver for the translated package
+        SimpleDriver::new(9901, DriverType::Net)
     }
 }
 
@@ -89,7 +89,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> DriverID {
+    fn translate_to_driver(&self) -> SimpleDriver {
         println!(
             "PackageTranslator: Processing RPM Package '{}'. Verifying header layout signatures...",
             self.name
@@ -99,7 +99,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        9902
+        SimpleDriver::new(9902, DriverType::Block)
     }
 }
 
@@ -118,7 +118,7 @@ impl LinuxDriverPackageTranslator for PacmanPackageDriverTranslator {
         self.name
     }
 
-    fn translate_to_driver(&self) -> DriverID {
+    fn translate_to_driver(&self) -> SimpleDriver {
         println!(
             "PackageTranslator: Mapping Arch Linux Package '{}' to native driver layer.",
             self.name
@@ -126,7 +126,7 @@ impl LinuxDriverPackageTranslator for PacmanPackageDriverTranslator {
         if self.has_aur_recipes {
             println!("  -> Found embedded AUR building recipes. Executing clean compile sandbox.");
         }
-        9903
+        SimpleDriver::new(9903, DriverType::Char)
     }
 }
 

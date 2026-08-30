@@ -40,6 +40,8 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub mod app;
+pub mod auth;
 pub use process::{
     ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
     JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
@@ -96,6 +98,7 @@ pub mod hardware {
     pub mod compatibility;
     pub mod win32;
 }
+pub mod drivers;
 pub mod init;
 pub mod ml;
 pub mod performance;
@@ -145,7 +148,3 @@ pub use distro_inspirations::{
 pub use compatibility::fedora::{
     CryptoPolicyLevel, FedoraCryptoPoliciesEngine, FedoraSilverblueRpmOstreeEngine,
 };
-
-pub use crate::access as auth;
-
-pub use crate::desktop as app;

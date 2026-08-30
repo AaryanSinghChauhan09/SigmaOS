@@ -102,7 +102,7 @@ pub use gap_closure::{
     FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
     PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
     HidGraphicsDriver, AiTaskOrchestrator, SovereignDistroAbsorptionEngine,
-    OpenSourceCompetitorOrchestrator, TargetDistroFamily,
+    OpenSourceCompetitorOrchestrator, TargetDistroFamily, ZorinAppearanceSwitcher,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,
@@ -211,5 +211,24 @@ pub use open_source_dominance::{
     InspirationFeatureMatrix, InspirationFeature, InspirationPackageIntegrator,
     InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
 };
+
+pub use canonical::{
+    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BsdJailSandbox, CloudOrchestrator,
+    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer, ContinuityCoordinator,
+    DesktopMode, EcosystemSnapshot, FlatpakApp, HandoffTask, LanguageTranslationCatalog,
+    LocaleManager, ReleaseGovernanceCouncil, ReproducibleBuildVerifier, SigmaContainer, SnapshotManager,
+    SuiteRegistry, TtsSynthesizer, UnifiedAppStore, DistroReleaseChannel, BrailleMatrix,
+};
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, KapudanAssistant, InstallerStep,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
+};
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DriverBridge, GraphicsBridge, KernelPersona,
+    KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge,
+    SyscallAbi, WorkloadOptimizer, WorkloadProfile, DiscontinuedFS, GLOBAL_PERSONA_VM,
+    GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+};
+pub use gap_closure::{};
 
 

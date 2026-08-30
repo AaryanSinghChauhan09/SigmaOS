@@ -1,11 +1,10 @@
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
+use core::sync::atomic::{AtomicU8, AtomicU32, Ordering};
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.
-
-use core::sync::atomic::{AtomicU8, Ordering};
 
 // ==========================================
 // 1. Systemd-Free Init Manager (Runit/SysV Parity)
@@ -22,7 +21,7 @@ pub enum AntiXInitSystem {
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AntiXServiceState {
+pub enum MicroServiceState {
     Stopped = 0,
     Starting = 1,
     Running = 2,
@@ -31,16 +30,34 @@ pub enum AntiXServiceState {
 
 /// Lightweight service entry
 #[derive(Debug, Clone)]
-pub struct AntiXService {
+pub struct MicroService {
     pub name: String,
     pub init_type: AntiXInitSystem,
-    pub state: AntiXServiceState,
+    pub state: MicroServiceState,
+}
+
+impl MicroService {
+    pub fn new(name: &str, init_type: AntiXInitSystem) -> Self {
+        MicroService {
+            name: name.to_string(),
+            init_type,
+            state: MicroServiceState::Stopped,
+        }
+    }
+
+    pub fn get_state(&self) -> MicroServiceState {
+        self.state
+    }
+
+    pub fn stop(&mut self) {
+        self.state = MicroServiceState::Stopped;
+    }
 }
 
 /// Multi-init system switcher
 pub struct AntiXInitSwitcher {
     pub active_init: AntiXInitSystem,
-    pub services: Vec<AntiXService>,
+    pub services: Vec<MicroService>,
 }
 
 impl AntiXInitSwitcher {
@@ -52,17 +69,17 @@ impl AntiXInitSwitcher {
     }
 
     pub fn register_service(&mut self, name: &str) {
-        self.services.push(AntiXService {
+        self.services.push(MicroService {
             name: name.to_string(),
             init_type: self.active_init,
-            state: AntiXServiceState::Stopped,
+            state: MicroServiceState::Stopped,
         });
     }
 
     pub fn start_service(&mut self, name: &str) -> bool {
         for service in &mut self.services {
             if service.name == name {
-                service.state = AntiXServiceState::Running;
+                service.state = MicroServiceState::Running;
                 return true;
             }
         }
@@ -72,7 +89,7 @@ impl AntiXInitSwitcher {
     pub fn stop_service(&mut self, name: &str) -> bool {
         for service in &mut self.services {
             if service.name == name {
-                service.state = AntiXServiceState::Stopped;
+                service.state = MicroServiceState::Stopped;
                 return true;
             }
         }
@@ -211,6 +228,11 @@ impl AntiXControlCentre {
             "antiX-ControlCentre: Standard memory profile active."
         }
     }
+
+    pub fn auto_configure_legacy_hardware(&mut self) {
+        self.low_mem_mode = true;
+        self.power_save_active = true;
+    }
 }
 
 impl Default for AntiXControlCentre {
@@ -219,32 +241,86 @@ impl Default for AntiXControlCentre {
     }
 }
 
-pub struct AntixInitManager;
+pub struct AntixInitManager {
+    pub services: Vec<MicroService>,
+}
 impl AntixInitManager {
-    pub const fn new() -> Self {
-        Self
+    pub fn new() -> Self {
+        Self {
+            services: vec![
+                MicroService::new("syslogd", AntiXInitSystem::Runit),
+                MicroService::new("getty", AntiXInitSystem::Runit),
+            ],
+        }
+    }
+
+    pub fn boot_systemd_free(&mut self) {
+        for service in &mut self.services {
+            service.state = MicroServiceState::Running;
+        }
     }
 }
 
-pub struct AntixDesktopProfiler;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopProfile {
+    IceWM,
+    JWM,
+}
+
+pub struct AntixDesktopProfiler {
+    pub active_profile: AtomicU8,
+}
 impl AntixDesktopProfiler {
     pub const fn new() -> Self {
-        Self
+        Self {
+            active_profile: AtomicU8::new(0),
+        }
+    }
+
+    pub fn get_profile(&self) -> DesktopProfile {
+        match self.active_profile.load(Ordering::SeqCst) {
+            0 => DesktopProfile::IceWM,
+            1 => DesktopProfile::JWM,
+            _ => DesktopProfile::IceWM,
+        }
+    }
+
+    pub fn apply_profile(&self, profile: DesktopProfile) {
+        let val = match profile {
+            DesktopProfile::IceWM => 0,
+            DesktopProfile::JWM => 1,
+        };
+        self.active_profile.store(val, Ordering::SeqCst);
     }
 }
 
 pub type AntixControlCenter = AntiXControlCentre;
 
-pub struct LegacyMemoryTrimmer;
+pub struct LegacyMemoryTrimmer {
+    pub trim_aggressiveness: AtomicU8,
+}
 impl LegacyMemoryTrimmer {
     pub const fn new() -> Self {
-        Self
+        Self {
+            trim_aggressiveness: AtomicU8::new(1),
+        }
+    }
+
+    pub fn trim_caches(&self, available_ram_mb: u32) -> usize {
+        let aggressiveness = if available_ram_mb <= 256 {
+            self.trim_aggressiveness.store(10, Ordering::SeqCst);
+            10
+        } else {
+            self.trim_aggressiveness.store(1, Ordering::SeqCst);
+            1
+        };
+        (available_ram_mb as usize) / aggressiveness
     }
 }
 
-pub static GLOBAL_ANTIX_INIT: AntixInitManager = AntixInitManager::new();
+
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
-// pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
+pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();
 pub static GLOBAL_MEMORY_TRIMMER: LegacyMemoryTrimmer = LegacyMemoryTrimmer::new();
 
 // ==========================================
@@ -445,7 +521,7 @@ mod tests {
         let mut switcher = AntiXInitSwitcher::new(AntiXInitSystem::SysVInit);
         let pid = switcher.dispatch_fast_init_process("syslogd").unwrap();
         assert_eq!(pid, 1);
-        assert_eq!(switcher.services[0].state, AntiXServiceState::Running);
+        assert_eq!(switcher.services[0].state, MicroServiceState::Running);
 
         switcher.switch_init_system(AntiXInitSystem::Runit);
         assert_eq!(switcher.active_init, AntiXInitSystem::Runit);

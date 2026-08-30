@@ -1,6 +1,10 @@
 // SigmaOS Algorithm & OS Component Inspection Test Suite
 // Verifies internal kernel algorithms, scheduling models, memory allocators, and security mechanisms.
 
+mod klib {
+    pub use sigmaos::klib::*;
+}
+
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
 

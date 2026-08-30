@@ -411,11 +411,19 @@ impl TtsSynthesizer {
     }
 }
 
-pub struct BrailleMatrix;
+pub struct BrailleMatrix {
+    pub refresh_rate_hz: u32,
+    pub cell_rows: u32,
+    pub cell_columns: u32,
+}
 
 impl BrailleMatrix {
     pub fn new() -> Self {
-        Self
+        Self {
+            refresh_rate_hz: 250,
+            cell_rows: 40,
+            cell_columns: 80,
+        }
     }
 
     pub fn translate_text_to_braille(&self, text: &str) -> Vec<u8> {

@@ -6,6 +6,7 @@ pub mod defragmenter;
 pub mod disk_usage;
 pub mod ext4_ntfs_security;
 pub mod manager;
+pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
 pub use bsd_linux_innovations::*;
@@ -26,3 +27,4 @@ pub use manager::{
 };
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};

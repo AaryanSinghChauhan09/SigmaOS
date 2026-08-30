@@ -2,7 +2,9 @@
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 
-use crate::kernel::KernelPersona;
+use crate::compatibility::{KernelPersona, SyscallAbi};
+use crate::klib::HashMap;
+use alloc::string::{String, ToString};
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -11,7 +13,7 @@ const MAX_FALLBACK_PATHS: usize = 4;
 
 /// User-Defined Resolver Rule (User Defined Functions)
 /// Evaluates custom environmental rules to dynamically point to different directories or versions
-pub trait SymlinkResolverRule {
+pub trait SymlinkResolverRule: Sync {
     fn name(&self) -> &'static str;
     fn evaluate(&self, persona: KernelPersona) -> bool;
 }
@@ -22,7 +24,7 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        persona.name.contains("Linux") || persona.name.contains("linux")
+        persona.name().contains("Linux") || persona.name().contains("linux")
     }
 }
 
@@ -32,7 +34,7 @@ impl SymlinkResolverRule for LegacyLinuxRule {
         "legacy-linux-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        persona.name == "Linux_2_6" || persona.api_version == "2.6"
+        persona.name() == "linux_2_6" || persona.api_version() == 20006
     }
 }
 
@@ -44,12 +46,17 @@ pub struct SmartSymlink {
     pub fallback_count: usize,
     pub self_healing_active: AtomicBool,
     pub resolution_counter: RefCell<usize>,
+    /// Internal environment-context map used to expand `$TOKEN` paths.
+    env_map: HashMap<String, String>,
 }
 
 unsafe impl Sync for SmartSymlink {}
 
 impl SmartSymlink {
-    pub const fn new(name: &'static str, primary_target: &'static str) -> Self {
+    pub fn new(name: &'static str, primary_target: &'static str) -> Self {
+        let mut env_map = HashMap::new();
+        env_map.insert("USER".to_string(), "/home/{user}/libs".to_string());
+        env_map.insert("LANG".to_string(), "/usr/share/locale/{lang}".to_string());
         Self {
             name,
             primary_target,
@@ -57,6 +64,52 @@ impl SmartSymlink {
             fallback_count: 0,
             self_healing_active: AtomicBool::new(true),
             resolution_counter: RefCell::new(0),
+            env_map,
+        }
+    }
+
+    /// Resolves `$TOKEN` style environment variables embedded in a path using the
+    /// internal context map. The `user` and `lang` parameters render the
+    /// `{user}` and `{lang}` placeholders inside the mapped templates.
+    pub fn expand_environment_context(
+        &self,
+        path: &str,
+        user: &str,
+        lang: &str,
+    ) -> String {
+        if let Some(dollar) = path.find('$') {
+            let rest = &path[dollar + 1..];
+            let end = rest
+                .find(|c: char| !(c.is_alphanumeric() || c == '_'))
+                .unwrap_or(rest.len());
+            let token = &rest[..end];
+            if let Some(template) = self.env_map.get(&token.to_string()) {
+                let lang_prefix = lang.split('_').next().unwrap_or(lang);
+                return template
+                    .replace("{user}", user)
+                    .replace("{lang}", lang_prefix);
+            }
+        }
+        path.to_string()
+    }
+
+    /// Returns `true` only when `path` stays inside `sandbox_root` and does not
+    /// attempt to traverse outside of it (rejects `..` and absolute escapes).
+    pub fn is_sandbox_escape_safe(&self, path: &str, sandbox_root: &str) -> bool {
+        if !path.starts_with(sandbox_root) {
+            return false;
+        }
+        if path.contains("..") {
+            return false;
+        }
+        true
+    }
+
+    /// Maps a target syscall ABI to its multiarch library routing path.
+    pub fn resolve_multi_lib_routing(&self, abi: SyscallAbi) -> String {
+        match abi {
+            SyscallAbi::Oabi_32 | SyscallAbi::Eabi_32 => "/lib32/libc.so".to_string(),
+            SyscallAbi::Eabi_64 => "/lib64/libc.so".to_string(),
         }
     }
 

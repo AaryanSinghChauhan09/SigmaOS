@@ -64,6 +64,10 @@ impl KernelPersonaVM {
         }
     }
 
+    pub fn get_persona(&self) -> KernelPersona {
+        self.current_persona.get()
+    }
+
     pub fn hot_swap_persona(&self, persona: KernelPersona) {
         self.current_persona.set(persona);
         self.update_syscall_table(persona);
@@ -256,6 +260,10 @@ impl WorkloadOptimizer {
         Self {
             active_profile: Cell::new(WorkloadProfile::LowMemoryProfile),
         }
+    }
+
+    pub fn get_profile(&self) -> WorkloadProfile {
+        self.active_profile.get()
     }
 
     pub fn apply_workload_tuning(&self, profile: WorkloadProfile) {

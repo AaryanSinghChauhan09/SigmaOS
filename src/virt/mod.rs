@@ -7,9 +7,9 @@ extern crate alloc;
 use crate::klib::{String, ToString, Vec};
 
 #[cfg(feature = "standalone_test")]
-#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
 
 /// Hypervisor type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -193,7 +193,12 @@ impl EnhancedVirtualMachine {
             qcow2_overlay: None,
             vcpus,
             vfio_devices: Vec::new(),
-            virtqueues: vec![VirtqueueRing::new(256), VirtqueueRing::new(256)],
+            virtqueues: {
+                let mut v = Vec::new();
+                v.push(VirtqueueRing::new(256));
+                v.push(VirtqueueRing::new(256));
+                v
+            },
         }
     }
 

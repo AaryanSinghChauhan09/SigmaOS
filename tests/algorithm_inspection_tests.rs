@@ -5,11 +5,10 @@
 // - Machine Learning & Data Science algorithms (K-Means, PCA, Local LLM)
 // - Cryptographic & Security algorithms (Post-Quantum Kyber/Dilithium, Unveil, SELinux)
 
-use sigmaos::ai::{
-    KMeansClustering, LocalLlmWrapper, LocalQuantizationType, PrincipalComponentAnalysis,
-};
+use sigmaos::ai::sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
+use sigmaos::ai::local_llm::{LocalLlmWrapper, QuantizationType};
 use sigmaos::security::selinux::SelinuxEngine;
-use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
+use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermissions};
 use sigmaos::virtualization::kvm_vcpu::{KvmExitCode, KvmVcpu, RAX_HLT_SIGNAL};
 
 #[test]
@@ -28,7 +27,7 @@ fn test_ml_data_science_algorithms_inspection() {
     let reduced = pca.transform(&vec![1.0, 2.0, 3.0, 4.0]);
     assert_eq!(reduced.len(), 2);
 
-    let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", LocalQuantizationType::Q4_K_M);
+    let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", QuantizationType::Q4_K_M);
     let resp = llm.generate_response("system status");
     assert!(resp.contains("100% Sovereign"));
 }
@@ -36,12 +35,12 @@ fn test_ml_data_science_algorithms_inspection() {
 #[test]
 fn test_security_sandboxing_algorithms_inspection() {
     let mut unveil = UnveilManager::new();
-    unveil.unveil("/etc/nginx", "r").unwrap();
+    unveil.unveil(1, "/etc/nginx".to_string(), "r").unwrap();
     assert!(unveil
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
+        .check_access(1, "/etc/nginx/nginx.conf", UnveilPermissions::Read)
         .is_ok());
     assert!(unveil
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
+        .check_access(1, "/etc/nginx/nginx.conf", UnveilPermissions::Write)
         .is_err());
 
     let mut selinux = SelinuxEngine::new();

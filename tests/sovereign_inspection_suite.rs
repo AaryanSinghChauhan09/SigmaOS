@@ -8,6 +8,14 @@
 // - QEMU/KVM Qcow2 image overlays, vCPU context & VirtIO virtqueue ring buffers
 // - Classic OS Algorithms (VirtIO Ballooning, Banker's Algorithm, Sleeping Barber, Ticket Spinlocks, Stack Canaries, Batch Queue)
 
+mod klib {
+    pub use sigmaos::klib::*;
+}
+
+mod sigpkg {
+    pub use sigmaos::sigpkg::*;
+}
+
 #[path = "../src/kernel/pci_scanner.rs"]
 mod pci_scanner;
 

@@ -3,8 +3,17 @@
 
 extern crate alloc;
 
-#[path = "../src/klib/mod.rs"]
-pub mod klib;
+mod klib {
+    pub use sigmaos::klib::*;
+}
+
+mod sigpkg {
+    pub use sigmaos::sigpkg::*;
+}
+
+mod security {
+    pub use sigmaos::security::*;
+}
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
@@ -60,8 +69,6 @@ mod sigma_fs_extended;
 mod epoll;
 #[path = "../src/loader/elf/relocation.rs"]
 mod elf_relocation;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
 #[path = "../src/compatibility/antix.rs"]

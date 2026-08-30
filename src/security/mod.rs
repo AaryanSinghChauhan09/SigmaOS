@@ -1,4 +1,5 @@
 // SigmaOS Security Subsystem
+pub mod defensive_audit;
 pub mod audit;
 pub mod capability;
 pub mod hardening;
@@ -31,7 +32,10 @@ pub use sigma_unveil as unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod parrot;
+pub mod parrot_kali;
 pub mod parrot_linux;
+pub mod parrot_parity;
 pub mod kali_stack;
 
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
@@ -48,7 +52,15 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
 pub use forensics::*;
+pub use parrot::{
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, AnonSurfShunt, AppSandboxEngine,
+    ForensicStorageFilter, RoutingMode,
+};
 pub use kali_stack::{
     KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
     PcapPacketHeader, WifiFrameType,

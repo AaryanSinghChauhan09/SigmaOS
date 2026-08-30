@@ -182,7 +182,7 @@ impl UserManager {
     pub fn initialize(&self) -> Result<(), UserError> {
         let std_path = std::path::Path::new(&self.etc_dir);
         fs::create_dir_all(std_path)
-            .map_err(|_| UserError::InitError(self.etc_dir.clone(), "failed to create etc dir"))?;
+            .map_err(|_| UserError::InitError(self.etc_dir.clone(), "failed to create etc dir".to_string()))?;
         Ok(())
     }
 
@@ -608,7 +608,7 @@ pub enum UserError {
     GroupNotFound(String),
     CannotDeleteRoot,
     SudoPermissionDenied(String, String),
-    InitError(String, std::io::Error),
+    InitError(String, String),
     ReadError(String, std::io::Error),
     WriteError(String, std::io::Error),
 }

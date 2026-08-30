@@ -28,6 +28,8 @@ pub mod next_gen;
 pub mod perplexity;
 pub mod quantization;
 pub mod wandr;
+pub mod local_llm;
+pub mod sigma_data;
 
 pub use agentic_os_runtime::{
     ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,

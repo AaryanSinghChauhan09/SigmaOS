@@ -82,12 +82,12 @@ pub trait AuthService {
 }
 
 pub struct SimpleAuthService {
-    users: Vec<Option<Box<dyn User>>>,
+    users: SovereignVec<Option<Box<dyn User>>>,
     next_id: AtomicUsize,
 }
 
 impl SimpleAuthService {
-    pub fn new() -> Self { SimpleAuthService { users: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self { SimpleAuthService { users: SovereignVec::new(), next_id: AtomicUsize::new(1) } }
 }
 
 impl AuthService for SimpleAuthService {
@@ -204,10 +204,10 @@ impl Default for SovereignSingleUserEngine {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct SovereignVec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+impl<T> SovereignVec<T> {
+    fn new() -> Self { SovereignVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }

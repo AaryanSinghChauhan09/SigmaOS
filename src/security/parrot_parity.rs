@@ -5,6 +5,7 @@ use alloc::format;
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
 use core::cell::Cell;
+use core::sync::atomic::{AtomicUsize, AtomicBool, AtomicU64, Ordering};
 use crate::klib::SigmaString;
 
 /// Routing modes for network traffic
@@ -79,19 +80,26 @@ pub struct AppSandboxEngine {
     pub allow_network: AtomicBool,
     pub allow_raw_sockets: AtomicBool,
     pub allow_filesystem_write: AtomicBool,
+    pub permitted_subpath: &'static str,
+    pub current_policy: Cell<SandboxPolicy>,
 }
 
 unsafe impl Sync for AppSandboxEngine {}
 
 impl AppSandboxEngine {
     pub const fn new() -> Self {
+        let policy = SandboxPolicy {
+            allow_network: false,
+            allow_raw_sockets: false,
+            allow_filesystem_write: false,
+            permitted_subpath: "/sandbox/tmp",
+        };
         AppSandboxEngine {
-            current_policy: Cell::new(SandboxPolicy {
-                allow_network: false,
-                allow_raw_sockets: false,
-                allow_filesystem_write: false,
-                permitted_subpath: "/sandbox/tmp",
-            }),
+            allow_network: AtomicBool::new(false),
+            allow_raw_sockets: AtomicBool::new(false),
+            allow_filesystem_write: AtomicBool::new(false),
+            permitted_subpath: "/sandbox/tmp",
+            current_policy: Cell::new(policy),
         }
     }
 }

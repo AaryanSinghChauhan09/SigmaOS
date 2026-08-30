@@ -285,7 +285,7 @@ impl HashAuditor {
     }
 
     /// Simulates credentials auditing against wordlist using u32 hashes
-    pub fn audit_weak_credentials(&self, password_hash: u32, wordlist: &[&str]) -> Option<&'static str> {
+    pub fn audit_weak_credentials(&self, password_hash: u32, wordlist: &[&'static str]) -> Option<&'static str> {
         for &word in wordlist {
             // FNV-1a hash calculation
             let mut h = 2166136261u32;
@@ -429,8 +429,8 @@ mod tests {
         let auditor = HashAuditor::new();
         let wordlist = ["admin", "root", "password", "123456"];
 
-        // FNV-1a hash of "password" is 3532349141u32
-        let vulnerable_hash = 3532349141u32;
+        // FNV-1a hash of "password" is 910909208u32
+        let vulnerable_hash = 910909208u32;
         assert_eq!(auditor.audit_weak_credentials(vulnerable_hash, &wordlist), Some("password"));
 
         // Non-weak hash

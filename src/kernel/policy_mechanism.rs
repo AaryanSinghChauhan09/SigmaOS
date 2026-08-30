@@ -2,6 +2,8 @@
 // Implements core principles of OS design: Separation of Policy and Mechanism,
 // Protection & Isolation, Optimization for the Common Case, Privilege Levels, and Interrupt Handling.
 
+extern crate alloc;
+use alloc::vec::Vec;
 use crate::security::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -233,5 +235,65 @@ mod tests {
         let prev_ex = ipc.fast_exchange(99);
         assert_eq!(prev_ex, 42);
         assert_eq!(ipc.current_message(), 99);
+    }
+}
+
+pub trait KernelMechanism: Sync {
+    fn name(&self) -> &'static str;
+    fn execute(&self);
+}
+
+pub trait KernelPolicy: Sync {
+    fn name(&self) -> &'static str;
+    fn evaluate(&self) -> bool;
+}
+
+pub trait SovereignMechanism: Sync {
+    fn name(&self) -> &'static str;
+    fn activate(&self);
+}
+
+pub struct AdaptivePolicy {
+    pub mechanism: &'static dyn KernelMechanism,
+    pub policy: &'static dyn KernelPolicy,
+}
+
+impl AdaptivePolicy {
+    pub const fn new(mechanism: &'static dyn KernelMechanism, policy: &'static dyn KernelPolicy) -> Self {
+        Self { mechanism, policy }
+    }
+
+    pub fn apply(&self) {
+        if self.policy.evaluate() {
+            self.mechanism.execute();
+        }
+    }
+}
+
+pub struct PolicyMechanismCoordinator {
+    pub policies: Vec<&'static dyn KernelPolicy>,
+    pub mechanisms: Vec<&'static dyn KernelMechanism>,
+}
+
+impl PolicyMechanismCoordinator {
+    pub const fn new() -> Self {
+        Self {
+            policies: Vec::new(),
+            mechanisms: Vec::new(),
+        }
+    }
+
+    pub fn register_policy(&mut self, policy: &'static dyn KernelPolicy) {
+        self.policies.push(policy);
+    }
+
+    pub fn register_mechanism(&mut self, mechanism: &'static dyn KernelMechanism) {
+        self.mechanisms.push(mechanism);
+    }
+
+    pub fn coordinate(&self) {
+        for mechanism in &self.mechanisms {
+            mechanism.execute();
+        }
     }
 }

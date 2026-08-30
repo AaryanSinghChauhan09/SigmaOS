@@ -16,6 +16,7 @@ pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
 
+pub use media::{AudioChannel, GLOBAL_MEDIA_ENGINE, SigmaMediaEngine};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,

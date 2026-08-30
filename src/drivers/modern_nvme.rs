@@ -90,8 +90,8 @@ impl Default for SmartTelemetry {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct AhciCommandHeader {
     pub opts: u16,
     pub prdtl: u16,
@@ -114,63 +114,6 @@ pub struct AhciCommandHeaderV2 {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AhciCommandHeaderV3 {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
-
-/// AHCI Command Header
-
-/// AHCI Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
-
-/// AHCI Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
-
-/// AHCI Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
-
-/// AHCI Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
-
-/// AHCI Command Header
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct AhciCommandHeader {
     pub opts: u16,
     pub prdtl: u16,
     pub prdbc: u32,
