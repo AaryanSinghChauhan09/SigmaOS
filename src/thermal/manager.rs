@@ -52,6 +52,7 @@ pub trait ThermalSensor {
 pub struct SimpleThermalSensor {
     pub id: SensorID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub temperature: AtomicUsize,
     pub max_temperature: AtomicUsize,
 }
@@ -66,6 +67,7 @@ impl SimpleThermalSensor {
         SimpleThermalSensor {
             id,
             name: name_array,
+            name_len: name_len as u8,
             temperature: AtomicUsize::new(40),
             max_temperature: AtomicUsize::new(max_temperature as usize),
         }
@@ -75,8 +77,8 @@ impl SimpleThermalSensor {
 impl ThermalSensor for SimpleThermalSensor {
     fn id(&self) -> SensorID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.name[..self.name_len as usize]
     }
     fn temperature(&self) -> i32 { self.temperature.load(Ordering::SeqCst) as i32 }
     fn max_temperature(&self) -> i32 { self.max_temperature.load(Ordering::SeqCst) as i32 }
@@ -202,6 +204,20 @@ impl ThermalThrottling for SimpleThermalThrottling {
     }
 
     fn get_throttle_level(&self) -> u32 { self.throttle_level.load(Ordering::SeqCst) as u32 }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_thermal_sensor_name_caching() {
+        let sensor = SimpleThermalSensor::new(1, b"cpu_core_temp", 100);
+        assert_eq!(sensor.id(), 1);
+        assert_eq!(sensor.name(), b"cpu_core_temp");
+        assert_eq!(sensor.name_len, 13);
+        assert_eq!(sensor.max_temperature(), 100);
+    }
 }
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
