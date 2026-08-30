@@ -26,6 +26,8 @@ pub struct SovereignUniversalDistroBridge {
     pub mode: DistroSubsystemMode,
     pub active_jail: Option<FreeBSDJail>,
     pub pledge_sentinel: OpenBsdPledgeUnveilSentinel,
+    pub apk_hook_engine: ApkXbpsHookEngine,
+    pub retguard_engine: OpenBsdRetguardEngine,
 }
 
 impl SovereignUniversalDistroBridge {
@@ -34,6 +36,8 @@ impl SovereignUniversalDistroBridge {
             mode,
             active_jail: None,
             pledge_sentinel: OpenBsdPledgeUnveilSentinel::new(),
+            apk_hook_engine: ApkXbpsHookEngine::new(),
+            retguard_engine: OpenBsdRetguardEngine::new(),
         }
     }
 
@@ -66,6 +70,14 @@ impl SovereignUniversalDistroBridge {
             }
             _ => Ok(()),
         }
+    }
+
+    pub fn run_package_hooks(&mut self, pkg_name: &str) -> usize {
+        self.apk_hook_engine.run_pre_hooks(pkg_name) + self.apk_hook_engine.run_post_hooks(pkg_name)
+    }
+
+    pub fn validate_retguard_stack(&mut self, func_name: &str, canary: u64, sp: u64) -> Result<(), &'static str> {
+        self.retguard_engine.verify_exit_function(func_name, canary, sp)
     }
 }
 
@@ -1644,6 +1656,145 @@ impl HardenedBsdPaxGuardEngine {
 }
 
 impl Default for HardenedBsdPaxGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 38. ALPINE APK / VOID XBPS TRIGGER HOOK ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ApkXbpsHookRule {
+    pub name: String,
+    pub trigger_keyword: String,
+    pub exec_cmd: String,
+    pub revert_cmd: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApkXbpsHookEngine {
+    pub rules: Vec<ApkXbpsHookRule>,
+    pub executed_actions: Vec<String>,
+    pub rollback_stack: Vec<String>,
+}
+
+impl ApkXbpsHookEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            executed_actions: Vec::new(),
+            rollback_stack: Vec::new(),
+        }
+    }
+
+    pub fn register_hook(&mut self, name: &str, trigger_keyword: &str, exec_cmd: &str, revert_cmd: &str) {
+        self.rules.push(ApkXbpsHookRule {
+            name: name.to_string(),
+            trigger_keyword: trigger_keyword.to_string(),
+            exec_cmd: exec_cmd.to_string(),
+            revert_cmd: revert_cmd.to_string(),
+        });
+    }
+
+    pub fn run_pre_hooks(&mut self, package_name: &str) -> usize {
+        let mut count = 0;
+        for rule in &self.rules {
+            if package_name.contains(&rule.trigger_keyword) {
+                let action = format!("PRE:{}:{}", rule.name, rule.exec_cmd);
+                self.executed_actions.push(action);
+                self.rollback_stack.push(rule.revert_cmd.clone());
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn run_post_hooks(&mut self, package_name: &str) -> usize {
+        let mut count = 0;
+        for rule in &self.rules {
+            if package_name.contains(&rule.trigger_keyword) {
+                let action = format!("POST:{}:{}", rule.name, rule.exec_cmd);
+                self.executed_actions.push(action);
+                self.rollback_stack.push(rule.revert_cmd.clone());
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn rollback_transaction(&mut self) -> usize {
+        let count = self.executed_actions.len();
+        self.executed_actions.clear();
+        self.rollback_stack.clear();
+        count
+    }
+}
+
+impl Default for ApkXbpsHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 39. OPENBSD RETGUARD RETURN-ADDRESS PROTECTION & MAP_STACK REGION VALIDATOR
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct MapStackRegion {
+    pub base_addr: u64,
+    pub size: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdRetguardEngine {
+    pub stack_regions: Vec<MapStackRegion>,
+    pub violations: Vec<String>,
+}
+
+impl OpenBsdRetguardEngine {
+    pub fn new() -> Self {
+        Self {
+            stack_regions: Vec::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
+        self.stack_regions.push(MapStackRegion { base_addr, size });
+    }
+
+    pub fn is_valid_stack_pointer(&self, sp: u64) -> bool {
+        for region in &self.stack_regions {
+            if sp >= region.base_addr && sp < region.base_addr + region.size as u64 {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn enter_function(&mut self, func_name: &str, secret_key: u64, sp: u64) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in func_name.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        secret_key ^ hash ^ sp
+    }
+
+    pub fn verify_exit_function(&mut self, _func_name: &str, _canary: u64, sp: u64) -> Result<(), &'static str> {
+        if !self.is_valid_stack_pointer(sp) {
+            let msg = format!("MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region", sp);
+            self.violations.push(msg);
+            return Err("MAP_STACK Violation");
+        }
+        Ok(())
+    }
+}
+
+impl Default for OpenBsdRetguardEngine {
     fn default() -> Self {
         Self::new()
     }

@@ -2,13 +2,13 @@
 extern crate alloc;
 extern crate std;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[path = "../src/klib/mod.rs"]
-pub mod klib;
+mod klib;
 
 #[path = "../src/kernel/scheduler.rs"]
 mod scheduler;
