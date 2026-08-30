@@ -16,7 +16,9 @@ use alloc::vec::Vec;
 #[derive(Debug, Clone, Copy)]
 pub struct FeatureFlag {
     pub name: [u8; 64],
+    pub name_len: u8,
     pub description: [u8; 256],
+    pub description_len: u16,
     pub enabled: bool,
     pub global: bool,
     pub dependencies: [u64; 16], // Other flags this depends on
@@ -28,7 +30,9 @@ impl FeatureFlag {
     pub const fn empty() -> Self {
         Self {
             name: [0; 64],
+            name_len: 0,
             description: [0; 256],
+            description_len: 0,
             enabled: false,
             global: false,
             dependencies: [0; 16],
@@ -42,15 +46,19 @@ impl FeatureFlag {
 
         // Copy name (truncated if too long)
         let name_bytes = name.as_bytes();
+        let name_len = name_bytes.len().min(64);
         for (i, &byte) in name_bytes.iter().enumerate().take(64) {
             flag.name[i] = byte;
         }
+        flag.name_len = name_len as u8;
 
         // Copy description (truncated if too long)
         let desc_bytes = description.as_bytes();
+        let desc_len = desc_bytes.len().min(256);
         for (i, &byte) in desc_bytes.iter().enumerate().take(256) {
             flag.description[i] = byte;
         }
+        flag.description_len = desc_len as u16;
 
         flag.enabled = enabled;
         flag.global = global;
@@ -59,13 +67,15 @@ impl FeatureFlag {
 
     /// Get name as string
     pub fn get_name(&self) -> String {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // O(1) constant-time slice lookup using cached name_len, avoiding O(N) linear zero-byte scan
+        let len = (self.name_len as usize).min(64);
         String::from_utf8_lossy(&self.name[..len]).to_string()
     }
 
     /// Get description as string
     pub fn get_description(&self) -> String {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
+        // O(1) constant-time slice lookup using cached description_len, avoiding O(N) linear zero-byte scan
+        let len = (self.description_len as usize).min(256);
         String::from_utf8_lossy(&self.description[..len]).to_string()
     }
 
@@ -454,6 +464,12 @@ mod tests {
         assert_eq!(flag.get_name(), "wayland");
         assert_eq!(flag.get_description(), "Wayland graphics");
         assert!(flag.enabled);
+
+        // Test boundary condition: 256-byte description length without u8 overflow
+        let long_desc = "a".repeat(256);
+        let flag_long = FeatureFlag::new("test_flag", &long_desc, true, true);
+        assert_eq!(flag_long.get_description().len(), 256);
+        assert_eq!(flag_long.get_description(), long_desc);
     }
 
     #[test]

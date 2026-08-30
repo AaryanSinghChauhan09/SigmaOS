@@ -87,3 +87,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-30 - Caching Explicit Byte Length for SimpleThermalSensor in Thermal Management
 **Learning:** In thermal management and sensor monitoring routines (`SimpleThermalSensor` in `src/thermal/manager.rs`), calling `ThermalSensor::name(&self)` executed an $O(N)$ linear zero-byte scan (`.position(|&b| b == 0)`) over 64-byte name array buffers on every temperature update or state check iteration. Storing `name_len: u8` during `SimpleThermalSensor::new()` initialization replaces linear zero-byte scanning with an instantaneous $O(1)$ constant-time slice lookup `&self.name[..self.name_len as usize]`, eliminating linear scanning overhead in high-frequency hardware thermal monitoring hot paths.
 **Action:** Store explicit byte lengths (`name_len: u8`) alongside fixed-size buffer fields in hardware thermal and sensor monitoring structures to guarantee $O(1)$ slice retrieval.
+
+## 2026-08-31 - Type Width Precision in Fixed-Size Buffer Byte Length Storage
+**Learning:** When caching length fields for byte buffers larger than 255 bytes (e.g., `[u8; 256]` or `[u8; 512]`), using `u8` causes a silent wrap-around integer overflow when the buffer is completely full (`256 as u8` wraps to `0`), truncating slice operations to 0 length. `description_len` for a `[u8; 256]` array must be typed as `u16`.
+**Action:** Always verify that cached buffer length integer types (`u8` vs `u16` vs `usize`) can store the buffer's maximum capacity without overflow.
