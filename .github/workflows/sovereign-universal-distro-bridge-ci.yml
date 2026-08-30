@@ -1,0 +1,24 @@
+name: Sovereign Universal Distro Bridge Interop CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  universal-distro-bridge-ci:
+    name: Universal Distro Bridge Cross-Subsystem Interop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Universal Distro Bridge Inspection Test
+        run: rustc --test --edition=2021 tests/linux_bsd_inspection_tests.rs -o /tmp/test_runner && /tmp/test_runner test_sovereign_universal_distro_bridge_inspection
+
+      - name: Run Native Sovereign Atomic Harness
+        run: ./run_sigma_tests.sh

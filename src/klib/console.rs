@@ -83,7 +83,7 @@ pub static CONSOLE: SigmaConsole = SigmaConsole::new();
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-        let msg = alloc::format!($($arg)*);
+        let msg = format!($($arg)*);
         $crate::klib::console::CONSOLE.print(&msg);
     };
 }
@@ -94,7 +94,7 @@ macro_rules! println {
         $crate::klib::console::CONSOLE.print("\n");
     };
     ($($arg:tt)*) => {
-        let msg = alloc::format!($($arg)*);
+        let msg = format!($($arg)*);
         $crate::klib::console::CONSOLE.println(&msg);
     };
 }
@@ -102,7 +102,7 @@ macro_rules! println {
 #[macro_export]
 macro_rules! eprint {
     ($($arg:tt)*) => {
-        let msg = alloc::format!($($arg)*);
+        let msg = format!($($arg)*);
         $crate::klib::console::CONSOLE.eprint(&msg);
     };
 }
@@ -113,7 +113,7 @@ macro_rules! eprintln {
         $crate::klib::console::CONSOLE.eprint("\n");
     };
     ($($arg:tt)*) => {
-        let msg = alloc::format!($($arg)*);
+        let msg = format!($($arg)*);
         $crate::klib::console::CONSOLE.eprintln(&msg);
     };
 }

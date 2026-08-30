@@ -15,6 +15,7 @@ pub mod arch_linux;
 pub mod artix_linux;
 pub mod atomic_distribution;
 pub mod bodhi_moksha;
+pub mod community_foundation;
 pub mod bsd;
 pub mod cachy_os;
 pub mod canonical;
@@ -204,4 +205,8 @@ pub use sovereign_suite::{
 pub use open_source_dominance::{
     InspirationFeatureMatrix, InspirationFeature, InspirationPackageIntegrator,
     InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
+};
+
+pub use community_foundation::{
+    SovereignFoundationManager, FoundationRole, SecurityBounty, BountySeverity, HackathonEvent,
 };
