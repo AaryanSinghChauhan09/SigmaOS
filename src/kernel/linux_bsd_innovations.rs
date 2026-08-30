@@ -3791,6 +3791,319 @@ impl SovereignCgroupGovernor {
     }
 }
 
+// ================= Linux Landlock LSM Rule Engine =================
+
+#[derive(Debug, Clone)]
+pub struct LinuxLandlockLsmRuleEngine {
+    pub handled_access_fs: u32,
+    pub path_rules: HashMap<String, u32>,
+    pub is_enforced: bool,
+}
+
+impl LinuxLandlockLsmRuleEngine {
+    pub fn new(handled_access_fs: u32) -> Self {
+        Self {
+            handled_access_fs,
+            path_rules: HashMap::new(),
+            is_enforced: false,
+        }
+    }
+
+    pub fn add_path_benefit(&mut self, path: &str, allowed_access: u32) -> Result<(), &'static str> {
+        if self.is_enforced {
+            return Err("Landlock LSM rules locked; cannot add path rule post-enforcement");
+        }
+        self.path_rules.insert(path.to_string(), allowed_access);
+        Ok(())
+    }
+
+    pub fn enforce_ruleset(&mut self) -> Result<(), &'static str> {
+        self.is_enforced = true;
+        Ok(())
+    }
+
+    pub fn check_access(&self, path: &str, requested_access: u32) -> bool {
+        if !self.is_enforced {
+            return true;
+        }
+        for (prefix, allowed) in &self.path_rules {
+            if path.starts_with(prefix) {
+                return (allowed & requested_access) == requested_access;
+            }
+        }
+        false
+    }
+}
+
+// ================= FreeBSD Capsicum Capability Mode Engine =================
+
+pub const CAP_READ_FLAG: u64 = 1 << 0;
+pub const CAP_WRITE_FLAG: u64 = 1 << 1;
+pub const CAP_SEEK_FLAG: u64 = 1 << 2;
+pub const CAP_MMAP_FLAG: u64 = 1 << 3;
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdCapsicumEngine {
+    pub in_capability_mode: bool,
+    pub descriptor_rights: HashMap<u32, u64>,
+}
+
+impl FreeBsdCapsicumEngine {
+    pub fn new() -> Self {
+        Self {
+            in_capability_mode: false,
+            descriptor_rights: HashMap::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.in_capability_mode = true;
+    }
+
+    pub fn limit_descriptor_rights(&mut self, fd: u32, rights_mask: u64) -> Result<(), &'static str> {
+        if let Some(&existing) = self.descriptor_rights.get(&fd) {
+            if (existing & rights_mask) != rights_mask {
+                return Err("Capsicum: Cannot escalate descriptor rights in capability mode");
+            }
+        }
+        self.descriptor_rights.insert(fd, rights_mask);
+        Ok(())
+    }
+
+    pub fn check_descriptor_right(&self, fd: u32, required_right: u64) -> bool {
+        if !self.in_capability_mode {
+            return true;
+        }
+        if let Some(&rights) = self.descriptor_rights.get(&fd) {
+            (rights & required_right) == required_right
+        } else {
+            false
+        }
+    }
+}
+
+// ================= Void Linux runit 3-Stage Init Supervisor =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VoidRunitStage {
+    Stage1BootMounts,
+    Stage2RunsvDirectory,
+    Stage3ShutdownHalt,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidRunitService {
+    pub name: String,
+    pub pid: u32,
+    pub is_active: bool,
+}
+
+pub struct VoidLinuxRunitSupervisor {
+    pub current_stage: VoidRunitStage,
+    pub services: HashMap<String, VoidRunitService>,
+}
+
+impl VoidLinuxRunitSupervisor {
+    pub fn new() -> Self {
+        Self {
+            current_stage: VoidRunitStage::Stage1BootMounts,
+            services: HashMap::new(),
+        }
+    }
+
+    pub fn switch_stage(&mut self, stage: VoidRunitStage) {
+        self.current_stage = stage;
+    }
+
+    pub fn register_service(&mut self, name: &str, pid: u32) {
+        self.services.insert(name.to_string(), VoidRunitService {
+            name: name.to_string(),
+            pid,
+            is_active: true,
+        });
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> bool {
+        if let Some(svc) = self.services.get_mut(name) {
+            svc.is_active = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_service_active(&self, name: &str) -> bool {
+        self.services.get(name).map(|s| s.is_active).unwrap_or(false)
+    }
+}
+
+// ================= Intel Clear Linux Stateless Architecture Engine =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuIsaMicroarch {
+    X86_64_V1,
+    X86_64_V2,
+    X86_64_V3,
+    X86_64_V4,
+}
+
+pub struct IntelClearLinuxStatelessEngine {
+    pub usr_share_defaults: HashMap<String, String>,
+    pub etc_user_overrides: HashMap<String, String>,
+    pub detected_isa: CpuIsaMicroarch,
+}
+
+impl IntelClearLinuxStatelessEngine {
+    pub fn new() -> Self {
+        Self {
+            usr_share_defaults: HashMap::new(),
+            etc_user_overrides: HashMap::new(),
+            detected_isa: CpuIsaMicroarch::X86_64_V3,
+        }
+    }
+
+    pub fn auto_detect_isa(&mut self, has_avx2: bool, has_avx512: bool) -> CpuIsaMicroarch {
+        if has_avx512 {
+            self.detected_isa = CpuIsaMicroarch::X86_64_V4;
+        } else if has_avx2 {
+            self.detected_isa = CpuIsaMicroarch::X86_64_V3;
+        } else {
+            self.detected_isa = CpuIsaMicroarch::X86_64_V1;
+        }
+        self.detected_isa
+    }
+
+    pub fn register_default_config(&mut self, path: &str, content: &str) {
+        self.usr_share_defaults.insert(path.to_string(), content.to_string());
+    }
+
+    pub fn set_user_override(&mut self, path: &str, content: &str) {
+        self.etc_user_overrides.insert(path.to_string(), content.to_string());
+    }
+
+    pub fn resolve_config(&self, path: &str) -> Option<String> {
+        if let Some(user_val) = self.etc_user_overrides.get(path) {
+            Some(user_val.clone())
+        } else {
+            self.usr_share_defaults.get(path).cloned()
+        }
+    }
+
+    pub fn reset_etc_to_stateless(&mut self) {
+        self.etc_user_overrides.clear();
+    }
+}
+
+// ================= openSUSE Snapper Btrfs Snapshot Auto-Rollback Engine =================
+
+#[derive(Debug, Clone)]
+pub struct SnapperSnapshot {
+    pub id: u64,
+    pub description: String,
+    pub root_block_hash: u64,
+    pub timestamp: u64,
+}
+
+pub struct OpenSuseSnapperEngine {
+    pub snapshots: Vec<SnapperSnapshot>,
+    pub active_snapshot_id: u64,
+    pub next_id: u64,
+}
+
+impl OpenSuseSnapperEngine {
+    pub fn new() -> Self {
+        let root_snap = SnapperSnapshot {
+            id: 1,
+            description: "Factory Root Snapshot".to_string(),
+            root_block_hash: 0x10002000,
+            timestamp: 0,
+        };
+        Self {
+            snapshots: vec![root_snap],
+            active_snapshot_id: 1,
+            next_id: 2,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, description: &str, hash: u64, now_sec: u64) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.snapshots.push(SnapperSnapshot {
+            id,
+            description: description.to_string(),
+            root_block_hash: hash,
+            timestamp: now_sec,
+        });
+        id
+    }
+
+    pub fn rollback_to_snapshot(&mut self, id: u64) -> Result<u64, &'static str> {
+        let snap = self.snapshots.iter().find(|s| s.id == id).ok_or("Snapper: Target snapshot not found")?;
+        self.active_snapshot_id = id;
+        Ok(snap.root_block_hash)
+    }
+}
+
+#[cfg(test)]
+mod linux_bsd_extra_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_landlock_lsm_rules() {
+        let mut landlock = LinuxLandlockLsmRuleEngine::new(0x07);
+        landlock.add_path_benefit("/usr/bin", 0x01).unwrap(); // Read allowed
+        landlock.enforce_ruleset().unwrap();
+
+        assert!(landlock.check_access("/usr/bin/ls", 0x01));
+        assert!(!landlock.check_access("/usr/bin/ls", 0x02)); // Write denied
+        assert!(landlock.add_path_benefit("/tmp", 0x07).is_err()); // Locked
+    }
+
+    #[test]
+    fn test_freebsd_capsicum_engine() {
+        let mut capsicum = FreeBsdCapsicumEngine::new();
+        capsicum.limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG).unwrap();
+        capsicum.enter_capability_mode();
+
+        assert!(capsicum.check_descriptor_right(3, CAP_READ_FLAG));
+        assert!(!capsicum.check_descriptor_right(3, CAP_MMAP_FLAG));
+        assert!(!capsicum.check_descriptor_right(4, CAP_READ_FLAG)); // Unregistered fd in capability mode
+    }
+
+    #[test]
+    fn test_void_runit_supervisor() {
+        let mut runit = VoidLinuxRunitSupervisor::new();
+        runit.register_service("sshd", 101);
+        assert!(runit.is_service_active("sshd"));
+        assert!(runit.stop_service("sshd"));
+        assert!(!runit.is_service_active("sshd"));
+    }
+
+    #[test]
+    fn test_intel_clear_linux_stateless() {
+        let mut stateless = IntelClearLinuxStatelessEngine::new();
+        stateless.register_default_config("/etc/hostname", "sigma-default");
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
+
+        stateless.set_user_override("/etc/hostname", "sigma-custom");
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-custom");
+
+        stateless.reset_etc_to_stateless();
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
+    }
+
+    #[test]
+    fn test_opensuse_snapper_engine() {
+        let mut snapper = OpenSuseSnapperEngine::new();
+        let snap2 = snapper.create_snapshot("Pre-update", 0xAABBCCDD, 100);
+        assert_eq!(snap2, 2);
+
+        let hash = snapper.rollback_to_snapshot(2).unwrap();
+        assert_eq!(hash, 0xAABBCCDD);
+        assert_eq!(snapper.active_snapshot_id, 2);
+    }
+}
+
 /// FreeBSD inspired Jails (capability-based isolation)
 pub struct FreeBsdJail {
     pub id: u32,

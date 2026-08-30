@@ -589,7 +589,7 @@ pub struct SovereignHybridSchedulerInnovations {
 
 impl SovereignHybridSchedulerInnovations {
     pub fn new() -> Self {
-        let mut nodes = Vec::new();
+        let mut nodes: Vec<NumaNodeAffinity> = Vec::new();
         nodes.push(NumaNodeAffinity {
             node_id: 0,
             cpu_cores: Vec::from([0, 1, 2, 3]),
@@ -613,6 +613,10 @@ impl SovereignHybridSchedulerInnovations {
     pub fn add_task(&mut self, task: RtlaneRealtimeTask) {
         let tid = task.pid;
         self.rt_tasks.insert(tid, task);
+    }
+
+    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
+        self.rt_tasks.values().next()
     }
 
     pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {

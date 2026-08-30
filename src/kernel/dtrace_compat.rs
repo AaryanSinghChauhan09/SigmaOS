@@ -323,6 +323,68 @@ pub const PROBE_VFS_WRITE: Probe =
 pub const PROBE_SECURITY_PLEDGE: Probe =
     Probe::new("security", "pledge", "check", "entry", ProbeType::Entry);
 
+/// Linux perf_event / DTrace ring buffer event collector
+#[derive(Debug, Clone)]
+pub struct PerfEvent {
+    pub event_type: u32, // 0 = HW_CPU_CYCLES, 1 = HW_INSTRUCTIONS, 2 = SW_PAGE_FAULTS
+    pub sample_period: u64,
+    pub val: u64,
+}
+
+pub struct PerfEventRingBuffer {
+    pub events: Vec<PerfEvent>,
+    pub max_capacity: usize,
+    pub overflow_count: u64,
+}
+
+impl PerfEventRingBuffer {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            events: Vec::new(),
+            max_capacity: capacity,
+            overflow_count: 0,
+        }
+    }
+
+    pub fn record_event(&mut self, event: PerfEvent) -> bool {
+        if self.events.len() >= self.max_capacity {
+            self.overflow_count += 1;
+            false
+        } else {
+            self.events.push(event);
+            true
+        }
+    }
+}
+
+/// Dynamic DTrace / kprobe traceprobe manager
+pub struct TraceprobeManager {
+    pub engine: TraceEngine,
+    pub perf_ring: PerfEventRingBuffer,
+}
+
+impl TraceprobeManager {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            engine: TraceEngine::new(capacity),
+            perf_ring: PerfEventRingBuffer::new(capacity),
+        }
+    }
+
+    pub fn attach_kprobe(&mut self, provider: &'static str, module: &'static str, function: &'static str) -> usize {
+        let probe = Probe::new(provider, module, function, "entry", ProbeType::Entry);
+        let idx = self.engine.register(probe);
+        self.engine.enable_probe(idx);
+        idx
+    }
+}
+
+impl Default for TraceprobeManager {
+    fn default() -> Self {
+        Self::new(128)
+    }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {
@@ -398,5 +460,24 @@ mod tests {
         eng.fire(1, 2, 0, 1, [0; 4]);
         eng.fire(2, 3, 0, 1, [0; 4]);
         assert_eq!(eng.record_count(), 2);
+    }
+
+    #[test]
+    fn test_traceprobe_manager_and_perf_events() {
+        let mut mgr = TraceprobeManager::new(10);
+        let idx = mgr.attach_kprobe("vfs", "kernel", "sys_open");
+
+        assert_eq!(mgr.engine.probe_count(), 1);
+        mgr.engine.start();
+        mgr.engine.fire(idx, 100, 0, 1, [1, 2, 3, 4]);
+        assert_eq!(mgr.engine.record_count(), 1);
+
+        let perf_ev = PerfEvent {
+            event_type: 0,
+            sample_period: 1000,
+            val: 50000,
+        };
+        assert!(mgr.perf_ring.record_event(perf_ev));
+        assert_eq!(mgr.perf_ring.events.len(), 1);
     }
 }

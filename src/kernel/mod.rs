@@ -106,4 +106,8 @@ pub use linux_bsd_innovations::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
+    LinuxLandlockLsmRuleEngine, FreeBsdCapsicumEngine, CAP_READ_FLAG, CAP_WRITE_FLAG, CAP_SEEK_FLAG, CAP_MMAP_FLAG,
+    VoidLinuxRunitSupervisor, VoidRunitStage, VoidRunitService,
+    IntelClearLinuxStatelessEngine, CpuIsaMicroarch,
+    OpenSuseSnapperEngine, SnapperSnapshot,
 };

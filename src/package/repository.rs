@@ -749,5 +749,6 @@ mod tests {
         let rollback = journal.rollback_transaction(tx2);
         assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
+        assert_eq!(rollback[0].action, "upgrade");
     }
 }
