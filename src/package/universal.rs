@@ -1,10 +1,15 @@
+extern crate alloc;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -877,9 +882,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in current_keys {
-                if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+            for key in &current_keys {
+                if !checkpoint.installed_keys.contains(key) {
+                    self.remove(key)?;
                 }
             }
             Ok(())

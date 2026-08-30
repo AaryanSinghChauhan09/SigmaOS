@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case, static_mut_refs)]
+#![allow(dead_code, non_snake_case)]
 
-// SigmaOS: Sovereign System Configuration, Diagnostic, and Installation Wizard
-// Implements a lightweight, zero-allocation setup wizard to configure SigmaOS.
-// Aligns with the core vision: Anti-Bloat, Security Gating, Customization, and Ecosystem Cohesion.
+/// SigmaOS: Sovereign System Configuration, Diagnostic, and Installation Wizard
+/// Implements a lightweight, zero-allocation setup wizard to configure SigmaOS.
+/// Aligns with the core vision: Anti-Bloat, Security Gating, Customization, and Ecosystem Cohesion.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -23,12 +23,6 @@ type SigmaUsize = usize;
 pub struct StaticVec<T: Copy, const N: usize> {
     data: [Option<T>; N],
     len: usize,
-}
-
-impl<T: Copy, const N: usize> Default for StaticVec<T, N> {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl<T: Copy, const N: usize> StaticVec<T, N> {
@@ -112,12 +106,6 @@ pub struct SigmaOSSetupWizard {
     pub current_stage: WizardStage,
     pub config: WizardConfiguration,
     pub is_wizard_complete: bool,
-}
-
-impl Default for SigmaOSSetupWizard {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SigmaOSSetupWizard {
@@ -237,22 +225,16 @@ static mut GLOBAL_WIZARD: SigmaOSSetupWizard = SigmaOSSetupWizard {
     is_wizard_complete: false,
 };
 
-/// # Safety
-/// Initializes global setup wizard state.
 #[no_mangle]
 pub unsafe extern "C" fn setup_wizard_init() {
     GLOBAL_WIZARD.current_stage = WizardStage::HardwareWelcome;
 }
 
-/// # Safety
-/// Advances global setup wizard to the next stage.
 #[no_mangle]
 pub unsafe extern "C" fn setup_wizard_next() {
     let _ = GLOBAL_WIZARD.next_stage();
 }
 
-/// # Safety
-/// Sets the hardware profile on the global setup wizard.
 #[no_mangle]
 pub unsafe extern "C" fn setup_wizard_set_desktop() {
     GLOBAL_WIZARD.set_hardware_profile(TargetHardwareProfile::SovereignDesktop);
