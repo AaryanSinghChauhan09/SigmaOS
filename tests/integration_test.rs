@@ -3,15 +3,19 @@
 #![allow(unused, clippy::all)]
 
 use sigmaos::filesystem::{FileType, VirtualFilesystem};
-use sigmaos::graphics::ColorRgba;
+use sigmaos::graphics::paint::ColorRgba;
 use sigmaos::kernel::{Priority, Process, ProcessState};
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use sigmaos::compatibility::*;
+    use sigmaos::compatibility::gap_closure::*;
     use sigmaos::logging::*;
+    use sigmaos::productivity::subtitle_editor::SubtitleFormat;
     use sigmaos::productivity::*;
+    use sigmaos::unimplemented_features::*;
+    use sigmaos::unimplemented_tools::*;
     use std::collections::{BTreeMap, HashMap};
 
     #[test]
@@ -43,16 +47,16 @@ mod tests {
         // Linux-conforming Hard Link reference counting
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
 
         vfs.link_inode(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
 
         assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 1);
-        assert!(vfs.inodes.contains_key(&inode_id));
+        assert!(vfs.get_inode(inode_id).is_some());
 
         assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 0);
-        assert!(!vfs.inodes.contains_key(&inode_id)); // fully freed
+        assert!(vfs.get_inode(inode_id).is_none()); // fully freed
 
         // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
         let log_file = SimpleLogFile::new(10, b"/var/log/cron")
@@ -169,7 +173,7 @@ mod tests {
         assert_eq!(subtitle_sync.font_name, "Impact");
         assert_eq!(subtitle_sync.font_size, 32);
 
-        let mut subtitle_edit = SigmaSupportSubtitleEdit::new(SubtitleFormat::Ass);
+        let mut subtitle_edit = SigmaSupportSubtitleEdit::new(sigmaos::compatibility::gap_closure::SubtitleFormat::Ass);
         subtitle_edit.insert_subtitle_entry(500, 1500, "Caption A");
         subtitle_edit.shift_all_timings_ms(100);
         assert_eq!(subtitle_edit.entries[0].start_ms, 600);

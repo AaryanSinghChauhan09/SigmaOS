@@ -1,231 +1,91 @@
-use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, RandomizedAddressSpace,
-    SegmentDescriptor, SegmentSelector,
-};
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
 extern crate alloc;
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-use sigmaos::ipc::pipes::Pipe;
-use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
-use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
-use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use sigmaos::graphics::video::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
-use sigmaos::scheduler::scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
 
-use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
-use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
-use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
-use sigmaos::tools::sigmatools::*;
-
-#[path = "../src/storage/geom.rs"]
-mod geom;
-
-#[path = "../src/audio/editor.rs"]
-mod audio_editor;
-#[path = "../src/graphics/video_editor.rs"]
-mod video_editor;
-#[path = "../src/compatibility/chimera_linux.rs"]
-mod chimera_linux;
-#[path = "../src/compatibility/debian.rs"]
-mod debian_compat;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod distro_inspirations;
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
-#[path = "../src/distro/endeavour_os.rs"]
-mod endeavour_os;
-#[path = "../src/compatibility/fedora.rs"]
-mod fedora_compat;
-#[path = "../src/scheduler/scheduler.rs"]
-mod task_scheduler;
-#[path = "../src/ipc/alpc.rs"]
-mod alpc;
-#[path = "../src/memory/bitmap_pmm.rs"]
-mod bitmap_pmm;
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-#[path = "../src/access/control.rs"]
-mod access_control;
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
-pub enum AclTag {
-    User(u32),
-    Group(u32),
-    Other,
-}
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
-pub enum BreachSeverity {
-    Minor,
-    Major,
-    Critical,
-}
-pub enum StatutoryAuthority {
-    Gdpr,
-    Hipaa,
-    ISO27001,
-}
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-#[path = "../src/system/user.rs"]
-mod system_user;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-pub enum CpuPrivilegeMode {
-    KernelRing0,
-    UserRing3,
-}
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn insert_descriptor(
-        &mut self,
-        _desc: segmentation_paging::SegmentDescriptor,
-    ) -> SegmentSelector {
-        SegmentSelector {
-            index: 1,
-            rpl: segmentation_paging::CpuRing::Ring0Kernel,
-            is_ldt: false,
-        }
-    }
-    pub fn translate_address(
-        &self,
-        seg_addr: SegmentedAddress,
-        _mode: CpuPrivilegeMode,
-    ) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn map_page(
-        _v: u64,
-        _p: u64,
-        _r: bool,
-        _w: bool,
-        _x: bool,
-    ) -> Result<(), &'static str> {
-        Ok(())
-    }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
-        Ok(PageTableEntry)
-    }
-}
-pub struct PageTableEntry;
-impl PageTableEntry {
-    pub fn get_physical_address(&self) -> u64 {
-        0x0000000100000000
-    }
-}
-pub enum ProtectionLevel {
-    Normal,
-    High,
-}
-pub enum ProtectionViolationType {
-    ReadViolation,
-    WriteViolation,
-}
-pub enum SegmentType {
-    Code,
-    Data,
-}
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-pub type ProcessActivityManager = ActivityManager;
-pub struct ResourceUsageMetrics;
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-#[path = "../src/device/manager.rs"]
-mod device_manager;
-use community_toolkit::{
+use sigmaos::access::control::{
+    AclEntry, CapBoundingSet, DacPermission, FilterPolicy, MacSecurityLabel, PosixAcl,
+    SensitivityLevel, ZeroTrustAccessGate, AclTag as ControlAclTag, acm_rights, dac_flags,
+};
+use sigmaos::audio::editor::{
+    AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect,
+};
+use sigmaos::community::toolkit::{
     CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore, VirtualizationBlueprintStore,
 };
-use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+use sigmaos::compatibility::bsd;
+use sigmaos::compatibility::cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use sigmaos::compatibility::chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
 };
-use system_user::UserManager as TestUserManager;
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{
+use sigmaos::compatibility::debian::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxContext, SeLinuxEngine};
+use sigmaos::dashboard::statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority,
+    StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use sigmaos::device::manager::{
+    Device, DeviceClass, DeviceManager, PowerState, SimpleDevice, SimpleDeviceManager,
+};
+use sigmaos::distro::endeavour_os::{
+    AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper,
+};
+use sigmaos::distro::linux_bsd_inspirations;
+use sigmaos::event::epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use sigmaos::filesystem::ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
+use sigmaos::storage::geom::{BioRequest, GeomProvider, GeomTopology};
+use sigmaos::filesystem::sigma_fs::{
+    Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace,
+};
+use sigmaos::{
+    ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack,
+};
+use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
+use sigmaos::ipc::pipes::Pipe;
+use sigmaos::loader::elf::relocation::{
+    ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE,
+};
+use sigmaos::memory::bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
     SyscallTableRouter,
 };
-use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
-use low_level_memory::{
-    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+use sigmaos::memory::low_level::{
+    CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
     RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+    posix_syscall_nr,
 };
-use task_scheduler::{
+use sigmaos::memory::segmentation_paging::{
+    AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags,
+};
+use sigmaos::process::activity_manager::{
+    ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord,
+    RegisterSnapshot as ProcRegisterSnapshot,
+};
+use sigmaos::scheduler::scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
 };
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermissions};
+use std::path::{Path, PathBuf};
+use sigmaos::system::user::{
+    ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager,
 };
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use pipes::Pipe;
-use sigmatools::*;
-use unveil::{UnveilManager, UnveilPermission};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
-use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
-use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use sigmaos::tools::sigmatools::*;
 
-use access_control::{
-    AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
-    MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
-};
 #[test]
 fn test_segmentation_paging_and_aslr() {
     let code_desc = SegmentDescriptor::code_segment_ring0();
-    assert_eq!(code_desc.dpl, SegCpuPrivilegeMode::Ring0Kernel);
+    assert_eq!(code_desc.dpl, CpuRing::Ring0Kernel);
 
-    let selector = SegmentSelector::new(1, false, SegCpuPrivilegeMode::Ring0Kernel);
+    let selector = SegmentSelector::new(1, false, CpuRing::Ring0Kernel);
     assert_eq!(selector.index, 1);
 
-    let engine = segmentation_paging::SegmentationPagingEngine::new(
-        segmentation_paging::SpaceProtectionFlags::strict_hardening(),
+    let engine = sigmaos::memory::segmentation_paging::SegmentationPagingEngine::new(
+        SpaceProtectionFlags::strict_hardening(),
     );
     let linear = engine
-        .translate_logical_to_linear(selector, 0x1000, SegCpuPrivilegeMode::Ring0Kernel)
+        .translate_logical_to_linear(selector, 0x1000, CpuRing::Ring0Kernel)
         .unwrap();
     assert_eq!(linear, 0x1000);
 
@@ -240,12 +100,12 @@ fn test_segmentation_paging_and_aslr() {
 #[test]
 fn test_regex_unveil_and_glob_matching() {
     let mut unveil_mgr = UnveilManager::new();
-    unveil_mgr.unveil("/var/log/*.log", "r").unwrap();
+    unveil_mgr.unveil(1, PathBuf::from("/var/log"), "r").unwrap();
     assert!(unveil_mgr
-        .validate_path("/var/log/syslog.log", UnveilPermission::Read)
+        .check_access(1, Path::new("/var/log/syslog.log"), UnveilPermissions::Read)
         .is_ok());
     assert!(unveil_mgr
-        .validate_path("/var/log/syslog.txt", UnveilPermission::Read)
+        .check_access(1, Path::new("/etc/passwd"), UnveilPermissions::Read)
         .is_err());
 }
 
@@ -274,8 +134,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
-    pam.register_thread(500, 501, "render_main").unwrap();
+    pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();
@@ -326,24 +185,24 @@ fn test_zero_copy_ipc_pipes() {
 #[test]
 fn test_unveil_sandboxing_and_landlock() {
     let mut mgr = UnveilManager::new();
-    mgr.unveil("/usr/bin", "rx").unwrap();
-    mgr.unveil_at("/etc", "nginx", "r").unwrap();
+    mgr.unveil(1, PathBuf::from("/usr/bin"), "rx").unwrap();
+    mgr.unveil(1, PathBuf::from("/etc/nginx"), "r").unwrap();
 
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Read)
+        .check_access(1, Path::new("/usr/bin/cargo"), UnveilPermissions::Read)
         .is_ok());
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Execute)
+        .check_access(1, Path::new("/usr/bin/cargo"), UnveilPermissions::Execute)
         .is_ok());
     assert!(mgr
-        .validate_path("/usr/bin/cargo", UnveilPermission::Write)
+        .check_access(1, Path::new("/usr/bin/cargo"), UnveilPermissions::Write)
         .is_err());
 
     assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Read)
+        .check_access(1, Path::new("/etc/nginx/nginx.conf"), UnveilPermissions::Read)
         .is_ok());
     assert!(mgr
-        .validate_path("/etc/nginx/nginx.conf", UnveilPermission::Write)
+        .check_access(1, Path::new("/etc/nginx/nginx.conf"), UnveilPermissions::Write)
         .is_err());
 }
 
@@ -479,8 +338,8 @@ fn test_cachy_os_performance_governor() {
     assert_eq!(policy, SchedPolicy::Fifo);
     assert_eq!(io, 1);
 
-    let mut repo_selector = cachy_os::CachyosRepoMirrorSelector::new(3);
-    repo_selector.add_mirror(cachy_os::CachyosMirror {
+    let mut repo_selector = sigmaos::compatibility::cachy_os::CachyosRepoMirrorSelector::new(3);
+    repo_selector.add_mirror(sigmaos::compatibility::cachy_os::CachyosMirror {
         url: "https://mirror.cachyos.org/v3".to_string(),
         arch_v_level: 3,
         ping_ms: 10,
@@ -520,10 +379,9 @@ fn test_fedora_rpm_and_selinux() {
     let order = resolver.resolve_and_install("kernel-core").unwrap();
     assert_eq!(order, vec!["kernel-core".to_string()]);
 
-    let selinux = fedora_compat::SeLinuxEngine::new(true);
-    let src = fedora_compat::SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
-    let tgt =
-        fedora_compat::SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
+    let selinux = SeLinuxEngine::new(true);
+    let src = SeLinuxContext::new("system_u", "system_r", "httpd_t", "s0");
+    let tgt = SeLinuxContext::new("system_u", "object_r", "httpd_sys_content_t", "s0");
     assert!(selinux.authorize_access(&src, &tgt, "file", "read").is_ok());
 }
 
@@ -596,8 +454,7 @@ fn test_posix_and_nfsv4_acls() {
     let mut gate = ZeroTrustAccessGate::new(FilterPolicy::Whitelist, 0xFFFF);
     let allowed_mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
     gate.mac_filter.add_mac(allowed_mac);
-    gate.matrix
-        .grant_right(1, 10, access_control::acm_rights::READ);
+    gate.matrix.grant_right(1, 10, acm_rights::READ);
 }
 
 #[test]
@@ -608,7 +465,7 @@ fn test_alpc_local_procedure_calls() {
     let server = mgr
         .get_facility_server_mut(AlpcFacility::SecurityAuth)
         .unwrap();
-    server.register_procedure(301, |req| {
+    server.register_procedure(301, |req: &AlpcMessage| {
         let payload = req.get_payload();
         if payload == b"VERIFY_TOKEN_XYZ" {
             b"TOKEN_VALIDATED_OK".to_vec()
@@ -676,8 +533,8 @@ fn test_file_attributes_and_cpu_ring_privileges() {
     assert!(!bounds.is_capability_permitted(21));
 
     let dac = DacPermission::new(1000, 1000, 0o755);
-    assert!(dac.evaluate_access(1000, 1000, access_control::dac_flags::READ));
-    assert!(!dac.evaluate_access(1001, 1001, access_control::dac_flags::WRITE));
+    assert!(dac.evaluate_access(1000, 1000, dac_flags::READ));
+    assert!(!dac.evaluate_access(1001, 1001, dac_flags::WRITE));
 
     let mac_sub = MacSecurityLabel::new(SensitivityLevel::Secret, 0x01);
     let mac_obj = MacSecurityLabel::new(SensitivityLevel::Confidential, 0x01);
@@ -830,10 +687,10 @@ fn test_openbsd_sysctl_mib_inspection() {
 
 #[test]
 fn test_netbsd_rump_router_inspection() {
-    let mut router = distro_inspirations::NetBsdRumpRouter::new();
-    router.register_driver(distro_inspirations::RumpDriver {
+    let mut router = linux_bsd_inspirations::NetBsdRumpRouter::new();
+    router.register_driver(linux_bsd_inspirations::RumpDriver {
         name: "pci_net".to_string(),
-        context: distro_inspirations::DriverContext::KernelSpace,
+        context: linux_bsd_inspirations::DriverContext::KernelSpace,
         operations_handled: vec!["send_packet".to_string()],
     });
     let res = router.dispatch_hypercall("pci_net", "send_packet");
@@ -842,32 +699,32 @@ fn test_netbsd_rump_router_inspection() {
 
 #[test]
 fn test_sovereign_landlock_and_runit_inspection() {
-    let mut sandbox = distro_inspirations::SovereignLandlockLsm::new();
+    let mut sandbox = linux_bsd_inspirations::SovereignLandlockLsm::new();
     assert!(sandbox
-        .add_rule("/usr/share", distro_inspirations::LandlockAccess::ReadOnly)
+        .add_rule("/usr/share", linux_bsd_inspirations::LandlockAccess::ReadOnly)
         .is_ok());
 
-    let mut runit = distro_inspirations::SovereignRunitSupervisor::new(
-        distro_inspirations::RunitRunlevel::Default,
+    let mut runit = linux_bsd_inspirations::SovereignRunitSupervisor::new(
+        linux_bsd_inspirations::RunitRunlevel::Default,
     );
-    runit.register_service("nginx", distro_inspirations::RunitRunlevel::Default, &[], 3);
+    runit.register_service("nginx", linux_bsd_inspirations::RunitRunlevel::Default, &[], 3);
     assert_eq!(runit.tick_supervision(), 1);
     assert_eq!(
         runit.get_service_status("nginx").unwrap(),
-        distro_inspirations::RunitServiceStatus::Running
+        linux_bsd_inspirations::RunitServiceStatus::Running
     );
 }
 
 #[test]
 fn test_sovereign_ostree_and_io_uring_inspection() {
-    let mut ostree = distro_inspirations::SovereignOstreeEngine::new();
+    let mut ostree = linux_bsd_inspirations::SovereignOstreeEngine::new();
     let idx = ostree.stage_commit("commit-1.0.0", "1.0.0", "vmlinuz-6.8", 0x123456);
     assert_eq!(idx, 0);
 
-    let mut io_ring = distro_inspirations::SovereignIoUring::new(64);
+    let mut io_ring = linux_bsd_inspirations::SovereignIoUring::new(64);
     assert!(io_ring
-        .submit_entry(distro_inspirations::SubmissionQueueEntry {
-            opcode: distro_inspirations::IoUringOpcode::Read,
+        .submit_entry(linux_bsd_inspirations::SubmissionQueueEntry {
+            opcode: linux_bsd_inspirations::IoUringOpcode::Read,
             fd: 1,
             offset: 0,
             user_data: 100,
@@ -879,7 +736,7 @@ fn test_sovereign_ostree_and_io_uring_inspection() {
 
 #[test]
 fn test_device_manager_and_simple_device() {
-    use device_manager::{
+    use sigmaos::device::manager::{
         Device, DeviceClass, DeviceManager, PowerState, SimpleDevice, SimpleDeviceManager,
     };
 

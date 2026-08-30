@@ -26,7 +26,6 @@ where
     }
 }
 
-
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -55,27 +54,39 @@ where
         self.entries.insert(insert_idx, (key, value));
     }
 
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get<Q>(&self, key: &Q) -> Option<&V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + ?Sized,
+    {
         for (k, v) in self.entries.iter() {
-            if k == key {
+            if k.borrow() == key {
                 return Some(v);
             }
         }
         None
     }
 
-    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+    pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + ?Sized,
+    {
         for (k, v) in self.entries.iter_mut() {
-            if k == key {
+            if k.borrow() == key {
                 return Some(v);
             }
         }
         None
     }
 
-    pub fn remove(&mut self, key: &K) -> Option<V> {
+    pub fn remove<Q>(&mut self, key: &Q) -> Option<V>
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + ?Sized,
+    {
         for i in 0..self.entries.len() {
-            if self.entries[i].0 == *key {
+            if self.entries[i].0.borrow() == key {
                 return Some(self.entries.remove(i).1);
             }
         }
@@ -94,7 +105,11 @@ where
         None
     }
 
-    pub fn contains_key(&self, key: &K) -> bool {
+    pub fn contains_key<Q>(&self, key: &Q) -> bool
+    where
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + ?Sized,
+    {
         self.get(key).is_some()
     }
 
@@ -153,6 +168,73 @@ where
         BTreeMapIterMut {
             entries: &mut self.entries,
             idx: 0,
+        }
+    }
+
+    pub fn values(&self) -> Values<'_, K, V> {
+        Values {
+            entries: &self.entries,
+            idx: 0,
+        }
+    }
+
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
+        ValuesMut {
+            entries: &mut self.entries,
+            idx: 0,
+        }
+    }
+}
+
+pub struct Values<'a, K, V> {
+    entries: &'a Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for Values<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let item = &self.entries[self.idx].1;
+            self.idx += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct ValuesMut<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    entries: &'a mut Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for ValuesMut<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a mut V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let ptr = self.entries.as_mut_ptr();
+            unsafe {
+                let item = &mut *ptr.add(self.idx);
+                self.idx += 1;
+                Some(&mut item.1)
+            }
+        } else {
+            None
         }
     }
 }
@@ -242,42 +324,6 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.entries.iter().map(|(k, v)| (k, v))).finish()
-    }
-}
-
-impl<K, V> BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    pub fn values(&self) -> Values<'_, K, V> {
-        Values {
-            entries: &self.entries,
-            idx: 0,
-        }
-    }
-}
-
-pub struct Values<'a, K, V> {
-    entries: &'a Vec<(K, V)>,
-    idx: usize,
-}
-
-impl<'a, K, V> Iterator for Values<'a, K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    type Item = &'a V;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.idx < self.entries.len() {
-            let item = &self.entries[self.idx].1;
-            self.idx += 1;
-            Some(item)
-        } else {
-            None
-        }
     }
 }
 
@@ -373,8 +419,6 @@ impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
         let start = match range.start_bound() {
             core::ops::Bound::Included(x) => x.clone(),
             core::ops::Bound::Excluded(x) => {
-                // For simple types, we'd need successor logic
-                // For now, just start from the bound
                 x.clone()
             }
             core::ops::Bound::Unbounded => {
@@ -388,7 +432,6 @@ impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
 
         let end = match range.end_bound() {
             core::ops::Bound::Included(x) => {
-                // Find index after x
                 self.entries.iter().position(|(k, _)| k > x).unwrap_or(self.entries.len())
             }
             core::ops::Bound::Excluded(x) => {

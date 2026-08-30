@@ -45,6 +45,9 @@ pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod tracing;
+pub mod logging;
+pub mod crash;
 
 pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
@@ -54,6 +57,8 @@ pub use unimplemented_features::{
     ZorinWinAppDbRegistry,
 };
 pub mod virtualization;
+pub mod virt;
+pub mod fs;
 
 pub mod interrupt;
 
@@ -61,7 +66,9 @@ pub mod graphics {
     pub mod compositor;
     pub mod paint;
     pub mod video;
+    pub mod video_editor;
 }
+pub use graphics::video_editor::*;
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;

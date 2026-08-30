@@ -294,7 +294,7 @@ impl SystemdEngine {
         &self,
         unit_ids: &SystemdVec<UnitID>,
     ) -> Result<SystemdVec<UnitID>, &'static str> {
-        let mut sorted = Vec::new();
+        let mut sorted = SystemdVec::new();
         let mut visiting = Vec::new();
         let mut visited = Vec::new();
 
@@ -309,8 +309,8 @@ impl SystemdEngine {
     fn topo_visit(
         &self,
         id: UnitID,
-        all_ids: &[UnitID],
-        sorted: &mut Vec<UnitID>,
+        all_ids: &SystemdVec<UnitID>,
+        sorted: &mut SystemdVec<UnitID>,
         visiting: &mut Vec<UnitID>,
         visited: &mut Vec<UnitID>,
     ) -> Result<(), &'static str> {
@@ -340,7 +340,7 @@ impl SystemdEngine {
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
         let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
             (
-                u.enabled,
+                u.is_enabled,
                 u.conflicts.clone(),
                 u.requires.clone(),
                 u.wants.clone(),
@@ -629,7 +629,7 @@ impl SystemdEngine {
     }
 
     pub fn systemd_analyze_blame(&self) -> SystemdVec<(UnitID, u64)> {
-        let mut blame_list = Vec::new();
+        let mut blame_list = SystemdVec::new();
         for unit in self.units.iter() {
             if unit.state == UnitState::Active {
                 blame_list.push((unit.id, unit.duration_ms));

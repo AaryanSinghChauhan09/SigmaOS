@@ -1,12 +1,7 @@
 // S-BOOT FIRMWARE (PCI & PCIe Express Bus Scanner)
 // BIOS, UEFI & PCIe ECAM (Enhanced Configuration Access Mechanism) Specification compliance
 
-#[cfg(not(feature = "standalone_test"))]
-use alloc::vec::Vec;
-
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
 pub const PCI_MAX_BUS: usize = 256;

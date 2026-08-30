@@ -194,7 +194,12 @@ impl EnhancedVirtualMachine {
             qcow2_overlay: None,
             vcpus,
             vfio_devices: Vec::new(),
-            virtqueues: vec![VirtqueueRing::new(256), VirtqueueRing::new(256)],
+            virtqueues: {
+                let mut v = Vec::new();
+                v.push(VirtqueueRing::new(256));
+                v.push(VirtqueueRing::new(256));
+                v
+            },
         }
     }
 

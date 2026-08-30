@@ -125,7 +125,8 @@ impl ChimeraDinitSupervisor {
     }
 
     pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        if let Some(service) = self.services.get_mut(name) {
+        let name_str = name.to_string();
+        if let Some(service) = self.services.get_mut(&name_str) {
             service.state = DinitServiceState::Running;
             Ok(())
         } else {
@@ -162,14 +163,23 @@ pub struct MageiaUrpmiEngine {
 impl MageiaUrpmiEngine {
     pub fn new() -> Self {
         let mut db = HashMap::new();
-        db.insert(String::from("mageia-kde-desktop"), vec![String::from("plasma-workspace"), String::from("sddm"), String::from("kwin")]);
-        db.insert(String::from("plasma-workspace"), vec![String::from("qtbase"), String::from("kf5-kio")]);
+        let mut v1 = Vec::new();
+        v1.push(String::from("plasma-workspace"));
+        v1.push(String::from("sddm"));
+        v1.push(String::from("kwin"));
+        db.insert(String::from("mageia-kde-desktop"), v1);
+
+        let mut v2 = Vec::new();
+        v2.push(String::from("qtbase"));
+        v2.push(String::from("kf5-kio"));
+        db.insert(String::from("plasma-workspace"), v2);
+
         Self { package_database: db }
     }
 
     pub fn resolve_dependencies(&self, target_package: &str) -> Vec<String> {
         let mut resolved = Vec::new();
-        if let Some(deps) = self.package_database.get(target_package) {
+        if let Some(deps) = self.package_database.get(&target_package.to_string()) {
             for dep in deps {
                 resolved.push(dep.clone());
             }
@@ -211,10 +221,10 @@ mod tests {
     #[test]
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service(String::from("networking"), vec![]);
-        assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
+        dinit.register_service(String::from("networking"), Vec::new());
+        assert_eq!(dinit.services.get(&"networking".to_string()).unwrap().state, DinitServiceState::Stopped);
 
         assert!(dinit.start_service("networking").is_ok());
-        assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Running);
+        assert_eq!(dinit.services.get(&"networking".to_string()).unwrap().state, DinitServiceState::Running);
     }
 }

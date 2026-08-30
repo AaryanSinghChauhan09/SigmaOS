@@ -5,6 +5,7 @@ pub mod defragmenter;
 pub mod disk_usage;
 pub mod ext4_ntfs_security;
 pub mod manager;
+pub mod sigma_fs;
 pub mod support;
 pub mod vfs;
 

@@ -29,6 +29,8 @@ pub enum UnveilPermissions {
     ReadWrite,
     /// Execute access
     Execute,
+    /// Read and execute access
+    ReadExecute,
     /// Full access (read, write, execute)
     Full,
 }
@@ -41,6 +43,7 @@ impl UnveilPermissions {
             "w" => UnveilPermissions::Write,
             "rw" | "wr" => UnveilPermissions::ReadWrite,
             "x" => UnveilPermissions::Execute,
+            "rx" | "xr" => UnveilPermissions::ReadExecute,
             "rwx" | "rxw" | "xrw" | "xwr" | "wxr" | "wrx" => UnveilPermissions::Full,
             _ => UnveilPermissions::None,
         }
@@ -50,7 +53,7 @@ impl UnveilPermissions {
     pub fn allows_read(&self) -> bool {
         matches!(
             self,
-            UnveilPermissions::Read | UnveilPermissions::ReadWrite | UnveilPermissions::Full
+            UnveilPermissions::Read | UnveilPermissions::ReadWrite | UnveilPermissions::ReadExecute | UnveilPermissions::Full
         )
     }
 
@@ -64,7 +67,10 @@ impl UnveilPermissions {
 
     /// Check if execute is allowed
     pub fn allows_execute(&self) -> bool {
-        matches!(self, UnveilPermissions::Execute | UnveilPermissions::Full)
+        matches!(
+            self,
+            UnveilPermissions::Execute | UnveilPermissions::ReadExecute | UnveilPermissions::Full
+        )
     }
 }
 

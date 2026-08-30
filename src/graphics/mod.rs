@@ -3,12 +3,14 @@ pub mod compositor;
 pub mod video;
 pub mod video_editor;
 pub mod advanced_accel;
+pub mod paint;
 
+pub use paint::ColorRgba;
 pub use video::{PixelRgba, VideoFrame};
 
 pub use compositor::{
     BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
     Surface, Window,
 };
-pub use video_editor::{VideoClip, VideoEffect, VideoTimeline, VideoTrack};
+pub use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoEffect, VideoTimeline, VideoTrack};
 pub use advanced_accel::{GpuDevice as AccelGpuDevice, GraphicsBackendApi, GraphicsManager as AccelGraphicsManager, RenderPipeline};

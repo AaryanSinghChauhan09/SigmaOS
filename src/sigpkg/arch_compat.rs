@@ -5,6 +5,9 @@
 
 extern crate alloc;
 use crate::klib::HashMap;
+use alloc::vec::Vec;
+use alloc::format;
+use alloc::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -53,7 +56,7 @@ pub struct Package {
     pub name: crate::klib::string::SigmaString,
     pub version: Version,
     pub description: crate::klib::string::SigmaString,
-    pub dependencies: alloc::vec::Vec<Dependency>,
+    pub dependencies: Vec<Dependency>,
     pub checksum: crate::klib::string::SigmaString,
 }
 
@@ -62,7 +65,7 @@ impl Package {
         name: crate::klib::string::SigmaString,
         version: Version,
         description: crate::klib::string::SigmaString,
-        dependencies: alloc::vec::Vec<Dependency>,
+        dependencies: Vec<Dependency>,
         checksum: crate::klib::string::SigmaString,
     ) -> Self {
         Self {
@@ -107,8 +110,9 @@ impl AurRecipeCompiler {
                     .trim_matches(')')
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
+                    let clean_d = d.replace('\'', "").replace('"', "");
                     depends.push(Dependency {
-                        name: d.replace('\'', "").replace('"', "").into(),
+                        name: crate::klib::string::SigmaString::from(clean_d.as_str()),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -120,14 +124,13 @@ impl AurRecipeCompiler {
         }
 
         let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
-        let depends_klib = klib::vec::Vec::from_iter(depends);
 
         Ok(Package::new(
-            klib::string::SigmaString::from(pkgname),
+            crate::klib::string::SigmaString::from(pkgname),
             parsed_ver,
-            klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
-            depends_klib,
-            klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
+            crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            depends,
+            crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -143,7 +146,7 @@ impl Default for AurRecipeCompiler {
 pub struct DebianSbuildPackage {
     pub name: crate::klib::string::SigmaString,
     pub version: Version,
-    pub build_depends: alloc::vec::Vec<crate::klib::string::SigmaString>,
+    pub build_depends: Vec<crate::klib::string::SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
@@ -244,11 +247,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            klib::string::SigmaString::from(name),
+            crate::klib::string::SigmaString::from(name),
             parsed_ver,
-            klib::string::SigmaString::from(desc),
-            klib::vec::Vec::new(),
-            klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
+            crate::klib::string::SigmaString::from(desc),
+            Vec::new(),
+            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -271,13 +274,13 @@ pub struct AlpmHook {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: alloc::vec::Vec<AlpmHook>,
+    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
         Self {
-            hooks: alloc::vec::Vec::new(),
+            hooks: Vec::new(),
         }
     }
 
@@ -308,17 +311,17 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: klib::string::SigmaString::from(name),
+            name: crate::klib::string::SigmaString::from(name),
             when,
-            target_pattern: klib::string::SigmaString::from(target_pattern),
-            exec_cmd: klib::string::SigmaString::from(exec_cmd),
+            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
+            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
         });
 
         Ok(())
     }
 
-    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<klib::string::SigmaString> {
-        let mut triggered_cmds = alloc::vec::Vec::new();
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> Vec<crate::klib::string::SigmaString> {
+        let mut triggered_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
                 let pattern = hook.target_pattern.trim_end_matches('*');
@@ -341,21 +344,14 @@ impl Default for AlpmHookManager {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: alloc::vec::Vec<crate::klib::string::SigmaString>,
+    pub hooks: Vec<crate::klib::string::SigmaString>,
     pub compression: crate::klib::string::SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = crate::klib::vec::Vec::new();
-        hooks.push(crate::klib::string::SigmaString::from("base"));
-        hooks.push(crate::klib::string::SigmaString::from("udev"));
-        hooks.push(crate::klib::string::SigmaString::from("autodetect"));
-        hooks.push(crate::klib::string::SigmaString::from("modconf"));
-        hooks.push(crate::klib::string::SigmaString::from("block"));
-        hooks.push(crate::klib::string::SigmaString::from("filesystems"));
         Self {
-            hooks: alloc::vec![
+            hooks: vec![
                 crate::klib::string::SigmaString::from("base"),
                 crate::klib::string::SigmaString::from("udev"),
                 crate::klib::string::SigmaString::from("autodetect"),
@@ -382,7 +378,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        klib::vec::Vec::from_iter(image_header)
+        crate::klib::vec::Vec::from_iter(image_header)
     }
 }
 
@@ -536,7 +532,7 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, klib::vec::Vec::from_iter(archive_content)))
+        Ok((archive_name, crate::klib::vec::Vec::from_iter(archive_content)))
     }
 }
 
@@ -551,20 +547,20 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: klib::vec::Vec::from_iter(alloc::vec![klib::string::SigmaString::from("gcc"), klib::string::SigmaString::from("make")]),
+            build_depends: vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: klib::string::SigmaString::from("coreutils"),
+            name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
             build_depends: vec![
-                "gcc".to_string(),
-                "make".to_string(),
-                "libc-dev".to_string(),
+                crate::klib::string::SigmaString::from("gcc"),
+                crate::klib::string::SigmaString::from("make"),
+                crate::klib::string::SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
@@ -683,7 +679,7 @@ mod tests {
         let compiler = SAbsSimdCompiler::new(SimdTarget::Avx512, 3);
         let flags = compiler.generate_compiler_flags();
         assert!(flags.contains("skylake-avx512"));
-        assert!(flags.contains("opt-level=3"));
+        assert!(flags.contains("opt-level={}", 3) || flags.contains("opt-level=3"));
 
         let compiled = compiler.compile_vectorized_binary("fn main() {}");
         assert!(compiled.len() > 20);

@@ -12,8 +12,10 @@
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
 
+pub mod bitmap_pmm;
 pub mod cgroups;
 pub mod kswapd;
+pub mod low_level;
 pub mod paging;
 pub mod segmentation_paging;
 pub mod tlb_associative;

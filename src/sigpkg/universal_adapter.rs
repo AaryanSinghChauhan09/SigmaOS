@@ -182,7 +182,11 @@ impl UniversalPackageAdapter {
         Ok(PacmanPkgbuild {
             pkgname,
             pkgver,
+            pkgdesc: String::new(),
+            arch: Vec::new(),
             depends,
+            makedepends: Vec::new(),
+            source_urls: Vec::new(),
         })
     }
 
@@ -334,6 +338,11 @@ impl UniversalPackageAdapter {
             description: desc.to_string(),
             dependencies,
             checksum: format!("SHA256:{}", name),
+            mirrors: Vec::new(),
+            signing_keys: Vec::new(),
+            licenses: Vec::new(),
+            maintainers: Vec::new(),
+            changelogs: Vec::new(),
         })
     }
 }

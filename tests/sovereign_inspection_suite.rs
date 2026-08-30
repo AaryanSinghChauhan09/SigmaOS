@@ -1,41 +1,13 @@
 // SigmaOS Sovereign System Inspection & Open Source Parity Test Suite
-// Inspects and verifies advanced subsystem mechanisms inspired by Linux, FreeBSD, OpenBSD, NetBSD, QEMU/KVM:
-// - FreeBSD Capsicum & Jails VNET
-// - OpenBSD Pledge/Unveil Sandboxing
-// - Linux Btrfs subvolumes & incremental send/receive
-// - PCIe ECAM configuration space & BAR decoding
-// - PackageSnapshotRollbackEngine pre/post transaction rollbacks
-// - QEMU/KVM Qcow2 image overlays, vCPU context & VirtIO virtqueue ring buffers
-// - Classic OS Algorithms (VirtIO Ballooning, Banker's Algorithm, Sleeping Barber, Ticket Spinlocks, Stack Canaries, Batch Queue)
+// Inspects and verifies advanced subsystem mechanisms inspired by Linux, FreeBSD, OpenBSD, NetBSD, QEMU/KVM
 
-#[path = "../src/kernel/pci_scanner.rs"]
-mod pci_scanner;
-
-#[path = "../src/sigpkg/transaction.rs"]
-mod transaction;
-
-#[path = "../src/virt/mod.rs"]
-mod virt;
-
-#[path = "../src/fs/btrfs.rs"]
-mod btrfs;
-
-#[path = "../src/security/securelevels.rs"]
-mod securelevels;
-
-#[path = "../src/security/jails.rs"]
-mod jails;
-
-#[path = "../src/kernel/classic_os.rs"]
-mod classic_os;
-
-use btrfs::*;
-use classic_os::*;
-use jails::*;
-use pci_scanner::*;
-use securelevels::*;
-use transaction::*;
-use virt::*;
+use sigmaos::fs::btrfs::*;
+use sigmaos::kernel::classic_os::*;
+use sigmaos::kernel::pci_scanner::*;
+use sigmaos::security::jails::*;
+use sigmaos::security::securelevels::*;
+use sigmaos::sigpkg::*;
+use sigmaos::virt::*;
 
 #[test]
 fn test_inspection_pcie_ecam_and_bar_decoder() {

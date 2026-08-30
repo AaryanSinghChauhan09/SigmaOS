@@ -16,8 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+pub mod alpc;
 pub mod ipc;
 pub mod mechanism;
+pub mod pipes;
 pub mod message;
 pub mod unix_socket;
 pub mod signals;

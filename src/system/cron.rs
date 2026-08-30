@@ -377,8 +377,17 @@ impl SovereignCronDaemon {
         }
 
         let mut ran = 0;
+        let allowed = self.allowed_users.clone();
+        let denied = self.denied_users.clone();
         for job in self.base_daemon.jobs.values_mut() {
-            if job.enabled && self.is_user_permitted(&job.user) {
+            let is_permitted = if denied.contains(&job.user) {
+                false
+            } else if !allowed.is_empty() {
+                allowed.contains(&job.user)
+            } else {
+                true
+            };
+            if job.enabled && is_permitted {
                 if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);
                     job.next_run = current_time + 86400; // 24h

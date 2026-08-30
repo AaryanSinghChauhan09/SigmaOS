@@ -99,7 +99,7 @@ impl TransactionLog {
     pub fn commit(&mut self) -> Result<(), String> {
         if let Some(idx) = self.current_transaction {
             // Mark all pending entries as completed
-            for entry in &mut self.entries[idx..] {
+            for entry in &mut self.entries.as_mut_slice()[idx..] {
                 entry.state = TransactionState::Completed;
             }
             self.current_transaction = None;
@@ -113,7 +113,7 @@ impl TransactionLog {
     pub fn rollback(&mut self) -> Result<(), String> {
         if let Some(idx) = self.current_transaction {
             // Mark all entries as rolled back
-            for entry in &mut self.entries[idx..] {
+            for entry in &mut self.entries.as_mut_slice()[idx..] {
                 entry.state = TransactionState::RolledBack;
             }
             self.current_transaction = None;

@@ -476,7 +476,7 @@ mod tests {
         let version = crate::sigpkg::Version::new(1, 0, 0);
         let recipe = PackageRecipe::new("custom-shell-aur".to_string(), version)
             .with_arch("x86_64".to_string())
-            .with_pkgrel(2)
+            .with_pkgrel("2".to_string())
             .with_source(
                 "https://example.com/source".to_string(),
                 "hash_abc".to_string(),

@@ -400,57 +400,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -464,57 +413,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -851,12 +749,7 @@ impl ShellRepl {
                    apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
                    echo         - Print a message\n\
                    set          - Set a variable\n\
-                   help                      - Show this help message\n\
-                   ps                        - List running processes\n\
-                   ls                        - List files\n\
-                   echo <msg>                - Print a message\n\
-                   set <var> <val>           - Set a variable\n\
-                   get <var>                 - Get a variable\n\
+                   get <var>    - Get a variable\n\
                    theme list                - List available customization themes\n\
                    theme set <name>          - Set active system UI theme (GUI parity)\n\
                    routine enable <id>       - Enable background automation routine\n\
@@ -1374,15 +1267,11 @@ impl ShellRepl {
             }
 
             ShellCommand::Jobs => {
-                let jobs_list = self.job_manager.list_jobs();
-                if jobs_list.is_empty() {
-                    Ok("No active background or stopped jobs.".to_string())
-                } else {
-                    Ok(jobs_list.join("\n"))
-                }
+                let jobs_list = self.job_control.list_jobs();
+                Ok(jobs_list)
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_manager.bring_to_foreground(job_id) {
+                match self.job_control.bring_to_foreground(job_id) {
                     Ok(msg) => Ok(msg),
                     Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
                 }
@@ -1873,7 +1762,7 @@ mod tests {
         assert!(jobs_res.contains("No active background"));
 
         // Register job
-        repl.job_manager.add_job("sleep 100", 1234, true);
+        repl.job_control.add_job(1234, "sleep 100");
         let jobs_res2 = repl.execute_command(ShellCommand::Jobs).unwrap();
         assert!(jobs_res2.contains("sleep 100"));
 
