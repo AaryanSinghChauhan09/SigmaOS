@@ -7,7 +7,6 @@ use alloc::format;
 // Reduces dependency on std string parsing functions
 
 use core::iter::Iterator;
-use core::str::Chars;
 
 /// Custom string parser for common operations
 pub struct StringParser<'a> {

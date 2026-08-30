@@ -22,7 +22,6 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
-pub mod community_foundation;
 pub mod constellation;
 pub mod constellation_mesh;
 pub mod cross_platform;
@@ -211,6 +210,4 @@ pub use open_source_dominance::{
     InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
 };
 
-pub use community_foundation::{
-    SovereignFoundationManager, FoundationRole, SecurityBounty, BountySeverity, HackathonEvent,
-};
+

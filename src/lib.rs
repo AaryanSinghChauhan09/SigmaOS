@@ -141,3 +141,7 @@ pub use distro_inspirations::{
     RancherOsCloudConfig, RaspiConfigTool, ReleaseChannel, SaveMode, SigRepository, SteamABImageUpdate,
     TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
 };
+
+pub use crate::access as auth;
+
+pub use crate::desktop as app;
