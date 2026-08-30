@@ -133,7 +133,7 @@ impl LanWarpEngine {
         self.peers.len()
     }
 
-    pub fn send_file(&mut self, peer_address: &str, filename: &str, payload: &[u8]) -> TransferOutcome {
+    pub fn send_file(&mut self, peer_address: &str, _filename: &str, payload: &[u8]) -> TransferOutcome {
         if !self.peers.iter().any(|p| p.address == peer_address) {
             return TransferOutcome::Interrupted { bytes: 0 };
         }
@@ -268,12 +268,120 @@ impl Default for ThingyRecentDocs {
 // =========================================================================
 // 3. WEBAPP MANAGER -> WebappManager
 //    Run websites as if they were isolated applications.
+//    Incorporate Linux Mint WebApp Manager, Peppermint OS ICE/SSB, GNOME Web,
+//    and FreeBSD Capsicum sandbox innovations.
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WebEngineKind {
     Chromium,
     Gecko,
+    WebKitGtk,
+    Brave,
+    Vivaldi,
+    LibreWolf,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WebappCategory {
+    Web,
+    Office,
+    Graphics,
+    Multimedia,
+    Games,
+    Utilities,
+    Development,
+    Finance,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WebappNavigationMode {
+    /// Frameless SSB application window without navigation elements.
+    AppFrameOnly,
+    /// Thin header with back/forward/reload buttons and URL indicator.
+    MinimalNavigation,
+    /// Complete browser window with address bar, tabs, and extensions.
+    FullBrowser,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WebappProfileMode {
+    /// Isolated user data profile folder dedicated to this web application.
+    Isolated,
+    /// Shares the main browser profile and session state.
+    Shared,
+    /// Ephemeral in-memory profile cleared upon exit (inspired by Tails / OpenBSD).
+    IncognitoEphemeral,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NetworkPolicy {
+    Full,
+    DomainRestricted(Vec<String>),
+    Offline,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AdBlockLevel {
+    None,
+    Standard,
+    Strict,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WebappSecurityPolicy {
+    pub network: NetworkPolicy,
+    pub adblock: AdBlockLevel,
+    pub capsicum_sandboxed: bool,
+    pub isolate_storage: bool,
+}
+
+impl Default for WebappSecurityPolicy {
+    fn default() -> Self {
+        Self {
+            network: NetworkPolicy::Full,
+            adblock: AdBlockLevel::Standard,
+            capsicum_sandboxed: true,
+            isolate_storage: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PwaDisplayMode {
+    Standalone,
+    MinimalUi,
+    Fullscreen,
+    Browser,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PwaManifest {
+    pub name: String,
+    pub short_name: Option<String>,
+    pub start_url: String,
+    pub display: PwaDisplayMode,
+    pub theme_color: Option<String>,
+    pub background_color: Option<String>,
+    pub icon_url: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WebappConfig {
+    pub name: String,
+    pub url: String,
+    pub engine: WebEngineKind,
+    pub category: WebappCategory,
+    pub nav_mode: WebappNavigationMode,
+    pub profile_mode: WebappProfileMode,
+    pub security_policy: WebappSecurityPolicy,
+    pub custom_user_agent: Option<String>,
+    pub custom_css: Option<String>,
+    pub icon_path: Option<String>,
+    pub isolated: bool,
+    pub desktop_shortcut: bool,
+    pub pinned: bool,
+    pub force_https: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -281,9 +389,17 @@ pub struct Webapp {
     pub name: String,
     pub url: String,
     pub engine: WebEngineKind,
+    pub category: WebappCategory,
+    pub nav_mode: WebappNavigationMode,
+    pub profile_mode: WebappProfileMode,
+    pub security_policy: WebappSecurityPolicy,
+    pub custom_user_agent: Option<String>,
+    pub custom_css: Option<String>,
+    pub icon_path: Option<String>,
     pub isolated: bool,
     pub desktop_shortcut: bool,
     pub pinned: bool,
+    pub force_https: bool,
 }
 
 pub struct WebappManager {
@@ -296,29 +412,73 @@ impl WebappManager {
     }
 
     pub fn add_webapp(&mut self, name: &str, url: &str, engine: WebEngineKind) -> &Webapp {
-        if !url.starts_with("https://") && !url.starts_with("http://") {
-            let n = self.apps.len();
-            self.apps.push(Webapp {
-                name: name.to_string(),
-                url: format!("https://{}", url),
-                engine,
-                isolated: url.contains("accounts.google") || url.contains("mail"),
-                desktop_shortcut: true,
-                pinned: false,
-            });
-            return &self.apps[n];
-        }
-        self.apps.push(Webapp {
+        let is_iso = name.to_lowercase().contains("drive")
+            || name.to_lowercase().contains("mail")
+            || name.to_lowercase().contains("office")
+            || url.contains("accounts.google")
+            || url.contains("mail");
+
+        let formatted_url = if !url.starts_with("https://") && !url.starts_with("http://") {
+            format!("https://{}", url)
+        } else {
+            url.to_string()
+        };
+
+        let app = Webapp {
             name: name.to_string(),
-            url: url.to_string(),
+            url: formatted_url,
             engine,
-            isolated: name.to_lowercase().contains("drive")
-                || name.to_lowercase().contains("mail")
-                || name.to_lowercase().contains("office"),
+            category: WebappCategory::Web,
+            nav_mode: WebappNavigationMode::AppFrameOnly,
+            profile_mode: if is_iso { WebappProfileMode::Isolated } else { WebappProfileMode::Shared },
+            security_policy: WebappSecurityPolicy::default(),
+            custom_user_agent: None,
+            custom_css: None,
+            icon_path: None,
+            isolated: is_iso,
             desktop_shortcut: true,
             pinned: false,
-        });
+            force_https: true,
+        };
+
+        self.apps.push(app);
         self.apps.last().unwrap()
+    }
+
+    pub fn add_webapp_full(&mut self, cfg: WebappConfig) -> &Webapp {
+        let formatted_url = if cfg.force_https && cfg.url.starts_with("http://") {
+            format!("https://{}", &cfg.url[7..])
+        } else if !cfg.url.starts_with("https://") && !cfg.url.starts_with("http://") {
+            format!("https://{}", cfg.url)
+        } else {
+            cfg.url.clone()
+        };
+
+        let app = Webapp {
+            name: cfg.name,
+            url: formatted_url,
+            engine: cfg.engine,
+            category: cfg.category,
+            nav_mode: cfg.nav_mode,
+            profile_mode: cfg.profile_mode,
+            security_policy: cfg.security_policy,
+            custom_user_agent: cfg.custom_user_agent,
+            custom_css: cfg.custom_css,
+            icon_path: cfg.icon_path,
+            isolated: cfg.isolated || cfg.profile_mode == WebappProfileMode::Isolated,
+            desktop_shortcut: cfg.desktop_shortcut,
+            pinned: cfg.pinned,
+            force_https: cfg.force_https,
+        };
+
+        self.apps.push(app);
+        self.apps.last().unwrap()
+    }
+
+    pub fn remove_webapp(&mut self, name: &str) -> bool {
+        let prev_len = self.apps.len();
+        self.apps.retain(|a| a.name != name);
+        self.apps.len() < prev_len
     }
 
     pub fn launch(&self, name: &str) -> Option<&Webapp> {
@@ -327,6 +487,216 @@ impl WebappManager {
 
     pub fn app_count(&self) -> usize {
         self.apps.len()
+    }
+
+    pub fn get_apps_by_category(&self, category: WebappCategory) -> Vec<&Webapp> {
+        self.apps.iter().filter(|a| a.category == category).collect()
+    }
+
+    pub fn profile_path(&self, app_name: &str) -> Option<String> {
+        let app = self.launch(app_name)?;
+        match app.profile_mode {
+            WebappProfileMode::Isolated => Some(format!("/home/user/.local/share/sigmaos/webapps/{}", app_name.to_lowercase().replace(' ', "-"))),
+            WebappProfileMode::Shared => Some("/home/user/.config/browser-default".to_string()),
+            WebappProfileMode::IncognitoEphemeral => Some("/tmp/sigmaos-webapp-ephemeral".to_string()),
+        }
+    }
+
+    pub fn generate_launch_command(&self, app_name: &str) -> Option<String> {
+        let app = self.launch(app_name)?;
+        let profile = self.profile_path(app_name).unwrap_or_default();
+        let cmd = match app.engine {
+            WebEngineKind::Chromium | WebEngineKind::Brave | WebEngineKind::Vivaldi => {
+                let bin = match app.engine {
+                    WebEngineKind::Brave => "brave",
+                    WebEngineKind::Vivaldi => "vivaldi",
+                    _ => "chromium",
+                };
+                let mut base = format!("{} --app=\"{}\" --user-data-dir=\"{}\"", bin, app.url, profile);
+                if app.nav_mode == WebappNavigationMode::MinimalNavigation {
+                    base.push_str(" --enable-minimal-ui");
+                }
+                if app.profile_mode == WebappProfileMode::IncognitoEphemeral {
+                    base.push_str(" --incognito");
+                }
+                if let Some(ref ua) = app.custom_user_agent {
+                    base.push_str(&format!(" --user-agent=\"{}\"", ua));
+                }
+                base
+            }
+            WebEngineKind::Gecko | WebEngineKind::LibreWolf => {
+                let bin = if app.engine == WebEngineKind::LibreWolf { "librewolf" } else { "firefox" };
+                let mut base = format!("{} --profile \"{}\" --kiosk \"{}\"", bin, profile, app.url);
+                if app.profile_mode == WebappProfileMode::IncognitoEphemeral {
+                    base.push_str(" --private-window");
+                }
+                base
+            }
+            WebEngineKind::WebKitGtk => {
+                format!("epiphany --application-mode --profile=\"{}\" \"{}\"", profile, app.url)
+            }
+        };
+        Some(cmd)
+    }
+
+    pub fn generate_desktop_entry(&self, app_name: &str) -> Option<String> {
+        let app = self.launch(app_name)?;
+        let exec = self.generate_launch_command(app_name)?;
+        let cat_str = match app.category {
+            WebappCategory::Web => "Network;WebBrowser;",
+            WebappCategory::Office => "Office;Network;",
+            WebappCategory::Graphics => "Graphics;Network;",
+            WebappCategory::Multimedia => "AudioVideo;Network;",
+            WebappCategory::Games => "Game;Network;",
+            WebappCategory::Utilities => "Utility;Network;",
+            WebappCategory::Development => "Development;Network;",
+            WebappCategory::Finance => "Office;Finance;Network;",
+        };
+        let icon = app.icon_path.as_deref().unwrap_or("www-browser");
+
+        let entry = format!(
+            "[Desktop Entry]\n\
+             Version=1.0\n\
+             Type=Application\n\
+             Name={}\n\
+             Comment=Web application powered by SigmaOS WebappManager\n\
+             Exec={}\n\
+             Icon={}\n\
+             Terminal=false\n\
+             Categories={}\n\
+             StartupWMClass={}\n\
+             X-SigmaOS-Webapp=true\n",
+            app.name,
+            exec,
+            icon,
+            cat_str,
+            app.name.replace(' ', "")
+        );
+        Some(entry)
+    }
+
+    pub fn evaluate_domain_access(&self, app_name: &str, target_domain: &str) -> bool {
+        let app = match self.launch(app_name) {
+            Some(a) => a,
+            None => return false,
+        };
+        match &app.security_policy.network {
+            NetworkPolicy::Full => true,
+            NetworkPolicy::Offline => false,
+            NetworkPolicy::DomainRestricted(allowed_list) => {
+                allowed_list.iter().any(|d| d == target_domain || target_domain.ends_with(&format!(".{}", d)))
+            }
+        }
+    }
+
+    pub fn parse_pwa_manifest(json_str: &str) -> Result<PwaManifest, &'static str> {
+        let name = json_str
+            .split("\"name\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .ok_or("missing name in manifest")?;
+
+        let start_url = json_str
+            .split("\"start_url\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .unwrap_or("/");
+
+        let display_str = json_str
+            .split("\"display\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .unwrap_or("standalone");
+
+        let display = match display_str {
+            "minimal-ui" => PwaDisplayMode::MinimalUi,
+            "fullscreen" => PwaDisplayMode::Fullscreen,
+            "browser" => PwaDisplayMode::Browser,
+            _ => PwaDisplayMode::Standalone,
+        };
+
+        let short_name = json_str
+            .split("\"short_name\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .map(|s| s.to_string());
+
+        let theme_color = json_str
+            .split("\"theme_color\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .map(|s| s.to_string());
+
+        let bg_color = json_str
+            .split("\"background_color\"")
+            .nth(1)
+            .and_then(|s| s.split('"').nth(1))
+            .map(|s| s.to_string());
+
+        Ok(PwaManifest {
+            name: name.to_string(),
+            short_name,
+            start_url: start_url.to_string(),
+            display,
+            theme_color,
+            background_color: bg_color,
+            icon_url: None,
+        })
+    }
+
+    pub fn add_from_pwa_manifest(&mut self, manifest: &PwaManifest, engine: WebEngineKind) -> &Webapp {
+        let nav_mode = match manifest.display {
+            PwaDisplayMode::Standalone | PwaDisplayMode::Fullscreen => WebappNavigationMode::AppFrameOnly,
+            PwaDisplayMode::MinimalUi => WebappNavigationMode::MinimalNavigation,
+            PwaDisplayMode::Browser => WebappNavigationMode::FullBrowser,
+        };
+
+        let cfg = WebappConfig {
+            name: manifest.name.clone(),
+            url: manifest.start_url.clone(),
+            engine,
+            category: WebappCategory::Web,
+            nav_mode,
+            profile_mode: WebappProfileMode::Isolated,
+            security_policy: WebappSecurityPolicy::default(),
+            custom_user_agent: None,
+            custom_css: None,
+            icon_path: manifest.icon_url.clone(),
+            isolated: true,
+            desktop_shortcut: true,
+            pinned: false,
+            force_https: true,
+        };
+
+        self.add_webapp_full(cfg)
+    }
+
+    pub fn export_config(&self) -> String {
+        let mut out = String::from("[\n");
+        for (i, app) in self.apps.iter().enumerate() {
+            out.push_str(&format!(
+                "  {{\"name\": \"{}\", \"url\": \"{}\", \"engine\": \"{:?}\", \"category\": \"{:?}\"}}{}\n",
+                app.name, app.url, app.engine, app.category,
+                if i + 1 < self.apps.len() { "," } else { "" }
+            ));
+        }
+        out.push_str("]\n");
+        out
+    }
+
+    pub fn import_config(&mut self, config: &str) -> usize {
+        let mut imported = 0;
+        for line in config.lines() {
+            if line.contains("\"name\"") && line.contains("\"url\"") {
+                if let Some(name) = line.split("\"name\": \"").nth(1).and_then(|s| s.split('"').next()) {
+                    if let Some(url) = line.split("\"url\": \"").nth(1).and_then(|s| s.split('"').next()) {
+                        self.add_webapp(name, url, WebEngineKind::Chromium);
+                        imported += 1;
+                    }
+                }
+            }
+        }
+        imported
     }
 }
 
@@ -1016,5 +1386,113 @@ mod tests {
         assert_eq!(n.evaluate("https://media.adult.example/x"), NannyDecision::Block);
         assert_eq!(n.evaluate("https://docs.example/guide"), NannyDecision::Allow);
         assert_eq!(n.evaluate("https://other.example/"), NannyDecision::Allow);
+    }
+
+    #[test]
+    fn webapp_manager_full_config_and_launch_command() {
+        let mut mgr = WebappManager::new();
+        let cfg = WebappConfig {
+            name: "Matrix Chat".into(),
+            url: "https://chat.example.com".into(),
+            engine: WebEngineKind::Brave,
+            category: WebappCategory::Utilities,
+            nav_mode: WebappNavigationMode::MinimalNavigation,
+            profile_mode: WebappProfileMode::Isolated,
+            security_policy: WebappSecurityPolicy::default(),
+            custom_user_agent: Some("SigmaOS/1.0 WebApp".into()),
+            custom_css: None,
+            icon_path: Some("matrix-icon".into()),
+            isolated: true,
+            desktop_shortcut: true,
+            pinned: true,
+            force_https: true,
+        };
+        mgr.add_webapp_full(cfg);
+
+        let cmd = mgr.generate_launch_command("Matrix Chat").unwrap();
+        assert!(cmd.contains("brave --app=\"https://chat.example.com\""));
+        assert!(cmd.contains("--enable-minimal-ui"));
+        assert!(cmd.contains("--user-agent=\"SigmaOS/1.0 WebApp\""));
+
+        let path = mgr.profile_path("Matrix Chat").unwrap();
+        assert!(path.contains("/home/user/.local/share/sigmaos/webapps/matrix-chat"));
+    }
+
+    #[test]
+    fn webapp_manager_pwa_manifest_parsing_and_import() {
+        let manifest_json = "{\n\"name\": \"Sigma Mail\",\n\"short_name\": \"Mail\",\n\"start_url\": \"https://mail.sigma.org\",\n\"display\": \"minimal-ui\",\n\"theme_color\": \"#1f2937\"\n}";
+        let manifest = WebappManager::parse_pwa_manifest(manifest_json).unwrap();
+        assert_eq!(manifest.name, "Sigma Mail");
+        assert_eq!(manifest.display, PwaDisplayMode::MinimalUi);
+
+        let mut mgr = WebappManager::new();
+        mgr.add_from_pwa_manifest(&manifest, WebEngineKind::LibreWolf);
+        assert_eq!(mgr.app_count(), 1);
+
+        let cmd = mgr.generate_launch_command("Sigma Mail").unwrap();
+        assert!(cmd.contains("librewolf --profile"));
+        assert!(cmd.contains("https://mail.sigma.org"));
+    }
+
+    #[test]
+    fn webapp_manager_desktop_entry_and_category_filtering() {
+        let mut mgr = WebappManager::new();
+        mgr.add_webapp_full(WebappConfig {
+            name: "Krita Web".into(),
+            url: "https://krita.org".into(),
+            engine: WebEngineKind::WebKitGtk,
+            category: WebappCategory::Graphics,
+            nav_mode: WebappNavigationMode::AppFrameOnly,
+            profile_mode: WebappProfileMode::Shared,
+            security_policy: WebappSecurityPolicy::default(),
+            custom_user_agent: None,
+            custom_css: None,
+            icon_path: None,
+            isolated: false,
+            desktop_shortcut: true,
+            pinned: false,
+            force_https: true,
+        });
+
+        let graphics_apps = mgr.get_apps_by_category(WebappCategory::Graphics);
+        assert_eq!(graphics_apps.len(), 1);
+
+        let desktop_entry = mgr.generate_desktop_entry("Krita Web").unwrap();
+        assert!(desktop_entry.contains("[Desktop Entry]"));
+        assert!(desktop_entry.contains("Categories=Graphics;Network;"));
+        assert!(desktop_entry.contains("Exec=epiphany --application-mode"));
+    }
+
+    #[test]
+    fn webapp_manager_capsicum_domain_security_policy() {
+        let mut mgr = WebappManager::new();
+        mgr.add_webapp_full(WebappConfig {
+            name: "Restricted Portal".into(),
+            url: "https://internal.company.com".into(),
+            engine: WebEngineKind::Chromium,
+            category: WebappCategory::Office,
+            nav_mode: WebappNavigationMode::AppFrameOnly,
+            profile_mode: WebappProfileMode::Isolated,
+            security_policy: WebappSecurityPolicy {
+                network: NetworkPolicy::DomainRestricted(vec![
+                    "company.com".to_string(),
+                    "auth.provider.org".to_string(),
+                ]),
+                adblock: AdBlockLevel::Strict,
+                capsicum_sandboxed: true,
+                isolate_storage: true,
+            },
+            custom_user_agent: None,
+            custom_css: None,
+            icon_path: None,
+            isolated: true,
+            desktop_shortcut: true,
+            pinned: false,
+            force_https: true,
+        });
+
+        assert!(mgr.evaluate_domain_access("Restricted Portal", "internal.company.com"));
+        assert!(mgr.evaluate_domain_access("Restricted Portal", "auth.provider.org"));
+        assert!(!mgr.evaluate_domain_access("Restricted Portal", "untrusted.tracker.net"));
     }
 }

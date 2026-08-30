@@ -1,9 +1,11 @@
 extern crate alloc;
 
 use sigmaos::linuxmint_inspirations::{
-    BulkyRenamer, CaptainInstaller, DebPackage, FsFormat, HypnotixIptvPlayer, IsolationMode,
-    LanWarpEngine, MintNannyFilter, NannyDecision, ProviderType, RenameRule, ThingyRecentDocs,
-    WebappManager, WebEngineKind, WARP_AUTH_PORT, WARP_TRANSFER_PORT,
+    AdBlockLevel, BulkyRenamer, CaptainInstaller, DebPackage, FsFormat, HypnotixIptvPlayer,
+    IsolationMode, LanWarpEngine, MintNannyFilter, NannyDecision, NetworkPolicy, ProviderType,
+    PwaDisplayMode, RenameRule, ThingyRecentDocs, WebEngineKind, WebappCategory, WebappConfig,
+    WebappManager, WebappNavigationMode, WebappProfileMode, WebappSecurityPolicy, WARP_AUTH_PORT,
+    WARP_TRANSFER_PORT,
 };
 
 #[test]
@@ -53,6 +55,52 @@ fn webapp_manager_registers_isolated_apps() {
     assert_eq!(m.app_count(), 2);
     let docs = m.launch("Docs").unwrap();
     assert!(docs.url.starts_with("https://"));
+}
+
+#[test]
+fn webapp_manager_advanced_innovations() {
+    let mut m = WebappManager::new();
+    let cfg = WebappConfig {
+        name: "ProtonMail".into(),
+        url: "proton.me".into(),
+        engine: WebEngineKind::LibreWolf,
+        category: WebappCategory::Office,
+        nav_mode: WebappNavigationMode::AppFrameOnly,
+        profile_mode: WebappProfileMode::IncognitoEphemeral,
+        security_policy: WebappSecurityPolicy {
+            network: NetworkPolicy::DomainRestricted(vec!["proton.me".into(), "protonmail.com".into()]),
+            adblock: AdBlockLevel::Strict,
+            capsicum_sandboxed: true,
+            isolate_storage: true,
+        },
+        custom_user_agent: None,
+        custom_css: Some("body { background-color: #000; }".into()),
+        icon_path: Some("proton-icon".into()),
+        isolated: true,
+        desktop_shortcut: true,
+        pinned: true,
+        force_https: true,
+    };
+
+    m.add_webapp_full(cfg);
+    assert_eq!(m.app_count(), 1);
+
+    let app = m.launch("ProtonMail").unwrap();
+    assert_eq!(app.url, "https://proton.me");
+    assert_eq!(app.category, WebappCategory::Office);
+
+    let cmd = m.generate_launch_command("ProtonMail").unwrap();
+    assert!(cmd.contains("librewolf --profile"));
+    assert!(cmd.contains("--private-window"));
+
+    assert!(m.evaluate_domain_access("ProtonMail", "proton.me"));
+    assert!(!m.evaluate_domain_access("ProtonMail", "google-analytics.com"));
+
+    let json_export = m.export_config();
+    assert!(json_export.contains("ProtonMail"));
+
+    assert!(m.remove_webapp("ProtonMail"));
+    assert_eq!(m.app_count(), 0);
 }
 
 #[test]

@@ -117,12 +117,14 @@ pub mod arch_kernel_inspirations;
 pub mod distro_inspirations;
 
 pub use linuxmint_inspirations::{
-    AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
-    FsFormat, HypnotixIptvPlayer, IsolationMode, LanPeer, LanWarpEngine, MintConfigHub,
-    MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintWelcomeFlow, NannyDecision,
-    ProviderType, RenameRule, TransferOutcome, TvChannel, WebEngineKind, Webapp, WebappManager,
-    XAppThemeEngine, ThingyEntry, ThingyKind, ThingyRecentDocs, WelcomeStep,
-    WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
+    AdBlockLevel, AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage,
+    DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, LanPeer, LanWarpEngine,
+    MintConfigHub, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintWelcomeFlow,
+    NannyDecision, NetworkPolicy, ProviderType, PwaDisplayMode, PwaManifest, RenameRule,
+    ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome, TvChannel, WebEngineKind, Webapp,
+    WebappCategory, WebappConfig, WebappManager, WebappNavigationMode, WebappProfileMode,
+    WebappSecurityPolicy, WelcomeStep, XAppThemeEngine, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT,
+    WARP_TRANSFER_PORT,
 };
 
 pub use arch_kernel_inspirations::{
