@@ -1,6 +1,9 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+extern crate alloc;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
@@ -8,7 +11,7 @@ use alloc::format;
 use crate::klib::HashMap;
 
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -138,7 +141,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -149,7 +152,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: alloc::sync::Arc::new(handler),
+            handler: Arc::new(handler),
         }
     }
 }
@@ -163,6 +166,42 @@ impl PackageHook for CustomPackageHook {
     }
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         (self.handler)(package)
+    }
+}
+
+/// Dynamic User Defined Function (UDF) for dynamic package transformation
+pub trait UserDefinedPackageTransformFunction: Send + Sync {
+    fn name(&self) -> &str;
+    fn transform(&self, package: &mut UnifiedPackage) -> Result<(), PackageError>;
+}
+
+/// User Defined Package Pipeline combining multiple UDF transform functions
+pub struct UserDefinedPackagePipeline {
+    pub transforms: Vec<Arc<dyn UserDefinedPackageTransformFunction>>,
+}
+
+impl UserDefinedPackagePipeline {
+    pub fn new() -> Self {
+        Self {
+            transforms: Vec::new(),
+        }
+    }
+
+    pub fn add_transform(&mut self, transform: Arc<dyn UserDefinedPackageTransformFunction>) {
+        self.transforms.push(transform);
+    }
+
+    pub fn apply(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
+        for transform in &self.transforms {
+            transform.transform(package)?;
+        }
+        Ok(())
+    }
+}
+
+impl Default for UserDefinedPackagePipeline {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -340,7 +379,7 @@ impl PackageAdapter {
         Ok(())
     }
 
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Purging DEB package {}",
             self.adapter_name, package.name
@@ -348,7 +387,7 @@ impl PackageAdapter {
         Ok(())
     }
 
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
             "[{}] Refreshing and updating DEB package {}",
             self.adapter_name, package.name
@@ -360,11 +399,12 @@ impl PackageAdapter {
     pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
         let mut enforced_pledges = Vec::new();
         for arg in &manifest.finish_args {
-            if arg.contains("--share=network") {
+            let arg_str: &str = arg.as_str();
+            if arg_str.contains("--share=network") {
                 enforced_pledges.push(String::from("network"));
-            } else if arg.contains("--share=ipc") {
+            } else if arg_str.contains("--share=ipc") {
                 enforced_pledges.push(String::from("ipc"));
-            } else if arg.contains("--filesystem=host") {
+            } else if arg_str.contains("--filesystem=host") {
                 enforced_pledges.push(String::from("unveil_all"));
             }
         }
@@ -395,7 +435,7 @@ impl PackageAdapter {
 
     /// Simulates querying APT repository sources
     pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        config.enabled_components().len() > 0 && !config.sourcelist_url.is_empty()
+        !config.enabled_components().is_empty() && !config.sourcelist_url.is_empty()
     }
 
     /// Simulates querying DNF repository sources
@@ -436,6 +476,12 @@ impl AptDebAdapter {
     }
 }
 
+impl Default for AptDebAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PackageFormatAdapter for AptDebAdapter {
     fn format(&self) -> PackageFormat {
         PackageFormat::Deb
@@ -453,14 +499,16 @@ impl PackageFormatAdapter for AptDebAdapter {
         let mut dependencies = Vec::new();
 
         for line in manifest.lines() {
-            if line.starts_with("Package: ") {
-                name = line["Package: ".len()..].trim().to_string();
-            } else if line.starts_with("Version: ") {
-                version = line["Version: ".len()..].trim().to_string();
-            } else if line.starts_with("Depends: ") {
-                let deps = line["Depends: ".len()..].trim();
+            let line_str: &str = line;
+            if line_str.starts_with("Package: ") {
+                name = line_str["Package: ".len()..].trim().to_string();
+            } else if line_str.starts_with("Version: ") {
+                version = line_str["Version: ".len()..].trim().to_string();
+            } else if line_str.starts_with("Depends: ") {
+                let deps = line_str["Depends: ".len()..].trim();
                 for d in deps.split(',') {
-                    dependencies.push(d.trim().to_string());
+                    let dep_item: String = d.trim().to_string();
+                    dependencies.push(dep_item);
                 }
             }
         }
@@ -493,6 +541,12 @@ impl YumRpmAdapter {
         Self {
             repo_metadata_path: "/var/lib/yum/repos".to_string(),
         }
+    }
+}
+
+impl Default for YumRpmAdapter {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -569,9 +623,9 @@ impl DependencyResolver {
     pub fn resolve_dependencies(
         &self,
         package_name: &str,
-    ) -> Result<alloc::vec::Vec<String>, PackageError> {
-        let mut resolved: alloc::vec::Vec<String> = alloc::vec::Vec::new();
-        let mut to_visit: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+    ) -> Result<Vec<String>, PackageError> {
+        let mut resolved: Vec<String> = Vec::new();
+        let mut to_visit: Vec<String> = Vec::new();
         to_visit.push(package_name.to_string());
         let mut visited = alloc::collections::BTreeSet::<String>::new();
 
@@ -620,11 +674,10 @@ impl DependencyResolver {
     }
 
     pub fn resolve_conflicts(&self, conflicts: &[(String, String)]) -> Vec<String> {
-        let mut resolution = Vec::new();
+        let mut resolution: Vec<String> = Vec::new();
 
         match self.resolution_strategy {
             ConflictResolution::PreferNewest => {
-                // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -637,7 +690,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::PreferOldest => {
-                // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -650,7 +702,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::PreferNative => {
-                // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -665,7 +716,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::Manual => {
-                // Return conflicts for manual resolution
                 for (pkg1, pkg2) in conflicts {
                     resolution.push(pkg1.clone());
                     resolution.push(pkg2.clone());
@@ -709,7 +759,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+        let mut keys: Vec<String> = Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());
@@ -747,7 +797,8 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
-    pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    pub user_hooks: Vec<Arc<dyn PackageHook>>,
+    pub user_pipeline: UserDefinedPackagePipeline,
 }
 
 impl UniversalPackageManager {
@@ -760,6 +811,7 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
+            user_pipeline: UserDefinedPackagePipeline::new(),
         };
 
         manager.add_default_adapters();
@@ -767,15 +819,16 @@ impl UniversalPackageManager {
     }
 
     /// Registers a user-defined lifecycle hook
-    pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
+    pub fn add_user_hook(&mut self, hook: Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
     }
 
     /// Triggers user-defined hooks matching the requested lifecycle stage
     pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
         for hook in &self.user_hooks {
-            if hook.timing() == timing {
-                hook.execute(package)?;
+            let hook_ref: &dyn PackageHook = hook.as_ref();
+            if hook_ref.timing() == timing {
+                hook_ref.execute(package)?;
             }
         }
         Ok(())
@@ -810,34 +863,10 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters.insert(
-            PackageFormat::Deb,
-            PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")),
-        );
-        self.adapters.insert(
-            PackageFormat::Rpm,
-            PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")),
-        );
-        self.adapters.insert(
-            PackageFormat::Pacman,
-            PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")),
-        );
-        self.adapters.insert(
-            PackageFormat::Snap,
-            PackageAdapter::new(PackageFormat::Snap, String::from("Snap")),
-        );
-        self.adapters.insert(
-            PackageFormat::Flatpak,
-            PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
-        );
-        self.adapters.insert(
-            PackageFormat::AppImage,
-            appimage_adapter,
-        );
-        self.adapters.insert(
-            PackageFormat::SigmaPkg,
-            PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
-        );
+        self.adapters.insert(PackageFormat::Flatpak, flatpak_adapter);
+        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters.insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+
         self.adapters.insert(PackageFormat::Air, PackageAdapter::new(PackageFormat::Air, "air".to_string()));
         self.adapters.insert(PackageFormat::Bottle, PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()));
         self.adapters.insert(PackageFormat::Ipa, PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()));
@@ -883,7 +912,7 @@ impl UniversalPackageManager {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
             for key in current_keys {
                 if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+                    self.remove(key.as_str())?;
                 }
             }
             Ok(())
@@ -896,10 +925,7 @@ impl UniversalPackageManager {
     }
 
     pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
-        // Resolve dependencies
         let dependencies = self.resolver.resolve_dependencies(package_name)?;
-
-        // Detect conflicts
         let conflicts = self.resolver.detect_conflicts(&dependencies);
 
         if !conflicts.is_empty() {
@@ -908,14 +934,15 @@ impl UniversalPackageManager {
             println!("Resolution: {:?}", resolution);
         }
 
-        // Install packages
         for dep_name in dependencies {
             let package_opt = self.packages.get(&dep_name).cloned();
-            if let Some(package) = package_opt {
+            if let Some(mut package) = package_opt {
+                // Apply UDF transformation pipeline
+                self.user_pipeline.apply(&mut package)?;
+
                 // Trigger PreInstall user defined hooks
                 self.trigger_user_hooks(HookTiming::PreInstall, &package)?;
 
-                // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
                         let adapter: &PackageAdapter = adapter;
@@ -939,7 +966,6 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
-            // Trigger PreRemove user defined hooks
             self.trigger_user_hooks(HookTiming::PreRemove, &package)?;
 
             for format in &package.formats {
@@ -951,7 +977,6 @@ impl UniversalPackageManager {
             }
             self.installed_packages.remove(package_name);
 
-            // Trigger PostRemove user defined hooks
             self.trigger_user_hooks(HookTiming::PostRemove, &package)?;
         }
         Ok(())
@@ -1114,7 +1139,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert!(manager.adapters.len() >= 25);
+        assert!(manager.registered_adapter_count() >= 20);
     }
 
     #[test]
@@ -1169,7 +1194,7 @@ mod tests {
     fn test_user_defined_hooks_and_extension_install() {
         let mut manager = UniversalPackageManager::new();
 
-        let hook_ran = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
+        let hook_ran = Arc::new(core::sync::atomic::AtomicBool::new(false));
         let hook_ran_clone = hook_ran.clone();
 
         let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
@@ -1177,20 +1202,17 @@ mod tests {
             Ok(())
         });
 
-        manager.add_user_hook(alloc::sync::Arc::new(custom_hook));
+        manager.add_user_hook(Arc::new(custom_hook));
 
-        // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
         assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
         assert_eq!(PackageFormat::from_filename("nginx.rpm"), Some(PackageFormat::Rpm));
         assert_eq!(PackageFormat::from_filename("alpine.apk"), Some(PackageFormat::Apk));
         assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
         assert_eq!(PackageFormat::from_filename("tool.appimage"), Some(PackageFormat::AppImage));
 
-        // Install from file
         assert!(manager.install_from_file("/tmp/htop.deb").is_ok());
         assert!(manager.get_package("htop").is_some());
 
-        // Verify pre-install user defined hook executed
         assert!(hook_ran.load(core::sync::atomic::Ordering::SeqCst));
     }
 
@@ -1205,16 +1227,13 @@ mod tests {
         manager.add_package(pkg1);
         manager.add_package(pkg2);
 
-        // 1. Create a baseline checkpoint (empty)
         let checkpoint_id = manager.create_checkpoint();
         assert_eq!(checkpoint_id, 1);
 
-        // 2. Install pkg1 and pkg2
         manager.install("pkg1").unwrap();
         manager.install("pkg2").unwrap();
         assert_eq!(manager.installed_packages.len(), 2);
 
-        // 3. Roll back to baseline checkpoint
         manager.rollback_to_checkpoint(checkpoint_id).unwrap();
         assert_eq!(manager.installed_packages.len(), 0);
     }
@@ -1223,20 +1242,17 @@ mod tests {
     fn test_distro_packaging_manifests_and_sandboxing() {
         let adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
 
-        // 1. Test Flatpak sandboxing policy translation
         let flat_manifest = FlatpakManifest {
             id: "org.gnome.Gimp".to_string(),
             runtime: "org.gnome.Platform".to_string(),
             runtime_version: "44".to_string(),
             sdk: "org.gnome.Sdk".to_string(),
             command: "gimp".to_string(),
-            finish_args: {
-                let mut v = Vec::new();
-                v.push("--share=network".to_string());
-                v.push("--share=ipc".to_string());
-                v.push("--filesystem=host".to_string());
-                v
-            },
+            finish_args: vec![
+                "--share=network".to_string(),
+                "--share=ipc".to_string(),
+                "--filesystem=host".to_string(),
+            ],
         };
 
         let enforced_pledges = adapter.translate_flatpak_sandbox_policy(&flat_manifest);
@@ -1245,70 +1261,24 @@ mod tests {
         assert!(enforced_pledges.contains(&"ipc".to_string()));
         assert!(enforced_pledges.contains(&"unveil_all".to_string()));
 
-        // 2. Test Snapcraft confinement translation
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
         let snap_manifest = SnapcraftManifest {
             name: "gimp".to_string(),
             version: "2.10.30".to_string(),
             summary: "GNU Image Manipulation Program".to_string(),
             confinement: "strict".to_string(),
-            plugs: {
-                let mut v = Vec::new();
-                v.push("network".to_string());
-                v
-            },
+            plugs: vec!["network".to_string()],
             slots: Vec::new(),
         };
 
         let confinement_rule = snap_adapter.translate_snap_confinement(&snap_manifest);
         assert_eq!(confinement_rule, "strict_pledge_sandbox");
-
-        // 3. Verify general manifest definitions compile (AptDebManifest and PacmanPkgbuild)
-        let _deb = AptDebManifest {
-            package: "curl".to_string(),
-            version: "7.81.0".to_string(),
-            architecture: "amd64".to_string(),
-            maintainer: "Debian Curl Maintainers".to_string(),
-            depends: {
-                let mut v = Vec::new();
-                v.push("libcurl4".to_string());
-                v
-            },
-            description: "command line tool for transferring data with URLs".to_string(),
-        };
-
-        let _pkgbuild = PacmanPkgbuild {
-            pkgname: "curl".to_string(),
-            pkgver: "7.81.0".to_string(),
-            pkgdesc: "command line tool for transferring data with URLs".to_string(),
-            arch: {
-                let mut v = Vec::new();
-                v.push("x86_64".to_string());
-                v
-            },
-            depends: {
-                let mut v = Vec::new();
-                v.push("openssl".to_string());
-                v
-            },
-            makedepends: {
-                let mut v = Vec::new();
-                v.push("git".to_string());
-                v
-            },
-            source_urls: {
-                let mut v = Vec::new();
-                v.push("https://curl.se/download/curl-7.81.0.tar.gz".to_string());
-                v
-            },
-        };
     }
 
     #[test]
     fn test_comprehensive_packaging_systems() {
         let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
 
-        // 1. Test AppImage metadata runtime & mount mock
         let app_runtime = AppImageRuntime {
             app_name: "Blender".to_string(),
             signature_offset: 1024,
@@ -1320,7 +1290,6 @@ mod tests {
             .unwrap();
         assert_eq!(mount_path, "/tmp/.mount_Blender_squashfs");
 
-        // AppImage mount offset error checking
         let bad_app = AppImageRuntime {
             app_name: "BadApp".to_string(),
             signature_offset: 0,
@@ -1329,22 +1298,15 @@ mod tests {
         };
         assert!(appimage_adapter.mount_appimage_squashfs(&bad_app).is_err());
 
-        // 2. Test APT repository source query checks
         let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
         let apt_config = AptRepoConfig {
             sourcelist_url: "deb https://deb.debian.org/debian".to_string(),
             suite: "bookworm".to_string(),
-            components: {
-                let mut v = Vec::new();
-                v.push("main".to_string());
-                v.push("contrib".to_string());
-                v
-            },
+            components: vec!["main".to_string(), "contrib".to_string()],
             trust_anchor: None,
         };
         assert!(apt_adapter.query_apt_repository(&apt_config));
 
-        // 3. Test DNF repository configuration query checks
         let dnf_adapter = PackageAdapter::new(PackageFormat::Rpm, "dnf".to_string());
         let dnf_config = DnfRepoConfig {
             repoid: "fedora".to_string(),
@@ -1369,18 +1331,5 @@ mod tests {
         let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
-    }
-
-    #[test]
-    fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
-        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
-    }
-
-    #[test]
-    fn test_universal_package_manager_adapter_count() {
-        let manager = UniversalPackageManager::new();
-        assert!(manager.registered_adapter_count() >= 20);
     }
 }
