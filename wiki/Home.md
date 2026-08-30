@@ -1,126 +1,105 @@
-# 🏠 SigmaOS — Home
+# 🚀 SigmaOS Operating System
 
-> **The world's most advanced sovereign, bare-metal operating system.**  
-> Built 100% in Rust. Zero-dependency. Multi-architecture (x86_64, AArch64, RISC-V 64).
+[![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
+
+SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
 
 ---
 
-## 📊 Build Status
+## ✨ Features & Subsystems
 
+- **Sovereign Microkernel Core:** Memory isolation, capability bounding sets, and lightweight IPC channels (ALPC/Pipes).
+- **Multi-Distro Compatibility & Parity:** Adapters and translation layers for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), CachyOS (BORE scheduler), and FreeBSD (Jails/Capsicum/GEOM).
+- **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
+- **Zero-Trust Access Control:** Integrated Discretionary (DAC), Mandatory (MAC / Bell-LaPadula), and Role-Based (RBAC) access controls.
+- **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+
+---
+
+## 🛠️ Building & Running Tests
+
+To build and run the full native test harness:
+
+```bash
+./run_sigma_tests.sh
 ```
-Phase F (Competitor Crusher):   ████████████████████  100% ✅ COMPLETE
-Phase G (Kernel Boot + Drivers):████████████████░░░░   80% 🔄 ACTIVE  
-Phase H (India Stack + Cloud):  ████░░░░░░░░░░░░░░░░   20% 📋 UPCOMING
-Phase I (AI + Enterprise):      ░░░░░░░░░░░░░░░░░░░░    0% 📋 PLANNED
+
+---
+
+## 📚 Canonical Documentation (GitHub Wiki)
+
+```text
+Phase F (Competitor Crusher)   ████████████████████  100% ✅
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
+Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
 ```
 
----
+### Current Status
 
-## 🗺️ Wiki Navigation
+**Kernel Core:**
+- ✅ Microkernel scheduler & IPC
+- ✅ Physical & virtual memory manager
+- ✅ Multi-core SMP support
+- 🔄 x86_64 / AArch64 / RISC-V HAL
+- 🔄 PCI / PCIe bus driver
 
-### 🚀 Getting Started
-- [Getting Started](Getting-Started)
-- [Building SigmaOS](Building-SigmaOS)
-- [Quick Start Guide](Quick-Start-Guide)
-- [Installation Guide](Installation-Guide)
-- [FAQ](FAQ)
+**Security Subsystem:**
+- ✅ Discretionary & Mandatory Access Control
+- ✅ Post-quantum cryptographic attestation (Dilithium-5 / Kyber-1024)
+- ✅ Capabilities & pledge sandboxing
 
-### 🧠 Architecture
-- [Architecture Overview](Architecture-Overview)
-- [Kernel Internals](Kernel-Internals)
-- [Boot Process](Boot-Process-Architecture)
-- [Filesystem Spec](Filesystem-Spec-and-Virtual-FS)
-- [AI Subsystem](AI-Subsystem)
-- [AI Daemon Arch](AI_DAEMON_ARCH)
+**Userland & Applications:**
+- ✅ Zenith Desktop frontend
+- ✅ Sovereign Video & Audio Editor
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
 
-### 🔩 Components
-- [**Components Master Table**](Components-Master-Table) ← Full status table
-- [Components & Inspirations](Components-and-Inspirations)
+**Package Management:**
+- ✅ sigma-pkg CLI
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
 
-### 📦 Package Management
-- [Package Management](Package-Management)
-- [Universal Package Manager](Universal-Package-Manager)
-- [AUR Helper](AUR-Helper)
+**Networking:**
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
 
-### 🔌 Hardware & Drivers
-- [Driver Development Guide](Driver-Development-Guide)
-- [Hardware Compatibility](Hardware-Compatibility)
-- [Universal Driver Support](UNIVERSAL_DRIVER_SUPPORT_PLAN)
-- [Driver Management Roadmap](Driver_Management_Roadmap)
+**AI & Automation:**
+- 🔄 AI orchestrator for system optimization
 
-### 🌐 Networking
-- [Networking](Networking)
-- [Enterprise Networking](Enterprise-Networking)
-- [Zero Trust Network](zero_trust_network)
-- [TCP/UDP Stack](TCP-UDP-Stack)
+**Customization:**
+- 🔄 Unified control center
+- ✅ Declarative theming engine
 
-### 🔒 Security
-- [Security Policy](SECURITY)
-- [Security Hardening Guide](Security-Hardening-Guide)
-- [Security Scanning Fixes](Security-Scanning-Fixes)
-- [Defensive Audit Systems](DEFENSIVE_AUDIT_SYSTEMS_BLUEPRINT)
-- [Parrot Security Parity](PARROT_SECURITY_PARITY_BLUEPRINT)
-- [Qubes Isolation](QUBES_ISOLATION_ROADMAP)
+**Boot & Deployment:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
+- ✅ Zenith Desktop prototype
+- ✅ sigma-pkg CLI
+- ⬜ Bootable ISO (Phase G)
 
-### 🐧 Linux/BSD Inspirations
-- [**Linux Distro Ideas Implementation**](Linux-Distro-Ideas-Implementation) ← NEW
-- [Linux BSD Inspirations](LINUX_BSD_INSPIRATIONS)
-- [Arch Linux Parity](Arch_Linux_Parity_Roadmap)
-- [Linux Distro Guide](LINUX_DISTRO_GUIDE)
-- [BSD Distros Analysis](BSD_DISTROS_ANALYSIS)
-- [Distro Absorption Blueprint](Distro-Absorption-Blueprint)
-- [Debian Innovation](DebianInnovation)
-
-### 🗺️ Roadmaps
-- [Future Development Roadmap](Future_Development_Roadmap)
-- [3-Year Strategic Vision](3-Year-Strategic-Vision)
-- [Gap Closing Roadmap](Gap_Closing_Roadmap)
-- [Breakthrough OS Tools](Breakthrough_Os_Tools_Roadmap)
-- [CLI Power Blueprint](Cli_Power_Blueprint)
-- [Realtime HPC Scheduling](REALTIME_HPC_SCHEDULING_ROADMAP)
-- [OCI Container Runtime](OCI_CONTAINER_RUNTIME_ROADMAP)
-- [Constellation Mesh](Constellation_Mesh_Roadmap)
-
-### 🖥️ Desktop & UI
-- [Zenith Desktop Improvement](Zenith-System-Improvement-Plan)
-- [Win32 Compatibility](WIN32_COMPATIBILITY_PLANS)
-- [Accessibility & Localization](ACCESSIBILITY_LOCALIZATION_GUIDE)
-
-### 🧪 Testing & Quality
-- [Testing Guide](Testing-Guide)
-- [What Is Working](What-Is-Working-and-What-Is-Not)
-- [Algorithms Diagnostics](ALGORITHMS_DIAGNOSTICS_MASTER_GUIDE)
-
-### 📈 Development
-- [Contributing](Contributing)
-- [Contributor FAQ](CONTRIBUTOR_FAQ)
-- [Code of Conduct](Code-of-Conduct)
-- [Changelog](CHANGELOG)
-- [Release Governance](RELEASE_GOVERNANCE_CI_CD)
-- [Branch History](Branch-Consolidation-History)
-
-### 🌍 Advanced
-- [Virtualization & Containers](Virtualization-and-Containers)
-- [Observability & Tracing](OBSERVABILITY_TRACING_ROADMAP)
-- [Policy Mechanism](Policy_Mechanism_Roadmap)
-- [Sovereign Self-Sufficiency](SOVEREIGN_OS_OMNIPRESENT_SUPREME_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA)
 
 ---
 
-## 🐧 Distro Compatibility Matrix
+## 🤝 Contributing
 
-| Distro | Package Format | Init System | Security Model | Status |
-|--------|---------------|-------------|----------------|--------|
-| Arch Linux | ALPM/pacman | systemd | AppArmor | ✅ |
-| Debian/Ubuntu | .deb/APT | systemd | AppArmor | ✅ |
-| Fedora/RHEL | RPM/DNF | systemd | SELinux | ✅ |
-| Gentoo | portage | OpenRC | hardened | ✅ |
-| Alpine Linux | APK | OpenRC | grsecurity | ✅ |
-| FreeBSD | pkg | rc.d | Capsicum | ✅ |
-| NixOS | Nix | systemd | declarative | 🔄 |
-| Void Linux | XBPS | runit | - | ✅ |
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### High-Impact Areas
+
+- Round-robin scheduler implementation
+- Buddy allocator completion
+- sigma-sh REPL
+- USB HID keyboard driver
 
 ---
 
-*SigmaOS — Silicon Sovereignty. Built in Rust. Built to Last.*  
-*Repository: [github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)*
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
