@@ -185,7 +185,7 @@ impl ArchBuildSystem {
             }
         }
 
-        self.srcinfo = format!("{}/{}", srcinfo_lines, "\n");
+        self.srcinfo = srcinfo_lines.join("\n");
         Ok(())
     }
 

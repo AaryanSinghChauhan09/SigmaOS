@@ -217,7 +217,7 @@ impl SigmaBuildGraph {
         let build_flags = self.features.to_build_flags(&spec.name, &spec.use_flags);
         let cpu_flags = self.cpu.optimal_flags();
 
-        let configure_args = format!("{}/{}", build_flags, " ");
+        let configure_args = build_flags.join(" ");
         let rust_opt = cpu_flags.get("RUSTFLAGS").unwrap();
 
         Ok(format!(

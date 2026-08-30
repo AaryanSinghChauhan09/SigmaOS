@@ -69,7 +69,7 @@ impl AnalysisStrategy for QuickAnalysisStrategy {
     fn analyze(&self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError> {
         // Simulated quick analysis
         Ok(DirectorySizeInfo {
-            path: path.clone(),
+            path: path.to_string(),
             size_bytes: 1024 * 1024 * 1024, // 1GB
             file_count: 100,
             directory_count: 10,
@@ -101,7 +101,7 @@ impl AnalysisStrategy for DeepAnalysisStrategy {
     fn analyze(&self, path: &str) -> Result<DirectorySizeInfo, DiskUsageError> {
         // Simulated deep analysis
         Ok(DirectorySizeInfo {
-            path: path.clone(),
+            path: path.to_string(),
             size_bytes: 2 * 1024 * 1024 * 1024, // 2GB
             file_count: 500,
             directory_count: 50,
@@ -158,7 +158,7 @@ impl DiskUsageAnalyzer {
         let result = self.strategy.analyze(path)?;
 
         if self.cache_enabled {
-            self.cache.insert(path.clone(), result.clone());
+            self.cache.insert(path.to_string(), result.clone());
         }
 
         Ok(result)
@@ -168,7 +168,7 @@ impl DiskUsageAnalyzer {
     pub fn get_disk_usage(&self, path: &str) -> Result<DiskUsageInfo, DiskUsageError> {
         // Simulated disk usage
         Ok(DiskUsageInfo {
-            path: path.clone(),
+            path: path.to_string(),
             total_bytes: 500 * 1024 * 1024 * 1024, // 500GB
             used_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
             free_bytes: 250 * 1024 * 1024 * 1024,  // 250GB
@@ -182,7 +182,7 @@ impl DiskUsageAnalyzer {
             .strategy
             .analyze(path)
             .unwrap_or_else(|_| DirectorySizeInfo {
-                path: path.clone(),
+                path: path.to_string(),
                 size_bytes: 0,
                 file_count: 0,
                 directory_count: 0,

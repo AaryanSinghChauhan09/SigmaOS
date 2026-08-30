@@ -288,17 +288,14 @@ impl NixosConfig {
                     item.push_str("\"");
                     items_str.push(item);
                 }
-                let mut result = String::from("[ ");
-                result.push_str(&format!("{}/{}", items_str, " "));
-                result.push_str(" ]");
-                result
+                format!("[ {} ]", items_str.join(" "))
             }
             ConfigOption::Attrs(attrs) => {
                 let attrs_str: Vec<String> = attrs
                     .iter()
                     .map(|(k, v)| format!("{} = {}", k, self.config_option_to_string(v)))
                     .collect();
-                format!("{{ {} }}", format!("{}/{}", attrs_str, "; "))
+                format!("{{ {} }}", attrs_str.join("; "))
             }
         }
     }

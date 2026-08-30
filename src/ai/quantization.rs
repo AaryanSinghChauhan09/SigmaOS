@@ -216,7 +216,7 @@ impl AiExecutionDispatcher {
                     }
                 }
             }
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => DeviceFallbackRoute {
+            _ => DeviceFallbackRoute {
                 primary_device: requested,
                 active_device: ComputeDeviceTarget::CpuSimd,
                 is_fallback_active: false,
@@ -235,7 +235,7 @@ impl AiExecutionDispatcher {
         let exec_time_us = match route.active_device {
             ComputeDeviceTarget::DiscreteGpu => ops as u64 / 10_000,
             ComputeDeviceTarget::IntegratedNpu => ops as u64 / 5_000,
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => ops as u64 / 1_000,
+            _ => ops as u64 / 1_000,
         };
 
         (ops, exec_time_us.max(1))

@@ -104,7 +104,7 @@ impl Profiler for SimpleProfiler {
 
     fn stop_profile(&mut self, id: ProfileID) -> Result<(), ProfilerError> {
         for profile_option in &mut self.profiles {
-            if let Some(ref profile) = *profile_option {
+            if let Some(ref mut profile) = *profile_option {
                 if profile.id() == id {
                     profile.stop_profile();
                     return Ok(());

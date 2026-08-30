@@ -396,7 +396,7 @@ impl IPackageParser for DebAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("{}/{}", dep_names, ", "));
+            output.push_str(&dep_names.join(", "));
             output.push('\n');
         }
 
@@ -648,7 +648,7 @@ impl IPackageParser for RpmAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("{}/{}", dep_names, " "));
+            output.push_str(&dep_names.join(" "));
             output.push('\n');
         }
 
@@ -864,7 +864,7 @@ impl IPackageParser for EbuildAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("RDEPEND=\"{}\"\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("RDEPEND=\"{}\"\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -971,7 +971,7 @@ impl IPackageParser for ApkAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("D:{}\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("D:{}\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -1089,7 +1089,7 @@ impl IPackageParser for NixAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("  buildInputs = [ {} ];\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("  buildInputs = [ {} ];\n", dep_names.join(" ")));
         }
         output.push_str("}\n");
 
@@ -1320,7 +1320,7 @@ impl IPackageParser for SnapAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("requires: {}\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("requires: {}\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -1438,7 +1438,7 @@ impl IPackageParser for AppImageAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Depends={}\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("Depends={}\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -1545,7 +1545,7 @@ impl IPackageParser for XbpsAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("depends=\"{}\"\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("depends=\"{}\"\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -1655,7 +1655,7 @@ impl IPackageParser for TxzAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("PACKAGE_REQUIRED={}\n", format!("{}/{}", dep_names, ",")));
+            output.push_str(&format!("PACKAGE_REQUIRED={}\n", dep_names.join(",")));
         }
 
         Ok(output.into_bytes())
@@ -1876,7 +1876,7 @@ impl IPackageParser for ZypperAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Requires: {}\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("Requires: {}\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())
@@ -1998,7 +1998,7 @@ impl IPackageParser for GuixAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("  (inputs `({}))\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("  (inputs `({}))\n", dep_names.join(" ")));
         }
         output.push_str(")\n");
 
@@ -2106,7 +2106,7 @@ impl IPackageParser for SigmaAdapter {
                 .iter()
                 .map(|d| d.name.as_str())
                 .collect();
-            output.push_str(&format!("Depends: {}\n", format!("{}/{}", dep_names, " ")));
+            output.push_str(&format!("Depends: {}\n", dep_names.join(" ")));
         }
 
         Ok(output.into_bytes())

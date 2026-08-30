@@ -33,7 +33,7 @@ impl NixDerivation {
 
     /// Computes the unique deterministic content-addressed store path for the output package.
     pub fn compute_store_path(&self) -> String {
-        let mut hash_input = format!("{}-{}-{}", self.name, self.builder, self.format!("{}/{}", args, ","));
+        let mut hash_input = format!("{}-{}-{}", self.name, self.builder, self.args.join(","));
         for (k, v) in &self.env {
             hash_input.push_str(&format!(";{}={}", k, v));
         }
@@ -85,8 +85,8 @@ impl BazelBuildEngine {
     /// Calculates cache key representing exact input sources and dependency versions
     pub fn calculate_target_cache_key(&self, target: &BazelTarget) -> String {
         let mut key = format!("{}-{:?}", target.label, target.rule_type);
-        key.push_str(&target.format!("{}/{}", srcs, ","));
-        key.push_str(&target.format!("{}/{}", deps, ","));
+        key.push_str(&target.srcs.join(","));
+        key.push_str(&target.deps.join(","));
         key
     }
 

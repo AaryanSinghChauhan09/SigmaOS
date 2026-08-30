@@ -422,10 +422,10 @@ impl SystemdEngine {
 
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
-                self.topo_visit(id, unit_ids.as_slice(), &mut sorted, &mut visiting, &mut visited)?;
+                self.topo_visit(id, unit_ids, &mut sorted, &mut visiting, &mut visited)?;
             }
         }
-        Ok(SystemdVec::from(sorted.as_slice()))
+        Ok(sorted)
     }
 
     fn topo_visit(

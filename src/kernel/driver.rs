@@ -241,7 +241,7 @@ mod tests {
     impl KernelObject for MockDriver {
         fn name(&self) -> &str { self.base.name() }
         fn set_name(&mut self, name: &str) { self.base.set_name(name); }
-        fn parent(&self) -> Option<&dyn KernelObject> { self.None::<&str> }
+        fn parent(&self) -> Option<&dyn KernelObject> { self.base.parent() }
         fn set_parent(&mut self, parent: Option<&dyn KernelObject>) { self.base.set_parent(parent); }
         fn children(&self) -> Vec<&dyn KernelObject> { self.base.children() }
         fn add_child(&mut self, child: &dyn KernelObject) { self.base.add_child(child); }

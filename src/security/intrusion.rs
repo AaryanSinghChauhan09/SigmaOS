@@ -190,7 +190,7 @@ impl DetectionStrategy for AnomalyDetection {
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
-            let deviation: f64 = (event.0u64 as f64 - *baseline).abs();
+            let deviation: f64 = (event.timestamp as f64 - *baseline).abs();
 
             if deviation > self.threshold {
                 return Some(DetectionResult {

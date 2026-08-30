@@ -187,7 +187,7 @@ impl EosLogTool {
             })
             .collect();
 
-        sanitized = format!("{}/{}", words, " ");
+        sanitized = words.join(" ");
 
         // 2. Redact sensitive keywords
         for keyword in &self.sensitive_keywords {

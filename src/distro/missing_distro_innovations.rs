@@ -55,6 +55,143 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
+/// 10. Linux & BSD Sysctl Kernel MIB Parameter Management Engine
+#[derive(Debug, Clone)]
+pub struct SysctlNode {
+    pub mib_name: String,
+    pub value: String,
+    pub is_read_only: bool,
+}
+
+pub struct LinuxBsdSysctlEngine {
+    pub mib_tree: BTreeMap<String, SysctlNode>,
+}
+
+impl LinuxBsdSysctlEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            mib_tree: BTreeMap::new(),
+        };
+        engine.register_defaults();
+        engine
+    }
+
+    fn register_defaults(&mut self) {
+        let defaults = [
+            ("kernel.ostype", "SigmaOS", true),
+            ("kernel.osrelease", "1.0.0-sovereign", true),
+            ("vm.swappiness", "60", false),
+            ("net.ipv4.ip_forward", "0", false),
+            ("net.ipv6.conf.all.forwarding", "0", false),
+            ("hw.ncpu", "8", true),
+            ("hw.physmem", "17179869184", true),
+        ];
+
+        for (name, val, ro) in defaults {
+            self.mib_tree.insert(
+                name.to_string(),
+                SysctlNode {
+                    mib_name: name.to_string(),
+                    value: val.to_string(),
+                    is_read_only: ro,
+                },
+            );
+        }
+    }
+
+    pub fn get_value(&self, mib_name: &str) -> Option<String> {
+        self.mib_tree.get(mib_name).map(|node| node.value.clone())
+    }
+
+    pub fn set_value(&mut self, mib_name: &str, new_value: &str) -> Result<(), &'static str> {
+        if let Some(node) = self.mib_tree.get_mut(mib_name) {
+            if node.is_read_only {
+                return Err("Sysctl error: MIB parameter is read-only");
+            }
+            node.value = new_value.to_string();
+            Ok(())
+        } else {
+            Err("Sysctl error: MIB entry not found")
+        }
+    }
+}
+
+impl Default for LinuxBsdSysctlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 11. Linux io_uring Asynchronous Submission/Completion Queue Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoUringOp {
+    Nop,
+    Readv,
+    Writev,
+    Fsync,
+    Timeout,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubmissionQueueEntry {
+    pub opcode: IoUringOp,
+    pub fd: usize,
+    pub len: usize,
+    pub user_data: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub res: i32,
+    pub flags: u32,
+}
+
+pub struct IoUringEngine {
+    pub sq_entries: Vec<SubmissionQueueEntry>,
+    pub cq_entries: Vec<CompletionQueueEntry>,
+}
+
+impl IoUringEngine {
+    pub fn new() -> Self {
+        Self {
+            sq_entries: Vec::new(),
+            cq_entries: Vec::new(),
+        }
+    }
+
+    pub fn submit_sqe(&mut self, entry: SubmissionQueueEntry) {
+        self.sq_entries.push(entry);
+    }
+
+    pub fn process_ring(&mut self) -> Vec<CompletionQueueEntry> {
+        let mut processed = Vec::new();
+        for sqe in self.sq_entries.drain(..) {
+            let res = match sqe.opcode {
+                IoUringOp::Nop => 0,
+                IoUringOp::Readv => sqe.len as i32,
+                IoUringOp::Writev => sqe.len as i32,
+                IoUringOp::Fsync => 0,
+                IoUringOp::Timeout => 0,
+            };
+            let cqe = CompletionQueueEntry {
+                user_data: sqe.user_data,
+                res,
+                flags: 0,
+            };
+            processed.push(cqe.clone());
+            self.cq_entries.push(cqe);
+        }
+        processed
+    }
+}
+
+impl Default for IoUringEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 2. Tails OS Amnesic Memory Scrubbing Engine
 pub struct TailsAmnesicEngine {
     pub ram_pages: Vec<Vec<u8>>,
