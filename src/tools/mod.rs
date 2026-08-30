@@ -5,6 +5,7 @@ pub mod data_engine;
 pub mod sigmatools;
 pub mod sovereign_commands;
 pub mod textproc;
+pub mod window_manager;
 
 pub use data_engine::{
     AggregateOp, ColumnType, DataFrame, DataRecord, DataSchema, DataValue, JoinType,
@@ -21,3 +22,7 @@ pub use sovereign_commands::{
     SovereignGccToolchain, SovereignInitramfsSystemd, SovereignSudo, SovereignTopHtop,
 };
 pub use textproc::{AwkPattern, PatternSearch, SedPattern, StreamEditor, TextProcessor};
+pub use window_manager::{
+    Container, KeyBinding, LayoutType, MonitorOutputConfig, Rect, ScratchpadManager,
+    TilingWindowManager, Window, WmGapsConfig, Workspace,
+};
