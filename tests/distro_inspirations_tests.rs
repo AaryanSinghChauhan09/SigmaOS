@@ -217,7 +217,7 @@ fn rescuezilla_and_clear_linux_auto_optimization_work() {
     assert!(rescue.verify_image("root_clone"));
 
     let optimizer = ClearLinuxAutoOptimizer::detect_hardware(true, true);
-    assert_eq!(optimizer.microarch_tier, MicroarchTier::X86_64_v4);
+    assert_eq!(optimizer.microarch_tier, MicroarchTier::X86_64V4);
     assert_eq!(optimizer.active_binary_suffix(), ".v4-avx512");
 }
 

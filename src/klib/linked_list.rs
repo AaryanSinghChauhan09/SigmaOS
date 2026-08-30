@@ -141,7 +141,7 @@ impl<T> LinkedList<T> {
     }
 
     /// Iterate over elements from front to back.
-    pub fn iter(&self) -> LinkedListIter<T> {
+    pub fn iter(&self) -> LinkedListIter<'_, T> {
         LinkedListIter {
             current: self.head,
             _marker: PhantomData,

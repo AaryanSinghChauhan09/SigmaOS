@@ -302,10 +302,10 @@ impl SovereignPackageManager {
     /// Dynamically routes package resolution to the most optimal microarchitecture binary based on CPU capability level (V4 down to V1)
     pub fn resolve_optimized_package(&self, pkg_name: &str, cpu_level: CpuArchLevel) -> String {
         let target_suffix = match cpu_level {
-            CpuArchLevel::X86_64_v4 => "-v4",
-            CpuArchLevel::X86_64_v3 => "-v3",
-            CpuArchLevel::X86_64_v2 => "-v2",
-            CpuArchLevel::X86_64_v1 => "",
+            CpuArchLevel::X86_64V4 => "-v4",
+            CpuArchLevel::X86_64V3 => "-v3",
+            CpuArchLevel::X86_64V2 => "-v2",
+            CpuArchLevel::X86_64V1 => "",
         };
 
         // Simulated check if the optimized package suffix is supported or falls back
@@ -706,10 +706,10 @@ impl IPackageAdapter for EbuildPackageAdapter {
     ) -> Result<(), &'static str> {
         let level = CachyCpuDetector::detect_level();
         let march = match level {
-            CpuArchLevel::X86_64_v4 => "march=x86-64-v4",
-            CpuArchLevel::X86_64_v3 => "march=x86-64-v3",
-            CpuArchLevel::X86_64_v2 => "march=x86-64-v2",
-            CpuArchLevel::X86_64_v1 => "march=x86-64",
+            CpuArchLevel::X86_64V4 => "march=x86-64-v4",
+            CpuArchLevel::X86_64V3 => "march=x86-64-v3",
+            CpuArchLevel::X86_64V2 => "march=x86-64-v2",
+            CpuArchLevel::X86_64V1 => "march=x86-64",
         };
         println!(
             "Portage/ebuild compiler: Compiling source using micro-architecture target: {} with USE flags: {:?}",
@@ -987,13 +987,13 @@ impl CachyCpuDetector {
             && features.contains(&"avx512bw");
 
         if has_v4 {
-            CpuArchLevel::X86_64_v4
+            CpuArchLevel::X86_64V4
         } else if has_v3 {
-            CpuArchLevel::X86_64_v3
+            CpuArchLevel::X86_64V3
         } else if has_v2 {
-            CpuArchLevel::X86_64_v2
+            CpuArchLevel::X86_64V2
         } else {
-            CpuArchLevel::X86_64_v1
+            CpuArchLevel::X86_64V1
         }
     }
 
@@ -1006,10 +1006,10 @@ impl CachyCpuDetector {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchLevel {
-    X86_64_v1,
-    X86_64_v2,
-    X86_64_v3,
-    X86_64_v4,
+    X86_64V1,
+    X86_64V2,
+    X86_64V3,
+    X86_64V4,
 }
 
 pub struct UniversalPackage;
@@ -1218,13 +1218,13 @@ mod tests {
         let level = CachyCpuDetector::detect_level_from_features(&[
             "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2",
         ]);
-        assert_eq!(level, CpuArchLevel::X86_64_v3);
+        assert_eq!(level, CpuArchLevel::X86_64V3);
 
         let v4_level = CachyCpuDetector::detect_level_from_features(&[
             "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f",
             "avx512vl", "avx512dq", "avx512bw",
         ]);
-        assert_eq!(v4_level, CpuArchLevel::X86_64_v4);
+        assert_eq!(v4_level, CpuArchLevel::X86_64V4);
     }
 
     #[test]

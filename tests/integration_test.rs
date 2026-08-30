@@ -80,7 +80,7 @@ mod tests {
         assert_eq!(vm.get_persona(), KernelPersona::Linux2_6);
 
         // Step 2: Use the Binary Compatibility Matrix to decode and translate syscall expectations
-        let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi_32);
+        let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi32);
         let translated_sys = matrix.translate_sys_context(5); // expect 1005 offset mapping
         assert_eq!(translated_sys, 1005);
 
@@ -283,11 +283,11 @@ mod tests {
 
         // Case 8: Multi-Lib architecture routing translation
         assert_eq!(
-            link1.resolve_multi_lib_routing(SyscallAbi::Oabi_32),
+            link1.resolve_multi_lib_routing(SyscallAbi::Oabi32),
             "/lib32/libc.so"
         );
         assert_eq!(
-            link1.resolve_multi_lib_routing(SyscallAbi::Eabi_64),
+            link1.resolve_multi_lib_routing(SyscallAbi::Eabi64),
             "/lib64/libc.so"
         );
     }

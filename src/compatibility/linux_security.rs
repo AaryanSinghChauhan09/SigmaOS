@@ -30,30 +30,30 @@ use alloc::format;
 /// Linux capability (capability-based security)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxCapability {
-    CAP_CHOWN,
-    CAP_DAC_OVERRIDE,
-    CAP_DAC_READ_SEARCH,
-    CAP_FOWNER,
-    CAP_FSETID,
-    CAP_KILL,
-    CAP_SETGID,
-    CAP_SETUID,
-    CAP_SETPCAP,
-    CAP_LINUX_IMMUTABLE,
-    CAP_NET_BIND_SERVICE,
-    CAP_NET_BROADCAST,
-    CAP_NET_ADMIN,
-    CAP_NET_RAW,
-    CAP_IPC_LOCK,
-    CAP_IPC_OWNER,
-    CAP_SYS_MODULE,
-    CAP_SYS_RAWIO,
-    CAP_SYS_CHROOT,
-    CAP_SYS_PTRACE,
-    CAP_SYS_ADMIN,
-    CAP_SYS_BOOT,
-    CAP_AUDIT_WRITE,
-    CAP_AUDIT_CONTROL,
+    CapChown,
+    CapDacOverride,
+    CapDacReadSearch,
+    CapFowner,
+    CapFsetid,
+    CapKill,
+    CapSetgid,
+    CapSetuid,
+    CapSetpcap,
+    CapLinuxImmutable,
+    CapNetBindService,
+    CapNetBroadcast,
+    CapNetAdmin,
+    CapNetRaw,
+    CapIpcLock,
+    CapIpcOwner,
+    CapSysModule,
+    CapSysRawio,
+    CapSysChroot,
+    CapSysPtrace,
+    CapSysAdmin,
+    CapSysBoot,
+    CapAuditWrite,
+    CapAuditControl,
 }
 
 /// Security context (SELinux-inspired)
@@ -258,7 +258,7 @@ mod tests {
     fn test_apparmor_profile() {
         let mut profile = AppArmorProfile::new("test_profile".to_string(), "/bin/test".to_string());
         profile.allow_path("/etc/passwd".to_string());
-        profile.add_capability(LinuxCapability::CAP_NET_BIND_SERVICE);
+        profile.add_capability(LinuxCapability::CapNetBindService);
         assert_eq!(profile.allow_paths.len(), 1);
         assert_eq!(profile.capabilities.len(), 1);
     }

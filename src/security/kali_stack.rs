@@ -5,6 +5,7 @@ use core::mem;
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -75,7 +76,7 @@ impl IptablesFirewall {
         // Defaults to ACCEPT
         let mut decision = true;
 
-        for i in 0..self.rules.len {
+        for i in 0..self.rules.len() {
             if let Some(ref rule) = self.rules[i] {
                 if rule.is_input == is_input
                     && &rule.protocol[..protocol.len()] == protocol
@@ -124,7 +125,7 @@ impl CronDaemon {
     /// Simulate cron tick iteration
     pub fn tick_minute(&self, current_minute: u8) -> usize {
         let mut executed = 0;
-        for i in 0..self.jobs.len {
+        for i in 0..self.jobs.len() {
             if let Some(ref job) = self.jobs[i] {
                 if job.minute_cron == 0xFF || job.minute_cron == current_minute {
                     self.total_executions.fetch_add(1, Ordering::SeqCst);
@@ -201,7 +202,7 @@ impl TmuxMultiplexer {
 
     /// Swap two terminal pane layouts dynamically (tmux swap-pane equivalent)
     pub fn swap_panes(&mut self, pane_a_idx: usize, pane_b_idx: usize) -> Result<(), KaliError> {
-        if pane_a_idx >= self.panes.len || pane_b_idx >= self.panes.len {
+        if pane_a_idx >= self.panes.len() || pane_b_idx >= self.panes.len() {
             return Err(KaliError::SwapFailed);
         }
 
@@ -393,83 +394,6 @@ impl KaliAirgeddonWifiAudit {
     }
 }
 
-struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use alloc::alloc::{alloc as std_alloc, Layout};
@@ -541,7 +465,7 @@ mod tests {
     fn test_tmux_split() {
         let mut tmux = TmuxMultiplexer::new(b"admin-session");
         tmux.split_window(1, 100, 50);
-        assert_eq!(tmux.panes.len, 1);
+        assert_eq!(tmux.panes.len(), 1);
 
         // Test attaching/detaching client terminal
         assert!(tmux.is_attached);

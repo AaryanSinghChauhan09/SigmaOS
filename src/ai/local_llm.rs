@@ -10,7 +10,7 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QuantizationType {
-    Q4_K_M,
+    Q4KM,
     Q8_0,
     F16,
 }
@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn test_local_llm_and_whisper() {
-        let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", QuantizationType::Q4_K_M);
+        let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", QuantizationType::Q4KM);
         let resp = llm.generate_response("open browser");
         assert!(resp.contains("Sovereign Browser"));
 

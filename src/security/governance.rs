@@ -311,8 +311,8 @@ pub struct ContainerSecurityPolicyEngine {
 impl ContainerSecurityPolicyEngine {
     pub fn new() -> Self {
         let mut caps = Vec::new();
-        caps.push("CAP_SYS_ADMIN".to_string());
-        caps.push("CAP_NET_RAW".to_string());
+        caps.push("CapSysAdmin".to_string());
+        caps.push("CapNetRaw".to_string());
 
         Self {
             enforce_read_only_rootfs: true,

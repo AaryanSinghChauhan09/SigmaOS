@@ -27,6 +27,11 @@ cloud = ["cloud-init"]
 cloud-init = []
 wasm = []
 browser = ["wasm"]
+# Opt-in feature consumed by src/klib/custom_allocator.rs via cfg(feature = "...").
+custom_alloc_error_handler = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(custom_alloc_error_handler)'] }
 
 [profile.dev]
 opt-level = 0

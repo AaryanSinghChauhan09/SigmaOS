@@ -33,8 +33,8 @@ use alloc::vec::Vec;
 pub enum MeshPersona {
     EraLinux2_4,
     EraLinux2_6,
-    EraLinux4_x,
-    EraLinux6_x,
+    EraLinux4X,
+    EraLinux6X,
 }
 
 pub struct MeshNode {
@@ -65,9 +65,9 @@ impl KernelRelayMesh {
                     n.persona == MeshPersona::EraLinux2_4 || n.persona == MeshPersona::EraLinux2_6
                 })
                 .map(|n| n.persona)
-                .unwrap_or(MeshPersona::EraLinux6_x)
+                .unwrap_or(MeshPersona::EraLinux6X)
         } else {
-            MeshPersona::EraLinux6_x
+            MeshPersona::EraLinux6X
         }
     }
 }
@@ -366,7 +366,7 @@ mod tests {
         });
 
         assert_eq!(mesh.route_subsystem(true), MeshPersona::EraLinux2_4);
-        assert_eq!(mesh.route_subsystem(false), MeshPersona::EraLinux6_x);
+        assert_eq!(mesh.route_subsystem(false), MeshPersona::EraLinux6X);
     }
 
     #[test]

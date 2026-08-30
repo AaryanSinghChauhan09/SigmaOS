@@ -33,7 +33,7 @@ use alloc::vec::Vec;
 pub enum LatticePersona {
     EraLinux2_2,
     EraLinux3_2,
-    EraLinux6_x,
+    EraLinux6X,
 }
 
 pub struct LatticeNode {
@@ -371,7 +371,7 @@ mod tests {
             coordinates: (1, 1),
         });
         lattice.register_node(LatticeNode {
-            persona: LatticePersona::EraLinux6_x,
+            persona: LatticePersona::EraLinux6X,
             coordinates: (5, 5),
         });
 

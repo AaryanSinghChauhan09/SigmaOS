@@ -3941,10 +3941,10 @@ impl VoidLinuxRunitSupervisor {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuIsaMicroarch {
-    X86_64_V1,
-    X86_64_V2,
-    X86_64_V3,
-    X86_64_V4,
+    X86_64V1,
+    X86_64V2,
+    X86_64V3,
+    X86_64V4,
 }
 
 pub struct IntelClearLinuxStatelessEngine {
@@ -3958,17 +3958,17 @@ impl IntelClearLinuxStatelessEngine {
         Self {
             usr_share_defaults: HashMap::new(),
             etc_user_overrides: HashMap::new(),
-            detected_isa: CpuIsaMicroarch::X86_64_V3,
+            detected_isa: CpuIsaMicroarch::X86_64V3,
         }
     }
 
     pub fn auto_detect_isa(&mut self, has_avx2: bool, has_avx512: bool) -> CpuIsaMicroarch {
         if has_avx512 {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V4;
+            self.detected_isa = CpuIsaMicroarch::X86_64V4;
         } else if has_avx2 {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V3;
+            self.detected_isa = CpuIsaMicroarch::X86_64V3;
         } else {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V1;
+            self.detected_isa = CpuIsaMicroarch::X86_64V1;
         }
         self.detected_isa
     }

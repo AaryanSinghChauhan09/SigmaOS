@@ -108,8 +108,8 @@ impl SmartSymlink {
     /// Maps a target syscall ABI to its multiarch library routing path.
     pub fn resolve_multi_lib_routing(&self, abi: SyscallAbi) -> String {
         match abi {
-            SyscallAbi::Oabi_32 | SyscallAbi::Eabi_32 => "/lib32/libc.so".to_string(),
-            SyscallAbi::Eabi_64 => "/lib64/libc.so".to_string(),
+            SyscallAbi::Oabi32 | SyscallAbi::Eabi32 => "/lib32/libc.so".to_string(),
+            SyscallAbi::Eabi64 => "/lib64/libc.so".to_string(),
         }
     }
 

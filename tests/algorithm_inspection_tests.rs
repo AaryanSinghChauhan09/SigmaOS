@@ -27,7 +27,7 @@ fn test_ml_data_science_algorithms_inspection() {
     let reduced = pca.transform(&vec![1.0, 2.0, 3.0, 4.0]);
     assert_eq!(reduced.len(), 2);
 
-    let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", QuantizationType::Q4_K_M);
+    let llm = LocalLlmWrapper::new("/models/llama3-8b.gguf", QuantizationType::Q4KM);
     let resp = llm.generate_response("system status");
     assert!(resp.contains("100% Sovereign"));
 }

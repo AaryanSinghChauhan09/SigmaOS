@@ -183,8 +183,8 @@ impl BootManager for CorebootBoot {
 pub enum DriverEra {
     EraLinux2_4,
     EraLinux2_6,
-    EraLinux4_x,
-    EraLinux6_x,
+    EraLinux4X,
+    EraLinux6X,
 }
 
 pub struct DriverTimeline {
@@ -196,7 +196,7 @@ impl DriverTimeline {
     pub fn new(device_name: &'static str) -> Self {
         Self {
             device_name,
-            loaded_era: DriverEra::EraLinux6_x,
+            loaded_era: DriverEra::EraLinux6X,
         }
     }
 

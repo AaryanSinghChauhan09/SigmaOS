@@ -223,8 +223,11 @@ static mut GLOBAL_CPU_OPTIMIZER: Option<SovereignCompilerOptimizer> = None;
 /// Initialize global CPU optimizer
 pub fn init_cpu_optimizer() {
     unsafe {
-        GLOBAL_CPU_OPTIMIZER = Some(SovereignCompilerOptimizer::new());
-        if let Some(ref mut optimizer) = GLOBAL_CPU_OPTIMIZER {
+        // Use addr_of_mut! so we never form a shared/mutable reference to the
+        // mutable static itself (which is UB under the static_mut_refs lint).
+        let slot = core::ptr::addr_of_mut!(GLOBAL_CPU_OPTIMIZER);
+        *slot = Some(SovereignCompilerOptimizer::new());
+        if let Some(optimizer) = &mut *slot {
             optimizer.detect_processor_extensions();
         }
     }
@@ -233,7 +236,12 @@ pub fn init_cpu_optimizer() {
 /// Get global CPU optimizer reference
 pub fn get_cpu_optimizer() -> &'static SovereignCompilerOptimizer {
     unsafe {
-        GLOBAL_CPU_OPTIMIZER.as_ref().expect("CPU optimizer not initialized")
+        // Read through addr_of! (raw pointer) rather than as_ref(), which would
+        // hand out a reference to the mutable static.
+        match *core::ptr::addr_of!(GLOBAL_CPU_OPTIMIZER) {
+            Some(ref optimizer) => optimizer,
+            None => panic!("CPU optimizer not initialized"),
+        }
     }
 }
 

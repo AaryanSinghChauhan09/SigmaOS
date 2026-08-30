@@ -1038,9 +1038,9 @@ impl Default for RescuezillaBackupEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MicroarchTier {
     GenericX86_64,
-    X86_64_v2,
-    X86_64_v3,
-    X86_64_v4,
+    X86_64V2,
+    X86_64V3,
+    X86_64V4,
 }
 
 pub struct ClearLinuxAutoOptimizer {
@@ -1052,11 +1052,11 @@ pub struct ClearLinuxAutoOptimizer {
 impl ClearLinuxAutoOptimizer {
     pub fn detect_hardware(has_avx2: bool, has_avx512: bool) -> Self {
         let microarch_tier = if has_avx512 {
-            MicroarchTier::X86_64_v4
+            MicroarchTier::X86_64V4
         } else if has_avx2 {
-            MicroarchTier::X86_64_v3
+            MicroarchTier::X86_64V3
         } else {
-            MicroarchTier::X86_64_v2
+            MicroarchTier::X86_64V2
         };
 
         Self {
@@ -1069,9 +1069,9 @@ impl ClearLinuxAutoOptimizer {
     pub fn active_binary_suffix(&self) -> &'static str {
         match self.microarch_tier {
             MicroarchTier::GenericX86_64 => ".generic",
-            MicroarchTier::X86_64_v2 => ".v2",
-            MicroarchTier::X86_64_v3 => ".v3-avx2",
-            MicroarchTier::X86_64_v4 => ".v4-avx512",
+            MicroarchTier::X86_64V2 => ".v2",
+            MicroarchTier::X86_64V3 => ".v3-avx2",
+            MicroarchTier::X86_64V4 => ".v4-avx512",
         }
     }
 }

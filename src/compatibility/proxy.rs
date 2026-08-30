@@ -35,8 +35,8 @@ use crate::klib::BTreeMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KernelPersonality {
     Linux2_6,
-    Linux3_x,
-    Linux4_x,
+    Linux3X,
+    Linux4X,
     POSIXLegacy,
 }
 
@@ -67,11 +67,11 @@ impl KernelProxy {
                     syscall_num, args
                 ))
             }
-            KernelPersonality::Linux3_x => Ok(format!(
+            KernelPersonality::Linux3X => Ok(format!(
                 "Routed Linux 3.x syscall {} with args {:?}",
                 syscall_num, args
             )),
-            KernelPersonality::Linux4_x => Ok(format!(
+            KernelPersonality::Linux4X => Ok(format!(
                 "Routed Linux 4.x syscall {} with args {:?}",
                 syscall_num, args
             )),
