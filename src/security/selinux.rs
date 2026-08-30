@@ -214,7 +214,7 @@ impl SecurityContext {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AvcKey {
     pub source_type: String,
     pub target_type: String,

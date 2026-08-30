@@ -43,8 +43,7 @@ pub struct SystemSnapshot {
 
 impl SystemSnapshot {
     pub fn new(description: String) -> Self {
-        let timestamp_nanos = core::time::Duration::from_secs(0)
-            .duration_since(core::time::Duration::from_secs(0))
+        let timestamp_nanos = Some(core::time::Duration::from_secs(0))
             .map(|d| d.as_nanos())
             .unwrap_or(0);
         Self {
@@ -210,8 +209,7 @@ impl SelfHealingModule {
         // Log the event
         self.event_log.push((
             event_type,
-            core::time::Duration::from_secs(0)
-                .duration_since(core::time::Duration::from_secs(0))
+            Some(core::time::Duration::from_secs(0))
                 .map(|d| d.as_secs())
                 .unwrap_or(0),
         ));

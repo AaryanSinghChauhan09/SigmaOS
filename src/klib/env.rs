@@ -2,16 +2,18 @@
 //! Custom environment variable access for SigmaOS
 //! Inspired by Linux & BSD distribution standards (XDG Base Directory, OpenBSD secure_getenv, FreeBSD defaults)
 
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::string::FromUtf8Error as Utf8Error;
 use core::arch::asm;
 use core::ffi::c_char;
-use core:: String::Utf8Error;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Process privilege state flag for OpenBSD issetugid() parity
 static IS_TAINTED: AtomicBool = AtomicBool::new(false);
 
 /// Error types for environment operations
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum EnvError {
     SetFailed,
     RemoveFailed,
@@ -250,14 +252,14 @@ impl SigmaEnv {
                     in_pos += 1;
                 }
 
-                let var_name = core:: String::from_utf8(&bytes[var_start..in_pos])
+                let var_name = String::from_utf8(bytes[var_start..in_pos].to_vec())
                     .map_err(EnvError::Utf8Error)?;
 
                 if is_braced && in_pos < bytes.len() && bytes[in_pos] == b'}' {
                     in_pos += 1;
                 }
 
-                let value = Self::get_or_default(var_name);
+                let value = Self::get_or_default(&var_name);
                 let val_bytes = value.as_bytes();
 
                 if out_pos + val_bytes.len() > out_buf.len() {
@@ -323,7 +325,8 @@ impl SigmaEnv {
         loop {
             if *ptr.add(len) == 0 {
                 let bytes = core::slice::from_raw_parts(ptr as *const u8, len);
-                return core:: String::from_utf8(bytes).map_err(EnvError::Utf8Error);
+                let string = String::from_utf8(bytes.to_vec()).map_err(EnvError::Utf8Error)?;
+                return Ok(Box::leak(string.into_boxed_str()));
             }
             len += 1;
         }
@@ -546,7 +549,7 @@ mod tests {
         let mut out = [0u8; 128];
 
         let len = SigmaEnv::expand_vars("Blocksize is $BLOCKSIZE and editor is ${EDITOR}", &mut out).unwrap();
-        let expanded = core:: String::from_utf8(&out[..len]).unwrap();
+        let expanded = String::from_utf8(out[..len].to_vec()).unwrap();
 
         assert_eq!(
             expanded,

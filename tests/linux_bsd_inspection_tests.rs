@@ -878,3 +878,45 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     swap.swappiness = 80;
     assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
 }
+
+#[test]
+fn test_new_kernel_subsystem_innovations_inspection() {
+    use linux_bsd_innovations::{
+        LinuxXdpExtendedFilter, XdpAction,
+        FreeBsdVfsVnodeLock, VnodeLockState,
+        KernelMemoryPagePool,
+    };
+
+    // 1. Linux XDP Extended Packet Filter
+    let mut xdp = LinuxXdpExtendedFilter::new();
+    xdp.block_port(8080);
+    assert_eq!(xdp.filter_packet_at_rx_ring(8080), XdpAction::Drop);
+    assert_eq!(xdp.filter_packet_at_rx_ring(443), XdpAction::Pass);
+    assert_eq!(xdp.drop_count, 1);
+    assert_eq!(xdp.pass_count, 1);
+
+    // 2. FreeBSD VFS Vnode Lock
+    let mut vnode = FreeBsdVfsVnodeLock::new(101);
+    assert_eq!(vnode.state, VnodeLockState::Unlocked);
+    assert!(vnode.acquire_shared().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(1));
+    assert!(vnode.acquire_shared().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(2));
+    assert!(vnode.release().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Shared(1));
+    assert!(vnode.release().is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Unlocked);
+
+    assert!(vnode.acquire_exclusive(42).is_ok());
+    assert_eq!(vnode.state, VnodeLockState::Exclusive(42));
+    assert!(vnode.acquire_shared().is_err());
+    assert!(vnode.release().is_ok());
+
+    // 3. Kernel Memory Page Pool
+    let mut pool = KernelMemoryPagePool::new(16);
+    assert_eq!(pool.free_frame_pfns.len(), 16);
+    let frame_pfn = pool.alloc_page_frame().unwrap();
+    assert_eq!(pool.free_frame_pfns.len(), 15);
+    pool.free_page_frame(frame_pfn);
+    assert_eq!(pool.free_frame_pfns.len(), 16);
+}

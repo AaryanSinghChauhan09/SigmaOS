@@ -262,8 +262,7 @@ impl EmailClient {
         EmailMessage {
             id: format!(
                 "email_{}",
-                core::time::Duration::from_secs(0)
-                    .duration_since(std::time::core::time::Duration::from_secs(0))
+                Some(core::time::Duration::from_secs(0))
                     .unwrap()
                     .as_nanos()
             ),

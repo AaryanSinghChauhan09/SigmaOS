@@ -407,8 +407,7 @@ impl SystemAutomationManager {
         };
 
         let pseudo_random = || -> f64 {
-            let nanos = core::time::Duration::from_secs(0)
-                .duration_since(std::time::core::time::Duration::from_secs(0))
+            let nanos = Some(core::time::Duration::from_secs(0))
                 .map(|d| d.as_nanos())
                 .unwrap_or(123456789);
             let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);

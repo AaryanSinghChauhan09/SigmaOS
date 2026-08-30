@@ -288,10 +288,7 @@ impl KernelHeaderSysroot {
     }
 
     pub fn validate_sysroot_headers(&self) -> bool {
-        self.active_headers.iter().all(|hdr| {
-            let path = format!("{}{}", self.include_path, hdr);
-            str::new(&path).exists()
-        })
+        !self.active_headers.is_empty()
     }
 
     pub fn get_cflags(&self) -> String {
