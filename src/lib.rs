@@ -142,6 +142,10 @@ pub use distro_inspirations::{
     TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
 };
 
+pub use compatibility::fedora::{
+    CryptoPolicyLevel, FedoraCryptoPoliciesEngine, FedoraSilverblueRpmOstreeEngine,
+};
+
 pub use crate::access as auth;
 
 pub use crate::desktop as app;
