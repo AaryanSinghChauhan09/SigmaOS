@@ -3,6 +3,7 @@
 // and execution over standard in-kernel maps.
 
 use crate::klib::HashMap;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EbpfInstruction {

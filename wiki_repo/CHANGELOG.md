@@ -103,4 +103,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic repository structure
 - Initial documentation
 - CI/CD pipeline setup
->>>>>>> origin/improve-package-manager-and-containers-15562379424742924660

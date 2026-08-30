@@ -547,6 +547,18 @@ pub enum SchedulerClass {
     Idle,
 }
 
+impl SchedulerClass {
+    /// Lower value == more urgent, so classes sort naturally.
+    pub fn urgency(&self) -> u8 {
+        match self {
+            SchedulerClass::RTLane => 0,
+            SchedulerClass::Interactive => 1,
+            SchedulerClass::Normal => 2,
+            SchedulerClass::Idle => 3,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DvfsPowerGovernor {
     Performance,
@@ -615,12 +627,41 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.insert(tid, task);
     }
 
+    /// Earliest-Deadline-First selection, modelled on Linux `SCHED_DEADLINE`.
+    ///
+    /// Ordering is (1) scheduling class urgency, (2) earliest absolute deadline,
+    /// (3) pid as a deterministic tie-break so the choice never depends on hash
+    /// map iteration order.
     pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
-        self.rt_tasks.values().next()
+        let mut best: Option<&RealtimeTask> = None;
+        for task in self.rt_tasks.values() {
+            best = match best {
+                None => Some(task),
+                Some(current) => {
+                    let task_key = (task.class.urgency(), task.deadline_us, task.pid);
+                    let cur_key = (current.class.urgency(), current.deadline_us, current.pid);
+                    if task_key < cur_key {
+                        Some(task)
+                    } else {
+                        Some(current)
+                    }
+                }
+            };
+        }
+        best
     }
 
-    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
-        self.rt_tasks.values().next()
+    /// Reject any task whose worst-case execution time cannot fit its deadline,
+    /// the admission test Linux performs before accepting a SCHED_DEADLINE job.
+    pub fn admit_rt_task(&mut self, tid: usize, task: RealtimeTask) -> Result<(), &'static str> {
+        if task.wcet_us == 0 {
+            return Err("RT admission: wcet_us must be greater than zero");
+        }
+        if task.wcet_us > task.deadline_us {
+            return Err("RT admission: wcet_us exceeds deadline_us");
+        }
+        self.rt_tasks.insert(tid, task);
+        Ok(())
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.

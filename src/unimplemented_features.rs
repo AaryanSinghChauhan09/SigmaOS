@@ -236,7 +236,6 @@ impl Default for BareMetalPeripheralManager {
     }
 }
 
-=======
 // ==================================================================
 // 6.2 ZERO-ALLOCATION UDF BYTECODE INTERPRETER SPECIFICATION
 // ==================================================================

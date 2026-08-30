@@ -9,6 +9,7 @@ extern crate alloc;
 use crate::klib::HashMap;
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 // ==========================================
