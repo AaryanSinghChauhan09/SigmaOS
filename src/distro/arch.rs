@@ -12,10 +12,6 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 /// Pacman sync database repository types

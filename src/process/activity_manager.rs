@@ -7,9 +7,6 @@ use alloc::format;
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test)]
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

@@ -14,10 +14,6 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::time::Duration;
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 #[cfg(test)]

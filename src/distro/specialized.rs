@@ -3,10 +3,6 @@ use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 /// HPC Cluster Job State

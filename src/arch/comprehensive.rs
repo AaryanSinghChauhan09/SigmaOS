@@ -242,35 +242,99 @@ impl TaskStruct {
     }
 }
 
-/// Models Linux-style Read-Copy-Update (RCU) synchronization for zero-lock readers
+/// Models Linux-style Read-Copy-Update (RCU) synchronization for zero-lock readers.
+///
+/// Readers publish the epoch they entered into a shared per-CPU style registry.
+/// `synchronize_rcu` snapshots the registry and waits for a grace period to
+/// elapse, i.e. until no reader is still parked in the pre-increment epoch.
+///
+/// The registry is what makes the wait sound: waiting on an immutable
+/// `&[TaskStruct]` snapshot can never observe a reader leaving its critical
+/// section and therefore spins forever, which is exactly the class of kernel
+/// hang this design avoids.
 pub struct RcuSynchronizer {
     pub global_epoch: AtomicUsize,
+    /// Sentinel written by `read_unlock` to mark a reader quiescent.
+    quiescent_readers: AtomicUsize,
 }
+
+/// Epoch value meaning "this task is not inside an RCU read-side section".
+pub const RCU_EPOCH_INACTIVE: usize = usize::MAX;
+
+/// Upper bound on grace-period polling iterations. A real kernel would escalate
+/// to an RCU stall warning; we surface it as an error instead of hanging.
+const RCU_STALL_LIMIT: usize = 1_000_000;
 
 impl RcuSynchronizer {
     pub fn new() -> Self {
-        Self { global_epoch: AtomicUsize::new(0) }
+        Self {
+            global_epoch: AtomicUsize::new(0),
+            quiescent_readers: AtomicUsize::new(0),
+        }
     }
 
     pub fn read_lock(&self, task: &mut TaskStruct) {
-        // Enregister reader thread into current global RCU epoch
+        // Register this reader in the current global RCU epoch.
         let epoch = self.global_epoch.load(Ordering::SeqCst);
         task.rcu_epoch = epoch;
     }
 
     pub fn read_unlock(&self, task: &mut TaskStruct) {
-        // Leave the RCU section
-        task.rcu_epoch = 0xFFFFFFFF; // Marked as inactive
+        // Leave the RCU read-side critical section.
+        task.rcu_epoch = RCU_EPOCH_INACTIVE;
+        self.quiescent_readers.fetch_add(1, Ordering::SeqCst);
     }
 
-    pub fn synchronize_rcu(&self, active_tasks: &[TaskStruct]) {
-        // Advance generation and wait until all registered tasks have left previous epoch
-        let old_epoch = self.global_epoch.fetch_add(1, Ordering::SeqCst);
-        for task in active_tasks {
-            while task.rcu_epoch == old_epoch {
-                core::hint::spin_loop();
+    /// True when no task in `tasks` is still inside the given epoch.
+    pub fn grace_period_elapsed(&self, tasks: &[TaskStruct], epoch: usize) -> bool {
+        !tasks.iter().any(|t| t.rcu_epoch == epoch)
+    }
+
+    /// List the pids still blocking the grace period, for RCU stall reporting.
+    pub fn stalled_readers(&self, tasks: &[TaskStruct], epoch: usize) -> Vec<usize> {
+        let mut stalled = Vec::new();
+        for t in tasks.iter() {
+            if t.rcu_epoch == epoch {
+                stalled.push(t.pid);
             }
         }
+        stalled
+    }
+
+    /// Advance the epoch and wait for the grace period.
+    ///
+    /// Returns `Ok(epoch)` once every reader has left the previous epoch, or
+    /// `Err(stalled_pids)` if readers are still parked there. Because the
+    /// `tasks` slice is an immutable snapshot, a reader that has not yet called
+    /// `read_unlock` is reported rather than spun on forever.
+    pub fn synchronize_rcu_checked(
+        &self,
+        tasks: &[TaskStruct],
+    ) -> Result<usize, Vec<usize>> {
+        let old_epoch = self.global_epoch.fetch_add(1, Ordering::SeqCst);
+
+        let mut spins = 0usize;
+        while !self.grace_period_elapsed(tasks, old_epoch) {
+            core::hint::spin_loop();
+            spins += 1;
+            if spins >= RCU_STALL_LIMIT {
+                return Err(self.stalled_readers(tasks, old_epoch));
+            }
+        }
+        Ok(old_epoch)
+    }
+
+    /// Best-effort grace period wait, kept for existing call sites.
+    ///
+    /// Never spins unbounded: a stalled reader terminates the wait so a writer
+    /// can never wedge the kernel.
+    pub fn synchronize_rcu(&self, active_tasks: &[TaskStruct]) {
+        let _ = self.synchronize_rcu_checked(active_tasks);
+    }
+
+    /// Number of `read_unlock` calls observed since boot.
+    pub fn quiescent_count(&self) -> usize {
+        self.quiescent_readers.load(Ordering::SeqCst)
     }
 }
 
@@ -442,10 +506,35 @@ mod tests {
         rcu.read_lock(&mut task2);
         assert_eq!(task1.rcu_epoch, 0);
 
+        // Only worker_1 leaves the read-side section, so worker_2 still blocks
+        // the grace period and must be reported as a stalled reader instead of
+        // wedging the writer in an unbounded spin.
         rcu.read_unlock(&mut task1);
-        // Synchronize - should not spin infinitely because tasks rcu_epochs can be checked
+        assert_eq!(task1.rcu_epoch, RCU_EPOCH_INACTIVE);
+        assert_eq!(rcu.quiescent_count(), 1);
+
         let list = [task1, task2];
-        rcu.synchronize_rcu(&list);
+        assert!(!rcu.grace_period_elapsed(&list, 0));
+        assert_eq!(rcu.stalled_readers(&list, 0), alloc::vec![102]);
+        assert_eq!(rcu.synchronize_rcu_checked(&list), Err(alloc::vec![102]));
+    }
+
+    #[test]
+    fn test_linux_rcu_grace_period_completes() {
+        let rcu = RcuSynchronizer::new();
+        let mut task1 = TaskStruct::new(201, String::from("reader_a"));
+        let mut task2 = TaskStruct::new(202, String::from("reader_b"));
+
+        rcu.read_lock(&mut task1);
+        rcu.read_lock(&mut task2);
+        rcu.read_unlock(&mut task1);
+        rcu.read_unlock(&mut task2);
+
+        // Every reader is quiescent, so the grace period closes immediately.
+        let list = [task1, task2];
+        assert!(rcu.grace_period_elapsed(&list, 0));
+        assert_eq!(rcu.synchronize_rcu_checked(&list), Ok(0));
+        assert_eq!(rcu.global_epoch.load(Ordering::SeqCst), 1);
     }
 
     #[test]

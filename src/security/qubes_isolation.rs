@@ -7,10 +7,6 @@ extern crate alloc;
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
 
 
-#[cfg(not(test))]
-use core::cell::RefCell;
-
-#[cfg(test)]
 use core::cell::RefCell;
 
 #[cfg(not(test))]
@@ -30,10 +26,6 @@ impl CapabilityToken {
     }
 }
 
-#[cfg(not(test))]
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-#[cfg(test)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 

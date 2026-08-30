@@ -21,9 +21,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 
-#[cfg(not(test))]
-use crate::klib::BTreeMap;
-#[cfg(test)]
 use crate::klib::BTreeMap;
 
 /// Represents an AI SysAdmin Recommendation or Action

@@ -236,7 +236,7 @@ mod tests {
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        let response_str = std:: String::from_utf8(&response).unwrap();
+        let response_str = core::str::from_utf8(&response).unwrap();
         assert!(response_str.contains("file_io"));
         assert!(response_str.contains("read file /etc/hosts"));
     }

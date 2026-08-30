@@ -14,10 +14,6 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

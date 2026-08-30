@@ -8,9 +8,6 @@ use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test)]
 use crate::klib::HashMap;
 
 /// Memory page size (4KB)

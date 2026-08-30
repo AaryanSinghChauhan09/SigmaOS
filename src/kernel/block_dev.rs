@@ -334,16 +334,9 @@ mod tests {
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-        let write_data: Vec<u8> = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-            .to_le_bytes()
-            .iter()
-            .cycle()
-            .take(512)
-            .copied()
-            .collect();
+        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
+        let mut write_data = vec![0u8; 512];
+        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_data);
         rd.write_sectors(0, &write_data).unwrap();
         let mut read_buf = vec![0u8; 512];
         rd.read_sectors(0, &mut read_buf).unwrap();
@@ -375,16 +368,13 @@ mod tests {
         assert_eq!(mgr.device_count(), 1);
 
         let bio_id = mgr.next_bio_id();
-        let write_data: Vec<u8> = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-            .to_le_bytes()
-            .iter()
-            .cycle()
-            .take(512)
-            .copied()
-            .collect();
+        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
+        let mut write_bytes = [0u8; 512];
+        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_bytes);
+        let mut write_data = Vec::new();
+        for b in write_bytes.iter() {
+            write_data.push(*b);
+        }
         let write_bio = Bio::write(bio_id, 10, write_data);
         mgr.submit_bio(write_bio);
         let processed = mgr.process_pending();

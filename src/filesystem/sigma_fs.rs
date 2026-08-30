@@ -5,9 +5,6 @@ use alloc::format;
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test)]
 use crate::klib::HashMap;
 use crate::klib::path::PathBuf;
 use alloc::string::{String, ToString};

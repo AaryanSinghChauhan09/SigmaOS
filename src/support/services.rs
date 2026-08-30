@@ -13,10 +13,6 @@ use alloc::vec::Vec;
 use alloc::string::ToString;
 use core::sync::atomic::{AtomicBool, Ordering};
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
 use crate::klib::HashMap;
 
 /// Professional support levels

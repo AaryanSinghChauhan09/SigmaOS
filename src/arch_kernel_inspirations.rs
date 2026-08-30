@@ -817,7 +817,10 @@ mod tests {
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases = vec![
+        // Each closure literal has its own type, so coerce to a plain fn pointer
+        // to keep the homogeneous Vec that run_suite<F> requires.
+        type KUnitBody = fn(&mut Vec<Expectation>);
+        let cases: Vec<(String, KUnitBody)> = vec![
             ("test_ok".to_string(), |e: &mut Vec<Expectation>| {
                 e.push(Expectation {
                     kind: ExpectationKind::Eq,

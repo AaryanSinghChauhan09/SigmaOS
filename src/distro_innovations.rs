@@ -295,21 +295,6 @@ impl DebianUnattendedUpgradesEngine {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_debian_unattended_upgrades_engine() {
-        let mut engine = DebianUnattendedUpgradesEngine::new();
-        assert!(engine.should_auto_upgrade("libc6", "Debian-Security"));
-        assert!(!engine.should_auto_upgrade("untrusted-app", "UntrustedOrigin"));
-
-        engine.package_blacklists.push("libc6".to_string());
-        assert!(!engine.should_auto_upgrade("libc6", "Debian-Security"));
-    }
-}
-
 /// 8. Void Linux: XBPS Transaction Graph
 #[derive(Debug, Clone)]
 pub struct XbpsTransactionEngine {
@@ -468,5 +453,15 @@ mod tests {
         let stateless = ClearLinuxStatelessRoot::new();
         assert_eq!(stateless.resolve_config_priority(true), "/etc");
         assert_eq!(stateless.resolve_config_priority(false), "/usr/share/defaults");
+    }
+
+    #[test]
+    fn test_debian_unattended_upgrades_engine() {
+        let mut engine = DebianUnattendedUpgradesEngine::new();
+        assert!(engine.should_auto_upgrade("libc6", "Debian-Security"));
+        assert!(!engine.should_auto_upgrade("untrusted-app", "UntrustedOrigin"));
+
+        engine.package_blacklists.push("libc6".to_string());
+        assert!(!engine.should_auto_upgrade("libc6", "Debian-Security"));
     }
 }

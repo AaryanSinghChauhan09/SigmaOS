@@ -232,7 +232,7 @@ mod tests {
             .dispatch_task(b"RELOAD_CORES", Some(1))
             .unwrap();
         assert_eq!(
-            std:: String::from_utf8(&response).unwrap(),
+            core::str::from_utf8(&response).unwrap(),
             "TaskAgent: RELOAD_CORES"
         );
 
@@ -242,6 +242,6 @@ mod tests {
         assert_eq!(queue.size(), 2);
 
         let task = queue.dequeue().unwrap();
-        assert_eq!(std:: String::from_utf8(&task).unwrap(), "TASK_PRIO_HIGH");
+        assert_eq!(core::str::from_utf8(&task).unwrap(), "TASK_PRIO_HIGH");
     }
 }
