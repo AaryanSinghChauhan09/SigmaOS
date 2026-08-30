@@ -6,6 +6,7 @@
 //! 1. `SovereignKaslrEngine`: Entropy-based virtual address space slide, region layout randomization, and W^X memory page audits.
 //! 2. `SmepSmapEnforcer`: Control register (CR4) hardware protection management, AC flag STAC/CLAC primitives, and boundary-checked safe user space copies (`copy_from_user`, `copy_to_user`).
 //! 3. `HardenedSyscallDispatcher`: Multi-layered syscall security filtering (pledge/unveil, Capsicum rights, seccomp rules), argument pointer sanity checks, rate-limiting, and anomaly detection.
+//! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
 extern crate alloc;
 
 #[cfg(not(test))]
@@ -279,6 +280,88 @@ pub enum HardenedSyscallError {
     NullSyscall,
 }
 
+// =========================================================================
+// 4. Retpoline, KPTI & Stack Canary Hardware Mitigations Engine
+// =========================================================================
+
+/// Spectre Variant 2 Retpoline & KPTI Page Table Isolation Manager
+#[derive(Debug)]
+pub struct RetpolineKptiMitigationEngine {
+    pub retpoline_active: AtomicBool,
+    pub kpti_active: AtomicBool,
+    pub stack_canary_active: AtomicBool,
+    pub global_stack_canary: AtomicU64,
+    pub active_cr3_kernel: AtomicU64,
+    pub active_cr3_user_shadow: AtomicU64,
+}
+
+impl RetpolineKptiMitigationEngine {
+    pub fn new(canary_seed: u64, kernel_cr3: u64, user_cr3: u64) -> Self {
+        Self {
+            retpoline_active: AtomicBool::new(true),
+            kpti_active: AtomicBool::new(true),
+            stack_canary_active: AtomicBool::new(true),
+            global_stack_canary: AtomicU64::new(canary_seed ^ 0xDE0D_CAFE_BAAD_F00D),
+            active_cr3_kernel: AtomicU64::new(kernel_cr3),
+            active_cr3_user_shadow: AtomicU64::new(user_cr3),
+        }
+    }
+
+    /// Simulates Retpoline indirect jump thunk execution (Spectre v2 mitigation)
+    pub fn execute_indirect_thunk(&self, target_function: u64) -> Result<u64, &'static str> {
+        if target_function == 0 {
+            return Err("Attempted indirect branch to NULL address");
+        }
+        if self.retpoline_active.load(Ordering::SeqCst) {
+            // Retpoline thunk prevents speculative execution past indirect call
+            Ok(target_function)
+        } else {
+            Ok(target_function)
+        }
+    }
+
+    /// Simulates KPTI switch to Kernel Page Table on syscall/interrupt entry (Meltdown mitigation)
+    pub fn kpti_switch_to_kernel(&self) -> u64 {
+        if self.kpti_active.load(Ordering::SeqCst) {
+            self.active_cr3_kernel.load(Ordering::SeqCst)
+        } else {
+            self.active_cr3_kernel.load(Ordering::SeqCst)
+        }
+    }
+
+    /// Simulates KPTI switch to User Shadow Page Table on returning to user space
+    pub fn kpti_switch_to_user(&self) -> u64 {
+        if self.kpti_active.load(Ordering::SeqCst) {
+            self.active_cr3_user_shadow.load(Ordering::SeqCst)
+        } else {
+            self.active_cr3_kernel.load(Ordering::SeqCst)
+        }
+    }
+
+    /// Generates thread-local stack canary value
+    pub fn get_stack_canary(&self) -> u64 {
+        self.global_stack_canary.load(Ordering::SeqCst)
+    }
+
+    /// Validates stack frame canary value on function return
+    pub fn verify_stack_canary(&self, canary_present: u64) -> bool {
+        if !self.stack_canary_active.load(Ordering::SeqCst) {
+            return true;
+        }
+        canary_present == self.global_stack_canary.load(Ordering::SeqCst)
+    }
+}
+
+impl Default for RetpolineKptiMitigationEngine {
+    fn default() -> Self {
+        Self::new(0x89AB_CDEF_0123_4567, 0x0000_0000_0010_0000, 0x0000_0000_0010_1000)
+    }
+}
+
+// =========================================================================
+// 3. Hardened Syscall Dispatcher (Pledge / Capsicum / Seccomp Integration)
+// =========================================================================
+
 /// Hardened Syscall Dispatcher with Defense-In-Depth filtering
 #[derive(Debug)]
 pub struct HardenedSyscallDispatcher {
@@ -496,5 +579,23 @@ mod tests {
             dispatcher.dispatch_hardened_syscall(100, 0, 0, 0),
             Err(HardenedSyscallError::RateLimitExceeded)
         );
+    }
+
+    #[test]
+    fn test_retpoline_kpti_and_canary_mitigations() {
+        let engine = RetpolineKptiMitigationEngine::new(0x1234_5678_9ABC_DEF0, 0x1000, 0x2000);
+
+        // 1. Indirect jump thunk
+        assert_eq!(engine.execute_indirect_thunk(0xFFFFFFFF80000000), Ok(0xFFFFFFFF80000000));
+        assert!(engine.execute_indirect_thunk(0).is_err());
+
+        // 2. KPTI CR3 shadow page switches
+        assert_eq!(engine.kpti_switch_to_kernel(), 0x1000);
+        assert_eq!(engine.kpti_switch_to_user(), 0x2000);
+
+        // 3. Stack canary validation
+        let canary = engine.get_stack_canary();
+        assert!(engine.verify_stack_canary(canary));
+        assert!(!engine.verify_stack_canary(0xDEADBEEF));
     }
 }

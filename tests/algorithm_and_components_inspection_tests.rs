@@ -4,6 +4,13 @@
 //! Deeply inspects core algorithms across scheduling, memory management,
 //! cryptographic key exchanges, network state machines, and filesystem journaling.
 
+#[macro_use]
+extern crate alloc;
+extern crate std;
+
+#[path = "../src/klib/mod.rs"]
+mod klib;
+
 #[path = "../src/kernel/scheduler.rs"]
 mod scheduler;
 

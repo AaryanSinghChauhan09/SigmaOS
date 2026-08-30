@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
@@ -240,7 +239,7 @@ impl MemoryPool for SimpleBuddyAllocator {
     }
 }
 
-pub use crate::klib::vec::Vec;
+use crate::klib::vec::Vec;
 
 #[cfg(test)]
 mod tests {

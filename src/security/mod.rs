@@ -2,6 +2,7 @@
 pub mod audit;
 pub mod capability;
 pub mod hardening;
+pub mod kernel_hardening;
 
 pub mod bridge;
 pub mod capability_enforcer;
@@ -30,6 +31,7 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
+pub mod kali_stack;
 
 pub use qubes_isolation::*;
 pub use root_improvement::{
@@ -49,8 +51,17 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use forensics::*;
+pub use kali_stack::{
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType,
+};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+};
+pub use kernel_hardening::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine,
+    SmepSmapEnforcer, SovereignKaslrEngine, SyscallCategory,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,

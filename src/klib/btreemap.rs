@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 // Custom BTreeMap implementation for SigmaOS
 // Reduces dependency on std::collections::BTreeMap

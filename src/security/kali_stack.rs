@@ -268,6 +268,131 @@ impl DmesgLog {
     }
 }
 
+// ==========================================
+// KALI LINUX SECURITY AUDITING & DEFENSIVE ANALYZER SUITE
+// ==========================================
+
+/// Metasploit payload detector & signature inspector
+pub struct KaliMetasploitPayloadFilter {
+    pub known_nop_sled_bytes: u8,
+    pub max_nop_threshold: usize,
+    pub detected_threats_count: AtomicUsize,
+}
+
+impl KaliMetasploitPayloadFilter {
+    pub fn new() -> Self {
+        Self {
+            known_nop_sled_bytes: 0x90, // x86 NOP instruction byte
+            max_nop_threshold: 8,
+            detected_threats_count: AtomicUsize::new(0),
+        }
+    }
+
+    /// Inspects memory buffer for NOP sleds or shellcode entry signatures
+    pub fn inspect_payload(&self, buffer: &[u8]) -> bool {
+        let mut consecutive_nops = 0;
+        for &byte in buffer {
+            if byte == self.known_nop_sled_bytes {
+                consecutive_nops += 1;
+                if consecutive_nops >= self.max_nop_threshold {
+                    self.detected_threats_count.fetch_add(1, Ordering::SeqCst);
+                    return true; // NOP sled threat detected!
+                }
+            } else {
+                consecutive_nops = 0;
+            }
+        }
+        false
+    }
+}
+
+impl Default for KaliMetasploitPayloadFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Wireshark-inspired PCAP packet header and anomaly analyzer
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PcapPacketHeader {
+    pub timestamp_sec: u32,
+    pub captured_length: u32,
+    pub original_length: u32,
+}
+
+pub struct KaliWiresharkPacketAnalyzer {
+    pub total_analyzed: AtomicUsize,
+    pub malformed_packets: AtomicUsize,
+}
+
+impl KaliWiresharkPacketAnalyzer {
+    pub fn new() -> Self {
+        Self {
+            total_analyzed: AtomicUsize::new(0),
+            malformed_packets: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn analyze_packet(&self, header: &PcapPacketHeader, payload: &[u8]) -> bool {
+        self.total_analyzed.fetch_add(1, Ordering::SeqCst);
+
+        if header.captured_length != payload.len() as u32
+            || header.captured_length > header.original_length
+        {
+            self.malformed_packets.fetch_add(1, Ordering::SeqCst);
+            return false; // Malformed PCAP packet header
+        }
+        true
+    }
+}
+
+impl Default for KaliWiresharkPacketAnalyzer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Airgeddon-inspired Wi-Fi 802.11 frame auditor & deauth flood detector
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WifiFrameType {
+    Beacon,
+    ProbeRequest,
+    Deauthentication,
+    AssociationRequest,
+}
+
+pub struct KaliAirgeddonWifiAudit {
+    pub deauth_flood_threshold: usize,
+    pub consecutive_deauths: AtomicUsize,
+    pub attack_alert: bool,
+}
+
+impl KaliAirgeddonWifiAudit {
+    pub fn new(deauth_threshold: usize) -> Self {
+        Self {
+            deauth_flood_threshold: deauth_threshold,
+            consecutive_deauths: AtomicUsize::new(0),
+            attack_alert: false,
+        }
+    }
+
+    pub fn audit_wifi_frame(&mut self, frame_type: WifiFrameType) -> bool {
+        match frame_type {
+            WifiFrameType::Deauthentication => {
+                let current = self.consecutive_deauths.fetch_add(1, Ordering::SeqCst) + 1;
+                if current >= self.deauth_flood_threshold {
+                    self.attack_alert = true;
+                    return true; // Deauth flood attack detected!
+                }
+            }
+            _ => {
+                self.consecutive_deauths.store(0, Ordering::SeqCst);
+            }
+        }
+        false
+    }
+}
+
 struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
@@ -447,5 +572,45 @@ mod tests {
         let dmesg = DmesgLog::new();
         dmesg.log_message(b"Booting kernel...");
         assert!(dmesg.write_idx.load(Ordering::SeqCst) > 0);
+    }
+
+    #[test]
+    fn test_kali_metasploit_payload_filter() {
+        let filter = KaliMetasploitPayloadFilter::new();
+        let safe_buf = [0x00, 0x11, 0x22, 0x33];
+        assert!(!filter.inspect_payload(&safe_buf));
+
+        let nop_sled = [0x90; 12];
+        assert!(filter.inspect_payload(&nop_sled));
+        assert_eq!(filter.detected_threats_count.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_kali_wireshark_packet_analyzer() {
+        let analyzer = KaliWiresharkPacketAnalyzer::new();
+        let payload = [0xAA; 32];
+        let valid_hdr = PcapPacketHeader {
+            timestamp_sec: 1000,
+            captured_length: 32,
+            original_length: 32,
+        };
+        assert!(analyzer.analyze_packet(&valid_hdr, &payload));
+
+        let invalid_hdr = PcapPacketHeader {
+            timestamp_sec: 1000,
+            captured_length: 64, // mismatches payload length 32
+            original_length: 32,
+        };
+        assert!(!analyzer.analyze_packet(&invalid_hdr, &payload));
+    }
+
+    #[test]
+    fn test_kali_airgeddon_wifi_audit() {
+        let mut wifi_audit = KaliAirgeddonWifiAudit::new(3);
+        assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Beacon));
+        assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
+        assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
+        assert!(wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication)); // 3rd consecutive deauth triggers alert
+        assert!(wifi_audit.attack_alert);
     }
 }

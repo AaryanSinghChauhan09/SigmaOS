@@ -72,6 +72,12 @@ mod package_repository;
 mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod linux_bsd_inspirations;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
 
 use bsd_compat::*;
 
@@ -781,6 +787,114 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
     assert_eq!(linux_bridge.dispatch_syscall(9).unwrap(), 0x7FFF0000); // SYS_mmap
     let mut openbsd_bridge = LinuxBsdAbiBridge::new(BinaryAbiFormat::OpenBsdElf64);
     assert_eq!(openbsd_bridge.dispatch_syscall(20).unwrap(), 1000); // SYS_getpid
+}
+
+#[test]
+fn test_kernel_hardening_hardware_mitigations_inspection() {
+    use kernel_hardening::{
+        RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine, PagePermissions,
+    };
+
+    // 1. Retpoline, KPTI, and Stack Canary Mitigations
+    let mitigation = RetpolineKptiMitigationEngine::new(0xCAFE_BABE_1234_5678, 0x1000, 0x2000);
+    assert_eq!(mitigation.execute_indirect_thunk(0xFFFFFFFF80000000).unwrap(), 0xFFFFFFFF80000000);
+    assert_eq!(mitigation.kpti_switch_to_kernel(), 0x1000);
+    assert_eq!(mitigation.kpti_switch_to_user(), 0x2000);
+
+    let canary = mitigation.get_stack_canary();
+    assert!(mitigation.verify_stack_canary(canary));
+    assert!(!mitigation.verify_stack_canary(0x1234));
+
+    // 2. SMEP / SMAP Enforcer
+    let smep_smap = SmepSmapEnforcer::new(0x1000, 0x000F_FFFF);
+    assert!(smep_smap.validate_kernel_execution(0xFFFF_8000_0000_0000).is_ok());
+    assert!(smep_smap.validate_kernel_execution(0x2000).is_err()); // SMEP violation
+
+    // 3. KASLR & OpenBSD W^X Audit
+    let kaslr = SovereignKaslrEngine::new(0x8000_0000, 0x9000_0000, 42);
+    let mappings = vec![
+        (0x8000_1000, PagePermissions::new(true, false, true, false)), // R-X
+        (0x8000_2000, PagePermissions::new(true, true, false, false)), // RW-
+    ];
+    assert!(kaslr.audit_wx_protection(&mappings).is_ok());
+}
+
+#[test]
+fn test_linux_bsd_subsystem_innovations_inspection() {
+    use linux_bsd_inspirations::{
+        ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+        HermeticStoreClosureEngine, StoreClosurePackage, FD_RIGHT_READ, FD_RIGHT_WRITE,
+    };
+
+    // 1. Alpine / Void Chroot Build Sandbox Engine
+    let mut sbx = ApkChrootBuildSandboxEngine::new("sbx_test", "/chroot", true);
+    assert!(sbx.add_bind_mount("/usr").is_ok());
+    sbx.set_env("OPT", "-O3");
+    assert!(sbx.enter_chroot().is_ok());
+    let compile_res = sbx.compile_package("zlib", "make").unwrap();
+    assert!(compile_res.contains("zlib"));
+    assert!(sbx.exit_chroot().is_ok());
+
+    // 2. OpenBSD FD Pledge Gate Engine
+    let mut gate = OpenBsdFdPledgeGate::new();
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_ok());
+    assert!(gate.check_fd_right(4, FD_RIGHT_READ));
+    assert!(!gate.check_fd_right(4, 0x10)); // FD_RIGHT_DUP
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ).is_ok());
+    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_err()); // Cannot expand
+
+    // 3. FreeBSD GEOM & ZFS VDEV Topology Engine
+    let d1 = GeomVdevNode::leaf_disk("sda", true);
+    let d2 = GeomVdevNode::leaf_disk("sdb", true);
+    let mirror = GeomVdevNode::mirror("mirror0", vec![d1, d2]);
+    let mut geom = FreeBsdGeomVdevTopology::new("tank");
+    geom.add_vdev(mirror);
+    assert_eq!(geom.evaluate_topology_health(), "ONLINE");
+
+    // 4. NixOS / Guix Hermetic Store Closure Engine
+    let mut store = HermeticStoreClosureEngine::new("/sigma/store");
+    let libc = StoreClosurePackage {
+        hash_path: "/sigma/store/h1-libc".to_string(),
+        name: "libc".to_string(),
+        deps: vec![],
+        sha256: [0xAA; 32],
+    };
+    store.pin_closure(libc);
+    assert_eq!(store.compute_closure_size("/sigma/store/h1-libc"), 1);
+
+    // 5. Pop!_OS System76 Power Governor Engine
+    use linux_bsd_inspirations::{System76PowerGovernor, PowerProfileMode, GpuSwitchMode};
+    let mut power = System76PowerGovernor::new();
+    power.set_power_profile(PowerProfileMode::HighPerformance);
+    assert_eq!(power.gpu_mode, GpuSwitchMode::NvidiaDiscrete);
+
+    // 6. DragonFly BSD HAMMER2 PFS Cluster Quorum Engine
+    use linux_bsd_inspirations::Hammer2PfsClusterQuorumEngine;
+    let mut quorum = Hammer2PfsClusterQuorumEngine::new();
+    quorum.register_node(101, "192.168.1.10", 0x123456);
+    quorum.register_node(102, "192.168.1.11", 0x123456);
+    assert_eq!(quorum.evaluate_quorum().unwrap(), 0x123456);
+
+    // 7. HardenedBSD PaX Guard Security Engine
+    use linux_bsd_inspirations::HardenedBsdPaxGuardEngine;
+    let mut pax = HardenedBsdPaxGuardEngine::new();
+    assert!(pax.check_mprotect(500, 0x1000, true, true).is_err());
+
+    // 8. Kali Linux Security Auditing Suite
+    use kali_stack::{
+        KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer, KaliAirgeddonWifiAudit,
+        PcapPacketHeader, WifiFrameType,
+    };
+    let msf = KaliMetasploitPayloadFilter::new();
+    assert!(msf.inspect_payload(&[0x90; 10]));
+
+    let ws = KaliWiresharkPacketAnalyzer::new();
+    let pcap_hdr = PcapPacketHeader { timestamp_sec: 100, captured_length: 10, original_length: 10 };
+    assert!(ws.analyze_packet(&pcap_hdr, &[0u8; 10]));
+
+    let mut air = KaliAirgeddonWifiAudit::new(2);
+    assert!(!air.audit_wifi_frame(WifiFrameType::Deauthentication));
+    assert!(air.audit_wifi_frame(WifiFrameType::Deauthentication));
 }
 
 #[test]

@@ -1,5 +1,4 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 use crate::klib::vec::Vec;
 /// OOP-based Paging + Virtual Memory for SigmaOS

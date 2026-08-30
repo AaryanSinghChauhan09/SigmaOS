@@ -1,0 +1,25 @@
+name: FreeBSD kqueue Vnode Monitoring & PROCFS CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  test-freebsd-kqueue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test FreeBSD GEOM VDEV & Capsicum Rights
+        run: |
+          rustc --edition 2021 --test src/distro/linux_bsd_inspirations.rs -o build/freebsd_kqueue_test
+          ./build/freebsd_kqueue_test test_freebsd_geom_vdev_topology test_bsd_capsicum_rights_and_mode
