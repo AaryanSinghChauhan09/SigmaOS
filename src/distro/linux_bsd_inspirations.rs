@@ -5197,6 +5197,134 @@ mod tests {
 }
 
 // ==========================================
+// 38. ALPINE / VOID APK & XBPS TRANSACTIONAL HOOK ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ApkXbpsHookEntry {
+    pub name: String,
+    pub trigger_pattern: String,
+    pub pre_action: String,
+    pub post_action: String,
+}
+
+pub struct ApkXbpsHookEngine {
+    pub hooks: Vec<ApkXbpsHookEntry>,
+    pub executed_actions: Vec<String>,
+}
+
+impl ApkXbpsHookEngine {
+    pub fn new() -> Self {
+        Self {
+            hooks: Vec::new(),
+            executed_actions: Vec::new(),
+        }
+    }
+
+    pub fn register_hook(&mut self, name: &str, trigger_pattern: &str, pre_action: &str, post_action: &str) {
+        self.hooks.push(ApkXbpsHookEntry {
+            name: name.to_string(),
+            trigger_pattern: trigger_pattern.to_string(),
+            pre_action: pre_action.to_string(),
+            post_action: post_action.to_string(),
+        });
+    }
+
+    pub fn run_pre_hooks(&mut self, pkg_name: &str) -> usize {
+        let mut count = 0;
+        for hook in &self.hooks {
+            if pkg_name.contains(&hook.trigger_pattern) {
+                self.executed_actions.push(hook.pre_action.clone());
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn run_post_hooks(&mut self, pkg_name: &str) -> usize {
+        let mut count = 0;
+        for hook in &self.hooks {
+            if pkg_name.contains(&hook.trigger_pattern) {
+                self.executed_actions.push(hook.post_action.clone());
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn rollback_transaction(&mut self) -> usize {
+        let count = self.executed_actions.len();
+        self.executed_actions.clear();
+        count
+    }
+}
+
+impl Default for ApkXbpsHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 39. OPENBSD RETGUARD & MAP_STACK HARDENING ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct MapStackRegion {
+    pub base_addr: u64,
+    pub size: usize,
+}
+
+pub struct OpenBsdRetguardEngine {
+    pub map_stack_regions: Vec<MapStackRegion>,
+    pub active_canaries: Vec<(String, u64)>,
+    pub violations: Vec<String>,
+}
+
+impl OpenBsdRetguardEngine {
+    pub fn new() -> Self {
+        Self {
+            map_stack_regions: Vec::new(),
+            active_canaries: Vec::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
+        self.map_stack_regions.push(MapStackRegion { base_addr, size });
+    }
+
+    pub fn enter_function(&mut self, fn_name: &str, secret_key: u64, sp: u64) -> u64 {
+        let canary = secret_key ^ sp;
+        self.active_canaries.push((fn_name.to_string(), canary));
+        canary
+    }
+
+    pub fn verify_exit_function(&mut self, fn_name: &str, expected_canary: u64, sp: u64) -> Result<(), &'static str> {
+        let is_sp_valid = self.map_stack_regions.iter().any(|r| sp >= r.base_addr && sp < r.base_addr + r.size as u64);
+        if !is_sp_valid {
+            self.violations.push(format!("MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region in {}", sp, fn_name));
+            return Err("Stack pointer outside MAP_STACK region");
+        }
+
+        if let Some(pos) = self.active_canaries.iter().position(|(f, _)| f == fn_name) {
+            let (_, canary) = self.active_canaries.remove(pos);
+            if canary != expected_canary {
+                self.violations.push(format!("Retguard Canary Mismatch in {}", fn_name));
+                return Err("Retguard canary mismatch");
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for OpenBsdRetguardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
 // ==========================================
 

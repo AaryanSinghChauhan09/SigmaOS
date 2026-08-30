@@ -301,7 +301,7 @@ mod tests {
         assert_eq!(sum, AbstractValue::Constant(30));
 
         let interval = AbstractValue::Interval(1, 5);
-        let join = format!("{}/{}", v1, &interval);
+        let join = v1.join(&interval);
         assert_eq!(join, AbstractValue::Interval(1, 10));
     }
 
