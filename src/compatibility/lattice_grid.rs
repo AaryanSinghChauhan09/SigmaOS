@@ -30,6 +30,7 @@ use alloc::vec::Vec;
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum LatticePersona {
     EraLinux2_2,
     EraLinux3_2,
