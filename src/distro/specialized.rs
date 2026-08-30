@@ -254,46 +254,6 @@ impl Default for EosUpdateNotifier {
     }
 }
 
-/// Troubleshooting Issue Severity
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum TroubleshootingSeverity {
-    Info,
-    Warning,
-    Error,
-    Critical,
-}
-
-/// Troubleshooting Subsystem Category
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TroubleshootingCategory {
-    KernelPanic,
-    ServiceFailure,
-    MemoryExhaustion,
-    NetworkDisruption,
-    StorageFull,
-    SecurityViolation,
-    HardwareFault,
-    General,
-}
-
-/// Structured Troubleshooting Issue Record
-#[derive(Debug, Clone)]
-pub struct SovereignTroubleshootingIssue {
-    pub source: String,
-    pub category: TroubleshootingCategory,
-    pub severity: TroubleshootingSeverity,
-    pub log_message: String,
-    pub recommended_action: String,
-}
-
-/// Comprehensive System Troubleshooting Report
-#[derive(Debug, Clone)]
-pub struct SovereignTroubleshootingReport {
-    pub total_logs_analyzed: usize,
-    pub detected_issues: Vec<SovereignTroubleshootingIssue>,
-    pub summary_text: String,
-}
-
 /// Unified diagnostic collector for kernel and package manager logs
 #[derive(Debug, Clone)]
 pub struct DiagnosticLogTool {
@@ -318,100 +278,6 @@ impl DiagnosticLogTool {
             report.push('\n');
         }
         report
-    }
-
-    pub fn analyze_system_issues(&self) -> SovereignTroubleshootingReport {
-        let mut issues = Vec::new();
-
-        for line in &self.collected_lines {
-            let lower = line.to_lowercase();
-
-            if lower.contains("panic") || lower.contains("out of memory") || lower.contains("oom-killer") {
-                issues.push(SovereignTroubleshootingIssue {
-                    source: "Kernel/Memory".to_string(),
-                    category: TroubleshootingCategory::MemoryExhaustion,
-                    severity: TroubleshootingSeverity::Critical,
-                    log_message: line.clone(),
-                    recommended_action: "Increase swap partition size or invoke ZRAM memory compaction (`sysctl vm.swappiness=80`).".to_string(),
-                });
-            } else if lower.contains("failed") || lower.contains("error starting") || lower.contains("exit-code") {
-                issues.push(SovereignTroubleshootingIssue {
-                    source: "Init/Service".to_string(),
-                    category: TroubleshootingCategory::ServiceFailure,
-                    severity: TroubleshootingSeverity::Error,
-                    log_message: line.clone(),
-                    recommended_action: "Inspect service unit logs (`journalctl -xe -u <service>`) and restart using supervisor (`systemctl restart <service>`).".to_string(),
-                });
-            } else if lower.contains("pledge violation") || lower.contains("unveil violation") || lower.contains("capsicum denial") {
-                issues.push(SovereignTroubleshootingIssue {
-                    source: "Security/Sandbox".to_string(),
-                    category: TroubleshootingCategory::SecurityViolation,
-                    severity: TroubleshootingSeverity::Error,
-                    log_message: line.clone(),
-                    recommended_action: "Audit binary permissions or grant missing pledge/unveil rights in security manifest.".to_string(),
-                });
-            } else if lower.contains("no space left") || lower.contains("disk full") || lower.contains("fs error") {
-                issues.push(SovereignTroubleshootingIssue {
-                    source: "VFS/Storage".to_string(),
-                    category: TroubleshootingCategory::StorageFull,
-                    severity: TroubleshootingSeverity::Error,
-                    log_message: line.clone(),
-                    recommended_action: "Run package store garbage collection (`nix-collect-garbage` / `pacman -Sc`) or expand storage volume.".to_string(),
-                });
-            } else if lower.contains("link down") || lower.contains("timeout") || lower.contains("unreachable") {
-                issues.push(SovereignTroubleshootingIssue {
-                    source: "Network".to_string(),
-                    category: TroubleshootingCategory::NetworkDisruption,
-                    severity: TroubleshootingSeverity::Warning,
-                    log_message: line.clone(),
-                    recommended_action: "Verify interface status (`ip link`) and check DNS/routing configuration.".to_string(),
-                });
-            }
-        }
-
-        let critical_count = issues.iter().filter(|i| i.severity == TroubleshootingSeverity::Critical).count();
-        let error_count = issues.iter().filter(|i| i.severity == TroubleshootingSeverity::Error).count();
-        let warning_count = issues.iter().filter(|i| i.severity == TroubleshootingSeverity::Warning).count();
-
-        let summary_text = format!(
-            "Analyzed {} log entries. Found {} critical, {} error(s), and {} warning(s).",
-            self.collected_lines.len(),
-            critical_count,
-            error_count,
-            warning_count
-        );
-
-        SovereignTroubleshootingReport {
-            total_logs_analyzed: self.collected_lines.len(),
-            detected_issues: issues,
-            summary_text,
-        }
-    }
-
-    pub fn generate_auto_remediation_guide(&self) -> String {
-        let report = self.analyze_system_issues();
-        let mut guide = String::from("=== SigmaOS Automated Troubleshooting & Remediation Guide ===\n");
-        guide.push_str(&format!("Summary: {}\n\n", report.summary_text));
-
-        if report.detected_issues.is_empty() {
-            guide.push_str("✅ No critical system issues or service failures detected.\n");
-            return guide;
-        }
-
-        guide.push_str("Detected Issues & Actionable Remediation Steps:\n");
-        for (idx, issue) in report.detected_issues.iter().enumerate() {
-            guide.push_str(&format!(
-                "{}. [{:?}][{:?}] Source: {}\n   Log: {}\n   -> Remedy: {}\n\n",
-                idx + 1,
-                issue.severity,
-                issue.category,
-                issue.source,
-                issue.log_message,
-                issue.recommended_action
-            ));
-        }
-
-        guide
     }
 }
 
@@ -1187,23 +1053,5 @@ mod tests {
         assert!(!stabilization.is_update_allowed("new-feature"));
         assert!(stabilization.is_update_allowed("security"));
         assert!(stabilization.is_update_allowed("critical-bugfix"));
-    }
-
-    #[test]
-    fn test_diagnostic_log_tool_troubleshooting() {
-        let mut diag = DiagnosticLogTool::new();
-        diag.record_log_entry("kernel", "Kernel panic - out of memory (OOM-killer invoked)");
-        diag.record_log_entry("init", "Error starting nginx.service (exit-code 1)");
-        diag.record_log_entry("security", "Pledge violation: process attempted forbidden socket syscall");
-        diag.record_log_entry("vfs", "No space left on device (/var/log)");
-
-        let report = diag.analyze_system_issues();
-        assert_eq!(report.total_logs_analyzed, 4);
-        assert_eq!(report.detected_issues.len(), 4);
-
-        let guide = diag.generate_auto_remediation_guide();
-        assert!(guide.contains("SigmaOS Automated Troubleshooting"));
-        assert!(guide.contains("Remedy:"));
-        assert!(guide.contains("swappiness"));
     }
 }

@@ -25,10 +25,15 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use crate::sigpkg::universal_engine::PackageFormat;
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
-use crate::security::Permission;
-#[cfg(test)]
-use crate::access_control::AclEntry as Permission;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Permission {
+    NetworkTcp,
+    NetworkUdp,
+    FileRead,
+    FileWrite,
+    Ipc,
+}
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -295,7 +300,6 @@ impl UniversalPackageAdapter {
     }
 
     /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(not(test))]
     pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
         let mut permissions = Vec::new();
         for arg in plugs_or_args {
@@ -307,24 +311,6 @@ impl UniversalPackageAdapter {
                 permissions.push(Permission::FileWrite);
             } else if arg == "--share=ipc" {
                 permissions.push(Permission::Ipc);
-            }
-        }
-        permissions
-    }
-
-    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(test)]
-    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<String> {
-        let mut permissions = Vec::new();
-        for arg in plugs_or_args {
-            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
-                permissions.push("NetworkTcp".to_string());
-                permissions.push("NetworkUdp".to_string());
-            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
-                permissions.push("FileRead".to_string());
-                permissions.push("FileWrite".to_string());
-            } else if arg == "--share=ipc" {
-                permissions.push("Ipc".to_string());
             }
         }
         permissions
@@ -727,16 +713,8 @@ mod tests {
 
         // Verify container permissions map perfectly to SigmaOS capability permissions
         let perms = adapter.translate_sandbox_permissions(parsed.plugs.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileRead));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileRead".to_string()));
-        }
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileRead));
     }
 
     #[test]
@@ -759,18 +737,9 @@ mod tests {
         assert_eq!(parsed.finish_args.len(), 3);
 
         let perms = adapter.translate_sandbox_permissions(parsed.finish_args.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::Ipc));
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileWrite));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"Ipc".to_string()));
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileWrite".to_string()));
-        }
+        assert!(perms.contains(&Permission::Ipc));
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileWrite));
     }
 
     #[test]

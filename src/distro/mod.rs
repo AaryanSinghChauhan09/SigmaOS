@@ -80,8 +80,6 @@ pub use specialized::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
     ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
-    DiagnosticLogTool, SovereignTroubleshootingReport, SovereignTroubleshootingIssue,
-    TroubleshootingCategory, TroubleshootingSeverity,
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
@@ -109,7 +107,7 @@ pub use missing_distro_innovations::{
 };
 
 pub use linux_bsd_inspirations::{
-    SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType,
+    SovereignUniversalDistroBridge, DistroSubsystemMode,
     SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
     NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
     SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,

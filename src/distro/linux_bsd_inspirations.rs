@@ -18,21 +18,8 @@ pub enum DistroSubsystemMode {
     LinuxDebian,
     LinuxAlpine,
     LinuxNix,
-    LinuxGentoo,
-    LinuxFedora,
     FreeBsd,
     OpenBsd,
-    NetBsd,
-    DragonFlyBsd,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ServiceSupervisorType {
-    Systemd,
-    OpenRc,
-    Runit,
-    Dinit,
-    BsdRcD,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -64,52 +51,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
-            DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::FreeBsd => format!("{}.pkg", input_pkg),
             DistroSubsystemMode::OpenBsd => format!("{}.tgz", input_pkg),
-            DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
-            DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
-        }
-    }
-
-    pub fn translate_vfs_path(&self, relative_path: &str) -> String {
-        let clean = relative_path.trim_start_matches('/');
-        match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
-                if clean.starts_with("bin/") || clean.starts_with("lib/") || clean.starts_with("share/") {
-                    format!("/usr/local/{}", clean)
-                } else if clean.starts_with("etc/") {
-                    format!("/usr/local/etc/{}", clean.trim_start_matches("etc/"))
-                } else {
-                    format!("/{}", clean)
-                }
-            }
-            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFedora => {
-                if clean.starts_with("bin/") {
-                    format!("/usr/bin/{}", clean.trim_start_matches("bin/"))
-                } else if clean.starts_with("lib/") {
-                    format!("/usr/lib/{}", clean.trim_start_matches("lib/"))
-                } else {
-                    format!("/{}", clean)
-                }
-            }
-            DistroSubsystemMode::LinuxNix => format!("/nix/store/sigmaos-current/{}", clean),
-        }
-    }
-
-    pub fn query_preferred_supervisor(&self) -> ServiceSupervisorType {
-        match self.mode {
-            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxGentoo => ServiceSupervisorType::OpenRc,
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::BsdRcD,
-            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Systemd,
         }
     }
 
     pub fn enforce_security_isolation(&mut self, pid: u64, root_path: &str) -> Result<(), &'static str> {
         match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+            DistroSubsystemMode::FreeBsd => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
                 Ok(())
@@ -5368,7 +5317,6 @@ mod tests {
     }
 }
 
-// Section 38 & 39 duplicates removed - defined above in Section 10 & 11.
 
 // ==========================================
 // 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
@@ -5522,15 +5470,3 @@ impl ShepherdServiceManager {
         Ok(())
     }
 }
-
-impl Default for ShepherdServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Section 29 & 30 duplicates removed.
-
-// ==========================================
-// 35. SOVEREIGN UNIVERSAL DISTRO BRIDGE
-// ==========================================

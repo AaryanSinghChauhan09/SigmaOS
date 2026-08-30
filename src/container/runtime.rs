@@ -994,7 +994,7 @@ mod tests {
 
     #[test]
     fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let mut runtime = SimpleContainerRuntime::new(ContainerCapability::full());
         let id = runtime
             .create_container(
                 b"sovereign_container",

@@ -82,11 +82,11 @@ impl KUnitEngine {
     /// Run a suite defined by a set of test-case functions.
     pub fn run_suite<F>(&mut self, suite_name: &str, cases: Vec<(String, F)>) -> KUnitSuiteResult
     where
-        F: FnMut(&mut Vec<Expectation>) + Send,
+        F: FnOnce(&mut Vec<Expectation>) + Send,
     {
         let mut passed = 0;
         let mut failed = 0;
-        for (name, mut body) in cases {
+        for (name, body) in cases {
             let mut expectations = Vec::new();
             body(&mut expectations);
             let failed_count = expectations.iter().filter(|e| !e.passed).count();
@@ -817,7 +817,7 @@ mod tests {
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases: Vec<(String, fn(&mut Vec<Expectation>))> = vec![
+        let cases = vec![
             ("test_ok".to_string(), |e: &mut Vec<Expectation>| {
                 e.push(Expectation {
                     kind: ExpectationKind::Eq,

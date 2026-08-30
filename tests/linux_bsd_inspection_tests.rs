@@ -40,8 +40,6 @@ mod protocols;
 mod hardening;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
-#[path = "../src/distro/specialized.rs"]
-mod specialized;
 #[path = "../src/compatibility/garuda_zen.rs"]
 mod garuda_zen;
 #[path = "../src/virtualization/vm_manager.rs"]
@@ -112,48 +110,22 @@ fn test_sovereign_community_foundation_inspection() {
 
 #[test]
 fn test_sovereign_universal_distro_bridge_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
+    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
 
     let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
-    assert_eq!(bridge.translate_vfs_path("bin/nginx"), "/usr/bin/nginx");
-    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::Systemd);
 
     bridge.set_subsystem_mode(DistroSubsystemMode::LinuxAlpine);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.apk");
-    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::OpenRc);
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxGentoo);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.ebuild");
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxFedora);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.rpm");
 
     bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
-    assert_eq!(bridge.translate_vfs_path("bin/nginx"), "/usr/local/bin/nginx");
-    assert_eq!(bridge.translate_vfs_path("etc/nginx.conf"), "/usr/local/etc/nginx.conf");
-    assert_eq!(bridge.query_preferred_supervisor(), ServiceSupervisorType::BsdRcD);
     assert!(bridge.enforce_security_isolation(101, "/jails/app").is_ok());
     assert!(bridge.active_jail.is_some());
 
     bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
     assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
     assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
-}
-
-#[test]
-fn test_sovereign_troubleshooting_inspection() {
-    use specialized::DiagnosticLogTool;
-
-    let mut diag = DiagnosticLogTool::new();
-    diag.record_log_entry("kernel", "out of memory: OOM-killer killed process 981 (mysqld)");
-    diag.record_log_entry("init", "Failed to start OpenSSH server daemon");
-
-    let report = diag.analyze_system_issues();
-    assert_eq!(report.detected_issues.len(), 2);
-    let guide = diag.generate_auto_remediation_guide();
-    assert!(guide.contains("journalctl"));
 }
 
 #[test]

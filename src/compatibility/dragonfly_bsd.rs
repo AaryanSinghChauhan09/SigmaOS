@@ -131,8 +131,7 @@ impl LwktScheduler {
     /// Pops next lockless message for given thread ID
     pub fn receive_message(&mut self, tid: u32) -> Option<LwktMessage> {
         if let Some(queue) = self.thread_queues.get_mut(&tid) {
-            let queue_slice: &mut [LwktMessage] = queue.as_mut_slice();
-            if !queue_slice.is_empty() {
+            if !queue.is_empty() {
                 return Some(queue.remove(0));
             }
         }
