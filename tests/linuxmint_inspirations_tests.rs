@@ -3,7 +3,7 @@ extern crate alloc;
 use sigmaos::linuxmint_inspirations::{
     AdBlockLevel, BulkyRenamer, CaptainInstaller, DebPackage, FsFormat, HypnotixIptvPlayer,
     IsolationMode, LanWarpEngine, MintNannyFilter, NannyDecision, NetworkPolicy, ProviderType,
-    PwaDisplayMode, RenameRule, ThingyRecentDocs, WebEngineKind, WebappCategory, WebappConfig,
+    RenameRule, ThingyRecentDocs, WebEngineKind, WebappCategory, WebappConfig,
     WebappManager, WebappNavigationMode, WebappProfileMode, WebappSecurityPolicy, WARP_AUTH_PORT,
     WARP_TRANSFER_PORT,
 };
