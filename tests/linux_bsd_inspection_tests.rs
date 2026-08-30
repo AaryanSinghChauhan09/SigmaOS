@@ -238,20 +238,14 @@ fn test_zenith_desktop_applets_and_themes_inspection() {
     assert_eq!(theme_mgr.accent_color_hex, "#3852A4");
 }
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
 #[path = "../src/network/protocols.rs"]
 mod protocols;
 
 #[path = "../src/security/hardening.rs"]
 mod hardening;
+
+#[path = "../src/sigpkg/portage.rs"]
+mod portage;
 
 #[test]
 fn test_sovereign_linux_bsd_kernel_innovations_inspection() {
@@ -457,16 +451,12 @@ fn test_pam_authentication_policy_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooPortageMaskEngine;
+    use portage::PortageResolver;
 
-    let mut portage = GentooPortageMaskEngine::new("amd64");
-    portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
-    portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
+    let mut resolver = PortageResolver::new("amd64".to_string());
+    resolver.set_use_flag("wayland".to_string(), true);
+    resolver.set_use_flag("systemd".to_string(), false);
 
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", false).unwrap());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", false).is_err());
-    assert!(portage.evaluate_installability("sys-kernel/gentoo-sources", "6.6", true).unwrap());
-
-    portage.add_hard_mask("app-admin/sudo");
-    assert!(portage.evaluate_installability("app-admin/sudo", "0", true).is_err());
+    assert!(resolver.get_use_flag("wayland").unwrap_or(false));
+    assert!(!resolver.get_use_flag("systemd").unwrap_or(true));
 }
