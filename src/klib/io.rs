@@ -1,5 +1,3 @@
-extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::format;
 // SigmaOS Custom I/O Implementation

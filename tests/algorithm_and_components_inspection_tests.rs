@@ -10,6 +10,13 @@ use alloc::format;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[macro_use]
+extern crate alloc;
+extern crate std;
+
+#[path = "../src/klib/mod.rs"]
+mod klib;
+
 #[path = "../src/kernel/scheduler.rs"]
 mod scheduler;
 

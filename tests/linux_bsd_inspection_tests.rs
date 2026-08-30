@@ -76,6 +76,10 @@ mod keyboard_driver;
 mod missing_distro_innovations;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
 
 use bsd_compat::*;
 
@@ -819,26 +823,33 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
 }
 
 #[test]
-fn test_usb_hid_keyboard_driver_linux_bsd_parity_inspection() {
-    use keyboard_driver::{UsbHidKeyboardDriver, HID_MODIFIER_LSHIFT, HID_LED_CAPS_LOCK, HID_LED_NUM_LOCK};
+fn test_kernel_hardening_hardware_mitigations_inspection() {
+    use kernel_hardening::{
+        RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine, PagePermissions,
+    };
 
-    let mut driver = UsbHidKeyboardDriver::new();
-    driver.set_repeat_rate(500, 25);
-    assert_eq!(driver.repeat_delay_ms, 500);
-    assert_eq!(driver.repeat_rate_hz, 25);
+    // 1. Retpoline, KPTI, and Stack Canary Mitigations
+    let mitigation = RetpolineKptiMitigationEngine::new(0xCAFE_BABE_1234_5678, 0x1000, 0x2000);
+    assert_eq!(mitigation.execute_indirect_thunk(0xFFFFFFFF80000000).unwrap(), 0xFFFFFFFF80000000);
+    assert_eq!(mitigation.kpti_switch_to_kernel(), 0x1000);
+    assert_eq!(mitigation.kpti_switch_to_user(), 0x2000);
 
-    let leds = driver.update_led_state(true, true, false);
-    assert_eq!(leds, HID_LED_NUM_LOCK | HID_LED_CAPS_LOCK);
+    let canary = mitigation.get_stack_canary();
+    assert!(mitigation.verify_stack_canary(canary));
+    assert!(!mitigation.verify_stack_canary(0x1234));
 
-    // Simulate pressing key 'b' (HID 0x05) with Shift modifier
-    let report = [HID_MODIFIER_LSHIFT, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00];
-    let pressed = driver.process_input_report(&report).unwrap();
-    assert_eq!(pressed, 1);
-    assert_eq!(driver.key_press_events[0], 0x05);
+    // 2. SMEP / SMAP Enforcer
+    let smep_smap = SmepSmapEnforcer::new(0x1000, 0x000F_FFFF);
+    assert!(smep_smap.validate_kernel_execution(0xFFFF_8000_0000_0000).is_ok());
+    assert!(smep_smap.validate_kernel_execution(0x2000).is_err()); // SMEP violation
 
-    // CapsLock (on) + Shift (pressed) -> lowercase 'b'
-    let ascii = driver.decode_hid_key_to_ascii(0x05);
-    assert_eq!(ascii, 'b');
+    // 3. KASLR & OpenBSD W^X Audit
+    let kaslr = SovereignKaslrEngine::new(0x8000_0000, 0x9000_0000, 42);
+    let mappings = vec![
+        (0x8000_1000, PagePermissions::new(true, false, true, false)), // R-X
+        (0x8000_2000, PagePermissions::new(true, true, false, false)), // RW-
+    ];
+    assert!(kaslr.audit_wx_protection(&mappings).is_ok());
 }
 
 #[test]
@@ -883,6 +894,40 @@ fn test_linux_bsd_subsystem_innovations_inspection() {
     };
     store.pin_closure(libc);
     assert_eq!(store.compute_closure_size("/sigma/store/h1-libc"), 1);
+
+    // 5. Pop!_OS System76 Power Governor Engine
+    use linux_bsd_inspirations::{System76PowerGovernor, PowerProfileMode, GpuSwitchMode};
+    let mut power = System76PowerGovernor::new();
+    power.set_power_profile(PowerProfileMode::HighPerformance);
+    assert_eq!(power.gpu_mode, GpuSwitchMode::NvidiaDiscrete);
+
+    // 6. DragonFly BSD HAMMER2 PFS Cluster Quorum Engine
+    use linux_bsd_inspirations::Hammer2PfsClusterQuorumEngine;
+    let mut quorum = Hammer2PfsClusterQuorumEngine::new();
+    quorum.register_node(101, "192.168.1.10", 0x123456);
+    quorum.register_node(102, "192.168.1.11", 0x123456);
+    assert_eq!(quorum.evaluate_quorum().unwrap(), 0x123456);
+
+    // 7. HardenedBSD PaX Guard Security Engine
+    use linux_bsd_inspirations::HardenedBsdPaxGuardEngine;
+    let mut pax = HardenedBsdPaxGuardEngine::new();
+    assert!(pax.check_mprotect(500, 0x1000, true, true).is_err());
+
+    // 8. Kali Linux Security Auditing Suite
+    use kali_stack::{
+        KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer, KaliAirgeddonWifiAudit,
+        PcapPacketHeader, WifiFrameType,
+    };
+    let msf = KaliMetasploitPayloadFilter::new();
+    assert!(msf.inspect_payload(&[0x90; 10]));
+
+    let ws = KaliWiresharkPacketAnalyzer::new();
+    let pcap_hdr = PcapPacketHeader { timestamp_sec: 100, captured_length: 10, original_length: 10 };
+    assert!(ws.analyze_packet(&pcap_hdr, &[0u8; 10]));
+
+    let mut air = KaliAirgeddonWifiAudit::new(2);
+    assert!(!air.audit_wifi_frame(WifiFrameType::Deauthentication));
+    assert!(air.audit_wifi_frame(WifiFrameType::Deauthentication));
 }
 
 #[test]

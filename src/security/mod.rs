@@ -32,7 +32,7 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod parrot_linux;
-pub mod ai_anomaly_detection;
+pub mod kali_stack;
 
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
 pub use qubes_isolation::*;
@@ -49,6 +49,10 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use forensics::*;
+pub use kali_stack::{
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType,
+};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };

@@ -1,0 +1,25 @@
+name: CachyOS BORE Scheduler & System76 Power Governor CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  test-bore-power-governor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Environment
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Execute CachyOS BORE Scheduler & System76 Power Governor Tests
+        run: |
+          rustc --edition 2021 --test src/distro/linux_bsd_inspirations.rs -o build/bore_power_test
+          ./build/bore_power_test test_cachy_bore_scheduler test_system76_power_governor

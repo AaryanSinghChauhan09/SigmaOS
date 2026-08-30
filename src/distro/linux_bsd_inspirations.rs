@@ -1376,6 +1376,219 @@ impl HermeticStoreClosureEngine {
 }
 
 // ==========================================
+// 35. POP!_OS SYSTEM76 POWER GOVERNOR ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerProfileMode {
+    BatterySaver,
+    Balanced,
+    HighPerformance,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuSwitchMode {
+    Integrated,
+    NvidiaDiscrete,
+    HybridOffload,
+}
+
+pub struct System76PowerGovernor {
+    pub current_profile: PowerProfileMode,
+    pub gpu_mode: GpuSwitchMode,
+    pub cpu_freq_cap_mhz: u32,
+    pub charge_threshold_pct: u8,
+}
+
+impl System76PowerGovernor {
+    pub fn new() -> Self {
+        Self {
+            current_profile: PowerProfileMode::Balanced,
+            gpu_mode: GpuSwitchMode::HybridOffload,
+            cpu_freq_cap_mhz: 3200,
+            charge_threshold_pct: 80,
+        }
+    }
+
+    pub fn set_power_profile(&mut self, mode: PowerProfileMode) {
+        self.current_profile = mode;
+        match mode {
+            PowerProfileMode::BatterySaver => {
+                self.cpu_freq_cap_mhz = 1800;
+                self.gpu_mode = GpuSwitchMode::Integrated;
+            }
+            PowerProfileMode::Balanced => {
+                self.cpu_freq_cap_mhz = 3200;
+                self.gpu_mode = GpuSwitchMode::HybridOffload;
+            }
+            PowerProfileMode::HighPerformance => {
+                self.cpu_freq_cap_mhz = 4800;
+                self.gpu_mode = GpuSwitchMode::NvidiaDiscrete;
+            }
+        }
+    }
+
+    pub fn switch_gpu_mode(&mut self, mode: GpuSwitchMode) -> Result<(), &'static str> {
+        self.gpu_mode = mode;
+        Ok(())
+    }
+}
+
+impl Default for System76PowerGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 36. DRAGONFLY BSD HAMMER2 PFS CLUSTER QUORUM ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct PfsNodeVote {
+    pub node_id: u32,
+    pub ip_address: String,
+    pub merkle_root_hash: u64,
+    pub is_online: bool,
+}
+
+pub struct Hammer2PfsClusterQuorumEngine {
+    pub cluster_nodes: Vec<PfsNodeVote>,
+    pub required_quorum_ratio: f64,
+}
+
+impl Hammer2PfsClusterQuorumEngine {
+    pub fn new() -> Self {
+        Self {
+            cluster_nodes: Vec::new(),
+            required_quorum_ratio: 0.51, // 51% majority quorum
+        }
+    }
+
+    pub fn register_node(&mut self, node_id: u32, ip_address: &str, initial_merkle: u64) {
+        self.cluster_nodes.push(PfsNodeVote {
+            node_id,
+            ip_address: ip_address.to_string(),
+            merkle_root_hash: initial_merkle,
+            is_online: true,
+        });
+    }
+
+    pub fn evaluate_quorum(&self) -> Result<u64, &'static str> {
+        let total = self.cluster_nodes.len();
+        if total == 0 {
+            return Err("No nodes in cluster");
+        }
+
+        let online_nodes: Vec<&PfsNodeVote> = self.cluster_nodes.iter().filter(|n| n.is_online).collect();
+        if (online_nodes.len() as f64 / total as f64) < self.required_quorum_ratio {
+            return Err("Cluster quorum lost: insufficient online nodes");
+        }
+
+        // Count votes per Merkle hash
+        let mut max_votes = 0;
+        let mut consensus_hash = 0u64;
+
+        for node in &online_nodes {
+            let count = online_nodes.iter().filter(|n| n.merkle_root_hash == node.merkle_root_hash).count();
+            if count > max_votes {
+                max_votes = count;
+                consensus_hash = node.merkle_root_hash;
+            }
+        }
+
+        if (max_votes as f64 / online_nodes.len() as f64) >= self.required_quorum_ratio {
+            Ok(consensus_hash)
+        } else {
+            Err("Consensus failure: no Merkle root reached quorum majority")
+        }
+    }
+}
+
+impl Default for Hammer2PfsClusterQuorumEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 37. HARDENEDBSD PAX GUARD SECURITY ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaxViolationType {
+    MprotectWxViolation,
+    PageExecViolation,
+    SegvGuardThresholdExceeded,
+}
+
+#[derive(Debug, Clone)]
+pub struct PaxViolationLog {
+    pub pid: u64,
+    pub violation: PaxViolationType,
+    pub target_addr: u64,
+}
+
+pub struct HardenedBsdPaxGuardEngine {
+    pub mprotect_wx_enforced: bool,
+    pub pageexec_enabled: bool,
+    pub segvguard_max_crashes: u32,
+    pub crash_records: Vec<(u64, u32)>, // (pid, crash_count)
+    pub violations: Vec<PaxViolationLog>,
+}
+
+impl HardenedBsdPaxGuardEngine {
+    pub fn new() -> Self {
+        Self {
+            mprotect_wx_enforced: true,
+            pageexec_enabled: true,
+            segvguard_max_crashes: 5,
+            crash_records: Vec::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn check_mprotect(&mut self, pid: u64, vaddr: u64, can_write: bool, can_exec: bool) -> Result<(), &'static str> {
+        if self.mprotect_wx_enforced && can_write && can_exec {
+            self.violations.push(PaxViolationLog {
+                pid,
+                violation: PaxViolationType::MprotectWxViolation,
+                target_addr: vaddr,
+            });
+            return Err("PaX MPROTECT: W^X transition prohibited");
+        }
+        Ok(())
+    }
+
+    pub fn record_segfault(&mut self, pid: u64, vaddr: u64) -> bool {
+        let count = if let Some(pos) = self.crash_records.iter().position(|(p, _)| *p == pid) {
+            self.crash_records[pos].1 += 1;
+            self.crash_records[pos].1
+        } else {
+            self.crash_records.push((pid, 1));
+            1
+        };
+
+        if count >= self.segvguard_max_crashes {
+            self.violations.push(PaxViolationLog {
+                pid,
+                violation: PaxViolationType::SegvGuardThresholdExceeded,
+                target_addr: vaddr,
+            });
+            true // True indicates process should be suspended/terminated to mitigate brute force attacks
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for HardenedBsdPaxGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
 // ==========================================
 
@@ -4870,6 +5083,55 @@ mod tests {
         store.pin_closure(pkg_glibc);
         assert_eq!(store.verify_closure_hermeticity("/sigma/store/hash2-bash"), Ok(true));
         assert_eq!(store.compute_closure_size("/sigma/store/hash2-bash"), 2);
+    }
+
+    #[test]
+    fn test_system76_power_governor() {
+        let mut power = System76PowerGovernor::new();
+        assert_eq!(power.current_profile, PowerProfileMode::Balanced);
+
+        power.set_power_profile(PowerProfileMode::HighPerformance);
+        assert_eq!(power.cpu_freq_cap_mhz, 4800);
+        assert_eq!(power.gpu_mode, GpuSwitchMode::NvidiaDiscrete);
+
+        power.set_power_profile(PowerProfileMode::BatterySaver);
+        assert_eq!(power.cpu_freq_cap_mhz, 1800);
+        assert_eq!(power.gpu_mode, GpuSwitchMode::Integrated);
+    }
+
+    #[test]
+    fn test_hammer2_pfs_cluster_quorum() {
+        let mut quorum = Hammer2PfsClusterQuorumEngine::new();
+        quorum.register_node(1, "10.0.0.1", 0xAAAA);
+        quorum.register_node(2, "10.0.0.2", 0xAAAA);
+        quorum.register_node(3, "10.0.0.3", 0xBBBB);
+
+        let consensus = quorum.evaluate_quorum().unwrap();
+        assert_eq!(consensus, 0xAAAA);
+
+        // Offline node reduces quorum below 51%
+        quorum.cluster_nodes[0].is_online = false;
+        quorum.cluster_nodes[1].is_online = false;
+        assert!(quorum.evaluate_quorum().is_err());
+    }
+
+    #[test]
+    fn test_hardenedbsd_pax_guard() {
+        let mut pax = HardenedBsdPaxGuardEngine::new();
+
+        // MPROTECT W^X Violation check
+        assert!(pax.check_mprotect(100, 0x7FFF0000, true, true).is_err());
+        assert_eq!(pax.violations.len(), 1);
+        assert_eq!(pax.violations[0].violation, PaxViolationType::MprotectWxViolation);
+
+        // SegvGuard threshold check
+        for _ in 0..4 {
+            assert!(!pax.record_segfault(200, 0x0));
+        }
+        // 5th crash triggers SegvGuard brute force mitigation
+        assert!(pax.record_segfault(200, 0x0));
+        assert_eq!(pax.violations.len(), 2);
+        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
     }
 }
 

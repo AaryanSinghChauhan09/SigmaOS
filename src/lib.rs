@@ -73,12 +73,14 @@ pub use unimplemented_features::{
 };
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage, BedrockStratum, BedrockLinuxStrataEngine,
-    SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig, SmartOsZoneEngine,
+    HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
+    GpuSwitchMode, Hammer2PfsClusterQuorumEngine, HardenedBsdPaxGuardEngine, PaxViolationType,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
     PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;

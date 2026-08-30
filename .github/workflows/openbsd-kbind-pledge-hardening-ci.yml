@@ -1,0 +1,25 @@
+name: OpenBSD kbind CFI Pointer Guard & Pledge Hardening CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  test-openbsd-kbind-pledge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Environment
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Execute OpenBSD kbind, Retguard & Pledge Hardening Tests
+        run: |
+          rustc --edition 2021 --test src/distro/linux_bsd_inspirations.rs -o build/openbsd_hard_test
+          ./build/openbsd_hard_test test_openbsd_retguard_and_map_stack test_openbsd_fd_pledge_gate test_hardenedbsd_pax_guard
