@@ -89,11 +89,12 @@ pub mod virtualization;
 
 pub mod interrupt;
 
-pub mod graphics {
-    pub mod compositor;
-    pub mod paint;
-    pub mod video;
-}
+pub mod graphics;
+
+pub use graphics::country_flags_svg::{
+    CountryFlagMetadata, DistroEmblemKind, DistroEmblemMetadata, FlagRenderMode,
+    IsoCountryFlagsSvgCollection, SystemFeatureFlagMetadata, WorldRegion,
+};
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;

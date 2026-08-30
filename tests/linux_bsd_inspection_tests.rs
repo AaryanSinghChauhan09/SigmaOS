@@ -1065,3 +1065,50 @@ fn test_sovereign_distro_dominance_suite_inspection() {
     assert!(suite.pqc_vpn.transmit_pqc_packet("datacenter-east", 512).is_ok());
     assert_eq!(suite.pqc_vpn.peers.get("datacenter-east").unwrap().tx_bytes, 512);
 }
+
+#[test]
+fn test_sovereign_iso_country_flags_svg_collection_inspection() {
+    use sigmaos::graphics::country_flags_svg::{
+        DistroEmblemKind, FlagRenderMode, IsoCountryFlagsSvgCollection, WorldRegion,
+    };
+
+    let collection = IsoCountryFlagsSvgCollection::new();
+
+    // 1. Verify ISO country flags collection size and key nations
+    assert!(collection.count() >= 24);
+    assert!(collection.get_by_alpha2("US").is_some());
+    assert!(collection.get_by_alpha2("IN").is_some());
+    assert!(collection.get_by_alpha2("JP").is_some());
+    assert!(collection.get_by_alpha2("DE").is_some());
+    assert!(collection.get_by_alpha2("FR").is_some());
+    assert!(collection.get_by_alpha2("GB").is_some());
+
+    // 2. Verify SVG flag markup generation & render modes
+    let us_rect = collection.generate_country_svg("US", FlagRenderMode::Rectangular4x3).unwrap();
+    assert!(us_rect.contains("<svg"));
+    assert!(us_rect.contains("id=\"flag-iso-US\""));
+
+    let in_badge = collection.generate_country_svg("IN", FlagRenderMode::CircularBadge).unwrap();
+    assert!(in_badge.contains("badge-clip"));
+    assert!(in_badge.contains("#FF9933")); // Saffron
+    assert!(in_badge.contains("#138808")); // Green
+
+    // 3. Verify Linux & BSD distro emblem SVG generation
+    let debian_svg = collection.generate_distro_svg(DistroEmblemKind::Debian, 500, 500);
+    assert!(debian_svg.contains("Debian"));
+    assert!(debian_svg.contains("#D70A53"));
+
+    let freebsd_svg = collection.generate_distro_svg(DistroEmblemKind::FreeBSD, 500, 500);
+    assert!(freebsd_svg.contains("FreeBSD"));
+
+    let sigma_svg = collection.generate_distro_svg(DistroEmblemKind::SigmaOS, 500, 500);
+    assert!(sigma_svg.contains("SigmaOS Sovereign"));
+
+    // 4. Verify Locale lookup and world region filtering
+    let meta_in = collection.lookup_by_locale("en_IN").unwrap();
+    assert_eq!(meta_in.alpha2, "IN");
+    assert_eq!(meta_in.english_name, "India");
+
+    let europe_flags = collection.filter_by_region(WorldRegion::Europe);
+    assert!(europe_flags.len() >= 8);
+}
