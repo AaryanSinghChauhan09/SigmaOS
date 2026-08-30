@@ -253,6 +253,8 @@ jobs:
   benchmark:
     permissions:
       contents: read
+      pull-requests: write
+      issues: write
 
     name: Performance Benchmarks
     needs: boot-test
@@ -310,12 +312,16 @@ jobs:
         script: |
           const fs = require('fs');
           const report = fs.readFileSync('benchmark-report.md', 'utf8');
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: report
-          });
+          try {
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+          } catch (err) {
+            console.warn('Unable to post benchmark comment:', err.message);
+          }
 
   security-scan:
     permissions:

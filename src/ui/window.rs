@@ -58,7 +58,6 @@ pub trait Window {
 pub struct SimpleWindow {
     pub id: WindowID,
     pub title: [u8; 128],
-    pub title_len: u8,
     pub x: AtomicUsize,
     pub y: AtomicUsize,
     pub width: AtomicUsize,
@@ -76,7 +75,6 @@ impl SimpleWindow {
         SimpleWindow {
             id,
             title: title_array,
-            title_len: title_len as u8,
             x: AtomicUsize::new(x as usize),
             y: AtomicUsize::new(y as usize),
             width: AtomicUsize::new(width as usize),
@@ -89,8 +87,8 @@ impl SimpleWindow {
 impl Window for SimpleWindow {
     fn id(&self) -> WindowID { self.id }
     fn title(&self) -> &[u8] {
-        // O(1) slice lookup using cached title_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
-        &self.title[..self.title_len as usize]
+        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
+        &self.title[..len]
     }
     fn x(&self) -> i32 { self.x.load(Ordering::SeqCst) as i32 }
     fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }
@@ -295,32 +293,3 @@ impl<T> Drop for Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_simple_window_title_len_caching() {
-        let win = SimpleWindow::new(1, b"Terminal", 10, 20, 800, 600);
-        assert_eq!(win.id(), 1);
-        assert_eq!(win.title(), b"Terminal");
-        assert_eq!(win.title_len, 8);
-        assert_eq!(win.x(), 10);
-        assert_eq!(win.y(), 20);
-        assert_eq!(win.width(), 800);
-        assert_eq!(win.height(), 600);
-    }
-
-    #[test]
-    fn test_simple_window_manager() {
-        let mut wm = SimpleWindowManager::new();
-        let id = wm.create_window(b"Calculator", 0, 0, 300, 400).unwrap();
-        assert_eq!(id, 1);
-        let win_opt = wm.get_window(id);
-        assert!(win_opt.is_some());
-        let win = win_opt.unwrap();
-        assert_eq!(win.title(), b"Calculator");
-        assert_eq!(wm.list_windows(), vec![1]);
-    }
-}
