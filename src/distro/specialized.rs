@@ -254,6 +254,34 @@ impl Default for EosUpdateNotifier {
     }
 }
 
+/// Troubleshooting severity categories for diagnostic log analysis
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TroubleshootingSeverity {
+    Info,
+    Warning,
+    Error,
+    Critical,
+}
+
+/// Category of system subsystem under diagnosis
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TroubleshootingCategory {
+    Kernel,
+    PackageManager,
+    StorageFilesystem,
+    Network,
+    SecurityPermissions,
+}
+
+/// Structured troubleshooting issue and remediation suggestion
+#[derive(Debug, Clone)]
+pub struct SovereignTroubleshootingReport {
+    pub category: TroubleshootingCategory,
+    pub severity: TroubleshootingSeverity,
+    pub issue_summary: String,
+    pub recommended_fix: String,
+}
+
 /// Unified diagnostic collector for kernel and package manager logs
 #[derive(Debug, Clone)]
 pub struct DiagnosticLogTool {
@@ -278,6 +306,66 @@ impl DiagnosticLogTool {
             report.push('\n');
         }
         report
+    }
+
+    /// Analyzes recorded log lines for known patterns and returns structured issues
+    pub fn analyze_system_issues(&self) -> Vec<SovereignTroubleshootingReport> {
+        let mut reports = Vec::new();
+        for line in &self.collected_lines {
+            let lower = line.to_lowercase();
+            if lower.contains("out of memory") || lower.contains("oom-killer") {
+                reports.push(SovereignTroubleshootingReport {
+                    category: TroubleshootingCategory::Kernel,
+                    severity: TroubleshootingSeverity::Critical,
+                    issue_summary: "Kernel Memory Exhaustion (OOM)".to_string(),
+                    recommended_fix: "Enable ZRAM swap device (`sovereign-swap enable zram`) or reduce process memory consumption.".to_string(),
+                });
+            } else if lower.contains("checksum mismatch") || lower.contains("corrupt block") {
+                reports.push(SovereignTroubleshootingReport {
+                    category: TroubleshootingCategory::StorageFilesystem,
+                    severity: TroubleshootingSeverity::Error,
+                    issue_summary: "Filesystem Block Corruption Detected".to_string(),
+                    recommended_fix: "Execute HAMMER2 / ZFS self-healing scrub (`pfs-scrub --repair`).".to_string(),
+                });
+            } else if lower.contains("dependency conflict") || lower.contains("broken package") {
+                reports.push(SovereignTroubleshootingReport {
+                    category: TroubleshootingCategory::PackageManager,
+                    severity: TroubleshootingSeverity::Warning,
+                    issue_summary: "Package Dependency Conflict".to_string(),
+                    recommended_fix: "Run `sigpkg fix-deps` or roll back to previous store generation (`sigpkg rollback`).".to_string(),
+                });
+            } else if lower.contains("pledge violation") || lower.contains("unveil denial") {
+                reports.push(SovereignTroubleshootingReport {
+                    category: TroubleshootingCategory::SecurityPermissions,
+                    severity: TroubleshootingSeverity::Warning,
+                    issue_summary: "Security Isolation Boundary Violation".to_string(),
+                    recommended_fix: "Audit process pledge/unveil manifest or update Landlock sandboxing rules.".to_string(),
+                });
+            }
+        }
+        reports
+    }
+
+    /// Generates an automated remediation playbook based on log diagnostics
+    pub fn generate_auto_remediation_guide(&self) -> String {
+        let issues = self.analyze_system_issues();
+        let mut guide = String::from("=== Sovereign Automated System Remediation Playbook ===\n");
+        if issues.is_empty() {
+            guide.push_str("No critical system anomalies or issues detected.\n");
+            return guide;
+        }
+
+        for (idx, issue) in issues.iter().enumerate() {
+            guide.push_str(&format!(
+                "{}. [{:?}][{:?}] {}\n   Fix: {}\n",
+                idx + 1,
+                issue.category,
+                issue.severity,
+                issue.issue_summary,
+                issue.recommended_fix
+            ));
+        }
+        guide
     }
 }
 
@@ -910,10 +998,24 @@ mod tests {
             "PackageManager",
             "Transaction completed: installed sigma-vim",
         );
+        log_tool.record_log_entry("Kernel", "Out of memory: Killed process 1024 (chrome)");
+        log_tool.record_log_entry("Storage", "Checksum mismatch in block 0xDEADBEEF");
 
         let report = log_tool.generate_troubleshooting_report();
         assert!(report.contains("--- SigmaOS Troubleshooting Report ---"));
         assert!(report.contains("[Kernel] Vulkan context bound successfully"));
+
+        let issues = log_tool.analyze_system_issues();
+        assert_eq!(issues.len(), 2);
+        assert_eq!(issues[0].category, TroubleshootingCategory::Kernel);
+        assert_eq!(issues[0].severity, TroubleshootingSeverity::Critical);
+        assert_eq!(issues[1].category, TroubleshootingCategory::StorageFilesystem);
+        assert_eq!(issues[1].severity, TroubleshootingSeverity::Error);
+
+        let guide = log_tool.generate_auto_remediation_guide();
+        assert!(guide.contains("=== Sovereign Automated System Remediation Playbook ==="));
+        assert!(guide.contains("Kernel Memory Exhaustion (OOM)"));
+        assert!(guide.contains("sovereign-swap enable zram"));
     }
 
     #[test]

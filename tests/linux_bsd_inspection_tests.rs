@@ -82,10 +82,31 @@ mod missing_distro_innovations;
 mod linux_bsd_inspirations;
 #[path = "../src/compatibility/community_foundation.rs"]
 mod community_foundation;
+#[path = "../src/distro/specialized.rs"]
+mod specialized;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 
 use bsd_compat::*;
+
+#[test]
+fn test_sovereign_diagnostic_troubleshooting_inspection() {
+    use specialized::{DiagnosticLogTool, TroubleshootingCategory, TroubleshootingSeverity};
+
+    let mut tool = DiagnosticLogTool::new();
+    tool.record_log_entry("PackageManager", "dependency conflict detected: package foo broken");
+    tool.record_log_entry("Security", "unveil denial on /root/.ssh");
+
+    let issues = tool.analyze_system_issues();
+    assert_eq!(issues.len(), 2);
+    assert_eq!(issues[0].category, TroubleshootingCategory::PackageManager);
+    assert_eq!(issues[0].severity, TroubleshootingSeverity::Warning);
+    assert_eq!(issues[1].category, TroubleshootingCategory::SecurityPermissions);
+
+    let guide = tool.generate_auto_remediation_guide();
+    assert!(guide.contains("sigpkg fix-deps"));
+    assert!(guide.contains("Audit process pledge/unveil manifest"));
+}
 
 #[test]
 fn test_sovereign_community_foundation_inspection() {
