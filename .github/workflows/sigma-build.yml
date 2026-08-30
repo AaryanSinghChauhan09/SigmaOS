@@ -18,6 +18,9 @@ jobs:
   # fail-fast: false so all arches run even if one fails
   # ===========================================================================
   build:
+    permissions:
+      contents: read
+
     name: Build (${{ matrix.arch }}, ${{ matrix.profile }})
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -34,13 +37,15 @@ jobs:
             cross: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
       # -----------------------------------------------------------------------
       # Build cache (NixOS Cachix-inspired) — skip rebuilding unchanged objects
       # -----------------------------------------------------------------------
       - name: Cache build artifacts & Go modules
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+
         with:
           path: |
             build/
@@ -78,7 +83,8 @@ jobs:
           cd build_test && ctest --output-on-failure
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
         with:
           name: sigmaos-${{ matrix.arch }}-${{ matrix.profile }}
           path: |
@@ -91,11 +97,15 @@ jobs:
   # 30-second budget per CI run; crashes saved as artifacts
   # ===========================================================================
   fuzz:
+    permissions:
+      contents: read
+
     name: Fuzz TCP stack
     runs-on: ubuntu-24.04
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
       - name: Install clang + libFuzzer
         run: |
@@ -124,7 +134,8 @@ jobs:
 
       - name: Upload crash artifacts
         if: always()
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
         with:
           name: fuzz-crashes
           path: fuzz_crash_*
@@ -135,10 +146,14 @@ jobs:
   # (Linux kernel / systemd inspired)
   # ===========================================================================
   quality:
+    permissions:
+      contents: read
+
     name: Code Quality
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
       - name: Install analysis tools
         run: |
@@ -188,7 +203,8 @@ jobs:
 
       - name: Upload quality reports
         if: always()
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
         with:
           name: quality-reports
           path: |
@@ -201,12 +217,16 @@ jobs:
   # Runs only on pull_requests so it has a base branch to diff against.
   # ===========================================================================
   coverage:
+    permissions:
+      contents: read
+
     name: Coverage Gate
     runs-on: ubuntu-24.04
     needs: build
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
         with:
           fetch-depth: 0   # full history required for diff-cover
 
@@ -249,7 +269,8 @@ jobs:
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
         with:
           name: coverage-report
           path: coverage-report.html
@@ -259,11 +280,15 @@ jobs:
   # Regression test suite — OpenBSD regress/-style per-subsystem tests
   # ===========================================================================
   regress:
+    permissions:
+      contents: read
+
     name: Kernel Regression Tests
     runs-on: ubuntu-24.04
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
       - name: Install toolchain
         run: |
@@ -276,7 +301,8 @@ jobs:
 
       - name: Upload regress results
         if: always()
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
         with:
           name: regress-results
           path: tests/regress-*.log

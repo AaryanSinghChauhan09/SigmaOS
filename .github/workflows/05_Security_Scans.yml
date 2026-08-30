@@ -11,11 +11,15 @@ permissions:
 
 jobs:
   security-audit:
+    permissions:
+      contents: read
+
     name: Security & Vulnerability Scans
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
       - name: Setup cppcheck
         run: sudo apt-get install -y cppcheck

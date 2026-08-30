@@ -13,17 +13,24 @@ permissions:
   contents: read
 jobs:
   wiki-sync:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     runs-on: ubuntu-latest
     name: Sync wiki_repo/ → GitHub Wiki
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
         with:
           fetch-depth: 0
 
       - name: Push wiki_repo/ to GitHub Wiki
-        uses: Andrew-Chen-Wang/github-wiki-action@v5
+        uses: Andrew-Chen-Wang/github-wiki-action@1bbb4280446f9630e8e21a18012cbacf3b0f992e
+
         with:
           path: wiki_repo/
           token: ${{ secrets.GITHUB_TOKEN }}

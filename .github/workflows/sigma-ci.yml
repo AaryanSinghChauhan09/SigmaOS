@@ -12,6 +12,9 @@ permissions:
   contents: read
 jobs:
   build:
+    permissions:
+      contents: read
+
     name: Build SigmaOS (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -33,7 +36,8 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
       with:
         submodules: recursive
 
@@ -55,7 +59,8 @@ jobs:
           grub-efi-ia32-bin
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af
+
       with:
         profile: minimal
         toolchain: stable
@@ -63,7 +68,8 @@ jobs:
         override: true
 
     - name: Cache build artifacts
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+
       with:
         path: |
           ~/.cargo/registry
@@ -98,13 +104,17 @@ jobs:
         ninja iso
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4.3.6
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
       with:
         name: sigmaos-${{ matrix.arch }}-iso
         path: build/sigmaos-${{ matrix.arch }}.iso
         retention-days: 7
 
   boot-test:
+    permissions:
+      contents: read
+
     name: Boot Test (${{ matrix.arch }})
     needs: build
     runs-on: ubuntu-latest
@@ -124,10 +134,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4.3.0
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+
       with:
         name: sigmaos-${{ matrix.arch }}-iso
         path: build
@@ -150,13 +162,17 @@ jobs:
         fi
 
   reproducible-build:
+    permissions:
+      contents: read
+
     name: Reproducible Build Check
     needs: build
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
       with:
         submodules: recursive
 
@@ -172,7 +188,8 @@ jobs:
           xorriso
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af
+
       with:
         profile: minimal
         toolchain: stable
@@ -227,22 +244,28 @@ jobs:
         cat provenance.json
 
     - name: Upload provenance
-      uses: actions/upload-artifact@v4.3.6
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
       with:
         name: build-provenance
         path: provenance.json
 
   benchmark:
+    permissions:
+      contents: read
+
     name: Performance Benchmarks
     needs: boot-test
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4.3.0
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+
       with:
         name: sigmaos-x86_64-iso
         path: build
@@ -270,7 +293,8 @@ jobs:
           --output benchmark-report.md
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v4.3.6
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a
+
       with:
         name: benchmark-results
         path: |
@@ -280,7 +304,8 @@ jobs:
 
     - name: Comment PR with benchmarks
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
+      uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
+
       with:
         script: |
           const fs = require('fs');
@@ -293,15 +318,20 @@ jobs:
           });
 
   security-scan:
+    permissions:
+      contents: read
+
     name: Security Scan
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
     - name: Run Rust security audit
-      uses: actions-rs/audit-check@v1
+      uses: actions-rs/audit-check@35b7b53b1e25b55642157ac01b4adceb5b9ebef3
+
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -311,22 +341,28 @@ jobs:
         cargo clippy --all-targets --all-features -- -D warnings
 
     - name: Check for secrets
-      uses: trufflesecurity/trufflehog@main
+      uses: trufflesecurity/trufflehog@0c952ace0f842f11c75775922d7400335cf60bc6
+
       with:
         path: ./
         base: ${{ github.event.repository.default_branch }}
         head: HEAD
 
   test:
+    permissions:
+      contents: read
+
     name: Unit Tests
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
 
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
+      uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af
+
       with:
         profile: minimal
         toolchain: stable
@@ -342,6 +378,7 @@ jobs:
         cargo tarpaulin --out Xml --output-dir coverage
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457
+
       with:
         file: ./coverage/cobertura.xml

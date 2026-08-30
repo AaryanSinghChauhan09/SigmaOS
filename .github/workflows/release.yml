@@ -9,9 +9,15 @@ permissions:
   contents: write
 jobs:
   build-release:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
       
       - name: Build Industrial ISOs
         run: |
@@ -26,7 +32,8 @@ jobs:
           sha512sum release_assets/*.iso > release_assets/checksums.txt
           
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+
         with:
           files: release_assets/*
           body_path: RELEASES.md
