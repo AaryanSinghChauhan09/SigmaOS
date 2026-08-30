@@ -391,19 +391,19 @@ let db_container = ContainerConfig {
 
 ## Future Enhancements
 
-1. **GPU Passthrough**: Direct GPU access for compute workloads
-2. **Live Migration**: Container migration between hosts
-3. **Snapshotting**: Container state snapshots
-4. **Container Orchestration**: Native container orchestration
-5. **FIPS Mode**: FIPS 140-2 compliant cryptographic operations
+1.  **GPU Passthrough**: Direct GPU access for compute workloads
+2.  **Live Migration**: Container migration between hosts
+3.  **Snapshotting**: Container state snapshots
+4.  **Container Orchestration**: Native container orchestration
+5.  **FIPS Mode**: FIPS 140-2 compliant cryptographic operations
 
 ## Best Practices
 
-1. **Minimal Base Images**: Use minimal base images to reduce attack surface
-2. **Capability Drop**: Drop unnecessary capabilities
-3. **Resource Limits**: Always set resource limits
-4. **Read-only Root**: Mount root filesystem as read-only when possible
-5. **Security Scanning**: Scan images for vulnerabilities before deployment
+1.  **Minimal Base Images**: Use minimal base images to reduce attack surface
+2.  **Capability Drop**: Drop unnecessary capabilities
+3.  **Resource Limits**: Always set resource limits
+4.  **Read-only Root**: Mount root filesystem as read-only when possible
+5.  **Security Scanning**: Scan images for vulnerabilities before deployment
 
 ## Troubleshooting
 
@@ -433,7 +433,7 @@ cat /sys/fs/cgroup/sigma/<container_id>/memory.max
 
 ## References
 
-- [Linux Containers](https://linuxcontainers.org/)
-- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)
-- [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
-- [Capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html)
+*   [Linux Containers](https://linuxcontainers.org/)
+*   [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)
+*   [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
+*   [Capabilities(7)](https://man7.org/linux/man-pages/man7/capabilities.7.html)

@@ -8,16 +8,16 @@ The core `MemoryDescriptorList` structure (implemented under `src/kernel/mm/desc
 
 ### Struct Anatomy
 
-* **Virtual Address Mapping**: Associates high-memory virtual segments with distinct physical offset chains.
-* **Locked/Pinned Memory States**: Implements direct physical pinning to prevent pages from being paged out or swapped.
-* **Chained Linked Lists**: Links multiple lists for massive multi-entry DMA queues.
-* **Memory Protection Enforcements**:
-  - `ReadOnly`
-  - `ReadWrite`
-  - `ExecuteRead`
-  - `ExecuteReadWrite`
+*   **Virtual Address Mapping**: Associates high-memory virtual segments with distinct physical offset chains.
+*   **Locked/Pinned Memory States**: Implements direct physical pinning to prevent pages from being paged out or swapped.
+*   **Chained Linked Lists**: Links multiple lists for massive multi-entry DMA queues.
+*   **Memory Protection Enforcements**:
+    *   `ReadOnly`
+    *   `ReadWrite`
+    *   `ExecuteRead`
+    *   `ExecuteReadWrite`
 
----
+***
 
 ## 2. Ancient Device DMA Buffers
 
@@ -25,12 +25,12 @@ Traditional 8-bit and 16-bit ISA Direct Memory Access (DMA) controllers (such as
 
 ### Supported Vintage Devices
 
-1. **Floppy Disk Controller**:
-   - Enforces a strict 64KB maximum buffer transfer limit.
-   - Dedicated ISA DMA Channel 2 allocation.
-   - Constrained to physical pages below the 16MB threshold.
-2. **Sound Blaster 16**:
-   - Implements double-buffered ping-pong audio transfers.
-   - Dedicated ISA DMA Channel 5 allocation.
-3. **NE2000 Ethernet Controller**:
-   - Simulates Shared-RAM ring buffer access bounds and packet offsets without needing dedicated ISA channels.
+1.  **Floppy Disk Controller**:
+    *   Enforces a strict 64KB maximum buffer transfer limit.
+    *   Dedicated ISA DMA Channel 2 allocation.
+    *   Constrained to physical pages below the 16MB threshold.
+2.  **Sound Blaster 16**:
+    *   Implements double-buffered ping-pong audio transfers.
+    *   Dedicated ISA DMA Channel 5 allocation.
+3.  **NE2000 Ethernet Controller**:
+    *   Simulates Shared-RAM ring buffer access bounds and packet offsets without needing dedicated ISA channels.

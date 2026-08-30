@@ -5,18 +5,18 @@ SigmaOS networking shard.
 
 ## Features
 
-- **DNS-over-TLS (DoT)** and **DNS-over-HTTPS (DoH)** support
+*   **DNS-over-TLS (DoT)** and **DNS-over-HTTPS (DoH)** support
 
-- Local shard-based caching (no external resolver required)
+*   Local shard-based caching (no external resolver required)
 
-- DNSSEC validation
+*   DNSSEC validation
 
-- Sovereign split-horizon: internal `.sigma` domains resolved locally
+*   Sovereign split-horizon: internal `.sigma` domains resolved locally
 
 ## Roadmap
 
-- [x] DoT client implementation
+*   \[ ] DoT client implementation
 
-- [x] DNSSEC chain validator
+*   \[ ] DNSSEC chain validator
 
-- [x] Local authority for `.sigma` TLD
+*   \[ ] Local authority for `.sigma` TLD

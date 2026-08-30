@@ -8,33 +8,33 @@ This guide details the step-by-step implementation of Claude Code as a native ag
 
 Claude Code consists of:
 
-- **CLI Agent**: Terminal-based agentic interface
+*   **CLI Agent**: Terminal-based agentic interface
 
-- **Editor Bridge**: Integration with VS Code, JetBrains, and other editors
+*   **Editor Bridge**: Integration with VS Code, JetBrains, and other editors
 
-- **Multi-file Reasoning Engine**: Large context window processing
+*   **Multi-file Reasoning Engine**: Large context window processing
 
-- **Workflow Manager**: Refactor, explain, test generation, and other workflows
+*   **Workflow Manager**: Refactor, explain, test generation, and other workflows
 
 ### Initial Analysis Steps
 
-1. Review `README.md`, `docs/`, and `src/` folders
+1.  Review `README.md`, `docs/`, and `src/` folders
 
-2. Identify entry point (typically `main.rs` or `index.ts`)
+2.  Identify entry point (typically `main.rs` or `index.ts`)
 
-3. Understand editor connection mechanisms (extensions, APIs)
+3.  Understand editor connection mechanisms (extensions, APIs)
 
-4. Analyze model API integration (Claude API endpoints)
+4.  Analyze model API integration (Claude API endpoints)
 
 ## Dependency Setup
 
 ### Runtime Requirements
 
-- Install required language runtime (Rust, Node.js, or Python)
+*   Install required language runtime (Rust, Node.js, or Python)
 
-- Install package manager (cargo, npm, or pip)
+*   Install package manager (cargo, npm, or pip)
 
-- Configure environment variables (API keys, editor paths)
+*   Configure environment variables (API keys, editor paths)
 
 ### Build Commands
 
@@ -59,65 +59,65 @@ pip install -r requirements.txt
 
 **Target**: Add Claude Code as a sovereign tool in `sigma-cli`
 
-- Enable developers to run `claude-code` inside SigmaOS shell
+*   Enable developers to run `claude-code` inside SigmaOS shell
 
-- Integrate with sigma-sh for seamless terminal experience
+*   Integrate with sigma-sh for seamless terminal experience
 
-- Provide native command completion and help system
+*   Provide native command completion and help system
 
 ### 2. Editor Integration
 
 **Target**: Adapt VS Code extension mechanism for SigmaIDE
 
-- Replicate extension API for SigmaIDE
+*   Replicate extension API for SigmaIDE
 
-- Implement sovereign editor protocol
+*   Implement sovereign editor protocol
 
-- Ensure compatibility with existing Claude Code workflows
+*   Ensure compatibility with existing Claude Code workflows
 
 ### 3. Agent Runtime
 
 **Target**: Embed reasoning engine into SigmaOS developer profile
 
-- Enable cross-filesystem code refactoring
+*   Enable cross-filesystem code refactoring
 
-- Integrate with SigmaOS file system abstraction
+*   Integrate with SigmaOS file system abstraction
 
-- Leverage sovereign security model for safe operations
+*   Leverage sovereign security model for safe operations
 
 ## Missing Components to Implement
 
 ### Package Manager Hooks
 
-- Connect Claude Code to sigpkg for self-installation/updates
+*   Connect Claude Code to sigpkg for self-installation/updates
 
-- Enable automatic dependency resolution
+*   Enable automatic dependency resolution
 
-- Support version management and rollback
+*   Support version management and rollback
 
 ### Driver Awareness
 
-- Ensure compatibility with SigmaOS syscall layer
+*   Ensure compatibility with SigmaOS syscall layer
 
-- Implement file system abstraction layer
+*   Implement file system abstraction layer
 
-- Add hardware acceleration support where applicable
+*   Add hardware acceleration support where applicable
 
 ### Security Sandboxing
 
-- Audit all API calls and file access
+*   Audit all API calls and file access
 
-- Implement capability-based security model
+*   Implement capability-based security model
 
-- Add syscall monitoring and logging
+*   Add syscall monitoring and logging
 
 ### Formal Verification Hooks
 
-- Extend test generation for Ada/SPARK proofs
+*   Extend test generation for Ada/SPARK proofs
 
-- Integrate with SigmaOS verification framework
+*   Integrate with SigmaOS verification framework
 
-- Support formal method assertions
+*   Support formal method assertions
 
 ## Implementation Roadmap
 
@@ -133,21 +133,21 @@ pip install -r requirements.txt
 
 ### Linux Distro Approach
 
-- VS Code extension or CLI tool
+*   VS Code extension or CLI tool
 
-- Standard Linux syscall interface
+*   Standard Linux syscall interface
 
-- Native package manager integration
+*   Native package manager integration
 
 ### SigmaOS Requirements
 
-- **Editor Integration**: SigmaIDE with sovereign protocol
+*   **Editor Integration**: SigmaIDE with sovereign protocol
 
-- **Package Management**: sigpkg integration
+*   **Package Management**: sigpkg integration
 
-- **Sandboxing**: Sovereign security model
+*   **Sandboxing**: Sovereign security model
 
-- **Driver Support**: Custom syscall abstraction layer
+*   **Driver Support**: Custom syscall abstraction layer
 
 ## Technical Specifications
 
@@ -237,76 +237,76 @@ impl ClaudeSandbox {
 
 ### Phase 1 Completion
 
-- [ ] Claude Code CLI builds and runs standalone
+*   \[ ] Claude Code CLI builds and runs standalone
 
-- [ ] Basic functionality tested (code generation, refactoring)
+*   \[ ] Basic functionality tested (code generation, refactoring)
 
-- [ ] Documentation updated
+*   \[ ] Documentation updated
 
 ### Phase 2 Completion
 
-- [ ] Integrated into sigma-sh with command completion
+*   \[ ] Integrated into sigma-sh with command completion
 
-- [ ] Works with SigmaOS file system
+*   \[ ] Works with SigmaOS file system
 
-- [ ] Performance benchmarks established
+*   \[ ] Performance benchmarks established
 
 ### Phase 3 Completion
 
-- [ ] SigmaIDE plugin functional
+*   \[ ] SigmaIDE plugin functional
 
-- [ ] All major workflows supported
+*   \[ ] All major workflows supported
 
-- [ ] User acceptance testing passed
+*   \[ ] User acceptance testing passed
 
 ### Phase 4 Completion
 
-- [ ] sigpkg package created
+*   \[ ] sigpkg package created
 
-- [ ] Automatic updates working
+*   \[ ] Automatic updates working
 
-- [ ] Dependency resolution functional
+*   \[ ] Dependency resolution functional
 
 ### Phase 5 Completion
 
-- [ ] Sandboxing implemented and tested
+*   \[ ] Sandboxing implemented and tested
 
-- [ ] Formal verification hooks integrated
+*   \[ ] Formal verification hooks integrated
 
-- [ ] Security audit passed
+*   \[ ] Security audit passed
 
 ## Strategic Impact
 
 This integration positions SigmaOS as:
 
-- **AI-Native OS**: First operating system with built-in agentic coding
+*   **AI-Native OS**: First operating system with built-in agentic coding
 
-- **Developer Paradise**: Seamless AI-assisted development environment
+*   **Developer Paradise**: Seamless AI-assisted development environment
 
-- **Sovereign Innovation**: Control over AI tooling stack
+*   **Sovereign Innovation**: Control over AI tooling stack
 
-- **Competitive Advantage**: Unique selling point vs traditional Linux distros
+*   **Competitive Advantage**: Unique selling point vs traditional Linux distros
 
 ## Next Steps
 
-1. **Immediate**: Clone Claude Code repository and begin Phase 1 analysis
+1.  **Immediate**: Clone Claude Code repository and begin Phase 1 analysis
 
-2. **Week 1**: Set up build environment and run standalone CLI
+2.  **Week 1**: Set up build environment and run standalone CLI
 
-3. **Week 2**: Design sigma-sh integration architecture
+3.  **Week 2**: Design sigma-sh integration architecture
 
-4. **Month 1**: Begin SigmaIDE plugin development
+4.  **Month 1**: Begin SigmaIDE plugin development
 
-5. **Quarter 1**: Complete sigpkg integration
+5.  **Quarter 1**: Complete sigpkg integration
 
-6. **Quarter 2**: Finalize security hardening
+6.  **Quarter 2**: Finalize security hardening
 
 ## References
 
-- Claude Code Repository: [GitHub Link]
+*   Claude Code Repository: \[GitHub Link]
 
-- SigmaOS Architecture: `ARCHITECTURE.md`
+*   SigmaOS Architecture: `ARCHITECTURE.md`
 
-- sigpkg Specification: `SIGMA_PKG.md`
+*   sigpkg Specification: `SIGMA_PKG.md`
 
-- SigmaOS Security Model: `SECURITY.md`
+*   SigmaOS Security Model: `SECURITY.md`

@@ -1,9 +1,10 @@
 # 🇸🇴 SigmaOS Sovereign System - Master Daily Improvement Plan & Audit Report
+
 ## 🚀 Next Steps Guidelines, Operational Audits, Self-Healing Resilience, and 36-Month Strategic Roadmaps
 
 This document serves as the master daily improvement plan, comprehensive system audit, and operational roadmap for **SigmaOS**. It details zero-dependency digital sovereignty, hard real-time latency guarantees, advanced Object-Oriented Programming (OOP) patterns, and self-healing system resilience, directly addressing the core tasks requested by the team and incorporating our complete 36-month strategic execution blueprint.
 
----
+***
 
 ## 📊 Quick Priority Action Matrix
 
@@ -11,64 +12,72 @@ This document serves as the master daily improvement plan, comprehensive system 
 | :--- | :--- | :--- | :--- | :--- |
 | **ACT-01** | Code Quality | Fix compilation & syntax blockers in `src/network/enterprise.rs`, `src/distro/improvements.rs`, `src/shell/command.rs`, and `src/sigpkg/resolver.rs`. (RESOLVED) | **High (Fixed)** | Stable v0.2.0 |
 | **ACT-02** | Code Quality | Fix borrow checker / move errors in firewall rules evaluator inside `src/network/pf_firewall.rs` and `src/network/nftables.rs`. | **High** | Stable v0.2.0 |
-| **ACT-03** | Code Quality | Fix missing `mem` size_of and box imports inside custom `Vec` under `#[cfg(target_os = "none")]` in `src/scheduler/scheduler.rs`. | **High** | Stable v0.2.0 |
+| **ACT-03** | Code Quality | Fix missing `mem` size\_of and box imports inside custom `Vec` under `#[cfg(target_os = "none")]` in `src/scheduler/scheduler.rs`. | **High** | Stable v0.2.0 |
 | **ACT-04** | Security | Upgrade npm dependency `brace-expansion` to `v2.0.1` to resolve the ReDoS vulnerability (GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895). | **High** | Hotfix Release |
 | **ACT-05** | OOP / Patterns | Refactor procedural package translation logic into an abstract `PackageTranslator` factory pattern. | **Medium** | Stable v0.2.0 |
 | **ACT-06** | Performance | Transition logging from dynamic format strings to pre-allocated circular ring buffers in hotpaths. | **Medium** | Perf Sprint 1 |
 | **ACT-07** | Workflow | Consolidate the 30+ overlapping GitHub Actions workflow files to simplify pipeline maintenance. | **Medium** | CI Overhaul |
 | **ACT-08** | Documentation | Document RISC-V and ARM64 cross-compilation target setups in `CONTRIBUTING.md`. | **Low** | Docs Overhaul |
 
----
+***
 
 ## 🌐 HIGH-FIDELITY TCP/UDP NETWORKING STACKS: MULTI-PLATFORM DESIGN INSPIRES
 
 To establish world-class throughput, low-latency packet processing, and absolute network resilience, the SigmaOS TCP/UDP networking architecture incorporates advanced patterns adapted from leading desktop, enterprise, and mobile platforms:
 
 ### A. Linux BBR & Bottleneck Bandwidth Congestion Control (Android & iOS Parity)
+
 *   *Design Implementation:* Model our TCP Congestion Control layer after Linux's modern **BBR (Bottleneck Bandwidth and RTT)** algorithm.
 *   *LTE / 5G Mobile Optimization:* Unlike legacy loss-based congestion (Cubic/Reno) which panics and drops throughput on wireless packet drops (common in Android/iOS environments), BBR models the physical bandwidth capacity and round-trip time, delivering up to 10x higher speeds over lossy 5G/Wi-Fi channels.
 
 ### B. FreeBSD Netmap & Zero-Copy Socket Processing (Enterprise Parity)
+
 *   *Design Implementation:* Implement Netmap-inspired shared ring buffers between kernel drivers and userland sockets.
 *   *Zero-Copy Sockets:* By mapping network driver ring buffer DMA sectors directly to user-space page directories, we eliminate standard `copy_to_user` memory copies, unlocking full 10Gbps line-rate processing with under 5% CPU utilization.
 
 ### C. Windows TCP Chimney & Hardware Offloads (Desktop Parity)
+
 *   *Design Implementation:* Leverage hardware segmentation offloads natively within our network stack loop (`src/network/tcp_udp.rs`).
 *   *NIC Hardware Offloads:* Offload large TCP Segmentations (TSO) and Checksum calculations directly to physical Network Interface Cards (NICs), preserving critical CPU cycles for userland applications and compiler runtimes.
 
 ### D. Multipath TCP - MPTCP (Mobile Handover Parity)
+
 *   *Design Implementation:* Introduce Multipath TCP capabilities to bind multiple subflows to a single socket connection.
 *   *Seamless Handover:* Enables mobile endpoints to dynamically steer and load-balance TCP data segments concurrently over both Wi-Fi and Cellular (LTE/5G) pathways, guaranteeing zero-disconnect connection handovers.
 
----
+***
 
 ## 🧬 ADVANCED RUST-NATIVE ALGORITHMS: OPEN-SOURCE OS LEADERSHIP REDESIGNS
 
 To ensure SigmaOS delivers unmatched computational performance, we optimize our custom mathematical, scheduling, and search primitives by taking inspiration from pioneering open-source operating system algorithms:
 
 ### A. Sub-Millisecond Context Switch Schedulers (Linux CFS & FreeBSD ULE)
+
 *   **Linux CFS-Inspired Virtual Runtime (vruntime):**
     *   Maintain process scheduling execution queues mapped via Red-Black trees (`src/klib/btreemap.rs`), sorting nodes dynamically by their accumulated CPU runtime (`vruntime`). This bounds context selection to $O(\log N)$ latency.
 *   **FreeBSD ULE-Inspired Work-Stealing Queues:**
     *   Implement per-CPU run queues with dynamic affinity. When a CPU core falls idle, it initiates safe lock-free work-stealing from busier neighbor cores, minimizing NUMA-node cache-line thrashing.
 
 ### B. High-Precision Math Primitives & Fast Approximations (Quake III & fdlibm)
+
 *   **Fast Logarithmic Scaling & Binary Bit-Hacks:**
     *   Optimize low-level arithmetic loops (such as the binary fast `log10` in `src/klib/math.rs`) by replacing slow division steps with standard binary shift loops and CPU CLZ (Count Leading Zeros) instructions.
 *   **Quake III Fast Inverse Square Root Approximations:**
     *   Integrate highly optimized floating-point inverse approximations for DSP filters and graphics rendering (Mesa backend in `Zenith`), bypassing traditional costly CPU divisions.
 
 ### C. Logarithmic Collection Lookups (BTreeMap vs. Linear Scans)
+
 *   **O(log N) Binary Partition Scheme:**
     *   Replace sequential searching in custom container nodes (`src/klib/btreemap.rs` and `hashmap.rs`) with binary partition scans. By packing keys contiguously in cache lines, we maximize memory bandwidth efficiency and minimize L1/L2 cache misses.
 
----
+***
 
 ## 🛠️ LOW-LEVEL TOOLING INSPIRATIONS FROM LINUX & BSD DISTRIBUTIONS
 
 To elevate SigmaOS tools into competitor-grade production utilities, we model our tooling architecture on verified, highly successful tools from various Linux and BSD distributions:
 
 ### A. Package Manager & Ports Tooling (Arch Linux, Void Linux & FreeBSD)
+
 *   **Arch Linux `pacman` and `makepkg` Parity:**
     *   Design a custom ports/recipe format (`SigmaBuild`) using declarative metadata files to compile native programs from source with secure sandboxed isolation.
     *   Implement cryptographic package signing using Dilithium-5 signatures (replacing legacy GPG) to protect against registry mirroring and man-in-the-middle attacks.
@@ -78,80 +87,93 @@ To elevate SigmaOS tools into competitor-grade production utilities, we model ou
     *   Support delta updates (diff-compressing packages) to conserve bandwidth on low-power cloud VMs or satellite communication arrays.
 
 ### B. Security & Sandbox Tooling (OpenBSD, HardenedBSD & Linux)
+
 *   **OpenBSD `pledge`/`unveil` Inspired API Sandboxing:**
     *   Provide simple API endpoints (`sys_pledge` and `sys_unveil`) to restrict process execution surfaces. Once a process pledges `stdio rpath`, the kernel instantly blocks access to networking or raw file descriptors outside the specified subdirectory.
 *   **HardenedBSD ASLR & PaX Inspired Protection Tooling:**
     *   Integrate proactive exploit mitigation tools inside our binary loader to enforce non-executable stacks, address space layout randomizations (ASLR), and runtime safe pointer boundaries.
 
 ### C. Diagnostics, Sysctl & Telemetry Tooling (FreeBSD, Illumos & Linux)
+
 *   **FreeBSD `sysctl` MIB-Style Configuration Tooling:**
     *   Implement a hierarchical system configuration and telemetry engine (`sigma-sysctl`) managing hardware parameters, kernel states, and security knobs via a dynamic tree interface.
 *   **Illumos `DTrace` & Linux eBPF Tracing Tooling:**
     *   Provide safe, sandboxed, low-overhead dynamic tracepoints inside the kernel and filesystem layers. This enables live system profiling under production workloads with zero runtime compilation or execution penalties.
 
----
+***
 
 ## 🔄 CO-DESIGNING CO-ABSORBED PACKAGE SNAPSHOTS & TRANSACTIONAL ROLLBACKS
 
 To prevent system corruption and provide bulletproof recovery systems, SigmaOS adapts transaction and rollback patterns inspired by industry-leading Linux/BSD package environments:
 
 ### A. NixOS / Nix-Style Generation Checkpoints
+
 *   *Design Implementation:* Package manager transactions are tracked under a strictly ordered, incremental generation map (`store_generations: HashMap<u32, Vec<String>>` inside `universal_engine.rs`).
 *   *Atomic Pointer Promotion:* Similar to NixOS generation profiles, upgrading or removing a package is atomic ($O(1)$) because the active system environment is symlinked directly to the current generation pointer.
 *   *Instant Reversion:* If a package transaction fails, the engine instantly discards the partial transaction, retaining active system retaining pointers unchanged and completely avoiding half-installed file configurations.
 
 ### B. Btrfs-Inspired Copy-on-Write (CoW) Snapshots & Snapper / Timeshift integration
+
 *   *Design Implementation:* Implement transactional rollbacks utilizing our internal `BtrfsSnapshot` and `CowSnapshotManager` subsystems.
 *   *Subvolume Isolation:* System-wide configuration profiles and package stores are partitioned into isolated directory subvolumes.
 *   *Transactional Logging:* Before any `sigpkg` upgrade cycle, our automated hook calls `create_cow_snapshot` to log the current checksum and layout state.
 *   *Unified Rollback Command:* On system degradation, running `sigma-rollback` triggers `rollback_to_snapshot`, which replays transaction files backwards to restore directories to previous pristine sectors, surpassing classical Ubuntu `apt` restore cycles in reliability and speed.
 
----
+***
 
 ## 🛡️ DEFEATING KALI LINUX & PARROT SECURITY OS: SOVEREIGN CYBERSECURITY TOOLING
 
 To establish absolute dominance over traditional offensive toolsets and live forensic distros (Kali Linux, Parrot Security OS, Tails, and DEFT), SigmaOS incorporates native, zero-dependency, safe implementations of advanced cybersecurity mechanisms:
 
 ### A. AnonSurf Routing Shunt (Defeating Cleartext Tracking)
+
 *   *Competitor Limitation:* Kali Linux relies on unstable external python wrappers (like `anonsurf`) that are easily decoupled or leaked during sudden connection terminations.
 *   *SigmaOS Shard:* Integrate anonymous routing shunts natively at the virtual interface layer (`VpnVirtualInterface` / `TorAnonymized` / `I2pAnonymized`). By redirecting all traffic through Tor-parity loops and DNS leak-shielding at the kernel socket boundary, we prevent any unencrypted, cleartext leakage.
 
 ### B. Forensic Integrity Write-Blocking (Defeating Data Tampering)
+
 *   *Competitor Limitation:* Traditional forensics tools require separate hardware loop blockers, as Linux standard kernels permit write requests to physical node descriptors.
 *   *SigmaOS Shard:* Implement a forensic block-device filter (`MacFramework` / `ForensicWriteBlocker`). It intercepts raw device writes at the partition driver layer, throwing permission denied exceptions to ensure absolute evidence preservation and zero system footprint modifications.
 
 ### C. Penetration Assistant Framework (Defeating procedural script-kiddie tools)
+
 *   *Competitor Limitation:* Kali Linux relies on a chaotic, unmaintained jungle of thousands of third-party command-line binaries lacking typed APIs.
 *   *SigmaOS Shard:* Define a standard, typed `PenetrationAssistant` trait with deterministic default execution blocks, providing an clean API boundary for automated audits, self-assessments, and secure remediation.
 
----
+***
 
 ## 💡 UNIMPLEMENTED IDEAS & COMPETITIVE GAP FILLING (vs. Linux & BSD Distros)
 
 By conducting a detailed market analysis against Debian, Arch Linux, FreeBSD, and OpenBSD, we identify critical unimplemented features in SigmaOS and design custom clean-room alternatives:
 
 ### 1. File I/O Engine: `Sigma Ring` (Inspiration: Linux `io_uring` & FreeBSD `AIO`)
+
 *   *Competitor Advantage:* Linux's `io_uring` completely avoids context switch overhead for intensive I/O routines by utilizing a pair of ring buffers shared directly between userland and kernel space.
 *   *SigmaOS Alternative:* Implement `Sigma Ring` – an asynchronous, lock-free Submission Queue (SQ) and Completion Queue (CQ) system mapped directly to physical driver DMA, ensuring zero system-call overhead for block storage operations.
 
 ### 2. High-Performance Compiler Optimizations (Inspiration: Intel/Clear Linux)
+
 *   *Competitor Advantage:* Clear Linux achieves maximum speed by compiling libraries with aggressive auto-vectorization (AVX2, AVX-512) and Profile-Guided Optimization (PGO) by default.
 *   *SigmaOS Alternative:* Create architecture-specific standard library configurations (`klib-opt`) that dynamically swap mathematical and string functions with AVX-512 or NEON SIMD implementations based on runtime CPUID checks.
 
 ### 3. Declarative OS Environments (Inspiration: NixOS & Guix)
+
 *   *Competitor Advantage:* NixOS guarantees total system reproducibility and transactional rollbacks by deriving the entire OS layout declaratively from a single source file.
 *   *SigmaOS Alternative:* Define a declarative configuration manifest (`sigma-system.toml`) at the bootloader level. The system boots into a read-only, symlinked filesystem state computed deterministically from the manifest, enabling instant, atomic rollbacks.
 
 ### 4. RAM-Disk Execution Mode (Inspiration: Alpine Linux & Tails)
+
 *   *Competitor Advantage:* Alpine Linux can boot entirely into system RAM (`diskless mode`), running extremely fast with zero physical disk degradation.
 *   *SigmaOS Alternative:* Design an overlay initramfs stage that copies the entire OS image into compressed RAM-backed virtual storage, running 100% in-memory with physical disk drives powered down or spun down.
 
----
+***
 
 ## 🔍 1. Code Quality & Testing
 
 ### A. Core Compilation & Syntax Blockers (Audit and Resolutions)
+
 We have conducted a thorough compilation audit of the workspace and identified several critical syntax/compilation issues:
+
 *   **Git Merge Delimiter in Enterprise Network Suite (`src/network/enterprise.rs`):**
     *   *Issue:* Mismatched Git merge indicators (`>>>>>>> origin/jules-...`) and truncated/duplicate test blocks caused parsing failures and shifted panics.
     *   *Resolution:* Restored the complete and clean implementations of `AntiReplayWindow`, `VpnVirtualInterface`, `TlsState`, `TlsRecordType`, and `SovereignSslEngine`, resolving the shift overflows via dynamic `(i % 16) * 8` wrapping. All 5 enterprise network tests now compile and pass 100% cleanly.
@@ -166,11 +188,14 @@ We have conducted a thorough compilation audit of the workspace and identified s
     *   *Resolution:* Standardized the block to use `Package::new(...)` cleanly.
 
 ### B. Linting and Style Checks
+
 *   **ESLint Configuration Gap:** The Node.js/Electron interface (`zenith_desktop`) is configured to run `pnpm lint`, but the workspace lacks a root `eslint.config.js` file, causing ESLint execution to fail instantly. Recommend generating a standard ESLint flat config.
 *   **Clippy Warning Abatement:** Enforce strict warning boundaries on `#![deny(clippy::all)]` inside the library root to catch runtime micro-allocation issues.
 
 ### C. Unit Test Coverage & Untested Functions
+
 While the monorepo utilizes a comprehensive integration suite testing driver bridges, virtual filesystems, and package translators, several core components remain under-tested:
+
 *   **Untested Functions list:**
     *   `src/ai/llm.rs`: Quantized neural weights forward-pass calculations.
     *   `src/crypto/primitives.rs`: Kyber post-quantum cryptography handshake routines.
@@ -178,72 +203,84 @@ While the monorepo utilizes a comprehensive integration suite testing driver bri
 *   **Remediation:** Introduce mocking test boundaries with conditional test attributes (`#[cfg(test)]`) inside each sub-crate.
 
 ### D. Algorithm Correctness, Edge Cases, and Error Handling
-*   **BTreeMap Search Efficiency:** The BTreeMap model (`src/klib/btreemap.rs`) utilizes an insertion algorithm with O(N) linear scans. Suggest refactoring to use a binary search partition scheme (O(log N)) to handle larger datasets.
-*   **Validation of Schedulers:** Ensure MLFQ feedback decays are monotonic. Ensure shell command expansion routes safely reject or sanitize null bytes ( ) to prevent command injection exploits.
 
----
+*   **BTreeMap Search Efficiency:** The BTreeMap model (`src/klib/btreemap.rs`) utilizes an insertion algorithm with O(N) linear scans. Suggest refactoring to use a binary search partition scheme (O(log N)) to handle larger datasets.
+*   **Validation of Schedulers:** Ensure MLFQ feedback decays are monotonic. Ensure shell command expansion routes safely reject or sanitize null bytes (�) to prevent command injection exploits.
+
+***
 
 ## ⚡ 2. Performance & Optimization
 
 ### A. Memory Profile & Hotpath Allocations
+
 *   **Hotpath Bottleneck:** Diagnostic telemetry and logging within execution loops perform dynamic heap formatting of strings.
 *   **Remediation:** Utilize static-lifetime string slices (&'static str) or pre-allocated zero-allocation circular byte buffers for hotpath diagnostics.
 *   **Buddy Allocator Efficiency:** The O(1) saturation short-circuit must be fully leveraged to skip list traversal when free lists are empty.
 
 ### B. Core Module Bottlenecks
+
 *   **DMA Storage Polling:** The storage driver models (`src/drivers/`) utilize tight spin-locks for physical DMA operations.
 *   **Remediation:** Transition block storage interactions to hardware-level MSI-X APIC interrupt delivery.
 
 ### C. Build-Time Benchmarks
+
 *   **Monolithic Compilation:** Compilation times are elevated due to building the entire workspace as a monolithic package.
 *   **Remediation:** Enable multi-threaded codegen in `Cargo.toml`, set `codegen-units = 16` for development profiles, and reserve fat Link Time Optimization (lto = "fat") strictly for release targets.
 
----
+***
 
 ## 🛡️ 3. Security & Compliance
 
 ### A. Dependency Scans & ReDoS Vulnerability
+
 *   **Vulnerability Detected:** High-severity ReDoS (Regular Expression Denial of Service) in Node.js dependency `brace-expansion` (GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895) causing OOM process crashes.
 *   **Remediation:** Update `package.json` to upgrade `brace-expansion` to version `2.0.1` or higher and execute lockfile regeneration.
 
 ### B. Secrets Exposure & Cryptographic Keys
-*   **Hardcoded Keys:** Syncing networks (`src/network/sync.rs`) contain fallback "test_key" string literals. Replace with secure environment configuration parameters.
+
+*   **Hardcoded Keys:** Syncing networks (`src/network/sync.rs`) contain fallback "test\_key" string literals. Replace with secure environment configuration parameters.
 *   **ASLR Dynamism:** Secure all cryptographic token generation using high-entropy dynamic entropy pools.
 
 ### C. Regulatory & Accessibility Compliance
+
 *   **GDPR / Privacy:** Enforce automated zero-out routines on physical RAM page frames before writing memory dumps to disk on crash-reporting loops.
 *   **WCAG 2.1 AA / Accessibility:** Custom UI components must draw high-contrast keyboard focus indicators to support screen reader and assistive technology flows.
 
----
+***
 
 ## 📂 4. Documentation & Workflow
 
 ### A. Completeness & Onboarding Guides
+
 *   **Onboarding Guides:** Expand `CONTRIBUTING.md` with compiler configurations for compiling safe `#![no_std]` Rust modules for ARM64 and RISC-V targets.
 *   **API Docs:** Enforce `#![warn(missing_docs)]` to guarantee document coverage on all newly designed subsystems.
 
 ### B. GHA CI/CD Pipelines
+
 *   **CI Wait Times:** Current GHA pipeline wait times exceed 15 minutes due to rebuilding without caching.
 *   **Redundant Workflows:** There are over 30 separate YAML files inside `.github/workflows/` that overlap in trigger conditions and execution.
 *   **Remediation:** Consolidate these into a unified, modular multi-stage workflow, and implement caching steps for cargo registries (`~/.cargo/registry`) and build target folders to reduce pipeline execution to under 3 minutes.
 
----
+***
 
 ## 🏛️ 5. Repo Governance & Branch Health
 
 ### A. Issue & Pull Request Triage
+
 *   **Issues Categorization:** Define three clear categories: `bug` (compilation failures), `feature` (adding new distribution layers), and `enhancement` (OOP modular refactoring).
 *   **Stale Branches:** Remove inactive or unmerged feature branches older than 6 months (e.g., outdated `jules-*` and leftover `bolt-*` experimental branches).
 
 ### B. Draft Release Notes (v0.2.0 - "Sovereign Dawn")
+
 *   **New Features:** Multi-distro package parser compatibility, hardware-accelerated desktop compositor, post-quantum cryptography hardening.
 *   **Bug Fixes:** Resolved E0277 custom Arc Smart Pointer compilation failures, eliminated klib vector symbol collisions, resolved duplicate shell commands.
 
----
+***
 
 ## 🤝 6. Community & Collaboration
 
 ### A. Discussions Summary & Guidelines
+
 *   **Zero-Dependency Strategy:** Transition all remaining components to custom collections (`klib`) to maintain compiler independence.
 *   **Community Mentorship:** Establish the following pairings of maintainers with incoming contributors:
 
@@ -253,18 +290,19 @@ While the monorepo utilizes a comprehensive integration suite testing driver bri
 | AI Subsystems / LLM | Agent Expert (`Jules`) | Optimize Deep Research WANDR engine routing logic and model quantizations. |
 | Desktop UI / Accessibility | UX Designer (`Palette`) | Add comprehensive WCAG keyboard and focus navigation styles. |
 
----
+***
 
 ## 🛠️ 7. Tools & Utilities
 
 *   **Sigma Shell (`src/shell/sigma_sh.rs`):** Integrate robust command-history logging (`.sigma_history`) and custom tab-completion helpers.
 *   **Installer Scripts:** Update pre-boot installers to identify UEFI and secure boot layouts and auto-configure fallback splash loaders.
 
----
+***
 
 ## 🧩 8. Object-Oriented Programming (OOP) Principles
 
 To manage 1100+ files efficiently, apply robust OOP architectural designs:
+
 *   **Encapsulation:** Protect `CapabilityToken` internals behind private boundaries and secure accessors.
 *   **Inheritance:** Implement common base filesystem traits for Ext4, Btrfs, and Zfs.
 *   **Polymorphism:** Use the polymorphic `IPackageParser` trait to parse and load dissimilar package formats.
@@ -275,35 +313,41 @@ To manage 1100+ files efficiently, apply robust OOP architectural designs:
     *   *Strategy Pattern:* Leverage installation strategies to execute different verification policies.
     *   *Decorator Pattern:* Sandbox capability wrapping around standard runtime tasks.
 
----
+***
 
 ## ⚡ Agent-Specific Daily Optimizations
 
 ### ⚡ Bolt’s Daily Performance Optimization (Bolt Mode)
+
 *   **Optimization:** Replaced manual indexing loops with single-pass iterator chains (e.g. `zip`) inside custom hashing algorithms, completely avoiding redundant bounds checks.
 *   **Latency Impact:** Expected execution latency reduction of 12.4% in performance-critical loops.
 
 ### 🎨 Palette’s Daily UX/A11y Delighters (Palette Mode)
+
 *   **Optimization:** Enforced high-contrast focus rings and robust ARIA descriptions for all virtual keyboard screen widgets.
 *   **A11y Score:** 100% WCAG 2.1 AA level compliance.
 
 ### 🛡️ Sentinel’s Daily Security Hardening (Sentinel Mode)
+
 *   **Security Fix:** Upgraded `brace-expansion` to version `2.0.1` or higher to eliminate Regular Expression Denial of Service (ReDoS) risks.
 *   **Risk Level:** Down from High-Risk Vulnerability to Zero Identified External Risk Vectors.
 
----
+***
 
 # 📋 DETAILED STEP-BY-STEP PLAN TO IMPROVE SigmaOS
+
 ## Executive Summary
+
 This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS as a world-leading sovereign operating system that surpasses Linux and BSD distributions in computational speed, efficiency, performance, ease of use, tools, and reliability. The strategy is grounded in proven principles from Linux (Linus Torvalds), Arch Linux, Void Linux, Alpine Linux, NixOS, Fedora/RHEL, Debian, openSUSE, Clear Linux and BSD variants (FreeBSD, OpenBSD, NetBSD, HardenedBSD).
 
----
+***
 
 ## 🎯 PHASE 1: FOUNDATION HARDENING (Months 1-6)
 
 ### 1.1 Kernel Architecture & Performance Optimization
 
 #### 1.1.1 Microkernel Stabilization (Critical)
+
 *   **Finalize Phase G microkernel blockers (reference: MINIX 3, seL4, Genode)**
     *   Complete capability-token delegation system
     *   Implement deterministic interrupt handling
@@ -318,6 +362,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Linux's Completely Fair Scheduler (CFS), Illumos's multi-queue scheduler
 
 #### 1.1.2 Memory Management Hardening
+
 *   **Implement demand-paging with copy-on-write (CoW)**
     *   Absorb ZFS/Btrfs CoW Merkle-tree logic
     *   Sub-millisecond virtual memory page fault resolution
@@ -326,10 +371,11 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 *   **Zero-copy network stack**
     *   Implement DPDK-style packet processing without kernel copies
     *   Memory-mapped ring buffers for NIC DMA
-    *   Support for AF_PACKET, AF_XDP-like socket families
+    *   Support for AF\_PACKET, AF\_XDP-like socket families
     *   *Inspiration:* Linux XDP (eXpress Data Path), DPDK
 
 #### 1.1.3 Compiler & Runtime Tuning
+
 *   **Optimize Rust compilation flags (Cargo.toml profile.release)**
     ```toml
     [profile.release]
@@ -347,6 +393,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 1.2 Filesystem Layer Excellence (SigmaFS)
 
 #### 1.2.1 Copy-on-Write Filesystem Implementation
+
 *   **Design SigmaFS 2.0 specification (50 KB document)**
     *   Implement Merkle-tree data integrity
     *   Sub-millisecond snapshot creation
@@ -360,18 +407,20 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Linux blk-mq, FreeBSD's geom
 
 #### 1.2.2 Security & Integrity
+
 *   Implement dm-verity equivalent for signed, tamper-proof root filesystem
 *   Authenticate all kernel and initramfs against TPM 2.0
 *   Secure boot integration (UEFI SecureBoot)
 *   *Inspiration:* Linux dm-verity, OpenBSD's FFS2 features
 
----
+***
 
 ## 🔐 PHASE 2: SECURITY & RELIABILITY HARDENING (Months 7-12)
 
 ### 2.1 Post-Quantum Cryptography Integration (S-ARMOR)
 
 #### 2.1.1 Implement NIST-Standardized Algorithms
+
 *   **Kyber-1024 (key encapsulation mechanism)**
     *   Replace RSA/ECDH with lattice-based cryptography
     *   All IPC message encryption, network frames, package signatures
@@ -387,6 +436,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Hardware constant-time implementations where feasible
 
 #### 2.1.2 Secure Boot & Attestation
+
 *   **TPM 2.0 integration**
     *   PCR (Platform Configuration Register) measurements for kernel integrity
     *   Sealed secrets for full-disk encryption (LUKS2)
@@ -400,9 +450,10 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 2.2 Defensive Security Architecture
 
 #### 2.2.1 Capability-Based Security (Sentinel Core)
+
 *   **Role-based access control (RBAC)**
     *   Every process receives immutable capability token set at spawn time
-    *   Capability delegation via cap_grant() IPC
+    *   Capability delegation via cap\_grant() IPC
     *   Principle of least privilege enforcement
     *   *Inspiration:* seL4, Genode, OpenBSD pledge/unveil
 *   **Sandbox & confinement isolation**
@@ -415,6 +466,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* OpenBSD pledge/unveil, Linux AppArmor, Fedora SELinux
 
 #### 2.2.2 Memory Safety & Hardening
+
 *   **Shadow stack & control-flow guard (CET)**
     *   Protect against ROP/JOP gadget chains
     *   Hardware support on modern x86-64 CPUs (Intel CET, AMD ShadowStack)
@@ -434,6 +486,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 2.3 Reliability & Testing
 
 #### 2.3.1 Comprehensive Testing Framework
+
 *   **Fuzzing & property-based testing**
     *   Implement cargo fuzz harnesses for all public kernel APIs
     *   AFL++ integration for binary fuzzing
@@ -449,6 +502,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Linux kselftest, OpenBSD regress suite
 
 #### 2.3.2 Observability & Debugging
+
 *   **Comprehensive tracing & profiling**
     *   Kernel-level tracepoints (reference: Linux trace-cmd, perf)
     *   eBPF-equivalent for dynamic instrumentation
@@ -459,13 +513,14 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Minidump format for post-mortem debugging
     *   Crash telemetry with opt-in anonymization
 
----
+***
 
 ## 🚀 PHASE 3: USABILITY, TOOLS & DEVELOPER EXPERIENCE (Months 13-18)
 
 ### 3.1 Package Management Excellence (Sigma Package Manager)
 
 #### 3.1.1 Content-Addressed Package Format (.spkg)
+
 *   **Design atomic package format (inspiration: Nix, Guix, Alpine)**
     *   All packages identified by SHA-256 content hash
     *   Eliminates version conflicts ("works on my machine" problem)
@@ -480,6 +535,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* OpenBSD's ports infrastructure, Arch Linux's makepkg
 
 #### 3.1.2 Dependency Resolution & SAT Solving
+
 *   **DPLL SAT solver integration (reference: MiniSat, CaDiCaL)**
     *   Detect and prevent broken dependency loops
     *   Automatic version constraint satisfaction
@@ -492,6 +548,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 3.2 Desktop Environment & UX (Zenith)
 
 #### 3.2.1 Lightweight, Efficient Compositor
+
 *   **Wayland-native display server**
     *   Replace X11 with modern Wayland compositor
     *   Fractional scaling support for HiDPI displays
@@ -502,6 +559,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Variable refresh rate (VRR) for gaming
 
 #### 3.2.2 Zenith Profile System (Sigma Studio)
+
 *   **Dynamic profile switching (Developer, Gamer, Minimalist, Accessibility)**
     *   *Profile 1 (Developer):* LTO caching, debug symbols, 3.2 GHz CPU cap
     *   *Profile 2 (Gamer):* 4.2 GHz CPU, GPU overclock, 10ms scheduler quantum
@@ -515,6 +573,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Linux cpufreq, macOS's Intelligent Cooling
 
 #### 3.2.3 Unified Design System
+
 *   **Design token library**
     *   Consistent colors, typography, spacing, shadows
     *   Dark/light mode automatic detection
@@ -529,6 +588,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 3.3 CLI Tools & Utilities
 
 #### 3.3.1 Multicall POSIX Utilities (sigma-coreutils)
+
 *   **Single, highly optimized binary replacing traditional utils**
     *   *Implement:* `ls`, `cat`, `grep`, `sed`, `awk`, `find`, `cp`, `rm`, `chmod`, `chown`, `ps`, `kill`, `nc`, `dd`, `tar`, `gzip`, `bzip2`
     *   *Performance target:* 10-50% faster than GNU coreutils
@@ -540,6 +600,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Bash 5.0+, Zsh, Fish shell
 
 #### 3.3.2 Development Tools
+
 *   **SigmaDev IDE**
     *   Lightweight code editor with LSP support
     *   Integrated debugger (gdb/lldb equivalent)
@@ -550,13 +611,14 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Remote build caching
     *   Incremental compilation optimization
 
----
+***
 
 ## 🧠 PHASE 4: AI INTEGRATION & AUTOMATION (Months 19-24)
 
 ### 4.1 Natural Language Shell (SigmaAgent)
 
 #### 4.1.1 Conversational CLI REPL
+
 *   **NLP-to-shell command translation**
     *   *Input:* "Show me all processes using more than 1GB RAM"
     *   *Output:* `ps aux | awk '$6 > 1048576'`
@@ -571,6 +633,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Rust compiler error messages (excellent diagnostics)
 
 #### 4.1.2 Local LLM Serving
+
 *   **Lightweight model infrastructure**
     *   Support 7B-13B parameter models (e.g., Mistral 7B, Llama 2)
     *   Quantized inference (INT8, FP8) for low latency
@@ -584,6 +647,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 4.2 Predictive Maintenance Agent
 
 #### 4.2.1 Hardware Telemetry Collection
+
 *   **Real-time hardware monitoring**
     *   CPU temperature, frequency, power consumption
     *   Disk read/write latency, SMART monitoring
@@ -595,6 +659,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Detect thermal throttling patterns
 
 #### 4.2.2 Automated Remediation
+
 *   **Self-healing capabilities**
     *   Automatic filesystem check on degradation
     *   Thermal management: throttle CPU or trigger cooling
@@ -608,6 +673,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 4.3 Container & Virtualization Orchestration
 
 #### 4.3.1 OCI-Compliant Container Runtime
+
 *   **Lightweight container implementation**
     *   Native namespace isolation (PID, mount, network, UTS, IPC)
     *   Resource limits via cgroups v2
@@ -620,19 +686,21 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Read-only root filesystem by default
 
 #### 4.3.2 Lightweight Virtualization
+
 *   MicroVM hypervisor (similar to Firecracker)
 *   KVM-based guest execution with minimal overhead
 *   Sub-second VM boot time
 *   Memory sharing between guests (identical kernel pages)
 *   *Inspiration:* Firecracker, Kata Containers
 
----
+***
 
 ## 🎮 PHASE 5: ECOSYSTEM & APPLICATIONS (Months 25-30)
 
 ### 5.1 Professional Applications
 
 #### 5.1.1 Media Suite
+
 *   **SigmaCut (Video Editor)**
     *   GPU-accelerated timeline scrubbing
     *   Real-time effects preview (color grading, transitions)
@@ -645,6 +713,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   *Inspiration:* Inkscape, Blender's grease pencil
 
 #### 5.1.2 Productivity Suite
+
 *   **SigmaCalc (Spreadsheet)**
     *   Functional formula DAG evaluation
     *   Lazy recalculation on cell change
@@ -658,6 +727,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 5.2 Developer Ecosystem
 
 #### 5.2.1 Programming Language Support
+
 *   **Zero-setup development environments**
     *   *Rust:* `rustup` + `cargo` pre-installed
     *   *Go, Python, Node.js:* version managers bundled
@@ -668,6 +738,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   eBPF debugger for kernel-space tracing
 
 #### 5.2.2 Container & Cloud Tools
+
 *   **Docker compatibility layer**
     *   Buildkit integration for container builds
     *   Registry authentication (Docker Hub, private registries)
@@ -675,13 +746,14 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   kubeadm bootstrap with pre-configured CNI
     *   Helm package manager pre-installed
 
----
+***
 
 ## 📈 PHASE 6: PERFORMANCE OPTIMIZATION & TUNING (Months 31-36)
 
 ### 6.1 Benchmarking & Profiling
 
 #### 6.1.1 Comprehensive Benchmark Suite
+
 *   **Baseline measurements**
     *   Context switch latency: target < 0.5μs (reference: Linux < 1μs)
     *   System call overhead: target < 100ns (reference: Linux ~100ns)
@@ -694,6 +766,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Network throughput & latency
 
 #### 6.1.2 Performance Monitoring & Telemetry
+
 *   Built-in performance dashboard
 *   Real-time CPU/memory/disk/network graphs
 *   Historical trend analysis
@@ -703,6 +776,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 6.2 CPU & Memory Optimization
 
 #### 6.2.1 CPU Cache Optimization
+
 *   **Kernel page layout optimization**
     *   Group frequently accessed kernel structures together
     *   Minimize cache line thrashing
@@ -714,6 +788,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   LLVM's `#pragma GCC optimize` directives
 
 #### 6.2.2 Memory Bandwidth Optimization
+
 *   **NUMA-aware memory allocation**
     *   Prefer local NUMA node memory
     *   Automatic memory migration on idle cores
@@ -726,6 +801,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 ### 6.3 I/O Stack Optimization
 
 #### 6.3.1 Disk I/O Tuning
+
 *   **Elevator algorithm selection**
     *   Use deadline scheduler for SSD (no seek penalty)
     *   Use deadline for HDD (minimize seek time)
@@ -736,6 +812,7 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   Commit interval optimization
 
 #### 6.3.2 Network Stack Optimization
+
 *   **TCP window scaling**
     *   Increase TCP receive window for high-bandwidth links
     *   `TCP_NODELAY` for interactive applications
@@ -745,63 +822,74 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
     *   GRO (Generic Receive Offload)
     *   Checksum offloading
 
----
+***
 
 ## 🛠️ Technical Improvements
 
 ### Compatibility layer
+
 *   Provide a way to run Linux apps on SigmaOS (like Wine or WSL).
 *   This instantly gives developers familiar tools while they build native ones.
 
 ### Modular SDKs
+
 *   Offer SigmaOS-specific SDKs for networking, GUI, and filesystem.
 *   Developers can build apps without worrying about low-level kernel details.
 
 ### Testing framework
+
 *   Create automated test suites for drivers, networking, and GUI.
 *   Contributors can validate their code quickly, reducing friction.
 
 ### Documentation-first design
+
 *   Every subsystem should have a “How to extend this” guide.
 *   Example: “How to add a new filesystem driver in 10 steps.”
 
----
+***
 
 ## 🌍 Community Improvements
 
 ### Mentorship program
+
 *   Pair experienced OS/Rust developers with newcomers.
 *   Builds loyalty and accelerates skill growth.
 
 ### Hackathons & bounty programs
+
 *   Offer small rewards (swag, recognition, certificates) for completing key features.
 *   Example: “Implement IPv6 support — bounty $100.”
 
 ### Showcase contributions
+
 *   Highlight contributor apps in a “SigmaOS App Gallery.”
 *   Recognition motivates developers to keep building.
 
 ### University partnerships
+
 *   Collaborate with CS departments for research projects.
 *   Students can contribute drivers, networking, or GUI features as coursework.
 
----
+***
 
 ## 🚀 Visionary Improvements
 
 ### AI-native integration
+
 *   Provide APIs for running local LLMs and AI agents.
 *   Contributors can build AI-powered apps directly into the OS.
 
 ### Post-quantum security demos
+
 *   Showcase SigmaOS’s Kyber/Dilithium cryptography with example secure apps.
 *   Attract security researchers and cryptography enthusiasts.
 
 ### Regional dominance strategy
+
 *   Build India-first apps (UPI payments, GST compliance, multilingual support).
 *   Contributors from India will feel directly invested in the project.
 
----
+***
 
 ## 📊 Suggested Roadmap for Improvement
 
@@ -813,11 +901,11 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 | **Stage 4** | Compatibility + app gallery | Attract mainstream developers |
 | **Stage 5** | AI + security demos | Differentiate SigmaOS globally |
 
----
+***
 
 *👉 By combining starter code, clear documentation, and community incentives, SigmaOS can transform from a research prototype into a developer magnet.*
 
----
+***
 
 ## 📊 SUCCESS METRICS & KPIs
 
@@ -836,41 +924,47 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 | **CPU Efficiency** | -20% power | watts per FLOP | vs Ubuntu |
 | **Memory Footprint** | < 200MB | full OS boot | Ubuntu minimal: ~500MB |
 
----
+***
 
 ## 🔧 IMPLEMENTATION ROADMAP (Detailed Timeline)
 
 ### Q1 2026: Phase 1 Foundation Hardening
+
 *   **Week 1-4:** Microkernel Phase G completion, scheduler optimization
 *   **Week 5-8:** SigmaFS 2.0 design & prototype, CoW implementation
 *   **Week 9-12:** Fuzzing harness setup, kernel API testing
 
 ### Q2 2026: Phase 2 Security
+
 *   **Week 13-16:** Kyber-1024 & Dilithium-5 integration, post-quantum crypto
 *   **Week 17-20:** TPM 2.0 boot, secure boot chain
 *   **Week 21-24:** KASI (kernel address space isolation), fuzzing expansion
 
 ### Q3 2026: Phase 3 Usability
+
 *   **Week 25-28:** Sigma Package Manager design, .spkg format
 *   **Week 29-32:** Zenith desktop environment, profile system
 *   **Week 33-36:** sigma-coreutils, CLI tool optimization
 
 ### Q4 2026: Phase 4 AI
+
 *   **Week 37-40:** SigmaAgent NLP-to-command translation
 *   **Week 41-44:** Local LLM integration (Mistral 7B)
 *   **Week 45-48:** Predictive maintenance agent, hardware telemetry
 
 ### Q1-Q2 2027: Phase 5 Ecosystem
+
 *   Media suite (SigmaCut, SigmaDraw) development
 *   Container runtime OCI compliance
 *   Developer environment zero-setup
 
 ### Q3-Q4 2027: Phase 6 Performance
+
 *   Comprehensive benchmark suite
 *   CPU/memory optimization (PGO, NUMA)
-*   I/O stack tuning (io_uring, NIC offloads)
+*   I/O stack tuning (io\_uring, NIC offloads)
 
----
+***
 
 ## 🎯 COMPETITIVE DIFFERENTIATION VS LINUX/BSD
 
@@ -887,11 +981,12 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 | **Package Rollback** | Atomic transactions | Limited | Manual |
 | **Power Efficiency** | -20% vs Linux | Baseline | -5% vs Linux |
 
----
+***
 
 ## 📚 REFERENCE INSPIRATIONS
 
 ### Linux Distributions
+
 *   **Arch Linux:** KISS principle, rolling releases, community
 *   **Void Linux:** xbps simplicity, systemd-free
 *   **Alpine Linux:** musl libc, minimal footprint
@@ -901,12 +996,14 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 *   **Debian:** stability, testing suites
 
 ### BSD Systems
+
 *   **OpenBSD:** pledge/unveil capability model, security
 *   **FreeBSD:** UVM (memory management), ports system
 *   **NetBSD:** portability, clean architecture
 *   **HardenedBSD:** security-focused hardening
 
 ### Technologies to Absorb
+
 *   **Linux kernel:** POSIX compliance, device drivers, scheduler
 *   **systemd:** service management, predictable boot
 *   **DPDK:** high-speed packet processing
@@ -916,9 +1013,10 @@ This plan outlines a phased, 36-month improvement roadmap to establish SigmaOS a
 *   **LLVM/Clang:** compiler infrastructure
 *   **Rust standard library:** memory safety patterns
 
----
+***
 
 ## 🚀 CRITICAL SUCCESS FACTORS
+
 1.  **Focus on Performance & Reliability:** Every feature must improve speed or stability, never compromise.
 2.  **Security by Default:** Capability-based model applied everywhere, not bolted on.
 3.  **Reproducible Builds:** Enable users to verify binary authenticity.

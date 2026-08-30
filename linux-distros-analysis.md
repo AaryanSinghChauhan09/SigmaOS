@@ -1,32 +1,36 @@
 # 📑 Linux Distros & Subsystem Parity Analysis Report
 
 ## 1. Problem Description
+
 Distribution codebases and related tooling contain recurring issues: hard-coded cryptographic values, unsafe native pointer usage in C/C++ modules, UI components that render untrusted text as HTML, prototype-polluting JS/CSS interactions, accidental property overwrites, unused variables/imports, and overly-broad exception handling (catching BaseException or empty except blocks).
-Rust components misuse unsafe patterns (transmute without annotations), crate attributes (#![no_main], #![no_std] used outside crate root), and include unused imports like core::mem.
+Rust components misuse unsafe patterns (transmute without annotations), crate attributes (#!\[no\_main], #!\[no\_std] used outside crate root), and include unused imports like core::mem.
 
 ## 2. Root Cause Analysis
-- Rapid prototyping and cross-language glue left unsafe shortcuts in place.
-- Lack of consistent cross-language secure-coding rules and automated static analysis.
-- Web frontends for distro tooling sometimes render system logs or metadata with innerHTML.
-- Insufficient architecture for secure key provisioning and hardware-backed RNGs.
+
+*   Rapid prototyping and cross-language glue left unsafe shortcuts in place.
+*   Lack of consistent cross-language secure-coding rules and automated static analysis.
+*   Web frontends for distro tooling sometimes render system logs or metadata with innerHTML.
+*   Insufficient architecture for secure key provisioning and hardware-backed RNGs.
 
 ## 3. Proposed Fix
-- Centralize cryptographic management:
-  Replace hard-coded keys with runtime-provisioned keys (CSPRNG, hardware tokens, or secure file with strict permissions).
-  Provide a pluggable provider interface so implementations can be swapped (software RNG vs hardware).
-- Native memory safety:
-  Convert risky C/C++ modules to Rust where feasible.
-  Where C/C++ must remain, add explicit bounds checks and modern APIs (span/slice).
-- Web UI safety:
-  Replace innerHTML use with safe rendering (textContent) and strict sanitizers for any HTML allowed.
-- Rust safety hygiene:
-  Add explanations and comments where unsafe/transmute are used, with unit tests and audits.
-  Ensure #![no_std]/#![no_main] appear only at crate root; remove unused core::mem imports.
-- Tooling and CI:
-  Enforce clippy with pedantic rules, compile warnings-as-errors, forbid unused imports/variables, and run static analyzers (e.g., cargo-audit).
-  Add pre-commit hooks and CI jobs to run formatting, lint, and basic fuzz-tests.
+
+*   Centralize cryptographic management:
+    Replace hard-coded keys with runtime-provisioned keys (CSPRNG, hardware tokens, or secure file with strict permissions).
+    Provide a pluggable provider interface so implementations can be swapped (software RNG vs hardware).
+*   Native memory safety:
+    Convert risky C/C++ modules to Rust where feasible.
+    Where C/C++ must remain, add explicit bounds checks and modern APIs (span/slice).
+*   Web UI safety:
+    Replace innerHTML use with safe rendering (textContent) and strict sanitizers for any HTML allowed.
+*   Rust safety hygiene:
+    Add explanations and comments where unsafe/transmute are used, with unit tests and audits.
+    Ensure #!\[no\_std]/#!\[no\_main] appear only at crate root; remove unused core::mem imports.
+*   Tooling and CI:
+    Enforce clippy with pedantic rules, compile warnings-as-errors, forbid unused imports/variables, and run static analyzers (e.g., cargo-audit).
+    Add pre-commit hooks and CI jobs to run formatting, lint, and basic fuzz-tests.
 
 ## 4. Code Snippet (Rust — Secure Key Provider Pattern)
+
 ```rust
 // name=docs/examples/rust_secure_key_provider.rs
 use rand::rngs::OsRng;
@@ -66,6 +70,7 @@ impl KeyProvider for OsKeyProvider {
 ```
 
 ## 5. Validation Steps
-- Unit tests to ensure generate_key returns different values across runs.
-- Integration test: provider loads from file with 0o600 permission; fails when world-readable.
-- CI: run cargo fmt, cargo clippy -- -D warnings, cargo test, and cargo-audit.
+
+*   Unit tests to ensure generate\_key returns different values across runs.
+*   Integration test: provider loads from file with 0o600 permission; fails when world-readable.
+*   CI: run cargo fmt, cargo clippy -- -D warnings, cargo test, and cargo-audit.

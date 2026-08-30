@@ -6,23 +6,21 @@ SigmaOS uses a formal **OKR (Objectives & Key Results)** governance model for st
 
 ## Governance Structure
 
-```
-SigmaOS Foundation
-├── Technical Steering Committee (TSC)
-│   ├── Kernel Working Group
-│   ├── Security Working Group
-│   ├── AI/ML Working Group
-│   ├── Desktop Working Group
-│   └── Networking Working Group
-├── Release Engineering
-│   ├── Release Manager
-│   ├── QA Lead
-│   └── Documentation Lead
-└── Community Council
-    ├── Contributor Relations
-    ├── Localization Team
-    └── Security Response Team
-```
+    SigmaOS Foundation
+    ├── Technical Steering Committee (TSC)
+    │   ├── Kernel Working Group
+    │   ├── Security Working Group
+    │   ├── AI/ML Working Group
+    │   ├── Desktop Working Group
+    │   └── Networking Working Group
+    ├── Release Engineering
+    │   ├── Release Manager
+    │   ├── QA Lead
+    │   └── Documentation Lead
+    └── Community Council
+        ├── Contributor Relations
+        ├── Localization Team
+        └── Security Response Team
 
 ## OKR Framework
 
@@ -47,14 +45,14 @@ SigmaOS Foundation
 
 ## Decision Making
 
-- **RFC Process**: Major changes require a Request for Comments document
-- **TSC Vote**: 2/3 majority for architectural changes
-- **Fast-track**: Security fixes can bypass RFC with TSC emergency approval
-- **Community Input**: All RFCs open for 2-week public comment period
+*   **RFC Process**: Major changes require a Request for Comments document
+*   **TSC Vote**: 2/3 majority for architectural changes
+*   **Fast-track**: Security fixes can bypass RFC with TSC emergency approval
+*   **Community Input**: All RFCs open for 2-week public comment period
 
 ## Release Cadence
 
-- **Nightly**: Automated builds from main
-- **Weekly**: Tested snapshot with release notes
-- **Monthly**: Stable release with full QA
-- **LTS**: Every 12 months, supported for 36 months
+*   **Nightly**: Automated builds from main
+*   **Weekly**: Tested snapshot with release notes
+*   **Monthly**: Stable release with full QA
+*   **LTS**: Every 12 months, supported for 36 months

@@ -4,7 +4,7 @@
 
 A core engineering principle of SigmaOS is **self-sufficiency and minimal external dependencies**. Rather than relying on external dynamic C libraries (`glibc`, `openssl`, `libsystemd`) or third-party precompiled packages, SigmaOS implements native, clean-room Rust equivalents designed for security, auditability, and deterministic builds.
 
----
+***
 
 ## Zero-Dependency Matrix
 
@@ -17,10 +17,10 @@ A core engineering principle of SigmaOS is **self-sufficiency and minimal extern
 | **DPKG / APT / RPM** | [`src/sigpkg/`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/) | In-memory DAG solver with cycle elimination and atomic filesystem rollback |
 | **libevent / libuv** | [`src/distro/linux_bsd_inspirations.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/distro/linux_bsd_inspirations.rs) | SPSC lock-free ring buffer and `io_uring` kernel emulation |
 
----
+***
 
 ## Architectural Guidelines
 
-1. **No Unaudited External Crates in Core Kernel**: The kernel and core drivers execute in `#![no_std]` environments with dedicated memory allocators (`BuddyAllocator`, `SlabAllocator`).
-2. **Deterministic Builds**: Build outputs are bit-for-bit reproducible across independent toolchain invocations.
-3. **Safe Memory Abstractions**: All low-level MMIO, DMA, and page table interactions are encapsulated inside rigorously documented safe wrappers with `# Safety` contracts.
+1.  **No Unaudited External Crates in Core Kernel**: The kernel and core drivers execute in `#![no_std]` environments with dedicated memory allocators (`BuddyAllocator`, `SlabAllocator`).
+2.  **Deterministic Builds**: Build outputs are bit-for-bit reproducible across independent toolchain invocations.
+3.  **Safe Memory Abstractions**: All low-level MMIO, DMA, and page table interactions are encapsulated inside rigorously documented safe wrappers with `# Safety` contracts.

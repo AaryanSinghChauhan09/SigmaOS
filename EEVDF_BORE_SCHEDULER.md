@@ -6,9 +6,9 @@ EEVDF (Earliest Eligible Virtual Deadline First) — introduced in Linux 6.6.
 
 ### Core Concepts
 
-- **vruntime**: Normalized CPU time consumed, weighted by priority
-- **virtual_deadline**: vruntime + (time_slice / weight)
-- **eligibility**: process.vruntime <= system_vtime
+*   **vruntime**: Normalized CPU time consumed, weighted by priority
+*   **virtual\_deadline**: vruntime + (time\_slice / weight)
+*   **eligibility**: process.vruntime <= system\_vtime
 
 ### Weight Table (Nice -20 to +19)
 
@@ -22,9 +22,9 @@ EEVDF (Earliest Eligible Virtual Deadline First) — introduced in Linux 6.6.
 
 ### Selection Rule
 
-1. Filter: eligible processes (vruntime <= system_vtime)
-2. Pick: min(virtual_deadline) among eligible
-3. Fallback: min(vruntime) if no eligible (starvation prevention)
+1.  Filter: eligible processes (vruntime <= system\_vtime)
+2.  Pick: min(virtual\_deadline) among eligible
+3.  Fallback: min(vruntime) if no eligible (starvation prevention)
 
 ### vruntime Update
 
@@ -62,23 +62,23 @@ process.virtual_deadline = base_deadline + bore_penalty;
 ```
 
 **Effect**: CPU-bound processes get pushed later in selection queue.
-Interactive processes (low burst_score) get selected more often.
+Interactive processes (low burst\_score) get selected more often.
 
 ## Implementation Details
 
 ### Data Structures
 
-- **Red-black tree**: Processes ordered by virtual_deadline for O(log n) selection
-- **Per-NUMA run queues**: Each NUMA node has independent scheduler queue
-- **Work-stealing deque**: Lock-free queue for cross-CPU task migration
+*   **Red-black tree**: Processes ordered by virtual\_deadline for O(log n) selection
+*   **Per-NUMA run queues**: Each NUMA node has independent scheduler queue
+*   **Work-stealing deque**: Lock-free queue for cross-CPU task migration
 
 ### Scheduler Classes (Priority)
 
-1. Stop (CPU hotplug)
-2. Deadline (EDF, hard real-time)
-3. Realtime (FIFO + RR, soft real-time)
-4. **Fair (EEVDF+BORE)** — normal processes
-5. Idle (background)
+1.  Stop (CPU hotplug)
+2.  Deadline (EDF, hard real-time)
+3.  Realtime (FIFO + RR, soft real-time)
+4.  **Fair (EEVDF+BORE)** — normal processes
+5.  Idle (background)
 
 ### Time Slices
 

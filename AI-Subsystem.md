@@ -1,88 +1,98 @@
-# S-AI: SigmaOS AI Subsystem
+# AI Subsystem
+
+SigmaOS integrates a local AI subsystem for OS-level intelligence — no cloud dependency.
 
 ## Architecture
 
-```
-User Request
-  ↓
-Orchestrator (decompose + route)
-  ↓
-Specialist Agents (Code, System, Security, Analysis, Debug)
-  ↓
-LLM Router (select best local model)
-  ↓
-Local LLM: llama.cpp | Ollama | LM Studio | vLLM
-```
-
-## Sigma Copilot
-
-```bash
-sigma-ai "how do I set up WireGuard?"      # Q&A
-sigma-ai code "write a Rust HTTP server"   # Code gen
-sigma-ai debug --log /var/log/sigma.log    # Debug
-sigma-ai analyze --system                  # System analysis
-sigma-ai explain src/kernel/scheduler.rs   # Code explain
-sigma-ai summarize docs/security.md        # Summarize
-```
-
-**Access**: `Super+A` hotkey, system tray button, or `sigma-ai` CLI.
+    User / Application
+            ↓
+      S-AI Orchestrator  (src/ai/orchestrator.rs)
+            ↓
+      ┌─────┴──────┬──────────────┐
+      ▼            ▼              ▼
+    Agent Pool    LLM Engine    APM Monitor
+    (Bolt/Palette (src/ai/llm.rs) (src/ai/apm.rs)
+     /Sentinel)
+      ↓
+    Memory Search (LiftEngine)
+      ↓
+    Task Queue → Execution → Result
 
 ## Agents
 
-| Agent | Specialization |
-|-------|---------------|
-| PlannerAgent | Multi-step decomposition |
-| CodeAgent | Code generation/review |
-| SystemAgent | OS configuration |
-| SecurityAgent | Threat analysis |
-| DebugAgent | Error diagnosis |
-| SearchAgent | Information retrieval |
-| SummaryAgent | Text summarization |
+SigmaOS has three specialized AI agents:
 
-## LLM Router Model Selection
+### Bolt ⚡
 
-| Task | Model |
-|------|-------|
-| Code generation | Codestral-22B / Deepseek-Coder |
-| System analysis | Llama-3.1-70B |
-| Quick Q&A | Phi-3-mini (3.8B) |
-| Summarization | Mistral-7B |
+*   Performance optimizer
+*   Analyzes hotpaths and suggests micro-optimizations
+*   Manages circular IPC queue tuning
+*   File: `src/ai/agent.rs` + `.jules/bolt_journal.md`
 
-## AI-Native OS Features
+### Palette 🎨
 
-### Neural Power Manager
+*   UI/UX specialist
+*   Manages Zenith desktop theming and animations
+*   Spring physics engine for UI motion
+*   File: `src/ai/agent.rs` + `.jules/palette_journal.md`
 
-```
-Workload history → LSTM predictor → CPU frequency decision → cpufreq update
-(every 100ms)       (5min lookahead)   (P-state 0–max)
-```
+### Sentinel 🛡️
 
-### Predictive Prefetcher
+*   Security auditor
+*   Monitors capability token usage
+*   Detects privilege escalation attempts
+*   Fixed the bitmask overlap bug in `CapabilityToken`
 
-```
-Session file access history → Markov chain → Prefetch list → readahead()
-```
+## Local LLM Engine (`src/ai/llm.rs`)
 
-### AI Crash Analyzer
+*   Transformer-based inference running entirely on-device
+*   No internet required
+*   Quantized model support (4-bit, 8-bit)
+*   Used by the AI scheduler for process behavior prediction
 
-Auto-analyzes core dumps on crash, identifies root cause, generates fix suggestions.
+## Multi-Agent Orchestration (`src/ai/orchestrator.rs`)
 
-### Intelligent Terminal
-
-Context-aware command completion, error explanation, natural language to command.
-
-## Model Management
-
-```bash
-sigma-ai models list
-sigma-ai models download llama3.1:8b
-sigma-ai models set-default llama3.1:8b
-sigma-ai models benchmark --task code-gen
+```rust
+// Route a task to the appropriate agent
+let result = orchestrator.route_task(Task {
+    kind: TaskKind::SecurityAudit,
+    payload: "check capability tokens".into(),
+})?;
 ```
 
-## Privacy
+Supports:
 
-- All inference **100% local** by default
-- Zero telemetry/data collection
-- AI memory isolated from user data
-- Optional cloud API (user-configured, opt-in)
+*   Model routing (pick LLM based on task type)
+*   Task negotiation between agents
+*   Memory search (LiftEngine context retrieval)
+*   Parallel agent execution
+
+## WANDR Research Integration (`src/ai/wandr.rs`, `src/compatibility/relay_nexus.rs`)
+
+Inspired by Perplexity AI's WANDR benchmark:
+
+*   **WandrEvent**: tracks research trajectory
+*   **AtifTrajectoryMonitor**: monitors search path quality
+*   **VerifierConsensus**: multi-agent result verification
+*   **RelayNexus**: multi-hop research relay
+
+## AutoGen (`src/ai/autogen.rs`)
+
+Multi-agent task generation framework — agents can spawn sub-agents for complex tasks.
+
+## APM — AI Performance Monitor (`src/ai/apm.rs`)
+
+Tracks AI subsystem metrics:
+
+*   Inference latency per query
+*   Token throughput
+*   Memory usage per model
+*   Agent task success/failure rates
+
+## Voice (`src/ai/voice.rs`)
+
+Local speech synthesis and recognition:
+
+*   Text-to-speech for screen reader integration
+*   Speech-to-text for voice commands
+*   No cloud API dependency

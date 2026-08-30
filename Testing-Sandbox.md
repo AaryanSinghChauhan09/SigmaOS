@@ -14,14 +14,12 @@ fuzz targets, and integration tests without risking the production kernel state.
 
 ## Architecture
 
-```
-Test Runner
-   └─ sandbox_create(config)
-         └─ Isolated shard (separate memory domain, IOMMU)
-               ├─ Fake hardware (QEMU device model via virtio)
-               ├─ Snapshot of kernel state (SovereignFS CoW)
-               └─ Instrumented syscall interceptor (for coverage)
-```
+    Test Runner
+       └─ sandbox_create(config)
+             └─ Isolated shard (separate memory domain, IOMMU)
+                   ├─ Fake hardware (QEMU device model via virtio)
+                   ├─ Snapshot of kernel state (SovereignFS CoW)
+                   └─ Instrumented syscall interceptor (for coverage)
 
 ## API Interface
 
@@ -72,24 +70,24 @@ sigma sandbox run --repro crash-001.bin --target fuzz_net_parser
 
 ## Roadmap
 
-- [ ] Basic shard isolation (`sandbox_create` / `sandbox_destroy`)
+*   \[ ] Basic shard isolation (`sandbox_create` / `sandbox_destroy`)
 
-- [ ] SovereignFS snapshot-based reset (`sandbox_reset`)
+*   \[ ] SovereignFS snapshot-based reset (`sandbox_reset`)
 
-- [ ] Syscall trace interceptor (`sandbox_trace_syscalls`)
+*   \[ ] Syscall trace interceptor (`sandbox_trace_syscalls`)
 
-- [ ] AFL++ / libFuzzer integration harness
+*   \[ ] AFL++ / libFuzzer integration harness
 
-- [ ] QEMU-backed hardware simulation (virtio-blk, virtio-net)
+*   \[ ] QEMU-backed hardware simulation (virtio-blk, virtio-net)
 
-- [ ] Coverage-guided fuzzing via KCOV equivalent
+*   \[ ] Coverage-guided fuzzing via KCOV equivalent
 
-- [ ] Distributed sandbox pool for CI parallelism
+*   \[ ] Distributed sandbox pool for CI parallelism
 
 ## Related Modules
 
-- [`modules/security/isolation`](../../security/isolation/README.md) — Production isolation
+*   [`modules/security/isolation`](../../security/isolation/README.md) — Production isolation
 
-- [`modules/tools/diag`](../diag/README.md) — Syscall tracing
+*   [`modules/tools/diag`](../diag/README.md) — Syscall tracing
 
-- [`modules/perf/bench`](../../perf/bench/README.md) — Performance regression testing
+*   [`modules/perf/bench`](../../perf/bench/README.md) — Performance regression testing

@@ -6,14 +6,14 @@ This document describes additional Linux distribution features that can be imple
 
 ## Table of Contents
 
-1. [Package Management Enhancements](#package-management-enhancements)
-2. [System Services Management](#system-services-management)
-3. [Filesystem Hierarchy Standards](#filesystem-hierarchy-standards)
-4. [Boot Configuration](#boot-configuration)
-5. [Network Management](#network-management)
-6. [User Management](#user-management)
-7. [System Logging](#system-logging)
-8. [Hardware Abstraction](#hardware-abstraction)
+1.  [Package Management Enhancements](#package-management-enhancements)
+2.  [System Services Management](#system-services-management)
+3.  [Filesystem Hierarchy Standards](#filesystem-hierarchy-standards)
+4.  [Boot Configuration](#boot-configuration)
+5.  [Network Management](#network-management)
+6.  [User Management](#user-management)
+7.  [System Logging](#system-logging)
+8.  [Hardware Abstraction](#hardware-abstraction)
 
 ## Package Management Enhancements
 
@@ -930,20 +930,20 @@ impl LinuxCompatibilityTester {
 
 ## Resources
 
-- [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
-- [systemd Documentation](https://www.freedesktop.org/software/systemd/man/)
-- [NetworkManager Documentation](https://networkmanager.dev/)
-- [Linux Standard Base](https://refspecs.linuxfoundation.org/lsb.shtml)
+*   [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
+*   [systemd Documentation](https://www.freedesktop.org/software/systemd/man/)
+*   [NetworkManager Documentation](https://networkmanager.dev/)
+*   [Linux Standard Base](https://refspecs.linuxfoundation.org/lsb.shtml)
 
 ## Contributing
 
 When implementing Linux distro features:
 
-1. Follow relevant standards (FHS, LSB, etc.)
-2. Provide compatibility with existing tools
-3. Include comprehensive testing
-4. Document deviations from standards
-5. Consider security implications
+1.  Follow relevant standards (FHS, LSB, etc.)
+2.  Provide compatibility with existing tools
+3.  Include comprehensive testing
+4.  Document deviations from standards
+5.  Consider security implications
 
 ## License
 

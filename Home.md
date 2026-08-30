@@ -6,17 +6,17 @@
 
 SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
 
----
+***
 
 ## ✨ Features & Subsystems
 
-- **Sovereign Microkernel Core:** Memory isolation, capability bounding sets, and lightweight IPC channels (ALPC/Pipes).
-- **Multi-Distro Compatibility & Parity:** Adapters and translation layers for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), CachyOS (BORE scheduler), and FreeBSD (Jails/Capsicum/GEOM).
-- **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
-- **Zero-Trust Access Control:** Integrated Discretionary (DAC), Mandatory (MAC / Bell-LaPadula), and Role-Based (RBAC) access controls.
-- **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+*   **Sovereign Microkernel Core:** Memory isolation, capability bounding sets, and lightweight IPC channels (ALPC/Pipes).
+*   **Multi-Distro Compatibility & Parity:** Adapters and translation layers for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), CachyOS (BORE scheduler), and FreeBSD (Jails/Capsicum/GEOM).
+*   **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
+*   **Zero-Trust Access Control:** Integrated Discretionary (DAC), Mandatory (MAC / Bell-LaPadula), and Role-Based (RBAC) access controls.
+*   **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
 
----
+***
 
 ## 🛠️ Building & Running Tests
 
@@ -26,7 +26,7 @@ To build and run the full native test harness:
 ./run_sigma_tests.sh
 ```
 
----
+***
 
 ## 📚 Canonical Documentation (GitHub Wiki)
 
@@ -39,66 +39,73 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 ### Current Status
 
 **Kernel Core:**
-- ✅ Microkernel scheduler & IPC
-- ✅ Physical & virtual memory manager
-- ✅ Multi-core SMP support
-- 🔄 x86_64 / AArch64 / RISC-V HAL
-- 🔄 PCI / PCIe bus driver
+
+*   ✅ Microkernel scheduler & IPC
+*   ✅ Physical & virtual memory manager
+*   ✅ Multi-core SMP support
+*   🔄 x86\_64 / AArch64 / RISC-V HAL
+*   🔄 PCI / PCIe bus driver
 
 **Security Subsystem:**
-- ✅ Discretionary & Mandatory Access Control
-- ✅ Post-quantum cryptographic attestation (Dilithium-5 / Kyber-1024)
-- ✅ Capabilities & pledge sandboxing
+
+*   ✅ Discretionary & Mandatory Access Control
+*   ✅ Post-quantum cryptographic attestation (Dilithium-5 / Kyber-1024)
+*   ✅ Capabilities & pledge sandboxing
 
 **Userland & Applications:**
-- ✅ Zenith Desktop frontend
-- ✅ Sovereign Video & Audio Editor
-- ✅ Disk usage analyzer
-- ✅ System monitor
-- ✅ Process manager
-- 🔄 Virtual machine manager (QEMU/KVM)
-- 🔄 Container manager (Docker/Podman)
+
+*   ✅ Zenith Desktop frontend
+*   ✅ Sovereign Video & Audio Editor
+*   ✅ Disk usage analyzer
+*   ✅ System monitor
+*   ✅ Process manager
+*   🔄 Virtual machine manager (QEMU/KVM)
+*   🔄 Container manager (Docker/Podman)
 
 **Package Management:**
-- ✅ sigma-pkg CLI
-- 🔄 Universal package manager
-- 🔄 Rollback package snapshots
+
+*   ✅ sigma-pkg CLI
+*   🔄 Universal package manager
+*   🔄 Rollback package snapshots
 
 **Networking:**
-- 🔄 Cloud sync engine
-- 🔄 Built-in torrent client
-- 🔄 Network traffic analyzer
+
+*   🔄 Cloud sync engine
+*   🔄 Built-in torrent client
+*   🔄 Network traffic analyzer
 
 **AI & Automation:**
-- 🔄 AI orchestrator for system optimization
+
+*   🔄 AI orchestrator for system optimization
 
 **Customization:**
-- 🔄 Unified control center
-- ✅ Declarative theming engine
+
+*   🔄 Unified control center
+*   ✅ Declarative theming engine
 
 **Boot & Deployment:**
-- 🔄 TCP/UDP stack - Partial
-- ✅ Ext4 + FAT32 filesystems
-- ✅ NVMe + USB xHCI drivers
-- ✅ Zenith Desktop prototype
-- ✅ sigma-pkg CLI
-- ⬜ Bootable ISO (Phase G)
 
+*   🔄 TCP/UDP stack - Partial
+*   ✅ Ext4 + FAT32 filesystems
+*   ✅ NVMe + USB xHCI drivers
+*   ✅ Zenith Desktop prototype
+*   ✅ sigma-pkg CLI
+*   ⬜ Bootable ISO (Phase G)
 
----
+***
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING) for guidelines.
 
 ### High-Impact Areas
 
-- Round-robin scheduler implementation
-- Buddy allocator completion
-- sigma-sh REPL
-- USB HID keyboard driver
+*   Round-robin scheduler implementation
+*   Buddy allocator completion
+*   sigma-sh REPL
+*   USB HID keyboard driver
 
----
+***
 
 ## 📄 License
 

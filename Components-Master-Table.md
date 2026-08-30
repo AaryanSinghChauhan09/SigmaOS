@@ -4,7 +4,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 
 > 📄 This page was automatically generated from [SigmaOS-Components-Master-Table.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/SigmaOS-Components-Master-Table.md) in the main repository.
 
----
+***
 
 ## Legend
 
@@ -15,7 +15,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | 📋 | Planned / not yet started |
 | 🧪 | Experimental / proof-of-concept |
 
----
+***
 
 ## Kernel Subsystem
 
@@ -25,13 +25,13 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **CachyBoreScheduler** | BORE + EEVDF hybrid CPU scheduler | ✅ | `src/kernel/scheduler.rs` | CachyOS, Linux CFS |
 | **SigmaMemoryManager** | Physical/virtual memory manager with buddy allocator | ✅ | `src/kernel/memory.rs` | Linux mm, FreeBSD vm |
 | **SigmaSMP** | Symmetric multiprocessing and core pinning | ✅ | `src/kernel/smp.rs` | Linux SMP |
-| **SigmaHAL** | Hardware Abstraction Layer (x86_64, AArch64, RISC-V) | 🔄 | `src/kernel/architecture.rs` | UEFI, ARM TF-A |
+| **SigmaHAL** | Hardware Abstraction Layer (x86\_64, AArch64, RISC-V) | 🔄 | `src/kernel/architecture.rs` | UEFI, ARM TF-A |
 | **SigmaIPC** | ALPC/Pipe inter-process communication channels | ✅ | `src/kernel/ipc.rs` | Windows ALPC, seL4 |
 | **SigmaSyscall** | System call dispatch table and validation | ✅ | `src/kernel/syscall.rs` | Linux syscall ABI |
 | **SigmaPCIScanner** | PCIe ECAM config access, BAR decoding, MSI/MSI-X | 🔄 | `src/kernel/pci_scanner.rs` | Linux PCI subsystem |
 | **SigmaPageFault** | Page fault handler and demand paging | ✅ | `src/kernel/paging.rs` | Linux page fault |
 
----
+***
 
 ## Security Subsystem
 
@@ -48,7 +48,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaSecureBoot** | UEFI Secure Boot + measured boot chain | 🔄 | `src/boot/secure_boot.rs` | shim, UEFI spec |
 | **SigmaAudit** | Kernel-level audit subsystem with log streaming | ✅ | `src/audit/` | Linux audit |
 
----
+***
 
 ## Package Management
 
@@ -60,7 +60,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **UniversalOopSystem** | Multi-distro format verification and rollback hooks | ✅ | `src/sigpkg/universal_oop_system.rs` | Nix, Portage |
 | **SigmaAUR** | AUR-compatible community package helper | 🔄 | `src/sigpkg/aur.rs` | paru, yay |
 
----
+***
 
 ## Filesystem
 
@@ -72,7 +72,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaZFS** | ZFS-compatible snapshot and pool management | ✅ | `src/fs/zfs_compat.rs` | OpenZFS |
 | **SigmaEncrypt** | Transparent filesystem encryption (LUKS2) | ✅ | `src/fs/encrypt.rs` | dm-crypt, LUKS2 |
 
----
+***
 
 ## Networking
 
@@ -85,7 +85,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaDNS** | Encrypted DNS resolver (DoH/DoT) | 🔄 | `src/net/dns.rs` | systemd-resolved |
 | **FreeBsdRacctVnetGuard** | RACCT resource accounting + VNET isolation | ✅ | `src/compat/freebsd.rs` | FreeBSD VNET |
 
----
+***
 
 ## Desktop & UI
 
@@ -98,7 +98,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaTheme** | Declarative theming engine with CSS-like syntax | ✅ | `src/desktop/theme.rs` | GTK themes |
 | **SigmaA11y** | Accessibility layer (screen reader, magnifier) | 🔄 | `src/accessibility/` | AT-SPI, Orca |
 
----
+***
 
 ## Drivers
 
@@ -112,7 +112,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaInput** | Keyboard/mouse/touchpad/touchscreen drivers | ✅ | `src/drivers/input/` | Linux input layer |
 | **UnifiedDriverFramework** | Universal driver loading with hardware ID matching | ✅ | `src/driver/device.rs` | Windows WDM |
 
----
+***
 
 ## Virtualization & Containers
 
@@ -124,7 +124,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaWASM** | WebAssembly runtime for sandboxed execution | 🔄 | `src/wasm/` | Wasmtime |
 | **SigmaNamespace** | Linux namespace emulation (PID/NET/MNT/UTS) | ✅ | `src/container/namespace.rs` | Linux namespaces |
 
----
+***
 
 ## Init & Service Management
 
@@ -136,7 +136,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaTimer** | Timer-based service activation | ✅ | `src/init/timer.rs` | systemd.timer |
 | **SigmaMount** | Automount and mount unit management | 🔄 | `src/fs/mount.rs` | systemd.mount |
 
----
+***
 
 ## AI & Automation
 
@@ -146,7 +146,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **SigmaCopilot** | AI-assisted CLI and system configuration | 🔄 | `src/ai/copilot.rs` | GitHub Copilot |
 | **SigmaPredict** | Predictive prefetch and memory optimization | 🔄 | `src/ai/predict.rs` | inotify, fwupd |
 
----
+***
 
 ## Developer Tools
 
@@ -162,7 +162,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | **FastFileSearchEngine** | fd-inspired fast file search engine | ✅ | `src/unimplemented_tools.rs` | fd, find |
 | **EbpfSystemTracer** | eBPF-based system performance tracer | ✅ | `src/unimplemented_tools.rs` | bpftrace |
 
----
+***
 
 ## Summary Statistics
 
@@ -181,7 +181,7 @@ This wiki page is the **authoritative reference** for all SigmaOS components. It
 | Dev Tools | 9 | 7 | 2 |
 | **TOTAL** | **75** | **50 (67%)** | **20 (27%)** |
 
----
+***
 
 > 💡 **Want to contribute?** See the [Contributing Guide](Contributing) and pick any 🔄 component!
 

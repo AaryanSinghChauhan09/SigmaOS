@@ -8,11 +8,11 @@ SigmaOS uses the **EEVDF (Energy-Efficient Virtual Deadline-First)** scheduler a
 
 | Class | Policy | Use Case | Priority |
 |-------|--------|----------|----------|
-| DL | SCHED_DEADLINE | Audio/Video | Highest |
-| RT | SCHED_FIFO/RR | Real-time tasks | High |
-| EEVDF | SCHED_NORMAL | Normal tasks | Normal |
-| IDLE | SCHED_IDLE | Background | Lowest |
-| BPF | sch_ext | Custom policies | Flexible |
+| DL | SCHED\_DEADLINE | Audio/Video | Highest |
+| RT | SCHED\_FIFO/RR | Real-time tasks | High |
+| EEVDF | SCHED\_NORMAL | Normal tasks | Normal |
+| IDLE | SCHED\_IDLE | Background | Lowest |
+| BPF | sch\_ext | Custom policies | Flexible |
 
 ## EEVDF Configuration
 
@@ -41,7 +41,7 @@ sigma-kernel sched set bore
 echo 2 > /sys/kernel/sched/bore/burst_penalty_scale
 ```
 
-## sched_ext (BPF Scheduler)
+## sched\_ext (BPF Scheduler)
 
 SigmaOS fully supports `sched_ext`, allowing user-space BPF schedulers:
 

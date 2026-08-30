@@ -16,23 +16,21 @@ SigmaBus is SigmaOS's inter-process communication (IPC) subsystem, inspired by D
 
 ## Message Types
 
-```
-Method Call (→ Service)       Reply (← Service)
-  ┌──────────────────────┐     ┌──────────────────────┐
-  │ Type: MethodCall     │ ──► │ Type: MethodReturn   │
-  │ Serial: 42           │     │ ReplySerial: 42       │
-  │ Dest: FileManager    │     │ Payload: result       │
-  │ Interface: OpenFile  │     └──────────────────────┘
-  │ Payload: path        │
-  └──────────────────────┘
+    Method Call (→ Service)       Reply (← Service)
+      ┌──────────────────────┐     ┌──────────────────────┐
+      │ Type: MethodCall     │ ──► │ Type: MethodReturn   │
+      │ Serial: 42           │     │ ReplySerial: 42       │
+      │ Dest: FileManager    │     │ Payload: result       │
+      │ Interface: OpenFile  │     └──────────────────────┘
+      │ Payload: path        │
+      └──────────────────────┘
 
-Signal (Broadcast)
-  ┌──────────────────────┐ ──► All subscribers
-  │ Type: Signal         │
-  │ Interface: SysEvents │
-  │ Member: Shutdown     │
-  └──────────────────────┘
-```
+    Signal (Broadcast)
+      ┌──────────────────────┐ ──► All subscribers
+      │ Type: Signal         │
+      │ Interface: SysEvents │
+      │ Member: Shutdown     │
+      └──────────────────────┘
 
 ## Message Header
 
@@ -74,19 +72,17 @@ This means interface lookups are O(1) integer comparisons, not O(n) string compa
 
 ## Signal Subscription System
 
-```
-Process A subscribes to:
-  interface = "org.sigma.SystemEvents"
-  member = "Shutdown"
+    Process A subscribes to:
+      interface = "org.sigma.SystemEvents"
+      member = "Shutdown"
 
-Signal sent by Init:
-  ┌──────────────────────────────────────────┐
-  │ SigmaBus.send(Shutdown signal)           │
-  │   for each subscription:                │
-  │     if filter.matches(signal):          │
-  │       queue message to subscriber       │
-  └──────────────────────────────────────────┘
-```
+    Signal sent by Init:
+      ┌──────────────────────────────────────────┐
+      │ SigmaBus.send(Shutdown signal)           │
+      │   for each subscription:                │
+      │     if filter.matches(signal):          │
+      │       queue message to subscriber       │
+      └──────────────────────────────────────────┘
 
 ## Well-Known Service Names
 
@@ -125,7 +121,7 @@ Following D-Bus naming conventions:
 
 ## References
 
-- `src/ipc/sigma_bus.rs` - Main implementation
-- `sigmaos/core/src/atomic_ipc_deliver.cpp` - C++ atomic IPC layer
-- [D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html)
-- [Security Architecture](Security-Architecture.md)
+*   `src/ipc/sigma_bus.rs` - Main implementation
+*   `sigmaos/core/src/atomic_ipc_deliver.cpp` - C++ atomic IPC layer
+*   [D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html)
+*   [Security Architecture](Security-Architecture)

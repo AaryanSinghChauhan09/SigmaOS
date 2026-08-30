@@ -2,26 +2,26 @@
 
 This document catalogs ideas, innovations, and best practices from prominent Linux distributions that have been (or are planned to be) implemented in SigmaOS.
 
----
+***
 
 ## Table of Contents
 
-1. [Arch Linux Ideas](#arch-linux-ideas)
-2. [Debian / Ubuntu Ideas](#debian--ubuntu-ideas)
-3. [Fedora / RHEL / CentOS Ideas](#fedora--rhel--centos-ideas)
-4. [Gentoo Ideas](#gentoo-ideas)
-5. [NixOS Ideas](#nixos-ideas)
-6. [Alpine Linux Ideas](#alpine-linux-ideas)
-7. [CachyOS / Zen Kernel Ideas](#cachyos--zen-kernel-ideas)
-8. [Void Linux Ideas](#void-linux-ideas)
-9. [Artix Linux Ideas](#artix-linux-ideas)
+1.  [Arch Linux Ideas](#arch-linux-ideas)
+2.  [Debian / Ubuntu Ideas](#debian--ubuntu-ideas)
+3.  [Fedora / RHEL / CentOS Ideas](#fedora--rhel--centos-ideas)
+4.  [Gentoo Ideas](#gentoo-ideas)
+5.  [NixOS Ideas](#nixos-ideas)
+6.  [Alpine Linux Ideas](#alpine-linux-ideas)
+7.  [CachyOS / Zen Kernel Ideas](#cachyos--zen-kernel-ideas)
+8.  [Void Linux Ideas](#void-linux-ideas)
+9.  [Artix Linux Ideas](#artix-linux-ideas)
 10. [OpenSUSE Ideas](#opensuse-ideas)
 11. [Parrot / Kali Security Ideas](#parrot--kali-security-ideas)
 12. [QubesOS Ideas](#qubesos-ideas)
 13. [FreeBSD / OpenBSD / NetBSD Ideas](#freebsd--openbsd--netbsd-ideas)
 14. [Status Summary Table](#status-summary-table)
 
----
+***
 
 ## Arch Linux Ideas
 
@@ -39,7 +39,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | ALPM hooks | ✅ Implemented | `SigmaPkg` transaction hooks |
 | Encrypted `/home` with LUKS | ✅ Implemented | SigmaFS LUKS2 volume encryption |
 
----
+***
 
 ## Debian / Ubuntu Ideas
 
@@ -57,7 +57,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | PPA-style user repositories | 🔄 In Progress | `sigma-repo add` command |
 | `update-alternatives` | ✅ Implemented | `sigma-alt` alternative symlinks |
 
----
+***
 
 ## Fedora / RHEL / CentOS Ideas
 
@@ -75,7 +75,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | SSSD / LDAP authentication | 🔄 In Progress | `SigmaAuth` directory service client |
 | `abrt` crash reporting | ✅ Implemented | `SigmaCrash` telemetry reporter |
 
----
+***
 
 ## Gentoo Ideas
 
@@ -92,7 +92,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | `layman` overlay management | 🔄 In Progress | `sigma-overlay` repository layers |
 | Per-package CFLAGS optimization | ✅ Implemented | `SigmaCompile` per-binary flags |
 
----
+***
 
 ## NixOS Ideas
 
@@ -109,7 +109,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | Module system for config | ✅ Implemented | `sigma-module` system |
 | `nix-shell` dev environments | 🔄 In Progress | `sigma-shell` ephemeral shells |
 
----
+***
 
 ## Alpine Linux Ideas
 
@@ -126,7 +126,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | LTS + Edge channel model | ✅ Implemented | `stable` / `edge` release channels |
 | `abuild` package build tool | 🔄 In Progress | `sigma-abuild` port |
 
----
+***
 
 ## CachyOS / Zen Kernel Ideas
 
@@ -143,7 +143,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | `hardened_malloc` allocator | ✅ Implemented | `SigmaAlloc` security-hardened heap |
 | CachyOS kernel patchset | ✅ Implemented | SigmaKernel custom patchset |
 
----
+***
 
 ## Void Linux Ideas
 
@@ -159,7 +159,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | `sv` service control commands | ✅ Implemented | `sigma-service` CLI |
 | Void Linux templates model | 🔄 In Progress | `sigma-template` packaging |
 
----
+***
 
 ## Artix Linux Ideas
 
@@ -172,7 +172,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | `dinit` init option | 🔄 In Progress | Dinit adapter module |
 | Per-service resource limits | ✅ Implemented | `SigmaInit` unit resource controls |
 
----
+***
 
 ## OpenSUSE Ideas
 
@@ -187,7 +187,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | Leap + Tumbleweed dual model | ✅ Implemented | SigmaOS Stable + Rolling channels |
 | `Aeon` immutable desktop | 🔄 In Progress | SigmaOS immutable edition |
 
----
+***
 
 ## Parrot / Kali Security Ideas
 
@@ -195,14 +195,14 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 |------|--------|------------------------|
 | Security tooling metapackage | ✅ Implemented | `sigma-security-tools` bundle |
 | `anonsurf` anonymization | 🔄 In Progress | `SigmaAnon` Tor routing daemon |
-| Network traffic analysis | ✅ Implemented | `EbpfSystemTracer` in unimplemented_tools |
+| Network traffic analysis | ✅ Implemented | `EbpfSystemTracer` in unimplemented\_tools |
 | Forensics tools integration | 🔄 In Progress | `sigma-forensics` toolkit |
 | Hardened kernel by default | ✅ Implemented | `SigmaKernel` hardened profile |
 | Sandboxed browser | 🔄 In Progress | `SigmaBrowser` sandboxed via pledge |
 | OpenVAS / vulnerability scanner | 🔄 In Progress | `SigmaScan` vulnerability engine |
 | Parrot MATE desktop | 🔄 In Progress | Zenith MATE-style layout theme |
 
----
+***
 
 ## QubesOS Ideas
 
@@ -216,7 +216,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | U2F proxy for domains | 🔄 In Progress | `SigmaU2F` cross-domain proxy |
 | Network isolation per app | ✅ Implemented | Per-process network namespaces |
 
----
+***
 
 ## FreeBSD / OpenBSD / NetBSD Ideas
 
@@ -235,7 +235,7 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | `relayd` load balancer | 🔄 In Progress | `SigmaRelay` TCP load balancer |
 | `sysctl` tunable parameters | ✅ Implemented | `sigma-sysctl` kernel parameter tool |
 
----
+***
 
 ## Status Summary Table
 
@@ -256,6 +256,6 @@ This document catalogs ideas, innovations, and best practices from prominent Lin
 | FreeBSD/BSDs | 12 | 8 | 4 |
 | **TOTAL** | **123** | **68 (55%)** | **55 (45%)** |
 
----
+***
 
 *Last updated: 2026-08-23 | SigmaOS Development Team*

@@ -11,48 +11,44 @@ only permitted when the lattice partial order is satisfied.
 
 ## Architecture
 
-```
-Subject (Shard)
-   └─ Capability Token (clearance label)
-         └─ MAC Policy Engine
-               ├─ Policy Compiler (text → binary)
-               ├─ Policy Evaluator (lattice check)
-               └─ Audit Chain (BLAKE3-linked log)
-                     └─ Object (Resource)
-```
+    Subject (Shard)
+       └─ Capability Token (clearance label)
+             └─ MAC Policy Engine
+                   ├─ Policy Compiler (text → binary)
+                   ├─ Policy Evaluator (lattice check)
+                   └─ Audit Chain (BLAKE3-linked log)
+                         └─ Object (Resource)
 
 ## Lattice Structure
 
 The security lattice is defined as a partial order `(L, ≤)` where:
 
-- **Subjects** have clearance labels `{confidentiality, integrity}`
-- **Objects** have sensitivity labels
-- **Operations** are permitted when `subject_label ≥ object_label`
+*   **Subjects** have clearance labels `{confidentiality, integrity}`
+*   **Objects** have sensitivity labels
+*   **Operations** are permitted when `subject_label ≥ object_label`
 
-```
-Top (SYSTEM_ADMIN)
-├── High (CONFIDENTIAL, HIGH_INTEGRITY)
-├── Medium (INTERNAL, MEDIUM_INTEGRITY)
-└── Low (PUBLIC, LOW_INTEGRITY)
-```
+<!---->
+
+    Top (SYSTEM_ADMIN)
+    ├── High (CONFIDENTIAL, HIGH_INTEGRITY)
+    ├── Medium (INTERNAL, MEDIUM_INTEGRITY)
+    └── Low (PUBLIC, LOW_INTEGRITY)
 
 ## Policy Language
 
-```
-# Example: allow browser shard to read /media, deny /sys
+    # Example: allow browser shard to read /media, deny /sys
 
-ALLOW browser_shard READ /media
-DENY  browser_shard ANY  /sys
+    ALLOW browser_shard READ /media
+    DENY  browser_shard ANY  /sys
 
-# Network policies
-ALLOW web_shard   CONNECT net:443
-DENY  web_shard   BIND    net:*
+    # Network policies
+    ALLOW web_shard   CONNECT net:443
+    DENY  web_shard   BIND    net:*
 
-# Filesystem policies
-ALLOW app_shard   READ  /home
-ALLOW app_shard   WRITE /tmp
-DENY  app_shard   ANY   /etc/shadow
-```
+    # Filesystem policies
+    ALLOW app_shard   READ  /home
+    ALLOW app_shard   WRITE /tmp
+    DENY  app_shard   ANY   /etc/shadow
 
 ## API Interface
 
@@ -80,15 +76,13 @@ void init_security_mac(void);
 
 The policy compiler transforms human-readable policy rules into an efficient binary format:
 
-```
-Policy File (text)
-   └─ Policy Compiler
-         ├─ Lexical Analysis
-         ├─ Syntax Parsing
-         ├─ Semantic Analysis (lattice validation)
-         └─ Binary Generation
-               └─ Policy Binary (O(1) lookup table)
-```
+    Policy File (text)
+       └─ Policy Compiler
+             ├─ Lexical Analysis
+             ├─ Syntax Parsing
+             ├─ Semantic Analysis (lattice validation)
+             └─ Binary Generation
+                   └─ Policy Binary (O(1) lookup table)
 
 ## Enforcement Points
 
@@ -103,18 +97,18 @@ MAC policies are enforced at multiple kernel entry points:
 
 ## Roadmap
 
-- [x] Basic MAC policy language
-- [ ] Label assignment to all shards at boot
-- [ ] Policy compiler (text → binary rule table)
-- [ ] Kernel enforcement hook in syscall dispatcher
-- [ ] VFS layer integration
-- [ ] Network stack integration
-- [ ] GUI policy editor for Zenith Desktop
-- [ ] Policy hot-reload (without reboot)
-- [ ] Formal verification of policy correctness
-- [ ] SELinux policy import tool
+*   \[x] Basic MAC policy language
+*   \[ ] Label assignment to all shards at boot
+*   \[ ] Policy compiler (text → binary rule table)
+*   \[ ] Kernel enforcement hook in syscall dispatcher
+*   \[ ] VFS layer integration
+*   \[ ] Network stack integration
+*   \[ ] GUI policy editor for Zenith Desktop
+*   \[ ] Policy hot-reload (without reboot)
+*   \[ ] Formal verification of policy correctness
+*   \[ ] SELinux policy import tool
 
 ## Related Modules
 
-- [`modules/security/access_control`](../modules/security/access_control/README.md) — Runtime MAC & Audit
-- [`modules/security/isolation`](../modules/security/isolation/README.md) — Process isolation
+*   [`modules/security/access_control`](../modules/security/access_control/README.md) — Runtime MAC & Audit
+*   [`modules/security/isolation`](../modules/security/isolation/README.md) — Process isolation

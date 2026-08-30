@@ -1,11 +1,12 @@
 # 🧠 Next-Generation Advanced Algorithms Shard Blueprint (SovereignAlgorithms)
 
 Inspired by **advanced real-time scheduling**, **probabilistic resource allocation**, and **blockchain-inspired tamper-proof auditing**, this document defines a complete, functional, `#![no_std]` advanced algorithms manager. It implements:
-1. **Earliest Deadline First (EDF) Real-Time Scheduler**: Selects tasks dynamically based on strict hard deadlines.
-2. **Lottery Scheduler**: Probabilistic time-slicing utilizing a local, zero-dependency Linear Congruential Generator (LCG) pseudo-random engine.
-3. **Consensus-Based Process Ledger (Forensic Audit Trail)**: Chained cryptographic hashes securing system process events from tampering.
 
----
+1.  **Earliest Deadline First (EDF) Real-Time Scheduler**: Selects tasks dynamically based on strict hard deadlines.
+2.  **Lottery Scheduler**: Probabilistic time-slicing utilizing a local, zero-dependency Linear Congruential Generator (LCG) pseudo-random engine.
+3.  **Consensus-Based Process Ledger (Forensic Audit Trail)**: Chained cryptographic hashes securing system process events from tampering.
+
+***
 
 ## 🏗️ Component Implementation Source Code
 
@@ -279,11 +280,12 @@ impl AdvancedAlgorithmsManager {
 }
 ```
 
----
+***
 
 ## 🧪 Test Harness Verification
 
 The algorithms in this shard are verified via standalone inspection unit tests in [`tests/os_algorithms_inspection_tests.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/tests/os_algorithms_inspection_tests.rs):
-- **Earliest Deadline First (EDF) Scheduling**: Verifies deadline sorting priority.
-- **Lottery Scheduling**: Verifies ticket weight distribution and LCG random draws.
-- **Process Audit Ledger**: Verifies cryptographic hash chain integrity and tamper detection.
+
+*   **Earliest Deadline First (EDF) Scheduling**: Verifies deadline sorting priority.
+*   **Lottery Scheduling**: Verifies ticket weight distribution and LCG random draws.
+*   **Process Audit Ledger**: Verifies cryptographic hash chain integrity and tamper detection.

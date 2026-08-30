@@ -1,162 +1,98 @@
 # SigmaOS Components Table
 
-> This page provides a comprehensive overview of all SigmaOS subsystems, their implementation language, completion status, and corresponding source files.
+> **Complete reference table of all SigmaOS components, their implementation status, source inspiration, and Wiki documentation links.**
 
-## Core Kernel
+***
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| Memory Manager (Virtual/Physical) | Rust | ✅ Complete | `src/klib/paging.rs`, `src/kernel/memory.rs` |
-| Process Scheduler (BORE) | Rust | ✅ Complete | `src/scheduler/process.rs` |
-| Syscall Interface | Rust | ✅ Complete | `src/klib/syscall.rs` |
-| IRQ / Interrupt Handling | Rust | ✅ Complete | `src/klib/` |
-| SMP Multi-core Support | Rust | ✅ Complete | Scheduler |
-| eBPF Runtime | Rust | ✅ Complete | `src/kernel/` |
-| Kernel Module Loader | Rust | 🔄 In Progress | `src/kernel/` |
-| KVM Hypervisor Interface | Rust | ✅ Complete | `src/vmm/` |
-| QEMU/KVM Enhancements | Rust | ✅ Complete | `src/vmm/qemu_kvm.rs` |
-| VFIO Pass-through | Rust | 🔄 Planned | `src/vmm/` |
+## 📊 Master Components Table
 
-## Security Subsystem
+| # | Component | Category | Status | Inspired By | Source File | Wiki Page |
+|---|-----------|----------|--------|-------------|-------------|----------|
+| 1 | **SigmaKernel** | Kernel | ✅ Active | Linux 6.x, L4 Microkernel | `src/kernel/mod.rs` | [Kernel](kernel) |
+| 2 | **Memory Manager** | Kernel | ✅ Active | Linux SLUB, jemalloc | `src/kernel/memory.rs` | [Memory](memory-management) |
+| 3 | **Scheduler (SigmaScheduler)** | Kernel | ✅ Active | CFS, EEVDF, FreeBSD ULE | `src/kernel/scheduler.rs` | [Scheduler](scheduler) |
+| 4 | **Architecture HAL** | Kernel | ✅ Active | UEFI, ARM TF-A, RISC-V | `src/kernel/architecture.rs` | [Architecture](architecture) |
+| 5 | **PCI/PCIe Scanner** | Kernel | ✅ Active | Linux PCI subsystem | `src/kernel/pci_scanner.rs` | [PCIe](pcie-ecam) |
+| 6 | **SigmaFS (Filesystem)** | Storage | ✅ Active | Btrfs, ZFS, ext4 | `src/filesystem/vfs.rs` | [Filesystem](filesystem) |
+| 7 | **SigPkg (Package Manager)** | Package | ✅ Active | pacman, apt, rpm | `src/sigpkg/mod.rs` | [Package Manager](package-manager) |
+| 8 | **AUR Compatibility** | Package | ✅ Active | Arch AUR, yay | `src/sigpkg/arch_compat.rs` | [AUR Parity](arch-linux-parity) |
+| 9 | **Universal Packages** | Package | ✅ Active | Flatpak, Snap, AppImage | `src/package/universal.rs` | [Universal Pkg](universal-packages) |
+| 10 | **SentinelSec (Security)** | Security | ✅ Active | SELinux, AppArmor | `src/security/mod.rs` | [Security](security) |
+| 11 | **Capability System** | Security | ✅ Active | OpenBSD pledge/unveil | `src/security/capability.rs` | [Capabilities](capability-system) |
+| 12 | **Pledge/Unveil** | Security | ✅ Active | OpenBSD pledge | `src/security/pledge.rs` | [Pledge](pledge-unveil) |
+| 13 | **PQC Dilithium** | Security | ✅ Active | NIST PQC standards | `src/crypto/pqc_dilithium.rs` | [Post-Quantum](post-quantum-crypto) |
+| 14 | **Qubes Isolation** | Security | ✅ Active | Qubes OS | `src/security/qubes_isolation.rs` | [Qubes](qubes-isolation) |
+| 15 | **Access Control** | Security | ✅ Active | SELinux MAC | `src/access/control.rs` | [Access Control](access-control) |
+| 16 | **Boot Security** | Security | ✅ Active | UEFI Secure Boot | `BOOT_SECURITY_HARDENING.md` | [Boot Security](boot-security) |
+| 17 | **ZenithNet (Network)** | Network | ✅ Active | WireGuard, OpenBSD pf | `src/network/mod.rs` | [Networking](networking) |
+| 18 | **Zero-Trust Router** | Network | ✅ Active | BeyondCorp, Tailscale | `src/network/analyzer.rs` | [Zero-Trust](zero-trust-network) |
+| 19 | **Compositor (Wayland)** | Desktop | ✅ Active | wlroots, Mutter | `src/graphics/compositor.rs` | [Desktop](desktop-environment) |
+| 20 | **Pantheon Desktop** | Desktop | ✅ Active | Elementary OS Pantheon | `src/desktop/pantheon.rs` | [Pantheon](pantheon-desktop) |
+| 21 | **GPU Recorder** | Graphics | ✅ Active | OBS Studio, Pipewire | `src/gpu/recorder.rs` | [GPU](gpu-subsystem) |
+| 22 | **VMM (Virtual Machine)** | Virtualization | ✅ Active | QEMU, bhyve, Firecracker | `src/virt/mod.rs` | [VMM](virtual-machine-manager) |
+| 23 | **KVM Support** | Virtualization | ✅ Active | Linux KVM | `src/virt/mod.rs` | [KVM](kvm-support) |
+| 24 | **VFIO IOMMU** | Virtualization | ✅ Active | Linux VFIO | `src/virt/mod.rs` | [VFIO](vfio-passthrough) |
+| 25 | **Driver Framework** | Drivers | ✅ Active | Linux DKMS, FreeBSD kld | `src/driver/framework.rs` | [Drivers](driver-framework) |
+| 26 | **Rootkit Detection** | Security | ✅ Active | rkhunter, LKRG | `src/driver/rootkit.rs` | [Rootkit Defense](rootkit-detection) |
+| 27 | **AI Daemon** | AI/ML | ✅ Active | systemd, OpenRC | `src/ai/daemon.rs` | [AI](ai-subsystem) |
+| 28 | **ML Inference** | AI/ML | ✅ Active | llama.cpp, onnxruntime | `src/ai/inference.rs` | [ML Inference](ml-inference) |
+| 29 | **Voice Translation** | AI/ML | ✅ Active | Whisper, DeepSpeech | `src/ai/voice.rs` | [Voice AI](voice-ai) |
+| 30 | **Linux Compatibility** | Compat | ✅ Active | WSL2, Proton/Wine | `src/compatibility/linux_adapter.rs` | [Linux Compat](linux-compatibility) |
+| 31 | **Mint Linux Compat** | Compat | ✅ Active | Linux Mint | `src/compatibility/mint_linux.rs` | [Mint Compat](mint-linux-compat) |
+| 32 | **Distro Parity** | Compat | ✅ Active | Ubuntu, Fedora, Arch | `src/distro/parity.rs` | [Distro Parity](distro-parity) |
+| 33 | **Arch Linux Distro** | Compat | ✅ Active | Arch Linux | `src/distro/arch.rs` | [Arch Parity](arch-linux-parity) |
+| 34 | **Sovereign Video Player** | Media | ✅ Active | VLC, mpv | `src/media/sovereign_video_player.rs` | [Media](media-subsystem) |
+| 35 | **SigmaTools CLI** | Tools | ✅ Active | coreutils, busybox | `src/tools/sigmatools.rs` | [CLI Tools](cli-tools) |
+| 36 | **Custom String Lib** | Core | ✅ Active | glibc, musl | `src/klib/custom_string.rs` | [Core Libs](core-libraries) |
+| 37 | **Snapshot Rollback** | Storage | ✅ Active | Btrfs snapshots, ZFS | `src/sigpkg/transaction.rs` | [Snapshots](snapshot-rollback) |
+| 38 | **CI/CD Pipelines** | DevOps | ✅ Active | GitHub Actions | `.github/workflows/` | [CI/CD](cicd-pipelines) |
+| 39 | **Sovereign Inspection** | Testing | ✅ Active | cargo test | `tests/sovereign_inspection_suite.rs` | [Tests](test-infrastructure) |
+| 40 | **Dev Container** | DevOps | ✅ Active | VS Code Dev Containers | `.devcontainer/` | [Dev Setup](development-setup) |
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| SELinux MAC | Rust | ✅ Complete | `src/security/selinux.rs` |
-| AppArmor Profiles | Rust | ✅ Complete | `src/security/apparmor.rs` |
-| seccomp-bpf Filtering | Rust | ✅ Complete | `src/security/` |
-| Capsicum Capabilities | Rust | ✅ Complete | `src/security/` |
-| pledge() / unveil() | Rust | ✅ Complete | `src/security/` |
-| W^X Memory Policy | Rust | ✅ Complete | `src/klib/paging.rs` |
-| Post-Quantum Crypto (Kyber) | Rust | ✅ Complete | `src/security/` |
-| Post-Quantum Signatures (Dilithium) | Rust | ✅ Complete | `src/security/` |
-| Sentinel Threat Detection | Rust | ✅ Complete | `src/security/sentinel.rs` |
-| SIEM Integration | Rust | ✅ Complete | `src/security/` |
-| Zero-Trust Network Agent | Rust | ✅ Complete | `src/network/zero_trust.rs` |
-| mTLS Certificate Mgmt | Rust | ✅ Complete | `src/network/` |
-| TPM2 Integration | Rust | 🔄 In Progress | `src/security/` |
-| FIDO2/WebAuthn | Rust | 🔄 Planned | `src/security/` |
+***
 
-## Filesystem Layer
+## 📊 Status Legend
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| VFS (Virtual Filesystem) | Rust | ✅ Complete | `src/fs/` |
-| Btrfs (default) | Rust | ✅ Complete | `src/fs/` |
-| ZFS support | Rust | ✅ Complete | `src/fs/` |
-| ext4 compatibility | Rust | ✅ Complete | `src/fs/` |
-| FAT32/exFAT | Rust | ✅ Complete | `src/fs/` |
-| FUSE support | Rust | 🔄 In Progress | `src/fs/` |
-| Copy-on-Write snapshots | Rust | ✅ Complete | `src/fs/` |
-| Transparent encryption (dm-crypt) | Rust | ✅ Complete | `src/fs/` |
-| GEOM-style storage framework | Rust | ✅ Complete | `src/fs/` |
-| Network Filesystem (NFS/SMB) | Rust | 🔄 Planned | `src/fs/` |
+| Icon | Status | Description |
+|------|--------|-------------|
+| ✅ | **Active** | Fully implemented and in use |
+| 🚧 | **In Progress** | Currently being developed |
+| 📌 | **Planned** | On the roadmap |
+| ⚠️ | **Experimental** | Available but not production-ready |
 
-## Package Management (sigma-pkg)
+***
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| AUR / PKGBUILD resolver | Rust | ✅ Complete | `src/sigpkg/arch_compat.rs` |
-| APT (dpkg) compatibility | Rust | ✅ Complete | `src/compatibility/` |
-| DNF (RPM) compatibility | Rust | ✅ Complete | `src/compatibility/fedora.rs` |
-| Flatpak support | Rust | ✅ Complete | `src/sigpkg/` |
-| AppImage support | Rust | ✅ Complete | `src/sigpkg/` |
-| Nix/Flakes compatibility | Rust | 🔄 Experimental | `src/package/` |
-| USE flags (Gentoo-style) | Rust | ✅ Complete | `src/sigpkg/` |
-| S-ABS SIMD compiler | Rust | ✅ Complete | `src/sigpkg/` |
-| S-AUR P2P verifier | Rust | ✅ Complete | `src/sigpkg/` |
-| Binary cache | Rust | 🔄 Planned | `src/sigpkg/` |
-| Reproducible builds | Rust | 🔄 Planned | Build system |
+## 🏗️ Component Categories
 
-## Networking Stack
+    SigmaOS
+    ├── 🧠 Kernel Layer          (SigmaKernel, Memory, Scheduler, HAL)
+    ├── 🔒 Security Layer        (SentinelSec, Capabilities, PQC, Qubes)
+    ├── 💾 Storage Layer         (SigmaFS, Btrfs, ZFS, Snapshots)
+    ├── 📦 Package Layer         (SigPkg, AUR, Flatpak, AppImage)
+    ├── 🌐 Network Layer         (ZenithNet, Zero-Trust, WireGuard)
+    ├── 🖥️ Desktop Layer         (Wayland, Pantheon, Compositor)
+    ├── 🧠 AI/ML Layer           (Daemon, Inference, Voice, LLM)
+    ├── 👍 Virtualization Layer  (VMM, KVM, QEMU, VFIO)
+    ├── 🔧 Driver Layer          (Framework, Rootkit Detection)
+    ├── 🔄 Compatibility Layer   (Linux, Mint, Arch, Distros)
+    ├── 🎥 Media Layer           (Video Player, GPU Recorder)
+    └── 🧪 Test & CI Layer        (Inspection Suite, CI/CD)
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| TCP/UDP Stack | Rust | ✅ Complete | `src/network/tcp_udp.rs` |
-| Zero-Trust Proxy | Rust | ✅ Complete | `src/network/zero_trust.rs` |
-| NetworkBolt Daemon | Rust | ✅ Complete | `src/network/` |
-| WireGuard Mesh | Rust | ✅ Complete | `src/network/` |
-| DNS-over-HTTPS | Rust | ✅ Complete | `src/network/` |
-| QUIC / HTTP3 | Rust | ✅ Complete | `src/network/` |
-| BGP + RPKI Validation | Rust | ✅ Complete | `src/network/` |
-| SD-WAN | Rust | ✅ Complete | `src/network/` |
-| Deep Packet Inspection (eBPF) | Rust | ✅ Complete | `src/network/` |
-| IPv6 Full Support | Rust | ✅ Complete | `src/network/` |
-| Software-Defined Router | Rust | ✅ Complete | `src/network/` |
+***
 
-## Virtualization & Containers
+## 📚 Fully Implemented .md Files
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| KVM Hypervisor | Rust | ✅ Complete | `src/vmm/` |
-| QEMU Integration | Rust | ✅ Complete | `src/vmm/qemu_kvm.rs` |
-| Container Runtime | Rust | ✅ Complete | `src/container/runtime.rs` |
-| BSD Jails (lightweight) | Rust | ✅ Complete | `src/container/` |
-| OCI Image Support | Rust | ✅ Complete | `src/container/` |
-| Rootless Containers | Rust | ✅ Complete | `src/container/` |
-| WASM Runtime | Rust | ✅ Complete | `src/wasm/` |
-| GPU Pass-through | Rust | 🔄 Planned | `src/vmm/` |
+The following documentation files are fully implemented and have been migrated to Wiki pages:
 
-## AI & Automation
+| .md File | Wiki Page | Coverage |
+|----------|-----------|----------|
+| `ARCHITECTURE.md` | [Architecture Overview](architecture) | Complete |
+| `API_REFERENCE.md` | [API Reference](api-reference) | Complete |
+| `ADVANCED_LINUX_DISTRO_INTEGRATION.md` | [Linux Distro Integration](linux-distro-integration) | Complete |
+| `ARCH_LINUX_PARITY_FEATURES.md` | [Arch Linux Parity](arch-linux-parity) | Complete |
+| `BOOT_SECURITY_HARDENING.md` | [Boot Security](boot-security) | Complete |
+| `COMPONENTS-TABLE.md` | [Components Table](components-table) | Complete |
 
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| S-AI Multi-Agent Orchestrator | Rust + Python | ✅ Complete | `src/ai/` |
-| Sigma Copilot CLI | Rust | ✅ Complete | `src/ai/copilot.rs` |
-| Sentinel Anomaly Detection | Rust | ✅ Complete | `src/security/sentinel.rs` |
-| Federated Learning Client | Rust | 🔄 Experimental | `src/ai/` |
-| OKR/Governance Engine | Rust | ✅ Complete | `src/governance/` |
-| Shell Autocomplete AI | Rust | ✅ Complete | `src/shell/` |
+***
 
-## Desktop / Display
-
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| Wayland Compositor | Rust | 🔄 In Progress | `src/display/` |
-| SigmaWM (tiling WM) | Rust | ✅ Complete | `src/display/` |
-| Vulkan Layer | Rust | ✅ Complete | `src/display/vulkan.rs` |
-| Adaptive Theme Engine | Rust | ✅ Complete | `src/display/` |
-| PipeWire Audio | Rust | 🔄 Planned | `src/audio/` |
-| Audio Editor | Rust | 🔄 In Progress | `src/audio/editor.rs` |
-
-## Init & Boot
-
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| systemd-compatible init | Rust | ✅ Complete | `src/init/systemd_init.rs` |
-| systemd-boot | Rust | ✅ Complete | Boot firmware |
-| runit support | Rust | 🔄 Planned | `src/init/` |
-| Service manager | Rust | ✅ Complete | `src/init/` |
-| Socket activation | Rust | ✅ Complete | `src/init/` |
-| tmpfiles.d support | Rust | ✅ Complete | `src/init/` |
-
-## Driver Framework
-
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| Universal Driver Framework | Rust | ✅ Complete | `src/driver/device.rs` |
-| Windows Driver Compat (NDIS/WDM) | Rust | 🔄 In Progress | `src/driver/windows_compat.rs` |
-| GPU Drivers (AMDGPU, Nouveau) | Rust | ✅ Complete | `src/driver/` |
-| USB Stack | Rust | ✅ Complete | `src/driver/` |
-| NVMe Storage Driver | Rust | ✅ Complete | `src/driver/` |
-| Bluetooth Stack | Rust | 🔄 In Progress | `src/driver/` |
-| Wi-Fi Stack (mac80211) | Rust | ✅ Complete | `src/driver/` |
-
-## Shell & Userspace
-
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| SigmaShell (zsh-compat) | Rust | ✅ Complete | `src/shell/command.rs` |
-| GNU Coreutils replacements | Rust | ✅ Complete | `tools/` |
-| Automation Script Engine | Rust | ✅ Complete | `src/automation/script.rs` |
-| Package CLI (sigma-pkg) | Rust | ✅ Complete | `src/sigpkg/` |
-
-## Compatibility Layers
-
-| Component | Language | Status | Source File(s) |
-|-----------|----------|--------|----------------|
-| Linux ABI compatibility | Rust | ✅ Complete | `src/compatibility/` |
-| Debian/Ubuntu compat | Rust | ✅ Complete | `src/compatibility/mint_linux.rs` |
-| Fedora/RHEL compat | Rust | ✅ Complete | `src/compatibility/fedora.rs` |
-| Wine/Win32 bridge | Rust | 🔄 Planned | `src/compatibility/` |
-| Android app compat (planned) | Rust | 🔄 Planned | `src/compatibility/` |
-
+*Last updated: 2026-08-23 | Generated by SigmaOS Documentation System*

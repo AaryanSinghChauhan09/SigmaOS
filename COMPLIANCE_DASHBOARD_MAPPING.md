@@ -3,20 +3,20 @@
 > Detailed mapping of every compliance requirement to the SigmaOS module,
 > source file, and dashboard indicator that implements and monitors it.
 
----
+***
 
 ## Table of Contents
 
-1. [Dashboard Overview](#dashboard-overview)
-2. [GDPR Mapping](#gdpr-mapping)
-3. [HIPAA Mapping](#hipaa-mapping)
-4. [SOC 2 Type II Mapping](#soc-2-type-ii-mapping)
-5. [PCI-DSS v4.0 Mapping](#pci-dss-v40-mapping)
-6. [India DPDP Act Mapping](#india-dpdp-act-mapping)
-7. [Dashboard Indicators Reference](#dashboard-indicators-reference)
-8. [Automated Evidence Collection](#automated-evidence-collection)
+1.  [Dashboard Overview](#dashboard-overview)
+2.  [GDPR Mapping](#gdpr-mapping)
+3.  [HIPAA Mapping](#hipaa-mapping)
+4.  [SOC 2 Type II Mapping](#soc-2-type-ii-mapping)
+5.  [PCI-DSS v4.0 Mapping](#pci-dss-v40-mapping)
+6.  [India DPDP Act Mapping](#india-dpdp-act-mapping)
+7.  [Dashboard Indicators Reference](#dashboard-indicators-reference)
+8.  [Automated Evidence Collection](#automated-evidence-collection)
 
----
+***
 
 ## Dashboard Overview
 
@@ -35,7 +35,7 @@ provides a unified view of compliance status across all frameworks.
 | **Reports** | One-click compliance report generation |
 | **Inventory** | Catalogue of personal data locations |
 
----
+***
 
 ## GDPR Mapping
 
@@ -52,6 +52,7 @@ provides a unified view of compliance status across all frameworks.
 | Integrity & confidentiality | Data secured | EncryptionEngine | `src/security/vault.rs` | Security panel |
 
 ### Article 13/14 – Right to Information
+
 | Requirement | Implementation | File |
 |------------|----------------|------|
 | Identity of controller | System config metadata | `sigma-core.toml` |
@@ -61,6 +62,7 @@ provides a unified view of compliance status across all frameworks.
 | Recipients | Network connection log | `src/security/audit.rs` |
 
 ### Article 15 – Right of Access
+
 | Requirement | Implementation | Dashboard Panel |
 |------------|----------------|----------------|
 | Confirmation of processing | Query audit log | Data Subjects |
@@ -69,6 +71,7 @@ provides a unified view of compliance status across all frameworks.
 | Retention period | RetentionManager | Data Subjects |
 
 ### Article 16 – Right to Rectification
+
 | Requirement | Implementation | File |
 |------------|----------------|------|
 | Correct inaccurate data | DataCorrectionRequest syscall | `src/legal/mod.rs` |
@@ -100,6 +103,7 @@ provides a unified view of compliance status across all frameworks.
 ### Article 30 – ROPA (Records of Processing Activities)
 
 Auto-generated from audit log. Export with:
+
 ```bash
 sigaudit report --framework gdpr --type ropa --format pdf
 ```
@@ -124,7 +128,7 @@ sigaudit report --framework gdpr --type ropa --format pdf
 | Notify supervisory authority | Alert webhook | `src/integration/api.rs` |
 | Notify data subjects | Email notification | `src/productivity/email.rs` |
 
----
+***
 
 ## HIPAA Mapping
 
@@ -164,19 +168,17 @@ sigaudit report --framework gdpr --type ropa --format pdf
 
 ### PHI Data Flow Map
 
-```
-PHI Tagged File ──► Kernel intercept ──► HIPAA audit record
-                              │
-                    PhiAccessCheck
-                              │
-                   Is purpose declared?  ──No──► EPERM + audit alert
-                              │ Yes
-                   Is user authorised?   ──No──► EPERM + audit alert
-                              │ Yes
-                   Allow access + log
-```
+    PHI Tagged File ──► Kernel intercept ──► HIPAA audit record
+                                  │
+                        PhiAccessCheck
+                                  │
+                       Is purpose declared?  ──No──► EPERM + audit alert
+                                  │ Yes
+                       Is user authorised?   ──No──► EPERM + audit alert
+                                  │ Yes
+                       Allow access + log
 
----
+***
 
 ## SOC 2 Type II Mapping
 
@@ -219,7 +221,7 @@ PHI Tagged File ──► Kernel intercept ──► HIPAA audit record
 
 Maps 1:1 to GDPR articles (see GDPR mapping above).
 
----
+***
 
 ## PCI-DSS v4.0 Mapping
 
@@ -269,7 +271,7 @@ Maps 1:1 to GDPR articles (see GDPR mapping above).
 | 10.3 Protect audit logs | Tamper-evident journal | `src/security/audit.rs` |
 | 10.4 Log review | Dashboard | `src/dashboard/monitor.rs` |
 
----
+***
 
 ## India DPDP Act Mapping
 
@@ -288,7 +290,7 @@ Maps 1:1 to GDPR articles (see GDPR mapping above).
 | Section | Right | Implementation | Dashboard |
 |---------|-------|----------------|-----------|
 | § 11 | Access to personal data | DataSubjectRequest | Data Subjects |
-| § 12 | Correction and erasure | dpdp_erase / dpdp_correct | Data Subjects |
+| § 12 | Correction and erasure | dpdp\_erase / dpdp\_correct | Data Subjects |
 | § 13 | Grievance redressal | GrievanceQueue | Requests |
 | § 14 | Nominee designation | NomineeRecord | Data Subjects |
 
@@ -301,7 +303,7 @@ Maps 1:1 to GDPR articles (see GDPR mapping above).
 | § 19 | DPIA | Impact assessment module | `tools/sigma_dpdp_compat.rs` |
 | § 20 | Data audits | DPDP audit report | `src/security/audit.rs` |
 
----
+***
 
 ## Dashboard Indicators Reference
 
@@ -326,7 +328,7 @@ Maps 1:1 to GDPR articles (see GDPR mapping above).
 | `pcidss.tls_version` | Minimum TLS version in use | TLS 1.3 |
 | `dpdp.localisation_violations` | Data sent outside allowed regions | 0 |
 
----
+***
 
 ## Automated Evidence Collection
 
@@ -342,6 +344,6 @@ Maps 1:1 to GDPR articles (see GDPR mapping above).
 # evidence/dpdp/processing-register-2026-08.pdf
 ```
 
----
+***
 
 *Last updated: 2026-08-04*

@@ -6,14 +6,14 @@ This guide provides comprehensive instructions for developing device drivers for
 
 ## Table of Contents
 
-1. [Driver Architecture](#driver-architecture)
-2. [Development Environment Setup](#development-environment-setup)
-3. [Basic Driver Structure](#basic-driver-structure)
-4. [Driver Types](#driver-types)
-5. [Security and Capabilities](#security-and-capabilities)
-6. [Testing and Debugging](#testing-and-debugging)
-7. [Driver Integration](#driver-integration)
-8. [Best Practices](#best-practices)
+1.  [Driver Architecture](#driver-architecture)
+2.  [Development Environment Setup](#development-environment-setup)
+3.  [Basic Driver Structure](#basic-driver-structure)
+4.  [Driver Types](#driver-types)
+5.  [Security and Capabilities](#security-and-capabilities)
+6.  [Testing and Debugging](#testing-and-debugging)
+7.  [Driver Integration](#driver-integration)
+8.  [Best Practices](#best-practices)
 
 ## Driver Architecture
 
@@ -70,25 +70,23 @@ cd SigmaOS
 
 ### Driver Development Directory Structure
 
-```
-src/drivers/
-├── mod.rs
-├── network/
-│   ├── mod.rs
-│   ├── ethernet.rs
-│   └── wifi.rs
-├── storage/
-│   ├── mod.rs
-│   ├── nvme.rs
-│   └── ahci.rs
-├── input/
-│   ├── mod.rs
-│   ├── keyboard.rs
-│   └── mouse.rs
-└── graphics/
+    src/drivers/
     ├── mod.rs
-    └── vesa.rs
-```
+    ├── network/
+    │   ├── mod.rs
+    │   ├── ethernet.rs
+    │   └── wifi.rs
+    ├── storage/
+    │   ├── mod.rs
+    │   ├── nvme.rs
+    │   └── ahci.rs
+    ├── input/
+    │   ├── mod.rs
+    │   ├── keyboard.rs
+    │   └── mouse.rs
+    └── graphics/
+        ├── mod.rs
+        └── vesa.rs
 
 ## Basic Driver Structure
 
@@ -429,7 +427,8 @@ rm build/ethernet_tests
 
 ### Debugging Techniques
 
-1. **Serial Output Debugging**:
+1.  **Serial Output Debugging**:
+
 ```rust
 use sigmaos::serial::SerialWriter;
 
@@ -437,7 +436,8 @@ let mut serial = SerialWriter::new();
 writeln!(serial, "Driver initialization: device_id={}", device.id());
 ```
 
-2. **Memory Debugging**:
+2.  **Memory Debugging**:
+
 ```rust
 // Enable memory debugging in configuration
 let debug_config = MemoryDebugConfig {
@@ -447,7 +447,8 @@ let debug_config = MemoryDebugConfig {
 };
 ```
 
-3. **Interrupt Debugging**:
+3.  **Interrupt Debugging**:
+
 ```rust
 // Log interrupt handling
 pub fn handle_interrupt(&mut self) {
@@ -506,10 +507,10 @@ sigmaos_core = { path = "../sigmaos_core" }
 
 ### Memory Safety
 
-1. **Use Safe Abstractions**: Prefer safe Rust abstractions over unsafe code
-2. **Bounds Checking**: Always validate array indices and buffer sizes
-3. **Memory Pools**: Use appropriate memory pools (Paged vs NonPaged)
-4. **Zero-Copy**: Use zero-copy techniques where possible for performance
+1.  **Use Safe Abstractions**: Prefer safe Rust abstractions over unsafe code
+2.  **Bounds Checking**: Always validate array indices and buffer sizes
+3.  **Memory Pools**: Use appropriate memory pools (Paged vs NonPaged)
+4.  **Zero-Copy**: Use zero-copy techniques where possible for performance
 
 ### Error Handling
 
@@ -554,7 +555,7 @@ impl Drop for MyCustomDevice {
 
 ### Documentation
 
-```rust
+````rust
 /// Custom device driver for XYZ hardware
 /// 
 /// This driver provides support for the XYZ device family with the following features:
@@ -575,7 +576,7 @@ impl Drop for MyCustomDevice {
 pub struct MyCustomDevice {
     // Implementation
 }
-```
+````
 
 ## Advanced Topics
 
@@ -653,20 +654,20 @@ impl DeviceHotplug for MyCustomDevice {
 
 ## Resources
 
-- [SigmaOS API Reference](API_REFERENCE.md)
-- [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE.md)
-- [Security Hardening Guide](SECURITY_HARDENING_GUIDE.md)
-- [Hardware Compatibility List](HARDWARE_COMPATIBILITY.md)
+*   [SigmaOS API Reference](API_REFERENCE)
+*   [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE)
+*   [Security Hardening Guide](SECURITY_HARDENING_GUIDE)
+*   [Hardware Compatibility List](HARDWARE_COMPATIBILITY)
 
 ## Contributing
 
 When contributing drivers:
 
-1. Follow the driver development guidelines
-2. Include comprehensive tests
-3. Document hardware specifications
-4. Provide usage examples
-5. Ensure security best practices
+1.  Follow the driver development guidelines
+2.  Include comprehensive tests
+3.  Document hardware specifications
+4.  Provide usage examples
+5.  Ensure security best practices
 
 ## License
 

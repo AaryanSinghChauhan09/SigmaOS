@@ -12,11 +12,12 @@ Replaced all `unsafe { core::mem::transmute(...) }` calls with safe match-based 
 
 | File | Line | Fix Applied |
 |------|------|-------------|
-| src/ml/inference.rs | 82 | ModelType::from_usize() |
-| src/ml/training.rs | 95 | OptimizerType::from_usize() |
-| src/print/driver.rs | 75 | PrinterState::from_usize() |
+| src/ml/inference.rs | 82 | ModelType::from\_usize() |
+| src/ml/training.rs | 95 | OptimizerType::from\_usize() |
+| src/print/driver.rs | 75 | PrinterState::from\_usize() |
 
 **Before:**
+
 ```rust
 fn model_type(&self) -> ModelType {
     unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst) as u32) }
@@ -24,6 +25,7 @@ fn model_type(&self) -> ModelType {
 ```
 
 **After:**
+
 ```rust
 fn model_type(&self) -> ModelType {
     ModelType::from_usize(self.model_type.load(Ordering::SeqCst))
@@ -38,8 +40,8 @@ The `from_usize()` method uses an exhaustive `match` with a safe default, elimin
 
 | File | Duplicate Enum | Fix |
 |------|---------------|-----|
-| src/ml/inference.rs | ModelType | Removed duplicate, added from_usize impl |
-| src/ml/training.rs | OptimizerType | Removed duplicate, added from_usize impl |
+| src/ml/inference.rs | ModelType | Removed duplicate, added from\_usize impl |
+| src/ml/training.rs | OptimizerType | Removed duplicate, added from\_usize impl |
 
 ### 3. Conflict Markers Eliminated from Source Files
 
@@ -64,16 +66,17 @@ Replaced `timestamp: 1716000000` hardcoded value with a call to the kernel's mon
 ### Code Scanning Configuration
 
 Added CodeQL configuration to scan for:
-- `unsafe` block usage without justification comment
-- `unwrap()` on user-controlled data
-- `expect()` on network/file I/O paths
-- Use of deprecated cryptography (MD5, SHA1, DES)
+
+*   `unsafe` block usage without justification comment
+*   `unwrap()` on user-controlled data
+*   `expect()` on network/file I/O paths
+*   Use of deprecated cryptography (MD5, SHA1, DES)
 
 ### Process
 
-1. All unsafe blocks must be annotated with `// SAFETY: <justification>`
-2. `unwrap()` may not be used in kernel-critical paths
-3. All new code is reviewed for CodeQL alerts before merge
+1.  All unsafe blocks must be annotated with `// SAFETY: <justification>`
+2.  `unwrap()` may not be used in kernel-critical paths
+3.  All new code is reviewed for CodeQL alerts before merge
 
 ## Fixes by Branch
 

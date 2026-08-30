@@ -3,6 +3,7 @@
 This page provides a comprehensive table of all SigmaOS components, their implementation language, description, and current status.
 
 ## Status Legend
+
 | Status | Meaning |
 |--------|---------|
 | ✅ Active | Fully implemented and tested |
@@ -10,7 +11,7 @@ This page provides a comprehensive table of all SigmaOS components, their implem
 | 📋 Planned | Designed but not yet implemented |
 | 🚧 In Progress | Currently being developed |
 
----
+***
 
 ## Core Kernel
 
@@ -39,7 +40,7 @@ This page provides a comprehensive table of all SigmaOS components, their implem
 |-----------|----------|-------------|--------|
 | Buddy Allocator | Rust | Physical memory zone allocator | ✅ Active |
 | Slab Allocator | Rust | Object cache allocator | ✅ Active |
-| Paging Engine | Rust | x86_64 4-level, ARM64 paging | ✅ Active |
+| Paging Engine | Rust | x86\_64 4-level, ARM64 paging | ✅ Active |
 | Segmentation | Rust | GDT, LDT, protected mode segments | ✅ Active |
 | kswapd | Rust | Background memory reclamation daemon | ✅ Active |
 | Predictive Prefetcher | Rust | AI-driven memory prefetch | 📋 Planned |
@@ -185,7 +186,7 @@ This page provides a comprehensive table of all SigmaOS components, their implem
 | USB | C | Universal Serial Bus stack | ✅ Active |
 | NVMe | C | PCIe NVMe storage driver | ✅ Active |
 | SATA/AHCI | C | SATA storage driver | ✅ Active |
-| x86_64 | ASM/C | Primary architecture support | ✅ Active |
+| x86\_64 | ASM/C | Primary architecture support | ✅ Active |
 | ARM64/AArch64 | ASM/C | ARM 64-bit support | ✅ Active |
 | RISC-V 64 | ASM/C | RISC-V experimental support | 🔬 Experimental |
 

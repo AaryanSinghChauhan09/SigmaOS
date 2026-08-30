@@ -4,14 +4,14 @@
 
 SigmaPkg is SigmaOS's native package manager, a clean-room, zero-dependency implementation inspired by the best of Fedora's DNF, Arch's Pacman, Debian's APT, and Nix's purely functional model. It is fully written in Rust with no reliance on system package managers.
 
----
+***
 
 ## Key Features
 
 | Feature | Description |
 |---------|-------------|
 | **Atomic upgrades** | All-or-nothing transactions (Nix-inspired) |
-| **Parallel downloads** | Multi-threaded fetch with io_uring backend |
+| **Parallel downloads** | Multi-threaded fetch with io\_uring backend |
 | **GPG verification** | Ed25519 signature validation on all packages |
 | **Dependency solver** | Optimized recursive resolver with cycle detection |
 | **Delta packages** | Binary delta updates (bsdiff-inspired) |
@@ -21,18 +21,16 @@ SigmaPkg is SigmaOS's native package manager, a clean-room, zero-dependency impl
 | **Parallel Mirror Fetcher** | Dynamic latency-based mirror ranking & parallel downloading |
 | **Dependency Graph Resolver** | Topological sort with cycle detection for multi-distro packages |
 
----
+***
 
 ## Architecture
 
-```
-sigpkg/
-├── mod.rs           # Core package manager
-├── arch_compat.rs   # Arch Linux PKGBUILD compatibility
-└── resolver/        # Dependency resolution engine
-    ├── fedora.rs    # DNF/RPM-style resolver
-    └── debian.rs    # APT-style resolver
-```
+    sigpkg/
+    ├── mod.rs           # Core package manager
+    ├── arch_compat.rs   # Arch Linux PKGBUILD compatibility
+    └── resolver/        # Dependency resolution engine
+        ├── fedora.rs    # DNF/RPM-style resolver
+        └── debian.rs    # APT-style resolver
 
 ### Dependency Resolution Algorithm
 
@@ -52,15 +50,17 @@ pub fn resolve_and_install(&mut self, name: &str) -> Result<Vec<String>, String>
 **Complexity:** O(V + E) where V = packages, E = dependency edges
 
 **Optimizations** (from `feature/optimize-dependency-resolvers`):
-- Pre-allocated capacity avoids heap reallocations
-- Reference-based deduplication vs. string cloning
-- In-progress tracking prevents cycle traversal
 
----
+*   Pre-allocated capacity avoids heap reallocations
+*   Reference-based deduplication vs. string cloning
+*   In-progress tracking prevents cycle traversal
+
+***
 
 ## Repository Configuration
 
 ### sigma-rolling.toml
+
 ```toml
 [repo.sigma-core]
 url = "https://pkg.sigmaos.io/rolling/core"
@@ -74,38 +74,36 @@ priority = 90
 ```
 
 ### sigma-stable.toml
+
 ```toml
 [repo.sigma-stable]
 url = "https://pkg.sigmaos.io/stable"
 gpg_key = "SIGMA_STABLE_GPG_KEY"
 ```
 
----
+***
 
 ## Package Format
 
 SigmaOS packages use `.spkg` format (Sigma Package):
 
-```
-package.spkg
-├── PKGINFO          # Package metadata (name, version, deps)
-├── INSTALL          # Pre/post install scripts
-├── data.tar.zst     # Compressed payload (zstd)
-└── signature.ed25519 # Ed25519 signature over data.tar.zst
-```
+    package.spkg
+    ├── PKGINFO          # Package metadata (name, version, deps)
+    ├── INSTALL          # Pre/post install scripts
+    ├── data.tar.zst     # Compressed payload (zstd)
+    └── signature.ed25519 # Ed25519 signature over data.tar.zst
 
 ### PKGINFO Format
-```
-pkgname = firefox
-pkgver = 128.0-1
-pkgdesc = Mozilla Firefox web browser
-arch = x86_64
-depends = (libgtk glibc-sigma dbus-sigma)
-makedepends = (rust cargo nodejs)
-maintainer = SigmaOS Ports Team
-```
 
----
+    pkgname = firefox
+    pkgver = 128.0-1
+    pkgdesc = Mozilla Firefox web browser
+    arch = x86_64
+    depends = (libgtk glibc-sigma dbus-sigma)
+    makedepends = (rust cargo nodejs)
+    maintainer = SigmaOS Ports Team
+
+***
 
 ## CLI Reference
 
@@ -135,18 +133,19 @@ sigma-pkg verify firefox
 sigma-pkg remove --orphans firefox
 ```
 
----
+***
 
 ## Fedora/DNF Parity Module
 
 **Module:** `src/compatibility/fedora.rs`
 
 Implements DNF/RPM compatibility for running Fedora packages on SigmaOS:
-- RPM package registration and metadata
-- GPG signature verification
-- Mock chroot builder for clean package builds
-- SELinux context propagation
-- systemd preset compatibility
+
+*   RPM package registration and metadata
+*   GPG signature verification
+*   Mock chroot builder for clean package builds
+*   SELinux context propagation
+*   systemd preset compatibility
 
 ```rust
 let mut resolver = DnfPackageResolver::new();
@@ -155,35 +154,40 @@ resolver.register_rpm("firefox", vec!["libgtk", "dbus"]);
 let install_order = resolver.resolve_and_install("firefox")?;
 ```
 
----
+***
 
 ## Arch Linux Parity Module
 
 **Module:** `src/sigpkg/arch_compat.rs`
 
 PKGBUILD processing and makepkg compatibility:
-- Parse and execute PKGBUILD scripts
-- Source tarball download + verification
-- Custom build environment (clean chroot)
-- AUR helpers integration
 
----
+*   Parse and execute PKGBUILD scripts
+*   Source tarball download + verification
+*   Custom build environment (clean chroot)
+*   AUR helpers integration
+
+***
 
 ## Nix-Inspired Features
 
 ### Atomic Transactions
+
 Every package operation is atomic:
-1. Download + verify all packages
-2. Prepare new system generation
-3. Atomically switch symlink to new generation
-4. Rollback on failure
+
+1.  Download + verify all packages
+2.  Prepare new system generation
+3.  Atomically switch symlink to new generation
+4.  Rollback on failure
 
 ### Content-Addressable Store
+
 Packages stored by content hash — identical files shared automatically.
 
----
+***
 
 *See also:*
-- [DEPENDENCY_REDUCTION_GUIDE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DEPENDENCY_REDUCTION_GUIDE.md)
-- [KLIB_REFERENCE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/KLIB_REFERENCE.md)
-- [ARCH_LINUX_PARITY_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ARCH_LINUX_PARITY_ROADMAP.md)
+
+*   [DEPENDENCY\_REDUCTION\_GUIDE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DEPENDENCY_REDUCTION_GUIDE.md)
+*   [KLIB\_REFERENCE.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/KLIB_REFERENCE.md)
+*   [ARCH\_LINUX\_PARITY\_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/ARCH_LINUX_PARITY_ROADMAP.md)

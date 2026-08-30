@@ -2,23 +2,26 @@
 
 This document outlines AI-native capabilities including natural language CLI, workflow automation, and adaptive assistance.
 
----
+***
 
 ## Phase 1: SigmaAI Agent — Natural Language to CLI
 
 ### Current Status
-- Kernel-level AI inference engine exists
-- No natural language interface
+
+*   Kernel-level AI inference engine exists
+*   No natural language interface
 
 ### Target State
-- **Natural Language Command Translator**
-  - Convert natural language to CLI commands
-  - Support for India languages (Hindi, Tamil, Bengali, etc.)
-  - Context-aware command generation
-  - Safety checks before execution
-  - Command explanation in plain language
+
+*   **Natural Language Command Translator**
+    *   Convert natural language to CLI commands
+    *   Support for India languages (Hindi, Tamil, Bengali, etc.)
+    *   Context-aware command generation
+    *   Safety checks before execution
+    *   Command explanation in plain language
 
 ### Features
+
 ```bash
 # Natural language commands
 sigma-ai "install libreoffice"
@@ -49,33 +52,37 @@ sigma-ai explain "tar -xvf archive.tar.gz"
 ```
 
 ### Implementation Tasks
-- [ ] Design natural language parser
-- [ ] Build command mapping database
-- [ ] Integrate India language models
-- [ ] Add safety check system
-- [ ] Implement command explanation engine
-- [ ] Create context awareness (current directory, user profile)
-- [ ] Build learning system (user preferences)
+
+*   \[ ] Design natural language parser
+*   \[ ] Build command mapping database
+*   \[ ] Integrate India language models
+*   \[ ] Add safety check system
+*   \[ ] Implement command explanation engine
+*   \[ ] Create context awareness (current directory, user profile)
+*   \[ ] Build learning system (user preferences)
 
 ### Estimated Timeline: 3-4 months
 
----
+***
 
 ## Phase 2: Workflow Automation
 
 ### Current Status
-- No workflow automation
-- Manual task execution
+
+*   No workflow automation
+*   Manual task execution
 
 ### Target State
-- **Multi-Step Task Automation**
-  - Visual workflow builder (n8n or Airflow integration)
-  - Pre-built workflow templates
-  - Trigger-based automation (time, event, condition)
-  - Cross-app workflows
-  - AI-powered workflow suggestions
+
+*   **Multi-Step Task Automation**
+    *   Visual workflow builder (n8n or Airflow integration)
+    *   Pre-built workflow templates
+    *   Trigger-based automation (time, event, condition)
+    *   Cross-app workflows
+    *   AI-powered workflow suggestions
 
 ### Features
+
 ```bash
 # Visual workflow builder
 sigma-workflow create --name "Daily GST Filing"
@@ -102,33 +109,37 @@ sigma-workflow suggest --based-on "recent activity"
 ```
 
 ### Implementation Tasks
-- [ ] Integrate n8n or build custom workflow engine
-- [ ] Create visual workflow builder
-- [ ] Build pre-built workflow templates
-- [ ] Implement trigger system (cron, event, condition)
-- [ ] Add cross-app workflow support
-- [ ] Build AI suggestion engine
-- [ ] Create workflow sharing platform
+
+*   \[ ] Integrate n8n or build custom workflow engine
+*   \[ ] Create visual workflow builder
+*   \[ ] Build pre-built workflow templates
+*   \[ ] Implement trigger system (cron, event, condition)
+*   \[ ] Add cross-app workflow support
+*   \[ ] Build AI suggestion engine
+*   \[ ] Create workflow sharing platform
 
 ### Estimated Timeline: 4-5 months
 
----
+***
 
 ## Phase 3: Adaptive CLI Suggestions
 
 ### Current Status
-- No adaptive suggestions
-- Static command completion
+
+*   No adaptive suggestions
+*   Static command completion
 
 ### Target State
-- **AI-Powered Command Recommendations**
-  - Context-aware suggestions
-  - Learning from user behavior
-  - Predictive command completion
-  - Error prevention suggestions
-  - Efficiency optimization
+
+*   **AI-Powered Command Recommendations**
+    *   Context-aware suggestions
+    *   Learning from user behavior
+    *   Predictive command completion
+    *   Error prevention suggestions
+    *   Efficiency optimization
 
 ### Features
+
 ```bash
 # Context-aware suggestions
 $ sigma-
@@ -155,33 +166,37 @@ $ sigma-ai "optimize my workflow"
 ```
 
 ### Implementation Tasks
-- [ ] Build usage tracking system
-- [ ] Implement suggestion engine
-- [ ] Add predictive completion
-- [ ] Create error prevention system
-- [ ] Build efficiency analyzer
-- [ ] Add learning algorithm
-- [ ] Create suggestion UI
+
+*   \[ ] Build usage tracking system
+*   \[ ] Implement suggestion engine
+*   \[ ] Add predictive completion
+*   \[ ] Create error prevention system
+*   \[ ] Build efficiency analyzer
+*   \[ ] Add learning algorithm
+*   \[ ] Create suggestion UI
 
 ### Estimated Timeline: 2-3 months
 
----
+***
 
 ## Phase 4: Error Explanation Layer
 
 ### Current Status
-- Standard error messages
-- No plain language explanations
+
+*   Standard error messages
+*   No plain language explanations
 
 ### Target State
-- **AI-Powered Error Explanations**
-  - Plain language explanations for all errors
-  - Suggested fixes
-  - Related documentation
-  - Community solutions
-  - Automatic error reporting
+
+*   **AI-Powered Error Explanations**
+    *   Plain language explanations for all errors
+    *   Suggested fixes
+    *   Related documentation
+    *   Community solutions
+    *   Automatic error reporting
 
 ### Features
+
 ```bash
 # Plain language explanations
 $ sigpkg install libreoffice
@@ -208,32 +223,36 @@ These two versions cannot be installed at the same time."
 ```
 
 ### Implementation Tasks
-- [ ] Build error database
-- [ ] Create explanation engine
-- [ ] Implement fix suggestion system
-- [ ] Integrate documentation
-- [ ] Add community solutions platform
-- [ ] Build automatic error reporting
-- [ ] Create error learning system
+
+*   \[ ] Build error database
+*   \[ ] Create explanation engine
+*   \[ ] Implement fix suggestion system
+*   \[ ] Integrate documentation
+*   \[ ] Add community solutions platform
+*   \[ ] Build automatic error reporting
+*   \[ ] Create error learning system
 
 ### Estimated Timeline: 2-3 months
 
----
+***
 
 ## Phase 5: SigmaAI Assistant
 
 ### Current Status
-- Concept only
+
+*   Concept only
 
 ### Target State
-- **Full AI Assistant (India Languages)**
-  - Voice assistant (Hindi, Tamil, Bengali, etc.)
-  - Context-aware assistance
-  - Proactive suggestions
-  - Task automation
-  - Learning user preferences
+
+*   **Full AI Assistant (India Languages)**
+    *   Voice assistant (Hindi, Tamil, Bengali, etc.)
+    *   Context-aware assistance
+    *   Proactive suggestions
+    *   Task automation
+    *   Learning user preferences
 
 ### Features
+
 ```bash
 # Voice assistant (Hindi)
 "Sigma, meri GST return file karo"
@@ -253,49 +272,50 @@ SigmaAI: "Workflow created. Will run every day at 9 AM."
 ```
 
 ### Implementation Tasks
-- [ ] Design SigmaAI assistant architecture
-- [ ] Integrate voice recognition (India languages)
-- [ ] Build context awareness engine
-- [ ] Implement proactive suggestion system
-- [ ] Add task automation
-- [ ] Create preference learning system
-- [ ] Build assistant UI
+
+*   \[ ] Design SigmaAI assistant architecture
+*   \[ ] Integrate voice recognition (India languages)
+*   \[ ] Build context awareness engine
+*   \[ ] Implement proactive suggestion system
+*   \[ ] Add task automation
+*   \[ ] Create preference learning system
+*   \[ ] Build assistant UI
 
 ### Estimated Timeline: 5-6 months
 
----
+***
 
 ## Dependencies
 
-- Core System (for kernel AI inference)
-- Package Ecosystem (for AI packages)
-- User Experience (for assistant UI)
+*   Core System (for kernel AI inference)
+*   Package Ecosystem (for AI packages)
+*   User Experience (for assistant UI)
 
----
+***
 
 ## Success Metrics
 
-- 90% accuracy for natural language to CLI translation
-- 10+ India languages supported
-- 50+ pre-built workflow templates
-- 95% error explanation accuracy
-- SigmaAI assistant in beta
-- <1s response time for suggestions
+*   90% accuracy for natural language to CLI translation
+*   10+ India languages supported
+*   50+ pre-built workflow templates
+*   95% error explanation accuracy
+*   SigmaAI assistant in beta
+*   <1s response time for suggestions
 
----
+***
 
 ## Next Steps
 
-1. Begin natural language parser development
-2. Integrate n8n for workflow automation
-3. Build usage tracking for adaptive suggestions
-4. Create error database
-5. Design SigmaAI assistant
+1.  Begin natural language parser development
+2.  Integrate n8n for workflow automation
+3.  Build usage tracking for adaptive suggestions
+4.  Create error database
+5.  Design SigmaAI assistant
 
----
+***
 
 ## See Also
 
-- [Core System Roadmap](Core_System.md)
-- [Package Ecosystem Roadmap](Package_Ecosystem.md)
-- [User Experience Roadmap](User_Experience.md)
+*   [Core System Roadmap](Core_System)
+*   [Package Ecosystem Roadmap](Package_Ecosystem)
+*   [User Experience Roadmap](User_Experience)

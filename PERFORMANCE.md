@@ -6,15 +6,15 @@ SigmaOS is engineered for exceptional performance across all hardware configurat
 
 ## Table of Contents
 
-1. [Performance Architecture](#performance-architecture)
-2. [System Monitoring](#system-monitoring)
-3. [CPU Optimization](#cpu-optimization)
-4. [Memory Optimization](#memory-optimization)
-5. [Storage Optimization](#storage-optimization)
-6. [Network Optimization](#network-optimization)
-7. [Graphics Optimization](#graphics-optimization)
-8. [Application Performance](#application-performance)
-9. [Power Management](#power-management)
+1.  [Performance Architecture](#performance-architecture)
+2.  [System Monitoring](#system-monitoring)
+3.  [CPU Optimization](#cpu-optimization)
+4.  [Memory Optimization](#memory-optimization)
+5.  [Storage Optimization](#storage-optimization)
+6.  [Network Optimization](#network-optimization)
+7.  [Graphics Optimization](#graphics-optimization)
+8.  [Application Performance](#application-performance)
+9.  [Power Management](#power-management)
 10. [Benchmarking and Profiling](#benchmarking-and-profiling)
 
 ## Performance Architecture
@@ -23,58 +23,61 @@ SigmaOS is engineered for exceptional performance across all hardware configurat
 
 SigmaOS employs an AI-driven adaptive performance system that continuously optimizes resource allocation:
 
-```
-┌─────────────────────────────────────────────────────┐
-│              AI Performance Engine                  │
-│  ◦ Workload Prediction  ◦ Resource Allocation      │
-├─────────────────────────────────────────────────────┤
-│               Performance Monitors                  │
-│  ◦ CPU Utilization     ◦ Memory Pressure           │
-│  ◦ I/O Bandwidth       ◦ Network Latency           │
-├─────────────────────────────────────────────────────┤
-│              Optimization Engines                   │
-│  ◦ Scheduler Tuning    ◦ Memory Management          │
-│  ◦ Cache Optimization  ◦ Prefetch Control           │
-├─────────────────────────────────────────────────────┤
-│                Hardware Layer                       │
-│  ◦ CPU Governors       ◦ Memory Controllers         │
-│  ◦ Storage Controllers ◦ Network Adapters           │
-└─────────────────────────────────────────────────────┘
-```
+    ┌─────────────────────────────────────────────────────┐
+    │              AI Performance Engine                  │
+    │  ◦ Workload Prediction  ◦ Resource Allocation      │
+    ├─────────────────────────────────────────────────────┤
+    │               Performance Monitors                  │
+    │  ◦ CPU Utilization     ◦ Memory Pressure           │
+    │  ◦ I/O Bandwidth       ◦ Network Latency           │
+    ├─────────────────────────────────────────────────────┤
+    │              Optimization Engines                   │
+    │  ◦ Scheduler Tuning    ◦ Memory Management          │
+    │  ◦ Cache Optimization  ◦ Prefetch Control           │
+    ├─────────────────────────────────────────────────────┤
+    │                Hardware Layer                       │
+    │  ◦ CPU Governors       ◦ Memory Controllers         │
+    │  ◦ Storage Controllers ◦ Network Adapters           │
+    └─────────────────────────────────────────────────────┘
 
 ### Performance Profiles
 
 #### Gaming Profile
-- **Priority**: Low latency, high frame rates
-- **CPU**: Performance governor, isolated cores
-- **Memory**: Reduced swapping, large pages
-- **Graphics**: Maximum GPU clocks, minimal compositing
-- **Audio**: Low-latency audio pipeline
 
-#### Workstation Profile  
-- **Priority**: Balanced performance and efficiency
-- **CPU**: Ondemand governor, NUMA awareness
-- **Memory**: Moderate compression, smart prefetch
-- **Storage**: Read-ahead optimization
-- **Network**: Bandwidth optimization
+*   **Priority**: Low latency, high frame rates
+*   **CPU**: Performance governor, isolated cores
+*   **Memory**: Reduced swapping, large pages
+*   **Graphics**: Maximum GPU clocks, minimal compositing
+*   **Audio**: Low-latency audio pipeline
+
+#### Workstation Profile
+
+*   **Priority**: Balanced performance and efficiency
+*   **CPU**: Ondemand governor, NUMA awareness
+*   **Memory**: Moderate compression, smart prefetch
+*   **Storage**: Read-ahead optimization
+*   **Network**: Bandwidth optimization
 
 #### Server Profile
-- **Priority**: Throughput and reliability
-- **CPU**: Performance per watt optimization
-- **Memory**: Aggressive compression, large buffers
-- **Storage**: I/O scheduling optimization
-- **Network**: High bandwidth, low CPU overhead
+
+*   **Priority**: Throughput and reliability
+*   **CPU**: Performance per watt optimization
+*   **Memory**: Aggressive compression, large buffers
+*   **Storage**: I/O scheduling optimization
+*   **Network**: High bandwidth, low CPU overhead
 
 #### Battery Profile
-- **Priority**: Maximum battery life
-- **CPU**: Powersave governor, aggressive scaling
-- **Memory**: Aggressive compression, zswap
-- **Display**: Reduced refresh rate, dimming
-- **Network**: Power-aware networking
+
+*   **Priority**: Maximum battery life
+*   **CPU**: Powersave governor, aggressive scaling
+*   **Memory**: Aggressive compression, zswap
+*   **Display**: Reduced refresh rate, dimming
+*   **Network**: Power-aware networking
 
 ## System Monitoring
 
 ### Real-Time Performance Dashboard
+
 ```bash
 # Launch performance monitor
 sigma-monitor --dashboard
@@ -90,6 +93,7 @@ sigma-monitor --dashboard
 ```
 
 ### Command-Line Monitoring
+
 ```bash
 # CPU information and utilization
 sigma-monitor --cpu
@@ -129,6 +133,7 @@ sigma-monitor --network
 ```
 
 ### Performance Logging
+
 ```rust
 use sigmaos::performance::*;
 
@@ -148,6 +153,7 @@ let logger = PerformanceLogger::new()
 ### Scheduler Configuration
 
 #### CFS+ (Completely Fair Scheduler Plus)
+
 ```bash
 # Tune CFS parameters for different workloads
 sigma-tune --scheduler cfs
@@ -166,6 +172,7 @@ sigma-tune --scheduler rt --budget 950ms
 ```
 
 #### CPU Isolation
+
 ```bash
 # Isolate CPU cores for specific applications
 sigma-tune --isolcpus 2,3,6,7
@@ -180,6 +187,7 @@ sigma-tune --numa-policy preferred --node 0
 ```
 
 ### CPU Frequency Management
+
 ```bash
 # Available CPU governors
 sigma-tune --list-governors
@@ -195,6 +203,7 @@ sigma-tune --turbo enable
 ```
 
 ### Advanced CPU Features
+
 ```rust
 use sigmaos::cpu::*;
 
@@ -220,6 +229,7 @@ MitigationControl::new()
 ## Memory Optimization
 
 ### Memory Management Tuning
+
 ```bash
 # Configure memory subsystem
 sigma-tune --memory
@@ -240,6 +250,7 @@ sigma-tune --compaction-proactiveness 20
 ```
 
 ### NUMA Optimization
+
 ```bash
 # NUMA topology information
 sigma-monitor --numa
@@ -257,6 +268,7 @@ numactl --membind=0 --cpunodebind=0 my-application
 ```
 
 ### Memory Compression
+
 ```rust
 use sigmaos::memory::compression::*;
 
@@ -282,6 +294,7 @@ compressor.set_pressure_callback(|pressure| {
 ### Filesystem Optimization
 
 #### SigmaFS Configuration
+
 ```bash
 # Create optimized SigmaFS filesystem
 mkfs.sigmafs /dev/nvme0n1p2 \
@@ -296,6 +309,7 @@ mount -t sigmafs /dev/nvme0n1p2 /home \
 ```
 
 #### I/O Scheduling
+
 ```bash
 # Configure I/O scheduler per device
 sigma-tune --io-scheduler mq-deadline --device /dev/nvme0n1
@@ -308,6 +322,7 @@ sigma-tune --io-scheduler-param fifo_batch=16
 ```
 
 ### Storage Performance Optimization
+
 ```bash
 # NVMe optimization
 sigma-tune --nvme-optimize /dev/nvme0n1
@@ -331,6 +346,7 @@ sigma-tune --raid-optimize /dev/md0 \
 ```
 
 ### Caching Optimization
+
 ```rust
 use sigmaos::storage::cache::*;
 
@@ -357,6 +373,7 @@ let cache = StorageCache::new()
 ## Network Optimization
 
 ### Network Stack Tuning
+
 ```bash
 # TCP/IP stack optimization
 sigma-tune --network tcp
@@ -377,6 +394,7 @@ sigma-tune --tcp-selective-ack enable
 ```
 
 ### High-Performance Networking
+
 ```rust
 use sigmaos::network::performance::*;
 
@@ -397,6 +415,7 @@ let packet_processor = PacketProcessor::new()
 ```
 
 ### Network Interface Optimization
+
 ```bash
 # Ethernet optimization
 sigma-tune --interface eth0 \
@@ -420,6 +439,7 @@ sigma-tune --interface eth0 \
 ## Graphics Optimization
 
 ### GPU Performance
+
 ```bash
 # GPU monitoring
 sigma-monitor --gpu
@@ -438,6 +458,7 @@ sigma-tune --gpu-power-limit 450W
 ```
 
 ### Display Optimization
+
 ```bash
 # Display configuration for performance
 sigma-tune --display \
@@ -456,6 +477,7 @@ sigma-tune --display --hdr-peak-brightness 1000
 ```
 
 ### Compositor Optimization
+
 ```rust
 use sigmaos::graphics::compositor::*;
 
@@ -473,6 +495,7 @@ let compositor = Compositor::new()
 ## Application Performance
 
 ### Process Priority Management
+
 ```bash
 # Set process priorities
 sigma-tune --process firefox --nice -5        # Higher priority
@@ -488,6 +511,7 @@ sigma-tune --process compiler --cpu-affinity 0,1,2,3
 ```
 
 ### Memory Management for Applications
+
 ```rust
 use sigmaos::process::memory::*;
 
@@ -509,6 +533,7 @@ let pool = MemoryPool::new()
 ```
 
 ### JIT Compilation Optimization
+
 ```rust
 use sigmaos::jit::*;
 
@@ -530,6 +555,7 @@ let optimized_function = jit.compile_function(
 ## Power Management
 
 ### CPU Power Management
+
 ```bash
 # CPU power states
 sigma-tune --cpu-idle-states
@@ -551,6 +577,7 @@ sigma-tune --cpu 4-11 --governor powersave    # Efficiency cores
 ```
 
 ### Thermal Management
+
 ```bash
 # Thermal monitoring
 sigma-monitor --thermal
@@ -570,6 +597,7 @@ sigma-tune --thermal \
 ```
 
 ### Power Profiles
+
 ```rust
 use sigmaos::power::*;
 
@@ -593,6 +621,7 @@ PowerManager::new()
 ## Benchmarking and Profiling
 
 ### System Benchmarks
+
 ```bash
 # Comprehensive system benchmark
 sigma-benchmark --full-system
@@ -611,6 +640,7 @@ sigma-benchmark --gpu --duration 60s
 ```
 
 ### Application Profiling
+
 ```bash
 # Profile application performance
 sigma-profile --process firefox \
@@ -628,6 +658,7 @@ sigma-profile --perf report --call-graph
 ```
 
 ### Performance Regression Detection
+
 ```rust
 use sigmaos::benchmark::*;
 
@@ -651,24 +682,27 @@ PerformanceMonitor::new()
 ## Performance Best Practices
 
 ### For Developers
-1. **Profile Early and Often**: Use built-in profiling tools
-2. **Optimize Hot Paths**: Focus on frequently executed code
-3. **Memory Efficiency**: Minimize allocations, use object pools
-4. **Cache-Friendly Code**: Optimize memory access patterns
-5. **Parallel Processing**: Utilize multiple CPU cores effectively
 
-### For System Administrators  
-1. **Monitor Continuously**: Use real-time performance monitoring
-2. **Tune for Workload**: Configure system for specific use cases
-3. **Regular Benchmarking**: Establish performance baselines
-4. **Resource Planning**: Anticipate scaling needs
-5. **Update Regularly**: Keep drivers and firmware updated
+1.  **Profile Early and Often**: Use built-in profiling tools
+2.  **Optimize Hot Paths**: Focus on frequently executed code
+3.  **Memory Efficiency**: Minimize allocations, use object pools
+4.  **Cache-Friendly Code**: Optimize memory access patterns
+5.  **Parallel Processing**: Utilize multiple CPU cores effectively
+
+### For System Administrators
+
+1.  **Monitor Continuously**: Use real-time performance monitoring
+2.  **Tune for Workload**: Configure system for specific use cases
+3.  **Regular Benchmarking**: Establish performance baselines
+4.  **Resource Planning**: Anticipate scaling needs
+5.  **Update Regularly**: Keep drivers and firmware updated
 
 ### For Users
-1. **Choose Appropriate Profile**: Select optimal performance profile
-2. **Close Unused Applications**: Free up system resources
-3. **Regular Maintenance**: Clean temporary files, defragment storage
-4. **Hardware Upgrades**: Identify bottlenecks for upgrades
-5. **Monitor Resource Usage**: Use system monitoring tools
+
+1.  **Choose Appropriate Profile**: Select optimal performance profile
+2.  **Close Unused Applications**: Free up system resources
+3.  **Regular Maintenance**: Clean temporary files, defragment storage
+4.  **Hardware Upgrades**: Identify bottlenecks for upgrades
+5.  **Monitor Resource Usage**: Use system monitoring tools
 
 SigmaOS provides the tools and flexibility to achieve optimal performance for any workload, from gaming and content creation to enterprise servers and embedded systems.

@@ -2,12 +2,12 @@
 
 ## Prerequisites
 
-- **OS:** Linux (Debian/Ubuntu/Arch/Fedora) or macOS
-- **Rust:** 1.75+ (nightly recommended)
-- **Tools:** `git`, `make`, `qemu-system-x86_64` (for testing)
-- **GitHub CLI:** `gh` (for PR/wiki operations)
+*   **OS:** Linux (Debian/Ubuntu/Arch/Fedora) or macOS
+*   **Rust:** 1.75+ (nightly recommended)
+*   **Tools:** `git`, `make`, `qemu-system-x86_64` (for testing)
+*   **GitHub CLI:** `gh` (for PR/wiki operations)
 
----
+***
 
 ## 1. Clone the Repository
 
@@ -16,7 +16,7 @@ git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 ```
 
----
+***
 
 ## 2. Install Rust (Nightly)
 
@@ -27,26 +27,29 @@ rustup default nightly
 rustup component add rust-src llvm-tools-preview
 ```
 
----
+***
 
 ## 3. Install Build Dependencies
 
 ### Ubuntu/Debian
+
 ```bash
 sudo apt install -y build-essential qemu-system-x86_64 nasm xorriso grub-pc-bin
 ```
 
 ### Arch Linux
+
 ```bash
 sudo pacman -S base-devel qemu nasm xorriso grub
 ```
 
 ### Fedora
+
 ```bash
 sudo dnf install -y qemu nasm xorriso grub2-tools
 ```
 
----
+***
 
 ## 4. Build SigmaOS
 
@@ -61,7 +64,7 @@ cargo build --release --all-features
 cargo check
 ```
 
----
+***
 
 ## 5. Run Tests
 
@@ -79,7 +82,7 @@ cargo test --test os_components_tests
 cargo test -- --nocapture
 ```
 
----
+***
 
 ## 6. Run in QEMU (Emulated)
 
@@ -93,7 +96,7 @@ qemu-system-x86_64 \
   -serial stdio
 ```
 
----
+***
 
 ## 7. Package Management with `sigpkg`
 
@@ -114,11 +117,12 @@ sigpkg remove firefox
 sigpkg build ./PKGBUILD
 ```
 
----
+***
 
 ## 8. Development Workflow
 
 ### Creating a New Feature Branch (don't — all dev happens on `main`)
+
 SigmaOS uses a **trunk-based development** model. All changes go directly to `main` via PRs, which are immediately merged and the branch deleted.
 
 ### Running the CI Pipeline Locally
@@ -139,31 +143,33 @@ cargo clippy -- -D warnings
 
 ### Code Style
 
-- Follow Rust idioms and standard formatting (`cargo fmt`)
-- All `unsafe` blocks must have a `// SAFETY:` comment
-- No external dependencies — use `src/klib/` implementations
-- Document all public APIs with doc comments (`///`)
+*   Follow Rust idioms and standard formatting (`cargo fmt`)
+*   All `unsafe` blocks must have a `// SAFETY:` comment
+*   No external dependencies — use `src/klib/` implementations
+*   Document all public APIs with doc comments (`///`)
 
----
+***
 
 ## 9. Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING) for full guidelines.
 
 ### Quick Contribution Steps
-1. Fork the repository
-2. Make your changes on a branch
-3. Open a Pull Request
-4. PR will be reviewed and merged (branch auto-deleted)
+
+1.  Fork the repository
+2.  Make your changes on a branch
+3.  Open a Pull Request
+4.  PR will be reviewed and merged (branch auto-deleted)
 
 ### Priority Areas
-- Bootable ISO image generation
-- USB HID keyboard driver
-- Container manager (Docker/Podman compatibility)
-- Virtual machine manager (KVM integration)
-- sigma-sh shell completion
 
----
+*   Bootable ISO image generation
+*   USB HID keyboard driver
+*   Container manager (Docker/Podman compatibility)
+*   Virtual machine manager (KVM integration)
+*   sigma-sh shell completion
+
+***
 
 ## 10. Directory Quick Reference
 
@@ -179,7 +185,7 @@ See [CONTRIBUTING.md](CONTRIBUTING) for full guidelines.
 | `.github/workflows/` | CI/CD pipeline definitions |
 | `tests/` | Integration and component tests |
 
----
+***
 
 ## 11. Useful Commands
 
@@ -200,6 +206,6 @@ cargo doc --open
 cargo llvm-cov --html
 ```
 
----
+***
 
 *Last updated: 2026-08-23 | SigmaOS Documentation*

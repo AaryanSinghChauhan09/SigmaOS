@@ -2,7 +2,7 @@
 
 This document provides a comprehensive technical blueprint of how **SigmaOS** operates as a pure `#![no_std]` bare-metal operating system, detailing the architecture of its clean-room kernel library (`klib`), custom data structures, math intrinsics, synchronization primitives, and panic handlers.
 
----
+***
 
 ## 1. Operating Without the Standard Library
 
@@ -35,14 +35,14 @@ graph TD
 
 | Capability | Standard Rust (`std`) | Pure `core` | **SigmaOS `klib`** |
 |:---|:---|:---|:---|
-| **Platform Target** | Hosted OS (Linux/macOS/Win)| Any (Bare-Metal / Embedded) | **Bare-Metal x86_64 / SMP** |
+| **Platform Target** | Hosted OS (Linux/macOS/Win)| Any (Bare-Metal / Embedded) | **Bare-Metal x86\_64 / SMP** |
 | **Heap Allocation** | System `malloc` / `mmap` | None (No Heap) | **Custom Buddy + SLAB Engine** |
 | **Dynamic Collections**| `Vec`, `String`, `HashMap` | None | **`CustomVec`, `CustomString`, `CustomHashMap`** |
 | **Math Functions** | Host `libm` (`sin`, `sqrt`, `log`) | Basic Integer/Float Operations | **Fast Software `sqrt`, `log2`, `log10`** |
 | **Memory Intrinsics** | Host `libc` (`memcpy`, `memset`) | Built-in LLVM intrinsics | **SIMD-Optimized Clean-Room Intrinsics** |
 | **Threading & Sync** | `std::sync::Mutex` (pthreads)| `core::sync::atomic` | **Spinlocks, Ticket Locks, Seqlocks** |
 
----
+***
 
 ## 2. The `klib` Clean-Room Subsystem
 
@@ -79,7 +79,7 @@ graph TB
     MathIntrinsics --> Collections
 ```
 
----
+***
 
 ## 3. Deep Dive: Core `klib` Data Structures
 
@@ -154,7 +154,7 @@ pub struct RingBuffer<T, const CAP: usize> {
 }
 ```
 
----
+***
 
 ## 4. Bare-Metal Math & Memory Intrinsics
 
@@ -217,7 +217,7 @@ pub unsafe extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut
 }
 ```
 
----
+***
 
 ## 5. Panic Handling & Kernel Oops Architecture
 
@@ -266,7 +266,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 }
 ```
 
----
+***
 
 ## 6. Comparison with Linux `lib/` and FreeBSD Libkern
 
@@ -278,13 +278,13 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 | **Memory Allocator** | SLUB / Buddy | UMA / Zone Allocator | Slab Allocator | **Buddy Allocator + SLAB Cache** |
 | **Memory Corruption Risk** | High (Buffer Overflows) | High (Buffer Overflows) | Medium | **Zero (Rust Memory Safety Model)** |
 
----
+***
 
 ## 7. Related Documentation
 
-- [Custom Allocator Guide](Custom-Allocator-Guide.md) — Detailed Buddy and SLAB allocator guide.
-- [Architecture Overview](Architecture-Overview.md) — Modular kernel topology.
-- [Getting Started](Getting-Started.md) — Compilation and setup instructions.
-- [Contributing Guide](Contributing.md) — Coding standards for `#![no_std]`.
+*   [Custom Allocator Guide](Custom-Allocator-Guide) — Detailed Buddy and SLAB allocator guide.
+*   [Architecture Overview](Architecture-Overview) — Modular kernel topology.
+*   [Getting Started](Getting-Started) — Compilation and setup instructions.
+*   [Contributing Guide](Contributing) — Coding standards for `#![no_std]`.
 
 *SigmaOS No-Std Architecture Guide — Maintained by the SigmaOS Core Engineering Team.*

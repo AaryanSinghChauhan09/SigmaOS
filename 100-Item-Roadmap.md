@@ -1,19 +1,20 @@
 # SigmaOS 100-Item Future Development Roadmap
 
 ## Overview
+
 Comprehensive 100-item roadmap organized into six strategic categories. Each item is a concise, actionable initiative contributors can pick up, prioritize, and track.
 
 ## Core System (1-20)
 
-1. **Adopt stable Linux kernel** — upstream latest LTS and maintain a SigmaOS kernel branch
-2. **Hardware compatibility matrix** — publish supported GPUs, Wi-Fi, printers, and chipsets
-3. **Native driver program** — implement drivers for common GPUs and Wi-Fi chipsets
-4. **Bootloader & installer** — build a Calamares-style graphical installer with dual-boot support
-5. **Lightweight init system** — implement or integrate a minimal init (runit/OpenRC alternative)
-6. **Systemd compatibility layer** — provide compatibility shims for systemd-dependent apps
-7. **Filesystem support** — integrate ext4, Btrfs, and ZFS with snapshot/rollback APIs
-8. **Power management stack** — implement advanced power profiles and CPU governor tuning
-9. **Real-time kernel option** — provide a PREEMPT_RT variant for low-latency use cases
+1.  **Adopt stable Linux kernel** — upstream latest LTS and maintain a SigmaOS kernel branch
+2.  **Hardware compatibility matrix** — publish supported GPUs, Wi-Fi, printers, and chipsets
+3.  **Native driver program** — implement drivers for common GPUs and Wi-Fi chipsets
+4.  **Bootloader & installer** — build a Calamares-style graphical installer with dual-boot support
+5.  **Lightweight init system** — implement or integrate a minimal init (runit/OpenRC alternative)
+6.  **Systemd compatibility layer** — provide compatibility shims for systemd-dependent apps
+7.  **Filesystem support** — integrate ext4, Btrfs, and ZFS with snapshot/rollback APIs
+8.  **Power management stack** — implement advanced power profiles and CPU governor tuning
+9.  **Real-time kernel option** — provide a PREEMPT\_RT variant for low-latency use cases
 10. **Secure boot & firmware validation** — enable secure boot with signed kernels and firmware checks
 11. **MicroVM sandboxing foundation** — integrate Firecracker or lightweight VMM primitives
 12. **Kernel hardening features** — enable KASLR, SMEP/SMAP mitigations, and hardened syscalls
@@ -116,69 +117,79 @@ Comprehensive 100-item roadmap organized into six strategic categories. Each ite
 97. **Plugin marketplace** — secure extensions for AI, automation, and UI features
 98. **Telemetry for dev features** — opt-in analytics to prioritize developer UX improvements
 99. **Education & sandbox labs** — prebuilt learning environments for students and trainers
-100. **Ecosystem incubator program** — funding, mentorship, and templates to grow third-party apps
+100.    **Ecosystem incubator program** — funding, mentorship, and templates to grow third-party apps
 
 ## Prioritization Strategy
 
 ### Phase 1: Foundation (Items 1-10, 21-30)
-- Kernel stability and LTS adoption
-- Package manager implementation
-- Installer and bootloader
-- Reproducible build system
+
+*   Kernel stability and LTS adoption
+*   Package manager implementation
+*   Installer and bootloader
+*   Reproducible build system
 
 ### Phase 2: Core Infrastructure (Items 11-20, 31-40)
-- Kernel hardening and security
-- Package ecosystem
-- Build automation
-- Cross-compilation support
+
+*   Kernel hardening and security
+*   Package ecosystem
+*   Build automation
+*   Cross-compilation support
 
 ### Phase 3: User Experience (Items 41-50, 61-70)
-- Desktop environment
-- Accessibility tools
-- Security foundations
-- Privacy controls
+
+*   Desktop environment
+*   Accessibility tools
+*   Security foundations
+*   Privacy controls
 
 ### Phase 4: Advanced Features (Items 51-60, 71-80)
-- UI polish and optimization
-- Governance and compliance
-- Advanced security features
-- Privacy enhancements
+
+*   UI polish and optimization
+*   Governance and compliance
+*   Advanced security features
+*   Privacy enhancements
 
 ### Phase 5: AI & Automation (Items 81-90)
-- SigmaAI implementation
-- Automation engine
-- Developer platform
-- Observability stack
+
+*   SigmaAI implementation
+*   Automation engine
+*   Developer platform
+*   Observability stack
 
 ### Phase 6: Ecosystem (Items 91-100)
-- AI safety and marketplace
-- Education and incubation
-- Plugin ecosystem
-- Developer experience
+
+*   AI safety and marketplace
+*   Education and incubation
+*   Plugin ecosystem
+*   Developer experience
 
 ## Implementation Guidelines
 
 ### Documentation Requirements
-- For every technical task, add a corresponding .md in the repo
-- Update the Wiki immediately after completion
-- Include implementation status, dependencies, and testing instructions
+
+*   For every technical task, add a corresponding .md in the repo
+*   Update the Wiki immediately after completion
+*   Include implementation status, dependencies, and testing instructions
 
 ### Branch Policy
-- Consolidate work into main
-- Use feature branches locally
-- Enforce PR reviews and CI before merging
-- Maintain single main branch policy
+
+*   Consolidate work into main
+*   Use feature branches locally
+*   Enforce PR reviews and CI before merging
+*   Maintain single main branch policy
 
 ### Quality Standards
-- All implementations must be in Rust with no_std and C ABI compatibility
-- Reduce dependency on predefined functions and libraries
-- Follow Linux distro best practices from Arch, Ubuntu, Fedora, Gentoo, Kali, Debian
-- Prioritize performance, speed, capabilities, ease of use, features, functions, tools, UI, and UX
+
+*   All implementations must be in Rust with no\_std and C ABI compatibility
+*   Reduce dependency on predefined functions and libraries
+*   Follow Linux distro best practices from Arch, Ubuntu, Fedora, Gentoo, Kali, Debian
+*   Prioritize performance, speed, capabilities, ease of use, features, functions, tools, UI, and UX
 
 ## References
-- Arch Linux: https://wiki.archlinux.org/
-- Ubuntu: https://ubuntu.com/
-- Fedora: https://fedoraproject.org/
-- Gentoo: https://www.gentoo.org/
-- Kali Linux: https://www.kali.org/
-- Debian: https://www.debian.org/
+
+*   Arch Linux: https://wiki.archlinux.org/
+*   Ubuntu: https://ubuntu.com/
+*   Fedora: https://fedoraproject.org/
+*   Gentoo: https://www.gentoo.org/
+*   Kali Linux: https://www.kali.org/
+*   Debian: https://www.debian.org/

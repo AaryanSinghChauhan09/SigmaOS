@@ -11,11 +11,12 @@ SigmaOS implements a round-robin scheduler for CPU time management. This documen
 **Location**: `kernel/scheduler/round_robin_scheduler.rs`
 
 **Features**:
-- Fair time sharing among processes
-- Configurable time slice quantum
-- Task queue management
-- Context switching
-- RDTSC-based timestamps
+
+*   Fair time sharing among processes
+*   Configurable time slice quantum
+*   Task queue management
+*   Context switching
+*   RDTSC-based timestamps
 
 **Data Structures**:
 
@@ -84,48 +85,50 @@ pub unsafe fn sigma_sched_get_switches() -> u64;
 
 ### Round-Robin Algorithm
 
-1. **Initialization**: Create empty task queue
-2. **Add Task**: Add task to end of queue
-3. **Schedule Tick**:
-   - Decrement current task's time slice
-   - If time slice expired, schedule next task
-4. **Schedule Next**:
-   - Move current task to end of queue
-   - Get next task from head
-   - Switch context to new task
-5. **Yield**: Voluntarily give up CPU time
+1.  **Initialization**: Create empty task queue
+2.  **Add Task**: Add task to end of queue
+3.  **Schedule Tick**:
+    *   Decrement current task's time slice
+    *   If time slice expired, schedule next task
+4.  **Schedule Next**:
+    *   Move current task to end of queue
+    *   Get next task from head
+    *   Switch context to new task
+5.  **Yield**: Voluntarily give up CPU time
 
 ### Time Slice Management
 
-- **Default**: 10ms quantum
-- **Configurable**: Can be adjusted per system
-- **Per-Task**: Each task has its own time slice counter
+*   **Default**: 10ms quantum
+*   **Configurable**: Can be adjusted per system
+*   **Per-Task**: Each task has its own time slice counter
 
 ### Task States
 
-- **Running**: Task currently executing on CPU
-- **Ready**: Task waiting for CPU time
-- **Blocked**: Task waiting for I/O or resource
+*   **Running**: Task currently executing on CPU
+*   **Ready**: Task waiting for CPU time
+*   **Blocked**: Task waiting for I/O or resource
 
 ## Context Switching
 
 ### Context Save
 
 When switching away from a task:
-1. Save general-purpose registers
-2. Save stack pointer
-4. Save instruction pointer
-5. Save flags
-6. Save page table base (CR3)
+
+1.  Save general-purpose registers
+2.  Save stack pointer
+3.  Save instruction pointer
+4.  Save flags
+5.  Save page table base (CR3)
 
 ### Context Restore
 
 When switching to a task:
-1. Restore page table base (CR3)
-2. Restore flags
-3. Restore instruction pointer
-4. Restore stack pointer
-5. Restore general-purpose registers
+
+1.  Restore page table base (CR3)
+2.  Restore flags
+3.  Restore instruction pointer
+4.  Restore stack pointer
+5.  Restore general-purpose registers
 
 ### Switch Assembly
 
@@ -205,24 +208,27 @@ pub unsafe fn timer_interrupt_handler() {
 ### Static Priority
 
 Each task has a static priority level:
-- **0-31**: Real-time tasks
-- **32-63**: Interactive tasks
-- **64-95**: Normal tasks
-- **96-127**: Background tasks
+
+*   **0-31**: Real-time tasks
+*   **32-63**: Interactive tasks
+*   **64-95**: Normal tasks
+*   **96-127**: Background tasks
 
 ### Dynamic Priority
 
 Dynamic priority adjusts based on:
-- CPU usage
-- I/O wait time
-- Nice value
+
+*   CPU usage
+*   I/O wait time
+*   Nice value
 
 ### Priority Inheritance
 
 To prevent priority inversion:
-- High-priority task waiting on low-priority task
-- Temporarily boost low-priority task's priority
-- Restore priority after resource release
+
+*   High-priority task waiting on low-priority task
+*   Temporarily boost low-priority task's priority
+*   Restore priority after resource release
 
 ## Scheduler Statistics
 
@@ -245,36 +251,36 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 
 ### Planned Features
 
-1. **Multi-level feedback queue**: Better interactive performance
-2. **Real-time scheduler**: For real-time tasks
-3. **CPU affinity**: Bind tasks to specific CPUs
-4. **Load balancing**: Distribute tasks across CPUs
-5. **Power management**: CPU frequency scaling
+1.  **Multi-level feedback queue**: Better interactive performance
+2.  **Real-time scheduler**: For real-time tasks
+3.  **CPU affinity**: Bind tasks to specific CPUs
+4.  **Load balancing**: Distribute tasks across CPUs
+5.  **Power management**: CPU frequency scaling
 
 ### Research Areas
 
-1. **Predictive scheduling**: AI-based task placement
-2. **Energy-aware scheduling**: Minimize power consumption
-3. **Heterogeneous scheduling**: Big.LITTLE CPU support
-4. **Deadline scheduling**: Real-time deadline guarantees
+1.  **Predictive scheduling**: AI-based task placement
+2.  **Energy-aware scheduling**: Minimize power consumption
+3.  **Heterogeneous scheduling**: Big.LITTLE CPU support
+4.  **Deadline scheduling**: Real-time deadline guarantees
 
 ## Best Practices
 
 ### For Kernel Developers
 
-1. Keep critical sections short
-2. Avoid holding locks across context switches
-3. Use appropriate time slice values
-4. Consider priority when designing interfaces
-5. Test with various workloads
+1.  Keep critical sections short
+2.  Avoid holding locks across context switches
+3.  Use appropriate time slice values
+4.  Consider priority when designing interfaces
+5.  Test with various workloads
 
 ### For Userland Developers
 
-1. Use yield() when waiting for I/O
-2. Set appropriate priorities
-3. Avoid busy-wait loops
-4. Profile CPU usage
-5. Consider batch processing for CPU-intensive tasks
+1.  Use yield() when waiting for I/O
+2.  Set appropriate priorities
+3.  Avoid busy-wait loops
+4.  Profile CPU usage
+5.  Consider batch processing for CPU-intensive tasks
 
 ## Troubleshooting
 
@@ -283,33 +289,36 @@ pub unsafe fn print_stats(&mut self, buf: &mut [u8]) -> usize {
 **Symptoms**: Poor performance, high overhead
 
 **Solutions**:
-1. Increase time slice quantum
-2. Reduce number of tasks
-3. Check for busy-wait loops
-4. Profile scheduler behavior
+
+1.  Increase time slice quantum
+2.  Reduce number of tasks
+3.  Check for busy-wait loops
+4.  Profile scheduler behavior
 
 ### Starvation
 
 **Symptoms**: Task never gets CPU time
 
 **Solutions**:
-1. Check priority settings
-2. Verify task is not blocked
-3. Review scheduling algorithm
-4. Implement priority boosting
+
+1.  Check priority settings
+2.  Verify task is not blocked
+3.  Review scheduling algorithm
+4.  Implement priority boosting
 
 ### Latency Issues
 
 **Symptoms**: Poor interactive response
 
 **Solutions**:
-1. Reduce time slice for interactive tasks
-2. Implement priority boosting
-3. Use multi-level feedback queue
-4. Profile interrupt latency
+
+1.  Reduce time slice for interactive tasks
+2.  Implement priority boosting
+3.  Use multi-level feedback queue
+4.  Profile interrupt latency
 
 ## References
 
-- [Round-Robin Scheduling](https://en.wikipedia.org/wiki/Round-robin_scheduling)
-- [OSDev Scheduler](https://wiki.osdev.org/Scheduling_Algorithms)
-- [Linux CFS Scheduler](https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html)
+*   [Round-Robin Scheduling](https://en.wikipedia.org/wiki/Round-robin_scheduling)
+*   [OSDev Scheduler](https://wiki.osdev.org/Scheduling_Algorithms)
+*   [Linux CFS Scheduler](https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html)

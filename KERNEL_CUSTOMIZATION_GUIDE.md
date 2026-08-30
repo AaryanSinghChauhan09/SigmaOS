@@ -6,13 +6,13 @@ This guide provides comprehensive instructions for customizing the SigmaOS kerne
 
 ## Table of Contents
 
-1. [Kernel Configuration](#kernel-configuration)
-2. [Build Profiles](#build-profiles)
-3. [Memory Management Customization](#memory-management-customization)
-4. [Scheduler Tuning](#scheduler-tuning)
-5. [Device Driver Integration](#device-driver-integration)
-6. [Security Hardening](#security-hardening)
-7. [Performance Optimization](#performance-optimization)
+1.  [Kernel Configuration](#kernel-configuration)
+2.  [Build Profiles](#build-profiles)
+3.  [Memory Management Customization](#memory-management-customization)
+4.  [Scheduler Tuning](#scheduler-tuning)
+5.  [Device Driver Integration](#device-driver-integration)
+6.  [Security Hardening](#security-hardening)
+7.  [Performance Optimization](#performance-optimization)
 
 ## Kernel Configuration
 
@@ -64,11 +64,11 @@ cargo build --features "rtos,preempt_rt"
 
 ### Available Profiles
 
-1. **Standalone**: Full desktop environment
-2. **RTOS**: Hard real-time capabilities
-3. **Cloud**: Headless cloud deployment
-4. **Browser**: WASM bundle for web deployment
-5. **Embedded**: Minimal footprint for embedded systems
+1.  **Standalone**: Full desktop environment
+2.  **RTOS**: Hard real-time capabilities
+3.  **Cloud**: Headless cloud deployment
+4.  **Browser**: WASM bundle for web deployment
+5.  **Embedded**: Minimal footprint for embedded systems
 
 ### Custom Profile Creation
 
@@ -91,6 +91,7 @@ stack_size = "8MB"
 ```
 
 Build with custom profile:
+
 ```bash
 make PROFILE=custom all
 ```
@@ -196,7 +197,7 @@ pub struct RtSchedulerConfig {
 
 ### Custom Driver Development
 
-1. **Implement the Device trait**:
+1.  **Implement the Device trait**:
 
 ```rust
 use sigmaos::device::{Device, DeviceClass, DeviceError};
@@ -234,7 +235,7 @@ impl Device for MyCustomDevice {
 }
 ```
 
-2. **Register with Device Manager**:
+2.  **Register with Device Manager**:
 
 ```rust
 use sigmaos::device::{DeviceManager, SimpleDeviceManager};
@@ -421,38 +422,38 @@ make PROFILE=custom deploy-image
 
 ### Common Issues
 
-1. **Memory Allocation Failures**
-   - Check pool sizes in configuration
-   - Verify memory map for target hardware
-   - Enable memory debugging in kernel config
+1.  **Memory Allocation Failures**
+    *   Check pool sizes in configuration
+    *   Verify memory map for target hardware
+    *   Enable memory debugging in kernel config
 
-2. **Scheduler Performance Issues**
-   - Profile scheduler performance
-   - Adjust time slice and priority levels
-   - Consider workload-specific scheduler configuration
+2.  **Scheduler Performance Issues**
+    *   Profile scheduler performance
+    *   Adjust time slice and priority levels
+    *   Consider workload-specific scheduler configuration
 
-3. **Driver Initialization Failures**
-   - Check device detection and registration
-   - Verify interrupt handling configuration
-   - Test driver in isolation before integration
+3.  **Driver Initialization Failures**
+    *   Check device detection and registration
+    *   Verify interrupt handling configuration
+    *   Test driver in isolation before integration
 
 ## Additional Resources
 
-- [SigmaOS Architecture Guide](ARCHITECTURE.md)
-- [Device Driver Development Guide](DEVICE_DRIVER_GUIDE.md)
-- [Security Hardening Guide](SECURITY_HARDENING_GUIDE.md)
-- [Performance Tuning Guide](PERFORMANCE_TUNING_GUIDE.md)
-- [API Reference](API_REFERENCE.md)
+*   [SigmaOS Architecture Guide](ARCHITECTURE)
+*   [Device Driver Development Guide](DEVICE_DRIVER_GUIDE)
+*   [Security Hardening Guide](SECURITY_HARDENING_GUIDE)
+*   [Performance Tuning Guide](PERFORMANCE_TUNING_GUIDE)
+*   [API Reference](API_REFERENCE)
 
 ## Contributing
 
 When contributing kernel customizations:
 
-1. Document configuration options thoroughly
-2. Provide example configurations for common use cases
-3. Include performance benchmarks
-4. Add test cases for custom functionality
-5. Update relevant documentation
+1.  Document configuration options thoroughly
+2.  Provide example configurations for common use cases
+3.  Include performance benchmarks
+4.  Add test cases for custom functionality
+5.  Update relevant documentation
 
 ## License
 

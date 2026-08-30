@@ -13,7 +13,7 @@ This guide provides comprehensive instructions for eliminating dependency on Rus
 | Security modules | 0 std calls ✅ | 0 | ✅ Complete |
 | Network stack | 0 std calls ✅ | 0 | ✅ Complete |
 | Package manager (sigpkg) | 0 std calls ✅ | 0 | ✅ Complete |
-| Shell (sigma_sh) | 0 std calls ✅ | 0 | ✅ Complete |
+| Shell (sigma\_sh) | 0 std calls ✅ | 0 | ✅ Complete |
 | Userland tools | 0 std calls ✅ | < 5 (allow for I/O) | ✅ Complete |
 
 ## Klib Architecture
@@ -22,15 +22,15 @@ SigmaOS uses a custom kernel library (klib) to replace std functionality:
 
 ### Available Klib Modules
 
-1. **`src/klib/env.rs`** - Environment variable access
-2. **`src/klib/fs.rs`** - File system operations
-3. **`src/klib/io.rs`** - Enhanced I/O traits
-4. **`src/klib/process.rs`** - Process management
-5. **`src/klib/thread.rs`** - Thread management
-6. **`src/klib/sync.rs`** - Synchronization primitives
-7. **`src/klib/vec.rs`** - Vector operations
-8. **`src/klib/hashmap.rs`** - HashMap operations
-9. **`src/klib/string.rs`** - String operations
+1.  **`src/klib/env.rs`** - Environment variable access
+2.  **`src/klib/fs.rs`** - File system operations
+3.  **`src/klib/io.rs`** - Enhanced I/O traits
+4.  **`src/klib/process.rs`** - Process management
+5.  **`src/klib/thread.rs`** - Thread management
+6.  **`src/klib/sync.rs`** - Synchronization primitives
+7.  **`src/klib/vec.rs`** - Vector operations
+8.  **`src/klib/hashmap.rs`** - HashMap operations
+9.  **`src/klib/string.rs`** - String operations
 
 ## Usage Examples
 
@@ -170,11 +170,11 @@ cargo check --target x86_64-unknown-none --no-default-features
 
 ## Best Practices
 
-1. **Use klib consistently**: Always prefer klib over std
-2. **Error handling**: Use klib's error types instead of std::error
-3. **Memory management**: Use klib's allocators instead of std::alloc
-4. **Testing**: Test with no_std target regularly
-5. **Documentation**: Document klib usage clearly
+1.  **Use klib consistently**: Always prefer klib over std
+2.  **Error handling**: Use klib's error types instead of std::error
+3.  **Memory management**: Use klib's allocators instead of std::alloc
+4.  **Testing**: Test with no\_std target regularly
+5.  **Documentation**: Document klib usage clearly
 
 ## Troubleshooting
 
@@ -182,41 +182,41 @@ cargo check --target x86_64-unknown-none --no-default-features
 
 If you encounter compilation errors:
 
-1. Check for hidden std dependencies
-2. Verify all trait implementations use klib
-3. Ensure no conditional std imports remain
-4. Review external crate dependencies
+1.  Check for hidden std dependencies
+2.  Verify all trait implementations use klib
+3.  Ensure no conditional std imports remain
+4.  Review external crate dependencies
 
 ### Performance Issues
 
 If performance degrades:
 
-1. Profile the klib implementation
-2. Optimize critical paths
-3. Consider custom allocators
-4. Benchmark against std alternatives
+1.  Profile the klib implementation
+2.  Optimize critical paths
+3.  Consider custom allocators
+4.  Benchmark against std alternatives
 
 ## Contributing
 
 When adding new klib functionality:
 
-1. Follow existing klib patterns
-2. Provide comprehensive tests
-3. Document the API clearly
-4. Consider no_std constraints
-5. Maintain compatibility
+1.  Follow existing klib patterns
+2.  Provide comprehensive tests
+3.  Document the API clearly
+4.  Consider no\_std constraints
+5.  Maintain compatibility
 
 ## Resources
 
-- [Std Elimination Implementation](STD_ELIMINATION_IMPLEMENTATION.md)
-- [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE.md)
-- [Klib Source Code](src/klib/)
-- [No_std Rust Book](https://rust-embedded.github.io/book/intro/no-std.html)
+*   [Std Elimination Implementation](STD_ELIMINATION_IMPLEMENTATION)
+*   [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE)
+*   [Klib Source Code](src/klib/)
+*   [No\_std Rust Book](https://rust-embedded.github.io/book/intro/no-std.html)
 
 ## Status
 
 ✅ **Complete** - All core components have been migrated to klib with zero std dependencies as of August 21, 2026
 
----
+***
 
 *Last updated: August 21, 2026*
