@@ -3689,6 +3689,23 @@ impl FreeBsdJail {
         }
         false
     }
+
+    /// Recursively check if this jail is a descendant of target_parent_id using a hierarchy map
+    pub fn is_descendant_in_hierarchy(&self, target_parent_id: u32, hierarchy: &[FreeBsdJail]) -> bool {
+        let mut curr_parent = self.parent_id;
+        let mut depth = 0;
+        while let Some(pid) = curr_parent {
+            if pid == target_parent_id {
+                return true;
+            }
+            depth += 1;
+            if depth > 64 {
+                break; // Prevent infinite loop on cycle
+            }
+            curr_parent = hierarchy.iter().find(|j| j.id == pid).and_then(|j| j.parent_id);
+        }
+        false
+    }
 }
 
 /// NixOS inspired Declarative package management

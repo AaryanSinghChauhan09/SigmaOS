@@ -30,6 +30,7 @@ pub struct ArchPacmanPackage {
     pub packager: String,
     pub build_date: String,
     pub install_date: String,
+    pub is_explicit: bool,
 }
 
 /// Pacman database manager
@@ -141,6 +142,23 @@ impl PacmanDatabase {
     fn is_installed(&self, package_name: &str) -> bool {
         self.local_packages.iter().any(|p| p.name == package_name)
     }
+
+    /// Remove orphan packages (installed as dependencies, but no longer required by any installed package: pacman -Qtdq)
+    pub fn remove_orphans(&mut self) -> usize {
+        let mut required_deps = Vec::new();
+        for pkg in &self.local_packages {
+            for dep in &pkg.depends {
+                if !required_deps.contains(dep) {
+                    required_deps.push(dep.clone());
+                }
+            }
+        }
+
+        let initial_count = self.local_packages.len();
+        // Retain explicitly installed packages OR packages that are required as dependencies
+        self.local_packages.retain(|p| p.is_explicit || required_deps.contains(&p.name));
+        initial_count - self.local_packages.len()
+    }
 }
 
 /// Arch Build System (ABS) compatibility
@@ -222,6 +240,11 @@ impl AURHelper {
     /// Get AUR package information
     pub fn get_aur_package(&self, package_name: &str) -> Option<&ArchPacmanPackage> {
         self.aur_packages.iter().find(|p| p.name == package_name)
+    }
+
+    /// Register a package into the local AUR cache
+    pub fn register_aur_package(&mut self, pkg: ArchPacmanPackage) {
+        self.aur_packages.push(pkg);
     }
 
     /// Install AUR package
@@ -334,7 +357,7 @@ depends=('glibc')
 
     #[test]
     fn test_aur_helper_search() {
-        let aur = AURHelper::new();
+        let mut aur = AURHelper::new();
         let test_pkg = ArchPacmanPackage {
             name: "aur-test".to_string(),
             version: "1.0.0".to_string(),
@@ -361,5 +384,86 @@ depends=('glibc')
         let results = aur.search_aur("test");
         // Since aur_packages is empty, this should return empty
         assert!(results.is_empty());
+    }
+
+    #[test]
+    fn test_arch_pacman_orphan_removal() {
+        let mut db = PacmanDatabase::new();
+        let app_pkg = ArchPacmanPackage {
+            name: "app".to_string(),
+            version: "1.0".to_string(),
+            description: "App".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: vec!["libdep".to_string()],
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 100,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: true,
+        };
+        let lib_pkg = ArchPacmanPackage {
+            name: "libdep".to_string(),
+            version: "1.0".to_string(),
+            description: "Lib dep".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 50,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: false,
+        };
+        let orphan_pkg = ArchPacmanPackage {
+            name: "orphan".to_string(),
+            version: "1.0".to_string(),
+            description: "Orphan".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 10,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: false,
+        };
+
+        db.local_packages.push(app_pkg);
+        db.local_packages.push(lib_pkg);
+        db.local_packages.push(orphan_pkg);
+
+        let removed = db.remove_orphans();
+        assert_eq!(removed, 1); // Only 'orphan' removed (is_explicit: false & not in depends)
+        assert_eq!(db.local_packages.len(), 2);
+        assert!(db.local_packages.iter().any(|p| p.name == "app"));
+        assert!(db.local_packages.iter().any(|p| p.name == "libdep"));
     }
 }

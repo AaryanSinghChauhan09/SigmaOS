@@ -90,8 +90,12 @@ impl PackageFormat {
             Some(PackageFormat::Ebuild)
         } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
+        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
             Some(PackageFormat::Xz)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".cachy") {
+            Some(PackageFormat::Pacman)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
         } else if name.ends_with(".hap") {
@@ -861,6 +865,10 @@ impl UniversalPackageManager {
         self.packages.insert(package.name.clone(), package);
     }
 
+    pub fn registered_adapter_count(&self) -> usize {
+        self.adapters.len()
+    }
+
     pub fn create_checkpoint(&mut self) -> usize {
         self.transaction_history
             .create_checkpoint(&self.installed_packages)
@@ -1361,5 +1369,18 @@ mod tests {
         let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_package_format_from_filename_extensions() {
+        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
+        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+    }
+
+    #[test]
+    fn test_universal_package_manager_adapter_count() {
+        let manager = UniversalPackageManager::new();
+        assert!(manager.registered_adapter_count() >= 20);
     }
 }
