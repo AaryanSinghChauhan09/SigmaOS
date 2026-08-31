@@ -1319,4 +1319,44 @@ mod tests {
         assert_eq!(result.package_name, "wget");
         assert_eq!(result.resolved_dependencies.len(), 2);
     }
+
+    #[test]
+    fn test_sigpkg_cli_universal_install_and_convert() {
+        let adapter = UniversalPackageAdapter::new();
+        let mapper = UniversalDependencyMapper::new();
+
+        // 1. Test parsing and dependency mapping for APT (.deb)
+        let deb_manifest = "Package: nginx\nVersion: 1.24.0\nDepends: libssl-dev, zlib1g-dev\nDescription: Web server\n";
+        let deb_pkg = adapter.parse_and_translate_manifest("nginx.deb", deb_manifest).unwrap();
+        assert_eq!(deb_pkg.name, "nginx");
+        assert_eq!(deb_pkg.version, Version::new(1, 24, 0));
+        assert_eq!(deb_pkg.dependencies.len(), 2);
+
+        // 2. Test parsing and dependency mapping for Pacman (PKGBUILD)
+        let pkgbuild_manifest = "pkgname=htop\npkgver=3.2.1\ndepends=('ncurses' 'libnl')\n";
+        let pacman_pkg = adapter.parse_and_translate_manifest("PKGBUILD", pkgbuild_manifest).unwrap();
+        assert_eq!(pacman_pkg.name, "htop");
+        assert_eq!(pacman_pkg.version, Version::new(3, 2, 1));
+        assert_eq!(pacman_pkg.dependencies[0].name, "ncurses");
+
+        // 3. Test parsing and dependency mapping for RPM (.spec)
+        let rpm_spec = "Name: ripgrep\nVersion: 14.1.0\nSummary: Fast grep\nRequires: libc6, openssl-devel\n";
+        let rpm_pkg = adapter.parse_and_translate_manifest("ripgrep.spec", rpm_spec).unwrap();
+        assert_eq!(rpm_pkg.name, "ripgrep");
+        assert_eq!(rpm_pkg.version, Version::new(14, 1, 0));
+
+        // 4. Test mapper canonical translation across distro package names
+        assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
+        assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
+        assert_eq!(mapper.to_canonical_name("zlib1g-dev"), "zlib");
+        assert_eq!(mapper.to_canonical_name("zlib-devel"), "zlib");
+
+        // 5. Test Dry Run simulation for foreign package conversion
+        let simulator = UniversalDryRunSimulator::new();
+        let result = simulator.simulate_install(PackageFormat::Apt, deb_manifest.as_bytes()).unwrap();
+        assert!(result.is_valid);
+        assert_eq!(result.package_name, "nginx");
+        assert!(result.resolved_dependencies.contains(&"openssl".to_string()));
+        assert!(result.resolved_dependencies.contains(&"zlib".to_string()));
+    }
 }
