@@ -594,7 +594,424 @@ impl SearchSwitcher {
 }
 
 // =========================================================================
-// 9. UNIFIED SIGMAWEB BROWSER SUITE
+// 9. CHROMIUM-INSPIRED V8/BLINK IPC & PARTITIONALLOC MEMORY ISOLATION
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PartitionType {
+    Main,
+    JsV8Heap,
+    NetworkBuffer,
+    CookieJarPartition,
+}
+
+#[derive(Debug, Clone)]
+pub struct PartitionAllocMemoryBlock {
+    pub partition_type: PartitionType,
+    pub site_origin: String,
+    pub size_bytes: usize,
+    pub token_hash: u64,
+}
+
+pub struct PartitionAllocEngine {
+    pub total_allocated_bytes: usize,
+    pub memory_quota_bytes: usize,
+    pub partitions: Vec<PartitionAllocMemoryBlock>,
+}
+
+impl PartitionAllocEngine {
+    pub fn new(quota_mb: usize) -> Self {
+        Self {
+            total_allocated_bytes: 0,
+            memory_quota_bytes: quota_mb * 1024 * 1024,
+            partitions: Vec::new(),
+        }
+    }
+
+    pub fn allocate_partition(
+        &mut self,
+        partition_type: PartitionType,
+        site_origin: &str,
+        size_bytes: usize,
+    ) -> Result<u64, &'static str> {
+        if self.total_allocated_bytes + size_bytes > self.memory_quota_bytes {
+            return Err("PartitionAlloc: Quota exceeded");
+        }
+
+        let token_hash = (size_bytes as u64) ^ 0x9E37_79B9_7F4A_7C15 ^ (self.partitions.len() as u64);
+        self.partitions.push(PartitionAllocMemoryBlock {
+            partition_type,
+            site_origin: site_origin.to_string(),
+            size_bytes,
+            token_hash,
+        });
+
+        self.total_allocated_bytes += size_bytes;
+        Ok(token_hash)
+    }
+
+    pub fn deallocate_partition(&mut self, token_hash: u64) -> bool {
+        if let Some(pos) = self.partitions.iter().position(|p| p.token_hash == token_hash) {
+            let block = self.partitions.remove(pos);
+            self.total_allocated_bytes = self.total_allocated_bytes.saturating_sub(block.size_bytes);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChromiumIpcMessage {
+    pub id: u64,
+    pub sender_pid: u32,
+    pub target_pid: u32,
+    pub payload: String,
+    pub capability_token: u64,
+}
+
+pub struct ChromiumIpcChannelEngine {
+    pub message_queue: Vec<ChromiumIpcMessage>,
+    pub next_msg_id: u64,
+}
+
+impl ChromiumIpcChannelEngine {
+    pub fn new() -> Self {
+        Self {
+            message_queue: Vec::new(),
+            next_msg_id: 1,
+        }
+    }
+
+    pub fn send_message(
+        &mut self,
+        sender_pid: u32,
+        target_pid: u32,
+        payload: &str,
+        cap_token: u64,
+    ) -> u64 {
+        let msg_id = self.next_msg_id;
+        self.next_msg_id += 1;
+
+        self.message_queue.push(ChromiumIpcMessage {
+            id: msg_id,
+            sender_pid,
+            target_pid,
+            payload: payload.to_string(),
+            capability_token: cap_token,
+        });
+
+        msg_id
+    }
+
+    pub fn receive_messages_for_pid(&mut self, target_pid: u32) -> Vec<ChromiumIpcMessage> {
+        let mut matched = Vec::new();
+        let mut i = 0;
+        while i < self.message_queue.len() {
+            if self.message_queue[i].target_pid == target_pid {
+                matched.push(self.message_queue.remove(i));
+            } else {
+                i += 1;
+            }
+        }
+        matched
+    }
+}
+
+impl Default for ChromiumIpcChannelEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. FIREFOX GECKOVIEW & QUANTUM CSS PARALLEL LAYOUT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CssBoxModel {
+    pub width: f32,
+    pub height: f32,
+    pub margin: (f32, f32, f32, f32),  // top, right, bottom, left
+    pub padding: (f32, f32, f32, f32), // top, right, bottom, left
+}
+
+#[derive(Debug, Clone)]
+pub struct LayoutGeometry {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+}
+
+#[derive(Debug, Clone)]
+pub enum RenderDisplayItem {
+    Rectangle { geom: LayoutGeometry, color_rgba: (u8, u8, u8, u8) },
+    Text { geom: LayoutGeometry, text: String, font_size: f32 },
+    Image { geom: LayoutGeometry, src_url: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct DisplayList {
+    pub items: Vec<RenderDisplayItem>,
+}
+
+pub struct QuantumStyleEngine;
+
+impl QuantumStyleEngine {
+    /// Computes box geometry and builds WebRender display list items for HTML/CSS nodes
+    pub fn compute_layout_and_display_list(
+        tag: &str,
+        style_rules: &[(&str, &str)],
+        content: &str,
+        viewport_width: f32,
+    ) -> DisplayList {
+        let mut items = Vec::new();
+
+        let mut width = viewport_width;
+        let mut height = 40.0f32;
+        let mut bg_color = (255u8, 255u8, 255u8, 255u8);
+        let mut font_size = 16.0f32;
+
+        for &(prop, val) in style_rules {
+            match prop {
+                "width" => {
+                    if val.ends_with("px") {
+                        width = val[..val.len() - 2].parse::<f32>().unwrap_or(width);
+                    }
+                }
+                "height" => {
+                    if val.ends_with("px") {
+                        height = val[..val.len() - 2].parse::<f32>().unwrap_or(height);
+                    }
+                }
+                "background-color" => {
+                    if val == "blue" {
+                        bg_color = (0, 0, 255, 255);
+                    } else if val == "red" {
+                        bg_color = (255, 0, 0, 255);
+                    } else if val == "dark" {
+                        bg_color = (30, 30, 30, 255);
+                    }
+                }
+                "font-size" => {
+                    if val.ends_with("px") {
+                        font_size = val[..val.len() - 2].parse::<f32>().unwrap_or(font_size);
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        let rect_geom = LayoutGeometry { x: 0.0, y: 0.0, width, height };
+        items.push(RenderDisplayItem::Rectangle { geom: rect_geom, color_rgba: bg_color });
+
+        if !content.is_empty() {
+            let text_geom = LayoutGeometry { x: 10.0, y: 10.0, width: width - 20.0, height: height - 20.0 };
+            items.push(RenderDisplayItem::Text { geom: text_geom, text: content.to_string(), font_size });
+        }
+
+        DisplayList { items }
+    }
+}
+
+// =========================================================================
+// 11. LIBREWOLF & WATERFOX ADVANCED UBLOCK ORIGIN FILTER ENGINE
+// =========================================================================
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum uBlockFilterOption {
+    ThirdParty,
+    Script,
+    Image,
+    XmlHttpRequest,
+    Subdocument,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone)]
+pub struct uBlockFilterRule {
+    pub pattern: String,
+    pub is_exception: bool, // @@ exception rule
+    pub target_domains: Vec<String>,
+    pub options: Vec<uBlockFilterOption>,
+}
+
+#[allow(non_camel_case_types)]
+pub struct uBlockOriginFilterEngine {
+    pub network_rules: Vec<uBlockFilterRule>,
+    pub cosmetic_element_rules: Vec<String>,
+}
+
+impl uBlockOriginFilterEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            network_rules: Vec::new(),
+            cosmetic_element_rules: Vec::new(),
+        };
+
+        // Seed default uBlock Origin / EasyList filters
+        engine.add_rule("||doubleclick.net^", false, vec![], vec![uBlockFilterOption::ThirdParty]);
+        engine.add_rule("||google-analytics.com/analytics.js", false, vec![], vec![uBlockFilterOption::Script]);
+        engine.add_cosmetic_rule("##.ad-wrapper");
+        engine.add_cosmetic_rule("##.sponsor-banner");
+
+        engine
+    }
+
+    pub fn add_rule(
+        &mut self,
+        pattern: &str,
+        is_exception: bool,
+        domains: Vec<String>,
+        options: Vec<uBlockFilterOption>,
+    ) {
+        let clean_pat = pattern.trim_start_matches("||").trim_end_matches('^');
+        self.network_rules.push(uBlockFilterRule {
+            pattern: clean_pat.to_string(),
+            is_exception,
+            target_domains: domains,
+            options,
+        });
+    }
+
+    pub fn add_cosmetic_rule(&mut self, selector: &str) {
+        self.cosmetic_element_rules.push(selector.to_string());
+    }
+
+    pub fn should_block_request(
+        &self,
+        request_url: &str,
+        is_third_party: bool,
+        resource_option: uBlockFilterOption,
+    ) -> bool {
+        // 1. Check exceptions (whitelist) first
+        for rule in &self.network_rules {
+            if rule.is_exception && request_url.contains(&rule.pattern) {
+                return false;
+            }
+        }
+
+        // 2. Check block rules
+        for rule in &self.network_rules {
+            if !rule.is_exception && request_url.contains(&rule.pattern) {
+                if rule.options.contains(&uBlockFilterOption::ThirdParty) && !is_third_party {
+                    continue;
+                }
+                if !rule.options.is_empty() && !rule.options.contains(&resource_option) && !rule.options.contains(&uBlockFilterOption::ThirdParty) {
+                    continue;
+                }
+                return true;
+            }
+        }
+
+        false
+    }
+}
+
+impl Default for uBlockOriginFilterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. ZEN BROWSER VERTICAL TAB TREE & SPLIT SCREEN WORKSPACE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct TabTreeNode {
+    pub id: u64,
+    pub parent_id: Option<u64>,
+    pub title: String,
+    pub url: String,
+    pub is_collapsed: bool,
+    pub depth: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SplitScreenMode {
+    Single,
+    DualSideBySide,
+    QuadGrid,
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkspaceGroup {
+    pub id: u64,
+    pub name: String,
+    pub tab_nodes: Vec<TabTreeNode>,
+    pub split_mode: SplitScreenMode,
+}
+
+pub struct ZenWorkspaceTreeEngine {
+    pub workspaces: Vec<WorkspaceGroup>,
+    pub active_workspace_id: u64,
+    pub next_node_id: u64,
+}
+
+impl ZenWorkspaceTreeEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            workspaces: Vec::new(),
+            active_workspace_id: 1,
+            next_node_id: 1,
+        };
+
+        engine.workspaces.push(WorkspaceGroup {
+            id: 1,
+            name: "Main Workspace".to_string(),
+            tab_nodes: Vec::new(),
+            split_mode: SplitScreenMode::Single,
+        });
+
+        engine
+    }
+
+    pub fn add_tab_node(&mut self, parent_id: Option<u64>, title: &str, url: &str) -> u64 {
+        let node_id = self.next_node_id;
+        self.next_node_id += 1;
+
+        let depth = if let Some(pid) = parent_id {
+            if let Some(ws) = self.workspaces.iter().find(|w| w.id == self.active_workspace_id) {
+                ws.tab_nodes.iter().find(|n| n.id == pid).map(|n| n.depth + 1).unwrap_or(0)
+            } else {
+                0
+            }
+        } else {
+            0
+        };
+
+        if let Some(ws) = self.workspaces.iter_mut().find(|w| w.id == self.active_workspace_id) {
+            ws.tab_nodes.push(TabTreeNode {
+                id: node_id,
+                parent_id,
+                title: title.to_string(),
+                url: url.to_string(),
+                is_collapsed: false,
+                depth,
+            });
+        }
+
+        node_id
+    }
+
+    pub fn set_split_screen_mode(&mut self, mode: SplitScreenMode) {
+        if let Some(ws) = self.workspaces.iter_mut().find(|w| w.id == self.active_workspace_id) {
+            ws.split_mode = mode;
+        }
+    }
+}
+
+impl Default for ZenWorkspaceTreeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -605,6 +1022,11 @@ pub struct SigmaWebBrowser {
     pub tor_manager: TorCircuitManager,
     pub gpc: GlobalPrivacyControl,
     pub memory_optimizer: TabMemoryOptimizer,
+    pub ipc_engine: ChromiumIpcChannelEngine,
+    pub partition_alloc: PartitionAllocEngine,
+    pub quantum_style: QuantumStyleEngine,
+    pub ublock_engine: uBlockOriginFilterEngine,
+    pub zen_workspace: ZenWorkspaceTreeEngine,
 }
 
 impl SigmaWebBrowser {
@@ -618,6 +1040,11 @@ impl SigmaWebBrowser {
             tor_manager: TorCircuitManager::new(),
             gpc: GlobalPrivacyControl::new(),
             memory_optimizer: TabMemoryOptimizer::new(4096),
+            ipc_engine: ChromiumIpcChannelEngine::new(),
+            partition_alloc: PartitionAllocEngine::new(1024),
+            quantum_style: QuantumStyleEngine,
+            ublock_engine: uBlockOriginFilterEngine::new(),
+            zen_workspace: ZenWorkspaceTreeEngine::new(),
         }
     }
 
@@ -647,6 +1074,7 @@ impl SigmaWebBrowser {
         // 4. Check if uncloaked domain is a blocked ad or telemetry target
         if self.stripper.should_block_telemetry(&uncloaked)
             || !self.engine.navigate_url(&uncloaked)
+            || self.ublock_engine.should_block_request(&uncloaked, true, uBlockFilterOption::Script)
         {
             return Err("Navigation Blocked: Ad/Telemetry Target Detected");
         }
@@ -819,5 +1247,64 @@ mod tests {
         // Test CNAME uncloaked ad target detection and block
         let blocked_nav = sigma_web.navigate_protected("http://metrics.example.com/collect?fbclid=123");
         assert!(blocked_nav.is_err());
+    }
+
+    #[test]
+    fn test_chromium_ipc_and_partition_alloc() {
+        let mut partition_alloc = PartitionAllocEngine::new(512);
+        let token = partition_alloc
+            .allocate_partition(PartitionType::JsV8Heap, "https://example.com", 1024 * 1024)
+            .unwrap();
+        assert_eq!(partition_alloc.total_allocated_bytes, 1024 * 1024);
+        assert!(partition_alloc.deallocate_partition(token));
+        assert_eq!(partition_alloc.total_allocated_bytes, 0);
+
+        let mut ipc = ChromiumIpcChannelEngine::new();
+        let msg_id = ipc.send_message(10, 20, "RENDER_FRAME", 0x1234);
+        assert_eq!(msg_id, 1);
+        let msgs = ipc.receive_messages_for_pid(20);
+        assert_eq!(msgs.len(), 1);
+        assert_eq!(msgs[0].payload, "RENDER_FRAME");
+    }
+
+    #[test]
+    fn test_quantum_style_engine() {
+        let display_list = QuantumStyleEngine::compute_layout_and_display_list(
+            "div",
+            &[("width", "800px"), ("height", "100px"), ("background-color", "blue")],
+            "Hello Quantum",
+            1280.0,
+        );
+        assert_eq!(display_list.items.len(), 2);
+    }
+
+    #[test]
+    fn test_ublock_origin_filter_engine() {
+        let ublock = uBlockOriginFilterEngine::new();
+        assert!(ublock.should_block_request(
+            "https://doubleclick.net/ad.js",
+            true,
+            uBlockFilterOption::Script
+        ));
+        assert!(!ublock.should_block_request(
+            "https://example.com/main.js",
+            false,
+            uBlockFilterOption::Script
+        ));
+        assert_eq!(ublock.cosmetic_element_rules.len(), 2);
+    }
+
+    #[test]
+    fn test_zen_workspace_tree_engine() {
+        let mut zen = ZenWorkspaceTreeEngine::new();
+        let root_id = zen.add_tab_node(None, "Docs", "https://docs.rs");
+        let child_id = zen.add_tab_node(Some(root_id), "SubDoc", "https://docs.rs/sub");
+
+        let ws = &zen.workspaces[0];
+        assert_eq!(ws.tab_nodes.len(), 2);
+        assert_eq!(ws.tab_nodes[1].depth, 1);
+
+        zen.set_split_screen_mode(SplitScreenMode::DualSideBySide);
+        assert_eq!(zen.workspaces[0].split_mode, SplitScreenMode::DualSideBySide);
     }
 }
