@@ -372,7 +372,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,

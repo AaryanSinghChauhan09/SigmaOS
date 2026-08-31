@@ -59,7 +59,7 @@ impl QuantizedMatrix {
         let mut zero_points = Vec::new();
 
         match target_dtype {
-            TensorDtype::Int8 => {
+            TensorDtype::INT8 => {
                 // Per-row symmetric INT8 quantization
                 for r in 0..rows {
                     let row_slice = &weights[r * cols..(r + 1) * cols];
@@ -74,7 +74,7 @@ impl QuantizedMatrix {
                     }
                 }
             }
-            TensorDtype::Int4 => {
+            TensorDtype::INT4 => {
                 // Pack two 4-bit elements per byte
                 for r in 0..rows {
                     let row_slice = &weights[r * cols..(r + 1) * cols];
@@ -95,7 +95,7 @@ impl QuantizedMatrix {
                     }
                 }
             }
-            TensorDtype::Fp16 | TensorDtype::Bf16 => {
+            TensorDtype::FP16 | TensorDtype::BF16 => {
                 // Simulated FP16 conversion (2 bytes per weight)
                 for &w in weights {
                     let bytes = (w as f32).to_le_bytes();
@@ -105,7 +105,7 @@ impl QuantizedMatrix {
                 scales.push(1.0);
                 zero_points.push(0);
             }
-            TensorDtype::Fp32 => {
+            TensorDtype::FP32 => {
                 for &w in weights {
                     quantized_data.extend_from_slice(&w.to_le_bytes());
                 }
@@ -124,7 +124,7 @@ impl QuantizedMatrix {
 
         Ok(Self {
             name: name.to_string(),
-            original_dtype: TensorDtype::Fp32,
+            original_dtype: TensorDtype::FP32,
             target_dtype,
             rows,
             cols,
@@ -187,7 +187,7 @@ impl AiExecutionDispatcher {
                     self.fallback_count += 1;
                     DeviceFallbackRoute {
                         primary_device: requested,
-                        active_device: ComputeDeviceTarget::CpuSimd,
+                        active_device: ComputeDeviceTarget::CPU_SIMD,
                         is_fallback_active: true,
                         fallback_reason:
                             "Discrete GPU and NPU unavailable, falling back to CPU SIMD/AVX-512"
@@ -207,7 +207,7 @@ impl AiExecutionDispatcher {
                     self.fallback_count += 1;
                     DeviceFallbackRoute {
                         primary_device: requested,
-                        active_device: ComputeDeviceTarget::CpuSimd,
+                        active_device: ComputeDeviceTarget::CPU_SIMD,
                         is_fallback_active: true,
                         fallback_reason:
                             "Integrated NPU unavailable, falling back to CPU SIMD/AVX-512"
@@ -215,9 +215,9 @@ impl AiExecutionDispatcher {
                     }
                 }
             }
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => DeviceFallbackRoute {
+            _ => DeviceFallbackRoute {
                 primary_device: requested,
-                active_device: ComputeDeviceTarget::CpuSimd,
+                active_device: ComputeDeviceTarget::CPU_SIMD,
                 is_fallback_active: false,
                 fallback_reason: String::new(),
             },
@@ -234,7 +234,8 @@ impl AiExecutionDispatcher {
         let exec_time_us = match route.active_device {
             ComputeDeviceTarget::DiscreteGpu => ops as u64 / 10_000,
             ComputeDeviceTarget::IntegratedNpu => ops as u64 / 5_000,
-            ComputeDeviceTarget::CpuSimd | ComputeDeviceTarget::AutoSelect => ops as u64 / 1_000,
+            ComputeDeviceTarget::CPU_SIMD | ComputeDeviceTarget::AutoSelect => ops as u64 / 1_000,
+            _ => ops as u64 / 1_000,
         };
 
         (ops, exec_time_us.max(1))

@@ -236,6 +236,10 @@ jobs:
     name: Performance Benchmarks
     needs: boot-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
     steps:
     - name: Checkout code
@@ -300,10 +304,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install cargo-audit
+      run: cargo install cargo-audit --locked
+
     - name: Run Rust security audit
-      uses: actions-rs/audit-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      run: cargo audit
 
     - name: Run static analysis
       run: |

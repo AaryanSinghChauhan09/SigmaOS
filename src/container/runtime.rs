@@ -220,7 +220,13 @@ pub struct SeccompProfile {
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        self.blocked_syscalls.contains(&syscall_id)
+        if self.blocked_syscalls.contains(&syscall_id) {
+            return true;
+        }
+        if self.hardened && syscall_id < 32 {
+            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
+        }
+        false
     }
 }
 
@@ -994,7 +1000,7 @@ mod tests {
             .create_container(
                 b"sovereign_container",
                 b"ubuntu-pqc",
-                RuntimeCapability::full(),
+                ContainerCapability::full(),
             )
             .unwrap();
         assert_eq!(id, 1);
@@ -1042,9 +1048,10 @@ mod tests {
             1,
             b"hardened_ct",
             b"alpine",
-            RuntimeCapability::full(),
+            ContainerCapability::full(),
         );
         container.seccomp = SeccompProfile {
+            blocked_syscalls: Vec::new(),
             hardened: true,
             blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
         };

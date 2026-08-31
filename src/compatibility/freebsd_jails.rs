@@ -144,11 +144,6 @@ impl SigmaJailManager {
             }
         }
 
-        if let Some(ref exec_stop_script) = exec_stop {
-            if let Some(jid) = jid {
-                let _ = self.execute_in_jail(jid, exec_stop_script);
-            }
-        }
 
         // Kill all processes in jail
         self.kill_jail_processes_by_pids(&processes)?;
@@ -451,6 +446,7 @@ impl SigmaJailManager {
         Ok(())
     }
 
+    #[allow(dead_code)]
     fn kill_jail_processes(&self, jail: &Jail) -> Result<(), Box<dyn std::error::Error>> {
         self.kill_jail_processes_by_pids(&jail.processes)
     }

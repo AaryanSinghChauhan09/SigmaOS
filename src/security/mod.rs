@@ -25,7 +25,7 @@ pub mod secrets;
 pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
-pub use sigma_unveil as unveil;
+pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
