@@ -3,8 +3,12 @@ pub mod compositor;
 pub mod video;
 pub mod video_editor;
 pub mod advanced_accel;
+pub mod nvidia_prime;
 
 pub use video::{PixelRgba, VideoFrame};
+pub use nvidia_prime::{
+    GpuPowerState, NvidiaPrimeEngine, NvidiaPrimeOffloadConfig, PrimeDmaBufShare, PrimeProfile,
+};
 
 pub use compositor::{
     BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
