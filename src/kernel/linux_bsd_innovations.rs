@@ -1,7 +1,7 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
