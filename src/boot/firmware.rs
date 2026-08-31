@@ -1,5 +1,6 @@
 extern crate core;
 extern crate alloc;
+extern crate core;
 
 #[cfg(not(feature = "default"))]
 extern crate core;
