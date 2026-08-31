@@ -41,46 +41,81 @@ This document outlines the strategic engineering roadmap and gap analysis for br
 
 ---
 
-## 🧩 5. SigmaOS vs Linux/BSD Feature Matrix
+## 📊 5. SigmaOS Feature Scorecard
 
-| Feature Domain | Linux Inspiration | BSD Inspiration | SigmaOS Current State | Gap / Target Milestone |
-|---|---|---|---|---|
-| **Package Management** | Arch pacman, Nix reproducibility | BSD Ports (`pkgsrc`) | Universal package solver, 12 format adapters | Complete zero-dependency reproducible builds |
-| **Init Systems** | systemd, OpenRC | rc.d scripts | `SigmaInit` process supervision & runlevels | Unified declarative YAML service targets |
-| **Filesystem** | Btrfs snapshots, CoW | ZFS deduplication & datasets | Transactional CoW filesystem, CRC self-healing | Atomic snapshot rollbacks (`SovereignProfileManager`) |
-| **Security** | SELinux (MLS/MCS), AppArmor | Capsicum sandboxing, OpenBSD pledge | Capability tokens, `DynamicMacEnforcer`, pledge shims | Mandatory Access Control policy enforcement by default |
-| **Networking** | nftables, WireGuard | PF firewall, CARP failover | Composable network engine, iptables translator | Native WireGuard PQC tunnel & PF packet filtering |
-| **Virtualization** | KVM/QEMU, OCI containers | FreeBSD Jails, bhyve | Qubes-style `SovereignIsolationManager`, Jails | Native light hypervisor & container orchestration |
-| **Desktop/UX** | GNOME/KDE modularity | Lightweight Xfce, Haiku UX | Zenith compositor, Pantheon environment | Full tiling WM & adaptive accessibility overlays |
-| **Documentation** | Arch Wiki | FreeBSD Handbook | Comprehensive Markdown docs, offline Wiki | Unified SovereignOS Handbook & community wiki |
+| Feature | Dependency | Quarterly KPI | Status |
+|---|---|---|---|
+| Kernel Hybrid | Foundation for scheduler, FS, security | Boot stability ≥ 95% | 🔴 Pending |
+| Transactional FS | Requires kernel stability | Rollback success ≥ 99% | 🟠 In progress |
+| Adaptive Scheduler | Depends on kernel hybrid | Latency < 10ms | 🔴 Pending |
+| Visual Sandbox GUI | Needs FS + kernel hooks | Policy adoption ≥ 80% | 🟠 Prototype |
+| Unified Firewall Dashboard | Requires networking stack | Rule accuracy ≥ 99% | 🔴 Pending |
+| Native Containers | Needs scheduler + FS | Launch time < 2s | 🔴 Pending |
+| Zenith Overlays | Independent, but benefits from FS rollback | Stability ≥ 95% uptime | 🟠 Early design |
+| Compliance Handbook | Parallel to all features | Coverage ≥ 90% | 🟢 Drafting |
 
 ---
 
-## 🚀 6. Priority Adoption Roadmap Overlay
+## 📅 6. Roadmap Overlay & Development Timeline (Gantt-Style)
 
-1. **Core Stability**
-   - Implement ZFS/Btrfs-style snapshot rollbacks (`SovereignProfileManager`).
-   - Deliver 100% reproducible package builds via Nix-like declarative store (`BuildLedgerSystem`).
+### Phase 1 — Foundation (Quarter 1–2 / 0–6 months)
+- **Kernel Hybrid:** Begin modular microkernel experiments & scheduler/FS/security foundation.
+- **Transactional FS:** Implement rollback-safe file operations & prototype.
+- **Compliance Handbook:** Document core features and compliance handbook baseline in publisher-grade style.
+- **KPIs:**
+  - Boot stability ≥ 95% success rate
+  - FS rollback tested on 100+ scenarios
+  - Handbook coverage ≥ 70% of core modules
 
-2. **Security & Networking**
-   - Integrate Capsicum capability sandboxing + SELinux profiles (`DynamicMacEnforcer`).
-   - Build unified stateful firewall engine (PF + nftables hybrid).
+### Phase 2 — Expansion (Quarter 3–4 / 6–12 months)
+- **Adaptive Scheduler:** Introduce workload-aware scheduling policies & latency tuning.
+- **Visual Sandboxing GUI:** Build GUI-driven security profiles & policy adoption.
+- **Unified Firewall Dashboard:** Integrate firewall + VPN orchestration & rule management.
+- **KPIs:**
+  - Scheduler latency < 10ms under stress
+  - Sandbox GUI adoption ≥ 80% of test users
+  - Firewall dashboard rules applied correctly ≥ 99%
 
-3. **Service Orchestration**
-   - Implement YAML-based adaptive init system (`SigmaInit`).
-   - Deploy event-driven automation (systemd timers + BSD rc.d triggers).
+### Phase 3 — Differentiation (Quarter 5–6 / 12–18 months)
+- **Native Containers:** Lightweight orchestration for dev workflows.
+- **Zenith Overlays:** Adaptive desktop UX with compliance dashboards.
+- **Distributed FS Overlay:** Enable collaborative storage environments.
+- **KPIs:**
+  - Container launch time < 2s
+  - Zenith overlays stability ≥ 95% uptime
+  - Distributed FS sync accuracy ≥ 99.9%
 
-4. **Virtualization Layer**
-   - Native lightweight container orchestration (`SigmaContainer`).
-   - Bhyve/QEMU-parity virtual machine guest supervisor.
+---
 
-5. **Desktop/UX**
-   - Zenith Tiling Window Manager integration.
-   - Adaptive overlays for WCAG 2.1 AA compliance and system telemetry.
+## 📊 7. SigmaOS vs Linux & BSD Distros — Benchmarking Mega-Matrix
 
-6. **Documentation Expansion**
-   - Consolidate Markdown documentations into the official **SigmaOS Handbook**.
-   - Mirror Arch Wiki's collaborative community knowledge model.
+| Feature | Ubuntu (Linux) | Arch (Linux) | Fedora (Linux) | FreeBSD | OpenBSD | NetBSD | SigmaOS Opportunity / Competitive Edge |
+|---|---|---|---|---|---|---|---|
+| **Kernel** | Stable monolithic | Rolling modular | Cutting-edge | Clean monolithic | Security-focused | Portable | Hybrid microkernel + modular services |
+| **Scheduler** | CFS | CFS | CFS | ULE | ULE | ULE | Policy-driven adaptive scheduler (real-time, batch, compliance) |
+| **Filesystem** | ext4, ZFS | Btrfs | Btrfs | ZFS | FFS | FFS | Transactional FS with compliance-friendly journaling & rollback |
+| **Security** | AppArmor/SELinux | User choice | SELinux | Capsicum | Strong defaults | Lightweight | Visual sandboxing + immutable system layers |
+| **Networking** | nftables | nftables | nftables | PF | PF | PF | Unified firewall + VPN GUI dashboard |
+| **Virtualization** | KVM/QEMU | User choice | KVM/QEMU | bhyve | Minimal | Minimal | Native container orchestration + lightweight VM integration |
+| **Desktop/UX** | GNOME/KDE | User choice | GNOME/KDE | Lightweight DEs | Minimal | Minimal | Adaptive Zenith overlays (tiling + compliance dashboards) |
+| **Documentation** | Ubuntu Wiki | Arch Wiki | Fedora Docs | FreeBSD Handbook | OpenBSD FAQ | NetBSD Guide | Publisher-grade compliance handbook with benchmarking tables |
+
+---
+
+## 🌟 8. Strategic Flow & Differentiators
+
+### Strategic Flow
+- **Kernel hybrid is the backbone** → unlocks scheduler + FS.
+- **Transactional FS ensures resilience** → supports sandboxing + rollback.
+- **Security overlays (sandbox + firewall)** → compliance differentiator.
+- **UX overlays (Zenith)** → user adoption driver.
+- **Docs run parallel** → ensure community + compliance visibility.
+
+### Key Differentiators
+- **Compliance-first OS:** Position SigmaOS as the trusted, audit-ready OS for regulated industries (finance, healthcare, defense).
+- **Visual-first dashboards:** Replace CLI-heavy workflows with intuitive, visual compliance and security overlays.
+- **Resilience implants:** Snapshot rollback + immutable layers for update safety and zero-downtime recovery.
+- **Community-driven modules:** Encourage contributions accompanied by automated compliance verification pipelines.
 
 ---
 

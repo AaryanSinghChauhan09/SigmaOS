@@ -2630,6 +2630,17 @@ impl InteractiveHybridScheduler {
         self.current_pid = Some(selected.pid);
         Some(selected.pid)
     }
+
+    pub fn yield_task(&mut self, pid: u64) {
+        if let Some(task) = self.ready_tasks.iter_mut().find(|t| t.pid == pid) {
+            task.vruntime += 5;
+            task.sleep_time_ms += 5;
+        }
+    }
+
+    pub fn get_task_count(&self) -> usize {
+        self.ready_tasks.len()
+    }
 }
 
 // ================= DragonFly BSD HAMMER2 PFS & Linux Btrfs CoW Storage Engine =================
@@ -3609,6 +3620,8 @@ impl SovereignCgroupGovernor {
     #[test]
     fn test_interactive_hybrid_scheduler() {
         let mut sched = InteractiveHybridScheduler::new();
+        assert_eq!(sched.get_task_count(), 0);
+
         let mut interactive_task = HybridTask::new(101, 20);
         interactive_task.sleep_time_ms = 90;
         interactive_task.cpu_time_ms = 10;
@@ -3619,9 +3632,14 @@ impl SovereignCgroupGovernor {
 
         sched.add_task(interactive_task);
         sched.add_task(cpu_bound_task);
+        assert_eq!(sched.get_task_count(), 2);
 
         let selected_pid = sched.schedule_next().unwrap();
         assert_eq!(selected_pid, 101); // Interactive task scheduled first!
+
+        sched.yield_task(101);
+        let next_pid = sched.schedule_next().unwrap();
+        assert!(next_pid == 101 || next_pid == 102);
     }
 
     #[test]

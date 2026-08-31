@@ -293,6 +293,16 @@ impl GpuDriver {
         Ok(())
     }
 
+    /// Query total committed atomic plane count
+    pub fn get_atomic_plane_count(&self) -> usize {
+        self.atomic_planes.len()
+    }
+
+    /// Clear imported Wayland DMA-BUF buffers
+    pub fn clear_dma_buffers(&mut self) {
+        self.dma_buffers.clear();
+    }
+
     /// Wayland SHM Zero-Copy DMA-BUF Import
     pub fn import_dma_buf(&mut self, buf: WaylandDmaBuf) -> Result<usize, &'static str> {
         let size = buf.size;
@@ -362,6 +372,7 @@ mod tests {
     #[test]
     fn test_drm_kms_atomic_plane() {
         let mut driver = GpuDriver::new();
+        assert_eq!(driver.get_atomic_plane_count(), 0);
         let plane = DrmAtomicPlaneState {
             plane_id: 1, crtc_id: 10, fb_id: 100,
             src_x: 0, src_y: 0, src_w: 1920, src_h: 1080,
@@ -369,7 +380,7 @@ mod tests {
             zpos: 0,
         };
         assert!(driver.commit_atomic_plane(plane).is_ok());
-        assert_eq!(driver.atomic_planes.len(), 1);
+        assert_eq!(driver.get_atomic_plane_count(), 1);
     }
 
     #[test]
@@ -382,6 +393,9 @@ mod tests {
         let size = driver.import_dma_buf(buf).unwrap();
         assert_eq!(size, 1920 * 1080 * 4);
         assert_eq!(driver.dma_buffers.len(), 1);
+
+        driver.clear_dma_buffers();
+        assert_eq!(driver.dma_buffers.len(), 0);
     }
 
     #[test]
