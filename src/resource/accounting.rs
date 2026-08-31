@@ -8,7 +8,11 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::String;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::collections::BTreeMap as HashMap;
 
 pub type Pid = usize;
 pub type UserID = u32;
