@@ -45,7 +45,7 @@ impl SystemConfigManager {
 
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = format!("{}/{}", self.config_dir.inner, filename);
+        let file_path = format!("{}/{}", self.config_dir.to_str().unwrap_or(""), filename);
         
         let entries = self.get_default_config(filename);
         self.configs.insert(filename.to_string(), entries);
@@ -87,7 +87,7 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let _file_path = format!("{}/{}", self.config_dir.inner, filename);
+        let _file_path = format!("{}/{}", self.config_dir.to_str().unwrap_or(""), filename);
         
         let _entries = self.configs.get(filename)
             .ok_or(ConfigError::NotFound(filename.to_string()))?;
