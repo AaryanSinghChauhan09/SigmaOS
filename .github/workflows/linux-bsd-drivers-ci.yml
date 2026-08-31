@@ -1,0 +1,30 @@
+name: Sovereign Linux & BSD Drivers Continuous Integration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  drivers-verify:
+    name: Verify Sovereign Hardware Drivers & Device Probing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Linux & BSD Drivers Subsystem
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/drivers/linux_bsd_drivers.rs -o build/linux_bsd_drivers_test
+          ./build/linux_bsd_drivers_test
+
+      - name: Test Driver Lifecycle & Hardware Bring-Up Engine
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/drivers/sovereign_driver_lifecycle.rs -o build/sovereign_driver_lifecycle_test
+          ./build/sovereign_driver_lifecycle_test
