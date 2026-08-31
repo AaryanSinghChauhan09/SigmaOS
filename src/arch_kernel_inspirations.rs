@@ -80,10 +80,11 @@ impl KUnitEngine {
     }
 
     /// Run a suite defined by a set of test-case functions.
-    pub fn run_suite<F>(&mut self, suite_name: &str, cases: Vec<(String, F)>) -> KUnitSuiteResult
-    where
-        F: FnOnce(&mut Vec<Expectation>) + Send,
-    {
+    pub fn run_suite(
+        &mut self,
+        suite_name: &str,
+        cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
+    ) -> KUnitSuiteResult {
         let mut passed = 0;
         let mut failed = 0;
         for (name, body) in cases {
@@ -817,27 +818,33 @@ mod tests {
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases = vec![
-            ("test_ok".to_string(), |e: &mut Vec<Expectation>| {
-                e.push(Expectation {
-                    kind: ExpectationKind::Eq,
-                    left: "1".into(),
-                    right: "1".into(),
-                    file: "drivers/foo.c".into(),
-                    line: 10,
-                    passed: true,
-                });
-            }),
-            ("test_bad".to_string(), |e: &mut Vec<Expectation>| {
-                e.push(Expectation {
-                    kind: ExpectationKind::True,
-                    left: "false".into(),
-                    right: "true".into(),
-                    file: "drivers/foo.c".into(),
-                    line: 12,
-                    passed: false,
-                });
-            }),
+        let cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+            (
+                "test_ok".to_string(),
+                alloc::boxed::Box::new(|e: &mut Vec<Expectation>| {
+                    e.push(Expectation {
+                        kind: ExpectationKind::Eq,
+                        left: "1".into(),
+                        right: "1".into(),
+                        file: "drivers/foo.c".into(),
+                        line: 10,
+                        passed: true,
+                    });
+                }),
+            ),
+            (
+                "test_bad".to_string(),
+                alloc::boxed::Box::new(|e: &mut Vec<Expectation>| {
+                    e.push(Expectation {
+                        kind: ExpectationKind::True,
+                        left: "false".into(),
+                        right: "true".into(),
+                        file: "drivers/foo.c".into(),
+                        line: 12,
+                        passed: false,
+                    });
+                }),
+            ),
         ];
         let r = eng.run_suite("foo", cases);
         assert_eq!(r.failed, 1);

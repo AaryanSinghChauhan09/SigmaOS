@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::HashMap;
+use alloc::collections::BTreeMap as HashMap;
 use alloc::format;
 
 /// VM configuration

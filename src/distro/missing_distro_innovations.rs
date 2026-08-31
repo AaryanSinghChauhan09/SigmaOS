@@ -55,6 +55,198 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
+/// Bedrock Linux Strata Virtualization Engine
+#[derive(Debug, Clone)]
+pub struct BedrockStratum {
+    pub name: String,
+    pub root_path: String,
+    pub is_enabled: bool,
+    pub provided_binaries: Vec<String>,
+}
+
+pub struct BedrockLinuxStrataEngine {
+    pub default_stratum: String,
+    pub strata: BTreeMap<String, BedrockStratum>,
+}
+
+impl BedrockLinuxStrataEngine {
+    pub fn new(default_stratum: &str) -> Self {
+        let mut strata = BTreeMap::new();
+        strata.insert(
+            default_stratum.to_string(),
+            BedrockStratum {
+                name: default_stratum.to_string(),
+                root_path: "/".to_string(),
+                is_enabled: true,
+                provided_binaries: Vec::new(),
+            },
+        );
+        Self {
+            default_stratum: default_stratum.to_string(),
+            strata,
+        }
+    }
+
+    pub fn register_stratum(&mut self, stratum: BedrockStratum) {
+        self.strata.insert(stratum.name.clone(), stratum);
+    }
+
+    pub fn resolve_strata_path(&self, stratum_name: &str, relative_path: &str) -> Option<String> {
+        if let Some(stratum) = self.strata.get(stratum_name) {
+            if !stratum.is_enabled {
+                return None;
+            }
+            if stratum.root_path == "/" {
+                Some(relative_path.to_string())
+            } else {
+                Some(format!("{}{}", stratum.root_path, relative_path))
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn strat(&self, stratum_name: &str, cmd: &str, args: &[&str]) -> Result<String, String> {
+        if let Some(stratum) = self.strata.get(stratum_name) {
+            if !stratum.is_enabled {
+                return Err(format!("Stratum '{}' is disabled", stratum_name));
+            }
+            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
+        } else {
+            Err(format!("Stratum '{}' not found", stratum_name))
+        }
+    }
+
+    pub fn disable_stratum(&mut self, stratum_name: &str) -> Result<(), String> {
+        if stratum_name == self.default_stratum {
+            return Err("Cannot disable default stratum".to_string());
+        }
+        if let Some(stratum) = self.strata.get_mut(stratum_name) {
+            stratum.is_enabled = false;
+            Ok(())
+        } else {
+            Err(format!("Stratum '{}' not found", stratum_name))
+        }
+    }
+}
+
+/// SmartOS Zone & VM Lifecycle Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SmartOsVmBrand {
+    JoyentZone,
+    KvmVm,
+    BhyveVm,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SmartOsVmState {
+    Stopped,
+    Running,
+    Suspended,
+}
+
+#[derive(Debug, Clone)]
+pub struct SmartOsImage {
+    pub uuid: String,
+    pub name: String,
+    pub version: String,
+    pub os: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SmartOsVmConfig {
+    pub uuid: String,
+    pub alias: String,
+    pub brand: SmartOsVmBrand,
+    pub quota_gb: u32,
+    pub max_physical_memory_mb: u64,
+    pub image_uuid: String,
+    pub vnics: Vec<String>,
+    pub state: SmartOsVmState,
+}
+
+pub struct SmartOsZoneEngine {
+    pub images: BTreeMap<String, SmartOsImage>,
+    pub vms: BTreeMap<String, SmartOsVmConfig>,
+}
+
+impl SmartOsZoneEngine {
+    pub fn new() -> Self {
+        Self {
+            images: BTreeMap::new(),
+            vms: BTreeMap::new(),
+        }
+    }
+
+    pub fn imgadm_import(&mut self, uuid: &str, name: &str, version: &str, os: &str) -> String {
+        let img = SmartOsImage {
+            uuid: uuid.to_string(),
+            name: name.to_string(),
+            version: version.to_string(),
+            os: os.to_string(),
+        };
+        self.images.insert(uuid.to_string(), img);
+        format!("Imported image {} ({}-{})", uuid, name, version)
+    }
+
+    pub fn vmadm_create(
+        &mut self,
+        uuid: &str,
+        alias: &str,
+        brand: SmartOsVmBrand,
+        quota_gb: u32,
+        ram_mb: u64,
+        image_uuid: &str,
+        vnics: &[&str],
+    ) -> Result<String, String> {
+        if self.vms.contains_key(uuid) {
+            return Err(format!("VM with UUID {} already exists", uuid));
+        }
+        let vm = SmartOsVmConfig {
+            uuid: uuid.to_string(),
+            alias: alias.to_string(),
+            brand,
+            quota_gb,
+            max_physical_memory_mb: ram_mb,
+            image_uuid: image_uuid.to_string(),
+            vnics: vnics.iter().map(|s| s.to_string()).collect(),
+            state: SmartOsVmState::Stopped,
+        };
+        self.vms.insert(uuid.to_string(), vm);
+        Ok(format!("Successfully created VM {}", uuid))
+    }
+
+    pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        vm.state = SmartOsVmState::Running;
+        Ok(())
+    }
+
+    pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        vm.state = SmartOsVmState::Stopped;
+        Ok(())
+    }
+
+    pub fn vmadm_delete(&mut self, uuid: &str) -> Result<String, String> {
+        if let Some(vm) = self.vms.get(uuid) {
+            if vm.state == SmartOsVmState::Running {
+                return Err(format!("Cannot delete running VM {}", uuid));
+            }
+            self.vms.remove(uuid);
+            Ok(format!("Deleted VM {}", uuid))
+        } else {
+            Err(format!("VM {} not found", uuid))
+        }
+    }
+}
+
+impl Default for SmartOsZoneEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 10. Linux & BSD Sysctl Kernel MIB Parameter Management Engine
 #[derive(Debug, Clone)]
 pub struct SysctlNode {

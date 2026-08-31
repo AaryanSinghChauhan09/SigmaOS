@@ -1036,6 +1036,7 @@ impl Default for RescuezillaBackupEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum MicroarchTier {
     GenericX86_64,
     X86_64_v2,

@@ -38,10 +38,6 @@ mod distro_bridge;
 mod protocols;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/compatibility/garuda_zen.rs"]
@@ -86,10 +82,6 @@ mod missing_distro_innovations;
 mod linux_bsd_inspirations;
 #[path = "../src/compatibility/community_foundation.rs"]
 mod community_foundation;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 

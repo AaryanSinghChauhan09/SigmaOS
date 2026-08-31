@@ -301,6 +301,7 @@ mod tests {
             packager: "SigmaOS".to_string(),
             build_date: "2026-08-24".to_string(),
             install_date: "2026-08-24".to_string(),
+            is_explicit: true,
         };
 
         db.packages.push(test_pkg.clone());
@@ -331,6 +332,7 @@ mod tests {
             packager: "SigmaOS".to_string(),
             build_date: "2026-08-24".to_string(),
             install_date: "2026-08-24".to_string(),
+            is_explicit: true,
         };
 
         db.local_packages.push(test_pkg);
@@ -378,6 +380,7 @@ depends=('glibc')
             packager: "AUR".to_string(),
             build_date: "2026-08-24".to_string(),
             install_date: "2026-08-24".to_string(),
+            is_explicit: true,
         };
 
         // Note: In a real implementation, we'd add this to aur_packages
