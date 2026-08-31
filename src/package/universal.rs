@@ -1484,7 +1484,7 @@ mod tests {
     #[test]
     fn test_package_format_from_filename_extensions() {
         assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
         assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
     }
 
