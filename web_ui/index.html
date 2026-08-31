@@ -72,7 +72,7 @@
                     <label class="checkbox-container">
                         <input type="checkbox" id="accept-license" aria-required="true" aria-describedby="license-error">
                         <span class="checkmark"></span>
-                        I accept the Sovereign Digital Autonomy Agreement and Licensing Terms.
+                        I accept the Sovereign Digital Autonomy Agreement and Licensing Terms. <span style="color: var(--danger);" aria-hidden="true">*</span>
                     </label>
                     <div id="license-error" role="alert" style="display: none; color: var(--danger); font-size: 0.78rem; margin-top: 8px; font-weight: 500;">
                         ⚠️ Please accept the licensing terms and sovereign autonomy agreement to proceed.
@@ -188,7 +188,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="hostname-input">Hostname</label>
+                        <label for="hostname-input">Hostname <span style="color: var(--danger);" aria-hidden="true">*</span></label>
                         <input type="text" id="hostname-input" value="sigmaos-node" placeholder="Enter system name" aria-describedby="hostname-error">
                         <div id="hostname-error" role="alert" style="display: none; color: var(--danger); font-size: 0.78rem; margin-top: 4px; font-weight: 500;">
                             ⚠️ Please enter a valid system hostname.
@@ -266,6 +266,35 @@
 
     <!-- Installer Script Logic -->
     <script>
+        function setupValidationListeners() {
+            const licenseCb = document.getElementById('accept-license');
+            const licenseErr = document.getElementById('license-error');
+            if (licenseCb && licenseErr) {
+                licenseCb.addEventListener('change', () => {
+                    if (licenseCb.checked) {
+                        licenseErr.style.display = 'none';
+                        licenseCb.removeAttribute('aria-invalid');
+                    }
+                });
+            }
+
+            const hostnameInput = document.getElementById('hostname-input');
+            const hostnameErr = document.getElementById('hostname-error');
+            if (hostnameInput && hostnameErr) {
+                hostnameInput.addEventListener('input', () => {
+                    if (hostnameInput.value.trim()) {
+                        hostnameErr.style.display = 'none';
+                        hostnameInput.removeAttribute('aria-invalid');
+                    }
+                });
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupValidationListeners);
+        } else {
+            setupValidationListeners();
+        }
+
         let currentStep = 1;
         const totalSteps = 6;
         let selectedDiskId = 'sda';
