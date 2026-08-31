@@ -19,6 +19,5 @@ jobs:
 
       - name: Test FreeBSD Jails Submodule
         run: |
-          mkdir -p build
           rustc --test src/compatibility/freebsd_jails.rs --edition=2021 -o build/freebsd_jails_test
           ./build/freebsd_jails_test

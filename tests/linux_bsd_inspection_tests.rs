@@ -13,6 +13,9 @@ use alloc::vec::Vec;
 pub mod klib;
 
 
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 #[path = "../src/unimplemented_features.rs"]

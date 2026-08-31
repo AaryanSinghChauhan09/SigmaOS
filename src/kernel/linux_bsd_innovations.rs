@@ -369,9 +369,11 @@ pub struct PerfEventSample {
     pub raw_count: u64,
     pub enabled_time_ns: u64,
     pub running_time_ns: u64,
+}
 
 pub struct LinuxPerfEventsEngine {
     pub active_counters: Vec<(u32, PerfHardwareCounterType, u64)>,
+}
 
 impl LinuxPerfEventsEngine {
     pub fn new() -> Self {
@@ -383,10 +385,13 @@ impl LinuxPerfEventsEngine {
     pub fn open_counter(&mut self, pid: u32, counter_type: PerfHardwareCounterType) -> usize {
         self.active_counters.push((pid, counter_type, 0));
         self.active_counters.len() - 1
+    }
 
     pub fn increment_counter(&mut self, handle: usize, delta: u64) {
         if let Some((_, _, ref mut count)) = self.active_counters.get_mut(handle) {
             *count += delta;
+        }
+    }
 
     pub fn sample_counter(&self, handle: usize) -> Option<PerfEventSample> {
         if let Some(&(pid, counter_type, count)) = self.active_counters.get(handle) {
@@ -399,6 +404,9 @@ impl LinuxPerfEventsEngine {
             })
         } else {
             None
+        }
+    }
+}
 
 // 2. FreeBSD `racct(9)` Resource Accounting & `rctl(8)` Resource Limits
 
@@ -409,6 +417,7 @@ pub enum RacctResource {
     OpenFilesCount,
     BlockIoReadBytes,
     BlockIoWriteBytes,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RctlAction {

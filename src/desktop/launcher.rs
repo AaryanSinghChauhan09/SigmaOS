@@ -690,4 +690,16 @@ mod tests {
         assert_eq!(launcher.unregister_app(10), Ok(()));
         assert!(launcher.get_app(10).is_none());
     }
+
+    #[test]
+    fn test_plist_bundle_config() {
+        let plist = PlistBundleConfig::new(b"org.mozilla.firefox", b"Contents/MacOS/firefox", b"firefox.icns");
+        assert!(!plist.bundle_identifier.is_empty());
+    }
+
+    #[test]
+    fn test_ini_desktop_config() {
+        let ini = IniDesktopConfig::new(b"C:\\Program Files\\Firefox\\firefox.exe", b"firefox.ico", b"C:\\Program Files\\Firefox");
+        assert!(!ini.target_path.is_empty());
+    }
 }

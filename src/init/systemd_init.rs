@@ -684,6 +684,75 @@ impl SystemdServiceWatchdog {
 
 // ================= Systemd Cgroup v2 Slice Governor =================
 
+/// Debian Betsy / LMDE Systemd Compatibility Shim
+pub struct BetsySystemdCompatShim {
+    pub is_systemd_active: bool,
+    pub cgroup_v2_mounted: bool,
+}
+
+impl BetsySystemdCompatShim {
+    pub fn new() -> Self {
+        Self {
+            is_systemd_active: true,
+            cgroup_v2_mounted: true,
+        }
+    }
+
+    pub fn emulate_systemd_sysv_fallback(&self, init_script_path: &str) -> String {
+        format!("systemd-sysv-generator: Emulating SysV init script at '{}'", init_script_path)
+    }
+}
+
+/// Systemd Transient Unit (`systemd-run`) Service Generator
+pub struct TransientServiceGenerator;
+
+impl TransientServiceGenerator {
+    pub fn create_transient_unit(cmd: &str, service_name: &str) -> SystemdUnit {
+        let mut unit = SystemdUnit::new(999, service_name.as_bytes(), UnitType::Service);
+        unit.restart_policy = RestartPolicy::No;
+        unit
+    }
+}
+
+/// Systemd Dynamic User Sandboxing Context (`DynamicUser=yes`)
+#[derive(Debug, Clone)]
+pub struct SystemdDynamicUserContext {
+    pub allocated_uid: u32,
+    pub allocated_gid: u32,
+    pub private_tmp: bool,
+    pub protect_system: String, // e.g. "strict", "full"
+}
+
+impl SystemdDynamicUserContext {
+    pub fn allocate_ephemeral_user(uid_seed: u32) -> Self {
+        Self {
+            allocated_uid: 60000 + (uid_seed % 5000),
+            allocated_gid: 60000 + (uid_seed % 5000),
+            private_tmp: true,
+            protect_system: "strict".to_string(),
+        }
+    }
+}
+
+/// Systemd Service Hardening Directives Evaluator (`systemd-analyze security`)
+pub struct SystemdServiceHardeningEvaluator;
+
+impl SystemdServiceHardeningEvaluator {
+    pub fn calculate_hardening_score(dynamic_user: bool, private_tmp: bool, protect_home: bool) -> f32 {
+        let mut score: f32 = 10.0; // Start at 10 (unprotected)
+        if dynamic_user {
+            score -= 3.0;
+        }
+        if private_tmp {
+            score -= 2.0;
+        }
+        if protect_home {
+            score -= 2.5;
+        }
+        score.max(0.0) // 0.0 is fully hardened
+    }
+}
+
 pub struct SystemdCgroupSliceGovernor {
     pub slice_name: String,
     pub cpu_weight: u32,
@@ -2156,5 +2225,34 @@ WantedBy=multi-user.target
         // Now main unit 2 starts successfully
         engine.systemctl_start(2).unwrap();
         assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
+    fn test_betsy_systemd_compat_shim() {
+        let shim = BetsySystemdCompatShim::new();
+        assert!(shim.is_systemd_active);
+        let msg = shim.emulate_systemd_sysv_fallback("/etc/init.d/nginx");
+        assert!(msg.contains("nginx"));
+    }
+
+    #[test]
+    fn test_transient_service_generator() {
+        let unit = TransientServiceGenerator::create_transient_unit("/usr/bin/curl", "transient-fetch");
+        assert_eq!(unit.unit_type, UnitType::Service);
+        assert_eq!(unit.restart_policy, RestartPolicy::No);
+    }
+
+    #[test]
+    fn test_systemd_dynamic_user_context() {
+        let ctx = SystemdDynamicUserContext::allocate_ephemeral_user(123);
+        assert!(ctx.allocated_uid >= 60000);
+        assert!(ctx.private_tmp);
+        assert_eq!(ctx.protect_system, "strict");
+    }
+
+    #[test]
+    fn test_systemd_service_hardening_evaluator() {
+        let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
+        assert_eq!(score_full, 2.5);
+
+        let score_none = SystemdServiceHardeningEvaluator::calculate_hardening_score(false, false, false);
+        assert_eq!(score_none, 10.0);
     }
 }

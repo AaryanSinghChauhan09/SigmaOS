@@ -274,6 +274,9 @@ mod tests {
         assert_eq!(memory.user_id, 1000);
         assert_eq!(memory.last_selected_session, "Wayland");
 
+    }
+
+    #[test]
     fn test_greeter_accessibility_overlay() {
         let mut overlay = GreeterAccessibilityOverlay::new();
         assert!(!overlay.onscreen_keyboard_enabled);
@@ -298,3 +301,5 @@ mod tests {
         assert!(!a11y.high_contrast);
         a11y.high_contrast = true;
         assert!(a11y.high_contrast);
+    }
+}

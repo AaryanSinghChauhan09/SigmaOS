@@ -1254,6 +1254,9 @@ mod tests {
         let chain = IconInheritsResolver::resolve_lookup_chain(&index);
         assert_eq!(chain, vec!["Breeze".to_string(), "oxygen".to_string(), "hicolor".to_string()]);
 
+    }
+
+    #[test]
     fn test_symbolic_icon_tint_engine() {
         let svg = "<path fill=\"#000000\" d=\"M0 0h24v24H0z\"/>";
         let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
