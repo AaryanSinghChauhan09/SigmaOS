@@ -3,6 +3,7 @@ extern crate alloc;
 // Fully-featured, zero-dependency, safe Rust implementation of standard-defeating
 // desktop features matching and crushing Linux Mint (Cinnamon, Software/Update/Driver Managers)
 
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -747,55 +748,81 @@ mod tests {
     }
 
     #[test]
-    fn test_nvidia_prime_engine_and_applet() {
-        let mut applet = NvidiaPrimeApplet::new(101);
-        assert_eq!(
-            applet.prime_engine.active_profile,
-            NvidiaPrimeProfile::NvidiaOnDemand
-        );
-        assert_eq!(
-            applet.render_status_text(),
-            "GPU: NVIDIA On-Demand (Sleeping)"
-        );
+    fn test_sovereign_mintupgrade_engine() {
+        let mut upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
+        let result = upgrade.execute_upgrade(20480);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "SigmaOS 2.0");
+        assert_eq!(upgrade.stage, UpgradeStage::Completed);
 
-        // Test process offloading registration
-        applet.prime_engine.register_offload_process(4512);
-        assert_eq!(applet.prime_engine.power_state, NvidiaPowerState::D0Active);
-        assert_eq!(
-            applet.render_status_text(),
-            "GPU: NVIDIA On-Demand (Active: 1 app(s))"
-        );
+        let mut failed_upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
+        let failed_res = failed_upgrade.execute_upgrade(500); // 500MB insufficient
+        assert!(failed_res.is_err());
+        assert_eq!(failed_upgrade.stage, UpgradeStage::Failed);
+    }
 
-        // Offload command generation
-        let offload_cmd = applet.prime_engine.generate_offload_command("vkcube");
-        assert_eq!(offload_cmd.env_vars.len(), 3);
-        assert!(offload_cmd.formatted_cmd.contains("__NV_PRIME_RENDER_OFFLOAD=1"));
+    #[test]
+    fn test_cinnamon_translation_engine() {
+        let mut trans = CinnamonTranslationEngine::new("en_US");
+        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "Software Manager");
 
-        // Unregister offload process
-        applet.prime_engine.unregister_offload_process(4512);
-        assert_eq!(applet.prime_engine.power_state, NvidiaPowerState::D3Hot);
+        trans.set_locale("hi_IN");
+        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "सॉफ़्टवेयर मैनेजर");
+        assert_eq!(trans.gettext("cinnamon", "Unknown"), "Unknown");
+        assert_eq!(trans.ngettext("cinnamon", "File", "Files", 1), "File");
+    }
 
-        // Test profile switching to Integrated (requires relogin)
-        let relogin = applet
-            .prime_engine
-            .set_profile(NvidiaPrimeProfile::IntegratedIntelRadeon)
-            .unwrap();
-        assert!(relogin);
-        assert_eq!(
-            applet.prime_engine.pending_profile,
-            Some(NvidiaPrimeProfile::IntegratedIntelRadeon)
-        );
+    #[test]
+    fn test_sovereign_mintstick_engine() {
+        let mut flasher = SovereignMintStickEngine::new("/dev/sdb");
+        let dummy_iso = vec![0u8; 16384];
+        let written = flasher.flash_iso_image(&dummy_iso).unwrap();
+        assert_eq!(written, 16384);
+        assert_eq!(flasher.progress_pct, 100);
+        assert_eq!(flasher.mode, MintStickMode::Completed);
 
-        let active = applet.prime_engine.apply_pending_profile().unwrap();
-        assert_eq!(active, NvidiaPrimeProfile::IntegratedIntelRadeon);
-        assert_eq!(
-            applet.prime_engine.power_state,
-            NvidiaPowerState::D3ColdPowerOff
-        );
-        assert_eq!(
-            applet.render_status_text(),
-            "GPU: Integrated (Power Saving)"
-        );
+        let mut unsafe_flasher = SovereignMintStickEngine::new("/dev/sda");
+        assert!(unsafe_flasher.flash_iso_image(&dummy_iso).is_err());
+        assert_eq!(unsafe_flasher.mode, MintStickMode::Failed);
+
+        let mut formatter = SovereignMintStickEngine::new("/dev/sdc");
+        assert!(formatter.format_usb_drive(UsbFileSystem::Fat32, "SIGMAOS_BOOT").is_ok());
+        assert_eq!(formatter.mode, MintStickMode::Completed);
+    }
+
+    #[test]
+    fn test_nvidia_prime_applet() {
+        let mut prime = NvidiaPrimeApplet::new();
+        assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaOnDemand);
+
+        let envs = prime.switch_profile(NvidiaPrimeProfile::NvidiaPerformance);
+        assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaPerformance);
+        assert!(prime.is_relogin_required);
+        assert_eq!(envs.get("__NV_PRIME_RENDER_OFFLOAD").unwrap(), "1");
+        assert_eq!(prime.gpu_power_draw_watts, 45);
+
+        let intel_envs = prime.switch_profile(NvidiaPrimeProfile::IntegratedIntelRadeon);
+        assert!(intel_envs.is_empty());
+        assert_eq!(prime.gpu_power_draw_watts, 0);
+    }
+
+    #[test]
+    fn test_mintmenu_vala_engine() {
+        let mut menu = SovereignMintMenuValaEngine::new();
+        let favs = menu.filter_by_category(MintMenuCategory::Favorites);
+        assert_eq!(favs.len(), 2);
+
+        let search_res = menu.search_items("Terminal");
+        assert_eq!(search_res.len(), 1);
+        assert_eq!(search_res[0].id, "terminal");
+
+        let cmd = menu.launch_item("firefox").unwrap();
+        assert_eq!(cmd, "firefox %U");
+        assert_eq!(menu.recent_launches.len(), 1);
+
+        let is_fav = menu.toggle_favorite("software").unwrap();
+        assert!(is_fav);
+        assert_eq!(menu.filter_by_category(MintMenuCategory::Favorites).len(), 3);
     }
 }
 

@@ -5,9 +5,11 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
-/// Provides robust target dependency graphs, wants/requires/requisite properties,
-/// systemd-analyze security auditor, critical-chain boot timing diagnostics,
-/// socket/timer activation extensions, and multi-init BSD/Linux conversion bridge.
+/// Provides robust target dependency graphs, wants/requires properties,
+/// and target states to defeat Fedora's Systemd initialization.
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -1040,7 +1042,6 @@ impl SystemdEngine {
         let slice: &[UnitID] = &**unit_ids;
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
-                self.topo_visit(id, unit_ids, &mut sorted, &mut visiting, &mut visited)?;
                 self.topo_visit(id, slice, &mut sorted, &mut visiting, &mut visited)?;
             }
         }

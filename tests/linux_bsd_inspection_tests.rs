@@ -234,9 +234,6 @@ fn test_wiki_distro_innovations_inspection() {
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
-    };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);

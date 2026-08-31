@@ -339,10 +339,16 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+/// Linux (glibc/musl) & BSD inspired POSIX setlocale and GNU gettext Locale Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum LocaleCategory {
+    All,
+    Ctype,
+    Numeric,
+    Time,
+    Collate,
+    Monetary,
+    Messages,
 }
 
 pub struct SovereignLocaleEngine {

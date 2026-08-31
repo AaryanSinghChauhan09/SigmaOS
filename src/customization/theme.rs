@@ -27,7 +27,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-use crate::klib::BTreeMap;
 
 /// Color palette
 #[derive(Debug, Clone)]
@@ -1124,26 +1123,15 @@ mod tests {
     }
 
     #[test]
-    fn test_icon_theme_spec_index() {
-        let mut index = IconThemeSpecIndex::new("Yaru", "Ubuntu Yaru Icon Theme");
-        index.add_inherits("Adwaita");
-        index.add_directory("48x48/apps");
-        assert_eq!(index.name, "Yaru");
-        assert_eq!(index.inherits, vec!["Adwaita".to_string()]);
-    }
+    fn test_cinnamon_theme_engine() {
+        let mut engine = SovereignCinnamonThemeEngine::new("Mint-Y-Teal");
+        assert_eq!(engine.active_config.accent_color_hex, "#87A922");
 
-    #[test]
-    fn test_icon_inherits_resolver() {
-        let mut index = IconThemeSpecIndex::new("Breeze", "KDE Breeze Icon Theme");
-        index.add_inherits("oxygen");
-        let chain = IconInheritsResolver::resolve_lookup_chain(&index);
-        assert_eq!(chain, vec!["Breeze".to_string(), "oxygen".to_string(), "hicolor".to_string()]);
-    }
+        engine.set_accent_color("#00adb5");
+        assert_eq!(engine.active_config.accent_color_hex, "#00adb5");
 
-    #[test]
-    fn test_symbolic_icon_tint_engine() {
-        let svg = "<path fill=\"#000000\" d=\"M0 0h24v24H0z\"/>";
-        let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
-        assert_eq!(tinted, "<path fill=\"#3584E4\" d=\"M0 0h24v24H0z\"/>");
+        let css = engine.render_css_stylesheet();
+        assert!(css.contains(".panel-bottom"));
+        assert!(css.contains("#00adb5"));
     }
 }

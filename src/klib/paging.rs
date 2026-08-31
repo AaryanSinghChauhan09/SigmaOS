@@ -274,7 +274,7 @@ impl SimpleVMM {
 
     pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
-        let pdpt_idx = self.get_pdpt_index(virt);
+        let _pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
@@ -282,14 +282,13 @@ impl SimpleVMM {
             return Err(PageFaultError::NotPresent);
         }
 
-        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
-        let pd_idx_in_vec = ((pdpt_phys / 4096) * 512 + pdpt_idx) * 512 + pd_idx;
-
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx_in_vec).and_then(|opt| opt.as_mut()) {
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
-            pt_entry.set_cow(true);
-            pt_entry.set_writable(false);
-            return Ok(());
+            if pt_entry.is_present() {
+                pt_entry.set_writable(false);
+                pt_entry.set_cow(true);
+                return Ok(());
+            }
         }
         Err(PageFaultError::NotPresent)
     }
@@ -408,7 +407,6 @@ impl SimpleVMM {
             }
         }
     }
-
 }
 
 impl Default for SimpleVMM {
