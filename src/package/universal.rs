@@ -1,3 +1,4 @@
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
@@ -8,9 +9,6 @@ use alloc::collections::BTreeMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -172,6 +170,7 @@ impl PackageFormat {
         } else if name.ends_with(".cports") {
             Some(PackageFormat::Cports)
         } else if name.ends_with(".cachy") {
+            Some(PackageFormat::SigmaPkg)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
         } else if name.ends_with(".hap") {
@@ -269,12 +268,6 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
-}
-
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        UniversalPackageManifestParser::detect_format_from_filename(filename)
-    }
 }
 
 impl UnifiedPackage {
@@ -976,19 +969,6 @@ impl Default for DependencyResolver {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookTiming {
-    PreInstall,
-    PostInstall,
-    PreRemove,
-    PostRemove,
-}
-
-pub trait PackageHook: Send + Sync {
-    fn timing(&self) -> HookTiming;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
-
 /// Transactional package manager checkpoint
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageCheckpoint {
@@ -1539,6 +1519,7 @@ impl SovereignPackageRollbackEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_manager_creation() {
