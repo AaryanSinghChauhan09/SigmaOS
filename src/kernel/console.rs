@@ -230,8 +230,7 @@ static mut GLOBAL_CONSOLE: Option<KernelConsole> = None;
 
 pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static str> {
     unsafe {
-        let console_ptr = &raw mut GLOBAL_CONSOLE;
-        if (*console_ptr).is_none() {
+        if (*(&raw const GLOBAL_CONSOLE)).is_none() {
             let mut console = KernelConsole::new();
             console.initialize(backend)?;
             *console_ptr = Some(console);

@@ -3,6 +3,9 @@
 
 
 // Core working modules
+pub mod ai;
+pub mod app;
+pub mod auth;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;

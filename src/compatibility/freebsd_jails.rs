@@ -147,6 +147,7 @@ impl SigmaJailManager {
             }
         }
 
+
         // Kill all processes in jail
         self.kill_jail_processes_by_pids(&processes)?;
 
@@ -410,6 +411,7 @@ impl SigmaJailManager {
         Ok(())
     }
 
+    #[allow(dead_code)]
     fn kill_jail_processes(&self, jail: &Jail) -> Result<(), Box<dyn std::error::Error>> {
         self.kill_jail_processes_by_pids(&jail.processes)
     }

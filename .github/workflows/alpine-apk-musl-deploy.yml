@@ -1,0 +1,33 @@
+name: Alpine Linux APK Musl Deploy Automation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  alpine-apk-musl-build:
+    name: Build & Package Alpine APK Static Binary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Rust Toolchain (Musl Target)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: x86_64-unknown-linux-musl
+
+      - name: Verify Alpine APK & Musl Subsystems
+        run: |
+          cargo test --lib -- distro::parity
+          cargo test --lib -- unimplemented_features::extra_unimplemented_tests::test_alpine_apk_package_index
+
+      - name: Build Musl Static Executable
+        run: cargo build --target x86_64-unknown-linux-musl --lib

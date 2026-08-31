@@ -9,8 +9,7 @@ use alloc::vec::Vec;
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
-use crate::klib::path::PathBuf;
+use std::collections::HashMap;
 use std::fs;
 
 /// User account information
