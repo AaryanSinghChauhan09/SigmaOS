@@ -17,6 +17,9 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
+//! SigmaOS CPU Feature Detection and Optimization
+//! Implements Gentoo-like compiler-assisted target optimizations
+//! Zero-dependency CPU capability detection for bare-metal
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
