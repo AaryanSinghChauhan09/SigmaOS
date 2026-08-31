@@ -11,6 +11,7 @@ extern crate alloc;
 pub mod klib;
 
 pub mod accessibility;
+pub mod bluetooth;
 pub mod ai;
 pub mod arch;
 pub mod audio;

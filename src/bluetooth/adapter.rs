@@ -87,7 +87,15 @@ impl BluetoothAdapter for SimpleBluetoothAdapter {
         &self.name[..self.name_len as usize]
     }
     fn address(&self) -> &[u8] { &self.address }
-    fn state(&self) -> BluetoothState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> BluetoothState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => BluetoothState::Off,
+            1 => BluetoothState::On,
+            2 => BluetoothState::Scanning,
+            3 => BluetoothState::Pairing,
+            _ => BluetoothState::Off,
+        }
+    }
 
     fn set_state(&mut self, state: BluetoothState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -215,89 +223,86 @@ impl DevicePairing for SimpleDevicePairing {
         let mut devices = Vec::new();
         for &(id, ref addr) in &self.paired {
             if id == adapter_id {
-                devices.push(addr);
+                devices.push(&addr[..]);
             }
         }
         devices
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+/// HCI Socket Controller State (inspired by NetBSD/FreeBSD hciconfig & bthset)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HciState {
+    Down,
+    Up,
+    Resetting,
+    Testing,
+}
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HciInquiryMode {
+    Standard,
+    Rssi,
+    Extended,
+}
+
+/// HCI Controller Configuration
+#[derive(Debug, Clone)]
+pub struct HciControllerConfig {
+    pub dev_index: usize,
+    pub bd_addr: [u8; 6],
+    pub state: HciState,
+    pub page_timeout: u16,
+    pub inquiry_mode: HciInquiryMode,
+    pub acl_mtu: u16,
+    pub sco_mtu: u8,
+}
+
+impl Default for HciControllerConfig {
+    fn default() -> Self {
+        Self {
+            dev_index: 0,
+            bd_addr: [0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13],
+            state: HciState::Down,
+            page_timeout: 0x2000,
+            inquiry_mode: HciInquiryMode::Extended,
+            acl_mtu: 1021,
+            sco_mtu: 64,
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+/// Linux rfkill Subsystem Integration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RfKillState {
+    Unblocked = 0,
+    SoftBlocked = 1,
+    HardBlocked = 2,
+}
 
+#[derive(Debug, Clone)]
+pub struct RfKillSwitch {
+    pub id: usize,
+    pub name: String,
+    pub state: RfKillState,
+}
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+impl RfKillSwitch {
+    pub fn new(id: usize, name: &str) -> Self {
+        Self {
+            id,
+            name: String::from(name),
+            state: RfKillState::Unblocked,
         }
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+    pub fn set_soft_block(&mut self, blocked: bool) {
+        if self.state != RfKillState::HardBlocked {
+            self.state = if blocked { RfKillState::SoftBlocked } else { RfKillState::Unblocked };
         }
     }
-}
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    pub fn is_blocked(&self) -> bool {
+        self.state != RfKillState::Unblocked
     }
 }
