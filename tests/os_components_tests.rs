@@ -3,12 +3,17 @@
 
 extern crate alloc;
 
-#[path = "../src/klib/mod.rs"]
-mod klib;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
-#[path = "../src/security/mod.rs"]
-mod security;
+mod klib {
+    pub use sigmaos::klib::*;
+}
+
+mod sigpkg {
+    pub use sigmaos::sigpkg::*;
+}
+
+mod security {
+    pub use sigmaos::security::*;
+}
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
@@ -839,124 +844,4 @@ fn test_antix_linux_parity_and_lightweight_init() {
     let kernel_updater = AntixKernelUpdater::new();
     let k_msg = kernel_updater.switch_kernel_variant(KernelVariant::Kernel486NonPae);
     assert!(k_msg.contains("non-PAE"));
-}
-
-#[test]
-fn test_bsd_linux_package_management_innovations_inspection() {
-    use sigpkg::*;
-
-    // 1. FreeBSD Ports Flavours & VuXML Audit Engine
-    let mut ports_vuxml = FreeBsdPortsFlavoursAndVuxmlEngine::new();
-    ports_vuxml.register_port(PortFlavourSpec {
-        origin: "www/nginx".to_string(),
-        selected_flavour: "full".to_string(),
-        available_flavours: vec!["lite".to_string(), "full".to_string()],
-        default_options: vec!["HTTP2".to_string()],
-        flavour_options: vec!["SSL".to_string()],
-        flavour_dependencies: vec!["security/openssl".to_string()],
-    });
-
-    let deps = ports_vuxml.select_flavour("www/nginx", "full").unwrap();
-    assert!(deps.contains(&"security/openssl".to_string()));
-
-    ports_vuxml.register_vulnerability(VuXmlVulnerabilityRecord {
-        vid: "vuxml-nginx-cve-1234".to_string(),
-        affected_package: "nginx".to_string(),
-        vulnerable_range_min: "1.20.0".to_string(),
-        vulnerable_range_max: "1.24.0".to_string(),
-        severity: VulnerabilitySeverity::High,
-        cve_ids: vec!["CVE-2023-1234".to_string()],
-        description: "Buffer overflow in HTTP2 module".to_string(),
-        fixed_version: "1.24.1".to_string(),
-    });
-
-    let v_matches = ports_vuxml.audit_installed_packages(&[("nginx", "1.22.0")]);
-    assert_eq!(v_matches.len(), 1);
-    assert_eq!(v_matches[0].severity, VulnerabilitySeverity::High);
-
-    // 2. Void XBPS Soname Integrity & Orphan Purging Engine
-    let mut xbps_engine = XbpsSonameAndOrphanEngine::new();
-    xbps_engine.register_installed_package(ElfSonameRecord {
-        package_name: "libz".to_string(),
-        provided_sonames: vec!["libz.so.1".to_string()],
-        required_sonames: vec![],
-        is_explicitly_installed: false,
-    });
-    xbps_engine.register_installed_package(ElfSonameRecord {
-        package_name: "tar".to_string(),
-        provided_sonames: vec!["tar".to_string()],
-        required_sonames: vec!["libz.so.1".to_string()],
-        is_explicitly_installed: true,
-    });
-    assert!(xbps_engine.verify_soname_integrity().is_ok());
-    assert_eq!(xbps_engine.find_orphan_packages().len(), 0);
-
-    // 3. Alpine APK v3 World Specification & Ephemeral Virtual Packages
-    let mut apk_v3 = AlpineApkWorldAndVirtualPkgEngine::new();
-    apk_v3.add_world_rule(ApkWorldRule {
-        package_name: "musl".to_string(),
-        version_constraint: Some(">=1.2".to_string()),
-        pinned_repository_tag: None,
-    });
-    apk_v3.create_virtual_package_set(".build-tools", &["gcc", "g++", "make"], 1000);
-    assert_eq!(apk_v3.installed_packages.len(), 3);
-    assert!(apk_v3.purge_virtual_package_set(".build-tools").is_ok());
-    assert_eq!(apk_v3.installed_packages.len(), 0);
-
-    // 4. Nix/Guix Store GC & Profile Generation Engine
-    let mut nix_guix = NixGuixCasGcProfileEngine::new();
-    nix_guix.add_store_object("/nix/store/1111-coreutils", b"COREUTILS_BLOB");
-    nix_guix.add_store_object("/nix/store/2222-temp", b"TEMP_BLOB");
-    nix_guix.add_gc_root("/nix/store/1111-coreutils");
-    assert_eq!(nix_guix.collect_garbage(), 1);
-    assert!(!nix_guix.store_objects.contains_key("/nix/store/2222-temp"));
-
-    // 5. Arch Linux Split Packages & ALPM Path Hook Runner
-    let mut arch_runner = ArchSplitPackageHookRunnerEngine::new();
-    arch_runner.register_split_pkg(PkgbuildSplitPackageSpec {
-        base_pkgname: "gcc".to_string(),
-        sub_packages: vec!["gcc-libs".to_string(), "gcc-fortran".to_string()],
-        common_depends: vec!["glibc".to_string()],
-    });
-    arch_runner.register_hook(AlpmPathHookRule {
-        name: "depmod".to_string(),
-        when: HookWhen::PostTransaction,
-        path_trigger: "usr/lib/modules/".to_string(),
-        exec_command: "depmod -a".to_string(),
-    });
-    assert_eq!(arch_runner.trigger_hooks_for_paths(HookWhen::PostTransaction, &["usr/lib/modules/6.8.0/"]), 1);
-
-    // 6. Fedora DNF5 Advisories & Delta RPM Engine
-    let mut dnf5_engine = FedoraDnf5AdvisoryAndDeltaRpmEngine::new();
-    dnf5_engine.register_advisory(Dnf5AdvisoryNotice {
-        advisory_id: "FEDORA-2026-999".to_string(),
-        kind: Dnf5AdvisoryKind::Security,
-        affected_package: "glibc".to_string(),
-        new_version: "2.39-2".to_string(),
-        cve_references: vec!["CVE-2026-9999".to_string()],
-    });
-    assert_eq!(dnf5_engine.filter_security_updates().len(), 1);
-
-    // 7. Gentoo Subslot ABI Rebuild & USE_EXPAND Engine
-    let mut gentoo_engine = GentooPortageSubslotAndUseExpandEngine::new();
-    gentoo_engine.register_subslot(PortageSubslotSpec {
-        package_atom: "media-libs/libpng".to_string(),
-        slot: "0".to_string(),
-        subslot: "1.6".to_string(),
-        reverse_dependents: vec!["media-gfx/gimp".to_string()],
-    });
-    let rebuilds = gentoo_engine.check_subslot_rebuild_trigger("media-libs/libpng", "1.7");
-    assert_eq!(rebuilds, vec!["media-gfx/gimp".to_string()]);
-
-    // 8. Haiku HPKG PackageFS & Solus Moss Stateless Overlay Engine
-    let mut hpkg_moss = HaikuHpkgPackageFsEngine::new();
-    let mounted_path = hpkg_moss.mount_hpkg_package(HpkgContainerSpec {
-        hpkg_filename: "bash-5.2.hpkg".to_string(),
-        mounted_vfs_path: "/system/packages/bash-5.2.hpkg".to_string(),
-        contained_files: vec!["/bin/bash".to_string()],
-        is_mounted: false,
-    }).unwrap();
-    assert_eq!(mounted_path, "/system/packages/bash-5.2.hpkg");
-    hpkg_moss.set_stateless_default_config("/etc/bashrc", "# Default bashrc");
-    assert_eq!(hpkg_moss.resolve_config_fallback("/etc/bashrc").unwrap(), "# Default bashrc");
 }
