@@ -40,7 +40,7 @@ This document serves as the single source of truth for repository health, techni
 * **Compliance Matrix:**
   - **GDPR:** Data minimization & cryptographic sanitization engines implemented in `DataClassificationAndDeletionEngine`. Audit logging required for user telemetry endpoints.
   - **HIPAA:** Encryption-at-rest (`SigmaFsCowStoragePool`) and cryptographic key agility (`CryptoAgilityFramework`) verified. Access control logs require immutability enforcement.
-  - **WCAG (Web Content Accessibility Guidelines):** Desktop UI components (`zenith_desktop`) require mandatory keyboard focus indicators, screen reader ARIA attributes, high-contrast modes, and semantic HTML tags across web and desktop interfaces.
+  - **WCAG (Web Content Accessibility Guidelines):** Desktop UI components (`zenith_desktop` and GTK toolkit `src/ui/toolkit.rs`) feature GTK AT-SPI accessibility roles (`GtkAccessibilityRole`), mandatory keyboard focus indicators, high-contrast modes, and semantic tags.
   - **ISO 27001:** Mandatory UEFI Secure Boot chain of trust verification and Loadable Kernel Module (LKM) signature validation integrated in `SecureBootVerifier`.
 
 ---
