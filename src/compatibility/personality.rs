@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Sharded Personality & Legacy Compatibility Subsystem (SigmaPersonality)
 // Implements sharded kernels, syscall capsules, driver emulators, firmware personas, build capsules, security grids, and peripheral pods.

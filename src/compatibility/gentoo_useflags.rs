@@ -1,8 +1,6 @@
 //! Gentoo-Inspired USE Flags and Source Compilation System
 extern crate alloc;
 
-
-
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

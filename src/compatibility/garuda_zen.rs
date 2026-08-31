@@ -287,10 +287,26 @@ impl GarudaAutoNiceEngine {
     pub fn new() -> Self {
         Self {
             rules: [
-                GarudaAutoNiceRule { process_name: "steam", nice_value: -10, io_class: ProcessIoClass::Realtime },
-                GarudaAutoNiceRule { process_name: "pipewire", nice_value: -15, io_class: ProcessIoClass::Realtime },
-                GarudaAutoNiceRule { process_name: "obs", nice_value: -8, io_class: ProcessIoClass::BestEffort },
-                GarudaAutoNiceRule { process_name: "baloo", nice_value: 19, io_class: ProcessIoClass::Idle },
+                GarudaAutoNiceRule {
+                    process_name: "steam",
+                    nice_value: -10,
+                    io_class: ProcessIoClass::Realtime,
+                },
+                GarudaAutoNiceRule {
+                    process_name: "pipewire",
+                    nice_value: -15,
+                    io_class: ProcessIoClass::Realtime,
+                },
+                GarudaAutoNiceRule {
+                    process_name: "obs",
+                    nice_value: -8,
+                    io_class: ProcessIoClass::BestEffort,
+                },
+                GarudaAutoNiceRule {
+                    process_name: "baloo",
+                    nice_value: 19,
+                    io_class: ProcessIoClass::Idle,
+                },
             ],
         }
     }

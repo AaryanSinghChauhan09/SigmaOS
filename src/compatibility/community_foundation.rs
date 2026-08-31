@@ -123,7 +123,11 @@ impl SovereignFoundationManager {
         });
     }
 
-    pub fn register_hackathon_participant(&mut self, hackathon_name: &str, participant: &str) -> Result<(), &'static str> {
+    pub fn register_hackathon_participant(
+        &mut self,
+        hackathon_name: &str,
+        participant: &str,
+    ) -> Result<(), &'static str> {
         let event = self
             .hackathons
             .iter_mut()
@@ -137,7 +141,11 @@ impl SovereignFoundationManager {
         Ok(())
     }
 
-    pub fn submit_hackathon_project(&mut self, hackathon_name: &str, project: &str) -> Result<(), &'static str> {
+    pub fn submit_hackathon_project(
+        &mut self,
+        hackathon_name: &str,
+        project: &str,
+    ) -> Result<(), &'static str> {
         let event = self
             .hackathons
             .iter_mut()
@@ -183,8 +191,12 @@ mod tests {
         assert!(foundation.bounties[0].resolved);
 
         foundation.organize_hackathon("Global Kernel Hackathon 2026", "Zero-Copy IPC Innovations");
-        assert!(foundation.register_hackathon_participant("Global Kernel Hackathon 2026", "charlie_dev").is_ok());
-        assert!(foundation.submit_hackathon_project("Global Kernel Hackathon 2026", "SovereignRingFS").is_ok());
+        assert!(foundation
+            .register_hackathon_participant("Global Kernel Hackathon 2026", "charlie_dev")
+            .is_ok());
+        assert!(foundation
+            .submit_hackathon_project("Global Kernel Hackathon 2026", "SovereignRingFS")
+            .is_ok());
 
         assert_eq!(foundation.hackathons[0].projects_submitted.len(), 1);
     }

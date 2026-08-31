@@ -2,7 +2,6 @@ extern crate alloc;
 // Sovereign Fedora & RHEL Domination Core for SigmaOS
 // Zero-dependency, safe Rust, no_std compatible architecture
 
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
