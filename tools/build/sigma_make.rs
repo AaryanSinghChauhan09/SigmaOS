@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case, static_mut_refs, clippy::all)]
+#![allow(dead_code, non_snake_case, static_mut_refs)]
 
-// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
-// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-// All types hand-defined. OOP via struct + impl + trait patterns.
+/// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -23,12 +23,6 @@ type SigmaUsize = usize;
 pub struct StaticVec<T: Copy, const N: usize> {
     data: [Option<T>; N],
     len: usize,
-}
-
-impl<T: Copy, const N: usize> Default for StaticVec<T, N> {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl<T: Copy, const N: usize> StaticVec<T, N> {
@@ -89,11 +83,15 @@ impl SigmaTarget {
     pub fn new(name_str: &[u8], command_str: &[u8]) -> Self {
         let mut name = [0u8; 32];
         let name_len = name_str.len().min(31);
-        name[..name_len].copy_from_slice(&name_str[..name_len]);
+        for i in 0..name_len {
+            name[i] = name_str[i];
+        }
 
         let mut command = [0u8; 256];
         let cmd_len = command_str.len().min(255);
-        command[..cmd_len].copy_from_slice(&command_str[..cmd_len]);
+        for i in 0..cmd_len {
+            command[i] = command_str[i];
+        }
 
         Self {
             name,
@@ -114,12 +112,6 @@ pub struct SigmaMakeEngine {
     pub targets: StaticVec<SigmaTarget, 16>,
     /// Tuple of (parent_target_idx, child_target_idx)
     pub dependencies: StaticVec<(SigmaUsize, SigmaUsize), 32>,
-}
-
-impl Default for SigmaMakeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SigmaMakeEngine {
@@ -174,28 +166,21 @@ impl SigmaMakeEngine {
     }
 }
 
-/// # Safety
-/// Caller must ensure `dest` slice has sufficient allocated capacity.
 pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
     let len = src.len().min(dest.len());
-    dest[..len].copy_from_slice(&src[..len]);
+    for i in 0..len {
+        dest[i] = src[i];
+    }
 }
 
 static mut GLOBAL_MAKE: SigmaMakeEngine = SigmaMakeEngine::new();
 
-/// # Safety
-/// Empty C-ABI string copy symbol helper.
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {}
 
-/// # Safety
-/// Caller must ensure single-threaded execution when modifying global make engine static.
 #[no_mangle]
 pub unsafe extern "C" fn sigma_make_register_c_target() {
-    unsafe {
-        let _ = (&mut *core::ptr::addr_of_mut!(GLOBAL_MAKE))
-            .register_target(b"c_target", b"gcc c_target.c -o c_target");
-    }
+    let _ = GLOBAL_MAKE.register_target(b"c_target", b"gcc c_target.c -o c_target");
 }
 
 fn main() {}

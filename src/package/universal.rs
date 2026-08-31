@@ -1,15 +1,11 @@
 extern crate alloc;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -21,7 +17,7 @@ pub enum PackagePriority {
     Optional,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     Deb,      // apt/dpkg
     Rpm,      // yum/dnf/zypper
@@ -50,6 +46,19 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
+    Xbps,     // Void Linux (.xbps)
+    Zypper,   // OpenSUSE Zypper (.zypper)
+    Guix,     // GNU Guix (.guix / .scm)
+    Moss,     // Solus Moss (.moss)
+    Hpkg,     // Haiku Package (.hpkg)
+    Tcz,      // Tiny Core Linux (.tcz)
+    Gobo,     // GoboLinux (.gobo)
+    Ostree,   // OSTree commit (.commit)
+    Pkgsrc,   // NetBSD pkgsrc (.pkgsrc)
+    Sfs,      // SquashFS (.sfs)
+    Puk,      // Portable Package (.puk)
+    Dmg,      // macOS Disk Image (.dmg)
+    Cports,   // Chimera Linux (.cports)
 }
 
 impl PackageFormat {
@@ -59,10 +68,7 @@ impl PackageFormat {
             Some(PackageFormat::Deb)
         } else if name.ends_with(".rpm") {
             Some(PackageFormat::Rpm)
-        } else if name.ends_with(".pkg.tar.zst")
-            || name.ends_with(".pkg.tar.xz")
-            || name.ends_with(".pkg.tar.gz")
-        {
+        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".snap") {
             Some(PackageFormat::Snap)
@@ -97,7 +103,31 @@ impl PackageFormat {
         } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
             Some(PackageFormat::Xz)
         } else if name.ends_with(".xbps") {
-            Some(PackageFormat::SigmaPkg)
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
         } else if name.ends_with(".cachy") {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".app") {
@@ -142,8 +172,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler:
-        alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -777,11 +806,7 @@ impl UniversalPackageManager {
     }
 
     /// Triggers user-defined hooks matching the requested lifecycle stage
-    pub fn trigger_user_hooks(
-        &self,
-        timing: HookTiming,
-        package: &UnifiedPackage,
-    ) -> Result<(), PackageError> {
+    pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
         for hook in &self.user_hooks {
             if hook.timing() == timing {
                 hook.execute(package)?;
@@ -793,17 +818,14 @@ impl UniversalPackageManager {
     /// Installs a package file directly by inferring format from filename
     pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
         let format = PackageFormat::from_filename(filepath).ok_or_else(|| {
-            PackageError::InstallationFailed(format!(
-                "Unsupported file format extension for file: {}",
-                filepath
-            ))
+            PackageError::InstallationFailed(format!("Unsupported file format extension for file: {}", filepath))
         })?;
 
         let file_name = filepath.split('/').last().unwrap_or(filepath);
         let pkg_name = file_name.split('.').next().unwrap_or(file_name);
 
-        let package =
-            UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string()).with_format(format);
+        let package = UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string())
+            .with_format(format);
 
         self.add_package(package);
         self.install(pkg_name)
@@ -842,92 +864,47 @@ impl UniversalPackageManager {
             PackageFormat::Flatpak,
             PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
         );
-        self.adapters
-            .insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters.insert(
+            PackageFormat::AppImage,
+            appimage_adapter,
+        );
         self.adapters.insert(
             PackageFormat::SigmaPkg,
             PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
         );
-        self.adapters.insert(
-            PackageFormat::Air,
-            PackageAdapter::new(PackageFormat::Air, "air".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Bottle,
-            PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Ipa,
-            PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Ports,
-            PackageAdapter::new(PackageFormat::Ports, "ports".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Pkg,
-            PackageAdapter::new(PackageFormat::Pkg, "pkg".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Aab,
-            PackageAdapter::new(PackageFormat::Aab, "aab".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Apk,
-            PackageAdapter::new(PackageFormat::Apk, "apk".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Eopkg,
-            PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Nixpkg,
-            PackageAdapter::new(PackageFormat::Nixpkg, "nixpkg".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Ebuild,
-            PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::TarGz,
-            PackageAdapter::new(PackageFormat::TarGz, "targz".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Xz,
-            PackageAdapter::new(PackageFormat::Xz, "xz".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::App,
-            PackageAdapter::new(PackageFormat::App, "app".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Hap,
-            PackageAdapter::new(PackageFormat::Hap, "hap".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Pisi,
-            PackageAdapter::new(PackageFormat::Pisi, "pisi".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Superdeb,
-            PackageAdapter::new(PackageFormat::Superdeb, "superdeb".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Lzm,
-            PackageAdapter::new(PackageFormat::Lzm, "lzm".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Pup,
-            PackageAdapter::new(PackageFormat::Pup, "pup".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Pet,
-            PackageAdapter::new(PackageFormat::Pet, "pet".to_string()),
-        );
-        self.adapters.insert(
-            PackageFormat::Tar,
-            PackageAdapter::new(PackageFormat::Tar, "tar".to_string()),
-        );
+        self.adapters.insert(PackageFormat::Air, PackageAdapter::new(PackageFormat::Air, "air".to_string()));
+        self.adapters.insert(PackageFormat::Bottle, PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()));
+        self.adapters.insert(PackageFormat::Ipa, PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()));
+        self.adapters.insert(PackageFormat::Ports, PackageAdapter::new(PackageFormat::Ports, "ports".to_string()));
+        self.adapters.insert(PackageFormat::Pkg, PackageAdapter::new(PackageFormat::Pkg, "pkg".to_string()));
+        self.adapters.insert(PackageFormat::Aab, PackageAdapter::new(PackageFormat::Aab, "aab".to_string()));
+        self.adapters.insert(PackageFormat::Apk, PackageAdapter::new(PackageFormat::Apk, "apk".to_string()));
+        self.adapters.insert(PackageFormat::Eopkg, PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string()));
+        self.adapters.insert(PackageFormat::Nixpkg, PackageAdapter::new(PackageFormat::Nixpkg, "nixpkg".to_string()));
+        self.adapters.insert(PackageFormat::Ebuild, PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string()));
+        self.adapters.insert(PackageFormat::TarGz, PackageAdapter::new(PackageFormat::TarGz, "targz".to_string()));
+        self.adapters.insert(PackageFormat::Xz, PackageAdapter::new(PackageFormat::Xz, "xz".to_string()));
+        self.adapters.insert(PackageFormat::App, PackageAdapter::new(PackageFormat::App, "app".to_string()));
+        self.adapters.insert(PackageFormat::Hap, PackageAdapter::new(PackageFormat::Hap, "hap".to_string()));
+        self.adapters.insert(PackageFormat::Pisi, PackageAdapter::new(PackageFormat::Pisi, "pisi".to_string()));
+        self.adapters.insert(PackageFormat::Superdeb, PackageAdapter::new(PackageFormat::Superdeb, "superdeb".to_string()));
+        self.adapters.insert(PackageFormat::Lzm, PackageAdapter::new(PackageFormat::Lzm, "lzm".to_string()));
+        self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
+        self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
+        self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
+        self.adapters.insert(PackageFormat::Xbps, PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()));
+        self.adapters.insert(PackageFormat::Zypper, PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()));
+        self.adapters.insert(PackageFormat::Guix, PackageAdapter::new(PackageFormat::Guix, "guix".to_string()));
+        self.adapters.insert(PackageFormat::Moss, PackageAdapter::new(PackageFormat::Moss, "moss".to_string()));
+        self.adapters.insert(PackageFormat::Hpkg, PackageAdapter::new(PackageFormat::Hpkg, "hpkg".to_string()));
+        self.adapters.insert(PackageFormat::Tcz, PackageAdapter::new(PackageFormat::Tcz, "tcz".to_string()));
+        self.adapters.insert(PackageFormat::Gobo, PackageAdapter::new(PackageFormat::Gobo, "gobo".to_string()));
+        self.adapters.insert(PackageFormat::Ostree, PackageAdapter::new(PackageFormat::Ostree, "ostree".to_string()));
+        self.adapters.insert(PackageFormat::Pkgsrc, PackageAdapter::new(PackageFormat::Pkgsrc, "pkgsrc".to_string()));
+        self.adapters.insert(PackageFormat::Sfs, PackageAdapter::new(PackageFormat::Sfs, "sfs".to_string()));
+        self.adapters.insert(PackageFormat::Puk, PackageAdapter::new(PackageFormat::Puk, "puk".to_string()));
+        self.adapters.insert(PackageFormat::Dmg, PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()));
+        self.adapters.insert(PackageFormat::Cports, PackageAdapter::new(PackageFormat::Cports, "cports".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -951,9 +928,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in current_keys {
-                if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+            for key in &current_keys {
+                if !checkpoint.installed_keys.contains(key) {
+                    self.remove(key)?;
                 }
             }
             Ok(())
@@ -996,8 +973,7 @@ impl UniversalPackageManager {
 
                 let mut installed = package.clone();
                 installed.installed = true;
-                self.installed_packages
-                    .insert(dep_name.clone(), installed.clone());
+                self.installed_packages.insert(dep_name.clone(), installed.clone());
 
                 // Trigger PostInstall user defined hooks
                 self.trigger_user_hooks(HookTiming::PostInstall, &installed)?;
@@ -1160,14 +1136,15 @@ impl UniversalPackageManifestParser {
         }
     }
 
-    pub fn parse_manifest_auto(
-        filename: &str,
-        raw_data: &[u8],
-    ) -> Result<UnifiedPackage, &'static str> {
+    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
         let fmt = Self::detect_format_from_filename(filename)
             .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
 
-        let pkg_name = filename.split('.').next().unwrap_or("unknown").to_string();
+        let pkg_name = filename
+            .split('.')
+            .next()
+            .unwrap_or("unknown")
+            .to_string();
 
         let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
         if !raw_data.is_empty() {
@@ -1180,11 +1157,11 @@ impl UniversalPackageManifestParser {
 /// Linux & BSD Distro Inspired Rollback Mechanics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRollbackType {
-    NixOsGeneration,   // NixOS atomic generation profile rollback
-    FreeBsdZfsBootEnv, // FreeBSD ZFS boot environment (bectl / beadm) rollback
-    OpenSuseSnapper,   // openSUSE Snapper CoW snapshot rollback
-    FedoraRpmOstree,   // Fedora Silverblue / rpm-ostree deployment rollback
-    AlpineApkCache,    // Alpine Linux local apk tarball cache rollback
+    NixOsGeneration,       // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
 }
 
 #[derive(Debug, Clone)]
@@ -1235,11 +1212,7 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.snapshot_id == snapshot_id)
-            .ok_or("Rollback Engine: Snapshot not found")?;
+        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
         self.active_snapshot_id = Some(snapshot_id);
         Ok(snap.installed_packages_state.clone())
     }
@@ -1310,35 +1283,19 @@ mod tests {
         let hook_ran = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
         let hook_ran_clone = hook_ran.clone();
 
-        let custom_hook =
-            CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
-                hook_ran_clone.store(true, core::sync::atomic::Ordering::SeqCst);
-                Ok(())
-            });
+        let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
+            hook_ran_clone.store(true, core::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
 
         manager.add_user_hook(alloc::sync::Arc::new(custom_hook));
 
         // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
-        assert_eq!(
-            PackageFormat::from_filename("gcc.deb"),
-            Some(PackageFormat::Deb)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("nginx.rpm"),
-            Some(PackageFormat::Rpm)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("alpine.apk"),
-            Some(PackageFormat::Apk)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("app.flatpak"),
-            Some(PackageFormat::Flatpak)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("tool.appimage"),
-            Some(PackageFormat::AppImage)
-        );
+        assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::from_filename("nginx.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::from_filename("alpine.apk"), Some(PackageFormat::Apk));
+        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::from_filename("tool.appimage"), Some(PackageFormat::AppImage));
 
         // Install from file
         assert!(manager.install_from_file("/tmp/htop.deb").is_ok());
@@ -1520,26 +1477,16 @@ mod tests {
             Some(PackageFormat::Flatpak)
         );
 
-        let pkg =
-            UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }
 
     #[test]
     fn test_package_format_from_filename_extensions() {
-        assert_eq!(
-            PackageFormat::from_filename("slackware.txz"),
-            Some(PackageFormat::Xz)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("package.xbps"),
-            Some(PackageFormat::SigmaPkg)
-        );
-        assert_eq!(
-            PackageFormat::from_filename("kernel.cachy"),
-            Some(PackageFormat::Pacman)
-        );
+        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
+        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
     }
 
     #[test]

@@ -14,6 +14,7 @@ pub mod deobfuscation;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
+pub mod libgksu;
 pub mod mac;
 pub mod password;
 pub mod openbsd_karl;
@@ -59,6 +60,10 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
+pub use libgksu::{
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
 pub use parrot::{
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, AnonSurfShunt, AppSandboxEngine,
     ForensicStorageFilter, RoutingMode,
@@ -96,13 +101,13 @@ pub use vault::{
     VaultResult,
 };
 pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, PiaDedicatedIpBinding,
+    PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient,
+    SplitTunnelRule, VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler,
+    VpnStatistics, WireGuardHandler,
 };
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
     SimpleVulnerabilityScanner,
 };
-
-

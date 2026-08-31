@@ -1,15 +1,5 @@
-extern crate core;
 extern crate alloc;
-extern crate core;
 
-#[cfg(not(feature = "default"))]
-extern crate core;
-
-#[cfg(feature = "default")]
-use core::convert::TryInto;
-
-#[cfg(not(feature = "default"))]
-use std::convert::TryInto;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

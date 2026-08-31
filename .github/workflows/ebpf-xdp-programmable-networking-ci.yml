@@ -25,5 +25,5 @@ jobs:
       - name: Test eBPF Fast Data-Plane Engine
         run: |
           mkdir -p build
-          rustc --test --cfg 'feature="standalone_test"' src/kernel/ebpf.rs --edition=2021 -o build/ebpf_test
+          rustc --test src/kernel/ebpf.rs --edition=2021 -o build/ebpf_test
           ./build/ebpf_test

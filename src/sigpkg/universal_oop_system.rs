@@ -30,7 +30,11 @@ use alloc::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap;
 
 use alloc::sync::Arc;
 
@@ -174,6 +178,26 @@ pub enum PackageFormat {
     Pup,
     // Puppy Extra Tarball / Pet (.pet)
     Pet,
+    // Solus Moss (.moss)
+    Moss,
+    // Haiku Package (.hpkg)
+    Hpkg,
+    // Tiny Core Linux extension (.tcz)
+    Tcz,
+    // GoboLinux package (.gobo)
+    Gobo,
+    // OSTree commit (.commit)
+    Ostree,
+    // NetBSD pkgsrc (.pkgsrc)
+    Pkgsrc,
+    // SquashFS package (.sfs)
+    Sfs,
+    // Portable package (.puk)
+    Puk,
+    // macOS Disk Image (.dmg)
+    Dmg,
+    // Chimera Linux (.cports)
+    Cports,
 }
 
 /// Package metadata structure
@@ -440,17 +464,10 @@ macro_rules! impl_generic_package_adapter {
                 for line in content.lines() {
                     let trimmed = line.trim();
                     if trimmed.starts_with($name_prefix) {
-                        name = trimmed[$name_prefix.len()..]
-                            .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
-                            .to_string();
+                        name = trimmed[$name_prefix.len()..].trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
                     } else if trimmed.starts_with($version_prefix) {
-                        version_str = trimmed[$version_prefix.len()..]
-                            .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
-                            .to_string();
-                    } else if trimmed.starts_with("description=")
-                        || trimmed.starts_with("Description:")
-                        || trimmed.starts_with("summary=")
-                    {
+                        version_str = trimmed[$version_prefix.len()..].trim_matches(|c| c == '"' || c == '\'' || c == ' ').to_string();
+                    } else if trimmed.starts_with("description=") || trimmed.starts_with("Description:") || trimmed.starts_with("summary=") {
                         let pos = trimmed.find('=').or_else(|| trimmed.find(':')).unwrap_or(0);
                         description = trimmed[pos + 1..].trim().to_string();
                     } else if trimmed.starts_with("depends=") || trimmed.starts_with("Depends:") {
@@ -468,8 +485,7 @@ macro_rules! impl_generic_package_adapter {
                     name = stringify!($struct_name).to_lowercase();
                 }
 
-                let version =
-                    Version::parse(&version_str).unwrap_or_else(|_| Version::new(1, 0, 0));
+                let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(1, 0, 0));
 
                 let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
                     metadata: PackageMetadata {
@@ -513,106 +529,32 @@ macro_rules! impl_generic_package_adapter {
     };
 }
 
-impl_generic_package_adapter!(
-    AirAdapter,
-    Air,
-    "air-application:",
-    "air-application: ",
-    "air-version: "
-);
-impl_generic_package_adapter!(
-    BottleAdapter,
-    Bottle,
-    "bottle:",
-    "bottle: ",
-    "bottle-version: "
-);
-impl_generic_package_adapter!(
-    IpaAdapter,
-    Ipa,
-    "CFBundleName",
-    "CFBundleName: ",
-    "CFBundleShortVersionString: "
-);
-impl_generic_package_adapter!(
-    PortsAdapter,
-    Ports,
-    "PORTNAME=",
-    "PORTNAME=",
-    "PORTVERSION="
-);
+impl_generic_package_adapter!(AirAdapter, Air, "air-application:", "air-application: ", "air-version: ");
+impl_generic_package_adapter!(BottleAdapter, Bottle, "bottle:", "bottle: ", "bottle-version: ");
+impl_generic_package_adapter!(IpaAdapter, Ipa, "CFBundleName", "CFBundleName: ", "CFBundleShortVersionString: ");
+impl_generic_package_adapter!(PortsAdapter, Ports, "PORTNAME=", "PORTNAME=", "PORTVERSION=");
 impl_generic_package_adapter!(PkgAdapter, Pkg, "pkg_name:", "pkg_name: ", "pkg_version: ");
-impl_generic_package_adapter!(
-    AabAdapter,
-    Aab,
-    "aab-package:",
-    "aab-package: ",
-    "aab-version: "
-);
-impl_generic_package_adapter!(
-    TarGzAdapter,
-    TarGz,
-    "tar-gz-package:",
-    "tar-gz-package: ",
-    "tar-gz-version: "
-);
-impl_generic_package_adapter!(
-    TarXzAdapter,
-    TarXz,
-    "tar-xz-package:",
-    "tar-xz-package: ",
-    "tar-xz-version: "
-);
-impl_generic_package_adapter!(
-    TarAdapter,
-    Tar,
-    "tar-package:",
-    "tar-package: ",
-    "tar-version: "
-);
-impl_generic_package_adapter!(
-    AppBundleAdapter,
-    AppBundle,
-    "CFBundleExecutable",
-    "CFBundleExecutable: ",
-    "CFBundleVersion: "
-);
-impl_generic_package_adapter!(
-    HapAdapter,
-    Hap,
-    "hap-app-name:",
-    "hap-app-name: ",
-    "hap-version: "
-);
-impl_generic_package_adapter!(
-    PisiAdapter,
-    Pisi,
-    "pisi-name:",
-    "pisi-name: ",
-    "pisi-version: "
-);
-impl_generic_package_adapter!(
-    SuperdebAdapter,
-    Superdeb,
-    "Superdeb-Package:",
-    "Superdeb-Package: ",
-    "Superdeb-Version: "
-);
-impl_generic_package_adapter!(
-    LzmAdapter,
-    Lzm,
-    "lzm-module:",
-    "lzm-module: ",
-    "lzm-version: "
-);
+impl_generic_package_adapter!(AabAdapter, Aab, "aab-package:", "aab-package: ", "aab-version: ");
+impl_generic_package_adapter!(TarGzAdapter, TarGz, "tar-gz-package:", "tar-gz-package: ", "tar-gz-version: ");
+impl_generic_package_adapter!(TarXzAdapter, TarXz, "tar-xz-package:", "tar-xz-package: ", "tar-xz-version: ");
+impl_generic_package_adapter!(TarAdapter, Tar, "tar-package:", "tar-package: ", "tar-version: ");
+impl_generic_package_adapter!(AppBundleAdapter, AppBundle, "CFBundleExecutable", "CFBundleExecutable: ", "CFBundleVersion: ");
+impl_generic_package_adapter!(HapAdapter, Hap, "hap-app-name:", "hap-app-name: ", "hap-version: ");
+impl_generic_package_adapter!(PisiAdapter, Pisi, "pisi-name:", "pisi-name: ", "pisi-version: ");
+impl_generic_package_adapter!(SuperdebAdapter, Superdeb, "Superdeb-Package:", "Superdeb-Package: ", "Superdeb-Version: ");
+impl_generic_package_adapter!(LzmAdapter, Lzm, "lzm-module:", "lzm-module: ", "lzm-version: ");
 impl_generic_package_adapter!(PupAdapter, Pup, "pup-name:", "pup-name: ", "pup-version: ");
-impl_generic_package_adapter!(
-    PetAdapter,
-    Pet,
-    "pet-package:",
-    "pet-package: ",
-    "pet-version: "
-);
+impl_generic_package_adapter!(PetAdapter, Pet, "pet-package:", "pet-package: ", "pet-version: ");
+impl_generic_package_adapter!(MossAdapter, Moss, "moss-package:", "moss-package: ", "moss-version: ");
+impl_generic_package_adapter!(HpkgAdapter, Hpkg, "hpkg-package:", "hpkg-package: ", "hpkg-version: ");
+impl_generic_package_adapter!(TczAdapter, Tcz, "tcz-package:", "tcz-package: ", "tcz-version: ");
+impl_generic_package_adapter!(GoboAdapter, Gobo, "gobo-package:", "gobo-package: ", "gobo-version: ");
+impl_generic_package_adapter!(OstreeAdapter, Ostree, "ostree-commit:", "ostree-commit: ", "ostree-version: ");
+impl_generic_package_adapter!(PkgsrcAdapter, Pkgsrc, "pkgsrc-package:", "pkgsrc-package: ", "pkgsrc-version: ");
+impl_generic_package_adapter!(SfsAdapter, Sfs, "sfs-module:", "sfs-module: ", "sfs-version: ");
+impl_generic_package_adapter!(PukAdapter, Puk, "puk-package:", "puk-package: ", "puk-version: ");
+impl_generic_package_adapter!(DmgAdapter, Dmg, "dmg-image:", "dmg-image: ", "dmg-version: ");
+impl_generic_package_adapter!(CportsAdapter, Cports, "cports-package:", "cports-package: ", "cports-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2282,6 +2224,16 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(LzmAdapter::new()));
         factory.register_parser(Box::new(PupAdapter::new()));
         factory.register_parser(Box::new(PetAdapter::new()));
+        factory.register_parser(Box::new(MossAdapter::new()));
+        factory.register_parser(Box::new(HpkgAdapter::new()));
+        factory.register_parser(Box::new(TczAdapter::new()));
+        factory.register_parser(Box::new(GoboAdapter::new()));
+        factory.register_parser(Box::new(OstreeAdapter::new()));
+        factory.register_parser(Box::new(PkgsrcAdapter::new()));
+        factory.register_parser(Box::new(SfsAdapter::new()));
+        factory.register_parser(Box::new(PukAdapter::new()));
+        factory.register_parser(Box::new(DmgAdapter::new()));
+        factory.register_parser(Box::new(CportsAdapter::new()));
 
         factory
     }
@@ -2596,11 +2548,7 @@ pub enum InstallError {
 /// Trait for package translation across different major Linux distribution formats.
 /// Uses OOP design principles to translate unified package metadata.
 pub trait UniversalPackageTranslator {
-    fn translate(
-        &self,
-        package: &dyn IPackage,
-        target_format: PackageFormat,
-    ) -> Result<Box<dyn IPackage>, TranslateError>;
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError>;
 }
 
 /// Dynamic error types during package conversion.
@@ -2626,21 +2574,12 @@ impl Default for SigmaPackageTranslator {
 }
 
 impl UniversalPackageTranslator for SigmaPackageTranslator {
-    fn translate(
-        &self,
-        package: &dyn IPackage,
-        target_format: PackageFormat,
-    ) -> Result<Box<dyn IPackage>, TranslateError> {
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError> {
         let meta = package.metadata();
         let new_meta = PackageMetadata {
             name: meta.name.clone(),
             version: meta.version.clone(),
-            description: format!(
-                "Translated from {:?} to {:?}: {}",
-                package.format(),
-                target_format,
-                meta.description
-            ),
+            description: format!("Translated from {:?} to {:?}: {}", package.format(), target_format, meta.description),
             license: meta.license.clone(),
             maintainer: meta.maintainer.clone(),
             homepage: meta.homepage.clone(),
@@ -2912,7 +2851,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s: &String| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3440,24 +3379,13 @@ Description: Hook test";
         assert_eq!(profile.current_generation_id, 0);
 
         // Generation 1: Base utilities
-        let gen1 = profile.create_generation(
-            "Base core utilities",
-            vec!["coreutils".to_string(), "bash".to_string()],
-        );
+        let gen1 = profile.create_generation("Base core utilities", vec!["coreutils".to_string(), "bash".to_string()]);
         assert_eq!(gen1, 1);
         assert_eq!(profile.current_generation_id, 1);
         assert_eq!(profile.current_packages().len(), 2);
 
         // Generation 2: Enhanced tools
-        let gen2 = profile.create_generation(
-            "Developer tools",
-            vec![
-                "coreutils".to_string(),
-                "bash".to_string(),
-                "git".to_string(),
-                "neovim".to_string(),
-            ],
-        );
+        let gen2 = profile.create_generation("Developer tools", vec!["coreutils".to_string(), "bash".to_string(), "git".to_string(), "neovim".to_string()]);
         assert_eq!(gen2, 2);
         assert_eq!(profile.current_generation_id, 2);
         assert_eq!(profile.current_packages().len(), 4);
@@ -3490,8 +3418,7 @@ Description: Hook test";
             fn execute(&self, matched_paths: &[&str]) -> Result<(), String> {
                 assert_eq!(matched_paths.len(), 2);
                 assert!(matched_paths.contains(&"usr/share/man/man1/git.1"));
-                self.executed_flag
-                    .store(true, core::sync::atomic::Ordering::SeqCst);
+                self.executed_flag.store(true, core::sync::atomic::Ordering::SeqCst);
                 Ok(())
             }
         }
