@@ -322,7 +322,7 @@ pub enum DoasAction {
 #[derive(Debug, Clone)]
 pub struct DoasRule {
     pub action: DoasAction,
-    pub identity: String,    // username or group (e.g. ":wheel" or "alice")
+    pub identity: String, // username or group (e.g. ":wheel" or "alice")
     pub target_user: String, // target user (e.g. "root")
     pub keepenv: bool,
     pub nopass: bool,
@@ -343,13 +343,7 @@ impl DoasRuleEngine {
         self.rules.push(rule);
     }
 
-    pub fn evaluate_groups(
-        &self,
-        user: &str,
-        groups: &[&str],
-        target: &str,
-        cmd: &str,
-    ) -> DoasEvaluationResult {
+    pub fn evaluate_groups(&self, user: &str, groups: &[&str], target: &str, cmd: &str) -> DoasEvaluationResult {
         let is_wheel = groups.contains(&"wheel");
         let rule_opt = self.evaluate(user, is_wheel, target, cmd);
         if let Some(rule) = rule_opt {
@@ -368,13 +362,7 @@ impl DoasRuleEngine {
     }
 
     /// Evaluates rules using OpenBSD's last-matching-rule semantics.
-    pub fn evaluate(
-        &self,
-        user: &str,
-        is_wheel: bool,
-        target: &str,
-        cmd: &str,
-    ) -> Option<&DoasRule> {
+    pub fn evaluate(&self, user: &str, is_wheel: bool, target: &str, cmd: &str) -> Option<&DoasRule> {
         let mut last_match = None;
         for rule in &self.rules {
             let id_match = if rule.identity.starts_with(':') {
@@ -429,9 +417,7 @@ pub struct BsdSecurelevelGuard {
 
 impl BsdSecurelevelGuard {
     pub fn new(level: SecureLevel) -> Self {
-        Self {
-            current_level: level,
-        }
+        Self { current_level: level }
     }
 
     pub fn current_level(&self) -> SecureLevel {
@@ -511,10 +497,7 @@ impl SubUidGidMapper {
 
     pub fn is_subuid_valid(&self, username: &str, mapped_uid: u32) -> bool {
         for range in &self.subuid_ranges {
-            if range.username == username
-                && mapped_uid >= range.start_id
-                && mapped_uid < range.start_id + range.count
-            {
+            if range.username == username && mapped_uid >= range.start_id && mapped_uid < range.start_id + range.count {
                 return true;
             }
         }
@@ -1071,9 +1054,7 @@ mod tests {
     #[test]
     fn test_sudo_doas_privilege_elevation() {
         let mut elevator = SudoDoasElevator::new();
-        elevator
-            .password_database
-            .push(("admin".to_string(), "secure_hash_123".to_string()));
+        elevator.password_database.push(("admin".to_string(), "secure_hash_123".to_string()));
 
         // Failed attempt with incorrect password hash
         assert!(elevator
@@ -1081,9 +1062,7 @@ mod tests {
             .is_err());
 
         // Successful elevation
-        let uid = elevator
-            .elevate_via_doas("admin", "secure_hash_123", 10000)
-            .unwrap();
+        let uid = elevator.elevate_via_doas("admin", "secure_hash_123", 10000).unwrap();
         assert_eq!(uid, 0);
 
         // Verification must confirm active session under TTL
@@ -1214,8 +1193,9 @@ mod tests {
     fn test_linux_inspired_pam_stack() {
         let mut engine = PamEngine::new();
 
-        let unix_db: Vec<(String, String)> =
-            vec![("alice".to_string(), "alice_pwd_hash".to_string())];
+        let unix_db: Vec<(String, String)> = vec![
+            ("alice".to_string(), "alice_pwd_hash".to_string()),
+        ];
         let pam_unix = alloc::sync::Arc::new(PamUnixModule::new(unix_db));
         let pam_faillock = alloc::sync::Arc::new(PamFaillockModule);
         let pam_time = alloc::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM

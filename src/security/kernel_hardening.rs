@@ -58,11 +58,7 @@ pub struct SovereignKaslrEngine {
 impl SovereignKaslrEngine {
     pub fn new(base_min: u64, base_max: u64, seed_entropy: u64) -> Self {
         let alignment = 0x0020_0000; // 2MB huge-page alignment
-        let range = if base_max > base_min {
-            base_max - base_min
-        } else {
-            0
-        };
+        let range = if base_max > base_min { base_max - base_min } else { 0 };
 
         let mut engine = Self {
             base_address_min: base_min,
@@ -95,27 +91,13 @@ impl SovereignKaslrEngine {
         self.active_kernel_base = self.base_address_min.wrapping_add(aligned_slide);
 
         // Randomize section offsets (OpenBSD KARL style section relinking)
-        let text_offset =
-            (hashed ^ 0x1111_2222_3333_4444) % (16 * 1024 * 1024) & self.alignment_mask;
-        let data_offset =
-            (hashed ^ 0x5555_6666_7777_8888) % (16 * 1024 * 1024) & self.alignment_mask;
-        let rodata_offset =
-            (hashed ^ 0x9999_AAAA_BBBB_CCCC) % (16 * 1024 * 1024) & self.alignment_mask;
+        let text_offset = (hashed ^ 0x1111_2222_3333_4444) % (16 * 1024 * 1024) & self.alignment_mask;
+        let data_offset = (hashed ^ 0x5555_6666_7777_8888) % (16 * 1024 * 1024) & self.alignment_mask;
+        let rodata_offset = (hashed ^ 0x9999_AAAA_BBBB_CCCC) % (16 * 1024 * 1024) & self.alignment_mask;
 
-        self.region_offsets.insert(
-            ".text".to_string(),
-            self.active_kernel_base.wrapping_add(text_offset),
-        );
-        self.region_offsets.insert(
-            ".data".to_string(),
-            self.active_kernel_base
-                .wrapping_add(0x1000_0000 + data_offset),
-        );
-        self.region_offsets.insert(
-            ".rodata".to_string(),
-            self.active_kernel_base
-                .wrapping_add(0x2000_0000 + rodata_offset),
-        );
+        self.region_offsets.insert(".text".to_string(), self.active_kernel_base.wrapping_add(text_offset));
+        self.region_offsets.insert(".data".to_string(), self.active_kernel_base.wrapping_add(0x1000_0000 + data_offset));
+        self.region_offsets.insert(".rodata".to_string(), self.active_kernel_base.wrapping_add(0x2000_0000 + rodata_offset));
     }
 
     /// Resolves an un-slid kernel virtual symbol address to its randomized runtime virtual address
@@ -207,9 +189,7 @@ impl SmepSmapEnforcer {
             return Err(MemoryAccessError::InvalidUserAddress);
         }
 
-        if self.smap_active.load(Ordering::SeqCst)
-            && !self.alignment_check_flag.load(Ordering::SeqCst)
-        {
+        if self.smap_active.load(Ordering::SeqCst) && !self.alignment_check_flag.load(Ordering::SeqCst) {
             return Err(MemoryAccessError::SmapViolation);
         }
 
@@ -233,9 +213,7 @@ impl SmepSmapEnforcer {
             return Err(MemoryAccessError::InvalidUserAddress);
         }
 
-        if self.smap_active.load(Ordering::SeqCst)
-            && !self.alignment_check_flag.load(Ordering::SeqCst)
-        {
+        if self.smap_active.load(Ordering::SeqCst) && !self.alignment_check_flag.load(Ordering::SeqCst) {
             return Err(MemoryAccessError::SmapViolation);
         }
 
@@ -261,13 +239,13 @@ impl Default for SmepSmapEnforcer {
 /// Pledge promises inspired by OpenBSD `pledge(2)`
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PledgePromise {
-    StdIo, // read, write, close, fstat
-    RPath, // open, stat, readlink
-    WPath, // open (write), truncate, chmod
-    CPath, // create, unlink, mkdir, rename
-    Inet,  // socket, connect, bind, listen
-    Exec,  // execve
-    Proc,  // fork, kill, wait4
+    StdIo,      // read, write, close, fstat
+    RPath,      // open, stat, readlink
+    WPath,      // open (write), truncate, chmod
+    CPath,      // create, unlink, mkdir, rename
+    Inet,       // socket, connect, bind, listen
+    Exec,       // execve
+    Proc,       // fork, kill, wait4
 }
 
 /// System call category classification
@@ -367,11 +345,7 @@ impl RetpolineKptiMitigationEngine {
 
 impl Default for RetpolineKptiMitigationEngine {
     fn default() -> Self {
-        Self::new(
-            0x89AB_CDEF_0123_4567,
-            0x0000_0000_0010_0000,
-            0x0000_0000_0010_1000,
-        )
+        Self::new(0x89AB_CDEF_0123_4567, 0x0000_0000_0010_0000, 0x0000_0000_0010_1000)
     }
 }
 
@@ -427,28 +401,18 @@ impl HardenedSyscallDispatcher {
 
         let category = self.classify_syscall(sys_nr);
         match category {
-            SyscallCategory::FileRead => {
-                pledges.contains(&PledgePromise::StdIo) || pledges.contains(&PledgePromise::RPath)
-            }
-            SyscallCategory::FileWrite => {
-                pledges.contains(&PledgePromise::StdIo) || pledges.contains(&PledgePromise::WPath)
-            }
+            SyscallCategory::FileRead => pledges.contains(&PledgePromise::StdIo) || pledges.contains(&PledgePromise::RPath),
+            SyscallCategory::FileWrite => pledges.contains(&PledgePromise::StdIo) || pledges.contains(&PledgePromise::WPath),
             SyscallCategory::FileCreate => pledges.contains(&PledgePromise::CPath),
             SyscallCategory::Network => pledges.contains(&PledgePromise::Inet),
-            SyscallCategory::ProcessControl => {
-                pledges.contains(&PledgePromise::Proc) || pledges.contains(&PledgePromise::Exec)
-            }
+            SyscallCategory::ProcessControl => pledges.contains(&PledgePromise::Proc) || pledges.contains(&PledgePromise::Exec),
             SyscallCategory::MemoryManagement => pledges.contains(&PledgePromise::StdIo),
             SyscallCategory::SystemAdmin => false, // System admin calls restricted under pledge
         }
     }
 
     /// Evaluates syscall argument pointers against user boundary limits to prevent arbitrary kernel read/write
-    pub fn validate_pointer_arg(
-        &self,
-        ptr_arg: u64,
-        size: usize,
-    ) -> Result<(), HardenedSyscallError> {
+    pub fn validate_pointer_arg(&self, ptr_arg: u64, size: usize) -> Result<(), HardenedSyscallError> {
         if ptr_arg == 0 {
             return Ok(()); // NULL pointers handled by specific syscall handlers
         }

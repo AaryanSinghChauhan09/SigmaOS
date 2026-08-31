@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // System Activity Manager for SigmaOS
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.
@@ -159,12 +159,7 @@ impl ActivityManager {
     }
 
     /// Register a thread for a process
-    pub fn register_thread(
-        &mut self,
-        pid: usize,
-        _tid: usize,
-        _name: &str,
-    ) -> Result<(), &'static str> {
+    pub fn register_thread(&mut self, pid: usize, _tid: usize, _name: &str) -> Result<(), &'static str> {
         let proc = self.activities.get_mut(&pid).ok_or("Process not found")?;
         proc.thread_count += 1;
         Ok(())

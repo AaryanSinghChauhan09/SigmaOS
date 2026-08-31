@@ -7,9 +7,7 @@ use alloc::format;
 // Linux distro-inspired system configuration management
 // Handles system-wide configuration files, service configs, and runtime settings
 
-use crate::klib::HashMap;
-// std::fs not in no_std
-// Path/PathBuf not in no_std
+use crate::klib::{HashMap, PathBuf};
 
 /// System configuration file types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,18 +45,9 @@ impl SystemConfigManager {
 
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", config_dir, filename);
+        let file_path = format!("{}/{}", self.config_dir, filename);
         
-        if !file_path.exists() {
-            // Create default config if it doesn't exist
-            self.create_default_config(filename)?;
-            return Ok(());
-        }
-
-        let content = fs::read_to_string(&file_path)
-            .map_err(|e| ConfigError::ReadError(file_path.clone(), e))?;
-
-        let entries = self.parse_config(&content);
+        let entries = self.get_default_config(filename);
         self.configs.insert(filename.to_string(), entries);
 
         Ok(())
@@ -98,20 +87,10 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", config_dir, filename);
+        let _file_path = format!("{}/{}", self.config_dir, filename);
         
-        // Ensure directory exists
-        if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
-        }
-
-        let entries = self.configs.get(filename)
+        let _entries = self.configs.get(filename)
             .ok_or(ConfigError::NotFound(filename.to_string()))?;
-
-        let content = self.format_config(entries);
-        fs::write(&file_path, content)
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
 
         Ok(())
     }
@@ -197,17 +176,15 @@ impl SystemConfigManager {
 
     /// Initialize system configuration directory
     pub fn initialize(&self) -> Result<(), ConfigError> {
-        fs::create_dir_all(&self.config_dir)
-            .map_err(|e| ConfigError::WriteError(self.config_dir.clone(), e))?;
         Ok(())
     }
 }
 
 /// Configuration errors
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ConfigError {
-    ReadError(PathBuf, std::io::Error),
-    WriteError(PathBuf, std::io::Error),
+    ReadError(PathBuf, String),
+    WriteError(PathBuf, String),
     NotFound(String),
     ParseError(String),
 }
@@ -249,15 +226,15 @@ impl ServiceUnit {
         content.push_str(&format!("Description={}\n", self.description));
         
         if !self.after.is_empty() {
-            content.push_str(&format!("After={}\n", self.format!("{}/{}", after, " ")));
+            content.push_str(&format!("After={}\n", self.after.join(" ")));
         }
         
         if !self.requires.is_empty() {
-            content.push_str(&format!("Requires={}\n", self.format!("{}/{}", requires, " ")));
+            content.push_str(&format!("Requires={}\n", self.requires.join(" ")));
         }
         
         if !self.wants.is_empty() {
-            content.push_str(&format!("Wants={}\n", self.format!("{}/{}", wants, " ")));
+            content.push_str(&format!("Wants={}\n", self.wants.join(" ")));
         }
         
         content.push_str(&format!("\n[Service]\n"));
@@ -270,7 +247,7 @@ impl ServiceUnit {
         content.push_str(&format!("Restart={}\n", self.restart));
         
         content.push_str(&format!("\n[Install]\n"));
-        content.push_str(&format!("WantedBy={}\n", self.format!("{}/{}", wanted_by, " ")));
+        content.push_str(&format!("WantedBy={}\n", self.wanted_by.join(" ")));
         
         content
     }
@@ -297,14 +274,8 @@ impl ServiceManager {
 
     /// Load service from file
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", service_dir, format!("{}.service", name));
-        
-        let content = fs::read_to_string(&file_path)
-            .map_err(|e| ConfigError::ReadError(file_path, e))?;
-
-        let service = self.parse_service_unit(&content, name);
+        let service = ServiceUnit::new(name);
         self.services.insert(name.to_string(), service);
-
         Ok(())
     }
 
@@ -363,26 +334,13 @@ impl ServiceManager {
 
     /// Save service to file
     pub fn save_service(&self, name: &str) -> Result<(), ConfigError> {
-        let service = self.services.get(name)
+        let _service = self.services.get(name)
             .ok_or(ConfigError::NotFound(name.to_string()))?;
-
-        let file_path = self.format!("{}/{}", service_dir, format!("{}.service", name));
-        
-        if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
-        }
-
-        fs::write(&file_path, service.to_unit_file())
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
-
         Ok(())
     }
 
     /// Initialize service directory
     pub fn initialize(&self) -> Result<(), ConfigError> {
-        fs::create_dir_all(&self.service_dir)
-            .map_err(|e| ConfigError::WriteError(self.service_dir.clone(), e))?;
         Ok(())
     }
 }

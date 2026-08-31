@@ -3,9 +3,9 @@ extern crate alloc;
 // NixOS Declarative Profile Generations & Content-Addressed Store Manager
 // Inspired by NixOS /nix/store generations, profiles, atomic rollbacks, and hash verification.
 
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
 /// Content-addressed Nix store package entry
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -83,10 +83,7 @@ impl NixProfileStore {
     }
 
     pub fn add_package_to_active(&mut self, pkg: NixStorePackage) -> Result<(), &'static str> {
-        let gen = self
-            .generations
-            .get_mut(&self.active_generation)
-            .ok_or("Active generation not found")?;
+        let gen = self.generations.get_mut(&self.active_generation).ok_or("Active generation not found")?;
         gen.packages.insert(pkg.name.clone(), pkg);
         Ok(())
     }

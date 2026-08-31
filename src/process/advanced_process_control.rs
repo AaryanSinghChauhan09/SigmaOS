@@ -7,10 +7,10 @@ extern crate alloc;
 // - Cancellation tokens (pthread_cancel) & Zombie process reaping/reparenting
 // - Advanced IPC Hub (POSIX Message Queue, eventfd counters, sigqueue rich signal dispatch)
 
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProcessControlError {
@@ -38,10 +38,7 @@ impl ProcessVmReadWriteEngine {
     }
 
     pub fn register_process_memory(&mut self, pid: usize, base_addr: u64, data: Vec<u8>) {
-        self.address_spaces
-            .entry(pid)
-            .or_insert_with(BTreeMap::new)
-            .insert(base_addr, data);
+        self.address_spaces.entry(pid).or_insert_with(BTreeMap::new).insert(base_addr, data);
     }
 
     pub fn process_vm_readv(
@@ -50,10 +47,7 @@ impl ProcessVmReadWriteEngine {
         remote_addr: u64,
         len: usize,
     ) -> Result<Vec<u8>, ProcessControlError> {
-        let space = self
-            .address_spaces
-            .get(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
+        let space = self.address_spaces.get(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
         for (&base, block) in space {
             let block_len = block.len() as u64;
             if remote_addr >= base && remote_addr < base + block_len {
@@ -71,10 +65,7 @@ impl ProcessVmReadWriteEngine {
         remote_addr: u64,
         buffer: &[u8],
     ) -> Result<usize, ProcessControlError> {
-        let space = self
-            .address_spaces
-            .get_mut(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
+        let space = self.address_spaces.get_mut(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
         for (&base, block) in space {
             let block_len = block.len() as u64;
             if remote_addr >= base && remote_addr < base + block_len {
@@ -162,37 +153,23 @@ impl JobControlLifecycleEngine {
     }
 
     pub fn send_to_background(&mut self, pid: usize) -> Result<(), ProcessControlError> {
-        let job = self
-            .jobs
-            .get_mut(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
+        let job = self.jobs.get_mut(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
         job.is_foreground = false;
         job.state = JobState::Background;
         Ok(())
     }
 
     pub fn daemonize(&mut self, pid: usize) -> Result<(), ProcessControlError> {
-        let job = self
-            .jobs
-            .get_mut(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
-        job.sid = pid; // setsid()
+        let job = self.jobs.get_mut(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
+        job.sid = pid;  // setsid()
         job.pgid = pid; // setpgid()
         job.is_foreground = false;
         job.state = JobState::Background;
         Ok(())
     }
 
-    pub fn abort_process(
-        &mut self,
-        pid: usize,
-        signal: u32,
-        fault_addr: u64,
-    ) -> Result<CoreDumpMetadata, ProcessControlError> {
-        let job = self
-            .jobs
-            .get_mut(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
+    pub fn abort_process(&mut self, pid: usize, signal: u32, fault_addr: u64) -> Result<CoreDumpMetadata, ProcessControlError> {
+        let job = self.jobs.get_mut(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
         job.state = JobState::Aborted;
 
         let core = CoreDumpMetadata {
@@ -331,12 +308,7 @@ impl ProcessCancellationAndTerminationManager {
         }
     }
 
-    pub fn register_process(
-        &mut self,
-        pid: usize,
-        parent_pid: usize,
-        cancel_type: CancellationType,
-    ) {
+    pub fn register_process(&mut self, pid: usize, parent_pid: usize, cancel_type: CancellationType) {
         self.process_parents.insert(pid, parent_pid);
         self.cancel_states.insert(
             pid,
@@ -349,10 +321,7 @@ impl ProcessCancellationAndTerminationManager {
     }
 
     pub fn request_cancellation(&mut self, pid: usize) -> Result<(), ProcessControlError> {
-        let state = self
-            .cancel_states
-            .get_mut(&pid)
-            .ok_or(ProcessControlError::ProcessNotFound(pid))?;
+        let state = self.cancel_states.get_mut(&pid).ok_or(ProcessControlError::ProcessNotFound(pid))?;
         if state.cancel_type == CancellationType::Disabled {
             return Err(ProcessControlError::PermissionDenied);
         }
@@ -374,11 +343,7 @@ impl ProcessCancellationAndTerminationManager {
         }
     }
 
-    pub fn reap_child(
-        &mut self,
-        parent_pid: usize,
-        child_pid: usize,
-    ) -> Result<bool, ProcessControlError> {
+    pub fn reap_child(&mut self, parent_pid: usize, child_pid: usize) -> Result<bool, ProcessControlError> {
         if self.process_parents.get(&child_pid) == Some(&parent_pid) {
             if let Some(pos) = self.zombies.iter().position(|&z| z == child_pid) {
                 self.zombies.remove(pos);
@@ -515,11 +480,7 @@ impl SovereignProcessLifecycleController {
         Ok(data.len())
     }
 
-    pub fn read_process_buffer(
-        &mut self,
-        pid: u64,
-        buffer: &mut [u8],
-    ) -> Result<usize, &'static str> {
+    pub fn read_process_buffer(&mut self, pid: u64, buffer: &mut [u8]) -> Result<usize, &'static str> {
         let proc_rec = self
             .processes
             .get_mut(&pid)
@@ -606,26 +567,16 @@ impl AdvancedIpcHub {
     // --- POSIX Message Queue ---
     pub fn mq_open(&mut self, name: &str, max_msg: usize) -> String {
         let q_name = name.to_string();
-        self.message_queues
-            .entry(q_name.clone())
-            .or_insert_with(|| PosixMessageQueue {
-                name: q_name.clone(),
-                max_msg,
-                messages: Vec::new(),
-            });
+        self.message_queues.entry(q_name.clone()).or_insert_with(|| PosixMessageQueue {
+            name: q_name.clone(),
+            max_msg,
+            messages: Vec::new(),
+        });
         q_name
     }
 
-    pub fn mq_send(
-        &mut self,
-        name: &str,
-        payload: &[u8],
-        priority: u32,
-    ) -> Result<(), ProcessControlError> {
-        let mq = self
-            .message_queues
-            .get_mut(name)
-            .ok_or(ProcessControlError::IpcChannelClosed)?;
+    pub fn mq_send(&mut self, name: &str, payload: &[u8], priority: u32) -> Result<(), ProcessControlError> {
+        let mq = self.message_queues.get_mut(name).ok_or(ProcessControlError::IpcChannelClosed)?;
         if mq.messages.len() >= mq.max_msg {
             return Err(ProcessControlError::WouldBlock);
         }
@@ -636,20 +587,13 @@ impl AdvancedIpcHub {
         };
 
         // Insert sorted by priority (higher priority first)
-        let pos = mq
-            .messages
-            .iter()
-            .position(|m| m.priority < priority)
-            .unwrap_or(mq.messages.len());
+        let pos = mq.messages.iter().position(|m| m.priority < priority).unwrap_or(mq.messages.len());
         mq.messages.insert(pos, msg);
         Ok(())
     }
 
     pub fn mq_receive(&mut self, name: &str) -> Result<PosixMessage, ProcessControlError> {
-        let mq = self
-            .message_queues
-            .get_mut(name)
-            .ok_or(ProcessControlError::IpcChannelClosed)?;
+        let mq = self.message_queues.get_mut(name).ok_or(ProcessControlError::IpcChannelClosed)?;
         if mq.messages.is_empty() {
             return Err(ProcessControlError::WouldBlock);
         }
@@ -661,30 +605,18 @@ impl AdvancedIpcHub {
         let efd = self.next_event_fd;
         self.next_event_fd += 1;
 
-        self.event_fds.insert(
-            efd,
-            EventFd {
-                counter: init_val,
-                is_semaphore,
-            },
-        );
+        self.event_fds.insert(efd, EventFd { counter: init_val, is_semaphore });
         efd
     }
 
     pub fn eventfd_write(&mut self, efd: usize, val: u64) -> Result<(), ProcessControlError> {
-        let event_fd = self
-            .event_fds
-            .get_mut(&efd)
-            .ok_or(ProcessControlError::IpcChannelClosed)?;
+        let event_fd = self.event_fds.get_mut(&efd).ok_or(ProcessControlError::IpcChannelClosed)?;
         event_fd.counter += val;
         Ok(())
     }
 
     pub fn eventfd_read(&mut self, efd: usize) -> Result<u64, ProcessControlError> {
-        let event_fd = self
-            .event_fds
-            .get_mut(&efd)
-            .ok_or(ProcessControlError::IpcChannelClosed)?;
+        let event_fd = self.event_fds.get_mut(&efd).ok_or(ProcessControlError::IpcChannelClosed)?;
         if event_fd.counter == 0 {
             return Err(ProcessControlError::WouldBlock);
         }
@@ -706,10 +638,7 @@ impl AdvancedIpcHub {
             signal_nr: sig_nr,
             value_u64: value,
         };
-        self.signal_queues
-            .entry(target_pid)
-            .or_insert_with(Vec::new)
-            .push(payload);
+        self.signal_queues.entry(target_pid).or_insert_with(Vec::new).push(payload);
     }
 
     pub fn pop_sigqueue(&mut self, target_pid: usize) -> Option<SigQueuePayload> {
@@ -740,9 +669,7 @@ mod tests {
         let read_data = vm_engine.process_vm_readv(100, 0x10001, 3).unwrap();
         assert_eq!(read_data, vec![0x22, 0x33, 0x44]);
 
-        let written = vm_engine
-            .process_vm_writev(100, 0x10002, &[0xAA, 0xBB])
-            .unwrap();
+        let written = vm_engine.process_vm_writev(100, 0x10002, &[0xAA, 0xBB]).unwrap();
         assert_eq!(written, 2);
 
         let updated_data = vm_engine.process_vm_readv(100, 0x10000, 5).unwrap();
@@ -832,11 +759,7 @@ mod tests {
         assert_eq!(plc.get_state(1001), Some(ProcessLifecycleState::Running));
 
         // Read/Write buffer
-        assert_eq!(
-            plc.write_process_buffer(1001, b"LIFECYCLE_TEST_DATA")
-                .unwrap(),
-            19
-        );
+        assert_eq!(plc.write_process_buffer(1001, b"LIFECYCLE_TEST_DATA").unwrap(), 19);
         let mut read_buf = [0u8; 19];
         assert_eq!(plc.read_process_buffer(1001, &mut read_buf).unwrap(), 19);
         assert_eq!(&read_buf, b"LIFECYCLE_TEST_DATA");

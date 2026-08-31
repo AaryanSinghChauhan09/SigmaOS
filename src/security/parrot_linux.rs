@@ -142,12 +142,7 @@ impl Default for SecureWipeTool {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
+pub enum IntrusionSeverity { Low, Medium, High, Critical }
 
 #[derive(Debug, Clone)]
 pub struct IntrusionAlert {

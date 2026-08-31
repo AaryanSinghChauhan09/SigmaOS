@@ -4,10 +4,10 @@ extern crate alloc;
 // background process management, timeout waiting, process cancellation/termination,
 // and zero-copy IPC channels inspired by Linux and BSD distributions.
 
-use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignProcessState {
@@ -102,14 +102,8 @@ impl SovereignProcessManager {
     }
 
     pub fn sovereign_run(&mut self, pid: usize) -> Result<(), String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
-        if proc.state == SovereignProcessState::Cancelled
-            || proc.state == SovereignProcessState::Aborted
-            || matches!(proc.state, SovereignProcessState::Terminated(_))
-        {
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
+        if proc.state == SovereignProcessState::Cancelled || proc.state == SovereignProcessState::Aborted || matches!(proc.state, SovereignProcessState::Terminated(_)) {
             return Err(format!("Cannot run dead process {}", pid));
         }
         proc.state = SovereignProcessState::Running;
@@ -117,14 +111,8 @@ impl SovereignProcessManager {
     }
 
     pub fn sovereign_run_background(&mut self, pid: usize) -> Result<(), String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
-        if proc.state == SovereignProcessState::Cancelled
-            || proc.state == SovereignProcessState::Aborted
-            || matches!(proc.state, SovereignProcessState::Terminated(_))
-        {
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
+        if proc.state == SovereignProcessState::Cancelled || proc.state == SovereignProcessState::Aborted || matches!(proc.state, SovereignProcessState::Terminated(_)) {
             return Err(format!("Cannot run background on dead process {}", pid));
         }
         proc.state = SovereignProcessState::BackgroundRunning;
@@ -135,66 +123,41 @@ impl SovereignProcessManager {
     }
 
     pub fn sovereign_abort(&mut self, pid: usize) -> Result<(), String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         proc.state = SovereignProcessState::Aborted;
         Ok(())
     }
 
     pub fn sovereign_write(&mut self, pid: usize, data: &[u8]) -> Result<usize, String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         proc.stdin_buffer.extend_from_slice(data);
         Ok(data.len())
     }
 
     pub fn sovereign_read(&mut self, pid: usize, max_len: usize) -> Result<Vec<u8>, String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         let read_len = core::cmp::min(max_len, proc.stdout_buffer.len());
         let read_bytes = proc.stdout_buffer.drain(..read_len).collect();
         Ok(read_bytes)
     }
 
-    pub fn sovereign_wait_timeout(
-        &mut self,
-        pid: usize,
-        timeout_ms: u64,
-    ) -> Result<SovereignProcessState, String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+    pub fn sovereign_wait_timeout(&mut self, pid: usize, timeout_ms: u64) -> Result<SovereignProcessState, String> {
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         proc.execution_time_ms += timeout_ms;
-        if proc.execution_time_ms >= 100
-            && (proc.state == SovereignProcessState::BackgroundRunning
-                || proc.state == SovereignProcessState::Running)
-        {
+        if proc.execution_time_ms >= 100 && (proc.state == SovereignProcessState::BackgroundRunning || proc.state == SovereignProcessState::Running) {
             proc.state = SovereignProcessState::Terminated(0);
         }
         Ok(proc.state)
     }
 
     pub fn sovereign_cancel(&mut self, pid: usize) -> Result<(), String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         proc.state = SovereignProcessState::Cancelled;
         Ok(())
     }
 
     pub fn sovereign_terminate(&mut self, pid: usize, exit_code: i32) -> Result<(), String> {
-        let proc = self
-            .processes
-            .get_mut(&pid)
-            .ok_or_else(|| format!("Process {} not found", pid))?;
+        let proc = self.processes.get_mut(&pid).ok_or_else(|| format!("Process {} not found", pid))?;
         proc.state = SovereignProcessState::Terminated(exit_code);
         Ok(())
     }
@@ -217,15 +180,8 @@ impl SovereignProcessManager {
         channel_id
     }
 
-    pub fn sovereign_ipc_send(
-        &mut self,
-        channel_id: usize,
-        payload: &[u8],
-    ) -> Result<usize, String> {
-        let channel = self
-            .ipc_channels
-            .get_mut(&channel_id)
-            .ok_or_else(|| format!("IPC channel {} not found", channel_id))?;
+    pub fn sovereign_ipc_send(&mut self, channel_id: usize, payload: &[u8]) -> Result<usize, String> {
+        let channel = self.ipc_channels.get_mut(&channel_id).ok_or_else(|| format!("IPC channel {} not found", channel_id))?;
         if channel.ring_buffer.len() + payload.len() > channel.capacity_bytes {
             return Err("IPC channel ring buffer overflow".to_string());
         }
@@ -235,10 +191,7 @@ impl SovereignProcessManager {
     }
 
     pub fn sovereign_ipc_receive(&mut self, channel_id: usize) -> Result<Vec<u8>, String> {
-        let channel = self
-            .ipc_channels
-            .get_mut(&channel_id)
-            .ok_or_else(|| format!("IPC channel {} not found", channel_id))?;
+        let channel = self.ipc_channels.get_mut(&channel_id).ok_or_else(|| format!("IPC channel {} not found", channel_id))?;
         let data = channel.ring_buffer.clone();
         channel.ring_buffer.clear();
         Ok(data)
@@ -262,10 +215,7 @@ mod tests {
         assert_eq!(pid, 1);
 
         mgr.sovereign_run_background(pid).unwrap();
-        assert_eq!(
-            mgr.processes.get(&pid).unwrap().state,
-            SovereignProcessState::BackgroundRunning
-        );
+        assert_eq!(mgr.processes.get(&pid).unwrap().state, SovereignProcessState::BackgroundRunning);
 
         mgr.sovereign_write(pid, b"input_data").unwrap();
         assert_eq!(mgr.processes.get(&pid).unwrap().stdin_buffer, b"input_data");
@@ -293,10 +243,7 @@ mod tests {
         let pid = mgr.sovereign_spawn("cancel_target", 1);
         mgr.sovereign_cancel(pid).unwrap();
 
-        assert_eq!(
-            mgr.processes.get(&pid).unwrap().state,
-            SovereignProcessState::Cancelled
-        );
+        assert_eq!(mgr.processes.get(&pid).unwrap().state, SovereignProcessState::Cancelled);
         assert!(mgr.sovereign_run_background(pid).is_err());
     }
 }

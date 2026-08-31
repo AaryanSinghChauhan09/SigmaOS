@@ -16,8 +16,8 @@ use sigmaos::compatibility::{
     ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
     SyscallAbi, TribeInstaller, TtsSynthesizer, UnifiedAppStore, WorkloadOptimizer,
     WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
-    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 use sigmaos::drivers::{
     Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
@@ -26,7 +26,7 @@ use sigmaos::drivers::{
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    SocketStatsCommand,     SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
     UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_UFW_RULE,
 };
 use sigmaos::package::{
@@ -42,12 +42,13 @@ use sigmaos::performance::{
 };
 use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
-use sigmaos::security::parrot::SandboxPolicy;
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
-    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, GLOBAL_ANONSURF,
-    GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
 };
+use sigmaos::security::parrot::SandboxPolicy;
 
 use sigmaos::kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
@@ -373,8 +374,13 @@ mod tests {
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning
-        let res3 =
-            link1.resolve_symlink(KernelPersona::Linux6X, false, &[false, false], &rule, None);
+        let res3 = link1.resolve_symlink(
+            KernelPersona::Linux6X,
+            false,
+            &[false, false],
+            &rule,
+            None,
+        );
         assert!(res3.is_err());
 
         // Case 4: ELOOP infinite recursion detection (nested lookup chains)

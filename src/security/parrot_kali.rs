@@ -144,9 +144,7 @@ impl ForensicStorageFilter {
     pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
         for byte in target_buffer.iter_mut() {
             // Write volatile zero states safely
-            unsafe {
-                core::ptr::write_volatile(byte, 0x00);
-            }
+            unsafe { core::ptr::write_volatile(byte, 0x00); }
         }
     }
 }
@@ -229,8 +227,7 @@ impl KaliPacketSniffer {
 
         // IPv4 Header: Protocol sits at offset 9
         let protocol = packet_bytes[9];
-        if protocol == 6 {
-            // TCP
+        if protocol == 6 { // TCP
             let dest_port = ((packet_bytes[22] as u16) << 8) | (packet_bytes[23] as u16);
             let tcp_flags = packet_bytes[33];
 
@@ -254,7 +251,7 @@ impl KaliPacketSniffer {
                 let mut found_sensitive = false;
                 if payload.len() >= 5 {
                     for i in 0..=(payload.len() - 5) {
-                        let word = &payload[i..i + 5];
+                        let word = &payload[i..i+5];
                         if word == b"USER " || word == b"PASS " {
                             found_sensitive = true;
                             break;
@@ -288,11 +285,7 @@ impl HashAuditor {
     }
 
     /// Simulates credentials auditing against wordlist using u32 hashes
-    pub fn audit_weak_credentials(
-        &self,
-        password_hash: u32,
-        wordlist: &[&'static str],
-    ) -> Option<&'static str> {
+    pub fn audit_weak_credentials(&self, password_hash: u32, wordlist: &[&'static str]) -> Option<&'static str> {
         for &word in wordlist {
             // FNV-1a hash calculation
             let mut h = 2166136261u32;
@@ -394,10 +387,7 @@ mod tests {
     #[test]
     fn test_mac_changer() {
         let changer = MacChanger::new();
-        assert_eq!(
-            changer.current_mac.get(),
-            [0x00, 0x0C, 0x29, 0xAB, 0xCD, 0xEF]
-        );
+        assert_eq!(changer.current_mac.get(), [0x00, 0x0C, 0x29, 0xAB, 0xCD, 0xEF]);
 
         changer.spoof_random_mac(42);
         let mac1 = changer.current_mac.get();
@@ -417,24 +407,19 @@ mod tests {
         // Standard cleartext HTTP TCP packet with sensitive payload
         let mut packet = [0u8; 40];
         packet[9] = 6; // Protocol: TCP
-        packet[22] = 0;
-        packet[23] = 80; // Dest port: 80
+        packet[22] = 0; packet[23] = 80; // Dest port: 80
         packet[33] = 0x10; // ACK flag
 
         assert_eq!(sniffer.analyze_packet(&packet), PacketAnomaly::None);
 
         // Inject "USER " in payload
         packet[34..39].copy_from_slice(b"USER ");
-        assert_eq!(
-            sniffer.analyze_packet(&packet),
-            PacketAnomaly::UnencryptedSensitives
-        );
+        assert_eq!(sniffer.analyze_packet(&packet), PacketAnomaly::UnencryptedSensitives);
 
         // SYN flood signature
         let mut syn_packet = [0u8; 35];
         syn_packet[9] = 6;
-        syn_packet[22] = 0;
-        syn_packet[23] = 80;
+        syn_packet[22] = 0; syn_packet[23] = 80;
         syn_packet[33] = 0x02; // SYN flag
         assert_eq!(sniffer.analyze_packet(&syn_packet), PacketAnomaly::SynFlood);
     }
@@ -446,10 +431,7 @@ mod tests {
 
         // FNV-1a hash of "password" is 910909208u32
         let vulnerable_hash = 910909208u32;
-        assert_eq!(
-            auditor.audit_weak_credentials(vulnerable_hash, &wordlist),
-            Some("password")
-        );
+        assert_eq!(auditor.audit_weak_credentials(vulnerable_hash, &wordlist), Some("password"));
 
         // Non-weak hash
         assert_eq!(auditor.audit_weak_credentials(11111111, &wordlist), None);

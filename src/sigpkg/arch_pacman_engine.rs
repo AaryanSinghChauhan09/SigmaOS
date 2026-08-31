@@ -1,5 +1,5 @@
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman Compatibility Engine
@@ -156,8 +156,7 @@ impl PacmanDatabase {
 
         let initial_count = self.local_packages.len();
         // Retain explicitly installed packages OR packages that are required as dependencies
-        self.local_packages
-            .retain(|p| p.is_explicit || required_deps.contains(&p.name));
+        self.local_packages.retain(|p| p.is_explicit || required_deps.contains(&p.name));
         initial_count - self.local_packages.len()
     }
 }

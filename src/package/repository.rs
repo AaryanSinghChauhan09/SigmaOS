@@ -48,13 +48,9 @@ pub struct PinRule {
 
 impl PinRule {
     pub fn matches(&self, package_name: &str, channel: RepositoryChannel, version: &str) -> bool {
-        let name_match =
-            self.package_pattern == "*" || package_name.contains(&self.package_pattern);
+        let name_match = self.package_pattern == "*" || package_name.contains(&self.package_pattern);
         let channel_match = self.channel_filter.map_or(true, |c| c == channel);
-        let version_match = self
-            .version_prefix
-            .as_ref()
-            .map_or(true, |v| version.starts_with(v));
+        let version_match = self.version_prefix.as_ref().map_or(true, |v| version.starts_with(v));
         name_match && channel_match && version_match
     }
 }
@@ -168,10 +164,9 @@ impl DeltaRepositoryIndex {
         old_version: &str,
         new_version: &str,
     ) -> Option<&DeltaPackageDescriptor> {
-        self.deltas
-            .get(package_name)?
-            .iter()
-            .find(|d| d.old_version == old_version && d.new_version == new_version)
+        self.deltas.get(package_name)?.iter().find(|d| {
+            d.old_version == old_version && d.new_version == new_version
+        })
     }
 }
 
@@ -267,12 +262,7 @@ impl RepositoryManager {
     }
 
     /// Evaluates pin priority for a given package, channel, and version
-    pub fn evaluate_pin_priority(
-        &self,
-        package_name: &str,
-        channel: RepositoryChannel,
-        version: &str,
-    ) -> u32 {
+    pub fn evaluate_pin_priority(&self, package_name: &str, channel: RepositoryChannel, version: &str) -> u32 {
         let mut highest_priority = match channel {
             RepositoryChannel::Security => 990,
             RepositoryChannel::Updates => 900,
@@ -561,9 +551,7 @@ pub struct MirrorSyncEngine {
 
 impl MirrorSyncEngine {
     pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
+        Self { mirrors: Vec::new() }
     }
 
     pub fn add_mirror(&mut self, url: &str, country: &str, latency_ms: u32) {
@@ -580,10 +568,7 @@ impl MirrorSyncEngine {
     }
 
     pub fn get_fastest_mirror(&self) -> Option<String> {
-        self.mirrors
-            .iter()
-            .find(|m| m.active)
-            .map(|m| m.url.clone())
+        self.mirrors.iter().find(|m| m.active).map(|m| m.url.clone())
     }
 
     pub fn mark_failure(&mut self, url: &str) {
@@ -682,19 +667,9 @@ pub struct MirrorCandidate {
 /// Transactional Package History & Rollback (Inspired by DNF history & FreeBSD pkg rollback)
 #[derive(Debug, Clone)]
 pub enum TransactionAction {
-    Install {
-        package: String,
-        version: String,
-    },
-    Remove {
-        package: String,
-        version: String,
-    },
-    Upgrade {
-        package: String,
-        old_version: String,
-        new_version: String,
-    },
+    Install { package: String, version: String },
+    Remove { package: String, version: String },
+    Upgrade { package: String, old_version: String, new_version: String },
 }
 
 #[derive(Debug, Clone)]
@@ -757,18 +732,12 @@ mod tests {
         sync_engine.add_mirror("https://mirror1.sigmaos.org", "US", 20);
 
         sync_engine.rank_mirrors();
-        assert_eq!(
-            sync_engine.get_fastest_mirror().unwrap(),
-            "https://mirror1.sigmaos.org"
-        );
+        assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
 
         // Fail mirror 1 to trigger failover
         sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
-        assert_eq!(
-            sync_engine.get_fastest_mirror().unwrap(),
-            "https://mirror2.sigmaos.org"
-        );
+        assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror2.sigmaos.org");
     }
 
     #[test]

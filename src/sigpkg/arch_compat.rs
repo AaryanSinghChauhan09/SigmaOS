@@ -4,9 +4,9 @@ extern crate alloc;
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, and packages with makepkg.
 
-use crate::klib;
-use crate::klib::Vec;
 use crate::klib::{HashMap, SigmaString, Vec as KVec};
+use crate::klib::Vec;
+use crate::klib;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec as AllocVec;
@@ -124,8 +124,7 @@ impl AurRecipeCompiler {
             return Err("PKGBUILD missing mandatory pkgname field");
         }
 
-        let parsed_ver =
-            Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
+        let parsed_ver = Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
             crate::klib::string::SigmaString::from(pkgname),
@@ -177,7 +176,9 @@ impl RollingSyncManager {
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(&self) -> Vec<(SigmaString, Version, Version)> {
+    pub fn list_pending_rolling_updates(
+        &self,
+    ) -> Vec<(SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -320,11 +321,7 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(
-        &self,
-        when: HookWhen,
-        changed_file: &str,
-    ) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
         let mut triggered_cmds = alloc::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -513,7 +510,8 @@ impl MakepkgBuilder {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
         let computed = SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
+        computed == self.expected_sha256
+            || self.expected_sha256 == SigmaString::from("SKIP")
     }
 
     pub fn build_package_archive(
@@ -556,10 +554,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make")
-            ],
+            build_depends: alloc::vec![crate::klib::string::SigmaString::from("gcc"), crate::klib::string::SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));

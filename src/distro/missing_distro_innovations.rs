@@ -12,16 +12,16 @@ use crate::klib::HashMap;
 // - FreeBSD VNET Virtualized Network Stack Per-Jail Isolation
 // - OpenBSD Unveil Access Violation Audit Sentinel
 
-use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
+use alloc::collections::BTreeMap;
 
 /// 1. Clear Linux Stateless Architecture Engine
 pub struct ClearLinuxStatelessEngine {
     pub vendor_defaults: BTreeMap<String, String>, // /usr/share/defaults/
-    pub user_overrides: BTreeMap<String, String>,  // /etc/
+    pub user_overrides: BTreeMap<String, String>,   // /etc/
 }
 
 impl ClearLinuxStatelessEngine {
@@ -33,13 +33,11 @@ impl ClearLinuxStatelessEngine {
     }
 
     pub fn set_vendor_default(&mut self, path: &str, content: &str) {
-        self.vendor_defaults
-            .insert(path.to_string(), content.to_string());
+        self.vendor_defaults.insert(path.to_string(), content.to_string());
     }
 
     pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.user_overrides
-            .insert(path.to_string(), content.to_string());
+        self.user_overrides.insert(path.to_string(), content.to_string());
     }
 
     pub fn resolve_configuration(&self, path: &str) -> Option<String> {
@@ -113,12 +111,7 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!(
-                "Executed '{} {}' from stratum '{}'",
-                cmd,
-                args.join(" "),
-                stratum_name
-            ))
+            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -224,19 +217,13 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }
@@ -473,10 +460,7 @@ impl ChimeraDinitSupervisor {
     }
 
     pub fn start_service(&mut self, name: &str) -> Result<DinitServiceState, String> {
-        let service = self
-            .services
-            .get_mut(name)
-            .ok_or_else(|| format!("Dinit service {} not found", name))?;
+        let service = self.services.get_mut(name).ok_or_else(|| format!("Dinit service {} not found", name))?;
         service.state = DinitServiceState::Started;
         Ok(DinitServiceState::Started)
     }
@@ -500,19 +484,13 @@ impl SolusEopkgManager {
         }
     }
 
-    pub fn apply_eopkg_delta(
-        &mut self,
-        pkg_name: &str,
-        old_ver: &str,
-        new_ver: &str,
-    ) -> Result<String, String> {
+    pub fn apply_eopkg_delta(&mut self, pkg_name: &str, old_ver: &str, new_ver: &str) -> Result<String, String> {
         if let Some(curr_ver) = self.installed_packages.get(pkg_name) {
             if curr_ver != old_ver {
                 return Err(format!("Version mismatch for delta update on {}", pkg_name));
             }
         }
-        self.installed_packages
-            .insert(pkg_name.to_string(), new_ver.to_string());
+        self.installed_packages.insert(pkg_name.to_string(), new_ver.to_string());
         Ok(format!("{}-{}.eopkg.delta applied", pkg_name, new_ver))
     }
 }
@@ -549,11 +527,7 @@ impl MageiaUrpmiEngine {
     }
 
     pub fn resolve_urpmi(&self, target_pkg: &str) -> Vec<String> {
-        vec![
-            String::from("glibc"),
-            String::from("liburpmi-core"),
-            target_pkg.to_string(),
-        ]
+        vec![String::from("glibc"), String::from("liburpmi-core"), target_pkg.to_string()]
     }
 }
 
@@ -696,16 +670,10 @@ mod tests {
     fn test_clear_linux_stateless() {
         let mut clear = ClearLinuxStatelessEngine::new();
         clear.set_vendor_default("/etc/nginx.conf", "worker_processes 1;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 1;"
-        );
+        assert_eq!(clear.resolve_configuration("/etc/nginx.conf").unwrap(), "worker_processes 1;");
 
         clear.set_user_override("/etc/nginx.conf", "worker_processes 4;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 4;"
-        );
+        assert_eq!(clear.resolve_configuration("/etc/nginx.conf").unwrap(), "worker_processes 4;");
     }
 
     #[test]
@@ -723,21 +691,14 @@ mod tests {
     fn test_chimera_dinit_supervisor() {
         let mut dinit = ChimeraDinitSupervisor::new();
         dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
-        assert_eq!(
-            dinit.services.get("networking").unwrap().state,
-            DinitServiceState::Stopped
-        );
+        assert_eq!(dinit.services.get("networking").unwrap().state, DinitServiceState::Stopped);
     }
 
     #[test]
     fn test_solus_eopkg_manager() {
         let mut eopkg = SolusEopkgManager::new();
-        eopkg
-            .installed_packages
-            .insert("firefox".to_string(), "115.0".to_string());
-        let res = eopkg
-            .apply_eopkg_delta("firefox", "115.0", "116.0")
-            .unwrap();
+        eopkg.installed_packages.insert("firefox".to_string(), "115.0".to_string());
+        let res = eopkg.apply_eopkg_delta("firefox", "115.0", "116.0").unwrap();
         assert!(res.contains("firefox-116.0.eopkg.delta applied"));
     }
 

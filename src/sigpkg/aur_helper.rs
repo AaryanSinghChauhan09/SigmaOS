@@ -9,8 +9,8 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 // SigmaOS AUR Helper - Arch User Repository integration
 // Provides high-speed CLI helpers for AUR metadata parsing and package management
 
