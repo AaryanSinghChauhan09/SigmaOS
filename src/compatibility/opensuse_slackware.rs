@@ -69,6 +69,196 @@ impl Default for YastCentralControlCenter {
 }
 
 // =========================================================================
+// 1b. OPENSUSE ZYPPER PACKAGE SOLVER & LIBZYPP REPOSITORY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZypperPackage {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+    pub vendor: String,
+    pub dependencies: Vec<String>,
+}
+
+pub struct ZypperRepository {
+    pub name: String,
+    pub enabled: bool,
+    pub base_url: String,
+    pub priority: u32, // Lower = higher priority (libzypp style)
+    pub packages: Vec<ZypperPackage>,
+}
+
+impl ZypperRepository {
+    pub fn new(name: &str, url: &str, priority: u32) -> Self {
+        ZypperRepository {
+            name: name.to_string(),
+            enabled: true,
+            base_url: url.to_string(),
+            priority,
+            packages: Vec::new(),
+        }
+    }
+
+    pub fn add_package(&mut self, name: &str, ver: &str, arch: &str, deps: &[&str]) {
+        self.packages.push(ZypperPackage {
+            name: name.to_string(),
+            version: ver.to_string(),
+            arch: arch.to_string(),
+            vendor: String::from("openSUSE Build Service"),
+            dependencies: deps.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+}
+
+/// Zypper Solver utilizing libzypp-style SAT solver logic
+pub struct ZypperSolver {
+    pub repositories: Vec<ZypperRepository>,
+    pub installed_packages: BTreeMap<String, String>, // pkg -> ver
+}
+
+impl ZypperSolver {
+    pub fn new() -> Self {
+        ZypperSolver {
+            repositories: Vec::new(),
+            installed_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_repository(&mut self, repo: ZypperRepository) {
+        self.repositories.push(repo);
+        // Sort repos by priority asc (lower priority number = preferred)
+        self.repositories.sort_by_key(|r| r.priority);
+    }
+
+    pub fn zypper_install(&mut self, package_name: &str) -> Result<String, &'static str> {
+        let mut found_pkg: Option<ZypperPackage> = None;
+
+        for repo in &self.repositories {
+            if !repo.enabled {
+                continue;
+            }
+            if let Some(pkg) = repo.packages.iter().find(|p| p.name == package_name) {
+                found_pkg = Some(pkg.clone());
+                break;
+            }
+        }
+
+        if let Some(pkg) = found_pkg {
+            // Resolve dependencies recursively
+            for dep in &pkg.dependencies {
+                if !self.installed_packages.contains_key(dep) {
+                    self.zypper_install(dep)?;
+                }
+            }
+            self.installed_packages.insert(pkg.name.clone(), pkg.version.clone());
+            Ok(format!("zypper: Successfully installed {} version {}", pkg.name, pkg.version))
+        } else {
+            Err("zypper: Package not found in active repositories")
+        }
+    }
+}
+
+// =========================================================================
+// 1c. OPENSUSE OPEN BUILD SERVICE (OBS) ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ObsBuildTarget {
+    OpenSuseTumbleweed,
+    OpenSuseLeap15,
+    Sle15,
+}
+
+#[derive(Debug, Clone)]
+pub struct ObsPackageProject {
+    pub project_name: String,
+    pub package_name: String,
+    pub build_target: ObsBuildTarget,
+    pub spec_file_content: String,
+    pub source_services: Vec<String>, // e.g. "tar_scm", "recompress"
+    pub build_successful: bool,
+}
+
+pub struct OpenBuildServiceEngine {
+    pub projects: Vec<ObsPackageProject>,
+}
+
+impl OpenBuildServiceEngine {
+    pub fn new() -> Self {
+        OpenBuildServiceEngine {
+            projects: Vec::new(),
+        }
+    }
+
+    pub fn create_obs_project(&mut self, proj: &str, pkg: &str, target: ObsBuildTarget, spec: &str) -> &ObsPackageProject {
+        let obs_proj = ObsPackageProject {
+            project_name: proj.to_string(),
+            package_name: pkg.to_string(),
+            build_target: target,
+            spec_file_content: spec.to_string(),
+            source_services: vec!["tar_scm".to_string(), "recompress".to_string()],
+            build_successful: false,
+        };
+        self.projects.push(obs_proj);
+        self.projects.last().unwrap()
+    }
+
+    pub fn trigger_obs_build(&mut self, proj_name: &str) -> Result<String, &'static str> {
+        let proj = self.projects.iter_mut().find(|p| p.project_name == proj_name).ok_or("OBS project not found")?;
+
+        if !proj.spec_file_content.contains("Name:") || !proj.spec_file_content.contains("Version:") {
+            return Err("OBS build failed: Invalid RPM spec file syntax");
+        }
+
+        proj.build_successful = true;
+        Ok(format!("OBS: Successfully compiled {} for target {:?}", proj.package_name, proj.build_target))
+    }
+}
+
+// =========================================================================
+// 1d. OPENSUSE YaST 1-CLICK INSTALL (.ymp) PARSER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct YmpRepositorySubscription {
+    pub repo_name: String,
+    pub repo_url: String,
+    pub package_to_install: String,
+}
+
+pub struct YaST1ClickInstallParser;
+
+impl YaST1ClickInstallParser {
+    pub fn parse_ymp_xml(ymp_xml: &str) -> Result<YmpRepositorySubscription, &'static str> {
+        let mut name = String::new();
+        let mut url = String::new();
+        let mut pkg = String::new();
+
+        for line in ymp_xml.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with("<name>") && trimmed.ends_with("</name>") {
+                name = trimmed[6..trimmed.len() - 7].to_string();
+            } else if trimmed.starts_with("<url>") && trimmed.ends_with("</url>") {
+                url = trimmed[5..trimmed.len() - 6].to_string();
+            } else if trimmed.starts_with("<item>") && trimmed.ends_with("</item>") {
+                pkg = trimmed[6..trimmed.len() - 7].to_string();
+            }
+        }
+
+        if name.is_empty() || url.is_empty() || pkg.is_empty() {
+            Err("YaST: Invalid .ymp 1-Click Install XML payload")
+        } else {
+            Ok(YmpRepositorySubscription {
+                repo_name: name,
+                repo_url: url,
+                package_to_install: pkg,
+            })
+        }
+    }
+}
+
+// =========================================================================
 // 2. SLACKWARE PKGTOOLS & SLACKPKG MINIMALIST PACKAGE MANAGER
 // =========================================================================
 
@@ -205,5 +395,46 @@ mod tests {
         let count = pkgtools.removepkg("slackpkg").unwrap();
         assert_eq!(count, 2);
         assert_eq!(pkgtools.installed_packages_db.len(), 0);
+    }
+
+    #[test]
+    fn test_zypper_solver_flow() {
+        let mut solver = ZypperSolver::new();
+        let mut repo = ZypperRepository::new("openSUSE-OSS", "https://download.opensuse.org/distribution/leap/15.5/repo/oss/", 10);
+        repo.add_package("zlib", "1.2.13", "x86_64", &[]);
+        repo.add_package("curl", "8.0.1", "x86_64", &["zlib"]);
+
+        solver.add_repository(repo);
+
+        let res = solver.zypper_install("curl").unwrap();
+        assert!(res.contains("Successfully installed curl"));
+        assert_eq!(solver.installed_packages.get("zlib").unwrap(), "1.2.13");
+        assert_eq!(solver.installed_packages.get("curl").unwrap(), "8.0.1");
+    }
+
+    #[test]
+    fn test_open_build_service_engine() {
+        let mut obs = OpenBuildServiceEngine::new();
+        let spec = "Name: hello\nVersion: 2.10\nSummary: GNU Hello World\n";
+        obs.create_obs_project("home:user:branches", "hello", ObsBuildTarget::OpenSuseTumbleweed, spec);
+
+        let res = obs.trigger_obs_build("home:user:branches").unwrap();
+        assert!(res.contains("Successfully compiled hello"));
+        assert!(obs.projects[0].build_successful);
+    }
+
+    #[test]
+    fn test_yast_1click_install_parser() {
+        let ymp = "
+            <metapackage>
+                <name>Games Repository</name>
+                <url>https://download.opensuse.org/repositories/games/openSUSE_Tumbleweed/</url>
+                <item>supertuxkart</item>
+            </metapackage>
+        ";
+
+        let sub = YaST1ClickInstallParser::parse_ymp_xml(ymp).unwrap();
+        assert_eq!(sub.repo_name, "Games Repository");
+        assert_eq!(sub.package_to_install, "supertuxkart");
     }
 }

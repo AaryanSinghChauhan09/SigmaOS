@@ -95,6 +95,126 @@ mod systemd_init;
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
+#[path = "../src/graphics/paint.rs"]
+mod paint;
+#[path = "../src/tools/display_manager.rs"]
+mod display_manager;
+#[path = "../src/tools/simple_scan.rs"]
+mod simple_scan;
+#[path = "../src/desktop/mate_betsy.rs"]
+mod mate_betsy;
+use bsd_compat::*;
+#[test]
+fn test_mate_betsy_desktop_suite_inspection() {
+    use mate_betsy::MateBetsyDesktopEnvironment;
+    let mut mate = MateBetsyDesktopEnvironment::new();
+    assert_eq!(mate.marco.theme_name, "Menta");
+    mate.launch_pluma_editor("config.conf");
+    assert!(mate.active_editor.is_some());
+    assert_eq!(mate.marco.active_windows.len(), 1);
+    mate.launch_atril_pdf("manual.pdf", 25);
+    assert!(mate.active_atril.is_some());
+    assert_eq!(mate.active_atril.as_ref().unwrap().total_pages, 25);
+}
+#[path = "../src/compatibility/mint_linux.rs"]
+mod mint_linux;
+#[path = "../src/compatibility/opensuse_slackware.rs"]
+mod opensuse_slackware;
+fn test_opensuse_zypper_and_obs_engine_inspection() {
+    use opensuse_slackware::{ZypperRepository, ZypperSolver, OpenBuildServiceEngine, ObsBuildTarget, YaST1ClickInstallParser};
+    let mut solver = ZypperSolver::new();
+    let mut repo = ZypperRepository::new("Tumbleweed-Main", "https://download.opensuse.org/tumbleweed/repo/oss/", 5);
+    repo.add_package("bash", "5.2", "x86_64", &[]);
+    solver.add_repository(repo);
+    assert!(solver.zypper_install("bash").is_ok());
+    let mut obs = OpenBuildServiceEngine::new();
+    obs.create_obs_project("Kernel:HEAD", "linux", ObsBuildTarget::OpenSuseTumbleweed, "Name: linux\nVersion: 6.8\n");
+    assert!(obs.trigger_obs_build("Kernel:HEAD").is_ok());
+    let sub = YaST1ClickInstallParser::parse_ymp_xml("<name>Packman</name>\n<url>https://packman.links2linux.de</url>\n<item>vlc</item>").unwrap();
+    assert_eq!(sub.package_to_install, "vlc");
+fn test_mint4win_installer_engine_inspection() {
+    use mint_linux::{
+        Mint4WinInstallerEngine, Mint4WinInstallationConfig,
+    };
+    let config = Mint4WinInstallationConfig::default_windows_c('D', "bob");
+    let mut engine = Mint4WinInstallerEngine::new(config);
+    assert!(engine.allocate_loopback_disks().is_ok());
+    assert!(engine.configure_windows_bcd_boot_entry().is_ok());
+    assert!(engine.installed);
+fn test_simple_scan_engine_inspection() {
+    use simple_scan::{SovereignSimpleScanEngine, ScanExportFormat};
+    let mut scan_engine = SovereignSimpleScanEngine::new();
+    assert_eq!(scan_engine.connected_scanners.len(), 1);
+    let page1 = scan_engine.acquire_scan_page().unwrap();
+    assert_eq!(page1, 1);
+    let ocr_text = scan_engine.perform_ocr_text_extraction(0).unwrap();
+    assert!(ocr_text.contains("Page #1"));
+    let pdf = scan_engine.export_document_multipage(ScanExportFormat::Pdf).unwrap();
+    assert!(pdf.starts_with(b"%PDF-1.7"));
+fn test_display_manager_mdm_theme_engine_inspection() {
+    use display_manager::{MdmGreeterThemeEngine, MdmThemeConfig, MdmThemeStyle, User, Session, SessionType};
+    let config = MdmThemeConfig::new("Mint-Sovereign", MdmThemeStyle::Html5Canvas);
+    let mut greeter = MdmGreeterThemeEngine::new(config);
+    greeter.set_user_avatar(1001, "/home/bob/.face");
+    let users = vec![User::new(1001, "bob", "/home/bob")];
+    let sessions = vec![Session::new("Zenith-Wayland", SessionType::Wayland, "/usr/bin/zenith")];
+    let html = greeter.render_html5_greeter_markup(&users, &sessions);
+    assert!(html.contains("Mint-Sovereign"));
+    assert!(html.contains("bob"));
+    assert!(html.contains("Zenith-Wayland"));
+fn test_graphics_paint_suite_inspection() {
+    use paint::{
+        SigmaLayerMaskEngine, SigmaLayerMask, SovereignBrushEngine, BrushType, BrushPoint,
+        ColorRgba, SigmaSelectionEngine, SigmaVectorPathEngine, VectorControlPoint,
+        SigmaPaletteManager, SigmaImageExporter,
+    // 1. Layer Mask Engine
+    let mut mask_engine = SigmaLayerMaskEngine::new();
+    let mut mask = SigmaLayerMask::new(2, 2, 255);
+    mask.set_value(0, 0, 128);
+    mask_engine.attach_mask(mask);
+    let mut pixels = vec![ColorRgba::new(255, 0, 0, 200); 4];
+    mask_engine.apply_mask_to_layer(2, 2, &mut pixels);
+    assert_eq!(pixels[0].a, 100);
+    // 2. Brush Engine
+    let brush = SovereignBrushEngine::new(BrushType::SoftRound, 10.0, ColorRgba::new(0, 0, 255, 255));
+    let bp = BrushPoint { x: 5.0, y: 5.0, pressure: 0.8 };
+    let mut canvas_pixels = vec![ColorRgba::new(0, 0, 0, 0); 100];
+    brush.paint_dab(bp, 10, 10, &mut canvas_pixels);
+    assert!(canvas_pixels[55].b > 0);
+    // 3. Selection Engine
+    let mut sel = SigmaSelectionEngine::new(10, 10);
+    sel.select_rectangle(1, 1, 5, 5);
+    assert!(sel.is_selected(2, 2));
+    // 4. Vector Path Engine
+    let mut path = SigmaVectorPathEngine::new();
+    path.add_point(VectorControlPoint { x: 1.0, y: 1.0, handle_in_x: 1.0, handle_in_y: 1.0, handle_out_x: 3.0, handle_out_y: 1.0 });
+    path.add_point(VectorControlPoint { x: 5.0, y: 5.0, handle_in_x: 3.0, handle_in_y: 5.0, handle_out_x: 5.0, handle_out_y: 5.0 });
+    path.stroke_path_onto_canvas(10, 10, &mut canvas_pixels);
+    // 5. Palette Manager
+    let mut pal = SigmaPaletteManager::new("Tango");
+    assert_eq!(pal.load_gpl_palette("GIMP Palette\n100 100 100 Red\n"), 1);
+    // 6. Image Exporter
+    let ppm = SigmaImageExporter::export_ppm(2, 2, &pixels).unwrap();
+    assert!(ppm.contains("P3"));
+fn test_sovereign_community_foundation_inspection() {
+    use community_foundation::{SovereignFoundationManager, FoundationRole, BountySeverity};
+    let mut foundation = SovereignFoundationManager::new("SigmaOS Foundation");
+    foundation.register_member("alice", FoundationRole::BoardMember);
+    assert_eq!(foundation.members.len(), 1);
+    let bounty_id = foundation.submit_security_bounty(
+        "VFS Buffer Overflow",
+        "bob_auditor",
+        BountySeverity::High,
+    );
+    assert_eq!(bounty_id, 1);
+    assert_eq!(foundation.resolve_bounty(bounty_id).unwrap(), 5000);
+    foundation.organize_hackathon("Kernel Hack 2026", "Subsystem Interop");
+    assert!(foundation.register_hackathon_participant("Kernel Hack 2026", "dev_charlie").is_ok());
+    assert!(foundation.submit_hackathon_project("Kernel Hack 2026", "SovereignBridge").is_ok());
 
 #[test]
 fn test_sovereign_universal_distro_bridge_inspection() {

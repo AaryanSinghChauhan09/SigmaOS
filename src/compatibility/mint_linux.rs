@@ -648,6 +648,122 @@ impl MintDriverInfo {
 }
 
 /// MintDrivers-inspired Hardware Driver Manager
+// ==========================================
+// Linux Mint mint4win & Wubi Loopback Windows Installer Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LoopbackDiskFormat {
+    VhdFixed,
+    VhdDynamic,
+    RawNtfsImage,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowsBootloaderType {
+    Ntldr,          // Windows XP / Server 2003
+    BcdBootmgr,     // Windows Vista / 7 / 8 / 10 / 11
+    Grub4Dos,       // Legacy MBR chainloader
+    UefiEfiEntry,   // UEFI NVRAM Boot Entry
+}
+
+#[derive(Debug, Clone)]
+pub struct Mint4WinInstallationConfig {
+    pub target_drive_letter: char, // e.g. 'C'
+    pub target_folder: String,     // e.g. "C:\mint4win"
+    pub disk_format: LoopbackDiskFormat,
+    pub bootloader_type: WindowsBootloaderType,
+    pub root_disk_size_mb: u64,    // e.g. 32768 MB (32 GB)
+    pub swap_file_size_mb: u64,    // e.g. 4096 MB (4 GB)
+    pub default_username: String,
+    pub host_os_version: String,
+}
+
+impl Mint4WinInstallationConfig {
+    pub fn default_windows_c(drive_letter: char, username: &str) -> Self {
+        Mint4WinInstallationConfig {
+            target_drive_letter: drive_letter,
+            target_folder: format!("{}:\\mint4win", drive_letter),
+            disk_format: LoopbackDiskFormat::RawNtfsImage,
+            bootloader_type: WindowsBootloaderType::BcdBootmgr,
+            root_disk_size_mb: 32768,
+            swap_file_size_mb: 4096,
+            default_username: username.to_string(),
+            host_os_version: "Windows 11".to_string(),
+        }
+    }
+}
+
+/// Linux Mint `mint4win` & Ubuntu `Wubi` inspired Windows Loopback Installer Engine
+pub struct Mint4WinInstallerEngine {
+    pub config: Mint4WinInstallationConfig,
+    pub loopback_root_vhd_created: bool,
+    pub bcd_entry_added: bool,
+    pub installed: bool,
+    pub bcd_guid: String,
+}
+
+impl Mint4WinInstallerEngine {
+    pub fn new(config: Mint4WinInstallationConfig) -> Self {
+        Mint4WinInstallerEngine {
+            config,
+            loopback_root_vhd_created: false,
+            bcd_entry_added: false,
+            installed: false,
+            bcd_guid: String::from("{a1b2c3d4-e5f6-7890-abcd-1234567890ab}"),
+        }
+    }
+
+    pub fn allocate_loopback_disks(&mut self) -> Result<String, &'static str> {
+        if self.config.root_disk_size_mb < 8192 {
+            return Err("mint4win: Minimum root disk size is 8192 MB (8 GB)");
+        }
+
+        self.loopback_root_vhd_created = true;
+        Ok(format!(
+            "Successfully allocated {} MB loopback root disk and {} MB swap file at {}",
+            self.config.root_disk_size_mb,
+            self.config.swap_file_size_mb,
+            self.config.target_folder
+        ))
+    }
+
+    pub fn configure_windows_bcd_boot_entry(&mut self) -> Result<String, &'static str> {
+        if !self.loopback_root_vhd_created {
+            return Err("mint4win: Must allocate loopback disk before configuring Windows BCD");
+        }
+
+        self.bcd_entry_added = true;
+        self.installed = true;
+        Ok(format!(
+            "Added Windows BCD boot entry [{}] 'SigmaOS (Linux Mint Dual-Boot)'",
+            self.bcd_guid
+        ))
+    }
+
+    pub fn generate_unattended_install_script(&self) -> String {
+        format!(
+            "unattended_user=\"{}\"\nloopback_root=\"{}\\disks\\root.disk\"\nloopback_swap=\"{}\\disks\\swap.disk\"\nbootloader=\"{:?}\"\n",
+            self.config.default_username,
+            self.config.target_folder,
+            self.config.target_folder,
+            self.config.bootloader_type
+        )
+    }
+
+    pub fn uninstall_mint4win(&mut self) -> Result<String, &'static str> {
+        if !self.installed {
+            return Err("mint4win is not installed");
+        }
+
+        self.bcd_entry_added = false;
+        self.loopback_root_vhd_created = false;
+        self.installed = false;
+
+        Ok("Successfully removed mint4win Windows boot entry and loopback disk files".to_string())
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }

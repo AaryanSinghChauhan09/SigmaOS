@@ -78,6 +78,7 @@ pub mod oldlinux;
 pub mod open_source_dominance;
 pub mod open_source_tier1;
 pub mod opensuse_slackware;
+pub use opensuse_slackware::*;
 pub mod overtake;
 pub mod penetration_assistant;
 pub mod persona;
@@ -149,6 +150,11 @@ pub use historic_linux::{
 pub use legacy_adapters::{LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter};
 pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
+pub use mint_linux::{
+    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata,
+    MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    WindowsBootloaderType,
 };
 pub use mint_linux::{
     LoopbackDiskImage, Mint4WinConfig, Mint4WinInstaller, MintAppMetadata, MintBackupTool,
