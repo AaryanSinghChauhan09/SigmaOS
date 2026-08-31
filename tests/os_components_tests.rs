@@ -22,8 +22,13 @@ mod chimera_linux;
 mod debian_compat;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod distro_inspirations;
+#[path = "../src/distro"]
+pub mod distro {
+    pub mod sovereign_distro_dominance;
+    pub mod universal_distro_super_matrix;
+    pub mod linux_bsd_inspirations;
+}
+use distro::linux_bsd_inspirations as distro_inspirations;
 #[path = "../src/compatibility/cachy_os.rs"]
 mod cachy_os;
 #[path = "../src/distro/endeavour_os.rs"]
