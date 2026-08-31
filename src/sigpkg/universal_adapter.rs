@@ -1296,27 +1296,36 @@ mod tests {
     }
 
     #[test]
-    fn test_universal_dependency_mapper_and_converters() {
-        let mapper = UniversalDependencyMapper::new();
-        assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
-        assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
-        assert_eq!(mapper.to_canonical_name("libc6"), "libc");
+    fn test_parse_and_translate_manifest_multi_format() {
+        let adapter = UniversalPackageAdapter::new();
 
-        let scriptlet_conv = UniversalScriptletConverter::new();
-        let hook = scriptlet_conv.convert_scriptlet(PackageFormat::Apt, "postinst", "echo post").unwrap();
-        assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
+        // 1. Deb / Apt
+        let deb_text = "Package: htop\nVersion: 3.2.2\nDepends: ncurses, libcap\nDescription: Interactive process viewer";
+        let deb_pkg = adapter.parse_and_translate_manifest("htop.deb", deb_text).unwrap();
+        assert_eq!(deb_pkg.name, "htop");
+        assert_eq!(deb_pkg.version, Version::new(3, 2, 2));
 
-        let format_conv = UniversalFormatConverter::new();
-        let deb_control = b"Package: wget\nVersion: 1.21.0\nDepends: libssl-dev, libc6\nDescription: Retrieval tool\n";
-        let pkg = format_conv.convert_to_sigma_pkg(PackageFormat::Apt, deb_control).unwrap();
-        assert_eq!(pkg.name, "wget");
-        assert_eq!(pkg.dependencies[0].name, "openssl");
-        assert_eq!(pkg.dependencies[1].name, "libc");
+        // 2. Pacman / PKGBUILD
+        let arch_text = "pkgname=neovim\npkgver=0.9.1\ndepends=(libvterm luajit)";
+        let arch_pkg = adapter.parse_and_translate_manifest("PKGBUILD.pkg.tar.zst", arch_text).unwrap();
+        assert_eq!(arch_pkg.name, "neovim");
+        assert_eq!(arch_pkg.version, Version::new(0, 9, 1));
 
-        let simulator = UniversalDryRunSimulator::new();
-        let result = simulator.simulate_install(PackageFormat::Apt, deb_control).unwrap();
-        assert!(result.is_valid);
-        assert_eq!(result.package_name, "wget");
-        assert_eq!(result.resolved_dependencies.len(), 2);
+        // 3. RPM / Spec
+        let rpm_text = "Name: bash\nVersion: 5.2.15\nSummary: GNU Bourne Again SHell\nRequires: glibc";
+        let rpm_pkg = adapter.parse_and_translate_manifest("bash.rpm", rpm_text).unwrap();
+        assert_eq!(rpm_pkg.name, "bash");
+        assert_eq!(rpm_pkg.version, Version::new(5, 2, 15));
+
+        // 4. Snap
+        let snap_text = "name: discord\nversion: '0.0.28'\nsummary: All-in-one voice and text chat\nconfinement: strict";
+        let snap_pkg = adapter.parse_and_translate_manifest("discord.yaml", snap_text).unwrap();
+        assert_eq!(snap_pkg.name, "discord");
+        assert_eq!(snap_pkg.version, Version::new(0, 0, 28));
+
+        // 5. Flatpak
+        let flatpak_text = "{\n  \"app-id\": \"org.gimp.GIMP\",\n  \"command\": \"gimp\"\n}";
+        let flatpak_pkg = adapter.parse_and_translate_manifest("manifest.json", flatpak_text).unwrap();
+        assert_eq!(flatpak_pkg.name, "org.gimp.GIMP");
     }
 }

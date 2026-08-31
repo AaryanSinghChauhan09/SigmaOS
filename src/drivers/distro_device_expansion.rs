@@ -1030,6 +1030,399 @@ impl PeripheralDevice for CanBusSocketDriver {
 }
 
 // =========================================================================
+// 13. External USB Storage: USB Mass Storage Bulk-Only Transport (BOT) Driver
+// =========================================================================
+
+/// USB Mass Storage Bulk-Only Transport (BOT) External Flash / Disk Driver (Linux usb-storage / FreeBSD umass(4))
+pub struct UsbMassStorageBotDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    sector_size_bytes: u32,
+    total_sectors: u64,
+    cbw_tag: u32,
+}
+
+impl UsbMassStorageBotDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            sector_size_bytes: 512,
+            total_sectors: 125_000_000, // ~64GB USB Drive
+            cbw_tag: 1,
+        }
+    }
+
+    pub fn total_capacity_bytes(&self) -> u64 {
+        self.sector_size_bytes as u64 * self.total_sectors
+    }
+}
+
+impl PeripheralDevice for UsbMassStorageBotDriver {
+    fn name(&self) -> &'static str {
+        "USB Mass Storage Bulk-Only Transport (BOT) External Drive"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.cbw_tag = 1;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("USB Storage offline");
+        }
+        if buffer.len() >= 12 {
+            buffer[0..4].copy_from_slice(&self.sector_size_bytes.to_le_bytes());
+            buffer[4..12].copy_from_slice(&self.total_sectors.to_le_bytes());
+            Ok(12)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("USB Storage offline");
+        }
+        self.cbw_tag += 1;
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 14. External HID: USB HID Gamepad & Joystick Controller Driver
+// =========================================================================
+
+/// USB HID Gamepad & Joystick Controller Driver (Linux xpad/hid-generic / FreeBSD uhid(4))
+pub struct UsbGamepadControllerDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    buttons_mask: u16,
+    left_stick_x: i16,
+    left_stick_y: i16,
+}
+
+impl UsbGamepadControllerDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            buttons_mask: 0,
+            left_stick_x: 0,
+            left_stick_y: 0,
+        }
+    }
+
+    pub fn is_button_pressed(&self, button_bit: u8) -> bool {
+        (self.buttons_mask & (1 << button_bit)) != 0
+    }
+}
+
+impl PeripheralDevice for UsbGamepadControllerDriver {
+    fn name(&self) -> &'static str {
+        "USB HID External Gamepad & Joystick Controller"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.buttons_mask = 0x0001; // Button A active
+        self.left_stick_x = 100;
+        self.left_stick_y = -100;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Gamepad offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[0..2].copy_from_slice(&self.buttons_mask.to_le_bytes());
+            buffer[2..4].copy_from_slice(&self.left_stick_x.to_le_bytes());
+            buffer[4..6].copy_from_slice(&self.left_stick_y.to_le_bytes());
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Gamepad offline");
+        }
+        // Force feedback rumble packet
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.buttons_mask = 0;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 15. External Wireless: Bluetooth GATT External HID Device Driver
+// =========================================================================
+
+/// Bluetooth GATT External Human Interface Device Driver (Linux bluez / NetBSD bthidev(4))
+pub struct BluetoothExternalGattHidDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    device_mac: [u8; 6],
+    battery_level_pct: u8,
+    is_paired: bool,
+}
+
+impl BluetoothExternalGattHidDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            device_mac: [0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13],
+            battery_level_pct: 85,
+            is_paired: false,
+        }
+    }
+
+    pub fn battery_percent(&self) -> u8 {
+        self.battery_level_pct
+    }
+}
+
+impl PeripheralDevice for BluetoothExternalGattHidDriver {
+    fn name(&self) -> &'static str {
+        "Bluetooth LE External GATT Human Interface Device"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.is_paired = true;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Bluetooth HID offline");
+        }
+        if buffer.len() >= 7 {
+            buffer[0..6].copy_from_slice(&self.device_mac);
+            buffer[6] = self.battery_level_pct;
+            Ok(7)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Bluetooth HID offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.is_paired = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 16. External Display & Connectivity: USB Type-C / Thunderbolt External DisplayPort Alt-Mode Driver
+// =========================================================================
+
+/// USB Type-C / Thunderbolt External DisplayPort Alt-Mode Driver (Linux typec/thunderbolt / FreeBSD typec(4))
+pub struct ThunderboltExternalDisplayDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    dp_lanes_active: u8,
+    max_resolution_width: u16,
+    max_resolution_height: u16,
+}
+
+impl ThunderboltExternalDisplayDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            dp_lanes_active: 4,
+            max_resolution_width: 3840,
+            max_resolution_height: 2160, // 4K External Display
+        }
+    }
+
+    pub fn resolution(&self) -> (u16, u16) {
+        (self.max_resolution_width, self.max_resolution_height)
+    }
+}
+
+impl PeripheralDevice for ThunderboltExternalDisplayDriver {
+    fn name(&self) -> &'static str {
+        "USB Type-C / Thunderbolt External DisplayPort Alt-Mode"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Thunderbolt Display offline");
+        }
+        if buffer.len() >= 5 {
+            buffer[0] = self.dp_lanes_active;
+            buffer[1..3].copy_from_slice(&self.max_resolution_width.to_le_bytes());
+            buffer[3..5].copy_from_slice(&self.max_resolution_height.to_le_bytes());
+            Ok(5)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Thunderbolt Display offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 17. External Serial: CH340 / FTDI USB Serial Controller Driver
+// =========================================================================
+
+/// CH340 / FTDI External Serial USB Bridge Controller Driver (Linux ch341 / FreeBSD uchcom(4))
+pub struct Ch340ExternalSerialDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    baud_rate: u32,
+    rx_buffer: Vec<u8>,
+}
+
+impl Ch340ExternalSerialDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            baud_rate: 115200,
+            rx_buffer: Vec::new(),
+        }
+    }
+
+    pub fn baud_rate(&self) -> u32 {
+        self.baud_rate
+    }
+}
+
+impl PeripheralDevice for Ch340ExternalSerialDriver {
+    fn name(&self) -> &'static str {
+        "CH340 / FTDI USB-to-Serial External Controller Bridge"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        let len = buffer.len().min(self.rx_buffer.len());
+        if len > 0 {
+            let chunk: Vec<u8> = self.rx_buffer.drain(..len).collect();
+            buffer[..len].copy_from_slice(&chunk);
+            Ok(len)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        self.rx_buffer.extend_from_slice(data);
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.rx_buffer.clear();
+        Ok(())
+    }
+}
+
+// =========================================================================
 // Unit Tests
 // =========================================================================
 
@@ -1252,7 +1645,86 @@ mod tests {
     }
 
     #[test]
-    fn test_peripheral_manager_registration_with_all_12_distro_expansion_drivers() {
+    fn test_usb_mass_storage_bot_driver() {
+        let mut bot = UsbMassStorageBotDriver::new();
+        assert_eq!(bot.name(), "USB Mass Storage Bulk-Only Transport (BOT) External Drive");
+        assert_eq!(bot.generation(), DeviceGeneration::Modern);
+        assert_eq!(bot.total_capacity_bytes(), 64_000_000_000);
+
+        assert!(bot.initialize().is_ok());
+        let mut geom_buf = [0u8; 12];
+        assert_eq!(bot.read(&mut geom_buf).unwrap(), 12);
+        assert_eq!(u32::from_le_bytes([geom_buf[0], geom_buf[1], geom_buf[2], geom_buf[3]]), 512);
+
+        assert_eq!(bot.write(b"WRITE-BLOCK").unwrap(), 11);
+        assert!(bot.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_usb_gamepad_controller_driver() {
+        let mut pad = UsbGamepadControllerDriver::new();
+        assert_eq!(pad.name(), "USB HID External Gamepad & Joystick Controller");
+        assert_eq!(pad.generation(), DeviceGeneration::Modern);
+
+        assert!(pad.initialize().is_ok());
+        assert!(pad.is_button_pressed(0)); // Button A
+        let mut state_buf = [0u8; 6];
+        assert_eq!(pad.read(&mut state_buf).unwrap(), 6);
+
+        assert_eq!(pad.write(b"RUMBLE-FF").unwrap(), 9);
+        assert!(pad.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_bluetooth_external_gatt_hid_driver() {
+        let mut bt_hid = BluetoothExternalGattHidDriver::new();
+        assert_eq!(bt_hid.name(), "Bluetooth LE External GATT Human Interface Device");
+        assert_eq!(bt_hid.generation(), DeviceGeneration::Modern);
+        assert_eq!(bt_hid.battery_percent(), 85);
+
+        assert!(bt_hid.initialize().is_ok());
+        let mut report_buf = [0u8; 7];
+        assert_eq!(bt_hid.read(&mut report_buf).unwrap(), 7);
+        assert_eq!(report_buf[6], 85);
+
+        assert_eq!(bt_hid.write(b"LED-CMD").unwrap(), 7);
+        assert!(bt_hid.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_thunderbolt_external_display_driver() {
+        let mut tb_dp = ThunderboltExternalDisplayDriver::new();
+        assert_eq!(tb_dp.name(), "USB Type-C / Thunderbolt External DisplayPort Alt-Mode");
+        assert_eq!(tb_dp.generation(), DeviceGeneration::Modern);
+        assert_eq!(tb_dp.resolution(), (3840, 2160));
+
+        assert!(tb_dp.initialize().is_ok());
+        let mut dp_buf = [0u8; 5];
+        assert_eq!(tb_dp.read(&mut dp_buf).unwrap(), 5);
+        assert_eq!(dp_buf[0], 4); // 4 DP lanes
+
+        assert_eq!(tb_dp.write(b"MODE-SET").unwrap(), 8);
+        assert!(tb_dp.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_ch340_external_serial_driver() {
+        let mut serial = Ch340ExternalSerialDriver::new();
+        assert_eq!(serial.name(), "CH340 / FTDI USB-to-Serial External Controller Bridge");
+        assert_eq!(serial.generation(), DeviceGeneration::Modern);
+        assert_eq!(serial.baud_rate(), 115200);
+
+        assert!(serial.initialize().is_ok());
+        let mut rx_buf = [0u8; 4];
+        assert_eq!(serial.read(&mut rx_buf).unwrap(), 4);
+        assert_eq!(&rx_buf, b"OK\r\n");
+
+        assert_eq!(serial.write(b"AT\r\n").unwrap(), 4);
+        assert!(serial.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_peripheral_manager_registration_with_all_17_distro_expansion_drivers() {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
@@ -1268,8 +1740,13 @@ mod tests {
         assert!(manager.register_device(Box::new(RaspberryPiGpioMailboxDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(IntelI2cSmbusControllerDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(CanBusSocketDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(UsbMassStorageBotDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(UsbGamepadControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(BluetoothExternalGattHidDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(ThunderboltExternalDisplayDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Ch340ExternalSerialDriver::new())).is_ok());
 
-        assert_eq!(manager.device_count(), 12);
+        assert_eq!(manager.device_count(), 17);
         manager.broadcast_power_state(PowerState::Sleep);
     }
 }
