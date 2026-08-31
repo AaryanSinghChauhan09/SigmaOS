@@ -1795,6 +1795,10 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
         assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
         assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("package.pkg.tar.zst"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
+        assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
+        assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
     }
 
     #[test]

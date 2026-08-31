@@ -335,6 +335,15 @@ mod tests {
                                                         // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
         let mut write_data = vec![0u8; 512];
         crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_data);
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         rd.write_sectors(0, &write_data).unwrap();
         let mut read_buf = vec![0u8; 512];
         rd.read_sectors(0, &mut read_buf).unwrap();
@@ -373,6 +382,15 @@ mod tests {
         for b in write_bytes.iter() {
             write_data.push(*b);
         }
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         let write_bio = Bio::write(bio_id, 10, write_data);
         mgr.submit_bio(write_bio);
         let processed = mgr.process_pending();

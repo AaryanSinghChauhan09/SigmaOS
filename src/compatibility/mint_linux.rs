@@ -324,27 +324,53 @@ pub struct CinnamonDesklet {
     pub y: usize,
 }
 
+/// Cinnamon Theme Presets (Linux Mint Mint-Y, Mint-X, Yaru, Adapta)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CinnamonPreset {
+    MintYDark,
+    MintYLight,
+    MintYAqua,
+    MintYPurple,
+    MintYTeal,
+    MintXDefault,
+    CinnamonAdwaita,
+    CustomCinnamon,
+}
+
+/// Cinnamon Spices & Theme Preset Manager
 pub struct CinnamonThemeEngine {
     pub active_gtk_theme: [u8; 32],
+    pub current_preset: CinnamonPreset,
     pub desklets: Vec<Option<CinnamonDesklet>>,
     pub is_panel_enabled: bool,
+    pub panel_transparency_alpha: u8, // 0 to 255
+    pub applet_icon_theme: [u8; 32],
+    pub sound_scheme_enabled: bool,
 }
 
 impl CinnamonThemeEngine {
     pub fn new() -> Self {
         let mut theme = [0u8; 32];
+        let mut icon_theme = [0u8; 32];
         let default_name = b"Mint-Y-Dark";
+        let default_icons = b"Mint-Y";
         unsafe {
             core::ptr::copy_nonoverlapping(
                 default_name.as_ptr(),
                 theme.as_mut_ptr(),
                 default_name.len(),
             );
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(default_icons.as_ptr(), icon_theme.as_mut_ptr(), default_icons.len());
         }
         Self {
             active_gtk_theme: theme,
+            current_preset: CinnamonPreset::MintYDark,
             desklets: Vec::new(),
             is_panel_enabled: true,
+            panel_transparency_alpha: 230,
+            applet_icon_theme: icon_theme,
+            sound_scheme_enabled: true,
         }
     }
 
@@ -355,6 +381,28 @@ impl CinnamonThemeEngine {
             core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
         }
         self.active_gtk_theme = theme;
+    }
+
+    pub fn apply_preset(&mut self, preset: CinnamonPreset) {
+        self.current_preset = preset;
+        let (gtk_name, icon_name): (&[u8], &[u8]) = match preset {
+            CinnamonPreset::MintYDark => (b"Mint-Y-Dark", b"Mint-Y"),
+            CinnamonPreset::MintYLight => (b"Mint-Y", b"Mint-Y"),
+            CinnamonPreset::MintYAqua => (b"Mint-Y-Dark-Aqua", b"Mint-Y-Aqua"),
+            CinnamonPreset::MintYPurple => (b"Mint-Y-Dark-Purple", b"Mint-Y-Purple"),
+            CinnamonPreset::MintYTeal => (b"Mint-Y-Dark-Teal", b"Mint-Y-Teal"),
+            CinnamonPreset::MintXDefault => (b"Mint-X", b"Mint-X"),
+            CinnamonPreset::CinnamonAdwaita => (b"Adwaita-dark", b"Adwaita"),
+            CinnamonPreset::CustomCinnamon => (b"Custom-Cinnamon", b"Custom-Icons"),
+        };
+
+        self.set_gtk_theme(gtk_name);
+        let mut icon_arr = [0u8; 32];
+        let len = icon_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(icon_name.as_ptr(), icon_arr.as_mut_ptr(), len);
+        }
+        self.applet_icon_theme = icon_arr;
     }
 
     pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
@@ -737,6 +785,16 @@ mod tests {
         assert!(style.menu_layout_compact);
         assert_eq!(style.opacity_percent, 85);
         assert!(!style.window_effects_enabled);
+
+        // Test Cinnamon Theme Presets
+        let mut cinnamon = CinnamonThemeEngine::new();
+        assert_eq!(cinnamon.current_preset, CinnamonPreset::MintYDark);
+        assert!(cinnamon.active_gtk_theme.starts_with(b"Mint-Y-Dark"));
+
+        cinnamon.apply_preset(CinnamonPreset::MintYAqua);
+        assert_eq!(cinnamon.current_preset, CinnamonPreset::MintYAqua);
+        assert!(cinnamon.active_gtk_theme.starts_with(b"Mint-Y-Dark-Aqua"));
+        assert!(cinnamon.applet_icon_theme.starts_with(b"Mint-Y-Aqua"));
     }
 
     #[test]

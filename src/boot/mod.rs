@@ -19,6 +19,7 @@ pub use sigma_boot::{
     BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
     OpenBsdBootDirective, SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
 };
+pub use sigma_boot::{BootEntry, BootManager, BootTheme};
 pub use plymouth::{
     GtkPlymouthBootsplashEngine, PlymouthMode, PlymouthTheme,
 };
