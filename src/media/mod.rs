@@ -11,8 +11,11 @@ pub use sovereign_screen_recorder::{
 };
 
 pub use browser::{
-    AdBlockFilter, BrowserProcess, BrowserProcessType, SearchEngineType, SearchSwitcher,
-    SecureStorageContainer, SovereignBrowserEngine,
+    AdBlockFilter, BraveShieldsEngine, BrowserContainerType, BrowserProcess, BrowserProcessType,
+    BrowserTabInstance, GlobalPrivacyControl, OnionCircuitNode, ResistFingerprintingEngine,
+    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
+    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
+    TorSecurityLevel,
 };
 
 pub use sovereign_video_player::{

@@ -170,8 +170,15 @@ impl BraveShield {
             return false;
         }
 
+        // Whitelist rules take precedence
         for rule in &self.rules {
-            if rule.matches(url) && !rule.is_whitelist {
+            if rule.is_whitelist && rule.matches(url) {
+                return false;
+            }
+        }
+
+        for rule in &self.rules {
+            if !rule.is_whitelist && rule.matches(url) {
                 return true;
             }
         }
