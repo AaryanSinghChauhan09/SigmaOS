@@ -1,0 +1,26 @@
+name: Sovereign OS Automated Release & Cryptographic Signatures
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-automation:
+    name: Build Multi-Format Release Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Core Library & Binary Packages
+        run: |
+          cargo check --lib
+          cargo test --lib -- package::universal::tests

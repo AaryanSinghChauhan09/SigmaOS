@@ -175,7 +175,6 @@ impl SigmaMakeEngine {
 }
 
 /// # Safety
-/// Caller must ensure `dest` slice has sufficient allocated capacity.
 /// Copies elements from `src` slice into `dest` slice up to the minimum length of both.
 pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
     let len = src.len().min(dest.len());
@@ -185,18 +184,11 @@ pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
 static mut GLOBAL_MAKE: SigmaMakeEngine = SigmaMakeEngine::new();
 
 /// # Safety
-/// Empty C-ABI string copy symbol helper.
 /// Legacy C ABI compatibility helper.
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {}
 
 /// # Safety
-/// Caller must ensure single-threaded execution when modifying global make engine static.
-#[no_mangle]
-pub unsafe extern "C" fn sigma_make_register_c_target() {
-    unsafe {
-        let _ = (&mut *core::ptr::addr_of_mut!(GLOBAL_MAKE))
-            .register_target(b"c_target", b"gcc c_target.c -o c_target");
 /// Registers a dummy C build target in the global engine.
 #[no_mangle]
 pub unsafe extern "C" fn sigma_make_register_c_target() {

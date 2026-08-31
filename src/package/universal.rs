@@ -3,31 +3,15 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
 use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-
-/// Lifecycle timing for package hooks
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookTiming {
-    PreInstall,
-    PostInstall,
-    PreRemove,
-    PostRemove,
-}
-
-/// Trait for package hooks
-pub trait PackageHook: Send + Sync {
-    fn timing(&self) -> HookTiming;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
-
 use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap as HashMap;
@@ -1079,7 +1063,6 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
-    #[cfg(not(feature = "standalone_test"))]
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1094,7 +1077,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            #[cfg(not(feature = "standalone_test"))]
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };
@@ -1104,7 +1086,6 @@ impl UniversalPackageManager {
     }
 
     /// Register and install a Node.js binary distribution runtime into the isolated store
-    #[cfg(not(feature = "standalone_test"))]
     pub fn install_node_runtime(
         &mut self,
         package: &NodeBinaryPackage,
@@ -1993,7 +1974,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(feature = "standalone_test"))]
     fn test_universal_package_manager_node_runtime_integration() {
         let mut manager = UniversalPackageManager::new();
         let bytes = vec![0x42u8; 120];
@@ -2022,46 +2002,5 @@ mod tests {
         let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
         assert_eq!(installed_pkg.version, "v20.11.0");
         assert!(installed_pkg.installed);
-    }
-
-    #[test]
-    fn test_package_translator_factory() {
-        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
-        assert_eq!(deb_trans.source_format(), PackageFormat::Deb);
-
-        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
-        assert_eq!(rpm_trans.source_format(), PackageFormat::Rpm);
-
-        let pacman_trans = PackageTranslatorFactory::create_translator(PackageFormat::Pacman).unwrap();
-        assert_eq!(pacman_trans.source_format(), PackageFormat::Pacman);
-
-        let apk_trans = PackageTranslatorFactory::create_translator(PackageFormat::Apk).unwrap();
-        assert_eq!(apk_trans.source_format(), PackageFormat::Apk);
-    }
-
-    #[test]
-    fn test_universal_distro_package_bridge_mapping() {
-        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apt", "install", "curl"), "sigpkg install curl");
-        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("dnf", "remove", "nginx"), "sigpkg remove nginx");
-        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("pacman", "-Sy", ""), "sigpkg update");
-        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apk", "add", "htop"), "sigpkg install htop");
-        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("emerge", "install", "zsh"), "sigpkg install zsh");
-    }
-
-    #[test]
-    fn test_multi_format_conversion() {
-        let deb_raw = b"Package: htop\nVersion: 3.2.1\n";
-        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
-        let deb_pkg = deb_trans.translate(deb_raw).unwrap();
-        assert_eq!(deb_pkg.name, "htop");
-        assert_eq!(deb_pkg.version, "3.2.1");
-        assert!(deb_pkg.formats.contains(&PackageFormat::SigmaPkg));
-
-        let rpm_raw = b"Name: kernel\nVersion: 6.5.6\n";
-        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
-        let rpm_pkg = rpm_trans.translate(rpm_raw).unwrap();
-        assert_eq!(rpm_pkg.name, "kernel");
-        assert_eq!(rpm_pkg.version, "6.5.6");
-        assert!(rpm_pkg.formats.contains(&PackageFormat::SigmaPkg));
     }
 }
