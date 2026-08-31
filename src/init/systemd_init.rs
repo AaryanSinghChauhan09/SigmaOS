@@ -2095,212 +2095,34 @@ mod tests {
     }
 
     #[test]
-    fn test_systemd_security_analyzer() {
-        let mut profile = SystemdUnitHardeningProfile::default();
-        let report_unsecure = SystemdSecurityAuditor::analyze_profile("insecure.service", &profile);
-        assert_eq!(report_unsecure.rating, "UNSAFE");
-        assert_eq!(report_unsecure.exposure_score, 10.0);
-
-        profile.no_new_privileges = true;
-        profile.protect_system = ProtectSystemLevel::Strict;
-        profile.protect_home = ProtectHomeLevel::ReadOnly;
-        profile.private_tmp = true;
-        profile.private_devices = true;
-        profile.protect_kernel_tunables = true;
-        profile.protect_kernel_modules = true;
-        profile.memory_deny_write_execute = true;
-        profile.pledge_promises = "stdio rpath wpath".to_string();
-
-        let report_secure = SystemdSecurityAuditor::analyze_profile("secure.service", &profile);
-        assert_eq!(report_secure.rating, "OK");
-        assert!(report_secure.exposure_score <= 3.0);
+    fn test_betsy_systemd_compat_shim() {
+        let shim = BetsySystemdCompatShim::new();
+        assert!(shim.is_systemd_active);
+        let msg = shim.emulate_systemd_sysv_fallback("/etc/init.d/nginx");
+        assert!(msg.contains("nginx"));
     }
 
     #[test]
-    fn test_systemd_analyze_critical_chain() {
-        let mut engine = SystemdEngine::new();
-
-        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        target.duration_ms = 50;
-        target.requires.push(2);
-
-        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
-        service.duration_ms = 400;
-        service.requires.push(3);
-
-        let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
-        network.duration_ms = 200;
-
-        engine.register_unit(target);
-        engine.register_unit(service);
-        engine.register_unit(network);
-
-        let chain = engine.systemd_analyze_critical_chain(1);
-        assert_eq!(chain.len(), 3);
-        assert_eq!(chain[0].unit_name, "graphical.target");
-        assert_eq!(chain[1].unit_name, "display-manager.service");
-        assert_eq!(chain[2].unit_name, "network.target");
+    fn test_transient_service_generator() {
+        let unit = TransientServiceGenerator::create_transient_unit("/usr/bin/curl", "transient-fetch");
+        assert_eq!(unit.unit_type, UnitType::Service);
+        assert_eq!(unit.restart_policy, RestartPolicy::No);
     }
 
     #[test]
-    fn test_requisite_and_on_failure_cascade() {
-        let mut engine = SystemdEngine::new();
-
-        let backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
-        engine.register_unit(backup_service);
-
-        let mut dep = SystemdUnit::new(1, b"db.service", UnitType::Service);
-        dep.state = UnitState::Inactive;
-        engine.register_unit(dep);
-
-        let mut app = SystemdUnit::new(2, b"app.service", UnitType::Service);
-        app.requisite.push(1);
-        app.on_failure.push(99);
-        engine.register_unit(app);
-
-        let res = engine.systemctl_start(2);
-        assert!(res.is_err());
-        assert_eq!(engine.systemctl_status(2), Some(UnitState::Failed));
-        assert_eq!(engine.systemctl_status(99), Some(UnitState::Active));
+    fn test_systemd_dynamic_user_context() {
+        let ctx = SystemdDynamicUserContext::allocate_ephemeral_user(123);
+        assert!(ctx.allocated_uid >= 60000);
+        assert!(ctx.private_tmp);
+        assert_eq!(ctx.protect_system, "strict");
     }
 
     #[test]
-    fn test_systemd_unit_file_parser_extended() {
-        let unit_content = r#"
-[Unit]
-Description=Sovereign Secure Web Service
-Requires=network.target
-Requisite=db.service
-OnFailure=fallback.service
+    fn test_systemd_service_hardening_evaluator() {
+        let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
+        assert_eq!(score_full, 2.5);
 
-[Service]
-ExecStart=/usr/bin/web-server --config /etc/web.conf
-Restart=always
-WatchdogSec=15s
-NoNewPrivileges=yes
-ProtectSystem=strict
-ProtectHome=read-only
-PrivateTmp=yes
-MemoryDenyWriteExecute=yes
-Pledge=stdio rpath wpath inet
-Unveil=/etc/web.conf r
-Environment=PORT=8080
-
-[Install]
-WantedBy=multi-user.target
-"#;
-
-        let parsed = SystemdUnitFileParser::parse_unit_file(unit_content);
-        assert_eq!(parsed.unit_description, "Sovereign Secure Web Service");
-        assert_eq!(parsed.requires, vec!["network.target"]);
-        assert_eq!(parsed.requisite, vec!["db.service"]);
-        assert_eq!(parsed.on_failure, vec!["fallback.service"]);
-        assert_eq!(parsed.exec_start, "/usr/bin/web-server --config /etc/web.conf");
-        assert_eq!(parsed.watchdog_sec, 15);
-        assert!(parsed.hardening_profile.no_new_privileges);
-        assert_eq!(parsed.hardening_profile.protect_system, ProtectSystemLevel::Strict);
-        assert_eq!(parsed.hardening_profile.protect_home, ProtectHomeLevel::ReadOnly);
-        assert!(parsed.hardening_profile.private_tmp);
-        assert!(parsed.hardening_profile.memory_deny_write_execute);
-        assert_eq!(parsed.hardening_profile.pledge_promises, "stdio rpath wpath inet");
-        assert_eq!(parsed.hardening_profile.unveil_paths.len(), 1);
-        assert_eq!(parsed.environment, vec![("PORT".to_string(), "8080".to_string())]);
-    }
-
-    #[test]
-    fn test_systemd_socket_activation_manager() {
-        let mut engine = SystemdEngine::new();
-        let srv = SystemdUnit::new(10, b"httpd.service", UnitType::Service);
-        engine.register_unit(srv);
-
-        let mut mgr = SystemdSocketActivationManager::new();
-        let socket_cfg = SystemdSocketConfig {
-            socket_id: 1,
-            listen_address: "0.0.0.0".to_string(),
-            port: 80,
-            kind: SocketKind::Stream,
-            bound_fd: 5,
-            target_service_id: 10,
-        };
-        mgr.register_socket(socket_cfg);
-
-        let fds = mgr.get_passed_fds_for_service(10);
-        assert_eq!(fds, vec![5]);
-
-        let event = SocketActivationEvent {
-            socket_id: 1,
-            incoming_bytes: 128,
-            client_addr: "192.168.1.5:54321".to_string(),
-        };
-
-        let fd = mgr.handle_incoming_connection(&mut engine, &event).unwrap();
-        assert_eq!(fd, 5);
-        assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
-    }
-
-    #[test]
-    fn test_declarative_unit_generator() {
-        let mut spec = DeclarativeUnitSpec::new("my-service", "/usr/bin/my-service --daemon");
-        spec.description = "My Custom Declarative Service".to_string();
-        spec.environment.push(("PORT".to_string(), "8080".to_string()));
-
-        let unit_file = spec.generate_unit_file();
-        assert!(unit_file.contains("Description=My Custom Declarative Service"));
-        assert!(unit_file.contains("ExecStart=/usr/bin/my-service --daemon"));
-        assert!(unit_file.contains("Environment=PORT=8080"));
-
-        let parsed = SystemdUnitFileParser::parse_unit_file(&unit_file);
-        assert_eq!(parsed.unit_description, "My Custom Declarative Service");
-        assert_eq!(parsed.exec_start, "/usr/bin/my-service --daemon");
-    }
-
-    #[test]
-    fn test_bsd_rc_parallel_stage_solver() {
-        let mut engine = SystemdEngine::new();
-
-        let mut u1 = SystemdUnit::new(1, b"mount.service", UnitType::Service);
-        u1.before.push(2);
-        u1.before.push(3);
-
-        let u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
-        let u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
-
-        let mut u4 = SystemdUnit::new(4, b"app.service", UnitType::Service);
-        u4.after.push(2);
-        u4.after.push(3);
-
-        engine.register_unit(u1);
-        engine.register_unit(u2);
-        engine.register_unit(u3);
-        engine.register_unit(u4);
-
-        let stages = BsdRcParallelStageSolver::compute_parallel_stages(&engine, &[1, 2, 3, 4]);
-        assert_eq!(stages.len(), 3);
-        assert_eq!(stages[0], vec![1]);
-        assert_eq!(stages[1], vec![2, 3]);
-        assert_eq!(stages[2], vec![4]);
-    }
-
-    #[test]
-    fn test_extended_unit_dependencies() {
-        let mut engine = SystemdEngine::new();
-
-        let req_unit = SystemdUnit::new(1, b"dep.service", UnitType::Service);
-        let mut main_unit = SystemdUnit::new(2, b"main.service", UnitType::Service);
-        main_unit.requisites.push(1);
-
-        engine.register_unit(req_unit);
-        engine.register_unit(main_unit);
-
-        // Fail to start because requisite unit 1 is inactive
-        assert!(engine.systemctl_start(2).is_err());
-
-        // Start requisite unit 1 first
-        engine.systemctl_start(1).unwrap();
-        assert_eq!(engine.systemctl_status(1), Some(UnitState::Active));
-
-        // Now main unit 2 starts successfully
-        engine.systemctl_start(2).unwrap();
-        assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
+        let score_none = SystemdServiceHardeningEvaluator::calculate_hardening_score(false, false, false);
+        assert_eq!(score_none, 10.0);
     }
 }

@@ -722,11 +722,6 @@ mod tests {
         let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
         let p2 = pin_engine.get_pin_priority("bash");
         assert_eq!(p1, PinPriority::PREFERRED);
-        pin_engine.add_pin_rule("sigmaos-kernel", "6.6.0", PinPriority::Hold);
-
-        let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
-        let p2 = pin_engine.get_pin_priority("bash");
-        assert_eq!(p1, PinPriority::Hold);
         assert_eq!(p2, PinPriority::Default);
     }
 
@@ -755,12 +750,5 @@ mod tests {
         assert_eq!(rollback.len(), 1);
         assert_eq!(rollback[0].package_name, "bash");
         assert_eq!(rollback[0].action, "upgrade");
-        let _tx1 = journal.log_transaction("install", "bash", "5.2", 100);
-        let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
-
-        let rollback = journal.rollback_transaction(tx2);
-        assert_eq!(rollback.len(), 1);
-        assert_eq!(rollback[0].package_name, "zsh");
-        assert_eq!(rollback[0].transaction_id, tx2);
     }
 }

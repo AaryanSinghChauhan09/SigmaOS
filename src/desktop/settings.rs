@@ -397,6 +397,19 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
@@ -502,6 +515,48 @@ mod tests {
             schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
             "SovereignDark"
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_gsettings_schema_validation() {
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"true"));
+        assert!(!GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"invalid"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Integer, b"100"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Color, b"#FF0000"));
+    }
+
+    #[test]
+    fn test_kconfig_cascading_store() {
+        let global = SimpleSettingsManager::new();
+        let mut user = SimpleSettingsManager::new();
+
+        let id = user.next_id.fetch_add(1, Ordering::SeqCst);
+        let s = SimpleSetting::new(id, b"theme", SettingType::String, b"dark");
+        user.settings.push(Some(Box::new(s)));
+
+        let store = KconfigCascadingStore::new(global, user);
+        let eff = store.get_effective_setting(b"theme");
+        assert!(eff.is_some());
+        assert_eq!(eff.unwrap().value(), b"dark");
+    }
+
+    #[test]
+    fn test_xfconf_bus_dispatcher() {
+        let mut dispatcher = XfconfBusDispatcher::new(b"xsettings");
+        dispatcher.notify_property_change(b"/Net/ThemeName", b"Adwaita-dark");
+        assert_eq!(dispatcher.dispatch_count, 1);
+    }
+
+    #[test]
+    fn test_rc_conf_overlay() {
+        let mut overlay = RcConfSettingsOverlay::new();
+        assert!(overlay.apply_override(b"kern.ipc.maxsockbuf", b"2097152").is_ok());
+        assert!(overlay.sysctl_overrides.get_setting(b"kern.ipc.maxsockbuf").is_some());
     }
 }
 

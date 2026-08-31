@@ -85,12 +85,6 @@ impl MdmGreeterTheme {
     }
 }
 
-impl Default for MdmGreeterTheme {
-    fn default() -> Self {
-        Self::new("Mint-MDM-Default", GreeterEngineStyle::Html5WebKit)
-    }
-}
-
 /// User Face Avatar & Session Memory Store
 #[derive(Debug, Clone)]
 pub struct UserSessionMemory {
@@ -100,7 +94,6 @@ pub struct UserSessionMemory {
 }
 
 /// On-Screen Accessibility Keyboard & High-Contrast Greeter Overlay
-#[derive(Debug, Clone)]
 pub struct GreeterAccessibilityOverlay {
     pub onscreen_keyboard_enabled: bool,
     pub high_contrast_enabled: bool,
@@ -118,12 +111,6 @@ impl GreeterAccessibilityOverlay {
 
     pub fn toggle_onscreen_keyboard(&mut self) {
         self.onscreen_keyboard_enabled = !self.onscreen_keyboard_enabled;
-    }
-}
-
-impl Default for GreeterAccessibilityOverlay {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -266,20 +253,27 @@ mod tests {
 
     #[test]
     fn test_mdm_greeter_theme() {
-        let theme = MdmGreeterTheme::default();
-        assert_eq!(theme.theme_name, "Mint-MDM-Default");
-        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5);
+        let theme = MdmGreeterTheme::new("Mint-Metallic", GreeterEngineStyle::Html5WebKit);
+        assert_eq!(theme.name, "Mint-Metallic");
+        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5WebKit);
+    }
 
-        let user_mem = UserSessionMemory {
+    #[test]
+    fn test_user_session_memory() {
+        let memory = UserSessionMemory {
             user_id: 1000,
-            last_session_name: "Cinnamon".to_string(),
-            avatar_image_path: "/var/lib/AccountsService/icons/jules".to_string(),
+            face_icon_path: "/var/lib/AccountsService/icons/user.png".to_string(),
+            last_selected_session: "Wayland".to_string(),
         };
-        assert_eq!(user_mem.last_session_name, "Cinnamon");
+        assert_eq!(memory.user_id, 1000);
+        assert_eq!(memory.last_selected_session, "Wayland");
+    }
 
-        let mut a11y = GreeterAccessibilityOverlay::default();
-        assert!(!a11y.high_contrast);
-        a11y.high_contrast = true;
-        assert!(a11y.high_contrast);
+    #[test]
+    fn test_greeter_accessibility_overlay() {
+        let mut overlay = GreeterAccessibilityOverlay::new();
+        assert!(!overlay.onscreen_keyboard_enabled);
+        overlay.toggle_onscreen_keyboard();
+        assert!(overlay.onscreen_keyboard_enabled);
     }
 }

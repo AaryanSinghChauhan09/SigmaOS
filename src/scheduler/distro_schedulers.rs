@@ -652,6 +652,172 @@ impl GangHpcClusterScheduler {
 }
 
 // ----------------------------------------------------------------------------
+// 21. KYBER I/O SCHEDULER (Linux Kyber I/O Latency Scheduler)
+// ----------------------------------------------------------------------------
+pub struct KyberIoScheduler {
+    pub read_sync_queue: Vec<SchedTask>,
+    pub write_async_queue: Vec<SchedTask>,
+    pub max_read_latency_ms: u32,
+    pub max_write_latency_ms: u32,
+}
+
+impl Default for KyberIoScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl KyberIoScheduler {
+    pub fn new() -> Self {
+        Self {
+            read_sync_queue: Vec::new(),
+            write_async_queue: Vec::new(),
+            max_read_latency_ms: 2,
+            max_write_latency_ms: 10,
+        }
+    }
+
+    pub fn enqueue_read(&mut self, task: SchedTask) {
+        self.read_sync_queue.push(task);
+    }
+
+    pub fn enqueue_write(&mut self, task: SchedTask) {
+        self.write_async_queue.push(task);
+    }
+
+    pub fn dispatch_next_io(&mut self) -> Option<SchedTask> {
+        // Kyber prioritizes synchronous read requests to keep desktop/I/O responsive
+        if !self.read_sync_queue.is_empty() {
+            Some(self.read_sync_queue.remove(0))
+        } else if !self.write_async_queue.is_empty() {
+            Some(self.write_async_queue.remove(0))
+        } else {
+            None
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 22. BFQ I/O SCHEDULER (Budget Fair Queueing - Desktop Storage Fairness)
+// ----------------------------------------------------------------------------
+#[derive(Debug, Clone)]
+pub struct BfqProcessEntity {
+    pub task: SchedTask,
+    pub sector_budget: u32,
+}
+
+pub struct BfqIoScheduler {
+    pub active_entities: Vec<BfqProcessEntity>,
+}
+
+impl Default for BfqIoScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl BfqIoScheduler {
+    pub fn new() -> Self {
+        Self {
+            active_entities: Vec::new(),
+        }
+    }
+
+    pub fn enqueue_request(&mut self, task: SchedTask, budget_sectors: u32) {
+        self.active_entities.push(BfqProcessEntity {
+            task,
+            sector_budget: budget_sectors,
+        });
+    }
+
+    pub fn dispatch_io_request(&mut self) -> Option<SchedTask> {
+        if self.active_entities.is_empty() {
+            None
+        } else {
+            let entity = self.active_entities.remove(0);
+            Some(entity.task)
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 23. FREEBSD 4.4BSD MULTI-LEVEL FEEDBACK QUEUE (MLFQ) SCHEDULER
+// ----------------------------------------------------------------------------
+pub struct BsdMlfqScheduler {
+    pub priority_levels: [Vec<SchedTask>; 32], // 32 feedback priority queues
+}
+
+impl Default for BsdMlfqScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl BsdMlfqScheduler {
+    pub fn new() -> Self {
+        let queues: [Vec<SchedTask>; 32] = Default::default();
+        Self {
+            priority_levels: queues,
+        }
+    }
+
+    pub fn add_task(&mut self, task: SchedTask, level: usize) {
+        let target_level = level.min(31);
+        self.priority_levels[target_level].push(task);
+    }
+
+    pub fn pick_next_task(&mut self) -> Option<SchedTask> {
+        for queue in self.priority_levels.iter_mut() {
+            if !queue.is_empty() {
+                return Some(queue.remove(0));
+            }
+        }
+        None
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 24. POSIX SCHED_BATCH & SCHED_IDLE SCHEDULER
+// ----------------------------------------------------------------------------
+pub struct PosixBatchIdleScheduler {
+    pub batch_queue: Vec<SchedTask>,
+    pub idle_queue: Vec<SchedTask>,
+}
+
+impl Default for PosixBatchIdleScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PosixBatchIdleScheduler {
+    pub fn new() -> Self {
+        Self {
+            batch_queue: Vec::new(),
+            idle_queue: Vec::new(),
+        }
+    }
+
+    pub fn add_batch(&mut self, task: SchedTask) {
+        self.batch_queue.push(task);
+    }
+
+    pub fn add_idle(&mut self, task: SchedTask) {
+        self.idle_queue.push(task);
+    }
+
+    pub fn pick_next_task(&mut self) -> Option<SchedTask> {
+        if !self.batch_queue.is_empty() {
+            Some(self.batch_queue.remove(0))
+        } else if !self.idle_queue.is_empty() {
+            Some(self.idle_queue.remove(0))
+        } else {
+            None
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
 // 20. AI PREDICTIVE LATENCY SCHEDULER
 // ----------------------------------------------------------------------------
 pub struct AiPredictiveScheduler {
@@ -859,5 +1025,36 @@ mod tests {
         let mut ai_sched = AiPredictiveScheduler::new();
         ai_sched.predict_and_set_prio(42, 1200);
         assert_eq!(ai_sched.task_latency_predictions.get(&42), Some(&1200));
+    }
+
+    #[test]
+    fn test_kyber_io_scheduler() {
+        let mut kyber = KyberIoScheduler::new();
+        kyber.enqueue_write(SchedTask::new(1, "write_task", 0));
+        kyber.enqueue_read(SchedTask::new(2, "read_task", 0));
+        assert_eq!(kyber.dispatch_next_io().unwrap().pid, 2); // Read prioritized
+    }
+
+    #[test]
+    fn test_bfq_io_scheduler() {
+        let mut bfq = BfqIoScheduler::new();
+        bfq.enqueue_request(SchedTask::new(10, "io_task", 0), 2048);
+        assert_eq!(bfq.dispatch_io_request().unwrap().pid, 10);
+    }
+
+    #[test]
+    fn test_bsd_mlfq_scheduler() {
+        let mut mlfq = BsdMlfqScheduler::new();
+        mlfq.add_task(SchedTask::new(1, "low_prio", 0), 10);
+        mlfq.add_task(SchedTask::new(2, "high_prio", 0), 0);
+        assert_eq!(mlfq.pick_next_task().unwrap().pid, 2); // Queue 0 first
+    }
+
+    #[test]
+    fn test_posix_batch_idle_scheduler() {
+        let mut posix = PosixBatchIdleScheduler::new();
+        posix.add_idle(SchedTask::new(1, "idle_task", 0));
+        posix.add_batch(SchedTask::new(2, "batch_task", 0));
+        assert_eq!(posix.pick_next_task().unwrap().pid, 2); // Batch prioritized over idle
     }
 }

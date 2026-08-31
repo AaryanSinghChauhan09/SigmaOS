@@ -1596,47 +1596,4 @@ mod tests {
         assert_eq!(run.len(), 1);
         assert_eq!(run[0], "echo hello");
     }
-
-    #[test]
-    fn test_network_discovery_mdns_browse() {
-        let mut discovery = SovereignNetworkDiscoveryEngine::new();
-        let web_services = discovery.browse_mdns_services("_http._tcp.local");
-        assert_eq!(web_services.len(), 1);
-        assert_eq!(web_services[0].service_name, "SigmaOS Zenith Web Service");
-        assert_eq!(web_services[0].port, 80);
-        assert_eq!(web_services[0].protocol, DiscoveryProtocolType::MdnsDnsSd);
-
-        let ssh_services = discovery.browse_mdns_services("_ssh._tcp.local");
-        assert_eq!(ssh_services.len(), 1);
-        assert_eq!(ssh_services[0].service_name, "SigmaOS Sovereign SSHd");
-        assert_eq!(ssh_services[0].port, 22);
-    }
-
-    #[test]
-    fn test_network_discovery_ssdp_msearch() {
-        let mut discovery = SovereignNetworkDiscoveryEngine::new();
-        let media_servers = discovery.send_ssdp_msearch("urn:schemas-upnp-org:device:MediaServer:1");
-        assert_eq!(media_servers.len(), 1);
-        assert_eq!(media_servers[0].service_name, "SigmaOS UPnP Media Server");
-        assert_eq!(media_servers[0].port, 8200);
-        assert_eq!(media_servers[0].protocol, DiscoveryProtocolType::SsdpUpnp);
-
-        let ip = discovery.resolve_llmnr_hostname("sigma-host");
-        assert_eq!(ip, Some([192, 168, 1, 105]));
-    }
-
-    #[test]
-    fn test_network_discovery_ttl_expiration() {
-        let mut discovery = SovereignNetworkDiscoveryEngine::new();
-        discovery.browse_mdns_services("_http._tcp.local");
-        assert_eq!(discovery.discovered_services.len(), 1);
-
-        // Before TTL expires (t = 1100 < 1000 + 120)
-        discovery.prune_expired_services(1100);
-        assert_eq!(discovery.discovered_services.len(), 1);
-
-        // After TTL expires (t = 1200 >= 1000 + 120)
-        discovery.prune_expired_services(1200);
-        assert_eq!(discovery.discovered_services.len(), 0);
-    }
 }

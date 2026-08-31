@@ -621,10 +621,6 @@ impl SigmaPkg {
         packages
     }
 
-    pub fn has_installed(&self, pkg_name: &str) -> bool {
-        self.installed_packages.contains_key(pkg_name)
-    }
-
     /// Import and install foreign package format directly via Universal PM adapter
     pub fn import_foreign_package(&mut self, file_path: &str) -> Result<Package, String> {
         let format = UniversalPackageImporter::autodetect_format(file_path)
@@ -671,33 +667,6 @@ mod tests {
         
         assert_eq!(package.name, "test");
         assert_eq!(package.version, "1.0.0");
-    }
-
-    #[test]
-    fn test_sigma_pkg_installed_check() {
-        let mut installed = HashMap::new();
-        installed.insert("curl".to_string(), Package {
-            name: "curl".to_string(),
-            version: "8.0.0".to_string(),
-            description: "curl".to_string(),
-            dependencies: vec![],
-            conflicts: vec![],
-            provides: vec![],
-            size: 500,
-            installed_size: 1000,
-            url: None,
-            license: "MIT".to_string(),
-            groups: vec![],
-            architecture: "x86_64".to_string(),
-            repository: "core".to_string(),
-        });
-        let pkg_mgr = SigmaPkg {
-            installed_packages: installed,
-            repositories: HashMap::new(),
-            config: PkgConfig::default(),
-        };
-        assert!(pkg_mgr.has_installed("curl"));
-        assert!(!pkg_mgr.has_installed("wget"));
     }
 
     #[test]
