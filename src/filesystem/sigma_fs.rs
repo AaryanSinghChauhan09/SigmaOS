@@ -187,6 +187,7 @@ impl DistributedSovereignFS {
     /// Verifies replication consensus. Returns true if the block is backed up on >= 2 distinct peer nodes.
     pub fn verify_replica_consensus(&self, block_hash: &str) -> bool {
         if let Some(replicas) = self.peer_replicas.get(block_hash) {
+            let replicas: &Vec<String> = replicas;
             replicas.len() >= 2
         } else {
             false
