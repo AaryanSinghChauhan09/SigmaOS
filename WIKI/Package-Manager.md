@@ -43,7 +43,7 @@ pub fn resolve_and_install(&mut self, name: &str) -> Result<Vec<String>, String>
     // Pre-allocate for performance
     let mut install_order = Vec::with_capacity(self.packages.len().min(32));
     let mut visited = HashMap::with_capacity(self.packages.len().min(32));
-    
+
     self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
     Ok(install_order)
 }

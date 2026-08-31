@@ -1,8 +1,10 @@
-# Virtualization & Containers
+# SigmaOS Virtualization and Containerization
 
-SigmaOS provides sandboxing models inspired by Qubes OS and FreeBSD Jails.
+SigmaOS implements highly secure, multi-layered isolation inspired by leading BSD and Linux distros.
 
-## Isolation Levels
-1. **Unprivileged Sandbox**: Restricts syscall footprint to absolute minimum.
-2. **OCI Container Runtime**: Matches OCI specifications to run Linux/BSD container images natively.
-3. **Hardware Isolation**: GPU and network isolation with direct PCI pass-through.\n
+## Jail & Container Subsystem
+
+Located in [`src/virtualization/container.rs`](file:///home/aaryansinghchauhan/SigmaOS/src/virtualization/container.rs):
+- **BSD Jails Parity**: Emulates chroot-style network and system namespace boundaries to isolate environments without hypervisor overhead.
+- **Rootless Podman Runtime**: Creates unprivileged containers, mapping local namespace configurations securely.
+- **OCI Container Parity**: Direct parsing and execution of OCI-compliant runtime configurations and namespaces.

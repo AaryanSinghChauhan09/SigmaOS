@@ -15,7 +15,7 @@ drivers/
 ├── usb/             # USB host controller drivers
 ├── storage/         # AHCI, NVMe, virtio-blk
 ├── net/             # Network device drivers
-├── gpu/             # GPU/display drivers  
+├── gpu/             # GPU/display drivers
 └── input/           # HID: keyboard, mouse, touchpad
 ```
 
@@ -35,7 +35,7 @@ pub struct MyDriver {
 
 impl Driver for MyDriver {
     fn name(&self) -> &str { "my-device" }
-    
+
     fn probe(&mut self, device: &DeviceId) -> Result<(), DriverError> {
         // Check if this device is ours
         if device.vendor_id != 0x1234 || device.device_id != 0x5678 {
@@ -43,11 +43,11 @@ impl Driver for MyDriver {
         }
         self.init_hardware()
     }
-    
+
     fn remove(&mut self) {
         self.shutdown_hardware();
     }
-    
+
     fn interrupt_handler(&mut self) {
         // Handle IRQ
         self.process_pending_events();
@@ -93,7 +93,7 @@ if mode.verify_timing_boundaries() {
 ### Timing Specification
 - `hdisplay` / `vdisplay`: Active pixel area
 - `hsync_start`, `hsync_end`, `htotal`: Horizontal timing
-- `vsync_start`, `vsync_end`, `vtotal`: Vertical timing  
+- `vsync_start`, `vsync_end`, `vtotal`: Vertical timing
 - `clock`: Pixel clock in kHz
 - `vrefresh`: Refresh rate in Hz
 
@@ -162,7 +162,7 @@ impl SigmaNvme {
         self.submit_admin(cmd);
         self.wait_completion()
     }
-    
+
     pub fn read_sectors(&mut self, lba: u64, count: u16, buf: &mut [u8]) {
         let cmd = NvmeCommand::read(lba, count, buf.as_mut_ptr() as u64);
         self.submit_io(cmd);
@@ -214,7 +214,7 @@ for device in usb_host.enumerate() {
 # Run driver unit tests
 cargo test --features=driver-tests -p sigmaos -- drivers::
 
-# QEMU virtual hardware testing  
+# QEMU virtual hardware testing
 make qemu-driver-test DRIVER=nvme
 
 # USB testing with virtual USB device

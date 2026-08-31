@@ -36,8 +36,13 @@ extern crate alloc;
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
-use crate::compatibility::canonical::DesktopMode;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopMode {
+    ClassicDE,
+    TilingWM,
+    TouchTabletMode,
+}
+
 
 // ==========================================
 // 1. Kernel Module Management

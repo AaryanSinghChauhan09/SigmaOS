@@ -142,7 +142,7 @@ The VFS layer provides a uniform interface across all supported filesystems:
 
 Clean-room implementation of Linux io_uring:
 - Submission Queue (SQ) ring buffer
-- Completion Queue (CQ) ring buffer  
+- Completion Queue (CQ) ring buffer
 - Async, zero-copy I/O submission
 - Batch operation support
 
