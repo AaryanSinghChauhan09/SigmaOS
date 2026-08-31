@@ -896,11 +896,13 @@ mod tests {
         // Simulate failure and restart
         assert!(engine.set_service_state("web", SupervisedServiceState::Failed).is_ok());
         assert_eq!(engine.reconcile_services(), 1);
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Running);
         assert_eq!(engine.services[1].restart_count, 1);
     }
 
     #[test]
     fn test_distro_inspired_racct_throttling() {
+        let mut engine = DistroInspiredAutomationEngine::new();
         engine.add_racct_policy(1001, 80, 1024 * 1024 * 100);
 
         let action = engine.evaluate_resource_limits(1001, 95, 1024 * 1024 * 50);
@@ -913,6 +915,10 @@ mod tests {
         assert!(engine.racct_policies[0].is_throttled);
 
     fn test_distro_inspired_auto_sandbox() {
+    }
+
+    #[test]
+        let mut engine = DistroInspiredAutomationEngine::new();
         let policy = engine.generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
 
         assert!(policy.allowed_promises.contains(&"inet".to_string()));
@@ -921,6 +927,10 @@ mod tests {
         assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/bin" && perm == "rx"));
 
     fn test_distro_inspired_declarative_reconciliation() {
+    }
+
+    #[test]
+        let mut engine = DistroInspiredAutomationEngine::new();
         let spec1 = DeclarativeSpecState {
             revision: 1,
             hostname: "sigma-node".to_string(),
@@ -938,6 +948,9 @@ mod tests {
             revision: 2,
             services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
             packages: vec!["coreutils".to_string(), "nginx".to_string()],
+            hostname: "sigma-node".to_string(),
+            packages: vec!["coreutils".to_string()],
+        };
         assert_eq!(engine.apply_declarative_spec(spec2).unwrap(), 2);
 
         // Rollback
@@ -945,6 +958,10 @@ mod tests {
         assert_eq!(engine.active_spec.as_ref().unwrap().revision, 1);
 
     fn test_distro_inspired_transactional_hooks() {
+    }
+
+    #[test]
+        let mut engine = DistroInspiredAutomationEngine::new();
         engine.register_hook(
             "pkg_trigger",
             "nginx",
@@ -963,11 +980,16 @@ mod tests {
         assert_eq!(undos[0], "UNDO:undo_install_nginx");
 
     fn test_distro_inspired_storage_tiering_and_scrubbing() {
+    }
+
+    #[test]
+        let mut engine = DistroInspiredAutomationEngine::new();
         engine.add_storage_extent("/data/db.dat", "HDD", b"DATA_PAYLOAD");
 
         // Record accesses to trigger promotion
         for _ in 0..5 {
             engine.record_extent_access("/data/db.dat");
+        }
 
         let (promoted, demoted) = engine.run_automated_tiering_pass();
         assert_eq!(promoted, 1);
