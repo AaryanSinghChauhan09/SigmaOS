@@ -19,8 +19,11 @@ pub mod network;
 pub mod peripheral;
 pub mod storage;
 pub mod touch_jingos;
+pub mod printing;
 pub mod usb_hid;
 pub mod vesa;
+
+pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};

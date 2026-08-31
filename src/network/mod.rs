@@ -1,9 +1,15 @@
 // SigmaOS Network Stack Module
+pub mod discovery;
 pub mod ring_buffer_stack;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod wireless_manager;
+
+pub use discovery::{
+    DiscoveredNetworkService, DiscoveryProtocolType, Icmpv6NdpEntry, LlmnrNbnsResolver,
+    NetworkDevicePeer, SovereignNetworkDiscoveryEngine, SsdpDiscoveryPacket,
+};
 
 pub use ring_buffer_stack::{
     compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,
