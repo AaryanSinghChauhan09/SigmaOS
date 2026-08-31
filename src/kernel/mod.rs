@@ -1,4 +1,6 @@
 // SigmaOS Kernel Module
+#![allow(ambiguous_glob_reexports)]
+
 pub mod architecture;
 pub mod atomic_extended;
 pub mod block_dev;

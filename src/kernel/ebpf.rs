@@ -2,8 +2,16 @@
 // Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
 // and execution over standard in-kernel maps.
 
+extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
 use alloc::vec::Vec;
+use alloc::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EbpfInstruction {
