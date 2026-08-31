@@ -1,0 +1,25 @@
+name: Gentoo Portage USE Flag Matrix Compilation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  gentoo-portage-matrix:
+    name: Gentoo ebuild & USE Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Portage Ebuild & Universal Packaging
+        run: |
+          cargo test --lib -- package::universal::tests
