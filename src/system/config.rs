@@ -10,7 +10,7 @@ use alloc::vec::Vec;
 use crate::klib::path::PathBuf;
 use crate::klib::HashMap;
 
-#[cfg(not(feature = "std"))]
+#[cfg(not(test))]
 mod fs {
     use super::*;
     pub fn read_to_string(_path: &PathBuf) -> Result<String, std::io::Error> {
