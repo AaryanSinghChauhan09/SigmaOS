@@ -69,3 +69,34 @@ cat << 'WIKI' > wiki/Code-Scanning-Fixes.md
 Recent updates removed unsafe transmutes, unused variables, and potential security risks from the codebase.
 WIKI
 
+cat << 'WIKI' > wiki/Linux-Distros-Architecture.md
+# Linux Distributions Architecture & Parity Guide
+
+SigmaOS incorporates architectural paradigms from leading Linux distributions:
+- **Arch Linux**: Rolling release dependency resolution (`ArchDependencyResolver`) and PKGBUILD recipe sandbox compilation (`ArchRecipeSandboxCompiler`).
+- **NixOS / Guix**: Declarative system generations (`NixDeclarativeSystemState`), content-addressed store (`NixStyleStore`), and GNU Shepherd service graph manager (`ShepherdServiceManager`).
+- **Clear Linux**: Stateless `/usr` configuration overlay architecture (`ClearLinuxStatelessOverlayEngine`).
+- **Gentoo**: Portage USE-flags compilation and dependency resolution (`GentooPortageUseFlagResolver`).
+- **Alpine / Void Linux**: Transactional trigger hooks (`AlpineVoidTriggerHookManager`) and Runit 3-stage service lifecycle supervision (`SovereignRunitSupervisor`).
+- **Fedora / Ubuntu**: Fedora Toolbox dev containers and Ubuntu Pro Livepatch hot-patching.
+WIKI
+
+cat << 'WIKI' > wiki/BSD-Security-Hardening.md
+# BSD Security Hardening & Isolation Guide
+
+SigmaOS integrates security and containment mechanisms from BSD distributions:
+- **OpenBSD**: Syscall process restriction (`pledge`), file path masking (`unveil`), W^X memory execution policies, and Retguard per-function return address cookies.
+- **FreeBSD**: Jails virtualization with nested child jail hierarchies, RACCT/RCTL resource controls, and Capsicum capability delegation (`CapsicumCapability`).
+- **DragonFly BSD**: HAMMER2 PFS multi-version B-tree filesystem and variant symlinks (`varsyms`) path resolution (`DragonFlyVarsymsPfsResolver`).
+- **HardenedBSD**: PaX MPROTECT W^X protection and SegvGuard brute force crash mitigation.
+WIKI
+
+cat << 'WIKI' > wiki/Declarative-Package-Management.md
+# Declarative Package Management & Automation
+
+SigmaPkg leverages declarative system state management and transactional automation:
+- **Atomic Rollbacks**: Instant generation rollbacks on configuration failures.
+- **Hermetic Build Closures**: Content-addressed dependency tracking ensuring zero unreferenced state.
+- **Automated Service Supervision**: Event-driven service dependency reconciliation with exponential backoff.
+- **Storage Tiering & Scrubbing**: Bcachefs/ZFS automated extent promotion/demotion and data integrity scrubbing.
+WIKI
