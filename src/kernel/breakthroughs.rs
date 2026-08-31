@@ -43,7 +43,10 @@ impl UniversalAbiTranslator {
         match (platform, syscall_num) {
             ("Windows", 0x2A) => Some("sys_win32_create_window"), // Emulated Win32 call
             ("Linux", 9) => Some("sys_mmap"),
-            ("MacOS", 0x2000004) => Some("sys_write"), // BSD-style Mach system call
+            ("Linux", 444) => Some("sys_landlock_create_ruleset"), // Linux Landlock LSM
+            ("FreeBSD", 536) => Some("sys_capsicum_enter"),        // FreeBSD Capsicum capability mode
+            ("OpenBSD", 108) => Some("sys_pledge"),                // OpenBSD pledge security sandboxing
+            ("MacOS", 0x2000004) => Some("sys_write"),             // BSD-style Mach system call
             _ => None,
         }
     }
@@ -487,6 +490,9 @@ mod tests {
         assert_eq!(translator.host_platform(), "SigmaOS");
         assert_eq!(translator.translate_abi_syscall("Windows", 0x2A), Some("sys_win32_create_window"));
         assert_eq!(translator.translate_abi_syscall("Linux", 9), Some("sys_mmap"));
+        assert_eq!(translator.translate_abi_syscall("Linux", 444), Some("sys_landlock_create_ruleset"));
+        assert_eq!(translator.translate_abi_syscall("FreeBSD", 536), Some("sys_capsicum_enter"));
+        assert_eq!(translator.translate_abi_syscall("OpenBSD", 108), Some("sys_pledge"));
         assert_eq!(translator.translate_abi_syscall("MacOS", 0x2000004), Some("sys_write"));
         assert_eq!(translator.translate_abi_syscall("Unknown", 1), None);
     }
