@@ -2,7 +2,7 @@
 
 Inspired by **Qubes OS's security-by-isolation paradigm**, Xen virtual machine domains, and the secure **Qrexec Inter-VM IPC communication protocol**, this document defines a complete, functional, `#![no_std]` domain isolation and secure IPC manager. It implements domain categorizations (`Dom0`, `AppVM`, `NetVM`, `DispVM`), a secure `qrexec` message bus, and a policy authorization engine.
 
-***
+---
 
 ## 🏗️ Component Implementation Source Code
 

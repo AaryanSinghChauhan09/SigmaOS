@@ -2,7 +2,7 @@
 
 SigmaOS natively supports concepts and interoperability frameworks inspired by 15+ Unix, Linux, and BSD operating systems.
 
-***
+---
 
 ## 🏛️ Extended Subsystem Architecture
 
@@ -10,17 +10,16 @@ SigmaOS natively supports concepts and interoperability frameworks inspired by 1
 | :--- | :--- | :--- | :--- |
 | **Slackware** | `slack-desc` text manifest parsing | `SlackwarePackageMeta` | ✅ Production Ready |
 | **Mageia / Mandriva** | URPMI synthesis media repository indexer | `UrpmiMedia` | ✅ Production Ready |
-| **Pop!\_OS** | Auto-tiling dynamic window calculations | `AutoTilingLayout` | ✅ Production Ready |
+| **Pop!_OS** | Auto-tiling dynamic window calculations | `AutoTilingLayout` | ✅ Production Ready |
 | **Tails OS** | Amnesic RAM zeroing scrubber | `AmnesicRamWiper` | ✅ Production Ready |
 | **Qubes OS** | Dom0 Qrexec inter-domain RPC policy evaluator | `QrexecPolicyEngine` | ✅ Production Ready |
 | **Solaris / illumos** | Service Management Facility (SMF) state machine | `SmfService` | ✅ Production Ready |
 
-***
+---
 
 ## 🧪 Verification
 
 All components are implemented in zero-dependency Safe Rust and tested with `rustc --test`:
-
 ```bash
 running 6 tests
 test tests::test_amnesic_ram_wiper ... ok

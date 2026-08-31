@@ -2,7 +2,7 @@
 
 SigmaOS integrates and elevates architectural innovations from across the Unix, Linux, and BSD operating system landscape into a unified, memory-safe, capability-gated Rust microkernel ecosystem.
 
-***
+---
 
 ## 🏛️ Integrated Distro Paradigms & Implementation Matrix
 
@@ -19,7 +19,7 @@ SigmaOS integrates and elevates architectural innovations from across the Unix, 
 | **openSUSE** | **Snapper Timeline** | `SnapperTimeline` | Coordinated pre/post filesystem snapshots for automated rollback |
 | **Clear Linux** | **Stateless OS Root** | `ClearLinuxStatelessRoot` | Strict separation of `/usr/share/defaults` and `/etc` user overrides |
 
-***
+---
 
 ## 💻 Zero-Dependency Safe-Rust Native Verification
 

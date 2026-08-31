@@ -8,13 +8,13 @@ SigmaOS is designed with absolute sovereignty in mind, which means zero monolith
 
 ### Prerequisites
 
-*   `cmake` (>= 3.20)
+- `cmake` (>= 3.20)
 
-*   `clang` (>= 15) or GCC (>= 12)
+- `clang` (>= 15) or GCC (>= 12)
 
-*   `qemu-system-x86_64` (for local emulation)
+- `qemu-system-x86_64` (for local emulation)
 
-*   `mtools` (for creating bootable FAT32 images)
+- `mtools` (for creating bootable FAT32 images)
 
 ### Compilation
 
@@ -49,11 +49,11 @@ qemu-system-x86_64 -cdrom sigmaos-zenith.iso -m 2G -enable-kvm -serial stdio
 
 SigmaOS does not use a monolithic kernel. It operates on a **Lattice Architecture**:
 
-*   **Sovereign Init (`sigma-init`)**: Handles dependency-resolved parallel booting and process monitoring.
+- **Sovereign Init (`sigma-init`)**: Handles dependency-resolved parallel booting and process monitoring.
 
-*   **Zero-Trust VFS (`sigma-pam-acl`)**: All resources are denied by default unless an explicit Role-Based Access Control (RBAC) entry allows it.
+- **Zero-Trust VFS (`sigma-pam-acl`)**: All resources are denied by default unless an explicit Role-Based Access Control (RBAC) entry allows it.
 
-*   **Proton Bridge**: An opt-in compatibility layer (`sigma_proton_bridge`) that translates standard Linux POSIX syscalls into native SigmaOS IPC messages, allowing standard ELF binaries to run.
+- **Proton Bridge**: An opt-in compatibility layer (`sigma_proton_bridge`) that translates standard Linux POSIX syscalls into native SigmaOS IPC messages, allowing standard ELF binaries to run.
 
 ## 📝 Writing a Native Service
 
@@ -80,7 +80,7 @@ int main() {
 }
 ```
 
-### Native Syscall API (x86\_64)
+### Native Syscall API (x86_64)
 
 Native syscalls are executed via the `syscall` instruction with arguments in `rdi, rsi, rdx, r10, r8, r9`. The syscall number is passed in `rax`.
 
@@ -93,6 +93,5 @@ Native syscalls are executed via the `syscall` instruction with arguments in `rd
 | `0x12` | `SYS_FILE_WRITE` | Write to an open VFS resource. | `fd`, `buf_ptr`, `count` |
 | `0x20` | `SYS_VMM_MAP` | Map a physical memory page into the shard's virtual space. | `virt_addr`, `phys_addr`, `flags` |
 
-***
-
+---
 *For contributing to the kernel core, please refer to the `CONTRIBUTOR_ROADMAP.md`.*

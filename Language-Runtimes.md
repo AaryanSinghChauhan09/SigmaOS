@@ -19,11 +19,13 @@ and JIT that sandboxes apps with hardware capability tokens.
 
 ### Execution Model
 
-    .wasm module
-      └─ sigma-wasm validator   (type checking, memory bounds)
-            └─ Interpreter      (boot-time, no JIT dependency)
-                  └─ Cranelift JIT (post-boot, hot path optimisation)
-                        └─ Native shard (capability-gated)
+```
+.wasm module
+  └─ sigma-wasm validator   (type checking, memory bounds)
+        └─ Interpreter      (boot-time, no JIT dependency)
+              └─ Cranelift JIT (post-boot, hot path optimisation)
+                    └─ Native shard (capability-gated)
+```
 
 ### WASI Sovereign Mapping
 
@@ -52,22 +54,22 @@ void sigma_wasm_destroy(wasm_instance_t *inst);
 
 ## Roadmap
 
-*   \[ ] WASM binary validator (MVP spec)
+- [ ] WASM binary validator (MVP spec)
 
-*   \[ ] Stack-machine interpreter (for early boot)
+- [ ] Stack-machine interpreter (for early boot)
 
-*   \[ ] Cranelift JIT backend integration
+- [ ] Cranelift JIT backend integration
 
-*   \[ ] WASI → SigmaOS syscall mapping table
+- [ ] WASI → SigmaOS syscall mapping table
 
-*   \[ ] Lua 5.4 interpreter port (no C stdlib)
+- [ ] Lua 5.4 interpreter port (no C stdlib)
 
-*   \[ ] Python 3 minimal port (for scripting tools)
+- [ ] Python 3 minimal port (for scripting tools)
 
-*   \[ ] Runtime hot-swap (update runtime without reboot)
+- [ ] Runtime hot-swap (update runtime without reboot)
 
 ## Related Modules
 
-*   [`modules/ext/plugins`](../plugins/README.md) — WASM capsule packaging
+- [`modules/ext/plugins`](../plugins/README.md) — WASM capsule packaging
 
-*   [`modules/tools/sandbox`](../../tools/sandbox/README.md) — Runtime sandboxing
+- [`modules/tools/sandbox`](../../tools/sandbox/README.md) — Runtime sandboxing

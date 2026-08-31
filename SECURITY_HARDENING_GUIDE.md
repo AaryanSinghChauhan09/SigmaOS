@@ -7,7 +7,6 @@ SigmaOS applies a **defense-in-depth** approach to security, drawing from Linux 
 ## 1. Memory Safety
 
 ### Unsafe Code Policy
-
 All `unsafe` blocks **must** include a `// SAFETY:` comment explaining invariants:
 
 ```rust
@@ -16,9 +15,7 @@ unsafe { &*self.data.add(idx) }
 ```
 
 ### Integer Overflow Prevention
-
 In kernel/klib code, use checked arithmetic:
-
 ```rust
 // ❌ Vulnerable
 let new_size = self.len * 2;
@@ -28,9 +25,7 @@ let new_size = self.len.checked_mul(2).expect("size overflow");
 ```
 
 ### Buffer Bounds Validation
-
 Before any pointer arithmetic or unsafe block:
-
 ```rust
 pub fn get(&self, index: usize) -> Option<&T> {
     if index >= self.len {
@@ -110,7 +105,7 @@ Processes operate with minimal capabilities required (principle of least privile
 
 ## 5. Secure Memory Zeroing
 
-Inspired by OpenBSD explicit\_bzero and Linux's memzero\_explicit:
+Inspired by OpenBSD explicit_bzero and Linux's memzero_explicit:
 
 ```rust
 // src/kernel/secure_free.rs
@@ -127,10 +122,9 @@ pub fn secure_zero(ptr: *mut u8, len: usize) {
 ## 6. Address Space Layout Randomization (ASLR)
 
 ASLR randomizes the base addresses of:
-
-*   Kernel modules
-*   Stack
-*   Heap
+- Kernel modules
+- Stack
+- Heap
 
 ```rust
 // src/kernel/memory.rs - ASLR implementation
@@ -184,16 +178,15 @@ Inspired by OpenBSD malloc's randomization:
 ## 10. Continuous Security Scanning
 
 The CI/CD pipeline (`.github/workflows/`) includes:
-
-*   `cargo audit` for dependency vulnerability scanning
-*   Custom static analysis for `unsafe` block patterns
-*   Memory sanitizer tests
-*   Fuzzing with custom input generation
+- `cargo audit` for dependency vulnerability scanning
+- Custom static analysis for `unsafe` block patterns
+- Memory sanitizer tests
+- Fuzzing with custom input generation
 
 ## Security Contact
 
 Report vulnerabilities via: [SECURITY.md](../SECURITY.md)
 
-> \[!CAUTION]
+> [!CAUTION]
 > Never commit credentials, keys, or sensitive data to the repository.
 > All cryptographic keys must use the `src/kernel/crypto/` key storage APIs.

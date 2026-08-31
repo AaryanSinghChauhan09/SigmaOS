@@ -2,7 +2,7 @@
 
 This document defines the zero-dependency, `#![no_std]`, capability-gated Rust driver implementation for the **Intel High Definition Audio (HDA) Controller**. It maps standard audio streams, manages cyclic ring buffers (DMA), and configures codec channels.
 
-***
+---
 
 ## 🏗️ Driver Source Code Implementation
 

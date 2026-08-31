@@ -2,7 +2,7 @@
 
 Inspired by **NixOS's declarative sandboxing**, **Flatpak application runtimes**, and content-addressed storage (CAS) models, this document defines a complete, functional, `#![no_std]` package compiler and dependency resolution system. It contains zero external dependencies, performs SHA-256 integrity verification, and isolates runtime parameters.
 
-***
+---
 
 ## 🏗️ Component Implementation Source Code
 

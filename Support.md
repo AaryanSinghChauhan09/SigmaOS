@@ -14,18 +14,18 @@ https://github.com/AaryanSinghChauhan09/SigmaOS/issues
 
 ### Before opening an issue
 
-*   Search existing issues first
+- Search existing issues first
 
-*   Check [CURRENT\_PROBLEMS\_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST) \x97 your issue may already be tracked
+- Check [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md) \x97 your issue may already be tracked
 
-*   Use the appropriate issue template (bug, feature, driver request, docs)
+- Use the appropriate issue template (bug, feature, driver request, docs)
 
 ### Wiki
 
 Comprehensive documentation:
 https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 
-***
+---
 
 ## Issue Labels
 
@@ -42,15 +42,15 @@ https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
 | `good first issue` | Suitable for new contributors |
 | `help wanted` | Maintainers need community assistance |
 
-***
+---
 
 ## Security Issues
 
 ### Do not open public issues for security vulnerabilities
 
-See [SECURITY\_POLICY.md](SECURITY_POLICY) for private reporting.
+See [SECURITY_POLICY.md](SECURITY_POLICY.md) for private reporting.
 
-***
+---
 
 ## FAQ
 
@@ -64,11 +64,11 @@ A: A Linux ELF compatibility layer (`runtime/containers/sigma_linux_compat.cpp`)
 
 ### Q: What architectures are supported?
 
-A: x86\_64 (primary), ARM64 (Phase G), RISC-V RV64GC (Phase H). HAL stubs exist for all three.
+A: x86_64 (primary), ARM64 (Phase G), RISC-V RV64GC (Phase H). HAL stubs exist for all three.
 
 ### Q: How do I contribute a driver?
 
-A: See [CONTRIBUTING.md](CONTRIBUTING) and the SDF driver template in [DEVELOPMENT\_ROADMAP.md](DEVELOPMENT_ROADMAP).
+A: See [CONTRIBUTING.md](CONTRIBUTING.md) and the SDF driver template in [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md).
 
 ### Q: Where is the package registry?
 

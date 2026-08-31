@@ -3,27 +3,29 @@
 > **"Uncompromising security and forensic integrity are achieved through anonymous routing shunts, strict system-call sandboxing, and write-blocking storage filters."**
 > This blueprint specifies the strategic adaptation and high-density technical design patterns to defeat and surpass **Parrot Security OS** by integrating **Sovereign AnonSurf routing mechanisms, strict Firejail-parity AppSandboxes, and Forensic write-blocker filters** directly into the core design of **SigmaOS**.
 
-***
+---
 
 ## 🏗️ Operational Security Architecture
 
-    +---------------------------------------------------------------------------------+
-    |                                 ANONSURF ROUTING                                |
-    |        (Virtual Interface Redirection, TOR-Parity Shunts, DNS Leak Shield)       |
-    +---------------------------------------------------------------------------------+
-                                            |
-                                            v
-    +---------------------------------------------------------------------------------+
-    | APPSANDBOX SECURITY ENGINE                                                      |
-    | - Restricts process privileges using capability matrix verification             |
-    | - Restricts system-call and directory path accesses in Rust                     |
-    +---------------------------------------------------------------------------------+
-    | FORENSIC WRITE-BLOCKER & SECURE WIPER                                           |
-    | - Intercepts sector writes on raw storage device nodes to guarantee integrity    |
-    | - Zeros out security credentials in volatile RAM to prevent cold-boot attacks    |
-    +---------------------------------------------------------------------------------+
+```
++---------------------------------------------------------------------------------+
+|                                 ANONSURF ROUTING                                |
+|        (Virtual Interface Redirection, TOR-Parity Shunts, DNS Leak Shield)       |
++---------------------------------------------------------------------------------+
+                                        |
+                                        v
++---------------------------------------------------------------------------------+
+| APPSANDBOX SECURITY ENGINE                                                      |
+| - Restricts process privileges using capability matrix verification             |
+| - Restricts system-call and directory path accesses in Rust                     |
++---------------------------------------------------------------------------------+
+| FORENSIC WRITE-BLOCKER & SECURE WIPER                                           |
+| - Intercepts sector writes on raw storage device nodes to guarantee integrity    |
+| - Zeros out security credentials in volatile RAM to prevent cold-boot attacks    |
++---------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## 🏗️ Reference Implementation
 
@@ -197,12 +199,12 @@ pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();
 pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();
 ```
 
-***
+---
 
 ## 🚀 Future Penetration Testing Integrations
 
 To consolidate our security stance and provide full parity with Parrot Security OS’s pentesting collections, SigmaOS defines these future expansion vectors:
 
-1.  **Sovereign Wireless Decoupling**: Raw 802.11 monitor-mode driver frames handled safely in clean user namespaces.
-2.  **Post-Quantum Crypto Keyrings**: Automatic PQC key rotations for decentralized shell links.
-3.  **Seccomp System Call Masking**: Restricting kernel surface visibility down to exactly the minimal set of syscall requirements.
+1. **Sovereign Wireless Decoupling**: Raw 802.11 monitor-mode driver frames handled safely in clean user namespaces.
+2. **Post-Quantum Crypto Keyrings**: Automatic PQC key rotations for decentralized shell links.
+3. **Seccomp System Call Masking**: Restricting kernel surface visibility down to exactly the minimal set of syscall requirements.

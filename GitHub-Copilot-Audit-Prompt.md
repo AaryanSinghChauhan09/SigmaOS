@@ -2,7 +2,7 @@
 
 This document presents a comprehensive, production-grade prompt designed for **GitHub Copilot** (or any advanced LLM architect) to audit, secure, and optimize a zero-dependency microkernel operating system like **SigmaOS**.
 
-***
+---
 
 ## 📋 The Ultimate Copilot Audit & Transformation Prompt
 
@@ -44,28 +44,24 @@ Your goal is to prepare a detailed strategic plan and production-ready code tran
 Provide a granular, step-by-step checklist of files to modify, followed by fully written, compilable, and self-contained Rust code blocks implementing these fixes.
 ```
 
-***
+---
 
 ## 🛠️ Resolved OS Gaps & Bug Fix Summary (Already Completed)
 
 We have already proactively resolved and implemented the entire list of target bugs and sovereign features mentioned in the prompt inside the SigmaOS core:
 
 ### 1. Hardcoded Cryptographic Key Fallbacks Fixed
-
-*   **The Issue:** The encryption service inside `src/crypto/encryption.rs` used a static hardcoded XOR mask `0x42` for all `encrypt`/`decrypt` operations.
-*   **The Resolution:** Refactored the service to dynamically retrieve the registered key data bytes via a newly added `EncryptionKey::key_data()` trait method, using those bytes as the XOR mask.
+- **The Issue:** The encryption service inside `src/crypto/encryption.rs` used a static hardcoded XOR mask `0x42` for all `encrypt`/`decrypt` operations.
+- **The Resolution:** Refactored the service to dynamically retrieve the registered key data bytes via a newly added `EncryptionKey::key_data()` trait method, using those bytes as the XOR mask.
 
 ### 2. Compilation Blockages & Duplicate Definitions Resolved
-
-*   **The Issue:** Submodules inside `src/security/` had duplicate implementations of custom `Vec<T>` structures within their test blocks, leading to duplicate symbol errors.
-*   **The Resolution:** Cleaned up and deleted all redundant helper structures and duplicate `#[cfg(test)]` headers across `mac.rs`, `pki.rs`, and `secrets.rs`.
+- **The Issue:** Submodules inside `src/security/` had duplicate implementations of custom `Vec<T>` structures within their test blocks, leading to duplicate symbol errors.
+- **The Resolution:** Cleaned up and deleted all redundant helper structures and duplicate `#[cfg(test)]` headers across `mac.rs`, `pki.rs`, and `secrets.rs`.
 
 ### 3. Penetration Assistant & Vulnerability Scanner Fixed
-
-*   **The Issue:** `src/security/vulnerability.rs` contained duplicate definitions of the `Severity` and `ScanError` enums, used unannotated `transmute` calls, and lacked the definition and `Default` implementation for the `PenetrationAssistant` and `ExploitPayload` referenced in the unit tests.
-*   **The Resolution:** Completely rewrote `vulnerability.rs`. Removed the duplicate enums, annotated transmutes safely, fully implemented `ExploitPayload` and `PenetrationAssistant` (along with its `Default` trait implementation), and used raw pointer index iterations to traverse custom vector arrays safely.
+- **The Issue:** `src/security/vulnerability.rs` contained duplicate definitions of the `Severity` and `ScanError` enums, used unannotated `transmute` calls, and lacked the definition and `Default` implementation for the `PenetrationAssistant` and `ExploitPayload` referenced in the unit tests.
+- **The Resolution:** Completely rewrote `vulnerability.rs`. Removed the duplicate enums, annotated transmutes safely, fully implemented `ExploitPayload` and `PenetrationAssistant` (along with its `Default` trait implementation), and used raw pointer index iterations to traverse custom vector arrays safely.
 
 ### 4. Crate-Root Attribute Hygiene Corrected
-
-*   **The Issue:** Submodules were declaring `#![no_std]` and `#![no_main]` attributes which only belong at the crate root.
-*   **The Resolution:** Cleaned up and stripped all `#![no_std]` and `#![no_main]` annotations from all localized submodules, allowing clean nested compilation.
+- **The Issue:** Submodules were declaring `#![no_std]` and `#![no_main]` attributes which only belong at the crate root.
+- **The Resolution:** Cleaned up and stripped all `#![no_std]` and `#![no_main]` annotations from all localized submodules, allowing clean nested compilation.

@@ -1,38 +1,35 @@
 # SigmaOS Package Management Guide
 
 ## Table of Contents
-
-1.  [Introduction to SigmaPkg](#introduction-to-sigmapkg)
-2.  [Basic Package Operations](#basic-package-operations)
-3.  [Repository Management](#repository-management)
-4.  [Package Building](#package-building)
-5.  [Package Compatibility](#package-compatibility)
-6.  [Advanced Features](#advanced-features)
-7.  [Troubleshooting](#troubleshooting)
+1. [Introduction to SigmaPkg](#introduction-to-sigmapkg)
+2. [Basic Package Operations](#basic-package-operations)
+3. [Repository Management](#repository-management)
+4. [Package Building](#package-building)
+5. [Package Compatibility](#package-compatibility)
+6. [Advanced Features](#advanced-features)
+7. [Troubleshooting](#troubleshooting)
 
 ## Introduction to SigmaPkg
 
 SigmaPkg is the native package manager for SigmaOS, inspired by Arch Linux's Pacman and Debian's APT. It provides:
 
-*   Content-addressed storage (Nix-inspired)
-*   Declarative build system (Bazel/Nix-inspired)
-*   Package ratings and reviews
-*   Multiple package format support
-*   Transaction rollback capabilities
+- Content-addressed storage (Nix-inspired)
+- Declarative build system (Bazel/Nix-inspired)
+- Package ratings and reviews
+- Multiple package format support
+- Transaction rollback capabilities
 
 ### Package Formats Supported
-
-*   **SigmaPackage (.spkg)**: Native SigmaOS format
-*   **Debian (.deb)**: Full compatibility via translation layer
-*   **Arch (.pkg.tar.xz)**: PKGBUILD support
-*   **RPM (.rpm)**: Red Hat compatibility
-*   **Flatpak**: Containerized applications
-*   **AppImage**: Portable applications
+- **SigmaPackage (.spkg)**: Native SigmaOS format
+- **Debian (.deb)**: Full compatibility via translation layer
+- **Arch (.pkg.tar.xz)**: PKGBUILD support
+- **RPM (.rpm)**: Red Hat compatibility
+- **Flatpak**: Containerized applications
+- **AppImage**: Portable applications
 
 ## Basic Package Operations
 
 ### Update Package Database
-
 ```bash
 # Update repository metadata
 sigpkg update
@@ -42,7 +39,6 @@ sigpkg check-updates
 ```
 
 ### Install Packages
-
 ```bash
 # Install a package
 sigpkg install package-name
@@ -58,7 +54,6 @@ sigpkg install ./package.spkg
 ```
 
 ### Remove Packages
-
 ```bash
 # Remove a package
 sigpkg remove package-name
@@ -74,7 +69,6 @@ sigpkg remove-orphans
 ```
 
 ### Upgrade Packages
-
 ```bash
 # Upgrade all packages
 sigpkg upgrade
@@ -87,7 +81,6 @@ sigpkg upgrade --from version package-name
 ```
 
 ### Search Packages
-
 ```bash
 # Search by name
 sigpkg search package-name
@@ -103,7 +96,6 @@ sigpkg search --updates
 ```
 
 ### Package Information
-
 ```bash
 # Show package information
 sigpkg info package-name
@@ -121,7 +113,6 @@ sigpkg deps --tree package-name
 ## Repository Management
 
 ### Repository Configuration
-
 ```bash
 # List repositories
 sigpkg repo list
@@ -140,7 +131,6 @@ sigpkg repo disable repo-name
 ```
 
 ### Repository Mirrors
-
 ```bash
 # List mirrors
 sigpkg mirror list
@@ -156,7 +146,6 @@ sigpkg mirror rank repo-name
 ```
 
 ### Repository Components
-
 ```bash
 # Add repository component
 sigpkg repo component add repo-name component-name
@@ -168,7 +157,6 @@ sigpkg repo component remove repo-name component-name
 ## Package Building
 
 ### PKGBUILD System (Arch Inspiration)
-
 Create PKGBUILD files for custom packages:
 
 ```bash
@@ -186,7 +174,6 @@ sigpkg build --install package-name
 ```
 
 ### PKGBUILD Example
-
 ```bash
 # PKGBUILD template
 pkgname="example-package"
@@ -214,7 +201,6 @@ package() {
 ```
 
 ### Declarative Build System (Nix/Bazel Inspiration)
-
 Use declarative build definitions:
 
 ```nix
@@ -248,7 +234,6 @@ py_binary(
 ## Package Compatibility
 
 ### Debian Package Support
-
 ```bash
 # Install Debian package
 sigpkg install ./package.deb
@@ -261,7 +246,6 @@ sigpkg import deb http://archive.debian.org/debian stable main
 ```
 
 ### Arch Package Support
-
 ```bash
 # Install Arch package
 sigpkg install ./package.pkg.tar.xz
@@ -274,7 +258,6 @@ sigpkg aur install package-name
 ```
 
 ### RPM Package Support
-
 ```bash
 # Install RPM package
 sigpkg install ./package.rpm
@@ -287,7 +270,6 @@ sigpkg import rpm http://mirror.centos.org/centos/8/os/x86_64/
 ```
 
 ### Flatpak Support
-
 ```bash
 # Install Flatpak
 sigpkg flatpak install app-id
@@ -302,7 +284,6 @@ sigpkg flatpak remote-add flathub https://flathub.org/repo/flathub.flatpakrepo
 ## Advanced Features
 
 ### Transaction Management
-
 ```bash
 # Begin transaction
 sigpkg transaction begin
@@ -322,7 +303,6 @@ sigpkg transaction history
 ```
 
 ### Package Ratings and Reviews
-
 ```bash
 # View package ratings
 sigpkg rating package-name
@@ -338,7 +318,6 @@ sigpkg reviews package-name
 ```
 
 ### Dependency Resolution
-
 ```bash
 # SAT solver-based dependency resolution
 sigpkg resolve package-name
@@ -354,7 +333,6 @@ sigpkg resolve-conflicts package-name
 ```
 
 ### Package Verification
-
 ```bash
 # Verify package signature
 sigpkg verify package-name
@@ -367,7 +345,6 @@ sigpkg integrity package-name
 ```
 
 ### Package Cache Management
-
 ```bash
 # Clean package cache
 sigpkg clean
@@ -385,7 +362,6 @@ sigpkg cache size
 ## Troubleshooting
 
 ### Package Installation Fails
-
 ```bash
 # Check for conflicts
 sigpkg conflicts package-name
@@ -401,7 +377,6 @@ sigpkg log package-name
 ```
 
 ### Dependency Issues
-
 ```bash
 # Show dependency tree
 sigpkg deps --tree package-name
@@ -414,7 +389,6 @@ sigpkg resolve --force package-name
 ```
 
 ### Repository Issues
-
 ```bash
 # Update repository metadata
 sigpkg update
@@ -430,7 +404,6 @@ sigpkg repo clean
 ```
 
 ### Build Failures
-
 ```bash
 # Check build logs
 sigpkg build log package-name
@@ -448,7 +421,6 @@ sigpkg build deps package-name
 ## Best Practices
 
 ### System Updates
-
 ```bash
 # Regular updates
 sigpkg update && sigpkg upgrade
@@ -461,7 +433,6 @@ sigpkg backup
 ```
 
 ### Package Selection
-
 ```bash
 # Check package ratings before installing
 sigpkg rating package-name
@@ -474,7 +445,6 @@ sigpkg deps package-name
 ```
 
 ### System Maintenance
-
 ```bash
 # Remove orphan packages
 sigpkg remove-orphans
@@ -488,8 +458,8 @@ sigpkg security check
 
 ## Additional Resources
 
-*   [Installation Guide](./INSTALLATION)
-*   [Configuration Guide](./CONFIGURATION)
-*   [Security Hardening Guide](./SECURITY)
-*   [Development Guide](./DEVELOPMENT)
-*   [SigmaPkg API Documentation](../src/sigpkg/)
+- [Installation Guide](./INSTALLATION.md)
+- [Configuration Guide](./CONFIGURATION.md)
+- [Security Hardening Guide](./SECURITY.md)
+- [Development Guide](./DEVELOPMENT.md)
+- [SigmaPkg API Documentation](../src/sigpkg/)

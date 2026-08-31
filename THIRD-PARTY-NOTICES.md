@@ -1,4 +1,4 @@
-# Licenses of bundled dependencies
+﻿# Licenses of bundled dependencies
 
 The published Prettier artifact additionally contains code with the following licenses:
 MIT, ISC, BSD-3-Clause, BSD-2-Clause, and Apache-2.0.
@@ -33,7 +33,7 @@ Author: angular
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## @babel/code-frame@v7.26.2
 
@@ -67,7 +67,7 @@ Author: The Babel Team (https://babel.dev/team)
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## @babel/helper-validator-identifier@v7.25.9
 
@@ -100,7 +100,7 @@ Author: The Babel Team (https://babel.dev/team)
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## @babel/parser@v7.26.9
 
@@ -131,7 +131,7 @@ Author: The Babel Team (https://babel.dev/team)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## @glimmer/syntax@v0.94.7
 
@@ -158,7 +158,7 @@ Repository: <git+https://github.com/glimmerjs/glimmer-vm.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @glimmer/util@v0.94.6
 
@@ -187,7 +187,7 @@ Repository: <git+https://github.com/glimmerjs/glimmer-vm.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @glimmer/wire-format@v0.94.6
 
@@ -214,7 +214,7 @@ Repository: <git+https://github.com/glimmerjs/glimmer-vm.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @handlebars/parser@v2.0.0
 
@@ -224,7 +224,7 @@ License: ISC
 Homepage: <https://github.com/handlebars-lang/handlebars-parser#readme>
 Repository: <git+https://github.com/handlebars-lang/handlebars-parser.git>
 
-***
+----------------------------------------
 
 ## @keyv/serialize@v1.0.2
 
@@ -258,7 +258,7 @@ Author: Jared Wray <me@jaredwray.com> (https://jaredwray.com)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @nodelib/fs.scandir@v2.1.5
 
@@ -288,7 +288,7 @@ License: MIT
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @nodelib/fs.stat@v2.0.5
 
@@ -318,7 +318,7 @@ License: MIT
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @nodelib/fs.walk@v1.2.8
 
@@ -348,7 +348,7 @@ License: MIT
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @prettier/is-es5-identifier-name@v0.2.0
 
@@ -379,7 +379,7 @@ Author: fisker Cheung <lionkay@gmail.com>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @prettier/parse-srcset@v3.1.0
 
@@ -412,7 +412,7 @@ Author: Alex Bell <alex@bellandwhistle.net>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @typescript-eslint/types@v8.24.1
 
@@ -444,7 +444,7 @@ Repository: <https://github.com/typescript-eslint/typescript-eslint.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## @typescript-eslint/typescript-estree@v8.24.1
 
@@ -476,7 +476,7 @@ Repository: <https://github.com/typescript-eslint/typescript-eslint.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## acorn@v8.14.0
 
@@ -508,7 +508,7 @@ Repository: <git+https://github.com/acornjs/acorn.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## acorn-jsx@v5.3.2
 
@@ -538,7 +538,7 @@ Repository: <https://github.com/acornjs/acorn-jsx>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## angular-estree-parser@v10.2.0
 
@@ -570,7 +570,7 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## angular-html-parser@v8.0.1
 
@@ -602,7 +602,7 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## ansi-regex@v6.1.0
 
@@ -621,7 +621,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## bail@v1.0.5
 
@@ -631,7 +631,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -656,7 +657,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## braces@v3.0.3
 
@@ -667,11 +668,12 @@ Homepage: <https://github.com/micromatch/braces>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Brian Woodward (https://twitter.com/doowb)
-*   Elan Shanker (https://github.com/es128)
-*   Eugene Sharygin (https://github.com/eush77)
-*   hemanth.hm (http://h3manth.com)
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Brian Woodward (https://twitter.com/doowb)
+ - Elan Shanker (https://github.com/es128)
+ - Eugene Sharygin (https://github.com/eush77)
+ - hemanth.hm (http://h3manth.com)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+
 
 > The MIT License (MIT)
 >
@@ -695,7 +697,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## cacheable@v1.8.8
 
@@ -725,7 +727,7 @@ Author: Jared Wray <me@jaredwray.com>
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 > DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## camelcase@v8.0.0
 
@@ -744,7 +746,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## ccount@v1.1.0
 
@@ -754,7 +756,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -779,7 +782,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## chalk@v5.4.1
 
@@ -797,7 +800,7 @@ License: MIT
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## character-entities@v1.2.4
 
@@ -807,7 +810,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -832,7 +836,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## character-entities-legacy@v1.1.4
 
@@ -842,7 +846,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -867,7 +872,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## character-reference-invalid@v1.1.4
 
@@ -877,7 +882,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -902,7 +908,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## ci-info@v4.1.0
 
@@ -913,7 +919,8 @@ Homepage: <https://github.com/watson/ci-info>
 Author: Thomas Watson Steen <w@tson.dk> (https://twitter.com/wa7son)
 Contributors:
 
-*   Sibiraj (https://github.com/sibiraj-s)
+ - Sibiraj (https://github.com/sibiraj-s)
+
 
 > The MIT License (MIT)
 >
@@ -937,7 +944,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## collapse-white-space@v1.0.6
 
@@ -947,7 +954,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -972,7 +980,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## common-path-prefix@v3.0.0
 
@@ -998,7 +1006,7 @@ Author: Mark Wubben (https://novemberborn.net/)
 > TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 > THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## dashify@v2.0.0
 
@@ -1009,9 +1017,10 @@ Homepage: <https://github.com/jonschlinkert/dashify>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Jeffrey Priebe (https://github.com/jeffreypriebe)
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
-*   Ondrej Brinkel (https://www.anzui.de)
+ - Jeffrey Priebe (https://github.com/jeffreypriebe)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Ondrej Brinkel (https://www.anzui.de)
+
 
 > The MIT License (MIT)
 >
@@ -1035,7 +1044,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## diff@v7.0.0
 
@@ -1052,16 +1061,16 @@ Repository: <git://github.com/kpdecker/jsdiff.git>
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are met:
 >
-> 1.  Redistributions of source code must retain the above copyright notice, this
->     list of conditions and the following disclaimer.
+> 1. Redistributions of source code must retain the above copyright notice, this
+>    list of conditions and the following disclaimer.
 >
-> 2.  Redistributions in binary form must reproduce the above copyright notice,
->     this list of conditions and the following disclaimer in the documentation
->     and/or other materials provided with the distribution.
+> 2. Redistributions in binary form must reproduce the above copyright notice,
+>    this list of conditions and the following disclaimer in the documentation
+>    and/or other materials provided with the distribution.
 >
-> 3.  Neither the name of the copyright holder nor the names of its
->     contributors may be used to endorse or promote products derived from
->     this software without specific prior written permission.
+> 3. Neither the name of the copyright holder nor the names of its
+>    contributors may be used to endorse or promote products derived from
+>    this software without specific prior written permission.
 >
 > THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 > AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -1074,7 +1083,7 @@ Repository: <git://github.com/kpdecker/jsdiff.git>
 > OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-***
+----------------------------------------
 
 ## editorconfig@v0.15.3
 
@@ -1085,9 +1094,10 @@ Repository: <git://github.com/editorconfig/editorconfig-core-js.git>
 Author: EditorConfig Team
 Contributors:
 
-*   Hong Xu (topbug.net)
-*   Jed Mao (https://github.com/jedmao/)
-*   Trey Hunner (http://treyhunner.com)
+ - Hong Xu (topbug.net)
+ - Jed Mao (https://github.com/jedmao/)
+ - Trey Hunner (http://treyhunner.com)
+
 
 > Copyright Â© 2012 EditorConfig Team
 >
@@ -1109,7 +1119,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## emoji-regex@v10.4.0
 
@@ -1141,7 +1151,7 @@ Author: Mathias Bynens (https://mathiasbynens.be/)
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## escape-string-regexp@v5.0.0
 
@@ -1160,7 +1170,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## espree@v10.3.0
 
@@ -1178,12 +1188,12 @@ Author: Nicholas C. Zakas <nicholas+npm@nczconsulting.com>
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are met:
 >
-> 1.  Redistributions of source code must retain the above copyright notice, this
->     list of conditions and the following disclaimer.
+> 1. Redistributions of source code must retain the above copyright notice, this
+>    list of conditions and the following disclaimer.
 >
-> 2.  Redistributions in binary form must reproduce the above copyright notice,
->     this list of conditions and the following disclaimer in the documentation
->     and/or other materials provided with the distribution.
+> 2. Redistributions in binary form must reproduce the above copyright notice,
+>    this list of conditions and the following disclaimer in the documentation
+>    and/or other materials provided with the distribution.
 >
 > THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 > AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -1196,7 +1206,7 @@ Author: Nicholas C. Zakas <nicholas+npm@nczconsulting.com>
 > OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-***
+----------------------------------------
 
 ## extend@v3.0.2
 
@@ -1207,7 +1217,8 @@ Repository: <https://github.com/justmoon/node-extend.git>
 Author: Stefan Thomas <justmoon@members.fsf.org> (http://www.justmoon.net)
 Contributors:
 
-*   Jordan Harband (https://github.com/ljharb)
+ - Jordan Harband (https://github.com/ljharb)
+
 
 > The MIT License (MIT)
 >
@@ -1232,7 +1243,7 @@ Contributors:
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## fast-glob@v3.3.3
 
@@ -1263,7 +1274,7 @@ Author: Denis Malinochkin (https://mrmlnc.com)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## fast-json-stable-stringify@v2.1.0
 
@@ -1296,7 +1307,7 @@ Author: James Halliday <mail@substack.net> (http://substack.net)
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## fastq@v1.18.0
 
@@ -1321,7 +1332,7 @@ Author: Matteo Collina <hello@matteocollina.com>
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 > OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## file-entry-cache@v10.0.6
 
@@ -1351,7 +1362,7 @@ Author: Jared Wray <me@jaredwray.com>
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 > DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## fill-range@v7.1.1
 
@@ -1362,11 +1373,12 @@ Homepage: <https://github.com/jonschlinkert/fill-range>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Edo Rivai (edo.rivai.nl)
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
-*   Paul Miller (paulmillr.com)
-*   Rouven WeÃŸling (www.rouvenwessling.de)
-*   null (https://github.com/wtgtybhertgeghgtwtg)
+ - Edo Rivai (edo.rivai.nl)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Paul Miller (paulmillr.com)
+ - Rouven WeÃŸling (www.rouvenwessling.de)
+ - null (https://github.com/wtgtybhertgeghgtwtg)
+
 
 > The MIT License (MIT)
 >
@@ -1390,7 +1402,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## find-cache-dir@v5.0.0
 
@@ -1410,7 +1422,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## find-up@v6.3.0
 
@@ -1429,7 +1441,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## flat-cache@v6.1.6
 
@@ -1459,7 +1471,7 @@ Author: Jared Wray <me@jaredwray.com>
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 > DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## flatted@v3.3.2
 
@@ -1486,7 +1498,7 @@ Author: Andrea Giammarchi
 > OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 > PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## flatten@v1.0.3
 
@@ -1498,7 +1510,8 @@ Repository: <git+https://github.com/mk-pmb/flatten-js.git>
 Author: Joshua Holbrook <josh.holbrook@gmail.com> (http://jesusabdullah.net)
 Contributors:
 
-*   M.K. (https://github.com/mk-pmb)
+ - M.K. (https://github.com/mk-pmb)
+
 
 > The MIT License (MIT)
 >
@@ -1522,7 +1535,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## flow-parser@v0.259.1
 
@@ -1533,7 +1546,7 @@ Homepage: <https://flow.org>
 Repository: <https://github.com/facebook/flow.git>
 Author: Flow Team <flow@fb.com>
 
-***
+----------------------------------------
 
 ## get-east-asian-width@v1.3.0
 
@@ -1552,7 +1565,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## get-stdin@v9.0.0
 
@@ -1571,7 +1584,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## glob-parent@v5.1.2
 
@@ -1581,8 +1594,9 @@ License: ISC
 Author: Gulp Team <team@gulpjs.com> (https://gulpjs.com/)
 Contributors:
 
-*   Elan Shanker (https://github.com/es128)
-*   Blaine Bublitz <blaine.bublitz@gmail.com>
+ - Elan Shanker (https://github.com/es128)
+ - Blaine Bublitz <blaine.bublitz@gmail.com>
+
 
 > The ISC License
 >
@@ -1600,7 +1614,7 @@ Contributors:
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## graphql@v16.10.0
 
@@ -1632,7 +1646,7 @@ Repository: <https://github.com/graphql/graphql-js.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## hookified@v1.7.0
 
@@ -1663,14 +1677,14 @@ Author: Jared Wray <me@jaredwray.com>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## ignore@v7.0.3
 
 > Ignore is a manager and filter for .gitignore rules, the one used by eslint, gitbook and many others.
 
 License: MIT
-Repository: \<git@github.com:kaelzhang/node-ignore.git>
+Repository: <git@github.com:kaelzhang/node-ignore.git>
 Author: kael
 
 > Copyright (c) 2013 Kael Zhang <i@kael.me>, contributors
@@ -1695,7 +1709,7 @@ Author: kael
 > OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## import-meta-resolve@v4.1.0
 
@@ -1705,7 +1719,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -1730,7 +1745,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 >
-> ***
+> ---
 >
 > This is a derivative work based on:
 > <https://github.com/nodejs/node>.
@@ -1782,7 +1797,7 @@ Contributors:
 > IN THE SOFTWARE.
 > """
 
-***
+----------------------------------------
 
 ## index-to-position@v0.1.2
 
@@ -1801,7 +1816,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## indexes-of@v1.0.1
 
@@ -1835,7 +1850,7 @@ Author: Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## inherits@v2.0.4
 
@@ -1859,7 +1874,7 @@ License: ISC
 > OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 > PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-alphabetical@v1.0.4
 
@@ -1869,7 +1884,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -1894,7 +1910,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-alphanumerical@v1.0.4
 
@@ -1904,7 +1920,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -1929,7 +1946,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-buffer@v2.0.5
 
@@ -1961,7 +1978,7 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-decimal@v1.0.4
 
@@ -1971,7 +1988,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -1996,7 +2014,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-extglob@v2.1.1
 
@@ -2028,7 +2046,7 @@ Author: Jon Schlinkert (https://github.com/jonschlinkert)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-glob@v4.0.3
 
@@ -2039,9 +2057,10 @@ Homepage: <https://github.com/micromatch/is-glob>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Brian Woodward (https://twitter.com/doowb)
-*   Daniel Perez (https://tuvistavie.com)
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Brian Woodward (https://twitter.com/doowb)
+ - Daniel Perez (https://tuvistavie.com)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+
 
 > The MIT License (MIT)
 >
@@ -2065,7 +2084,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-hexadecimal@v1.0.4
 
@@ -2075,7 +2094,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -2100,7 +2120,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-number@v7.0.0
 
@@ -2111,9 +2131,10 @@ Homepage: <https://github.com/jonschlinkert/is-number>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
-*   Olsten Larck (https://i.am.charlike.online)
-*   Rouven WeÃŸling (www.rouvenwessling.de)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Olsten Larck (https://i.am.charlike.online)
+ - Rouven WeÃŸling (www.rouvenwessling.de)
+
 
 > The MIT License (MIT)
 >
@@ -2137,7 +2158,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-plain-obj@v2.1.0
 
@@ -2156,7 +2177,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-whitespace-character@v1.0.4
 
@@ -2166,7 +2187,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -2191,7 +2213,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## is-word-character@v1.0.4
 
@@ -2201,7 +2223,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -2226,7 +2249,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## iterate-directory-up@v1.1.1
 
@@ -2258,7 +2281,7 @@ Author: fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## jest-docblock@v30.0.0-alpha.7
 
@@ -2288,7 +2311,7 @@ Repository: <https://github.com/jestjs/jest.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## js-tokens@v4.0.0
 
@@ -2319,7 +2342,7 @@ Author: Simon Lydell
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## js-yaml@v4.1.0
 
@@ -2329,9 +2352,10 @@ License: MIT
 Author: Vladimir Zapparov <dervus.grim@gmail.com>
 Contributors:
 
-*   Aleksey V Zapparov <ixti@member.fsf.org> (http://www.ixti.net/)
-*   Vitaly Puzrin <vitaly@rcdesign.ru> (https://github.com/puzrin)
-*   Martin Grenfell <martin.grenfell@gmail.com> (http://got-ravings.blogspot.com)
+ - Aleksey V Zapparov <ixti@member.fsf.org> (http://www.ixti.net/)
+ - Vitaly Puzrin <vitaly@rcdesign.ru> (https://github.com/puzrin)
+ - Martin Grenfell <martin.grenfell@gmail.com> (http://got-ravings.blogspot.com)
+
 
 > (The MIT License)
 >
@@ -2355,7 +2379,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## json5@v2.2.3
 
@@ -2367,9 +2391,10 @@ Repository: <git+https://github.com/json5/json5.git>
 Author: Aseem Kishore <aseem.kishore@gmail.com>
 Contributors:
 
-*   Max Nanasy <max.nanasy@gmail.com>
-*   Andrew Eisenberg <andrew@eisenberg.as>
-*   Jordan Tucker <jordanbtucker@gmail.com>
+ - Max Nanasy <max.nanasy@gmail.com>
+ - Andrew Eisenberg <andrew@eisenberg.as>
+ - Jordan Tucker <jordanbtucker@gmail.com>
+
 
 > MIT License
 >
@@ -2395,7 +2420,7 @@ Contributors:
 >
 > [others]: https://github.com/json5/json5/contributors
 
-***
+----------------------------------------
 
 ## keyv@v5.2.3
 
@@ -2429,7 +2454,7 @@ Author: Jared Wray <me@jaredwray.com> (http://jaredwray.com)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## leven@v4.0.0
 
@@ -2448,7 +2473,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## lines-and-columns@v2.0.4
 
@@ -2481,7 +2506,7 @@ Author: Brian Donovan <brian@donovans.cc>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## locate-path@v7.2.0
 
@@ -2500,7 +2525,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## lru-cache@v4.1.5
 
@@ -2525,7 +2550,7 @@ Author: Isaac Z. Schlueter <i@izs.me>
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## markdown-escapes@v1.0.4
 
@@ -2535,7 +2560,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -2560,7 +2586,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## merge2@v1.4.1
 
@@ -2568,7 +2594,7 @@ Contributors:
 
 License: MIT
 Homepage: <https://github.com/teambition/merge2>
-Repository: \<git@github.com:teambition/merge2.git>
+Repository: <git@github.com:teambition/merge2.git>
 
 > The MIT License (MIT)
 >
@@ -2592,7 +2618,7 @@ Repository: \<git@github.com:teambition/merge2.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## meriyah@v6.0.5
 
@@ -2604,7 +2630,8 @@ Repository: <git+https://github.com/meriyah/meriyah.git>
 Author: Kenny F. (https://github.com/KFlash)
 Contributors:
 
-*   Chunpeng Huo (https://github.com/3cp)
+ - Chunpeng Huo (https://github.com/3cp)
+
 
 > ISC License
 >
@@ -2614,7 +2641,7 @@ Contributors:
 >
 > THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## micromatch@v4.0.8
 
@@ -2625,21 +2652,22 @@ Homepage: <https://github.com/micromatch/micromatch>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   null (https://github.com/DianeLooney)
-*   Amila Welihinda (amilajack.com)
-*   Bogdan Chadkin (https://github.com/TrySound)
-*   Brian Woodward (https://twitter.com/doowb)
-*   Devon Govett (http://badassjs.com)
-*   Elan Shanker (https://github.com/es128)
-*   FabrÃ­cio MattÃ© (https://ultcombo.js.org)
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
-*   Martin KolÃ¡rik (https://kolarik.sk)
-*   Olsten Larck (https://i.am.charlike.online)
-*   Paul Miller (paulmillr.com)
-*   Tom Byrer (https://github.com/tomByrer)
-*   Tyler Akins (http://rumkin.com)
-*   Peter Bright <drpizza@quiscalusmexicanus.org> (https://github.com/drpizza)
-*   Kuba Juszczyk (https://github.com/ku8ar)
+ - null (https://github.com/DianeLooney)
+ - Amila Welihinda (amilajack.com)
+ - Bogdan Chadkin (https://github.com/TrySound)
+ - Brian Woodward (https://twitter.com/doowb)
+ - Devon Govett (http://badassjs.com)
+ - Elan Shanker (https://github.com/es128)
+ - FabrÃ­cio MattÃ© (https://ultcombo.js.org)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Martin KolÃ¡rik (https://kolarik.sk)
+ - Olsten Larck (https://i.am.charlike.online)
+ - Paul Miller (paulmillr.com)
+ - Tom Byrer (https://github.com/tomByrer)
+ - Tyler Akins (http://rumkin.com)
+ - Peter Bright <drpizza@quiscalusmexicanus.org> (https://github.com/drpizza)
+ - Kuba Juszczyk (https://github.com/ku8ar)
+
 
 > The MIT License (MIT)
 >
@@ -2663,7 +2691,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## minimist@v1.2.8
 
@@ -2693,7 +2721,7 @@ Author: James Halliday <mail@substack.net> (http://substack.net)
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## n-readlines@v1.0.1
 
@@ -2724,7 +2752,7 @@ Author: Yoan Arnaudov <jonidev@gmail.com>
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## nanoid@v3.3.8
 
@@ -2754,7 +2782,7 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## p-limit@v4.0.0
 
@@ -2773,7 +2801,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## p-locate@v6.0.0
 
@@ -2792,7 +2820,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## parse-entities@v2.0.0
 
@@ -2802,7 +2830,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -2827,7 +2856,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## parse-json@v8.1.0
 
@@ -2846,7 +2875,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## path-exists@v5.0.0
 
@@ -2865,7 +2894,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## picocolors@v1.1.1
 
@@ -2890,7 +2919,7 @@ Author: Alexey Raspopov
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 > OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## picomatch@v2.3.1
 
@@ -2922,7 +2951,7 @@ Author: Jon Schlinkert (https://github.com/jonschlinkert)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## pkg-dir@v7.0.0
 
@@ -2941,7 +2970,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## please-upgrade-node@v3.2.0
 
@@ -2974,7 +3003,7 @@ Author: typicode
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## postcss@v8.5.3
 
@@ -3005,7 +3034,7 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## postcss-less@v6.0.0
 
@@ -3040,7 +3069,7 @@ Author: Denys Kniazevych <webschik@gmail.com>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## postcss-media-query-parser@v0.2.3
 
@@ -3051,7 +3080,7 @@ Homepage: <https://github.com/dryoma/postcss-media-query-parser>
 Repository: <git+https://github.com/dryoma/postcss-media-query-parser.git>
 Author: dryoma
 
-***
+----------------------------------------
 
 ## postcss-scss@v4.0.9
 
@@ -3081,7 +3110,7 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## postcss-selector-parser@v2.2.3
 
@@ -3112,7 +3141,7 @@ Author: Ben Briggs <beneb.info@gmail.com> (http://beneb.info)
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 > OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## postcss-values-parser@v2.0.1
 
@@ -3144,7 +3173,7 @@ Author: Andrew Powell (shellscape) <andrew@shellscape.org> (http://shellscape.or
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 > OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## pseudomap@v1.0.2
 
@@ -3171,7 +3200,7 @@ Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## queue-microtask@v1.2.3
 
@@ -3203,7 +3232,7 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## remark-footnotes@v2.0.0
 
@@ -3213,7 +3242,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -3238,7 +3268,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## remark-math@v3.0.1
 
@@ -3248,10 +3278,11 @@ License: MIT
 Author: Junyoung Choi <fluke8259@gmail.com> (https://rokt33r.github.io)
 Contributors:
 
-*   Junyoung Choi <fluke8259@gmail.com> (https://rokt33r.github.io)
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Junyoung Choi <fluke8259@gmail.com> (https://rokt33r.github.io)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 
-***
+
+----------------------------------------
 
 ## remark-parse@v8.0.3
 
@@ -3262,13 +3293,14 @@ Homepage: <https://remark.js.org>
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Eugene Sharygin <eush77@gmail.com>
-*   Junyoung Choi <fluke8259@gmail.com>
-*   Elijah Hamovitz <elijahhamovitz@gmail.com>
-*   Ika <ikatyang@gmail.com>
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Eugene Sharygin <eush77@gmail.com>
+ - Junyoung Choi <fluke8259@gmail.com>
+ - Elijah Hamovitz <elijahhamovitz@gmail.com>
+ - Ika <ikatyang@gmail.com>
 
-***
+
+----------------------------------------
 
 ## repeat-string@v1.6.1
 
@@ -3279,11 +3311,12 @@ Homepage: <https://github.com/jonschlinkert/repeat-string>
 Author: Jon Schlinkert (http://github.com/jonschlinkert)
 Contributors:
 
-*   Brian Woodward <brian.woodward@gmail.com> (https://github.com/doowb)
-*   Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)
-*   Linus UnnebÃ¤ck <linus@folkdatorn.se> (http://linus.unnebÃ¤ck.se)
-*   Thijs Busser <tbusser@gmail.com> (http://tbusser.net)
-*   Titus <tituswormer@gmail.com> (wooorm.com)
+ - Brian Woodward <brian.woodward@gmail.com> (https://github.com/doowb)
+ - Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)
+ - Linus UnnebÃ¤ck <linus@folkdatorn.se> (http://linus.unnebÃ¤ck.se)
+ - Thijs Busser <tbusser@gmail.com> (http://tbusser.net)
+ - Titus <tituswormer@gmail.com> (wooorm.com)
+
 
 > The MIT License (MIT)
 >
@@ -3307,7 +3340,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## reusify@v1.0.4
 
@@ -3340,7 +3373,7 @@ Author: Matteo Collina <hello@matteocollina.com>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## run-parallel@v1.2.0
 
@@ -3372,7 +3405,7 @@ Author: Feross Aboukhadijeh <feross@feross.org> (https://feross.org)
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## sdbm@v2.0.0
 
@@ -3391,7 +3424,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## semver@v7.7.1
 
@@ -3417,7 +3450,7 @@ Author: GitHub Inc.
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## semver-compare@v1.0.0
 
@@ -3447,7 +3480,7 @@ Author: James Halliday <mail@substack.net> (http://substack.net)
 > IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## sigmund@v1.0.1
 
@@ -3473,7 +3506,7 @@ Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## simple-html-tokenizer@v0.5.11
 
@@ -3502,7 +3535,7 @@ Repository: <https://github.com/tildeio/simple-html-tokenizer.git>
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## smol-toml@v1.3.1
 
@@ -3516,14 +3549,14 @@ Author: Cynthia <cyyynthia@borkenware.com>
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are met:
 >
-> 1.  Redistributions of source code must retain the above copyright notice, this
->     list of conditions and the following disclaimer.
-> 2.  Redistributions in binary form must reproduce the above copyright notice,
->     this list of conditions and the following disclaimer in the
->     documentation and/or other materials provided with the distribution.
-> 3.  Neither the name of the copyright holder nor the names of its contributors
->     may be used to endorse or promote products derived from this software without
->     specific prior written permission.
+> 1. Redistributions of source code must retain the above copyright notice, this
+>    list of conditions and the following disclaimer.
+> 2. Redistributions in binary form must reproduce the above copyright notice,
+>    this list of conditions and the following disclaimer in the
+>    documentation and/or other materials provided with the distribution.
+> 3. Neither the name of the copyright holder nor the names of its contributors
+>    may be used to endorse or promote products derived from this software without
+>    specific prior written permission.
 >
 > THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 > ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -3536,7 +3569,7 @@ Author: Cynthia <cyyynthia@borkenware.com>
 > OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-***
+----------------------------------------
 
 ## state-toggle@v1.0.3
 
@@ -3546,7 +3579,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -3571,7 +3605,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## strip-ansi@v7.1.0
 
@@ -3590,7 +3624,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## to-fast-properties@v4.0.0
 
@@ -3602,9 +3636,9 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https:/sindresorhus.com)
 > MIT License
 >
 > Copyright (c) Petka Antonov
-> Benjamin Gruenbaum
-> John-David Dalton
-> Sindre Sorhus
+>               Benjamin Gruenbaum
+>               John-David Dalton
+>               Sindre Sorhus
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
@@ -3612,7 +3646,7 @@ Author: Sindre Sorhus <sindresorhus@gmail.com> (https:/sindresorhus.com)
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## to-regex-range@v5.0.1
 
@@ -3623,8 +3657,9 @@ Homepage: <https://github.com/micromatch/to-regex-range>
 Author: Jon Schlinkert (https://github.com/jonschlinkert)
 Contributors:
 
-*   Jon Schlinkert (http://twitter.com/jonschlinkert)
-*   Rouven WeÃŸling (www.rouvenwessling.de)
+ - Jon Schlinkert (http://twitter.com/jonschlinkert)
+ - Rouven WeÃŸling (www.rouvenwessling.de)
+
 
 > The MIT License (MIT)
 >
@@ -3648,7 +3683,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## trim@v1.0.1
 
@@ -3658,7 +3693,7 @@ License: MIT
 Repository: <https://github.com/Trott/trim.git>
 Author: TJ Holowaychuk <tj@vision-media.ca>
 
-***
+----------------------------------------
 
 ## trim-trailing-lines@v1.1.4
 
@@ -3668,7 +3703,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -3693,7 +3729,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## trough@v1.0.5
 
@@ -3703,7 +3739,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -3727,7 +3764,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## ts-api-utils@v2.0.1
 
@@ -3739,6 +3776,7 @@ Author: JoshuaKGoldberg <npm@joshuakgoldberg.com>
 
 > # MIT License
 
+>
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
 > 'Software'), to deal in the Software without restriction, including
@@ -3758,7 +3796,7 @@ Author: JoshuaKGoldberg <npm@joshuakgoldberg.com>
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## typescript@v5.7.3
 
@@ -3777,7 +3815,7 @@ Author: Microsoft Corp.
 >
 > TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 >
-> 1.  Definitions.
+> 1. Definitions.
 >
 > "License" shall mean the terms and conditions for use, reproduction, and distribution as defined by Sections 1 through 9 of this document.
 >
@@ -3799,11 +3837,11 @@ Author: Microsoft Corp.
 >
 > "Contributor" shall mean Licensor and any individual or Legal Entity on behalf of whom a Contribution has been received by Licensor and subsequently incorporated within the Work.
 >
-> 2.  Grant of Copyright License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
+> 2. Grant of Copyright License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
 >
-> 3.  Grant of Patent License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.
+> 3. Grant of Patent License. Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.
 >
-> 4.  Redistribution. You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
+> 4. Redistribution. You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
 >
 > You must give any other recipients of the Work or Derivative Works a copy of this License; and
 >
@@ -3813,19 +3851,19 @@ Author: Microsoft Corp.
 >
 > If the Work includes a "NOTICE" text file as part of its distribution, then any Derivative Works that You distribute must include a readable copy of the attribution notices contained within such NOTICE file, excluding those notices that do not pertain to any part of the Derivative Works, in at least one of the following places: within a NOTICE text file distributed as part of the Derivative Works; within the Source form or documentation, if provided along with the Derivative Works; or, within a display generated by the Derivative Works, if and wherever such third-party notices normally appear. The contents of the NOTICE file are for informational purposes only and do not modify the License. You may add Your own attribution notices within Derivative Works that You distribute, alongside or as an addendum to the NOTICE text from the Work, provided that such additional attribution notices cannot be construed as modifying the License. You may add Your own copyright statement to Your modifications and may provide additional or different license terms and conditions for use, reproduction, or distribution of Your modifications, or for any such Derivative Works as a whole, provided Your use, reproduction, and distribution of the Work otherwise complies with the conditions stated in this License.
 >
-> 5.  Submission of Contributions. Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.
+> 5. Submission of Contributions. Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.
 >
-> 6.  Trademarks. This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.
+> 6. Trademarks. This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.
 >
-> 7.  Disclaimer of Warranty. Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
+> 7. Disclaimer of Warranty. Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
 >
-> 8.  Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+> 8. Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
 >
-> 9.  Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
+> 9. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
 >
 > END OF TERMS AND CONDITIONS
 
-***
+----------------------------------------
 
 ## unherit@v1.1.3
 
@@ -3835,7 +3873,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -3859,7 +3898,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unified@v9.2.2
 
@@ -3870,12 +3909,13 @@ Homepage: <https://unifiedjs.com>
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Junyoung Choi <fluke8259@gmail.com>
-*   Hernan Rajchert <hrajchert@gmail.com>
-*   Christian Murphy <christian.murphy.42@gmail.com>
-*   Vse Mozhet Byt <vsemozhetbyt@gmail.com>
-*   Richard Littauer <richard.littauer@gmail.com>
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Junyoung Choi <fluke8259@gmail.com>
+ - Hernan Rajchert <hrajchert@gmail.com>
+ - Christian Murphy <christian.murphy.42@gmail.com>
+ - Vse Mozhet Byt <vsemozhetbyt@gmail.com>
+ - Richard Littauer <richard.littauer@gmail.com>
+
 
 > (The MIT License)
 >
@@ -3899,7 +3939,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## uniq@v1.0.1
 
@@ -3931,7 +3971,7 @@ Author: Mikola Lysenko
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unist-util-is@v4.1.0
 
@@ -3941,9 +3981,10 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Christian Murphy <christian.murphy.42@gmail.com>
-*   Lucas Brandstaetter <lucas@brandstaetter.tech> (https://github.com/Roang-zero1)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Christian Murphy <christian.murphy.42@gmail.com>
+ - Lucas Brandstaetter <lucas@brandstaetter.tech> (https://github.com/Roang-zero1)
+
 
 > (The MIT license)
 >
@@ -3968,7 +4009,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unist-util-remove-position@v2.0.1
 
@@ -3978,7 +4019,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -4003,7 +4045,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unist-util-stringify-position@v2.0.3
 
@@ -4013,7 +4055,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -4038,7 +4081,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unist-util-visit@v2.0.3
 
@@ -4048,9 +4091,10 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Eugene Sharygin <eush77@gmail.com>
-*   Richard Gibson <richard.gibson@gmail.com>
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Eugene Sharygin <eush77@gmail.com>
+ - Richard Gibson <richard.gibson@gmail.com>
+
 
 > (The MIT License)
 >
@@ -4075,7 +4119,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## unist-util-visit-parents@v3.1.1
 
@@ -4085,7 +4129,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -4110,7 +4155,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## url-or-path@v2.3.2
 
@@ -4142,7 +4187,7 @@ Author: fisker Cheung <lionkay@gmail.com> (https://www.fiskercheung.com/)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## vfile@v4.2.1
 
@@ -4152,12 +4197,13 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Brendan Abbott <brendan.abbott@temando.com>
-*   Denys Dovhan <email@denysdovhan.com>
-*   Kyle Mathews <mathews.kyle@gmail.com>
-*   Shinnosuke Watanabe <snnskwtnb@gmail.com>
-*   Sindre Sorhus <sindresorhus@gmail.com>
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Brendan Abbott <brendan.abbott@temando.com>
+ - Denys Dovhan <email@denysdovhan.com>
+ - Kyle Mathews <mathews.kyle@gmail.com>
+ - Shinnosuke Watanabe <snnskwtnb@gmail.com>
+ - Sindre Sorhus <sindresorhus@gmail.com>
+
 
 > (The MIT License)
 >
@@ -4181,7 +4227,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## vfile-location@v3.2.0
 
@@ -4191,8 +4237,9 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
-*   Christian Murphy <christian.murphy.42@gmail.com>
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Christian Murphy <christian.murphy.42@gmail.com>
+
 
 > (The MIT License)
 >
@@ -4217,7 +4264,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## vfile-message@v2.0.4
 
@@ -4227,7 +4274,8 @@ License: MIT
 Author: Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
 Contributors:
 
-*   Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+ - Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)
+
 
 > (The MIT License)
 >
@@ -4252,7 +4300,7 @@ Contributors:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## vnopts@v2.0.0
 
@@ -4284,7 +4332,7 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## wcwidth.js@v2.0.0
 
@@ -4296,9 +4344,11 @@ Repository: <https://github.com/mycoboco/wcwidth.js.git>
 Author: Woong Jun <woong.jun@gmail.com> (http://code.woong.org/)
 Contributors:
 
-*   Tim Oxley <secoif@gmail.com> (http://campjs.com/)
+ - Tim Oxley <secoif@gmail.com> (http://campjs.com/)
 
-> # wcwidth.js: a javascript portng of C's wcwidth()
+
+> wcwidth.js: a javascript portng of C's wcwidth()
+> ================================================
 >
 > Copyright (C) 2012-2014 by Woong Jun and Tim Oxley.
 >
@@ -4315,7 +4365,8 @@ Contributors:
 > The above copyright notice and this permission notice shall be included in all
 > copies or substantial portions of the Software.
 >
-> THIS SOFTWARE IS PROVIDED \`\`AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+>
+> THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 > INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 > FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR
 > OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
@@ -4326,7 +4377,7 @@ Contributors:
 > IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 > OF SUCH DAMAGE.
 
-***
+----------------------------------------
 
 ## xtend@v4.0.2
 
@@ -4337,8 +4388,9 @@ Homepage: <https://github.com/Raynos/xtend>
 Author: Raynos <raynos2@gmail.com>
 Contributors:
 
-*   Jake Verbaten
-*   Matt Esch
+ - Jake Verbaten
+ - Matt Esch
+
 
 > The MIT License (MIT)
 > Copyright (c) 2012-2014 Raynos.
@@ -4361,7 +4413,7 @@ Contributors:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > THE SOFTWARE.
 
-***
+----------------------------------------
 
 ## yallist@v2.1.2
 
@@ -4387,7 +4439,7 @@ Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 > ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 > IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## yaml@v1.10.2
 
@@ -4411,7 +4463,7 @@ Author: Eemeli Aro <eemeli@gmail.com>
 > TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 > THIS SOFTWARE.
 
-***
+----------------------------------------
 
 ## yaml-unist-parser@v2.0.1
 
@@ -4443,7 +4495,7 @@ Author: Ika <ikatyang@gmail.com> (https://github.com/ikatyang)
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-***
+----------------------------------------
 
 ## yocto-queue@v1.1.1
 

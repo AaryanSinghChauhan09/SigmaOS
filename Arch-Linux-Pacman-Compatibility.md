@@ -4,14 +4,14 @@
 
 SigmaOS includes a zero-dependency, clean-room subsystem providing comprehensive compatibility with **Arch Linux** and its **Pacman** package manager. This subsystem allows Arch packages, PKGBUILD files, and AUR (Arch User Repository) packages to be parsed, resolved, and managed natively on SigmaOS.
 
-***
+---
 
 ## Key Modules
 
-*   [`src/sigpkg/arch_pacman_engine.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/arch_pacman_engine.rs): Pacman package manager, PKGBUILD parser, and AUR helper
-*   [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, Arch `.pkg.tar`, and other formats
+- [`src/sigpkg/arch_pacman_engine.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/arch_pacman_engine.rs): Pacman package manager, PKGBUILD parser, and AUR helper
+- [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, Arch `.pkg.tar`, and other formats
 
-***
+---
 
 ## Features
 
@@ -24,28 +24,30 @@ SigmaOS includes a zero-dependency, clean-room subsystem providing comprehensive
 | **Repository Management** | Core, extra, community, multilib | Full Arch repository support |
 | **Dependency Resolution** | Recursive dependency graph | Handles complex dependency trees |
 
-***
+---
 
 ## Architecture Flow
 
-    Arch Linux Repositories
-           │ (Download Packages)
-           ▼
-    [Pacman Database] ──────> Manages package metadata
-           │
-           ▼
-    [Dependency Resolver] ───> Resolves Depends/MakeDepends/OptDepends
-           │
-           ▼
-    [Arch Build System] ─────> Parses PKGBUILD files
-           │
-           ▼
-    [AUR Helper] ────────────> Manages AUR packages
-           │
-           ▼
-    [SigmaPkg Native Index] ───────> Integrates with native package system
+```
+Arch Linux Repositories
+       │ (Download Packages)
+       ▼
+[Pacman Database] ──────> Manages package metadata
+       │
+       ▼
+[Dependency Resolver] ───> Resolves Depends/MakeDepends/OptDepends
+       │
+       ▼
+[Arch Build System] ─────> Parses PKGBUILD files
+       │
+       ▼
+[AUR Helper] ────────────> Manages AUR packages
+       │
+       ▼
+[SigmaPkg Native Index] ───────> Integrates with native package system
+```
 
-***
+---
 
 ## CLI Usage
 
@@ -69,7 +71,7 @@ sigma-pacman -Q
 sigma-pacman -R nginx
 ```
 
-***
+---
 
 ## Implementation Details
 
@@ -112,23 +114,22 @@ pub struct PacmanDatabase {
 ### Repository Configuration
 
 Arch Linux repositories are automatically configured:
-
-*   **core**: Essential packages
-*   **extra**: Additional packages
-*   **community**: Community-maintained packages
-*   **multilib**: 32-bit compatibility libraries
+- **core**: Essential packages
+- **extra**: Additional packages
+- **community**: Community-maintained packages
+- **multilib**: 32-bit compatibility libraries
 
 ### Dependency Fields
 
-*   **depends**: Required dependencies
-*   **makedepends**: Build-time dependencies
-*   **checkdepends**: Test dependencies
-*   **optdepends**: Optional dependencies
-*   **provides**: Virtual packages provided
-*   **conflicts**: Conflicting packages
-*   **replaces**: Packages this replaces
+- **depends**: Required dependencies
+- **makedepends**: Build-time dependencies
+- **checkdepends**: Test dependencies
+- **optdepends**: Optional dependencies
+- **provides**: Virtual packages provided
+- **conflicts**: Conflicting packages
+- **replaces**: Packages this replaces
 
-***
+---
 
 ## PKGBUILD Support
 
@@ -159,13 +160,12 @@ pub struct ArchBuildSystem {
 ```
 
 The ABS provides:
+- PKGBUILD parsing
+- SRCINFO extraction
+- Package building capabilities
+- Source integration
 
-*   PKGBUILD parsing
-*   SRCINFO extraction
-*   Package building capabilities
-*   Source integration
-
-***
+---
 
 ## AUR Integration
 
@@ -179,10 +179,10 @@ pub struct AURHelper {
 
 ### AUR Features
 
-*   **Package Search**: Search AUR for packages
-*   **Package Information**: Get detailed AUR package info
-*   **Package Installation**: Install AUR packages with dependencies
-*   **PKGBUILD Integration**: Clone and build from AUR
+- **Package Search**: Search AUR for packages
+- **Package Information**: Get detailed AUR package info
+- **Package Installation**: Install AUR packages with dependencies
+- **PKGBUILD Integration**: Clone and build from AUR
 
 ### AUR Workflow
 
@@ -197,29 +197,28 @@ sigma-pkg aur-info yay
 sigma-pkg aur-install yay
 ```
 
-***
+---
 
 ## Integration with SigmaOS
 
 The Arch Pacman engine integrates seamlessly with:
+- **SigmaPkg**: Native package manager
+- **Repository System**: Cross-distro repository management
+- **Filesystem**: Arch-standard filesystem layout
+- **Service Management**: Systemd integration
 
-*   **SigmaPkg**: Native package manager
-*   **Repository System**: Cross-distro repository management
-*   **Filesystem**: Arch-standard filesystem layout
-*   **Service Management**: Systemd integration
-
-***
+---
 
 ## Benefits
 
-1.  **Zero-Dependency**: No external Pacman tools required
-2.  **Arch Ecosystem**: Access to vast Arch package ecosystem
-3.  **Rolling Release**: Latest software versions
-4.  **AUR Access**: Community-driven package repository
-5.  **ABS Support**: Build packages from source
-6.  **Minimal Overhead**: Efficient package management
+1. **Zero-Dependency**: No external Pacman tools required
+2. **Arch Ecosystem**: Access to vast Arch package ecosystem
+3. **Rolling Release**: Latest software versions
+4. **AUR Access**: Community-driven package repository
+5. **ABS Support**: Build packages from source
+6. **Minimal Overhead**: Efficient package management
 
-***
+---
 
 ## Examples
 
@@ -268,7 +267,7 @@ sigma-pacman -Sy
 sigma-pacman -S nginx
 ```
 
-***
+---
 
 ## Comparison with Original Pacman
 
@@ -280,27 +279,26 @@ sigma-pacman -S nginx
 | **Configuration** | /etc/pacman.conf | Native configuration system |
 | **Tool Dependency** | pacman, makepkg | Zero external tools |
 
-***
+---
 
 ## Repository Mirrors
 
 SigmaOS supports standard Arch Linux mirror configuration:
+- Official Arch mirrors
+- Custom mirror configuration
+- Mirror ranking and selection
+- Geographic mirror optimization
 
-*   Official Arch mirrors
-*   Custom mirror configuration
-*   Mirror ranking and selection
-*   Geographic mirror optimization
-
-***
+---
 
 ## Security Features
 
-*   **Package Signing**: PGP signature verification
-*   **SHA256 Checksums**: Package integrity verification
-*   **Dependency Validation**: Secure dependency resolution
-*   **Build Verification**: Reproducible builds
+- **Package Signing**: PGP signature verification
+- **SHA256 Checksums**: Package integrity verification
+- **Dependency Validation**: Secure dependency resolution
+- **Build Verification**: Reproducible builds
 
-***
+---
 
-**Generated:** August 24, 2026\
+**Generated:** August 24, 2026  
 **Repository:** [SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)

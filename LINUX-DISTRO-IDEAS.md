@@ -2,13 +2,13 @@
 
 > A comprehensive collection of ideas, features, and philosophies absorbed from leading Linux distributions into SigmaOS.
 
-***
+---
 
 ## 🌊 Overview
 
 SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD systems, and beyond. This document catalogs those inspirations and tracks their implementation status.
 
-***
+---
 
 ## 🐧 Arch Linux Ideas
 
@@ -117,7 +117,7 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **Gaming optimization** | Game mode | 🚧 In Progress | `src/performance/gaming.rs` |
 | **Education layout** | Student-focused UI | 📌 Planned | - |
 
-***
+---
 
 ## 🐡 BSD System Ideas
 
@@ -134,30 +134,27 @@ SigmaOS draws inspiration from the best ideas across the Linux ecosystem, BSD sy
 | **Ports system** | FreeBSD/NetBSD | 🚧 In Progress | `src/sigpkg/ports.rs` |
 | **DTrace** | Solaris/FreeBSD | 📌 Planned | - |
 
-***
+---
 
 ## 💡 Innovation Ideas from Distro Survey
 
 ### Performance
-
-*   **Zstd everywhere** (Arch): Zstd compression for packages, initramfs, and filesystem - ✅ Implemented
-*   **io\_uring networking** (Fedora/kernel): Zero-copy I/O - 🚧 In Progress
-*   **Btrfs CoW snapshots** (openSUSE): Automatic pre-update snapshots - ✅ Implemented
-*   **Transparent huge pages** (RHEL): Automatic memory optimization - ✅ Implemented
+- **Zstd everywhere** (Arch): Zstd compression for packages, initramfs, and filesystem - ✅ Implemented
+- **io_uring networking** (Fedora/kernel): Zero-copy I/O - 🚧 In Progress
+- **Btrfs CoW snapshots** (openSUSE): Automatic pre-update snapshots - ✅ Implemented
+- **Transparent huge pages** (RHEL): Automatic memory optimization - ✅ Implemented
 
 ### Security
-
-*   **Unprivileged user namespaces OFF by default** (Debian): Reduce attack surface - ✅ Implemented
-*   **ASLR+PIE everywhere** (Hardened Gentoo): Memory randomization - ✅ Implemented
-*   **Stack canaries** (OpenBSD): Buffer overflow protection - ✅ Implemented
-*   **FORTIFY\_SOURCE=3** (Ubuntu): Stricter source fortification - ✅ Implemented
+- **Unprivileged user namespaces OFF by default** (Debian): Reduce attack surface - ✅ Implemented
+- **ASLR+PIE everywhere** (Hardened Gentoo): Memory randomization - ✅ Implemented
+- **Stack canaries** (OpenBSD): Buffer overflow protection - ✅ Implemented
+- **FORTIFY_SOURCE=3** (Ubuntu): Stricter source fortification - ✅ Implemented
 
 ### Developer Experience
+- **devenv.sh** (NixOS community): Reproducible dev environments - 📌 Planned
+- **mise (asdf replacement)**: Universal version manager - 📌 Planned
+- **Flatpak SDK** (Fedora/GNOME): Portable development kit - 📌 Planned
 
-*   **devenv.sh** (NixOS community): Reproducible dev environments - 📌 Planned
-*   **mise (asdf replacement)**: Universal version manager - 📌 Planned
-*   **Flatpak SDK** (Fedora/GNOME): Portable development kit - 📌 Planned
-
-***
+---
 
 *Part of SigmaOS Documentation | Updated: 2026-08-23*

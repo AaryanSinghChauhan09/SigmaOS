@@ -102,13 +102,12 @@ impl SigmaAPT {
 ```
 
 **Key Features:**
-
-*   Dependency resolution
-*   Configuration file handling
-*   Package cache management
-*   Release management
-*   Recommends/suggests support
-*   Interactive configuration
+- Dependency resolution
+- Configuration file handling
+- Package cache management
+- Release management
+- Recommends/suggests support
+- Interactive configuration
 
 ### 2. Debian Policy Compliance
 
@@ -155,12 +154,11 @@ impl DebianPolicy {
 ```
 
 **Key Features:**
-
-*   Filesystem hierarchy compliance
-*   Package naming conventions
-*   Maintainer script standards
-*   Dependency policy enforcement
-*   Configuration file handling
+- Filesystem hierarchy compliance
+- Package naming conventions
+- Maintainer script standards
+- Dependency policy enforcement
+- Configuration file handling
 
 ### 3. Release Management
 
@@ -223,12 +221,11 @@ impl DebianReleaseManager {
 ```
 
 **Key Features:**
-
-*   Stable/testing/unstable releases
-*   Release upgrade paths
-*   Configuration file preservation
-*   Obsolete package removal
-*   Sources list management
+- Stable/testing/unstable releases
+- Release upgrade paths
+- Configuration file preservation
+- Obsolete package removal
+- Sources list management
 
 ## Security Implementation
 
@@ -289,12 +286,11 @@ pub struct DebianDesktop {
 ```
 
 **Supported Desktops:**
-
-*   GNOME
-*   KDE Plasma
-*   XFCE
-*   LXDE
-*   MATE
+- GNOME
+- KDE Plasma
+- XFCE
+- LXDE
+- MATE
 
 ## Installation System
 
@@ -355,9 +351,10 @@ pub struct SourcesEntry {
 ```
 
 **Example Configuration:**
-
-    deb http://deb.debian.org/debian stable main contrib non-free
-    deb http://security.debian.org/debian-security stable/updates main contrib non-free
+```
+deb http://deb.debian.org/debian stable main contrib non-free
+deb http://security.debian.org/debian-security stable/updates main contrib non-free
+```
 
 ## Testing
 
@@ -454,19 +451,19 @@ cache.clean_obsolete()?;
 
 ## Documentation Resources
 
-*   [Debian Documentation](https://www.debian.org/doc/)
-*   [APT Documentation](https://manpages.debian.org/apt)
-*   [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
-*   [Debian Developer's Reference](https://www.debian.org/doc/manuals/devel-ref-manual/)
-*   [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
+- [Debian Documentation](https://www.debian.org/doc/)
+- [APT Documentation](https://manpages.debian.org/apt)
+- [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
+- [Debian Developer's Reference](https://www.debian.org/doc/manuals/devel-ref-manual/)
+- [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
 
 ## Best Practices
 
-1.  **Stability First**: Prefer stable packages for production
-2.  **Policy Compliance**: Follow Debian policy strictly
-3.  **Security**: Keep security updates current
-4.  **Configuration**: Preserve user configurations during upgrades
-5.  **Testing**: Test upgrades in testing environment first
+1. **Stability First**: Prefer stable packages for production
+2. **Policy Compliance**: Follow Debian policy strictly
+3. **Security**: Keep security updates current
+4. **Configuration**: Preserve user configurations during upgrades
+5. **Testing**: Test upgrades in testing environment first
 
 ## Migration Tools
 
@@ -478,20 +475,19 @@ assistant.migrate_from(DistroType::Ubuntu)?;
 ```
 
 **Supported Source Distributions:**
-
-*   Ubuntu
-*   Linux Mint
-*   Fedora
-*   Arch Linux
+- Ubuntu
+- Linux Mint
+- Fedora
+- Arch Linux
 
 ## Future Enhancements
 
-*   Enhanced policy validation
-*   Improved release upgrade automation
-*   Better configuration file handling
-*   Enhanced security features
-*   Improved performance optimization
+- Enhanced policy validation
+- Improved release upgrade automation
+- Better configuration file handling
+- Enhanced security features
+- Improved performance optimization
 
-***
+---
 
 *Last updated: August 21, 2026*

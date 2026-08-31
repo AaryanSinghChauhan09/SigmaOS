@@ -2,7 +2,7 @@
 
 This document provides a comprehensive technical specification of **SigmaBus** — the high-performance, zero-dependency, cacheline-aligned inter-process communication (IPC) message bus of **SigmaOS** — alongside complementary IPC subsystems including HelenOS-inspired asynchronous messaging, POSIX pipes, Unix domain sockets, and zero-copy shared memory channels.
 
-***
+---
 
 ## 1. IPC Architecture Overview
 
@@ -31,7 +31,7 @@ graph TB
     SandboxedApp <--> SigmaBus
 ```
 
-***
+---
 
 ## 2. SigmaBus Protocol Specification (`src/ipc/sigma_bus.rs`)
 
@@ -85,7 +85,7 @@ classDiagram
     }
 ```
 
-***
+---
 
 ### 2.2 O(1) Fast Interface & Member Resolution
 
@@ -104,7 +104,7 @@ pub fn fnv1a_hash(data: &str) -> u64 {
 
 When a message arrives at the broker, destination lookup and method matching are performed via direct integer comparisons in O(1) time.
 
-***
+---
 
 ## 3. Communication Patterns & Workflows
 
@@ -144,7 +144,7 @@ sequenceDiagram
     end
 ```
 
-***
+---
 
 ## 4. Alternative IPC Primitives in SigmaOS
 
@@ -156,7 +156,7 @@ sequenceDiagram
 | **Unix Sockets** | [`src/ipc/unix_socket.rs`](../src/ipc/unix_socket.rs)| POSIX stream & datagram sockets | Linux compatibility layer, shell pipelines |
 | **FIFO Pipes** | [`src/ipc/pipes.rs`](../src/ipc/pipes.rs) | Unidirectional byte streams | CLI command chaining (`stdout \| stdin`) |
 
-***
+---
 
 ## 5. SigmaBus Code Implementation Examples
 
@@ -193,7 +193,7 @@ pub fn emit_battery_warning(sender_id: u64, battery_percent: u8) -> SigmaMessage
 }
 ```
 
-***
+---
 
 ## 6. IPC Performance Benchmarks & Comparison
 
@@ -205,13 +205,13 @@ pub fn emit_battery_warning(sender_id: u64, battery_percent: u8) -> SigmaMessage
 | **HelenOS Async IPC** | 64 Bytes | 450 ns | ~2,200,000 | Yes |
 | **SigmaOS SigmaBus (Rust)** | **64 Bytes** | **< 120 ns** | **> 8,300,000** | **Yes (Full Zero-Copy)** |
 
-***
+---
 
 ## 7. Related Documentation
 
-*   [No-Std Architecture](No-Std-Architecture) — Bare-metal `klib` foundations.
-*   [Architecture Overview](Architecture-Overview) — Layered kernel architecture.
-*   [Scheduler Architecture](Scheduler-Architecture) — Task dispatching and thread waking.
-*   [Security & Hardening](Security-Hardening) — Sandbox capabilities over IPC channels.
+- [No-Std Architecture](No-Std-Architecture.md) — Bare-metal `klib` foundations.
+- [Architecture Overview](Architecture-Overview.md) — Layered kernel architecture.
+- [Scheduler Architecture](Scheduler-Architecture.md) — Task dispatching and thread waking.
+- [Security & Hardening](Security-Hardening.md) — Sandbox capabilities over IPC channels.
 
 *SigmaOS SigmaBus Architecture Specification — Maintained by the SigmaOS Core Engineering Team.*

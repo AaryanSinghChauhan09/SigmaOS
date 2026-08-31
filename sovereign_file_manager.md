@@ -2,7 +2,7 @@
 
 Inspired by **Dolphin's robust metadata indexing**, **Ranger's terminal column layout**, and **Midnight Commander's split-pane design**, this document defines a complete, functional, `#![no_std]` file manager engine. It features OOP pane navigation, custom user-defined sorting/filtering functions (UDF), a copy/paste transaction buffer, and integration with S-SEC capability tokens.
 
-***
+---
 
 ## 🏗️ Component Implementation Source Code
 

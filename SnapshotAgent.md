@@ -1,16 +1,20 @@
-# SnapshotAgent
+﻿# SnapshotAgent
 
 The `SnapshotAgent` provides a powerful way to record and replay HTTP requests for testing purposes. It extends `MockAgent` to enable automatic snapshot testing, eliminating the need to manually define mock responses.
 
 ## Use Cases
 
-*   **Integration Testing**: Record real API interactions and replay them in tests
+- **Integration Testing**: Record real API interactions and replay them in tests
 
-*   **Offline Development**: Work with APIs without network connectivity
 
-*   **Consistent Test Data**: Ensure tests use the same responses across runs
+- **Offline Development**: Work with APIs without network connectivity
 
-*   **API Contract Testing**: Capture and validate API behavior over time
+
+- **Consistent Test Data**: Ensure tests use the same responses across runs
+
+
+- **API Contract Testing**: Capture and validate API behavior over time
+
 
 ## Constructor
 
@@ -20,22 +24,23 @@ new SnapshotAgent([options])
 
 ### Parameters
 
-*   **options** `Object` (optional)
-    *   **mode** `String` - The snapshot mode: `'record'`, `'playback'`, or `'update'`. Default: `'record'`
-    *   **snapshotPath** `String` - Path to the snapshot file for loading/saving
-    *   **maxSnapshots** `Number` - Maximum number of snapshots to keep in memory. Default: `Infinity`
-    *   **autoFlush** `Boolean` - Whether to automatically save snapshots to disk. Default: `false`
-    *   **flushInterval** `Number` - Interval in milliseconds for auto-flush. Default: `30000`
-    *   **matchHeaders** `Array<String>` - Specific headers to include in request matching. Default: all headers
-    *   **ignoreHeaders** `Array<String>` - Headers to ignore during request matching
-    *   **excludeHeaders** `Array<String>` - Headers to exclude from snapshots (for security)
-    *   **matchBody** `Boolean` - Whether to include request body in matching. Default: `true`
-    *   **matchQuery** `Boolean` - Whether to include query parameters in matching. Default: `true`
-    *   **caseSensitive** `Boolean` - Whether header matching is case-sensitive. Default: `false`
-    *   **shouldRecord** `Function` - Callback to determine if a request should be recorded
-    *   **shouldPlayback** `Function` - Callback to determine if a request should be played back
-    *   **excludeUrls** `Array` - URL patterns (strings or RegExp) to exclude from recording/playback
-    *   All other options from `MockAgent` are supported
+- **options** `Object` (optional)
+  - **mode** `String` - The snapshot mode: `'record'`, `'playback'`, or `'update'`. Default: `'record'`
+  - **snapshotPath** `String` - Path to the snapshot file for loading/saving
+  - **maxSnapshots** `Number` - Maximum number of snapshots to keep in memory. Default: `Infinity`
+  - **autoFlush** `Boolean` - Whether to automatically save snapshots to disk. Default: `false`
+  - **flushInterval** `Number` - Interval in milliseconds for auto-flush. Default: `30000`
+  - **matchHeaders** `Array<String>` - Specific headers to include in request matching. Default: all headers
+  - **ignoreHeaders** `Array<String>` - Headers to ignore during request matching
+  - **excludeHeaders** `Array<String>` - Headers to exclude from snapshots (for security)
+  - **matchBody** `Boolean` - Whether to include request body in matching. Default: `true`
+  - **matchQuery** `Boolean` - Whether to include query parameters in matching. Default: `true`
+  - **caseSensitive** `Boolean` - Whether header matching is case-sensitive. Default: `false`
+  - **shouldRecord** `Function` - Callback to determine if a request should be recorded
+  - **shouldPlayback** `Function` - Callback to determine if a request should be played back
+  - **excludeUrls** `Array` - URL patterns (strings or RegExp) to exclude from recording/playback
+  - All other options from `MockAgent` are supported
+
 
 ### Modes
 
@@ -102,7 +107,8 @@ Saves all recorded snapshots to a file.
 
 #### Parameters
 
-*   **filePath** `String` (optional) - Path to save snapshots. Uses constructor `snapshotPath` if not provided.
+- **filePath** `String` (optional) - Path to save snapshots. Uses constructor `snapshotPath` if not provided.
+
 
 #### Returns
 
@@ -254,7 +260,8 @@ Loads snapshots from a file.
 
 #### Parameters
 
-*   **filePath** `String` (optional) - Path to load snapshots from. Uses constructor `snapshotPath` if not provided.
+- **filePath** `String` (optional) - Path to load snapshots from. Uses constructor `snapshotPath` if not provided.
+
 
 #### Returns
 
@@ -478,17 +485,23 @@ const agent = new SnapshotAgent({
 
 **Important**: Snapshot files may contain sensitive data. Handle them securely:
 
-*   âœ… Add snapshot files to `.gitignore` if they contain real API data
+- âœ… Add snapshot files to `.gitignore` if they contain real API data
 
-*   âœ… Use environment-specific snapshots (dev/staging/prod)
 
-*   âœ… Regularly review snapshot contents for sensitive information
+- âœ… Use environment-specific snapshots (dev/staging/prod)
 
-*   âœ… Use the `excludeHeaders` option for production snapshots
 
-*   âŒ Never commit snapshots with real authentication tokens
+- âœ… Regularly review snapshot contents for sensitive information
 
-*   âŒ Don't share snapshot files containing personal data
+
+- âœ… Use the `excludeHeaders` option for production snapshots
+
+
+- âŒ Never commit snapshots with real authentication tokens
+
+
+- âŒ Don't share snapshot files containing personal data
+
 
 ```gitignore
 
@@ -622,18 +635,24 @@ const agent = new SnapshotAgent({ mode: 'playback', snapshotPath: './snapshots.j
 
 SnapshotAgent provides similar functionality to nock but is specifically designed for undici:
 
-*   âœ… Works with all undici APIs (`request`, `stream`, `pipeline`, etc.)
+- âœ… Works with all undici APIs (`request`, `stream`, `pipeline`, etc.)
 
-*   âœ… Supports undici-specific features (RetryAgent, connection pooling)
 
-*   âœ… Better TypeScript integration
+- âœ… Supports undici-specific features (RetryAgent, connection pooling)
 
-*   âœ… More efficient for high-performance scenarios
+
+- âœ… Better TypeScript integration
+
+
+- âœ… More efficient for high-performance scenarios
+
 
 ## See Also
 
-*   [MockAgent](./MockAgent) - Manual mocking for more control
+- [MockAgent](./MockAgent.md) - Manual mocking for more control
 
-*   [MockCallHistory](./MockCallHistory) - Inspecting request history
 
-*   [Testing Best Practices](../best-practices/writing-tests.md) - General testing guidance
+- [MockCallHistory](./MockCallHistory.md) - Inspecting request history
+
+
+- [Testing Best Practices](../best-practices/writing-tests.md) - General testing guidance

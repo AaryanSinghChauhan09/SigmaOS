@@ -4,52 +4,49 @@ This document details the complete, industrial-grade development plans, architec
 
 Rather than a simple fork or copy of Wine, SigmaWin is designed as an AI-driven, PQC-secured, and Indian compliance-ready capability sandbox. It guarantees that legacy Windows enterprise software executes securely, with zero-copy speeds, on top of the SigmaOS sovereign microkernel transaction bus.
 
-***
+---
 
 ## 🏗️ 1. Core Architectural Vision
 
 SigmaWin decomposes legacy Windows DLL piles and registry blobs into isolated, secure **NT-Capability Shards** overseen by the core security validator.
 
 ### Key Design Pillars
+1. **W^X Enforcement by Default**: Unlike Windows and standard Wine implementations, all loaded PE binaries are strictly subject to Write-XOR-Execute paging boundaries, preventing code injection at the loader level.
+2. **Unified .spkg Packaging**: Windows apps are packaged as immutable `.spkg` objects, storing files in content-addressed storage (CAS) hashes to eliminate registry/DLL bloat.
+3. **Indian Sovereign Compliance**: Integrated natively with India Stack API gates (UPI, Aadhaar, GST) to enable sovereign enterprise accounting and workflow execution within legacy Win32 binaries.
+4. **Self-Healing Rollbacks**: Launches are actively monitored by parent watchers; any crash or security violation automatically triggers a rollback of the package snapshot state in under 1ms.
 
-1.  **W^X Enforcement by Default**: Unlike Windows and standard Wine implementations, all loaded PE binaries are strictly subject to Write-XOR-Execute paging boundaries, preventing code injection at the loader level.
-2.  **Unified .spkg Packaging**: Windows apps are packaged as immutable `.spkg` objects, storing files in content-addressed storage (CAS) hashes to eliminate registry/DLL bloat.
-3.  **Indian Sovereign Compliance**: Integrated natively with India Stack API gates (UPI, Aadhaar, GST) to enable sovereign enterprise accounting and workflow execution within legacy Win32 binaries.
-4.  **Self-Healing Rollbacks**: Launches are actively monitored by parent watchers; any crash or security violation automatically triggers a rollback of the package snapshot state in under 1ms.
-
-***
+---
 
 ## 🚀 2. Master Development Roadmap
 
 The compatibility subsystem transitions from basic binary parsing to complete multi-platform integration across five granular phases.
 
-      Phase A: Loader & NT-API [Core]  -->  Phase B: Registry & USER32 [Short-Term]
-                                                           |
-      Phase D: DirectX & GPU [Long-Term] <--  Phase C: COM/OLE & WinSock [Mid-Term]
-                                                           |
-                                            Phase E: Sandboxing & seccomp [Enterprise]
+```
+  Phase A: Loader & NT-API [Core]  -->  Phase B: Registry & USER32 [Short-Term]
+                                                       |
+  Phase D: DirectX & GPU [Long-Term] <--  Phase C: COM/OLE & WinSock [Mid-Term]
+                                                       |
+                                        Phase E: Sandboxing & seccomp [Enterprise]
+```
 
 ### 2.1 Phase B — Compatibility Expansion (Short-Term: 1–3 Months)
-
-*   **32-Bit PE32 Loader**: Add support for parsing and loading x86 (32-bit) Portable Executable headers alongside PE32+.
-*   **Persistent Registry Database**: Map Windows registry hives (`HKLM`, `HKCU`) to structured file paths on SigmaFS.
-*   **Basic GUI Layer**: Wire primitive `USER32` and `GDI32` drawing operations into Zenith's compositor bus.
+- **32-Bit PE32 Loader**: Add support for parsing and loading x86 (32-bit) Portable Executable headers alongside PE32+.
+- **Persistent Registry Database**: Map Windows registry hives (`HKLM`, `HKCU`) to structured file paths on SigmaFS.
+- **Basic GUI Layer**: Wire primitive `USER32` and `GDI32` drawing operations into Zenith's compositor bus.
 
 ### 2.2 Phase C — Developer & Productivity Apps (Mid-Term: 6–12 Months)
-
-*   **COM & OLE Support**: Implement a safe, zero-dependency Component Object Model (COM) dispatch table for MS Office integrations and legacy MSI installers.
-*   **WinSock Integration**: Translate standard Windows networking socket APIs (`WSAStartup`, `send`, `recv`) directly to SigmaNet Zero-Trust endpoints.
+- **COM & OLE Support**: Implement a safe, zero-dependency Component Object Model (COM) dispatch table for MS Office integrations and legacy MSI installers.
+- **WinSock Integration**: Translate standard Windows networking socket APIs (`WSAStartup`, `send`, `recv`) directly to SigmaNet Zero-Trust endpoints.
 
 ### 2.3 Phase D — Graphics & Multimedia (Long-Term: 12–24 Months)
-
-*   **DirectX translation (D3D to Vulkan)**: Render DX9/11 calls directly to the sovereign Vulkan layer, bypassing legacy kernel drivers.
-*   **DirectSound Engine**: Map legacy sound buffers to the modern SigmaAudio multi-channel audio mixer.
+- **DirectX translation (D3D to Vulkan)**: Render DX9/11 calls directly to the sovereign Vulkan layer, bypassing legacy kernel drivers.
+- **DirectSound Engine**: Map legacy sound buffers to the modern SigmaAudio multi-channel audio mixer.
 
 ### 2.4 Phase E — Enterprise & Security (Hardening)
+- **Dynamic Seccomp Sandboxing**: Wrap loaded executables behind strict capability gates using `sigma_pledge` and `sigma_unveil`.
 
-*   **Dynamic Seccomp Sandboxing**: Wrap loaded executables behind strict capability gates using `sigma_pledge` and `sigma_unveil`.
-
-***
+---
 
 ## 💻 3. Executable Reference Implementation
 
@@ -198,14 +195,13 @@ impl User32MessageQueue {
 }
 ```
 
-***
+---
 
 ## 🔬 4. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the compatibility subsystem:
-
-1.  **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2.  **W^X Execution Sanity**: Under active memory monitoring, PE section loader mmappings strictly assert permissions, panic-crashing on any page attempting to have both WRITE and EXECUTE flags.
-3.  **Snapshot Healing Validation**: In the event of a page-fault or GPF, the watcher thread automatically executes `self_healing.rollback_to_snapshot` to restore pristine registry hives on SigmaFS.
+1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
+2. **W^X Execution Sanity**: Under active memory monitoring, PE section loader mmappings strictly assert permissions, panic-crashing on any page attempting to have both WRITE and EXECUTE flags.
+3. **Snapshot Healing Validation**: In the event of a page-fault or GPF, the watcher thread automatically executes `self_healing.rollback_to_snapshot` to restore pristine registry hives on SigmaFS.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized Win32 Compatibility layer that completely surpasses legacy desktop toolkits.

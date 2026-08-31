@@ -1,43 +1,43 @@
 # 🇸🇴 SigmaOS Omnipresent Supreme Self-Sufficiency Ultra Encyclopedia (V10)
-
 ## 🌌 The Absolute Architectural Blueprint & Safe-Rust Native Implementation Engine to Natively Absorb, Obsolete, and Elevate All 500+ Legacy Software Packages, Suites, Databases, AI Models, Scientific Simulators, Codecs, and Tools
 
 > **"A completely sovereign computational universe has no need for external software downloads. By replacing third-party binary downloads, standard library bloat, and legacy platform dependencies with capability-gated, zero-dependency, safe-Rust primitives embedded natively into the microkernel architecture, SigmaOS renders all external software packages—from VLC, Office, GIMP, Blender, PyTorch, LLaMA, DeepSeek, Gazebo, OpenCV, PostgreSQL, VirtualBox, to Wireshark—entirely obsolete."**
 
-***
+---
 
 ## 🗺️ SECTION I: The 12-Shard Sovereign Microkernel Architecture
 
 SigmaOS isolates all operating system functionalities into twelve specialized, hardware-enforced **Sovereign Shards (`S-SHARDS`)**. Operating in Ring 3 user space with capability-gated microkernel IPC mapped directly to Ring 0 memory pages, each shard delivers zero-copy, hardware-accelerated, zero-dependency native execution.
 
-    +----------------------------------------------------------------------------------------------------------+
-    |                                        ZENITH GRAPHICAL DESKTOP ENVIRONMENT                              |
-    |                                  (SIMD-Accelerated Unified User Interface Engine)                        |
-    +----------------------------------------------------------------------------------------------------------+
-                                                         |
-                                                         v (Capability-Token Zero-Copy IPC Bus)
-    +----------------------------------------------------------------------------------------------------------+
-    |                                           SIGMAOS SYSTEM SHARDS                                          |
-    |                                                                                                          |
-    |   [S-MEDIA]   |   [S-OFFICE]  |  [S-CONNECT]  |   [S-VIRT]    |    [S-AI]     |   [S-DATA]   | [S-CODEC] |
-    |  Visuals, 3D, |  Documents,   | Secure P2P,   |  Type-1 VM,   |  Transformer  | Relational & | Universal |
-    |  Audio Synth, |  Mindmaps,    | HTTP/3 Web,   | Android & NT  |  Inference &  | Spatial DBMS | Decoders, |
-    |  Video/Photo  |  Block Lang   | Onion Routing | Subsystem     |  MoE Router   | & Indexers   | VFS Map   |
-    |               |               |               |               |               |              |           |
-    |  [S-SCIENCE]  |    [S-SIM]    |   [S-ROBO]    |  [S-SECURE]   |    [S-ML]     |                          |
-    |  ETL, Mining, | Physics, CFD, | Autopilots,   | Post-Quantum  | Deep Learning |                          |
-    |  Analytics,   | FEM & Chem    | Telemetry &   | Forensics, AV |  Convolutions |                          |
-    |  Visuals      | Solvers       | SLAM Loop     | & RAM Shunt   |   & Auto-Diff |                          |
-    +----------------------------------------------------------------------------------------------------------+
+```
++----------------------------------------------------------------------------------------------------------+
+|                                        ZENITH GRAPHICAL DESKTOP ENVIRONMENT                              |
+|                                  (SIMD-Accelerated Unified User Interface Engine)                        |
++----------------------------------------------------------------------------------------------------------+
+                                                     |
+                                                     v (Capability-Token Zero-Copy IPC Bus)
++----------------------------------------------------------------------------------------------------------+
+|                                           SIGMAOS SYSTEM SHARDS                                          |
+|                                                                                                          |
+|   [S-MEDIA]   |   [S-OFFICE]  |  [S-CONNECT]  |   [S-VIRT]    |    [S-AI]     |   [S-DATA]   | [S-CODEC] |
+|  Visuals, 3D, |  Documents,   | Secure P2P,   |  Type-1 VM,   |  Transformer  | Relational & | Universal |
+|  Audio Synth, |  Mindmaps,    | HTTP/3 Web,   | Android & NT  |  Inference &  | Spatial DBMS | Decoders, |
+|  Video/Photo  |  Block Lang   | Onion Routing | Subsystem     |  MoE Router   | & Indexers   | VFS Map   |
+|               |               |               |               |               |              |           |
+|  [S-SCIENCE]  |    [S-SIM]    |   [S-ROBO]    |  [S-SECURE]   |    [S-ML]     |                          |
+|  ETL, Mining, | Physics, CFD, | Autopilots,   | Post-Quantum  | Deep Learning |                          |
+|  Analytics,   | FEM & Chem    | Telemetry &   | Forensics, AV |  Convolutions |                          |
+|  Visuals      | Solvers       | SLAM Loop     | & RAM Shunt   |   & Auto-Diff |                          |
++----------------------------------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## 📊 SECTION II: Comprehensive Legacy-to-Sovereign Target Matrix
 
 Below is the exhaustive matrix mapping every single third-party application, suite, database, framework, model, codec, format, simulator, and tool directly to its native S-Shard replacement strategy in SigmaOS:
 
 ### 1. Productivity, Office, Document, & Publishing Suites (`S-OFFICE`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **Apache OpenOffice / LibreOffice Suites** | `S-OFFICE` | Safe-Rust compound document processing engine with real-time asynchronous DAG spreadsheet evaluation and layout formatting. |
@@ -50,7 +50,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **Data & Columnar Formats: .avro, .cml, .csv, .hdf5, .ods, .orc, .parquet, .protobuf, .shp, .sqlite, .tsv** | `S-OFFICE` | SIMD-accelerated columnar deserializer and schema-enforced binary layout engine bound directly to Ring 3 page tables. |
 
 ### 2. Multimedia, Video, Audio, Creative, 3D, & Image Codecs (`S-MEDIA` & `S-CODEC`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **VLC Media Player / Shotcut / FFmpeg** | `S-MEDIA` | Direct KMS/DRM hardware video playback and multi-track non-linear video editor utilizing Vulkan compute shaders for real-time frame effects. |
@@ -67,7 +66,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **Audio Codecs: Apple Lossless, CELT, Codec2, FAAD2, FLAC, Fraunhofer FDK AAC, iLBC, iSAC, LAME, libdca, libopus, libvorbis, Musepack, Speex, TooLAME / TwoLAME, WavPack** | `S-CODEC` | Zero-dependency high-fidelity audio stream decoders converting compressed bitstreams to 32-bit floating point PCM audio frames. |
 
 ### 3. Browsers, P2P Networks, Cryptography, & Secure Communications (`S-CONNECT` & `S-SECURE`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **Brave / Firefox** | `S-CONNECT` | Native high-performance web rendering engine parsing HTML5, CSS Grid, and WebAssembly directly into isolated process sandboxes. |
@@ -80,7 +78,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **FrontlineSMS** | `S-CONNECT` | SMS message processing transceiver driver with telemetry queuing for GSM/satellite modules. |
 
 ### 4. Hypervisors, Virtualization, & Operating Systems Parity (`S-VIRT`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **Oracle VirtualBox** | `S-VIRT` | Native Type-1 microkernel hypervisor managing Intel VT-x/VMX and AMD-V/SVM hardware virtualization directly. |
@@ -89,7 +86,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **GParted / FIPS / TestDisk** | `S-VIRT` | Non-destructive disk partition editor, raw sector investigator, and filesystem repair engine. |
 
 ### 5. Multi-Model Databases, Search Indexers, & Data Engines (`S-DATA`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **MySQL / PostgreSQL / MariaDB / PostGIS** | `S-DATA` | Multi-model ACID relational and spatial database engine supporting B+ Trees, R-Trees, spatial coordinates, and parallel SQL queries. |
@@ -98,7 +94,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **ApexDB** | `S-DATA` | Ultra-low-latency transactional key-value store mapped directly to Ring 3 cache-coherent memory pages. |
 
 ### 6. Deep Learning, Machine Learning Frameworks, & Auto-Diff (`S-ML`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **PyTorch / PyTorch Lightning / Torch / TensorFlow / Keras / Google JAX / Flux.jl / Theano / MindSpore / MXNet / Microsoft Cognitive Toolkit / BigDL / OpenNN / PlaidML / fastai / FANN / DeepSpeed / Horovod / ONNX / OpenVINO / TensorRT-LLM / EDLUT / Emergent / Encog / JOONE / Nengo / Neuroph / SNNS / AlexNet / VGGNet / Inception / Caffe / Deeplearning4j** | `S-ML` | Unified automatic differentiation and tensor compute engine executing on Vulkan/CPU SIMD pipelines with graph optimization and dynamic execution. |
@@ -108,7 +103,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **Tesseract** | `S-ML` | Offline LSTM optical character recognition (OCR) engine for multi-language text extraction from raster images. |
 
 ### 7. Large Language Models (LLMs), Generative AI, & Autonomous Agents (`S-AI`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **Apertus, BERT, Cerebras-GPT, DeepSeek (R1, V3), Gemma (Gemma 4), GLM (GLM-4.5), GPT (GPT-1, GPT-2, GPT-OSS), GPT-J, GPT-Neo, GPT-NeoX, Granite, Grok-1, Kimi, Mistral, OLMo, Phi, Qwen, Sarvam (Sarvam-M, Sarvam-105B, Sarvam-30B), Step-3.5-Flash, T5, XLNet, vLLM, SGLang, llama.cpp, Ollama, Hugging Face transformers library** | `S-AI` | Native SIMD and Vulkan GPU LLM inference engine supporting FlashAttention-2, SwiGLU, RoPE, KV-caching, continuous batching, and dynamic Mixture-of-Experts (MoE) routing. |
@@ -119,7 +113,6 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **AlphaStar, AlphaDev, AlphaTensor, Deep reinforcement learning, Deep Q-learning, KataGo, GOLOG** | `S-AI` | Policy network evaluation, Monte Carlo Tree Search (MCTS), and matrix operation accelerators. |
 
 ### 8. Scientific Simulators, Aerodynamics, Fluid Dynamics, & Robotics (`S-SIM`, `S-ROBO`, & `S-SCIENCE`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **ArduPilot / Paparazzi Project** | `S-ROBO` | Hard-realtime flight dynamics controller featuring EKF3 15-state sensor fusion, PID stabilization, and motor actuation loops. |
@@ -134,42 +127,42 @@ Below is the exhaustive matrix mapping every single third-party application, sui
 | **KNIME / Orange / RapidMiner / Scriptella ETL / Weka / Jaspersoft / ParaView / VTK / Pentaho / JASP / Compendium** | `S-SCIENCE` | Visual data flow ETL pipelines, interactive statistical analysis, and Vulkan 3D volumetric data visualization engines. |
 
 ### 9. Operating System Security Shield, Forensics, & Maintenance (`S-SECURE`)
-
 | Legacy Target | Shard | Native Safe-Rust Replacement & Structural Upgrade Strategy |
 | :--- | :--- | :--- |
 | **ClamAV / ClamWin / Lynis / The Coroner's Toolkit / The Sleuth Kit / BleachBit / Leaf Project** | `S-SECURE` | Real-time behavioral anomaly analyzer, zero-copy sector forensics imaging, filesystem privacy cleaning, and memory wiping. |
 | **T-Rex (TREX)** | `S-SECURE` | High-throughput pattern matching engine for network packet inspection and threat detection. |
 
-***
+---
 
 ## 🎨 SECTION III: Deep Architectural Integration Pipelines
 
 ### 1. Zero-Copy Video and Visual Rendering Pipeline (`S-MEDIA` + `S-CODEC`)
-
 SigmaOS eliminates legacy window server and buffer copy overheads. Video frame streams and 3D graphics pass directly from storage to GPU memory:
 
-    +------------+       +-------------------+       +-------------------------+       +-----------------------+
-    |  VFS File  | ----> | SIMD Bitstream    | ----> | Direct GPU Frame Buffer | ----> | Vulkan Compute Shader |
-    |  (Raw Stream)|     | Decoder (S-CODEC) |       | (Zero-Copy Shared Page) |       | Composition & Display |
-    +------------+       +-------------------+       +-------------------------+       +-----------------------+
+```
++------------+       +-------------------+       +-------------------------+       +-----------------------+
+|  VFS File  | ----> | SIMD Bitstream    | ----> | Direct GPU Frame Buffer | ----> | Vulkan Compute Shader |
+|  (Raw Stream)|     | Decoder (S-CODEC) |       | (Zero-Copy Shared Page) |       | Composition & Display |
++------------+       +-------------------+       +-------------------------+       +-----------------------+
+```
 
 ### 2. Microkernel Native Agent & LLM Execution Pipeline (`S-AI` + `S-ML`)
-
 LLM inference and autonomous agents run directly on microkernel shared pages, accessing system tools through capability tokens without IPC latency:
 
-    +--------------------+       +---------------------+       +-----------------------+       +----------------------+
-    | User Context Prompt| ----> | MoE Router & KV-    | ----> | Vulkan SIMD Compute   | ----> | Capability Token     |
-    | (Zenith / System)  |       | Cache (S-AI)        |       | Matrix Engine (S-ML)  |       | Task Execution       |
-    +--------------------+       +---------------------+       +-----------------------+       +----------------------+
+```
++--------------------+       +---------------------+       +-----------------------+       +----------------------+
+| User Context Prompt| ----> | MoE Router & KV-    | ----> | Vulkan SIMD Compute   | ----> | Capability Token     |
+| (Zenith / System)  |       | Cache (S-AI)        |       | Matrix Engine (S-ML)  |       | Task Execution       |
++--------------------+       +---------------------+       +-----------------------+       +----------------------+
+```
 
-***
+---
 
 ## 💻 SECTION IV: Zero-Dependency Safe-Rust Prototype Implementations
 
 The following compile-ready, zero-dependency, safe-Rust primitives substantiate the architectural feasibility of natively replacing key third-party targets:
 
 ### 1. Unified Real-Time Multi-Channel Audio Mixer (`S-MEDIA` - Audacity & Gnaural Parity)
-
 ```rust
 //! Zero-allocation multi-channel audio mixer with high-precision binaural wave generators.
 #![no_std]
@@ -248,7 +241,6 @@ mod audio_tests {
 ```
 
 ### 2. Spatial Coordinate R-Tree Indexer (`S-DATA` - PostGIS & ELKI Parity)
-
 ```rust
 //! Safe-Rust spatial coordinate indexer replacing spatial GIS database components.
 #![no_std]
@@ -302,7 +294,6 @@ mod spatial_tests {
 ```
 
 ### 3. Flight Controller EKF & PID Loop (`S-ROBO` - ArduPilot & Gazebo Parity)
-
 ```rust
 //! Hard-realtime flight dynamics controller PID feedback loop.
 #![no_std]
@@ -342,16 +333,16 @@ mod flight_tests {
 }
 ```
 
-***
+---
 
 ## 📈 SECTION V: Physical Execution & Bare-Metal Hardening
 
 SigmaOS implements a continuous three-phase progression to migrate external computational paradigms directly into host microkernel space:
 
-1.  **Phase I: Capability Isolation (Current)**: All 12 S-Shards execute inside Ring 3 memory-protected sandboxes, passing capabilities via zero-copy IPC.
-2.  **Phase II: Hardware Vector Mapping**: Matrix and signal operations map directly onto host CPU vector extensions (AVX-512, NEON, RVV) and Vulkan GPU queues.
-3.  **Phase III: Complete Sovereignty**: External third-party applications, package managers, and binary dependencies become completely obsolete, establishing absolute system self-sufficiency.
+1. **Phase I: Capability Isolation (Current)**: All 12 S-Shards execute inside Ring 3 memory-protected sandboxes, passing capabilities via zero-copy IPC.
+2. **Phase II: Hardware Vector Mapping**: Matrix and signal operations map directly onto host CPU vector extensions (AVX-512, NEON, RVV) and Vulkan GPU queues.
+3. **Phase III: Complete Sovereignty**: External third-party applications, package managers, and binary dependencies become completely obsolete, establishing absolute system self-sufficiency.
 
-***
+---
 
 ### 👑 The Sovereign OS Paradigm: Complete Computational Autonomy. Zero External Downloads. Total Independence.

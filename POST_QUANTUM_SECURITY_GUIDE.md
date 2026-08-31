@@ -6,13 +6,13 @@ This guide provides comprehensive information about SigmaOS's post-quantum crypt
 
 ## Table of Contents
 
-1.  [Post-Quantum Cryptography Overview](#post-quantum-cryptography-overview)
-2.  [Implemented Algorithms](#implemented-algorithms)
-3.  [Key Management](#key-management)
-4.  [Protocol Integration](#protocol-integration)
-5.  [Performance Considerations](#performance-considerations)
-6.  [Migration Guide](#migration-guide)
-7.  [Security Analysis](#security-analysis)
+1. [Post-Quantum Cryptography Overview](#post-quantum-cryptography-overview)
+2. [Implemented Algorithms](#implemented-algorithms)
+3. [Key Management](#key-management)
+4. [Protocol Integration](#protocol-integration)
+5. [Performance Considerations](#performance-considerations)
+6. [Migration Guide](#migration-guide)
+7. [Security Analysis](#security-analysis)
 
 ## Post-Quantum Cryptography Overview
 
@@ -20,18 +20,18 @@ This guide provides comprehensive information about SigmaOS's post-quantum crypt
 
 Quantum computers pose significant threats to classical cryptographic systems:
 
-*   **Shor's Algorithm**: Can break RSA, ECC, and DSA in polynomial time
-*   **Grover's Algorithm**: Provides quadratic speedup for brute-force attacks
-*   **Timeline**: Large-scale quantum computers expected within 10-15 years
+- **Shor's Algorithm**: Can break RSA, ECC, and DSA in polynomial time
+- **Grover's Algorithm**: Provides quadratic speedup for brute-force attacks
+- **Timeline**: Large-scale quantum computers expected within 10-15 years
 
 ### SigmaOS PQC Strategy
 
 SigmaOS implements NIST-standardized post-quantum algorithms:
 
-*   **Kyber**: Key Encapsulation Mechanism (KEM)
-*   **Dilithium**: Digital Signature Algorithm
-*   **Hybrid Approach**: Combines classical and PQC for defense in depth
-*   **Hardware Acceleration**: Optimized implementations for supported hardware
+- **Kyber**: Key Encapsulation Mechanism (KEM)
+- **Dilithium**: Digital Signature Algorithm
+- **Hybrid Approach**: Combines classical and PQC for defense in depth
+- **Hardware Acceleration**: Optimized implementations for supported hardware
 
 ## Implemented Algorithms
 
@@ -764,20 +764,20 @@ pub struct ComplianceReport {
 
 ## Resources
 
-*   [NIST PQC Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
-*   [PQC Migration Guide](https://www.nsa.gov/Research/Post-Quantum-Cryptography)
-*   [SigmaOS Security Policy](SECURITY_POLICY)
-*   [API Reference](API_REFERENCE)
+- [NIST PQC Standardization](https://csrc.nist.gov/projects/post-quantum-cryptography)
+- [PQC Migration Guide](https://www.nsa.gov/Research/Post-Quantum-Cryptography)
+- [SigmaOS Security Policy](SECURITY_POLICY.md)
+- [API Reference](API_REFERENCE.md)
 
 ## Contributing
 
 When contributing PQC features:
 
-1.  Follow NIST standards exactly
-2.  Include security analysis
-3.  Provide performance benchmarks
-4.  Test side-channel resistance
-5.  Document compliance status
+1. Follow NIST standards exactly
+2. Include security analysis
+3. Provide performance benchmarks
+4. Test side-channel resistance
+5. Document compliance status
 
 ## License
 

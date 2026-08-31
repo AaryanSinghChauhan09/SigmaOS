@@ -2,7 +2,7 @@
 
 This document outlines core system administration tasks in SigmaOS, following **Arch Linux Wiki paradigms** for service supervision, journal logging, storage management, and networking.
 
-***
+---
 
 ## 🚦 Service Supervision (`systemctl` Parity)
 
@@ -28,15 +28,14 @@ systemctl enable sshd.service
 ```
 
 ### System Target Runlevels
-
 SigmaOS maps targets cleanly across SysVInit and Systemd runlevels (`SystemTarget`):
 
-*   `emergency.target` (Runlevel 0) - Emergency maintenance shell
-*   `rescue.target` (Runlevel 1) - Single-user recovery mode
-*   `multi-user.target` (Runlevel 3) - Multi-user non-graphical console
-*   `graphical.target` (Runlevel 5) - Full Zenith Desktop GUI environment
+- `emergency.target` (Runlevel 0) - Emergency maintenance shell
+- `rescue.target` (Runlevel 1) - Single-user recovery mode
+- `multi-user.target` (Runlevel 3) - Multi-user non-graphical console
+- `graphical.target` (Runlevel 5) - Full Zenith Desktop GUI environment
 
-***
+---
 
 ## 📜 System Logging (`journalctl` Parity)
 
@@ -58,7 +57,7 @@ journalctl -u sshd.service
 journalctl -p err
 ```
 
-***
+---
 
 ## 💾 Storage & Filesystem Management
 
@@ -66,10 +65,10 @@ SigmaOS supports advanced copy-on-write (CoW) filesystems, volume management, an
 
 ### Supported Filesystems
 
-1.  **Ext4:** Fast-commit journal recovery (`Ext4FastCommit`).
-2.  **Btrfs:** Differential snapshot send/receive streams (`BtrfsSendReceiveEngine`).
-3.  **ZFS:** Native pool replication and dataset snapshots.
-4.  **FAT32 / NVMe:** Zero-copy DMA transfers for high-speed NVMe storage.
+1. **Ext4:** Fast-commit journal recovery (`Ext4FastCommit`).
+2. **Btrfs:** Differential snapshot send/receive streams (`BtrfsSendReceiveEngine`).
+3. **ZFS:** Native pool replication and dataset snapshots.
+4. **FAT32 / NVMe:** Zero-copy DMA transfers for high-speed NVMe storage.
 
 ### Volume & Snapshot Commands
 
@@ -84,7 +83,7 @@ snapper create --type post --pre-id 1 --description "Post-Kernel-Upgrade"
 snapper list
 ```
 
-***
+---
 
 ## 🌐 Network Configuration
 

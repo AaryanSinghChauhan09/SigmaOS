@@ -1,6 +1,6 @@
 # Detects "eval(variable)" which can allow an attacker to run arbitrary code inside your process (`security/detect-eval-with-expression`)
 
-⚠️ This rule *warns* in the ✅ `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

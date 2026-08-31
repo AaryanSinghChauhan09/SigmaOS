@@ -4,14 +4,14 @@
 
 SigmaOS includes a zero-dependency, clean-room subsystem providing comprehensive compatibility with **Fedora Linux**, **RHEL**, and other **RPM-based distributions**. This subsystem allows RPM packages and spec files to be parsed, resolved, and managed natively on SigmaOS.
 
-***
+---
 
 ## Key Modules
 
-*   [`src/sigpkg/fedora_rpm_engine.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/fedora_rpm_engine.rs): RPM package manager, spec file parser, and DNF/YUM compatibility
-*   [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, RPM, and other formats
+- [`src/sigpkg/fedora_rpm_engine.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/fedora_rpm_engine.rs): RPM package manager, spec file parser, and DNF/YUM compatibility
+- [`src/sigpkg/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/mod.rs): Unified package orchestrator integrating native `.spkg`, RPM, and other formats
 
-***
+---
 
 ## Features
 
@@ -23,25 +23,27 @@ SigmaOS includes a zero-dependency, clean-room subsystem providing comprehensive
 | **RPM Database** | Native package database emulation | Compatible with rpmdb format |
 | **Repository Management** | .repo file format | Supports multiple repositories |
 
-***
+---
 
 ## Architecture Flow
 
-    Fedora/RHEL Repository
-           │ (Download RPMs)
-           ▼
-    [RPM Spec Parser] ──────> Validates package metadata
-           │
-           ▼
-    [Dependency Resolver] ───> Resolves Requires/Provides/Conflicts
-           │
-           ▼
-    [RPM Database] ───────────> Maintains package status
-           │
-           ▼
-    [SigmaPkg Native Index] ───────> Integrates with native package system
+```
+Fedora/RHEL Repository
+       │ (Download RPMs)
+       ▼
+[RPM Spec Parser] ──────> Validates package metadata
+       │
+       ▼
+[Dependency Resolver] ───> Resolves Requires/Provides/Conflicts
+       │
+       ▼
+[RPM Database] ───────────> Maintains package status
+       │
+       ▼
+[SigmaPkg Native Index] ───────> Integrates with native package system
+```
 
-***
+---
 
 ## CLI Usage
 
@@ -62,7 +64,7 @@ sigma-pkg rpm-show firefox
 sigma-pkg rpm-list
 ```
 
-***
+---
 
 ## Implementation Details
 
@@ -105,71 +107,71 @@ pub struct DnfRepository {
 ### RPM Spec File Format
 
 The spec file parser handles standard sections:
+- **%description**: Package description
+- **%files**: File list and attributes
+- **%install**: Installation scripts
+- **%clean**: Cleanup scripts
+- **%changelog: Version changelog
 
-*   **%description**: Package description
-*   **%files**: File list and attributes
-*   **%install**: Installation scripts
-*   **%clean**: Cleanup scripts
-*   \*\*%changelog: Version changelog
-
-***
+---
 
 ## Repository Support
 
-*   **Fedora**: Main, updates, updates-testing repositories
-*   **RHEL**: Base, AppStream, Extras repositories
-*   **CentOS**: Base, Updates, Extras repositories
-*   **Custom**: User-defined repositories
+- **Fedora**: Main, updates, updates-testing repositories
+- **RHEL**: Base, AppStream, Extras repositories
+- **CentOS**: Base, Updates, Extras repositories
+- **Custom**: User-defined repositories
 
 ### Repository Example
 
-    [fedora]
-    name=Fedora Repository
-    baseurl=https://download.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/
-    enabled=1
-    gpgcheck=1
+```
+[fedora]
+name=Fedora Repository
+baseurl=https://download.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/
+enabled=1
+gpgcheck=1
+```
 
-***
+---
 
 ## Dependency Resolution
 
 ### Dependency Fields
 
-*   **Requires**: Required dependencies
-*   **Provides**: Virtual packages provided
-*   **Conflicts**: Conflicting packages
-*   \*\*Obsoletes: Obsolete packages
+- **Requires**: Required dependencies
+- **Provides**: Virtual packages provided
+- **Conflicts**: Conflicting packages
+- **Obsoletes: Obsolete packages
 
 ### Dependency Resolution Process
 
-1.  Resolve direct dependencies
-2.  Check for conflicts
-3.  Handle obsoletes
-4.  Apply provides/requires relationships
-5.  Calculate final dependency tree
+1. Resolve direct dependencies
+2. Check for conflicts
+3. Handle obsoletes
+4. Apply provides/requires relationships
+5. Calculate final dependency tree
 
-***
+---
 
 ## Integration with SigmaOS
 
 The Fedora/RPM engine integrates seamlessly with:
+- **SigmaPkg**: Native package manager
+- **Systemd**: Systemd service compatibility
+- **SELinux**: Security-enhanced Linux integration
+- **Filesystem**: RPM-standard filesystem layout
 
-*   **SigmaPkg**: Native package manager
-*   **Systemd**: Systemd service compatibility
-*   **SELinux**: Security-enhanced Linux integration
-*   **Filesystem**: RPM-standard filesystem layout
-
-***
+---
 
 ## Benefits
 
-1.  **Zero-Dependency**: No external RPM tools required
-2.  **Fedora Ecosystem**: Access to latest Fedora packages
-    3 **Enterprise Support**: RHEL/CentOS compatibility
-3.  **Sophisticated Resolution**: Complex dependency handling
-4.  **Enterprise Features**: GPG checking, repository management
+1. **Zero-Dependency**: No external RPM tools required
+2. **Fedora Ecosystem**: Access to latest Fedora packages
+3 **Enterprise Support**: RHEL/CentOS compatibility
+4. **Sophisticated Resolution**: Complex dependency handling
+5. **Enterprise Features**: GPG checking, repository management
 
-***
+---
 
 ## Examples
 
@@ -202,7 +204,7 @@ sigma-pkg dnf-install httpd
 sigma-pkg dnf-install mariadb-server
 ```
 
-***
+---
 
 ## RPM Spec File Example
 
@@ -223,7 +225,7 @@ It provides essential functionality for the system.
 /usr/share/doc/sigmaos-example/README
 ```
 
-***
+---
 
 ## Comparison with Original DNF/YUM
 
@@ -235,27 +237,25 @@ It provides essential functionality for the system.
 | **Configuration** | /etc/dnf/ | Native configuration system |
 | **Tool Dependency** | dnf, yum | Zero external tools |
 
-***
+---
 
 ## SELinux Integration
 
 SigmaOS provides SELinux integration for RPM packages:
+- **Security Contexts**: File and process security contexts
+- **Policy Management**: SELinux policy enforcement
+- **Compatibility**: Fedora/RHEL SELinux policies
 
-*   **Security Contexts**: File and process security contexts
-*   **Policy Management**: SELinux policy enforcement
-*   **Compatibility**: Fedora/RHEL SELinux policies
-
-***
+---
 
 ## GPG Key Management
 
 RPM packages can be verified with GPG keys:
+- **Repository Keys**: Repository GPG keys
+- **Package Signatures**: Package signature verification
+- **Key Import**: GPG key import and management
 
-*   **Repository Keys**: Repository GPG keys
-*   **Package Signatures**: Package signature verification
-*   **Key Import**: GPG key import and management
+---
 
-***
-
-**Generated:** August 24, 2026\
+**Generated:** August 24, 2026  
 **Repository:** [SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)

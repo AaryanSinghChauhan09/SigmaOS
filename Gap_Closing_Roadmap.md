@@ -2,7 +2,7 @@
 
 This document establishes the master architectural strategy, design specification, and roadmap for **SigmaOS** to close the gap with and ultimately surpass legacy Linux and BSD distributions.
 
-***
+---
 
 ## 🗺️ 1. Core Operating System Principles to Embed
 
@@ -18,7 +18,7 @@ To deliver unmatched security, flexibility, and performance, SigmaOS embeds key 
 *   **Observability**: Real-time dynamically profiled traces (`SigmaTrace`), lock-free TSDB Prometheus metrics (`SigmaMetrics`), and symbolic post-mortem crash dumpers (`SigmaDebug`).
 *   **Self-Documentation**: Automatically generates system dependency mappings from the source code.
 
-***
+---
 
 ## 🏗️ 2. Core Driver Principles
 
@@ -27,46 +27,39 @@ To deliver unmatched security, flexibility, and performance, SigmaOS embeds key 
 *   **Dependency Inversion**: The kernel depends entirely on high-level abstract driver traits, never on concrete vendor implementations.
 *   **Self-Healing & Hot-Swap**: Automatic recovery from hardware faults and update rollbacks without requiring reboots.
 
-***
+---
 
 ## 🔧 3. Sovereign Tools to Build
 
 ### 3.1 Universal ABI Translator (`UniversalAbiTranslator`)
-
 *   **Mission**: Run original binaries compiled for Windows (.exe), Linux (ELF), and macOS (.dmg) natively on top of the microkernel.
 *   **Status**: Fully implemented system calls translation map.
 
 ### 3.2 Composable Filesystem (SigmaFS++) (`SigmaFsPlusPlus`)
-
 *   **Mission**: Plugin-based file storage featuring block-level deduplication, hardware-accelerated AES-XTS encryption, semantic indexing, and secure blockchain transaction audit trails.
 *   **Status**: Fully implemented transactional write auditor.
 
 ### 3.3 Self-Healing Kernel (`SelfHealingKernel`)
-
 *   **Mission**: Performs continuous memory checking and applies micro-patches or rollbacks dynamically.
 *   **Status**: Fully implemented checksum verifier.
 
 ### 3.4 AI-Native Runtime (`AiNativeRuntime`)
-
 *   **Mission**: Treats AI models as first-class scheduled threads.
 *   **Status**: Fully implemented dynamic model context executor.
 
 ### 3.5 Energy-Aware Scheduler (`EnergyAwareScheduler`)
-
 *   **Mission**: Dynamic eco-mode and thermal throttling scheduling policies.
 *   **Status**: Fully implemented frequency-scaling heuristics.
 
 ### 3.6 User-Defined Kernel Functions (`UserDefinedKernelFunctions`)
-
 *   **Mission**: Script custom schedulers, allocators, and filesystem layouts using safe sandboxed bytecodes at runtime.
 *   **Status**: Fully implemented micro-scripting interpreter.
 
 ### 3.7 Privacy-First Sandbox (`PrivacyFirstSandbox`)
-
 *   **Mission**: Sandboxes every process by default with post-quantum Kyber-1024 token checks.
 *   **Status**: Fully implemented zero-trust validation gate.
 
-***
+---
 
 ## 📊 4. Competitive Edge Dashboard
 

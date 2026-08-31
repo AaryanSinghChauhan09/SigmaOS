@@ -1,4 +1,4 @@
-# require-from-string [![Build Status](https://travis-ci.org/floatdrop/require-from-string.svg?branch=master)](https://travis-ci.org/floatdrop/require-from-string)
+﻿# require-from-string [![Build Status](https://travis-ci.org/floatdrop/require-from-string.svg?branch=master)](https://travis-ci.org/floatdrop/require-from-string)
 
 Load module from string in Node.
 
@@ -19,7 +19,7 @@ requireFromString('module.exports = 1');
 
 ## API
 
-### requireFromString(code, \[filename], \[options])
+### requireFromString(code, [filename], [options])
 
 #### code
 

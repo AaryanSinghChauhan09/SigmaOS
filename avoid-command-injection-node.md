@@ -1,4 +1,4 @@
-# Avoiding Command Injection in Node.js
+﻿# Avoiding Command Injection in Node.js
 
 In this post we are going to learn about the proper way to call a system command using node.js to avoid a common security flaw, command injection.
 
@@ -80,8 +80,10 @@ This does however come with a caveat: using `spawn` or `execFile` is not always 
 
 So, here's the collective guidance for running system commands from node.js:
 
-*   Avoid using `child_process.exec`, and never use it if the command contains any input that changes based on user input.
+- Avoid using `child_process.exec`, and never use it if the command contains any input that changes based on user input.
 
-*   Try to avoid letting users pass in options to commands if possible. Typically values are okay when using spawn or execfile, but selecting options via a user controlled string is a bad idea.
 
-*   If you must allow for user controlled options, look at the options for the command extensively, determine which options are safe, and whitelist only those options.
+- Try to avoid letting users pass in options to commands if possible. Typically values are okay when using spawn or execfile, but selecting options via a user controlled string is a bad idea.
+
+
+- If you must allow for user controlled options, look at the options for the command extensively, determine which options are safe, and whitelist only those options.

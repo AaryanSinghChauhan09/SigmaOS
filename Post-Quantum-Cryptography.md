@@ -13,33 +13,32 @@ algorithms at the kernel level.
 
 ## Architecture
 
-    Application Layer
-       └─ sigma_pqc_encrypt() / sigma_pqc_sign()
-             └─ PQC Kernel Module
-                   ├─ Kyber KEM (key encapsulation)
-                   ├─ Dilithium DSA (digital signatures)
-                   └─ BLAKE3 (hashing)
-                         └─ Hardware Acceleration (if available)
+```
+Application Layer
+   └─ sigma_pqc_encrypt() / sigma_pqc_sign()
+         └─ PQC Kernel Module
+               ├─ Kyber KEM (key encapsulation)
+               ├─ Dilithium DSA (digital signatures)
+               └─ BLAKE3 (hashing)
+                     └─ Hardware Acceleration (if available)
+```
 
 ## Integration Points
 
 ### VPN Key Exchange
-
-*   Kyber-768 hybrid with X25519 for forward secrecy
-*   Post-quantum resistant tunnel establishment
-*   Fallback to classical crypto if PQC unavailable
+- Kyber-768 hybrid with X25519 for forward secrecy
+- Post-quantum resistant tunnel establishment
+- Fallback to classical crypto if PQC unavailable
 
 ### Shard Identity Tokens
-
-*   Dilithium3 signatures for shard authentication
-*   Immutable identity verification
-*   Revocation via CRL (Certificate Revocation List)
+- Dilithium3 signatures for shard authentication
+- Immutable identity verification
+- Revocation via CRL (Certificate Revocation List)
 
 ### Shard Manifest Signatures
-
-*   SPM (Sigma Package Manager) uses Dilithium for package signing
-*   BLAKE3 for package integrity verification
-*   Trust root anchored in Secure Boot
+- SPM (Sigma Package Manager) uses Dilithium for package signing
+- BLAKE3 for package integrity verification
+- Trust root anchored in Secure Boot
 
 ## API Interface
 
@@ -72,24 +71,24 @@ void init_security_pqc(void);
 
 ## Security Properties
 
-*   **Quantum resistance**: All algorithms are secure against quantum computers
-*   **Hybrid approach**: Combines PQC with classical crypto for defense in depth
-*   **Constant-time**: All operations are constant-time to prevent timing attacks
-*   **Side-channel resistant**: Implements blinding and masking techniques
+- **Quantum resistance**: All algorithms are secure against quantum computers
+- **Hybrid approach**: Combines PQC with classical crypto for defense in depth
+- **Constant-time**: All operations are constant-time to prevent timing attacks
+- **Side-channel resistant**: Implements blinding and masking techniques
 
 ## Roadmap
 
-*   \[x] BLAKE3 hashing implementation
-*   \[ ] Kyber KEM integration in VPN
-*   \[ ] Dilithium signature in Identity Manager
-*   \[ ] Side-channel hardening (constant-time implementations)
-*   \[ ] Hardware acceleration support (Intel SHA extensions, ARM Crypto extensions)
-*   \[ ] PQC algorithm agility (support for multiple KEM/DSA algorithms)
-*   \[ ] Formal verification of PQC implementations
-*   \[ ] NIST PQC standard updates tracking
+- [x] BLAKE3 hashing implementation
+- [ ] Kyber KEM integration in VPN
+- [ ] Dilithium signature in Identity Manager
+- [ ] Side-channel hardening (constant-time implementations)
+- [ ] Hardware acceleration support (Intel SHA extensions, ARM Crypto extensions)
+- [ ] PQC algorithm agility (support for multiple KEM/DSA algorithms)
+- [ ] Formal verification of PQC implementations
+- [ ] NIST PQC standard updates tracking
 
 ## Related Modules
 
-*   [`security/mac/README.md`](mac/README) — Mandatory Access Control
-*   [`security/identity/README.md`](identity/README) — Identity Manager
-*   [`modules/core/net`](../modules/core/net/README.md) — Network stack (VPN integration)
+- [`security/mac/README.md`](mac/README.md) — Mandatory Access Control
+- [`security/identity/README.md`](identity/README.md) — Identity Manager
+- [`modules/core/net`](../modules/core/net/README.md) — Network stack (VPN integration)

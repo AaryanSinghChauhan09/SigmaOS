@@ -1,4 +1,4 @@
-# Global Installation
+﻿# Global Installation
 
 Undici provides an `install()` function to add all WHATWG fetch classes to `globalThis`, making them available globally without requiring imports.
 
@@ -95,15 +95,20 @@ multipart behavior across Node.js and undici versions.
 
 Global installation is useful for:
 
-*   **Polyfilling environments** that don't have native fetch support
+- **Polyfilling environments** that don't have native fetch support
 
-*   **Ensuring consistent behavior** across different Node.js versions
 
-*   **Library compatibility** when third-party libraries expect global fetch
+- **Ensuring consistent behavior** across different Node.js versions
 
-*   **Migration scenarios** where you want to replace built-in implementations
 
-*   **Testing environments** where you need predictable fetch behavior
+- **Library compatibility** when third-party libraries expect global fetch
+
+
+- **Migration scenarios** where you want to replace built-in implementations
+
+
+- **Testing environments** where you need predictable fetch behavior
+
 
 ## Example: Polyfilling an Environment
 
@@ -137,10 +142,13 @@ test('fetch API test', async () => {
 
 ## Notes
 
-*   The `install()` function overwrites any existing global implementations
+- The `install()` function overwrites any existing global implementations
 
-*   Classes installed are undici's implementations, not Node.js built-ins
 
-*   This provides access to undici's latest features and performance improvements
+- Classes installed are undici's implementations, not Node.js built-ins
 
-*   The global installation persists for the lifetime of the process
+
+- This provides access to undici's latest features and performance improvements
+
+
+- The global installation persists for the lifetime of the process

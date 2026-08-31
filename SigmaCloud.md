@@ -5,89 +5,83 @@
 ## Features
 
 ### SigmaDrive (Cloud Storage)
-
 Decentralized cloud file storage (Google Drive alternative):
-
-*   End-to-end encrypted file storage
-*   Decentralized storage via IPFS/Filecoin
-*   File versioning with SovereignFS snapshots
-*   Real-time collaboration
-*   Offline mode with sync
-*   File sharing with capability tokens
-*   10GB free storage, scalable to petabytes
-*   AI-powered file organization and search
-*   Cross-device sync (desktop, mobile, web)
+- End-to-end encrypted file storage
+- Decentralized storage via IPFS/Filecoin
+- File versioning with SovereignFS snapshots
+- Real-time collaboration
+- Offline mode with sync
+- File sharing with capability tokens
+- 10GB free storage, scalable to petabytes
+- AI-powered file organization and search
+- Cross-device sync (desktop, mobile, web)
 
 ### SigmaMail (Email Client)
-
 Secure, encrypted mailing (Gmail alternative):
-
-*   End-to-end encrypted email (PGP integration)
-*   Spam and phishing protection with AI
-*   Rich text composer
-*   Attachment encryption
-*   Calendar integration
-*   Contacts integration
-*   Multiple account support
-*   AI-powered email categorization (Primary, Social, Promotions)
-*   Smart replies and compose suggestions
-*   Offline mode with sync
+- End-to-end encrypted email (PGP integration)
+- Spam and phishing protection with AI
+- Rich text composer
+- Attachment encryption
+- Calendar integration
+- Contacts integration
+- Multiple account support
+- AI-powered email categorization (Primary, Social, Promotions)
+- Smart replies and compose suggestions
+- Offline mode with sync
 
 ### SigmaCalendar (Calendar & Scheduling)
-
 Sync and scheduling tools:
-
-*   Event creation and management
-*   Recurring events
-*   Calendar sharing with permission controls
-*   Meeting scheduling with availability detection
-*   Reminders and notifications
-*   Integration with SigmaMail
-*   Time zone support
-*   AI-powered scheduling suggestions
-*   Export to iCal format
+- Event creation and management
+- Recurring events
+- Calendar sharing with permission controls
+- Meeting scheduling with availability detection
+- Reminders and notifications
+- Integration with SigmaMail
+- Time zone support
+- AI-powered scheduling suggestions
+- Export to iCal format
 
 ### SigmaContacts (Contacts Management)
-
 Contact management and synchronization:
-
-*   Contact cards with multiple fields
-*   Contact groups and labels
-*   Import/export vCard format
-*   Integration with SigmaMail and SigmaCalendar
-*   Contact sharing
-*   AI-powered contact deduplication
-*   Sync with mobile devices
+- Contact cards with multiple fields
+- Contact groups and labels
+- Import/export vCard format
+- Integration with SigmaMail and SigmaCalendar
+- Contact sharing
+- AI-powered contact deduplication
+- Sync with mobile devices
 
 ## Architecture
 
-    SigmaCloud Suite
-       ├─ SigmaDrive (cloud storage engine)
-       │   ├─ IPFS/Filecoin backend
-       │   ├─ Encryption layer (ChaCha20-Poly1305)
-       │   ├─ Sync engine
-       │   └─ Collaboration backend
-       ├─ SigmaMail (email engine)
-       │   ├─ IMAP/SMTP client
-       │   ├─ PGP encryption
-       │   ├─ Spam filter (AI)
-       │   └─ Rich text composer
-       ├─ SigmaCalendar (calendar engine)
-       │   ├─ Event scheduler
-       │   ├─ Availability detector
-       │   └─ Reminder system
-       └─ SigmaContacts (contacts engine)
-           ├─ Contact database
-           ├─ vCard parser/generator
-           └─ Sync engine
+```
+SigmaCloud Suite
+   ├─ SigmaDrive (cloud storage engine)
+   │   ├─ IPFS/Filecoin backend
+   │   ├─ Encryption layer (ChaCha20-Poly1305)
+   │   ├─ Sync engine
+   │   └─ Collaboration backend
+   ├─ SigmaMail (email engine)
+   │   ├─ IMAP/SMTP client
+   │   ├─ PGP encryption
+   │   ├─ Spam filter (AI)
+   │   └─ Rich text composer
+   ├─ SigmaCalendar (calendar engine)
+   │   ├─ Event scheduler
+   │   ├─ Availability detector
+   │   └─ Reminder system
+   └─ SigmaContacts (contacts engine)
+       ├─ Contact database
+       ├─ vCard parser/generator
+       └─ Sync engine
+```
 
 ## Security Model
 
-*   **End-to-end encryption**: All data encrypted client-side before upload
-*   **Zero-knowledge architecture**: Server cannot access user data
-*   **Capability-based sharing**: Fine-grained access control via capability tokens
-*   **Post-quantum ready**: Uses Kyber-768 for key exchange
-*   **Secure boot integration**: Verified boot chain for cloud clients
+- **End-to-end encryption**: All data encrypted client-side before upload
+- **Zero-knowledge architecture**: Server cannot access user data
+- **Capability-based sharing**: Fine-grained access control via capability tokens
+- **Post-quantum ready**: Uses Kyber-768 for key exchange
+- **Secure boot integration**: Verified boot chain for cloud clients
 
 ## API Interface
 
@@ -124,11 +118,11 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 
 ## Integration
 
-*   **SigmaFS Integration**: Local cache with SovereignFS snapshots
-*   **SigmaAI Integration**: AI-powered spam filtering, email categorization, scheduling suggestions
-*   **SigmaNet Integration**: Encrypted communication via SovereignNet
-*   **Zenith Desktop Integration**: Native Zenith UI with notifications
-*   **Mobile Sync**: SigmaOS Mobile app for on-the-go access
+- **SigmaFS Integration**: Local cache with SovereignFS snapshots
+- **SigmaAI Integration**: AI-powered spam filtering, email categorization, scheduling suggestions
+- **SigmaNet Integration**: Encrypted communication via SovereignNet
+- **Zenith Desktop Integration**: Native Zenith UI with notifications
+- **Mobile Sync**: SigmaOS Mobile app for on-the-go access
 
 ## Performance Characteristics
 
@@ -141,19 +135,19 @@ int sigma_contacts_export_vcard(const char *contact_id, const char *path);
 
 ## Roadmap
 
-*   \[x] Architecture design and component specification
-*   \[ ] SigmaDrive IPFS/Filecoin integration
-*   \[ ] SigmaMail IMAP/SMTP client implementation
-*   \[ ] SigmaCalendar event scheduler implementation
-*   \[ ] SigmaContacts database implementation
-*   \[ ] End-to-end encryption implementation
-*   \[ ] AI-powered features (spam filter, categorization, suggestions)
-*   \[ ] Mobile apps (SigmaOS Mobile, iOS, Android)
-*   \[ ] Web interface (SigmaOS Cloud)
-*   \[ ] Enterprise features (SSO, admin console, audit logs)
+- [x] Architecture design and component specification
+- [ ] SigmaDrive IPFS/Filecoin integration
+- [ ] SigmaMail IMAP/SMTP client implementation
+- [ ] SigmaCalendar event scheduler implementation
+- [ ] SigmaContacts database implementation
+- [ ] End-to-end encryption implementation
+- [ ] AI-powered features (spam filter, categorization, suggestions)
+- [ ] Mobile apps (SigmaOS Mobile, iOS, Android)
+- [ ] Web interface (SigmaOS Cloud)
+- [ ] Enterprise features (SSO, admin console, audit logs)
 
 ## Related Modules
 
-*   [`modules/core/net`](../../modules/core/net/README.md) — Network stack
-*   [`security/pqc/README.md`](../../security/pqc/README.md) — Post-quantum cryptography
-*   [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration
+- [`modules/core/net`](../../modules/core/net/README.md) — Network stack
+- [`security/pqc/README.md`](../../security/pqc/README.md) — Post-quantum cryptography
+- [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration

@@ -1,6 +1,6 @@
 # Detects variable in filename argument of "fs" calls, which might allow an attacker to access anything on your system (`security/detect-non-literal-fs-filename`)
 
-⚠️ This rule *warns* in the ✅ `recommended` config.
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

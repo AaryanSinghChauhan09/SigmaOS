@@ -17,23 +17,24 @@
 ## Btrfs (Default Root)
 
 Key features:
-
-*   Copy-on-Write (all writes are CoW)
-*   Subvolumes (independent namespace)
-*   Snapshots (instant CoW clones)
-*   RAID 0/1/5/6/10 (built-in)
-*   Compression (zstd/lzo/zlib)
-*   Checksums (CRC32c/xxHash)
-*   Deduplication (offline)
+- Copy-on-Write (all writes are CoW)
+- Subvolumes (independent namespace)
+- Snapshots (instant CoW clones)
+- RAID 0/1/5/6/10 (built-in)
+- Compression (zstd/lzo/zlib)
+- Checksums (CRC32c/xxHash)
+- Deduplication (offline)
 
 ### Subvolume Layout
 
-    /dev/nvme0n1p2 (btrfs pool)
-    ├── @           → /
-    ├── @home       → /home
-    ├── @snapshots  → snapshot storage
-    ├── @var        → /var
-    └── @tmp        → /tmp
+```
+/dev/nvme0n1p2 (btrfs pool)
+├── @           → /
+├── @home       → /home
+├── @snapshots  → snapshot storage
+├── @var        → /var
+└── @tmp        → /tmp
+```
 
 ### Automatic Snapshots
 
@@ -45,9 +46,11 @@ Key features:
 
 ## OverlayFS (Containers)
 
-    upperdir: /containers/CTID/upper  (writable)
-    lowerdir: image/layer3 : layer2 : layer1  (read-only)
-    merged:   /containers/CTID/root  (mount point)
+```
+upperdir: /containers/CTID/upper  (writable)
+lowerdir: image/layer3 : layer2 : layer1  (read-only)
+merged:   /containers/CTID/root  (mount point)
+```
 
 ## EROFS (OCI Layers)
 
