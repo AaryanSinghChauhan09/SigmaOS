@@ -7,7 +7,7 @@
 //!
 //! ## Architecture
 //!
-//! ```
+//! ```text
 //! Application renders → wl_buffer (DMA-BUF or SHM)
 //!     → ZenithCompositor (damage tracking)
 //!     → Scene graph (sorted by z-order)

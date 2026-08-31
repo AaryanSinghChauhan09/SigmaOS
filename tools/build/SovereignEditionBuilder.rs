@@ -2,9 +2,9 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code, non_snake_case)]
 
-/// SigmaOS: SovereignEditionBuilder.rs
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
+// SigmaOS: SovereignEditionBuilder.rs
+// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+// All types hand-defined. OOP via struct + impl + trait patterns.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -24,6 +24,12 @@ type SigmaUsize = usize;
 pub struct StaticVec<T: Copy, const N: usize> {
     data: [Option<T>; N],
     len: usize,
+}
+
+impl<T: Copy, const N: usize> Default for StaticVec<T, N> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T: Copy, const N: usize> StaticVec<T, N> {
@@ -82,9 +88,7 @@ impl EditionPackage {
     pub fn new(name_str: &[u8], required: bool) -> Self {
         let mut name = [0u8; 48];
         let len = name_str.len().min(47);
-        for i in 0..len {
-            name[i] = name_str[i];
-        }
+        name[..len].copy_from_slice(&name_str[..len]);
         Self { name, required }
     }
 
@@ -119,15 +123,11 @@ impl Edition {
     ) -> Self {
         let mut name = [0u8; 48];
         let name_len = name_str.len().min(47);
-        for i in 0..name_len {
-            name[i] = name_str[i];
-        }
+        name[..name_len].copy_from_slice(&name_str[..name_len]);
 
         let mut make_target = [0u8; 32];
         let make_len = make_str.len().min(31);
-        for i in 0..make_len {
-            make_target[i] = make_str[i];
-        }
+        make_target[..make_len].copy_from_slice(&make_str[..make_len]);
 
         Self {
             id,
@@ -153,6 +153,12 @@ pub struct EditionTarget {
     pub initialized: SigmaBool,
     pub editions: StaticVec<Edition, 8>,
     pub packages: StaticVec<(SigmaU32, EditionPackage), 32>, // Mapped by (edition_id, package)
+}
+
+impl Default for EditionTarget {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EditionTarget {
@@ -271,34 +277,48 @@ impl EditionTarget {
 
 static mut INSTANCE: EditionTarget = EditionTarget::new();
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn init() {
-    INSTANCE.init();
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setTorDefault() {
-    INSTANCE.setTorDefault(1, true);
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).setTorDefault(1, true); }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setMinimalGUI() {
-    INSTANCE.setMinimalGUI(1, true);
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).setMinimalGUI(1, true); }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn printStatus() {}
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_init() {
-    INSTANCE.init();
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_build() {
-    let _ = INSTANCE.buildEdition(1);
+    unsafe { let _ = (&mut *core::ptr::addr_of_mut!(INSTANCE)).buildEdition(1); }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_status() {}
 
