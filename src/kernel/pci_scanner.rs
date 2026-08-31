@@ -16,6 +16,7 @@ pub enum PciClass {
     Unknown,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PciDevice {
     pub bus: u8,
     pub slot: u8,

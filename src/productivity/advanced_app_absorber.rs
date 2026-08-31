@@ -2,8 +2,8 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use klib::collections::{BTreeMap, HashMap, VecDeque};
-use klib::path::PathBuf;
+use crate::klib::collections::{BTreeMap, HashMap, VecDeque};
+use crate::klib::path::PathBuf;
 use std::path::Path;
 use crate::klib::Uuid;
 

@@ -577,6 +577,9 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
             IoOperation::Write { offset: _, data } => Ok(IoResult::WriteComplete {
                 bytes_written: data.len(),
             }),
+            IoOperation::Ioctl { .. } | IoOperation::Mmap { .. } | IoOperation::Poll { .. } => {
+                Err(DriverError::NotSupported)
+            }
         }
     }
 

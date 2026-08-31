@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 pub mod audio {
     pub mod driver;
     pub mod editor;
@@ -47,8 +49,6 @@ pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod virtualization;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
 pub mod cluster;
 
 pub mod graphics {
@@ -63,10 +63,7 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-}
+pub mod ai;
 pub mod boot;
 pub mod toolchain {
     pub mod adapter;
@@ -129,9 +126,26 @@ pub use kernel::{
     KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
     PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
+    Scheduler, RoundRobinSchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+};
+pub use process::{
+    ActivityManager, ActivityState, AddressSpaceBinding, CGroup, LinuxProcessEntry,
+    LinuxProcessState, LinuxSignal, NiceValue, PidNamespace, ProcFileSystem,
+    ProcessActivityRecord, ProcessSpawner, ProcessWaiter, RegisterSnapshot,
+    SimpleProcess, SimpleProcessSpawner, SimpleProcessWaiter,
+};
+pub use memory::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES, PageDirectory, PageDirectoryPointerTable, PageTable,
+    PageTableEntry, PhysicalAddress, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
+    SegmentationPagingEngine, SimpleVMM, SpaceProtectionFlags, SystemControlRegisters,
+    VirtualAddress,
+};
+pub use tools::{
+    ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
+    SigmaIdentity, SigmaToolError, UserIdentity,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -171,8 +185,8 @@ pub use package::{
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use remote::{
-    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
     SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
@@ -190,13 +204,13 @@ pub use security::hardening;
 pub use security::{
     secure_zeroize, AuditLogEntry, CapabilityGate, CapabilityToken, ExploitPayload,
     HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, PenetrationAssistant, Permission,
-    PledgeManager, PledgePromise, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    PledgeManager, PledgePromise, SimpleVulnerabilityScanner, VulnerabilityScanner,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier,
+    PackageRecipe, RecipeError, RecipeManager, SatSolver,
+    Transaction, UniversalPackageAdapterManager,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
@@ -208,12 +222,8 @@ pub mod init {
 }
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
-pub mod ai {
-    pub mod next_gen;
-    pub mod wandr;
-}
 pub use ai::next_gen::{
-    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyAwareScheduler,
+    AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType,
     EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
     WorkloadType,
 };

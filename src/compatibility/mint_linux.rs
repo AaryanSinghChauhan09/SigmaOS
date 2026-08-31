@@ -3,16 +3,9 @@
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
-
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
-
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {

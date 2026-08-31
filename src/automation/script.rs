@@ -1,13 +1,10 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
-
 #![no_std]
 
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
+
+extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::format;
@@ -19,11 +16,21 @@ pub type ScriptID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
+pub enum ScriptLanguage {
+    Python = 0,
+    JavaScript = 1,
+    Lua = 2,
+    Shell = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2, InvalidArgument = 3 }
+pub enum ScriptError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    InvalidArgument = 3,
+}
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -150,6 +157,12 @@ impl SimpleScriptEngine {
         }
 
         Err(ScriptError::NotFound)
+    }
+}
+
+impl Default for SimpleScriptEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -294,6 +307,12 @@ impl SimpleScriptEnvironment {
     }
 }
 
+impl Default for SimpleScriptEnvironment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================
 // ADDITIONAL DIAGNOSTICS & SYSTEM UTILITIES
 // ==========================================
@@ -319,7 +338,6 @@ impl UpxUnpacker {
             return Err("UPX: Signature mismatch (not compressed with UPX).");
         }
 
-        // Simple decompressive decryption: XOR shift with offset bytes
         let mut decompressed = Vec::new();
         for i in 4..compressed.len() {
             decompressed.push(compressed[i] ^ 0x5A);
@@ -376,137 +394,6 @@ impl StringDescrambler {
     }
 
     /// Descrambles an obfuscated byte sequence on-the-fly
-    pub fn descramble_string(&self, scrambled: &[u8]) -> Vec<u8> {
-        let mut cleartext = Vec::new();
-        for &byte in scrambled {
-            cleartext.push(byte ^ self.xor_key);
-        }
-        cleartext
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-
-        self.keys.push(key_entry);
-        self.values.push(value_entry);
-        self.key_lengths.push(key_len);
-        self.value_lengths.push(value_len);
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        None
-    }
-}
-
-impl Default for SimpleScriptEnvironment {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct UpxUnpacker {
-    pub magic_header: [u8; 4],
-}
-
-impl UpxUnpacker {
-    pub fn new() -> Self {
-        UpxUnpacker {
-            magic_header: *b"UPX!",
-        }
-    }
-
-    pub fn decompress_payload(&self, compressed: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if compressed.len() < 8 {
-            return Err("UPX: Payload is too small.");
-        }
-        if &compressed[..4] != &self.magic_header {
-            return Err("UPX: Signature mismatch (not compressed with UPX).");
-        }
-
-        let mut decompressed = Vec::new();
-        for i in 4..compressed.len() {
-            decompressed.push(compressed[i] ^ 0x5A);
-        }
-        Ok(decompressed)
-    }
-}
-
-impl Default for UpxUnpacker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FsEvent {
-    Modified,
-    Added,
-    Deleted,
-}
-
-pub struct FileMonitor {
-    pub monitored_path: [u8; 64],
-    pub events_count: u32,
-}
-
-impl FileMonitor {
-    pub fn new(path: &[u8]) -> Self {
-        let mut path_arr = [0u8; 64];
-        let len = path.len().min(63);
-        path_arr[..len].copy_from_slice(&path[..len]);
-        FileMonitor {
-            monitored_path: path_arr,
-            events_count: 0,
-        }
-    }
-
-    pub fn simulate_event(&mut self, _file_name: &str, event: FsEvent) -> (FsEvent, u32) {
-        self.events_count += 1;
-        (event, self.events_count)
-    }
-}
-
-pub struct StringDescrambler {
-    pub xor_key: u8,
-}
-
-impl StringDescrambler {
-    pub fn new(key: u8) -> Self {
-        StringDescrambler { xor_key: key }
-    }
-
     pub fn descramble_string(&self, scrambled: &[u8]) -> Vec<u8> {
         let mut cleartext = Vec::new();
         for &byte in scrambled {
@@ -651,80 +538,5 @@ mod tests {
         let res = router.substitute_arguments("Echo $1 then $2 all $@", &args);
         assert!(res.contains("arg1"));
         assert!(res.contains("arg2"));
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_script_positional_arguments_expansion() {
-        let engine = SimpleScriptEngine::new();
-        let script = SimpleScript::new(1, b"greet.sh", ScriptLanguage::Shell, b"echo hello $1, welcome back $2!");
-
-        let script_id = 1;
-        let mut scripts = Vec::new();
-        scripts.push(Some(Box::new(script) as Box<dyn Script>));
-
-        let mut engine_with_script = SimpleScriptEngine {
-            scripts,
-            next_id: AtomicUsize::new(2),
-            aliases: SimpleScriptEnvironment::new(),
-        };
-
-        let result = engine_with_script.execute_script_with_args(script_id, &[b"alice", b"sovereign"]).unwrap();
-        assert_eq!(result, b"echo hello alice, welcome back sovereign!");
-    }
-
-    #[test]
-    fn test_script_alias_mapping_and_call() {
-        let mut engine = SimpleScriptEngine::new();
-        let script = SimpleScript::new(1, b"backup.sh", ScriptLanguage::Shell, b"tar -cvf $1");
-
-        engine.load_script(Box::new(script)).unwrap();
-        engine.set_script_alias(b"backup", b"backup.sh");
-
-        let res = engine.execute_by_alias(b"backup", &[b"/home/state"]).unwrap();
-        assert_eq!(res, b"tar -cvf /home/state");
-    }
-
-    #[test]
-    fn test_upx_unpacker_decompression() {
-        let unpacker = UpxUnpacker::new();
-
-        // 1. Invalid payload
-        assert!(unpacker.decompress_payload(&[0; 5]).is_err());
-
-        // 2. Signature mismatch
-        assert!(unpacker.decompress_payload(b"NOT_UPX!").is_err());
-
-        // 3. Perfect decompression of standard mock payload
-        let compressed_payload = [
-            b'U', b'P', b'X', b'!',          // Magic header
-            b'H' ^ 0x5A, b'E' ^ 0x5A, b'L' ^ 0x5A, b'L' ^ 0x5A, b'O' ^ 0x5A, // Payload
-        ];
-
-        let decompressed = unpacker.decompress_payload(&compressed_payload).unwrap();
-        assert_eq!(decompressed, b"HELLO");
-    }
-
-    #[test]
-    fn test_file_monitor_events() {
-        let mut monitor = FileMonitor::new(b"/var/log");
-        assert_eq!(monitor.events_count, 0);
-
-        let (event, count) = monitor.simulate_event("auth.log", FsEvent::Modified);
-        assert_eq!(event, FsEvent::Modified);
-        assert_eq!(count, 1);
-    }
-
-    #[test]
-    fn test_string_descrambling() {
-        let descrambler = StringDescrambler::new(0x33);
-        let scrambled = [b'A' ^ 0x33, b'B' ^ 0x33, b'C' ^ 0x33];
-
-        let descrambled = descrambler.descramble_string(&scrambled);
-        assert_eq!(descrambled, b"ABC");
     }
 }

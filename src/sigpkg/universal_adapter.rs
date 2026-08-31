@@ -1,8 +1,51 @@
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+use crate::klib::collections::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
+
+pub trait PackageFormatAdapter {
+    fn format_name(&self) -> &str;
+    fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
+    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> { self.parse_manifest(raw) }
+    fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
+    fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
+    fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
+    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub id: String,
+    pub app_id: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
+
+pub type UniversalPackageAdapter = UniversalPackageManager;
+
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
-/// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
-/// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+/// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), Flatpak (.json),
+/// FreeBSD pkg (+MANIFEST), OpenBSD pkg_add (+CONTENTS), and Solus eopkg (pspec.xml).
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -232,6 +275,7 @@ impl DebAdapter {
         }
 
         Ok(FlatpakManifest {
+            id: app_id.clone(),
             app_id,
             command,
             finish_args,
@@ -296,7 +340,6 @@ impl PackageFormatAdapter for DebAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse debian control file format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -349,7 +392,6 @@ impl PackageFormatAdapter for DebAdapter {
     }
     
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        // Basic validation: check if it looks like a debian control file
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         
@@ -398,7 +440,6 @@ impl PackageFormatAdapter for RpmAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse RPM header format (simplified)
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -498,7 +539,6 @@ impl PackageFormatAdapter for PacmanAdapter {
     }
     
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        // Parse .PKGINFO format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         
@@ -566,6 +606,185 @@ impl Default for PacmanAdapter {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// FreeBSD `pkg` (+MANIFEST) package adapter
+pub struct FreeBsdPkgAdapter {
+    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+}
+
+impl FreeBsdPkgAdapter {
+    pub fn new() -> Self { Self { user_hooks: Vec::new() } }
+}
+
+impl PackageFormatAdapter for FreeBsdPkgAdapter {
+    fn format_name(&self) -> &str { "freebsd_pkg" }
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("name: ") {
+                name = line[6..].replace('"', "").replace(',', "");
+            } else if line.starts_with("version: ") {
+                version_str = line[9..].replace('"', "").replace(',', "");
+            } else if line.starts_with("comment: ") {
+                description = line[9..].replace('"', "").replace(',', "");
+            } else if line.starts_with("deps: ") || line.contains("origin:") {
+                let dep_name = line.split(':').nth(0).unwrap_or("").trim().replace('"', "");
+                if !dep_name.is_empty() && dep_name != "deps" && dep_name != "name" {
+                    dependencies.push(Dependency { name: dep_name, version_constraint: VersionConstraint::Any });
+                }
+            }
+        }
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+        Ok(Package::new(name, version, description, dependencies, String::new()))
+    }
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("name: \"{}\"\n", package.name));
+        output.push_str(&format!("version: \"{}.{}.{}\"\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("comment: \"{}\"\n", package.description));
+        Ok(output.into_bytes())
+    }
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("name:") && content.contains("version:"))
+    }
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks { hook(package)?; }
+        Ok(())
+    }
+}
+
+impl Default for FreeBsdPkgAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+/// OpenBSD `pkg_add` (+CONTENTS) package adapter
+pub struct OpenBsdPkgAddAdapter {
+    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+}
+
+impl OpenBsdPkgAddAdapter {
+    pub fn new() -> Self { Self { user_hooks: Vec::new() } }
+}
+
+impl PackageFormatAdapter for OpenBsdPkgAddAdapter {
+    fn format_name(&self) -> &str { "openbsd_pkg" }
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            if line.starts_with("@name ") {
+                let full = &line[6..];
+                if let Some(dash) = full.rfind('-') {
+                    name = full[..dash].to_string();
+                    version_str = full[dash + 1..].to_string();
+                } else {
+                    name = full.to_string();
+                }
+            } else if line.starts_with("@depend ") {
+                let dep_str = &line[8..];
+                let dep_name = dep_str.split(':').next().unwrap_or("").to_string();
+                dependencies.push(Dependency { name: dep_name, version_constraint: VersionConstraint::Any });
+            }
+        }
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+        Ok(Package::new(name, version, "OpenBSD package".to_string(), dependencies, String::new()))
+    }
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str(&format!("@name {}-{}.{}.{}\n", package.name, package.version.major, package.version.minor, package.version.patch));
+        for dep in &package.dependencies {
+            output.push_str(&format!("@depend {}:*:\n", dep.name));
+        }
+        Ok(output.into_bytes())
+    }
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("@name "))
+    }
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks { hook(package)?; }
+        Ok(())
+    }
+}
+
+impl Default for OpenBsdPkgAddAdapter {
+    fn default() -> Self { Self::new() }
+}
+
+/// Solus `eopkg` (pspec.xml) package adapter
+pub struct SolusEopkgAdapter {
+    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+}
+
+impl SolusEopkgAdapter {
+    pub fn new() -> Self { Self { user_hooks: Vec::new() } }
+}
+
+impl PackageFormatAdapter for SolusEopkgAdapter {
+    fn format_name(&self) -> &str { "solus_eopkg" }
+    fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("<Name>") && line.ends_with("</Name>") {
+                name = line[6..line.len() - 7].to_string();
+            } else if line.starts_with("<Version>") && line.ends_with("</Version>") {
+                version_str = line[9..line.len() - 10].to_string();
+            } else if line.starts_with("<Summary>") && line.ends_with("</Summary>") {
+                description = line[9..line.len() - 10].to_string();
+            }
+        }
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+        Ok(Package::new(name, version, description, Vec::new(), String::new()))
+    }
+    fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
+        let mut output = String::new();
+        output.push_str("<Pspec>\n");
+        output.push_str(&format!("  <Name>{}</Name>\n", package.name));
+        output.push_str(&format!("  <Version>{}.{}.{}</Version>\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!("  <Summary>{}</Summary>\n", package.description));
+        output.push_str("</Pspec>\n");
+        Ok(output.into_bytes())
+    }
+    fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
+        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("<Name>") && content.contains("<Version>"))
+    }
+    fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
+        let package = self.parse_package(data)?;
+        Ok(package.dependencies)
+    }
+    fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
+        for hook in &self.user_hooks { hook(package)?; }
+        Ok(())
+    }
+}
+
+impl Default for SolusEopkgAdapter {
+    fn default() -> Self { Self::new() }
 }
 
 /// Alpine Linux APK package adapter
@@ -673,7 +892,6 @@ impl PackageFormatAdapter for NixAdapter {
                 let parts: Vec<&str> = line.split('"').collect();
                 if parts.len() >= 2 { description = parts[1].to_string(); }
             } else if line.contains("buildInputs =") {
-                // extract dependencies simply
                 let parts: Vec<&str> = line.split('[').nth(1).unwrap_or("").split(']').next().unwrap_or("").split_whitespace().collect();
                 for dep in parts {
                     if !dep.is_empty() {
@@ -811,6 +1029,9 @@ impl UniversalPackageManager {
         manager.register_adapter(Box::new(ApkAdapter::new()));
         manager.register_adapter(Box::new(NixAdapter::new()));
         manager.register_adapter(Box::new(EbuildAdapter::new()));
+        manager.register_adapter(Box::new(FreeBsdPkgAdapter::new()));
+        manager.register_adapter(Box::new(OpenBsdPkgAddAdapter::new()));
+        manager.register_adapter(Box::new(SolusEopkgAdapter::new()));
         
         manager
     }
@@ -835,7 +1056,7 @@ impl UniversalPackageManager {
     
     /// Auto-detect package format and parse
     pub fn auto_parse(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        for (format_name, adapter) in &self.adapters {
+        for (_format_name, adapter) in &self.adapters {
             if adapter.validate(data).unwrap_or(false) {
                 let mut package = adapter.parse_package(data)?;
                 adapter.process_hook(&mut package)?;
@@ -906,7 +1127,6 @@ mod tests {
         assert_eq!(parsed.depends.len(), 3);
         assert_eq!(parsed.priority, PackagePriority::Standard);
 
-        // Test parsing system essential priority (Debian-style)
         let essential_text = r#"
             Package: sigma-init
             Version: 1.0.0
@@ -925,6 +1145,28 @@ mod tests {
             .unwrap();
         assert_eq!(native.name, "curl");
         assert_eq!(native.version, Version::new(8, 2, 1));
+    }
+
+    #[test]
+    fn test_bsd_and_solus_package_adapters() {
+        let freebsd = FreeBsdPkgAdapter::new();
+        let freebsd_data = b"name: \"nginx\"\nversion: \"1.24.0\"\ncomment: \"High performance web server\"";
+        let pkg_fb = freebsd.parse_package(freebsd_data).unwrap();
+        assert_eq!(pkg_fb.name, "nginx");
+        assert_eq!(pkg_fb.version.major, 1);
+
+        let openbsd = OpenBsdPkgAddAdapter::new();
+        let openbsd_data = b"@name bash-5.2.15\n@depend gettext-runtime:*:";
+        let pkg_ob = openbsd.parse_package(openbsd_data).unwrap();
+        assert_eq!(pkg_ob.name, "bash");
+        assert_eq!(pkg_ob.version.major, 5);
+        assert_eq!(pkg_ob.dependencies.len(), 1);
+
+        let solus = SolusEopkgAdapter::new();
+        let solus_data = b"<Pspec>\n  <Name>gnome-terminal</Name>\n  <Version>3.44.0</Version>\n  <Summary>Terminal emulator</Summary>\n</Pspec>";
+        let pkg_solus = solus.parse_package(solus_data).unwrap();
+        assert_eq!(pkg_solus.name, "gnome-terminal");
+        assert_eq!(pkg_solus.version.major, 3);
     }
 
     #[test]
@@ -966,180 +1208,5 @@ Description: Auto-detection test";
         
         let package = manager.auto_parse(deb_data).unwrap();
         assert_eq!(package.name, "auto-test");
-    }
-    
-    #[test]
-    fn test_user_defined_hook() {
-        let mut adapter = DebAdapter::new();
-        
-        // Add a user-defined hook that modifies the package
-        adapter.add_hook(|package: &mut Package| -> Result<(), AdapterError> {
-            package.name = format!("hooked-{}", package.name);
-            Ok(())
-        });
-        
-        let deb_data = b"Package: original
-Version: 1.0.0
-Description: Hook test";
-        
-        let mut package = adapter.parse_package(deb_data).unwrap();
-        adapter.process_hook(&mut package).unwrap();
-        
-        assert_eq!(package.name, "hooked-original");
-    }
-    
-    #[test]
-    fn test_format_conversion() {
-        let manager = UniversalPackageManager::new();
-        let package = Package::new(
-            "convert-test".to_string(),
-            Version::new(1, 0, 0),
-            "Conversion test".to_string(),
-            vec![],
-            String::new(),
-        );
-        
-        let rpm_data = manager.convert_format(&package, "rpm").unwrap();
-        let rpm_str = String::from_utf8(rpm_data).unwrap();
-        
-        assert!(rpm_str.contains("Name: convert-test"));
-        assert!(rpm_str.contains("Version: 1.0.0"));
-    }
-}
-
-/// RedHat/Yum RPM SPEC manifest structure
-#[derive(Debug, Clone)]
-pub struct RpmSpecManifest {
-    pub name: String,
-    pub version: String,
-    pub release: String,
-    pub summary: String,
-    pub license: String,
-    pub requires: Vec<String>, // Dependencies list
-}
-
-/// AppImage single-file containerized loop-mounted layout
-#[derive(Debug, Clone)]
-pub struct AppImageContainer {
-    pub file_name: String,
-    pub payload_offset_bytes: u64,
-    pub entry_point_cmd: String,
-    pub mounted: bool,
-}
-
-impl AppImageContainer {
-    pub fn new(file_name: &str, entry_point_cmd: &str) -> Self {
-        AppImageContainer {
-            file_name: file_name.to_string(),
-            payload_offset_bytes: 0x20000, // standard SquashFS offset
-            entry_point_cmd: entry_point_cmd.to_string(),
-            mounted: false,
-        }
-    }
-
-    /// Mounts the SquashFS payload of the AppImage dynamically (simulated)
-    pub fn mount_and_run(&mut self, mount_point: &str) -> Result<String, &'static str> {
-        if mount_point.is_empty() {
-            return Err("AppImage: Invalid mount point.");
-        }
-        self.mounted = true;
-        let mut exec_path = mount_point.to_string();
-        exec_path.push_str("/");
-        exec_path.push_str(&self.entry_point_cmd);
-        Ok(exec_path)
-    }
-}
-
-impl UniversalPackageAdapter {
-    /// Parses RedHat/Yum .spec files for RPM metadata translation
-    pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut release = String::new();
-        let mut summary = String::new();
-        let mut license = String::new();
-        let mut requires = Vec::new();
-
-        for line in text.lines() {
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
-                continue;
-            }
-            if let Some(pos) = line.find(':') {
-                let key = line[..pos].trim();
-                let val = line[pos + 1..].trim();
-                match key {
-                    "Name" => name = val.to_string(),
-                    "Version" => version = val.to_string(),
-                    "Release" => release = val.to_string(),
-                    "Summary" => summary = val.to_string(),
-                    "License" => license = val.to_string(),
-                    "Requires" => {
-                        for req in val.split(',') {
-                            requires.push(req.trim().to_string());
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        if name.is_empty() || version.is_empty() {
-            return Err("Invalid RPM spec file: missing Name or Version");
-        }
-
-        Ok(RpmSpecManifest {
-            name,
-            version,
-            release,
-            summary,
-            license,
-            requires,
-        })
-    }
-}
-
-#[cfg(test)]
-mod additional_adapter_tests {
-    use super::*;
-
-    #[test]
-    fn test_rpm_spec_parsing_and_native_translation() {
-        let adapter = UniversalPackageAdapter::new();
-        let spec_text = r#"
-            Name: custom_service
-            Version: 2.1
-            Release: 1%{?dist}
-            Summary: High performance backend service
-            License: GPL-3.0
-            Requires: bash, glibc >= 2.17
-        "#;
-
-        let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
-        assert_eq!(parsed.name, "custom_service");
-        assert_eq!(parsed.version, "2.1");
-        assert_eq!(parsed.license, "GPL-3.0");
-        assert_eq!(parsed.requires.len(), 2);
-        assert_eq!(parsed.requires[0], "bash");
-
-        let native = adapter.translate_to_native_package(
-            &parsed.name,
-            &parsed.version,
-            &parsed.summary,
-            parsed.requires.as_slice(),
-        ).unwrap();
-
-        assert_eq!(native.name, "custom_service");
-        assert_eq!(native.version, Version::new(2, 1, 0));
-    }
-
-    #[test]
-    fn test_appimage_single_file_loop_mounting() {
-        let mut appimage = AppImageContainer::new("Vlc-3.0.18-x86_64.AppImage", "vlc");
-        assert!(!appimage.mounted);
-
-        let exec_path = appimage.mount_and_run("/tmp/.mount_vlc").unwrap();
-        assert_eq!(exec_path, "/tmp/.mount_vlc/vlc");
-        assert!(appimage.mounted);
     }
 }

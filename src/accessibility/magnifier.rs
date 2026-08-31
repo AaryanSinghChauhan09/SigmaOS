@@ -1,4 +1,5 @@
-use crate::klib::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
@@ -106,7 +107,7 @@ impl MagnifierManager for SimpleMagnifierManager {
         for magnifier_option in &self.magnifiers {
             if let Some(ref magnifier) = *magnifier_option {
                 if magnifier.id() == id {
-                    return Some(magnifier.as_ref());
+                    return Some(&**magnifier);
                 }
             }
         }

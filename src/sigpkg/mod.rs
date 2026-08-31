@@ -2,24 +2,37 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod aur;
+pub mod aur_helper;
+pub mod debian_crusher;
 pub mod debian_defeater;
+pub mod declarative_build;
 pub mod importer;
+pub mod linux_compat;
 pub mod makepkg;
 pub mod nix_shell;
+pub mod pacman;
 pub mod portage;
 pub mod recipe;
+pub mod repository_manager;
 pub mod resolver;
+pub mod rolling_release;
 pub mod rpm_compat;
+pub mod sovereign_sigpkg;
+pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod transaction_log;
 pub mod universal_adapter;
+pub mod universal_engine;
+pub mod universal_oop_system;
 pub mod verifier;
+pub mod zero_alloc_resolver;
 
 pub use arch_compat::{AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager};
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use debian_defeater::{
-    SovereignDeltaGenerator, SovereignMirrorSelector, SovereignSandboxEnforcer,
-    SovereignTransactionManager, TransactionStatus,
+    SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use spec::{
@@ -35,7 +48,8 @@ pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+    ApkAdapter, AptDebManifest, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter,
+    RpmAdapter, RpmSpecManifest, UniversalPackageManager as UniversalPackageAdapterManager,
 };
 pub use verifier::CryptoVerifier;
 
@@ -47,9 +61,8 @@ pub struct Version {
     pub patch: u64,
 }
 
-
 impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<"_">) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }

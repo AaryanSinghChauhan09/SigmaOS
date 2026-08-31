@@ -88,7 +88,7 @@ impl SigmaEnv {
     
     /// Get environment variables iterator
     pub fn vars() -> EnvIterator {
-        let envp = Self::get_envp_pointer();
+        let envp = unsafe { Self::get_envp_pointer() };
         EnvIterator::new(envp)
     }
     

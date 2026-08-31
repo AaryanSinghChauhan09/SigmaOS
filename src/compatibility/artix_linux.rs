@@ -191,6 +191,7 @@ pub enum OpenRCServiceState {
     Crashed,
 }
 
+#[derive(Debug, Clone)]
 pub struct OpenRCService {
     pub name: String,
     pub state: OpenRCServiceState,
