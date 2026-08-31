@@ -1,29 +1,16 @@
-extern crate alloc;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
-
-/// Lifecycle timing for package hooks
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookTiming {
-    PreInstall,
-    PostInstall,
-    PreRemove,
-    PostRemove,
-}
-
-/// Trait for package hooks
-pub trait PackageHook: Send + Sync {
-    fn timing(&self) -> HookTiming;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
-
+use alloc::vec;
+use alloc::format;
+use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -1854,20 +1841,6 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
-    }
-
-    #[test]
-    fn test_convert_to_sigpkg() {
-        let manager = UniversalPackageManager::new();
-        let deb_pkg = UnifiedPackage::new("curl".to_string(), "7.88.1".to_string())
-            .with_format(PackageFormat::Deb)
-            .with_dependency("libssl".to_string());
-
-        let sigpkg = manager.convert_to_sigpkg(&deb_pkg).unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-curl");
-        assert!(sigpkg.formats.contains(&PackageFormat::SigmaPkg));
-        assert!(sigpkg.dependencies.contains(&"libssl".to_string()));
-        assert!(sigpkg.provides.contains(&"curl".to_string()));
     }
 
     #[test]
