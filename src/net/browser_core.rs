@@ -195,8 +195,11 @@ impl BrowserCore {
     /// Check if URL should be blocked by adblock
     pub fn should_block_url(&self, url: &str) -> bool {
         for rule in &self.adblock_rules {
-            if !rule.is_whitelist && url.contains(&rule.pattern) {
-                return true;
+            if !rule.is_whitelist {
+                let pat = rule.pattern.trim_start_matches("*.");
+                if url.contains(pat) {
+                    return true;
+                }
             }
         }
         false
