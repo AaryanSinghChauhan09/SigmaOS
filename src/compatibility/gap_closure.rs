@@ -33,7 +33,13 @@ use alloc::vec;
 // 11. Local AI task orchestration scheduler (S-AI)
 
 extern crate alloc;
-use crate::compatibility::canonical::DesktopMode;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopMode {
+    ClassicDE,
+    TilingWM,
+    TouchTabletMode,
+}
+
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::format;
 use alloc::string::{String, ToString};
