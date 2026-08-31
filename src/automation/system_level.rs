@@ -43,6 +43,9 @@ pub enum SystemEventType {
     LocationChange,
     DeviceConnected,
     DeviceDisconnected,
+    LinuxEBPFNetworkFilter,
+    BsdKqueueFileEvent,
+    AnondDevlinkThermalFault,
 }
 
 /// System action type
@@ -58,6 +61,8 @@ pub enum SystemAction {
     BalanceLoad,
     EnableTurboMode { enabled: bool },
     AdjustCooling { level: u8 },
+    TriggerBsdCronTask { task_name: String },
+    TriggerSystemdTimer { unit_name: String },
 }
 
 /// Predictive model type
@@ -353,6 +358,8 @@ impl SystemAutomationManager {
             SystemAction::BalanceLoad => 9,
             SystemAction::EnableTurboMode { .. } => 11,
             SystemAction::AdjustCooling { .. } => 14,
+            SystemAction::TriggerBsdCronTask { .. } => 13,
+            SystemAction::TriggerSystemdTimer { .. } => 13,
         }
     }
 
@@ -387,6 +394,12 @@ impl SystemAutomationManager {
             }
             SystemAction::AdjustCooling { level } => {
                 println!("Adjusting cooling to level {}", level);
+            }
+            SystemAction::TriggerBsdCronTask { task_name } => {
+                println!("Triggering BSD periodic cron task: {}", task_name);
+            }
+            SystemAction::TriggerSystemdTimer { unit_name } => {
+                println!("Triggering systemd timer unit: {}", unit_name);
             }
         }
         Ok(())
@@ -532,5 +545,34 @@ mod tests {
         let duration = Duration::from_secs(3600);
         let scheduled_time = manager.get_smart_scheduling(duration);
         assert!(scheduled_time > 0);
+    }
+
+    #[test]
+    fn test_linux_bsd_automation_triggers() {
+        let mut manager = SystemAutomationManager::new();
+        let rule = SystemAutomationRule::new(
+            "ebpf_net_rule".to_string(),
+            "eBPF Fast Path Filter Trigger".to_string(),
+            SystemEventType::LinuxEBPFNetworkFilter,
+        )
+        .with_action(SystemAction::BalanceLoad);
+
+        manager.add_rule(rule);
+        let actions = manager.handle_event(SystemEventType::LinuxEBPFNetworkFilter, BTreeMap::new());
+        assert_eq!(actions.len(), 1);
+    }
+
+    #[test]
+    fn test_system_automation_cron_and_timer_actions() {
+        let mut manager = SystemAutomationManager::new();
+        let cron_action = SystemAction::TriggerBsdCronTask {
+            task_name: "daily.clean".to_string(),
+        };
+        let timer_action = SystemAction::TriggerSystemdTimer {
+            unit_name: "fstrim.timer".to_string(),
+        };
+
+        assert!(manager.execute_action(cron_action).is_ok());
+        assert!(manager.execute_action(timer_action).is_ok());
     }
 }

@@ -2,6 +2,11 @@
 pub mod zenith_compositor;
 pub mod moksha;
 pub mod pantheon;
+pub mod screensaver;
+
+pub use screensaver::{
+    DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+};
 
 pub use pantheon::{
     GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,

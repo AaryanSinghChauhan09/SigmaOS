@@ -1,12 +1,55 @@
-# 🖥️ SigmaOS vs Linux Distros (Ubuntu/Fedora/Arch) — Comparative Dashboard & Evolution Roadmap
+# 🖥️ SigmaOS vs Linux & BSD Distros — Comparative Dashboard, Gantt Roadmap & Competitive Strategy
 
-This document presents a comparative dashboard and strategic development roadmap tracing SigmaOS's evolution from conceptual microkernel skeleton into a daily-driver sovereign operating system ecosystem.
+This document presents a comparative dashboard, Gantt-style timeline roadmap, and strategic positioning framework benchmarking SigmaOS against major Linux distributions (Ubuntu, Arch, Fedora) and BSD variants (FreeBSD, OpenBSD, NetBSD).
 
 ---
 
-## 🖥️ SigmaOS vs Linux Distros Comparative Matrix
+## 📅 SigmaOS Development Timeline (Gantt-style Roadmap)
 
-| Component | Linux Distros (Ubuntu/Fedora/Arch) | SigmaOS (Current Implementation) | Gap / Action Plan |
+### Phase 1 — Foundation (0–6 months)
+- **Kernel Hybrid Architecture**: Begin modular microkernel experiments and kernel personality switching (`DynamicKernelPersonalitySwitcher`).
+- **Transactional Filesystem**: Implement rollback-safe file operations, Btrfs/ZFS-inspired snapshots, and `SigmaFS++`.
+- **Compliance Handbook**: Document core features in publisher-grade style (`WIKI/` and `docs/`).
+
+### Phase 2 — Expansion (6–12 months)
+- **Adaptive Scheduler**: Introduce workload-aware scheduling policies (FreeBSD ULE, Linux CFS/EEVDF, BORE).
+- **Visual Sandboxing**: Build GUI-driven security profiles (`PrivacyFirstSandbox`, OpenBSD `pledge`/`unveil`, Linux Landlock LSM).
+- **Unified Firewall Dashboard**: Integrate stateful firewall, PF rules, and WireGuard VPN orchestration.
+
+### Phase 3 — Differentiation (12–18 months)
+- **Native Containers**: Lightweight container orchestration (`OciPodDeploymentEngine`) for developer workflows.
+- **Zenith Overlays**: Adaptive desktop UX with real-time compliance dashboards (`ZenithCompositor`).
+- **Distributed FS Overlay**: Enable collaborative storage environments and content-addressed storage.
+
+---
+
+## 📊 Benchmarking SigmaOS vs Linux & BSD Distros
+
+| Feature | Ubuntu (Linux) | Arch (Linux) | Fedora (Linux) | FreeBSD | OpenBSD | NetBSD | SigmaOS Opportunity |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Kernel** | Stable monolithic | Rolling modular | Cutting-edge | Clean monolithic | Security-focused | Portable | Hybrid microkernel + modular services |
+| **Scheduler** | CFS / EEVDF | CFS / BORE | CFS / EEVDF | ULE | ULE | ULE | Policy-driven adaptive scheduler |
+| **Filesystem** | ext4, ZFS | Btrfs | Btrfs | ZFS | FFS | FFS | Transactional FS with rollback (`SigmaFS++`) |
+| **Security** | AppArmor | User choice | SELinux | Capsicum | Strong defaults (pledge/unveil) | Lightweight | Visual sandboxing + immutable layers |
+| **Networking** | nftables | nftables | nftables | PF | PF | PF | Unified firewall + VPN GUI |
+| **Virtualization** | KVM/QEMU | User choice | KVM/QEMU | bhyve | Minimal | Minimal | Native containers + VM orchestration |
+| **Desktop/UX** | GNOME/KDE | User choice | GNOME/KDE | Lightweight DEs | Minimal | Minimal | Adaptive Zenith overlays |
+| **Docs** | Ubuntu Wiki | Arch Wiki | Fedora Docs | FreeBSD Handbook | OpenBSD FAQ | NetBSD Guide | Compliance handbook + benchmarking dashboards |
+
+---
+
+## 🌟 Strategic Differentiators for SigmaOS
+
+1. **Compliance-First OS**: Position SigmaOS as the go-to operating system for regulated industries (finance, law, healthcare, defense) with built-in PQC encryption and audit ledgers.
+2. **Visual-First Dashboards**: Unlike CLI-heavy Linux/BSD variants, SigmaOS delivers intuitive visual dashboards for system management, security rules, and performance tuning.
+3. **Resilience Implants**: Automated snapshot rollback + immutable layers for complete system stability and self-healing.
+4. **Community-Driven Modules**: Encourage contributions backed by automated compliance verification and test pipelines.
+
+---
+
+## 🖥️ Detailed Component Matrix & Action Plan
+
+| Component | Linux Distros (Ubuntu/Fedora/Arch) | SigmaOS (Current Implementation) | Action Plan |
 | :--- | :--- | :--- | :--- |
 | **Kernel** | Mature, modular, supports SMP & preemptive multitasking | Sovereign microkernel with BORE scheduler, CachyOS SMP, & NUMA buddy allocator | Expand POSIX process lifecycle, signal handling, and preemptive thread scheduling. |
 | **File System** | ext4, Btrfs, XFS, ZFS | `SigmaFS` with transactional journaling, Ext4/NTFS translation, & POSIX ACLs | Implement hard links, ext4 read/write compatibility, and copy-on-write snapshotting. |
