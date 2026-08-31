@@ -34,7 +34,7 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::klib::HashMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+use alloc::collections::BTreeMap as HashMap;
 
 use alloc::sync::Arc;
 
@@ -114,7 +114,7 @@ pub trait IPackage: Send + Sync {
 }
 
 /// Package format enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
     // Debian-based
     Deb,
