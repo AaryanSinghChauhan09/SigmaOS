@@ -35,6 +35,7 @@ pub mod process;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
+pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -91,6 +92,8 @@ pub mod interrupt;
 
 pub mod graphics {
     pub mod compositor;
+    pub mod gpu_driver;
+    pub mod nvidia_prime;
     pub mod paint;
     pub mod video;
 }
