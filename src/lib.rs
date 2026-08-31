@@ -85,6 +85,8 @@ pub use security::{
     PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
     PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
     PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;

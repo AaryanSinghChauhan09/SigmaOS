@@ -14,6 +14,7 @@ pub mod deobfuscation;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
+pub mod libgksu;
 pub mod mac;
 pub mod password;
 pub mod openbsd_karl;
@@ -59,6 +60,10 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
+pub use libgksu::{
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
 pub use parrot::{
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, AnonSurfShunt, AppSandboxEngine,
     ForensicStorageFilter, RoutingMode,
