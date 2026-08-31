@@ -89,6 +89,14 @@ impl FancyZones {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CaseOption {
+    None,
+    LowerCase,
+    UpperCase,
+    TitleCase,
+}
+
 pub struct PowerRename;
 
 impl PowerRename {
@@ -96,25 +104,103 @@ impl PowerRename {
         Self
     }
 
-    /// Performs bulk rename substitutions on matching name patterns
+    /// Performs bulk rename substitutions on matching name patterns with optional case conversion and numbering
     pub fn rename_files(&self, filenames: &mut Vec<[u8; 32]>, search_pattern: &[u8], replace_pattern: &[u8]) {
+        self.rename_files_advanced(filenames, search_pattern, replace_pattern, CaseOption::None, false);
+    }
+
+    /// Advanced bulk rename support including case options, counter insertion, and collision safety checks
+    pub fn rename_files_advanced(
+        &self,
+        filenames: &mut Vec<[u8; 32]>,
+        search_pattern: &[u8],
+        replace_pattern: &[u8],
+        case_opt: CaseOption,
+        enable_enum_counter: bool,
+    ) {
+        let mut new_names = Vec::new();
+
         for i in 0..filenames.len() {
-            let mut name = filenames[i];
-            // Simple byte substring replacement (standard Linux/Windows PowerRename match logic)
+            let name = filenames[i];
+            let mut new_name = name;
+
             if let Some(pos) = find_substring(&name, search_pattern) {
-                let mut new_name = [0u8; 32];
+                let mut temp = [0u8; 32];
                 // copy before search_pattern
-                new_name[..pos].copy_from_slice(&name[..pos]);
+                temp[..pos].copy_from_slice(&name[..pos]);
                 // copy replace_pattern
                 let r_len = replace_pattern.len().min(32 - pos);
-                new_name[pos..pos + r_len].copy_from_slice(&replace_pattern[..r_len]);
+                temp[pos..pos + r_len].copy_from_slice(&replace_pattern[..r_len]);
                 // copy after search_pattern
                 let after_pos = pos + search_pattern.len();
                 if after_pos < 32 {
                     let rem_len = (32 - (pos + r_len)).min(32 - after_pos);
-                    new_name[pos + r_len..pos + r_len + rem_len].copy_from_slice(&name[after_pos..after_pos + rem_len]);
+                    temp[pos + r_len..pos + r_len + rem_len].copy_from_slice(&name[after_pos..after_pos + rem_len]);
                 }
-                filenames[i] = new_name;
+                new_name = temp;
+            }
+
+            // Apply case option
+            if case_opt != CaseOption::None {
+                let mut capitalize_next = true;
+                for b in new_name.iter_mut() {
+                    match case_opt {
+                        CaseOption::LowerCase => {
+                            if *b >= b'A' && *b <= b'Z' {
+                                *b += 32;
+                            }
+                        }
+                        CaseOption::UpperCase => {
+                            if *b >= b'a' && *b <= b'z' {
+                                *b -= 32;
+                            }
+                        }
+                        CaseOption::TitleCase => {
+                            if *b == b' ' || *b == b'_' || *b == b'-' || *b == b'.' {
+                                capitalize_next = true;
+                            } else if capitalize_next {
+                                if *b >= b'a' && *b <= b'z' {
+                                    *b -= 32;
+                                }
+                                capitalize_next = false;
+                            } else if *b >= b'A' && *b <= b'Z' {
+                                *b += 32;
+                            }
+                        }
+                        CaseOption::None => {}
+                    }
+                }
+            }
+
+            // Apply counter enumeration if enabled
+            if enable_enum_counter {
+                let counter_str = format!("_{:02}", i + 1);
+                let counter_bytes = counter_str.as_bytes();
+                // append before null byte or end
+                let len = new_name.iter().position(|&b| b == 0).unwrap_or(32);
+                let space = 32 - len;
+                if space >= counter_bytes.len() {
+                    new_name[len..len + counter_bytes.len()].copy_from_slice(counter_bytes);
+                }
+            }
+
+            new_names.push(new_name);
+        }
+
+        // Collision safety check: ensure no duplicate filenames created
+        let mut has_duplicate = false;
+        for i in 0..new_names.len() {
+            for j in (i + 1)..new_names.len() {
+                if new_names[i] == new_names[j] && new_names[i] != [0u8; 32] {
+                    has_duplicate = true;
+                    break;
+                }
+            }
+        }
+
+        if !has_duplicate {
+            for i in 0..filenames.len() {
+                filenames[i] = new_names[i];
             }
         }
     }
@@ -383,11 +469,11 @@ mod tests {
         // 3. PowerRename bulk file renamer
         let mut names = Vec::new();
         let mut name1 = [0u8; 32];
-        name1[..8].copy_from_slice(b"test_img");
+        name1[..8].copy_from_slice(b"TEST_img");
         names.push(name1);
 
-        toys.power_rename.rename_files(&mut names, b"test", b"prod");
-        assert_eq!(&names[0][..8], b"prod_img");
+        toys.power_rename.rename_files_advanced(&mut names, b"TEST", b"prod", CaseOption::LowerCase, true);
+        assert_eq!(&names[0][..11], b"prod_img_01");
 
         // 4. FileLocksmith open process file locks
         toys.locksmith.lock_file(5555, 100);

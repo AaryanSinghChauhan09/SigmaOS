@@ -525,13 +525,27 @@ pub enum RenameRule {
     Append { suffix: String },
     LowerCase,
     UpperCase,
+    TitleCase,
     TrimWhitespace,
-    Sequence { start: u32, step: u32 },
+    Sequence { start: u32, step: u32, width: usize },
+    ChangeExtension { new_ext: String },
+    InsertAt { text: String, position: usize },
+    RemoveCharacters { count: usize, from_start: bool },
+    SanitizeFilename,
+    RegexReplace { pattern: String, replace: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RenameConflict {
+    pub original_file: String,
+    pub target_file: String,
+    pub reason: String,
 }
 
 pub struct BulkyRenamer {
     pub files: Vec<String>,
     pub rules: Vec<RenameRule>,
+    pub undo_stack: Vec<Vec<(String, String)>>,
 }
 
 impl BulkyRenamer {
@@ -539,6 +553,7 @@ impl BulkyRenamer {
         Self {
             files: Vec::new(),
             rules: Vec::new(),
+            undo_stack: Vec::new(),
         }
     }
 
@@ -550,8 +565,15 @@ impl BulkyRenamer {
         self.rules.push(rule);
     }
 
+    pub fn clear_rules(&mut self) {
+        self.rules.clear();
+    }
+
     pub fn preview(&self) -> Vec<RenamedFile> {
-        self.files
+        let mut target_counts = alloc::collections::BTreeMap::<String, usize>::new();
+
+        let initial_previews: Vec<(String, String)> = self
+            .files
             .iter()
             .enumerate()
             .map(|(i, f)| {
@@ -560,18 +582,57 @@ impl BulkyRenamer {
                 for rule in &self.rules {
                     out = apply_rule(rule, &out, seq);
                 }
+                *target_counts.entry(out.clone()).or_insert(0) += 1;
+                (f.clone(), out)
+            })
+            .collect();
+
+        initial_previews
+            .into_iter()
+            .map(|(orig, target)| {
+                let has_conflict = target_counts.get(&target).copied().unwrap_or(0) > 1;
                 RenamedFile {
-                    original: f.clone(),
-                    renamed: out,
+                    original: orig,
+                    renamed: target,
+                    has_conflict,
                 }
             })
             .collect()
     }
 
+    pub fn preview_conflicts(&self) -> Vec<RenameConflict> {
+        let previews = self.preview();
+        let mut conflicts = Vec::new();
+        for p in &previews {
+            if p.has_conflict {
+                conflicts.push(RenameConflict {
+                    original_file: p.original.clone(),
+                    target_file: p.renamed.clone(),
+                    reason: "Duplicate target filename collision".to_string(),
+                });
+            }
+        }
+        conflicts
+    }
+
     pub fn execute(&mut self) -> Vec<RenamedFile> {
         let renamed = self.preview();
+        let history: Vec<(String, String)> = renamed
+            .iter()
+            .map(|r| (r.original.clone(), r.renamed.clone()))
+            .collect();
+        self.undo_stack.push(history);
         self.files = renamed.iter().map(|r| r.renamed.clone()).collect();
         renamed
+    }
+
+    pub fn undo(&mut self) -> bool {
+        if let Some(history) = self.undo_stack.pop() {
+            self.files = history.iter().map(|(orig, _)| orig.clone()).collect();
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -579,6 +640,7 @@ impl BulkyRenamer {
 pub struct RenamedFile {
     pub original: String,
     pub renamed: String,
+    pub has_conflict: bool,
 }
 
 fn apply_rule(rule: &RenameRule, input: &str, seq: u32) -> String {
@@ -590,10 +652,90 @@ fn apply_rule(rule: &RenameRule, input: &str, seq: u32) -> String {
         RenameRule::Append { suffix } => format!("{}{}", input, suffix),
         RenameRule::LowerCase => input.to_lowercase(),
         RenameRule::UpperCase => input.to_uppercase(),
+        RenameRule::TitleCase => {
+            let mut result = String::new();
+            let mut capitalize_next = true;
+            for c in input.chars() {
+                if c.is_whitespace() || c == '_' || c == '-' || c == '.' {
+                    capitalize_next = true;
+                    result.push(c);
+                } else if capitalize_next {
+                    result.extend(c.to_uppercase());
+                    capitalize_next = false;
+                } else {
+                    result.extend(c.to_lowercase());
+                }
+            }
+            result
+        }
         RenameRule::TrimWhitespace => input.trim().to_string(),
-        RenameRule::Sequence { start, step } => {
+        RenameRule::Sequence { start, step, width } => {
             let n = start + seq * step;
-            format!("{}{}", input, n)
+            let num_str = format!("{}", n);
+            if num_str.len() < *width {
+                let pad = "0".repeat(*width - num_str.len());
+                format!("{}{}{}", input, pad, num_str)
+            } else {
+                format!("{}{}", input, n)
+            }
+        }
+        RenameRule::ChangeExtension { new_ext } => {
+            if let Some(dot_pos) = input.rfind('.') {
+                let stem = &input[..dot_pos];
+                if new_ext.is_empty() {
+                    stem.to_string()
+                } else if new_ext.starts_with('.') {
+                    format!("{}{}", stem, new_ext)
+                } else {
+                    format!("{}.{}", stem, new_ext)
+                }
+            } else if new_ext.starts_with('.') {
+                format!("{}{}", input, new_ext)
+            } else {
+                format!("{}.{}", input, new_ext)
+            }
+        }
+        RenameRule::InsertAt { text, position } => {
+            let char_len = input.chars().count();
+            let pos = (*position).min(char_len);
+            let mut out = String::new();
+            for (idx, c) in input.chars().enumerate() {
+                if idx == pos {
+                    out.push_str(text);
+                }
+                out.push(c);
+            }
+            if pos >= char_len {
+                out.push_str(text);
+            }
+            out
+        }
+        RenameRule::RemoveCharacters { count, from_start } => {
+            if *from_start {
+                input.chars().skip(*count).collect()
+            } else {
+                let total = input.chars().count();
+                let keep = total.saturating_sub(*count);
+                input.chars().take(keep).collect()
+            }
+        }
+        RenameRule::SanitizeFilename => {
+            input
+                .chars()
+                .map(|c| match c {
+                    'a'..='z' | 'A'..='Z' | '0'..='9' | '.' | '_' | '-' => c,
+                    _ => '_',
+                })
+                .collect()
+        }
+        RenameRule::RegexReplace { pattern, replace } => {
+            // Simplified regex/wildcard substitution: replacing exact pattern or $seq with sequence
+            let r = replace.replace("$seq", &seq.to_string());
+            if pattern == "*" || pattern == ".*" {
+                r
+            } else {
+                input.replace(pattern.as_str(), r.as_str())
+            }
         }
     }
 }
@@ -1005,6 +1147,42 @@ mod tests {
         let previews = b.preview();
         assert_eq!(previews[0].renamed, "photo_1.jpg");
         assert_eq!(previews[1].renamed, "photo_2.jpg");
+
+        // Test title case, sequence padding, insert, extension change, sanitize, conflicts, and undo
+        let mut b2 = BulkyRenamer::new();
+        b2.add_file("my_document_one.txt");
+        b2.add_file("my_document_two.txt");
+        b2.add_rule(RenameRule::TitleCase);
+        b2.add_rule(RenameRule::ChangeExtension { new_ext: "md".to_string() });
+        let prev2 = b2.preview();
+        assert_eq!(prev2[0].renamed, "My_Document_One.md");
+        assert_eq!(prev2[1].renamed, "My_Document_Two.md");
+
+        // Test Sequence and Conflict detection
+        let mut b3 = BulkyRenamer::new();
+        b3.add_file("item.png");
+        b3.add_file("item.png"); // duplicate input to trigger conflict
+        b3.add_rule(RenameRule::Sequence { start: 1, step: 1, width: 3 });
+        let prev3 = b3.preview();
+        assert_eq!(prev3[0].renamed, "item.png001");
+        assert_eq!(prev3[1].renamed, "item.png002");
+
+        let mut b4 = BulkyRenamer::new();
+        b4.add_file("a.txt");
+        b4.add_file("b.txt");
+        b4.add_rule(RenameRule::FindReplace { find: "b".to_string(), replace: "a".to_string() });
+        let conflicts = b4.preview_conflicts();
+        assert_eq!(conflicts.len(), 2);
+        assert_eq!(conflicts[0].reason, "Duplicate target filename collision");
+
+        // Test execute & undo
+        let mut b5 = BulkyRenamer::new();
+        b5.add_file("file1.doc");
+        b5.add_rule(RenameRule::SanitizeFilename);
+        b5.execute();
+        assert_eq!(b5.files[0], "file1.doc");
+        assert!(b5.undo());
+        assert_eq!(b5.files[0], "file1.doc");
     }
 
     #[test]
