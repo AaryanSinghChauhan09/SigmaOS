@@ -11,7 +11,7 @@ use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
@@ -2295,6 +2295,323 @@ impl DragonFlyHammer2FsSnapshotV2 {
     }
 }
 
+// ==================================================================
+// 45. SLACKWARE PKGTOOL & LOG PACKAGES TRACKING ENGINE
+// ==================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SlackwarePackage {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+    pub build: String,
+    pub installed_files: Vec<String>,
+    pub post_install_script: Option<String>,
+}
+
+pub struct SlackwarePkgtoolEngine {
+    pub var_log_packages: Vec<SlackwarePackage>,
+}
+
+impl SlackwarePkgtoolEngine {
+    pub fn new() -> Self {
+        Self {
+            var_log_packages: Vec::new(),
+        }
+    }
+
+    pub fn install_pkg(&mut self, pkg: SlackwarePackage) -> Result<String, &'static str> {
+        if pkg.name.is_empty() || pkg.version.is_empty() {
+            return Err("Slackware Pkgtool: Invalid package name or version");
+        }
+        let log_entry_name = format!("{}-{}-{}-{}", pkg.name, pkg.version, pkg.arch, pkg.build);
+        self.var_log_packages.push(pkg);
+        Ok(format!("/var/log/packages/{}", log_entry_name))
+    }
+
+    pub fn remove_pkg(&mut self, name: &str) -> Result<usize, &'static str> {
+        let pos = self.var_log_packages.iter().position(|p| p.name == name);
+        if let Some(idx) = pos {
+            let removed = self.var_log_packages.remove(idx);
+            Ok(removed.installed_files.len())
+        } else {
+            Err("Slackware Pkgtool: Package not found in /var/log/packages")
+        }
+    }
+
+    pub fn run_doinst_script(&self, name: &str) -> bool {
+        if let Some(pkg) = self.var_log_packages.iter().find(|p| p.name == name) {
+            pkg.post_install_script.is_some()
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SlackwarePkgtoolEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 46. SOLUS EOPKG DELTA UPDATES & RAVEN PANEL GOVERNOR
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct SolusEopkgDeltaPackage {
+    pub package_name: String,
+    pub base_version: String,
+    pub target_version: String,
+    pub delta_size_bytes: u64,
+    pub full_size_bytes: u64,
+    pub sha1_hash: [u8; 20],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RavenWidgetState {
+    Collapsed,
+    Expanded,
+    Muted,
+}
+
+pub struct SolusEopkgRavenGovernor {
+    pub delta_packages: Vec<SolusEopkgDeltaPackage>,
+    pub raven_panel_open: bool,
+    pub audio_widget_state: RavenWidgetState,
+    pub notification_count: u32,
+}
+
+impl SolusEopkgRavenGovernor {
+    pub fn new() -> Self {
+        Self {
+            delta_packages: Vec::new(),
+            raven_panel_open: false,
+            audio_widget_state: RavenWidgetState::Collapsed,
+            notification_count: 0,
+        }
+    }
+
+    pub fn register_delta_package(&mut self, delta: SolusEopkgDeltaPackage) {
+        self.delta_packages.push(delta);
+    }
+
+    pub fn calculate_bandwidth_savings_percent(&self) -> u32 {
+        let mut total_delta = 0u64;
+        let mut total_full = 0u64;
+        for delta in &self.delta_packages {
+            total_delta += delta.delta_size_bytes;
+            total_full += delta.full_size_bytes;
+        }
+        if total_full == 0 {
+            0
+        } else {
+            100 - ((total_delta * 100) / total_full) as u32
+        }
+    }
+
+    pub fn toggle_raven_panel(&mut self) -> bool {
+        self.raven_panel_open = !self.raven_panel_open;
+        self.raven_panel_open
+    }
+
+    pub fn push_notification(&mut self) -> u32 {
+        self.notification_count += 1;
+        self.notification_count
+    }
+}
+
+impl Default for SolusEopkgRavenGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 47. MAGEIA URPMI SYNTHESIS & DRAKX MCC RESOLVER
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct MageiaSynthesisPackage {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub arch: String,
+    pub provides: Vec<String>,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct MageiaMirror {
+    pub url: String,
+    pub country: String,
+    pub priority: u32,
+}
+
+pub struct MageiaUrpmiMccResolver {
+    pub synthesis_db: Vec<MageiaSynthesisPackage>,
+    pub mirrors: Vec<MageiaMirror>,
+    pub hardware_auto_detected: bool,
+}
+
+impl MageiaUrpmiMccResolver {
+    pub fn new() -> Self {
+        Self {
+            synthesis_db: Vec::new(),
+            mirrors: Vec::new(),
+            hardware_auto_detected: false,
+        }
+    }
+
+    pub fn load_synthesis_hdlist(&mut self, pkg: MageiaSynthesisPackage) {
+        self.synthesis_db.push(pkg);
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, priority: u32) {
+        self.mirrors.push(MageiaMirror {
+            url: url.to_string(),
+            country: country.to_string(),
+            priority,
+        });
+    }
+
+    pub fn resolve_package_deps(&self, pkg_name: &str) -> Result<Vec<String>, &'static str> {
+        let pkg = self.synthesis_db.iter().find(|p| p.name == pkg_name)
+            .ok_or("Mageia URPMI: Package missing in synthesis.hdlist.cz")?;
+        let mut deps = Vec::new();
+        for req in &pkg.requires {
+            deps.push(req.clone());
+        }
+        Ok(deps)
+    }
+
+    pub fn run_drakx_mcc_hardware_probe(&mut self, pci_count: usize) -> bool {
+        self.hardware_auto_detected = pci_count > 0;
+        self.hardware_auto_detected
+    }
+}
+
+impl Default for MageiaUrpmiMccResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 48. DRAGONFLY BSD HAMMER2 BLOCK DEDUPLICATION ENGINE
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Hammer2Block {
+    pub block_offset: u64,
+    pub size_bytes: usize,
+    pub merkle_hash: u64,
+    pub ref_count: u32,
+}
+
+pub struct DragonFlyHammer2DeduplicationEngine {
+    pub blocks: Vec<Hammer2Block>,
+    pub saved_bytes: u64,
+}
+
+impl DragonFlyHammer2DeduplicationEngine {
+    pub fn new() -> Self {
+        Self {
+            blocks: Vec::new(),
+            saved_bytes: 0,
+        }
+    }
+
+    pub fn write_or_dedup_block(&mut self, offset: u64, size: usize, merkle_hash: u64) -> bool {
+        if let Some(existing) = self.blocks.iter_mut().find(|b| b.merkle_hash == merkle_hash) {
+            existing.ref_count += 1;
+            self.saved_bytes += size as u64;
+            true // Deduplicated
+        } else {
+            self.blocks.push(Hammer2Block {
+                block_offset: offset,
+                size_bytes: size,
+                merkle_hash,
+                ref_count: 1,
+            });
+            false // New unique block
+        }
+    }
+
+    pub fn get_dedup_ratio(&self) -> u32 {
+        let total_unique: u64 = self.blocks.iter().map(|b| b.size_bytes as u64).sum();
+        let total_logical = total_unique + self.saved_bytes;
+        if total_unique == 0 {
+            100
+        } else {
+            ((total_logical * 100) / total_unique) as u32
+        }
+    }
+}
+
+impl Default for DragonFlyHammer2DeduplicationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 49. NETBSD RUMP KERNEL MODULAR COMPONENT DISPATCHER
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RumpComponentType {
+    Vfs,
+    NetStack,
+    Crypto,
+    SyscallBridge,
+}
+
+pub struct RumpComponent {
+    pub name: &'static str,
+    pub component_type: RumpComponentType,
+    pub is_initialized: bool,
+}
+
+pub struct NetBsdRumpComponentEngine {
+    pub components: Vec<RumpComponent>,
+}
+
+impl NetBsdRumpComponentEngine {
+    pub fn new() -> Self {
+        Self {
+            components: Vec::new(),
+        }
+    }
+
+    pub fn register_component(&mut self, name: &'static str, component_type: RumpComponentType) {
+        self.components.push(RumpComponent {
+            name,
+            component_type,
+            is_initialized: false,
+        });
+    }
+
+    pub fn initialize_all_components(&mut self) -> usize {
+        let mut count = 0;
+        for comp in self.components.iter_mut() {
+            comp.is_initialized = true;
+            count += 1;
+        }
+        count
+    }
+
+    pub fn dispatch_rump_hypercall(&self, component_name: &str, syscall_id: u32) -> Result<u64, &'static str> {
+        let comp = self.components.iter().find(|c| c.name == component_name)
+            .ok_or("NetBSD Rump: Component not found")?;
+        if !comp.is_initialized {
+            return Err("NetBSD Rump: Component uninitialized");
+        }
+        Ok((syscall_id as u64) | 0x8000_0000)
+    }
+}
+
+impl Default for NetBsdRumpComponentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -2592,6 +2909,76 @@ mod extra_unimplemented_tests {
         loop_engine.post_event(event);
         assert_eq!(loop_engine.run_loop_step(), 1);
         assert!(loop_engine.is_running);
+    }
+
+    #[test]
+    fn test_slackware_pkgtool_engine() {
+        let mut pkgtool = SlackwarePkgtoolEngine::new();
+        let pkg = SlackwarePackage {
+            name: "bash".to_string(),
+            version: "5.2.21".to_string(),
+            arch: "x86_64".to_string(),
+            build: "1".to_string(),
+            installed_files: vec!["/bin/bash".to_string(), "/usr/share/man/man1/bash.1".to_string()],
+            post_install_script: Some("install-info /usr/share/info/bash.info".to_string()),
+        };
+        let log_path = pkgtool.install_pkg(pkg).unwrap();
+        assert_eq!(log_path, "/var/log/packages/bash-5.2.21-x86_64-1");
+        assert!(pkgtool.run_doinst_script("bash"));
+        let removed_count = pkgtool.remove_pkg("bash").unwrap();
+        assert_eq!(removed_count, 2);
+    }
+
+    #[test]
+    fn test_solus_eopkg_raven_governor() {
+        let mut solus = SolusEopkgRavenGovernor::new();
+        solus.register_delta_package(SolusEopkgDeltaPackage {
+            package_name: "firefox".to_string(),
+            base_version: "120.0".to_string(),
+            target_version: "121.0".to_string(),
+            delta_size_bytes: 15_000_000,
+            full_size_bytes: 75_000_000,
+            sha1_hash: [0x12; 20],
+        });
+        assert_eq!(solus.calculate_bandwidth_savings_percent(), 80);
+        assert!(solus.toggle_raven_panel());
+        assert_eq!(solus.push_notification(), 1);
+    }
+
+    #[test]
+    fn test_mageia_urpmi_mcc_resolver() {
+        let mut mageia = MageiaUrpmiMccResolver::new();
+        mageia.load_synthesis_hdlist(MageiaSynthesisPackage {
+            name: "gimp".to_string(),
+            version: "2.10.36".to_string(),
+            release: "1.mga9".to_string(),
+            arch: "x86_64".to_string(),
+            provides: vec!["gimp".to_string()],
+            requires: vec!["libgegl".to_string(), "libbabl".to_string()],
+        });
+        mageia.add_mirror("https://mirror.mageia.org", "FR", 100);
+        let deps = mageia.resolve_package_deps("gimp").unwrap();
+        assert_eq!(deps, vec!["libgegl".to_string(), "libbabl".to_string()]);
+        assert!(mageia.run_drakx_mcc_hardware_probe(4));
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_deduplication_engine() {
+        let mut hammer2_dedup = DragonFlyHammer2DeduplicationEngine::new();
+        assert!(!hammer2_dedup.write_or_dedup_block(0, 4096, 0x1122334455667788));
+        assert!(hammer2_dedup.write_or_dedup_block(4096, 4096, 0x1122334455667788));
+        assert_eq!(hammer2_dedup.saved_bytes, 4096);
+        assert_eq!(hammer2_dedup.get_dedup_ratio(), 200);
+    }
+
+    #[test]
+    fn test_netbsd_rump_component_engine() {
+        let mut rump = NetBsdRumpComponentEngine::new();
+        rump.register_component("rumpvfs", RumpComponentType::Vfs);
+        rump.register_component("rumpnet", RumpComponentType::NetStack);
+        assert_eq!(rump.initialize_all_components(), 2);
+        let dispatch_res = rump.dispatch_rump_hypercall("rumpvfs", 5).unwrap();
+        assert_eq!(dispatch_res, 0x8000_0005);
     }
 
 }
