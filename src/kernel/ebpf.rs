@@ -170,6 +170,78 @@ impl Default for EbpfEngine {
     }
 }
 
+// =========================================================================
+// eBPF XDP Fast Data-Plane Programmable Networking Hooks
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpHookType {
+    Ingress,
+    Egress,
+    DriverNative,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpAction {
+    Pass = 1,
+    Drop = 2,
+    Tx = 3,
+    Redirect = 4,
+}
+
+#[derive(Debug, Clone)]
+pub struct XdpPacketContext {
+    pub ingress_ifindex: u32,
+    pub payload: Vec<u8>,
+    pub rx_timestamp_ns: u64,
+}
+
+pub struct EbpfXdpFilterEngine {
+    pub hook_type: XdpHookType,
+    pub loaded_program: Vec<EbpfInstruction>,
+    pub engine: EbpfEngine,
+}
+
+impl EbpfXdpFilterEngine {
+    pub fn new(hook_type: XdpHookType) -> Self {
+        Self {
+            hook_type,
+            loaded_program: Vec::new(),
+            engine: EbpfEngine::new(),
+        }
+    }
+
+    pub fn attach_program(&mut self, program: Vec<EbpfInstruction>) -> Result<(), &'static str> {
+        EbpfVerifier::verify(&program)?;
+        self.loaded_program = program;
+        Ok(())
+    }
+
+    pub fn process_xdp_packet_hook(&mut self, ctx: &mut XdpPacketContext) -> Result<XdpAction, &'static str> {
+        if self.loaded_program.is_empty() {
+            return Ok(XdpAction::Pass);
+        }
+
+        // Pass packet length in R1
+        self.engine.registers[1] = ctx.payload.len() as i64;
+        let return_code = self.engine.execute(&self.loaded_program)?;
+
+        match return_code {
+            1 => Ok(XdpAction::Pass),
+            2 => Ok(XdpAction::Drop),
+            3 => Ok(XdpAction::Tx),
+            4 => Ok(XdpAction::Redirect),
+            _ => Ok(XdpAction::Pass),
+        }
+    }
+}
+
+impl Default for EbpfXdpFilterEngine {
+    fn default() -> Self {
+        Self::new(XdpHookType::Ingress)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -198,5 +270,39 @@ mod tests {
         let mut engine = EbpfEngine::new();
         let result = engine.execute(&program).unwrap();
         assert_eq!(result, 42);
+    }
+
+    #[test]
+    fn test_ebpf_xdp_fast_path_hook() {
+        let mut xdp_engine = EbpfXdpFilterEngine::new(XdpHookType::Ingress);
+        let mut ctx = XdpPacketContext {
+            ingress_ifindex: 1,
+            payload: vec![1, 2, 3, 4, 5],
+            rx_timestamp_ns: 1000,
+        };
+
+        // Unloaded program defaults to Pass
+        assert_eq!(xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(), XdpAction::Pass);
+
+        // eBPF program returning 2 (XdpAction::Drop)
+        let drop_program = vec![
+            EbpfInstruction {
+                opcode: EBPF_OP_ADDI,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 2,
+            },
+            EbpfInstruction {
+                opcode: EBPF_OP_EXIT,
+                dst: 0,
+                src: 0,
+                offset: 0,
+                imm: 0,
+            },
+        ];
+
+        xdp_engine.attach_program(drop_program).unwrap();
+        assert_eq!(xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(), XdpAction::Drop);
     }
 }
