@@ -2712,15 +2712,14 @@ impl RosettaDynamicBinaryTranslator {
             return cached.host_instructions.clone();
         }
 
-        // Generate synthetic host binary sequence
         let mut translated = Vec::new();
         match self.target_arch {
             TargetArch::AArch64 => {
-                translated.extend_from_slice(&[0x1F, 0x20, 0x03, 0xD5]); // NOP (A64)
+                translated.extend_from_slice(&[0x1F, 0x20, 0x03, 0xD5]);
                 translated.extend_from_slice(x86_bytes);
             }
             TargetArch::RiscV64 => {
-                translated.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]); // NOP (RISC-V)
+                translated.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]);
                 translated.extend_from_slice(x86_bytes);
             }
         }
