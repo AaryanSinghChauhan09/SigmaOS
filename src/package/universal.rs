@@ -1,17 +1,10 @@
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
-
-#[cfg(test)]
-use crate::klib::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,6 +45,121 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        if name.ends_with(".deb") || name.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::Xz)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".cachy") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::App)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else {
+            None
+        }
+    }
+}
+
+/// User-defined hook timing
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookTiming {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+/// Dynamic user-defined package hook trait (OOP approach for package system lifecycle)
+pub trait PackageHook: Send + Sync {
+    fn name(&self) -> &str;
+    fn timing(&self) -> HookTiming;
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
+/// Custom closure-based user-defined hook
+pub struct CustomPackageHook {
+    pub name: String,
+    pub timing: HookTiming,
+    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+}
+
+impl CustomPackageHook {
+    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
+    where
+        F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
+    {
+        Self {
+            name: name.to_string(),
+            timing,
+            handler: alloc::sync::Arc::new(handler),
+        }
+    }
+}
+
+impl PackageHook for CustomPackageHook {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn timing(&self) -> HookTiming {
+        self.timing
+    }
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        (self.handler)(package)
+    }
 }
 
 /// Package source
@@ -457,11 +565,11 @@ impl DependencyResolver {
     pub fn resolve_dependencies(
         &self,
         package_name: &str,
-    ) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+    ) -> Result<alloc::vec::Vec<String>, PackageError> {
+        let mut resolved: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+        let mut to_visit: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+        let mut visited = alloc::collections::BTreeSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -597,7 +705,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut keys: alloc::vec::Vec<String> = alloc::vec::Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());
@@ -636,7 +744,6 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
-    pub node_distro_engine: NodeBinaryDistroEngine,
 }
 
 impl UniversalPackageManager {
@@ -649,38 +756,16 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            node_distro_engine: NodeBinaryDistroEngine::new(),
         };
 
         manager.add_default_adapters();
         manager
     }
 
-    /// Register and install a Node.js binary distribution runtime into the isolated store
-    pub fn install_node_runtime(
-        &mut self,
-        package: &NodeBinaryPackage,
-        bytes: &[u8],
-        npm_version: &str,
-    ) -> Result<String, PackageError> {
-        let store_path = self
-            .node_distro_engine
-            .install_to_store(package, bytes, npm_version)
-            .map_err(|e| PackageError::InstallationFailed(e.to_string()))?;
-
-        let mut pkg = UnifiedPackage::new(format!("nodejs-{}", package.version), package.version.clone())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_provides("nodejs".to_string());
-        pkg.installed = true;
-
-        self.installed_packages
-            .insert(format!("nodejs-{}", package.version), pkg);
-        Ok(store_path)
-    }
-
     /// Registers a user-defined lifecycle hook
     pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
+    }
 
     /// Triggers user-defined hooks matching the requested lifecycle stage
     pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -690,6 +775,7 @@ impl UniversalPackageManager {
             }
         }
         Ok(())
+    }
 
     /// Installs a package file directly by inferring format from filename
     pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
@@ -705,6 +791,7 @@ impl UniversalPackageManager {
 
         self.add_package(package);
         self.install(pkg_name)
+    }
 
     fn add_default_adapters(&mut self) {
         let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
@@ -774,6 +861,10 @@ impl UniversalPackageManager {
         self.packages.insert(package.name.clone(), package);
     }
 
+    pub fn registered_adapter_count(&self) -> usize {
+        self.adapters.len()
+    }
+
     pub fn create_checkpoint(&mut self) -> usize {
         self.transaction_history
             .create_checkpoint(&self.installed_packages)
@@ -817,6 +908,9 @@ impl UniversalPackageManager {
         for dep_name in dependencies {
             let package_opt = self.packages.get(&dep_name).cloned();
             if let Some(package) = package_opt {
+                // Trigger PreInstall user defined hooks
+                self.trigger_user_hooks(HookTiming::PreInstall, &package)?;
+
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
@@ -828,7 +922,10 @@ impl UniversalPackageManager {
 
                 let mut installed = package.clone();
                 installed.installed = true;
-                self.installed_packages.insert(dep_name.clone(), installed);
+                self.installed_packages.insert(dep_name.clone(), installed.clone());
+
+                // Trigger PostInstall user defined hooks
+                self.trigger_user_hooks(HookTiming::PostInstall, &installed)?;
             }
         }
 
@@ -838,6 +935,9 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
+            // Trigger PreRemove user defined hooks
+            self.trigger_user_hooks(HookTiming::PreRemove, &package)?;
+
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
@@ -846,6 +946,9 @@ impl UniversalPackageManager {
                 }
             }
             self.installed_packages.remove(package_name);
+
+            // Trigger PostRemove user defined hooks
+            self.trigger_user_hooks(HookTiming::PostRemove, &package)?;
         }
         Ok(())
     }
@@ -1064,6 +1167,138 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+// =========================================================================
+// Universal Multi-Distro Package Translator Factory & Cross-PM Bridge
+// =========================================================================
+
+/// Universal Package Translator Trait for converting foreign distro package formats to Sigma-pkg
+pub trait PackageTranslator: Send + Sync {
+    fn source_format(&self) -> PackageFormat;
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError>;
+}
+
+pub struct DebTranslator;
+impl PackageTranslator for DebTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Deb }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("DEB UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("Package: "))
+            .map(|l| l["Package: ".len()..].trim().to_string()).unwrap_or_else(|| "deb_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("Version: "))
+            .map(|l| l["Version: ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Deb).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct RpmTranslator;
+impl PackageTranslator for RpmTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Rpm }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("RPM UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("Name: "))
+            .map(|l| l["Name: ".len()..].trim().to_string()).unwrap_or_else(|| "rpm_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("Version: "))
+            .map(|l| l["Version: ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Rpm).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct PacmanTranslator;
+impl PackageTranslator for PacmanTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Pacman }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Pacman UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("pkgname = "))
+            .map(|l| l["pkgname = ".len()..].trim().to_string()).unwrap_or_else(|| "arch_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("pkgver = "))
+            .map(|l| l["pkgver = ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Pacman).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct ApkTranslator;
+impl PackageTranslator for ApkTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Apk }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("APK UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("P:"))
+            .map(|l| l["P:".len()..].trim().to_string()).unwrap_or_else(|| "alpine_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("V:"))
+            .map(|l| l["V:".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Apk).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct FlatpakTranslator;
+impl PackageTranslator for FlatpakTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Flatpak }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Flatpak UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("name="))
+            .map(|l| l["name=".len()..].trim().to_string()).unwrap_or_else(|| "flatpak_pkg".to_string());
+        Ok(UnifiedPackage::new(name, "1.0.0".to_string()).with_format(PackageFormat::Flatpak).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct EbuildTranslator;
+impl PackageTranslator for EbuildTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Ebuild }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Ebuild UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("PN="))
+            .map(|l| l["PN=".len()..].trim().to_string()).unwrap_or_else(|| "gentoo_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("PV="))
+            .map(|l| l["PV=".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Ebuild).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+/// Factory pattern for retrieving foreign package translators
+pub struct PackageTranslatorFactory;
+
+impl PackageTranslatorFactory {
+    pub fn create_translator(fmt: PackageFormat) -> Option<alloc::boxed::Box<dyn PackageTranslator>> {
+        match fmt {
+            PackageFormat::Deb => Some(alloc::boxed::Box::new(DebTranslator)),
+            PackageFormat::Rpm => Some(alloc::boxed::Box::new(RpmTranslator)),
+            PackageFormat::Pacman => Some(alloc::boxed::Box::new(PacmanTranslator)),
+            PackageFormat::Apk => Some(alloc::boxed::Box::new(ApkTranslator)),
+            PackageFormat::Flatpak => Some(alloc::boxed::Box::new(FlatpakTranslator)),
+            PackageFormat::Ebuild => Some(alloc::boxed::Box::new(EbuildTranslator)),
+            _ => None,
+        }
+    }
+}
+
+/// Universal Distro Package Bridge for mapping CLI commands across apt, dnf, pacman, apk, and emerge to Sigma-pkg
+pub struct UniversalDistroPackageBridge;
+
+impl UniversalDistroPackageBridge {
+    pub fn translate_cli_command(distro_tool: &str, action: &str, package: &str) -> String {
+        match (distro_tool, action) {
+            ("apt" | "apt-get", "install") | ("dnf" | "yum" | "zypper", "install") |
+            ("pacman", "-S") | ("apk", "add") | ("emerge", "install") => {
+                format!("sigpkg install {}", package)
+            }
+            ("apt" | "apt-get", "remove") | ("dnf" | "yum" | "zypper", "remove") |
+            ("pacman", "-R") | ("apk", "del") | ("emerge", "unmerge") => {
+                format!("sigpkg remove {}", package)
+            }
+            ("apt" | "apt-get", "update") | ("dnf" | "yum" | "zypper", "refresh") |
+            ("pacman", "-Sy") | ("apk", "update") => {
+                "sigpkg update".to_string()
+            }
+            _ => format!("sigpkg {} {}", action, package),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1120,6 +1355,35 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_user_defined_hooks_and_extension_install() {
+        let mut manager = UniversalPackageManager::new();
+
+        let hook_ran = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
+        let hook_ran_clone = hook_ran.clone();
+
+        let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
+            hook_ran_clone.store(true, core::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
+        manager.add_user_hook(alloc::sync::Arc::new(custom_hook));
+
+        // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
+        assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::from_filename("nginx.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::from_filename("alpine.apk"), Some(PackageFormat::Apk));
+        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::from_filename("tool.appimage"), Some(PackageFormat::AppImage));
+
+        // Install from file
+        assert!(manager.install_from_file("/tmp/htop.deb").is_ok());
+        assert!(manager.get_package("htop").is_some());
+
+        // Verify pre-install user defined hook executed
+        assert!(hook_ran.load(core::sync::atomic::Ordering::SeqCst));
     }
 
     #[test]
@@ -1300,6 +1564,19 @@ mod tests {
     }
 
     #[test]
+    fn test_package_format_from_filename_extensions() {
+        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
+        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+    }
+
+    #[test]
+    fn test_universal_package_manager_adapter_count() {
+        let manager = UniversalPackageManager::new();
+        assert!(manager.registered_adapter_count() >= 20);
+    }
+
+    #[test]
     fn test_distro_package_rollback_engine() {
         let mut engine = SovereignPackageRollbackEngine::new();
         let pkgs = vec!["nginx".to_string(), "curl".to_string()];
@@ -1317,33 +1594,43 @@ mod tests {
     }
 
     #[test]
-    fn test_universal_package_manager_node_runtime_integration() {
-        let mut manager = UniversalPackageManager::new();
-        let bytes = vec![0x42u8; 120];
-        let mut hash = [0u8; 32];
-        let mut state: u64 = 0xcbf29ce484222325;
-        for (i, &b) in bytes.iter().enumerate() {
-            state ^= b as u64;
-            state = state.wrapping_mul(0x100000001b3);
-            hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
-        }
+    fn test_package_translator_factory() {
+        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
+        assert_eq!(deb_trans.source_format(), PackageFormat::Deb);
 
-        let node_pkg = NodeBinaryPackage::new(
-            "v20.11.0",
-            NodeReleaseStream::Lts,
-            NodeTargetArch::X86_64,
-            LibcFlavor::Musl,
-            "https://dist.sigmaos.org/node/v20.11.0.tar.xz",
-            hash,
-            [0u8; 64],
-            120,
-        );
+        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
+        assert_eq!(rpm_trans.source_format(), PackageFormat::Rpm);
 
-        let path = manager.install_node_runtime(&node_pkg, &bytes, "10.2.4").unwrap();
-        assert!(path.starts_with("/sovereign/store/node-v20.11.0-"));
+        let pacman_trans = PackageTranslatorFactory::create_translator(PackageFormat::Pacman).unwrap();
+        assert_eq!(pacman_trans.source_format(), PackageFormat::Pacman);
 
-        let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
-        assert_eq!(installed_pkg.version, "v20.11.0");
-        assert!(installed_pkg.installed);
+        let apk_trans = PackageTranslatorFactory::create_translator(PackageFormat::Apk).unwrap();
+        assert_eq!(apk_trans.source_format(), PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_universal_distro_package_bridge_mapping() {
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apt", "install", "curl"), "sigpkg install curl");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("dnf", "remove", "nginx"), "sigpkg remove nginx");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("pacman", "-Sy", ""), "sigpkg update");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apk", "add", "htop"), "sigpkg install htop");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("emerge", "install", "zsh"), "sigpkg install zsh");
+    }
+
+    #[test]
+    fn test_multi_format_conversion() {
+        let deb_raw = b"Package: htop\nVersion: 3.2.1\n";
+        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
+        let deb_pkg = deb_trans.translate(deb_raw).unwrap();
+        assert_eq!(deb_pkg.name, "htop");
+        assert_eq!(deb_pkg.version, "3.2.1");
+        assert!(deb_pkg.formats.contains(&PackageFormat::SigmaPkg));
+
+        let rpm_raw = b"Name: kernel\nVersion: 6.5.6\n";
+        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
+        let rpm_pkg = rpm_trans.translate(rpm_raw).unwrap();
+        assert_eq!(rpm_pkg.name, "kernel");
+        assert_eq!(rpm_pkg.version, "6.5.6");
+        assert!(rpm_pkg.formats.contains(&PackageFormat::SigmaPkg));
     }
 }

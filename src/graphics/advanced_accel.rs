@@ -6,8 +6,6 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-use crate::productivity::mint_competitor::{NvidiaPrimeProfile, SovereignNvidiaPrimeEngine};
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsBackendApi {
     Vulkan,
@@ -198,7 +196,6 @@ pub struct GraphicsManager {
     pub gpus: Vec<GpuDevice>,
     pub active_pipelines: Vec<RenderPipeline>,
     pub is_prime_hybrid_graphics_enabled: bool,
-    pub prime_engine: SovereignNvidiaPrimeEngine,
     pub prime_engine: NvidiaPrimeEngine,
 }
 
@@ -208,7 +205,6 @@ impl GraphicsManager {
             gpus: Vec::new(),
             active_pipelines: Vec::new(),
             is_prime_hybrid_graphics_enabled: true,
-            prime_engine: SovereignNvidiaPrimeEngine::new(),
             prime_engine: NvidiaPrimeEngine::new(),
         }
     }
@@ -222,19 +218,9 @@ impl GraphicsManager {
         self.gpus.push(gpu);
     }
 
-    pub fn set_prime_profile(&mut self, profile: NvidiaPrimeProfile) -> Result<bool, &'static str> {
-        self.prime_engine.set_profile(profile)
-    }
-
     pub fn create_pipeline(&mut self, api: GraphicsBackendApi, force_discrete_offload: bool) -> Result<usize, &'static str> {
         let pipeline_id = self.active_pipelines.len() + 1;
-        let has_dgpu = self.gpus.iter().any(|g| g.is_discrete);
-        let profile_offload = match self.prime_engine.active_profile {
-            NvidiaPrimeProfile::NvidiaPerformance => true,
-            NvidiaPrimeProfile::IntegratedIntelRadeon => false,
-            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::OffloadCompute => force_discrete_offload,
-        };
-        let is_offloaded = (force_discrete_offload || profile_offload) && has_dgpu;
+        let is_offloaded = force_discrete_offload && self.gpus.iter().any(|g| g.is_discrete);
 
         if is_offloaded {
             self.prime_engine.request_power_state(DynamicPowerState::D0Active);
@@ -290,21 +276,6 @@ mod tests {
     }
 
     #[test]
-    fn test_graphics_manager_nvidia_prime_profiles() {
-        let mut mgr = GraphicsManager::new();
-
-        mgr.register_gpu(GpuDevice {
-            gpu_id: 1,
-            name: "Intel Graphics".to_string(),
-            vendor_id: 0x8086,
-            is_discrete: false,
-            vram_capacity_bytes: 1024 * 1024 * 1024,
-            supports_ray_tracing: false,
-            supports_compute_shaders: true,
-        });
-
-            gpu_id: 2,
-            name: "NVIDIA RTX 4080".to_string(),
     fn test_nvidia_prime_profile_switching() {
         let mut engine = NvidiaPrimeEngine::new();
         assert_eq!(engine.active_profile, PrimeProfile::HybridOnDemand);
@@ -314,6 +285,7 @@ mod tests {
         assert_eq!(engine.active_profile, PrimeProfile::Integrated);
         assert_eq!(engine.offload_env.nv_prime_render_offload, 0);
         assert_eq!(engine.offload_env.glx_vendor_library_name, "mesa");
+        assert_eq!(engine.power_state, DynamicPowerState::D3coldPowerOff);
 
         engine.set_profile(PrimeProfile::Nvidia);
         assert_eq!(engine.active_profile, PrimeProfile::Nvidia);
@@ -324,8 +296,18 @@ mod tests {
 
     #[test]
     fn test_rtd3_power_state_transitions() {
+        let mut mgr = GraphicsManager::new();
+        mgr.register_gpu(GpuDevice {
+            gpu_id: 1,
             name: "Intel Iris Xe".to_string(),
+            vendor_id: 0x8086,
+            is_discrete: false,
             vram_capacity_bytes: 4096 * 1024 * 1024,
+            supports_ray_tracing: false,
+            supports_compute_shaders: true,
+        });
+        mgr.register_gpu(GpuDevice {
+            gpu_id: 2,
             name: "Nvidia RTX 4090 Mobile".to_string(),
             vendor_id: 0x10DE,
             is_discrete: true,
@@ -334,20 +316,6 @@ mod tests {
             supports_compute_shaders: true,
         });
 
-        // 1. Default On-Demand mode: without force offload -> not offloaded
-        let pipe1 = mgr.create_pipeline(GraphicsBackendApi::ModernOpenGl, false).unwrap();
-        assert!(!mgr.active_pipelines[pipe1 - 1].is_prime_offloaded);
-
-        // 2. Default On-Demand mode: with force offload -> offloaded
-        let pipe2 = mgr.create_pipeline(GraphicsBackendApi::Vulkan, true).unwrap();
-        assert!(mgr.active_pipelines[pipe2 - 1].is_prime_offloaded);
-
-        // 3. Switch profile to NvidiaPerformance (runtime pending relogin)
-        mgr.set_prime_profile(NvidiaPrimeProfile::NvidiaPerformance).unwrap();
-        let _ = mgr.prime_engine.apply_pending_profile().unwrap();
-
-        let pipe3 = mgr.create_pipeline(GraphicsBackendApi::DirectRenderingDri3, false).unwrap();
-        assert!(mgr.active_pipelines[pipe3 - 1].is_prime_offloaded);
         assert_eq!(mgr.prime_engine.power_state, DynamicPowerState::D3coldPowerOff);
         mgr.create_pipeline(GraphicsBackendApi::Vulkan, true).unwrap();
         assert_eq!(mgr.prime_engine.power_state, DynamicPowerState::D0Active);

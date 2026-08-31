@@ -1,9 +1,9 @@
 #![allow(clippy::large_enum_variant)]
 extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
@@ -14,12 +14,10 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: String,
+    pub path: alloc::string::String,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: String) -> Self {
-    pub path: alloc::string::String,
     pub fn new(path: alloc::string::String) -> Self {
         Self { path }
     }
@@ -343,7 +341,7 @@ mod tests {
 
     #[test]
     fn test_transaction_creation() {
-        let store = ContentAddressedStore::new("/tmp/test".to_string());
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
         assert!(transaction.operations.is_empty());
@@ -351,7 +349,7 @@ mod tests {
 
     #[test]
     fn test_install_operation() {
-        let store = ContentAddressedStore::new("/tmp/test".to_string());
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -375,7 +373,7 @@ mod tests {
 
     #[test]
     fn test_remove_operation() {
-        let store = ContentAddressedStore::new("/tmp/test".to_string());
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -385,7 +383,7 @@ mod tests {
 
     #[test]
     fn test_preview() {
-        let store = ContentAddressedStore::new("/tmp/test".to_string());
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
 
