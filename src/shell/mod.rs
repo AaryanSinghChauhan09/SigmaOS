@@ -12,6 +12,12 @@ pub use sigma_sh::{
     SovereignSigmaShRepl, ZshPromptFormatter,
 };
 
+pub use sigma_sh::{
+    AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
+    ParameterExpansionEngine, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
+    SovereignSigmaShRepl, ZshPromptFormatter,
+};
+
 // pub use repl::{ShellCommand, ShellRepl};
 pub use command::{CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession, SimpleCommandRegistry, SimpleShellSession};
 pub use terminal_emulator::{TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
