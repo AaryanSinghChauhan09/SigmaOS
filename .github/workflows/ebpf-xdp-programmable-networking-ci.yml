@@ -1,0 +1,23 @@
+name: eBPF XDP Programmable Networking CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  ebpf-xdp-verify:
+    name: Verify eBPF XDP Fast Data-Plane Hooks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test eBPF Fast Data-Plane Engine
+        run: |
+          rustc --test src/kernel/ebpf.rs --edition=2021 -o build/ebpf_test
+          ./build/ebpf_test

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 #[path = "../src/unimplemented_features.rs"]
@@ -51,58 +54,21 @@ mod gap_closure;
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
-
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-
-#[path = "../src/process/advanced_process_control.rs"]
-mod advanced_process_control;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-
-#[path = "../src/compatibility/abi_extended.rs"]
-mod abi_extended;
-
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-
 #[path = "../src/logging/unified.rs"]
 mod unified;
+#[path = "../src/process/sovereign_process_engine.rs"]
+mod sovereign_process_engine;
+#[path = "../src/shell/sovereign_shell_parity.rs"]
+mod sovereign_shell_parity;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
 
-use bsd::*;
-use wiki_ideas_implementation::SystemdUnitActiveState;
-use bsd_compat::*;
-use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unveil::{UnveilManager, UnveilPermission};
-use wiki_ideas_implementation::SystemdUnitActiveState;
-use bsd_compat::*;
-use wiki_ideas::SystemdUnitActiveState;
+use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
+use wiki_ideas_implementation as wiki_ideas;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -220,7 +186,7 @@ fn test_wiki_distro_innovations_inspection() {
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
-        SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
+        SovereignSystemdParityEngine, SystemdUnitActiveState,
     };
 
     // 1. NixOS Declarative System State
@@ -306,12 +272,12 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(mir_eng.get_fastest_mirror(), Some("https://fast.repo.org".to_string()));
 
     let mut journal = PackageTransactionJournal::new();
-    let tx1 = journal.log_transaction("install", "bash", "5.2", 100);
+    let _tx1 = journal.log_transaction("install", "bash", "5.2", 100);
     let tx2 = journal.log_transaction("install", "zsh", "5.9", 105);
     assert_eq!(journal.rollback_transaction(tx2).len(), 1);
 
     // 12. Sovereign Kernel Module Loader (insmod / rmmod / kldload / kldstat Parity)
-    use module_loader::{SovereignKernelModuleManager, ModuleState};
+    use module_loader::SovereignKernelModuleManager;
     use std::collections::BTreeMap as TestBTreeMap;
 
     let mut kmod_mgr = SovereignKernelModuleManager::new();
@@ -325,7 +291,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
     kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
-    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s| s.as_str()), Some("1"));
+    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
