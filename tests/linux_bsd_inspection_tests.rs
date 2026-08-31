@@ -19,6 +19,8 @@ mod linux_bsd_innovations;
 mod unimplemented_features;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
+#[path = "../src/boot/sigma_boot.rs"]
+mod sigma_boot;
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
 #[path = "../src/kernel/sysctl.rs"]
@@ -811,4 +813,42 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     // Swappiness eviction check
     swap.swappiness = 80;
     assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
+}
+
+#[test]
+fn test_sovereign_distro_boot_stage_handoff_integration() {
+    use sigma_boot::{SovereignDistroBootStageHandoff, HandoffProtocol};
+
+    let mut handoff = SovereignDistroBootStageHandoff::new();
+
+    // 1. Linux EFISTUB handoff protocol setup
+    handoff.setup_linux_efistub(0x1000000, "root=UUID=sigma_root quiet splash", Some(0x2000000), 1024 * 1024 * 8);
+    assert_eq!(handoff.execute_handoff().unwrap(), 0x1000000);
+    assert_eq!(handoff.stage_descriptor.as_ref().unwrap().protocol, HandoffProtocol::LinuxEfiStub);
+
+    // 2. Multiboot2 protocol setup
+    handoff.setup_multiboot2(0x1800000, "loglevel=info init=/bin/sigma-sh");
+    assert_eq!(handoff.execute_handoff().unwrap(), 0x1800000);
+    assert_eq!(handoff.stage_descriptor.as_ref().unwrap().protocol, HandoffProtocol::Multiboot2);
+
+    // 3. FreeBSD BTX ELF stage handoff
+    handoff.setup_freebsd_btx_elf(0x2000000, "-v -s");
+    assert_eq!(handoff.execute_handoff().unwrap(), 0x2000000);
+
+    // 4. OpenBSD boot.conf parser
+    let conf = "set status on\nstty com0 115200\nboot hd0a:/bsd.mp\n";
+    let directives_count = handoff.parse_openbsd_boot_conf(conf);
+    assert_eq!(directives_count, 3);
+    assert_eq!(handoff.execute_handoff().unwrap(), 0x100000);
+
+    // 5. Live ISO RAM Disk OverlayFS stage
+    assert!(handoff.prepare_live_iso_overlay("/iso_root/boot/rootfs.squashfs", 1024).is_ok());
+    assert!(handoff.live_overlay_mounted);
+    assert_eq!(handoff.execute_handoff().unwrap(), 0x200000);
+
+    // 6. Emergency Rescue Console trigger
+    handoff.trigger_emergency_rescue("EFI Framebuffer resolution not supported");
+    assert!(handoff.emergency_rescue_active);
+    assert_eq!(handoff.last_error_log.as_deref(), Some("EFI Framebuffer resolution not supported"));
+    assert!(handoff.execute_handoff().is_err());
 }

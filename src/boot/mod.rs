@@ -15,7 +15,10 @@ pub mod verified;
 
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
-pub use sigma_boot::{BootEntry, BootManager, BootTheme};
+pub use sigma_boot::{
+    BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
+    OpenBsdBootDirective, SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
+};
 pub use plymouth::{
     GtkPlymouthBootsplashEngine, PlymouthMode, PlymouthTheme,
 };
