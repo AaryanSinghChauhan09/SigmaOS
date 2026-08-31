@@ -7,13 +7,13 @@
 //!
 //! ## Architecture
 //!
-//! ```
-//! Application renders → wl_buffer (DMA-BUF or SHM)
-//!     → ZenithCompositor (damage tracking)
-//!     → Scene graph (sorted by z-order)
-//!     → GPU backend (Vulkan render pass)
-//!     → KMS/DRM (vsync atomic commit)
-//!     → Display
+//! ```text
+//! Application renders -> wl_buffer (DMA-BUF or SHM)
+//!     -> ZenithCompositor (damage tracking)
+//!     -> Scene graph (sorted by z-order)
+//!     -> GPU backend (Vulkan render pass)
+//!     -> KMS/DRM (vsync atomic commit)
+//!     -> Display
 //! ```
 extern crate alloc;
 use alloc::string::{String, ToString};
@@ -21,6 +21,14 @@ use alloc::vec::Vec;
 use alloc::format;
 
 
+#[cfg(not(feature = "default"))]
+#[path = "../klib/mod.rs"]
+pub mod klib;
+
+#[cfg(not(feature = "default"))]
+use klib::HashMap;
+
+#[cfg(feature = "default")]
 use crate::klib::HashMap;
 
 /// Stub capability token for security-aware windowing

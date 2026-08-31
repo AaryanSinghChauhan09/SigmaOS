@@ -148,3 +148,9 @@ pub use distro_inspirations::{
 pub use compatibility::fedora::{
     CryptoPolicyLevel, FedoraCryptoPoliciesEngine, FedoraSilverblueRpmOstreeEngine,
 };
+
+pub use ui::gtk::{
+    AdwNavigationSplitView, AdwPreferencesEngine, BsdGtkSandboxGuard, GtkAccentColor,
+    GtkCssProvider, GtkHeaderBar, GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine,
+    XAppStatusIconManager,
+};

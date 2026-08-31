@@ -3,17 +3,14 @@
 
 extern crate alloc;
 
-mod klib {
-    pub use sigmaos::klib::*;
-}
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
 
-mod sigpkg {
-    pub use sigmaos::sigpkg::*;
-}
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
 
-mod security {
-    pub use sigmaos::security::*;
-}
+#[path = "../src/security/mod.rs"]
+pub mod security;
 
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
