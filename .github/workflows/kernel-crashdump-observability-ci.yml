@@ -24,6 +24,7 @@ jobs:
 
       - name: Test Kdump & Watchdog Engine
         run: |
+          mkdir -p build
           rustc --test src/kernel/watchdog.rs --edition=2021 -o build/watchdog_test
           ./build/watchdog_test
 

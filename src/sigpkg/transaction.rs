@@ -14,11 +14,11 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: crate::klib::path::PathBuf,
+    pub path: alloc::string::String,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: crate::klib::path::PathBuf) -> Self {
+    pub fn new(path: alloc::string::String) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {
@@ -337,11 +337,11 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 mod tests {
     use super::*;
     use crate::klib::custom_string::SigmaString;
-    type PathBuf = alloc::string::String;
+    use crate::klib::path::PathBuf;
 
     #[test]
     fn test_transaction_creation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test").to_string());
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
         assert!(transaction.operations.is_empty());
@@ -349,7 +349,7 @@ mod tests {
 
     #[test]
     fn test_install_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test").to_string());
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -373,7 +373,7 @@ mod tests {
 
     #[test]
     fn test_remove_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test").to_string());
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -383,7 +383,7 @@ mod tests {
 
     #[test]
     fn test_preview() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test").to_string());
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
 

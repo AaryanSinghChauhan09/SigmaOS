@@ -34,7 +34,7 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::klib::HashMap;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 use alloc::sync::Arc;
 
