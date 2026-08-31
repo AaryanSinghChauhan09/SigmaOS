@@ -26,8 +26,8 @@ SigmaOS draws inspiration from the best features of major Linux distributions an
 | **Void Linux** | XBPS package manager | XBPS compatibility | 📋 |
 | **Alpine Linux** | Security-first minimal base | Minimal kernel mode | ✅ |
 | **Alpine Linux** | musl libc | musl compatibility | 📋 |
-| **Pop!\_OS** | Auto-tiling window manager | Tiling WM | ✅ |
-| **Pop!\_OS** | System76 firmware tools | Firmware manager | 📋 |
+| **Pop!_OS** | Auto-tiling window manager | Tiling WM | ✅ |
+| **Pop!_OS** | System76 firmware tools | Firmware manager | 📋 |
 | **Garuda Linux** | Dr460nized theme | Dark/blur theme | ✅ |
 | **Garuda Linux** | Gaming optimizations | Gaming mode | 📋 |
 | **antiX/MX Linux** | Lightweight tools | Busybox-style tools | ✅ |
@@ -45,35 +45,30 @@ SigmaOS draws inspiration from the best features of major Linux distributions an
 ## Detailed Feature Implementations
 
 ### Arch Linux Parity
-
-*   **AUR client**: Resolve, download, build, and install AUR packages natively
-*   **Pacman compatibility**: pacman-style CLI wrapper around sigma-pkg
-*   **Rolling release**: Continuous package updates without version pinning
+- **AUR client**: Resolve, download, build, and install AUR packages natively
+- **Pacman compatibility**: pacman-style CLI wrapper around sigma-pkg
+- **Rolling release**: Continuous package updates without version pinning
 
 ### CachyOS Parity
-
-*   **BORE scheduler**: Burst-Oriented Response Enhancer reduces latency for interactive workloads
-*   **EEVDF scheduler**: Earliest Eligible Virtual Deadline First for fairness
-*   **LTO builds**: Link-time optimization for kernel and userspace
-*   **zstd compression**: Fast compression for initramfs and packages
+- **BORE scheduler**: Burst-Oriented Response Enhancer reduces latency for interactive workloads
+- **EEVDF scheduler**: Earliest Eligible Virtual Deadline First for fairness
+- **LTO builds**: Link-time optimization for kernel and userspace
+- **zstd compression**: Fast compression for initramfs and packages
 
 ### NixOS Parity
-
-*   **Declarative system**: Define entire system state in Nix expressions
-*   **Atomic rollback**: Every update is atomic; rollback to any generation
-*   **Content-addressed store**: Packages stored by hash for reproducibility
-*   **Dependency isolation**: No DLL hell — packages carry their own dependencies
+- **Declarative system**: Define entire system state in Nix expressions
+- **Atomic rollback**: Every update is atomic; rollback to any generation
+- **Content-addressed store**: Packages stored by hash for reproducibility
+- **Dependency isolation**: No DLL hell — packages carry their own dependencies
 
 ### OpenBSD Parity
-
-*   **pledge()**: Processes declare capability requirements upfront
-*   **unveil()**: Filesystem access restricted to declared paths
-*   **Secure levels**: Kernel hardening levels (securelevel 0-3)
-*   **W^X enforcement**: Writable XOR executable memory pages
+- **pledge()**: Processes declare capability requirements upfront
+- **unveil()**: Filesystem access restricted to declared paths
+- **Secure levels**: Kernel hardening levels (securelevel 0-3)
+- **W^X enforcement**: Writable XOR executable memory pages
 
 ### FreeBSD Parity
-
-*   **pf firewall**: Packet Filter with stateful inspection
-*   **Jails**: Lightweight OS-level virtualization (via namespaces)
-*   **ZFS**: Advanced storage with checksums and snapshots
-*   **bhyve-inspired VMM**: Type-2 hypervisor model
+- **pf firewall**: Packet Filter with stateful inspection
+- **Jails**: Lightweight OS-level virtualization (via namespaces)
+- **ZFS**: Advanced storage with checksums and snapshots
+- **bhyve-inspired VMM**: Type-2 hypervisor model

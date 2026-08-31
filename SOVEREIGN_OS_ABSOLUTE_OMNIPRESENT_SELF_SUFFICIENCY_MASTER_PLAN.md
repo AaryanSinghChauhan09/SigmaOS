@@ -1,45 +1,45 @@
 # 🌌 SigmaOS Absolute & Omnipresent Self-Sufficiency Master Plan
-
 ## 👑 The Sovereign Paradigm: Native zero-dependency replacement of all legacy software, runtimes, hypervisors, speech-vision-language AI models, databases, utilities, graphics tools, and scientific simulators.
 
 > **"A sovereign Operating System is an absolute and self-contained computational universe. To maintain digital independence, it must never require the download, installation, execution, or compilation of external software. Every tool, simulator, utility, codec, language model, relational or spatial database, virtualizer, and framework must exist natively as high-performance, memory-safe, zero-dependency safe-Rust primitives compiled directly into the SigmaOS kernel and userland space."**
 
 This master plan lays out the exhaustive blueprint, direct code execution pipelines, capability-gated microkernel integration pathways, and fully-functioning, safe-Rust code prototypes to completely replace and natively obsolete **every single application, format, codec, database, AI/ML package, and scientific simulator** specified in the ecosystem checklist.
 
-***
+---
 
 ## 🗺️ SECTION I: The Multi-Shard Sovereign Architecture
 
 SigmaOS architecture decomposes all computational tasks into **Twelve Core Sovereign Shards (`S-SHARDS`)**. These shards run in hardware-isolated address spaces and communicate via lock-free, zero-copy, capability-gated IPC messaging over the microkernel's direct memory mapped rings.
 
-    +----------------------------------------------------------------------------------------------------------+
-    |                                        ZENITH GRAPHICAL DESKTOP ENVIRONMENT                              |
-    |                                       (High-Fidelity Unified User Interface)                             |
-    +----------------------------------------------------------------------------------------------------------+
-                                                         |
-                                                         v (Capability-Token IPC Bus)
-    +----------------------------------------------------------------------------------------------------------+
-    |                                           SIGMAOS CORE KERNEL SHARDS                                     |
-    |                                                                                                          |
-    |   [S-MEDIA]   |   [S-OFFICE]  |  [S-CONNECT]  |   [S-VIRT]    |    [S-AI]     |   [S-DATA]   | [S-CODEC] |
-    |   Multimedia, |   Documents,  |  Onion P2P,   |  Type-1 VM,   |   Unified NLP | Relational & | Universal |
-    |   Vector, 3D  |   Mind-Maps,  |  PQ-Chat, Web | Android, PE   |   Transformer | Spatial DBMS | Codec-VFS |
-    |   & Audio     |   Office      |  & Tor Stack  | Translator    |   & MoE Mesh  | & Indexing   | & Decoders|
-    |               |               |               |               |               |              |           |
-    |  [S-SCIENCE]  |    [S-SIM]    |   [S-ROBO]    |  [S-SECURE]   |    [S-ML]     |                          |
-    |  ETL, Mining, | Physics, CFD, | Autopilots,   | Post-Quantum  | Deep Learning |                          |
-    |  Analytics,   | FEM & Chem    | Transforms &  | Forensics, AV |  Convolutions |                          |
-    |  Visuals      | Solvers       | SLAM Loop     | & RAM Shunt   |   & Auto-Diff |                          |
-    +----------------------------------------------------------------------------------------------------------+
+```
++----------------------------------------------------------------------------------------------------------+
+|                                        ZENITH GRAPHICAL DESKTOP ENVIRONMENT                              |
+|                                       (High-Fidelity Unified User Interface)                             |
++----------------------------------------------------------------------------------------------------------+
+                                                     |
+                                                     v (Capability-Token IPC Bus)
++----------------------------------------------------------------------------------------------------------+
+|                                           SIGMAOS CORE KERNEL SHARDS                                     |
+|                                                                                                          |
+|   [S-MEDIA]   |   [S-OFFICE]  |  [S-CONNECT]  |   [S-VIRT]    |    [S-AI]     |   [S-DATA]   | [S-CODEC] |
+|   Multimedia, |   Documents,  |  Onion P2P,   |  Type-1 VM,   |   Unified NLP | Relational & | Universal |
+|   Vector, 3D  |   Mind-Maps,  |  PQ-Chat, Web | Android, PE   |   Transformer | Spatial DBMS | Codec-VFS |
+|   & Audio     |   Office      |  & Tor Stack  | Translator    |   & MoE Mesh  | & Indexing   | & Decoders|
+|               |               |               |               |               |              |           |
+|  [S-SCIENCE]  |    [S-SIM]    |   [S-ROBO]    |  [S-SECURE]   |    [S-ML]     |                          |
+|  ETL, Mining, | Physics, CFD, | Autopilots,   | Post-Quantum  | Deep Learning |                          |
+|  Analytics,   | FEM & Chem    | Transforms &  | Forensics, AV |  Convolutions |                          |
+|  Visuals      | Solvers       | SLAM Loop     | & RAM Shunt   |   & Auto-Diff |                          |
++----------------------------------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## 📊 SECTION II: Ultimate Legacy Parity Trace Matrix
 
 The following comprehensive registry details the native SigmaOS equivalent, architectural target shard, and direct technological upgrade over the respective legacy third-party application or framework:
 
 ### 1. Productivity, Office, & Graphics Suite
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **VLC Media Player** | `S-MEDIA` | Zero-copy frame pipelines rendering directly to KMS/DRM VESA framebuffers via Vulkan compute shaders. |
@@ -54,7 +54,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **Gnaural** | `S-MEDIA` | Real-time dual-channel binaural beat synthesizer generating frequencies directly onto the audio codec interrupts. |
 
 ### 2. Networks, Browsers, & P2P Protocols
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **Brave / Firefox** | `S-CONNECT` | Strict multi-sandbox browser engine parsing CSS and HTML elements directly into hardware-isolated secure VFS spaces. |
@@ -65,7 +64,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **FrontlineSMS** | `S-CONNECT` | Direct microkernel serial interface with cellular basebands, buffering and queuing SMS broadcasts natively. |
 
 ### 3. Hypervisors, Emulation, & Virtualization
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **Oracle VirtualBox** | `S-VIRT` | Type-1 hypervisor controlling hardware-assisted virtualization extensions (VMX/SVM) natively. |
@@ -74,7 +72,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **Linux Distros / GNU** | `S-VIRT` | Standard, POSIX-conforming multi-call utility suite (`sigma-sh`) written natively in memory-safe Rust. |
 
 ### 4. Forensic, Antivirus, & Encryption Utilities
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **GnuPG / OpenSSL** | `S-SECURE` | Kyber-1024 asymmetric encryption and Dilithium-5 digital signature systems compiled natively as core system brokers. |
@@ -86,7 +83,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **BleachBit** | `S-SECURE` | Low-level military-grade secure file shredder overwriting sectors with random bytes before unlink. |
 
 ### 5. Multi-Model Databases & Text Engines
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **MySQL / PostgreSQL / MariaDB** | `S-DATA` | Multi-version Concurrency Control (MVCC) transactional SQL database compiling tables into B-Tree indexes. |
@@ -95,7 +91,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **Lucene / Solr / Nutch / Xapian** | `S-DATA` | High-speed TF-IDF and BM25 indexers parsing inverted indices directly from VFS files. |
 
 ### 6. Deep Learning & AI Frameworks
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **PyTorch / TensorFlow / Keras** | `S-ML` | Computational graph engine utilizing auto-differentiation compiled directly onto Vulkan compute shaders. |
@@ -108,7 +103,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **H2O / Pyomo / Infer.NET** | `S-ML` | Automated machine learning (AutoML) routines and probabilistic graphical models in safe Rust. |
 
 ### 7. Large Language Models (LLMs) & AI Agents
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **Meta LLaMA (all versions)** | `S-AI` | High-performance Grouped-Query Attention (GQA) inference engines utilizing mmap model weights directly. |
@@ -122,7 +116,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **OpenCog / Soar / CLARION** | `S-AI` | Cognitive symbolic logic architectures executing reasoning rules on physical semantic graphs. |
 
 ### 8. Speech, NLP, & Vision Tools
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **Whisper / CMU Sphinx / DeepSpeech** | `S-AI` | Audio spectrograph Fast Fourier Transforms (FFT) decoded natively by transformer layers. |
@@ -131,7 +124,6 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **Festival / eSpeak / WaveNet** | `S-AI` | Real-time text-to-speech formant synthesis and neural vocoders producing low-latency waveforms. |
 
 ### 9. Scientific Simulators, Solver Engines, & Analytics
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **GNU Octave / MATLAB / Mathematica** | `S-SCIENCE` | Numeric algebra matrices, eigenvalue routines, and high-precision analytical math solvers. |
@@ -144,48 +136,42 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **ParaView / VTK** | `S-SCIENCE` | 3D scientific visualization engine generating isosurfaces from raw volumetric datasets via Vulkan. |
 
 ### 10. Robotics, Autopilots, & UAVs
-
 | Component / Legacy Target | Shard | Native Replacement Strategy & System-Wide Upgrades |
 | :--- | :--- | :--- |
 | **ArduPilot / Paparazzi Project** | `S-ROBO` | Flight attitude PID stabilization loops running on real-time microkernel timer interrupts. |
 | **CoppeliaSim / Gazebo / Webots** | `S-ROBO` | Real-time 3D physics-based collision and sensor emulation platform running directly on GPU. |
 | **ROS (Robot Operating System) / MRPT** | `S-ROBO` | Transform coordinate propagation frames and message brokers executing on lockless Treiber queues. |
 
-***
+---
 
 ## 🎨 SECTION III: Deep Architectural Integration & Pipelines
 
 ### 1. Zero-Copy Image & Video Rendering Pipeline (`S-MEDIA` + `S-CODEC`)
-
 SigmaOS strips out massive, vulnerable graphic stacks (X11, Wayland, PulseAudio, FFmpeg). Instead, image, video, and vector streams are parsed via **capability-bounded, SIMD-accelerated Rust codecs**.
+* **The Frame Lifecycle**: When a multimedia file is read from the VFS, raw bytes are mapped directly into physical memory pages.
+* **The Zero-Copy Magic**: Decoders write uncompressed image arrays (from `.avif`, `.png`, `.exr`, or `.mkv` video blocks) directly into GPU-mapped, shared-frame memory blocks.
+* **Direct Composite Blending**: Drawing overlays, video rendering, brush dynamics, and vector manipulations (Inkscape/GIMP features) execute as Vulkan compute shader kernels acting directly on these GPU buffers. This eliminates CPU-to-GPU copy operations entirely.
 
-*   **The Frame Lifecycle**: When a multimedia file is read from the VFS, raw bytes are mapped directly into physical memory pages.
-*   **The Zero-Copy Magic**: Decoders write uncompressed image arrays (from `.avif`, `.png`, `.exr`, or `.mkv` video blocks) directly into GPU-mapped, shared-frame memory blocks.
-*   **Direct Composite Blending**: Drawing overlays, video rendering, brush dynamics, and vector manipulations (Inkscape/GIMP features) execute as Vulkan compute shader kernels acting directly on these GPU buffers. This eliminates CPU-to-GPU copy operations entirely.
-
-<!---->
-
-    +------------+       +-------------------+       +-------------------------+       +-----------------------+
-    |  VFS File  | ----> | Unified SIMD VFS  | ----> | Direct GPU Frame Buffer | ----> | Vulkan Compute Shader |
-    |  (Raw S)   | (mmap)| Decoder (S-CODEC) |       | (Zero-Copy Shared Page) |       | Blending & Composite  |
-    +------------+       +-------------------+       +-------------------------+       +-----------------------+
+```
++------------+       +-------------------+       +-------------------------+       +-----------------------+
+|  VFS File  | ----> | Unified SIMD VFS  | ----> | Direct GPU Frame Buffer | ----> | Vulkan Compute Shader |
+|  (Raw S)   | (mmap)| Decoder (S-CODEC) |       | (Zero-Copy Shared Page) |       | Blending & Composite  |
++------------+       +-------------------+       +-------------------------+       +-----------------------+
+```
 
 ### 2. Post-Quantum Cryptographic Keyring & RAM Sandboxing (`S-SECURE`)
-
 Legacy systems rely on OpenSSL (notoriously fragile and written in C) and external GPG keyrings. SigmaOS establishes an **immutable Post-Quantum Cryptographic Enclave** within `S-SECURE`.
+* **Asymmetric Exchange**: Implements Kyber-1024 asymmetric key exchange protocols natively in safe Rust.
+* **Digital Signatures**: Signatures are generated and verified via Dilithium-5.
+* **RAM Sandboxing & Volatile Execution**: Secure virtual desktops and connection instances (Tor/Tails replacement) run inside temporary address spaces where all page descriptors are flagged as **volatile-only**. Upon closing the connection or locking the system, the microkernel executes high-priority physical page scrubbing routines (`BleachBit` parity), overwriting physical memory frames with cryptographically secure random numbers to block memory-dump attacks.
 
-*   **Asymmetric Exchange**: Implements Kyber-1024 asymmetric key exchange protocols natively in safe Rust.
-*   **Digital Signatures**: Signatures are generated and verified via Dilithium-5.
-*   **RAM Sandboxing & Volatile Execution**: Secure virtual desktops and connection instances (Tor/Tails replacement) run inside temporary address spaces where all page descriptors are flagged as **volatile-only**. Upon closing the connection or locking the system, the microkernel executes high-priority physical page scrubbing routines (`BleachBit` parity), overwriting physical memory frames with cryptographically secure random numbers to block memory-dump attacks.
-
-***
+---
 
 ## 💻 SECTION IV: High-Performance Safe-Rust Implementation Blueprints
 
 Below are complete, compile-ready, zero-dependency safe-Rust implementations for core subsystems covering all critical divisions requested by the user.
 
 ### 1. Audio Suite: Real-Time Low-Latency Binaural Mixer & Multi-Track Synthesis (`S-MEDIA` - Audacity & Gnaural Parity)
-
 This module acts as the native system audio mixer, using a lockless master ring buffer to synthesize and mix audio channels with nanosecond-level accuracy.
 
 ```rust
@@ -266,7 +252,6 @@ mod audio_tests {
 ```
 
 ### 2. AI Suite: Large Language Model Mixture-of-Experts Dynamic Routing (`S-AI` - DeepSeek-R1, Grok-1 & vLLM Parity)
-
 To natively run deep models like DeepSeek-R1, Mistral, and LLaMA, SigmaOS implements continuous batching and load-balanced Mixture-of-Experts (MoE) routing directly in safe Rust.
 
 ```rust
@@ -346,7 +331,6 @@ mod ai_tests {
 ```
 
 ### 3. Spatial GIS Engine: Kd-Tree Spatial Geometries Indexer (`S-DATA` - PostGIS Parity)
-
 PostGIS features are replaced by an optimized Kd-Tree bounding box engine, enabling ultra-fast querying of geographic, GIS, and UAV coordinates.
 
 ```rust
@@ -428,7 +412,6 @@ mod spatial_tests {
 ```
 
 ### 4. Aerospace & Robotic Loop: Attitude PID Controller (`S-ROBO` / `S-SIM` - ArduPilot, Gazebo & ROS Parity)
-
 SigmaOS incorporates flight dynamics and simulator loops natively. This module handles real-time PID correction loop calculations with hardware timer resolution.
 
 ```rust
@@ -483,39 +466,35 @@ mod robotics_tests {
 }
 ```
 
-***
+---
 
 ## 🏎️ SECTION V: High-Performance, Unified Native File Decoders (`S-CODEC`)
 
 SigmaOS implements safe-Rust zero-dependency decoders and metadata parsers natively in its file system, removing all external parsing binaries:
+* **Digital Raster Images**: Highly efficient SIMD parsers for `.apng`, `.avif`, `.bpg`, `.exr`, `.fits`, `.flif`, `.gif`, `.iff` / `.lbm`, `.jng`, `.jpg` or `.jpeg`, `.jxl`, `.mng`, `.miff` / `.mi`, `.pam`, `.pbm`, `.pgm`, `.ppm`, `.pnm`, `.pgf`, `.png`, `.qoi`, `.tiff`, `.wbmp`, `.webp`, `.xbm`, `.xcf`, and `.xpm`.
+* **Scalable Vectors & Layouts**: Native support for `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, and `.xar`.
+* **Structured Documents & Notebooks**: On-the-fly markdown and layout conversions for `.adoc`, `.epub`, `.latex`, `.md`, `.odt`, `.rtf`, `.tex`, and `.texinfo`.
+* **Standard Schemas & Data Formats**: Zero-copy binary parsers for `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, and `.xml`.
+* **High-Fidelity 3D Formats**: Dynamic vertex grid parsers for `.3mf`, `.amf`, `.blend`, `.dae`, `.dxf`, `.fbx`, `.gltf` / `.glb`, `.hdr`, `.ifc`, `.iges`, `.obj`, `.off`, `.ply`, `.rad`, `.step` / `.stp`, `.stl`, `.usd`, `.vrml`, and `.x3d`.
 
-*   **Digital Raster Images**: Highly efficient SIMD parsers for `.apng`, `.avif`, `.bpg`, `.exr`, `.fits`, `.flif`, `.gif`, `.iff` / `.lbm`, `.jng`, `.jpg` or `.jpeg`, `.jxl`, `.mng`, `.miff` / `.mi`, `.pam`, `.pbm`, `.pgm`, `.ppm`, `.pnm`, `.pgf`, `.png`, `.qoi`, `.tiff`, `.wbmp`, `.webp`, `.xbm`, `.xcf`, and `.xpm`.
-*   **Scalable Vectors & Layouts**: Native support for `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, and `.xar`.
-*   **Structured Documents & Notebooks**: On-the-fly markdown and layout conversions for `.adoc`, `.epub`, `.latex`, `.md`, `.odt`, `.rtf`, `.tex`, and `.texinfo`.
-*   **Standard Schemas & Data Formats**: Zero-copy binary parsers for `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, and `.xml`.
-*   **High-Fidelity 3D Formats**: Dynamic vertex grid parsers for `.3mf`, `.amf`, `.blend`, `.dae`, `.dxf`, `.fbx`, `.gltf` / `.glb`, `.hdr`, `.ifc`, `.iges`, `.obj`, `.off`, `.ply`, `.rad`, `.step` / `.stp`, `.stl`, `.usd`, `.vrml`, and `.x3d`.
-
-***
+---
 
 ## 📈 SECTION VI: Physical Execution & Bare-Metal Hardening Roadmap
 
 SigmaOS uses a three-stage roadmap to move from simulator-based environments directly to physical, bare-metal CPU instruction pipelines:
 
 ### Phase I: The Virtual Sandbox (Current State)
-
-*   All core shards compile into a memory-safe execution workspace.
-*   Unit tests simulate spatial indexes, MoE routing matrices, and PID flight controller updates to ensure logical correctness.
+* All core shards compile into a memory-safe execution workspace.
+* Unit tests simulate spatial indexes, MoE routing matrices, and PID flight controller updates to ensure logical correctness.
 
 ### Phase II: The Capability-Gated Microkernel Linkage (Next State)
-
-*   Relocate execution tables directly into hardware address spaces.
-*   Secure multi-threading is enforced via system capability-token descriptors at physical CPU paging rings (Ring 0 to Ring 3 boundary).
+* Relocate execution tables directly into hardware address spaces.
+* Secure multi-threading is enforced via system capability-token descriptors at physical CPU paging rings (Ring 0 to Ring 3 boundary).
 
 ### Phase III: Sovereign Silicon Independence (Ultimate State)
+* Asymmetric multiprocessor booting isolates real-time processes (`S-ROBO`, `S-MEDIA`) from general computation tasks.
+* Active, cryptographically-signed memory integrity watchers dynamically restore corrupted pages, enabling hardware-level self-healing.
 
-*   Asymmetric multiprocessor booting isolates real-time processes (`S-ROBO`, `S-MEDIA`) from general computation tasks.
-*   Active, cryptographically-signed memory integrity watchers dynamically restore corrupted pages, enabling hardware-level self-healing.
-
-***
+---
 
 ### 👑 The Sovereign OS Paradigm: Absolute Computational Autonomy. Zero External Dependencies. Complete Control.

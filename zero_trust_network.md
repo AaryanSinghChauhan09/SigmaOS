@@ -2,7 +2,7 @@
 
 Inspired by **WireGuard's stateless Noise protocol handshakes**, stateful packet processing, and Linux's `iptables` rate-limiting firewalls, this document defines a complete, functional, `#![no_std]` network secure router shard. It includes post-quantum cryptographic keys, rate limiters, and threat log parsing.
 
-***
+---
 
 ## 🏗️ Component Implementation Source Code
 

@@ -8,7 +8,7 @@ SigmaOS implements W^X (Write XOR Execute), wired page protection from FreeBSD, 
 
 The W^X policy ensures no memory page is simultaneously writable and executable.
 
-### Implementation (src/mm/virtual\_memory.rs)
+### Implementation (src/mm/virtual_memory.rs)
 
 ```rust
 pub enum PageFlags {
@@ -32,9 +32,9 @@ impl VirtualMemoryManager {
 
 Wired pages are pinned in physical memory and protected from swapping or modification by unprivileged code:
 
-*   Kernel code sections: wired + read-only + executable
-*   Kernel data sections: wired + read-write (non-executable)
-*   Interrupt handlers: wired + read-only + executable
+- Kernel code sections: wired + read-only + executable
+- Kernel data sections: wired + read-write (non-executable)
+- Interrupt handlers: wired + read-only + executable
 
 ## ASLR Configuration
 
@@ -47,17 +47,19 @@ Wired pages are pinned in physical memory and protected from swapping or modific
 
 ## Virtual Memory Layout
 
-    0x0000_0000_0000_0000  - NULL (unmapped, catches null dereferences)
-    0x0000_7FFF_FFFF_FFFF  - Userspace limit
-    0xFFFF_8000_0000_0000  - Kernel space start (W^X enforced)
-    0xFFFF_FFFF_8000_0000  - Kernel image (wired, read-only+exec)
-    0xFFFF_FFFF_C000_0000  - Kernel data (wired, read-write, non-exec)
+```
+0x0000_0000_0000_0000  - NULL (unmapped, catches null dereferences)
+0x0000_7FFF_FFFF_FFFF  - Userspace limit
+0xFFFF_8000_0000_0000  - Kernel space start (W^X enforced)
+0xFFFF_FFFF_8000_0000  - Kernel image (wired, read-only+exec)
+0xFFFF_FFFF_C000_0000  - Kernel data (wired, read-write, non-exec)
+```
 
 ## Security Audit
 
-*   W^X violations log to the security audit subsystem (src/security/audit.rs)
-*   Any attempt to map W+X pages triggers an immediate process termination
-*   Kernel modules must be signed before being granted execute permissions
+- W^X violations log to the security audit subsystem (src/security/audit.rs)
+- Any attempt to map W+X pages triggers an immediate process termination
+- Kernel modules must be signed before being granted execute permissions
 
 ## Linux Distro Inspirations
 

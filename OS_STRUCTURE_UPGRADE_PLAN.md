@@ -2,71 +2,70 @@
 
 This document defines the comprehensive core-infrastructure upgrade plan to harden **SigmaOS**'s **Virtual Memory (paging)**, **TCP/UDP Stack**, and **Universal Package Manager (`sigma-pkg`)**, enabling absolute digital sovereignty and container-parity.
 
-***
+---
 
 ## 🎯 1. Architectural Vision
 
 Operating systems traditionally separate memory management, networking, and package managers into disjoint, monolithic userland and kernel systems.
 
 **SigmaOS** unifies these components using **Object-Oriented Programming (OOP) principles** and **Capability-Gated Microkernel Isolation**:
+1. **Virtual MM & Paging**: Implements a robust 4-level paging system (PML4, PDPT, PD, PT) with dedicated user-space process memory isolation, page fault healing, and sub-millisecond physical buddy page merges.
+2. **TCP/UDP Stack**: Implements polymorphic socket connections, Reno/BBR congestion control, state machines, zero-copy memory-mapped socket buffers, and stateful ports firewalling.
+3. **Universal Packaging (`sigma-pkg`)**: Extends the DPLL (Davis-Putnam-Logemann-Loveland) SAT-solver and Content-Addressed Storage (CAS) graph formats, making existing Linux packaging systems (Debian `dpkg` / `.deb`, RedHat `.rpm` / `spec`, Arch Linux `pacman` / `PKGBUILD`) mere modular subsets and components of `sigma-pkg`!
 
-1.  **Virtual MM & Paging**: Implements a robust 4-level paging system (PML4, PDPT, PD, PT) with dedicated user-space process memory isolation, page fault healing, and sub-millisecond physical buddy page merges.
-2.  **TCP/UDP Stack**: Implements polymorphic socket connections, Reno/BBR congestion control, state machines, zero-copy memory-mapped socket buffers, and stateful ports firewalling.
-3.  **Universal Packaging (`sigma-pkg`)**: Extends the DPLL (Davis-Putnam-Logemann-Loveland) SAT-solver and Content-Addressed Storage (CAS) graph formats, making existing Linux packaging systems (Debian `dpkg` / `.deb`, RedHat `.rpm` / `spec`, Arch Linux `pacman` / `PKGBUILD`) mere modular subsets and components of `sigma-pkg`!
-
-***
+---
 
 ## 🏗️ 2. Three-Tiered Upgraded Architecture
 
-    +-------------------------------------------------------------------------------+
-    |                            UNIVERSAL SIGMA-PKG                                |
-    |                                                                               |
-    |  +------------------------+  +------------------------+  +-----------------+  |
-    |  |   Debian (.deb) Shim   |  |   RedHat (.rpm) Shim   |  | Arch PKGBUILD   |  |
-    |  +-----------+------------+  +-----------+------------+  +--------+--------+  |
-    |              |                           |                        |           |
-    |              v                           v                        v           |
-    |  +-------------------------------------------------------------------------+  |
-    |  |                  DPLL SAT Solver & CAS Dependency Engine                |  |
-    |  +---------------------------------------+---------------------------------+  |
-    +------------------------------------------|------------------------------------+
-                                               v
-    +-------------------------------------------------------------------------------+
-    |                          KVM / NETWORK STACK (TCP/UDP)                        |
-    |                                                                               |
-    |  +------------------------+  +------------------------+  +-----------------+  |
-    |  |     TCP Connection     |  |     UDP Socket         |  | Stateful Firewl |  |
-    |  |   (Reno/BBR Control)   |  |   (Zero-Copy Buffer)   |  | (Blocked/Allow) |  |
-    |  +------------------------+  +------------------------+  +-----------------+  |
-    +------------------------------------------|------------------------------------+
-                                               v
-    +-------------------------------------------------------------------------------+
-    |                      VIRTUAL MEMORY MANAGER & PAGING                          |
-    |                                                                               |
-    |   +------------------------------------------------------------------------+  |
-    |   |                  4-Level PML4 Page Table Walk Mapping                  |  |
-    |   |                  - Buddy Allocator split / coalesce coalesce           |  |
-    |   +------------------------------------------------------------------------+  |
-    +-------------------------------------------------------------------------------+
+```
++-------------------------------------------------------------------------------+
+|                            UNIVERSAL SIGMA-PKG                                |
+|                                                                               |
+|  +------------------------+  +------------------------+  +-----------------+  |
+|  |   Debian (.deb) Shim   |  |   RedHat (.rpm) Shim   |  | Arch PKGBUILD   |  |
+|  +-----------+------------+  +-----------+------------+  +--------+--------+  |
+|              |                           |                        |           |
+|              v                           v                        v           |
+|  +-------------------------------------------------------------------------+  |
+|  |                  DPLL SAT Solver & CAS Dependency Engine                |  |
+|  +---------------------------------------+---------------------------------+  |
++------------------------------------------|------------------------------------+
+                                           v
++-------------------------------------------------------------------------------+
+|                          KVM / NETWORK STACK (TCP/UDP)                        |
+|                                                                               |
+|  +------------------------+  +------------------------+  +-----------------+  |
+|  |     TCP Connection     |  |     UDP Socket         |  | Stateful Firewl |  |
+|  |   (Reno/BBR Control)   |  |   (Zero-Copy Buffer)   |  | (Blocked/Allow) |  |
+|  +------------------------+  +------------------------+  +-----------------+  |
++------------------------------------------|------------------------------------+
+                                           v
++-------------------------------------------------------------------------------+
+|                      VIRTUAL MEMORY MANAGER & PAGING                          |
+|                                                                               |
+|   +------------------------------------------------------------------------+  |
+|   |                  4-Level PML4 Page Table Walk Mapping                  |  |
+|   |                  - Buddy Allocator split / coalesce coalesce           |  |
+|   +------------------------------------------------------------------------+  |
++-------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## ⚡ 3. The DPLL SAT Solver & Packaging Shims
 
 To make standard Linux distribution packaging mere modular sub-components of `sigma-pkg`:
+- **DPLL Constraint Solver**: We represent package dependencies as propositional logic clauses (e.g., `A` requires `B` or `C` is mapped as `(A => B \/ C)`). The SAT solver runs a Davis-Putnam-Logemann-Loveland algorithm to resolve dependency conflicts instantly.
+- **Cryptographic CAS Store**: Packages are stored and addressed exclusively by their SHA-256 content hash in the Content-Addressed Store, eliminating version conflicts and enabling secure atomic rolls and rollbacks.
+- **Metadata Shims**: Translation wrappers parse standard metadata formats (`DEBIAN/control`, `.spec`, `PKGBUILD`) and map them dynamically to our `Package` and `Dependency` structures.
 
-*   **DPLL Constraint Solver**: We represent package dependencies as propositional logic clauses (e.g., `A` requires `B` or `C` is mapped as `(A => B \/ C)`). The SAT solver runs a Davis-Putnam-Logemann-Loveland algorithm to resolve dependency conflicts instantly.
-*   **Cryptographic CAS Store**: Packages are stored and addressed exclusively by their SHA-256 content hash in the Content-Addressed Store, eliminating version conflicts and enabling secure atomic rolls and rollbacks.
-*   **Metadata Shims**: Translation wrappers parse standard metadata formats (`DEBIAN/control`, `.spec`, `PKGBUILD`) and map them dynamically to our `Package` and `Dependency` structures.
-
-***
+---
 
 ## 🛡️ 4. Executable Implementation Reference
 
 To guarantee 100% consistency with the codebase, here are the actual executable-grade Rust implementations for the core-infrastructure systems.
 
 ### 4.1 4-Level Paging System (from `src/klib/paging.rs`)
-
 ```rust
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
@@ -111,7 +110,6 @@ impl PageTableEntry for SimplePageTableEntry {
 ```
 
 ### 4.2 TCP Connection, Congestion Control & Firewall (from `src/network/tcp_udp.rs`)
-
 ```rust
 pub trait TCPConnection {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError>;
@@ -152,7 +150,7 @@ impl CongestionControl for RenoCongestionControl {
 }
 ```
 
-***
+---
 
 ## 🛡️ 5. Conclusion
 

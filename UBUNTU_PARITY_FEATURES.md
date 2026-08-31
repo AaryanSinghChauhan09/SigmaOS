@@ -586,11 +586,11 @@ impl SigmaDevTools {
 
 ## Best Practices
 
-1.  **User-Friendly**: Prioritize ease of use and intuitive interfaces
-2.  **Cloud Integration**: Ensure seamless cloud platform integration
-3.  **Developer Focus**: Provide comprehensive development tools
-4.  **Security**: Implement robust security features with AppArmor
-5.  **Regular Updates**: Maintain predictable release schedule
+1. **User-Friendly**: Prioritize ease of use and intuitive interfaces
+2. **Cloud Integration**: Ensure seamless cloud platform integration
+3. **Developer Focus**: Provide comprehensive development tools
+4. **Security**: Implement robust security features with AppArmor
+5. **Regular Updates**: Maintain predictable release schedule
 
 ## Migration Tools
 
@@ -634,8 +634,8 @@ impl UbuntuMigrationAssistant {
 
 ## References
 
-*   [Ubuntu Documentation](https://ubuntu.com/server/docs)
-*   [Snapcraft Documentation](https://snapcraft.io/docs)
-*   [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
-*   [Cloud-Init Documentation](https://cloudinit.readthedocs.io/)
-*   [Unity 7 Documentation](https://doc.ubuntu.com/unity/)
+- [Ubuntu Documentation](https://ubuntu.com/server/docs)
+- [Snapcraft Documentation](https://snapcraft.io/docs)
+- [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
+- [Cloud-Init Documentation](https://cloudinit.readthedocs.io/)
+- [Unity 7 Documentation](https://doc.ubuntu.com/unity/)

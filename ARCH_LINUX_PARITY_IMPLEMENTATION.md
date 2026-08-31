@@ -31,12 +31,11 @@ aur.build_package("libreoffice")?;
 ```
 
 **Key Features:**
-
-*   PKGBUILD parsing and validation
-*   Dependency resolution and building
-*   Checksum verification
-*   Source downloading and extraction
-*   Package creation and installation
+- PKGBUILD parsing and validation
+- Dependency resolution and building
+- Checksum verification
+- Source downloading and extraction
+- Package creation and installation
 
 ### 2. SigmaPacman Package Manager
 
@@ -51,12 +50,11 @@ pacman.remove(vec!["old-package"], true)?;
 ```
 
 **Key Features:**
-
-*   Local and sync database management
-*   Dependency resolution
-*   Package installation and removal
-*   System upgrades
-*   Configuration file handling
+- Local and sync database management
+- Dependency resolution
+- Package installation and removal
+- System upgrades
+- Configuration file handling
 
 ### 3. Rolling Release Management
 
@@ -72,27 +70,28 @@ for update in updates {
 ```
 
 **Key Features:**
-
-*   Continuous update checking
-*   Automatic dependency resolution
-*   Rollback capability
-*   Version management
-*   Update testing
+- Continuous update checking
+- Automatic dependency resolution
+- Rollback capability
+- Version management
+- Update testing
 
 ## Filesystem Structure
 
 SigmaOS implements the Arch Linux filesystem layout with capability-based security:
 
-    /
-    ├── bin/         -> /usr/bin/
-    ├── etc/         -> System configuration
-    ├── home/        -> User home directories
-    ├── usr/
-    │   ├── bin/     -> User binaries
-    │   ├── lib/     -> Libraries
-    │   └── share/   -> Shared data
-    ├── var/         -> Variable data
-    └── boot/        -> Boot files
+```
+/
+├── bin/         -> /usr/bin/
+├── etc/         -> System configuration
+├── home/        -> User home directories
+├── usr/
+│   ├── bin/     -> User binaries
+│   ├── lib/     -> Libraries
+│   └── share/   -> Shared data
+├── var/         -> Variable data
+└── boot/        -> Boot files
+```
 
 ## Service Management
 
@@ -107,12 +106,11 @@ systemd.disable_service("bluetooth")?;
 ```
 
 **Key Features:**
-
-*   Service unit parsing
-*   Dependency management
-*   Automatic restart policies
-*   Journal logging
-*   Target management
+- Service unit parsing
+- Dependency management
+- Automatic restart policies
+- Journal logging
+- Target management
 
 ## Build System Integration
 
@@ -126,12 +124,11 @@ build_env.build_package(&pkgbuild)?;
 ```
 
 **Key Features:**
-
-*   Chroot environment setup
-*   Base package installation
-*   PKGBUILD execution
-*   Package creation
-*   Build directory management
+- Chroot environment setup
+- Base package installation
+- PKGBUILD execution
+- Package creation
+- Build directory management
 
 ## Mirror Management
 
@@ -144,12 +141,11 @@ mirrors.select_best_mirror()?;
 ```
 
 **Key Features:**
-
-*   Mirror performance testing
-*   Geographic preference
-*   Sync status checking
-*   Automatic failover
-*   Score-based selection
+- Mirror performance testing
+- Geographic preference
+- Sync status checking
+- Automatic failover
+- Score-based selection
 
 ## Security Implementation
 
@@ -164,11 +160,11 @@ policy.verify_package(&package)?;
 
 ### Security Levels
 
-*   **None**: No signature verification
-*   **Optional**: Verify signatures if present
-*   **Required**: Reject unsigned packages
-*   **PackageRequired**: Require package signatures
-*   **DatabaseRequired**: Require database signatures
+- **None**: No signature verification
+- **Optional**: Verify signatures if present
+- **Required**: Reject unsigned packages
+- **PackageRequired**: Require package signatures
+- **DatabaseRequired**: Require database signatures
 
 ## Migration Tools
 
@@ -180,11 +176,10 @@ assistant.migrate_from(DistroType::Ubuntu)?;
 ```
 
 **Supported Source Distributions:**
-
-*   Ubuntu
-*   Debian
-*   Fedora
-*   Linux Mint
+- Ubuntu
+- Debian
+- Fedora
+- Linux Mint
 
 ## Testing
 
@@ -282,27 +277,27 @@ cache.update_index()?;
 
 ## Documentation Resources
 
-*   [Arch Linux Wiki](https://wiki.archlinux.org/)
-*   [Pacman Manual](https://man.archlinux.org/man/pacman.8)
-*   [PKGBUILD Guidelines](https://wiki.archlinux.org/title/Creating_packages)
-*   [AUR Guidelines](https://wiki.archlinux.org/title/Arch_User_Repository)
+- [Arch Linux Wiki](https://wiki.archlinux.org/)
+- [Pacman Manual](https://man.archlinux.org/man/pacman.8)
+- [PKGBUILD Guidelines](https://wiki.archlinux.org/title/Creating_packages)
+- [AUR Guidelines](https://wiki.archlinux.org/title/Arch_User_Repository)
 
 ## Best Practices
 
-1.  **Keep It Simple**: Follow Arch philosophy of simplicity
-2.  **User-Centric**: Prioritize user control and flexibility
-3.  **Minimalist**: Avoid unnecessary complexity
-4.  **Documentation**: Maintain clear, comprehensive documentation
-5.  **Community**: Encourage community participation
+1. **Keep It Simple**: Follow Arch philosophy of simplicity
+2. **User-Centric**: Prioritize user control and flexibility
+3. **Minimalist**: Avoid unnecessary complexity
+4. **Documentation**: Maintain clear, comprehensive documentation
+5. **Community**: Encourage community participation
 
 ## Future Enhancements
 
-*   Enhanced AUR web interface
-*   Improved dependency resolution algorithms
-*   Automatic system optimization
-*   Cloud-based package building
-*   Enhanced security features
+- Enhanced AUR web interface
+- Improved dependency resolution algorithms
+- Automatic system optimization
+- Cloud-based package building
+- Enhanced security features
 
-***
+---
 
 *Last updated: August 21, 2026*

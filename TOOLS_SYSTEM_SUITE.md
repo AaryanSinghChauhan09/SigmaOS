@@ -9,39 +9,34 @@ The Tools System Suite provides a unified interface for all system utilities in 
 
 ## Tool Categories
 
-### System Tools (src/tools/sys\_tools.rs)
-
-*   `sigma-df`: Disk free space (no coreutils dependency)
-*   `sigma-du`: Disk usage (no coreutils dependency)
-*   `sigma-top`: Process monitor (no procps dependency)
-*   `sigma-ps`: Process list
-*   `sigma-kill`: Signal delivery
+### System Tools (src/tools/sys_tools.rs)
+- `sigma-df`: Disk free space (no coreutils dependency)
+- `sigma-du`: Disk usage (no coreutils dependency)
+- `sigma-top`: Process monitor (no procps dependency)
+- `sigma-ps`: Process list
+- `sigma-kill`: Signal delivery
 
 ### Archive Tools (src/tools/archive.rs)
-
-*   `sigma-tar`: TAR/TGZ extraction (pure Rust)
-*   `sigma-zip`: ZIP/ZSTD compression
-*   `sigma-xz`: XZ compression/decompression
+- `sigma-tar`: TAR/TGZ extraction (pure Rust)
+- `sigma-zip`: ZIP/ZSTD compression
+- `sigma-xz`: XZ compression/decompression
 
 ### Text Processing (src/tools/textproc.rs)
-
-*   `sigma-grep`: Pattern search (no grep binary needed)
-*   `sigma-sed`: Stream editor
-*   `sigma-awk`: Field processor
-*   `sigma-wc`: Word/line counter
+- `sigma-grep`: Pattern search (no grep binary needed)
+- `sigma-sed`: Stream editor
+- `sigma-awk`: Field processor
+- `sigma-wc`: Word/line counter
 
 ### Package Management (src/sigpkg/)
-
-*   `sigpkg install <pkg>`: Install from SigmaOS registry
-*   `sigpkg remove <pkg>`: Uninstall
-*   `sigpkg search <query>`: Search package database
-*   `sigpkg audit`: Security audit of installed packages
+- `sigpkg install <pkg>`: Install from SigmaOS registry
+- `sigpkg remove <pkg>`: Uninstall
+- `sigpkg search <query>`: Search package database
+- `sigpkg audit`: Security audit of installed packages
 
 ### Shell (src/tools/shell.rs, src/shell/repl.rs)
-
-*   sigma-sh: Built-in POSIX-compatible shell
-*   Tab completion, command history, job control
-*   No bash/dash dependency
+- sigma-sh: Built-in POSIX-compatible shell
+- Tab completion, command history, job control
+- No bash/dash dependency
 
 ## Tool Registration API
 
@@ -76,15 +71,14 @@ SigmaOS integrates OliveTin-style web action runners, allowing system tasks to b
 ## PowerToys Equivalent (src/tools/powertoys.rs)
 
 Inspired by Windows PowerToys, SigmaOS PowerTools provides:
+- Screen ruler
+- Color picker
+- Keyboard shortcut guide
+- File renamer with regex
+- Image resizer
+- Spotlight-like app launcher
 
-*   Screen ruler
-*   Color picker
-*   Keyboard shortcut guide
-*   File renamer with regex
-*   Image resizer
-*   Spotlight-like app launcher
-
-## Feature Flags (src/tools/feature\_flags/)
+## Feature Flags (src/tools/feature_flags/)
 
 All tools support feature-flag gating to allow minimal installs:
 

@@ -34,10 +34,9 @@ impl BOREScheduler {
 ```
 
 **Optimization Strategies:**
-
-*   Desktop: Lower latency, higher responsiveness
-*   Server: Higher throughput, lower context switching
-*   Real-time: Deterministic scheduling, minimal latency
+- Desktop: Lower latency, higher responsiveness
+- Server: Higher throughput, lower context switching
+- Real-time: Deterministic scheduling, minimal latency
 
 ### 2. Memory Management
 
@@ -64,15 +63,14 @@ impl OptimizedBuddyAllocator {
 ```
 
 **Optimization Techniques:**
-
-*   Adaptive cache sizing
-*   Fragmentation reduction
-*   NUMA-aware allocation
-*   Huge page support
+- Adaptive cache sizing
+- Fragmentation reduction
+- NUMA-aware allocation
+- Huge page support
 
 ### 3. I/O Optimization
 
-Asynchronous I/O with io\_uring:
+Asynchronous I/O with io_uring:
 
 ```rust
 pub struct IoUringManager {
@@ -95,10 +93,9 @@ impl IoUringManager {
 ```
 
 **I/O Strategies:**
-
-*   SSD: Higher queue depth, more workers
-*   HDD: Lower queue depth, fewer workers
-*   NVMe: Maximum queue depth, parallel workers
+- SSD: Higher queue depth, more workers
+- HDD: Lower queue depth, fewer workers
+- NVMe: Maximum queue depth, parallel workers
 
 ## Application Performance
 
@@ -126,11 +123,10 @@ pub enum OptLevel {
 ```
 
 **Optimization Guidelines:**
-
-*   System libraries: O2 for stability
-*   Performance-critical: O3 for speed
-*   Embedded: Os for size
-*   Development: Og for debugging
+- System libraries: O2 for stability
+- Performance-critical: O3 for speed
+- Embedded: Os for size
+- Development: Og for debugging
 
 ### 2. Memory Pool Allocation
 
@@ -163,11 +159,10 @@ impl<T> MemoryPool<T> {
 ```
 
 **Use Cases:**
-
-*   Network packet processing
-*   Graphics rendering
-*   Database operations
-*   Real-time systems
+- Network packet processing
+- Graphics rendering
+- Database operations
+- Real-time systems
 
 ### 3. Lock-Free Data Structures
 
@@ -214,11 +209,10 @@ impl<T> LockFreeQueue<T> {
 ```
 
 **Applications:**
-
-*   Multi-threaded servers
-*   Real-time systems
-*   High-frequency trading
-*   Game engines
+- Multi-threaded servers
+- Real-time systems
+- High-frequency trading
+- Game engines
 
 ## System Tuning
 
@@ -242,11 +236,10 @@ pub struct CpuGovernor {
 ```
 
 **Governor Selection:**
-
-*   Performance: Maximum frequency
-*   Powersave: Minimum frequency
-*   Ondemand: Dynamic scaling
-*   Conservative: Gradual scaling
+- Performance: Maximum frequency
+- Powersave: Minimum frequency
+- Ondemand: Dynamic scaling
+- Conservative: Gradual scaling
 
 ### 2. Network Optimization
 
@@ -268,11 +261,10 @@ pub struct TcpSettings {
 ```
 
 **Optimization Parameters:**
-
-*   TCP window scaling
-*   Selective acknowledgments
-*   Congestion control algorithms
-*   Buffer sizes
+- TCP window scaling
+- Selective acknowledgments
+- Congestion control algorithms
+- Buffer sizes
 
 ### 3. Filesystem Optimization
 
@@ -294,10 +286,9 @@ pub struct MountOptions {
 ```
 
 **Workload-Specific Tuning:**
-
-*   Database: Direct I/O, larger caches
-*   Web server: Noatime, optimized for reads
-*   Logging: Journal optimization, write-back caching
+- Database: Direct I/O, larger caches
+- Web server: Noatime, optimized for reads
+- Logging: Journal optimization, write-back caching
 
 ## Monitoring and Profiling
 
@@ -353,11 +344,10 @@ impl Profiler {
 ```
 
 **Profiling Techniques:**
-
-*   CPU sampling
-*   Memory profiling
-*   I/O profiling
-*   Lock contention analysis
+- CPU sampling
+- Memory profiling
+- I/O profiling
+- Lock contention analysis
 
 ## Benchmarking
 
@@ -461,11 +451,11 @@ impl ContinuousMonitor {
 
 ## Best Practices
 
-1.  **Measure First**: Always profile before optimizing
-2.  **Target Bottlenecks**: Focus on actual performance issues
-3.  **Validate Changes**: Verify improvements with benchmarks
-4.  **Consider Trade-offs**: Balance performance vs. maintainability
-5.  **Document Optimizations**: Keep records of changes and results
+1. **Measure First**: Always profile before optimizing
+2. **Target Bottlenecks**: Focus on actual performance issues
+3. **Validate Changes**: Verify improvements with benchmarks
+4. **Consider Trade-offs**: Balance performance vs. maintainability
+5. **Document Optimizations**: Keep records of changes and results
 
 ## Troubleshooting
 
@@ -497,10 +487,10 @@ sigmactl perf optimize-memory
 
 ## Resources
 
-*   [Linux Performance Tuning](https://www.redhat.com/en/blog/performance-tuning-linux)
-*   [Kernel Performance](https://www.kernel.org/doc/html/latest/admin-guide/perf/index.html)
-*   [Optimization Guide](https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Performance)
+- [Linux Performance Tuning](https://www.redhat.com/en/blog/performance-tuning-linux)
+- [Kernel Performance](https://www.kernel.org/doc/html/latest/admin-guide/perf/index.html)
+- [Optimization Guide](https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Performance)
 
-***
+---
 
 *Last updated: August 21, 2026*

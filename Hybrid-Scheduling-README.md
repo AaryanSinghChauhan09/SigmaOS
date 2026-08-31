@@ -2,25 +2,27 @@
 
 Extends SigmaOS's Round-Robin and EDF schedulers with:
 
-*   **NUMA awareness** — tasks affined to local memory nodes
+- **NUMA awareness** — tasks affined to local memory nodes
 
-*   **Real-time (RT) lanes** — hard deadlines guaranteed
+- **Real-time (RT) lanes** — hard deadlines guaranteed
 
-*   **Energy efficiency** — frequency scaling for idle workloads
+- **Energy efficiency** — frequency scaling for idle workloads
 
-*   **AI prediction** — ML model pre-fetches task requirements
+- **AI prediction** — ML model pre-fetches task requirements
 
 ## Class Hierarchy
 
-    SovereignScheduler
-      ├─ RTLane      (hard real-time, EDF)
-      ├─ NUMAFair    (NUMA-aware CFS analogue)
-      └─ EcoLane     (battery/power optimised)
+```
+SovereignScheduler
+  ├─ RTLane      (hard real-time, EDF)
+  ├─ NUMAFair    (NUMA-aware CFS analogue)
+  └─ EcoLane     (battery/power optimised)
+```
 
 ## Roadmap
 
-*   \[ ] RTLane preemption guarantees
+- [ ] RTLane preemption guarantees
 
-*   \[ ] NUMA topology detector
+- [ ] NUMA topology detector
 
-*   \[ ] CPU frequency governor integration
+- [ ] CPU frequency governor integration

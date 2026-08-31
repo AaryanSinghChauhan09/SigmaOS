@@ -5,25 +5,27 @@ proprietary user-space libraries.
 
 ## Architecture
 
-    User App
-       └─ SigmaGPU API (sovereign, no CUDA/ROCm)
-             └─ SovereignHAL GPU backend
-                   ├─ NVIDIA (via open-firmware commands)
-                   ├─ AMD (via AMDGPU register map)
-                   └─ Intel (via i915-compatible open spec)
+```
+User App
+   └─ SigmaGPU API (sovereign, no CUDA/ROCm)
+         └─ SovereignHAL GPU backend
+               ├─ NVIDIA (via open-firmware commands)
+               ├─ AMD (via AMDGPU register map)
+               └─ Intel (via i915-compatible open spec)
+```
 
 ## Goals
 
-*   Compute kernels launched via structured shard messages
+- Compute kernels launched via structured shard messages
 
-*   Deterministic memory mapping (GPU VRAM ↔ RAM) with cryptographic attestation
+- Deterministic memory mapping (GPU VRAM ↔ RAM) with cryptographic attestation
 
-*   Zero vendor lock-in
+- Zero vendor lock-in
 
 ## Roadmap
 
-*   \[ ] Shader compiler (SPIR-V front-end)
+- [ ] Shader compiler (SPIR-V front-end)
 
-*   \[ ] Command buffer submission
+- [ ] Command buffer submission
 
-*   \[ ] Memory allocator (GPU VRAM)
+- [ ] Memory allocator (GPU VRAM)

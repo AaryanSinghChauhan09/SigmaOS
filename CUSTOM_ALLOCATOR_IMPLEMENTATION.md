@@ -6,11 +6,11 @@ SigmaOS implements custom memory allocators to reduce dependency on standard lib
 
 ## Design Principles
 
-1.  **No Std Dependency**: All allocators work without the standard library
-2.  **Deterministic Behavior**: Predictable allocation/deallocation timing
-3.  **Fragmentation Control**: Strategies to minimize memory fragmentation
-4.  **Security**: Protection against allocator-based attacks
-5.  **Performance**: Optimized for kernel workloads
+1. **No Std Dependency**: All allocators work without the standard library
+2. **Deterministic Behavior**: Predictable allocation/deallocation timing
+3. **Fragmentation Control**: Strategies to minimize memory fragmentation
+4. **Security**: Protection against allocator-based attacks
+5. **Performance**: Optimized for kernel workloads
 
 ## Allocator Types
 
@@ -547,11 +547,11 @@ mod tests {
 
 ## Best Practices
 
-1.  **Choose the Right Allocator**: Use bump allocators for temporary allocations, slab allocators for fixed-size objects
-2.  **Minimize Fragmentation**: Prefer slab allocators for frequent small allocations
-3.  **Monitor Usage**: Track allocation patterns to optimize allocator choice
-4.  **Error Handling**: Always handle allocation failures gracefully
-5.  **Memory Safety**: Ensure proper cleanup even in error paths
+1. **Choose the Right Allocator**: Use bump allocators for temporary allocations, slab allocators for fixed-size objects
+2. **Minimize Fragmentation**: Prefer slab allocators for frequent small allocations
+3. **Monitor Usage**: Track allocation patterns to optimize allocator choice
+4. **Error Handling**: Always handle allocation failures gracefully
+5. **Memory Safety**: Ensure proper cleanup even in error paths
 
 ## Troubleshooting
 
@@ -580,7 +580,7 @@ pool.defragment();
 
 ## References
 
-*   [The Slab Allocator](http://www.usenix.org/publications/library/proceedings/newor94/full_papers/bonwick.pdf)
-*   [Buddy System Memory Allocation](https://en.wikipedia.org/wiki/Buddy_memory_allocation)
-*   [jemalloc Design](http://www.canonware.com/jemalloc/design.html)
-*   [Linux Kernel Memory Management](https://www.kernel.org/doc/html/latest/mm/index.html)
+- [The Slab Allocator](http://www.usenix.org/publications/library/proceedings/newor94/full_papers/bonwick.pdf)
+- [Buddy System Memory Allocation](https://en.wikipedia.org/wiki/Buddy_memory_allocation)
+- [jemalloc Design](http://www.canonware.com/jemalloc/design.html)
+- [Linux Kernel Memory Management](https://www.kernel.org/doc/html/latest/mm/index.html)

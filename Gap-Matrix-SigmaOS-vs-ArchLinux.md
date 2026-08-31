@@ -2,7 +2,7 @@
 
 This document provides a comprehensive, prioritized comparison matrix between **Arch Linux** and **SigmaOS**, categorizing technical shortfalls, competitive advantages, and concrete action plans into **Critical**, **Important**, and **Optional** execution tiers.
 
-***
+---
 
 ## 🚦 Prioritized Gap Matrix
 
@@ -18,30 +18,26 @@ This document provides a comprehensive, prioritized comparison matrix between **
 | **Internationalization** | Multilingual glibc locales, language packs | India Stack localization & Unicode support | **Optional** | Build i18n/l10n translation layers and multi-region keyboard/locale configurations. |
 | **Backup & Recovery** | Timeshift, Btrfs snapshots, rsync | Content-addressed storage and transactional snapshots | **Optional** | Add snapshot/rollback CLI tooling (`sigpkg rollback`) and automated disaster recovery managers. |
 
-***
+---
 
 ## 🔑 Strategic Roadmap Sequencing
 
 ### Phase 1: Critical Priorities (Months 0–3)
-
-1.  **Package Ecosystem**: Finalize `sigpkg` with AUR compilation, local cache simulation (`AptCacheSimulator`), and atomic rollback stores.
-2.  **SigmaWiki**: Establish public documentation, installation guides, and developer API references.
-3.  **Release Discipline**: Maintain rolling release updates with reproducible ISO generation.
-4.  **Community Building**: Set up governance models, issue templates, and contributor pipelines.
+1. **Package Ecosystem**: Finalize `sigpkg` with AUR compilation, local cache simulation (`AptCacheSimulator`), and atomic rollback stores.
+2. **SigmaWiki**: Establish public documentation, installation guides, and developer API references.
+3. **Release Discipline**: Maintain rolling release updates with reproducible ISO generation.
+4. **Community Building**: Set up governance models, issue templates, and contributor pipelines.
 
 ### Phase 2: Important Priorities (Months 3–9)
-
-1.  **Modular Customization**: Provide desktop persona switching (`ZorinLayoutSwitcher`) and window manager choices.
-2.  **Granular Control**: Expose fine-grained system controls, `/proc` and `/sys` virtual filesystems, and init switching.
-3.  **Hardened Security**: Combine PQC enclave tokens, Qubes-style Kata Containers microVMs, and mandatory access control (MAC).
+1. **Modular Customization**: Provide desktop persona switching (`ZorinLayoutSwitcher`) and window manager choices.
+2. **Granular Control**: Expose fine-grained system controls, `/proc` and `/sys` virtual filesystems, and init switching.
+3. **Hardened Security**: Combine PQC enclave tokens, Qubes-style Kata Containers microVMs, and mandatory access control (MAC).
 
 ### Phase 3: Optional Priorities (Months 9+)
+1. **Internationalization (i18n)**: Expand locale translations and multi-language support.
+2. **Snapshot Recovery**: Integrate Btrfs/SigmaFS snapshot recovery and automated backup tools.
 
-1.  **Internationalization (i18n)**: Expand locale translations and multi-language support.
-2.  **Snapshot Recovery**: Integrate Btrfs/SigmaFS snapshot recovery and automated backup tools.
-
-***
+---
 
 ## 🎯 Strategic Differentiation
-
 Arch Linux succeeds by empowering advanced users with granular control, comprehensive documentation, and community scale. SigmaOS builds credibility by closing these critical adoption gaps while differentiating through **Post-Quantum Cryptography (PQC)**, **zero-trust microVM isolation**, **multi-distro driver compatibility**, and **AI-driven self-healing OS automation**.

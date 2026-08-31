@@ -13,12 +13,11 @@ Zenith is the native desktop environment for SigmaOS, designed with a focus on a
 **Implementation:** `desktop/zenith_*.rs`
 
 The Zenith desktop environment is built with a modular architecture:
-
-*   **Accessibility:** Screen reader, magnifier, high-contrast themes, keyboard navigation
-*   **Touch:** Multi-touch tracking and gesture recognition
-*   **Theme Engine:** Comprehensive theming system with presets and custom themes
-*   **Control Center:** Unified settings management
-*   **Onboarding:** First-time user setup wizard
+- **Accessibility:** Screen reader, magnifier, high-contrast themes, keyboard navigation
+- **Touch:** Multi-touch tracking and gesture recognition
+- **Theme Engine:** Comprehensive theming system with presets and custom themes
+- **Control Center:** Unified settings management
+- **Onboarding:** First-time user setup wizard
 
 ## Accessibility Features
 
@@ -33,7 +32,6 @@ SigmaOS includes comprehensive accessibility features to ensure the desktop envi
 The screen reader provides text-to-speech functionality for visually impaired users.
 
 #### Screen Reader Features
-
 ```rust
 pub struct ScreenReader {
     pub enabled: bool,
@@ -45,7 +43,6 @@ pub struct ScreenReader {
 ```
 
 #### C-ABI Functions
-
 ```rust
 pub fn speak(&self, text: &str);
 pub fn stop(&self);
@@ -56,7 +53,6 @@ pub fn set_volume(&mut self, volume: f32);
 ```
 
 #### Usage
-
 ```rust
 let screen_reader = ScreenReader::new();
 screen_reader.set_voice("en-US");
@@ -69,7 +65,6 @@ screen_reader.speak("Welcome to SigmaOS");
 Zenith includes WCAG AAA compliant high-contrast themes for users with visual impairments.
 
 #### Theme Types
-
 ```rust
 pub enum Theme {
     Default,
@@ -80,11 +75,9 @@ pub enum Theme {
 ```
 
 #### WCAG AAA Compliance
-
 All high-contrast themes meet WCAG AAA contrast ratio requirements (7:1 minimum contrast).
 
 #### Color Palette
-
 ```rust
 pub struct ThemeColors {
     pub background: [u8; 4],
@@ -96,7 +89,6 @@ pub struct ThemeColors {
 ```
 
 #### Contrast Validation
-
 ```rust
 pub fn check_wcag_aaa_contrast(&self, fg: [u8; 4], bg: [u8; 4]) -> bool {
     let fg_luminance = self.luminance(fg);
@@ -111,7 +103,6 @@ pub fn check_wcag_aaa_contrast(&self, fg: [u8; 4], bg: [u8; 4]) -> bool {
 The magnifier provides zoom functionality for users with low vision.
 
 #### Magnifier Features
-
 ```rust
 pub struct Magnifier {
     pub enabled: bool,
@@ -123,14 +114,12 @@ pub struct Magnifier {
 ```
 
 #### Zoom Levels
-
-*   Minimum: 2x
-*   Maximum: 16x
-*   Default: 2x
-*   Cursor following: Optional
+- Minimum: 2x
+- Maximum: 16x
+- Default: 2x
+- Cursor following: Optional
 
 #### C-ABI Functions
-
 ```rust
 pub fn set_magnifier_enabled(&mut self, enabled: bool);
 pub fn set_magnifier_zoom(&mut self, zoom: f32);
@@ -144,7 +133,6 @@ pub fn set_magnifier_position(&mut self, x: i32, y: i32);
 Keyboard navigation allows users to navigate the desktop without a mouse.
 
 #### Keyboard Navigation Features
-
 ```rust
 pub struct KeyboardNav {
     pub enabled: bool,
@@ -156,13 +144,11 @@ pub struct KeyboardNav {
 ```
 
 #### Focus Ring
-
-*   Customizable color (default: bright green)
-*   Adjustable width (default: 3px)
-*   Tab navigation support
+- Customizable color (default: bright green)
+- Adjustable width (default: 3px)
+- Tab navigation support
 
 #### C-ABI Functions
-
 ```rust
 pub fn set_keyboard_nav_enabled(&mut self, enabled: bool);
 pub fn set_focus_ring_visible(&mut self, visible: bool);
@@ -175,7 +161,6 @@ pub fn set_focus_ring_width(&mut self, width: u32);
 Reduced motion mode disables animations for users who experience motion sickness or vestibular disorders.
 
 #### C-ABI Functions
-
 ```rust
 pub fn set_reduced_motion(&mut self, enabled: bool);
 pub fn is_reduced_motion(&self) -> bool;
@@ -192,7 +177,6 @@ SigmaOS provides comprehensive touch and gesture support for tablets and touch-e
 ### Touch Point Tracking
 
 #### Touch Point Structure
-
 ```rust
 pub struct TouchPoint {
     pub id: u32,
@@ -209,7 +193,6 @@ pub struct TouchPoint {
 ### Touch Events
 
 #### Event Types
-
 ```rust
 pub enum TouchEventType {
     Down,
@@ -220,7 +203,6 @@ pub enum TouchEventType {
 ```
 
 #### Touch Event Structure
-
 ```rust
 pub struct TouchEvent {
     pub event_type: TouchEventType,
@@ -232,7 +214,6 @@ pub struct TouchEvent {
 ### Gesture Recognition
 
 #### Supported Gestures
-
 ```rust
 pub enum GestureType {
     Tap,
@@ -247,7 +228,6 @@ pub enum GestureType {
 ```
 
 #### Gesture Event Structure
-
 ```rust
 pub struct GestureEvent {
     pub gesture_type: GestureType,
@@ -265,7 +245,6 @@ pub struct GestureEvent {
 ### Gesture Configuration
 
 #### Gesture Thresholds
-
 ```rust
 pub struct GestureConfig {
     pub tap_timeout: u64, // milliseconds
@@ -280,20 +259,18 @@ pub struct GestureConfig {
 ```
 
 #### Default Values
-
-*   Tap timeout: 300ms
-*   Double-tap timeout: 500ms
-*   Long-press timeout: 500ms
-*   Swipe threshold: 50px
-*   Pinch threshold: 10px
-*   Rotate threshold: 0.1 radians
-*   Scroll threshold: 10px
-*   Minimum velocity: 100px/s
+- Tap timeout: 300ms
+- Double-tap timeout: 500ms
+- Long-press timeout: 500ms
+- Swipe threshold: 50px
+- Pinch threshold: 10px
+- Rotate threshold: 0.1 radians
+- Scroll threshold: 10px
+- Minimum velocity: 100px/s
 
 ### Touch Manager
 
 #### Touch Manager Structure
-
 ```rust
 pub struct TouchManager {
     pub state: TouchState,
@@ -304,7 +281,6 @@ pub struct TouchManager {
 ```
 
 #### C-ABI Functions
-
 ```rust
 pub fn init(&mut self);
 pub fn process_event(&mut self, event: &TouchEvent) -> Vec<GestureEvent>;
@@ -316,7 +292,6 @@ pub fn set_config(&mut self, config: GestureConfig);
 ### Touch Event Handler
 
 #### Trait Definition
-
 ```rust
 pub trait TouchEventHandler {
     fn on_touch_event(&mut self, event: &TouchEvent);
@@ -325,7 +300,6 @@ pub trait TouchEventHandler {
 ```
 
 #### Default Handler
-
 ```rust
 pub struct DefaultTouchHandler {
     pub touch_manager: TouchManager,
@@ -354,7 +328,6 @@ pub enum ThemeMode {
 ### Color Palette
 
 #### Palette Structure
-
 ```rust
 pub struct ColorPalette {
     pub primary: Color,
@@ -375,7 +348,6 @@ pub struct ColorPalette {
 ### Typography
 
 #### Typography Structure
-
 ```rust
 pub struct Typography {
     pub font_family: [u8; 64],
@@ -393,7 +365,6 @@ pub struct Typography {
 ### Spacing System
 
 #### Spacing Structure
-
 ```rust
 pub struct Spacing {
     pub unit: u32,
@@ -406,18 +377,16 @@ pub struct Spacing {
 ```
 
 #### Default Values
-
-*   unit: 4px
-*   xs: 4px
-*   sm: 8px
-*   md: 16px
-*   lg: 24px
-*   xl: 32px
+- unit: 4px
+- xs: 4px
+- sm: 8px
+- md: 16px
+- lg: 24px
+- xl: 32px
 
 ### Border Radius
 
 #### Border Radius Structure
-
 ```rust
 pub struct BorderRadius {
     pub none: u32,
@@ -429,17 +398,15 @@ pub struct BorderRadius {
 ```
 
 #### Default Values
-
-*   none: 0px
-*   small: 4px
-*   medium: 8px
-*   large: 16px
-*   full: 9999px
+- none: 0px
+- small: 4px
+- medium: 8px
+- large: 16px
+- full: 9999px
 
 ### Shadows
 
 #### Shadow Structure
-
 ```rust
 pub struct Shadows {
     pub small: Color,
@@ -452,7 +419,6 @@ pub struct Shadows {
 ### Animation Settings
 
 #### Animation Structure
-
 ```rust
 pub struct AnimationSettings {
     pub duration_fast: u32,
@@ -466,15 +432,13 @@ pub struct AnimationSettings {
 ```
 
 #### Default Durations
-
-*   fast: 150ms
-*   normal: 300ms
-*   slow: 500ms
+- fast: 150ms
+- normal: 300ms
+- slow: 500ms
 
 ### Theme Management
 
 #### C-ABI Functions
-
 ```c
 int zenith_theme_init(void);
 void zenith_theme_load_shard(void);
@@ -493,43 +457,37 @@ void personalization_sync_ui(void);
 ### Preset Themes
 
 #### Light Theme
-
-*   Background: White (#FFFFFF)
-*   Surface: Light Gray (#F5F5F5)
-*   Primary: Blue (#0078D7)
-*   Text: Dark Gray (#212121)
+- Background: White (#FFFFFF)
+- Surface: Light Gray (#F5F5F5)
+- Primary: Blue (#0078D7)
+- Text: Dark Gray (#212121)
 
 #### Dark Theme
-
-*   Background: Dark Gray (#121212)
-*   Surface: Medium Gray (#1E1E1E)
-*   Primary: Light Blue (#90CAF9)
-*   Text: White (#FFFFFF)
+- Background: Dark Gray (#121212)
+- Surface: Medium Gray (#1E1E1E)
+- Primary: Light Blue (#90CAF9)
+- Text: White (#FFFFFF)
 
 #### Shard Theme
-
-*   Background: Dark Blue (#0A0A14)
-*   Surface: Darker Blue (#14141E)
-*   Primary: Cyan (#00FFFF)
-*   Secondary: Magenta (#FF00FF)
+- Background: Dark Blue (#0A0A14)
+- Surface: Darker Blue (#14141E)
+- Primary: Cyan (#00FFFF)
+- Secondary: Magenta (#FF00FF)
 
 #### Industrial Theme
-
-*   Background: Light Gray (#FAFAFA)
-*   Surface: White (#FFFFFF)
-*   Primary: Blue (#1976D2)
-*   Secondary: Gray (#424242)
+- Background: Light Gray (#FAFAFA)
+- Surface: White (#FFFFFF)
+- Primary: Blue (#1976D2)
+- Secondary: Gray (#424242)
 
 ### Theme Export/Import
 
 #### JSON Export
-
 ```c
 int zenith_theme_export_json(uint8_t* buffer, uint32_t buffer_size, uint32_t* bytes_written);
 ```
 
 #### JSON Import
-
 ```c
 int zenith_theme_import_json(const uint8_t* json, uint32_t json_len);
 ```
@@ -545,7 +503,6 @@ The unified Control Center provides centralized access to all system settings.
 ### Panels
 
 #### Available Panels
-
 ```rust
 pub enum PanelType {
     Network,
@@ -566,12 +523,11 @@ pub enum PanelType {
 ### Quick Settings
 
 #### Default Quick Settings
-
-*   WiFi toggle
-*   Bluetooth toggle
-*   Do Not Disturb toggle
-*   Brightness slider
-*   Volume slider
+- WiFi toggle
+- Bluetooth toggle
+- Do Not Disturb toggle
+- Brightness slider
+- Volume slider
 
 ### Setting Types
 
@@ -627,7 +583,6 @@ pub struct ControlCenterManager {
 ```
 
 #### Manager Functions
-
 ```rust
 pub fn init(&mut self);
 pub fn show(&mut self);
@@ -732,7 +687,6 @@ pub struct OnboardingManager {
 ```
 
 #### Manager Functions
-
 ```rust
 pub fn init(&mut self);
 pub fn start_onboarding(&mut self);
@@ -745,7 +699,6 @@ pub fn is_first_boot(&self) -> bool;
 ### Accessibility Configuration
 
 Example accessibility configuration:
-
 ```rust
 let mut a11y = AccessibilityManager::new();
 a11y.init();
@@ -760,7 +713,6 @@ a11y.set_reduced_motion(true);
 ### Touch Configuration
 
 Example touch configuration:
-
 ```rust
 let mut touch = TouchManager::new();
 touch.init();
@@ -777,7 +729,6 @@ touch.set_config(config);
 ### Theme Configuration
 
 Example theme configuration:
-
 ```rust
 zenith_theme_init();
 zenith_theme_set_mode(ThemeMode::Dark);
@@ -790,7 +741,6 @@ personalization_sync_ui();
 ### Control Center Configuration
 
 Example control center usage:
-
 ```rust
 let mut cc = ControlCenterManager::new();
 cc.init();
@@ -803,7 +753,6 @@ cc.state.toggle_do_not_disturb();
 ### Onboarding Configuration
 
 Example onboarding usage:
-
 ```rust
 let mut onboarding = OnboardingManager::new();
 onboarding.init();
@@ -820,67 +769,59 @@ onboarding.complete_onboarding();
 ## Performance Optimization
 
 ### Accessibility Performance
-
-*   Screen reader uses efficient TTS caching
-*   Magnifier uses hardware-accelerated scaling
-*   Focus ring rendering optimized for minimal overhead
+- Screen reader uses efficient TTS caching
+- Magnifier uses hardware-accelerated scaling
+- Focus ring rendering optimized for minimal overhead
 
 ### Touch Performance
-
-*   Touch point tracking uses efficient data structures
-*   Gesture recognition uses incremental calculations
-*   Velocity calculation optimized for real-time detection
+- Touch point tracking uses efficient data structures
+- Gesture recognition uses incremental calculations
+- Velocity calculation optimized for real-time detection
 
 ### Theme Performance
-
-*   Theme changes use efficient diff algorithm
-*   Color palette updates are batched
-*   Font changes use lazy loading
+- Theme changes use efficient diff algorithm
+- Color palette updates are batched
+- Font changes use lazy loading
 
 ## Troubleshooting
 
 ### Accessibility Issues
-
-*   Check if screen reader is enabled
-*   Verify TTS engine is installed
-*   Check magnifier zoom level
-*   Verify keyboard navigation is enabled
+- Check if screen reader is enabled
+- Verify TTS engine is installed
+- Check magnifier zoom level
+- Verify keyboard navigation is enabled
 
 ### Touch Issues
-
-*   Check if touch is enabled
-*   Verify gesture thresholds
-*   Check multi-touch support
-*   Verify touch driver is loaded
+- Check if touch is enabled
+- Verify gesture thresholds
+- Check multi-touch support
+- Verify touch driver is loaded
 
 ### Theme Issues
-
-*   Check if theme engine is initialized
-*   Verify theme mode is set correctly
-*   Check custom colors are valid
-*   Verify font is installed
+- Check if theme engine is initialized
+- Verify theme mode is set correctly
+- Check custom colors are valid
+- Verify font is installed
 
 ### Control Center Issues
-
-*   Check if control center is visible
-*   Verify panel is loaded
-*   Check setting values are valid
-*   Verify search query format
+- Check if control center is visible
+- Verify panel is loaded
+- Check setting values are valid
+- Verify search query format
 
 ### Onboarding Issues
-
-*   Check if it's first boot
-*   Verify step validation
-*   Check configuration values
-*   Verify configuration application
+- Check if it's first boot
+- Verify step validation
+- Check configuration values
+- Verify configuration application
 
 ## References
 
-*   [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-*   [Material Design Guidelines](https://material.io/design)
-*   [Kernel Architecture](Kernel-Architecture)
-*   [Security Documentation](Security)
-*   [Networking Documentation](Networking)
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Material Design Guidelines](https://material.io/design)
+- [Kernel Architecture](Kernel-Architecture.md)
+- [Security Documentation](Security.md)
+- [Networking Documentation](Networking.md)
 
 ## License
 

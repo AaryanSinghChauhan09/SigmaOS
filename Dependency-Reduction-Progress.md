@@ -9,13 +9,12 @@ and replace them with SigmaOS-native implementations, inspired by BSD and Linux 
 > — SigmaOS Core Development Principle
 
 Reducing external dependencies improves:
+- **Security** — smaller attack surface
+- **Portability** — runs on bare metal with no host OS
+- **Control** — full understanding of every subsystem
+- **Learning** — deep OS engineering knowledge
 
-*   **Security** — smaller attack surface
-*   **Portability** — runs on bare metal with no host OS
-*   **Control** — full understanding of every subsystem
-*   **Learning** — deep OS engineering knowledge
-
-***
+---
 
 ## Custom Implementations Completed
 
@@ -42,7 +41,7 @@ Reducing external dependencies improves:
 | Atomic operations via `core::sync::atomic` | `std::sync` | across `klib/` |
 | Custom spinlocks (planned) | `std::sync::Mutex` | TBD |
 
-***
+---
 
 ## In Progress
 
@@ -53,30 +52,33 @@ Reducing external dependencies improves:
 | Custom I/O primitives | Partial (VESA, UART drivers) | Complete driver framework |
 | Custom formatting | Using `core::fmt` | Custom fmt macros |
 
-***
+---
 
 ## Planned Replacements
 
 ### Phase 2 — Custom Collections
-
-    klib/map.rs       → replaces BTreeMap/HashMap
-    klib/set.rs       → replaces BTreeSet/HashSet  
-    klib/linked_list.rs → replaces LinkedList
-    klib/ringbuf.rs   → replaces VecDeque
+```
+klib/map.rs       → replaces BTreeMap/HashMap
+klib/set.rs       → replaces BTreeSet/HashSet  
+klib/linked_list.rs → replaces LinkedList
+klib/ringbuf.rs   → replaces VecDeque
+```
 
 ### Phase 3 — Custom Primitives
-
-    klib/fmt.rs       → custom print!/format! macros
-    klib/str.rs       → custom &str + owned string  
-    klib/slice.rs     → slice utility functions
+```
+klib/fmt.rs       → custom print!/format! macros
+klib/str.rs       → custom &str + owned string  
+klib/slice.rs     → slice utility functions
+```
 
 ### Phase 4 — No-std Kernel Core
+```
+All kernel/ files → pure #![no_std] + #![no_main]
+No alloc crate   → custom allocator only
+No core re-use   → architecture-specific core
+```
 
-    All kernel/ files → pure #![no_std] + #![no_main]
-    No alloc crate   → custom allocator only
-    No core re-use   → architecture-specific core
-
-***
+---
 
 ## Linux / BSD Inspirations
 
@@ -84,7 +86,7 @@ Reducing external dependencies improves:
 |---------|-----------|----------------------|
 | Buddy allocator | Linux `mm/page_alloc.c` | `klib/buddy_allocator.rs` |
 | EEVDF scheduler | Linux 6.6+ | `kernel/scheduler.rs` |
-| Page table walk | x86\_64 Linux | `klib/paging.rs` |
+| Page table walk | x86_64 Linux | `klib/paging.rs` |
 | Pledge/Unveil | OpenBSD | `security/capability.rs` |
 | Jails | FreeBSD | `security/` (planned) |
 | Kqueue | FreeBSD/macOS | `net/` (planned) |
@@ -92,7 +94,7 @@ Reducing external dependencies improves:
 | DRM/KMS GPU abstraction | Linux DRM | `drivers/gpu.rs` |
 | TDR (Timeout Detection Recovery) | Windows/Linux | `drivers/gpu.rs` |
 
-***
+---
 
 ## Metrics
 
@@ -103,10 +105,10 @@ Reducing external dependencies improves:
 | Custom allocators | 0 | 1 | 3 |
 | Custom collections | 0 | 1 (Vec) | 6 |
 
-***
+---
 
 ## Related Pages
 
-*   [Zero Dependency Architecture](Zero-Dependency-Architecture)
-*   [STD Elimination Plan](STD-Elimination-Plan)
-*   [Kernel Architecture](Architecture-Overview)
+- [Zero Dependency Architecture](Zero-Dependency-Architecture)
+- [STD Elimination Plan](STD-Elimination-Plan)
+- [Kernel Architecture](Architecture-Overview)

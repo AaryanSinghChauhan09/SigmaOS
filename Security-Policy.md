@@ -13,55 +13,55 @@
 
 Report security issues privately:
 
-1.  Email: security@sigmaos.dev (or open a private GitHub Security Advisory)
+1. Email: security@sigmaos.dev (or open a private GitHub Security Advisory)
 
-2.  Include: affected component, reproduction steps, potential impact
+2. Include: affected component, reproduction steps, potential impact
 
-3.  Response SLA: acknowledge within 48 hours, patch within 14 days for critical
+3. Response SLA: acknowledge within 48 hours, patch within 14 days for critical
 
 ## Security Architecture Overview
 
 ### Post-Quantum Cryptography
 
-*   **KEM:** Kyber-1024 (FIPS 203 / CRYSTALS-Kyber)
+- **KEM:** Kyber-1024 (FIPS 203 / CRYSTALS-Kyber)
 
-*   **Signatures:** Dilithium-5 (FIPS 204 / CRYSTALS-Dilithium)
+- **Signatures:** Dilithium-5 (FIPS 204 / CRYSTALS-Dilithium)
 
-*   **Hash:** BLAKE3 for package integrity, BLAKE2b for audit trails
+- **Hash:** BLAKE3 for package integrity, BLAKE2b for audit trails
 
-*   **TLS:** 1.3 with X25519/Kyber-1024 hybrid key exchange
+- **TLS:** 1.3 with X25519/Kyber-1024 hybrid key exchange
 
 ### Kernel Hardening
 
-*   W^X (Write XOR Execute) enforcement on all memory regions
+- W^X (Write XOR Execute) enforcement on all memory regions
 
-*   ASLR 42-bit per-region randomisation
+- ASLR 42-bit per-region randomisation
 
-*   sigma\_pledge: per-process syscall allowlist
+- sigma_pledge: per-process syscall allowlist
 
-*   sigma\_unveil: per-process filesystem path restriction
+- sigma_unveil: per-process filesystem path restriction
 
-*   AVC (Access Vector Cache): O(1) MAC policy enforcement
+- AVC (Access Vector Cache): O(1) MAC policy enforcement
 
-*   Zero-trust SPIFFE workload identities
+- Zero-trust SPIFFE workload identities
 
-*   Namespace isolation (unshare/pivot\_root/seccomp)
+- Namespace isolation (unshare/pivot_root/seccomp)
 
 ### Boot Security
 
-*   TPM2 attestation + key unsealing (CryptFS)
+- TPM2 attestation + key unsealing (CryptFS)
 
-*   Immutable audit trail (append-only, cryptographically chained)
+- Immutable audit trail (append-only, cryptographically chained)
 
-*   Verified boot pipeline (planned: sigma-boot.efi with signed stages)
+- Verified boot pipeline (planned: sigma-boot.efi with signed stages)
 
 ### Package Security
 
-*   All `.spkg` packages signed with Dilithium-5
+- All `.spkg` packages signed with Dilithium-5
 
-*   BLAKE2b content hashes verified before installation
+- BLAKE2b content hashes verified before installation
 
-*   Reproducible builds enforced via `sigma-repro-build`
+- Reproducible builds enforced via `sigma-repro-build`
 
 ## Known Open Issues
 
@@ -73,12 +73,12 @@ Report security issues privately:
 
 ## Security Contacts
 
-*   Maintainer: @AaryanSinghChauhan09
+- Maintainer: @AaryanSinghChauhan09
 
-*   Security label: `security` on GitHub Issues
+- Security label: `security` on GitHub Issues
 
-*   CVE tracking: see `wiki_repo/CVE_TRIAGE.md`
+- CVE tracking: see `wiki_repo/CVE_TRIAGE.md`
 
-***
+---
 
-*See also: [SECURITY.md](SECURITY) · [Wiki: Security Model](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Model)*
+*See also: [SECURITY.md](SECURITY.md) · [Wiki: Security Model](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security-Model)*

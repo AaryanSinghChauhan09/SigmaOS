@@ -97,13 +97,12 @@ impl SigmaPortage {
 ```
 
 **Key Features:**
-
-*   Source-based compilation
-*   USE flag system
-*   Dependency resolution
-*   Slot management
-*   Overlay support
-*   World file management
+- Source-based compilation
+- USE flag system
+- Dependency resolution
+- Slot management
+- Overlay support
+- World file management
 
 ### 2. USE Flags System
 
@@ -172,12 +171,11 @@ impl UseFlagManager {
 ```
 
 **Key Features:**
-
-*   Global flag management
-*   Package-specific flags
-*   Profile inheritance
-*   Environment overrides
-*   Flag dependency resolution
+- Global flag management
+- Package-specific flags
+- Profile inheritance
+- Environment overrides
+- Flag dependency resolution
 
 ### 3. Profile System
 
@@ -239,12 +237,11 @@ impl ProfileManager {
 ```
 
 **Key Features:**
-
-*   Profile selection
-*   Profile inheritance
-*   System configuration
-*   Package masking/unmasking
-*   Keyword management
+- Profile selection
+- Profile inheritance
+- System configuration
+- Package masking/unmasking
+- Keyword management
 
 ### 4. OpenRC Init System
 
@@ -299,12 +296,11 @@ impl OpenRCManager {
 ```
 
 **Key Features:**
-
-*   Service management
-*   Runlevel configuration
-*   Dependency management
-*   Parallel service startup
-*   Service status monitoring
+- Service management
+- Runlevel configuration
+- Dependency management
+- Parallel service startup
+- Service status monitoring
 
 ## Kernel Configuration
 
@@ -343,12 +339,11 @@ impl KernelBuilder {
 ```
 
 **Key Features:**
-
-*   Kernel configuration
-*   Custom kernel building
-*   Module management
-*   Kernel installation
-*   Bootloader integration
+- Kernel configuration
+- Custom kernel building
+- Module management
+- Kernel installation
+- Bootloader integration
 
 ## Overlay System
 
@@ -395,11 +390,10 @@ impl OverlayManager {
 ```
 
 **Key Features:**
-
-*   Overlay management
-*   Priority system
-*   Custom ebuild support
-*   Repository integration
+- Overlay management
+- Priority system
+- Custom ebuild support
+- Repository integration
 
 ## Testing
 
@@ -489,18 +483,18 @@ ccache.configure_cache_size("10G")?;
 
 ## Documentation Resources
 
-*   [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page)
-*   [Portage Documentation](https://wiki.gentoo.org/wiki/Portage)
-*   [USE Flag Guide](https://wiki.gentoo.org/wiki/USE_flag)
-*   [Ebuild Guide](https://devmanual.gentoo.org/ebuild-references/)
+- [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page)
+- [Portage Documentation](https://wiki.gentoo.org/wiki/Portage)
+- [USE Flag Guide](https://wiki.gentoo.org/wiki/USE_flag)
+- [Ebuild Guide](https://devmanual.gentoo.org/ebuild-references/)
 
 ## Best Practices
 
-1.  **Customization**: Leverage USE flags for optimal builds
-2.  **Performance**: Use appropriate CFLAGS for your hardware
-3.  **Stability**: Choose appropriate profiles for your needs
-4.  **Updates**: Regularly update world file and clean obsolete packages
-5.  **Documentation**: Document custom USE flags and configurations
+1. **Customization**: Leverage USE flags for optimal builds
+2. **Performance**: Use appropriate CFLAGS for your hardware
+3. **Stability**: Choose appropriate profiles for your needs
+4. **Updates**: Regularly update world file and clean obsolete packages
+5. **Documentation**: Document custom USE flags and configurations
 
 ## Migration Tools
 
@@ -512,20 +506,19 @@ assistant.migrate_from(DistroType::Arch)?;
 ```
 
 **Supported Source Distributions:**
-
-*   Arch Linux
-*   Debian
-*   Fedora
-*   Ubuntu
+- Arch Linux
+- Debian
+- Fedora
+- Ubuntu
 
 ## Future Enhancements
 
-*   Enhanced Portage performance
-*   Improved USE flag resolution
-*   Better kernel configuration tools
-*   Enhanced overlay management
-*   Improved documentation generation
+- Enhanced Portage performance
+- Improved USE flag resolution
+- Better kernel configuration tools
+- Enhanced overlay management
+- Improved documentation generation
 
-***
+---
 
 *Last updated: August 21, 2026*

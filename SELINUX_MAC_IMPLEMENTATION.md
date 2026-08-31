@@ -1,16 +1,16 @@
 # SELinux-Style MAC Implementation Guide
 
-**Date:** August 17, 2026\
-**Status:** ✅ Implemented\
+**Date:** August 17, 2026  
+**Status:** ✅ Implemented  
 **Inspiration:** Fedora SELinux (Security-Enhanced Linux)
 
-***
+---
 
 ## Overview
 
 SigmaOS implements a SELinux-style Mandatory Access Control (MAC) system inspired by Fedora's Security-Enhanced Linux. This provides fine-grained access control beyond traditional discretionary access control (DAC), enhancing system security through policy-driven permission management.
 
-***
+---
 
 ## Architecture
 
@@ -59,16 +59,16 @@ pub enum SecurityClass {
 }
 ```
 
-***
+---
 
 ## Security Context Model
 
 ### Context Components
 
-1.  **User Identity**: Represents the user account
-2.  **Role**: Role-based access control (RBAC) component
-3.  **Type**: Type enforcement (TE) component
-4.  **Level**: Multi-Level Security (MLS) component
+1. **User Identity**: Represents the user account
+2. **Role**: Role-based access control (RBAC) component
+3. **Type**: Type enforcement (TE) component
+4. **Level**: Multi-Level Security (MLS) component
 
 ```rust
 pub struct Context {
@@ -99,7 +99,7 @@ impl Context {
 }
 ```
 
-***
+---
 
 ## Policy Rules
 
@@ -152,7 +152,7 @@ impl RoleRule {
 }
 ```
 
-***
+---
 
 ## Implementation Details
 
@@ -221,7 +221,7 @@ pub enum AccessDecision {
 }
 ```
 
-***
+---
 
 ## File Context Labeling
 
@@ -257,7 +257,7 @@ impl FileContextManager {
 }
 ```
 
-***
+---
 
 ## Boolean Configuration
 
@@ -298,7 +298,7 @@ pub const COMMON_BOOLEANS: &[&str] = &[
 ];
 ```
 
-***
+---
 
 ## Integration with System
 
@@ -356,7 +356,7 @@ impl SelinuxKernel {
 }
 ```
 
-***
+---
 
 ## Configuration
 
@@ -399,12 +399,11 @@ use_nfs_home_dirs = false
 "/var/www/html(/.*)?" = "system_u:object_r:httpd_sys_content_t:s0"
 ```
 
-***
+---
 
 ## Enforcement Modes
 
 ### Permissive Mode
-
 ```rust
 pub enum EnforcementMode {
     Enforcing,    // Strictly enforce policy
@@ -424,59 +423,55 @@ impl SelinuxKernel {
 }
 ```
 
-***
+---
 
 ## Security Benefits
 
 ### 1. Confined Processes
-
-*   Processes run with minimum required privileges
-*   Compromised processes have limited impact
-*   Defense in depth through multiple security layers
+- Processes run with minimum required privileges
+- Compromised processes have limited impact
+- Defense in depth through multiple security layers
 
 ### 2. Data Protection
-
-*   Fine-grained access control to sensitive data
-*   Mandatory separation of data types
-*   Protection against unauthorized data access
+- Fine-grained access control to sensitive data
+- Mandatory separation of data types
+- Protection against unauthorized data access
 
 ### 3. System Integrity
-
-*   Protection of system files and configuration
-*   Prevention of unauthorized system modifications
-*   Integrity verification for critical system components
+- Protection of system files and configuration
+- Prevention of unauthorized system modifications
+- Integrity verification for critical system components
 
 ### 4. Zero-Day Protection
+- Generic protection against unknown vulnerabilities
+- Containment of exploitation attempts
+- Reduced attack surface through principle of least privilege
 
-*   Generic protection against unknown vulnerabilities
-*   Containment of exploitation attempts
-*   Reduced attack surface through principle of least privilege
-
-***
+---
 
 ## Troubleshooting
 
 ### Common Issues
 
-1.  **Access Denied Errors**
-    *   Check context labels on files and processes
-    *   Review policy rules for appropriate permissions
-    *   Use audit logs to identify denied operations
-    *   Consider adding necessary policy rules
+1. **Access Denied Errors**
+   - Check context labels on files and processes
+   - Review policy rules for appropriate permissions
+   - Use audit logs to identify denied operations
+   - Consider adding necessary policy rules
 
-2.  **Context Label Issues**
-    *   Verify file context assignments
-    *   Restore proper contexts using restorecon
-    *   Check for context configuration errors
-    *   Validate context syntax
+2. **Context Label Issues**
+   - Verify file context assignments
+   - Restore proper contexts using restorecon
+   - Check for context configuration errors
+   - Validate context syntax
 
-3.  **Policy Compilation Errors**
-    *   Check policy syntax and structure
-    *   Verify type and role definitions
-    *   Review rule dependencies
-    *   Check for conflicting rules
+3. **Policy Compilation Errors**
+   - Check policy syntax and structure
+   - Verify type and role definitions
+   - Review rule dependencies
+   - Check for conflicting rules
 
-***
+---
 
 ## Monitoring and Auditing
 
@@ -516,51 +511,47 @@ impl AuditLog {
 }
 ```
 
-***
+---
 
 ## Future Enhancements
 
 ### Planned Features
-
-*   **Policy Learning**: Machine learning for policy generation
-*   **Context-Aware Policies**: Dynamic context adaptation
-*   **Container Integration**: SELinux for container security
-*   **Cloud Policies**: Cloud-specific policy configurations
+- **Policy Learning**: Machine learning for policy generation
+- **Context-Aware Policies**: Dynamic context adaptation
+- **Container Integration**: SELinux for container security
+- **Cloud Policies**: Cloud-specific policy configurations
 
 ### Integration Goals
+- **Kubernetes Integration**: SELinux for pod security
+- **Multi-Tenant Security**: Tenant isolation via SELinux
+- **DevSecOps**: Policy as Code integration
+- **Automated Policy Testing**: Continuous policy validation
 
-*   **Kubernetes Integration**: SELinux for pod security
-*   **Multi-Tenant Security**: Tenant isolation via SELinux
-*   **DevSecOps**: Policy as Code integration
-*   **Automated Policy Testing**: Continuous policy validation
-
-***
+---
 
 ## Comparison with Fedora SELinux
 
 ### Similarities
-
-*   Type enforcement architecture
-*   Role-based access control
-*   Multi-level security support
-*   Policy booleans for configuration
+- Type enforcement architecture
+- Role-based access control
+- Multi-level security support
+- Policy booleans for configuration
 
 ### SigmaOS Enhancements
+- AI-powered policy optimization
+- Automated policy generation
+- Enhanced container support
+- Better integration with modern security frameworks
+- Improved performance and scalability
 
-*   AI-powered policy optimization
-*   Automated policy generation
-*   Enhanced container support
-*   Better integration with modern security frameworks
-*   Improved performance and scalability
-
-***
+---
 
 ## Conclusion
 
 The SigmaOS SELinux-style MAC implementation provides robust mandatory access control that significantly enhances system security beyond traditional discretionary access control. This implementation follows the proven SELinux architecture while adding modern enhancements for better integration with contemporary security needs and cloud environments.
 
-***
+---
 
-**Implementation Date:** August 17, 2026\
-**Status:** ✅ Complete\
+**Implementation Date:** August 17, 2026  
+**Status:** ✅ Complete  
 **Next Review:** September 17, 2026

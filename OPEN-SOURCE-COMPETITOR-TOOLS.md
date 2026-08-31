@@ -4,7 +4,7 @@
 
 This document catalogs open source tools from competing operating systems that SigmaOS has absorbed, re-implemented in Rust, or plans to replace with superior alternatives.
 
-***
+---
 
 ## Package Managers
 
@@ -23,7 +23,7 @@ This document catalogs open source tools from competing operating systems that S
 | brew | macOS | 🔄 Planned | sigma-pkg (brew compat) |
 | xbps | Void Linux | 🔄 Planned | sigma-pkg |
 
-***
+---
 
 ## System Management Tools
 
@@ -40,7 +40,7 @@ This document catalogs open source tools from competing operating systems that S
 | Timeshift | Linux Mint | ✅ Replaced | Btrfs snapshot manager |
 | snapper | openSUSE | ✅ Absorbed | Auto-snapshot on pkg install |
 
-***
+---
 
 ## Security Tools
 
@@ -59,7 +59,7 @@ This document catalogs open source tools from competing operating systems that S
 | GnuPG | GNU | ✅ Active | Enhanced with PQC signing |
 | age | FiloSottile | ✅ Active | Modern file encryption |
 
-***
+---
 
 ## Development Tools (Included in SigmaOS Dev Edition)
 
@@ -80,7 +80,7 @@ This document catalogs open source tools from competing operating systems that S
 | exa/eza | Community | ✅ Active | Modern ls |
 | delta | dandavison | ✅ Active | Git diff pager |
 
-***
+---
 
 ## Monitoring & Observability
 
@@ -95,7 +95,7 @@ This document catalogs open source tools from competing operating systems that S
 | Jaeger | CNCF | 🔄 Planned | Distributed tracing |
 | eBPF tools (bcc/bpftrace) | IOVisor | ✅ Active | Native kernel tracing |
 
-***
+---
 
 ## SigmaOS-Unique Tools (No Competitor Equivalent)
 
@@ -111,3 +111,4 @@ This document catalogs open source tools from competing operating systems that S
 | `sigma-snapshot` | Filesystem snapshot manager | ✅ Active |
 | `sigma-perf` | eBPF-native profiler | ✅ Active |
 | `sigma-pqcrypt` | Post-quantum file encryption | ✅ Active |
+

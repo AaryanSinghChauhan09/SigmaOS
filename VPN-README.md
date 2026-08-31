@@ -10,16 +10,16 @@ throughput.
 
 ## Cryptography
 
-*   **Key Exchange:** X25519 (classical) + Kyber-768 (post-quantum, hybrid)
+- **Key Exchange:** X25519 (classical) + Kyber-768 (post-quantum, hybrid)
 
-*   **Data Encryption:** ChaCha20-Poly1305
+- **Data Encryption:** ChaCha20-Poly1305
 
-*   **Authentication:** BLAKE3 MAC
+- **Authentication:** BLAKE3 MAC
 
 ## Roadmap
 
-*   \[ ] Tunnel establishment protocol
+- [ ] Tunnel establishment protocol
 
-*   \[ ] Peer management
+- [ ] Peer management
 
-*   \[ ] PQC key-exchange integration
+- [ ] PQC key-exchange integration

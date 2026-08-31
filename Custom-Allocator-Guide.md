@@ -2,7 +2,7 @@
 
 This document provides a comprehensive technical guide to the **memory allocation architecture** of **SigmaOS**. Operating without a standard C runtime library, SigmaOS implements an autonomous, multi-tier memory subsystem centered around the clean-room `klib` **Buddy Allocator**, **SLAB Cache**, and **BSD Zone Allocator**.
 
-***
+---
 
 ## 1. Multi-Tier Memory Allocation Hierarchy
 
@@ -53,7 +53,7 @@ graph TB
     VMM --> Kswapd
 ```
 
-***
+---
 
 ## 2. The `klib` Buddy Allocator (`src/klib/buddy_allocator.rs`)
 
@@ -74,21 +74,20 @@ Memory is managed in power-of-two page orders (where base page size is $4096$ by
 | **Order 6** | 64 Pages | 256 KB | Audio multi-track DSP scratch buffers |
 | **Order 7** | 128 Pages | 512 KB | Video decoder frame buffers |
 | **Order 8** | 256 Pages | 1 MB | Linear framebuffer blitting caches |
-| **Order 9** | 512 Pages | 2 MB | x86\_64 Large Page Table mappings |
+| **Order 9** | 512 Pages | 2 MB | x86_64 Large Page Table mappings |
 | **Order 10** | 1024 Pages | 4 MB | Large contiguous DMA device buffers |
 | **Order 11** | 4096 Pages | 16 MB | Maximum contiguous kernel allocation pool |
 
-***
+---
 
 ### 2.2 Buddy Splitting & Coalescing Mechanics
 
 When an allocation of order $N$ is requested:
-
-1.  The allocator inspects `free_lists[N]`. If a free block exists, it is popped and returned in O(1) time.
-2.  If `free_lists[N]` is empty, the allocator searches for the lowest available order $M > N$, splits the block into two equal halves ("buddies"), places the unused half in `free_lists[M-1]`, and recurses down to order $N$.
-3.  When freeing a block of address $A$ and order $N$, the buddy address is calculated via bitwise XOR:
-    $$\text{Buddy Address} = A \oplus (1 \ll (N + 12))$$
-4.  If the buddy is free, both blocks are coalesced into a single block of order $N+1$.
+1. The allocator inspects `free_lists[N]`. If a free block exists, it is popped and returned in O(1) time.
+2. If `free_lists[N]` is empty, the allocator searches for the lowest available order $M > N$, splits the block into two equal halves ("buddies"), places the unused half in `free_lists[M-1]`, and recurses down to order $N$.
+3. When freeing a block of address $A$ and order $N$, the buddy address is calculated via bitwise XOR:
+   $$\text{Buddy Address} = A \oplus (1 \ll (N + 12))$$
+4. If the buddy is free, both blocks are coalesced into a single block of order $N+1$.
 
 ```mermaid
 flowchart TD
@@ -101,7 +100,7 @@ flowchart TD
     CheckO2 -- No --> CheckHigher["Search Orders 3..11 and recursively split"]
 ```
 
-***
+---
 
 ### 2.3 Lazy Page Cache Reclamation (`reclaim_pages`)
 
@@ -119,7 +118,7 @@ pub trait BuddyAllocator {
 
 The allocator scans memory blocks flagged as `is_cache == 1` (clean file system buffers, discarded page folios), invalidates the cache entries, and coalesces the reclaimed blocks to satisfy the allocation.
 
-***
+---
 
 ## 3. The `klib` SLAB / SLUB Allocator (`src/klib/slab.rs`)
 
@@ -195,7 +194,7 @@ impl SlabCache {
 }
 ```
 
-***
+---
 
 ## 4. BSD Zone Allocator & Memory Cgroups (`src/memory/`)
 
@@ -213,16 +212,16 @@ graph TD
     CgroupCheck -- Exceeded --> Evict["Trigger LinuxKswapd / MGLRU Eviction"]
 ```
 
-1.  **`Zone::DMA`**: Memory mapped within physical addresses $\[0, 16\text{MB}]$ for legacy DMA peripherals.
-2.  **`Zone::Normal`**: Main system memory $\[16\text{MB}, 4\text{GB}]$ for kernel structures, page tables, and drivers.
-3.  **`Zone::HighMem`**: Memory $> 4\text{GB}$ utilized for user space address spaces and page caches.
-4.  **`MemCgroupManager`**: Enforces hierarchical memory quotas on process groups, preventing denial-of-service memory exhaustion.
+1. **`Zone::DMA`**: Memory mapped within physical addresses $[0, 16\text{MB}]$ for legacy DMA peripherals.
+2. **`Zone::Normal`**: Main system memory $[16\text{MB}, 4\text{GB}]$ for kernel structures, page tables, and drivers.
+3. **`Zone::HighMem`**: Memory $> 4\text{GB}$ utilized for user space address spaces and page caches.
+4. **`MemCgroupManager`**: Enforces hierarchical memory quotas on process groups, preventing denial-of-service memory exhaustion.
 
-***
+---
 
 ## 5. Virtual Memory Manager (VMM) & Paging (`src/memory/paging.rs`)
 
-SigmaOS manages x86\_64 4-level PML4 (Page Map Level 4) translation tables with strict security controls:
+SigmaOS manages x86_64 4-level PML4 (Page Map Level 4) translation tables with strict security controls:
 
 ```mermaid
 graph LR
@@ -234,13 +233,12 @@ graph LR
 ```
 
 ### 5.1 Memory Protection Flags:
+- **`PRESENT` (Bit 0)**: Page is mapped in RAM.
+- **`WRITABLE` (Bit 1)**: Page allows read/write access.
+- **`USER_ACCESSIBLE` (Bit 2)**: Page is reachable by Ring 3 userland processes.
+- **`NO_EXECUTE (NX)` (Bit 63)**: Prevents CPU instruction fetching, strictly enforcing **W^X** (Write XOR Execute) security across all stack and heap allocations.
 
-*   **`PRESENT` (Bit 0)**: Page is mapped in RAM.
-*   **`WRITABLE` (Bit 1)**: Page allows read/write access.
-*   **`USER_ACCESSIBLE` (Bit 2)**: Page is reachable by Ring 3 userland processes.
-*   **`NO_EXECUTE (NX)` (Bit 63)**: Prevents CPU instruction fetching, strictly enforcing **W^X** (Write XOR Execute) security across all stack and heap allocations.
-
-***
+---
 
 ## 6. Performance Benchmarks & Comparison
 
@@ -253,13 +251,13 @@ graph LR
 | **Memory Overhead per Object**| 8 - 16 bytes | 8 bytes | **0 bytes (Intrusive FreeNode)** |
 | **Safety Guarantee** | Manual Pointer Arithmetic | C Pointer Arithmetic | **Rust Bounds & Concurrency Safe** |
 
-***
+---
 
 ## 7. Related Documentation
 
-*   [No-Std Architecture](No-Std-Architecture) — Fundamental `klib` design.
-*   [Architecture Overview](Architecture-Overview) — Subsystem layout and tiering.
-*   [Security & Hardening](Security-Hardening) — W^X paging, KASLR, and sandboxing.
-*   [Getting Started](Getting-Started) — Testing and compiling the allocator.
+- [No-Std Architecture](No-Std-Architecture.md) — Fundamental `klib` design.
+- [Architecture Overview](Architecture-Overview.md) — Subsystem layout and tiering.
+- [Security & Hardening](Security-Hardening.md) — W^X paging, KASLR, and sandboxing.
+- [Getting Started](Getting-Started.md) — Testing and compiling the allocator.
 
 *SigmaOS Custom Allocator Architecture Guide — Maintained by the SigmaOS Core Engineering Team.*

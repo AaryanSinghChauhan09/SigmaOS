@@ -15,21 +15,23 @@ cargo build && cargo test
 
 ## Repository Structure
 
-    src/
-    ├── lib.rs              # Crate root
-    ├── kernel/             # Scheduler, memory, IPC
-    │   ├── scheduler.rs    # EEVDF+BORE
-    │   └── sched/          # MLFQ, thermal, task types
-    ├── ai/                 # S-AI orchestrator
-    ├── security/           # SELinux, pledge, CVE scanner
-    ├── network/            # TCP/UDP stack
-    ├── container/          # OCI runtime
-    ├── boot/               # UEFI, TPM, secure boot
-    ├── klib/               # No-std collections
-    │   ├── vec.rs          # Custom Vec
-    │   ├── hashmap.rs      # Custom HashMap
-    │   └── buddy_allocator.rs
-    └── distro/             # Linux/BSD parity
+```
+src/
+├── lib.rs              # Crate root
+├── kernel/             # Scheduler, memory, IPC
+│   ├── scheduler.rs    # EEVDF+BORE
+│   └── sched/          # MLFQ, thermal, task types
+├── ai/                 # S-AI orchestrator
+├── security/           # SELinux, pledge, CVE scanner
+├── network/            # TCP/UDP stack
+├── container/          # OCI runtime
+├── boot/               # UEFI, TPM, secure boot
+├── klib/               # No-std collections
+│   ├── vec.rs          # Custom Vec
+│   ├── hashmap.rs      # Custom HashMap
+│   └── buddy_allocator.rs
+└── distro/             # Linux/BSD parity
+```
 
 ## Module Template
 
@@ -46,7 +48,7 @@ pub struct MyComponent { state: u64 }
 impl MyComponent {
     /// Creates a new instance.
     pub fn new() -> Self { Self { state: 0 } }
-
+    
     /// Processes input.
     pub fn process(&mut self, input: &str) -> Result<String, MyError> {
         Ok(String::from("result"))
@@ -101,9 +103,9 @@ cargo test --test os_components_tests # Integration
 
 ## Contribution Workflow
 
-1.  Fork → `git checkout -b feat/my-feature`
-2.  Implement + write tests
-3.  `cargo test && cargo clippy && cargo fmt`
-4.  `git push origin feat/my-feature`
-5.  Open PR → `main`
-6.  Address reviews → merge → branch auto-deleted
+1. Fork → `git checkout -b feat/my-feature`
+2. Implement + write tests
+3. `cargo test && cargo clippy && cargo fmt`
+4. `git push origin feat/my-feature`
+5. Open PR → `main`
+6. Address reviews → merge → branch auto-deleted

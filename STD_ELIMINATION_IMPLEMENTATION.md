@@ -6,12 +6,12 @@ This document provides a detailed implementation plan for eliminating dependency
 
 ## Table of Contents
 
-1.  [Current Status Assessment](#current-status-assessment)
-2.  [Priority Elimination Targets](#priority-elimination-targets)
-3.  [Klib Enhancement Plan](#klib-enhancement-plan)
-4.  [Implementation Phases](#implementation-phases)
-5.  [Testing Strategy](#testing-strategy)
-6.  [Verification Procedures](#verification-procedures)
+1. [Current Status Assessment](#current-status-assessment)
+2. [Priority Elimination Targets](#priority-elimination-targets)
+3. [Klib Enhancement Plan](#klib-enhancement-plan)
+4. [Implementation Phases](#implementation-phases)
+5. [Testing Strategy](#testing-strategy)
+6. [Verification Procedures](#verification-procedures)
 
 ## Current Status Assessment
 
@@ -26,26 +26,23 @@ Based on `STD_REDUCTION_PLAN.md`, the current status is:
 | Security modules | 0 std calls ✅ | 0 | ✅ Complete |
 | Network stack | 0 std calls ✅ | 0 | ✅ Complete |
 | Package manager (sigpkg) | 3 std calls ⚠️ | 0 | ⚠️ 95% done |
-| Shell (sigma\_sh) | 12 std calls ⚠️ | 0 | ⚠️ Partial |
+| Shell (sigma_sh) | 12 std calls ⚠️ | 0 | ⚠️ Partial |
 | Userland tools | 47 std calls ⚠️ | < 5 (allow for I/O) | ⚠️ In Progress |
 
 ### Remaining std Dependencies
 
 **Package Manager (sigpkg):**
+- `std::env` - Environment variable access
+- `std::fs::File` - File system access
+- `std::io::Read` - I/O trait
 
-*   `std::env` - Environment variable access
-*   `std::fs::File` - File system access
-*   `std::io::Read` - I/O trait
-
-**Shell (sigma\_sh):**
-
-*   `std::io::stdin, stdout, BufReader` - Terminal I/O
-*   `std::process::Command` - Process spawning
-*   `std::io::*` - General I/O operations
+**Shell (sigma_sh):**
+- `std::io::stdin, stdout, BufReader` - Terminal I/O
+- `std::process::Command` - Process spawning
+- `std::io::*` - General I/O operations
 
 **Userland Tools:**
-
-*   Various std collections and I/O operations
+- Various std collections and I/O operations
 
 ## Priority Elimination Targets
 
@@ -488,48 +485,48 @@ pub enum IoError {
 
 ### New Klib Modules
 
-1.  **`src/klib/env.rs`** - Environment variable access
-2.  **`src/klib/fs.rs`** - File system operations
-3.  **`src/klib/io.rs`** - Enhanced I/O traits
-4.  **`src/klib/process.rs`** - Process management
-5.  **`src/klib/thread.rs`** - Thread management
-6.  **`src/klib/sync.rs`** - Synchronization primitives
+1. **`src/klib/env.rs`** - Environment variable access
+2. **`src/klib/fs.rs`** - File system operations
+3. **`src/klib/io.rs`** - Enhanced I/O traits
+4. **`src/klib/process.rs`** - Process management
+5. **`src/klib/thread.rs`** - Thread management
+6. **`src/klib/sync.rs`** - Synchronization primitives
 
 ### Enhanced Existing Modules
 
-1.  **`src/klib/vec.rs`** - Additional vector methods
-2.  **`src/klib/hashmap.rs`** - Performance optimizations
-3.  **`src/klib/string.rs`** - Enhanced string operations
+1. **`src/klib/vec.rs`** - Additional vector methods
+2. **`src/klib/hashmap.rs`** - Performance optimizations
+3. **`src/klib/string.rs`** - Enhanced string operations
 
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure (Week 1-2)
 
-*   Implement `src/klib/env.rs`
-*   Implement `src/klib/fs.rs`
-*   Implement enhanced `src/klib/io.rs`
-*   Update klib mod.rs with new modules
+- Implement `src/klib/env.rs`
+- Implement `src/klib/fs.rs`
+- Implement enhanced `src/klib/io.rs`
+- Update klib mod.rs with new modules
 
 ### Phase 2: Shell Migration (Week 3-4)
 
-*   Implement `src/klib/process.rs`
-*   Implement terminal I/O in `src/klib/io.rs`
-*   Update sigma\_sh to use klib modules
-*   Test shell functionality
+- Implement `src/klib/process.rs`
+- Implement terminal I/O in `src/klib/io.rs`
+- Update sigma_sh to use klib modules
+- Test shell functionality
 
 ### Phase 3: Userland Migration (Week 5-6)
 
-*   Implement `src/klib/thread.rs`
-*   Implement `src/klib/sync.rs`
-*   Update userland tools to use klib
-*   Test userland functionality
+- Implement `src/klib/thread.rs`
+- Implement `src/klib/sync.rs`
+- Update userland tools to use klib
+- Test userland functionality
 
 ### Phase 4: Validation (Week 7-8)
 
-*   Comprehensive testing of all modules
-*   Performance benchmarking
-*   Security audit
-*   Documentation updates
+- Comprehensive testing of all modules
+- Performance benchmarking
+- Security audit
+- Documentation updates
 
 ## Testing Strategy
 
@@ -672,31 +669,31 @@ cargo test --target x86_64-unknown-none
 
 ## Success Criteria
 
-*   ✅ All kernel modules have 0 std imports
-*   ✅ klib has 0 std imports
-*   ✅ sigpkg has 0 std imports
-*   ✅ Shell has < 5 std imports (for terminal I/O only)
-*   ✅ Userland tools have < 5 std imports (for I/O only)
-*   ✅ All tests pass with no\_std target
-*   ✅ Performance benchmarks acceptable
-*   ✅ Security audit passes
+- ✅ All kernel modules have 0 std imports
+- ✅ klib has 0 std imports
+- ✅ sigpkg has 0 std imports
+- ✅ Shell has < 5 std imports (for terminal I/O only)
+- ✅ Userland tools have < 5 std imports (for I/O only)
+- ✅ All tests pass with no_std target
+- ✅ Performance benchmarks acceptable
+- ✅ Security audit passes
 
 ## Resources
 
-*   [Std Reduction Plan](STD_REDUCTION_PLAN)
-*   [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE)
-*   [Function Reduction Plan](FUNCTION_REDUCTION_PLAN)
-*   [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE)
+- [Std Reduction Plan](STD_REDUCTION_PLAN.md)
+- [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE.md)
+- [Function Reduction Plan](FUNCTION_REDUCTION_PLAN.md)
+- [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE.md)
 
 ## Contributing
 
 When implementing std elimination:
 
-1.  Maintain backward compatibility where possible
-2.  Provide clear migration documentation
-3.  Include comprehensive testing
-4.  Monitor performance impact
-5.  Update related documentation
+1. Maintain backward compatibility where possible
+2. Provide clear migration documentation
+3. Include comprehensive testing
+4. Monitor performance impact
+5. Update related documentation
 
 ## License
 

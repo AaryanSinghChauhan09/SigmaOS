@@ -272,16 +272,16 @@ impl OpenSUSESecurity {
 
 ## Best Practices
 
-1.  **Rolling Updates:** Use zypper patch for security updates
-2.  **YaST Configuration:** Use YaST for system administration
-3.  **OBS Integration:** Build packages using openSUSE Build Service
-4.  **Security Hardening:** Apply all available security hardening features
-5.  **Repository Management:** Use official repositories
+1. **Rolling Updates:** Use zypper patch for security updates
+2. **YaST Configuration:** Use YaST for system administration
+3. **OBS Integration:** Build packages using openSUSE Build Service
+4. **Security Hardening:** Apply all available security hardening features
+5. **Repository Management:** Use official repositories
 
 ## References
 
-*   [openSUSE Documentation](https://en.opensuse.org/Documentation)
-*   [Zypper Documentation](https://en.opensuse.org/SDB:Zypper_manual)
-*   [YaST Documentation](https://en.opensuse.org/SDB:YaST)
-*   [openSUSE Build Service](https://build.opensuse.org/)
-*   [openSUSE Security Team](https://en.opensuse.org/Security)
+- [openSUSE Documentation](https://en.opensuse.org/Documentation)
+- [Zypper Documentation](https://en.opensuse.org/SDB:Zypper_manual)
+- [YaST Documentation](https://en.opensuse.org/SDB:YaST)
+- [openSUSE Build Service](https://build.opensuse.org/)
+- [openSUSE Security Team](https://en.opensuse.org/Security)

@@ -6,45 +6,43 @@ SigmaOS implements a full Zero-Trust network architecture based on the principle
 
 ## Architecture
 
-    +------------------+     mTLS      +--------------------+
-    |  User Process    |<------------>|  NetworkBolt Agent  |
-    +------------------+              +--------------------+
-                                              |
-                                        Policy Engine
-                                              |
-                                  +-------------------+
-                                  |  Zero-Trust Proxy |
-                                  +-------------------+
-                                              |
-                                      External Network
+```
++------------------+     mTLS      +--------------------+
+|  User Process    |<------------>|  NetworkBolt Agent  |
++------------------+              +--------------------+
+                                          |
+                                    Policy Engine
+                                          |
+                              +-------------------+
+                              |  Zero-Trust Proxy |
+                              +-------------------+
+                                          |
+                                  External Network
+```
 
 ## Core Components
 
 ### 1. NetworkBolt Daemon (`src/network/zero_trust.rs`)
-
-*   Intercepts all outbound connections from user processes
-*   Enforces per-process, per-user network policies
-*   Performs mTLS certificate validation
-*   Logs all connection attempts to Sentinel SIEM
+- Intercepts all outbound connections from user processes
+- Enforces per-process, per-user network policies
+- Performs mTLS certificate validation
+- Logs all connection attempts to Sentinel SIEM
 
 ### 2. Policy Engine
-
-*   YAML-based policy definitions in `/etc/sigma/network-policies/`
-*   Supports allowlist / denylist rules
-*   Integrates with SELinux labels and process capabilities
-*   Dynamic policy updates without restart
+- YAML-based policy definitions in `/etc/sigma/network-policies/`
+- Supports allowlist / denylist rules
+- Integrates with SELinux labels and process capabilities
+- Dynamic policy updates without restart
 
 ### 3. Certificate Infrastructure
-
-*   Per-process client certificates (Kyber-768 post-quantum)
-*   Automatic certificate rotation every 24h
-*   OCSP stapling for revocation checks
-*   Hardware TPM binding for certificate storage
+- Per-process client certificates (Kyber-768 post-quantum)
+- Automatic certificate rotation every 24h
+- OCSP stapling for revocation checks
+- Hardware TPM binding for certificate storage
 
 ## Configuration
 
 ### Basic Policy Example (`/etc/sigma/network-policies/default.yaml`)
-
 ```yaml
 version: v1
 kind: NetworkPolicy
@@ -55,25 +53,23 @@ spec:
       protocol: udp
       port: 53
       action: allow
-
+      
     - name: allow-https
       protocol: tcp
       port: 443
       action: allow
       require_mtls: true
-
+      
     - name: block-telemetry
       destination: "*.telemetry.microsoft.com"
       action: deny
 ```
 
 ### Process-level Isolation
-
 Each process gets its own network namespace with:
-
-*   Dedicated virtual interface
-*   Egress filtering based on binary hash
-*   Ingress filtering based on SELinux label
+- Dedicated virtual interface
+- Egress filtering based on binary hash
+- Ingress filtering based on SELinux label
 
 ## Security Features
 
@@ -91,11 +87,10 @@ Each process gets its own network namespace with:
 ## Network Router Integration
 
 The `feat/zero-trust-network-router` module (merged) adds:
-
-*   **Software-defined router** with policy enforcement at routing level
-*   **BGP peering** with route filtering and RPKI validation
-*   **SD-WAN** capability for multi-path redundancy
-*   **Wireguard mesh** for internal cluster communication
+- **Software-defined router** with policy enforcement at routing level
+- **BGP peering** with route filtering and RPKI validation  
+- **SD-WAN** capability for multi-path redundancy
+- **Wireguard mesh** for internal cluster communication
 
 ## Monitoring & Observability
 

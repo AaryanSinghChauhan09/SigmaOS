@@ -5,18 +5,18 @@ the Linux networking subsystem.
 
 ## Features
 
-*   Stateless Address Auto-Configuration (SLAAC)
+- Stateless Address Auto-Configuration (SLAAC)
 
-*   NDP (Neighbor Discovery Protocol)
+- NDP (Neighbor Discovery Protocol)
 
-*   Flow Labels for QoS
+- Flow Labels for QoS
 
-*   IPSec integration point
+- IPSec integration point
 
 ## Roadmap
 
-*   \[ ] ICMPv6 core
+- [ ] ICMPv6 core
 
-*   \[ ] DHCPv6 client
+- [ ] DHCPv6 client
 
-*   \[ ] Multicast routing
+- [ ] Multicast routing

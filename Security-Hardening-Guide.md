@@ -400,46 +400,46 @@ impl SecureRng {
 
 ### Kernel Hardening
 
-*   \[ ] Enable ASLR with maximum entropy
-*   \[ ] Enable stack canaries
-*   \[ ] Enable Control Flow Integrity
-*   \[ ] Enable Kernel Page Table Isolation (KPTI)
-*   \[ ] Enable Relocation Read-Only (RELRO)
-*   \[ ] Enable Stack Smashing Protection (SSP)
-*   \[ ] Enable Kernel Pointer Authentication
+- [ ] Enable ASLR with maximum entropy
+- [ ] Enable stack canaries
+- [ ] Enable Control Flow Integrity
+- [ ] Enable Kernel Page Table Isolation (KPTI)
+- [ ] Enable Relocation Read-Only (RELRO)
+- [ ] Enable Stack Smashing Protection (SSP)
+- [ ] Enable Kernel Pointer Authentication
 
 ### Filesystem Hardening
 
-*   \[ ] Mount sensitive filesystems with noexec, nosuid, nodev
-*   \[ ] Enable filesystem encryption
-*   \[ ] Set immutable flag on critical system files
-*   \[ ] Implement secure delete
-*   \[ ] Enable filesystem access logging
+- [ ] Mount sensitive filesystems with noexec, nosuid, nodev
+- [ ] Enable filesystem encryption
+- [ ] Set immutable flag on critical system files
+- [ ] Implement secure delete
+- [ ] Enable filesystem access logging
 
 ### Network Hardening
 
-*   \[ ] Configure firewall with default deny policy
-*   \[ ] Enable TCP SYN cookies
-*   \[ ] Disable unused network services
-*   \[ ] Enable TCP timestamps
-*   \[ ] Implement network intrusion detection
-*   \[ ] Enable DNSSEC validation
+- [ ] Configure firewall with default deny policy
+- [ ] Enable TCP SYN cookies
+- [ ] Disable unused network services
+- [ ] Enable TCP timestamps
+- [ ] Implement network intrusion detection
+- [ ] Enable DNSSEC validation
 
 ### Process Hardening
 
-*   \[ ] Enable sandboxing for all user processes
-*   \[ ] Drop unnecessary capabilities
-*   \[ ] Implement seccomp filters
-*   \[ ] Enable process auditing
-*   \[ ] Restrict ptrace access
+- [ ] Enable sandboxing for all user processes
+- [ ] Drop unnecessary capabilities
+- [ ] Implement seccomp filters
+- [ ] Enable process auditing
+- [ ] Restrict ptrace access
 
 ### Authentication Hardening
 
-*   \[ ] Enable multi-factor authentication
-*   \[ ] Implement strong password policies
-*   \[ ] Enable account lockout after failed attempts
-*   \[ ] Use SSH key-based authentication
-*   \[ ] Implement session timeouts
+- [ ] Enable multi-factor authentication
+- [ ] Implement strong password policies
+- [ ] Enable account lockout after failed attempts
+- [ ] Use SSH key-based authentication
+- [ ] Implement session timeouts
 
 ## Security Auditing
 
@@ -542,8 +542,8 @@ impl SOC2Compliance {
 
 ## References
 
-*   [SELinux Project Wiki](https://selinuxproject.org/)
-*   [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
-*   [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-*   [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
-*   [Post-Quantum Cryptography Standardization](https://csrc.nist.gov/Projects/post-quantum-cryptography)
+- [SELinux Project Wiki](https://selinuxproject.org/)
+- [AppArmor Documentation](https://gitlab.com/apparmor/apparmor/-/wikis/home)
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
+- [Post-Quantum Cryptography Standardization](https://csrc.nist.gov/Projects/post-quantum-cryptography)

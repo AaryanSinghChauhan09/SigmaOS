@@ -2,12 +2,11 @@
 
 This guide provides an **Arch Linux-style, step-by-step installation procedure** for deploying SigmaOS on bare-metal hardware (`x86_64`, `aarch64`, `riscv64`) or virtualized environments (QEMU/KVM, Xen, Bhyve).
 
-***
+---
 
 ## 🛠️ Pre-Installation
 
 ### 1. Acquire Installation Medium
-
 Download the latest bootable sovereign ISO image (`sigmaos-bootable-x86_64.iso`) or compile from source:
 
 ```bash
@@ -16,7 +15,6 @@ make iso
 ```
 
 ### 2. Verify Medium Signature
-
 Verify the ISO using Post-Quantum Dilithium-5 cryptographic attestation:
 
 ```bash
@@ -24,14 +22,13 @@ sigpkg verify-signature sigmaos-bootable-x86_64.iso --key dilithium5:root
 ```
 
 ### 3. Boot the Live Environment
-
 Flash to a USB drive using `dd`:
 
 ```bash
 dd if=sigmaos-bootable-x86_64.iso of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
-***
+---
 
 ## 💾 Disk Partitioning & Filesystems
 
@@ -57,7 +54,7 @@ mkfs.vfat -F32 /dev/nvme0n1p1
 mkfs.ext4 -F -O fast_commit /dev/nvme0n1p2
 ```
 
-***
+---
 
 ## ⚙️ System Bootstrap (`sigstrap`)
 
@@ -73,7 +70,7 @@ mount /dev/nvme0n1p1 /mnt/boot/efi
 sigstrap /mnt base sigmaos-kernel zenith-desktop sigpkg systemd-init
 ```
 
-***
+---
 
 ## 🔧 System Configuration (`sigchroot`)
 
@@ -84,7 +81,6 @@ sigchroot /mnt
 ```
 
 ### 1. Timezone & Locale
-
 Configure system timezone and UTF-8 locale:
 
 ```bash
@@ -104,14 +100,13 @@ EOF
 ```
 
 ### 3. Bootloader Setup
-
 Install the sovereign UEFI boot manager (`limine` / `grub` parity):
 
 ```bash
 sigma-bootctl install --esp-path=/boot/efi
 ```
 
-***
+---
 
 ## 🚀 Post-Installation
 

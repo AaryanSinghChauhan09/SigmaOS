@@ -1,20 +1,18 @@
 <!-- SPDX-License-Identifier: MIT -->
-
 # SigmaOS: Open Source Operating Systems Architectural Inspirations & Clean-Room Integration Plan
 
 This document outlines the strategic analysis, clean-room architectural comparisons, and integration blueprints for incorporating major open-source operating system paradigms into **SigmaOS** without intellectual property (IP) or license breaches.
 
-***
+---
 
 ## 1. Executive Summary & Legal Compliance Framework
 
 To maintain strict clean-room implementation standards and prevent copyright or license infringement:
+1. **Clean-Room Design**: All SigmaOS subsystems are implemented from first principles in freestanding `#![no_std]` Rust/Zig/Nim based on public specification, standard hypercall/ABI contracts, and API documentation.
+2. **License Compatibility**: No proprietary or GPL-encumbered source code is directly copied. Functional interfaces mimic standard BSD/POSIX/Linux contracts under the MIT License.
+3. **Multi-Paradigm Fusion**: SigmaOS unifies microkernel isolation (Redox, Fuchsia) with monolithic kernel performance (Linux io_uring, eBPF) and BSD resilience (OpenBSD pledge/unveil, DragonFly HAMMER2, FreeBSD Capsicum).
 
-1.  **Clean-Room Design**: All SigmaOS subsystems are implemented from first principles in freestanding `#![no_std]` Rust/Zig/Nim based on public specification, standard hypercall/ABI contracts, and API documentation.
-2.  **License Compatibility**: No proprietary or GPL-encumbered source code is directly copied. Functional interfaces mimic standard BSD/POSIX/Linux contracts under the MIT License.
-3.  **Multi-Paradigm Fusion**: SigmaOS unifies microkernel isolation (Redox, Fuchsia) with monolithic kernel performance (Linux io\_uring, eBPF) and BSD resilience (OpenBSD pledge/unveil, DragonFly HAMMER2, FreeBSD Capsicum).
-
-***
+---
 
 ## 2. Comprehensive OS Inspiration & Integration Matrix
 
@@ -28,49 +26,56 @@ To maintain strict clean-room implementation standards and prevent copyright or 
 | **SerenityOS** | Unified event-driven IPC, LibCore pipelines | `SerenityIpcManager` | Lightweight lock-free circular ring buffers for inter-process message passing and typed IPC endpoints. |
 | **Fuchsia OS** | Zircon capability handles, FIDL contracts | `FuchsiaZirconHandleManager` | Rights-restricted object handles, post-quantum signed token capabilities, schema-driven IPC definitions. |
 | **illumos / Solaris**| DTrace dynamic tracing, Zones isolation | `SovereignDTraceEngine`, `ZoneIsolationContainer` | Zero-overhead static/dynamic probes, lightweight kernel-enclosed tenant execution boundaries. |
+| **Plan 9 / 9front** | 9P2000 RPC protocol, `rfork` namespace isolation | `Plan9P2000ProtocolEngine` | Synthetic device filesystem messages, FID tree walks, and granular process namespace cloning. |
+| **Minix 3** | Reincarnation Server (RS) driver self-healing | `Minix3ReincarnationServer` | Heartbeat-monitored userland driver supervisor with automated crash recovery & PID reallocation. |
+| **NetBSD** | Rump Kernels & autoconf framework | `NetBsdRumpKernelEngine` | Userland virtualized NetBSD driver execution and hypercall interface isolation. |
+| **Haiku OS / BeOS** | BFS file attributes & query indexing | `HaikuBfsAttributeEngine` | Live key-value file metadata indexing and query evaluation. |
+| **SmartOS / Illumos**| Crossbow virtual networking (VNICs, Etherstubs) | `SmartOsCrossbowVnicEngine` | Virtual network interface controllers, bandwidth caps, and software etherstub switches. |
 
-***
+---
 
 ## 3. Subsystem Architectural Blueprints
 
 ### 3.1 Monolithic Performance Engine (Linux Parity)
-
-*   **Ring Buffer Async I/O (`KernelIoUringEngine`)**: Ring buffers mapped in shared memory between kernel and userspace for lockless SQ (Submission Queue) and CQ (Completion Queue) processing.
-*   **eBPF Safe Verifier (`SovereignEbpfEngine`)**: In-kernel sandboxed RISC-like virtual machine evaluating network packet filters, tracing probes, and security hooks with static DAG non-loop verifier checks.
+- **Ring Buffer Async I/O (`KernelIoUringEngine`)**: Ring buffers mapped in shared memory between kernel and userspace for lockless SQ (Submission Queue) and CQ (Completion Queue) processing.
+- **eBPF Safe Verifier (`SovereignEbpfEngine`)**: In-kernel sandboxed RISC-like virtual machine evaluating network packet filters, tracing probes, and security hooks with static DAG non-loop verifier checks.
 
 ### 3.2 Security & Isolation Stack (BSD & Fuchsia Parity)
-
-*   **Filesystem Access Unveil (`OpenBSDUnveil`)**: Granular path masking restricting process file access to explicit prefixes (`r`, `w`, `c`, `x`) and sealing rules permanently via immutable flag.
-*   **System Call Pledge (`PledgePromise`)**: Process privilege restriction dropping unwanted syscall families (`stdio`, `rpath`, `wpath`, `inet`, `dns`) at runtime.
-*   **Object Capabilities (`FuchsiaZirconHandleManager` / `Capsicum`)**: Fine-grained capability tokens governing handle operations (`READ`, `WRITE`, `EXECUTE`, `DUPLICATE`, `TRANSFER`).
+- **Filesystem Access Unveil (`OpenBSDUnveil`)**: Granular path masking restricting process file access to explicit prefixes (`r`, `w`, `c`, `x`) and sealing rules permanently via immutable flag.
+- **System Call Pledge (`PledgePromise`)**: Process privilege restriction dropping unwanted syscall families (`stdio`, `rpath`, `wpath`, `inet`, `dns`) at runtime.
+- **Object Capabilities (`FuchsiaZirconHandleManager` / `Capsicum`)**: Fine-grained capability tokens governing handle operations (`READ`, `WRITE`, `EXECUTE`, `DUPLICATE`, `TRANSFER`).
 
 ### 3.3 Storage & Resilience Subsystem (DragonFly & OpenBSD Parity)
+- **HAMMER2 Snapshotting (`DragonFlyHammerFs`)**: Instantaneous directory tree snapshotting with cryptographic checksum verification and copy-on-write transaction logs.
+- **Double Fault Guard & Self-Healing (`SystemStabilityMonitor`)**: Heartbeat telemetry monitoring component responsiveness and isolating failing shards automatically to prevent cascade crash loops.
 
-*   **HAMMER2 Snapshotting (`DragonFlyHammerFs`)**: Instantaneous directory tree snapshotting with cryptographic checksum verification and copy-on-write transaction logs.
-*   **Double Fault Guard & Self-Healing (`SystemStabilityMonitor`)**: Heartbeat telemetry monitoring component responsiveness and isolating failing shards automatically to prevent cascade crash loops.
-
-***
+---
 
 ## 4. Implementation Checklist & Strategic Milestones
 
-*   \[x] Clean-room `#![no_std]` Rust implementation of eBPF verifier & execution engine.
-*   \[x] Implementation of `OpenBSDUnveil` path restriction rules engine.
-*   \[x] Implementation of `KernelIoUringEngine` submission/completion queue manager.
-*   \[x] Implementation of `BsdPfStateTable` stateful packet filtering.
-*   \[x] Implementation of `SystemStabilityMonitor` double fault guard and recovery pipeline.
-*   \[x] Integration of Redox-inspired URL scheme drivers into microkernel VFS routing (`SovereignSchemeRouter`).
-*   \[x] Integration of Fuchsia Zircon-parity object handle table into capability-based syscall handler (`SovereignZirconHandleManager`).
-*   \[x] Integration of SerenityOS LibCore event loop & IPC pipeline (`SovereignSerenityAsyncEngine`).
-*   \[x] Integration of illumos/Solaris DTrace dynamic probes & tenant zone isolation (`SovereignSolarisZoneEngine`).
-*   \[x] Integration of NixOS/Guix functional declarative package management & Merkle store paths (`SovereignNixDeclarativeEngine`).
-*   \[x] Integration of Qubes OS Xen micro-domain isolation & clipboard proxying (`SovereignQubesIsolationEngine`).
-*   \[x] Integration of Linux eBPF verifier & Landlock LSM security hooks (`SovereignLinuxSecurityLsmEngine`).
-*   \[x] Integration of Haiku OS BeAPI Desktop Kits & zero-copy media format translators (`SovereignHaikuInterfaceEngine`).
-*   \[x] Integration of Firecracker lightweight microVM isolation & lifecycle manager (`SovereignFirecrackerMicroVmManager`).
-*   \[x] Integration of Fedora / TPM 2.0 remote hardware attestation & PCR measurement workflow (`SovereignTpmAttestationWorkflow`).
-*   \[x] Integration of NixOS / SPDX / CycloneDX Software Bill of Materials (SBOM) generator pipeline (`SovereignSbomGeneratorPipeline`).
-*   \[x] Integration of Calamares / Arch declarative system installer framework (`SovereignCalamaresInstallerFramework`).
-*   \[x] Integration of PipeWire SPA graph low-latency audio engine (`SovereignPipeWireAudioEngine`).
-*   \[x] Integration of IPFS / Web3FS decentralized content-addressed block storage engine (`SovereignWeb3FsIpfsEngine`).
-*   \[x] Integration of Wasmtime / Cranelift sandboxed WASI micro-runtime engine (`SovereignWasmCraneliftEngine`).
-*   \[x] Integration of NixOS Hydra / Debian deterministic reproducible build farm auditor (`SovereignReproducibleBuildFarm`).
+- [x] Clean-room `#![no_std]` Rust implementation of eBPF verifier & execution engine.
+- [x] Implementation of `OpenBSDUnveil` path restriction rules engine.
+- [x] Implementation of `KernelIoUringEngine` submission/completion queue manager.
+- [x] Implementation of `BsdPfStateTable` stateful packet filtering.
+- [x] Implementation of `SystemStabilityMonitor` double fault guard and recovery pipeline.
+- [x] Integration of Redox-inspired URL scheme drivers into microkernel VFS routing (`SovereignSchemeRouter`).
+- [x] Integration of Fuchsia Zircon-parity object handle table into capability-based syscall handler (`SovereignZirconHandleManager`).
+- [x] Integration of SerenityOS LibCore event loop & IPC pipeline (`SovereignSerenityAsyncEngine`).
+- [x] Integration of illumos/Solaris DTrace dynamic probes & tenant zone isolation (`SovereignSolarisZoneEngine`).
+- [x] Integration of NixOS/Guix functional declarative package management & Merkle store paths (`SovereignNixDeclarativeEngine`).
+- [x] Integration of Qubes OS Xen micro-domain isolation & clipboard proxying (`SovereignQubesIsolationEngine`).
+- [x] Integration of Linux eBPF verifier & Landlock LSM security hooks (`SovereignLinuxSecurityLsmEngine`).
+- [x] Integration of Haiku OS BeAPI Desktop Kits & zero-copy media format translators (`SovereignHaikuInterfaceEngine`).
+- [x] Integration of Firecracker lightweight microVM isolation & lifecycle manager (`SovereignFirecrackerMicroVmManager`).
+- [x] Integration of Fedora / TPM 2.0 remote hardware attestation & PCR measurement workflow (`SovereignTpmAttestationWorkflow`).
+- [x] Integration of NixOS / SPDX / CycloneDX Software Bill of Materials (SBOM) generator pipeline (`SovereignSbomGeneratorPipeline`).
+- [x] Integration of Calamares / Arch declarative system installer framework (`SovereignCalamaresInstallerFramework`).
+- [x] Integration of PipeWire SPA graph low-latency audio engine (`SovereignPipeWireAudioEngine`).
+- [x] Integration of IPFS / Web3FS decentralized content-addressed block storage engine (`SovereignWeb3FsIpfsEngine`).
+- [x] Integration of Wasmtime / Cranelift sandboxed WASI micro-runtime engine (`SovereignWasmCraneliftEngine`).
+- [x] Integration of NixOS Hydra / Debian deterministic reproducible build farm auditor (`SovereignReproducibleBuildFarm`).
+- [x] Integration of Plan 9 9P2000 RPC protocol & `rfork` namespace isolation (`Plan9P2000ProtocolEngine`).
+- [x] Integration of Minix 3 Reincarnation Server self-healing driver supervisor (`Minix3ReincarnationServer`).
+- [x] Integration of NetBSD Rump Kernel userland driver isolation engine (`NetBsdRumpKernelEngine`).
+- [x] Integration of Haiku OS BFS attributed file system indexing engine (`HaikuBfsAttributeEngine`).
+- [x] Integration of SmartOS Crossbow VNIC & etherstub virtual network engine (`SmartOsCrossbowVnicEngine`).

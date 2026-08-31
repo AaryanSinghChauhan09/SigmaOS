@@ -6,15 +6,17 @@ experimental galactic-scale mesh routing.
 
 ## Architecture
 
-    Application Layer
-       └─ socket.rs          (POSIX-style socket API)
-             └─ tcpip.rs     (TCP/IP stack)
-                   ├─ tcp.rs  (TCP state machine)
-                   ├─ icmp.rs (ICMP echo / error)
-                   └─ sovereign_net.rs  (SovereignNet overlay)
-                         ├─ pqfs.rs       (post-quantum forward secrecy)
-                         ├─ mesh_net.rs   (local mesh)
-                         └─ galactic_*.rs (long-range mesh routing)
+```
+Application Layer
+   └─ socket.rs          (POSIX-style socket API)
+         └─ tcpip.rs     (TCP/IP stack)
+               ├─ tcp.rs  (TCP state machine)
+               ├─ icmp.rs (ICMP echo / error)
+               └─ sovereign_net.rs  (SovereignNet overlay)
+                     ├─ pqfs.rs       (post-quantum forward secrecy)
+                     ├─ mesh_net.rs   (local mesh)
+                     └─ galactic_*.rs (long-range mesh routing)
+```
 
 ## Source Files
 
@@ -62,28 +64,28 @@ All `sovereign_net.rs` channels use a **hybrid** scheme:
 
 ## Roadmap
 
-*   \[x] TCP state machine (`tcp.rs`)
+- [x] TCP state machine (`tcp.rs`)
 
-*   \[x] Socket API (`socket.rs`)
+- [x] Socket API (`socket.rs`)
 
-*   \[x] ICMP (`icmp.rs`)
+- [x] ICMP (`icmp.rs`)
 
-*   \[x] Post-quantum encryption stub (`pqfs.rs`)
+- [x] Post-quantum encryption stub (`pqfs.rs`)
 
-*   \[x] Mesh gossip protocol (`mesh_net.rs`)
+- [x] Mesh gossip protocol (`mesh_net.rs`)
 
-*   \[ ] Full IPv6 SLAAC / NDP
+- [ ] Full IPv6 SLAAC / NDP
 
-*   \[ ] DHCPv4 / DHCPv6 client
+- [ ] DHCPv4 / DHCPv6 client
 
-*   \[ ] DNSSEC resolver integration
+- [ ] DNSSEC resolver integration
 
-*   \[ ] WireGuard-inspired VPN tunnel
+- [ ] WireGuard-inspired VPN tunnel
 
-*   \[ ] Formal Kani proofs for TCP state machine
+- [ ] Formal Kani proofs for TCP state machine
 
 ## Related Modules
 
-*   [`modules/core/kernel`](../kernel/README.md) — IPC used by net stack
+- [`modules/core/kernel`](../kernel/README.md) — IPC used by net stack
 
-*   [`modules/security/isolation`](../../security/isolation/README.md) — Network namespace isolation
+- [`modules/security/isolation`](../../security/isolation/README.md) — Network namespace isolation

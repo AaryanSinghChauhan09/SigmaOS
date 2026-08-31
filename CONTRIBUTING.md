@@ -1,47 +1,20 @@
 # Contributing to SigmaOS
 
-Thank you for considering contributing to SigmaOS!
-
-## Quick Start
-
-```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-cargo build
-cargo test
-```
-
-## Ways to Contribute
-
-*   🐛 **Bug Reports**: Open a GitHub Issue
-*   ✨ **Feature Requests**: Open a GitHub Issue with `[RFC]` prefix
-*   📝 **Documentation**: Fix typos, add examples, improve clarity
-*   🔧 **Code**: See open issues labeled `good first issue`
-*   🔒 **Security**: See [SECURITY.md](SECURITY)
+Thank you for your interest in contributing to SigmaOS!
 
 ## Development Process
+1. **Fork the Repository**: Create a personal fork of the repository.
+2. **Branch**: Create a feature branch (`feat/your-feature` or `fix/your-fix`).
+3. **Write Code**: Ensure your code is entirely written in Rust (unless strictly necessary for bootloader assembly). Avoid `unsafe` blocks whenever possible.
+4. **Format and Lint**: Run `cargo fmt` and `cargo clippy`.
+5. **Test**: Run the test suite (`cargo test` or `make test`).
+6. **Submit a PR**: Create a Pull Request against the `main` branch.
 
-1.  Fork the repository
-2.  Create a feature branch: `feat/your-feature`
-3.  Make changes with clear commits
-4.  Run `cargo test` and `cargo clippy`
-5.  Submit a Pull Request to `main`
+## Coding Standards
+- Strict adherence to Rust conventions.
+- Document all public modules, functions, and structs using `///` doc comments.
+- Keep the microkernel minimal. Put features in user-space servers.
 
-## Code Style
-
-*   Follow Rust idioms and use `rustfmt`
-*   Document all public APIs with `///` doc comments
-*   Write tests for new functionality
-*   Prefer `safe` Rust; document all `unsafe` blocks
-
-## Commit Format
-
-    type(scope): description
-
-    Body explaining WHY
-
-    Fixes #issue
-
-Types: `feat`, `fix`, `docs`, `refactor`, `test`, `perf`, `security`
-
-See [Contributing Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing) for full guide.
+## Communication
+- Open an Issue before starting major feature work to discuss design.
+- Be respectful and follow our [Code of Conduct](CODE_OF_CONDUCT.md).

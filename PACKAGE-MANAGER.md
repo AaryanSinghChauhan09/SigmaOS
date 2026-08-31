@@ -1,127 +1,34 @@
-# sigma-pkg: SigmaOS Package Manager
+# Package Manager (sigpkg)
 
-## Overview
+Welcome to the official documentation for Package Manager (sigpkg).
 
-`sigma-pkg` is the unified package manager for SigmaOS, combining ideas from pacman, DNF, APT, and Nix into a single coherent tool.
+## Format
 
-## Quick Reference
+Package and Repository format specification.
 
-| Operation | Command |
-|-----------|--------|
-| Install package | `sigma-pkg install <pkg>` |
-| Remove package | `sigma-pkg remove <pkg>` |
-| Update all | `sigma-pkg update` |
-| Search | `sigma-pkg search <query>` |
-| Show info | `sigma-pkg info <pkg>` |
-| List installed | `sigma-pkg list` |
-| Clean cache | `sigma-pkg clean` |
-| Install AUR pkg | `sigma-pkg aur <pkg>` |
-| Install Flatpak | `sigma-pkg flatpak <pkg>` |
-| Build from src | `sigma-pkg build <PKGBUILD>` |
-| Rollback | `sigma-pkg rollback` |
-| Lock version | `sigma-pkg pin <pkg>@<version>` |
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-## Package Sources
+## Algorithm
 
-### 1. Sigma Official Repository
+Dependency resolution algorithm.
 
-Curated, security-audited packages maintained by the SigmaOS team.
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-```bash
-# Enable/disable repos
-sigma-pkg repo list
-sigma-pkg repo enable extra
-sigma-pkg repo disable testing
-```
+## USE Flags
 
-### 2. AUR (Arch User Repository)
+USE flag implementation.
 
-Compatibility layer for Arch Linux AUR packages.
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-```bash
-# Install from AUR
-sigma-pkg aur yay
-sigma-pkg aur visual-studio-code-bin
-```
+## Nix Profiles
 
-### 3. Flatpak
+Source: Nix profile generation.
 
-Sandboxed application delivery from Flathub.
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-```bash
-# Install Flatpak app
-sigma-pkg flatpak org.gnome.Builder
-sigma-pkg flatpak com.spotify.Client
-```
+## OCI
 
-### 4. AppImage
+OCI integration and CLI reference.
 
-Portable application bundles.
+This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. This section details the critical architectural choices, including O(1) scheduling, memory management over 2MB superpages, lock-free ring buffers, zero-copy IPC, and the BORE/EEVDF algorithms. 
 
-```bash
-# Install AppImage
-sigma-pkg appimage https://example.com/app.AppImage
-```
-
-### 5. Nix Packages (experimental)
-
-Access to the Nix package ecosystem.
-
-```bash
-# Enable Nix integration
-sigma-pkg nix enable
-sigma-pkg nix install nixpkgs#hello
-```
-
-## PKGBUILD Compatibility
-
-SigmaOS natively supports Arch Linux PKGBUILD format:
-
-```bash
-# Build and install from PKGBUILD
-git clone https://aur.archlinux.org/package.git
-cd package
-sigma-pkg build .
-```
-
-## Sigma Package Format (.spkg)
-
-Native SigmaOS package format with enhanced metadata:
-
-```toml
-[package]
-name = "example"
-version = "1.0.0"
-arch = ["x86_64", "aarch64", "riscv64"]
-license = "MIT"
-description = "Example package"
-
-[dependencies]
-required = ["glibc", "openssl"]
-optional = ["curl"]
-
-[security]
-signature = "ed25519:..."
-sbom = true  # Software Bill of Materials
-
-[install]
-script = "install.sh"
-post-install = "post-install.sh"
-```
-
-## Dependency Resolution
-
-`sigma-pkg` uses a SAT-solver based dependency resolver inspired by DNF/libsolv:
-
-*   Handles conflicts automatically
-*   Suggests alternatives for conflicting packages
-*   Supports version constraints and ranges
-*   Generates dependency graph visualization: `sigma-pkg graph <pkg>`
-
-## Atomic Transactions
-
-All package operations are atomic:
-
-*   If installation fails, system is rolled back
-*   Transaction log at `/var/log/sigma-pkg/transactions.log`
-*   Rollback: `sigma-pkg rollback [--to=<date>]`

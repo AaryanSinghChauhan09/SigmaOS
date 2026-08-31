@@ -1,56 +1,39 @@
-# Zero-Dependency Architecture Implementation
+# Zero-Dependency Architecture
 
-SigmaOS is designed with a zero-dependency philosophy to maximize security, performance, and self-sufficiency. This document outlines the architecture and implementation strategies used to achieve minimal dependency on external libraries and predefined functions.
+SigmaOS aims to eliminate all external C runtime dependencies from the core kernel.
 
-## Core Principles
+## Implemented Custom Types
 
-### 1. No External Runtime Dependencies
+| Component | Replaces | Location |
+|-----------|----------|----------|
+| `klib::Vec<T>` | `std::vec::Vec` | `src/klib/vec.rs` |
+| `klib::HashMap<K,V>` | `std::collections::HashMap` | `src/klib/hashmap.rs` |
+| `klib::BTreeMap<K,V>` | `std::collections::BTreeMap` | `src/klib/btreemap.rs` |
+| `klib::String` | `std::string::String` | `src/klib/string.rs` |
+| `klib::Arc<T>` | `std::sync::Arc` | `src/klib/arc.rs` |
+| `BuddyAllocator` | `malloc`/`free` | `src/klib/buddy_allocator.rs` |
+| `SlabAllocator` | `kmem_cache_*` | `src/klib/slab.rs` |
+| `RingBuffer<T>` | N/A | `src/klib/ring_buffer.rs` |
+| `CustomHasher` | `DefaultHasher` | `src/klib/hash.rs` |
 
-*   **Custom Allocators**: Replace std::collections with custom allocators
-*   **Bare-Metal Support**: Designed to run without operating system services
-*   **Self-Contained**: All essential functionality implemented internally
+## Progress
 
-### 2. Minimal Predefined Functions
+| Subsystem | Dependency-Free? | Notes |
+|-----------|-----------------|-------|
+| Memory Manager | ✅ Yes | Pure Rust, no libc |
+| Scheduler | ✅ Yes | `alloc` only |
+| IPC Bus | ✅ Yes | Custom collections |
+| VFS | 🚧 Partial | Some `alloc` usage |
+| Network Stack | 🚧 Partial | TCP/UDP pure Rust |
+| Security (SELinux) | ❌ No | Requires kernel LSM hooks |
+| Graphics | ❌ No | Mesa dependency |
+| Audio | ❌ No | PipeWire dependency |
 
-*   **Direct System Calls**: Bypass libc for critical operations
-*   **Custom ABI**: SigmaOS-specific calling conventions where beneficial
-*   **Inline Implementations**: Replace library calls with direct implementations
+## Goals
 
-### 3. Dependency Reduction Strategies
-
-#### Memory Management
-
-*   **Custom Buddy Allocator**: Eliminates dependency on system allocators
-*   **Pool-Based Allocation**: Fixed-size pools for common allocations
-*   **Stack Allocation**: Prefer stack over heap where possible
-
-#### String Handling
-
-*   **Custom String Types**: sigma-klib::String instead of std::string::String
-*   **Slice-Based Operations**: Work with slices instead of owned strings
-*   **CString Compatibility**: Zero-terminated string handling for FFI
-
-#### Container Types
-
-*   **Custom HashMap**: sigma-klib::HashMap implementation
-*   **Custom Vec**: sigma-klib::Vec with no\_std support
-*   **Specialized Containers**: Task-specific data structures
-
-## Implementation Areas
-
-### Kernel Subsystems
-
-*   Custom allocators and direct system call interfaces
-*   Custom filesystem and network stacks
-*   Security subsystem with minimal external dependencies
-
-### Current Status
-
-*   **External Crates**: 12 (vs 45+ in typical Rust OS projects)
-*   **Custom Implementations**: 87 major components
-*   **Performance**: 40% reduction in allocation overhead vs std::alloc
-
-## References
-
-*   [No\_std Rust Programming](https://rust-embedded.github.io/book/)
-*   [OS Development Patterns](https://wiki.osdev.org/)
+- [ ] 100% zero-dependency core kernel
+- [ ] Custom audio processing
+- [ ] Custom graphics subsystem
+- [ ] Pure Rust DNS resolver (done)
+- [ ] Pure Rust TLS 1.3 (done)
+- [ ] Pure Rust WireGuard (in progress)

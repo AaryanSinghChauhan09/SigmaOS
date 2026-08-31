@@ -17,17 +17,15 @@ SigmaOS implements a **multi-class hierarchical scheduler** with Linux EEVDF, Ca
 **EEVDF** (Earliest Eligible Virtual Deadline First) was introduced in Linux 6.6 as the replacement for CFS.
 
 ### Key Concepts
-
-*   **Virtual Runtime (vruntime)**: Normalized CPU time consumed by a process
-*   **System Virtual Time (V)**: Minimum vruntime of all runnable processes
-*   **Eligibility**: A process is eligible if `vruntime ≤ V`
-*   **Virtual Deadline**: `virtual_deadline = vruntime + (time_slice / weight)`
+- **Virtual Runtime (vruntime)**: Normalized CPU time consumed by a process
+- **System Virtual Time (V)**: Minimum vruntime of all runnable processes
+- **Eligibility**: A process is eligible if `vruntime ≤ V`
+- **Virtual Deadline**: `virtual_deadline = vruntime + (time_slice / weight)`
 
 ### Selection Rule
-
-1.  Filter processes where `vruntime ≤ system_vtime` → eligible set
-2.  Among eligible, pick the one with **earliest virtual deadline**
-3.  If no eligible (starvation prevention): pick minimum vruntime
+1. Filter processes where `vruntime ≤ system_vtime` → eligible set
+2. Among eligible, pick the one with **earliest virtual deadline**
+3. If no eligible (starvation prevention): pick minimum vruntime
 
 ### Priority Weights
 
@@ -53,17 +51,18 @@ process.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
 
 SigmaOS supports **NUMA** (Non-Uniform Memory Access) topologies:
 
-    NUMA Node 0 (CPUs 0-7)    NUMA Node 1 (CPUs 8-15)
-        Run Queue 0                Run Queue 1
-             ↑                          ↑
-        Work Stealing ←→→→→→→→→ Work Stealing
+```
+NUMA Node 0 (CPUs 0-7)    NUMA Node 1 (CPUs 8-15)
+    Run Queue 0                Run Queue 1
+         ↑                          ↑
+    Work Stealing ←→→→→→→→→ Work Stealing
+```
 
 **Work-stealing algorithm**:
-
-1.  CPU checks its local run queue
-2.  If empty, try to steal a task from another CPU's queue
-3.  Prefer stealing from CPUs in the same NUMA node
-4.  Only steal from remote NUMA nodes as last resort
+1. CPU checks its local run queue
+2. If empty, try to steal a task from another CPU's queue
+3. Prefer stealing from CPUs in the same NUMA node
+4. Only steal from remote NUMA nodes as last resort
 
 ## MLFQ Scheduler
 
@@ -91,10 +90,9 @@ Adapts CPU frequencies and task placement based on thermal state:
 ## Aperiodic Task Scheduling
 
 For embedded/RTOS workloads, SigmaOS supports:
-
-*   **Polling Server**: Dedicated bandwidth for aperiodic tasks
-*   **Deferrable Server**: Budget rolls over if unused
-*   **Sporadic Server**: Replenishment after each service period
+- **Polling Server**: Dedicated bandwidth for aperiodic tasks
+- **Deferrable Server**: Budget rolls over if unused
+- **Sporadic Server**: Replenishment after each service period
 
 ## Workload Classification
 

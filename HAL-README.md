@@ -8,7 +8,7 @@ implementing one HAL backend — nothing else needs to change.
 
 | Architecture | Status |
 | --- | --- |
-| x86\_64 | ✅ Active |
+| x86_64 | ✅ Active |
 | AArch64 (ARM64) | 🔧 In-progress |
 | RISC-V RV64GC | 📋 Planned |
 
@@ -23,8 +23,8 @@ uint64_t hal_get_timestamp_ns(void);
 
 ## Roadmap
 
-*   \[ ] AArch64 MMU backend
+- [ ] AArch64 MMU backend
 
-*   \[ ] RISC-V SBI wrapper
+- [ ] RISC-V SBI wrapper
 
-*   \[ ] ACPI/DTB discovery
+- [ ] ACPI/DTB discovery
