@@ -13,6 +13,8 @@ mod sigpkg;
 #[path = "../src/security/mod.rs"]
 mod security;
 
+mod klib;
+
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
 #[path = "../src/security/unveil.rs"]

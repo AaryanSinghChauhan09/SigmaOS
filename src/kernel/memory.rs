@@ -9,6 +9,10 @@ use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;
+#[cfg(not(test))]
+use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;

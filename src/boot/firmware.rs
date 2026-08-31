@@ -880,6 +880,211 @@ impl Default for IommuFirmwareEngine {
     }
 }
 
+// ==================================================================
+// LEGACY BIOS SUBSYSTEM (E820, VBE, EDD, OPTION ROM, MBR)
+// ==================================================================
+
+/// E820 Memory Map Types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum E820MemoryType {
+    Ram = 1,
+    Reserved = 2,
+    AcpiReclaimable = 3,
+    AcpiNvs = 4,
+    Unusable = 5,
+    Disabled = 6,
+    Pmem = 7,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct E820Entry {
+    pub base_addr: u64,
+    pub length: u64,
+    pub entry_type: E820MemoryType,
+}
+
+pub struct BiosE820MemoryMap {
+    pub entries: Vec<E820Entry>,
+}
+
+impl BiosE820MemoryMap {
+    pub fn new() -> Self {
+        let mut map = Vec::new();
+        // Conventional Low Memory (0 - 640KB)
+        map.push(E820Entry { base_addr: 0x0000_0000, length: 0x000A_0000, entry_type: E820MemoryType::Ram });
+        // Video RAM & BIOS ROM (640KB - 1MB)
+        map.push(E820Entry { base_addr: 0x000A_0000, length: 0x0006_0000, entry_type: E820MemoryType::Reserved });
+        // Extended RAM (1MB - 3.5GB)
+        map.push(E820Entry { base_addr: 0x0010_0000, length: 0xDF00_0000, entry_type: E820MemoryType::Ram });
+        // PCI MMIO & ACPI Tables (3.5GB - 4GB)
+        map.push(E820Entry { base_addr: 0xE000_0000, length: 0x1FE0_0000, entry_type: E820MemoryType::AcpiReclaimable });
+        map.push(E820Entry { base_addr: 0xFFE0_0000, length: 0x0020_0000, entry_type: E820MemoryType::Reserved });
+
+        Self { entries: map }
+    }
+
+    pub fn get_usable_ram_bytes(&self) -> u64 {
+        self.entries.iter()
+            .filter(|e| e.entry_type == E820MemoryType::Ram)
+            .map(|e| e.length)
+            .sum()
+    }
+}
+
+impl Default for BiosE820MemoryMap {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// VESA BIOS Extension (VBE 3.0) Mode Information Structure
+#[derive(Debug, Clone)]
+pub struct VbeModeInfoBlock {
+    pub mode_attributes: u16,
+    pub width_pixels: u16,
+    pub height_pixels: u16,
+    pub bits_per_pixel: u8,
+    pub bytes_per_scanline: u16,
+    pub framebuffer_phys_addr: u32,
+    pub red_mask_size: u8,
+    pub green_mask_size: u8,
+    pub blue_mask_size: u8,
+}
+
+impl VbeModeInfoBlock {
+    pub fn new_standard_hd() -> Self {
+        Self {
+            mode_attributes: 0x9B, // Supported, Color, Graphics Mode, Linear Framebuffer
+            width_pixels: 1920,
+            height_pixels: 1080,
+            bits_per_pixel: 32,
+            bytes_per_scanline: 1920 * 4,
+            framebuffer_phys_addr: 0xE000_0000,
+            red_mask_size: 8,
+            green_mask_size: 8,
+            blue_mask_size: 8,
+        }
+    }
+}
+
+/// INT 13h EDD (Enhanced Disk Drive 3.0) Geometry Parameters
+#[derive(Debug, Clone)]
+pub struct EddDriveGeometry {
+    pub drive_number: u8,
+    pub cylinders: u16,
+    pub heads: u16,
+    pub sectors_per_track: u16,
+    pub total_lba_sectors: u64,
+    pub bytes_per_sector: u16,
+}
+
+impl EddDriveGeometry {
+    pub fn new_lba_disk(drive_num: u8, total_gb: u64) -> Self {
+        Self {
+            drive_number: drive_num,
+            cylinders: 1024,
+            heads: 255,
+            sectors_per_track: 63,
+            total_lba_sectors: total_gb * 1024 * 1024 * 1024 / 512,
+            bytes_per_sector: 512,
+        }
+    }
+}
+
+/// Option ROM Scanner (0xC0000 - 0xE0000 2KB Boundary Check)
+#[derive(Debug, Clone)]
+pub struct OptionRomEntry {
+    pub base_addr: u32,
+    pub size_bytes: usize,
+    pub is_valid_checksum: bool,
+}
+
+pub struct OptionRomScanner;
+
+impl OptionRomScanner {
+    pub fn scan_region(rom_memory: &[u8], start_phys_addr: u32) -> Vec<OptionRomEntry> {
+        let mut results = Vec::new();
+        let mut offset = 0;
+
+        while offset + 3 < rom_memory.len() {
+            if rom_memory[offset] == 0x55 && rom_memory[offset + 1] == 0xAA {
+                let size_blocks = rom_memory[offset + 2] as usize;
+                let size_bytes = size_blocks * 512;
+                if offset + size_bytes <= rom_memory.len() && size_bytes > 0 {
+                    let checksum: u8 = rom_memory[offset..offset + size_bytes]
+                        .iter()
+                        .fold(0u8, |acc, &b| acc.wrapping_add(b));
+                    results.push(OptionRomEntry {
+                        base_addr: start_phys_addr + offset as u32,
+                        size_bytes,
+                        is_valid_checksum: checksum == 0,
+                    });
+                    offset += size_bytes;
+                    continue;
+                }
+            }
+            offset += 2048; // Option ROMs align to 2KB boundaries
+        }
+        results
+    }
+}
+
+/// Legacy MBR Partition Table Entry (512-byte Master Boot Record)
+#[derive(Debug, Clone, Copy)]
+pub struct MbrPartitionEntry {
+    pub boot_indicator: u8, // 0x80 = Active/Bootable
+    pub start_head: u8,
+    pub start_sector_cylinder: u16,
+    pub partition_type: u8,
+    pub end_head: u8,
+    pub end_sector_cylinder: u16,
+    pub start_lba: u32,
+    pub total_sectors: u32,
+}
+
+pub struct MasterBootRecordParser;
+
+impl MasterBootRecordParser {
+    pub fn parse_mbr(sector: &[u8; 512]) -> Result<Vec<MbrPartitionEntry>, BootError> {
+        if sector[510] != 0x55 || sector[511] != 0xAA {
+            return Err(BootError::InvalidConfiguration);
+        }
+
+        let mut partitions = Vec::new();
+        for i in 0..4 {
+            let offset = 446 + i * 16;
+            let boot_indicator = sector[offset];
+            let partition_type = sector[offset + 4];
+            let start_lba = u32::from_le_bytes([
+                sector[offset + 8],
+                sector[offset + 9],
+                sector[offset + 10],
+                sector[offset + 11],
+            ]);
+            let total_sectors = u32::from_le_bytes([
+                sector[offset + 12],
+                sector[offset + 13],
+                sector[offset + 14],
+                sector[offset + 15],
+            ]);
+
+            if partition_type != 0x00 {
+                partitions.push(MbrPartitionEntry {
+                    boot_indicator,
+                    start_head: sector[offset + 1],
+                    start_sector_cylinder: u16::from_le_bytes([sector[offset + 2], sector[offset + 3]]),
+                    partition_type,
+                    end_head: sector[offset + 5],
+                    end_sector_cylinder: u16::from_le_bytes([sector[offset + 6], sector[offset + 7]]),
+                    start_lba,
+                    total_sectors,
+                });
+            }
+        }
+        Ok(partitions)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1062,6 +1267,30 @@ mod tests {
         assert_eq!(parser.bios_info.as_ref().unwrap().vendor, "SigmaOS Sovereign Core UEFI");
         assert!(parser.system_info.is_some());
         assert_eq!(parser.system_info.as_ref().unwrap().manufacturer, "SigmaOS Systems Corp");
+    }
+
+    #[test]
+    fn test_bios_legacy_subsystem_e820_and_vbe() {
+        let e820 = BiosE820MemoryMap::new();
+        assert!(e820.get_usable_ram_bytes() > 0);
+
+        let vbe = VbeModeInfoBlock::new_standard_hd();
+        assert_eq!(vbe.width_pixels, 1920);
+        assert_eq!(vbe.height_pixels, 1080);
+
+        let edd = EddDriveGeometry::new_lba_disk(0x80, 500);
+        assert_eq!(edd.drive_number, 0x80);
+        assert!(edd.total_lba_sectors > 0);
+
+        let mut fake_mbr = [0u8; 512];
+        fake_mbr[510] = 0x55;
+        fake_mbr[511] = 0xAA;
+        fake_mbr[446] = 0x80; // active
+        fake_mbr[450] = 0x83; // Linux filesystem
+        let parts = MasterBootRecordParser::parse_mbr(&fake_mbr).unwrap();
+        assert_eq!(parts.len(), 1);
+        assert_eq!(parts[0].boot_indicator, 0x80);
+        assert_eq!(parts[0].partition_type, 0x83);
     }
 
     #[test]

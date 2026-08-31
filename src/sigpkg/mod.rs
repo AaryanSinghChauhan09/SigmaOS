@@ -4,6 +4,7 @@ use alloc::format;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod alpine_apk_engine;
 pub mod arch_pacman_engine;
@@ -25,6 +26,7 @@ pub mod gentoo_use_flags;
 pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
+pub mod nixos;
 pub mod pacman;
 pub mod portage;
 pub mod recipe;

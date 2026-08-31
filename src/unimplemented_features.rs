@@ -288,7 +288,7 @@ impl UdfVm {
             }
 
             match instr.opcode {
-                OP_READ => {
+                0x10 => {
                     if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
                     {
                         return Err("UDF VM Safety Guard: Read address out of peripheral boundary");
@@ -296,7 +296,7 @@ impl UdfVm {
                     let val = hardware.read_register(instr.address_or_imm);
                     self.registers[instr.reg_dest as usize] = val;
                 }
-                OP_WRITE => {
+                0x20 => {
                     if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
                     {
                         return Err(
@@ -306,13 +306,13 @@ impl UdfVm {
                     let val = self.registers[instr.reg_src as usize];
                     hardware.write_register(instr.address_or_imm, val);
                 }
-                OP_ADD => {
+                0x30 => {
                     let r_dest = instr.reg_dest as usize;
                     let r_src = instr.reg_src as usize;
                     self.registers[r_dest] =
                         self.registers[r_dest].wrapping_add(self.registers[r_src]);
                 }
-                OP_HALT => {
+                0xF0 => {
                     self.is_halted = true;
                     return Ok(self.registers[instr.reg_dest as usize]);
                 }
@@ -1638,25 +1638,25 @@ mod peripheral_tests {
 
         let program = [
             UdfInstruction {
-                opcode: OP_WRITE,
+                opcode: 0x20,
                 reg_dest: 0,
                 reg_src: 0,
                 address_or_imm: 4,
             }, // write R0 (0) to addr 4
             UdfInstruction {
-                opcode: OP_READ,
+                opcode: 0x10,
                 reg_dest: 1,
                 reg_src: 0,
                 address_or_imm: 4,
             }, // read addr 4 to R1
             UdfInstruction {
-                opcode: OP_ADD,
+                opcode: 0x30,
                 reg_dest: 1,
                 reg_src: 1,
                 address_or_imm: 0,
             }, // R1 = R1 + R1
             UdfInstruction {
-                opcode: OP_HALT,
+                opcode: 0xF0,
                 reg_dest: 1,
                 reg_src: 0,
                 address_or_imm: 0,
@@ -1668,7 +1668,7 @@ mod peripheral_tests {
 
         let invalid_program = [
             UdfInstruction {
-                opcode: OP_READ,
+                opcode: 0x10,
                 reg_dest: 0,
                 reg_src: 0,
                 address_or_imm: 100,

@@ -15,6 +15,8 @@ pub mod klib;
 
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
+#[path = "../src/klib/mod.rs"]
+mod klib;
 
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
@@ -115,6 +117,9 @@ fn test_sovereign_universal_distro_bridge_inspection() {
     assert!(bridge.enforce_security_isolation(501, "/jails/hammer").is_ok());
     assert!(bridge.active_jail.is_some());
 }
+
+use wiki_ideas_implementation::SystemdUnitActiveState;
+use bsd_compat::*;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -228,11 +233,12 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas::{
+    use wiki_ideas_implementation::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
         SovereignSystemdParityEngine, SystemdUnitActiveState,
+        SovereignSystemdParityEngine,
     };
 
     // 1. NixOS Declarative System State

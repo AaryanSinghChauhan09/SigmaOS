@@ -17,11 +17,27 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Package Module
+pub mod apm;
+pub mod aur_integration;
+pub mod cache;
 pub mod debian;
+pub mod debian_translator;
+pub mod dependency_resolver;
+pub mod gentoo_opt;
 pub mod linux_translation;
 pub mod repository;
 pub mod store;
 pub mod universal;
+pub mod manager;
+pub mod repository;
+pub mod resolver;
+pub mod sandbox;
+pub mod sigma_pkg;
+pub mod signing;
+pub mod spac;
+pub mod store;
+pub mod universal;
+pub mod updater;
 
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
