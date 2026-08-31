@@ -8,9 +8,20 @@ use alloc::format;
 // Supports dependencies, repositories, transactions, and package management
 
 use crate::klib::HashMap;
-// std::fs not in no_std
-// Path/PathBuf not in no_std
-// std::process not in no_std
+use crate::klib::path::{Path, PathBuf};
+
+mod fs {
+    use super::*;
+    pub fn read_to_string<P: AsRef<str>>(_path: P) -> Result<String, ()> {
+        Ok(String::new())
+    }
+    pub fn write<P: AsRef<str>>(_path: P, _content: String) -> Result<(), ()> {
+        Ok(())
+    }
+    pub fn create_dir_all<P: AsRef<str>>(_path: P) -> Result<(), ()> {
+        Ok(())
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Package {

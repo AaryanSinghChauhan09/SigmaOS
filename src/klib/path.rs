@@ -5,7 +5,6 @@ extern crate alloc;
 use alloc::string::String;
 use core::ops::Deref;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub type Path = PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
