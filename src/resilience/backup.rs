@@ -153,6 +153,206 @@ impl SigmaTimeshiftManager {
     }
 }
 
+// ============================================================================
+// Linux & BSD Inspired Advanced Timeshift Engine (Btrfs, ZFS, Rsync & Bootloader Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapshotBackend {
+    Rsync,
+    Btrfs,
+    Zfs,
+    ZstdTar,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapshotSchedule {
+    Hourly,
+    Daily,
+    Weekly,
+    Boot,
+    PreUpdate,
+    Manual,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapshotRetentionPolicy {
+    pub keep_hourly: usize,
+    pub keep_daily: usize,
+    pub keep_weekly: usize,
+    pub keep_boot: usize,
+}
+
+impl Default for SnapshotRetentionPolicy {
+    fn default() -> Self {
+        Self {
+            keep_hourly: 5,
+            keep_daily: 7,
+            keep_weekly: 4,
+            keep_boot: 3,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExclusionFilter {
+    pub excluded_paths: Vec<String>,
+}
+
+impl ExclusionFilter {
+    pub fn default_timeshift_rules() -> Self {
+        Self {
+            excluded_paths: vec![
+                "/home".to_string(),
+                "/root".to_string(),
+                "/tmp".to_string(),
+                "/proc".to_string(),
+                "/sys".to_string(),
+                "/dev".to_string(),
+                "/run".to_string(),
+                "/var/tmp".to_string(),
+                "/var/log".to_string(),
+            ],
+        }
+    }
+
+    pub fn is_path_excluded(&self, path: &str) -> bool {
+        self.excluded_paths.iter().any(|excluded| path.starts_with(excluded))
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GrubSystemdBootEntry {
+    pub title: String,
+    pub snapshot_id: String,
+    pub kernel_params: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct AdvancedTimeshiftSnapshot {
+    pub id: String,
+    pub timestamp: u64,
+    pub schedule: SnapshotSchedule,
+    pub backend: SnapshotBackend,
+    pub label: String,
+    pub checksum_hash: u64,
+    pub file_manifest: HashMap<String, String>,
+}
+
+pub struct AdvancedTimeshiftEngine {
+    pub backend: SnapshotBackend,
+    pub retention_policy: SnapshotRetentionPolicy,
+    pub exclusion_filter: ExclusionFilter,
+    pub snapshots: Vec<AdvancedTimeshiftSnapshot>,
+    pub boot_entries: Vec<GrubSystemdBootEntry>,
+}
+
+impl AdvancedTimeshiftEngine {
+    pub fn new(backend: SnapshotBackend) -> Self {
+        Self {
+            backend,
+            retention_policy: SnapshotRetentionPolicy::default(),
+            exclusion_filter: ExclusionFilter::default_timeshift_rules(),
+            snapshots: Vec::new(),
+            boot_entries: Vec::new(),
+        }
+    }
+
+    pub fn create_checkpoint(
+        &mut self,
+        label: String,
+        schedule: SnapshotSchedule,
+        raw_manifest: HashMap<String, String>,
+    ) -> Result<String, &'static str> {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+
+        // Filter out excluded path entries
+        let filtered_manifest: HashMap<String, String> = raw_manifest
+            .into_iter()
+            .filter(|(path, _)| !self.exclusion_filter.is_path_excluded(path))
+            .collect();
+
+        // Calculate snapshot hash checksum
+        let mut checksum: u64 = 0xcbf29ce484222325;
+        for (k, v) in &filtered_manifest {
+            for b in k.bytes().chain(v.bytes()) {
+                checksum ^= b as u64;
+                checksum = checksum.wrapping_mul(0x100000001b3);
+            }
+        }
+
+        let snapshot_id = format!("timeshift-{:?}-{}-{}", self.backend, schedule as u8, timestamp);
+        let snapshot = AdvancedTimeshiftSnapshot {
+            id: snapshot_id.clone(),
+            timestamp,
+            schedule,
+            backend: self.backend,
+            label: label.clone(),
+            checksum_hash: checksum,
+            file_manifest: filtered_manifest,
+        };
+
+        self.snapshots.push(snapshot);
+
+        // Generate bootloader entry
+        let boot_entry = GrubSystemdBootEntry {
+            title: format!("SigmaOS Snapshot - {}", label),
+            snapshot_id: snapshot_id.clone(),
+            kernel_params: format!("rootflags=subvol=@snapshots/{}", snapshot_id),
+        };
+        self.boot_entries.push(boot_entry);
+
+        // Prune older snapshots based on retention policy
+        self.enforce_retention_policy(schedule);
+
+        Ok(snapshot_id)
+    }
+
+    pub fn enforce_retention_policy(&mut self, schedule: SnapshotSchedule) {
+        let max_keep = match schedule {
+            SnapshotSchedule::Hourly => self.retention_policy.keep_hourly,
+            SnapshotSchedule::Daily => self.retention_policy.keep_daily,
+            SnapshotSchedule::Weekly => self.retention_policy.keep_weekly,
+            SnapshotSchedule::Boot => self.retention_policy.keep_boot,
+            SnapshotSchedule::PreUpdate | SnapshotSchedule::Manual => 10,
+        };
+
+        let mut matching: Vec<usize> = self
+            .snapshots
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.schedule == schedule)
+            .map(|(idx, _)| idx)
+            .collect();
+
+        if matching.len() > max_keep {
+            matching.sort_by_key(|&idx| self.snapshots[idx].timestamp);
+            let to_remove_count = matching.len() - max_keep;
+            let remove_indices: Vec<usize> = matching.into_iter().take(to_remove_count).collect();
+
+            // Retain only those not marked for removal
+            let mut new_snapshots = Vec::new();
+            for (idx, snap) in self.snapshots.drain(..).enumerate() {
+                if !remove_indices.contains(&idx) {
+                    new_snapshots.push(snap);
+                }
+            }
+            self.snapshots = new_snapshots;
+        }
+    }
+
+    pub fn rollback(&self, snapshot_id: &str) -> Result<HashMap<String, String>, &'static str> {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.id == snapshot_id) {
+            Ok(snap.file_manifest.clone())
+        } else {
+            Err("AdvancedTimeshift: Target snapshot ID not found.")
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,5 +372,48 @@ mod tests {
 
         assert!(timeshift.delete_snapshot(&id).is_ok());
         assert_eq!(timeshift.snapshots.len(), 0);
+    }
+
+    #[test]
+    fn test_advanced_timeshift_engine() {
+        let mut engine = AdvancedTimeshiftEngine::new(SnapshotBackend::Btrfs);
+        let mut raw_manifest = HashMap::new();
+        raw_manifest.insert("/etc/sigma.conf".to_string(), "hash_config".to_string());
+        raw_manifest.insert("/usr/bin/kernel".to_string(), "hash_kernel".to_string());
+        raw_manifest.insert("/home/user/document.txt".to_string(), "hash_user".to_string()); // Should be excluded
+
+        let snap_id = engine
+            .create_checkpoint(
+                "Pre-Upgrade Snapshot".to_string(),
+                SnapshotSchedule::PreUpdate,
+                raw_manifest,
+            )
+            .unwrap();
+
+        assert_eq!(engine.snapshots.len(), 1);
+        assert_eq!(engine.boot_entries.len(), 1);
+        assert_eq!(engine.boot_entries[0].title, "SigmaOS Snapshot - Pre-Upgrade Snapshot");
+
+        let restored = engine.rollback(&snap_id).unwrap();
+        assert!(restored.contains_key("/etc/sigma.conf"));
+        assert!(restored.contains_key("/usr/bin/kernel"));
+        assert!(!restored.contains_key("/home/user/document.txt")); // Excluded by rules
+    }
+
+    #[test]
+    fn test_timeshift_retention_policy() {
+        let mut engine = AdvancedTimeshiftEngine::new(SnapshotBackend::Zfs);
+        engine.retention_policy.keep_boot = 2;
+
+        let mut raw = HashMap::new();
+        raw.insert("/etc/fstab".to_string(), "hash_fstab".to_string());
+
+        let _ = engine.create_checkpoint("Boot 1".to_string(), SnapshotSchedule::Boot, raw.clone());
+        let _ = engine.create_checkpoint("Boot 2".to_string(), SnapshotSchedule::Boot, raw.clone());
+        let _ = engine.create_checkpoint("Boot 3".to_string(), SnapshotSchedule::Boot, raw.clone());
+
+        // Should be capped at 2 boot snapshots according to policy
+        let boot_count = engine.snapshots.iter().filter(|s| s.schedule == SnapshotSchedule::Boot).count();
+        assert_eq!(boot_count, 2);
     }
 }

@@ -356,63 +356,29 @@ impl PackageFormatAdapter for YumRpmAdapter {
 
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
+            "Installing {} using {} adapter",
+            package.name, self.adapter_name()
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
             "Removing {} using {} adapter",
+            package.name, self.adapter_name()
+        );
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "Updating {} using {} adapter",
             package.name, self.adapter_name()
         );
         Ok(())
     }
 }
 
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Updating {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        Ok(())
-    }
-
-    /// Dynamically parses and enforces Flatpak/Snap sandboxing policy constraints onto SigmaOS sandboxes
-    fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut enforced_pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("--share=network") {
-                enforced_pledges.push(String::from("network"));
-            } else if arg.contains("--share=ipc") {
-                enforced_pledges.push(String::from("ipc"));
-            } else if arg.contains("--filesystem=host") {
-                enforced_pledges.push(String::from("unveil_all"));
-            }
-        }
-        enforced_pledges
-    }
-
-    /// Translates Snap squashfs confinement settings to native capability restrictions
-    fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> &'static str {
-        match manifest.confinement.as_str() {
-            "strict" => "strict_pledge_sandbox",
-            "classic" => "unrestricted_legacy",
-            _ => "devmode_permissive",
-        }
-    }
-
-    /// Simulates mounting the AppImage's internal squashfs payload region
-    fn mount_appimage_squashfs(&self, appimage: &AppImageRuntime) -> Result<String, PackageError> {
-        if appimage.squashfs_offset == 0 {
-            return Err(PackageError::InstallationFailed(String::from("Invalid squashfs offset inside AppImage payload")));
-        }
-        Ok(format!("/tmp/.mount_{}_squashfs", appimage.app_name))
-    }
-
-    /// Simulates querying APT repository sources
-    fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        config.enabled_components().len() > 0 && !config.sourcelist_url.is_empty()
-    }
-
-    /// Simulates querying DNF repository sources
-    fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
-        config.enabled && !config.baseurl.is_empty()
-    }
-}
 
 impl AptRepoConfig {
     pub fn enabled_components(&self) -> &[String] {
@@ -459,7 +425,7 @@ impl DependencyResolver {
                 continue;
             }
 
-            visited.push(current.clone());
+            visited.insert(current.clone());
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
@@ -655,18 +621,9 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
         self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
         self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters
-            .insert(PackageFormat::Deb, PackageAdapter::new(PackageFormat::Deb, String::from("AptDeb")));
-        self.adapters
-            .insert(PackageFormat::Rpm, PackageAdapter::new(PackageFormat::Rpm, String::from("YumRpm")));
-        self.adapters
-            .insert(PackageFormat::Pacman, PackageAdapter::new(PackageFormat::Pacman, String::from("Pacman")));
-        self.adapters
-            .insert(PackageFormat::Snap, PackageAdapter::new(PackageFormat::Snap, String::from("Snap")));
-        self.adapters
-            .insert(PackageFormat::Flatpak, PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")));
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")));
+        self.adapters.insert(PackageFormat::Flatpak, flatpak_adapter);
+        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters.insert(PackageFormat::SigmaPkg, sigpkg_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -721,7 +678,7 @@ impl UniversalPackageManager {
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
                         let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
+                        adapter.install(&package)?;
                         break;
                     }
                 }
@@ -741,7 +698,7 @@ impl UniversalPackageManager {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
-                    adapter.remove(package)?;
+                    adapter.remove(&package)?;
                     break;
                 }
             }
@@ -756,7 +713,7 @@ impl UniversalPackageManager {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
-                    adapter.update(package)?;
+                    adapter.update(&package)?;
                     break;
                 }
             }

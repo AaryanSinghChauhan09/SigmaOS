@@ -13,6 +13,14 @@ pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
+pub mod linux_bsd_distro_gaps;
+
+pub use linux_bsd_distro_gaps::{
+    BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
+    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
+    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
+    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+};
 pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
