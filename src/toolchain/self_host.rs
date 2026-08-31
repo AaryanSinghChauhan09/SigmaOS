@@ -65,8 +65,8 @@ impl SelfHostingManager {
             return Err(ToolchainError::CompilerNotFound);
         }
 
-        if source_path.extension().and_then(|s| s.to_str()) != Some("rs") &&
-           source_path.extension().and_then(|s| s.to_str()) != Some("c") {
+        if source_path.extension().and_then(|s: &std::ffi::OsStr| s.to_str()) != Some("rs") &&
+           source_path.extension().and_then(|s: &std::ffi::OsStr| s.to_str()) != Some("c") {
             return Err(ToolchainError::InvalidOutput);
         }
 

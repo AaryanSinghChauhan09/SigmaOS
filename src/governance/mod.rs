@@ -7,8 +7,10 @@ use alloc::format;
 pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
+pub mod supreme_court;
 
 pub use okr::*;
+pub use supreme_court::*;
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
