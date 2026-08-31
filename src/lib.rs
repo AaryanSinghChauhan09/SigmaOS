@@ -49,6 +49,8 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use unimplemented_features::{
+    AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
+    PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
