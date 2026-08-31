@@ -10,6 +10,8 @@ pub use ai_optimizer::{
     AiOptimizer, OptimizationCategory, OptimizationError, OptimizationRecommendation, SystemState,
 };
 pub use system_level::{
-    AutomationError, PerformanceProfile, PredictiveModel, SystemAction, SystemAutomationManager,
-    SystemAutomationRule, SystemEventType, SystemPrediction,
+    AutomatedRacctPolicy, AutomatedSandboxPolicy, AutomationError, DeclarativeSpecState,
+    DistroInspiredAutomationEngine, PerformanceProfile, PredictiveModel, SupervisedService,
+    SupervisedServiceState, SystemAction, SystemAutomationManager, SystemAutomationRule,
+    SystemEventType, SystemPrediction, TieredStorageExtent, TransactionalAutomationHook,
 };
