@@ -35,6 +35,30 @@ pub struct InvocationStackLayout {
     pub stack_alignment_bytes: usize,
 }
 
+#[derive(Debug, Clone)]
+pub struct SyscallAbiMapping {
+    pub os_abi: String,
+    pub syscall_nr: u32,
+    pub syscall_vector: u8,
+    pub arg_registers: Vec<(String, u64)>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SignalFrameContext {
+    pub signal_nr: i32,
+    pub fault_addr: u64,
+    pub instruction_pointer: u64,
+    pub saved_registers: Vec<(String, u64)>,
+}
+
+fn conv_for_os_abi(os_abi: &str) -> CallingConvention {
+    match os_abi {
+        "linux" | "freebsd" | "openbsd" | "netbsd" => CallingConvention::SystemVAmd64,
+        "windows" => CallingConvention::MicrosoftX64,
+        _ => CallingConvention::SystemVAmd64,
+    }
+}
+
 pub struct ABITranslator {
     pub target_arch: CpuArchitecture,
     pub legacy_abi_mode: bool,
@@ -49,6 +73,42 @@ impl ABITranslator {
     }
 
     /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
+    pub fn translate_syscall_abi(&self, os_abi: &str, syscall_nr: u32, args: &[u64]) -> SyscallAbiMapping {
+        let arg_regs = match conv_for_os_abi(os_abi) {
+            _ => vec!["RDI", "RSI", "RDX", "R10", "R8", "R9"],
+        };
+
+        let mut mapped_args = Vec::new();
+        for (i, arg) in args.iter().enumerate().take(6) {
+            if i < arg_regs.len() {
+                mapped_args.push((arg_regs[i].to_string(), *arg));
+            }
+        }
+
+        SyscallAbiMapping {
+            os_abi: os_abi.to_string(),
+            syscall_nr,
+            syscall_vector: 0x80,
+            arg_registers: mapped_args,
+        }
+    }
+
+    pub fn construct_signal_frame_context(&self, signal_nr: i32, fault_addr: u64, ip: u64) -> SignalFrameContext {
+        SignalFrameContext {
+            signal_nr,
+            fault_addr,
+            instruction_pointer: ip,
+            saved_registers: vec![
+                ("RAX".to_string(), 0),
+                ("RBX".to_string(), 0),
+                ("RCX".to_string(), 0),
+                ("RDX".to_string(), 0),
+                ("RSI".to_string(), 0),
+                ("RDI".to_string(), 0),
+            ],
+        }
+    }
+
     pub fn compute_invocation_layout(
         &self,
         params: &[u64],
@@ -400,5 +460,27 @@ mod tests {
         );
         assert!(aapcs64.stack_params.is_empty());
         assert_eq!(aapcs64.stack_alignment_bytes, 16);
+    }
+
+    #[test]
+    fn test_syscall_vector_and_signal_frame_abi_translation() {
+        let translator = ABITranslator::new(CpuArchitecture::X86);
+
+        // Linux x86_64 sys_read (syscall nr 0)
+        let linux_sys_read = translator.translate_syscall_abi("linux", 0, &[3, 0x1000, 64]);
+        assert_eq!(linux_sys_read.syscall_vector, 0x80);
+        assert_eq!(linux_sys_read.arg_registers[0], ("RDI".to_string(), 3));
+
+        // FreeBSD sys_read (syscall nr 3)
+        let bsd_sys_read = translator.translate_syscall_abi("freebsd", 3, &[3, 0x1000, 64]);
+        assert_eq!(bsd_sys_read.syscall_vector, 0x80);
+        assert_eq!(bsd_sys_read.arg_registers[0], ("RDI".to_string(), 3));
+
+        // Signal frame context creation
+        let sig_frame = translator.construct_signal_frame_context(11, 0x7FFF0000, 0x4000);
+        assert_eq!(sig_frame.signal_nr, 11);
+        assert_eq!(sig_frame.fault_addr, 0x7FFF0000);
+        assert_eq!(sig_frame.instruction_pointer, 0x4000);
+        assert_eq!(sig_frame.saved_registers.len(), 6);
     }
 }

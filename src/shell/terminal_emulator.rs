@@ -1034,6 +1034,98 @@ pub struct TerminalMultiplexerV2 {
     pub next_pane_id: u32,
 }
 
+// ==========================================
+// PTY MASTER/SLAVE & TERMIOS JOB CONTROL
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TermiosFlags {
+    pub echo: bool,
+    pub icanon: bool,
+    pub isig: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PtyDevice {
+    pub pty_id: u32,
+    pub is_master: bool,
+    pub buffer: Vec<u8>,
+    pub is_closed: bool,
+}
+
+pub struct PtyMasterSlavePair {
+    pub pair_id: u32,
+    pub master_fd: PtyDevice,
+    pub slave_fd: PtyDevice,
+    pub termios: TermiosFlags,
+}
+
+impl PtyMasterSlavePair {
+    pub fn new(pair_id: u32) -> Self {
+        Self {
+            pair_id,
+            master_fd: PtyDevice {
+                pty_id: pair_id,
+                is_master: true,
+                buffer: Vec::new(),
+                is_closed: false,
+            },
+            slave_fd: PtyDevice {
+                pty_id: pair_id,
+                is_master: false,
+                buffer: Vec::new(),
+                is_closed: false,
+            },
+            termios: TermiosFlags {
+                echo: true,
+                icanon: true,
+                isig: true,
+            },
+        }
+    }
+
+    pub fn write_master(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if self.master_fd.is_closed {
+            return Err("PTY master closed");
+        }
+        self.slave_fd.buffer.extend_from_slice(data);
+        Ok(data.len())
+    }
+
+    pub fn read_slave(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if self.slave_fd.is_closed {
+            return Err("PTY slave closed");
+        }
+        let len = buffer.len().min(self.slave_fd.buffer.len());
+        if len > 0 {
+            let chunk: Vec<u8> = self.slave_fd.buffer.drain(..len).collect();
+            buffer[..len].copy_from_slice(&chunk);
+            Ok(len)
+        } else {
+            Ok(0)
+        }
+    }
+
+    pub fn set_termios(&mut self, termios: TermiosFlags) {
+        self.termios = termios;
+    }
+
+    pub fn send_job_signal(&self, target_pid: u64, signal_nr: i32) -> Result<i32, &'static str> {
+        if !self.termios.isig {
+            return Err("Terminal line discipline ISIG disabled");
+        }
+        let _ = target_pid;
+        Ok(signal_nr)
+    }
+
+    pub fn close(&mut self) {
+        self.master_fd.is_closed = true;
+        self.slave_fd.is_closed = true;
+        self.master_fd.buffer.clear();
+        self.slave_fd.buffer.clear();
+    }
+}
+
 impl TerminalMultiplexerV2 {
     pub fn new(initial_width: usize, initial_height: usize) -> Self {
         let first_pane = TerminalPaneV2 {
@@ -1905,5 +1997,32 @@ mod tests {
 
         assert!(tab_mgr.close_tab(tab2_id));
         assert_eq!(tab_mgr.tabs.len(), 1);
+    }
+
+    #[test]
+    fn test_pty_master_slave_and_job_control_termios() {
+        let mut pty_pair = PtyMasterSlavePair::new(1);
+        assert!(!pty_pair.master_fd.is_closed);
+
+        assert!(pty_pair.write_master(b"echo hello\n").is_ok());
+        let mut slave_read = [0u8; 11];
+        assert_eq!(pty_pair.read_slave(&mut slave_read).unwrap(), 11);
+        assert_eq!(&slave_read, b"echo hello\n");
+
+        // Termios line discipline
+        let termios = TermiosFlags {
+            echo: true,
+            icanon: true,
+            isig: true,
+        };
+        pty_pair.set_termios(termios);
+        assert!(pty_pair.termios.icanon);
+
+        // Job control signal
+        let sig = pty_pair.send_job_signal(200, 20); // SIGTSTP (20)
+        assert_eq!(sig.unwrap(), 20);
+
+        pty_pair.close();
+        assert!(pty_pair.master_fd.is_closed);
     }
 }
