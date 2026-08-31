@@ -12,7 +12,7 @@ type SigmaBool = bool;
 type SigmaU64 = u64;
 
 /// Package states
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub enum XbpsPackageState {
     NotInstalled,
@@ -23,6 +23,7 @@ pub enum XbpsPackageState {
 
 /// XBPS package information
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct XbpsPackage {
     pub name: [u8; 64],
     pub version: [u8; 32],
@@ -35,6 +36,7 @@ pub struct XbpsPackage {
 
 /// XBPS repository
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct XbpsRepository {
     pub name: [u8; 64],
     pub url: [u8; 256],
@@ -248,7 +250,7 @@ pub unsafe extern "C" fn xbps_search(query: *const u8, results: *mut SigmaU32, m
         }
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Upgrade system
@@ -317,7 +319,7 @@ pub unsafe extern "C" fn xbps_list(packages: *mut XbpsPackage, max_count: SigmaU
         }
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Get package count

@@ -42,7 +42,7 @@ pub unsafe extern "C" fn uniq_init() -> SigmaI32 {
 /// Add line to uniq
 #[no_mangle]
 pub unsafe extern "C" fn uniq_add_line(line: *const u8) -> SigmaI32 {
-    if !UNIQ_INITIALIZED || line.isnull() || UNIQ_LINE_COUNT >= MAX_LINES as SigmaU32 {
+    if !UNIQ_INITIALIZED || line.is_null() || UNIQ_LINE_COUNT >= MAX_LINES as SigmaU32 {
         return -1;
     }
     
@@ -64,7 +64,7 @@ pub unsafe extern "C" fn uniq_execute(
     max_output: SigmaU32,
     options: UniqOptions,
 ) -> SigmaU32 {
-    if !UNIQ_INITIALIZED || output.isnull() || UNIQ_LINE_COUNT == 0 {
+    if !UNIQ_INITIALIZED || output.is_null() || UNIQ_LINE_COUNT == 0 {
         return 0;
     }
     
@@ -122,7 +122,7 @@ pub unsafe extern "C" fn uniq_execute(
                 // Output digits in reverse order
                 for i in (0..digit_idx).rev() {
                     if output_idx >= max_output as usize {
-                        return output_idx;
+                        return output_idx as SigmaU32;
                     }
                     *output.add(output_idx) = count_digits[i];
                     output_idx += 1;
@@ -137,7 +137,7 @@ pub unsafe extern "C" fn uniq_execute(
             // Add line
             for i in 0..MAX_LINE_LENGTH {
                 if output_idx >= max_output as usize {
-                    return output_idx;
+                    return output_idx as SigmaU32;
                 }
                 
                 let byte = UNIQ_LINES[current_idx][i];
@@ -156,7 +156,7 @@ pub unsafe extern "C" fn uniq_execute(
         current_idx = next_idx;
     }
     
-    output_idx
+    output_idx as SigmaU32
 }
 
 /// Clear lines

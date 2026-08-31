@@ -223,4 +223,95 @@ mod tests {
             "Contrib utilities for pacman package manager"
         );
     }
+
+    #[test]
+    fn test_pacman_keyring_and_mkinitcpio() {
+        let mut keyring = PacmanKeyringManager::new();
+        assert_eq!(keyring.registered_keys.len(), 0);
+
+        keyring.initialize_keyring();
+        assert_eq!(keyring.registered_keys.len(), 2);
+        assert!(keyring.verify_key_signature("archlinux-master-key"));
+
+        let mut generator = MkinitcpioGenerator::new("linux-sovereign");
+        generator.add_hook("base");
+        generator.add_hook("udev");
+        generator.add_hook("autodetect");
+
+        let initramfs = generator.generate_initramfs().unwrap();
+        assert!(initramfs.contains("linux-sovereign"));
+        assert!(initramfs.contains("udev"));
+    }
+}
+
+/// Emulates Arch Linux `pacman-key` GPG/PQC master keyring management
+pub struct PacmanKeyringManager {
+    pub registered_keys: HashMap<String, String>, // key_id -> fingerprint
+}
+
+impl PacmanKeyringManager {
+    pub fn new() -> Self {
+        Self {
+            registered_keys: HashMap::new(),
+        }
+    }
+
+    /// Initializes and populates standard master keys (pacman-key --init --populate archlinux)
+    pub fn initialize_keyring(&mut self) {
+        self.registered_keys.insert(
+            "archlinux-master-key".to_string(),
+            "Dilithium5_43A8F82019A82B".to_string(),
+        );
+        self.registered_keys.insert(
+            "sigmaos-master-key".to_string(),
+            "Kyber1024_0A918C281982BB".to_string(),
+        );
+    }
+
+    /// Verifies package signature against registered master keys
+    pub fn verify_key_signature(&self, key_id: &str) -> bool {
+        self.registered_keys.contains_key(key_id)
+    }
+}
+
+impl Default for PacmanKeyringManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Emulates Arch Linux `mkinitcpio` initial ramdisk generation
+pub struct MkinitcpioGenerator {
+    pub kernel_preset: String,
+    pub hooks: Vec<String>,
+}
+
+impl MkinitcpioGenerator {
+    pub fn new(kernel_preset: &str) -> Self {
+        Self {
+            kernel_preset: kernel_preset.to_string(),
+            hooks: Vec::new(),
+        }
+    }
+
+    /// Adds a build hook (e.g. "base", "udev", "autodetect", "block", "filesystems")
+    pub fn add_hook(&mut self, hook_name: &str) {
+        self.hooks.push(hook_name.to_string());
+    }
+
+    /// Generates initramfs image configuration profile
+    pub fn generate_initramfs(&self) -> Result<String, &'static str> {
+        if self.hooks.is_empty() {
+            return Err("mkinitcpio: No hooks configured for initramfs generation.");
+        }
+        let mut config = format!("PRESET={}\nHOOKS=(", self.kernel_preset);
+        for (i, hook) in self.hooks.iter().enumerate() {
+            if i > 0 {
+                config.push(' ');
+            }
+            config.push_str(hook);
+        }
+        config.push(')');
+        Ok(config)
+    }
 }

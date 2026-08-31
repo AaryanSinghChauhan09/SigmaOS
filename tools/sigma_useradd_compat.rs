@@ -13,6 +13,7 @@ type SigmaU64 = u64;
 
 /// User account
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct UserAccount {
     pub username: [u8; 32],
     pub uid: SigmaU32,
@@ -85,7 +86,7 @@ pub unsafe extern "C" fn useradd(
     home_dir: *const u8,
     shell: *const u8,
 ) -> SigmaI32 {
-    if !USERADD_INITIALIZED || username.isnull() || USER_COUNT >= MAX_USERS as SigmaU32 {
+    if !USERADD_INITIALIZED || username.is_null() || USER_COUNT >= MAX_USERS as SigmaU32 {
         return -1;
     }
     
@@ -105,7 +106,7 @@ pub unsafe extern "C" fn useradd(
         user.username[i] = byte;
     }
     
-    if !home_dir.isnull() {
+    if !home_dir.is_null() {
         for i in 0..255 {
             let byte = *home_dir.add(i);
             if byte == 0 { break; }
@@ -125,7 +126,7 @@ pub unsafe extern "C" fn useradd(
         }
     }
     
-    if !shell.isnull() {
+    if !shell.is_null() {
         for i in 0..63 {
             let byte = *shell.add(i);
             if byte == 0 { break; }
@@ -151,7 +152,7 @@ pub unsafe extern "C" fn useradd(
 /// Delete user
 #[no_mangle]
 pub unsafe extern "C" fn userdel(username: *const u8) -> SigmaI32 {
-    if !USERADD_INITIALIZED || username.isnull() {
+    if !USERADD_INITIALIZED || username.is_null() {
         return -1;
     }
     
@@ -188,7 +189,7 @@ pub unsafe extern "C" fn userdel(username: *const u8) -> SigmaI32 {
 /// Get user by name
 #[no_mangle]
 pub unsafe extern "C" fn useradd_get_by_name(username: *const u8, user: *mut UserAccount) -> SigmaI32 {
-    if !USERADD_INITIALIZED || username.isnull() || user.isnull() {
+    if !USERADD_INITIALIZED || username.is_null() || user.is_null() {
         return -1;
     }
     
@@ -221,7 +222,7 @@ pub unsafe extern "C" fn useradd_get_by_name(username: *const u8, user: *mut Use
 /// Get user by UID
 #[no_mangle]
 pub unsafe extern "C" fn useradd_get_by_uid(uid: SigmaU32, user: *mut UserAccount) -> SigmaI32 {
-    if !USERADD_INITIALIZED || user.isnull() {
+    if !USERADD_INITIALIZED || user.is_null() {
         return -1;
     }
     
@@ -238,7 +239,7 @@ pub unsafe extern "C" fn useradd_get_by_uid(uid: SigmaU32, user: *mut UserAccoun
 /// List users
 #[no_mangle]
 pub unsafe extern "C" fn useradd_list(users: *mut UserAccount, max_count: SigmaU32) -> SigmaU32 {
-    if !USERADD_INITIALIZED || users.isnull() {
+    if !USERADD_INITIALIZED || users.is_null() {
         return 0;
     }
     
@@ -251,7 +252,7 @@ pub unsafe extern "C" fn useradd_list(users: *mut UserAccount, max_count: SigmaU
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Get user count

@@ -1,7 +1,12 @@
 // SigmaOS Package Module
 pub mod linux_translation;
+pub mod packagekit;
 pub mod store;
 pub mod universal;
+
+pub use packagekit::{
+    PackageKitDaemon, PackageKitPackage, PackageKitRole, PackageKitStatus, PackageKitTransaction,
+};
 
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,

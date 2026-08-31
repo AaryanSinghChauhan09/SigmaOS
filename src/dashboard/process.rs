@@ -285,7 +285,7 @@ impl ProcessManager {
     }
 
     /// Execute action on process
-    pub fn execute_action(&mut self, pid: u32, action: ProcessAction) -> Result<(), ProcessError> {
+    pub fn execute_action(&mut self, _pid: u32, action: ProcessAction) -> Result<(), ProcessError> {
         // Simulated action execution
         match action {
             ProcessAction::Terminate => {

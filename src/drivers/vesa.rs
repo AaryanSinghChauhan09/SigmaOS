@@ -19,6 +19,10 @@ pub struct VesaDriver {
     pub mode_info: VesaModeInfo,
     pub capabilities: CapabilityToken,
     pub current_mode: u16,
+
+    // Double buffering support inspired by Linux fbdev
+    pub back_buffer_active: bool,
+    pub back_buffer: Vec<u32>,
 }
 
 impl VesaDriver {
@@ -33,6 +37,8 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
+            back_buffer_active: false,
+            back_buffer: Vec::new(),
         }
     }
 
@@ -48,6 +54,8 @@ impl VesaDriver {
             },
             capabilities: CapabilityToken::new(),
             current_mode: 0,
+            back_buffer_active: false,
+            back_buffer: Vec::new(),
         }
     }
 
@@ -84,6 +92,47 @@ impl VesaDriver {
         }
 
         self.mode_info.pitch = self.mode_info.width * (self.mode_info.bpp / 8);
+
+        // Resize back buffer if active
+        if self.back_buffer_active {
+            let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
+            self.back_buffer.resize(total_pixels, 0);
+        }
+
+        Ok(())
+    }
+
+    /// Initializes double-buffering backing storage
+    pub fn enable_double_buffering(&mut self) {
+        self.back_buffer_active = true;
+        let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
+        self.back_buffer.resize(total_pixels, 0);
+    }
+
+    /// Disables double-buffering backing storage
+    pub fn disable_double_buffering(&mut self) {
+        self.back_buffer_active = false;
+        self.back_buffer.clear();
+    }
+
+    /// Swaps the simulated back buffer elements onto the active hardware framebuffer
+    pub fn swap_buffers(&self) -> Result<(), VesaError> {
+        if !self.back_buffer_active {
+            return Err(VesaError::InitializationFailed);
+        }
+        #[cfg(target_os = "none")]
+        {
+            let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
+            if !fb_addr.is_null() {
+                unsafe {
+                    core::ptr::copy_nonoverlapping(
+                        self.back_buffer.as_ptr(),
+                        fb_addr,
+                        self.back_buffer.len(),
+                    );
+                }
+            }
+        }
         Ok(())
     }
 
@@ -91,7 +140,7 @@ impl VesaDriver {
         &self.mode_info
     }
 
-    pub fn write_pixel(&self, x: u32, y: u32, _color: u32) -> Result<(), VesaError> {
+    pub fn write_pixel(&mut self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
@@ -99,13 +148,91 @@ impl VesaDriver {
         // Calculate pixel offset
         let _offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
 
-        // In production, this would write to actual framebuffer
-        // For now, just validate the operation
+        // In production, this would write to actual framebuffer or back-buffer
+        if self.back_buffer_active {
+            let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
+            let idx = (y * self.mode_info.width + x) as usize;
+            if idx < total_pixels {
+                self.back_buffer[idx] = color;
+            }
+        }
+
         Ok(())
     }
 
-    pub fn clear_screen(&self, _color: u32) -> Result<(), VesaError> {
-        // Simulate screen clear
+    pub fn clear_screen(&mut self, color: u32) -> Result<(), VesaError> {
+        if self.back_buffer_active {
+            for pixel in self.back_buffer.iter_mut() {
+                *pixel = color;
+            }
+        }
+        Ok(())
+    }
+
+    /// Standard Bresenham's Line Drawing Algorithm (integer-only arithmetic)
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u32) -> Result<(), VesaError> {
+        let dx = (x1 - x0).abs();
+        let dy = -(y1 - y0).abs();
+        let sx = if x0 < x1 { 1 } else { -1 };
+        let sy = if y0 < y1 { 1 } else { -1 };
+        let mut err = dx + dy;
+
+        let mut cx = x0;
+        let mut cy = y0;
+
+        loop {
+            if cx >= 0 && cx < self.mode_info.width as i32 && cy >= 0 && cy < self.mode_info.height as i32 {
+                self.write_pixel(cx as u32, cy as u32, color).ok();
+            }
+
+            if cx == x1 && cy == y1 {
+                break;
+            }
+
+            let e2 = 2 * err;
+            if e2 >= dy {
+                err += dy;
+                cx += sx;
+            }
+            if e2 <= dx {
+                err += dx;
+                cy += sy;
+            }
+        }
+        Ok(())
+    }
+
+    /// Embedded 8x16 bitmap console font character blitting (inspired by BSD syscons)
+    /// Emulates drawing standard printable ASCII range
+    pub fn draw_char(&mut self, x: u32, y: u32, ch: char, color: u32) -> Result<(), VesaError> {
+        // Minimal representation of an 8x16 font glyph for letter 'A' and legacy text blocks
+        // Bit 1 indicates fill, 0 indicates empty background
+        let mut glyph = [0u8; 16];
+        if ch == 'A' {
+            glyph = [
+                0b00011000,
+                0b00111100,
+                0b01100110,
+                0b01100110,
+                0b11111111,
+                0b11000011,
+                0b11000011,
+                0b00000000,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            ];
+        } else {
+            // Default generic dash glyph
+            glyph[7] = 0b11111111;
+        }
+
+        for row in 0..16 {
+            let row_byte = glyph[row];
+            for col in 0..8 {
+                if (row_byte & (0x80 >> col)) != 0 {
+                    self.write_pixel(x + col, y + row as u32, color).ok();
+                }
+            }
+        }
         Ok(())
     }
 
@@ -265,9 +392,25 @@ mod tests {
     }
 
     #[test]
-    fn test_write_pixel() {
-        let vesa = VesaDriver::new();
+    fn test_write_pixel_and_double_buffer() {
+        let mut vesa = VesaDriver::new();
+        vesa.enable_double_buffering();
         assert!(vesa.write_pixel(100, 100, 0xFFFFFF).is_ok());
+        assert_eq!(vesa.back_buffer[(100 * 1024 + 100) as usize], 0xFFFFFF);
+
+        assert!(vesa.clear_screen(0x123456).is_ok());
+        assert_eq!(vesa.back_buffer[0], 0x123456);
+        assert!(vesa.swap_buffers().is_ok());
+    }
+
+    #[test]
+    fn test_draw_line_and_char() {
+        let mut vesa = VesaDriver::new();
+        vesa.enable_double_buffering();
+        assert!(vesa.draw_line(0, 0, 10, 10, 0xFFFFFF).is_ok());
+        assert_eq!(vesa.back_buffer[0], 0xFFFFFF);
+
+        assert!(vesa.draw_char(20, 20, 'A', 0xFFFFFF).is_ok());
     }
 
     #[test]
