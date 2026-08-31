@@ -1,6 +1,7 @@
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -21,11 +22,15 @@ pub trait PackageHook: Send + Sync {
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
 }
 
+use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 #[cfg(test)]
 use crate::klib::HashMap;
@@ -282,6 +287,218 @@ impl UnifiedPackage {
     pub fn has_conflict_with(&self, other: &UnifiedPackage) -> bool {
         self.conflicts.iter().any(|c| c == &other.name)
             || other.conflicts.iter().any(|c| c == &self.name)
+    }
+}
+
+// =========================================================================
+// Multi-Distro Package Translator & Dependency Normalizer (Bedrock / Bedrock-brl inspired)
+// =========================================================================
+
+/// Distro package metadata representation prior to SigmaPkg translation
+#[derive(Debug, Clone)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+/// Multi-Distro Package Translator translating APT, Pacman, DNF, APK, XBPS, and Ports into SigmaPkg objects
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    /// Normalizes distro-specific package dependency name differences into unified SigmaPkg virtual dependency tokens
+    pub fn normalize_dependency_name(dep: &str) -> String {
+        let clean = dep.trim().split(' ').next().unwrap_or(dep);
+        match clean {
+            // C Library & Compilers
+            "libc6" | "glibc" | "musl" | "libc" => "sovereign-libc".to_string(),
+            "gcc" | "gcc-c++" | "g++" | "clang" | "build-base" => "sovereign-build-essential".to_string(),
+
+            // SSL & Security Libraries
+            "libssl-dev" | "openssl-devel" | "openssl-dev" | "libssl3" => "sovereign-openssl".to_string(),
+
+            // Python Runtimes
+            "python3" | "python" | "python3-minimal" | "python3-base" => "sovereign-python3".to_string(),
+
+            // Node.js Runtimes & Package Managers
+            "nodejs" | "node" | "nodejs-lts" | "node20" => "sovereign-nodejs".to_string(),
+
+            // X11 / Display / GUI Libraries
+            "libx11-dev" | "libX11-devel" | "libx11" => "sovereign-libx11".to_string(),
+            "libwayland-dev" | "wayland-devel" | "wayland" => "sovereign-wayland".to_string(),
+
+            // Audio Subsystems
+            "libpipewire-0.3-dev" | "pipewire-devel" | "pipewire" => "sovereign-pipewire".to_string(),
+
+            // Compression Utilities
+            "zlib1g-dev" | "zlib-devel" | "zlib" => "sovereign-zlib".to_string(),
+
+            // Default: preserve original clean name
+            other => format!("sovereign-pkg-{}", other),
+        }
+    }
+
+    /// Converts a foreign distro manifest (.deb, .rpm, .pkg.tar.zst, .apk, .xbps, .pkg) into native SigmaPkg
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut sigma_pkg = UnifiedPackage::new(
+            format!("sigpkg-{}", manifest.original_name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_format(manifest.raw_format);
+
+        // Register original name in provides for cross-distro compatibility
+        sigma_pkg = sigma_pkg.with_provides(manifest.original_name.clone());
+
+        // Register additional raw provides
+        for prov in &manifest.raw_provides {
+            sigma_pkg = sigma_pkg.with_provides(prov.clone());
+        }
+
+        // Map and normalize dependencies into unified SigmaPkg virtual dependency tokens
+        for dep in &manifest.raw_dependencies {
+            let normalized = Self::normalize_dependency_name(dep);
+            sigma_pkg = sigma_pkg.with_dependency(normalized);
+        }
+
+        // Map conflicts
+        for conflict in &manifest.raw_conflicts {
+            sigma_pkg = sigma_pkg.with_conflict(conflict.clone());
+        }
+
+        sigma_pkg
+    }
+}
+
+// =========================================================================
+// External Distribution Repository Synchronizer (APT, ALPM, DNF, APKINDEX, XBPS, Ports)
+// =========================================================================
+
+/// Representation of an external Linux/BSD distribution repository channel
+#[derive(Debug, Clone)]
+pub struct DistroRepoChannel {
+    pub distro_name: String,
+    pub format: PackageFormat,
+    pub repo_url: String,
+    pub channel_suite: String,
+    pub is_enabled: bool,
+    pub package_count: usize,
+}
+
+/// External Distribution Repository Synchronizer for multi-distro indexing
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<DistroRepoChannel>,
+    pub indexed_manifests: BTreeMap<String, ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            registered_repos: Vec::new(),
+            indexed_manifests: BTreeMap::new(),
+        };
+
+        // Register default Linux & BSD repository mirrors
+        engine.register_default_repos();
+        engine
+    }
+
+    fn register_default_repos(&mut self) {
+        self.registered_repos.push(DistroRepoChannel {
+            distro_name: "Debian".to_string(),
+            format: PackageFormat::Deb,
+            repo_url: "https://deb.debian.org/debian".to_string(),
+            channel_suite: "bookworm".to_string(),
+            is_enabled: true,
+            package_count: 65000,
+        });
+
+        self.registered_repos.push(DistroRepoChannel {
+            distro_name: "ArchLinux".to_string(),
+            format: PackageFormat::Pacman,
+            repo_url: "https://geo.mirror.pkgbuild.com".to_string(),
+            channel_suite: "core".to_string(),
+            is_enabled: true,
+            package_count: 14000,
+        });
+
+        self.registered_repos.push(DistroRepoChannel {
+            distro_name: "Fedora".to_string(),
+            format: PackageFormat::Rpm,
+            repo_url: "https://mirrors.fedoraproject.org".to_string(),
+            channel_suite: "releases/40".to_string(),
+            is_enabled: true,
+            package_count: 38000,
+        });
+
+        self.registered_repos.push(DistroRepoChannel {
+            distro_name: "Alpine".to_string(),
+            format: PackageFormat::Apk,
+            repo_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
+            channel_suite: "v3.20/main".to_string(),
+            is_enabled: true,
+            package_count: 11000,
+        });
+
+        self.registered_repos.push(DistroRepoChannel {
+            distro_name: "FreeBSD".to_string(),
+            format: PackageFormat::Ports,
+            repo_url: "https://pkg.freebsd.org/FreeBSD:14:amd64".to_string(),
+            channel_suite: "latest".to_string(),
+            is_enabled: true,
+            package_count: 33000,
+        });
+    }
+
+    /// Register a foreign distro package manifest into the local index
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests
+            .insert(manifest.original_name.clone(), manifest);
+    }
+
+    /// Look up and translate a foreign package into native SigmaPkg
+    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .get(pkg_name)
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+    }
+
+    /// Query total indexed multi-distro packages
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Multi-Distro Package Adapter Execution Pipeline
+// =========================================================================
+
+/// Universal Distro Adapter Pipeline executing cross-distro package installations
+pub struct UniversalDistroAdapterPipeline;
+
+impl UniversalDistroAdapterPipeline {
+    /// Ingests a foreign distro package file (.deb, .rpm, .apk, .pkg.tar.zst, .xbps),
+    /// converts it to SigmaPkg, and installs it using UniversalPackageManager
+    pub fn ingest_and_install_foreign_package(
+        manager: &mut UniversalPackageManager,
+        manifest: ForeignDistroManifest,
+    ) -> Result<(), PackageError> {
+        let sigma_pkg = UniversalPackageTranslator::translate_to_sigma_pkg(&manifest);
+        let pkg_name = sigma_pkg.name.clone();
+
+        manager.add_package(sigma_pkg);
+        manager.install(&pkg_name)
     }
 }
 
@@ -798,6 +1015,7 @@ pub struct UniversalPackageManager {
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
     pub node_distro_engine: NodeBinaryDistroEngine,
+    pub distro_repo_sync: DistroRepoSyncEngine,
 }
 
 impl UniversalPackageManager {
@@ -811,6 +1029,7 @@ impl UniversalPackageManager {
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
+            distro_repo_sync: DistroRepoSyncEngine::new(),
         };
 
         manager.add_default_adapters();
@@ -837,6 +1056,14 @@ impl UniversalPackageManager {
         self.installed_packages
             .insert(format!("nodejs-{}", package.version), pkg);
         Ok(store_path)
+    }
+
+    /// Ingest and translate any foreign distro package manifest (.deb, .rpm, .apk, .xbps, .pkg) into native SigmaPkg
+    pub fn install_foreign_distro_package(
+        &mut self,
+        manifest: ForeignDistroManifest,
+    ) -> Result<(), PackageError> {
+        UniversalDistroAdapterPipeline::ingest_and_install_foreign_package(self, manifest)
     }
 
     /// Registers a user-defined lifecycle hook
@@ -1249,6 +1476,7 @@ mod tests {
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
         assert!(manager.adapters.len() >= 25);
+        assert!(manager.distro_repo_sync.registered_repos.len() >= 5);
     }
 
     #[test]
@@ -1322,6 +1550,60 @@ mod tests {
         // 3. Roll back to baseline checkpoint
         manager.rollback_to_checkpoint(checkpoint_id).unwrap();
         assert_eq!(manager.installed_packages.len(), 0);
+    }
+
+    #[test]
+    fn test_foreign_distro_package_translation_and_installation() {
+        let mut manager = UniversalPackageManager::new();
+
+        let foreign_deb = ForeignDistroManifest {
+            raw_format: PackageFormat::Deb,
+            original_name: "curl".to_string(),
+            version: "8.5.0".to_string(),
+            architecture: "amd64".to_string(),
+            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string()],
+            raw_provides: vec!["http-client".to_string()],
+            raw_conflicts: vec!["curl-legacy".to_string()],
+            maintainer: "Debian Packagers".to_string(),
+        };
+
+        // Pre-seed dependencies
+        manager.add_package(UnifiedPackage::new("sovereign-openssl".to_string(), "3.0.0".to_string()).with_format(PackageFormat::SigmaPkg));
+        manager.add_package(UnifiedPackage::new("sovereign-libc".to_string(), "2.38.0".to_string()).with_format(PackageFormat::SigmaPkg));
+
+        assert!(manager.install_foreign_distro_package(foreign_deb).is_ok());
+        assert!(manager.installed_packages.get("sigpkg-curl").is_some());
+
+        let installed = manager.installed_packages.get("sigpkg-curl").unwrap();
+        assert_eq!(installed.version, "8.5.0");
+        assert!(installed.provides.contains(&"curl".to_string()));
+        assert!(installed.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(installed.dependencies.contains(&"sovereign-libc".to_string()));
+    }
+
+    #[test]
+    fn test_distro_repo_sync_engine() {
+        let mut sync = DistroRepoSyncEngine::new();
+        assert!(sync.registered_repos.iter().any(|r| r.distro_name == "Debian"));
+        assert!(sync.registered_repos.iter().any(|r| r.distro_name == "ArchLinux"));
+
+        let foreign_rpm = ForeignDistroManifest {
+            raw_format: PackageFormat::Rpm,
+            original_name: "nginx".to_string(),
+            version: "1.26.0".to_string(),
+            architecture: "x86_64".to_string(),
+            raw_dependencies: vec!["openssl-devel".to_string()],
+            raw_provides: vec!["web-server".to_string()],
+            raw_conflicts: Vec::new(),
+            maintainer: "Fedora Project".to_string(),
+        };
+
+        sync.index_foreign_manifest(foreign_rpm);
+        assert_eq!(sync.total_indexed_packages(), 1);
+
+        let translated = sync.find_and_translate("nginx").unwrap();
+        assert_eq!(translated.name, "sigpkg-nginx");
+        assert!(translated.dependencies.contains(&"sovereign-openssl".to_string()));
     }
 
     #[test]
