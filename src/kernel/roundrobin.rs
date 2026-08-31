@@ -1,6 +1,9 @@
 // SigmaOS Round-Robin Scheduler
 // Enhanced priority-aware round-robin with process yielding and context tracking
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// CPU register context saved during a context switch
@@ -498,7 +501,8 @@ impl SovereignMultiQueueRoundRobin {
     }
 
     pub fn tick_cpu(&mut self, cpu_id: u8) {
-        for queue in [&mut self.realtime_queue, &mut self.high_queue, &mut self.normal_queue] {
+        let queues: [&mut Vec<MultiQueueTask>; 3] = [&mut self.realtime_queue, &mut self.high_queue, &mut self.normal_queue];
+        for queue in queues {
             for task in queue.iter_mut() {
                 if task.cpu_id == cpu_id && task.state == ProcessState::Running {
                     if task.time_slice_remaining_ms > 0 {
@@ -531,6 +535,7 @@ pub enum SchedulerError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_roundrobin_creation() {
