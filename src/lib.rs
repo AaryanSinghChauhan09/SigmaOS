@@ -1,20 +1,31 @@
+#![no_std]
+#![allow(clippy::all, unused)]
+
+#[macro_use]
+extern crate alloc;
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+#[macro_use]
+pub mod klib;
 
-// Core working modules
 pub mod accessibility;
+pub mod ai;
+pub mod arch;
+pub mod audio;
 pub mod automation;
+pub mod boot;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod filesystem;
 pub mod kernel;
-pub mod klib;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -26,6 +37,7 @@ pub mod remote;
 pub mod resilience;
 pub mod security;
 pub mod shell;
+pub mod runtime;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
@@ -43,6 +55,15 @@ pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod open_source_obsoletion;
+pub mod open_source_os_gap_closure;
+
+pub use open_source_os_gap_closure::{
+    BfsAttribute, BfsIndexedFile, CrossbowVnic, DriverHealthState, HaikuBfsAttributeEngine,
+    ManagedDriverUnit, Minix3ReincarnationServer, NetBsdRumpKernelEngine, Plan9Message,
+    Plan9MessageType, Plan9P2000ProtocolEngine, Plan9RforkFlags, RumpDeviceNode,
+    SmartOsCrossbowVnicEngine,
+};
 
 pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
@@ -50,6 +71,26 @@ pub use unimplemented_features::{
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+};
+pub use distro::{
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
+    GpuSwitchMode, Hammer2PfsClusterQuorumEngine, HardenedBsdPaxGuardEngine, PaxViolationType,
+};
+pub use security::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use driver::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
@@ -65,66 +106,98 @@ pub mod hardware {
     pub mod compatibility;
     pub mod win32;
 }
+pub mod init;
+pub mod ml;
+pub mod performance;
 pub mod power {
     pub mod governor;
 }
-pub mod boot;
-pub use boot::*;
-pub mod toolchain {
-    pub mod adapter;
-    pub mod bootstrap;
-    pub mod capsule;
-    pub mod codex;
+pub mod scheduler {
+    pub mod numa_scheduler;
 }
-pub mod scheduler;
+pub mod toolchain;
+pub mod ui;
 pub mod crypto {
     pub mod vectorized_pqc;
 }
+pub mod distro_innovations;
+pub mod extended_distro_matrix;
+pub mod linuxmint_inspirations;
+pub mod arch_kernel_inspirations;
+pub mod distro_inspirations;
 
-pub mod logging;
-pub mod ai;
-pub mod system;
-pub mod installer;
-pub mod performance;
-pub mod ml;
-pub mod iot;
+pub use compatibility::mint_linux::{
+    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine,
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    WindowsBootloaderType,
+};
 
-// Temporarily disabled problematic modules
-// pub mod accessibility;
-// pub mod automation;
-// pub mod compatibility;
-// pub mod container;
-// pub mod customization;
-// pub mod dashboard;
-// pub mod desktop;
-// pub mod device;
-// pub mod driver;
-// pub mod filesystem;
-// pub mod ml;
-// pub mod network;
-// pub mod observability;
-// pub mod orchestration;
-pub mod distro;
-// pub mod package;
-// pub mod performance;
-// pub mod productivity;
-// pub mod remote;
-// pub mod resilience;
-// pub mod shell;
-// pub mod sigpkg;
-// pub mod virtualization;
-// pub mod graphics {
-//     pub mod compositor;
-//     pub mod paint;
-//     pub mod video;
-// }
-// pub mod power {
-//     pub mod governor;
-// }
-// pub mod ai {
-//     pub mod agent;
-//     pub mod orchestrator;
-// }
-// pub mod boot;
-// pub mod system;
-// pub mod installer;
+pub use linuxmint_inspirations::{
+    AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
+    FsFormat, HypnotixIptvPlayer, IsolationMode, LanPeer, LanWarpEngine, MintConfigHub,
+    MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintWelcomeFlow, NannyDecision,
+    ProviderType, RenameRule, TransferOutcome, TvChannel, WebEngineKind, Webapp, WebappManager,
+    XAppThemeEngine, ThingyEntry, ThingyKind, ThingyRecentDocs, WelcomeStep,
+    WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
+};
+
+pub use arch_kernel_inspirations::{
+    AdvisorySeverity, AlpmAction, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
+    AlpmTransactionItem, Expectation, ExpectationKind, HookAction, InitramfsHook, KUnitEngine,
+    KUnitSuiteResult, KUnitTestCase, MkinitcpioHookFramework, PackageSignoff, RebuildOrderSolver,
+    ReproducibleBuildVerdict, ReproducibleStatus, SecurityAdvisory, SecurityAdvisoryTracker,
+    Signer, SignerPolicy, SignoffCount, SignoffEntry, SignstarService,
+};
+
+pub use distro_inspirations::{
+    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackarchTool, BlackmanBuild,
+    ElevateMigration, FlatcarImmutableRootfs, FormFactor, FreePolicyVerdict, GamescopeCompositor,
+    InterfaceFlag, IsolationKind, KaliMetapackage, KaliToolGroup, NebraskaInstance,
+    NebraskaUpdateServer, PhoshConvergence, PressureVessel, PuppySaveSession, PureosFreePolicy,
+    RancherOsCloudConfig, RaspiConfigTool, ReleaseChannel, SaveMode, SigRepository, SteamABImageUpdate,
+    TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
+};
+
+pub use tools::simple_scan::{
+    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource,
+    ScannedPage, SovereignSimpleScanEngine,
+};
+
+pub use compatibility::fedora::{
+    CryptoPolicyLevel, FedoraAdwaitaIconThemeEngine, FedoraAnacondaKickstartGenerator,
+    FedoraBtrfsSnapshot, FedoraBtrfsSnapperSnapshotEngine, FedoraCockpitWebConsoleEngine,
+    FedoraCoprRepositoryEngine, FedoraCryptoPoliciesEngine, FedoraDeskletItem,
+    FedoraDeskletWidgetEngine, FedoraDnf5PackageEngine, FedoraDnfHistoryRollbackEngine,
+    FedoraDnfTransaction, FedoraFirewalldPolicyEngine, FedoraFlatpakSandboxManager,
+    FedoraFolderColorSwitcherEngine, FedoraGettextL10nEngine, FedoraGnomeCinnamonShellBridge,
+    FedoraGpuPowerMode, FedoraKeyringPamModule, FedoraKojiTaskRunner,
+    FedoraLiveMediaOverlayEngine, FedoraMediaWriterEngine, FedoraMockChrootEnvironment,
+    FedoraNautilusFileBrowserEngine, FedoraNvidiaPrimeSwitcherEngine,
+    FedoraPipewireAudioSessionEngine, FedoraSilverblueRpmOstreeEngine,
+    FedoraSsdEnterpriseDirectoryClient, FedoraWebappContainerEngine, FedoraWebappProfile,
+    FedoraWelcomeInitialSetupEngine, FolderColor,
+};
+
+pub mod auth;
+pub mod app;
+pub mod drivers;
+
+pub use desktop::mate_betsy::{
+    AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
+    MateBetsyDesktopEnvironment, PlumaTextEditor,
+};
+
+pub use ui::gtk::{
+    AdwNavigationSplitView, AdwPreferencesEngine, BsdGtkSandboxGuard, GtkAccentColor,
+    GtkCssProvider, GtkHeaderBar, GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine,
+    XAppStatusIconManager,
+};
+
+pub use customization::{
+    MdmAccessibilitySettings, MdmBackgroundType, MdmMonitorPosition, MdmMultiMonitorConfig,
+    MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind, MdmThemeInfo, MdmUserAvatar,
+    SovereignMdmThemeEngine,
+};
+
+pub use tools::display_manager::{DMError, DisplayManager, Session, SessionType, User};
