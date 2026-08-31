@@ -25,8 +25,7 @@ use crate::sigpkg::Package;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-/// PathBuf-like alias using String for no_std compatibility
-type PathBuf = alloc::string::String;
+pub use crate::klib::path::PathBuf;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -54,11 +53,11 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = alloc::format!("{}/{}-{}", self.base_path, hash, package.name);
+        let package_path_str = alloc::format!("{}/{}-{}", self.base_path, hash, package.name);
 
         let stored = StoredPackage {
             package: package.clone(),
-            path: package_path.clone(),
+            path: PathBuf::from(package_path_str.as_str()),
             hash: hash.clone(),
         };
 
@@ -283,7 +282,8 @@ impl NixOsHermeticCasStore {
         let hash_str = alloc::format!("{:016x}", hash_val);
 
         let folder_name = alloc::format!("{}-{}-{}", hash_str, pkg_name, version);
-        let store_path = alloc::format!("{}/{}", self.store_dir, folder_name);
+        let store_path_str = alloc::format!("{}/{}", self.store_dir, folder_name);
+        let store_path = PathBuf::from(store_path_str.as_str());
         self.store_paths
             .insert(pkg_name.to_string(), store_path.clone());
         store_path

@@ -218,7 +218,7 @@ impl SigpkgClient {
         Self {
             repository_url: repository_url.to_string(),
             verifier: CryptoVerifier::new(),
-            store: ContentAddressedStore::new("/var/lib/sigpkg/store".to_string()),
+            store: ContentAddressedStore::new(crate::klib::path::PathBuf::from("/var/lib/sigpkg/store")),
             metadata: BTreeMap::new(),
         }
     }
