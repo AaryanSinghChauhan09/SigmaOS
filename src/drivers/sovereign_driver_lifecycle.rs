@@ -167,6 +167,33 @@ mod tests {
             DriverLifecycleState::Active
         );
 
+        // Register Nouveau Nvidia Driver
+        let nouveau_id = mgr.register_driver_factory(
+            "nouveau-sovereign-drm",
+            HardwareTier::ModernBareMetal,
+            Some(0x10de),
+            Some(0x2782),
+        );
+        assert_eq!(mgr.autoprobe_pci_bus(0x10de, 0x2782), Some(nouveau_id));
+
+        // Register Apple Silicon ANS2 NVMe Driver
+        let ans2_id = mgr.register_driver_factory(
+            "apple-ans2-nvme",
+            HardwareTier::ModernBareMetal,
+            Some(0x106b),
+            Some(0x2001),
+        );
+        assert_eq!(mgr.autoprobe_pci_bus(0x106b, 0x2001), Some(ans2_id));
+
+        // Register Intel Wi-Fi 7 BE200 Driver
+        let be200_id = mgr.register_driver_factory(
+            "intel-be200-wifi7",
+            HardwareTier::ModernBareMetal,
+            Some(0x8086),
+            Some(0x272b),
+        );
+        assert_eq!(mgr.autoprobe_pci_bus(0x8086, 0x272b), Some(be200_id));
+
         // Lockless SPSC DMA Queue test
         let mut dma_queue = LocklessDmaRingQueue::<4>::new();
         assert!(dma_queue.enqueue_descriptor(0x1000).is_ok());
