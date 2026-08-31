@@ -1,44 +1,18 @@
-# SigmaOS Architecture
+# SigmaOS Technical Architecture
 
-See the [Architecture Wiki page](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture) for the full deep-dive.
+This document outlines the high-level technical architecture of SigmaOS. For more detailed and up-to-date information, please see our [Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) (specifically the Architecture section).
 
-## Quick Overview
+## Overview
+SigmaOS is built on a **microkernel architecture** written in Rust. It emphasizes:
+1. **Memory Safety**: Leveraging Rust's ownership model to prevent memory leaks and data races.
+2. **Capability-based Security**: Sentinel, our security subsystem, ensures that processes only access what they explicitly have tokens for.
+3. **Modularity**: Device drivers, network stacks, and filesystems run as unprivileged user-space servers.
 
-```
-User Applications (Native, Flatpak, AppImage, AUR)
-         ↓
-Desktop Environment (Zenith + Sigma Shell + Wayland)
-         ↓
-System Services (sigma-init, D-Bus, Polkit, logging)
-         ↓
-S-AI Layer (Orchestrator, LLM Router, Copilot)
-         ↓
-Security Layer (SELinux, AppArmor, Sentinel, pledge)
-         ↓
-Sigma Kernel (EEVDF/BORE, Memory, IPC, VFS, Drivers)
-         ↓
-Hardware (x86_64, ARM64, RISC-V, UEFI, PCIe)
-```
+## Core Components
+- **The Microkernel**: Handles IPC, thread scheduling, and interrupts.
+- **VFS (Virtual Filesystem)**: User-space server coordinating mount points and inode access.
+- **sigpkg**: Universal multiformat packaging system capable of handling source compilation and OCI images.
+- **Palette**: The display server and graphical user interface.
+- **Bolt**: A low-latency audio subsystem.
 
-## Key Design Principles
-
-1. **Zero-dependency**: Core kernel with no external C runtime dependencies
-2. **Security-first**: Every layer has defence-in-depth mechanisms
-3. **AI-native**: AI orchestration built into the OS, not bolted on
-4. **Compatibility**: Run existing Linux apps without modification
-5. **Performance**: EEVDF+BORE scheduler, eBPF, NUMA-aware design
-
-## Module Map
-
-| Module | Path | Purpose |
-|--------|------|---------|
-| Kernel | `src/kernel/` | Core scheduler, memory, IPC |
-| AI | `src/ai/` | S-AI orchestrator and agents |
-| Security | `src/security/` | MAC, crypto, sandboxing |
-| Network | `src/network/` | TCP/UDP, firewall, WireGuard |
-| Container | `src/container/` | OCI runtime, sandboxing |
-| Boot | `src/boot/` | UEFI, TPM, sigma-init |
-| Package | `src/sigpkg/` | Package management |
-| Distro | `src/distro/` | Linux/BSD parity |
-| Desktop | `src/shell/` | Shell, terminal, aliases |
-| klib | `src/klib/` | No-std collection library |
+Please refer to the source tree (`src/kernel`, `src/servers`, etc.) for implementation details.

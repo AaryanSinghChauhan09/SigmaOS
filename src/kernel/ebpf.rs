@@ -4,10 +4,7 @@
 
 extern crate alloc;
 
-#[path = "../klib/mod.rs"]
-mod klib;
-
-use klib::HashMap;
+use crate::klib::HashMap;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

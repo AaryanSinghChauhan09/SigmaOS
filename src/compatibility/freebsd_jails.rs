@@ -8,9 +8,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 
-#[path = "../klib/mod.rs"]
-mod klib;
-use klib::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;
