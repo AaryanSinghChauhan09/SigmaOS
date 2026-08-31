@@ -24,6 +24,5 @@ jobs:
 
       - name: Test Kernel Scheduler Submodule
         run: |
-          mkdir -p build
           rustc --test src/kernel/scheduler.rs --edition=2021 -o build/sched_test
           ./build/sched_test

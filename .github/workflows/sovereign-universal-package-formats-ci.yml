@@ -24,6 +24,5 @@ jobs:
 
       - name: Test Universal Package Manager Submodule
         run: |
-          mkdir -p build
           rustc --test src/package/universal.rs --edition=2021 -o build/package_test
           ./build/package_test
