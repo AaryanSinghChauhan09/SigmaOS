@@ -18,8 +18,20 @@ pub enum DistroSubsystemMode {
     LinuxDebian,
     LinuxAlpine,
     LinuxNix,
+    LinuxGentoo,
+    LinuxFedora,
     FreeBsd,
     OpenBsd,
+    NetBsd,
+    DragonFlyBsd,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceSupervisorType {
+    Systemd,
+    OpenRC,
+    Runit,
+    Shepherd,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -45,25 +57,47 @@ impl SovereignUniversalDistroBridge {
         self.mode = mode;
     }
 
+    pub fn get_supervisor_type(&self) -> ServiceSupervisorType {
+        match self.mode {
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
+            DistroSubsystemMode::LinuxAlpine => ServiceSupervisorType::Runit,
+            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
+        }
+    }
+
+    pub fn translate_vfs_path(&self, generic_path: &str) -> String {
+        match (self.mode, generic_path) {
+            (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
+            (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
+            (DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/etc") => "/etc".to_string(),
+            _ => generic_path.to_string(),
+        }
+    }
+
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
+            DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
+            DistroSubsystemMode::LinuxFedora => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::FreeBsd => format!("{}.pkg", input_pkg),
             DistroSubsystemMode::OpenBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
         }
     }
 
     pub fn enforce_security_isolation(&mut self, pid: u64, root_path: &str) -> Result<(), &'static str> {
         match self.mode {
-            DistroSubsystemMode::FreeBsd => {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
                 Ok(())
             }
-            DistroSubsystemMode::OpenBsd => {
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
                 self.pledge_sentinel.pledge_process(pid, &["stdio", "rpath", "wpath"])?;
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
@@ -4162,6 +4196,30 @@ impl Default for SovereignDragonflyNpotEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_universal_distro_bridge_functionality() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
+        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
+        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+        assert_eq!(bridge.translate_vfs_path("/etc"), "/etc");
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxNix);
+        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.nix");
+        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Shepherd);
+        assert_eq!(bridge.translate_vfs_path("/etc"), "/etc/nixos");
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
+        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
+        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+        assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/local/etc");
+        assert!(bridge.enforce_security_isolation(101, "/jails/web").is_ok());
+        assert!(bridge.active_jail.is_some());
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
+        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
+        assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
+    }
 
     #[test]
     fn test_ebpf_verification_and_interpreter() {
