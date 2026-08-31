@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -70,8 +72,14 @@ mod package_repository;
 mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
 
-use wiki_ideas_implementation::SystemdUnitActiveState;
+use wiki_ideas_implementation::{SovereignHybridSchedulerInnovations, SystemdUnitActiveState};
 use bsd_compat::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -116,8 +124,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
-    use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
