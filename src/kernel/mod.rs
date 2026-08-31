@@ -46,6 +46,7 @@ pub mod vmm_paging;
 pub mod module_loader;
 pub mod performance;
 
+pub use structures::{ThreadState, CpuArchitectureClass};
 pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;

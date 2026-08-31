@@ -12,13 +12,16 @@ use alloc::format;
 use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 
 #[cfg(feature = "standalone_test")]
+use crate::klib::path::PathBuf;
+
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: std::path::PathBuf,
+    pub path: PathBuf,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: std::path::PathBuf) -> Self {
+    pub fn new(path: PathBuf) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {
