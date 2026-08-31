@@ -27,6 +27,6 @@ The following `.md` files in the main repository have been promoted to wiki page
 | `SigmaOS-Components-Master-Table.md` | [Components-Master-Table](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Components-Master-Table) |
 | `LINUX_DISTRO_IDEAS_IMPLEMENTATION.md` | [Linux-Distro-Ideas-Implementation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Linux-Distro-Ideas-Implementation) |
 | `Home.md` | [Home](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Home) |
-| `_Sidebar.md` | [\_Sidebar](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/_Sidebar) |
+| `_Sidebar.md` | [_Sidebar](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/_Sidebar) |
 | `Components-Master-Table.md` | [Components-Master-Table](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Components-Master-Table) |
 | `Linux-Distro-Ideas-Implementation.md` | [Linux-Distro-Ideas-Implementation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Linux-Distro-Ideas-Implementation) |

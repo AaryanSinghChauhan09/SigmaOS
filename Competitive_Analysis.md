@@ -3,7 +3,7 @@
 > An honest assessment of where SigmaOS stands versus established Linux distributions,
 > what the gaps are, and how to close them.
 
-***
+---
 
 ## The Feeling Gap
 
@@ -14,7 +14,7 @@ The difference isn't vision; it's accumulated execution.
 
 This document maps that gap precisely so we can close it systematically.
 
-***
+---
 
 ## Tier 1: Simple Distros (Immediate Competitors)
 
@@ -36,7 +36,7 @@ This document maps that gap precisely so we can close it systematically.
 
 **Verdict**: Alpine wins on simplicity and ecosystem today. SigmaOS wins on security architecture. Close Phase 1 to match Alpine on basics; our security story is already better.
 
-***
+---
 
 ### Tiny Core Linux
 
@@ -50,7 +50,7 @@ This document maps that gap precisely so we can close it systematically.
 
 **Verdict**: Tiny Core exists to be tiny. SigmaOS is not trying to be 16 MB — but a Phase 1 minimal ISO should target under 100 MB to be credible.
 
-***
+---
 
 ### Puppy Linux
 
@@ -63,7 +63,7 @@ This document maps that gap precisely so we can close it systematically.
 
 **Verdict**: Puppy's strength is the live USB + GUI-out-of-box experience. Our `installer.html` is already designed; it needs the backend kernel to boot.
 
-***
+---
 
 ## Tier 2: Mid-Range Distros (v1.0 Target Competitors)
 
@@ -77,11 +77,11 @@ This document maps that gap precisely so we can close it systematically.
 | AUR | 80,000+ community pkgs | sigpkg community (planned) |
 | Kernel | Linux 6.x | Custom freestanding |
 | Security | Partial (hardened-kernel optional) | PQC + pledge/unveil built-in |
-| Docs | Arch Wiki (world-class) | wiki\_repo (solid start) |
+| Docs | Arch Wiki (world-class) | wiki_repo (solid start) |
 
 **Key insight**: The Arch Wiki is one of Arch's biggest assets. SigmaOS has 500+ wiki pages already — we need to make them searchable and discoverable, not just voluminous.
 
-***
+---
 
 ### Ubuntu / Fedora
 
@@ -98,7 +98,7 @@ This document maps that gap precisely so we can close it systematically.
 
 **Key insight**: Ubuntu/Fedora win on ecosystem size. We never beat them there on day 1. Our angle is: *for developers who care about security and portability, SigmaOS is the only OS that does X* — where X is PQC, multi-format from one codebase, and sovereign package attestation.
 
-***
+---
 
 ## What Makes Simple Distros Feel "Complete"
 
@@ -141,7 +141,7 @@ Forum, Discord, GitHub Discussions, IRC — it doesn't matter what the venue is.
 Users need to know other humans have solved their problem before.
 A `#community` Discord + active GitHub Discussions costs nothing and matters enormously.
 
-***
+---
 
 ## SigmaOS Unique Strengths (Already Implemented)
 
@@ -151,7 +151,7 @@ These are real advantages we have *today* that no simple distro has:
 |----------|---------|
 | Post-quantum cryptography | Kyber-1024 + Dilithium-5 in `crypto/`, TLS stack |
 | Multi-format from one codebase | `download.html` — 50+ formats, one CMake flag |
-| sigma\_pledge / sigma\_unveil | `security/` — kernel-enforced capability restriction |
+| sigma_pledge / sigma_unveil | `security/` — kernel-enforced capability restriction |
 | 600+ shard modular architecture | `suites/` — independently testable, hot-swappable |
 | WASM kernel | `runtime/wasm/sigma_wasm_runtime.cpp` |
 | Professional identity (SPIFFE) | `security/sigma_spiffe.rs` |
@@ -160,7 +160,7 @@ These are real advantages we have *today* that no simple distro has:
 These should be front-and-center in the README and download page.
 Right now they're buried in docs — users never see them.
 
-***
+---
 
 ## Recommended Positioning Statement
 
@@ -173,7 +173,7 @@ Right now they're buried in docs — users never see them.
 This is not "another Linux distro." It's a different category.
 Lead with the category, not the comparison.
 
-***
+---
 
 ## Priority Actions to Close the Gap
 
@@ -193,6 +193,6 @@ Lead with the category, not the comparison.
 Items 2–7 can all be done without the bootable ISO.
 Start them in parallel while the kernel work progresses.
 
-***
+---
 
-*See also: [ROADMAP.md](../ROADMAP.md) · [docs/Minimal\_SigmaOS\_v0.1.md](Minimal_SigmaOS_v0.1) · [STRATEGIC\_VISION.md](../STRATEGIC_VISION.md)*
+*See also: [ROADMAP.md](../ROADMAP.md) · [docs/Minimal_SigmaOS_v0.1.md](Minimal_SigmaOS_v0.1.md) · [STRATEGIC_VISION.md](../STRATEGIC_VISION.md)*

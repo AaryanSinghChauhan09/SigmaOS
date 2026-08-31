@@ -2,7 +2,7 @@
 
 This document defines the zero-dependency, `#![no_std]`, capability-gated Rust driver implementation for high-performance **NVMe PCIe Solid-State Drives (v1.4 spec compliant)**. It implements OOP `UnifiedPeripheral` traits, mapping hardware queues, doorbell registers, and Physical Region Page (PRP) lists.
 
-***
+---
 
 ## 🏗️ Driver Source Code Implementation
 

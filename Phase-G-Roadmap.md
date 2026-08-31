@@ -9,71 +9,71 @@ It turns the OS from a well-designed scaffold into a bootable system.
 
 ### G-01: Kernel Scheduler
 
-*   **File:** `kernel/core/sigma_sched.cpp`
+- **File:** `kernel/core/sigma_sched.cpp`
 
-*   **Goal:** Round-robin scheduler for 64 tasks
+- **Goal:** Round-robin scheduler for 64 tasks
 
-*   **Test:** QEMU: 2 tasks interleave without deadlock
+- **Test:** QEMU: 2 tasks interleave without deadlock
 
-*   **Blocks:** All real hardware boot
+- **Blocks:** All real hardware boot
 
 ### G-02: Physical Memory Manager
 
-*   **File:** `kernel/core/sigma_mm.cpp`
+- **File:** `kernel/core/sigma_mm.cpp`
 
-*   **Goal:** Buddy allocator — alloc/free pages, no leaks
+- **Goal:** Buddy allocator — alloc/free pages, no leaks
 
-*   **Test:** alloc/free 100 pages, then slab 10 000 objects
+- **Test:** alloc/free 100 pages, then slab 10 000 objects
 
-*   **Blocks:** All real hardware boot
+- **Blocks:** All real hardware boot
 
 ### G-03: Virtual Memory Manager
 
-*   **File:** `kernel/mm/sigma_vmm.cpp`
+- **File:** `kernel/mm/sigma_vmm.cpp`
 
-*   **Goal:** x86-64 4-level page table walker
+- **Goal:** x86-64 4-level page table walker
 
-*   **Test:** map 1 MB region, read back correctly
+- **Test:** map 1 MB region, read back correctly
 
 ### G-04: IRQ Controller
 
-*   **File:** `kernel/core/sigma_irq.cpp`
+- **File:** `kernel/core/sigma_irq.cpp`
 
-*   **Goal:** APIC + PIC init, HPET timer → jiffies
+- **Goal:** APIC + PIC init, HPET timer → jiffies
 
-*   **Test:** timer IRQ fires in QEMU
+- **Test:** timer IRQ fires in QEMU
 
 ### G-05: Syscall Dispatch
 
-*   **File:** `kernel/core/sigma_syscall_dispatch.cpp`
+- **File:** `kernel/core/sigma_syscall_dispatch.cpp`
 
-*   **Goal:** 30 essential syscalls
+- **Goal:** 30 essential syscalls
 
-*   **Test:** `write(1, "hi\n", 3)` from userland works
+- **Test:** `write(1, "hi\n", 3)` from userland works
 
 ### G-06: VESA/GOP Framebuffer
 
-*   **File:** `drivers/display/sigma_vesa.cpp`
+- **File:** `drivers/display/sigma_vesa.cpp`
 
-*   **Goal:** Pixels on screen in QEMU
+- **Goal:** Pixels on screen in QEMU
 
-*   **Test:** A coloured rectangle appears at boot
+- **Test:** A coloured rectangle appears at boot
 
 ### G-07: UEFI Bootloader
 
-*   **File:** `sigma-boot/sigma_boot.c`
+- **File:** `sigma-boot/sigma_boot.c`
 
-*   **Goal:** sigma-boot.efi loads the kernel
+- **Goal:** sigma-boot.efi loads the kernel
 
-*   **Test:** QEMU boots to kernel entry point
+- **Test:** QEMU boots to kernel entry point
 
 ### G-08: Bootable ISO
 
-*   **File:** `Makefile`
+- **File:** `Makefile`
 
-*   **Goal:** `make iso` produces `SigmaOS.iso`
+- **Goal:** `make iso` produces `SigmaOS.iso`
 
-*   **Test:** `qemu-system-x86_64 -cdrom SigmaOS.iso` → sigma-sh prompt
+- **Test:** `qemu-system-x86_64 -cdrom SigmaOS.iso` → sigma-sh prompt
 
 ## Phase G Secondary Items
 
@@ -101,6 +101,6 @@ It turns the OS from a well-designed scaffold into a bootable system.
 | H-07 | Federated learning coordinator | H-04 + TCP |
 | H-08 | CBDC e-rupee wallet | H-03 UPI stack |
 
-***
+---
 
-*Track progress: [CURRENT\_PROBLEMS\_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST)*
+*Track progress: [CURRENT_PROBLEMS_MANIFEST.md](CURRENT_PROBLEMS_MANIFEST.md)*

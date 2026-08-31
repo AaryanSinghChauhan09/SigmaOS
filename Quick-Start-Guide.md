@@ -2,10 +2,10 @@
 
 ## Prerequisites
 
-*   Rust nightly toolchain (`rustup install nightly`)
-*   `x86_64-unknown-none` target (`rustup target add x86_64-unknown-none`)
-*   QEMU (`apt install qemu-system-x86` or equivalent)
-*   Optional: `grub-mkrescue`, `xorriso` for ISO creation
+- Rust nightly toolchain (`rustup install nightly`)
+- `x86_64-unknown-none` target (`rustup target add x86_64-unknown-none`)
+- QEMU (`apt install qemu-system-x86` or equivalent)
+- Optional: `grub-mkrescue`, `xorriso` for ISO creation
 
 ## Clone & Build
 

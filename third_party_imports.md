@@ -4,11 +4,11 @@ This document tracks all third-party components, drivers, tools, and features im
 
 ## Integration Principles
 
-1.  **Prefer upstream kernel for drivers**; maintain SigmaOS branch for local patches
-2.  **Convert packaging (RPM/PKG/DEB/Nix) into sigpkg** with SBOM and GPG signing
-3.  **Reimplement critical tooling in Rust/C** where feasible; keep high-level languages only for non-critical tooling with migration plans
-4.  **Document every import** in this file and mirror to the Wiki
-5.  **Track license compliance** for each imported component and add attribution in LICENSES.md
+1. **Prefer upstream kernel for drivers**; maintain SigmaOS branch for local patches
+2. **Convert packaging (RPM/PKG/DEB/Nix) into sigpkg** with SBOM and GPG signing
+3. **Reimplement critical tooling in Rust/C** where feasible; keep high-level languages only for non-critical tooling with migration plans
+4. **Document every import** in this file and mirror to the Wiki
+5. **Track license compliance** for each imported component and add attribution in LICENSES.md
 
 ## Source Distributions
 
@@ -26,33 +26,33 @@ This document tracks all third-party components, drivers, tools, and features im
 
 ### Quick Wins (0-6 weeks) - High Priority
 
-*   \[ ] Item 38: SBOM generation pipeline (NixOS/Fedora)
-*   \[ ] Item 39: Signed package repository tooling (Fedora)
-*   \[ ] Item 56: Calamares installer modules (Arch/Fedora)
-*   \[ ] Item 57: Encrypted home defaults (Ubuntu/Fedora)
-*   \[ ] Item 71: Wayland compositor improvements (Fedora)
-*   \[ ] Item 73: PipeWire audio stack defaults (Fedora)
-*   \[ ] Item 40: Package rollback hooks (NixOS/OSTree)
-*   \[ ] Item 36: Binary delta update algorithm (Fedora/OSTree)
-*   \[ ] Items 1-5, 61: HCL and driver CI tests for top 10 devices
+- [ ] Item 38: SBOM generation pipeline (NixOS/Fedora)
+- [ ] Item 39: Signed package repository tooling (Fedora)
+- [ ] Item 56: Calamares installer modules (Arch/Fedora)
+- [ ] Item 57: Encrypted home defaults (Ubuntu/Fedora)
+- [ ] Item 71: Wayland compositor improvements (Fedora)
+- [ ] Item 73: PipeWire audio stack defaults (Fedora)
+- [ ] Item 40: Package rollback hooks (NixOS/OSTree)
+- [ ] Item 36: Binary delta update algorithm (Fedora/OSTree)
+- [ ] Items 1-5, 61: HCL and driver CI tests for top 10 devices
 
 ### Medium Priority (1-3 months)
 
-*   \[ ] Item 91: Firecracker microVM integration (Qubes/Firecracker)
-*   \[ ] Item 45: Reproducible build farm orchestration (NixOS/Fedora)
-*   \[ ] Item 59: Persona bundle installer (Fedora/Ubuntu)
-*   \[ ] Item 94: TPM attestation workflows (Fedora)
-*   \[ ] Item 1: Mainline Intel GPU driver stack (torvalds/linux)
-*   \[ ] Item 2: AMDGPU updates (torvalds/linux)
-*   \[ ] Item 3: NVIDIA Nouveau improvements (torvalds/linux/mesa)
-*   \[ ] Item 4: Broadcom Wi-Fi driver fixes (Debian/Fedora patches)
-*   \[ ] Item 5: Realtek Wi-Fi driver backports (Arch/Fedora)
+- [ ] Item 91: Firecracker microVM integration (Qubes/Firecracker)
+- [ ] Item 45: Reproducible build farm orchestration (NixOS/Fedora)
+- [ ] Item 59: Persona bundle installer (Fedora/Ubuntu)
+- [ ] Item 94: TPM attestation workflows (Fedora)
+- [ ] Item 1: Mainline Intel GPU driver stack (torvalds/linux)
+- [ ] Item 2: AMDGPU updates (torvalds/linux)
+- [ ] Item 3: NVIDIA Nouveau improvements (torvalds/linux/mesa)
+- [ ] Item 4: Broadcom Wi-Fi driver fixes (Debian/Fedora patches)
+- [ ] Item 5: Realtek Wi-Fi driver backports (Arch/Fedora)
 
 ### Long Term (3-12 months) - Low Priority
 
-*   \[ ] Item 31: Nix-style declarative package modules (NixOS)
-*   \[ ] Item 37: OSTree/Immutable OS model (Fedora Silverblue)
-*   \[ ] Item 112: Signed model marketplace (community repos)
+- [ ] Item 31: Nix-style declarative package modules (NixOS)
+- [ ] Item 37: OSTree/Immutable OS model (Fedora Silverblue)
+- [ ] Item 112: Signed model marketplace (community repos)
 
 ## Detailed Import Records
 
@@ -209,15 +209,15 @@ All imported components must have their licenses tracked in this document and at
 
 ## Implementation Checklist
 
-*   \[x] Create docs/third\_party\_imports.md documentation structure
-*   \[ ] Open issues for each item with labels `area/*` and `priority/*`
-*   \[ ] Create feature branches `work/<area>/<short-desc>` for each implementation
-*   \[ ] Add CI jobs: build, reproducibility, SBOM, CVE scan, hardware driver tests
-*   \[ ] Mirror docs to Wiki via script that syncs docs/ to Wiki on merged PRs
-*   \[ ] Track license compliance for each imported component
-*   \[ ] Add attribution in LICENSES.md
+- [x] Create docs/third_party_imports.md documentation structure
+- [ ] Open issues for each item with labels `area/*` and `priority/*`
+- [ ] Create feature branches `work/<area>/<short-desc>` for each implementation
+- [ ] Add CI jobs: build, reproducibility, SBOM, CVE scan, hardware driver tests
+- [ ] Mirror docs to Wiki via script that syncs docs/ to Wiki on merged PRs
+- [ ] Track license compliance for each imported component
+- [ ] Add attribution in LICENSES.md
 
-***
+---
 
 **Document Version**: 1.1
 **Last Updated**: 2026-07-08

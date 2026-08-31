@@ -10,7 +10,9 @@ SigmaOS implements a hybrid scheduler inspired by Linux's Completely Fair Schedu
 
 CFS tracks a per-task `vruntime` - the amount of time a task "conceptually" used, weighted by priority:
 
-    vruntime += delta_exec * (NICE_0_LOAD / task.weight)
+```
+vruntime += delta_exec * (NICE_0_LOAD / task.weight)
+```
 
 Where `NICE_0_LOAD = 1024` is the default weight for nice-0 tasks.
 
@@ -75,13 +77,15 @@ impl BoreTask {
 
 ### Why BORE Improves Interactivity
 
-    Standard CFS:
-      Interactive GUI task │████░░░░░░░░░░░░░░│ waits for background compile
-      Background compile   │░░░░████████████░░│ gets full time slice
+```
+Standard CFS:
+  Interactive GUI task │████░░░░░░░░░░░░░░│ waits for background compile
+  Background compile   │░░░░████████████░░│ gets full time slice
 
-    BORE-enhanced:
-      Interactive GUI task │████░░████░░████░░│ gets frequent small bursts
-      Background compile   │░░░░████░░████░░██│ slightly lower priority
+BORE-enhanced:
+  Interactive GUI task │████░░████░░████░░│ gets frequent small bursts
+  Background compile   │░░░░████░░████░░██│ slightly lower priority
+```
 
 Interactive tasks have low `burst_score` (they sleep often), so BORE gives them scheduling preference.
 
@@ -162,8 +166,8 @@ pub fn can_run_on_cpu(&self, task_id: u64, cpu_id: u8) -> bool {
 
 ## References
 
-*   [CachyOS BORE Scheduler Architecture](CachyOS-BORE-Scheduler-Architecture)
-*   Linux kernel `kernel/sched/fair.c`
-*   [BORE patch on GitHub](https://github.com/firelzrd/bore-scheduler)
-*   `src/scheduler/` (SigmaOS implementation)
-*   `sigmaos/core/src/atomic_scheduler_cfs.cpp`
+- [CachyOS BORE Scheduler Architecture](CachyOS-BORE-Scheduler-Architecture.md)
+- Linux kernel `kernel/sched/fair.c`
+- [BORE patch on GitHub](https://github.com/firelzrd/bore-scheduler)
+- `src/scheduler/` (SigmaOS implementation)
+- `sigmaos/core/src/atomic_scheduler_cfs.cpp`

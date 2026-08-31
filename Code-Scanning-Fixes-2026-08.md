@@ -26,27 +26,22 @@ This page documents the resolution of all GitHub Code Scanning alerts for SigmaO
 ## Trait Signature Fixes
 
 The `PeripheralDevice::set_power_state` method signature was changed from:
-
 ```rust
 fn set_power_state(&mut self, state: PowerState);
 ```
-
 to:
-
 ```rust
 fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
 ```
 
 All driver implementations updated accordingly:
-
-*   `src/drivers/legacy_keyboard.rs`
-*   `src/drivers/legacy_serial.rs`
-*   `src/drivers/vesa.rs`
+- `src/drivers/legacy_keyboard.rs`
+- `src/drivers/legacy_serial.rs`
+- `src/drivers/vesa.rs`
 
 ## Security Scan Status
 
 The goal is to reach **0 open code scanning alerts**. Run locally with:
-
 ```bash
 cargo clippy -- -D warnings
 cargo check 2>&1
@@ -54,5 +49,5 @@ cargo check 2>&1
 
 ## References
 
-*   [GitHub Security Code Scanning](https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning)
-*   [Clippy Lints Reference](https://rust-lang.github.io/rust-clippy/master/)
+- [GitHub Security Code Scanning](https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning)
+- [Clippy Lints Reference](https://rust-lang.github.io/rust-clippy/master/)

@@ -19,9 +19,8 @@ graph TD
 ```
 
 ## Core Components
-
-*   **Kernel (`src/kernel/`, `kernel/`)**: Features memory isolation, lightweight task scheduling, capabilities-based security.
-*   **Memory Management**: Inspired by NUMA architectures and FreeBSD virtual memory layout.
-*   **IPC (Inter-Process Communication)**: High performance message passing with zero-copy options.
-*   **Drivers (`drivers/`)**: EHCI, xHCI, NVMe, and AHCI drivers executed in userspace sandboxes.
-*   **Userland (`userland/`, `zenith_desktop/`)**: Zenith Desktop user interface and POSIX/Linux-inspired tools.\n
+- **Kernel (`src/kernel/`, `kernel/`)**: Features memory isolation, lightweight task scheduling, capabilities-based security.
+- **Memory Management**: Inspired by NUMA architectures and FreeBSD virtual memory layout.
+- **IPC (Inter-Process Communication)**: High performance message passing with zero-copy options.
+- **Drivers (`drivers/`)**: EHCI, xHCI, NVMe, and AHCI drivers executed in userspace sandboxes.
+- **Userland (`userland/`, `zenith_desktop/`)**: Zenith Desktop user interface and POSIX/Linux-inspired tools.\n

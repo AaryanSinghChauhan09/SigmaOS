@@ -4,33 +4,33 @@
 > drop-in replacement for Rust's standard library, implemented entirely in bare-metal
 > Rust for `no_std` freestanding environments.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Overview](#overview)
-2.  [Allocators](#allocators)
-    *   [Buddy Allocator](#buddy-allocator)
-    *   [Slab Allocator](#slab-allocator)
-    *   [Custom Allocator](#custom-allocator)
-3.  [Collections](#collections)
-    *   [Vec](#vec)
-    *   [HashMap / HashSet](#hashmap--hashset)
-    *   [BTreeMap](#btreemap)
-    *   [LinkedList](#linkedlist)
-    *   [VecDeque](#vecdeque)
-    *   [RingBuffer](#ringbuffer)
-4.  [String Handling](#string-handling)
-5.  [Hashing & RNG](#hashing--rng)
-6.  [Paging & Virtual Memory](#paging--virtual-memory)
-7.  [Math & Bit Operations](#math--bit-operations)
-8.  [UUID Generation](#uuid-generation)
-9.  [Time & Timers](#time--timers)
+1. [Overview](#overview)
+2. [Allocators](#allocators)
+   - [Buddy Allocator](#buddy-allocator)
+   - [Slab Allocator](#slab-allocator)
+   - [Custom Allocator](#custom-allocator)
+3. [Collections](#collections)
+   - [Vec](#vec)
+   - [HashMap / HashSet](#hashmap--hashset)
+   - [BTreeMap](#btreemap)
+   - [LinkedList](#linkedlist)
+   - [VecDeque](#vecdeque)
+   - [RingBuffer](#ringbuffer)
+4. [String Handling](#string-handling)
+5. [Hashing & RNG](#hashing--rng)
+6. [Paging & Virtual Memory](#paging--virtual-memory)
+7. [Math & Bit Operations](#math--bit-operations)
+8. [UUID Generation](#uuid-generation)
+9. [Time & Timers](#time--timers)
 10. [Async Runtime](#async-runtime)
 11. [FFI & ISA Utilities](#ffi--isa-utilities)
 12. [Dependency Reduction Status](#dependency-reduction-status)
 
-***
+---
 
 ## Overview
 
@@ -60,13 +60,13 @@
 | `ffi` | `src/klib/ffi.rs` | `std::ffi` | ✅ Complete |
 | `error` | `src/klib/error.rs` | `std::error` | ✅ Complete |
 
-***
+---
 
 ## Allocators
 
 ### Buddy Allocator
 
-**File**: `src/klib/buddy_allocator.rs`\
+**File**: `src/klib/buddy_allocator.rs`  
 **Inspired by**: Linux kernel `mm/page_alloc.c`, FreeBSD `vm_page.c`
 
 The buddy allocator is the primary physical memory allocator. It manages memory in
@@ -97,11 +97,11 @@ allocator.free(ptr, 4096);
 
 **Complexity**: O(log n) alloc/free, O(1) coalescing
 
-***
+---
 
 ### Slab Allocator
 
-**File**: `src/klib/slab.rs`\
+**File**: `src/klib/slab.rs`  
 **Inspired by**: Linux SLAB/SLUB allocator, Solaris slab allocator (Jeff Bonwick, 1994)
 
 Slab allocators cache frequently allocated objects to reduce fragmentation and
@@ -117,11 +117,11 @@ let obj = slab.alloc(); // O(1) allocation
 slab.free(obj);         // O(1) deallocation
 ```
 
-***
+---
 
 ### Custom Allocator
 
-**File**: `src/klib/custom_allocator.rs`\
+**File**: `src/klib/custom_allocator.rs`  
 The `SigmaAllocator` implements `GlobalAlloc` and composes the buddy + slab
 allocators for the full memory subsystem.
 
@@ -130,13 +130,13 @@ allocators for the full memory subsystem.
 static ALLOCATOR: SigmaAllocator = SigmaAllocator::new();
 ```
 
-***
+---
 
 ## Collections
 
 ### Vec
 
-**File**: `src/klib/vec.rs`\
+**File**: `src/klib/vec.rs`  
 **Replaces**: `std::vec::Vec`
 
 A growable heap-allocated array using the klib buddy allocator.
@@ -177,12 +177,12 @@ let last = v.pop(); // Some(100)
 | `sort()` | In-place sort |
 | `contains(val)` | Linear search |
 
-***
+---
 
 ### HashMap / HashSet
 
-**File**: `src/klib/hashmap.rs`, `src/klib/hashset.rs`\
-**Replaces**: `std::collections::HashMap`, `std::collections::HashSet`\
+**File**: `src/klib/hashmap.rs`, `src/klib/hashset.rs`  
+**Replaces**: `std::collections::HashMap`, `std::collections::HashSet`  
 **Hash function**: SipHash-1-3 (custom implementation, no dependency on `std::hash`)
 
 ```rust
@@ -203,11 +203,11 @@ for (key, value) in &map {
 }
 ```
 
-***
+---
 
 ### BTreeMap
 
-**File**: `src/klib/btreemap.rs`\
+**File**: `src/klib/btreemap.rs`  
 **Replaces**: `std::collections::BTreeMap`
 
 Ordered map using a B-tree. Preferred for ordered key traversal.
@@ -225,11 +225,11 @@ for (k, v) in &map {
 }
 ```
 
-***
+---
 
 ### RingBuffer
 
-**File**: `src/klib/ring_buffer.rs`\
+**File**: `src/klib/ring_buffer.rs`  
 **Purpose**: Lock-free producer-consumer buffer for kernel I/O and interrupt handlers.
 
 ```rust
@@ -240,11 +240,11 @@ rb.push(b'A');
 let byte = rb.pop(); // Some(b'A')
 ```
 
-***
+---
 
 ## String Handling
 
-**Files**: `src/klib/string.rs`, `src/klib/custom_string.rs`, `src/klib/string_ops.rs`\
+**Files**: `src/klib/string.rs`, `src/klib/custom_string.rs`, `src/klib/string_ops.rs`  
 **Replaces**: `std::string::String`, `&str` methods
 
 ```rust
@@ -272,7 +272,7 @@ let formatted = sigma_format!("Value: {}", 42);
 | `sigma_strstr(hay, needle)` | Substring search |
 | `sigma_atoi(s)` | Parse integer from string |
 
-***
+---
 
 ## Hashing & RNG
 
@@ -290,7 +290,7 @@ let hash = hasher.finish(); // u64
 
 ### RNG (`src/klib/rng.rs`, `src/klib/random.rs`)
 
-**Replaces**: `rand` crate\
+**Replaces**: `rand` crate  
 **Algorithm**: xorshift64 + hardware RDRAND instruction fallback
 
 ```rust
@@ -301,12 +301,12 @@ let val: u64 = rng.next_u64();
 let byte: u8 = rng.next_u8();
 ```
 
-***
+---
 
 ## UUID Generation
 
-**File**: `src/klib/uuid.rs`\
-**Replaces**: `uuid` crate\
+**File**: `src/klib/uuid.rs`  
+**Replaces**: `uuid` crate  
 **Method**: UUID v4 (random), UUID v7 (time-ordered), UUID v5 (name-based SHA-1)
 
 ```rust
@@ -319,7 +319,7 @@ let uuid_v5 = Uuid::new_v5(b"name");   // Name-based
 let s = uuid_v4.to_string(); // "550e8400-e29b-41d4-a716-446655440000"
 ```
 
-***
+---
 
 ## Paging & Virtual Memory
 
@@ -341,7 +341,7 @@ pt.map(
 pt.unmap(VirtAddr(0xFFFF_8000_0000_0000));
 ```
 
-***
+---
 
 ## Math & Bit Operations
 
@@ -355,7 +355,7 @@ let l = log2_floor(128); // 7
 let z = clz(1u64);       // 63
 ```
 
-***
+---
 
 ## Dependency Reduction Status
 

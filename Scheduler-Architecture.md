@@ -2,7 +2,7 @@
 
 This document provides a comprehensive technical specification of the **Task Scheduling Architecture** in **SigmaOS**, covering the **BORE** (Burst-Oriented Response Enhancer) latency optimizer, the **EEVDF** (Earliest Eligible Virtual Deadline First) fairness engine, **Ananicy-CPP** auto-nice heuristics, NUMA load balancing, and real-time dispatching.
 
-***
+---
 
 ## 1. Multi-Paradigm Scheduling Hierarchy
 
@@ -28,7 +28,7 @@ graph TD
     end
 ```
 
-***
+---
 
 ## 2. BORE (Burst-Oriented Response Enhancer) Scheduler (`src/performance/cachy_opt.rs`)
 
@@ -53,7 +53,7 @@ The dynamic time-slice is computed according to:
 
 $$\text{Penalty} = \frac{\text{burst\_count} \times \text{burst\_penalty\_scale}}{100}$$
 
-$$\text{Time-Slice} = \max\Big(\text{base\_slice\_ms} - \text{Penalty},; \text{MIN\_SLICE\_FLOOR}\Big)$$
+$$\text{Time-Slice} = \max\Big(\text{base\_slice\_ms} - \text{Penalty},\; \text{MIN\_SLICE\_FLOOR}\Big)$$
 
 ```rust
 pub struct BoreScheduler {
@@ -86,7 +86,7 @@ impl BoreScheduler {
 }
 ```
 
-***
+---
 
 ## 3. EEVDF (Earliest Eligible Virtual Deadline First) Scheduler (`src/scheduler/eevdf.rs`)
 
@@ -109,18 +109,17 @@ sequenceDiagram
 ```
 
 ### 3.1 EEVDF Core Formulas:
+1. **Virtual Runtime ($v_i$)**:
+   $$v_i(t) = v_i(0) + \frac{\Delta t}{w_i}$$
+   Where $w_i$ is task weight (derived from nice level).
+2. **Task Lag ($L_i$)**:
+   $$L_i(t) = V(t) - v_i(t)$$
+   A task is **eligible** to run only when $L_i(t) \ge 0$.
+3. **Virtual Deadline ($d_i$)**:
+   $$d_i = v_i + \frac{q}{w_i}$$
+   Among all eligible tasks, the task with the smallest $d_i$ is dispatched first.
 
-1.  **Virtual Runtime ($v\_i$)**:
-    $$v\_i(t) = v\_i(0) + \frac{\Delta t}{w\_i}$$
-    Where $w\_i$ is task weight (derived from nice level).
-2.  **Task Lag ($L\_i$)**:
-    $$L\_i(t) = V(t) - v\_i(t)$$
-    A task is **eligible** to run only when $L\_i(t) \ge 0$.
-3.  **Virtual Deadline ($d\_i$)**:
-    $$d\_i = v\_i + \frac{q}{w\_i}$$
-    Among all eligible tasks, the task with the smallest $d\_i$ is dispatched first.
-
-***
+---
 
 ## 4. Ananicy-CPP Auto-Nice Daemon Integration (`src/performance/cachy_opt.rs`)
 
@@ -144,12 +143,11 @@ pub struct AnanicyRule {
 ```
 
 ### Curated Rule Defaults:
+- **Gaming & Interactive 3D** (`csgo`, `zenith_compositor`): `nice = -15`, `io_class = RealTime`, `autoboost = true`
+- **Audio & Communication** (`discord`, `audacity`, `pipewire`): `nice = -4`, `io_class = BestEffort`
+- **Background Maintenance** (`kcompactd`, `indexer`): `nice = 19`, `io_class = Idle`
 
-*   **Gaming & Interactive 3D** (`csgo`, `zenith_compositor`): `nice = -15`, `io_class = RealTime`, `autoboost = true`
-*   **Audio & Communication** (`discord`, `audacity`, `pipewire`): `nice = -4`, `io_class = BestEffort`
-*   **Background Maintenance** (`kcompactd`, `indexer`): `nice = 19`, `io_class = Idle`
-
-***
+---
 
 ## 5. Process & Thread Control Structures
 
@@ -179,11 +177,11 @@ classDiagram
     Pcb "1" *-- "many" Tcb : contains
 ```
 
-*   **`Pcb` (Process Control Block)** ([`src/kernel/`](../src/kernel/)): Manages virtual memory page mappings, file descriptors, capabilities, and child threads.
-*   **`Tcb` (Thread Control Block)** ([`src/kernel/`](../src/kernel/)): Holds CPU registers, kernel stack pointers, BORE burst counters, and virtual deadlines.
-*   **`ApcQueue` (Asynchronous Procedure Call)**: Facilitates kernel-to-user thread asynchronous callbacks for timer events and I/O completion.
+- **`Pcb` (Process Control Block)** ([`src/kernel/`](../src/kernel/)): Manages virtual memory page mappings, file descriptors, capabilities, and child threads.
+- **`Tcb` (Thread Control Block)** ([`src/kernel/`](../src/kernel/)): Holds CPU registers, kernel stack pointers, BORE burst counters, and virtual deadlines.
+- **`ApcQueue` (Asynchronous Procedure Call)**: Facilitates kernel-to-user thread asynchronous callbacks for timer events and I/O completion.
 
-***
+---
 
 ## 6. Thread State Lifecycle
 
@@ -198,7 +196,7 @@ stateDiagram-v2
     Terminated --> [*] : PCB Reclaimed
 ```
 
-***
+---
 
 ## 7. Comparative Performance Benchmarks
 
@@ -210,13 +208,13 @@ stateDiagram-v2
 | **Starvation Immunity** | Good | Fair | Good | **Mathematically Guaranteed (EEVDF)** |
 | **Kernel Implementation Safety** | Unsafe C | Unsafe C | Unsafe C | **Memory Safe Rust (`#![no_std]`)** |
 
-***
+---
 
 ## 8. Related Documentation
 
-*   [No-Std Architecture](No-Std-Architecture) — Foundation of the bare-metal kernel.
-*   [Architecture Overview](Architecture-Overview) — Subsystem hierarchy.
-*   [Custom Allocator Guide](Custom-Allocator-Guide) — Memory allocation for PCBs and TCBs.
-*   [Security & Hardening](Security-Hardening) — Sandboxing and privilege reduction.
+- [No-Std Architecture](No-Std-Architecture.md) — Foundation of the bare-metal kernel.
+- [Architecture Overview](Architecture-Overview.md) — Subsystem hierarchy.
+- [Custom Allocator Guide](Custom-Allocator-Guide.md) — Memory allocation for PCBs and TCBs.
+- [Security & Hardening](Security-Hardening.md) — Sandboxing and privilege reduction.
 
 *SigmaOS Scheduler Architecture Specification — Maintained by the SigmaOS Core Engineering Team.*

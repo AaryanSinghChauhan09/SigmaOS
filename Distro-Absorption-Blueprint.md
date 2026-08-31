@@ -2,7 +2,7 @@
 
 This document details how **SigmaOS** systematically absorbs, modernizes, and replaces the core USPs of mainstream Linux distributions (Gentoo, NixOS, Arch, Kali, Debian, Ubuntu, Fedora) natively inside its safe `#![no_std]`, zero-dependency, microkernel architecture.
 
-***
+---
 
 ## 📊 1. Distro Parity Absorption Matrix
 
@@ -15,14 +15,13 @@ This document details how **SigmaOS** systematically absorbs, modernizes, and re
 | **Debian / Ubuntu**| Massive software repos (.deb) | arbitary root setup shell scripts | **Binary .deb CAS Transpiler Shard** | Secure, read-only `.sigma` enclave conversion. |
 | **Fedora** | SELinux (MAC), systemd, enterprise | Complex configs, high context-switch lag | **Continuous Regulatory Ledger Shard** | hardware-enforced Token compliance, microsecond IPC. |
 
-***
+---
 
 ## 🛠️ 2. Zero-Dependency `#![no_std]` Distro Feature Blueprints
 
 Below are complete, safe, OOP-driven Rust implementation models for the integrated Linux distro tools:
 
 ### A. Gentoo-Style Dynamic SIMD Optimizer (`S-GENT`)
-
 Rather than compiling packages for hours on-device, SigmaOS inspects incoming binaries and performs real-time, SIMD-accelerated instruction mapping matching target CPU capabilities (e.g. mapping standard additions onto AVX-512 vector pipelines).
 
 ```rust
@@ -61,7 +60,6 @@ impl SimdOptimizer for SovereignSimdOptimizer {
 ```
 
 ### B. NixOS-Style Declarative State Graph & Merkle Rolling Updates (`S-TREE`)
-
 SigmaOS treats system configurations as a functional, cryptographically-verifiable Merkle tree. Upgrading or rolling back is as fast as updating a single root hash pointer, eliminating traditional file corruption during system updates.
 
 ```rust
@@ -109,7 +107,6 @@ impl SystemStateManager {
 ```
 
 ### C. Arch-Style Sandboxed Package Recipe Compiler (`S-AUR`)
-
 In traditional systems, building AUR recipes executes arbitrary scripts directly on the host file structure. SigmaOS compiles packages inside a hardware-isolated sandbox with read-only mappings of system headers, blocking sandbox escapes.
 
 ```rust
@@ -148,10 +145,9 @@ impl SecureCompilerSandbox {
 ```
 
 ### D. Kali-Style Active Zero-Trust Security Monitor (`S-KALI`)
-
 Repsonsible for continuous hardware-gated deep packet inspection (DPI) and system registry audits. Any attempts by compromised userland modules to read unauthorized files are terminated instantly.
 
-````rust
+```rust
 #![no_std]
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -221,8 +217,7 @@ impl SigmaLivepatch {
         self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
     }
 }
-````
-
+```
 ```
 
 ## ⏰ 3. Multi-Distro Improved Cron Scheduling Subsystem (`tools/sigma_cron_compat.rs`)
@@ -305,4 +300,3 @@ To support dynamically inspecting and tuning microkernel and network properties 
 1. **Dot-Notation Path Hierarchy**: Registers and manages hierarchical system parameters (such as `kern.maxproc` and `net.inet.tcp.sendspace`) dynamically.
 2. **Access Control Hardening**: Supports declaring write-locked read-only variables (such as `hw.ncpu` and `kern.osrelease`) to prevent runtime configuration poisoning.
 3. **Shell Tooling Integration**: Natively parses and evaluates standard BSD `sysctl` and `sysctl -w <path>=<value>` command invocations directly from the interactive terminal.
-```

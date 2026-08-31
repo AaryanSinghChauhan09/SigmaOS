@@ -1,4 +1,4 @@
-# Diagnostics Channel Support
+﻿# Diagnostics Channel Support
 
 Stability: Experimental.
 
@@ -192,17 +192,19 @@ diagnosticsChannel.channel('undici:websocket:open').subscribe(({
 
 The `handshakeResponse` object contains the HTTP response that established the WebSocket connection:
 
-*   `status` (number): The HTTP status code (`101` for HTTP/1.1 upgrade, `200` for HTTP/2 extended CONNECT)
+- `status` (number): The HTTP status code (`101` for HTTP/1.1 upgrade, `200` for HTTP/2 extended CONNECT)
 
-*   `statusText` (string): The HTTP status message (`'Switching Protocols'` for HTTP/1.1, commonly `'OK'` for HTTP/2 in Node.js)
 
-*   `headers` (object): The HTTP response headers from the server, including:
+- `statusText` (string): The HTTP status message (`'Switching Protocols'` for HTTP/1.1, commonly `'OK'` for HTTP/2 in Node.js)
 
-    *   `sec-websocket-accept` and other WebSocket-related headers
-    *   `upgrade: 'websocket'`
-    *   `connection: 'upgrade'`
 
-    The `upgrade` and `connection` headers are only present for HTTP/1.1 handshakes.
+- `headers` (object): The HTTP response headers from the server, including:
+  - `sec-websocket-accept` and other WebSocket-related headers
+  - `upgrade: 'websocket'`
+  - `connection: 'upgrade'`
+
+
+  The `upgrade` and `connection` headers are only present for HTTP/1.1 handshakes.
 
 This information is particularly useful for debugging and monitoring WebSocket connections, as it provides access to the initial HTTP handshake response that established the WebSocket connection.
 
@@ -292,11 +294,14 @@ diagnosticsChannel.channel('undici:request:pending-requests').subscribe(({ type,
 
 ### Event Properties
 
-*   `type` (`string`): Either `'added'` when a new pending request is registered, or `'removed'` when a pending request completes (successfully or with an error).
+- `type` (`string`): Either `'added'` when a new pending request is registered, or `'removed'` when a pending request completes (successfully or with an error).
 
-*   `size` (`number`): The current number of pending requests after the change.
 
-*   `key` (`string`): The deduplication key for the request, composed of the origin, method, path, and request headers.
+- `size` (`number`): The current number of pending requests after the change.
+
+
+- `key` (`string`): The deduplication key for the request, composed of the origin, method, path, and request headers.
+
 
 ### Example: Monitoring Request Deduplication
 
@@ -316,8 +321,10 @@ channel.subscribe(({ type, size, key }) => {
 
 This can be useful for:
 
-*   Verifying that request deduplication is working as expected
+- Verifying that request deduplication is working as expected
 
-*   Monitoring the number of concurrent in-flight requests
 
-*   Debugging deduplication behavior in production environments
+- Monitoring the number of concurrent in-flight requests
+
+
+- Debugging deduplication behavior in production environments

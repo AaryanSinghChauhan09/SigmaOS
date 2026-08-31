@@ -4,13 +4,13 @@
 
 SigmaOS incorporates **Gentoo Linux's USE flag system** to provide fine-grained control over package compilation and feature selection. This enables conditional compilation, dependency management, and system-wide feature configuration following Gentoo's proven methodology.
 
-***
+---
 
 ## Key Modules
 
-*   [`src/sigpkg/gentoo_use_flags.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/gentoo_use_flags.rs): USE flag manager, profile system, and conditional dependency resolution
+- [`src/sigpkg/gentoo_use_flags.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/sigpkg/gentoo_use_flags.rs): USE flag manager, profile system, and conditional dependency resolution
 
-***
+---
 
 ## Features
 
@@ -21,7 +21,7 @@ SigmaOS incorporates **Gentoo Linux's USE flag system** to provide fine-grained 
 | **Conditional Dependencies** | USE condition support | `X? ( x11-libs/libX11 )` syntax |
 | **Dynamic Resolution** | Runtime flag evaluation | Efficient dependency calculation |
 
-***
+---
 
 ## Core Concepts
 
@@ -47,43 +47,47 @@ gtk
 
 Profiles provide pre-configured sets of USE flags for different system types:
 
-*   **Desktop**: GUI applications, multimedia, desktop environments
-*   **Server**: Minimal, server-oriented packages
-*   **Minimal**: Core system without extra features
-*   **Custom**: User-defined profiles
+- **Desktop**: GUI applications, multimedia, desktop environments
+- **Server**: Minimal, server-oriented packages
+- **Minimal**: Core system without extra features
+- **Custom**: User-defined profiles
 
 ### Conditional Dependencies
 
 Packages can specify dependencies that are only required when certain USE flags are enabled:
 
-    # Only require X11 libraries if X support is enabled
-    X? ( x11-libs/libX11 )
+```
+# Only require X11 libraries if X support is enabled
+X? ( x11-libs/libX11 )
 
-    # Require GTK if both X and gtk flags are enabled
-    X gtk? ( x11-libs/gtk+ )
+# Require GTK if both X and gtk flags are enabled
+X gtk? ( x11-libs/gtk+ )
 
-    # Exclude systemd if systemd flag is disabled
-    !systemd? ( sys-apps/systemd )
+# Exclude systemd if systemd flag is disabled
+!systemd? ( sys-apps/systemd )
+```
 
-***
+---
 
 ## Architecture Flow
 
-    [USE Flag Definitions]
-           │
-           ▼
-    [Profile Selection] ──> Apply profile-specific flags
-           │
-           ▼
-    [Flag Resolution] ───> Calculate effective flags
-           │
-           ▼
-    [Dependency Evaluation] ──> Process conditional dependencies
-           │
-           ▼
-    [Package Compilation] ──> Build with selected features
+```
+[USE Flag Definitions]
+       │
+       ▼
+[Profile Selection] ──> Apply profile-specific flags
+       │
+       ▼
+[Flag Resolution] ───> Calculate effective flags
+       │
+       ▼
+[Dependency Evaluation] ──> Process conditional dependencies
+       │
+       ▼
+[Package Compilation] ──> Build with selected features
+```
 
-***
+---
 
 ## CLI Usage
 
@@ -107,7 +111,7 @@ sigma-use list
 sigma-use parse "X gtk -qt5 systemd"
 ```
 
-***
+---
 
 ## Implementation Details
 
@@ -139,7 +143,7 @@ pub struct ConditionalDependency {
 }
 ```
 
-***
+---
 
 ## Common USE Flags
 
@@ -156,28 +160,27 @@ SigmaOS supports many common Gentoo USE flags:
 | `pulseaudio` | PulseAudio support | false |
 | `wayland` | Wayland display server | false |
 
-***
+---
 
 ## Integration with SigmaOS
 
 The USE flag system integrates with:
+- **SigmaPkg**: Native package manager
+- **Build System**: Conditional compilation
+- **Dependency Resolver**: Smart dependency calculation
+- **System Configuration**: Global feature control
 
-*   **SigmaPkg**: Native package manager
-*   **Build System**: Conditional compilation
-*   **Dependency Resolver**: Smart dependency calculation
-*   **System Configuration**: Global feature control
-
-***
+---
 
 ## Benefits
 
-1.  **Fine-Grained Control**: Select exactly which features to include
-2.  **Reduced Size**: Disable unused features to minimize system footprint
-3.  **Security**: Exclude potentially vulnerable components
-4.  **Performance**: Optimize for specific use cases
-5.  **Flexibility**: Adapt system to different requirements
+1. **Fine-Grained Control**: Select exactly which features to include
+2. **Reduced Size**: Disable unused features to minimize system footprint
+3. **Security**: Exclude potentially vulnerable components
+4. **Performance**: Optimize for specific use cases
+5. **Flexibility**: Adapt system to different requirements
 
-***
+---
 
 ## Examples
 
@@ -223,7 +226,7 @@ sigma-use set qt5 false
 sigma-use set alsa false
 ```
 
-***
+---
 
-**Generated:** August 24, 2026\
+**Generated:** August 24, 2026  
 **Repository:** [SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)

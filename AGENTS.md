@@ -4,20 +4,20 @@ Welcome to **SigmaOS** — a zero-dependency, post-quantum resilient, capability
 
 These instructions provide actionable guidance, testing procedures, and architectural principles for AI agents (and human contributors) interacting with this codebase.
 
-***
+---
 
 ## 🚀 1. Core Architectural Directives
 
-1.  **Zero-Dependency & Self-Containment (`no_std`):**
-    *   The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
-    *   Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
-2.  **Capability-Based Security Model:**
-    *   Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
-3.  **Windows NT & Distro Parity Standards:**
-    *   Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
-    *   Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
+1. **Zero-Dependency & Self-Containment (`no_std`):**
+   * The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
+   * Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
+2. **Capability-Based Security Model:**
+   * Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
+3. **Windows NT & Distro Parity Standards:**
+   * Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
+   * Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
 
-***
+---
 
 ## 🧪 2. Testing & Verification Procedures
 
@@ -48,13 +48,13 @@ rustc --test --edition=2021 src/unimplemented_tools.rs -o build/tools_tests && .
 rustc --test --edition=2021 src/compatibility/reactos.rs -o build/reactos_tests && ./build/reactos_tests && rm build/reactos_tests
 ```
 
-***
+---
 
 ## 🛠️ 3. Coding Conventions
 
-1.  **Explicit Type Annotations for Collections:**
-    *   When instantiating custom vector collections or HashMap types, always supply explicit type annotations (e.g., `let mut keys: std::vec::Vec<String> = std::vec::Vec::new();`) to prevent compiler type-inference ambiguities.
-2.  **Bounds-Checked Memory Operations:**
-    *   When copying raw byte buffers using `copy_nonoverlapping`, always clamp the length using `.min()` against the target array capacity.
-3.  **No Unused Warnings:**
-    *   Keep the code clean of compiler warnings. Remove unused `mut` modifiers or prefix unused parameters with underscores (`_param`).
+1. **Explicit Type Annotations for Collections:**
+   * When instantiating custom vector collections or HashMap types, always supply explicit type annotations (e.g., `let mut keys: std::vec::Vec<String> = std::vec::Vec::new();`) to prevent compiler type-inference ambiguities.
+2. **Bounds-Checked Memory Operations:**
+   * When copying raw byte buffers using `copy_nonoverlapping`, always clamp the length using `.min()` against the target array capacity.
+3. **No Unused Warnings:**
+   * Keep the code clean of compiler warnings. Remove unused `mut` modifiers or prefix unused parameters with underscores (`_param`).

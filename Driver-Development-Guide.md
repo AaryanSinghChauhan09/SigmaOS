@@ -4,20 +4,22 @@
 
 SigmaOS implements drivers using a **clean-room, no-std Rust** approach with zero dependency on Linux kernel headers or Windows WDK. All drivers follow the SigmaOS Driver Model (SDM).
 
-***
+---
 
 ## Driver Architecture
 
-    drivers/
-    ├── mod.rs           # Driver registry and bus manager
-    ├── pci/             # PCI/PCIe bus enumeration
-    ├── usb/             # USB host controller drivers
-    ├── storage/         # AHCI, NVMe, virtio-blk
-    ├── net/             # Network device drivers
-    ├── gpu/             # GPU/display drivers
-    └── input/           # HID: keyboard, mouse, touchpad
+```
+drivers/
+├── mod.rs           # Driver registry and bus manager
+├── pci/             # PCI/PCIe bus enumeration
+├── usb/             # USB host controller drivers
+├── storage/         # AHCI, NVMe, virtio-blk
+├── net/             # Network device drivers
+├── gpu/             # GPU/display drivers
+└── input/           # HID: keyboard, mouse, touchpad
+```
 
-***
+---
 
 ## Writing a Driver
 
@@ -67,12 +69,11 @@ pub fn register() {
 ### Step 3: Device Tree / ACPI Binding
 
 For hardware discovery, drivers bind via:
+- **PCI subsystem**: Vendor ID + Device ID matching
+- **ACPI**: HID/CID string matching (e.g., "PNP0303" for PS/2 keyboard)
+- **Device Tree** (ARM): Compatible string matching
 
-*   **PCI subsystem**: Vendor ID + Device ID matching
-*   **ACPI**: HID/CID string matching (e.g., "PNP0303" for PS/2 keyboard)
-*   **Device Tree** (ARM): Compatible string matching
-
-***
+---
 
 ## DRM/KMS Display Driver
 
@@ -90,14 +91,13 @@ if mode.verify_timing_boundaries() {
 ```
 
 ### Timing Specification
+- `hdisplay` / `vdisplay`: Active pixel area
+- `hsync_start`, `hsync_end`, `htotal`: Horizontal timing
+- `vsync_start`, `vsync_end`, `vtotal`: Vertical timing
+- `clock`: Pixel clock in kHz
+- `vrefresh`: Refresh rate in Hz
 
-*   `hdisplay` / `vdisplay`: Active pixel area
-*   `hsync_start`, `hsync_end`, `htotal`: Horizontal timing
-*   `vsync_start`, `vsync_end`, `vtotal`: Vertical timing
-*   `clock`: Pixel clock in kHz
-*   `vrefresh`: Refresh rate in Hz
-
-***
+---
 
 ## Memory-Mapped I/O (MMIO)
 
@@ -111,7 +111,7 @@ let value = unsafe { read32(base_addr + REG_STATUS) };
 unsafe { write32(base_addr + REG_CTRL, CTRL_ENABLE) };
 ```
 
-***
+---
 
 ## Interrupt Handling
 
@@ -127,7 +127,7 @@ IrqManager::register(irq_num, |irq| {
 });
 ```
 
-***
+---
 
 ## DMA Support
 
@@ -144,7 +144,7 @@ let phys_addr = buf.phys_addr();
 device.set_dma_addr(phys_addr);
 ```
 
-***
+---
 
 ## PCI Driver Example: NVMe
 
@@ -170,19 +170,18 @@ impl SigmaNvme {
 }
 ```
 
-***
+---
 
 ## USB Stack
 
 **Module:** `src/drivers/usb/`
 
 SigmaOS implements a clean-room USB stack:
-
-*   **XHCI** (USB 3.x) host controller
-*   **EHCI** (USB 2.0) host controller
-*   **USB HID**: Keyboard, mouse, gamepad
-*   **USB Mass Storage**: Flash drives, external HDDs
-*   **USB Serial**: CDC-ACM devices
+- **XHCI** (USB 3.x) host controller
+- **EHCI** (USB 2.0) host controller
+- **USB HID**: Keyboard, mouse, gamepad
+- **USB Mass Storage**: Flash drives, external HDDs
+- **USB Serial**: CDC-ACM devices
 
 ```rust
 use crate::drivers::usb::{UsbDevice, UsbClass};
@@ -197,17 +196,17 @@ for device in usb_host.enumerate() {
 }
 ```
 
-***
+---
 
 ## Driver Safety Guidelines
 
-1.  **No panics in interrupt context** — use `Option`/`Result` instead
-2.  **No blocking in IRQ handlers** — defer work to kernel threads
-3.  **Cache-aligned DMA buffers** — use `DmaBuffer::new_aligned()`
-4.  **Memory barriers** — use `fence(Ordering::SeqCst)` around MMIO
-5.  **Document all `unsafe` blocks** — explain invariants maintained
+1. **No panics in interrupt context** — use `Option`/`Result` instead
+2. **No blocking in IRQ handlers** — defer work to kernel threads
+3. **Cache-aligned DMA buffers** — use `DmaBuffer::new_aligned()`
+4. **Memory barriers** — use `fence(Ordering::SeqCst)` around MMIO
+5. **Document all `unsafe` blocks** — explain invariants maintained
 
-***
+---
 
 ## Testing Drivers
 
@@ -222,10 +221,9 @@ make qemu-driver-test DRIVER=nvme
 make usb-test
 ```
 
-***
+---
 
 *See also:*
-
-*   [DRIVER\_DEVELOPMENT\_PLAN\_2026.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_DEVELOPMENT_PLAN_2026.md)
-*   [UNIVERSAL\_DRIVER\_SUPPORT\_PLAN.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/UNIVERSAL_DRIVER_SUPPORT_PLAN.md)
-*   [DRIVER\_MANAGEMENT\_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_MANAGEMENT_ROADMAP.md)
+- [DRIVER_DEVELOPMENT_PLAN_2026.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_DEVELOPMENT_PLAN_2026.md)
+- [UNIVERSAL_DRIVER_SUPPORT_PLAN.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/UNIVERSAL_DRIVER_SUPPORT_PLAN.md)
+- [DRIVER_MANAGEMENT_ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/DRIVER_MANAGEMENT_ROADMAP.md)

@@ -3,76 +3,74 @@
 > **Goal:** Zero external crate dependencies at runtime. Every function needed
 > by the kernel and userland is implemented in `src/klib/`.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Why Reduce Dependencies?](#why-reduce-dependencies)
-2.  [The klib Philosophy](#the-klib-philosophy)
-3.  [What klib Replaces](#what-klib-replaces)
-4.  [Module Reference](#module-reference)
-5.  [How to Port Code to klib](#how-to-port-code-to-klib)
-6.  [Common std → klib Migration Patterns](#common-std--klib-migration-patterns)
-7.  [Build Verification](#build-verification)
-8.  [Adding New klib Modules](#adding-new-klib-modules)
-9.  [Forbidden Imports](#forbidden-imports)
+1. [Why Reduce Dependencies?](#why-reduce-dependencies)
+2. [The klib Philosophy](#the-klib-philosophy)
+3. [What klib Replaces](#what-klib-replaces)
+4. [Module Reference](#module-reference)
+5. [How to Port Code to klib](#how-to-port-code-to-klib)
+6. [Common std → klib Migration Patterns](#common-std--klib-migration-patterns)
+7. [Build Verification](#build-verification)
+8. [Adding New klib Modules](#adding-new-klib-modules)
+9. [Forbidden Imports](#forbidden-imports)
 10. [Current Status](#current-status)
 
-***
+---
 
 ## Why Reduce Dependencies?
 
 ### Security Surface
-
 Every external crate is a potential supply-chain attack vector. The `solarwinds`
 and `xz-utils` incidents demonstrated that even widely-trusted packages can be
 compromised. SigmaOS's threat model requires that **every line of code running in
 ring 0 be authored and audited by the SigmaOS project**.
 
 ### Minimal Binary
-
 External crates often pull in large dependency trees. Eliminating them reduces
 the final kernel image size, improves cache locality, and shortens boot time.
 
 ### `no_std` Kernel Requirement
-
 The SigmaOS kernel runs before the OS is initialised. There is no runtime,
 no allocator, no filesystem. Rust's `std` library requires all of these.
 `klib` provides the same functionality without any of those preconditions.
 
 ### Auditability
-
 A 3 000-line custom hash map is easier to audit than a 15-crate dependency chain
 tracing back through `hashbrown → ahash → foldhash → ...`.
 
 ### Reproducibility
-
 External crates change. Pinning crate versions locks checksums but not the entire
 transitive closure. `klib` changes only when SigmaOS developers change it.
 
-***
+---
 
 ## The klib Philosophy
 
-    ┌─────────────────────────────────────────────────────────┐
-    │                     SigmaOS kernel                      │
-    │                                                         │
-    │  src/kernel/  src/security/  src/network/  ...          │
-    │        │              │              │                  │
-    │        └──────────────┴──────────────┘                  │
-    │                       │                                 │
-    │               src/klib/ (no external deps)              │
-    │                       │                                 │
-    │           core (Rust built-in, no OS needed)            │
-    └─────────────────────────────────────────────────────────┘
+```
+┌─────────────────────────────────────────────────────────┐
+│                     SigmaOS kernel                      │
+│                                                         │
+│  src/kernel/  src/security/  src/network/  ...          │
+│        │              │              │                  │
+│        └──────────────┴──────────────┘                  │
+│                       │                                 │
+│               src/klib/ (no external deps)              │
+│                       │                                 │
+│           core (Rust built-in, no OS needed)            │
+└─────────────────────────────────────────────────────────┘
+```
 
 The dependency graph is strictly:
-
-    kernel code  →  klib  →  core (no_std)  →  nothing
+```
+kernel code  →  klib  →  core (no_std)  →  nothing
+```
 
 No arrow points outside SigmaOS. No crate from crates.io is used at runtime.
 
-***
+---
 
 ## What klib Replaces
 
@@ -100,17 +98,16 @@ No arrow points outside SigmaOS. No crate from crates.io is used at runtime.
 | Virtual memory maps | `klib::UserVmMap` | `src/klib/uvm.rs` |
 | Key-value stores | `klib::Store` | `src/klib/store.rs` |
 
-***
+---
 
 ## Module Reference
 
 ### `src/klib/custom_allocator.rs`
 
 Implements `core::alloc::GlobalAlloc` with two allocation strategies:
-
-1.  **Bump allocator** – O(1) alloc, O(1) dealloc (dealloc is a no-op until
-    reset). Used during early boot before the heap is set up.
-2.  **Free-list allocator** – standard next-fit free list. Used after boot.
+1. **Bump allocator** – O(1) alloc, O(1) dealloc (dealloc is a no-op until
+   reset). Used during early boot before the heap is set up.
+2. **Free-list allocator** – standard next-fit free list. Used after boot.
 
 ```rust
 use klib::custom_allocator::SigmaAllocator;
@@ -216,7 +213,7 @@ KERNEL_HEAP.init(heap_start, heap_size);
 let ptr = KERNEL_HEAP.alloc(4096 * 16); // alloc 16 pages
 ```
 
-***
+---
 
 ## How to Port Code to klib
 
@@ -275,7 +272,7 @@ println!("debug: {}", msg);
 klib::debug_print!("debug: {}", msg);  // writes to serial port
 ```
 
-***
+---
 
 ## Common std → klib Migration Patterns
 
@@ -324,7 +321,7 @@ fn read() -> Result<u32, Box<dyn std::error::Error>> { ... }
 fn read() -> Result<u32, klib::error::KlibError> { ... }
 ```
 
-***
+---
 
 ## Build Verification
 
@@ -344,25 +341,24 @@ ls -lh target/x86_64-unknown-none/release/sigma_kernel
 ```
 
 The CI pipeline runs `scripts/smoke-test.sh` which includes:
-
 ```bash
 # Verify no external symbols
 nm target/*/release/sigma_kernel | grep 'U ' | grep -v '__' && exit 1 || echo "OK"
 ```
 
-***
+---
 
 ## Adding New klib Modules
 
 When you need functionality that isn't in klib yet:
 
-1.  Create `src/klib/<module_name>.rs`
-2.  Add `#![no_std]` at the top (or `#[cfg(not(feature="std"))]` guards)
-3.  Add `pub mod <module_name>;` to `src/klib/mod.rs`
-4.  Add a `pub use <module_name>::*;` re-export if appropriate
-5.  Add unit tests using `#[cfg(test)]` modules
-6.  Document with `///` doc comments
-7.  Submit PR with benchmark data showing it is ≥ the std equivalent
+1. Create `src/klib/<module_name>.rs`
+2. Add `#![no_std]` at the top (or `#[cfg(not(feature="std"))]` guards)
+3. Add `pub mod <module_name>;` to `src/klib/mod.rs`
+4. Add a `pub use <module_name>::*;` re-export if appropriate
+5. Add unit tests using `#[cfg(test)]` modules
+6. Document with `///` doc comments
+7. Submit PR with benchmark data showing it is ≥ the std equivalent
 
 ### Module Template
 
@@ -387,7 +383,7 @@ mod tests {
 }
 ```
 
-***
+---
 
 ## Forbidden Imports
 
@@ -407,7 +403,6 @@ use rand::*;            // use klib::random instead (CSPRNG)
 ```
 
 The CI workflow (`.github/workflows/sigma_ci.yml`) runs:
-
 ```yaml
 - name: Check forbidden imports
   run: |
@@ -416,7 +411,7 @@ The CI workflow (`.github/workflows/sigma_ci.yml`) runs:
     echo "PASS"
 ```
 
-***
+---
 
 ## Current Status
 
@@ -444,6 +439,6 @@ The CI workflow (`.github/workflows/sigma_ci.yml`) runs:
 
 **Remaining std usage in non-kernel code:** 3 places (all in test harness, not shipped).
 
-***
+---
 
 *Last updated: 2026-08-04*

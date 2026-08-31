@@ -2,25 +2,25 @@
 
 > Sovereign Driver Framework (SDF) — PQC-attested, lifecycle-managed, Ring-3-capable.
 >
-> Full reference: [docs/Open\_Source\_Drivers.md](../docs/Open_Source_Drivers.md)
+> Full reference: [docs/Open_Source_Drivers.md](../docs/Open_Source_Drivers.md)
 
-***
+---
 
 ## Philosophy
 
 SigmaOS follows Linux's proven model: **most drivers are open source and kernel-integrated**.
 This gives us:
 
-*   Hardware support tested against every kernel change.
+- Hardware support tested against every kernel change.
 
-*   No unsigned code executing in Ring 0.
+- No unsigned code executing in Ring 0.
 
-*   Community contributors can improve drivers without vendor permission.
+- Community contributors can improve drivers without vendor permission.
 
 Proprietary blobs (NVIDIA closed, Broadcom Wi-Fi firmware) are supported as an **opt-in**
 via `sigma-pkg install sigma-nonfree/<driver>` — isolated, integrity-checked, and audited.
 
-***
+---
 
 ## Directory Layout
 
@@ -68,7 +68,7 @@ drivers/
 
 ```
 
-***
+---
 
 ## Open-Source Driver Categories
 
@@ -94,19 +94,19 @@ drivers/
 
 ### ⬜ Planned (v16.0 Apex)
 
-*   `sigma-amdgpu` — AMD Radeon RX 400+ open driver
+- `sigma-amdgpu` — AMD Radeon RX 400+ open driver
 
-*   `sigma-nouveau` — Community NVIDIA open driver
+- `sigma-nouveau` — Community NVIDIA open driver
 
-*   `sigma-xe` — Intel Arc open driver
+- `sigma-xe` — Intel Arc open driver
 
-*   `sigma-mesa` — Mesa OpenGL 4.6 / Vulkan 1.3
+- `sigma-mesa` — Mesa OpenGL 4.6 / Vulkan 1.3
 
-*   `sigma-bluez` — Bluetooth stack
+- `sigma-bluez` — Bluetooth stack
 
-*   `sigma-ath9k` / `sigma-ath11k` — Qualcomm Wi-Fi
+- `sigma-ath9k` / `sigma-ath11k` — Qualcomm Wi-Fi
 
-***
+---
 
 ## SDF Driver Skeleton
 
@@ -131,5 +131,5 @@ impl SdfDriver for MyDriver {
 sigma_sdf::register_driver!(MyDriver, "sigma-mydriver");
 ```
 
-See [docs/Open\_Source\_Drivers.md](../docs/Open_Source_Drivers.md) for the complete guide,
+See [docs/Open_Source_Drivers.md](../docs/Open_Source_Drivers.md) for the complete guide,
 proprietary blob policy, and contribution instructions.

@@ -3,29 +3,31 @@
 > **"A hardware abstraction layer is only as good as its modularity, isolation boundaries, and object-oriented abstractions."**
 > This blueprint establishes the overarching architecture, safety constraints, and concrete implementation matrices for expanding the hardware support boundary in **SigmaOS** using a pure **Object-Oriented Programming (OOP) Driver Framework**. It details how to write robust, `#![no_std]` device drivers with strictly bounded memory footprint configurations and zero unsafe references.
 
-***
+---
 
 ## 🏗️ OOP-Based Driver Architecture & Isolation Bounds
 
-    +---------------------------------------------------------------------------------+
-    |                                 KERNEL CONTEXT                                  |
-    |     (DriverLifecycleManager, Plug-and-Play Factories, Observer notifications)   |
-    +---------------------------------------------------------------------------------+
-                                            |
-                                            v
-    +---------------------------------------------------------------------------------+
-    | BUS CLASS ABSTRACTIONS (PCI, USB, NVMe, I2C, SPI)                               |
-    | - Probes buses dynamically to identify peripheral devices                       |
-    | - Instantiates specialized subclasses via Plug-and-Play Factory design patterns  |
-    +---------------------------------------------------------------------------------+
-    | SPECIALIZED SUBCLASSES                                                          |
-    | - StorageDriver: Manages sector-based block operations with direct DMA          |
-    | - NetworkDriver: Dispatches packets and controls MAC addressing configurations  |
-    | - GraphicsDriver: Operates raw VESA framebuffers and hardware-accelerated GPUs  |
-    | - InputDriver: Captures asynchronous user interaction metrics                   |
-    +---------------------------------------------------------------------------------+
+```
++---------------------------------------------------------------------------------+
+|                                 KERNEL CONTEXT                                  |
+|     (DriverLifecycleManager, Plug-and-Play Factories, Observer notifications)   |
++---------------------------------------------------------------------------------+
+                                        |
+                                        v
++---------------------------------------------------------------------------------+
+| BUS CLASS ABSTRACTIONS (PCI, USB, NVMe, I2C, SPI)                               |
+| - Probes buses dynamically to identify peripheral devices                       |
+| - Instantiates specialized subclasses via Plug-and-Play Factory design patterns  |
++---------------------------------------------------------------------------------+
+| SPECIALIZED SUBCLASSES                                                          |
+| - StorageDriver: Manages sector-based block operations with direct DMA          |
+| - NetworkDriver: Dispatches packets and controls MAC addressing configurations  |
+| - GraphicsDriver: Operates raw VESA framebuffers and hardware-accelerated GPUs  |
+| - InputDriver: Captures asynchronous user interaction metrics                   |
++---------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## 📊 Benchmark vs Linux Distros
 
@@ -37,7 +39,7 @@
 | **Security** | SELinux / AppArmor | Sandboxed Drivers + Capability Tokens | Zero-Trust Driver Model |
 | **Developer Tools**| Kernel modules in C | Rust OOP SDK + Auto CI/CD | Safer, modern memory guarantees |
 
-***
+---
 
 ## 🏗️ Reference Implementation
 
@@ -269,90 +271,84 @@ impl DriverLifecycleManager {
 pub static GLOBAL_LIFECYCLE_MANAGER: DriverLifecycleManager = DriverLifecycleManager::new();
 ```
 
-***
+---
 
 ## 🚀 SDK & Developer Roadmap
 
 To write a brand new driver conforming to our OOP patterns, follow this standard pattern:
 
-1.  Declare a driver configuration struct.
-2.  Implement the standard base `Driver` trait.
-3.  Specialize the driver using `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, or `InputDriver`.
-4.  Register the driver struct with the static `GLOBAL_LIFECYCLE_MANAGER`.
-
+1. Declare a driver configuration struct.
+2. Implement the standard base `Driver` trait.
+3. Specialize the driver using `StorageDriver`, `NetworkDriver`, `GraphicsDriver`, or `InputDriver`.
+4. Register the driver struct with the static `GLOBAL_LIFECYCLE_MANAGER`.
 # 🛡️ SigmaOS: Sovereign Master Driver Development Blueprint
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Unified Multi-Generation OOP Driver Framework**.
 
 Inspired by the Linux Direct Rendering Manager (DRM), NVMe core, Intel e1000, and ALSA subsystems, this blueprint establishes a high-performance, capability-gated, and zero-dependency driver model designed for absolute digital sovereignty.
 
-***
+---
 
 ## 🏗️ 1. Core Architectural Vision
 
 SigmaOS decomposes traditional monolithic driver piles into **Polymorphic Device Shards** governed by a capability-enforced transaction bus.
 
 ### Key Design Pillars
+1. **Object-Oriented Polymorphism**: Decouple hardware access methods from logical device operations via traits.
+2. **Zero-Dependency Footprint**: Implement drivers with no external runtime dependencies, compiling directly in a `#![no_std]` environment.
+3. **Sandboxed UDF Extensibility**: Handle vendor-specific control variations by executing **User-Defined Function (UDF) bytecode** inside a zero-allocation micro-VM.
+4. **Link-Time Size Pruning**: Leverage LTO and dynamic devirtualization to compile out unused driver routines, matching Alpine/DietPi minimal storage standards.
 
-1.  **Object-Oriented Polymorphism**: Decouple hardware access methods from logical device operations via traits.
-2.  **Zero-Dependency Footprint**: Implement drivers with no external runtime dependencies, compiling directly in a `#![no_std]` environment.
-3.  **Sandboxed UDF Extensibility**: Handle vendor-specific control variations by executing **User-Defined Function (UDF) bytecode** inside a zero-allocation micro-VM.
-4.  **Link-Time Size Pruning**: Leverage LTO and dynamic devirtualization to compile out unused driver routines, matching Alpine/DietPi minimal storage standards.
-
-***
+---
 
 ## 🚀 2. Master Driver Development Plan
 
 The driver subsystem is organized into **six core technology domains**, mapping out integration pathways, Linux equivalents, and precise capability gates.
 
-                          +-----------------------------+
-                          |      Capability Gate        |
-                          +-----------------------------+
-                                         |
-             +---------------------------+---------------------------+
-             |                           |                           |
-             v                           v                           v
-    +-------------------+       +-------------------+       +-------------------+
-    |  Graphics Shard   |       |   Storage Shard   |       |   Network Shard   |
-    | - Intel HD/Radeon |       | - NVMe Controller |       | - Intel E1000     |
-    | - NVIDIA Core     |       | - AHCI / SATA     |       | - RTL8139 / VirtIO|
-    | - VESA Framebuffer|       | - VirtIO Block    |       | - zero-copy rings |
-    +-------------------+       +-------------------+       +-------------------+
+```
+                      +-----------------------------+
+                      |      Capability Gate        |
+                      +-----------------------------+
+                                     |
+         +---------------------------+---------------------------+
+         |                           |                           |
+         v                           v                           v
++-------------------+       +-------------------+       +-------------------+
+|  Graphics Shard   |       |   Storage Shard   |       |   Network Shard   |
+| - Intel HD/Radeon |       | - NVMe Controller |       | - Intel E1000     |
+| - NVIDIA Core     |       | - AHCI / SATA     |       | - RTL8139 / VirtIO|
+| - VESA Framebuffer|       | - VirtIO Block    |       | - zero-copy rings |
++-------------------+       +-------------------+       +-------------------+
+```
 
 ### 2.1 Graphics & Display Shards (Linux DRM Equivalent)
-
-*   **Objective**: Establish robust display blitting, page-flipping, and frame rendering.
-*   **Inspiration**: Linux DRM / KMS kernel display modesetting.
-*   **Purity**: Zero unsafe heap accesses; direct hardware/VESA page mapping.
+- **Objective**: Establish robust display blitting, page-flipping, and frame rendering.
+- **Inspiration**: Linux DRM / KMS kernel display modesetting.
+- **Purity**: Zero unsafe heap accesses; direct hardware/VESA page mapping.
 
 ### 2.2 Storage & Controllers (Linux Block Equivalent)
-
-*   **Objective**: Standardized sector reads/writes with Native Command Queuing (NCQ) and DMA ring buffers.
-*   **Inspiration**: Linux NVMe core and AHCI SCSI translation layers.
-*   **Efficiency**: High throughput under MLFQ scheduling with lock-free page completion tables.
+- **Objective**: Standardized sector reads/writes with Native Command Queuing (NCQ) and DMA ring buffers.
+- **Inspiration**: Linux NVMe core and AHCI SCSI translation layers.
+- **Efficiency**: High throughput under MLFQ scheduling with lock-free page completion tables.
 
 ### 2.3 Network Adapters (Linux Netdev Equivalent)
-
-*   **Objective**: Wire-speed ethernet send/receive packet queues with standard MTU configurations.
-*   **Inspiration**: Linux Intel e1000 e1000e driver and virtio-net.
-*   **Performance**: Zero-copy packet ring buffers directly mapping to network protocols.
+- **Objective**: Wire-speed ethernet send/receive packet queues with standard MTU configurations.
+- **Inspiration**: Linux Intel e1000 e1000e driver and virtio-net.
+- **Performance**: Zero-copy packet ring buffers directly mapping to network protocols.
 
 ### 2.4 Peripheral, Input, and Sound (Linux Input & ALSA Equivalent)
-
-*   **Objective**: Multi-channel sample rate audio pipelines, keycode event buffers, and touch points grids.
-*   **Inspiration**: Linux ALSA, `evdev` interface, and Broadcom BT/WiFi host stacks.
+- **Objective**: Multi-channel sample rate audio pipelines, keycode event buffers, and touch points grids.
+- **Inspiration**: Linux ALSA, `evdev` interface, and Broadcom BT/WiFi host stacks.
 
 ### 2.5 Bus Topologies (Linux Bus Equivalent)
-
-*   **Objective**: Auto-discovery and registration tables for PCIe configurations, I2C clocks, SPI modes, and GPIO pin matrices.
-*   **Inspiration**: Linux PCI subsystem, sysfs device trees, and ACPI tables.
+- **Objective**: Auto-discovery and registration tables for PCIe configurations, I2C clocks, SPI modes, and GPIO pin matrices.
+- **Inspiration**: Linux PCI subsystem, sysfs device trees, and ACPI tables.
 
 ### 2.6 Hardware Security & Enclaves (Linux TPM & Crypto Equivalent)
+- **Objective**: Enforce post-quantum cryptographic isolation, hardware-sealed secrets, and secure enclave boundaries.
+- **Inspiration**: Linux TPM 2.0 subsystem and Intel SGX.
 
-*   **Objective**: Enforce post-quantum cryptographic isolation, hardware-sealed secrets, and secure enclave boundaries.
-*   **Inspiration**: Linux TPM 2.0 subsystem and Intel SGX.
-
-***
+---
 
 ## 💻 3. Executable Reference Implementation
 
@@ -558,14 +554,13 @@ impl NetworkAdapterDevice for IntelE1000NetworkDriver {
 }
 ```
 
-***
+---
 
 ## 🔬 4. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the driver ecosystem:
-
-1.  **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2.  **Dynamic devirtualization and LTO**: Benchmarks under `Bolt` guarantee that driver footprints occupy < 15KB when LTO compiling is enabled.
-3.  **PQC Sandbox Attestation**: All memory read/write requests from user land are verified using post-quantum capability tags, ensuring perfect protection against hardware exploitation vectors.
+1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
+2. **Dynamic devirtualization and LTO**: Benchmarks under `Bolt` guarantee that driver footprints occupy < 15KB when LTO compiling is enabled.
+3. **PQC Sandbox Attestation**: All memory read/write requests from user land are verified using post-quantum capability tags, ensuring perfect protection against hardware exploitation vectors.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized driver ecosystem that completely surpasses legacy OS assumptions.

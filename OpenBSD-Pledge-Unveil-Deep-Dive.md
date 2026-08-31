@@ -8,36 +8,38 @@ SigmaOS implements the OpenBSD security sandbox model with `pledge()` and `unvei
 
 ### How It Works
 
-    Process calls pledge("stdio rpath", nullptr)
-             │
-             ▼
-        PledgeManager
-             │
-             ├─ Parse promise string into CapabilitySet
-             │
-             ├─ Apply restrictions (one-way ratchet)
-             │
-             └─ Store in process's security context
-                      │
-                      ▼
-             On syscall entry: check against promise
-                      │
-            ┌─────────┴─────────┐
-            │ ALLOWED            │ DENIED
-            ▼                   ▼
-      Continue               SIGABRT
+```
+Process calls pledge("stdio rpath", nullptr)
+         │
+         ▼
+    PledgeManager
+         │
+         ├─ Parse promise string into CapabilitySet
+         │
+         ├─ Apply restrictions (one-way ratchet)
+         │
+         └─ Store in process's security context
+                  │
+                  ▼
+         On syscall entry: check against promise
+                  │
+        ┌─────────┴─────────┐
+        │ ALLOWED            │ DENIED
+        ▼                   ▼
+  Continue               SIGABRT
+```
 
 ### Promise String Parsing
 
 | Promise Token | Allowed Syscalls |
 |--------------|-----------------|
 | `stdio` | read, write, close, fstat, stat, getdents |
-| `rpath` | open(O\_RDONLY), stat, lstat, readlink |
-| `wpath` | open(O\_WRONLY), create, truncate |
+| `rpath` | open(O_RDONLY), stat, lstat, readlink |
+| `wpath` | open(O_WRONLY), create, truncate |
 | `cpath` | mkdir, rename, link, symlink |
 | `dpath` | mknod, mkfifo, socket |
 | `exec` | execve, execvp |
-| `inet` | socket(AF\_INET), connect, listen, accept |
+| `inet` | socket(AF_INET), connect, listen, accept |
 | `dns` | getaddrinfo, getnameinfo |
 | `proc` | fork, waitpid, kill |
 | `id` | setuid, setgid, getuid, getgid |
@@ -83,26 +85,28 @@ impl PledgeManager {
 
 After `unveil()` is called, only explicitly unveiled paths are visible to the process. All other filesystem paths return `ENOENT`.
 
-    Process calls unveil("/etc", "r")
-    Process calls unveil("/tmp", "rw")
-    Process calls unveil("", "")      ← Lock the unveil list
-             │
-             ▼
-        UnveilManager
-             │
-             ├─ Add /etc with READ permission
-             ├─ Add /tmp with READ|WRITE permission
-             └─ Lock (no more unveil calls allowed)
-                      │
-                      ▼
-             On open("/usr/lib/libfoo.so", O_RDONLY):
-                      │
-             Check prefix against unveiled paths
-                      │
-            ┌─────────┴─────────┐
-            │ MATCH (prefix)     │ NO MATCH
-            ▼                   ▼
-      Check permissions       Return ENOENT
+```
+Process calls unveil("/etc", "r")
+Process calls unveil("/tmp", "rw")
+Process calls unveil("", "")      ← Lock the unveil list
+         │
+         ▼
+    UnveilManager
+         │
+         ├─ Add /etc with READ permission
+         ├─ Add /tmp with READ|WRITE permission
+         └─ Lock (no more unveil calls allowed)
+                  │
+                  ▼
+         On open("/usr/lib/libfoo.so", O_RDONLY):
+                  │
+         Check prefix against unveiled paths
+                  │
+        ┌─────────┴─────────┐
+        │ MATCH (prefix)     │ NO MATCH
+        ▼                   ▼
+  Check permissions       Return ENOENT
+```
 
 ### Directory Traversal Prevention
 
@@ -153,10 +157,11 @@ pub fn is_path_allowed(&self, path: &str, required: UnveilPermission) -> bool {
 ### Prefix Bypass Prevention
 
 **Vulnerability Example (FIXED)**:
-
-    Unveiled: /app/data
-    Attack path: /app/data-evil/../../etc/passwd
-                 ^^^^^^^^^^^^^^^^ This is /etc/passwd after normalization
+```
+Unveiled: /app/data
+Attack path: /app/data-evil/../../etc/passwd
+             ^^^^^^^^^^^^^^^^ This is /etc/passwd after normalization
+```
 
 The fix: always normalize BOTH the unveiled path AND the requested path before comparison, and use `/` suffix in prefix checks.
 
@@ -164,17 +169,19 @@ The fix: always normalize BOTH the unveiled path AND the requested path before c
 
 SigmaOS bridges pledge/unveil with a Tomoyo/AppArmor-like path-based MAC:
 
-    ┌─────────────────────────────────────────────────┐
-    │                  Syscall Entry                  │
-    ├─────────────────────────────────────────────────┤
-    │  1. pledge check: is this syscall in promises?  │
-    ├─────────────────────────────────────────────────┤
-    │  2. unveil check: is this path visible?         │
-    ├─────────────────────────────────────────────────┤
-    │  3. capability check: does process have cap?    │
-    ├─────────────────────────────────────────────────┤
-    │  4. SELinux label check (optional)              │
-    └─────────────────────────────────────────────────┘
+```
+┌─────────────────────────────────────────────────┐
+│                  Syscall Entry                  │
+├─────────────────────────────────────────────────┤
+│  1. pledge check: is this syscall in promises?  │
+├─────────────────────────────────────────────────┤
+│  2. unveil check: is this path visible?         │
+├─────────────────────────────────────────────────┤
+│  3. capability check: does process have cap?    │
+├─────────────────────────────────────────────────┤
+│  4. SELinux label check (optional)              │
+└─────────────────────────────────────────────────┘
+```
 
 ## Differences from OpenBSD
 
@@ -190,8 +197,8 @@ SigmaOS bridges pledge/unveil with a Tomoyo/AppArmor-like path-based MAC:
 
 ## References
 
-*   OpenBSD `pledge(2)` manpage
-*   OpenBSD `unveil(2)` manpage
-*   [Security Architecture](Security-Architecture)
-*   `src/security/pledge.rs`
-*   `src/security/unveil.rs`
+- OpenBSD `pledge(2)` manpage
+- OpenBSD `unveil(2)` manpage
+- [Security Architecture](Security-Architecture.md)
+- `src/security/pledge.rs`
+- `src/security/unveil.rs`

@@ -31,9 +31,9 @@ SigmaOS aims to eliminate all external C runtime dependencies from the core kern
 
 ## Goals
 
-*   \[ ] 100% zero-dependency core kernel
-*   \[ ] Custom audio processing
-*   \[ ] Custom graphics subsystem
-*   \[ ] Pure Rust DNS resolver (done)
-*   \[ ] Pure Rust TLS 1.3 (done)
-*   \[ ] Pure Rust WireGuard (in progress)
+- [ ] 100% zero-dependency core kernel
+- [ ] Custom audio processing
+- [ ] Custom graphics subsystem
+- [ ] Pure Rust DNS resolver (done)
+- [ ] Pure Rust TLS 1.3 (done)
+- [ ] Pure Rust WireGuard (in progress)

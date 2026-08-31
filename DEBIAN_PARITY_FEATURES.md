@@ -191,16 +191,16 @@ impl DebianSecurity {
 
 ## Best Practices
 
-1.  **Stability First:** Prioritize stable packages over testing/unstable
-2.  **Security Updates:** Apply security updates promptly
-3.  **Backports:** Use backports for newer software on stable systems
-4.  **Minimal Changes:** Make minimal changes to system configuration
-5.  **Testing:** Test changes in non-production environments first
+1. **Stability First:** Prioritize stable packages over testing/unstable
+2. **Security Updates:** Apply security updates promptly
+3. **Backports:** Use backports for newer software on stable systems
+4. **Minimal Changes:** Make minimal changes to system configuration
+5. **Testing:** Test changes in non-production environments first
 
 ## References
 
-*   [Debian Administrator's Handbook](https://debian-handbook.info/)
-*   [APT Documentation](https://manpages.debian.org/bookworm/apt/apt.8.en.html)
-*   [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
-*   [Debian Developer's Reference](https://www.debian.org/doc/manuals/developers-reference/)
-*   [Debian Security Team](https://www.debian.org/security/)
+- [Debian Administrator's Handbook](https://debian-handbook.info/)
+- [APT Documentation](https://manpages.debian.org/bookworm/apt/apt.8.en.html)
+- [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
+- [Debian Developer's Reference](https://www.debian.org/doc/manuals/developers-reference/)
+- [Debian Security Team](https://www.debian.org/security/)

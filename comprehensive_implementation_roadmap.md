@@ -2,17 +2,19 @@
 
 This master roadmap outlines the complete 120-Week phased milestone plan to bring **SigmaOS** to absolute industrial-grade maturity. It consolidates all features, updates, security hardened modules, and developer toolchains into a single-branch development paradigm backed by declarative feature flags.
 
-***
+---
 
 ## 📅 120-Week Phased Development Roadmap
 
-                 [Critical Foundations]               [Ecosystem & Hardening]              [Developer Workstations]
-      Phase 1-3 (Weeks 1-36)                Phase 4-7 (Weeks 37-84)              Phase 8-10 (Weeks 85-120)
-      - Complete Boot & IRQ S-NET           - SPM Universal Package Manager      - OCI Containers & Cgroups v2
-      - DRM/KMS i915 display drivers        - OSTree-style A/B transactional Up  - Zenith Compositor and Apps
-      - Tmpfs & VFS read-ahead filesystems  - SELinux MAC and seccomp filters    - SDK, build tools, & debuggers
+```
+             [Critical Foundations]               [Ecosystem & Hardening]              [Developer Workstations]
+  Phase 1-3 (Weeks 1-36)                Phase 4-7 (Weeks 37-84)              Phase 8-10 (Weeks 85-120)
+  - Complete Boot & IRQ S-NET           - SPM Universal Package Manager      - OCI Containers & Cgroups v2
+  - DRM/KMS i915 display drivers        - OSTree-style A/B transactional Up  - Zenith Compositor and Apps
+  - Tmpfs & VFS read-ahead filesystems  - SELinux MAC and seccomp filters    - SDK, build tools, & debuggers
+```
 
-***
+---
 
 ## 🏗️ Phase-specific Code Implementations
 

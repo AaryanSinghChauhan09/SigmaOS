@@ -5,24 +5,24 @@ workload bursts and pre-warm CPU/memory resources.
 
 ## Model Architecture
 
-*   Lightweight LSTM trained on historical shard behaviour
+- Lightweight LSTM trained on historical shard behaviour
 
-*   Runs entirely in a sandboxed inference shard (no GPU required at boot)
+- Runs entirely in a sandboxed inference shard (no GPU required at boot)
 
-*   Inference latency < 50 µs on baseline x86\_64
+- Inference latency < 50 µs on baseline x86_64
 
 ## Integration Points
 
-*   Feeds scheduling hints to `scheduling/hybrid/`
+- Feeds scheduling hints to `scheduling/hybrid/`
 
-*   Monitors memory pressure and pre-triggers compaction
+- Monitors memory pressure and pre-triggers compaction
 
-*   Signals VPN shard of expected burst traffic
+- Signals VPN shard of expected burst traffic
 
 ## Roadmap
 
-*   \[ ] Feature extraction pipeline (CPU/mem/io counters)
+- [ ] Feature extraction pipeline (CPU/mem/io counters)
 
-*   \[ ] Model training harness (offline, on reference hardware)
+- [ ] Model training harness (offline, on reference hardware)
 
-*   \[ ] Kernel hook for hint injection
+- [ ] Kernel hook for hint injection

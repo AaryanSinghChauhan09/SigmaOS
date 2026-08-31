@@ -2,26 +2,28 @@
 
 SigmaOS implements three powerful Linux/BSD-inspired security and performance primitives. This page documents their design, rationale, and usage.
 
-***
+---
 
 ## 1. eBPF-Inspired Security Verifier
 
 SigmaOS does **not** require a full Linux eBPF JIT compiler. Instead, it implements a lightweight **eBPF-inspired syscall verifier** that:
 
-1.  Validates syscall numbers against a blocked-syscall bitmap at kernel entry
-2.  Enforces per-process security policies without calling into external LSM libraries
-3.  Operates entirely in `no_std` kernel space
+1. Validates syscall numbers against a blocked-syscall bitmap at kernel entry
+2. Enforces per-process security policies without calling into external LSM libraries
+3. Operates entirely in `no_std` kernel space
 
 ### Design
 
-    Process → Syscall Entry → EbpfSecurityVerifier::is_allowed()
-                                        │
-                        ┌───────────────┴────────────────┐
-                        │  Blocked Syscall Bitmap (64)   │
-                        └────────────────────────────────┘
-                                        │
-                              Allowed? → Dispatch
-                              Denied?  → EACCES / kill
+```
+Process → Syscall Entry → EbpfSecurityVerifier::is_allowed()
+                                    │
+                    ┌───────────────┴────────────────┐
+                    │  Blocked Syscall Bitmap (64)   │
+                    └────────────────────────────────┘
+                                    │
+                          Allowed? → Dispatch
+                          Denied?  → EACCES / kill
+```
 
 ### Usage (Rust API)
 
@@ -43,7 +45,7 @@ if verifier.is_allowed(requested_syscall) {
 
 Full eBPF requires a JIT compiler, a verifier with unbounded-loop detection, and map infrastructure — all of which depend on significant runtime allocations. SigmaOS's philosophy of **zero std dependency** and **minimal allocator use** means the lightweight verifier is the correct trade-off for the kernel space, while a full eBPF runtime can be offered in userspace.
 
-***
+---
 
 ## 2. Zero-Copy Splice (`sigma_splice`)
 
@@ -56,9 +58,9 @@ Traditional data pipelines (pipe → read → write) copy data through kernel bu
 pub fn sigma_splice(src_fd: FileDescriptor, dst_fd: FileDescriptor, len: usize) -> Result<usize, SpliceError>;
 ```
 
-*   Uses page-reference counting to transfer ownership between VFS nodes
-*   Supports pipe → socket, file → pipe, and socket → socket paths
-*   Falls back to buffered copy if splice is unsupported on the target FS
+- Uses page-reference counting to transfer ownership between VFS nodes
+- Supports pipe → socket, file → pipe, and socket → socket paths
+- Falls back to buffered copy if splice is unsupported on the target FS
 
 ### Performance Impact
 
@@ -75,7 +77,7 @@ pub fn sigma_splice(src_fd: FileDescriptor, dst_fd: FileDescriptor, len: usize) 
 sigma-net send --splice /var/data/large.iso 192.168.1.5:8080
 ```
 
-***
+---
 
 ## 3. Landlock + OpenBSD Unveil Hybrid (`sigma-unveil`)
 
@@ -83,9 +85,9 @@ SigmaOS combines Linux **Landlock** (filesystem access control via LSM rules) wi
 
 ### Concept
 
-*   A process calls `sigma_unveil(path, permissions)` early in startup
-*   After calling `sigma_unveil_lock()`, the kernel restricts all future filesystem accesses to the declared paths
-*   This is enforced by the Landlock subsystem, providing a transparent security layer without root privileges
+- A process calls `sigma_unveil(path, permissions)` early in startup
+- After calling `sigma_unveil_lock()`, the kernel restricts all future filesystem accesses to the declared paths
+- This is enforced by the Landlock subsystem, providing a transparent security layer without root privileges
 
 ### API
 
@@ -118,11 +120,11 @@ sigma-sandbox --unveil /tmp:rw --unveil /etc:r -- ./my_program
 | macOS | Sandbox profiles | None |
 | SigmaOS | sigma-unveil (both) | None |
 
-***
+---
 
 ## See Also
 
-*   [Security Architecture](Security-Architecture)
-*   [Syscall Table](SYSCALL_TABLE)
-*   [Sandbox and Isolation](Sandbox-Isolation)
-*   [Gaming Performance Mode](Gaming-Performance-Mode)
+- [Security Architecture](Security-Architecture.md)
+- [Syscall Table](SYSCALL_TABLE.md)
+- [Sandbox and Isolation](Sandbox-Isolation.md)
+- [Gaming Performance Mode](Gaming-Performance-Mode.md)

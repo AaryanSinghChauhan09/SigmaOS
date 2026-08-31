@@ -2,23 +2,23 @@
 
 This document describes the primary Rust APIs exposed by the SigmaOS library (`sigmaos`). All APIs follow the OOP-inspired, trait-based design pattern with `no_std` compatibility at the kernel level.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Capability Security API](#capability-security-api)
-2.  [Process & Scheduler API](#process--scheduler-api)
-3.  [Memory Management API](#memory-management-api)
-4.  [Filesystem API](#filesystem-api)
-5.  [Network API](#network-api)
-6.  [Package Manager API](#package-manager-api)
-7.  [Driver Framework API](#driver-framework-api)
-8.  [Shell API](#shell-api)
-9.  [Isolation / Qubes API](#isolation--qubes-api)
+1. [Capability Security API](#capability-security-api)
+2. [Process & Scheduler API](#process--scheduler-api)
+3. [Memory Management API](#memory-management-api)
+4. [Filesystem API](#filesystem-api)
+5. [Network API](#network-api)
+6. [Package Manager API](#package-manager-api)
+7. [Driver Framework API](#driver-framework-api)
+8. [Shell API](#shell-api)
+9. [Isolation / Qubes API](#isolation--qubes-api)
 10. [IPC API](#ipc-api)
 11. [klib Custom Collections](#klib-custom-collections)
 
-***
+---
 
 ## Capability Security API
 
@@ -81,7 +81,7 @@ if gate.validate_syscall(Permission::ProcessExec) {
 }
 ```
 
-***
+---
 
 ## Process & Scheduler API
 
@@ -97,22 +97,20 @@ assert_eq!(proc.state(), ProcessState::Ready);
 ```
 
 **`ProcessState` variants:**
-
-*   `Ready` — waiting to be scheduled
-*   `Running` — currently executing
-*   `Blocked` — waiting for I/O or event
-*   `Zombie` — terminated, waiting for parent to reap
-*   `Sleeping` — timed sleep
+- `Ready` — waiting to be scheduled
+- `Running` — currently executing
+- `Blocked` — waiting for I/O or event
+- `Zombie` — terminated, waiting for parent to reap
+- `Sleeping` — timed sleep
 
 **`Priority` variants:**
+- `Realtime(u8)` — highest, for RT tasks (0-99)
+- `High` — interactive foreground tasks
+- `Normal` — standard user tasks
+- `Low` — background batch tasks
+- `Idle` — runs only when CPU is idle
 
-*   `Realtime(u8)` — highest, for RT tasks (0-99)
-*   `High` — interactive foreground tasks
-*   `Normal` — standard user tasks
-*   `Low` — background batch tasks
-*   `Idle` — runs only when CPU is idle
-
-***
+---
 
 ## Memory Management API
 
@@ -145,7 +143,7 @@ use sigmaos::klib::custom_allocator::SigmaGlobalAlloc;
 // slab allocation for kernel objects
 ```
 
-***
+---
 
 ## Filesystem API
 
@@ -201,7 +199,7 @@ zfs.create_dataset(b"tank/home").unwrap();
 zfs.create_snapshot(b"tank/data", b"snap1").unwrap();
 ```
 
-***
+---
 
 ## Network API
 
@@ -228,7 +226,7 @@ let n = conn.recv(&mut buf)?;
 conn.close()?;
 ```
 
-***
+---
 
 ## Package Manager API
 
@@ -282,7 +280,7 @@ let driver = translator.translate_to_driver();
 assert_eq!(driver.id, 9901);
 ```
 
-***
+---
 
 ## Driver Framework API
 
@@ -334,7 +332,7 @@ fw.unload_driver(1001).unwrap();
 | `Usb` | USB host controllers |
 | `Virtual` | Virtio, paravirtualized |
 
-***
+---
 
 ## Shell API
 
@@ -365,7 +363,7 @@ assert_eq!(cmd.args()[0], b"-la");
 assert_eq!(cmd.args()[1], b"/home/user");
 ```
 
-***
+---
 
 ## Isolation / Qubes API
 
@@ -411,7 +409,7 @@ let disp_id = orch.spawn_domain(
 let cleaned = orch.cleanup_disposable_domains();
 ```
 
-***
+---
 
 ## IPC API
 
@@ -434,13 +432,13 @@ let received = receiver.recv().unwrap();
 assert_eq!(received.data(), b"hello from proc 1");
 ```
 
-***
+---
 
 ## klib Custom Collections
 
 `src/klib/`
 
-### `SigmaVec` (custom no\_std Vec)
+### `SigmaVec` (custom no_std Vec)
 
 ```rust
 use sigmaos::klib::vec::SigmaVec;
@@ -456,7 +454,7 @@ assert_eq!(v[0], 1);
 v.sort();
 ```
 
-### `SigmaHashMap` (custom no\_std HashMap)
+### `SigmaHashMap` (custom no_std HashMap)
 
 ```rust
 use sigmaos::klib::hashmap::SigmaHashMap;
@@ -485,6 +483,6 @@ let ptr = alloc.allocate(256).expect("allocation failed");
 alloc.free(ptr, 256);
 ```
 
-***
+---
 
 *For full API documentation, run `cargo doc --open` in the repository root.*

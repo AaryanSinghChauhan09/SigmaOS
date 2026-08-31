@@ -2,30 +2,32 @@
 
 This document maps all 14 academic subjects of the **Zenith v15.1 Syllabus** to specialized subsystems within the **SigmaOS** microkernel and userspace. To ensure strict compliance with educational frameworks and industrial portability, each section details the architectural alignment and a complete, functional, `#![no_std]` Rust implementation of its core primitives.
 
-***
+---
 
 ## 🗺️ Syllabus Subsystem Alignment
 
-    +---------------------------------------------------------------------------------------------+
-    |                               ZENITH V15.1 SYLLABUS MAPPING                                 |
-    +---------------------------------------------------------------------------------------------+
-    | [FCIT]      -> Kernel Boot, HAL, CLI, and Standalone Core utils Shell                       |
-    | [Discrete]  -> Discrete Math/Logic Proof Engine (Boolean evaluation, lattice walks)         |
-    | [C-Prog]    -> Developer C API Layer (POSIX memory mappings, printf shims, safe C-strings)  |
-    | [Cpp-Prog]  -> Object-Oriented Shard Subsystems (C++ ABI compatibility virtual tables)      |
-    | [RDBMS]     -> SigmaDB Engine (Table memory pools, indexing, SQL query parsing)             |
-    | [Statistics]-> SigmaStats Toolkit (Mean, variance, standard deviation calculations)         |
-    | [WebProg]   -> SigmaWeb Runtime (WASM reactor, WebSocket frame decoders)                     |
-    | [OSConcepts]-> S-SCHED (EEVDF/MLFQ) & S-MM (Buddy alloc, 4-level paging virtual maps)        |
-    | [Python]    -> SigmaPy Runtime (Safe bytecode execution loops, dict lookups)                |
-    | [DWDM]      -> SigmaWarehouse (Data warehousing, association rule mining, k-means clustering)|
-    | [R-Prog]    -> SigmaR Runtime (Data frame structures, matrix transposition)                 |
-    | [AdvPython] -> SigmaAI NumPy Array Pipeline (SIMD-accelerated array slicing)                |
-    | [AIML]      -> SigmaAI Intelligence Layer (Perceptron backpropagation serving engine)       |
-    | [DataModel] -> SigmaModeler & SigmaViz (ERD layout engines, graph visualization matrices)  |
-    +---------------------------------------------------------------------------------------------+
+```
++---------------------------------------------------------------------------------------------+
+|                               ZENITH V15.1 SYLLABUS MAPPING                                 |
++---------------------------------------------------------------------------------------------+
+| [FCIT]      -> Kernel Boot, HAL, CLI, and Standalone Core utils Shell                       |
+| [Discrete]  -> Discrete Math/Logic Proof Engine (Boolean evaluation, lattice walks)         |
+| [C-Prog]    -> Developer C API Layer (POSIX memory mappings, printf shims, safe C-strings)  |
+| [Cpp-Prog]  -> Object-Oriented Shard Subsystems (C++ ABI compatibility virtual tables)      |
+| [RDBMS]     -> SigmaDB Engine (Table memory pools, indexing, SQL query parsing)             |
+| [Statistics]-> SigmaStats Toolkit (Mean, variance, standard deviation calculations)         |
+| [WebProg]   -> SigmaWeb Runtime (WASM reactor, WebSocket frame decoders)                     |
+| [OSConcepts]-> S-SCHED (EEVDF/MLFQ) & S-MM (Buddy alloc, 4-level paging virtual maps)        |
+| [Python]    -> SigmaPy Runtime (Safe bytecode execution loops, dict lookups)                |
+| [DWDM]      -> SigmaWarehouse (Data warehousing, association rule mining, k-means clustering)|
+| [R-Prog]    -> SigmaR Runtime (Data frame structures, matrix transposition)                 |
+| [AdvPython] -> SigmaAI NumPy Array Pipeline (SIMD-accelerated array slicing)                |
+| [AIML]      -> SigmaAI Intelligence Layer (Perceptron backpropagation serving engine)       |
+| [DataModel] -> SigmaModeler & SigmaViz (ERD layout engines, graph visualization matrices)  |
++---------------------------------------------------------------------------------------------+
+```
 
-***
+---
 
 ## 🏗️ Core Academic Implementations
 

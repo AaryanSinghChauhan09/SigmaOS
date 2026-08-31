@@ -493,11 +493,11 @@ impl SigmaOverlays {
 
 ## Best Practices
 
-1.  **Source-Based**: Compile from source for maximum optimization
-2.  **Customization**: Use USE flags for fine-grained control
-3.  **Performance**: Optimize compilation flags for specific hardware
-4.  **Security**: Implement hardened security features
-5.  **Flexibility**: Support multiple profiles and configurations
+1. **Source-Based**: Compile from source for maximum optimization
+2. **Customization**: Use USE flags for fine-grained control
+3. **Performance**: Optimize compilation flags for specific hardware
+4. **Security**: Implement hardened security features
+5. **Flexibility**: Support multiple profiles and configurations
 
 ## Migration Tools
 
@@ -550,8 +550,8 @@ impl GentooMigrationAssistant {
 
 ## References
 
-*   [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page)
-*   [Portage Documentation](https://wiki.gentoo.org/wiki/Portage)
-*   [USE Flags Guide](https://wiki.gentoo.org/wiki/USE_flag)
-*   [Gentoo Profiles](https://wiki.gentoo.org/wiki/Profile)
-*   [Gentoo Overlays](https://gpo.zugaina.org/)
+- [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:Main_Page)
+- [Portage Documentation](https://wiki.gentoo.org/wiki/Portage)
+- [USE Flags Guide](https://wiki.gentoo.org/wiki/USE_flag)
+- [Gentoo Profiles](https://wiki.gentoo.org/wiki/Profile)
+- [Gentoo Overlays](https://gpo.zugaina.org/)

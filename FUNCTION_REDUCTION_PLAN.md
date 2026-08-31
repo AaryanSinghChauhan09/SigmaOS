@@ -6,14 +6,14 @@ This document outlines strategies for reducing SigmaOS's dependency on pre-defin
 
 ## Table of Contents
 
-1.  [Current Dependencies](#current-dependencies)
-2.  [Custom Logging System](#custom-logging-system)
-3.  [Custom String Operations](#custom-string-operations)
-4.  [Custom Memory Operations](#custom-memory-operations)
-5.  [Custom I/O Operations](#custom-io-operations)
-6.  [Custom Time Functions](#custom-time-functions)
-7.  [Custom Math Functions](#custom-math-functions)
-8.  [Implementation Strategy](#implementation-strategy)
+1. [Current Dependencies](#current-dependencies)
+2. [Custom Logging System](#custom-logging-system)
+3. [Custom String Operations](#custom-string-operations)
+4. [Custom Memory Operations](#custom-memory-operations)
+5. [Custom I/O Operations](#custom-io-operations)
+6. [Custom Time Functions](#custom-time-functions)
+7. [Custom Math Functions](#custom-math-functions)
+8. [Implementation Strategy](#implementation-strategy)
 
 ## Current Dependencies
 
@@ -21,22 +21,22 @@ This document outlines strategies for reducing SigmaOS's dependency on pre-defin
 
 Based on code analysis, SigmaOS currently depends on these pre-defined functions:
 
-*   **println!** - Standard output for debugging
-*   **format!** - String formatting
-*   **vec!** - Vector creation
-*   **String::from()** - String conversions
-*   **HashMap::new()** - HashMap creation
-*   **Thread::spawn()** - Thread spawning (where applicable)
-*   **File operations** - File I/O via std::fs
+- **println!** - Standard output for debugging
+- **format!** - String formatting
+- **vec!** - Vector creation
+- **String::from()** - String conversions
+- **HashMap::new()** - HashMap creation
+- **Thread::spawn()** - Thread spawning (where applicable)
+- **File operations** - File I/O via std::fs
 
 ### Dependency Reduction Goals
 
-1.  Replace `println!` with custom logging system
-2.  Implement custom string formatting
-3.  Replace standard collections with klib implementations
-4.  Create custom memory allocation wrappers
-5.  Implement custom I/O primitives
-6.  Build custom time management functions
+1. Replace `println!` with custom logging system
+2. Implement custom string formatting
+3. Replace standard collections with klib implementations
+4. Create custom memory allocation wrappers
+5. Implement custom I/O primitives
+6. Build custom time management functions
 
 ## Custom Logging System
 
@@ -692,38 +692,38 @@ impl SigmaMath {
 
 ### Phase 1: Logging System Replacement
 
-1.  **Identify all println! usage**: Replace with sigma\_log macros
-2.  **Implement SigmaLogger**: Create custom logging infrastructure
-3.  **Update modules**: Replace logging calls systematically
-4.  **Test thoroughly**: Ensure logging functionality is preserved
+1. **Identify all println! usage**: Replace with sigma_log macros
+2. **Implement SigmaLogger**: Create custom logging infrastructure
+3. **Update modules**: Replace logging calls systematically
+4. **Test thoroughly**: Ensure logging functionality is preserved
 
 ### Phase 2: String Operations
 
-1.  **Replace String::from()**: Use SigmaString::from()
-2.  **Implement custom formatting**: Build SigmaString formatting methods
-3.  **Update string operations**: Systematically replace std::string usage
-4.  **Validate correctness**: Ensure string operations work correctly
+1. **Replace String::from()**: Use SigmaString::from()
+2. **Implement custom formatting**: Build SigmaString formatting methods
+3. **Update string operations**: Systematically replace std::string usage
+4. **Validate correctness**: Ensure string operations work correctly
 
 ### Phase 3: Memory Operations
 
-1.  **Replace Vec::new()**: Use klib::Vec::new()
-2.  **Implement custom allocators**: Use SigmaAllocator for memory management
-3.  **Update memory operations**: Replace std::alloc usage
-4.  **Memory safety testing**: Ensure memory operations are safe
+1. **Replace Vec::new()**: Use klib::Vec::new()
+2. **Implement custom allocators**: Use SigmaAllocator for memory management
+3. **Update memory operations**: Replace std::alloc usage
+4. **Memory safety testing**: Ensure memory operations are safe
 
 ### Phase 4: I/O Operations
 
-1.  **Replace std::io operations**: Use SigmaIo for I/O
-2.  **Implement custom I/O primitives**: Build serial port, framebuffer drivers
-3.  **Update I/O calls**: Replace std::io usage systematically
-4.  **I/O testing**: Ensure I/O operations work correctly
+1. **Replace std::io operations**: Use SigmaIo for I/O
+2. **Implement custom I/O primitives**: Build serial port, framebuffer drivers
+3. **Update I/O calls**: Replace std::io usage systematically
+4. **I/O testing**: Ensure I/O operations work correctly
 
 ### Phase 5: Time Functions
 
-1.  **Replace std::time usage**: Use SigmaTime for time operations
-2.  **Implement custom time functions**: Build TSC-based time management
-3.  **Update time calls**: Replace std::time usage
-4.  **Time accuracy testing**: Ensure time operations are accurate
+1. **Replace std::time usage**: Use SigmaTime for time operations
+2. **Implement custom time functions**: Build TSC-based time management
+3. **Update time calls**: Replace std::time usage
+4. **Time accuracy testing**: Ensure time operations are accurate
 
 ## Testing and Validation
 
@@ -809,28 +809,28 @@ sigma_sleep_ms(100);
 
 ## Benefits
 
-1.  **Reduced Dependency**: Less reliance on std library
-2.  **Better Control**: Fine-grained control over system behavior
-3.  **Performance**: Optimized for specific use cases
-4.  **Security**: Reduced attack surface
-5.  **Portability**: Easier to port to different platforms
+1. **Reduced Dependency**: Less reliance on std library
+2. **Better Control**: Fine-grained control over system behavior
+3. **Performance**: Optimized for specific use cases
+4. **Security**: Reduced attack surface
+5. **Portability**: Easier to port to different platforms
 
 ## Resources
 
-*   [SigmaOS Architecture](ARCHITECTURE)
-*   [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE)
-*   [Std Reduction Plan](STD_REDUCTION_PLAN)
-*   [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE)
+- [SigmaOS Architecture](ARCHITECTURE.md)
+- [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE.md)
+- [Std Reduction Plan](STD_REDUCTION_PLAN.md)
+- [Zero Dependency Architecture](ZERO_DEPENDENCY_ARCHITECTURE.md)
 
 ## Contributing
 
 When implementing function reduction:
 
-1.  Provide clear migration paths
-2.  Include comprehensive testing
-3.  Document performance characteristics
-4.  Ensure compatibility with existing code
-5.  Update relevant documentation
+1. Provide clear migration paths
+2. Include comprehensive testing
+3. Document performance characteristics
+4. Ensure compatibility with existing code
+5. Update relevant documentation
 
 ## License
 

@@ -6,20 +6,22 @@ affected component without rebooting.
 
 ## Recovery Flow
 
-    Fault detected (watchdog / page-fault / assertion)
-       ↓
-    Fault classifier (heuristic + ML)
-       ↓
-    Quarantine faulty shard (revoke capabilities)
-       ↓
-    Clean restart from last good snapshot (SovereignFS)
-       ↓
-    Telemetry report filed to Sovereign Audit Log
+```
+Fault detected (watchdog / page-fault / assertion)
+   ↓
+Fault classifier (heuristic + ML)
+   ↓
+Quarantine faulty shard (revoke capabilities)
+   ↓
+Clean restart from last good snapshot (SovereignFS)
+   ↓
+Telemetry report filed to Sovereign Audit Log
+```
 
 ## Roadmap
 
-*   \[ ] Watchdog timer integration
+- [ ] Watchdog timer integration
 
-*   \[ ] Snapshot restore from SovereignFS
+- [ ] Snapshot restore from SovereignFS
 
-*   \[ ] Fault classifier training data collection
+- [ ] Fault classifier training data collection
