@@ -44,13 +44,18 @@ pub use process::{
 pub mod community;
 pub mod access;
 pub mod tools;
+pub mod open_source_os_gap_closure;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 
-pub use unimplemented_features::{
+pub use open_source_os_gap_closure::{
     AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,
+    HaikuBfsAttributeEngine, Minix3ReincarnationServer, NetBsdRumpKernelEngine,
+    PhoronixAutomatedBenchmarkEngine, Plan9P2000ProtocolEngine, RosettaDynamicBinaryTranslator,
+    SmartOsCrossbowVnicEngine, TargetArch,
+};
+pub use unimplemented_features::{
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
