@@ -1167,6 +1167,138 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+// =========================================================================
+// Universal Multi-Distro Package Translator Factory & Cross-PM Bridge
+// =========================================================================
+
+/// Universal Package Translator Trait for converting foreign distro package formats to Sigma-pkg
+pub trait PackageTranslator: Send + Sync {
+    fn source_format(&self) -> PackageFormat;
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError>;
+}
+
+pub struct DebTranslator;
+impl PackageTranslator for DebTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Deb }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("DEB UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("Package: "))
+            .map(|l| l["Package: ".len()..].trim().to_string()).unwrap_or_else(|| "deb_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("Version: "))
+            .map(|l| l["Version: ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Deb).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct RpmTranslator;
+impl PackageTranslator for RpmTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Rpm }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("RPM UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("Name: "))
+            .map(|l| l["Name: ".len()..].trim().to_string()).unwrap_or_else(|| "rpm_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("Version: "))
+            .map(|l| l["Version: ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Rpm).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct PacmanTranslator;
+impl PackageTranslator for PacmanTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Pacman }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Pacman UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("pkgname = "))
+            .map(|l| l["pkgname = ".len()..].trim().to_string()).unwrap_or_else(|| "arch_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("pkgver = "))
+            .map(|l| l["pkgver = ".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Pacman).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct ApkTranslator;
+impl PackageTranslator for ApkTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Apk }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("APK UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("P:"))
+            .map(|l| l["P:".len()..].trim().to_string()).unwrap_or_else(|| "alpine_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("V:"))
+            .map(|l| l["V:".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Apk).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct FlatpakTranslator;
+impl PackageTranslator for FlatpakTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Flatpak }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Flatpak UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("name="))
+            .map(|l| l["name=".len()..].trim().to_string()).unwrap_or_else(|| "flatpak_pkg".to_string());
+        Ok(UnifiedPackage::new(name, "1.0.0".to_string()).with_format(PackageFormat::Flatpak).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+pub struct EbuildTranslator;
+impl PackageTranslator for EbuildTranslator {
+    fn source_format(&self) -> PackageFormat { PackageFormat::Ebuild }
+    fn translate(&self, raw_manifest: &[u8]) -> Result<UnifiedPackage, PackageError> {
+        let content = String::from_utf8(raw_manifest.to_vec())
+            .map_err(|_| PackageError::InstallationFailed("Ebuild UTF-8 parse error".to_string()))?;
+        let name = content.lines().find(|l| l.starts_with("PN="))
+            .map(|l| l["PN=".len()..].trim().to_string()).unwrap_or_else(|| "gentoo_pkg".to_string());
+        let version = content.lines().find(|l| l.starts_with("PV="))
+            .map(|l| l["PV=".len()..].trim().to_string()).unwrap_or_else(|| "1.0.0".to_string());
+        Ok(UnifiedPackage::new(name, version).with_format(PackageFormat::Ebuild).with_format(PackageFormat::SigmaPkg))
+    }
+}
+
+/// Factory pattern for retrieving foreign package translators
+pub struct PackageTranslatorFactory;
+
+impl PackageTranslatorFactory {
+    pub fn create_translator(fmt: PackageFormat) -> Option<alloc::boxed::Box<dyn PackageTranslator>> {
+        match fmt {
+            PackageFormat::Deb => Some(alloc::boxed::Box::new(DebTranslator)),
+            PackageFormat::Rpm => Some(alloc::boxed::Box::new(RpmTranslator)),
+            PackageFormat::Pacman => Some(alloc::boxed::Box::new(PacmanTranslator)),
+            PackageFormat::Apk => Some(alloc::boxed::Box::new(ApkTranslator)),
+            PackageFormat::Flatpak => Some(alloc::boxed::Box::new(FlatpakTranslator)),
+            PackageFormat::Ebuild => Some(alloc::boxed::Box::new(EbuildTranslator)),
+            _ => None,
+        }
+    }
+}
+
+/// Universal Distro Package Bridge for mapping CLI commands across apt, dnf, pacman, apk, and emerge to Sigma-pkg
+pub struct UniversalDistroPackageBridge;
+
+impl UniversalDistroPackageBridge {
+    pub fn translate_cli_command(distro_tool: &str, action: &str, package: &str) -> String {
+        match (distro_tool, action) {
+            ("apt" | "apt-get", "install") | ("dnf" | "yum" | "zypper", "install") |
+            ("pacman", "-S") | ("apk", "add") | ("emerge", "install") => {
+                format!("sigpkg install {}", package)
+            }
+            ("apt" | "apt-get", "remove") | ("dnf" | "yum" | "zypper", "remove") |
+            ("pacman", "-R") | ("apk", "del") | ("emerge", "unmerge") => {
+                format!("sigpkg remove {}", package)
+            }
+            ("apt" | "apt-get", "update") | ("dnf" | "yum" | "zypper", "refresh") |
+            ("pacman", "-Sy") | ("apk", "update") => {
+                "sigpkg update".to_string()
+            }
+            _ => format!("sigpkg {} {}", action, package),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1459,5 +1591,46 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_package_translator_factory() {
+        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
+        assert_eq!(deb_trans.source_format(), PackageFormat::Deb);
+
+        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
+        assert_eq!(rpm_trans.source_format(), PackageFormat::Rpm);
+
+        let pacman_trans = PackageTranslatorFactory::create_translator(PackageFormat::Pacman).unwrap();
+        assert_eq!(pacman_trans.source_format(), PackageFormat::Pacman);
+
+        let apk_trans = PackageTranslatorFactory::create_translator(PackageFormat::Apk).unwrap();
+        assert_eq!(apk_trans.source_format(), PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_universal_distro_package_bridge_mapping() {
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apt", "install", "curl"), "sigpkg install curl");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("dnf", "remove", "nginx"), "sigpkg remove nginx");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("pacman", "-Sy", ""), "sigpkg update");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("apk", "add", "htop"), "sigpkg install htop");
+        assert_eq!(UniversalDistroPackageBridge::translate_cli_command("emerge", "install", "zsh"), "sigpkg install zsh");
+    }
+
+    #[test]
+    fn test_multi_format_conversion() {
+        let deb_raw = b"Package: htop\nVersion: 3.2.1\n";
+        let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
+        let deb_pkg = deb_trans.translate(deb_raw).unwrap();
+        assert_eq!(deb_pkg.name, "htop");
+        assert_eq!(deb_pkg.version, "3.2.1");
+        assert!(deb_pkg.formats.contains(&PackageFormat::SigmaPkg));
+
+        let rpm_raw = b"Name: kernel\nVersion: 6.5.6\n";
+        let rpm_trans = PackageTranslatorFactory::create_translator(PackageFormat::Rpm).unwrap();
+        let rpm_pkg = rpm_trans.translate(rpm_raw).unwrap();
+        assert_eq!(rpm_pkg.name, "kernel");
+        assert_eq!(rpm_pkg.version, "6.5.6");
+        assert!(rpm_pkg.formats.contains(&PackageFormat::SigmaPkg));
     }
 }

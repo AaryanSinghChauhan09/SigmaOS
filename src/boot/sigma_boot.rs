@@ -26,6 +26,56 @@ pub struct BootTheme {
     pub highlight_color_rgb: (u8, u8, u8),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HandoffProtocol {
+    LinuxEfiStub,
+    Multiboot2,
+    FreeBsdBtxElf,
+    OpenBsdBootConf,
+    LiveIsoOverlayFs,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignDistroBootStageHandoff {
+    pub protocol: HandoffProtocol,
+    pub root_uuid: String,
+    pub is_initramfs_mounted: bool,
+    pub is_overlayfs_active: bool,
+    pub kernel_entry_point_addr: u64,
+}
+
+impl SovereignDistroBootStageHandoff {
+    pub fn new(protocol: HandoffProtocol, root_uuid: &str) -> Self {
+        Self {
+            protocol,
+            root_uuid: root_uuid.to_string(),
+            is_initramfs_mounted: false,
+            is_overlayfs_active: false,
+            kernel_entry_point_addr: 0x0010_0000,
+        }
+    }
+
+    pub fn mount_initramfs_vfs(&mut self) -> Result<(), &'static str> {
+        if self.root_uuid.is_empty() {
+            return Err("Boot Handoff: Root UUID cannot be empty");
+        }
+        self.is_initramfs_mounted = true;
+        Ok(())
+    }
+
+    pub fn setup_live_iso_overlayfs(&mut self) -> Result<(), &'static str> {
+        if !self.is_initramfs_mounted {
+            return Err("Boot Handoff: Initramfs VFS must be mounted before overlayfs setup");
+        }
+        self.is_overlayfs_active = true;
+        Ok(())
+    }
+
+    pub fn execute_stage_handoff(&self) -> bool {
+        self.is_initramfs_mounted && self.kernel_entry_point_addr > 0
+    }
+}
+
 pub struct BootManager {
     pub entries: Vec<BootEntry>,
     pub default_entry_id: String,
@@ -94,6 +144,10 @@ impl BootManager {
         pcr
     }
 
+    pub fn find_root_by_uuid(&self, uuid: &str) -> Option<&BootEntry> {
+        self.entries.iter().find(|e| e.cmdline_params.contains(uuid))
+    }
+
     pub fn generate_bootloader_config(&self) -> String {
         let mut cfg = String::new();
         cfg.push_str("# SigmaOS Boot Configuration\n");
@@ -142,5 +196,33 @@ mod tests {
 
         let cfg = boot.generate_bootloader_config();
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
+    }
+
+    #[test]
+    fn test_boot_stage_handoff_and_root_discovery() {
+        let mut boot = BootManager::new(3);
+        boot.add_entry(BootEntry {
+            id: "sigma-root-uuid".to_string(),
+            title: "SigmaOS Main Root".to_string(),
+            kernel_path: "/boot/vmlinuz".to_string(),
+            initrd_path: Some("/boot/initramfs".to_string()),
+            cmdline_params: "root=UUID=1234-5678 ro".to_string(),
+            is_default: true,
+            is_recovery: false,
+        });
+
+        let found = boot.find_root_by_uuid("1234-5678");
+        assert!(found.is_some());
+        assert_eq!(found.unwrap().title, "SigmaOS Main Root");
+
+        let mut handoff = SovereignDistroBootStageHandoff::new(HandoffProtocol::LinuxEfiStub, "1234-5678");
+        assert!(!handoff.execute_stage_handoff());
+
+        handoff.mount_initramfs_vfs().unwrap();
+        assert!(handoff.is_initramfs_mounted);
+
+        handoff.setup_live_iso_overlayfs().unwrap();
+        assert!(handoff.is_overlayfs_active);
+        assert!(handoff.execute_stage_handoff());
     }
 }
