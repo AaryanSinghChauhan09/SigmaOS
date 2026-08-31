@@ -1,6 +1,7 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod arch_pacman_engine;
 pub mod aur;
@@ -15,6 +16,7 @@ pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
 pub mod nix_shell;
+pub mod nixos;
 pub mod pacman;
 pub mod portage;
 pub mod recipe;
