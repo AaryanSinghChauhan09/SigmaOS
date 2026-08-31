@@ -9,6 +9,9 @@
 //   3. NetBSD                        -> Userland Rump Kernel Driver Isolation & Autoconf Engine
 //   4. Haiku OS / BeOS               -> BFS Attributed File System Query & Indexing Engine
 //   5. SmartOS / Illumos             -> Crossbow Virtual Network Architecture (VNICs & Etherstubs)
+//   6. DragonFly BSD                 -> HAMMER2 File System CoW & Multi-Master Clustering Engine
+//   7. OpenBSD                       -> Pledge & Unveil Capability & Path Security Engine
+//   8. Firecracker / Cloud Hypervisor -> MicroVM Zero-Overhead Virtual Machine Hypervisor
 
 #![no_std]
 
@@ -429,6 +432,265 @@ impl Default for SmartOsCrossbowVnicEngine {
 }
 
 // =========================================================================
+// 6. DRAGONFLY BSD (HAMMER2 File System CoW & Multi-Master Clustering Engine)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2BlockRef {
+    pub block_offset: u64,
+    pub data_len: u32,
+    pub checksum_crc32: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2Snapshot {
+    pub snapshot_id: u32,
+    pub name: String,
+    pub root_block_offset: u64,
+    pub timestamp_sec: u64,
+}
+
+pub struct Hammer2StorageEngine {
+    pub cluster_name: String,
+    pub allocated_bytes: u64,
+    pub block_refs: BTreeMap<u64, Hammer2BlockRef>,
+    pub snapshots: Vec<Hammer2Snapshot>,
+    pub deduplicated_blocks_count: u64,
+}
+
+impl Hammer2StorageEngine {
+    pub fn new(cluster_name: &str) -> Self {
+        Self {
+            cluster_name: cluster_name.to_string(),
+            allocated_bytes: 0,
+            block_refs: BTreeMap::new(),
+            snapshots: Vec::new(),
+            deduplicated_blocks_count: 0,
+        }
+    }
+
+    pub fn write_cow_block(&mut self, payload: &[u8]) -> u64 {
+        let mut crc = 0u32;
+        for &b in payload {
+            crc = crc.wrapping_add(b as u32).wrapping_mul(31);
+        }
+
+        // Deduplication check
+        if let Some((&offset, _)) = self.block_refs.iter().find(|(_, r)| r.checksum_crc32 == crc) {
+            self.deduplicated_blocks_count += 1;
+            return offset;
+        }
+
+        let new_offset = self.allocated_bytes + 4096;
+        self.allocated_bytes = new_offset;
+
+        self.block_refs.insert(
+            new_offset,
+            Hammer2BlockRef {
+                block_offset: new_offset,
+                data_len: payload.len() as u32,
+                checksum_crc32: crc,
+            },
+        );
+
+        new_offset
+    }
+
+    pub fn create_instant_snapshot(&mut self, name: &str, timestamp: u64) -> u32 {
+        let snap_id = (self.snapshots.len() + 1) as u32;
+        let root_offset = self.block_refs.keys().last().copied().unwrap_or(0);
+
+        self.snapshots.push(Hammer2Snapshot {
+            snapshot_id: snap_id,
+            name: name.to_string(),
+            root_block_offset: root_offset,
+            timestamp_sec: timestamp,
+        });
+
+        snap_id
+    }
+}
+
+// =========================================================================
+// 7. OPENBSD (Pledge & Unveil Capability & Path Security Engine)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenBsdPledgePromises {
+    Stdio,
+    Rpath,
+    Wpath,
+    Cpath,
+    Inet,
+    Dns,
+    Exec,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpenBsdUnveilRule {
+    pub path: String,
+    pub permissions: String, // "r", "w", "x", "c", "rwxc"
+}
+
+pub struct OpenBsdPledgeUnveilEngine {
+    pub active_promises: Vec<OpenBsdPledgePromises>,
+    pub pledge_enforced: bool,
+    pub unveil_rules: Vec<OpenBsdUnveilRule>,
+    pub unveil_locked: bool,
+}
+
+impl OpenBsdPledgeUnveilEngine {
+    pub fn new() -> Self {
+        Self {
+            active_promises: Vec::new(),
+            pledge_enforced: false,
+            unveil_rules: Vec::new(),
+            unveil_locked: false,
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &[OpenBsdPledgePromises]) -> Result<(), &'static str> {
+        if self.pledge_enforced {
+            // Pledge can only restrict promises further, never expand
+            for p in promises {
+                if !self.active_promises.contains(p) {
+                    return Err("Pledge: Cannot elevate syscall promises once enforced");
+                }
+            }
+        }
+        self.active_promises = promises.to_vec();
+        self.pledge_enforced = true;
+        Ok(())
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if self.unveil_locked {
+            return Err("Unveil: Unveil restrictions locked by unveil(NULL, NULL)");
+        }
+        if path.is_empty() && permissions.is_empty() {
+            self.unveil_locked = true;
+            return Ok(());
+        }
+
+        self.unveil_rules.retain(|r| r.path != path);
+        self.unveil_rules.push(OpenBsdUnveilRule {
+            path: path.to_string(),
+            permissions: permissions.to_string(),
+        });
+
+        Ok(())
+    }
+
+    pub fn check_syscall(&self, promise: OpenBsdPledgePromises) -> bool {
+        if !self.pledge_enforced {
+            return true;
+        }
+        self.active_promises.contains(&promise)
+    }
+
+    pub fn check_path_access(&self, path: &str, required_perm: char) -> bool {
+        if self.unveil_rules.is_empty() {
+            return true;
+        }
+        for rule in &self.unveil_rules {
+            if path.starts_with(&rule.path) {
+                return rule.permissions.contains(required_perm);
+            }
+        }
+        false
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 8. FIRECRACKER / CLOUD HYPERVISOR (MicroVM Hypervisor Engine)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmState {
+    Created,
+    Running,
+    Paused,
+    Terminated,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MicroVmInstance {
+    pub vm_id: String,
+    pub vcpu_count: u32,
+    pub memory_mb: u64,
+    pub kernel_path: String,
+    pub state: VmState,
+    pub virtio_devices: Vec<String>,
+}
+
+pub struct MicroVmHypervisorOrchestrator {
+    pub instances: Vec<MicroVmInstance>,
+}
+
+impl MicroVmHypervisorOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            instances: Vec::new(),
+        }
+    }
+
+    pub fn create_microvm(
+        &mut self,
+        vm_id: &str,
+        vcpus: u32,
+        memory_mb: u64,
+        kernel: &str,
+    ) -> Result<(), &'static str> {
+        if self.instances.iter().any(|i| i.vm_id == vm_id) {
+            return Err("MicroVM: Instance ID already exists");
+        }
+        self.instances.push(MicroVmInstance {
+            vm_id: vm_id.to_string(),
+            vcpu_count: vcpus,
+            memory_mb,
+            kernel_path: kernel.to_string(),
+            state: VmState::Created,
+            virtio_devices: Vec::from(["virtio-net".to_string(), "virtio-blk".to_string()]),
+        });
+        Ok(())
+    }
+
+    pub fn boot_microvm(&mut self, vm_id: &str) -> Result<(), &'static str> {
+        let instance = self
+            .instances
+            .iter_mut()
+            .find(|i| i.vm_id == vm_id)
+            .ok_or("MicroVM: Instance not found")?;
+
+        instance.state = VmState::Running;
+        Ok(())
+    }
+
+    pub fn balloon_memory(&mut self, vm_id: &str, new_memory_mb: u64) -> Result<(), &'static str> {
+        let instance = self
+            .instances
+            .iter_mut()
+            .find(|i| i.vm_id == vm_id)
+            .ok_or("MicroVM: Instance not found")?;
+
+        instance.memory_mb = new_memory_mb;
+        Ok(())
+    }
+}
+
+impl Default for MicroVmHypervisorOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -518,5 +780,60 @@ mod tests {
         let vnic = crossbow.lookup_vnic("vnic0").unwrap();
         assert_eq!(vnic.parent_interface, "stub0");
         assert_eq!(vnic.max_bandwidth_mbps, 1000);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_storage_engine() {
+        let mut hammer2 = Hammer2StorageEngine::new("dragon_cluster");
+        let offset1 = hammer2.write_cow_block(b"hammer2_block_data");
+        assert!(offset1 > 0);
+
+        // Deduplicated write
+        let offset2 = hammer2.write_cow_block(b"hammer2_block_data");
+        assert_eq!(offset1, offset2);
+        assert_eq!(hammer2.deduplicated_blocks_count, 1);
+
+        let snap_id = hammer2.create_instant_snapshot("root_v1", 1700000000);
+        assert_eq!(snap_id, 1);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_engine() {
+        let mut openbsd = OpenBsdPledgeUnveilEngine::new();
+        openbsd
+            .unveil("/var/log", "rw")
+            .expect("Unveil failed");
+        assert!(openbsd.check_path_access("/var/log/syslog", 'r'));
+        assert!(!openbsd.check_path_access("/var/log/syslog", 'x'));
+        assert!(!openbsd.check_path_access("/etc/shadow", 'r'));
+
+        openbsd
+            .pledge(&[OpenBsdPledgePromises::Stdio, OpenBsdPledgePromises::Rpath])
+            .expect("Pledge failed");
+        assert!(openbsd.check_syscall(OpenBsdPledgePromises::Stdio));
+        assert!(!openbsd.check_syscall(OpenBsdPledgePromises::Inet));
+
+        // Elevating promises should fail
+        assert!(openbsd
+            .pledge(&[
+                OpenBsdPledgePromises::Stdio,
+                OpenBsdPledgePromises::Rpath,
+                OpenBsdPledgePromises::Inet
+            ])
+            .is_err());
+    }
+
+    #[test]
+    fn test_microvm_hypervisor_orchestrator() {
+        let mut hypervisor = MicroVmHypervisorOrchestrator::new();
+        hypervisor
+            .create_microvm("vm-alpha", 2, 512, "/boot/vmlinux-6.6")
+            .unwrap();
+
+        assert!(hypervisor.boot_microvm("vm-alpha").is_ok());
+        assert_eq!(hypervisor.instances[0].state, VmState::Running);
+
+        assert!(hypervisor.balloon_memory("vm-alpha", 1024).is_ok());
+        assert_eq!(hypervisor.instances[0].memory_mb, 1024);
     }
 }
