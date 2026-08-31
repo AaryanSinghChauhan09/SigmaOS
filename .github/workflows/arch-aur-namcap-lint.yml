@@ -1,0 +1,25 @@
+name: Arch Linux PKGBUILD & Namcap Quality Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  arch-namcap-audit:
+    name: Arch Linux ALPM & Namcap Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Arch Pacman & ALPM Tests
+        run: |
+          cargo test --lib -- test_package_format_from_filename_extensions

@@ -1,0 +1,29 @@
+name: Sovereign OS GitHub Pages Documentation Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-sovereign"
+  cancel-in-progress: false
+
+jobs:
+  build-docs:
+    name: Build & Generate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate Cargo API Docs
+        run: cargo doc --no-deps --lib

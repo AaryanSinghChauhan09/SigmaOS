@@ -1,0 +1,27 @@
+name: Alpine Linux APK & Musl libc Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  alpine-musl-audit:
+    name: Alpine musl libc & APKINDEX Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain & musl Target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Test Alpine APK Format Parsing
+        run: |
+          cargo test --lib -- package::universal::tests

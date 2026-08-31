@@ -1,0 +1,25 @@
+name: Slackware SlackBuilds & txz Package Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  slackware-txz-check:
+    name: Slackware .txz Tarball & SlackBuild Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Slackware .txz Tarball Format
+        run: |
+          cargo test --lib -- test_package_format_from_filename_extensions

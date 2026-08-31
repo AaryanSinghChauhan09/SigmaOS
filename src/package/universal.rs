@@ -9,6 +9,9 @@ use alloc::collections::BTreeMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap as HashMap;
@@ -1068,7 +1071,6 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
-    #[cfg(not(feature = "standalone_test"))]
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1083,7 +1085,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            #[cfg(not(feature = "standalone_test"))]
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };
@@ -1093,7 +1094,6 @@ impl UniversalPackageManager {
     }
 
     /// Register and install a Node.js binary distribution runtime into the isolated store
-    #[cfg(not(feature = "standalone_test"))]
     pub fn install_node_runtime(
         &mut self,
         package: &NodeBinaryPackage,
@@ -2010,7 +2010,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(feature = "standalone_test"))]
     fn test_universal_package_manager_node_runtime_integration() {
         let mut manager = UniversalPackageManager::new();
         let bytes = vec![0x42u8; 120];
