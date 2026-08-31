@@ -124,7 +124,9 @@ impl ArchAlpmHookTransactionEngine {
     pub fn trigger_post_transaction_hooks(&mut self, installed_pkgs: &[&str]) -> usize {
         let mut count = 0;
         for hook in &self.hooks {
-            let matched = installed_pkgs.iter().any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
+            let matched = installed_pkgs
+                .iter()
+                .any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
             if matched {
                 self.executed_hooks.push(hook.exec_command.clone());
                 count += 1;
@@ -216,14 +218,22 @@ impl SlackwareBuildPackageEngine {
         self.build_scripts.push(script);
     }
 
-    pub fn compile_slackbuild(&mut self, pkg_name: &str, files: &[&str], slack_desc: &str) -> Result<String, &'static str> {
+    pub fn compile_slackbuild(
+        &mut self,
+        pkg_name: &str,
+        files: &[&str],
+        slack_desc: &str,
+    ) -> Result<String, &'static str> {
         let script = self
             .build_scripts
             .iter()
             .find(|s| s.name == pkg_name)
             .ok_or("SlackBuild script not found")?;
 
-        let txz_filename = format!("{}-{}-{}-{}.txz", script.name, script.version, script.arch, script.build_number);
+        let txz_filename = format!(
+            "{}-{}-{}-{}.txz",
+            script.name, script.version, script.arch, script.build_number
+        );
         let archive = SlackwarePackageArchive {
             name: script.name.clone(),
             txz_filename: txz_filename.clone(),
@@ -284,7 +294,10 @@ impl ZypperSatDependencyResolver {
         self.installed_packages.push(pkg);
     }
 
-    pub fn resolve_sat_selection(&self, target_pkg_name: &str) -> Result<ZypperPackageSpec, &'static str> {
+    pub fn resolve_sat_selection(
+        &self,
+        target_pkg_name: &str,
+    ) -> Result<ZypperPackageSpec, &'static str> {
         let candidates: Vec<&ZypperPackageSpec> = self
             .available_packages
             .iter()
@@ -296,7 +309,10 @@ impl ZypperSatDependencyResolver {
         }
 
         // Check for vendor lock/stickiness if package is currently installed
-        let current_installed = self.installed_packages.iter().find(|p| p.name == target_pkg_name);
+        let current_installed = self
+            .installed_packages
+            .iter()
+            .find(|p| p.name == target_pkg_name);
 
         if let Some(installed) = current_installed {
             if !self.allow_vendor_change {
@@ -368,7 +384,8 @@ impl SolusMossStatelessTransactionEngine {
             for (path, content) in &pkg.default_configs {
                 // Statutory stateless overlay under /usr/share/defaults/
                 let default_path = format!("/usr/share/defaults/{}", path.trim_start_matches('/'));
-                self.system_usr_overlay.insert(default_path, content.clone());
+                self.system_usr_overlay
+                    .insert(default_path, content.clone());
             }
         }
 
@@ -394,7 +411,8 @@ impl SolusMossStatelessTransactionEngine {
         for pkg in &tx.active_packages {
             for (path, content) in &pkg.default_configs {
                 let default_path = format!("/usr/share/defaults/{}", path.trim_start_matches('/'));
-                self.system_usr_overlay.insert(default_path, content.clone());
+                self.system_usr_overlay
+                    .insert(default_path, content.clone());
             }
         }
 
@@ -445,7 +463,10 @@ impl BsdPkgManifestSignatureAuditor {
             return Err("Unsigned package manifest");
         }
 
-        let is_signed_by_trusted = self.trusted_keys.iter().any(|k| manifest.signature_dilithium.contains(k));
+        let is_signed_by_trusted = self
+            .trusted_keys
+            .iter()
+            .any(|k| manifest.signature_dilithium.contains(k));
         if !is_signed_by_trusted {
             return Err("Untrusted cryptographic signature");
         }
@@ -479,7 +500,10 @@ mod tests {
             shared_libs: vec!["libncurses.so.6".to_string()],
         });
 
-        assert_eq!(db.query_pkg_file_owner("/usr/bin/zsh"), Some("zsh".to_string()));
+        assert_eq!(
+            db.query_pkg_file_owner("/usr/bin/zsh"),
+            Some("zsh".to_string())
+        );
         assert_eq!(db.query_pkg_file_owner("/usr/bin/bash"), None);
     }
 
@@ -496,10 +520,14 @@ mod tests {
     #[test]
     fn test_nix_flake_cache() {
         let mut store = NixFlakeHermeticCacheStore::new();
-        let hash = NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
+        let hash =
+            NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
 
         store.store_build(&hash, b"HERMETIC_NIX_OUTPUT");
-        assert_eq!(store.fetch_cached_build(&hash).unwrap(), b"HERMETIC_NIX_OUTPUT");
+        assert_eq!(
+            store.fetch_cached_build(&hash).unwrap(),
+            b"HERMETIC_NIX_OUTPUT"
+        );
     }
 
     #[test]
@@ -513,7 +541,13 @@ mod tests {
             configure_flags: vec!["--prefix=/usr".to_string()],
         });
 
-        let txz = engine.compile_slackbuild("htop", &["/usr/bin/htop", "/usr/man/man1/htop.1"], "htop process viewer").unwrap();
+        let txz = engine
+            .compile_slackbuild(
+                "htop",
+                &["/usr/bin/htop", "/usr/man/man1/htop.1"],
+                "htop process viewer",
+            )
+            .unwrap();
         assert_eq!(txz, "htop-3.2.1-x86_64-1.txz");
 
         let exploded = engine.explode_txz_archive(&txz).unwrap();
@@ -525,7 +559,7 @@ mod tests {
     fn test_zypper_sat_resolver_vendor_lock() {
         let mut resolver = ZypperSatDependencyResolver::new(false); // Vendor lock enabled
 
-        let pkg_openSUSE = ZypperPackageSpec {
+        let pkg_open_suse = ZypperPackageSpec {
             name: "libcurl".to_string(),
             version: "8.0.0".to_string(),
             vendor: "openSUSE".to_string(),
@@ -543,11 +577,11 @@ mod tests {
             conflicts: vec![],
         };
 
-        resolver.register_available_package(pkg_openSUSE.clone());
+        resolver.register_available_package(pkg_open_suse.clone());
         resolver.register_available_package(pkg_packman.clone());
 
         // Currently installed from openSUSE
-        resolver.install_package_record(pkg_openSUSE.clone());
+        resolver.install_package_record(pkg_open_suse.clone());
 
         // Resolution should pick openSUSE candidate due to vendor lock despite Packman having higher priority
         let selected = resolver.resolve_sat_selection("libcurl").unwrap();
@@ -570,7 +604,9 @@ mod tests {
         assert_eq!(state_1, 1);
 
         assert_eq!(
-            moss.system_usr_overlay.get("/usr/share/defaults/etc/nanorc").map(|s| s.as_str()),
+            moss.system_usr_overlay
+                .get("/usr/share/defaults/etc/nanorc")
+                .map(|s| s.as_str()),
             Some("set syntaxon")
         );
     }

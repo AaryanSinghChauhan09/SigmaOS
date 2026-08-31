@@ -1,11 +1,11 @@
 extern crate alloc;
+use alloc::format;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -335,7 +335,11 @@ impl CinnamonThemeEngine {
         let mut theme = [0u8; 32];
         let default_name = b"Mint-Y-Dark";
         unsafe {
-            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(
+                default_name.as_ptr(),
+                theme.as_mut_ptr(),
+                default_name.len(),
+            );
         }
         Self {
             active_gtk_theme: theme,
@@ -420,7 +424,6 @@ impl Default for TimeshiftSystemRestorer {
         Self::new()
     }
 }
-
 
 /// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -749,5 +752,254 @@ mod tests {
             .toggle_driver(b"Broadcom BCM4360 WiFi", true)
             .unwrap();
         assert!(drivers.available_drivers[0].active);
+    }
+
+    #[test]
+    fn test_mint4win_installer_flow() {
+        let config = Mint4WinConfig {
+            target_drive_letter: 'C',
+            install_folder: "sigmaos".to_string(),
+            root_disk_size_mb: 32768,
+            swap_disk_size_mb: 4096,
+            username: "mintuser".to_string(),
+            language: "en_US".to_string(),
+            bootloader_type: WindowsBootloaderType::BcdUefi,
+        };
+
+        let mut installer = Mint4WinInstaller::new(config);
+
+        // 1. Detect Fast Startup / Hibernation safety check
+        assert_eq!(
+            installer.detect_ntfs_fast_startup(true, false),
+            NtfsFastStartupState::DirtyHibernated
+        );
+
+        // Attempting to create loopback disk on hibernated NTFS fails for safety
+        assert!(installer.create_loopback_disks().is_err());
+
+        // Clear fast startup hibernation block
+        installer.detect_ntfs_fast_startup(false, false);
+        assert_eq!(installer.fast_startup_state, NtfsFastStartupState::Clean);
+
+        // 2. Allocate sparse loopback virtual disk images
+        assert!(installer.create_loopback_disks().is_ok());
+        let root_disk = installer.root_disk.as_ref().unwrap();
+        assert_eq!(root_disk.windows_path, "C:\\sigmaos\\disks\\root.disk");
+        assert_eq!(root_disk.size_mb, 32768);
+
+        // 3. Register BCD boot entry
+        let bcd_cmd = installer.register_windows_boot_entry();
+        assert!(bcd_cmd.contains("bcdedit /create"));
+        assert!(installer.bcd_entry_guid.is_some());
+
+        // 4. Register Windows Control Panel Uninstaller entry
+        let uninst = installer.register_windows_uninstaller();
+        assert!(uninst.key_path.contains("SigmaOS_mint4win"));
+        assert!(uninst
+            .uninstall_string
+            .contains("C:\\sigmaos\\uninstall.exe"));
+
+        // 5. Expand root loopback disk capacity dynamically
+        let new_size = installer.expand_root_disk(16384).unwrap();
+        assert_eq!(new_size, 49152);
+
+        // 6. Execute uninstallation and reclaim disk space
+        let reclaimed = installer.execute_uninstallation().unwrap();
+        assert_eq!(reclaimed, 53248); // 49152 + 4096 swap
+        assert!(installer.root_disk.is_none());
+    }
+}
+
+// ==========================================
+// Mint4Win Windows-Hosted Installer & Loopback Subsystem
+// Inspired by Linux Mint mint4win, Wubi, and BSD/Linux loopback VFS boot
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowsBootloaderType {
+    NtLdrLegacy,      // Windows XP / Server 2003 (boot.ini)
+    BcdUefi,          // Windows 7/8/10/11 UEFI & BIOS (BCD)
+    Grub4DosFallback, // GRUB4DOS fallback chainloader
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtfsFastStartupState {
+    Clean,
+    DirtyHibernated, // Fast Startup enabled (hiberfil.sys present)
+    UncleanShutdown,
+}
+
+#[derive(Debug, Clone)]
+pub struct LoopbackDiskImage {
+    pub name: String,
+    pub windows_path: String,
+    pub size_mb: u64,
+    pub allocated_mb: u64,
+    pub is_sparse: bool,
+    pub sha256_checksum: [u8; 32],
+}
+
+#[derive(Debug, Clone)]
+pub struct Mint4WinConfig {
+    pub target_drive_letter: char,
+    pub install_folder: String,
+    pub root_disk_size_mb: u64,
+    pub swap_disk_size_mb: u64,
+    pub username: String,
+    pub language: String,
+    pub bootloader_type: WindowsBootloaderType,
+}
+
+#[derive(Debug, Clone)]
+pub struct UninstallerRegistryEntry {
+    pub key_path: String,
+    pub display_name: String,
+    pub uninstall_string: String,
+    pub estimated_size_kb: u64,
+}
+
+pub struct Mint4WinInstaller {
+    pub config: Mint4WinConfig,
+    pub root_disk: Option<LoopbackDiskImage>,
+    pub swap_disk: Option<LoopbackDiskImage>,
+    pub fast_startup_state: NtfsFastStartupState,
+    pub bcd_entry_guid: Option<String>,
+    pub uninstaller_entry: Option<UninstallerRegistryEntry>,
+}
+
+impl Mint4WinInstaller {
+    pub fn new(config: Mint4WinConfig) -> Self {
+        Self {
+            config,
+            root_disk: None,
+            swap_disk: None,
+            fast_startup_state: NtfsFastStartupState::Clean,
+            bcd_entry_guid: None,
+            uninstaller_entry: None,
+        }
+    }
+
+    /// Detects Windows Fast Startup / Hibernation state (`hiberfil.sys` presence)
+    pub fn detect_ntfs_fast_startup(
+        &mut self,
+        is_hibernated: bool,
+        has_dirty_bit: bool,
+    ) -> NtfsFastStartupState {
+        if is_hibernated {
+            self.fast_startup_state = NtfsFastStartupState::DirtyHibernated;
+        } else if has_dirty_bit {
+            self.fast_startup_state = NtfsFastStartupState::UncleanShutdown;
+        } else {
+            self.fast_startup_state = NtfsFastStartupState::Clean;
+        }
+        self.fast_startup_state
+    }
+
+    /// Allocates sparse NTFS loopback virtual disks (`root.disk` and `swap.disk`)
+    pub fn create_loopback_disks(&mut self) -> Result<(), &'static str> {
+        if self.fast_startup_state == NtfsFastStartupState::DirtyHibernated {
+            return Err(
+                "Windows Fast Startup / Hibernation active. Cannot safely write loopback disks.",
+            );
+        }
+
+        let root_path = format!(
+            "{}:\\{}\\disks\\root.disk",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+        let swap_path = format!(
+            "{}:\\{}\\disks\\swap.disk",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+
+        self.root_disk = Some(LoopbackDiskImage {
+            name: "root.disk".to_string(),
+            windows_path: root_path,
+            size_mb: self.config.root_disk_size_mb,
+            allocated_mb: 64, // Initial sparse allocation
+            is_sparse: true,
+            sha256_checksum: [0xAA; 32],
+        });
+
+        if self.config.swap_disk_size_mb > 0 {
+            self.swap_disk = Some(LoopbackDiskImage {
+                name: "swap.disk".to_string(),
+                windows_path: swap_path,
+                size_mb: self.config.swap_disk_size_mb,
+                allocated_mb: self.config.swap_disk_size_mb, // Pre-allocated swap
+                is_sparse: false,
+                sha256_checksum: [0xBB; 32],
+            });
+        }
+
+        Ok(())
+    }
+
+    /// Registers dual-boot entry into Windows BCD / Boot.ini
+    pub fn register_windows_boot_entry(&mut self) -> String {
+        match self.config.bootloader_type {
+            WindowsBootloaderType::BcdUefi => {
+                let guid = "{77777777-1111-2222-3333-SIGMAOS12345}".to_string();
+                self.bcd_entry_guid = Some(guid.clone());
+                format!(
+                    "bcdedit /create {} /d \"SigmaOS (mint4win)\" /application bootsector",
+                    guid
+                )
+            }
+            WindowsBootloaderType::NtLdrLegacy => {
+                format!(
+                    "C:\\{}\\winboot\\wubildr.mbr=\"SigmaOS\"",
+                    self.config.install_folder
+                )
+            }
+            WindowsBootloaderType::Grub4DosFallback => {
+                "C:\\grldr=\"SigmaOS GRUB4DOS Loader\"".to_string()
+            }
+        }
+    }
+
+    /// Registers Windows Control Panel uninstaller (`Uninstall.exe` registry integration)
+    pub fn register_windows_uninstaller(&mut self) -> UninstallerRegistryEntry {
+        let key_path =
+            "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SigmaOS_mint4win"
+                .to_string();
+        let uninstall_cmd = format!(
+            "\"{}:\\{}\\uninstall.exe\"",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+
+        let entry = UninstallerRegistryEntry {
+            key_path,
+            display_name: "SigmaOS (Linux Mint4Win Loopback)".to_string(),
+            uninstall_string: uninstall_cmd,
+            estimated_size_kb: (self.config.root_disk_size_mb + self.config.swap_disk_size_mb)
+                * 1024,
+        };
+
+        self.uninstaller_entry = Some(entry.clone());
+        entry
+    }
+
+    /// Dynamically expands loopback disk capacity without data loss
+    pub fn expand_root_disk(&mut self, additional_mb: u64) -> Result<u64, &'static str> {
+        if let Some(ref mut disk) = self.root_disk {
+            disk.size_mb += additional_mb;
+            Ok(disk.size_mb)
+        } else {
+            Err("Root loopback disk not created")
+        }
+    }
+
+    /// Performs clean uninstallation and Windows system state restoration
+    pub fn execute_uninstallation(&mut self) -> Result<u64, &'static str> {
+        let reclaimed_mb = self.root_disk.as_ref().map(|d| d.size_mb).unwrap_or(0)
+            + self.swap_disk.as_ref().map(|d| d.size_mb).unwrap_or(0);
+
+        self.root_disk = None;
+        self.swap_disk = None;
+        self.bcd_entry_guid = None;
+        self.uninstaller_entry = None;
+
+        Ok(reclaimed_mb)
     }
 }

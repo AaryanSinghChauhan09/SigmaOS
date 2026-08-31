@@ -15,13 +15,13 @@ pub mod arch_linux;
 pub mod artix_linux;
 pub mod atomic_distribution;
 pub mod bodhi_moksha;
-pub mod community_foundation;
 pub mod bsd;
 pub mod cachy_os;
 pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
+pub mod community_foundation;
 pub mod constellation;
 pub mod constellation_mesh;
 pub mod cross_platform;
@@ -98,11 +98,11 @@ pub mod zorin;
 pub use zorin::*;
 
 pub use gap_closure::{
-    KernelModuleManager, SyscallCompatibilityRegistry, DriverRepositoryManager,
-    FirmwareBridgeManager, BuildLedgerSystem, SecurityPolicyManager,
-    PeripheralEmulationLibrary, VirtualMemoryManager, NetworkStackGateway,
-    HidGraphicsDriver, AiTaskOrchestrator, SovereignDistroAbsorptionEngine,
-    OpenSourceCompetitorOrchestrator, TargetDistroFamily, ZorinAppearanceSwitcher,
+    AiTaskOrchestrator, BuildLedgerSystem, DriverRepositoryManager, FirmwareBridgeManager,
+    HidGraphicsDriver, KernelModuleManager, NetworkStackGateway, OpenSourceCompetitorOrchestrator,
+    PeripheralEmulationLibrary, SecurityPolicyManager, SovereignDistroAbsorptionEngine,
+    SyscallCompatibilityRegistry, TargetDistroFamily, VirtualMemoryManager,
+    ZorinAppearanceSwitcher,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,
@@ -145,17 +145,15 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
+pub use legacy_adapters::{LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter};
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-};
-pub use legacy_adapters::{
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
+    LoopbackDiskImage, Mint4WinConfig, Mint4WinInstaller, MintAppMetadata, MintBackupTool,
+    MintReportAlert, MintReportAlertSeverity, MintReportSystem, MintSoftwareManager,
+    MintUpdateLevel, MintUpdateManager, MintUpdatePackage, NtfsFastStartupState,
+    UninstallerRegistryEntry, WindowsBootloaderType,
 };
 
-pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore,
-};
+pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};
 pub use community_foundation::{
     BountySeverity, FoundationRole, HackathonEvent, SecurityBounty, SovereignFoundationManager,
 };
@@ -176,7 +174,6 @@ pub use solid_kernel::{
     SigmaFSPlusPlus, SolidKernelCore,
 };
 
-
 pub use absorb_tools::{
     CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
     PledgeUnveilSandbox, PqcSecureChannel,
@@ -184,16 +181,15 @@ pub use absorb_tools::{
 
 pub use antix::*;
 pub use bsd::{
-    BsdJail, FreeBsdGeomManager, FreeBsdJailManager,
-    GeomClassType, GeomProvider, NetBsdRumpKernelRouter, OpenBsdSandboxGuard,
-    OpenBsdSysctlKernelMib, RumpHypercall,
+    BsdJail, FreeBsdGeomManager, FreeBsdJailManager, GeomClassType, GeomProvider,
+    NetBsdRumpKernelRouter, OpenBsdSandboxGuard, OpenBsdSysctlKernelMib, RumpHypercall,
 };
 pub use legacy_adapters::*;
 pub use linux_compat::{
     AuxVector, BsdKevent, BsdKqueueFilter, BsdKqueueFilter as BsdCompatKqueueFilter,
-    BsdKqueueMultiplexer, DistroTargetProfile,
-    LinuxCompatSpec, LinuxElfLoaderShim, LinuxProcFsAdapter, LinuxSyscallNum,
-    LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter, TargetDistro,
+    BsdKqueueMultiplexer, DistroTargetProfile, LinuxCompatSpec, LinuxElfLoaderShim,
+    LinuxProcFsAdapter, LinuxSyscallNum, LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter,
+    TargetDistro,
 };
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
@@ -208,27 +204,25 @@ pub use sovereign_suite::{
 };
 
 pub use open_source_dominance::{
-    InspirationFeatureMatrix, InspirationFeature, InspirationPackageIntegrator,
+    InspirationFeature, InspirationFeatureMatrix, InspirationPackageIntegrator,
     InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
 };
 
 pub use canonical::{
-    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BsdJailSandbox, CloudOrchestrator,
-    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer, ContinuityCoordinator,
-    DesktopMode, EcosystemSnapshot, FlatpakApp, HandoffTask, LanguageTranslationCatalog,
-    LocaleManager, ReleaseGovernanceCouncil, ReproducibleBuildVerifier, SigmaContainer, SnapshotManager,
-    SuiteRegistry, TtsSynthesizer, UnifiedAppStore, DistroReleaseChannel, BrailleMatrix,
+    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
+    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
+    UnifiedAppStore,
 };
 pub use chakra::{
-    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, KapudanAssistant, InstallerStep,
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 pub use legacy_adapters::{
-    APITimelineManager, BinaryCompatMatrix, DriverBridge, GraphicsBridge, KernelPersona,
-    KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge, StorageBridge,
-    SyscallAbi, WorkloadOptimizer, WorkloadProfile, DiscontinuedFS, GLOBAL_PERSONA_VM,
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, GraphicsBridge,
+    KernelPersona, KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge,
+    StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
     GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
-pub use gap_closure::{};
-
-

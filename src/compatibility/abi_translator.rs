@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Cross-Kernel ABI & System Alignment Checker
 // Designed to translate function register calling conventions, stack alignments,
 // page boundaries, ISA DMA limits, and SIMD memory operand alignment.

@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 /// Sovereign Productivity, Diagnostics, & Creative Suite (SovereignSuite) for SigmaOS
 /// Absorbs, standardizes, and unifies core principles, utilities, and functions from:
 /// Joplin (E2EE Markdown notes), Nextcloud (file sync metadata), LibreOffice (Spreadsheet cell formulas),

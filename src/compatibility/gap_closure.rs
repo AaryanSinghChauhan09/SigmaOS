@@ -33,11 +33,11 @@ use alloc::vec;
 // 11. Local AI task orchestration scheduler (S-AI)
 
 extern crate alloc;
+use crate::compatibility::canonical::DesktopMode;
 use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
-use crate::compatibility::canonical::DesktopMode;
 
 // ==========================================
 // 1. Kernel Module Management

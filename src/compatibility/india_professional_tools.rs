@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS India Professional Tools
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.

@@ -5,7 +5,6 @@ extern crate alloc;
 // FreeBSD (GEOM, Capsicum, Jail), OpenBSD (pledge, unveil, pf), DragonFly BSD (HAMMER2),
 // Haiku (BeOS Translators), SerenityOS, and ReactOS/Wine Win32 translation layers.
 
-
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -54,25 +53,29 @@ impl InspirationFeatureMatrix {
             name: "FreeBSD Capsicum Sandboxing".to_string(),
             tier: OpenSourceInspirationTier::FreeBsd,
             is_enabled: true,
-            description: "FreeBSD capability rights and descriptor-based process isolation".to_string(),
+            description: "FreeBSD capability rights and descriptor-based process isolation"
+                .to_string(),
         });
         self.features.push(InspirationFeature {
             name: "OpenBSD Pledge & Unveil".to_string(),
             tier: OpenSourceInspirationTier::OpenBsd,
             is_enabled: true,
-            description: "OpenBSD syscall pledge reduction and path-based unveil restriction".to_string(),
+            description: "OpenBSD syscall pledge reduction and path-based unveil restriction"
+                .to_string(),
         });
         self.features.push(InspirationFeature {
             name: "DragonFly HAMMER2 PFS".to_string(),
             tier: OpenSourceInspirationTier::DragonFlyBsd,
             is_enabled: true,
-            description: "DragonFly BSD Pseudo-FS snapshotting and BLAKE3 deduplication".to_string(),
+            description: "DragonFly BSD Pseudo-FS snapshotting and BLAKE3 deduplication"
+                .to_string(),
         });
         self.features.push(InspirationFeature {
             name: "NixOS Atomic Rollback".to_string(),
             tier: OpenSourceInspirationTier::NixOs,
             is_enabled: true,
-            description: "NixOS store generation rollbacks and declarative state management".to_string(),
+            description: "NixOS store generation rollbacks and declarative state management"
+                .to_string(),
         });
         self.features.push(InspirationFeature {
             name: "Haiku Translation Kit".to_string(),
@@ -161,14 +164,26 @@ impl InspirationPackageIntegrator {
             installed_packages_count: 0,
         };
         integrator.supported_formats.push("APT (.deb)".to_string());
-        integrator.supported_formats.push("Pacman (.pkg.tar.zst)".to_string());
-        integrator.supported_formats.push("Nix (.nix flake)".to_string());
-        integrator.supported_formats.push("Portage (ebuild)".to_string());
-        integrator.supported_formats.push("XBPS (.xbps)".to_string());
+        integrator
+            .supported_formats
+            .push("Pacman (.pkg.tar.zst)".to_string());
+        integrator
+            .supported_formats
+            .push("Nix (.nix flake)".to_string());
+        integrator
+            .supported_formats
+            .push("Portage (ebuild)".to_string());
+        integrator
+            .supported_formats
+            .push("XBPS (.xbps)".to_string());
         integrator
     }
 
-    pub fn install_package_transaction(&mut self, pkg_name: &str, format: &str) -> Result<usize, &'static str> {
+    pub fn install_package_transaction(
+        &mut self,
+        pkg_name: &str,
+        format: &str,
+    ) -> Result<usize, &'static str> {
         if !self.supported_formats.iter().any(|f| f.contains(format)) {
             return Err("Package Integrator: Unsupported package format");
         }
@@ -202,8 +217,7 @@ impl OpenSourceDominanceEngine {
     }
 
     pub fn audit_dominance_readiness(&self) -> bool {
-        self.matrix.features.len() >= 5
-            && self.package_integrator.supported_formats.len() >= 5
+        self.matrix.features.len() >= 5 && self.package_integrator.supported_formats.len() >= 5
     }
 }
 
@@ -225,8 +239,14 @@ mod tests {
     fn test_inspiration_feature_matrix() {
         let matrix = InspirationFeatureMatrix::new();
         assert!(matrix.is_feature_active("OpenBSD Pledge & Unveil"));
-        assert_eq!(matrix.count_features_by_tier(OpenSourceInspirationTier::LinuxKernel), 1);
-        assert_eq!(matrix.count_features_by_tier(OpenSourceInspirationTier::FreeBsd), 1);
+        assert_eq!(
+            matrix.count_features_by_tier(OpenSourceInspirationTier::LinuxKernel),
+            1
+        );
+        assert_eq!(
+            matrix.count_features_by_tier(OpenSourceInspirationTier::FreeBsd),
+            1
+        );
     }
 
     #[test]
@@ -242,7 +262,9 @@ mod tests {
     #[test]
     fn test_inspiration_package_integrator_and_dominance_engine() {
         let mut integrator = InspirationPackageIntegrator::new();
-        let count = integrator.install_package_transaction("vim", "APT").unwrap();
+        let count = integrator
+            .install_package_transaction("vim", "APT")
+            .unwrap();
         assert_eq!(count, 1);
 
         let engine = OpenSourceDominanceEngine::new();

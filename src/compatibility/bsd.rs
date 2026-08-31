@@ -274,7 +274,8 @@ impl OpenBsdSandboxGuard {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 

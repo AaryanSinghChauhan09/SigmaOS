@@ -24,9 +24,9 @@ extern crate alloc;
 use alloc::vec;
 // SigmaOS Linux Init System Concepts
 // Implements init system concepts inspired by systemd and SysVinit
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 /// Runlevel definitions (SysVinit-style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

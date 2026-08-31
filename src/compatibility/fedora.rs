@@ -1,6 +1,6 @@
 extern crate alloc;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 // Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
@@ -1235,7 +1235,10 @@ impl FedoraCryptoPoliciesEngine {
         if cipher.contains("SHA1") && !self.allow_sha1 {
             return false;
         }
-        if self.require_quantum_resistant && !cipher.contains("Kyber") && !cipher.contains("Dilithium") {
+        if self.require_quantum_resistant
+            && !cipher.contains("Kyber")
+            && !cipher.contains("Dilithium")
+        {
             return false;
         }
         true
@@ -1278,10 +1281,16 @@ impl FedoraSilverblueRpmOstreeEngine {
             let previous = self.active_commit.clone();
             self.active_commit = staged;
             self.pending_reboot = false;
-            Ok(format!("Successfully deployed commit {}. Previous: {}", self.active_commit, previous))
+            Ok(format!(
+                "Successfully deployed commit {}. Previous: {}",
+                self.active_commit, previous
+            ))
         } else if self.pending_reboot {
             self.pending_reboot = false;
-            Ok(format!("Re-assembled tree with layered packages: {:?}", self.layered_packages))
+            Ok(format!(
+                "Re-assembled tree with layered packages: {:?}",
+                self.layered_packages
+            ))
         } else {
             Err("No staged deployment or overlay changes pending")
         }
