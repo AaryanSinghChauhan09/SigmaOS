@@ -10,6 +10,18 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;
 
+pub mod pmm_vmm;
+pub mod resource_allocator;
+pub mod sigma_buddy;
+
+pub use pmm_vmm::*;
+pub use resource_allocator::{
+    ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,
+    PcieResourceAllocator, PcieResourceWindow, ResourceLimits, ResourceUsage,
+    SigmaResourceAllocatorHub, SlabObjectCacheAllocator, SlabSizeClass,
+};
+pub use sigma_buddy::*;
+
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
 
