@@ -247,8 +247,8 @@ impl SigmaJailManager {
             "home",
         ];
 
-        for dir in dirs {
-            Err("fs not available"))?;
+        for _dir in dirs {
+            let _ = Err::<(), &str>("fs not available");
         }
 
         // Copy essential binaries and libraries
@@ -280,8 +280,7 @@ impl SigmaJailManager {
             if src.exists() {
                 let dest = format!("{}/{}", root_path, &lib_dir[1..]);
                 if format!("{}/{}", src, "libc.so.6").exists() {
-                    let _ = Err("fs not available");
-                    let _ = Err("fs not available"), format!("{}/{}", dest, "libc.so.6"));
+                    let _ = Err::<(), &str>("fs not available");
                 }
             }
         }

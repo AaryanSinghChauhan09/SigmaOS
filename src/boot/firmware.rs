@@ -1,4 +1,5 @@
 extern crate alloc;
+extern crate core;
 
 use core::convert::TryInto;
 use alloc::format;

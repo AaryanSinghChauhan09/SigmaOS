@@ -1,10 +1,19 @@
+extern crate alloc;
+
+#[cfg(test)]
+#[path = "../klib/mod.rs"]
+mod klib;
+
+#[cfg(not(test))]
+use crate::klib;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
+use klib::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -877,9 +886,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in current_keys {
-                if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+            for key in &current_keys {
+                if !checkpoint.installed_keys.contains(key) {
+                    self.remove(key)?;
                 }
             }
             Ok(())
