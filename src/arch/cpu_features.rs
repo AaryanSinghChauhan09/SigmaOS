@@ -1,3 +1,7 @@
+//! SigmaOS CPU Feature Detection and Optimization
+//! Implements Gentoo-like compiler-assisted target optimizations
+//! Zero-dependency CPU capability detection for bare-metal
+
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -10,9 +14,6 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-//! SigmaOS CPU Feature Detection and Optimization
-//! Implements Gentoo-like compiler-assisted target optimizations
-//! Zero-dependency CPU capability detection for bare-metal
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

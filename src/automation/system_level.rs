@@ -891,6 +891,121 @@ mod tests {
     }
 
     #[test]
+    fn test_distro_inspired_service_reconciliation() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.register_service("db", &[], 3);
+        engine.register_service("web", &["db"], 3);
+
+        assert_eq!(engine.reconcile_services(), 1); // db becomes running
+        assert_eq!(engine.services[0].state, SupervisedServiceState::Running);
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Stopped);
+
+        assert_eq!(engine.reconcile_services(), 1); // web becomes running
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Running);
+
+        // Simulate failure and restart
+        assert!(engine.set_service_state("web", SupervisedServiceState::Failed).is_ok());
+        assert_eq!(engine.reconcile_services(), 1);
+        assert_eq!(engine.services[1].restart_count, 1);
+    }
+
+    #[test]
+    fn test_distro_inspired_racct_throttling() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.add_racct_policy(1001, 80, 1024 * 1024 * 100);
+
+        let action = engine.evaluate_resource_limits(1001, 95, 1024 * 1024 * 50);
+        assert!(action.is_some());
+        if let Some(SystemAction::ThrottleProcesses { pids }) = action {
+            assert_eq!(pids, vec![1001]);
+        } else {
+            panic!("Expected ThrottleProcesses action");
+        }
+        assert!(engine.racct_policies[0].is_throttled);
+    }
+
+    #[test]
+    fn test_distro_inspired_auto_sandbox() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        let policy = engine.generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
+
+        assert!(policy.allowed_promises.contains(&"inet".to_string()));
+        assert!(policy.allowed_promises.contains(&"exec".to_string()));
+        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/usr" && perm == "r"));
+        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/bin" && perm == "rx"));
+    }
+
+    #[test]
+    fn test_distro_inspired_declarative_reconciliation() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        let spec1 = DeclarativeSpecState {
+            revision: 1,
+            hostname: "sigma-node".to_string(),
+            services: vec!["db".to_string(), "logger".to_string()],
+            packages: vec!["coreutils".to_string()],
+        };
+
+        assert_eq!(engine.apply_declarative_spec(spec1).unwrap(), 1);
+        assert!(engine.reconcile_declarative_state().unwrap());
+        assert_eq!(engine.services.len(), 2);
+        assert_eq!(engine.services[0].name, "db");
+        assert_eq!(engine.services[1].name, "logger");
+
+        let spec2 = DeclarativeSpecState {
+            revision: 2,
+            hostname: "sigma-node".to_string(),
+            services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
+            packages: vec!["coreutils".to_string(), "nginx".to_string()],
+        };
+        assert_eq!(engine.apply_declarative_spec(spec2).unwrap(), 2);
+
+        // Rollback
+        assert_eq!(engine.rollback_declarative_state().unwrap(), 1);
+        assert_eq!(engine.active_spec.as_ref().unwrap().revision, 1);
+    }
+
+    #[test]
+    fn test_distro_inspired_transactional_hooks() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.register_hook(
+            "pkg_trigger",
+            "nginx",
+            "pre_install_nginx",
+            "post_install_nginx",
+            "undo_install_nginx",
+        );
+
+        let executed = engine.trigger_transactional_hooks("install_nginx_pkg");
+        assert_eq!(executed.len(), 2);
+        assert_eq!(executed[0], "PRE:pre_install_nginx");
+        assert_eq!(executed[1], "POST:post_install_nginx");
+
+        let undos = engine.rollback_hooks();
+        assert_eq!(undos.len(), 1);
+        assert_eq!(undos[0], "UNDO:undo_install_nginx");
+    }
+
+    #[test]
+    fn test_distro_inspired_storage_tiering_and_scrubbing() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.add_storage_extent("/data/db.dat", "HDD", b"DATA_PAYLOAD");
+
+        // Record accesses to trigger promotion
+        for _ in 0..5 {
+            engine.record_extent_access("/data/db.dat");
+        }
+
+        let (promoted, demoted) = engine.run_automated_tiering_pass();
+        assert_eq!(promoted, 1);
+        assert_eq!(demoted, 0);
+        assert_eq!(engine.storage_extents[0].tier, "SSD");
+
+        let (checked, corrupted) = engine.run_automated_scrub();
+        assert_eq!(checked, 1);
+        assert_eq!(corrupted, 0);
+    }
+
+    #[test]
     fn test_linux_bsd_automation_triggers() {
         let mut manager = SystemAutomationManager::new();
         let rule = SystemAutomationRule::new(

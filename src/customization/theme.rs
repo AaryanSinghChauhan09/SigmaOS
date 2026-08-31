@@ -1145,4 +1145,14 @@ mod tests {
         let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
         assert_eq!(tinted, "<path fill=\"#3584E4\" d=\"M0 0h24v24H0z\"/>");
     }
+
+    #[test]
+    fn test_yaru_theme_spec() {
+        let yaru = YaruThemeSpec::new(YaruThemeStyle::Dark, YaruAccentColor::Aubergine);
+        assert_eq!(yaru.accent_hex(), "#77216F");
+        let theme = yaru.to_theme();
+        assert_eq!(theme.mode, ThemeMode::Dark);
+        assert_eq!(theme.colors.primary, "#77216F");
+        assert_eq!(theme.colors.background, "#1E1E1E");
+    }
 }

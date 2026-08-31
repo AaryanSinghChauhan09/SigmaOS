@@ -1,16 +1,29 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
+extern crate alloc;
 use alloc::format;
-use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+/// Lifecycle timing for package hooks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookTiming {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+/// Trait for package hooks
+pub trait PackageHook: Send + Sync {
+    fn timing(&self) -> HookTiming;
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -1841,5 +1854,50 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_convert_to_sigpkg() {
+        let manager = UniversalPackageManager::new();
+        let deb_pkg = UnifiedPackage::new("curl".to_string(), "7.88.1".to_string())
+            .with_format(PackageFormat::Deb)
+            .with_dependency("libssl".to_string());
+
+        let sigpkg = manager.convert_to_sigpkg(&deb_pkg).unwrap();
+        assert_eq!(sigpkg.name, "sigpkg-curl");
+        assert!(sigpkg.formats.contains(&PackageFormat::SigmaPkg));
+        assert!(sigpkg.dependencies.contains(&"libssl".to_string()));
+        assert!(sigpkg.provides.contains(&"curl".to_string()));
+    }
+
+    #[test]
+    fn test_universal_package_manager_node_runtime_integration() {
+        let mut manager = UniversalPackageManager::new();
+        let bytes = vec![0x42u8; 120];
+        let mut hash = [0u8; 32];
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
+        }
+
+        let node_pkg = NodeBinaryPackage::new(
+            "v20.11.0",
+            NodeReleaseStream::Lts,
+            NodeTargetArch::X86_64,
+            LibcFlavor::Musl,
+            "https://dist.sigmaos.org/node/v20.11.0.tar.xz",
+            hash,
+            [0u8; 64],
+            120,
+        );
+
+        let path = manager.install_node_runtime(&node_pkg, &bytes, "10.2.4").unwrap();
+        assert!(path.starts_with("/sovereign/store/node-v20.11.0-"));
+
+        let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
+        assert_eq!(installed_pkg.version, "v20.11.0");
+        assert!(installed_pkg.installed);
     }
 }
