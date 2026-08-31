@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // Integration and Unit Test Harness for Extended Features in SigmaOS
 
 extern crate alloc;

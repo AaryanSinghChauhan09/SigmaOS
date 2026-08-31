@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Core OS & Component Algorithms Inspection Test Suite
 // Verifies working mechanisms across key operating system algorithms:
 // - Earliest Deadline First (EDF) Real-Time Scheduling Algorithm

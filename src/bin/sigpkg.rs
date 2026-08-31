@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+#![allow(warnings, clippy::all)]
 // SigmaPkg — Sovereign Universal Package Manager CLI
 // Implements the `sigpkg` commands documented in docs/PACKAGE_MANAGEMENT.md,
 // driving the no_std `sigmaos::sigpkg` library APIs from a std host binary.

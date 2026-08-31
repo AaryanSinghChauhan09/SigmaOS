@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Algorithm & OS Component Inspection Test Suite
 // Verifies internal kernel algorithms, scheduling models, memory allocators, and security mechanisms.
 

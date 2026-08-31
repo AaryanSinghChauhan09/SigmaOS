@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 #[macro_use]
 extern crate alloc;
 

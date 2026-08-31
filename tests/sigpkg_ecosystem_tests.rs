@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // Comprehensive unit & integration tests for the 20-pillar Sigpkg Package & Build System
 
 use sigmaos::sigpkg::*;

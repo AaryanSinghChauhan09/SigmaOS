@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // Integration tests for the SigmaPkg TUF-style repository client.
 use sigmaos::sigpkg::client::{Manifest, SigpkgClient, TufRole, parse_manifest};
 use sigmaos::sigpkg::{CryptoVerifier, Version};

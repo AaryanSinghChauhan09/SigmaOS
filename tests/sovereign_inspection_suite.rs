@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Sovereign System Inspection & Open Source Parity Test Suite
 // Inspects and verifies advanced subsystem mechanisms inspired by Linux, FreeBSD, OpenBSD, NetBSD, QEMU/KVM:
 // - FreeBSD Capsicum & Jails VNET

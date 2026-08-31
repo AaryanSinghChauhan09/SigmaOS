@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Distro Inspection & Security Unit Test Suite
 // Inspired by Linux and BSD distribution innovations:

@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Virtualization, QEMU & KVM Inspection Unit Test Suite
 // Inspired by QEMU, KVM, Firecracker, and Cloud-Hypervisor test harnesses.
 

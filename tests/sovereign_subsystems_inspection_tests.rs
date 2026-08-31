@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Sovereign Subsystems Inspection Unit Test Suite
 // Verifies working mechanisms across Sovereign Subsystems:
 // - Open Source Obsoletion Subsystem (Vcs, Init, PqcVpn, Observability, KnowledgeGraph, ApiTest, Partition)

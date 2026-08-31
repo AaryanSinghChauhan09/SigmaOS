@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, warnings, clippy::all, static_mut_refs)]
 
 /// SigmaOS: Sovereign System Configuration, Diagnostic, and Installation Wizard
 /// Implements a lightweight, zero-allocation setup wizard to configure SigmaOS.

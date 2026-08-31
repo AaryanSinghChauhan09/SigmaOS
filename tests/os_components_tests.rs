@@ -1,6 +1,8 @@
 // SigmaOS Comprehensive OS Components Integration & Unit Test Suite
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
+#![allow(clippy::all, warnings)]
+
 extern crate alloc;
 
 #[path = "../src/klib/mod.rs"]

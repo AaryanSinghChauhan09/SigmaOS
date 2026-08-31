@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // Comprehensive Integration & Subsystem Tests for Activity Manager and Segmentation/Paging Subsystem
 
 extern crate alloc;

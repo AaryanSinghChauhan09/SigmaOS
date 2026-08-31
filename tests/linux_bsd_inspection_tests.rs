@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 

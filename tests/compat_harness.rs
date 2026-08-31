@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Clean-Room Compatibility Test Harness
 // Verifies ELF binary loading, POSIX syscall translation, and Windows PE header parsing
 

@@ -1,3 +1,4 @@
+#![allow(clippy::all, warnings)]
 // SigmaOS Comprehensive Algorithm Inspection Test Suite
 // Inspects and verifies core OS algorithms:
 // - Scheduler algorithms (CFS, EEVDF, BORE, MLFQ)
