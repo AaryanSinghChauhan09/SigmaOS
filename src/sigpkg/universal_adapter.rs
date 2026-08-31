@@ -452,6 +452,46 @@ impl UniversalPackageAdapter {
             format!("SHA256:{}", name),
         ))
     }
+
+    /// Auto-detects package format by extension or text heuristics and parses & translates into native Package
+    pub fn parse_and_translate_manifest(&self, filename: &str, raw_text: &str) -> Result<Package, &'static str> {
+        let fmt = self.detect_format_by_extension(filename);
+        match fmt {
+            Some(PackageFormat::Apt) | Some(PackageFormat::Superdeb) => {
+                let deb = self.parse_apt_control(raw_text)?;
+                self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
+            }
+            Some(PackageFormat::Pacman) => {
+                let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
+                self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+            }
+            Some(PackageFormat::Yum) | Some(PackageFormat::Pisi) => {
+                let spec = self.parse_rpm_spec(raw_text)?;
+                self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
+            }
+            _ => {
+                // Heuristic inspection if extension detection wasn't definitive
+                if raw_text.contains("Package:") && raw_text.contains("Version:") {
+                    let deb = self.parse_apt_control(raw_text)?;
+                    self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
+                } else if raw_text.contains("pkgname=") && raw_text.contains("pkgver=") {
+                    let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
+                    self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+                } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
+                    let spec = self.parse_rpm_spec(raw_text)?;
+                    self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
+                } else if raw_text.contains("name:") && raw_text.contains("confinement:") {
+                    let snap = self.parse_snapcraft_yaml(raw_text)?;
+                    self.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
+                } else if raw_text.contains("\"app-id\"") {
+                    let flatpak = self.parse_flatpak_json(raw_text)?;
+                    self.translate_to_native_package(&flatpak.app_id, "1.0.0", "Flatpak Sandboxed App", &flatpak.finish_args)
+                } else {
+                    Err("Unrecognized package manifest format")
+                }
+            }
+        }
+    }
 }
 
 impl Default for UniversalPackageAdapter {
@@ -859,5 +899,39 @@ mod tests {
         assert_eq!(adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]), Some(PackageFormat::Yum));
         assert_eq!(adapter.detect_format_by_header(b"PK\x03\x04payload"), Some(PackageFormat::Aab));
         assert_eq!(adapter.detect_format_by_header(b"SPKG0001header"), Some(PackageFormat::Sovereign));
+    }
+
+    #[test]
+    fn test_parse_and_translate_manifest_multi_format() {
+        let adapter = UniversalPackageAdapter::new();
+
+        // 1. Deb / Apt
+        let deb_text = "Package: htop\nVersion: 3.2.2\nDepends: ncurses, libcap\nDescription: Interactive process viewer";
+        let deb_pkg = adapter.parse_and_translate_manifest("htop.deb", deb_text).unwrap();
+        assert_eq!(deb_pkg.name, "htop");
+        assert_eq!(deb_pkg.version, Version::new(3, 2, 2));
+
+        // 2. Pacman / PKGBUILD
+        let arch_text = "pkgname=neovim\npkgver=0.9.1\ndepends=(libvterm luajit)";
+        let arch_pkg = adapter.parse_and_translate_manifest("PKGBUILD.pkg.tar.zst", arch_text).unwrap();
+        assert_eq!(arch_pkg.name, "neovim");
+        assert_eq!(arch_pkg.version, Version::new(0, 9, 1));
+
+        // 3. RPM / Spec
+        let rpm_text = "Name: bash\nVersion: 5.2.15\nSummary: GNU Bourne Again SHell\nRequires: glibc";
+        let rpm_pkg = adapter.parse_and_translate_manifest("bash.rpm", rpm_text).unwrap();
+        assert_eq!(rpm_pkg.name, "bash");
+        assert_eq!(rpm_pkg.version, Version::new(5, 2, 15));
+
+        // 4. Snap
+        let snap_text = "name: discord\nversion: '0.0.28'\nsummary: All-in-one voice and text chat\nconfinement: strict";
+        let snap_pkg = adapter.parse_and_translate_manifest("discord.yaml", snap_text).unwrap();
+        assert_eq!(snap_pkg.name, "discord");
+        assert_eq!(snap_pkg.version, Version::new(0, 0, 28));
+
+        // 5. Flatpak
+        let flatpak_text = "{\n  \"app-id\": \"org.gimp.GIMP\",\n  \"command\": \"gimp\"\n}";
+        let flatpak_pkg = adapter.parse_and_translate_manifest("manifest.json", flatpak_text).unwrap();
+        assert_eq!(flatpak_pkg.name, "org.gimp.GIMP");
     }
 }
