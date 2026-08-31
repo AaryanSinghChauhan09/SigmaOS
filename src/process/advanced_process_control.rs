@@ -412,6 +412,148 @@ pub struct AdvancedIpcHub {
     next_event_fd: usize,
 }
 
+// ==========================================
+// SOVEREIGN PROCESS LIFECYCLE CONTROLLER
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessLifecycleState {
+    Created,
+    Running,
+    Waiting,
+    Background,
+    Cancelling,
+    Terminated,
+    Aborted,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WaitReason {
+    IoWait,
+    LockWait,
+    SignalWait,
+    TimerWait,
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessLifecycleRecord {
+    pub pid: u64,
+    pub name: String,
+    pub state: ProcessLifecycleState,
+    pub exit_code: Option<i32>,
+    pub wait_reason: Option<WaitReason>,
+    pub io_buffer: Vec<u8>,
+}
+
+/// Comprehensive process lifecycle controller managing read, run, abort, background, write, waiting, cancellation, termination, and IPC
+pub struct SovereignProcessLifecycleController {
+    pub processes: BTreeMap<u64, ProcessLifecycleRecord>,
+}
+
+impl SovereignProcessLifecycleController {
+    pub fn new() -> Self {
+        Self {
+            processes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_process(&mut self, pid: u64, name: &str) {
+        self.processes.insert(
+            pid,
+            ProcessLifecycleRecord {
+                pid,
+                name: name.to_string(),
+                state: ProcessLifecycleState::Running,
+                exit_code: None,
+                wait_reason: None,
+                io_buffer: Vec::new(),
+            },
+        );
+    }
+
+    pub fn write_process_buffer(&mut self, pid: u64, data: &[u8]) -> Result<usize, &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.io_buffer.extend_from_slice(data);
+        Ok(data.len())
+    }
+
+    pub fn read_process_buffer(&mut self, pid: u64, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        let len = buffer.len().min(proc_rec.io_buffer.len());
+        if len > 0 {
+            let chunk: Vec<u8> = proc_rec.io_buffer.drain(..len).collect();
+            buffer[..len].copy_from_slice(&chunk);
+            Ok(len)
+        } else {
+            Ok(0)
+        }
+    }
+
+    pub fn move_to_background(&mut self, pid: u64) -> Result<(), &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.state = ProcessLifecycleState::Background;
+        Ok(())
+    }
+
+    pub fn move_to_waiting(&mut self, pid: u64, reason: WaitReason) -> Result<(), &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.state = ProcessLifecycleState::Waiting;
+        proc_rec.wait_reason = Some(reason);
+        Ok(())
+    }
+
+    pub fn cancel_process(&mut self, pid: u64) -> Result<(), &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.state = ProcessLifecycleState::Cancelling;
+        Ok(())
+    }
+
+    pub fn terminate_process(&mut self, pid: u64, exit_code: i32) -> Result<(), &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.state = ProcessLifecycleState::Terminated;
+        proc_rec.exit_code = Some(exit_code);
+        Ok(())
+    }
+
+    pub fn abort_process(&mut self, pid: u64, signal: i32) -> Result<(), &'static str> {
+        let proc_rec = self
+            .processes
+            .get_mut(&pid)
+            .ok_or("Process record not found")?;
+        proc_rec.state = ProcessLifecycleState::Aborted;
+        proc_rec.exit_code = Some(128 + signal);
+        Ok(())
+    }
+
+    pub fn get_state(&self, pid: u64) -> Option<ProcessLifecycleState> {
+        self.processes.get(&pid).map(|p| p.state)
+    }
+}
+
+impl Default for SovereignProcessLifecycleController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AdvancedIpcHub {
     pub fn new() -> Self {
         Self {
@@ -607,5 +749,29 @@ mod tests {
         let payload = ipc.pop_sigqueue(50).unwrap();
         assert_eq!(payload.signal_nr, 10);
         assert_eq!(payload.value_u64, 0x1234);
+    }
+
+    #[test]
+    fn test_sovereign_process_lifecycle_controller() {
+        let mut plc = SovereignProcessLifecycleController::new();
+        plc.register_process(1001, "sovereign_daemon");
+
+        assert_eq!(plc.get_state(1001), Some(ProcessLifecycleState::Running));
+
+        // Read/Write buffer
+        assert_eq!(plc.write_process_buffer(1001, b"LIFECYCLE_TEST_DATA").unwrap(), 19);
+        let mut read_buf = [0u8; 19];
+        assert_eq!(plc.read_process_buffer(1001, &mut read_buf).unwrap(), 19);
+        assert_eq!(&read_buf, b"LIFECYCLE_TEST_DATA");
+
+        // Background / Wait / Abort
+        assert!(plc.move_to_background(1001).is_ok());
+        assert_eq!(plc.get_state(1001), Some(ProcessLifecycleState::Background));
+
+        assert!(plc.move_to_waiting(1001, WaitReason::IoWait).is_ok());
+        assert_eq!(plc.get_state(1001), Some(ProcessLifecycleState::Waiting));
+
+        assert!(plc.abort_process(1001, 134).is_ok());
+        assert_eq!(plc.get_state(1001), Some(ProcessLifecycleState::Aborted));
     }
 }

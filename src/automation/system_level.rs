@@ -490,6 +490,349 @@ pub enum AutomationError {
     RuleNotFound,
     InvalidAction,
     PredictionFailed,
+    ServiceNotFound,
+    StateReconciliationFailed,
+    ResourceViolation,
+}
+
+// ==========================================
+// DISTRO-INSPIRED AUTOMATION ENGINE
+// ==========================================
+
+/// Service state for automated lifecycle supervision (Linux Systemd/OpenRC inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SupervisedServiceState {
+    Stopped,
+    Starting,
+    Running,
+    Degraded,
+    Failed,
+}
+
+/// Managed service entry for automated service supervision
+#[derive(Debug, Clone)]
+pub struct SupervisedService {
+    pub name: String,
+    pub state: SupervisedServiceState,
+    pub dependencies: Vec<String>,
+    pub restart_count: u32,
+    pub max_restarts: u32,
+    pub auto_restart: bool,
+}
+
+/// Resource throttling policy entry (FreeBSD RACCT/RCTL inspired)
+#[derive(Debug, Clone)]
+pub struct AutomatedRacctPolicy {
+    pub pid: u64,
+    pub max_cpu_pct: u32,
+    pub max_rss_bytes: u64,
+    pub is_throttled: bool,
+}
+
+/// Process auto-sandboxing policy (OpenBSD Pledge/Unveil inspired)
+#[derive(Debug, Clone)]
+pub struct AutomatedSandboxPolicy {
+    pub process_name: String,
+    pub allowed_promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions "r", "rw", "x")
+}
+
+/// Declarative system specification state (NixOS inspired)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeclarativeSpecState {
+    pub revision: u32,
+    pub hostname: String,
+    pub services: Vec<String>,
+    pub packages: Vec<String>,
+}
+
+/// Event hook for transactional automation (Alpine APK / Void XBPS inspired)
+#[derive(Debug, Clone)]
+pub struct TransactionalAutomationHook {
+    pub name: String,
+    pub trigger_pattern: String,
+    pub pre_action: String,
+    pub post_action: String,
+    pub undo_action: String,
+}
+
+/// Storage extent for automated tiering & scrubbing (Bcachefs / ZFS inspired)
+#[derive(Debug, Clone)]
+pub struct TieredStorageExtent {
+    pub path: String,
+    pub tier: String, // "SSD", "HDD"
+    pub access_count: u64,
+    pub checksum: u64,
+    pub payload: Vec<u8>,
+}
+
+/// Distro-inspired multi-domain automation engine
+pub struct DistroInspiredAutomationEngine {
+    pub services: Vec<SupervisedService>,
+    pub racct_policies: Vec<AutomatedRacctPolicy>,
+    pub sandbox_policies: Vec<AutomatedSandboxPolicy>,
+    pub active_spec: Option<DeclarativeSpecState>,
+    pub spec_history: Vec<DeclarativeSpecState>,
+    pub hooks: Vec<TransactionalAutomationHook>,
+    pub rollback_stack: Vec<String>,
+    pub storage_extents: Vec<TieredStorageExtent>,
+}
+
+impl DistroInspiredAutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            services: Vec::new(),
+            racct_policies: Vec::new(),
+            sandbox_policies: Vec::new(),
+            active_spec: None,
+            spec_history: Vec::new(),
+            hooks: Vec::new(),
+            rollback_stack: Vec::new(),
+            storage_extents: Vec::new(),
+        }
+    }
+
+    // --- 1. Linux Systemd / OpenRC Service Lifecycle Automation ---
+    pub fn register_service(
+        &mut self,
+        name: &str,
+        dependencies: &[&str],
+        max_restarts: u32,
+    ) {
+        let deps = dependencies.iter().map(|s| s.to_string()).collect();
+        self.services.push(SupervisedService {
+            name: name.to_string(),
+            state: SupervisedServiceState::Stopped,
+            dependencies: deps,
+            restart_count: 0,
+            max_restarts,
+            auto_restart: true,
+        });
+    }
+
+    pub fn set_service_state(&mut self, name: &str, state: SupervisedServiceState) -> Result<(), AutomationError> {
+        let service = self
+            .services
+            .iter_mut()
+            .find(|s| s.name == name)
+            .ok_or(AutomationError::ServiceNotFound)?;
+        service.state = state;
+        Ok(())
+    }
+
+    pub fn reconcile_services(&mut self) -> usize {
+        let mut changes = 0;
+        let snapshot = self.services.clone();
+
+        for service in self.services.iter_mut() {
+            if service.state == SupervisedServiceState::Stopped {
+                let all_deps_running = service.dependencies.iter().all(|dep| {
+                    snapshot
+                        .iter()
+                        .any(|s| &s.name == dep && s.state == SupervisedServiceState::Running)
+                });
+                if all_deps_running {
+                    service.state = SupervisedServiceState::Running;
+                    changes += 1;
+                }
+            } else if service.state == SupervisedServiceState::Failed && service.auto_restart {
+                if service.restart_count < service.max_restarts {
+                    service.restart_count += 1;
+                    service.state = SupervisedServiceState::Running;
+                    changes += 1;
+                } else {
+                    service.state = SupervisedServiceState::Degraded;
+                    changes += 1;
+                }
+            }
+        }
+        changes
+    }
+
+    // --- 2. FreeBSD RACCT / RCTL Resource Throttling Automation ---
+    pub fn add_racct_policy(&mut self, pid: u64, max_cpu_pct: u32, max_rss_bytes: u64) {
+        self.racct_policies.push(AutomatedRacctPolicy {
+            pid,
+            max_cpu_pct,
+            max_rss_bytes,
+            is_throttled: false,
+        });
+    }
+
+    pub fn evaluate_resource_limits(&mut self, pid: u64, cpu_pct: u32, rss_bytes: u64) -> Option<SystemAction> {
+        if let Some(policy) = self.racct_policies.iter_mut().find(|p| p.pid == pid) {
+            if cpu_pct > policy.max_cpu_pct || rss_bytes > policy.max_rss_bytes {
+                policy.is_throttled = true;
+                return Some(SystemAction::ThrottleProcesses { pids: vec![pid] });
+            } else {
+                policy.is_throttled = false;
+            }
+        }
+        None
+    }
+
+    // --- 3. OpenBSD Pledge / Unveil Auto-Sandboxing ---
+    pub fn generate_auto_sandbox_policy(&mut self, process_name: &str, categories: &[&str]) -> AutomatedSandboxPolicy {
+        let mut promises = vec!["stdio".to_string()];
+        let mut unveiled = Vec::new();
+
+        for cat in categories {
+            match *cat {
+                "network" => promises.push("inet".to_string()),
+                "filesystem_read" => unveiled.push(("/usr".to_string(), "r".to_string())),
+                "filesystem_write" => unveiled.push(("/tmp".to_string(), "rw".to_string())),
+                "exec" => {
+                    promises.push("exec".to_string());
+                    unveiled.push(("/bin".to_string(), "rx".to_string()));
+                }
+                _ => {}
+            }
+        }
+
+        let policy = AutomatedSandboxPolicy {
+            process_name: process_name.to_string(),
+            allowed_promises: promises,
+            unveiled_paths: unveiled,
+        };
+
+        self.sandbox_policies.push(policy.clone());
+        policy
+    }
+
+    // --- 4. NixOS Declarative System State Reconciliation ---
+    pub fn apply_declarative_spec(&mut self, spec: DeclarativeSpecState) -> Result<u32, AutomationError> {
+        let rev = spec.revision;
+        if let Some(ref current) = self.active_spec {
+            self.spec_history.push(current.clone());
+        }
+        self.active_spec = Some(spec);
+        Ok(rev)
+    }
+
+    pub fn reconcile_declarative_state(&mut self) -> Result<bool, AutomationError> {
+        let services_to_register: Vec<String> = {
+            let spec = self
+                .active_spec
+                .as_ref()
+                .ok_or(AutomationError::StateReconciliationFailed)?;
+            spec.services
+                .iter()
+                .filter(|svc| !self.services.iter().any(|s| &s.name == *svc))
+                .cloned()
+                .collect()
+        };
+
+        // Ensure all declared services exist and are managed
+        for svc in services_to_register {
+            self.register_service(&svc, &[], 3);
+        }
+        Ok(true)
+    }
+
+    pub fn rollback_declarative_state(&mut self) -> Result<u32, AutomationError> {
+        if let Some(previous) = self.spec_history.pop() {
+            let rev = previous.revision;
+            self.active_spec = Some(previous);
+            Ok(rev)
+        } else {
+            Err(AutomationError::StateReconciliationFailed)
+        }
+    }
+
+    // --- 5. Alpine / Void Transactional Event Hooks ---
+    pub fn register_hook(&mut self, name: &str, pattern: &str, pre: &str, post: &str, undo: &str) {
+        self.hooks.push(TransactionalAutomationHook {
+            name: name.to_string(),
+            trigger_pattern: pattern.to_string(),
+            pre_action: pre.to_string(),
+            post_action: post.to_string(),
+            undo_action: undo.to_string(),
+        });
+    }
+
+    pub fn trigger_transactional_hooks(&mut self, target: &str) -> Vec<String> {
+        let mut executed = Vec::new();
+        for hook in &self.hooks {
+            if target.contains(&hook.trigger_pattern) {
+                executed.push(format!("PRE:{}", hook.pre_action));
+                executed.push(format!("POST:{}", hook.post_action));
+                if !hook.undo_action.is_empty() {
+                    self.rollback_stack.push(hook.undo_action.clone());
+                }
+            }
+        }
+        executed
+    }
+
+    pub fn rollback_hooks(&mut self) -> Vec<String> {
+        let mut undos = Vec::new();
+        while let Some(undo) = self.rollback_stack.pop() {
+            undos.push(format!("UNDO:{}", undo));
+        }
+        undos
+    }
+
+    // --- 6. Bcachefs / ZFS Automated Storage Tiering & Scrubbing ---
+    pub fn add_storage_extent(&mut self, path: &str, tier: &str, payload: &[u8]) {
+        let mut checksum: u64 = 0xcbf29ce484222325;
+        for &b in payload {
+            checksum ^= b as u64;
+            checksum = checksum.wrapping_mul(0x100000001b3);
+        }
+        self.storage_extents.push(TieredStorageExtent {
+            path: path.to_string(),
+            tier: tier.to_string(),
+            access_count: 1,
+            checksum,
+            payload: payload.to_vec(),
+        });
+    }
+
+    pub fn record_extent_access(&mut self, path: &str) {
+        if let Some(extent) = self.storage_extents.iter_mut().find(|e| e.path == path) {
+            extent.access_count += 1;
+        }
+    }
+
+    pub fn run_automated_tiering_pass(&mut self) -> (usize, usize) {
+        let mut promoted = 0;
+        let mut demoted = 0;
+
+        for extent in self.storage_extents.iter_mut() {
+            if extent.tier == "HDD" && extent.access_count >= 5 {
+                extent.tier = "SSD".to_string();
+                promoted += 1;
+            } else if extent.tier == "SSD" && extent.access_count <= 1 {
+                extent.tier = "HDD".to_string();
+                demoted += 1;
+            }
+        }
+        (promoted, demoted)
+    }
+
+    pub fn run_automated_scrub(&mut self) -> (usize, usize) {
+        let mut checked = 0;
+        let mut corrupted = 0;
+
+        for extent in &self.storage_extents {
+            checked += 1;
+            let mut actual_cksum: u64 = 0xcbf29ce484222325;
+            for &b in &extent.payload {
+                actual_cksum ^= b as u64;
+                actual_cksum = actual_cksum.wrapping_mul(0x100000001b3);
+            }
+            if actual_cksum != extent.checksum {
+                corrupted += 1;
+            }
+        }
+        (checked, corrupted)
+    }
+}
+
+impl Default for DistroInspiredAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -532,5 +875,121 @@ mod tests {
         let duration = Duration::from_secs(3600);
         let scheduled_time = manager.get_smart_scheduling(duration);
         assert!(scheduled_time > 0);
+    }
+
+    #[test]
+    fn test_distro_inspired_service_reconciliation() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.register_service("db", &[], 3);
+        engine.register_service("web", &["db"], 3);
+
+        assert_eq!(engine.reconcile_services(), 1); // db becomes running
+        assert_eq!(engine.services[0].state, SupervisedServiceState::Running);
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Stopped);
+
+        assert_eq!(engine.reconcile_services(), 1); // web becomes running
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Running);
+
+        // Simulate failure and restart
+        assert!(engine.set_service_state("web", SupervisedServiceState::Failed).is_ok());
+        assert_eq!(engine.reconcile_services(), 1);
+        assert_eq!(engine.services[1].state, SupervisedServiceState::Running);
+        assert_eq!(engine.services[1].restart_count, 1);
+    }
+
+    #[test]
+    fn test_distro_inspired_racct_throttling() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.add_racct_policy(1001, 80, 1024 * 1024 * 100);
+
+        let action = engine.evaluate_resource_limits(1001, 95, 1024 * 1024 * 50);
+        assert!(action.is_some());
+        if let Some(SystemAction::ThrottleProcesses { pids }) = action {
+            assert_eq!(pids, vec![1001]);
+        } else {
+            panic!("Expected ThrottleProcesses action");
+        }
+        assert!(engine.racct_policies[0].is_throttled);
+    }
+
+    #[test]
+    fn test_distro_inspired_auto_sandbox() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        let policy = engine.generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
+
+        assert!(policy.allowed_promises.contains(&"inet".to_string()));
+        assert!(policy.allowed_promises.contains(&"exec".to_string()));
+        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/usr" && perm == "r"));
+        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/bin" && perm == "rx"));
+    }
+
+    #[test]
+    fn test_distro_inspired_declarative_reconciliation() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        let spec1 = DeclarativeSpecState {
+            revision: 1,
+            hostname: "sigma-node".to_string(),
+            services: vec!["db".to_string(), "logger".to_string()],
+            packages: vec!["coreutils".to_string()],
+        };
+
+        assert_eq!(engine.apply_declarative_spec(spec1).unwrap(), 1);
+        assert!(engine.reconcile_declarative_state().unwrap());
+        assert_eq!(engine.services.len(), 2);
+        assert_eq!(engine.services[0].name, "db");
+        assert_eq!(engine.services[1].name, "logger");
+
+        let spec2 = DeclarativeSpecState {
+            revision: 2,
+            hostname: "sigma-node".to_string(),
+            services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
+            packages: vec!["coreutils".to_string()],
+        };
+        assert_eq!(engine.apply_declarative_spec(spec2).unwrap(), 2);
+
+        // Rollback
+        assert_eq!(engine.rollback_declarative_state().unwrap(), 1);
+        assert_eq!(engine.active_spec.as_ref().unwrap().revision, 1);
+    }
+
+    #[test]
+    fn test_distro_inspired_transactional_hooks() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.register_hook(
+            "pkg_trigger",
+            "nginx",
+            "pre_install_nginx",
+            "post_install_nginx",
+            "undo_install_nginx",
+        );
+
+        let executed = engine.trigger_transactional_hooks("install_nginx_pkg");
+        assert_eq!(executed.len(), 2);
+        assert_eq!(executed[0], "PRE:pre_install_nginx");
+        assert_eq!(executed[1], "POST:post_install_nginx");
+
+        let undos = engine.rollback_hooks();
+        assert_eq!(undos.len(), 1);
+        assert_eq!(undos[0], "UNDO:undo_install_nginx");
+    }
+
+    #[test]
+    fn test_distro_inspired_storage_tiering_and_scrubbing() {
+        let mut engine = DistroInspiredAutomationEngine::new();
+        engine.add_storage_extent("/data/db.dat", "HDD", b"DATA_PAYLOAD");
+
+        // Record accesses to trigger promotion
+        for _ in 0..5 {
+            engine.record_extent_access("/data/db.dat");
+        }
+
+        let (promoted, demoted) = engine.run_automated_tiering_pass();
+        assert_eq!(promoted, 1);
+        assert_eq!(demoted, 0);
+        assert_eq!(engine.storage_extents[0].tier, "SSD");
+
+        let (checked, corrupted) = engine.run_automated_scrub();
+        assert_eq!(checked, 1);
+        assert_eq!(corrupted, 0);
     }
 }

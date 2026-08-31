@@ -26,6 +26,7 @@ pub mod distro;
 pub mod driver;
 pub mod filesystem;
 pub mod kernel;
+pub mod media;
 pub mod memory;
 pub mod network;
 pub mod observability;

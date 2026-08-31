@@ -178,6 +178,197 @@ impl FlatpakSdkContainerBuilder {
     }
 }
 
+/// Clear Linux Stateless Overlay Configuration Engine
+pub struct ClearLinuxStatelessOverlayEngine {
+    pub usr_defaults_path: String,
+    pub etc_override_path: String,
+}
+
+impl ClearLinuxStatelessOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            usr_defaults_path: "/usr/share/defaults".to_string(),
+            etc_override_path: "/etc".to_string(),
+        }
+    }
+
+    pub fn resolve_config_file(&self, rel_path: &str) -> String {
+        format!("{}/{}", self.etc_override_path, rel_path)
+    }
+
+    pub fn fallback_factory_default(&self, rel_path: &str) -> String {
+        format!("{}/{}", self.usr_defaults_path, rel_path)
+    }
+}
+
+impl Default for ClearLinuxStatelessOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Alpine / Void Transactional Trigger Hook Engine
+pub struct AlpineVoidTriggerHookManager {
+    pub registered_triggers: Vec<(String, String)>, // (pattern, hook_cmd)
+}
+
+impl AlpineVoidTriggerHookManager {
+    pub fn new() -> Self {
+        Self {
+            registered_triggers: Vec::new(),
+        }
+    }
+
+    pub fn register_trigger(&mut self, pattern: &str, hook_cmd: &str) {
+        self.registered_triggers.push((pattern.to_string(), hook_cmd.to_string()));
+    }
+
+    pub fn execute_triggers_for_package(&self, pkg_name: &str) -> Vec<String> {
+        let mut executed = Vec::new();
+        for (pattern, hook_cmd) in &self.registered_triggers {
+            if pkg_name.contains(pattern) {
+                executed.push(format!("Trigger executed for {}: {}", pkg_name, hook_cmd));
+            }
+        }
+        executed
+    }
+}
+
+impl Default for AlpineVoidTriggerHookManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Gentoo Portage USE-Flags Build Resolver
+pub struct GentooPortageUseFlagResolver {
+    pub global_use_flags: Vec<String>,
+}
+
+impl GentooPortageUseFlagResolver {
+    pub fn new(use_flags: &[&str]) -> Self {
+        Self {
+            global_use_flags: use_flags.iter().map(|s| s.to_string()).collect(),
+        }
+    }
+
+    pub fn is_feature_enabled(&self, flag: &str) -> bool {
+        self.global_use_flags.contains(&flag.to_string())
+    }
+
+    pub fn resolve_dependencies(&self, pkg_name: &str) -> Vec<String> {
+        let mut deps = vec!["sys-libs/glibc".to_string()];
+        if self.is_feature_enabled("ssl") {
+            deps.push("dev-libs/openssl".to_string());
+        }
+        if self.is_feature_enabled("wayland") {
+            deps.push("gui-libs/wayland".to_string());
+        }
+        let _ = pkg_name;
+        deps
+    }
+}
+
+/// DragonFly BSD HAMMER2 PFS Snapshot & Varsyms Path Resolver
+pub struct DragonFlyVarsymsPfsResolver {
+    pub varsyms: Vec<(String, String)>,
+}
+
+impl DragonFlyVarsymsPfsResolver {
+    pub fn new() -> Self {
+        let mut resolver = Self { varsyms: Vec::new() };
+        resolver.set_varsym("MACHINE", "x86_64");
+        resolver.set_varsym("SYS", "SigmaOS");
+        resolver
+    }
+
+    pub fn set_varsym(&mut self, key: &str, val: &str) {
+        self.varsyms.retain(|(k, _)| k != key);
+        self.varsyms.push((key.to_string(), val.to_string()));
+    }
+
+    pub fn resolve_path(&self, template_path: &str) -> String {
+        let mut resolved = template_path.to_string();
+        for (k, v) in &self.varsyms {
+            let var_pattern = format!("${}", k);
+            resolved = resolved.replace(&var_pattern, v);
+        }
+        resolved
+    }
+}
+
+impl Default for DragonFlyVarsymsPfsResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenBSD W^X / Retguard / Unveil Security Sandbox Engine
+pub struct OpenBsdSecuritySandboxWikiEngine {
+    pub pledge_promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>,
+}
+
+impl OpenBsdSecuritySandboxWikiEngine {
+    pub fn new() -> Self {
+        Self {
+            pledge_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    pub fn pledge(&mut self, promise: &str) {
+        if !self.pledge_promises.contains(&promise.to_string()) {
+            self.pledge_promises.push(promise.to_string());
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, perms: &str) {
+        self.unveiled_paths.push((path.to_string(), perms.to_string()));
+    }
+
+    pub fn generate_sandbox_summary(&self) -> String {
+        format!(
+            "Sandbox configured with {} pledge promises and {} unveiled paths",
+            self.pledge_promises.len(),
+            self.unveiled_paths.len()
+        )
+    }
+}
+
+impl Default for OpenBsdSecuritySandboxWikiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Distro Wiki Page Documentation Generator
+pub struct DistroWikiPageDocumentationGenerator;
+
+impl DistroWikiPageDocumentationGenerator {
+    pub fn generate_linux_distros_architecture_wiki() -> String {
+        let mut wiki = String::new();
+        wiki.push_str("# Linux Distributions Architecture & Parity Guide\n\n");
+        wiki.push_str("SigmaOS integrates architectural concepts from premier Linux distributions:\n");
+        wiki.push_str("- **Arch Linux**: Rolling package release resolution and PKGBUILD recipes.\n");
+        wiki.push_str("- **NixOS**: Declarative system generations and atomic rollback.\n");
+        wiki.push_str("- **Clear Linux**: Stateless `/usr` configuration defaults with `/etc` overrides.\n");
+        wiki.push_str("- **Gentoo**: Portage USE-flags dependency compilation.\n");
+        wiki.push_str("- **Alpine / Void**: Lightweight trigger hooks and init supervision.\n");
+        wiki
+    }
+
+    pub fn generate_bsd_security_hardening_wiki() -> String {
+        let mut wiki = String::new();
+        wiki.push_str("# BSD Security Hardening & Isolation Guide\n\n");
+        wiki.push_str("SigmaOS incorporates security paradigms from BSD systems:\n");
+        wiki.push_str("- **OpenBSD**: Pledge syscall restrictions, unveil file path masking, W^X, and Retguard canaries.\n");
+        wiki.push_str("- **FreeBSD**: RACCT/RCTL resource controls and Capsicum capability delegation.\n");
+        wiki.push_str("- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n");
+        wiki
+    }
+}
+
 #[cfg(test)]
 mod expanded_wiki_tests {
     use super::*;
@@ -236,5 +427,66 @@ mod expanded_wiki_tests {
     fn test_flatpak_sdk_builder() {
         let builder = FlatpakSdkContainerBuilder::new("org.sigmaos.ZenithDesktop", "23.08");
         assert_eq!(builder.build_bundle(), "Flatpak bundle org.sigmaos.ZenithDesktop built with SDK 23.08");
+    }
+
+    #[test]
+    fn test_clear_linux_stateless_overlay() {
+        let engine = ClearLinuxStatelessOverlayEngine::new();
+        assert_eq!(engine.resolve_config_file("nginx/nginx.conf"), "/etc/nginx/nginx.conf");
+        assert_eq!(engine.fallback_factory_default("nginx/nginx.conf"), "/usr/share/defaults/nginx/nginx.conf");
+    }
+
+    #[test]
+    fn test_alpine_void_trigger_hooks() {
+        let mut mgr = AlpineVoidTriggerHookManager::new();
+        mgr.register_trigger("glibc", "ldconfig -v");
+
+        let execs = mgr.execute_triggers_for_package("sys-libs/glibc-2.38");
+        assert_eq!(execs.len(), 1);
+        assert!(execs[0].contains("ldconfig -v"));
+    }
+
+    #[test]
+    fn test_gentoo_portage_use_flags() {
+        let resolver = GentooPortageUseFlagResolver::new(&["ssl", "wayland"]);
+        assert!(resolver.is_feature_enabled("ssl"));
+        assert!(!resolver.is_feature_enabled("systemd"));
+
+        let deps = resolver.resolve_dependencies("nginx");
+        assert!(deps.contains(&"dev-libs/openssl".to_string()));
+        assert!(deps.contains(&"gui-libs/wayland".to_string()));
+    }
+
+    #[test]
+    fn test_dragonfly_varsyms_resolver() {
+        let mut resolver = DragonFlyVarsymsPfsResolver::new();
+        let path = resolver.resolve_path("/usr/lib/$MACHINE/$SYS/libcore.so");
+        assert_eq!(path, "/usr/lib/x86_64/SigmaOS/libcore.so");
+
+        resolver.set_varsym("MACHINE", "aarch64");
+        let arm_path = resolver.resolve_path("/usr/lib/$MACHINE/$SYS/libcore.so");
+        assert_eq!(arm_path, "/usr/lib/aarch64/SigmaOS/libcore.so");
+    }
+
+    #[test]
+    fn test_openbsd_security_sandbox_wiki_engine() {
+        let mut sandbox = OpenBsdSecuritySandboxWikiEngine::new();
+        sandbox.pledge("stdio");
+        sandbox.pledge("rpath");
+        sandbox.unveil("/usr/lib", "r");
+
+        let summary = sandbox.generate_sandbox_summary();
+        assert_eq!(summary, "Sandbox configured with 2 pledge promises and 1 unveiled paths");
+    }
+
+    #[test]
+    fn test_distro_wiki_page_documentation_generator() {
+        let linux_wiki = DistroWikiPageDocumentationGenerator::generate_linux_distros_architecture_wiki();
+        assert!(linux_wiki.contains("Arch Linux"));
+        assert!(linux_wiki.contains("Clear Linux"));
+
+        let bsd_wiki = DistroWikiPageDocumentationGenerator::generate_bsd_security_hardening_wiki();
+        assert!(bsd_wiki.contains("OpenBSD"));
+        assert!(bsd_wiki.contains("FreeBSD"));
     }
 }
