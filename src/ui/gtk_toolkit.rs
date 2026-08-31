@@ -400,6 +400,195 @@ impl Default for SovereignGtkToolkit {
     }
 }
 
+/// System Panel Tray Applet
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemTrayApplet {
+    pub id: String,
+    pub name: String,
+    pub icon_name: String,
+    pub status_text: String,
+    pub active: bool,
+}
+
+/// KDE Plasma / GNOME 45 inspired top bar status panel (`SovereignSystemStatusPanel`)
+pub struct SovereignSystemStatusPanel {
+    pub applets: Vec<SystemTrayApplet>,
+    pub clock_text: String,
+    pub battery_percent: u8,
+    pub wifi_signal_percent: u8,
+    pub volume_percent: u8,
+}
+
+impl SovereignSystemStatusPanel {
+    pub fn new() -> Self {
+        let mut applets = Vec::new();
+        applets.push(SystemTrayApplet {
+            id: "net".to_string(),
+            name: "Network".to_string(),
+            icon_name: "network-wireless-symbolic".to_string(),
+            status_text: "Connected (Wi-Fi)".to_string(),
+            active: true,
+        });
+        applets.push(SystemTrayApplet {
+            id: "vol".to_string(),
+            name: "Volume".to_string(),
+            icon_name: "audio-volume-high-symbolic".to_string(),
+            status_text: "100%".to_string(),
+            active: true,
+        });
+        applets.push(SystemTrayApplet {
+            id: "power".to_string(),
+            name: "Power".to_string(),
+            icon_name: "battery-good-symbolic".to_string(),
+            status_text: "Balanced Profile (98%)".to_string(),
+            active: true,
+        });
+
+        Self {
+            applets,
+            clock_text: "12:00 PM".to_string(),
+            battery_percent: 98,
+            wifi_signal_percent: 95,
+            volume_percent: 100,
+        }
+    }
+
+    pub fn update_clock(&mut self, time_str: &str) {
+        self.clock_text = time_str.to_string();
+    }
+
+    pub fn render_bar_summary(&self) -> String {
+        let mut s = String::new();
+        s.push_str("SystemPanel[Clock=");
+        s.push_str(&self.clock_text);
+        s.push_str(", WiFi=");
+        s.push_str(&self.wifi_signal_percent.to_string());
+        s.push_str("%, Battery=");
+        s.push_str(&self.battery_percent.to_string());
+        s.push_str("%, Applets=");
+        s.push_str(&self.applets.len().to_string());
+        s.push(']');
+        s
+    }
+}
+
+impl Default for SovereignSystemStatusPanel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dock Item for Desktop Dock
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DockItem {
+    pub app_id: String,
+    pub title: String,
+    pub icon_name: String,
+    pub is_running: bool,
+    pub is_pinned: bool,
+    pub magnification_factor: u32, // e.g. 100 = 1.0x, 150 = 1.5x on hover
+}
+
+/// macOS / elementaryOS / Deepin inspired desktop dock (`SovereignDockBar`)
+pub struct SovereignDockBar {
+    pub items: Vec<DockItem>,
+    pub position_bottom: bool,
+    pub auto_hide: bool,
+}
+
+impl SovereignDockBar {
+    pub fn new() -> Self {
+        let mut items = Vec::new();
+        items.push(DockItem {
+            app_id: "org.sigmaos.terminal".to_string(),
+            title: "Terminal".to_string(),
+            icon_name: "utilities-terminal-symbolic".to_string(),
+            is_running: true,
+            is_pinned: true,
+            magnification_factor: 100,
+        });
+        items.push(DockItem {
+            app_id: "org.sigmaos.browser".to_string(),
+            title: "Web Browser".to_string(),
+            icon_name: "web-browser-symbolic".to_string(),
+            is_running: false,
+            is_pinned: true,
+            magnification_factor: 100,
+        });
+        items.push(DockItem {
+            app_id: "org.sigmaos.files".to_string(),
+            title: "File Manager".to_string(),
+            icon_name: "system-file-manager-symbolic".to_string(),
+            is_running: true,
+            is_pinned: true,
+            magnification_factor: 100,
+        });
+
+        Self {
+            items,
+            position_bottom: true,
+            auto_hide: false,
+        }
+    }
+
+    pub fn pin_app(&mut self, app_id: &str, title: &str, icon_name: &str) {
+        if !self.items.iter().any(|item| item.app_id == app_id) {
+            self.items.push(DockItem {
+                app_id: app_id.to_string(),
+                title: title.to_string(),
+                icon_name: icon_name.to_string(),
+                is_running: false,
+                is_pinned: true,
+                magnification_factor: 100,
+            });
+        }
+    }
+
+    pub fn set_hover_magnification(&mut self, app_id: &str, factor: u32) {
+        if let Some(item) = self.items.iter_mut().find(|item| item.app_id == app_id) {
+            item.magnification_factor = factor;
+        }
+    }
+}
+
+impl Default for SovereignDockBar {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Overview Workspace Switcher
+pub struct SovereignOverviewWorkspaceSwitcher {
+    pub active_workspace_index: usize,
+    pub total_workspaces: usize,
+    pub workspace_names: Vec<String>,
+}
+
+impl SovereignOverviewWorkspaceSwitcher {
+    pub fn new(count: usize) -> Self {
+        let mut names = Vec::new();
+        for i in 1..=count {
+            let mut name = String::from("Workspace ");
+            name.push_str(&i.to_string());
+            names.push(name);
+        }
+        Self {
+            active_workspace_index: 0,
+            total_workspaces: count,
+            workspace_names: names,
+        }
+    }
+
+    pub fn switch_to_workspace(&mut self, index: usize) -> bool {
+        if index < self.total_workspaces {
+            self.active_workspace_index = index;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,5 +655,22 @@ mod tests {
 
         let unhandled = dispatcher.g_signal_emit(1001, "activate");
         assert!(!unhandled);
+    }
+
+    #[test]
+    fn test_system_status_panel_and_dock() {
+        let mut panel = SovereignSystemStatusPanel::new();
+        panel.update_clock("10:45 AM");
+        assert!(panel.render_bar_summary().contains("Clock=10:45 AM"));
+
+        let mut dock = SovereignDockBar::new();
+        dock.pin_app("org.sigmaos.calculator", "Calculator", "accessories-calculator-symbolic");
+        dock.set_hover_magnification("org.sigmaos.calculator", 140);
+        assert_eq!(dock.items.len(), 4);
+        assert_eq!(dock.items[3].magnification_factor, 140);
+
+        let mut switcher = SovereignOverviewWorkspaceSwitcher::new(4);
+        assert!(switcher.switch_to_workspace(2));
+        assert_eq!(switcher.active_workspace_index, 2);
     }
 }

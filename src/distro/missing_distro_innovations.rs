@@ -520,7 +520,7 @@ impl MageiaUrpmiEngine {
         plasma_deps.push(String::from("qtbase"));
         plasma_deps.push(String::from("kf5-kio"));
         db.insert(String::from("plasma-workspace"), plasma_deps);
-        Self { urpmi_db: db, package_database: BTreeMap::new() }
+        Self { package_database: db }
     }
 
     pub fn resolve_urpmi(&self, target_pkg: &str) -> Vec<String> {

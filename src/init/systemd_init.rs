@@ -8,6 +8,11 @@ use alloc::vec::Vec;
 /// Provides robust target dependency graphs, wants/requires/requisite properties,
 /// systemd-analyze security auditor, critical-chain boot timing diagnostics,
 /// socket/timer activation extensions, and multi-init BSD/Linux conversion bridge.
+/// Provides robust target dependency graphs, wants/requires properties,
+/// and target states to defeat Fedora's Systemd initialization.
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -1095,9 +1100,11 @@ impl SystemdEngine {
         let mut visiting = SystemdVec::new();
         let mut visited = SystemdVec::new();
 
+        let slice: &[UnitID] = &**unit_ids;
         for &id in unit_ids.iter() {
             if !visited.contains(&id) {
                 self.topo_visit(id, unit_ids, &mut sorted, &mut visiting, &mut visited)?;
+                self.topo_visit(id, slice, &mut sorted, &mut visiting, &mut visited)?;
             }
         }
         Ok(sorted)
@@ -1589,6 +1596,113 @@ impl SystemdEngine {
     }
 }
 
+/// Sovereign Systemd Betsy Engine uniting Init supervision, Unit parsing, Watchdogs, Cgroup slices, and Multi-init bridging
+pub struct SystemdBetsyEngine {
+    pub engine: SystemdEngine,
+    pub watchdogs: BTreeMap<String, SystemdServiceWatchdog>,
+    pub slice_governors: BTreeMap<String, SystemdCgroupSliceGovernor>,
+    pub init_bridge: InitSystemBridge,
+    pub target_name: String,
+}
+
+impl SystemdBetsyEngine {
+    pub fn new(default_target: &str) -> Self {
+        Self {
+            engine: SystemdEngine::new(),
+            watchdogs: BTreeMap::new(),
+            slice_governors: BTreeMap::new(),
+            init_bridge: InitSystemBridge::new(InitSystemType::SigmaInit),
+            target_name: default_target.to_string(),
+        }
+    }
+
+    pub fn register_unit(&mut self, unit: SystemdUnit) {
+        self.engine.register_unit(unit);
+    }
+
+    pub fn parse_and_load_unit_file(&mut self, unit_id: UnitID, unit_name: &str, file_content: &str, unit_type: UnitType) -> ParsedSystemdUnitFile {
+        let parsed = SystemdUnitFileParser::parse_unit_file(file_content);
+        let mut unit = SystemdUnit::new(unit_id, unit_name.as_bytes(), unit_type);
+        if parsed.restart_policy == "always" {
+            unit.restart_policy = RestartPolicy::Always;
+        } else if parsed.restart_policy == "on-failure" {
+            unit.restart_policy = RestartPolicy::OnFailure;
+        }
+        self.engine.register_unit(unit);
+
+        if parsed.watchdog_sec > 0 {
+            self.watchdogs.insert(
+                unit_name.to_string(),
+                SystemdServiceWatchdog::new(unit_name, parsed.watchdog_sec),
+            );
+        }
+
+        if !parsed.slice.is_empty() {
+            self.slice_governors.entry(parsed.slice.clone()).or_insert_with(|| {
+                SystemdCgroupSliceGovernor::new(&parsed.slice, 100, 512 * 1024 * 1024)
+            });
+        }
+
+        parsed
+    }
+
+    pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
+        self.engine.systemctl_start(id)
+    }
+
+    pub fn systemctl_stop(&mut self, id: UnitID) -> Result<(), &'static str> {
+        self.engine.systemctl_stop(id)
+    }
+
+    pub fn systemctl_restart(&mut self, id: UnitID) -> Result<(), &'static str> {
+        self.engine.systemctl_restart(id)
+    }
+
+    pub fn query_unit_state(&self, id: UnitID) -> Option<UnitState> {
+        self.engine.systemctl_status(id)
+    }
+
+    pub fn analyze_blame(&self) -> SystemdVec<(UnitID, u64)> {
+        self.engine.systemd_analyze_blame()
+    }
+
+    pub fn register_watchdog(&mut self, service_name: &str, interval_sec: u32) {
+        self.watchdogs.insert(
+            service_name.to_string(),
+            SystemdServiceWatchdog::new(service_name, interval_sec),
+        );
+    }
+
+    pub fn ping_watchdog(&mut self, service_name: &str, now_sec: u64) -> bool {
+        if let Some(wd) = self.watchdogs.get_mut(service_name) {
+            wd.ping_watchdog(now_sec);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn check_watchdog_health(&mut self, service_name: &str, now_sec: u64) -> bool {
+        if let Some(wd) = self.watchdogs.get_mut(service_name) {
+            wd.check_health(now_sec)
+        } else {
+            true
+        }
+    }
+
+    pub fn configure_slice(&mut self, slice_name: &str, cpu_weight: u32, memory_max_bytes: u64) -> Result<(), &'static str> {
+        let governor = SystemdCgroupSliceGovernor::new(slice_name, cpu_weight, memory_max_bytes);
+        self.slice_governors.insert(slice_name.to_string(), governor);
+        Ok(())
+    }
+}
+
+impl Default for SystemdBetsyEngine {
+    fn default() -> Self {
+        Self::new("multi-user.target")
+    }
+}
+
 pub struct SystemdVec<T> {
     data: *mut T,
     len: usize,
@@ -2006,6 +2120,31 @@ mod tests {
 
         let non_existent = engine.query_target_by_name(b"non-existent.target");
         assert_eq!(non_existent, None);
+    }
+
+    #[test]
+    fn test_systemd_betsy_engine_workflow() {
+        let mut betsy = SystemdBetsyEngine::new("multi-user.target");
+        let mut srv = SystemdUnit::new(1, b"nginx.service", UnitType::Service);
+        srv.restart_policy = RestartPolicy::OnFailure;
+        srv.startup_time_ms = 50;
+        srv.duration_ms = 120;
+
+        betsy.register_unit(srv);
+        assert!(betsy.systemctl_start(1).is_ok());
+
+        assert_eq!(betsy.query_unit_state(1), Some(UnitState::Active));
+
+        let blame = betsy.analyze_blame();
+        assert_eq!(blame.len(), 1);
+
+        betsy.register_watchdog("nginx.service", 30);
+        betsy.ping_watchdog("nginx.service", 90);
+        let healthy = betsy.check_watchdog_health("nginx.service", 100);
+        assert!(healthy);
+
+        let slice_ok = betsy.configure_slice("system.slice", 100, 1024 * 1024);
+        assert!(slice_ok.is_ok());
     }
 
     #[test]

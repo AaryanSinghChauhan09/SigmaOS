@@ -23,8 +23,15 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 776
 /// Implements desktop settings and preferences
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SettingID = usize;
 
@@ -212,7 +219,7 @@ impl SettingsCategory for SimpleSettingsCategory {
         }
 
         let mut found = false;
-        for &mut (ref cat, ref mut ids) in &mut self.categories {
+        for (cat, ids) in &mut self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 ids.push(id);
@@ -326,16 +333,54 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
+/// GNOME GSettings & KDE KConfig inspired Sovereign Settings Schema Engine
+#[derive(Debug, Clone)]
+pub struct SchemaKey {
+    pub path: String,       // e.g. "org.sigmaos.desktop.interface.theme"
+    pub default_value: String,
+    pub current_value: String,
+}
+
+pub struct SovereignGSettingsSchemaEngine {
+    pub schemas: BTreeMap<String, SchemaKey>,
+}
+
+impl SovereignGSettingsSchemaEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            schemas: BTreeMap::new(),
+        };
+        engine.register_key("org.sigmaos.desktop.interface.theme", "SovereignDark");
+        engine.register_key("org.sigmaos.desktop.interface.font-size", "11");
+        engine.register_key("org.sigmaos.desktop.wm.tiling-mode", "HorizontalSplit");
+        engine
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    pub fn register_key(&mut self, path: &str, default_value: &str) {
+        self.schemas.insert(
+            path.to_string(),
+            SchemaKey {
+                path: path.to_string(),
+                default_value: default_value.to_string(),
+                current_value: default_value.to_string(),
+            },
+        );
+    }
+
+    pub fn get_value(&self, path: &str) -> Option<String> {
+        self.schemas.get(path).map(|k| k.current_value.clone())
+    }
+
+    pub fn set_value(&mut self, path: &str, value: &str) -> Result<(), &'static str> {
+        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
+        key.current_value = value.to_string();
+        Ok(())
+    }
+
+    pub fn reset_to_default(&mut self, path: &str) -> Result<(), &'static str> {
+        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
+        key.current_value = key.default_value.clone();
+        Ok(())
     }
 }
 
@@ -428,6 +473,35 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+impl Default for SovereignGSettingsSchemaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sovereign_gsettings_schema_engine() {
+        let mut schema = SovereignGSettingsSchemaEngine::new();
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "SovereignDark"
+        );
+
+        assert!(schema.set_value("org.sigmaos.desktop.interface.theme", "ZenithLight").is_ok());
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "ZenithLight"
+        );
+
+        assert!(schema.reset_to_default("org.sigmaos.desktop.interface.theme").is_ok());
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "SovereignDark"
+        );
     }
 }
 

@@ -127,6 +127,7 @@ impl ArchAlpmHookTransactionEngine {
             let matched = installed_pkgs
                 .iter()
                 .any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
+            let matched = installed_pkgs.iter().any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
             if matched {
                 self.executed_hooks.push(hook.exec_command.clone());
                 count += 1;
@@ -504,6 +505,7 @@ mod tests {
             db.query_pkg_file_owner("/usr/bin/zsh"),
             Some("zsh".to_string())
         );
+        assert_eq!(db.query_pkg_file_owner("/usr/bin/zsh"), Some("zsh".to_string()));
         assert_eq!(db.query_pkg_file_owner("/usr/bin/bash"), None);
     }
 
@@ -638,5 +640,9 @@ mod tests {
             ..valid_manifest.clone()
         };
         assert!(auditor.audit_manifest(&bad_abi_manifest).is_err());
+        let hash = NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
+
+        store.store_build(&hash, b"HERMETIC_NIX_OUTPUT");
+        assert_eq!(store.fetch_cached_build(&hash).unwrap(), b"HERMETIC_NIX_OUTPUT");
     }
 }
