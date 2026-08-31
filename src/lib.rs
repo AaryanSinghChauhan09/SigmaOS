@@ -116,6 +116,13 @@ pub mod linuxmint_inspirations;
 pub mod arch_kernel_inspirations;
 pub mod distro_inspirations;
 
+pub use compatibility::mint_linux::{
+    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine,
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    WindowsBootloaderType,
+};
+
 pub use linuxmint_inspirations::{
     AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
     FsFormat, HypnotixIptvPlayer, IsolationMode, LanPeer, LanWarpEngine, MintConfigHub,
@@ -142,6 +149,31 @@ pub use distro_inspirations::{
     TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer, ZincatiUpdateAgent,
 };
 
+pub use tools::simple_scan::{
+    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource,
+    ScannedPage, SovereignSimpleScanEngine,
+};
+
+pub use compatibility::fedora::{
+    CryptoPolicyLevel, FedoraAdwaitaIconThemeEngine, FedoraAnacondaKickstartGenerator,
+    FedoraBtrfsSnapshot, FedoraBtrfsSnapperSnapshotEngine, FedoraCockpitWebConsoleEngine,
+    FedoraCoprRepositoryEngine, FedoraCryptoPoliciesEngine, FedoraDeskletItem,
+    FedoraDeskletWidgetEngine, FedoraDnf5PackageEngine, FedoraDnfHistoryRollbackEngine,
+    FedoraDnfTransaction, FedoraFirewalldPolicyEngine, FedoraFlatpakSandboxManager,
+    FedoraFolderColorSwitcherEngine, FedoraGettextL10nEngine, FedoraGnomeCinnamonShellBridge,
+    FedoraGpuPowerMode, FedoraKeyringPamModule, FedoraKojiTaskRunner,
+    FedoraLiveMediaOverlayEngine, FedoraMediaWriterEngine, FedoraMockChrootEnvironment,
+    FedoraNautilusFileBrowserEngine, FedoraNvidiaPrimeSwitcherEngine,
+    FedoraPipewireAudioSessionEngine, FedoraSilverblueRpmOstreeEngine,
+    FedoraSsdEnterpriseDirectoryClient, FedoraWebappContainerEngine, FedoraWebappProfile,
+    FedoraWelcomeInitialSetupEngine, FolderColor,
+};
+
 pub use crate::access as auth;
 
 pub use crate::desktop as app;
+
+pub use desktop::mate_betsy::{
+    AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
+    MateBetsyDesktopEnvironment, PlumaTextEditor,
+};
