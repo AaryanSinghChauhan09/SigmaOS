@@ -85,7 +85,9 @@ impl SlabObjectCacheAllocator {
 
     /// Deallocate object address and return to slab free list
     pub fn free_object(&mut self, addr: usize) -> Result<(), &'static str> {
-        if addr < self.base_address || addr >= self.base_address + (self.capacity * self.object_size) {
+        if addr < self.base_address
+            || addr >= self.base_address + (self.capacity * self.object_size)
+        {
             return Err("SlabAllocator: Address out of slab cache bounds");
         }
 
@@ -188,11 +190,11 @@ impl PcieResourceAllocator {
 /// Container / process resource quota limits inspired by Linux Cgroups v2 & FreeBSD RCTL
 #[derive(Debug, Clone)]
 pub struct ResourceLimits {
-    pub cpu_shares: u32,             // 1 - 1024 CPU weight
-    pub ram_limit_bytes: u64,        // Hard memory ceiling
-    pub ram_soft_limit_bytes: u64,   // Soft memory warning threshold
-    pub iops_read_limit: u32,        // Max read IOPS
-    pub iops_write_limit: u32,       // Max write IOPS
+    pub cpu_shares: u32,           // 1 - 1024 CPU weight
+    pub ram_limit_bytes: u64,      // Hard memory ceiling
+    pub ram_soft_limit_bytes: u64, // Soft memory warning threshold
+    pub iops_read_limit: u32,      // Max read IOPS
+    pub iops_write_limit: u32,     // Max write IOPS
 }
 
 /// Active resource utilization metrics
@@ -379,7 +381,9 @@ mod tests {
     fn test_pcie_resource_allocator() {
         let mut pcie = PcieResourceAllocator::new(0xE000_0000, 0x1000_0000_0000);
 
-        let bar0 = pcie.allocate_mmio_bar("nvidia_gpu", 0x1000_0000, true, true).unwrap();
+        let bar0 = pcie
+            .allocate_mmio_bar("nvidia_gpu", 0x1000_0000, true, true)
+            .unwrap();
         assert_eq!(bar0, 0x1000_0000_0000);
 
         let irq = pcie.allocate_msix_vector().unwrap();

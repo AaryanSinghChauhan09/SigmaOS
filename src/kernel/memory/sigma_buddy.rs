@@ -22,8 +22,8 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 use crate::kernel::memory::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
+use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
 /// SigmaOS Buddy Allocator Wrapper
 ///
