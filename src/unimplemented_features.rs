@@ -2981,8 +2981,6 @@ mod extra_unimplemented_tests {
         assert_eq!(dispatch_res, 0x8000_0005);
     }
 
-}
-
     #[test]
     fn test_android_apex_container_module_engine() {
         let mut engine = AndroidApexContainerModuleEngine::new();
