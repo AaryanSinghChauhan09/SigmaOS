@@ -7,6 +7,7 @@ pub mod mate_betsy;
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
+};
 pub mod screensaver;
 
 pub use screensaver::{
