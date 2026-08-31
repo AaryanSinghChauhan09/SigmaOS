@@ -19,8 +19,6 @@ pub struct ContentAddressedStore {
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
     pub fn new(path: String) -> Self {
-    pub path: alloc::string::String,
-    pub fn new(path: alloc::string::String) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {

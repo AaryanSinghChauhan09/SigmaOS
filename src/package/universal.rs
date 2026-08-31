@@ -1,3 +1,24 @@
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+/// Lifecycle timing for package hooks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookTiming {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+/// Trait for package hooks
+pub trait PackageHook: Send + Sync {
+    fn timing(&self) -> HookTiming;
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
@@ -678,6 +699,7 @@ impl UniversalPackageManager {
     /// Registers a user-defined lifecycle hook
     pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
+    }
 
     /// Triggers user-defined hooks matching the requested lifecycle stage
     pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -687,10 +709,11 @@ impl UniversalPackageManager {
             }
         }
         Ok(())
+    }
 
     /// Installs a package file directly by inferring format from filename
     pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
-        let format = PackageFormat::from_filename(filepath).ok_or_else(|| {
+        let format = UniversalPackageManifestParser::detect_format_from_filename(filepath).ok_or_else(|| {
             PackageError::InstallationFailed(format!("Unsupported file format extension for file: {}", filepath))
         })?;
 
@@ -702,6 +725,7 @@ impl UniversalPackageManager {
 
         self.add_package(package);
         self.install(pkg_name)
+    }
 
     fn add_default_adapters(&mut self) {
         let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
