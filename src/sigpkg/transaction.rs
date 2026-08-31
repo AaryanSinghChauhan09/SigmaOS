@@ -14,11 +14,11 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: alloc::string::String,
+    pub path: String,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: alloc::string::String) -> Self {
+    pub fn new(path: String) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {
@@ -341,7 +341,7 @@ mod tests {
 
     #[test]
     fn test_transaction_creation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new("/tmp/test".to_string());
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
         assert!(transaction.operations.is_empty());
@@ -349,7 +349,7 @@ mod tests {
 
     #[test]
     fn test_install_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new("/tmp/test".to_string());
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -373,7 +373,7 @@ mod tests {
 
     #[test]
     fn test_remove_operation() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new("/tmp/test".to_string());
         let resolver = SatSolver::new();
         let mut transaction = Transaction::new(store, resolver);
 
@@ -383,7 +383,7 @@ mod tests {
 
     #[test]
     fn test_preview() {
-        let store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
+        let store = ContentAddressedStore::new("/tmp/test".to_string());
         let resolver = SatSolver::new();
         let transaction = Transaction::new(store, resolver);
 

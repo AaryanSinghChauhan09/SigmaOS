@@ -1,4 +1,3 @@
-#![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
 pub mod architecture;
 pub mod atomic_extended;
@@ -47,8 +46,11 @@ pub mod vmm_paging;
 pub mod module_loader;
 pub mod performance;
 
-#[allow(ambiguous_glob_reexports)]
-pub use architecture::*;
+pub use architecture::{
+    AArch64Hal, ArchitectureEngine, HardwareException, InstructionCyclePhase, InterruptClass,
+    IoWaitProfile, Irql, LookasideList, MemoryDescriptorList, Pcb, PoolType as ArchPoolType,
+    ProcessorInitState, RiscV64Hal, SyscallHandler, SystemServiceDescriptorTable, Tcb, X86_64Hal,
+};
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;

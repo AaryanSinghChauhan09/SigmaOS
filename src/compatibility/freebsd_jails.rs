@@ -8,6 +8,14 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
 
+#[cfg(not(feature = "default"))]
+#[path = "../klib/mod.rs"]
+mod klib;
+
+#[cfg(not(feature = "default"))]
+use klib::HashMap;
+
+#[cfg(feature = "default")]
 use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;

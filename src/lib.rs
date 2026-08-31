@@ -178,3 +178,9 @@ pub use desktop::mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
+
+pub use ui::gtk::{
+    AdwNavigationSplitView, AdwPreferencesEngine, BsdGtkSandboxGuard, GtkAccentColor,
+    GtkCssProvider, GtkHeaderBar, GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine,
+    XAppStatusIconManager,
+};

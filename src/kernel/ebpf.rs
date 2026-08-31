@@ -4,6 +4,14 @@
 
 extern crate alloc;
 
+#[cfg(not(feature = "default"))]
+#[path = "../klib/mod.rs"]
+mod klib;
+
+#[cfg(not(feature = "default"))]
+use klib::HashMap;
+
+#[cfg(feature = "default")]
 use crate::klib::HashMap;
 use alloc::vec::Vec;
 
