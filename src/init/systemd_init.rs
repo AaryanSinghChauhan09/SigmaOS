@@ -521,6 +521,11 @@ impl SystemdUnitFileParser {
                     ("Service", "OOMScoreAdjust") => {
                         parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
                     }
+                    ("Service", "OOMScoreAdjust") => {
+                        parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
+                    }
+                    ("Service", "ProtectSystem") => parsed.protect_system = val.to_string(),
+                    ("Service", "ProtectHome") => parsed.protect_home = val.to_string(),
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -974,6 +979,57 @@ impl BsdRcParallelStageSolver {
     }
 }
 
+// ================= BSD rc.d Parallel Stage Execution Solver =================
+
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = units.to_vec();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let unit = match engine.find_unit(id) {
+                    Some(u) => u,
+                    None => continue,
+                };
+
+                let has_unresolved_prereq = remaining.iter().any(|&other| {
+                    if other == id {
+                        return false;
+                    }
+                    if unit.after.contains(&other) {
+                        return true;
+                    }
+                    if let Some(other_u) = engine.find_unit(other) {
+                        if other_u.before.contains(&id) {
+                            return true;
+                        }
+                    }
+                    false
+                });
+
+                if !has_unresolved_prereq {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                // Cycle or unresolvable stage, break remaining as final stage
+                stages.push(remaining);
+                break;
+            }
+
+            remaining.retain(|id| !current_stage.contains(id));
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 pub struct SystemdEngine {
     pub units: Vec<SystemdUnit>,
     pub current_target: AtomicUsize, // stores UnitID of active target
@@ -1217,6 +1273,21 @@ impl SystemdEngine {
         for &req_id in requisites.iter() {
             let is_active = self.find_unit(req_id).map(|u| u.state == UnitState::Active).unwrap_or(false);
             if !is_active {
+                if let Some(u) = self.find_unit_mut(id) {
+                    u.state = UnitState::Failed;
+                }
+                self.log_journal(
+                    id,
+                    b"Requisite dependency is not active",
+                    UnitState::Inactive,
+                    UnitState::Failed,
+                );
+                return Err("Requisite dependency is not active");
+            }
+        }
+
+        for &req_id in requires.iter() {
+            if self.systemctl_start(req_id).is_err() {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }

@@ -326,6 +326,104 @@ impl SimpleUILayout {
     }
 }
 
+use alloc::string::{String, ToString};
+use alloc::format;
+
+// --- GTK 4 / Libadwaita Abstractions ---
+#[derive(Debug, Clone)]
+pub struct GtkCssProvider {
+    pub css_data: String,
+    pub priority: u32, // GTK_STYLE_PROVIDER_PRIORITY_APPLICATION = 600
+}
+
+impl GtkCssProvider {
+    pub fn new(css: &str) -> Self {
+        Self {
+            css_data: css.to_string(),
+            priority: 600,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AdwHeaderBar {
+    pub title: String,
+    pub show_start_title_buttons: bool,
+    pub show_end_title_buttons: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AdwClamp {
+    pub maximum_width: u32,
+    pub tightening_threshold: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct GtkBoxContainer {
+    pub orientation_vertical: bool,
+    pub spacing_px: u32,
+    pub children_count: usize,
+}
+
+pub struct SovereignGtkToolkitEngine {
+    pub css_providers: Vec<GtkCssProvider>,
+    pub header_bars: Vec<AdwHeaderBar>,
+    pub clamps: Vec<AdwClamp>,
+    pub boxes: Vec<GtkBoxContainer>,
+    pub is_libadwaita_active: bool,
+}
+
+impl SovereignGtkToolkitEngine {
+    pub fn new() -> Self {
+        Self {
+            css_providers: Vec::new(),
+            header_bars: Vec::new(),
+            clamps: Vec::new(),
+            boxes: Vec::new(),
+            is_libadwaita_active: true,
+        }
+    }
+
+    pub fn load_css_theme(&mut self, css_data: &str) {
+        self.css_providers.push(GtkCssProvider::new(css_data));
+    }
+
+    pub fn add_adw_header_bar(&mut self, title: &str) -> usize {
+        let bar = AdwHeaderBar {
+            title: title.to_string(),
+            show_start_title_buttons: true,
+            show_end_title_buttons: true,
+        };
+        self.header_bars.push(bar);
+        self.header_bars.len() - 1
+    }
+
+    pub fn add_adw_clamp(&mut self, max_width: u32) -> usize {
+        let clamp = AdwClamp {
+            maximum_width: max_width,
+            tightening_threshold: (max_width as f32 * 0.8) as u32,
+        };
+        self.clamps.push(clamp);
+        self.clamps.len() - 1
+    }
+
+    pub fn add_gtk_box(&mut self, vertical: bool, spacing: u32) -> usize {
+        let box_container = GtkBoxContainer {
+            orientation_vertical: vertical,
+            spacing_px: spacing,
+            children_count: 0,
+        };
+        self.boxes.push(box_container);
+        self.boxes.len() - 1
+    }
+}
+
+impl Default for SovereignGtkToolkitEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UILayout for SimpleUILayout {
     fn add_widget(&mut self, widget: Box<dyn Widget>) -> Result<WidgetID, UIError> {
         if !self.capability.can_add {
@@ -419,5 +517,26 @@ mod tests {
         let widget_ref = layout.get_widget(101).unwrap();
         assert_eq!(widget_ref.label(), b"Confirm");
         assert_eq!(widget_ref.state(), WidgetState::Normal);
+    }
+
+    #[test]
+    fn test_gtk_css_provider_and_libadwaita() {
+        let mut gtk = SovereignGtkToolkitEngine::new();
+        gtk.load_css_theme("window { background-color: #1e1e1e; }");
+        assert_eq!(gtk.css_providers.len(), 1);
+        assert_eq!(gtk.css_providers[0].priority, 600);
+
+        let bar_idx = gtk.add_adw_header_bar("SigmaOS Sovereign Control Center");
+        assert_eq!(bar_idx, 0);
+        assert_eq!(gtk.header_bars[0].title, "SigmaOS Sovereign Control Center");
+
+        let clamp_idx = gtk.add_adw_clamp(800);
+        assert_eq!(clamp_idx, 0);
+        assert_eq!(gtk.clamps[0].maximum_width, 800);
+
+        let box_idx = gtk.add_gtk_box(true, 12);
+        assert_eq!(box_idx, 0);
+        assert!(gtk.boxes[0].orientation_vertical);
+        assert_eq!(gtk.boxes[0].spacing_px, 12);
     }
 }

@@ -240,6 +240,10 @@ impl GraphicsManager {
             self.prime_engine.request_power_state(DynamicPowerState::D0Active);
         }
 
+        if is_offloaded {
+            self.prime_engine.request_power_state(DynamicPowerState::D0Active);
+        }
+
         self.active_pipelines.push(RenderPipeline {
             pipeline_id,
             api,

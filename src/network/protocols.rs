@@ -154,12 +154,14 @@ pub struct NetworkDiscoveredService {
     pub txt_records: Vec<(String, String)>,
     pub ttl_seconds: u32,
     pub discovered_timestamp: u64,
+}
 
 pub struct SovereignNetworkDiscoveryEngine {
     pub discovered_services: Vec<NetworkDiscoveredService>,
     pub active_queries: Vec<String>,
     pub mdns_multicast_group: [u8; 4],
     pub ssdp_multicast_group: [u8; 4],
+}
 
 impl SovereignNetworkDiscoveryEngine {
     pub fn new() -> Self {
@@ -199,6 +201,27 @@ impl SovereignNetworkDiscoveryEngine {
 
     pub fn send_ssdp_msearch(&mut self, target: &str) -> Vec<NetworkDiscoveredService> {
         if target == "ssdp:all" || target == "urn:schemas-upnp-org:device:MediaServer:1" {
+            let service = NetworkDiscoveredService {
+                service_name: "SigmaOS Sovereign SSHd".to_string(),
+                service_type: "_ssh._tcp.local".to_string(),
+                domain: "local".to_string(),
+                protocol: DiscoveryProtocolType::MdnsDnsSd,
+                ip_address: [192, 168, 1, 51],
+                port: 22,
+                txt_records: vec![("u".to_string(), "sovereign".to_string())],
+                ttl_seconds: 120,
+                discovered_timestamp: 1000,
+            };
+            self.discovered_services.push(service.clone());
+            results.push(service);
+        }
+        results
+    }
+
+    pub fn send_ssdp_msearch(&mut self, target: &str) -> Vec<NetworkDiscoveredService> {
+        let mut results = Vec::new();
+        if target == "ssdp:all" || target == "urn:schemas-upnp-org:device:MediaServer:1" {
+            let service = NetworkDiscoveredService {
                 service_name: "SigmaOS UPnP Media Server".to_string(),
                 service_type: "urn:schemas-upnp-org:device:MediaServer:1".to_string(),
                 domain: "upnp".to_string(),
@@ -207,12 +230,21 @@ impl SovereignNetworkDiscoveryEngine {
                 port: 8200,
                 txt_records: vec![("location".to_string(), "http://192.168.1.75:8200/rootDesc.xml".to_string())],
                 ttl_seconds: 1800,
+                discovered_timestamp: 1000,
+            };
+            self.discovered_services.push(service.clone());
+            results.push(service);
+        }
+        results
+    }
 
     pub fn resolve_llmnr_hostname(&mut self, hostname: &str) -> Option<[u8; 4]> {
         if hostname.eq_ignore_ascii_case("sigma-host") {
             Some([192, 168, 1, 105])
         } else {
             None
+        }
+    }
 
     pub fn prune_expired_services(&mut self, current_time: u64) {
         self.discovered_services.retain(|s| {
@@ -365,6 +397,10 @@ impl SsdpWsdDiscoveryEngine {
             results.push(printer);
 
 impl Default for SsdpWsdDiscoveryEngine {
+    }
+}
+
+impl Default for SovereignNetworkDiscoveryEngine {
     fn default() -> Self {
         Self::new()
     }
