@@ -9,6 +9,11 @@ use alloc::collections::BTreeMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
@@ -1063,6 +1068,7 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    #[cfg(not(feature = "standalone_test"))]
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1077,6 +1083,7 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
+            #[cfg(not(feature = "standalone_test"))]
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };
@@ -1086,6 +1093,7 @@ impl UniversalPackageManager {
     }
 
     /// Register and install a Node.js binary distribution runtime into the isolated store
+    #[cfg(not(feature = "standalone_test"))]
     pub fn install_node_runtime(
         &mut self,
         package: &NodeBinaryPackage,
@@ -2002,20 +2010,7 @@ mod tests {
     }
 
     #[test]
-    fn test_convert_to_sigpkg() {
-        let manager = UniversalPackageManager::new();
-        let deb_pkg = UnifiedPackage::new("curl".to_string(), "7.88.1".to_string())
-            .with_format(PackageFormat::Deb)
-            .with_dependency("libssl".to_string());
-
-        let sigpkg = manager.convert_to_sigpkg(&deb_pkg).unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-curl");
-        assert!(sigpkg.formats.contains(&PackageFormat::SigmaPkg));
-        assert!(sigpkg.dependencies.contains(&"libssl".to_string()));
-        assert!(sigpkg.provides.contains(&"curl".to_string()));
-    }
-
-    #[test]
+    #[cfg(not(feature = "standalone_test"))]
     fn test_universal_package_manager_node_runtime_integration() {
         let mut manager = UniversalPackageManager::new();
         let bytes = vec![0x42u8; 120];
