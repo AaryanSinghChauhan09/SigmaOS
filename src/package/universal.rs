@@ -6,21 +6,18 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
     #[derive(Debug, Clone)]
     pub enum LibcFlavor { Musl, Glibc }
@@ -47,7 +44,7 @@ pub mod node_distribution_dummy {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 use node_distribution_dummy::*;
 
 /// Package format type
@@ -102,6 +99,7 @@ pub enum PackageFormat {
     Puk,      // Portable Package (.puk)
     Dmg,      // macOS Disk Image (.dmg)
     Cports,   // Chimera Linux (.cports)
+    Cachy,    // CachyOS Package (.cachy)
 }
 
 impl PackageFormat {
@@ -172,6 +170,7 @@ impl PackageFormat {
         } else if name.ends_with(".cports") {
             Some(PackageFormat::Cports)
         } else if name.ends_with(".cachy") {
+            Some(PackageFormat::Cachy)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
         } else if name.ends_with(".hap") {
@@ -271,11 +270,6 @@ pub struct UnifiedPackage {
     pub installed: bool,
 }
 
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        UniversalPackageManifestParser::detect_format_from_filename(filename)
-    }
-}
 
 impl UnifiedPackage {
     pub fn new(name: String, version: String) -> Self {
@@ -976,18 +970,6 @@ impl Default for DependencyResolver {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookTiming {
-    PreInstall,
-    PostInstall,
-    PreRemove,
-    PostRemove,
-}
-
-pub trait PackageHook: Send + Sync {
-    fn timing(&self) -> HookTiming;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
 
 /// Transactional package manager checkpoint
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1086,7 +1068,7 @@ impl UniversalPackageManager {
         let store_path = self
             .node_distro_engine
             .install_to_store(package, bytes, npm_version)
-            .map_err(|e| PackageError::InstallationFailed(e.to_string()))?;
+            .map_err(|e: &'static str| PackageError::InstallationFailed(e.to_string()))?;
 
         let mut pkg = UnifiedPackage::new(format!("nodejs-{}", package.version), package.version.clone())
             .with_format(PackageFormat::SigmaPkg)

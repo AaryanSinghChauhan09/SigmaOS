@@ -8,7 +8,6 @@ use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
