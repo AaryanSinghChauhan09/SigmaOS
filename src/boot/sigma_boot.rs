@@ -40,7 +40,6 @@ pub struct SovereignDistroBootStageHandoff {
     pub protocol: HandoffProtocol,
     pub root_uuid: String,
     pub live_overlay_mounted: bool,
-    pub live_overlay_mounted: bool,
     pub kernel_entry_point_addr: u64,
 }
 
@@ -49,7 +48,6 @@ impl SovereignDistroBootStageHandoff {
         Self {
             protocol,
             root_uuid: root_uuid.to_string(),
-            live_overlay_mounted: false,
             live_overlay_mounted: false,
             kernel_entry_point_addr: 0x0010_0000,
         }
@@ -275,4 +273,4 @@ mod tests {
         let cfg = boot.generate_bootloader_config();
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
-
+}
