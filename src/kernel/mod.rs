@@ -65,7 +65,11 @@ pub use gap_closing::{
 };
 pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use memory::{
+    BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
+    MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
+    SlabObjectCacheAllocator, SlabSizeClass, PAGE_SIZE,
+};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
     MetaKernel, MicroDriver, NetPod,

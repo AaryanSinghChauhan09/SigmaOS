@@ -18,6 +18,8 @@ use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use alloc::string::String;
 
+use super::nvidia_prime::{NvidiaPrimeEngine, PrimeProfile};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuState {
     Off,
@@ -111,6 +113,7 @@ pub struct GpuDriver {
     pub dma_buffers: Vec<WaylandDmaBuf>,
     pub ws_terminals: Vec<OpenBsdWsdisplayVt>,
     pub active_vt: u32,
+    pub nvidia_prime_engine: NvidiaPrimeEngine,
 }
 
 impl GpuDriver {
@@ -124,6 +127,7 @@ impl GpuDriver {
             dma_buffers: Vec::new(),
             ws_terminals: Vec::new(),
             active_vt: 1,
+            nvidia_prime_engine: NvidiaPrimeEngine::new(),
         };
 
         // Pre-configure OpenBSD wsdisplay VTs 1-4
