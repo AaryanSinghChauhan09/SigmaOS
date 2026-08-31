@@ -2,7 +2,6 @@
 // SigmaOS Kernel Library Collections
 // Eliminates dependency on std::collections
 
-
 extern crate alloc;
 use alloc::collections::BTreeMap as AllocBTreeMap;
 use alloc::collections::BTreeSet as AllocBTreeSet;

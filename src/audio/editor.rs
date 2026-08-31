@@ -79,7 +79,12 @@ impl MultiTrackSession {
 
     pub fn mix_session(&self) -> Vec<f32> {
         let has_solo = self.tracks.iter().any(|t| t.is_solo);
-        let max_len = self.tracks.iter().map(|t| t.samples.len()).max().unwrap_or(0);
+        let max_len = self
+            .tracks
+            .iter()
+            .map(|t| t.samples.len())
+            .max()
+            .unwrap_or(0);
         let mut mixed = alloc::vec![0.0f32; max_len];
 
         for track in &self.tracks {

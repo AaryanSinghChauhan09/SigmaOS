@@ -11,7 +11,9 @@ impl CapabilityToken {
         Self { rights_mask: 0 }
     }
     pub fn new_with_perms(rights: u64) -> Self {
-        Self { rights_mask: rights }
+        Self {
+            rights_mask: rights,
+        }
     }
     pub fn is_empty(&self) -> bool {
         self.rights_mask == 0
@@ -57,7 +59,12 @@ impl UdpSocketSim {
         }
     }
 
-    pub fn send_packet(&mut self, dest: [u8; 4], dest_port: u16, payload: &[u8]) -> Result<usize, &'static str> {
+    pub fn send_packet(
+        &mut self,
+        dest: [u8; 4],
+        dest_port: u16,
+        payload: &[u8],
+    ) -> Result<usize, &'static str> {
         if payload.is_empty() {
             return Err("Udp: Payload cannot be empty");
         }
@@ -173,7 +180,10 @@ impl DnsServiceDiscoveryEngine {
             service_type: service_type.to_string(),
             domain: "local".to_string(),
             port,
-            txt_records: txt_records.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
+            txt_records: txt_records
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
         };
         self.registered_services.push(record);
         Ok(())
@@ -195,7 +205,11 @@ impl DnsServiceDiscoveryEngine {
     }
 
     pub fn add_peer_announcement(&mut self, record: ServiceRecord) {
-        if !self.discovered_peers.iter().any(|p| p.name == record.name && p.service_type == record.service_type) {
+        if !self
+            .discovered_peers
+            .iter()
+            .any(|p| p.name == record.name && p.service_type == record.service_type)
+        {
             self.discovered_peers.push(record);
         }
     }
@@ -247,7 +261,11 @@ impl Ipv6NeighborDiscoveryEngine {
         is_router: bool,
         timestamp: u64,
     ) {
-        if let Some(entry) = self.neighbor_table.iter_mut().find(|e| e.ipv6_addr == ipv6_addr) {
+        if let Some(entry) = self
+            .neighbor_table
+            .iter_mut()
+            .find(|e| e.ipv6_addr == ipv6_addr)
+        {
             entry.mac_addr = mac_addr;
             entry.state = NdpNeighborState::Reachable;
             entry.is_router = is_router;
@@ -263,7 +281,12 @@ impl Ipv6NeighborDiscoveryEngine {
         }
     }
 
-    pub fn process_router_advertisement(&mut self, prefix: [u8; 16], router_mac: [u8; 6], timestamp: u64) {
+    pub fn process_router_advertisement(
+        &mut self,
+        prefix: [u8; 16],
+        router_mac: [u8; 6],
+        timestamp: u64,
+    ) {
         self.router_advertisements_received += 1;
         self.process_neighbor_advertisement(prefix, router_mac, true, timestamp);
     }
@@ -299,7 +322,9 @@ pub struct SsdpWsdDiscoveryEngine {
 
 impl SsdpWsdDiscoveryEngine {
     pub fn new() -> Self {
-        Self { devices: Vec::new() }
+        Self {
+            devices: Vec::new(),
+        }
     }
 
     pub fn send_ssdp_msearch(&mut self, target: &str) -> Vec<DiscoveredNetworkDevice> {
@@ -324,7 +349,10 @@ impl SsdpWsdDiscoveryEngine {
 
     pub fn send_wsd_probe(&mut self, device_type: &str) -> Vec<DiscoveredNetworkDevice> {
         let mut results = Vec::new();
-        if device_type == "pub:PrintDeviceType" || device_type == "* " || device_type == "wsd:Device" {
+        if device_type == "pub:PrintDeviceType"
+            || device_type == "* "
+            || device_type == "wsd:Device"
+        {
             let printer = DiscoveredNetworkDevice {
                 uuid: "urn:uuid:sigma-wsd-printer-01".to_string(),
                 friendly_name: "SigmaOS Network Laser Printer".to_string(),
@@ -485,7 +513,11 @@ impl BgpRoutingTableManager {
         self.routes.push(route);
     }
 
-    pub fn process_incoming_route(&mut self, mut route: BgpRoutePrefix, from_i_bgp_peer: bool) -> bool {
+    pub fn process_incoming_route(
+        &mut self,
+        mut route: BgpRoutePrefix,
+        from_i_bgp_peer: bool,
+    ) -> bool {
         // AS Path loop detection
         if route.as_path.contains(&self.local_as) {
             return false; // Reject loop
@@ -501,7 +533,11 @@ impl BgpRoutingTableManager {
         true
     }
 
-    pub fn best_path_selection(&self, prefix_ip: [u8; 4], prefix_len: u8) -> Option<&BgpRoutePrefix> {
+    pub fn best_path_selection(
+        &self,
+        prefix_ip: [u8; 4],
+        prefix_len: u8,
+    ) -> Option<&BgpRoutePrefix> {
         self.routes
             .iter()
             .filter(|r| r.prefix_ip == prefix_ip && r.prefix_len == prefix_len)
@@ -594,7 +630,9 @@ impl SshDaemon {
     /// Connect a client from an IP. Returns a welcome banner or error.
     pub fn handle_connection(&mut self, client_ip: &str) -> Result<Option<String>, &'static str> {
         if self.blocklisted_ips.contains(&client_ip.to_string()) {
-            return Err("SSHD: Connection rejected. IP address is blocklisted (brute force protection).");
+            return Err(
+                "SSHD: Connection rejected. IP address is blocklisted (brute force protection).",
+            );
         }
         if self.active_sessions >= self.max_sessions {
             return Err("SSHD: Max connection limit reached.");
@@ -631,7 +669,9 @@ impl SshDaemon {
         }
 
         // 2. Check AllowUsers filters
-        if !self.config.allow_users.is_empty() && !self.config.allow_users.contains(&username.to_string()) {
+        if !self.config.allow_users.is_empty()
+            && !self.config.allow_users.contains(&username.to_string())
+        {
             self.record_failure(client_ip);
             return Err("SSHD: User not in AllowUsers list.");
         }
@@ -1161,7 +1201,11 @@ impl SnclLedgerProtocol {
         }
     }
 
-    pub fn append_audit_entry(&mut self, shard_name: &str, operation: &str) -> Result<[u8; 32], &'static str> {
+    pub fn append_audit_entry(
+        &mut self,
+        shard_name: &str,
+        operation: &str,
+    ) -> Result<[u8; 32], &'static str> {
         if shard_name.is_empty() || operation.is_empty() {
             return Err("SnclError: Invalid empty audit parameters");
         }
@@ -1169,9 +1213,8 @@ impl SnclLedgerProtocol {
         // Mutate simulated merkle root with shard signature representation
         self.current_merkle_root[0] = self.current_merkle_root[0].wrapping_add(1);
         let slice_len = shard_name.len().min(30);
-        self.current_merkle_root[1..1 + slice_len].copy_from_slice(
-            &shard_name.as_bytes()[..slice_len]
-        );
+        self.current_merkle_root[1..1 + slice_len]
+            .copy_from_slice(&shard_name.as_bytes()[..slice_len]);
         Ok(self.current_merkle_root)
     }
 
@@ -1335,12 +1378,22 @@ mod tests {
     #[test]
     fn test_dns_sd_service_discovery_engine() {
         let mut dns_sd = DnsServiceDiscoveryEngine::new();
-        dns_sd.register_service("Zenith Web", "_http._tcp.local", 8080, &[("path", "/dashboard")]).unwrap();
+        dns_sd
+            .register_service(
+                "Zenith Web",
+                "_http._tcp.local",
+                8080,
+                &[("path", "/dashboard")],
+            )
+            .unwrap();
         let services = dns_sd.browse_services("_http._tcp.local");
         assert_eq!(services.len(), 1);
         assert_eq!(services[0].name, "Zenith Web");
         assert_eq!(services[0].port, 8080);
-        assert_eq!(services[0].txt_records[0], ("path".to_string(), "/dashboard".to_string()));
+        assert_eq!(
+            services[0].txt_records[0],
+            ("path".to_string(), "/dashboard".to_string())
+        );
     }
 
     #[test]
@@ -1350,7 +1403,11 @@ mod tests {
         let mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
         ndp.process_neighbor_advertisement(ip, mac, false, 100);
         assert_eq!(ndp.lookup_mac(&ip), Some(mac));
-        ndp.process_router_advertisement([0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], mac, 101);
+        ndp.process_router_advertisement(
+            [0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            mac,
+            101,
+        );
         assert_eq!(ndp.router_advertisements_received, 1);
     }
 
@@ -1468,8 +1525,14 @@ mod tests {
         assert!(!config.password_authentication);
         assert!(config.pubkey_authentication);
         assert_eq!(config.max_auth_tries, 3);
-        assert_eq!(config.banner, Some("Welcome to Linux Distro Inspired SSHD".to_string()));
-        assert_eq!(config.allow_users, vec!["alice".to_string(), "bob".to_string()]);
+        assert_eq!(
+            config.banner,
+            Some("Welcome to Linux Distro Inspired SSHD".to_string())
+        );
+        assert_eq!(
+            config.allow_users,
+            vec!["alice".to_string(), "bob".to_string()]
+        );
     }
 
     #[test]
@@ -1500,22 +1563,51 @@ mod tests {
         assert_eq!(daemon.active_sessions, 1);
 
         // 3. Authenticate with invalid password
-        let auth_failed = daemon.authenticate("192.168.1.1", "secure_user", "password", b"wrong_pass", None);
+        let auth_failed = daemon.authenticate(
+            "192.168.1.1",
+            "secure_user",
+            "password",
+            b"wrong_pass",
+            None,
+        );
         assert!(auth_failed.is_err());
 
         // 4. Authenticate with valid password
-        let session = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", None).unwrap();
+        let session = daemon
+            .authenticate(
+                "192.168.1.1",
+                "secure_user",
+                "password",
+                b"sovereign_pass",
+                None,
+            )
+            .unwrap();
         assert!(session.is_authenticated);
 
         // 5. Test root login permission check (root permitted is false)
-        let root_res = daemon.authenticate("192.168.1.1", "root", "password", b"sovereign_pass", None);
+        let root_res =
+            daemon.authenticate("192.168.1.1", "root", "password", b"sovereign_pass", None);
         assert!(root_res.is_err());
 
         // 6. Test PAM-like MFA support
-        let mfa_failed = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", Some("wrong_token"));
+        let mfa_failed = daemon.authenticate(
+            "192.168.1.1",
+            "secure_user",
+            "password",
+            b"sovereign_pass",
+            Some("wrong_token"),
+        );
         assert!(mfa_failed.is_err());
 
-        let mfa_success = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", Some("123456")).unwrap();
+        let mfa_success = daemon
+            .authenticate(
+                "192.168.1.1",
+                "secure_user",
+                "password",
+                b"sovereign_pass",
+                Some("123456"),
+            )
+            .unwrap();
         assert!(mfa_success.is_authenticated);
     }
 

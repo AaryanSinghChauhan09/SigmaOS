@@ -38,7 +38,10 @@ impl<K: Eq + Hash + Clone, V: PartialEq + Clone> PartialEq for BTreeMap<K, V> {
     }
 }
 
-impl<K: PartialEq + Clone + Eq + core::hash::Hash, V: PartialEq + Clone + Eq> Eq for BTreeMap<K, V> {}
+impl<K: PartialEq + Clone + Eq + core::hash::Hash, V: PartialEq + Clone + Eq> Eq
+    for BTreeMap<K, V>
+{
+}
 
 pub enum Entry<'a, K, V> {
     Occupied(OccupiedEntry<'a, K, V>),

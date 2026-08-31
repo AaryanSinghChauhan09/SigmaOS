@@ -1,7 +1,7 @@
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Extended Application Binary Interface (ABI) Calling Conventions & Relocation for SigmaOS
 
 /// Target Application Binary Interface Type

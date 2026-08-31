@@ -1,10 +1,10 @@
-extern crate core;
 extern crate alloc;
+extern crate core;
 
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {
@@ -381,7 +381,9 @@ pub struct EfiVariableStore {
 
 impl EfiVariableStore {
     pub fn new() -> Self {
-        let mut store = Self { variables: Vec::new() };
+        let mut store = Self {
+            variables: Vec::new(),
+        };
 
         // Initialize standard NVRAM boot variables
         store.set_variable(
@@ -409,11 +411,17 @@ impl EfiVariableStore {
     }
 
     pub fn get_variable(&self, name: &str, vendor_guid: &str) -> Option<&EfiVariable> {
-        self.variables.iter().find(|v| v.name == name && v.vendor_guid == vendor_guid)
+        self.variables
+            .iter()
+            .find(|v| v.name == name && v.vendor_guid == vendor_guid)
     }
 
     pub fn set_variable(&mut self, name: &str, vendor_guid: &str, attributes: u32, data: &[u8]) {
-        if let Some(pos) = self.variables.iter().position(|v| v.name == name && v.vendor_guid == vendor_guid) {
+        if let Some(pos) = self
+            .variables
+            .iter()
+            .position(|v| v.name == name && v.vendor_guid == vendor_guid)
+        {
             self.variables[pos].attributes = attributes;
             self.variables[pos].data = data.to_vec();
         } else {
@@ -427,7 +435,11 @@ impl EfiVariableStore {
     }
 
     pub fn delete_variable(&mut self, name: &str, vendor_guid: &str) -> bool {
-        if let Some(pos) = self.variables.iter().position(|v| v.name == name && v.vendor_guid == vendor_guid) {
+        if let Some(pos) = self
+            .variables
+            .iter()
+            .position(|v| v.name == name && v.vendor_guid == vendor_guid)
+        {
             self.variables.remove(pos);
             true
         } else {
@@ -448,7 +460,10 @@ impl EfiVariableStore {
         for v in &self.variables {
             manifest.push_str(&format!(
                 "/sys/firmware/efi/efivars/{}-{} attr=0x{:08x} size={}\n",
-                v.name, v.vendor_guid, v.attributes, v.data.len()
+                v.name,
+                v.vendor_guid,
+                v.attributes,
+                v.data.len()
             ));
         }
         manifest
@@ -509,7 +524,8 @@ impl CpuMicrocodePatchEngine {
         let sig = u32::from_le_bytes(raw_bytes[12..16].try_into().unwrap_or([0; 4]));
         let checksum = u32::from_le_bytes(raw_bytes[16..20].try_into().unwrap_or([0; 4]));
         let loader_rev = u32::from_le_bytes(raw_bytes[20..24].try_into().unwrap_or([0; 4]));
-        let patch_size = u32::from_le_bytes(raw_bytes[32..36].try_into().unwrap_or([0; 4])) as usize;
+        let patch_size =
+            u32::from_le_bytes(raw_bytes[32..36].try_into().unwrap_or([0; 4])) as usize;
 
         let total_size = if patch_size == 0 { 2048 } else { patch_size };
 
@@ -649,7 +665,11 @@ impl FirmwareCapsuleUpdateManager {
     }
 
     /// Stages a firmware capsule for post-reboot execution
-    pub fn stage_capsule_payload(&mut self, guid: &str, capsule_bytes: &[u8]) -> Result<(), BootError> {
+    pub fn stage_capsule_payload(
+        &mut self,
+        guid: &str,
+        capsule_bytes: &[u8],
+    ) -> Result<(), BootError> {
         if !self.verify_capsule_header(capsule_bytes) {
             return Err(BootError::InvalidConfiguration);
         }
@@ -665,7 +685,8 @@ impl FirmwareCapsuleUpdateManager {
             return Err(BootError::InvalidConfiguration);
         }
 
-        self.staged_capsules.push((guid.to_string(), capsule_bytes.to_vec()));
+        self.staged_capsules
+            .push((guid.to_string(), capsule_bytes.to_vec()));
         self.current_status = CapsuleUpdateStatus::Staged;
         Ok(())
     }
@@ -679,7 +700,11 @@ impl FirmwareCapsuleUpdateManager {
         self.current_status = CapsuleUpdateStatus::FlashingInPost;
 
         for (guid, payload) in &self.staged_capsules {
-            if let Some(entry) = self.esrt_entries.iter_mut().find(|e| &e.firmware_class_guid == guid) {
+            if let Some(entry) = self
+                .esrt_entries
+                .iter_mut()
+                .find(|e| &e.firmware_class_guid == guid)
+            {
                 let new_ver = u32::from_le_bytes(payload[12..16].try_into().unwrap_or([0; 4]));
                 entry.firmware_version = new_ver;
                 entry.last_attempt_version = new_ver;
@@ -769,7 +794,10 @@ impl SmbiosFirmwareParser {
                 product_name: "SigmaOS Enterprise Station".to_string(),
                 version: "v2.0".to_string(),
                 serial_number: "SIGMA-2026-8890".to_string(),
-                uuid: [0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88],
+                uuid: [
+                    0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22, 0x33, 0x44, 0x55,
+                    0x66, 0x77, 0x88,
+                ],
             });
 
             self.baseboard_info = Some(SmbiosType2BaseboardInfo {
@@ -910,20 +938,41 @@ impl BiosE820MemoryMap {
     pub fn new() -> Self {
         let mut map = Vec::new();
         // Conventional Low Memory (0 - 640KB)
-        map.push(E820Entry { base_addr: 0x0000_0000, length: 0x000A_0000, entry_type: E820MemoryType::Ram });
+        map.push(E820Entry {
+            base_addr: 0x0000_0000,
+            length: 0x000A_0000,
+            entry_type: E820MemoryType::Ram,
+        });
         // Video RAM & BIOS ROM (640KB - 1MB)
-        map.push(E820Entry { base_addr: 0x000A_0000, length: 0x0006_0000, entry_type: E820MemoryType::Reserved });
+        map.push(E820Entry {
+            base_addr: 0x000A_0000,
+            length: 0x0006_0000,
+            entry_type: E820MemoryType::Reserved,
+        });
         // Extended RAM (1MB - 3.5GB)
-        map.push(E820Entry { base_addr: 0x0010_0000, length: 0xDF00_0000, entry_type: E820MemoryType::Ram });
+        map.push(E820Entry {
+            base_addr: 0x0010_0000,
+            length: 0xDF00_0000,
+            entry_type: E820MemoryType::Ram,
+        });
         // PCI MMIO & ACPI Tables (3.5GB - 4GB)
-        map.push(E820Entry { base_addr: 0xE000_0000, length: 0x1FE0_0000, entry_type: E820MemoryType::AcpiReclaimable });
-        map.push(E820Entry { base_addr: 0xFFE0_0000, length: 0x0020_0000, entry_type: E820MemoryType::Reserved });
+        map.push(E820Entry {
+            base_addr: 0xE000_0000,
+            length: 0x1FE0_0000,
+            entry_type: E820MemoryType::AcpiReclaimable,
+        });
+        map.push(E820Entry {
+            base_addr: 0xFFE0_0000,
+            length: 0x0020_0000,
+            entry_type: E820MemoryType::Reserved,
+        });
 
         Self { entries: map }
     }
 
     pub fn get_usable_ram_bytes(&self) -> u64 {
-        self.entries.iter()
+        self.entries
+            .iter()
             .filter(|e| e.entry_type == E820MemoryType::Ram)
             .map(|e| e.length)
             .sum()
@@ -1071,10 +1120,16 @@ impl MasterBootRecordParser {
                 partitions.push(MbrPartitionEntry {
                     boot_indicator,
                     start_head: sector[offset + 1],
-                    start_sector_cylinder: u16::from_le_bytes([sector[offset + 2], sector[offset + 3]]),
+                    start_sector_cylinder: u16::from_le_bytes([
+                        sector[offset + 2],
+                        sector[offset + 3],
+                    ]),
                     partition_type,
                     end_head: sector[offset + 5],
-                    end_sector_cylinder: u16::from_le_bytes([sector[offset + 6], sector[offset + 7]]),
+                    end_sector_cylinder: u16::from_le_bytes([
+                        sector[offset + 6],
+                        sector[offset + 7],
+                    ]),
                     start_lba,
                     total_sectors,
                 });
@@ -1195,11 +1250,21 @@ mod tests {
     #[test]
     fn test_efi_variable_store() {
         let mut store = EfiVariableStore::new();
-        assert!(store.get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID).is_some());
+        assert!(store
+            .get_variable("BootOrder", EFI_GLOBAL_VARIABLE_GUID)
+            .is_some());
 
-        store.set_variable("CustomVar", "12345678-1234-1234-1234-123456789abc", 7, b"Value");
+        store.set_variable(
+            "CustomVar",
+            "12345678-1234-1234-1234-123456789abc",
+            7,
+            b"Value",
+        );
         assert_eq!(
-            store.get_variable("CustomVar", "12345678-1234-1234-1234-123456789abc").unwrap().data,
+            store
+                .get_variable("CustomVar", "12345678-1234-1234-1234-123456789abc")
+                .unwrap()
+                .data,
             b"Value"
         );
 
@@ -1208,7 +1273,9 @@ mod tests {
         assert!(manifest.contains("BootOrder"));
 
         assert!(store.delete_variable("CustomVar", "12345678-1234-1234-1234-123456789abc"));
-        assert!(store.get_variable("CustomVar", "12345678-1234-1234-1234-123456789abc").is_none());
+        assert!(store
+            .get_variable("CustomVar", "12345678-1234-1234-1234-123456789abc")
+            .is_none());
     }
 
     #[test]
@@ -1263,9 +1330,15 @@ mod tests {
         let mut parser = SmbiosFirmwareParser::new();
         assert!(parser.parse_smbios_entry_point(b"_SM_123456789012"));
         assert!(parser.bios_info.is_some());
-        assert_eq!(parser.bios_info.as_ref().unwrap().vendor, "SigmaOS Sovereign Core UEFI");
+        assert_eq!(
+            parser.bios_info.as_ref().unwrap().vendor,
+            "SigmaOS Sovereign Core UEFI"
+        );
         assert!(parser.system_info.is_some());
-        assert_eq!(parser.system_info.as_ref().unwrap().manufacturer, "SigmaOS Systems Corp");
+        assert_eq!(
+            parser.system_info.as_ref().unwrap().manufacturer,
+            "SigmaOS Systems Corp"
+        );
     }
 
     #[test]

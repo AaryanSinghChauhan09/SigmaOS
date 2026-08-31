@@ -1,5 +1,5 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // Debian Crusher Core for SigmaOS Package Management
 // Absorbs Debian .deb package control manifests, enforces zero-hook declarative

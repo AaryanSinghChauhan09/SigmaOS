@@ -1,9 +1,8 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // OOP-based Unified Logging System and Diverse Targets for SigmaOS
 // Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
-
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
@@ -124,9 +123,9 @@ pub struct UnifiedLogEntry {
     pub component: [u8; 64],
     pub component_len: u8, // Cached byte length for O(1) slice access without O(N) linear scanning
     pub message: [u8; 512],
-    pub message_len: u16,  // Cached byte length for O(1) slice access without O(N) linear scanning
+    pub message_len: u16, // Cached byte length for O(1) slice access without O(N) linear scanning
     pub module: [u8; 128],
-    pub module_len: u8,    // Cached byte length for O(1) slice access without O(N) linear scanning
+    pub module_len: u8, // Cached byte length for O(1) slice access without O(N) linear scanning
     pub line: u32,
     pub fields: Vec<LogField>,
 }
@@ -147,7 +146,8 @@ impl UnifiedLogEntry {
         let message_len = message.len().min(511) as u16;
         let module_len = module.len().min(127) as u8;
 
-        component_array[..component_len as usize].copy_from_slice(&component[..component_len as usize]);
+        component_array[..component_len as usize]
+            .copy_from_slice(&component[..component_len as usize]);
         message_array[..message_len as usize].copy_from_slice(&message[..message_len as usize]);
         module_array[..module_len as usize].copy_from_slice(&module[..module_len as usize]);
 
@@ -244,7 +244,12 @@ impl UnifiedLogEntry {
         let comp = self.get_component_str();
         let procid = if self.pid > 0 { self.pid } else { 1 };
 
-        let mut sd = alloc::format!("[meta@53828 component=\"{}\" module=\"{}\" line=\"{}\"", comp, self.get_module_str(), self.line);
+        let mut sd = alloc::format!(
+            "[meta@53828 component=\"{}\" module=\"{}\" line=\"{}\"",
+            comp,
+            self.get_module_str(),
+            self.line
+        );
         for field in &self.fields {
             let field_str = alloc::format!(" {}=\"{}\"", field.key, field.value);
             sd.push_str(&field_str);
@@ -256,7 +261,11 @@ impl UnifiedLogEntry {
             pri,
             self.timestamp,
             hostname,
-            if app_name.is_empty() { "sigmaos" } else { app_name },
+            if app_name.is_empty() {
+                "sigmaos"
+            } else {
+                app_name
+            },
             procid,
             sd,
             self.get_message_str()
@@ -990,7 +999,8 @@ impl AuditLogFilter {
             return false;
         }
 
-        if !self.allowed_facilities.is_empty() && !self.allowed_facilities.contains(&entry.facility) {
+        if !self.allowed_facilities.is_empty() && !self.allowed_facilities.contains(&entry.facility)
+        {
             return false;
         }
 
@@ -1008,7 +1018,11 @@ impl AuditLogFilter {
 pub struct StructuredLogQueryEngine;
 
 impl StructuredLogQueryEngine {
-    pub fn query<'a>(entries: &'a [UnifiedLogEntry], key: &str, value: &str) -> Vec<&'a UnifiedLogEntry> {
+    pub fn query<'a>(
+        entries: &'a [UnifiedLogEntry],
+        key: &str,
+        value: &str,
+    ) -> Vec<&'a UnifiedLogEntry> {
         let mut results = Vec::new();
         for entry in entries {
             if key == "_PID" && entry.pid.to_string() == value {
@@ -1084,10 +1098,16 @@ mod tests {
             .with_framing(NetworkFramingFormat::Rfc5424)
             .with_failover_ip("10.0.0.101");
 
-        let entry1 = UnifiedLogEntry::new(LogLevel::Error, b"AUTH", b"Failed SSH login attempt", b"auth/pam.rs", 44)
-            .with_facility(SyslogFacility::Auth)
-            .with_pid(882)
-            .with_field("ip", "192.168.1.50");
+        let entry1 = UnifiedLogEntry::new(
+            LogLevel::Error,
+            b"AUTH",
+            b"Failed SSH login attempt",
+            b"auth/pam.rs",
+            44,
+        )
+        .with_facility(SyslogFacility::Auth)
+        .with_pid(882)
+        .with_field("ip", "192.168.1.50");
 
         // Send while connected
         net_target.write(&entry1).unwrap();
@@ -1097,7 +1117,13 @@ mod tests {
 
         // Simulate network outage -> buffer offline
         net_target.set_connection_status(false);
-        let entry2 = UnifiedLogEntry::new(LogLevel::Warning, b"AUTH", b"Account locked", b"auth/pam.rs", 50);
+        let entry2 = UnifiedLogEntry::new(
+            LogLevel::Warning,
+            b"AUTH",
+            b"Account locked",
+            b"auth/pam.rs",
+            50,
+        );
         assert!(net_target.write(&entry2).is_err());
         assert_eq!(net_target.offline_ring_buffer.len(), 1);
 
@@ -1114,7 +1140,8 @@ mod tests {
             .with_max_entries(2);
 
         let entry1 = UnifiedLogEntry::new(LogLevel::Info, b"APP", b"Start service", b"main.rs", 10);
-        let entry2 = UnifiedLogEntry::new(LogLevel::Info, b"APP", b"Process request", b"main.rs", 15);
+        let entry2 =
+            UnifiedLogEntry::new(LogLevel::Info, b"APP", b"Process request", b"main.rs", 15);
         let entry3 = UnifiedLogEntry::new(LogLevel::Info, b"APP", b"Stop service", b"main.rs", 20);
 
         target.write(&entry1).unwrap();
@@ -1163,14 +1190,8 @@ mod tests {
 
     #[test]
     fn test_crlf_log_injection_sanitization() {
-        let entry = UnifiedLogEntry::new(
-            LogLevel::Info,
-            b"AUTH",
-            b"User login",
-            b"auth.rs",
-            100,
-        )
-        .with_field("user\r\ninjected_key", "admin\r\nCRLF_INJECTION_PAYLOAD");
+        let entry = UnifiedLogEntry::new(LogLevel::Info, b"AUTH", b"User login", b"auth.rs", 100)
+            .with_field("user\r\ninjected_key", "admin\r\nCRLF_INJECTION_PAYLOAD");
 
         assert_eq!(entry.fields[0].key, "userinjected_key");
         assert_eq!(entry.fields[0].value, "adminCRLF_INJECTION_PAYLOAD");
@@ -1194,7 +1215,8 @@ mod tests {
         // Audit Filter
         let mut filter = AuditLogFilter::new(LogLevel::Warning);
         filter.allowed_facilities.push(SyslogFacility::Kernel);
-        let entry2 = UnifiedLogEntry::new(LogLevel::Error, b"KERN", b"Disk fault", b"disk.rs", 5).with_facility(SyslogFacility::Kernel);
+        let entry2 = UnifiedLogEntry::new(LogLevel::Error, b"KERN", b"Disk fault", b"disk.rs", 5)
+            .with_facility(SyslogFacility::Kernel);
         assert!(filter.matches(&entry2));
 
         // Query Engine

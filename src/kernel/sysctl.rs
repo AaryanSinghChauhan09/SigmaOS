@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // BSD-style sysctl interface for dynamic kernel parameters.
 // Supports safe querying and mutation of kernel variables under hierarchical MIB nodes.
 
@@ -132,10 +132,7 @@ mod tests {
     #[test]
     fn test_sysctl_read_only() {
         let mut registry = SysctlRegistry::new();
-        let result = registry.set(
-            "kern.ostype",
-            SysctlValue::String("Linux".to_string()),
-        );
+        let result = registry.set("kern.ostype", SysctlValue::String("Linux".to_string()));
         assert!(result.is_err());
     }
 
