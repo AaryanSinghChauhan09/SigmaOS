@@ -181,6 +181,10 @@ impl BraveShield {
     pub fn rule_count(&self) -> usize {
         self.rules.len()
     }
+
+    pub fn clear_rules(&mut self) {
+        self.rules.clear();
+    }
 }
 
 impl Default for BraveShield {
@@ -338,6 +342,16 @@ impl SovereignBrowser {
         } else {
             self.shield.disable();
         }
+    }
+
+    /// Get total count of active adblock rules
+    pub fn get_adblock_rule_count(&self) -> usize {
+        self.shield.rule_count()
+    }
+
+    /// Clear all adblock rules
+    pub fn clear_adblock_rules(&mut self) {
+        self.shield.clear_rules();
     }
 
     /// Close tab
@@ -503,12 +517,17 @@ mod tests {
     #[test]
     fn test_adblock_toggle() {
         let mut browser = SovereignBrowser::new();
+        assert_eq!(browser.get_adblock_rule_count(), 0);
         browser.add_adblock_rule("ads.com".to_string(), false);
+        assert_eq!(browser.get_adblock_rule_count(), 1);
         browser.set_adblock_enabled(false);
 
         let tab_id = browser.create_tab();
         let result = browser.load_url(tab_id, "https://ads.com/banner".to_string());
 
         assert!(result.is_ok()); // Should not block when disabled
+
+        browser.clear_adblock_rules();
+        assert_eq!(browser.get_adblock_rule_count(), 0);
     }
 }
