@@ -33,7 +33,9 @@ pub mod elf_execution;
 pub mod endeavour;
 pub mod federation;
 pub mod fedora;
+pub use fedora::*;
 pub mod fedora_domination;
+pub use fedora_domination::*;
 // pub mod freebsd_jails;
 pub mod freedos;
 pub mod gap_closure;
@@ -144,8 +146,10 @@ pub use historic_linux::{
 };
 
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata,
+    MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    WindowsBootloaderType,
 };
 pub use legacy_adapters::{
     LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,

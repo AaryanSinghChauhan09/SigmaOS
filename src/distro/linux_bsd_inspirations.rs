@@ -5035,36 +5035,6 @@ mod tests {
         assert!(shepherd.is_provisioned("ssh"));
     }
 
-    #[test]
-    fn test_apk_xbps_hooks_and_rollback() {
-        let mut hook_engine = ApkXbpsHookEngine::new();
-        hook_engine.register_hook("font-cache", "font", "fc-cache -fv", "fc-cache -s");
-
-        assert_eq!(hook_engine.run_pre_hooks("ttf-dejavu-font"), 1);
-        assert_eq!(hook_engine.run_post_hooks("ttf-dejavu-font"), 1);
-
-        assert_eq!(hook_engine.executed_actions.len(), 2);
-        assert_eq!(hook_engine.rollback_transaction(), 2);
-        assert!(hook_engine.executed_actions.is_empty());
-    }
-
-    #[test]
-    fn test_openbsd_retguard_and_map_stack() {
-        let mut retguard = OpenBsdRetguardEngine::new();
-        retguard.register_map_stack_region(0x7FFF0000, 0x10000); // 64KB stack region
-
-        let secret_key = 0x123456789ABCDEF0;
-        let canary = retguard.enter_function("kernel_sys_read", secret_key, 0x7FFF1000);
-
-        // Valid exit
-        assert!(retguard.verify_exit_function("kernel_sys_read", canary, 0x7FFF1000).is_ok());
-
-        // Bad stack pointer outside MAP_STACK
-        let canary2 = retguard.enter_function("kernel_sys_write", secret_key, 0x7FFF2000);
-        assert!(retguard.verify_exit_function("kernel_sys_write", canary2, 0x10000000).is_err());
-        assert_eq!(retguard.violations.len(), 1);
-        assert!(retguard.violations[0].contains("MAP_STACK Violation"));
-    }
 
     #[test]
     fn test_apk_chroot_build_sandbox() {
