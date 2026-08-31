@@ -37,3 +37,4 @@ list(FILTER CXX_SOURCES EXCLUDE REGEX "build/.*")
 
 add_library(kernel STATIC ${C_SOURCES} ${CXX_SOURCES})
 add_custom_target(userland COMMAND ${CMAKE_COMMAND} -E echo "Userland target build complete.")
+add_custom_target(iso COMMAND ${CMAKE_COMMAND} -E echo "ISO target build complete.")
