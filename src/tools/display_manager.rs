@@ -1,8 +1,14 @@
+//! Display Manager (GDM/LightDM & Linux Mint MDM Inspiration)
+//! Login screen, session management, display server spawning, and MDM theme engine
+
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
-//! Display Manager (GDM/LightDM Inspiration)
-//! Login screen, session management, and display server spawning
+
+use crate::customization::theme::{
+    MdmAccessibilitySettings, MdmPamAuthStage, MdmPowerAction, MdmThemeInfo, MdmUserAvatar,
+    SovereignMdmThemeEngine,
+};
 
 
 
@@ -56,6 +62,7 @@ pub struct DisplayManager {
     pub users: Vec<User>,
     pub autologin: Option<u32>,
     pub current_session: Option<String>,
+    pub mdm_theme_engine: SovereignMdmThemeEngine,
 }
 
 impl DisplayManager {
@@ -65,7 +72,56 @@ impl DisplayManager {
             users: Vec::new(),
             autologin: None,
             current_session: None,
+            mdm_theme_engine: SovereignMdmThemeEngine::new(),
         }
+    }
+
+    pub fn set_mdm_theme(&mut self, theme_name: &str) -> Result<(), &'static str> {
+        self.mdm_theme_engine.set_active_theme(theme_name)
+    }
+
+    pub fn get_active_mdm_theme(&self) -> Option<&MdmThemeInfo> {
+        self.mdm_theme_engine.get_active_theme()
+    }
+
+    pub fn discover_user_avatar(
+        &mut self,
+        username: &str,
+        real_name: &str,
+        face_path: &str,
+    ) -> &MdmUserAvatar {
+        self.mdm_theme_engine
+            .discover_user_avatar(username, real_name, face_path)
+    }
+
+    pub fn authenticate_user_pam(
+        &mut self,
+        username: &str,
+        credential: &str,
+        pam_type: &str,
+    ) -> MdmPamAuthStage {
+        self.mdm_theme_engine
+            .authenticate_pam(username, credential, pam_type)
+    }
+
+    pub fn render_greeter_canvas_frame(&mut self, now_ms: u64) -> Vec<(f32, f32, f32)> {
+        self.mdm_theme_engine.render_html5_canvas_frame(now_ms)
+    }
+
+    pub fn evaluate_monitor_layout(
+        &self,
+        monitors_count: u32,
+        active_monitor: u32,
+    ) -> (u32, u32, f32) {
+        self.mdm_theme_engine
+            .evaluate_monitor_layout(monitors_count, active_monitor)
+    }
+
+    pub fn dispatch_power_action(
+        &self,
+        action: MdmPowerAction,
+    ) -> Result<&'static str, &'static str> {
+        self.mdm_theme_engine.dispatch_power_action(action)
     }
 
     pub fn add_session(&mut self, session: Session) {
@@ -129,5 +185,46 @@ mod tests {
         let session = Session::new("SigmaOS", SessionType::Wayland, "/usr/bin/sigmaos-wm");
         dm.add_session(session);
         assert_eq!(dm.sessions.len(), 1);
+    }
+
+    #[test]
+    fn test_display_manager_mdm_integration() {
+        let mut dm = DisplayManager::new();
+
+        // Check active MDM theme
+        let theme = dm.get_active_mdm_theme().unwrap();
+        assert_eq!(theme.name, "Mint-Webkit-Sovereign");
+
+        // Change active theme
+        assert!(dm.set_mdm_theme("Adwaita-MDM").is_ok());
+        assert_eq!(dm.get_active_mdm_theme().unwrap().name, "Adwaita-MDM");
+
+        // User avatar discovery
+        let avatar = dm.discover_user_avatar("alice", "Alice Smith", "/home/alice/.face");
+        assert_eq!(avatar.username, "alice");
+
+        // PAM authentication
+        let auth = dm.authenticate_user_pam("alice", "correct_pass", "password");
+        assert_eq!(
+            auth,
+            MdmPamAuthStage::Authenticated {
+                username: "alice".to_string()
+            }
+        );
+
+        // Canvas frame rendering
+        let frame = dm.render_greeter_canvas_frame(100);
+        assert_eq!(frame.len(), 16);
+
+        // Monitor alignment evaluation
+        let (mon, scale_pct, scale_f) = dm.evaluate_monitor_layout(2, 0);
+        assert_eq!(mon, 0);
+        assert_eq!(scale_pct, 100);
+        assert_eq!(scale_f, 1.0);
+
+        // Power action dispatch
+        let power_res = dm.dispatch_power_action(MdmPowerAction::Reboot);
+        assert!(power_res.is_ok());
+        assert!(power_res.unwrap().contains("reboot"));
     }
 }

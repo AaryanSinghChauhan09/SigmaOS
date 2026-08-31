@@ -12,3 +12,10 @@ pub use profile::{
     GameDifficultyBalancer, GamifiedProductivity as CustomGamifiedProductivity, PerformanceProfile,
     ProfileSwitcher, ZenithProfile,
 };
+
+pub use theme::{
+    CanvasParticle, IconThemeEngine, MdmAccessibilitySettings, MdmBackgroundType,
+    MdmMonitorPosition, MdmMultiMonitorConfig, MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind,
+    MdmThemeInfo, MdmUserAvatar, SigmaSoundscape, SovereignCssColorEngine, SovereignMdmThemeEngine,
+    ThemeEngine, ThemeProvider, ZenithBackdropFilter,
+};
