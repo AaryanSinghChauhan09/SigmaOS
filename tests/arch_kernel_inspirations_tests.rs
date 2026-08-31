@@ -3,18 +3,20 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 use sigmaos::arch_kernel_inspirations::{
-    AdvisorySeverity, AlpmAction, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
+    AdvisorySeverity, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
     Expectation, ExpectationKind, HookAction, KUnitEngine, MkinitcpioHookFramework,
     PackageSignoff, RebuildOrderSolver, ReproducibleBuildVerdict, ReproducibleStatus,
-    SecurityAdvisory, SecurityAdvisoryTracker, Signer, SignerPolicy, SignstarService,
+    SecurityAdvisory, SecurityAdvisoryTracker, SignerPolicy, SignstarService,
 };
+
+type KUnitTestCaseClosure = Box<dyn FnOnce(&mut Vec<Expectation>) + Send>;
 
 #[test]
 fn kunit_engine_reports_failures() {
     let mut eng = KUnitEngine::new();
     let eval = eng.evaluate(ExpectationKind::Eq, "42", "42", "foo.c", 10);
     assert!(eval.passed);
-    let cases: Vec<(String, Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+    let cases: Vec<(String, KUnitTestCaseClosure)> = vec![
         (
             "test_ok".to_string(),
             Box::new(|e: &mut Vec<Expectation>| {
