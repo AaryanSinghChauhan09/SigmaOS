@@ -30,11 +30,7 @@ use alloc::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
 
 use alloc::sync::Arc;
 
