@@ -30,6 +30,7 @@ pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, Subt
 
 pub use mint_competitor::{
     CinnamonApplet, CinnamonAppletEngine, NvidiaPowerState, NvidiaPrimeApplet,
+    SovereignNvidiaPrimeApplet,
     NvidiaPrimeProfile, NvidiaPrimeTelemetry, OffloadCommand, SovereignDriverManager,
     SovereignNvidiaPrimeEngine, SovereignSoftwareStore, SovereignUpdateManager,
 };

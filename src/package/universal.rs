@@ -222,25 +222,27 @@ impl PackageFormat {
     }
 }
 
-/// User-defined hook timing
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookTiming {
     PreInstall,
     PostInstall,
     PreRemove,
     PostRemove,
+}
 
 /// Dynamic user-defined package hook trait (OOP approach for package system lifecycle)
 pub trait PackageHook: Send + Sync {
     fn name(&self) -> &str;
     fn timing(&self) -> HookTiming;
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
 
 /// Custom closure-based user-defined hook
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
     pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+}
 
 impl CustomPackageHook {
     pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
@@ -251,14 +253,21 @@ impl CustomPackageHook {
             name: name.to_string(),
             timing,
             handler: alloc::sync::Arc::new(handler),
+        }
+    }
+}
 
 impl PackageHook for CustomPackageHook {
     fn name(&self) -> &str {
         &self.name
+    }
     fn timing(&self) -> HookTiming {
         self.timing
+    }
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         (self.handler)(package)
+    }
+}
 
 /// Package source
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1964,7 +1973,9 @@ mod tests {
     fn test_universal_package_manager_adapter_count() {
         let manager = UniversalPackageManager::new();
         assert!(manager.registered_adapter_count() >= 20);
+    }
 
+    #[test]
     fn test_distro_package_rollback_engine() {
         let mut engine = SovereignPackageRollbackEngine::new();
         let pkgs = vec!["nginx".to_string(), "curl".to_string()];
@@ -2010,6 +2021,9 @@ mod tests {
         let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
         assert_eq!(installed_pkg.version, "v20.11.0");
         assert!(installed_pkg.installed);
+    }
+
+    #[test]
     fn test_package_translator_factory() {
         let deb_trans = PackageTranslatorFactory::create_translator(PackageFormat::Deb).unwrap();
         assert_eq!(deb_trans.source_format(), PackageFormat::Deb);

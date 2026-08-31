@@ -917,9 +917,6 @@ mod tests {
 
     #[test]
     fn test_distro_inspired_auto_sandbox() {
-    }
-
-    #[test]
         let mut engine = DistroInspiredAutomationEngine::new();
         let policy = engine.generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
 
@@ -931,9 +928,6 @@ mod tests {
 
     #[test]
     fn test_distro_inspired_declarative_reconciliation() {
-    }
-
-    #[test]
         let mut engine = DistroInspiredAutomationEngine::new();
         let spec1 = DeclarativeSpecState {
             revision: 1,
@@ -953,8 +947,6 @@ mod tests {
             hostname: "sigma-node".to_string(),
             services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
             packages: vec!["coreutils".to_string(), "nginx".to_string()],
-            hostname: "sigma-node".to_string(),
-            packages: vec!["coreutils".to_string()],
         };
         assert_eq!(engine.apply_declarative_spec(spec2).unwrap(), 2);
 
@@ -965,9 +957,6 @@ mod tests {
 
     #[test]
     fn test_distro_inspired_transactional_hooks() {
-    }
-
-    #[test]
         let mut engine = DistroInspiredAutomationEngine::new();
         engine.register_hook(
             "pkg_trigger",
@@ -989,9 +978,6 @@ mod tests {
 
     #[test]
     fn test_distro_inspired_storage_tiering_and_scrubbing() {
-    }
-
-    #[test]
         let mut engine = DistroInspiredAutomationEngine::new();
         engine.add_storage_extent("/data/db.dat", "HDD", b"DATA_PAYLOAD");
 
@@ -1008,7 +994,6 @@ mod tests {
         let (checked, corrupted) = engine.run_automated_scrub();
         assert_eq!(checked, 1);
         assert_eq!(corrupted, 0);
-
     }
 
     #[test]

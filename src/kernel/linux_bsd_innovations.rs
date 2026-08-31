@@ -429,12 +429,14 @@ pub enum RctlAction {
     Log,
     SignalSigXCpu,
     SignalSigKill,
+}
 
 pub struct RctlRule {
     pub subject_pid: u32,
     pub resource: RacctResource,
     pub limit_value: u64,
     pub action: RctlAction,
+}
 
 pub struct FreeBsdRacctRctlEngine {
     pub rules: Vec<RctlRule>,
@@ -458,7 +460,9 @@ impl FreeBsdRacctRctlEngine {
         if let Some((_, _, ref mut current)) = self.accounting.iter_mut().find(|(p, r, _)| *p == pid && *r == resource) {
             *current += amount;
             new_val = *current;
+        } else {
             self.accounting.push((pid, resource, amount));
+        }
 
         for rule in &self.rules {
             if rule.subject_pid == pid && rule.resource == resource && new_val >= rule.limit_value {
@@ -484,11 +488,13 @@ pub enum FsEventMask {
     MovedTo,
     Create,
     Delete,
+}
 
 pub struct FsEventNotification {
     pub watch_descriptor: i32,
     pub mask: FsEventMask,
     pub path: String,
+}
 
 pub struct LinuxInotifyFanotifyEngine {
     pub watches: Vec<(i32, String, Vec<FsEventMask>)>,
@@ -510,6 +516,7 @@ impl LinuxInotifyFanotifyEngine {
         self.next_wd += 1;
         self.watches.push((wd, path.to_string(), masks));
         wd
+    }
 
     pub fn trigger_event(&mut self, path: &str, mask: FsEventMask) {
         for (wd, watch_path, masks) in &self.watches {
@@ -519,6 +526,9 @@ impl LinuxInotifyFanotifyEngine {
                     mask,
                     path: path.to_string(),
                 });
+            }
+        }
+    }
 
     pub fn pop_event(&mut self) -> Option<FsEventNotification> {
         if !self.pending_events.is_empty() {
@@ -539,6 +549,7 @@ pub enum SensorType {
     FanRpm,
     VoltageVolts,
     IndicatorState,
+}
 
 pub struct EnvironmentalSensor {
     pub name: String,
@@ -566,6 +577,8 @@ impl NetBsdSysmonPowerPwmEngine {
     pub fn update_sensor_value(&mut self, name: &str, val: f64) {
         if let Some(s) = self.sensors.iter_mut().find(|s| s.name == name) {
             s.current_value = val;
+        }
+    }
 
     pub fn check_alerts(&self) -> Vec<(String, &'static str)> {
         let mut alerts = Vec::new();
@@ -609,18 +622,26 @@ impl LinuxKernelLivepatchEngine {
             new_address: new_addr,
             is_patched: false,
         });
+    }
 
     pub fn apply_livepatch(&mut self, name: &str) -> Result<u64, &'static str> {
         if let Some(sym) = self.patches.iter_mut().find(|p| p.name == name) {
             sym.is_patched = true;
             Ok(sym.new_address)
+        } else {
             Err("Livepatch symbol not found")
+        }
+    }
 
     pub fn resolve_entry(&self, addr: u64) -> u64 {
         for sym in &self.patches {
             if sym.original_address == addr && sym.is_patched {
                 return sym.new_address;
+            }
+        }
         addr
+    }
+}
 
 // =========================================================================
 // Linux XDP (eXpress Data Path) Extended Packet Filter Engine
@@ -629,26 +650,39 @@ pub struct LinuxXdpExtendedFilter {
     pub blocked_ports: Vec<u16>,
     pub drop_count: u64,
     pub pass_count: u64,
+}
 
 impl LinuxXdpExtendedFilter {
+    pub fn new() -> Self {
+        Self {
             blocked_ports: Vec::new(),
             drop_count: 0,
             pass_count: 0,
+        }
+    }
 
     pub fn block_port(&mut self, port: u16) {
         if !self.blocked_ports.contains(&port) {
             self.blocked_ports.push(port);
+        }
+    }
 
     pub fn filter_packet_at_rx_ring(&mut self, dst_port: u16) -> XdpAction {
         if self.blocked_ports.contains(&dst_port) {
             self.drop_count += 1;
             XdpAction::Drop
+        } else {
             self.pass_count += 1;
             XdpAction::Pass
+        }
+    }
+}
 
 impl Default for LinuxXdpExtendedFilter {
     fn default() -> Self {
         Self::new()
+    }
+}
 
 // FreeBSD VFS Vnode Shared/Exclusive Locking Engine
 
@@ -656,58 +690,91 @@ pub enum VnodeLockState {
     Unlocked,
     Shared(u32),
     Exclusive(u64),
+}
 
 pub struct FreeBsdVfsVnodeLock {
     pub vnode_id: u64,
     pub state: VnodeLockState,
+}
 
 impl FreeBsdVfsVnodeLock {
     pub fn new(vnode_id: u64) -> Self {
+        Self {
             vnode_id,
             state: VnodeLockState::Unlocked,
+        }
+    }
 
     pub fn acquire_shared(&mut self) -> Result<(), &'static str> {
         match self.state {
             VnodeLockState::Unlocked => {
                 self.state = VnodeLockState::Shared(1);
                 Ok(())
+            }
             VnodeLockState::Shared(count) => {
                 self.state = VnodeLockState::Shared(count + 1);
+                Ok(())
+            }
             VnodeLockState::Exclusive(_) => Err("Vnode locked exclusively"),
+        }
+    }
 
     pub fn acquire_exclusive(&mut self, thread_id: u64) -> Result<(), &'static str> {
+        match self.state {
+            VnodeLockState::Unlocked => {
                 self.state = VnodeLockState::Exclusive(thread_id);
+                Ok(())
+            }
             _ => Err("Vnode lock busy"),
+        }
+    }
 
     pub fn release(&mut self) -> Result<(), &'static str> {
+        match self.state {
             VnodeLockState::Unlocked => Err("Vnode is not locked"),
+            VnodeLockState::Shared(count) => {
                 if count > 1 {
                     self.state = VnodeLockState::Shared(count - 1);
                 } else {
                     self.state = VnodeLockState::Unlocked;
                 }
+                Ok(())
+            }
             VnodeLockState::Exclusive(_) => {
                 self.state = VnodeLockState::Unlocked;
+                Ok(())
+            }
+        }
+    }
+}
 
 // Kernel Memory Page Pool Allocation Engine
 
 pub struct KernelMemoryPagePool {
     pub free_frame_pfns: Vec<u64>,
     pub pool_size: usize,
+}
 
 impl KernelMemoryPagePool {
     pub fn new(initial_capacity: usize) -> Self {
         let mut free_frames = Vec::with_capacity(initial_capacity);
         for i in 0..initial_capacity {
             free_frames.push(i as u64 + 0x10000); // Frame numbers above 0x10000
+        }
+        Self {
             free_frame_pfns: free_frames,
             pool_size: initial_capacity,
+        }
+    }
 
     pub fn alloc_page_frame(&mut self) -> Option<u64> {
         self.free_frame_pfns.pop()
+    }
 
     pub fn free_page_frame(&mut self, pfn: u64) {
         self.free_frame_pfns.push(pfn);
+    }
+}
 
 // ================= FreeBSD GEOM Modular Storage Framework =================
 

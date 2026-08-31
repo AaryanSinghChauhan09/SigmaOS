@@ -14,11 +14,6 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: String,
-}
-#[cfg(feature = "standalone_test")]
-impl ContentAddressedStore {
-    pub fn new(path: String) -> Self {
     pub path: alloc::string::String,
 }
 #[cfg(feature = "standalone_test")]

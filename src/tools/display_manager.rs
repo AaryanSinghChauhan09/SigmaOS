@@ -333,42 +333,6 @@ impl Default for DisplayManager {
     }
 }
 
-/// Linux Mint MDM (Mint Display Manager) inspired greeter theme specification
-#[derive(Debug, Clone)]
-pub struct MdmGreeterTheme {
-    pub theme_name: String,
-    pub background_wallpaper: String,
-    pub font_family: String,
-    pub engine_style: GreeterEngineStyle,
-    pub logo_icon_path: String,
-
-impl Default for MdmGreeterTheme {
-    fn default() -> Self {
-        Self {
-            theme_name: "Mint-MDM-Default".to_string(),
-            background_wallpaper: "/usr/share/backgrounds/mint.png".to_string(),
-            font_family: "Ubuntu".to_string(),
-            engine_style: GreeterEngineStyle::Html5,
-            logo_icon_path: "/usr/share/pixmaps/mint-logo.svg".to_string(),
-        }
-    }
-
-/// Remembers last selected user session and avatar icon (MDM / LightDM parity)
-pub struct UserSessionMemory {
-    pub user_id: u32,
-    pub last_session_name: String,
-    pub avatar_image_path: String,
-
-/// Accessibility controls overlay for MDM login greeter
-#[derive(Debug, Clone, Default)]
-pub struct GreeterAccessibilityOverlay {
-    pub onscreen_keyboard: bool,
-    pub high_contrast: bool,
-    pub screen_reader: bool,
-
-impl Default for DisplayManager {
-        Self::new()
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -405,33 +369,16 @@ mod tests {
         assert_eq!(memory.last_selected_session, "Wayland");
     }
 
-    }
-
     #[test]
     fn test_greeter_accessibility_overlay() {
         let mut overlay = GreeterAccessibilityOverlay::new();
         assert!(!overlay.onscreen_keyboard_enabled);
         overlay.toggle_onscreen_keyboard();
         assert!(overlay.onscreen_keyboard_enabled);
+
         let theme = MdmGreeterTheme::default();
         assert_eq!(theme.name, "Mint-MDM-Default");
-
-        let mut a11y = GreeterAccessibilityOverlay::default();
-        assert!(!a11y.high_contrast_enabled);
-        a11y.high_contrast_enabled = true;
-        assert!(a11y.high_contrast_enabled);
-}
-        assert_eq!(theme.theme_name, "Mint-MDM-Default");
-        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5);
-
-        let user_mem = UserSessionMemory {
-            last_session_name: "Cinnamon".to_string(),
-            avatar_image_path: "/var/lib/AccountsService/icons/jules".to_string(),
-        assert_eq!(user_mem.last_session_name, "Cinnamon");
-
-        assert!(!a11y.high_contrast);
-        a11y.high_contrast = true;
-        assert!(a11y.high_contrast);
+        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5WebKit);
 
         let mut a11y = GreeterAccessibilityOverlay::default();
         assert!(!a11y.high_contrast_enabled);

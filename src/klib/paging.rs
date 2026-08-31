@@ -274,7 +274,7 @@ impl SimpleVMM {
 
     pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
-        let _pdpt_idx = self.get_pdpt_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
@@ -283,14 +283,10 @@ impl SimpleVMM {
         }
 
         let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
-        let pd_idx_in_vec = ((pdpt_phys / 4096) * 512 + pdpt_idx) * 512 + pd_idx;
+        let pdpt_entry_idx = (pdpt_phys / 4096) * 512 + pdpt_idx;
+        let pd_idx_in_vec = pdpt_entry_idx * 512 + pd_idx;
 
         if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx_in_vec).and_then(|opt| opt.as_mut()) {
-            let pt_entry = pt.get_entry(pt_idx);
-            pt_entry.set_cow(true);
-            pt_entry.set_writable(false);
-            return Ok(());
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
             if pt_entry.is_present() {
                 pt_entry.set_writable(false);
@@ -481,7 +477,6 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        while self.pt_tables.len() <= pd_idx_in_vec {
         let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
 
         while self.pt_tables.len() <= pt_idx_in_vec {
@@ -564,9 +559,6 @@ impl VirtualMemoryManager for SimpleVMM {
             let pd_idx_in_vec = pdpt_entry_idx * 512 + pd_idx;
 
             if let Some(ref pd) = self.pd_tables.get(pdpt_entry_idx).and_then(|opt| opt.as_ref()) {
-            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
-
-            if let Some(ref pd) = self.pd_tables.get(pd_idx_in_vec).and_then(|opt| opt.as_ref()) {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
@@ -578,8 +570,6 @@ impl VirtualMemoryManager for SimpleVMM {
                 }
 
                 if let Some(ref pt) = self.pt_tables.get(pd_idx_in_vec).and_then(|opt| opt.as_ref()) {
-                let pt_idx_in_vec = pd_idx_in_vec * 512 + pd_idx;
-                if let Some(ref pt) = self.pt_tables.get(pt_idx_in_vec).and_then(|opt| opt.as_ref()) {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;

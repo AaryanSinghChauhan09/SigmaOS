@@ -561,7 +561,6 @@ mod tests {
     fn test_zypper_sat_resolver_vendor_lock() {
         let mut resolver = ZypperSatDependencyResolver::new(false); // Vendor lock enabled
 
-        let pkg_open_suse = ZypperPackageSpec {
         let pkg_opensuse = ZypperPackageSpec {
             name: "libcurl".to_string(),
             version: "8.0.0".to_string(),
@@ -580,11 +579,6 @@ mod tests {
             conflicts: vec![],
         };
 
-        resolver.register_available_package(pkg_open_suse.clone());
-        resolver.register_available_package(pkg_packman.clone());
-
-        // Currently installed from openSUSE
-        resolver.install_package_record(pkg_open_suse.clone());
         resolver.register_available_package(pkg_opensuse.clone());
         resolver.register_available_package(pkg_packman.clone());
 

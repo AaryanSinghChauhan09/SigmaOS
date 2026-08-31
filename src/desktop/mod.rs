@@ -3,19 +3,21 @@ pub mod zenith_compositor;
 pub mod moksha;
 pub mod pantheon;
 pub mod mate_betsy;
+pub mod screensaver;
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
-pub mod screensaver;
 pub use screensaver::{
     DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+};
 pub mod mate_packages;
 pub use mate_packages::{
     AppletKind, BetsyBundleHeader, BetsyPackageBundleExporter, MateAptUrlProtocolHandler,
     MateDesktopApplet, MatePanelLayout, MatePkgPpaRepositoryManager, MateSoftwareStoreManager,
     MateStoreAppEntry, PanelPosition, PpaRepositorySource,
+};
 pub mod desktop_portal;
 pub use desktop_portal::{
     AppChooserChoice, AppPermissionRule, CaptureSourceType, ContractorAppChooserPortal,

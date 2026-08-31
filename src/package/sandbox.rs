@@ -145,7 +145,7 @@ pub trait FilesystemIsolation {
 
 #[repr(C)]
 pub struct SimpleFilesystemIsolation {
-    pub mounts: Vec<([u8; 256], [u8; 256], AtomicUsize>)>,
+    pub mounts: Vec<([u8; 256], [u8; 256], AtomicUsize)>,
 }
 
 impl SimpleFilesystemIsolation {

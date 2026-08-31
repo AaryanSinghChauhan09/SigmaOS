@@ -481,6 +481,9 @@ mod tests {
         handoff.trigger_emergency_rescue("Corrupted initrd checksum");
         assert!(handoff.execute_handoff().is_err());
         assert!(handoff.emergency_rescue_active);
+    }
+
+    #[test]
     fn test_boot_stage_handoff_and_root_discovery() {
         let mut boot = BootManager::new(3);
         boot.add_entry(BootEntry {

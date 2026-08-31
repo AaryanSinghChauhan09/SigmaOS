@@ -150,17 +150,14 @@ pub use historic_linux::{
 pub use legacy_adapters::{LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter};
 pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
-pub use mint_linux::{
-    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata,
-    MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-    WindowsBootloaderType,
 };
 pub use mint_linux::{
-    LoopbackDiskImage, Mint4WinConfig, Mint4WinInstaller, MintAppMetadata, MintBackupTool,
-    MintReportAlert, MintReportAlertSeverity, MintReportSystem, MintSoftwareManager,
+    LoopbackDiskFormat, LoopbackDiskImage, Mint4WinConfig, Mint4WinInstallationConfig,
+    Mint4WinInstaller, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
+    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
+    MintReportAlertSeverity, MintReportSystem, MintSoftwareManager, MintTimeshiftEngine,
     MintUpdateLevel, MintUpdateManager, MintUpdatePackage, NtfsFastStartupState,
-    UninstallerRegistryEntry, WindowsBootloaderType,
+    TimeshiftSnapshot, UninstallerRegistryEntry, WindowsBootloaderType,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};

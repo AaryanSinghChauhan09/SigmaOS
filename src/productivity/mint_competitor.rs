@@ -749,7 +749,7 @@ mod tests {
 
     #[test]
     fn test_nvidia_prime_engine_and_applet() {
-        let mut applet = NvidiaPrimeApplet::new(101);
+        let mut applet = SovereignNvidiaPrimeApplet::new(101);
         assert_eq!(
             applet.prime_engine.active_profile,
             NvidiaPrimeProfile::NvidiaOnDemand
@@ -975,13 +975,13 @@ impl Default for SovereignNvidiaPrimeEngine {
     }
 }
 
-pub struct NvidiaPrimeApplet {
+pub struct SovereignNvidiaPrimeApplet {
     pub applet_id: u32,
     pub prime_engine: SovereignNvidiaPrimeEngine,
     pub icon_name: String,
 }
 
-impl NvidiaPrimeApplet {
+impl SovereignNvidiaPrimeApplet {
     pub fn new(id: u32) -> Self {
         Self {
             applet_id: id,
@@ -1018,6 +1018,10 @@ impl NvidiaPrimeApplet {
             NvidiaPrimeProfile::NvidiaPerformance => "GPU: NVIDIA Performance (NVIDIA Always On)".to_string(),
             NvidiaPrimeProfile::OffloadCompute => "GPU: Offload Compute (CUDA / Vulkan Only)".to_string(),
         }
+    }
+}
+
+    #[test]
     fn test_sovereign_mintupgrade_engine() {
         let mut upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
         let result = upgrade.execute_upgrade(20480);
@@ -1094,4 +1098,3 @@ impl NvidiaPrimeApplet {
         assert!(is_fav);
         assert_eq!(menu.filter_by_category(MintMenuCategory::Favorites).len(), 3);
     }
-}
