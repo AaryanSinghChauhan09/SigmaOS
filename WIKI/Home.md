@@ -14,6 +14,7 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - **Multi-Distro Compatibility & Parity:** Adapters and translation layers for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), CachyOS (BORE scheduler), and FreeBSD (Jails/Capsicum/GEOM).
 - **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
 - **Zero-Trust Access Control:** Integrated Discretionary (DAC), Mandatory (MAC / Bell-LaPadula), and Role-Based (RBAC) access controls.
+- **SigmaOS Bill of Rights:** Sovereign user charter codifying rights to resilience, compliance transparency, visual security control, adaptive scheduling, native orchestration, adaptive UX, and community trust ([Bill of Rights](WIKI/BILL_OF_RIGHTS.md)).
 - **Zenith Desktop & GTK Toolkit Engine:** Native GTK3/GTK4 inspired UI toolkit (`src/ui/toolkit.rs`) supporting Client-Side Decoration HeaderBars (`GtkHeaderBar`), flex box containers (`GtkBox`), CSS style contexts (`GtkStyleContext`), HiDPI metrics, and GLib-style signal dispatching (`GtkSignalDispatcher`).
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
 
