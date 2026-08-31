@@ -18,12 +18,32 @@ pub struct SubscriptionPool {
     pub consumed_quantity: usize,
 }
 
+impl SubscriptionPool {
+    pub fn is_fully_consumed(&self) -> bool {
+        self.consumed_quantity >= self.total_quantity
+    }
+
+    pub fn remaining_capacity(&self) -> usize {
+        self.total_quantity.saturating_sub(self.consumed_quantity)
+    }
+}
+
 /// Entitlement certificate attached to system
 #[derive(Debug, Clone)]
 pub struct EntitlementCertificate {
     pub sku: &'static str,
     pub serial_number: u64,
     pub active: bool,
+}
+
+impl EntitlementCertificate {
+    pub fn is_valid(&self) -> bool {
+        self.active && self.serial_number > 0
+    }
+
+    pub fn deactivate(&mut self) {
+        self.active = false;
+    }
 }
 
 /// RHEL / Rocky / AlmaLinux Subscription Entitlement Manager
@@ -316,6 +336,9 @@ mod tests {
         assert!(!mgr.is_registered());
         assert!(!mgr.verify_entitlement());
 
+        assert!(!mgr.pools[0].is_fully_consumed());
+        assert_eq!(mgr.pools[0].remaining_capacity(), 90);
+
         // Register system
         assert!(mgr.register_system("ORG-KEY-SIGMA-SERVER").is_ok());
         assert!(mgr.is_registered());
@@ -324,6 +347,11 @@ mod tests {
         let serial = mgr.attach_pool("RH-SERVER-POOL-8800").unwrap();
         assert!(serial > 0);
         assert!(mgr.verify_entitlement());
+
+        let cert = &mut mgr.entitlements[0];
+        assert!(cert.is_valid());
+        cert.deactivate();
+        assert!(!cert.is_valid());
     }
 
     #[test]

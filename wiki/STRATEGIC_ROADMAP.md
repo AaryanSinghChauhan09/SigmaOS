@@ -58,29 +58,29 @@ This document outlines the strategic engineering roadmap and gap analysis for br
 
 ## 🚀 6. Priority Adoption Roadmap Overlay
 
-1. **Core Stability**
-   - Implement ZFS/Btrfs-style snapshot rollbacks (`SovereignProfileManager`).
-   - Deliver 100% reproducible package builds via Nix-like declarative store (`BuildLedgerSystem`).
+### Phased Execution Milestones
+- **0–6 months (Foundation)**
+  - Kernel hybrid experiments
+  - Transactional FS prototype
+  - Compliance handbook draft
 
-2. **Security & Networking**
-   - Integrate Capsicum capability sandboxing + SELinux profiles (`DynamicMacEnforcer`).
-   - Build unified stateful firewall engine (PF + nftables hybrid).
+- **6–12 months (Expansion)**
+  - Adaptive scheduler rollout
+  - Visual sandboxing GUI
+  - Unified firewall dashboard
 
-3. **Service Orchestration**
-   - Implement YAML-based adaptive init system (`SigmaInit`).
-   - Deploy event-driven automation (systemd timers + BSD rc.d triggers).
+- **12–18 months (Differentiation)**
+  - Native container orchestration
+  - Zenith desktop overlays
+  - Distributed FS overlay
 
-4. **Virtualization Layer**
-   - Native lightweight container orchestration (`SigmaContainer`).
-   - Bhyve/QEMU-parity virtual machine guest supervisor.
+---
 
-5. **Desktop/UX**
-   - Zenith Tiling Window Manager integration.
-   - Adaptive overlays for WCAG 2.1 AA compliance and system telemetry.
-
-6. **Documentation Expansion**
-   - Consolidate Markdown documentations into the official **SigmaOS Handbook**.
-   - Mirror Arch Wiki's collaborative community knowledge model.
+## 🌟 Strategic Differentiators
+- **Compliance-first OS:** Unlike Linux/BSD, SigmaOS brands itself as the trusted OS for regulated industries.
+- **Visual-first dashboards:** Replace CLI-heavy workflows with intuitive compliance/security overlays.
+- **Resilience implants:** Snapshot rollback + immutable layers for update safety.
+- **Community-driven modules:** Encourage contributions with compliance verification pipelines.
 
 ---
 
