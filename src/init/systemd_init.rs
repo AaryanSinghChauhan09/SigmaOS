@@ -1,10 +1,13 @@
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
-/// Provides robust target dependency graphs, wants/requires properties,
-/// and target states to defeat Fedora's Systemd initialization.
+/// Provides robust target dependency graphs, wants/requires/requisite properties,
+/// systemd-analyze security auditor, critical-chain boot timing diagnostics,
+/// socket/timer activation extensions, and multi-init BSD/Linux conversion bridge.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -18,17 +21,21 @@ pub enum UnitType {
     Path,
     Mount,
     Device,
+    Slice,
+    Scope,
+    Swap,
 }
 
-/// Alternative Init System types (Artix & Devuan parity)
+/// Alternative Init System types (Artix, Devuan & BSD parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitSystemType {
-    SigmaInit, // Default SigmaOS Init
+    SigmaInit, // Default SigmaOS Sovereign Init
     Runit,
     S6,
     Dinit,
     Sysvinit,
     OpenRC,
+    BsdRc,
 }
 
 /// FreeBSD & OpenBSD rc.d boot execution ordering level
@@ -37,6 +44,246 @@ pub enum BsdRcOrder {
     EarlyBoot, // e.g. REQUIRE: mountcritlocal, BEFORE: DAEMON
     CoreBoot,  // e.g. REQUIRE: NETWORKING, BEFORE: LOGIN
     LateBoot,  // e.g. REQUIRE: LOGIN
+}
+
+/// Linux ProtectSystem directive levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProtectSystemLevel {
+    Off,
+    Full,     // /usr and /boot mounted read-only
+    Strict,   // /usr, /boot, /etc mounted read-only
+}
+
+/// Linux ProtectHome directive levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProtectHomeLevel {
+    Off,
+    Bool,     // /home, /root inaccessible
+    ReadOnly, // /home, /root read-only
+    Tmpfs,    // /home, /root mounted as tmpfs
+}
+
+/// Unit Security Hardening Profile (systemd security sandbox + BSD pledge/unveil parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemdUnitHardeningProfile {
+    pub no_new_privileges: bool,
+    pub protect_system: ProtectSystemLevel,
+    pub protect_home: ProtectHomeLevel,
+    pub private_tmp: bool,
+    pub private_devices: bool,
+    pub protect_kernel_tunables: bool,
+    pub protect_kernel_modules: bool,
+    pub restrict_namespaces: bool,
+    pub memory_deny_write_execute: bool,
+    pub lock_personality: bool,
+    pub restrict_realtime: bool,
+    pub capability_bounding_set: Vec<String>,
+    pub system_call_filter: Vec<String>,
+    pub unveil_paths: Vec<(String, String)>, // (path, permissions) - OpenBSD unveil parity
+    pub pledge_promises: String,             // OpenBSD pledge parity e.g. "stdio rpath wpath"
+}
+
+impl Default for SystemdUnitHardeningProfile {
+    fn default() -> Self {
+        Self {
+            no_new_privileges: false,
+            protect_system: ProtectSystemLevel::Off,
+            protect_home: ProtectHomeLevel::Off,
+            private_tmp: false,
+            private_devices: false,
+            protect_kernel_tunables: false,
+            protect_kernel_modules: false,
+            restrict_namespaces: false,
+            memory_deny_write_execute: false,
+            lock_personality: false,
+            restrict_realtime: false,
+            capability_bounding_set: Vec::new(),
+            system_call_filter: Vec::new(),
+            unveil_paths: Vec::new(),
+            pledge_promises: String::new(),
+        }
+    }
+}
+
+/// `systemd-analyze security` Auditor Engine
+#[derive(Debug, Clone)]
+pub struct SecurityAnalysisReport {
+    pub unit_name: String,
+    pub exposure_score: f32, // 0.0 (OK / Very Secure) to 10.0 (UNSAFE / Unprotected)
+    pub rating: String,      // "OK", "EXPOSED", "UNSAFE"
+    pub passed_checks: Vec<String>,
+    pub warnings: Vec<String>,
+}
+
+pub struct SystemdSecurityAuditor;
+
+impl SystemdSecurityAuditor {
+    pub fn analyze_profile(unit_name: &str, profile: &SystemdUnitHardeningProfile) -> SecurityAnalysisReport {
+        let mut score: f32 = 10.0;
+        let mut passed = Vec::new();
+        let mut warnings = Vec::new();
+
+        if profile.no_new_privileges {
+            score -= 1.0;
+            passed.push("NoNewPrivileges=yes".to_string());
+        } else {
+            warnings.push("NoNewPrivileges is disabled".to_string());
+        }
+
+        match profile.protect_system {
+            ProtectSystemLevel::Strict => {
+                score -= 1.5;
+                passed.push("ProtectSystem=strict".to_string());
+            }
+            ProtectSystemLevel::Full => {
+                score -= 1.0;
+                passed.push("ProtectSystem=full".to_string());
+            }
+            ProtectSystemLevel::Off => {
+                warnings.push("ProtectSystem is disabled".to_string());
+            }
+        }
+
+        if profile.protect_home != ProtectHomeLevel::Off {
+            score -= 1.0;
+            passed.push("ProtectHome enabled".to_string());
+        } else {
+            warnings.push("ProtectHome is disabled".to_string());
+        }
+
+        if profile.private_tmp {
+            score -= 0.8;
+            passed.push("PrivateTmp=yes".to_string());
+        } else {
+            warnings.push("PrivateTmp is disabled".to_string());
+        }
+
+        if profile.private_devices {
+            score -= 0.8;
+            passed.push("PrivateDevices=yes".to_string());
+        } else {
+            warnings.push("PrivateDevices is disabled".to_string());
+        }
+
+        if profile.protect_kernel_tunables {
+            score -= 0.8;
+            passed.push("ProtectKernelTunables=yes".to_string());
+        } else {
+            warnings.push("ProtectKernelTunables is disabled".to_string());
+        }
+
+        if profile.protect_kernel_modules {
+            score -= 0.8;
+            passed.push("ProtectKernelModules=yes".to_string());
+        } else {
+            warnings.push("ProtectKernelModules is disabled".to_string());
+        }
+
+        if profile.memory_deny_write_execute {
+            score -= 1.0;
+            passed.push("MemoryDenyWriteExecute=yes".to_string());
+        } else {
+            warnings.push("MemoryDenyWriteExecute is disabled".to_string());
+        }
+
+        if profile.restrict_namespaces {
+            score -= 0.8;
+            passed.push("RestrictNamespaces=yes".to_string());
+        }
+
+        if !profile.pledge_promises.is_empty() {
+            score -= 0.8;
+            passed.push(format!("OpenBSD Pledge promises: '{}'", profile.pledge_promises));
+        }
+
+        if !profile.unveil_paths.is_empty() {
+            score -= 0.7;
+            passed.push(format!("OpenBSD Unveil path count: {}", profile.unveil_paths.len()));
+        }
+
+        let exposure_score = score.max(0.0).min(10.0);
+        let rating = if exposure_score <= 3.0 {
+            "OK".to_string()
+        } else if exposure_score <= 6.5 {
+            "EXPOSED".to_string()
+        } else {
+            "UNSAFE".to_string()
+        };
+
+        SecurityAnalysisReport {
+            unit_name: unit_name.to_string(),
+            exposure_score,
+            rating,
+            passed_checks: passed,
+            warnings,
+        }
+    }
+}
+
+/// Socket activation transport kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketTransportKind {
+    StreamTcp,
+    DatagramUdp,
+    UnixDomain,
+    SequentialPacket,
+}
+
+/// Extended Socket Unit Configuration (`.socket`)
+#[derive(Debug, Clone)]
+pub struct SocketConfig {
+    pub transport: SocketTransportKind,
+    pub listen_address: String,
+    pub port: u16,
+    pub socket_path: String,
+    pub max_connections: u32,
+    pub pass_credentials: bool,
+    pub socket_user: String,
+    pub socket_group: String,
+}
+
+impl Default for SocketConfig {
+    fn default() -> Self {
+        Self {
+            transport: SocketTransportKind::StreamTcp,
+            listen_address: "0.0.0.0".to_string(),
+            port: 8080,
+            socket_path: String::new(),
+            max_connections: 128,
+            pass_credentials: true,
+            socket_user: "root".to_string(),
+            socket_group: "root".to_string(),
+        }
+    }
+}
+
+/// Timer activation trigger kind (`.timer`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TimerTrigger {
+    OnBootSec(u64),
+    OnStartupSec(u64),
+    OnUnitActiveSec(u64),
+    OnCalendar(String), // e.g. "*-*-* 00:00:00" or "daily"
+}
+
+/// Extended Timer Unit Configuration (`.timer`)
+#[derive(Debug, Clone)]
+pub struct TimerConfig {
+    pub triggers: Vec<TimerTrigger>,
+    pub accuracy_sec: u64,
+    pub persistent: bool,
+    pub randomized_delay_sec: u64,
+}
+
+impl Default for TimerConfig {
+    fn default() -> Self {
+        Self {
+            triggers: vec![TimerTrigger::OnBootSec(10)],
+            accuracy_sec: 1,
+            persistent: true,
+            randomized_delay_sec: 0,
+        }
+    }
 }
 
 /// Multi-init abstraction bridge allowing boot-time switching across Linux & BSD init models
@@ -100,6 +347,24 @@ impl InitSystemBridge {
         script.extend_from_slice(b"_enable\"\nload_rc_config $name\nrun_rc_command \"$1\"\n");
         script
     }
+
+    /// Converts a parsed systemd unit into equivalent shell init script according to active_init type
+    pub fn export_unit_to_active_init(&self, unit: &ParsedSystemdUnitFile, unit_name: &str) -> Vec<u8> {
+        match self.active_init {
+            InitSystemType::Runit => self.convert_runit_service_script(unit_name),
+            InitSystemType::OpenRC => self.convert_openrc_service_script(unit_name, "default"),
+            InitSystemType::BsdRc => self.convert_bsd_rc_script(unit_name, BsdRcOrder::CoreBoot),
+            _ => {
+                let mut content = Vec::new();
+                content.extend_from_slice(b"[Unit]\nDescription=");
+                content.extend_from_slice(unit.unit_description.as_bytes());
+                content.extend_from_slice(b"\n[Service]\nExecStart=");
+                content.extend_from_slice(unit.exec_start.as_bytes());
+                content.extend_from_slice(b"\n");
+                content
+            }
+        }
+    }
 }
 
 // ================= Systemd INI Unit Configuration Parser =================
@@ -112,6 +377,17 @@ pub struct ParsedSystemdUnitFile {
     pub wanted_by: String,
     pub watchdog_sec: u32,
     pub slice: String,
+    pub environment: Vec<(String, String)>,
+    pub requires: Vec<String>,
+    pub wants: Vec<String>,
+    pub requisite: Vec<String>,
+    pub before: Vec<String>,
+    pub after: Vec<String>,
+    pub conflicts: Vec<String>,
+    pub on_failure: Vec<String>,
+    pub hardening_profile: SystemdUnitHardeningProfile,
+    pub listen_stream: String,
+    pub on_calendar: String,
 }
 
 pub struct SystemdUnitFileParser;
@@ -138,6 +414,41 @@ impl SystemdUnitFileParser {
 
                 match (current_section, key) {
                     ("Unit", "Description") => parsed.unit_description = val.to_string(),
+                    ("Unit", "Requires") => {
+                        for dep in val.split_whitespace() {
+                            parsed.requires.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "Wants") => {
+                        for dep in val.split_whitespace() {
+                            parsed.wants.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "Requisite") => {
+                        for dep in val.split_whitespace() {
+                            parsed.requisite.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "Before") => {
+                        for dep in val.split_whitespace() {
+                            parsed.before.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "After") => {
+                        for dep in val.split_whitespace() {
+                            parsed.after.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "Conflicts") => {
+                        for dep in val.split_whitespace() {
+                            parsed.conflicts.push(dep.to_string());
+                        }
+                    }
+                    ("Unit", "OnFailure") => {
+                        for dep in val.split_whitespace() {
+                            parsed.on_failure.push(dep.to_string());
+                        }
+                    }
                     ("Service", "ExecStart") => parsed.exec_start = val.to_string(),
                     ("Service", "Restart") => parsed.restart_policy = val.to_string(),
                     ("Service", "WatchdogSec") => {
@@ -145,6 +456,58 @@ impl SystemdUnitFileParser {
                         parsed.watchdog_sec = sec_str.parse::<u32>().unwrap_or(0);
                     }
                     ("Service", "Slice") => parsed.slice = val.to_string(),
+                    ("Service", "Environment") => {
+                        if let Some(eq_idx) = val.find('=') {
+                            let env_k = val[..eq_idx].trim().to_string();
+                            let env_v = val[eq_idx + 1..].trim().trim_matches('"').to_string();
+                            parsed.environment.push((env_k, env_v));
+                        }
+                    }
+                    ("Service", "NoNewPrivileges") => {
+                        parsed.hardening_profile.no_new_privileges = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "ProtectSystem") => {
+                        parsed.hardening_profile.protect_system = match val.to_lowercase().as_str() {
+                            "strict" => ProtectSystemLevel::Strict,
+                            "full" | "yes" | "true" => ProtectSystemLevel::Full,
+                            _ => ProtectSystemLevel::Off,
+                        };
+                    }
+                    ("Service", "ProtectHome") => {
+                        parsed.hardening_profile.protect_home = match val.to_lowercase().as_str() {
+                            "read-only" => ProtectHomeLevel::ReadOnly,
+                            "tmpfs" => ProtectHomeLevel::Tmpfs,
+                            "yes" | "true" => ProtectHomeLevel::Bool,
+                            _ => ProtectHomeLevel::Off,
+                        };
+                    }
+                    ("Service", "PrivateTmp") => {
+                        parsed.hardening_profile.private_tmp = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "PrivateDevices") => {
+                        parsed.hardening_profile.private_devices = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "ProtectKernelTunables") => {
+                        parsed.hardening_profile.protect_kernel_tunables = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "ProtectKernelModules") => {
+                        parsed.hardening_profile.protect_kernel_modules = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "MemoryDenyWriteExecute") => {
+                        parsed.hardening_profile.memory_deny_write_execute = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
+                    ("Service", "Pledge") => {
+                        parsed.hardening_profile.pledge_promises = val.to_string();
+                    }
+                    ("Service", "Unveil") => {
+                        if let Some(space_idx) = val.find(' ') {
+                            let p = val[..space_idx].trim().to_string();
+                            let perm = val[space_idx + 1..].trim().to_string();
+                            parsed.hardening_profile.unveil_paths.push((p, perm));
+                        }
+                    }
+                    ("Socket", "ListenStream") => parsed.listen_stream = val.to_string(),
+                    ("Timer", "OnCalendar") => parsed.on_calendar = val.to_string(),
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -236,12 +599,26 @@ pub enum RestartPolicy {
     OnFailure,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum JournalPriority {
+    Emergency = 0,
+    Alert = 1,
+    Critical = 2,
+    Error = 3,
+    Warning = 4,
+    Notice = 5,
+    Info = 6,
+    Debug = 7,
+}
+
 #[derive(Debug, Clone)]
 pub struct JournalEntry {
     pub unit_id: UnitID,
     pub message: [u8; 64],
     pub from_state: UnitState,
     pub to_state: UnitState,
+    pub priority: JournalPriority,
+    pub timestamp_ms: u64,
 }
 
 impl JournalEntry {
@@ -254,8 +631,26 @@ impl JournalEntry {
             message: msg_arr,
             from_state,
             to_state,
+            priority: JournalPriority::Info,
+            timestamp_ms: 0,
         }
     }
+
+    pub fn with_priority(mut self, priority: JournalPriority) -> Self {
+        self.priority = priority;
+        self
+    }
+}
+
+/// Critical Chain Dependency Path Entry for `systemd-analyze critical-chain`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CriticalChainEntry {
+    pub unit_id: UnitID,
+    pub unit_name: String,
+    pub start_time_ms: u64,
+    pub finish_time_ms: u64,
+    pub duration_ms: u64,
+    pub dependent_unit_id: Option<UnitID>,
 }
 
 #[derive(Debug, Clone)]
@@ -266,17 +661,22 @@ pub struct SystemdUnit {
     pub state: UnitState,
     pub requires: Vec<UnitID>,
     pub wants: Vec<UnitID>,
+    pub requisite: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
     pub conflicts: Vec<UnitID>,
     pub binds_to: Vec<UnitID>,
     pub part_of: Vec<UnitID>,
+    pub on_failure: Vec<UnitID>,
     pub restart_policy: RestartPolicy,
     pub restart_count: usize,
     pub startup_time_ms: u64,
     pub duration_ms: u64,
     pub is_enabled: bool,
     pub triggered_unit: Option<UnitID>,
+    pub hardening_profile: SystemdUnitHardeningProfile,
+    pub socket_config: Option<SocketConfig>,
+    pub timer_config: Option<TimerConfig>,
 }
 
 impl SystemdUnit {
@@ -291,18 +691,28 @@ impl SystemdUnit {
             state: UnitState::Inactive,
             requires: Vec::new(),
             wants: Vec::new(),
+            requisite: Vec::new(),
             before: Vec::new(),
             after: Vec::new(),
             conflicts: Vec::new(),
             binds_to: Vec::new(),
             part_of: Vec::new(),
+            on_failure: Vec::new(),
             restart_policy: RestartPolicy::No,
             restart_count: 0,
             startup_time_ms: 0,
             duration_ms: 0,
             is_enabled: true,
             triggered_unit: None,
+            hardening_profile: SystemdUnitHardeningProfile::default(),
+            socket_config: None,
+            timer_config: None,
         }
+    }
+
+    pub fn name_as_str(&self) -> &str {
+        let end = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
+        core::str::from_utf8(&self.name[..end]).unwrap_or("unknown")
     }
 }
 
@@ -357,6 +767,18 @@ impl SystemdEngine {
         to_state: UnitState,
     ) {
         let entry = JournalEntry::new(unit_id, message, from_state, to_state);
+        self.journal.push(entry);
+    }
+
+    pub fn log_journal_with_priority(
+        &mut self,
+        unit_id: UnitID,
+        message: &[u8],
+        from_state: UnitState,
+        to_state: UnitState,
+        priority: JournalPriority,
+    ) {
+        let entry = JournalEntry::new(unit_id, message, from_state, to_state).with_priority(priority);
         self.journal.push(entry);
     }
 
@@ -472,12 +894,14 @@ impl SystemdEngine {
     }
 
     pub fn systemctl_start(&mut self, id: UnitID) -> Result<(), &'static str> {
-        let (is_enabled, conflicts, requires, wants) = if let Some(u) = self.find_unit(id) {
+        let (is_enabled, conflicts, requires, wants, requisite, on_failure_list) = if let Some(u) = self.find_unit(id) {
             (
                 u.is_enabled,
                 u.conflicts.clone(),
                 u.requires.clone(),
                 u.wants.clone(),
+                u.requisite.clone(),
+                u.on_failure.clone(),
             )
         } else {
             return Err("Unit not found");
@@ -485,6 +909,25 @@ impl SystemdEngine {
 
         if !is_enabled {
             return Err("Unit is disabled");
+        }
+
+        // Check Requisite dependency: if any requisite unit is not currently Active, fail immediately
+        for &req_site_id in requisite.iter() {
+            let is_req_active = self.find_unit(req_site_id).map_or(false, |u| u.state == UnitState::Active);
+            if !is_req_active {
+                if let Some(u) = self.find_unit_mut(id) {
+                    u.state = UnitState::Failed;
+                }
+                self.log_journal_with_priority(
+                    id,
+                    b"Requisite dependency is not active; failing unit start",
+                    UnitState::Inactive,
+                    UnitState::Failed,
+                    JournalPriority::Error,
+                );
+                self.trigger_on_failure_cascade(&on_failure_list);
+                return Err("Requisite dependency is not active");
+            }
         }
 
         for &conflict_id in conflicts.iter() {
@@ -510,12 +953,14 @@ impl SystemdEngine {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }
-                self.log_journal(
+                self.log_journal_with_priority(
                     id,
                     b"Required dependency failed to start",
                     UnitState::Inactive,
                     UnitState::Failed,
+                    JournalPriority::Error,
                 );
+                self.trigger_on_failure_cascade(&on_failure_list);
                 return Err("Required dependency failed to start");
             }
         }
@@ -547,6 +992,12 @@ impl SystemdEngine {
         );
 
         Ok(())
+    }
+
+    fn trigger_on_failure_cascade(&mut self, on_failure_units: &[UnitID]) {
+        for &fail_target in on_failure_units {
+            let _ = self.systemctl_start(fail_target);
+        }
     }
 
     pub fn systemctl_stop(&mut self, id: UnitID) -> Result<(), &'static str> {
@@ -654,8 +1105,8 @@ impl SystemdEngine {
 
     pub fn handle_unit_failure(&mut self, id: UnitID) -> Result<bool, &'static str> {
         let mut should_restart = false;
-        let (policy, count) = if let Some(unit) = self.find_unit(id) {
-            (unit.restart_policy, unit.restart_count)
+        let (policy, count, on_failure_list) = if let Some(unit) = self.find_unit(id) {
+            (unit.restart_policy, unit.restart_count, unit.on_failure.clone())
         } else {
             return Err("Unit not found");
         };
@@ -683,12 +1134,14 @@ impl SystemdEngine {
             if let Some(unit) = self.find_unit_mut(id) {
                 unit.state = UnitState::Failed;
             }
-            self.log_journal(
+            self.log_journal_with_priority(
                 id,
                 b"Unit entered Failed state, restart policy not met or limit exceeded",
                 UnitState::Inactive,
                 UnitState::Failed,
+                JournalPriority::Error,
             );
+            self.trigger_on_failure_cascade(&on_failure_list);
             Ok(false)
         }
     }
@@ -779,6 +1232,63 @@ impl SystemdEngine {
             }
         }
         blame_list
+    }
+
+    /// Traces the critical boot dependency chain leading to target_id (`systemd-analyze critical-chain`)
+    pub fn systemd_analyze_critical_chain(&self, target_id: UnitID) -> Vec<CriticalChainEntry> {
+        let mut chain = Vec::new();
+        let mut visited = Vec::new();
+        let mut current_id = target_id;
+        let mut current_time_offset: u64 = 0;
+
+        while let Some(unit) = self.find_unit(current_id) {
+            if visited.contains(&current_id) {
+                break; // Dependency cycle guard
+            }
+            visited.push(current_id);
+
+            let start = current_time_offset;
+            let finish = start + unit.duration_ms;
+            current_time_offset = finish;
+
+            // Find prerequisite dependency (Requires/After) that took longest or was primary
+            let mut prev_dep = None;
+            for &req in unit.requires.iter().chain(unit.after.iter()) {
+                if !visited.contains(&req) && self.find_unit(req).is_some() {
+                    prev_dep = Some(req);
+                    break;
+                }
+            }
+
+            chain.push(CriticalChainEntry {
+                unit_id: unit.id,
+                unit_name: unit.name_as_str().to_string(),
+                start_time_ms: start,
+                finish_time_ms: finish,
+                duration_ms: unit.duration_ms,
+                dependent_unit_id: prev_dep,
+            });
+
+            if let Some(next_id) = prev_dep {
+                current_id = next_id;
+            } else {
+                break;
+            }
+        }
+
+        chain
+    }
+
+    /// Evaluates `systemd-analyze security` across all registered units
+    pub fn systemd_analyze_security(&self) -> Vec<SecurityAnalysisReport> {
+        let mut reports = Vec::new();
+        for unit in self.units.iter() {
+            if unit.unit_type == UnitType::Service {
+                let report = SystemdSecurityAuditor::analyze_profile(unit.name_as_str(), &unit.hardening_profile);
+                reports.push(report);
+            }
+        }
+        reports
     }
 
     pub fn query_target_by_name(&self, name: &[u8]) -> Option<UnitID> {
@@ -1220,5 +1730,118 @@ mod tests {
 
         let runit_script = bridge.convert_runit_service_script("apache2");
         assert!(&runit_script[..].starts_with(b"#!/bin/sh\nexec apache2 --foreground\n"));
+    }
+
+    #[test]
+    fn test_systemd_security_analyzer() {
+        let mut profile = SystemdUnitHardeningProfile::default();
+        let report_unsecure = SystemdSecurityAuditor::analyze_profile("insecure.service", &profile);
+        assert_eq!(report_unsecure.rating, "UNSAFE");
+        assert_eq!(report_unsecure.exposure_score, 10.0);
+
+        profile.no_new_privileges = true;
+        profile.protect_system = ProtectSystemLevel::Strict;
+        profile.protect_home = ProtectHomeLevel::ReadOnly;
+        profile.private_tmp = true;
+        profile.private_devices = true;
+        profile.protect_kernel_tunables = true;
+        profile.protect_kernel_modules = true;
+        profile.memory_deny_write_execute = true;
+        profile.pledge_promises = "stdio rpath wpath".to_string();
+
+        let report_secure = SystemdSecurityAuditor::analyze_profile("secure.service", &profile);
+        assert_eq!(report_secure.rating, "OK");
+        assert!(report_secure.exposure_score <= 3.0);
+    }
+
+    #[test]
+    fn test_systemd_analyze_critical_chain() {
+        let mut engine = SystemdEngine::new();
+
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.duration_ms = 50;
+        target.requires.push(2);
+
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.duration_ms = 400;
+        service.requires.push(3);
+
+        let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
+        network.duration_ms = 200;
+
+        engine.register_unit(target);
+        engine.register_unit(service);
+        engine.register_unit(network);
+
+        let chain = engine.systemd_analyze_critical_chain(1);
+        assert_eq!(chain.len(), 3);
+        assert_eq!(chain[0].unit_name, "graphical.target");
+        assert_eq!(chain[1].unit_name, "display-manager.service");
+        assert_eq!(chain[2].unit_name, "network.target");
+    }
+
+    #[test]
+    fn test_requisite_and_on_failure_cascade() {
+        let mut engine = SystemdEngine::new();
+
+        let mut backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
+        engine.register_unit(backup_service);
+
+        let mut dep = SystemdUnit::new(1, b"db.service", UnitType::Service);
+        dep.state = UnitState::Inactive;
+        engine.register_unit(dep);
+
+        let mut app = SystemdUnit::new(2, b"app.service", UnitType::Service);
+        app.requisite.push(1);
+        app.on_failure.push(99);
+        engine.register_unit(app);
+
+        let res = engine.systemctl_start(2);
+        assert!(res.is_err());
+        assert_eq!(engine.systemctl_status(2), Some(UnitState::Failed));
+        assert_eq!(engine.systemctl_status(99), Some(UnitState::Active));
+    }
+
+    #[test]
+    fn test_systemd_unit_file_parser_extended() {
+        let unit_content = r#"
+[Unit]
+Description=Sovereign Secure Web Service
+Requires=network.target
+Requisite=db.service
+OnFailure=fallback.service
+
+[Service]
+ExecStart=/usr/bin/web-server --config /etc/web.conf
+Restart=always
+WatchdogSec=15s
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=yes
+MemoryDenyWriteExecute=yes
+Pledge=stdio rpath wpath inet
+Unveil=/etc/web.conf r
+Environment=PORT=8080
+
+[Install]
+WantedBy=multi-user.target
+"#;
+
+        let parsed = SystemdUnitFileParser::parse_unit_file(unit_content);
+        assert_eq!(parsed.unit_description, "Sovereign Secure Web Service");
+        assert_eq!(parsed.requires, vec!["network.target"]);
+        assert_eq!(parsed.requisite, vec!["db.service"]);
+        assert_eq!(parsed.on_failure, vec!["fallback.service"]);
+        assert_eq!(parsed.exec_start, "/usr/bin/web-server --config /etc/web.conf");
+        assert_eq!(parsed.watchdog_sec, 15);
+        assert!(parsed.hardening_profile.no_new_privileges);
+        assert_eq!(parsed.hardening_profile.protect_system, ProtectSystemLevel::Strict);
+        assert_eq!(parsed.hardening_profile.protect_home, ProtectHomeLevel::ReadOnly);
+        assert!(parsed.hardening_profile.private_tmp);
+        assert!(parsed.hardening_profile.memory_deny_write_execute);
+        assert_eq!(parsed.hardening_profile.pledge_promises, "stdio rpath wpath inet");
+        assert_eq!(parsed.hardening_profile.unveil_paths.len(), 1);
+        assert_eq!(parsed.environment, vec![("PORT".to_string(), "8080".to_string())]);
     }
 }

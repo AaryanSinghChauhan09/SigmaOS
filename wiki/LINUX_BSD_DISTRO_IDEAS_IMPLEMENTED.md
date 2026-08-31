@@ -105,7 +105,10 @@ SigmaOS absorbs the best architectural decisions from leading Linux distribution
 
 ### Fedora/RHEL Inspirations
 - **SELinux-style policy**: `src/kernel/policy_mechanism.rs`
-- **systemd-inspired init**: `src/init/` service management
+- **systemd-inspired init**: `src/init/systemd_init.rs` - Extended unit parser, `systemd-analyze security` auditor (`SystemdSecurityAuditor`, `SystemdUnitHardeningProfile`), `systemd-analyze critical-chain` boot bottleneck analyzer, `Requisite` dependency cascades, `OnFailure` triggers, `.socket`/`.timer` configs, and multi-init bridge for OpenRC, runit, and BSD `rc.d` scripts.
+
+### GNOME / GTK & Linux Mint Inspirations
+- **GTK3/GTK4 UI Toolkit**: `src/ui/toolkit.rs` - Client-Side Decoration HeaderBar (`GtkHeaderBar`), flex box layout container (`GtkBox`), CSS style context and pseudo-selectors (`GtkStyleContext`), GLib signal dispatcher (`GtkSignalDispatcher`), AT-SPI accessibility roles (`GtkAccessibilityRole`), and HiDPI scaling metrics (`GtkDisplayMetrics`).
 
 ### Debian Inspirations
 - **apt-style package format**: `src/package/universal.rs` universal package format

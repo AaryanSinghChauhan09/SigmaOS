@@ -1,6 +1,44 @@
 # 🗺️ SigmaOS Strategic Roadmap Overlay (2026 — 2029)
 
-This roadmap documents our short-term, mid-term, and long-term milestones. It charts how SigmaOS expands from a capability-gated microkernel into the ultimate sovereign OS ecosystem.
+This roadmap documents our short-term, mid-term, and long-term milestones. It charts how SigmaOS expands from a capability-gated microkernel into the ultimate sovereign OS ecosystem, mapping dependencies across kernel, filesystem, security, and UX development.
+
+---
+
+## 📊 SigmaOS Feature Scorecard
+
+| Feature | Dependency | Quarterly KPI | Status |
+|----------------|----------------|----------------|----------------|
+| Kernel Hybrid | Foundation for scheduler, FS, security | Boot stability ≥ 95% | 🔴 Pending |
+| Transactional FS | Requires kernel stability | Rollback success ≥ 99% | 🟠 In progress |
+| Adaptive Scheduler | Depends on kernel hybrid | Latency < 10ms | 🔴 Pending |
+| Visual Sandbox GUI | Needs FS + kernel hooks | Policy adoption ≥ 80% | 🟠 Prototype |
+| Unified Firewall Dashboard | Requires networking stack | Rule accuracy ≥ 99% | 🔴 Pending |
+| Native Containers | Needs scheduler + FS | Launch time < 2s | 🔴 Pending |
+| Zenith Overlays | Independent, but benefits from FS rollback | Stability ≥ 95% uptime | 🟠 Early design |
+| Compliance Handbook | Parallel to all features | Coverage ≥ 90% | 🟢 Drafting |
+
+---
+
+## 📅 Roadmap Overlay (Dependencies)
+
+- **Quarter 1–2 (Foundation)**
+  - Kernel hybrid → Transactional FS → Compliance handbook baseline.
+
+- **Quarter 3–4 (Expansion)**
+  - Adaptive scheduler → Visual sandbox GUI → Unified firewall dashboard.
+
+- **Quarter 5–6 (Differentiation)**
+  - Native containers → Zenith overlays → Distributed FS overlay.
+
+---
+
+## 🌟 Strategic Flow
+
+- **Kernel hybrid is the backbone** → unlocks scheduler + FS.
+- **Transactional FS ensures resilience** → supports sandboxing + rollback.
+- **Security overlays (sandbox + firewall)** → compliance differentiator.
+- **UX overlays (Zenith)** → user adoption driver.
+- **Docs run parallel** → ensure community + compliance visibility.
 
 ---
 
