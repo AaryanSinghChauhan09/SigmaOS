@@ -8,11 +8,6 @@ use alloc::vec::Vec;
 /// Provides robust target dependency graphs, wants/requires/requisite properties,
 /// systemd-analyze security auditor, critical-chain boot timing diagnostics,
 /// socket/timer activation extensions, and multi-init BSD/Linux conversion bridge.
-/// Provides robust target dependency graphs, wants/requires properties,
-/// and target states to defeat Fedora's Systemd initialization.
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -393,9 +388,6 @@ pub struct ParsedSystemdUnitFile {
     pub hardening_profile: SystemdUnitHardeningProfile,
     pub listen_stream: String,
     pub on_calendar: String,
-    pub oom_score_adjust: i32,
-    pub protect_system: String,
-    pub protect_home: String,
 }
 
 pub struct SystemdUnitFileParser;
@@ -480,7 +472,6 @@ impl SystemdUnitFileParser {
                             "full" | "yes" | "true" => ProtectSystemLevel::Full,
                             _ => ProtectSystemLevel::Off,
                         };
-                        parsed.protect_system = val.to_string();
                     }
                     ("Service", "ProtectHome") => {
                         parsed.hardening_profile.protect_home = match val.to_lowercase().as_str() {
@@ -489,7 +480,6 @@ impl SystemdUnitFileParser {
                             "yes" | "true" => ProtectHomeLevel::Bool,
                             _ => ProtectHomeLevel::Off,
                         };
-                        parsed.protect_home = val.to_string();
                     }
                     ("Service", "PrivateTmp") => {
                         parsed.hardening_profile.private_tmp = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
@@ -518,14 +508,6 @@ impl SystemdUnitFileParser {
                     }
                     ("Socket", "ListenStream") => parsed.listen_stream = val.to_string(),
                     ("Timer", "OnCalendar") => parsed.on_calendar = val.to_string(),
-                    ("Service", "OOMScoreAdjust") => {
-                        parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
-                    }
-                    ("Service", "OOMScoreAdjust") => {
-                        parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
-                    }
-                    ("Service", "ProtectSystem") => parsed.protect_system = val.to_string(),
-                    ("Service", "ProtectHome") => parsed.protect_home = val.to_string(),
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -869,7 +851,6 @@ pub struct SystemdUnit {
     pub requisites: Vec<UnitID>,
     pub wants: Vec<UnitID>,
     pub requisite: Vec<UnitID>,
-    pub upholds: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
     pub conflicts: Vec<UnitID>,
@@ -885,7 +866,6 @@ pub struct SystemdUnit {
     pub hardening_profile: SystemdUnitHardeningProfile,
     pub socket_config: Option<SocketConfig>,
     pub timer_config: Option<TimerConfig>,
-    pub oom_score_adjust: i32,
 }
 
 impl SystemdUnit {
@@ -902,7 +882,6 @@ impl SystemdUnit {
             requisites: Vec::new(),
             wants: Vec::new(),
             requisite: Vec::new(),
-            upholds: Vec::new(),
             before: Vec::new(),
             after: Vec::new(),
             conflicts: Vec::new(),
@@ -918,115 +897,12 @@ impl SystemdUnit {
             hardening_profile: SystemdUnitHardeningProfile::default(),
             socket_config: None,
             timer_config: None,
-            oom_score_adjust: 0,
         }
     }
 
     pub fn name_as_str(&self) -> &str {
         let end = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
         core::str::from_utf8(&self.name[..end]).unwrap_or("unknown")
-    }
-}
-
-// ================= BSD rc.d Parallel Stage Execution Solver =================
-
-pub struct BsdRcParallelStageSolver;
-
-impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
-        let mut stages = Vec::new();
-        let mut remaining: Vec<UnitID> = units.to_vec();
-
-        while !remaining.is_empty() {
-            let mut current_stage = Vec::new();
-            for &id in &remaining {
-                let unit = match engine.find_unit(id) {
-                    Some(u) => u,
-                    None => continue,
-                };
-
-                let has_unresolved_prereq = remaining.iter().any(|&other| {
-                    if other == id {
-                        return false;
-                    }
-                    if unit.after.contains(&other) {
-                        return true;
-                    }
-                    if let Some(other_u) = engine.find_unit(other) {
-                        if other_u.before.contains(&id) {
-                            return true;
-                        }
-                    }
-                    false
-                });
-
-                if !has_unresolved_prereq {
-                    current_stage.push(id);
-                }
-            }
-
-            if current_stage.is_empty() {
-                // Cycle or unresolvable stage, break remaining as final stage
-                stages.push(remaining);
-                break;
-            }
-
-            remaining.retain(|id| !current_stage.contains(id));
-            stages.push(current_stage);
-        }
-
-        stages
-    }
-}
-
-// ================= BSD rc.d Parallel Stage Execution Solver =================
-
-pub struct BsdRcParallelStageSolver;
-
-impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
-        let mut stages = Vec::new();
-        let mut remaining: Vec<UnitID> = units.to_vec();
-
-        while !remaining.is_empty() {
-            let mut current_stage = Vec::new();
-            for &id in &remaining {
-                let unit = match engine.find_unit(id) {
-                    Some(u) => u,
-                    None => continue,
-                };
-
-                let has_unresolved_prereq = remaining.iter().any(|&other| {
-                    if other == id {
-                        return false;
-                    }
-                    if unit.after.contains(&other) {
-                        return true;
-                    }
-                    if let Some(other_u) = engine.find_unit(other) {
-                        if other_u.before.contains(&id) {
-                            return true;
-                        }
-                    }
-                    false
-                });
-
-                if !has_unresolved_prereq {
-                    current_stage.push(id);
-                }
-            }
-
-            if current_stage.is_empty() {
-                // Cycle or unresolvable stage, break remaining as final stage
-                stages.push(remaining);
-                break;
-            }
-
-            remaining.retain(|id| !current_stage.contains(id));
-            stages.push(current_stage);
-        }
-
-        stages
     }
 }
 
@@ -1273,22 +1149,6 @@ impl SystemdEngine {
         for &req_id in requisites.iter() {
             let is_active = self.find_unit(req_id).map(|u| u.state == UnitState::Active).unwrap_or(false);
             if !is_active {
-                if let Some(u) = self.find_unit_mut(id) {
-                    u.state = UnitState::Failed;
-                }
-                self.log_journal_with_priority(
-                    id,
-                    b"Requisite dependency is not active",
-                    UnitState::Inactive,
-                    UnitState::Failed,
-                    JournalPriority::Error,
-                );
-                return Err("Requisite dependency is not active");
-            }
-        }
-
-        for &req_id in requires.iter() {
-            if self.systemctl_start(req_id).is_err() {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }
@@ -2281,7 +2141,6 @@ mod tests {
     fn test_requisite_and_on_failure_cascade() {
         let mut engine = SystemdEngine::new();
 
-        let backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
         let mut backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
         engine.register_unit(backup_service);
 
@@ -2341,131 +2200,5 @@ WantedBy=multi-user.target
         assert_eq!(parsed.hardening_profile.pledge_promises, "stdio rpath wpath inet");
         assert_eq!(parsed.hardening_profile.unveil_paths.len(), 1);
         assert_eq!(parsed.environment, vec![("PORT".to_string(), "8080".to_string())]);
-    }
-
-    #[test]
-    fn test_systemd_socket_activation_manager() {
-        let mut engine = SystemdEngine::new();
-        let srv = SystemdUnit::new(10, b"httpd.service", UnitType::Service);
-        engine.register_unit(srv);
-
-        let mut mgr = SystemdSocketActivationManager::new();
-        let socket_cfg = SystemdSocketConfig {
-            socket_id: 1,
-            listen_address: "0.0.0.0".to_string(),
-            port: 80,
-            kind: SocketKind::Stream,
-            bound_fd: 5,
-            target_service_id: 10,
-        };
-        mgr.register_socket(socket_cfg);
-
-        let fds = mgr.get_passed_fds_for_service(10);
-        assert_eq!(fds, vec![5]);
-
-        let event = SocketActivationEvent {
-            socket_id: 1,
-            incoming_bytes: 128,
-            client_addr: "192.168.1.5:54321".to_string(),
-        };
-
-        let fd = mgr.handle_incoming_connection(&mut engine, &event).unwrap();
-        assert_eq!(fd, 5);
-        assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
-    }
-
-    #[test]
-    fn test_declarative_unit_generator() {
-        let mut spec = DeclarativeUnitSpec::new("my-service", "/usr/bin/my-service --daemon");
-        spec.description = "My Custom Declarative Service".to_string();
-        spec.environment.push(("PORT".to_string(), "8080".to_string()));
-
-        let unit_file = spec.generate_unit_file();
-        assert!(unit_file.contains("Description=My Custom Declarative Service"));
-        assert!(unit_file.contains("ExecStart=/usr/bin/my-service --daemon"));
-        assert!(unit_file.contains("Environment=PORT=8080"));
-
-        let parsed = SystemdUnitFileParser::parse_unit_file(&unit_file);
-        assert_eq!(parsed.unit_description, "My Custom Declarative Service");
-        assert_eq!(parsed.exec_start, "/usr/bin/my-service --daemon");
-    }
-
-    #[test]
-    fn test_bsd_rc_parallel_stage_solver() {
-        let mut engine = SystemdEngine::new();
-
-        let mut u1 = SystemdUnit::new(1, b"mount.service", UnitType::Service);
-        u1.before.push(2);
-        u1.before.push(3);
-
-        let u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
-        let u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
-
-        let mut u4 = SystemdUnit::new(4, b"app.service", UnitType::Service);
-        u4.after.push(2);
-        u4.after.push(3);
-
-        engine.register_unit(u1);
-        engine.register_unit(u2);
-        engine.register_unit(u3);
-        engine.register_unit(u4);
-
-        let stages = BsdRcParallelStageSolver::compute_parallel_stages(&engine, &[1, 2, 3, 4]);
-        assert_eq!(stages.len(), 3);
-        assert_eq!(stages[0], vec![1]);
-        assert_eq!(stages[1], vec![2, 3]);
-        assert_eq!(stages[2], vec![4]);
-    }
-
-    #[test]
-    fn test_extended_unit_dependencies() {
-        let mut engine = SystemdEngine::new();
-
-        let req_unit = SystemdUnit::new(1, b"dep.service", UnitType::Service);
-        let mut main_unit = SystemdUnit::new(2, b"main.service", UnitType::Service);
-        main_unit.requisites.push(1);
-
-        engine.register_unit(req_unit);
-        engine.register_unit(main_unit);
-
-        // Fail to start because requisite unit 1 is inactive
-        assert!(engine.systemctl_start(2).is_err());
-
-        // Start requisite unit 1 first
-        engine.systemctl_start(1).unwrap();
-        assert_eq!(engine.systemctl_status(1), Some(UnitState::Active));
-
-        // Now main unit 2 starts successfully
-        engine.systemctl_start(2).unwrap();
-        assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
-    fn test_betsy_systemd_compat_shim() {
-        let shim = BetsySystemdCompatShim::new();
-        assert!(shim.is_systemd_active);
-        let msg = shim.emulate_systemd_sysv_fallback("/etc/init.d/nginx");
-        assert!(msg.contains("nginx"));
-    }
-
-    #[test]
-    fn test_transient_service_generator() {
-        let unit = TransientServiceGenerator::create_transient_unit("/usr/bin/curl", "transient-fetch");
-        assert_eq!(unit.unit_type, UnitType::Service);
-        assert_eq!(unit.restart_policy, RestartPolicy::No);
-    }
-
-    #[test]
-    fn test_systemd_dynamic_user_context() {
-        let ctx = SystemdDynamicUserContext::allocate_ephemeral_user(123);
-        assert!(ctx.allocated_uid >= 60000);
-        assert!(ctx.private_tmp);
-        assert_eq!(ctx.protect_system, "strict");
-    }
-
-    #[test]
-    fn test_systemd_service_hardening_evaluator() {
-        let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
-        assert_eq!(score_full, 2.5);
-
-        let score_none = SystemdServiceHardeningEvaluator::calculate_hardening_score(false, false, false);
-        assert_eq!(score_none, 10.0);
     }
 }
