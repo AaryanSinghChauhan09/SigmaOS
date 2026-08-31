@@ -89,7 +89,7 @@ pub use selinux::{
     SecurityRule, SelinuxPermission,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission, UnveilState};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,

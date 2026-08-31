@@ -46,14 +46,12 @@ pub mod vmm_paging;
 pub mod module_loader;
 pub mod performance;
 
-pub use architecture::{
-    AArch64Hal, ArchitectureEngine, HardwareException, InstructionCyclePhase, InterruptClass,
-    IoWaitProfile, Irql, LookasideList, MemoryDescriptorList, Pcb, PoolType as ArchPoolType,
-    ProcessorInitState, RiscV64Hal, SyscallHandler, SystemServiceDescriptorTable, Tcb, X86_64Hal,
-};
+#[allow(ambiguous_glob_reexports)]
+pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
 pub use policy_mechanism::*;
+#[allow(ambiguous_glob_reexports)]
 pub use structures::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -110,8 +108,4 @@ pub use linux_bsd_innovations::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
-    LinuxLandlockLsmRuleEngine, FreeBsdCapsicumEngine, CAP_READ_FLAG, CAP_WRITE_FLAG, CAP_SEEK_FLAG, CAP_MMAP_FLAG,
-    VoidLinuxRunitSupervisor, VoidRunitStage, VoidRunitService,
-    IntelClearLinuxStatelessEngine, CpuIsaMicroarch,
-    OpenSuseSnapperEngine, SnapperSnapshot,
 };

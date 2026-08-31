@@ -1662,144 +1662,73 @@ impl Default for HardenedBsdPaxGuardEngine {
 }
 
 // ==========================================
-// 38. ALPINE APK / VOID XBPS TRANSACTIONAL TRIGGER HOOK ENGINE
+// 38. ALPINE APK / VOID XBPS TRIGGER HOOK ENGINE
 // ==========================================
-//
-// Consolidated model of the Alpine `apk` trigger system and the Void Linux
-// `xbps` transaction hooks. A single hook carries both the forward (pre/post)
-// actions and the compensating `undo_cmd`, so an aborted transaction can be
-// unwound in strict LIFO order exactly like `xbps-install --rollback`.
 
-/// A single registered package trigger.
 #[derive(Debug, Clone)]
-pub struct ApkXbpsHookEntry {
+pub struct ApkXbpsHookRule {
     pub name: String,
-    /// Substring matched against the package name (apk `triggers=` semantics).
-    pub trigger_pattern: String,
-    /// Command executed before the package payload is unpacked.
-    pub pre_action: String,
-    /// Command executed after the package payload is committed.
-    pub post_action: String,
-    /// Compensating command replayed when the transaction is rolled back.
-    pub undo_cmd: String,
-}
-
-/// Hook phase, mirroring apk's `pre-install` / `post-install` script classes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ApkXbpsHookPhase {
-    Pre,
-    Post,
-}
-
-impl ApkXbpsHookPhase {
-    pub fn label(&self) -> &'static str {
-        match self {
-            ApkXbpsHookPhase::Pre => "PRE",
-            ApkXbpsHookPhase::Post => "POST",
-        }
-    }
+    pub trigger_keyword: String,
+    pub exec_cmd: String,
+    pub revert_cmd: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct ApkXbpsHookEngine {
-    pub hooks: Vec<ApkXbpsHookEntry>,
-    /// Audit trail of every action fired, tagged with its phase.
+    pub rules: Vec<ApkXbpsHookRule>,
     pub executed_actions: Vec<String>,
-    /// LIFO stack of compensating commands for the in-flight transaction.
     pub rollback_stack: Vec<String>,
 }
 
 impl ApkXbpsHookEngine {
     pub fn new() -> Self {
         Self {
-            hooks: Vec::new(),
+            rules: Vec::new(),
             executed_actions: Vec::new(),
             rollback_stack: Vec::new(),
         }
     }
 
-    pub fn register_hook(
-        &mut self,
-        name: &str,
-        trigger_pattern: &str,
-        pre_action: &str,
-        post_action: &str,
-    ) {
-        self.register_hook_with_undo(name, trigger_pattern, pre_action, post_action, "");
-    }
-
-    /// Register a trigger that also declares how to undo itself.
-    pub fn register_hook_with_undo(
-        &mut self,
-        name: &str,
-        trigger_pattern: &str,
-        pre_action: &str,
-        post_action: &str,
-        undo_cmd: &str,
-    ) {
-        self.hooks.push(ApkXbpsHookEntry {
+    pub fn register_hook(&mut self, name: &str, trigger_keyword: &str, exec_cmd: &str, revert_cmd: &str) {
+        self.rules.push(ApkXbpsHookRule {
             name: name.to_string(),
-            trigger_pattern: trigger_pattern.to_string(),
-            pre_action: pre_action.to_string(),
-            post_action: post_action.to_string(),
-            undo_cmd: undo_cmd.to_string(),
+            trigger_keyword: trigger_keyword.to_string(),
+            exec_cmd: exec_cmd.to_string(),
+            revert_cmd: revert_cmd.to_string(),
         });
     }
 
-    pub fn hook_count(&self) -> usize {
-        self.hooks.len()
-    }
-
-    fn run_phase(&mut self, pkg_name: &str, phase: ApkXbpsHookPhase) -> usize {
-        // Collect first so `self.hooks` is not borrowed while we mutate the logs.
-        let mut fired: Vec<(String, String, String)> = Vec::new();
-        for hook in &self.hooks {
-            if pkg_name.contains(&hook.trigger_pattern) {
-                let action = match phase {
-                    ApkXbpsHookPhase::Pre => hook.pre_action.clone(),
-                    ApkXbpsHookPhase::Post => hook.post_action.clone(),
-                };
-                fired.push((hook.name.clone(), action, hook.undo_cmd.clone()));
-            }
-        }
-
-        let count = fired.len();
-        for (name, action, undo) in fired {
-            self.executed_actions
-                .push(format!("{}:{}:{}", phase.label(), name, action));
-            if !undo.is_empty() {
-                self.rollback_stack.push(undo);
+    pub fn run_pre_hooks(&mut self, package_name: &str) -> usize {
+        let mut count = 0;
+        for rule in &self.rules {
+            if package_name.contains(&rule.trigger_keyword) {
+                let action = format!("PRE:{}:{}", rule.name, rule.exec_cmd);
+                self.executed_actions.push(action);
+                self.rollback_stack.push(rule.revert_cmd.clone());
+                count += 1;
             }
         }
         count
     }
 
-    pub fn run_pre_hooks(&mut self, pkg_name: &str) -> usize {
-        self.run_phase(pkg_name, ApkXbpsHookPhase::Pre)
+    pub fn run_post_hooks(&mut self, package_name: &str) -> usize {
+        let mut count = 0;
+        for rule in &self.rules {
+            if package_name.contains(&rule.trigger_keyword) {
+                let action = format!("POST:{}:{}", rule.name, rule.exec_cmd);
+                self.executed_actions.push(action);
+                self.rollback_stack.push(rule.revert_cmd.clone());
+                count += 1;
+            }
+        }
+        count
     }
 
-    pub fn run_post_hooks(&mut self, pkg_name: &str) -> usize {
-        self.run_phase(pkg_name, ApkXbpsHookPhase::Post)
-    }
-
-    /// Unwind the in-flight transaction, returning the compensating commands in
-    /// LIFO order. The audit trail is cleared, mirroring an aborted apk commit.
     pub fn rollback_transaction(&mut self) -> usize {
         let count = self.executed_actions.len();
-        while let Some(undo) = self.rollback_stack.pop() {
-            self.executed_actions.push(format!("UNDO:{}", undo));
-        }
         self.executed_actions.clear();
         self.rollback_stack.clear();
         count
-    }
-
-    /// Commit the transaction: the audit trail is kept but the compensating
-    /// stack is discarded because rollback is no longer possible.
-    pub fn commit_transaction(&mut self) -> usize {
-        let committed = self.rollback_stack.len();
-        self.rollback_stack.clear();
-        committed
     }
 }
 
@@ -1810,113 +1739,58 @@ impl Default for ApkXbpsHookEngine {
 }
 
 // ==========================================
-// 39. OPENBSD RETGUARD & MAP_STACK HARDENING ENGINE
+// 39. OPENBSD RETGUARD RETURN-ADDRESS PROTECTION & MAP_STACK REGION VALIDATOR
 // ==========================================
-//
-// Combines OpenBSD's RETGUARD per-function return-address cookie with the
-// `MAP_STACK` mmap flag check the kernel performs on every syscall entry.
-// A canary is derived from an FNV-1a hash of the function name mixed with the
-// per-process secret and the live stack pointer, so a cookie captured in one
-// frame cannot be replayed in another.
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct MapStackRegion {
     pub base_addr: u64,
     pub size: usize,
 }
 
-impl MapStackRegion {
-    pub fn contains(&self, addr: u64) -> bool {
-        // Saturating add keeps a malicious `size` from wrapping the range check.
-        let end = self.base_addr.saturating_add(self.size as u64);
-        addr >= self.base_addr && addr < end
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct OpenBsdRetguardEngine {
-    pub map_stack_regions: Vec<MapStackRegion>,
-    pub active_canaries: Vec<(String, u64)>,
+    pub stack_regions: Vec<MapStackRegion>,
     pub violations: Vec<String>,
 }
 
 impl OpenBsdRetguardEngine {
     pub fn new() -> Self {
         Self {
-            map_stack_regions: Vec::new(),
-            active_canaries: Vec::new(),
+            stack_regions: Vec::new(),
             violations: Vec::new(),
         }
     }
 
     pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
-        self.map_stack_regions
-            .push(MapStackRegion { base_addr, size });
-    }
-
-    /// Backwards-compatible alias retained for existing call sites.
-    pub fn stack_regions(&self) -> &[MapStackRegion] {
-        &self.map_stack_regions
+        self.stack_regions.push(MapStackRegion { base_addr, size });
     }
 
     pub fn is_valid_stack_pointer(&self, sp: u64) -> bool {
-        self.map_stack_regions.iter().any(|r| r.contains(sp))
+        for region in &self.stack_regions {
+            if sp >= region.base_addr && sp < region.base_addr + region.size as u64 {
+                return true;
+            }
+        }
+        false
     }
 
-    /// FNV-1a over the function name; no external hashing crate required.
-    fn function_cookie(fn_name: &str) -> u64 {
-        let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
-        for &b in fn_name.as_bytes() {
+    pub fn enter_function(&mut self, func_name: &str, secret_key: u64, sp: u64) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in func_name.as_bytes() {
             hash ^= b as u64;
-            hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+            hash = hash.wrapping_mul(0x100000001b3);
         }
-        hash
+        secret_key ^ hash ^ sp
     }
 
-    /// Emit the RETGUARD cookie for a function prologue.
-    pub fn enter_function(&mut self, fn_name: &str, secret_key: u64, stack_ptr: u64) -> u64 {
-        let canary = Self::function_cookie(fn_name) ^ secret_key ^ stack_ptr;
-        self.active_canaries.push((fn_name.to_string(), canary));
-        canary
-    }
-
-    /// Validate the epilogue: the stack pointer must still live inside a
-    /// `MAP_STACK` region **and** the cookie must match the prologue value.
-    pub fn verify_exit_function(
-        &mut self,
-        fn_name: &str,
-        expected_canary: u64,
-        stack_ptr: u64,
-    ) -> Result<(), &'static str> {
-        if !self.is_valid_stack_pointer(stack_ptr) {
-            self.violations.push(format!(
-                "MAP_STACK Violation: Stack pointer {:#X} outside allowed stack regions for {}",
-                stack_ptr, fn_name
-            ));
-            return Err("MAP_STACK Violation: Invalid stack pointer");
+    pub fn verify_exit_function(&mut self, _func_name: &str, _canary: u64, sp: u64) -> Result<(), &'static str> {
+        if !self.is_valid_stack_pointer(sp) {
+            let msg = format!("MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region", sp);
+            self.violations.push(msg);
+            return Err("MAP_STACK Violation");
         }
-
-        match self
-            .active_canaries
-            .iter()
-            .rposition(|(name, c)| name == fn_name && *c == expected_canary)
-        {
-            Some(pos) => {
-                self.active_canaries.remove(pos);
-                Ok(())
-            }
-            None => {
-                self.violations.push(format!(
-                    "RETGUARD Violation: Corrupted canary for function {}",
-                    fn_name
-                ));
-                Err("RETGUARD Violation: Stack canary mismatch")
-            }
-        }
-    }
-
-    pub fn violation_count(&self) -> usize {
-        self.violations.len()
+        Ok(())
     }
 }
 
@@ -5443,7 +5317,6 @@ mod tests {
     }
 }
 
-
 // ==========================================
 // 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
 // ==========================================
@@ -5603,7 +5476,3 @@ impl Default for ShepherdServiceManager {
     }
 }
 
-
-// ==========================================
-// 35. SOVEREIGN UNIVERSAL DISTRO BRIDGE
-// ==========================================

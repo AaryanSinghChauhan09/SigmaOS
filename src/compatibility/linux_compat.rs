@@ -88,11 +88,12 @@ pub struct BsdKevent {
     pub filter: BsdKqueueFilter,
     pub flags: u16,
     pub fflags: u32,
-    pub data: IntPtrT,
+    pub data: intptr_t,
     pub udata: u64,
 }
 
-type IntPtrT = isize;
+#[allow(non_camel_case_types)]
+type intptr_t = isize;
 
 /// FreeBSD-inspired kqueue Event Multiplexer
 pub struct BsdKqueueMultiplexer {

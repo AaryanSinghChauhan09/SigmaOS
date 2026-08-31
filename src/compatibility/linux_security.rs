@@ -29,6 +29,7 @@ use alloc::format;
 
 /// Linux capability (capability-based security)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum LinuxCapability {
     CapChown,
     CapDacOverride,

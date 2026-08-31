@@ -3,7 +3,7 @@
 pub mod math_plotter;
 pub mod toolkit;
 pub mod control_center;
-pub mod gtk;
+pub mod folder_color;
 
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
@@ -13,9 +13,6 @@ pub use toolkit::{
 pub use control_center::{
     UnifiedControlCenter, SwitchboardPlug, ControlCenterCategory, SystemSettingItem,
 };
-pub use gtk::{
-    AdwNavigationSplitView, AdwPreferenceRow, AdwPreferencesEngine, AdwPreferencesGroup,
-    AdwPreferencesPage, BsdGtkSandboxGuard, GtkAccentColor, GtkCssProvider, GtkHeaderBar,
-    GtkThemeMode, GtkToast, GtkToastOverlay, HeaderBarAction, SovereignGtkToolkitEngine,
-    WindowControlLayout, XAppStatusIcon, XAppStatusIconManager,
+pub use folder_color::{
+    FolderColor, FolderColorSwitcherEngine, FolderCustomization, FolderEmblem,
 };

@@ -180,6 +180,7 @@ impl BootManager for CorebootBoot {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum DriverEra {
     EraLinux2_4,
     EraLinux2_6,

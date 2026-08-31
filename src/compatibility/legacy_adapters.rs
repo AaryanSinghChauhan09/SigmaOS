@@ -165,6 +165,7 @@ pub enum LibcVersion {
 
 /// Syscall Application Binary Interfaces
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum SyscallAbi {
     Oabi32,
     Eabi32,

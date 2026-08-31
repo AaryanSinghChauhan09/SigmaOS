@@ -1,7 +1,8 @@
+extern crate core;
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
-extern crate alloc;
 // SigmaOS Microkernel Shard & Domain Isolation (Qubes OS & Kata Containers Parity)
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.

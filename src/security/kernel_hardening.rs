@@ -9,9 +9,7 @@
 //! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
 extern crate alloc;
 
-// Sovereign collections: klib's own HashMap/Vec, not alloc::collections.
 use crate::klib::{HashMap, Vec};
-
 use alloc::string::{String, ToString};
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};

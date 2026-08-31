@@ -1005,6 +1005,7 @@ impl CachyCpuDetector {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum CpuArchLevel {
     X86_64V1,
     X86_64V2,

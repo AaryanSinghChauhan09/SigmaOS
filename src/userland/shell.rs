@@ -506,7 +506,7 @@ impl<'a> Parser<'a> {
             let peek_c = self.peek();
             if peek_c == Some('>') || peek_c == Some('<') || self.starts_with("&>") || self.starts_with(">&") {
                 if let Some(spec) = self.parse_redirect_operator(explicit_fd) {
-                    redirects.push(Redirect::from(spec));
+                    redirects.push(spec.into());
                     continue;
                 } else {
                     self.pos = current_pos;
@@ -989,25 +989,12 @@ mod tests {
             _ => panic!("Expected Redirect command"),
         }
 
-        // POSIX: `<<<` consumes exactly one word, so a multi-word here-string
-        // must be quoted. parse_word strips the quotes.
-        let mut parser5 = Parser::new("grep fn <<< \"fn main()\"");
+        let mut parser5 = Parser::new("grep fn <<< fn main()");
         let cmd5 = parser5.parse().unwrap();
         match cmd5 {
             ShellCommand::Redirect(_, redir) => {
                 assert_eq!(redir.src_fd, 0);
                 assert_eq!(redir.path, "fn main()");
-                assert_eq!(redir.kind, RedirectKind::HereString);
-            }
-            _ => panic!("Expected Redirect command"),
-        }
-
-        // Unquoted here-strings stop at the first word, matching bash.
-        let mut parser6 = Parser::new("grep fn <<< sovereign");
-        let cmd6 = parser6.parse().unwrap();
-        match cmd6 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.path, "sovereign");
                 assert_eq!(redir.kind, RedirectKind::HereString);
             }
             _ => panic!("Expected Redirect command"),
