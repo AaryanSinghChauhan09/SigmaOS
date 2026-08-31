@@ -184,6 +184,7 @@ pub enum CapsicumRight {
     CapFstat = 1 << 3,
 }
 
+#[derive(Debug, Clone)]
 pub struct OpenBsdHardenedCapsicumPledge {
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
@@ -469,6 +470,245 @@ impl Default for SovereignPqcWireguardVpnEngine {
     }
 }
 
+/// 7. SovereignEbpfSchedExtEngine (Linux 6.12+ Dynamic BPF Schedulers)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedExtPolicy {
+    BpfBfc,            // First-Come-First-Served minimal latency
+    BpfL3Cell,          // L3 Cache awareness NUMA topology
+    BpfGamingBoost,     // Frame-pacing and anti-stutter priority
+    BpfServerThroughput,// Throughput-oriented batch execution
+}
+
+pub struct SovereignEbpfSchedExtEngine {
+    pub active_policy: SchedExtPolicy,
+    pub loaded_bpf_programs: Vec<String>,
+    pub policy_switches_count: u64,
+}
+
+impl SovereignEbpfSchedExtEngine {
+    pub fn new() -> Self {
+        Self {
+            active_policy: SchedExtPolicy::BpfL3Cell,
+            loaded_bpf_programs: vec!["scx_l3cell.bpf.o".to_string()],
+            policy_switches_count: 0,
+        }
+    }
+
+    pub fn load_and_switch_policy(&mut self, policy: SchedExtPolicy) -> Result<&'static str, String> {
+        let prog_name = match policy {
+            SchedExtPolicy::BpfBfc => "scx_bfc.bpf.o",
+            SchedExtPolicy::BpfL3Cell => "scx_l3cell.bpf.o",
+            SchedExtPolicy::BpfGamingBoost => "scx_gaming.bpf.o",
+            SchedExtPolicy::BpfServerThroughput => "scx_server.bpf.o",
+        };
+
+        if !self.loaded_bpf_programs.iter().any(|p| p == prog_name) {
+            self.loaded_bpf_programs.push(prog_name.to_string());
+        }
+
+        self.active_policy = policy;
+        self.policy_switches_count += 1;
+
+        match policy {
+            SchedExtPolicy::BpfBfc => Ok("Switched to scx_bfc (First-Come-First-Served eBPF Scheduler)"),
+            SchedExtPolicy::BpfL3Cell => Ok("Switched to scx_l3cell (L3 Cache NUMA eBPF Scheduler)"),
+            SchedExtPolicy::BpfGamingBoost => Ok("Switched to scx_gaming (Low-Jitter Frame Pacing eBPF Scheduler)"),
+            SchedExtPolicy::BpfServerThroughput => Ok("Switched to scx_server (Maximum Throughput eBPF Scheduler)"),
+        }
+    }
+}
+
+impl Default for SovereignEbpfSchedExtEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 8. SovereignImmutableRootfsEngine (SteamOS / Silverblue / Flatcar Atomic A/B Pivots)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootSlot {
+    SlotA,
+    SlotB,
+}
+
+#[derive(Debug, Clone)]
+pub struct RootfsSlotState {
+    pub slot: BootSlot,
+    pub image_version: String,
+    pub sha256_checksum: String,
+    pub is_valid: bool,
+    pub is_read_only: bool,
+}
+
+pub struct SovereignImmutableRootfsEngine {
+    pub active_slot: BootSlot,
+    pub slots: BTreeMap<String, RootfsSlotState>, // "SlotA" / "SlotB"
+    pub staged_update_version: Option<String>,
+}
+
+impl SovereignImmutableRootfsEngine {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(
+            "SlotA".to_string(),
+            RootfsSlotState {
+                slot: BootSlot::SlotA,
+                image_version: "1.0.0".to_string(),
+                sha256_checksum: "sha256_rootfs_v100_slot_a".to_string(),
+                is_valid: true,
+                is_read_only: true,
+            },
+        );
+        map.insert(
+            "SlotB".to_string(),
+            RootfsSlotState {
+                slot: BootSlot::SlotB,
+                image_version: "1.0.0".to_string(),
+                sha256_checksum: "sha256_rootfs_v100_slot_b".to_string(),
+                is_valid: true,
+                is_read_only: true,
+            },
+        );
+
+        Self {
+            active_slot: BootSlot::SlotA,
+            slots: map,
+            staged_update_version: None,
+        }
+    }
+
+    pub fn stage_update(&mut self, target_version: &str, checksum: &str) -> Result<BootSlot, String> {
+        let inactive_key = match self.active_slot {
+            BootSlot::SlotA => "SlotB",
+            BootSlot::SlotB => "SlotA",
+        };
+
+        if let Some(slot_state) = self.slots.get_mut(inactive_key) {
+            slot_state.image_version = target_version.to_string();
+            slot_state.sha256_checksum = checksum.to_string();
+            slot_state.is_valid = true;
+            slot_state.is_read_only = true;
+            self.staged_update_version = Some(target_version.to_string());
+            Ok(slot_state.slot)
+        } else {
+            Err("Failed to locate inactive slot for update".to_string())
+        }
+    }
+
+    pub fn commit_pivot_boot_slot(&mut self) -> Result<BootSlot, String> {
+        let inactive_key = match self.active_slot {
+            BootSlot::SlotA => "SlotB",
+            BootSlot::SlotB => "SlotA",
+        };
+
+        let is_valid = self.slots.get(inactive_key).map(|s| s.is_valid).unwrap_or(false);
+        if !is_valid {
+            return Err("Target slot is invalid or not verified".to_string());
+        }
+
+        self.active_slot = match self.active_slot {
+            BootSlot::SlotA => BootSlot::SlotB,
+            BootSlot::SlotB => BootSlot::SlotA,
+        };
+
+        Ok(self.active_slot)
+    }
+
+    pub fn rollback_slot(&mut self) -> BootSlot {
+        self.active_slot = match self.active_slot {
+            BootSlot::SlotA => BootSlot::SlotB,
+            BootSlot::SlotB => BootSlot::SlotA,
+        };
+        self.active_slot
+    }
+}
+
+impl Default for SovereignImmutableRootfsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 9. SovereignZeroTrustMicrovmContainerEngine (Qubes / Kata Container Isolation)
+#[derive(Debug, Clone)]
+pub struct MicrovmContainer {
+    pub container_id: String,
+    pub app_name: String,
+    pub pledge_caps: OpenBsdHardenedCapsicumPledge,
+    pub memory_limit_mb: u64,
+    pub is_running: bool,
+}
+
+pub struct SovereignZeroTrustMicrovmContainerEngine {
+    pub containers: BTreeMap<String, MicrovmContainer>,
+    pub hypervisor_gateway: SovereignMicrovmHypervisorGateway,
+}
+
+impl SovereignZeroTrustMicrovmContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            containers: BTreeMap::new(),
+            hypervisor_gateway: SovereignMicrovmHypervisorGateway::new(),
+        }
+    }
+
+    pub fn create_zero_trust_container(
+        &mut self,
+        container_id: &str,
+        app_name: &str,
+        memory_limit_mb: u64,
+        pledges: &[&str],
+        unveil_paths: &[(&str, &str)],
+    ) -> String {
+        let mut pledge_caps = OpenBsdHardenedCapsicumPledge::new();
+        pledge_caps.pledge(pledges);
+        for (path, perm) in unveil_paths {
+            pledge_caps.unveil(path, perm);
+        }
+
+        let container = MicrovmContainer {
+            container_id: container_id.to_string(),
+            app_name: app_name.to_string(),
+            pledge_caps,
+            memory_limit_mb,
+            is_running: false,
+        };
+
+        self.containers.insert(container_id.to_string(), container);
+        container_id.to_string()
+    }
+
+    pub fn start_container(&mut self, container_id: &str) -> Result<u64, String> {
+        let container = self.containers.get_mut(container_id).ok_or_else(|| format!("Container {} not found", container_id))?;
+        let vm_id = self.hypervisor_gateway.launch_microvm(
+            &container.app_name,
+            2,
+            container.memory_limit_mb,
+            "tap0",
+            "/dev/vda",
+        );
+        container.is_running = true;
+        Ok(vm_id)
+    }
+
+    pub fn authorize_container_syscall(&self, container_id: &str, promise: &str, path: Option<&str>) -> bool {
+        if let Some(container) = self.containers.get(container_id) {
+            if !container.is_running {
+                return false;
+            }
+            container.pledge_caps.authorize_syscall(promise, path, None)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignZeroTrustMicrovmContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Sovereign Distro Dominance Master Engine
 pub struct SovereignDistroDominanceSuite {
     pub nix_store: NixGuixZeroCopyStore,
@@ -477,6 +717,9 @@ pub struct SovereignDistroDominanceSuite {
     pub filesystem_cow: ZfsBtrfsHybridSelfHealingCoW,
     pub microvm_gateway: SovereignMicrovmHypervisorGateway,
     pub pqc_vpn: SovereignPqcWireguardVpnEngine,
+    pub sched_ext: SovereignEbpfSchedExtEngine,
+    pub immutable_rootfs: SovereignImmutableRootfsEngine,
+    pub zero_trust_containers: SovereignZeroTrustMicrovmContainerEngine,
 }
 
 impl SovereignDistroDominanceSuite {
@@ -488,6 +731,9 @@ impl SovereignDistroDominanceSuite {
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
+            sched_ext: SovereignEbpfSchedExtEngine::new(),
+            immutable_rootfs: SovereignImmutableRootfsEngine::new(),
+            zero_trust_containers: SovereignZeroTrustMicrovmContainerEngine::new(),
         }
     }
 }
@@ -583,5 +829,54 @@ mod tests {
         let healed = fs.verify_and_self_heal("@root", "/var/log/syslog", b"system initialized").unwrap();
         assert!(healed);
         assert_eq!(fs.total_self_healing_corrections, 1);
+    }
+
+    #[test]
+    fn test_sovereign_ebpf_sched_ext_engine() {
+        let mut engine = SovereignEbpfSchedExtEngine::new();
+        assert_eq!(engine.active_policy, SchedExtPolicy::BpfL3Cell);
+
+        let res = engine.load_and_switch_policy(SchedExtPolicy::BpfGamingBoost).unwrap();
+        assert!(res.contains("scx_gaming"));
+        assert_eq!(engine.active_policy, SchedExtPolicy::BpfGamingBoost);
+        assert_eq!(engine.policy_switches_count, 1);
+        assert!(engine.loaded_bpf_programs.contains(&"scx_gaming.bpf.o".to_string()));
+    }
+
+    #[test]
+    fn test_sovereign_immutable_rootfs_engine() {
+        let mut rootfs = SovereignImmutableRootfsEngine::new();
+        assert_eq!(rootfs.active_slot, BootSlot::SlotA);
+
+        let staged = rootfs.stage_update("2.0.0", "sha256_v200").unwrap();
+        assert_eq!(staged, BootSlot::SlotB);
+
+        let pivoted = rootfs.commit_pivot_boot_slot().unwrap();
+        assert_eq!(pivoted, BootSlot::SlotB);
+        assert_eq!(rootfs.active_slot, BootSlot::SlotB);
+
+        let rolled_back = rootfs.rollback_slot();
+        assert_eq!(rolled_back, BootSlot::SlotA);
+        assert_eq!(rootfs.active_slot, BootSlot::SlotA);
+    }
+
+    #[test]
+    fn test_sovereign_zero_trust_microvm_container_engine() {
+        let mut engine = SovereignZeroTrustMicrovmContainerEngine::new();
+        let cid = engine.create_zero_trust_container(
+            "banking-app-container",
+            "SovereignVaultApp",
+            512,
+            &["stdio", "rpath"],
+            &[("/etc/ssl", "r")],
+        );
+        assert_eq!(cid, "banking-app-container");
+
+        let vm_id = engine.start_container("banking-app-container").unwrap();
+        assert_eq!(vm_id, 1);
+
+        assert!(engine.authorize_container_syscall("banking-app-container", "stdio", None));
+        assert!(engine.authorize_container_syscall("banking-app-container", "rpath", Some("/etc/ssl")));
+        assert!(!engine.authorize_container_syscall("banking-app-container", "exec", None));
     }
 }
