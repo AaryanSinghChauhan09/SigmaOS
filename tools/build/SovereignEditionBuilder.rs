@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, static_mut_refs, clippy::all)]
 
 // SigmaOS: SovereignEditionBuilder.rs
 // Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

@@ -4,8 +4,6 @@ use alloc::vec;
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-
-
 extern crate alloc;
 use alloc::string::String;
 use core::fmt::Write;

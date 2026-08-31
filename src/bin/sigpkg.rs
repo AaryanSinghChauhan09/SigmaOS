@@ -5,11 +5,11 @@
 
 use std::process::exit;
 
-use sigmaos::sigpkg::{
-    ContentAddressedStore, CryptoVerifier, Package, SigpkgDaemon, SovereignPackageSnapshotRollbackEngine,
-    Version,
-};
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
+use sigmaos::sigpkg::{
+    ContentAddressedStore, CryptoVerifier, Package, SigpkgDaemon,
+    SovereignPackageSnapshotRollbackEngine, Version,
+};
 
 fn usage() -> ! {
     eprintln!(
@@ -116,14 +116,13 @@ fn cmd_search(args: &[String]) {
     match store.get(name) {
         Some(pkg) => {
             for dep in &pkg.dependencies {
-                println!("{} {}", dep.name, describe_constraint(&dep.version_constraint));
+                println!(
+                    "{} {}",
+                    dep.name,
+                    describe_constraint(&dep.version_constraint)
+                );
             }
-            println!(
-                "{} {} — {}",
-                pkg.name,
-                pkg.version,
-                pkg.description
-            );
+            println!("{} {} — {}", pkg.name, pkg.version, pkg.description);
             println!("  checksum: {}", pkg.checksum);
             for mirror in &pkg.mirrors {
                 println!("  mirror:   {}", mirror);
@@ -231,7 +230,10 @@ fn cmd_mirror(args: &[String]) {
         exit(2);
     }
     let mut manager = RepositoryManager::new();
-    manager.add_repository(Repository::new(&args[1], "https://mirror.sigmaos.dev/sigma"));
+    manager.add_repository(Repository::new(
+        &args[1],
+        "https://mirror.sigmaos.dev/sigma",
+    ));
     match manager.select_best_mirror(&args[1]) {
         Ok(best) => {
             println!("Best mirror for {}: {}", args[1], best);

@@ -1,6 +1,6 @@
-use alloc::vec;
 use alloc::boxed::Box;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 
 use alloc::string::String;

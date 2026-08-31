@@ -440,7 +440,6 @@ mod tests {
         assert_eq!(sys.modules.as_slice()[0].optimized_latency_ticks, 150);
     }
 
-
     #[test]
     fn test_adaptive_sudo() {
         let mut sudo = AdaptiveRoot::new();

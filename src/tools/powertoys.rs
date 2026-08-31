@@ -1,5 +1,3 @@
-use alloc::string::{String, ToString};
-use alloc::format;
 //! Sovereign Microsoft PowerToys replication suite for SigmaOS
 //! Implements a rich suite of system and workspace utilities:
 //! - ColorPicker (HEX / RGB screen color inspector)
@@ -8,7 +6,9 @@ use alloc::format;
 //! - FileLocksmith (Tracks active process IDs holding file descriptor locks)
 //! - HostsEditor (IP lookup hosts custom DNS routing rule editor)
 
-use crate::klib::{Vec, BTreeMap};
+use crate::klib::{BTreeMap, Vec};
+use alloc::format;
+use alloc::string::{String, ToString};
 
 pub struct ColorPicker;
 
@@ -89,6 +89,14 @@ impl FancyZones {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CaseOption {
+    None,
+    LowerCase,
+    UpperCase,
+    TitleCase,
+}
+
 pub struct PowerRename;
 
 impl PowerRename {
@@ -97,7 +105,12 @@ impl PowerRename {
     }
 
     /// Performs bulk rename substitutions on matching name patterns
-    pub fn rename_files(&self, filenames: &mut Vec<[u8; 32]>, search_pattern: &[u8], replace_pattern: &[u8]) {
+    pub fn rename_files(
+        &self,
+        filenames: &mut Vec<[u8; 32]>,
+        search_pattern: &[u8],
+        replace_pattern: &[u8],
+    ) {
         for i in 0..filenames.len() {
             let mut name = filenames[i];
             // Simple byte substring replacement (standard Linux/Windows PowerRename match logic)
@@ -112,11 +125,67 @@ impl PowerRename {
                 let after_pos = pos + search_pattern.len();
                 if after_pos < 32 {
                     let rem_len = (32 - (pos + r_len)).min(32 - after_pos);
-                    new_name[pos + r_len..pos + r_len + rem_len].copy_from_slice(&name[after_pos..after_pos + rem_len]);
+                    new_name[pos + r_len..pos + r_len + rem_len]
+                        .copy_from_slice(&name[after_pos..after_pos + rem_len]);
                 }
                 filenames[i] = new_name;
             }
         }
+    }
+
+    /// Advanced batch file renaming with case options, counter padding, and collision prevention
+    pub fn rename_files_advanced(
+        &self,
+        filenames: &[String],
+        search: &str,
+        replace: &str,
+        case_opt: CaseOption,
+        add_counter: bool,
+    ) -> Result<Vec<String>, &'static str> {
+        let mut results = Vec::new();
+
+        for (idx, file) in filenames.iter().enumerate() {
+            let mut name = file.replace(search, replace);
+
+            name = match case_opt {
+                CaseOption::None => name,
+                CaseOption::LowerCase => name.to_lowercase(),
+                CaseOption::UpperCase => name.to_uppercase(),
+                CaseOption::TitleCase => {
+                    let mut res = String::new();
+                    let mut cap = true;
+                    for c in name.chars() {
+                        if c.is_whitespace() || c == '_' || c == '-' || c == '.' {
+                            res.push(c);
+                            cap = true;
+                        } else if cap {
+                            for uc in c.to_uppercase() {
+                                res.push(uc);
+                            }
+                            cap = false;
+                        } else {
+                            for lc in c.to_lowercase() {
+                                res.push(lc);
+                            }
+                        }
+                    }
+                    res
+                }
+            };
+
+            if add_counter {
+                let num = idx + 1;
+                name = format!("{}_{:02}", name, num);
+            }
+
+            if results.contains(&name) {
+                return Err("Target filename collision detected in PowerRename batch execution");
+            }
+
+            results.push(name);
+        }
+
+        Ok(results)
     }
 }
 
@@ -169,7 +238,10 @@ impl FileLocksmith {
         } else {
             let mut pids = Vec::new();
             pids.push(pid);
-            self.locks.push(LocksmithRecord { filepath_hash, locking_pids: pids });
+            self.locks.push(LocksmithRecord {
+                filepath_hash,
+                locking_pids: pids,
+            });
         }
     }
 
@@ -199,7 +271,9 @@ pub struct HostsEditor {
 
 impl HostsEditor {
     pub fn new() -> Self {
-        Self { routes: BTreeMap::new() }
+        Self {
+            routes: BTreeMap::new(),
+        }
     }
 
     pub fn add_route(&mut self, domain: &[u8], ip: [u8; 4]) {
@@ -224,7 +298,9 @@ pub struct AlwaysOnTop {
 
 impl AlwaysOnTop {
     pub fn new() -> Self {
-        Self { pinned_pids: Vec::new() }
+        Self {
+            pinned_pids: Vec::new(),
+        }
     }
 
     pub fn toggle_pin(&mut self, pid: usize) -> bool {
@@ -295,10 +371,19 @@ pub struct MouseJump {
 
 impl MouseJump {
     pub fn new() -> Self {
-        Self { current_x: 0, current_y: 0 }
+        Self {
+            current_x: 0,
+            current_y: 0,
+        }
     }
 
-    pub fn jump_to_screen_center(&mut self, screen_x: u32, screen_y: u32, width: u32, height: u32) -> (u32, u32) {
+    pub fn jump_to_screen_center(
+        &mut self,
+        screen_x: u32,
+        screen_y: u32,
+        width: u32,
+        height: u32,
+    ) -> (u32, u32) {
         self.current_x = screen_x + width / 2;
         self.current_y = screen_y + height / 2;
         (self.current_x, self.current_y)
@@ -389,6 +474,14 @@ mod tests {
         toys.power_rename.rename_files(&mut names, b"test", b"prod");
         assert_eq!(&names[0][..8], b"prod_img");
 
+        let files = vec!["raw_photo.png".to_string(), "raw_video.mp4".to_string()];
+        let renamed = toys
+            .power_rename
+            .rename_files_advanced(&files, "raw", "final", CaseOption::TitleCase, true)
+            .unwrap();
+        assert_eq!(renamed[0], "Final_Photo.png_01");
+        assert_eq!(renamed[1], "Final_Video.mp4_02");
+
         // 4. FileLocksmith open process file locks
         toys.locksmith.lock_file(5555, 100);
         toys.locksmith.lock_file(5555, 101);
@@ -405,7 +498,10 @@ mod tests {
         toys.hosts_editor.add_route(b"www.google.com", [8, 8, 8, 8]);
         let ip = toys.hosts_editor.resolve_domain(b"www.google.com").unwrap();
         assert_eq!(ip, [8, 8, 8, 8]);
-        assert!(toys.hosts_editor.resolve_domain(b"www.offline.com").is_none());
+        assert!(toys
+            .hosts_editor
+            .resolve_domain(b"www.offline.com")
+            .is_none());
 
         // 6. AlwaysOnTop window Z-order pinning
         assert!(!toys.always_on_top.is_pinned(404));

@@ -98,8 +98,8 @@ impl SovereignNetconsole {
         buffer[19] = (seq & 0xFF) as u8;
         buffer[20] = 0x40; // Flags: Don't Fragment
         buffer[21] = 0x00;
-        buffer[22] = 64;   // TTL
-        buffer[23] = 17;   // Protocol: UDP
+        buffer[22] = 64; // TTL
+        buffer[23] = 17; // Protocol: UDP
         buffer[24] = 0x00; // Checksum placeholder
         buffer[25] = 0x00;
         buffer[26..30].copy_from_slice(&self.config.local_ip);
@@ -124,7 +124,8 @@ impl SovereignNetconsole {
         buffer[42..42 + payload_len].copy_from_slice(&msg_bytes[..payload_len]);
 
         let frame_len = 42 + payload_len;
-        self.bytes_sent.fetch_add(frame_len as u64, Ordering::SeqCst);
+        self.bytes_sent
+            .fetch_add(frame_len as u64, Ordering::SeqCst);
         frame_len
     }
 
@@ -200,7 +201,7 @@ pub struct KdumpConfig {
 impl Default for KdumpConfig {
     fn default() -> Self {
         Self {
-            crash_reserved_base: 0x20000000, // 512MB offset
+            crash_reserved_base: 0x20000000,       // 512MB offset
             crash_reserved_size: 64 * 1024 * 1024, // 64MB reserved crash memory
             dump_to_disk: true,
             auto_reboot_delay_sec: 5,
@@ -302,7 +303,10 @@ mod tests {
 
         let bytes_sent = netconsole.send_panic_log("KERNEL PANIC: Out of memory in page_alloc");
         assert!(bytes_sent > 42);
-        assert_eq!(netconsole.bytes_sent.load(Ordering::SeqCst), bytes_sent as u64);
+        assert_eq!(
+            netconsole.bytes_sent.load(Ordering::SeqCst),
+            bytes_sent as u64
+        );
     }
 
     #[test]
@@ -321,7 +325,12 @@ mod tests {
 
         let memory_sample = vec![0x90; 4096]; // 4KB NOP sled memory sample
         let dump_id = kdump
-            .trigger_kernel_panic("Kernel Panic: Null Pointer Dereference", 0, regs, &memory_sample)
+            .trigger_kernel_panic(
+                "Kernel Panic: Null Pointer Dereference",
+                0,
+                regs,
+                &memory_sample,
+            )
             .unwrap();
 
         assert_eq!(dump_id, 1);
