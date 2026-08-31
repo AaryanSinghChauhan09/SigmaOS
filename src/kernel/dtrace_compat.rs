@@ -268,6 +268,7 @@ impl TraceEngine {
 /// Fire a probe with up to 4 arguments.
 ///
 /// ```ignore
+/// use crate::sigma_trace;
 /// sigma_trace!(engine, probe_idx, timestamp, cpu, pid);
 /// sigma_trace!(engine, probe_idx, timestamp, cpu, pid, arg0);
 /// sigma_trace!(engine, probe_idx, timestamp, cpu, pid, arg0, arg1);
