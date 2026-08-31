@@ -17,12 +17,14 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Package Module
+pub mod bsd_linux_package_innovations;
 pub mod debian;
 pub mod linux_translation;
 pub mod repository;
 pub mod store;
 pub mod universal;
 
+pub use bsd_linux_package_innovations::*;
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
 };

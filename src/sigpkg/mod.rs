@@ -104,6 +104,9 @@ pub use sovereign_package_innovations::{
     MossStatelessPackage, MossStateTransaction, SolusMossStatelessTransactionEngine,
     BsdPkgManifestSpec, BsdPkgManifestSignatureAuditor,
 };
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::*;
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
 pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
 pub use client::{
