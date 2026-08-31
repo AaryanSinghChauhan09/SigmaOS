@@ -253,6 +253,8 @@ jobs:
   benchmark:
     permissions:
       contents: read
+      issues: write
+      pull-requests: write
 
     name: Performance Benchmarks
     needs: boot-test
