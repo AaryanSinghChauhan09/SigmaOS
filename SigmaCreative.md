@@ -5,65 +5,69 @@
 ## Features
 
 ### SigmaVector (Vector Graphics)
+
 Scalable vector drawing tools (Illustrator alternative):
-- Pen tool with Bézier curves
-- Shape tools (rectangle, ellipse, polygon, star)
-- Path operations (union, intersection, difference, exclusion)
-- Gradient and pattern fills
-- Stroke and fill management
-- Layers and groups
-- Vector effects (blur, shadow, glow)
-- SVG import/export
-- AI-powered vector tracing
-- Typography tools with OpenType features
+
+*   Pen tool with Bézier curves
+*   Shape tools (rectangle, ellipse, polygon, star)
+*   Path operations (union, intersection, difference, exclusion)
+*   Gradient and pattern fills
+*   Stroke and fill management
+*   Layers and groups
+*   Vector effects (blur, shadow, glow)
+*   SVG import/export
+*   AI-powered vector tracing
+*   Typography tools with OpenType features
 
 ### SigmaRaster (Raster Editing)
+
 Photo manipulation and layer-based image editing (Photoshop alternative):
-- Layer-based editing with blending modes
-- Selection tools (lasso, magic wand, quick select)
-- Adjustment layers (brightness, contrast, hue/saturation, curves)
-- Filters (blur, sharpen, noise, artistic effects)
-- Clone stamp and healing brush
-- Content-aware fill
-- RAW image processing
-- HDR merging and tone mapping
-- Batch processing
-- AI-powered object selection and removal
-- Export to PNG, JPEG, TIFF, WebP, PSD
+
+*   Layer-based editing with blending modes
+*   Selection tools (lasso, magic wand, quick select)
+*   Adjustment layers (brightness, contrast, hue/saturation, curves)
+*   Filters (blur, sharpen, noise, artistic effects)
+*   Clone stamp and healing brush
+*   Content-aware fill
+*   RAW image processing
+*   HDR merging and tone mapping
+*   Batch processing
+*   AI-powered object selection and removal
+*   Export to PNG, JPEG, TIFF, WebP, PSD
 
 ### SigmaVideo (Video Editing)
+
 Non-linear video editing (Premiere alternative):
-- Multi-track timeline editing
-- Video transitions and effects
-- Audio mixing and effects
-- Color grading with LUTs
-- Text and title overlays
-- Keyframe animation
-- Proxy editing for 4K+ footage
-- Export to H.264, H.265, ProRes, VP9
-- AI-powered auto-captioning
-- Motion tracking and stabilization
+
+*   Multi-track timeline editing
+*   Video transitions and effects
+*   Audio mixing and effects
+*   Color grading with LUTs
+*   Text and title overlays
+*   Keyframe animation
+*   Proxy editing for 4K+ footage
+*   Export to H.264, H.265, ProRes, VP9
+*   AI-powered auto-captioning
+*   Motion tracking and stabilization
 
 ## Architecture
 
-```
-SigmaCreative Suite
-   ├─ SigmaVector (vector graphics engine)
-   │   ├─ Path renderer
-   │   ├─ Bézier curve engine
-   │   ├─ SVG parser/generator
-   │   └─ AI vector tracing
-   ├─ SigmaRaster (raster graphics engine)
-   │   ├─ Layer compositor
-   │   ├─ Image processor
-   │   ├─ Filter pipeline
-   │   └─ RAW processor
-   └─ SigmaVideo (video engine)
-       ├─ Timeline editor
-       ├─ Video decoder/encoder
-       ├─ Audio mixer
-       └─ Color grading engine
-```
+    SigmaCreative Suite
+       ├─ SigmaVector (vector graphics engine)
+       │   ├─ Path renderer
+       │   ├─ Bézier curve engine
+       │   ├─ SVG parser/generator
+       │   └─ AI vector tracing
+       ├─ SigmaRaster (raster graphics engine)
+       │   ├─ Layer compositor
+       │   ├─ Image processor
+       │   ├─ Filter pipeline
+       │   └─ RAW processor
+       └─ SigmaVideo (video engine)
+           ├─ Timeline editor
+           ├─ Video decoder/encoder
+           ├─ Audio mixer
+           └─ Color grading engine
 
 ## File Formats
 
@@ -109,10 +113,10 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 
 ## Integration
 
-- **SigmaFS Integration**: Auto-save to SovereignFS snapshots
-- **SigmaAI Integration**: AI-powered vector tracing, object selection, auto-captioning
-- **GPU Acceleration**: Vulkan-based rendering for real-time effects
-- **Zenith Desktop Integration**: Native Zenith UI components with touch/gesture support
+*   **SigmaFS Integration**: Auto-save to SovereignFS snapshots
+*   **SigmaAI Integration**: AI-powered vector tracing, object selection, auto-captioning
+*   **GPU Acceleration**: Vulkan-based rendering for real-time effects
+*   **Zenith Desktop Integration**: Native Zenith UI components with touch/gesture support
 
 ## Performance Characteristics
 
@@ -124,19 +128,19 @@ int sigma_video_export(const video_project_t *proj, const char *path, codec_t co
 
 ## Roadmap
 
-- [x] Architecture design and component specification
-- [ ] SigmaVector path engine implementation
-- [ ] SigmaRaster layer compositor implementation
-- [ ] SigmaVideo timeline editor implementation
-- [ ] File format import/export (PSD, AI, SVG)
-- [ ] GPU acceleration pipeline
-- [ ] AI-powered features (vector tracing, object selection, auto-captioning)
-- [ ] Plugin system for third-party filters/effects
-- [ ] Mobile versions (SigmaOS Mobile)
-- [ ] Cloud collaboration (SigmaOS Cloud)
+*   \[x] Architecture design and component specification
+*   \[ ] SigmaVector path engine implementation
+*   \[ ] SigmaRaster layer compositor implementation
+*   \[ ] SigmaVideo timeline editor implementation
+*   \[ ] File format import/export (PSD, AI, SVG)
+*   \[ ] GPU acceleration pipeline
+*   \[ ] AI-powered features (vector tracing, object selection, auto-captioning)
+*   \[ ] Plugin system for third-party filters/effects
+*   \[ ] Mobile versions (SigmaOS Mobile)
+*   \[ ] Cloud collaboration (SigmaOS Cloud)
 
 ## Related Modules
 
-- [`kernel/core/vulkan`](../../kernel/core/vulkan/README.md) — GPU acceleration
-- [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration
-- [`desktop/zenith_accessibility.rs`](../../desktop/zenith_accessibility.rs) — Accessibility features
+*   [`kernel/core/vulkan`](../../kernel/core/vulkan/README.md) — GPU acceleration
+*   [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration
+*   [`desktop/zenith_accessibility.rs`](../../desktop/zenith_accessibility.rs) — Accessibility features

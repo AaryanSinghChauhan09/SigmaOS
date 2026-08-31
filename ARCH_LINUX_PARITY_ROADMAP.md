@@ -3,33 +3,31 @@
 > **"Simplicity is the ultimate sophistication."**
 > This master document outlines the strategic roadmap, compiler integrations, and architecture to achieve complete **Arch Linux and AUR (Arch User Repository) Parity** inside the **SigmaOS** package manager (`sigpkg`). It implements a clean metadata parser and sandboxed compilation orchestrations with zero pre-defined dependencies.
 
----
+***
 
 ## 🏗️ AUR Integration Architecture
 
-```
-+---------------------------------------------------------------------------------+
-|                                AUR PKGBUILD RECIPE                              |
-|          (Declarative shell parameters: pkgname, pkgver, arch, depends)         |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| TIER 1: SIGMPKG METADATA PARSER                                                 |
-| - Lexes shell string streams and extracts standard variables                    |
-| - Registers PKGBUILD dependencies into our universal dependency resolver       |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| TIER 2: SANDBOXED COMPILATION ORCHESTRATOR                                      |
-| - Allocates an isolated user namespace sandbox                                  |
-| - Mounts read-only compilation compiler toolchains                              |
-| - Attests output binary checksum hashes prior to CAS registry injection         |
-+---------------------------------------------------------------------------------+
-```
+    +---------------------------------------------------------------------------------+
+    |                                AUR PKGBUILD RECIPE                              |
+    |          (Declarative shell parameters: pkgname, pkgver, arch, depends)         |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | TIER 1: SIGMPKG METADATA PARSER                                                 |
+    | - Lexes shell string streams and extracts standard variables                    |
+    | - Registers PKGBUILD dependencies into our universal dependency resolver       |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | TIER 2: SANDBOXED COMPILATION ORCHESTRATOR                                      |
+    | - Allocates an isolated user namespace sandbox                                  |
+    | - Mounts read-only compilation compiler toolchains                              |
+    | - Attests output binary checksum hashes prior to CAS registry injection         |
+    +---------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Reference Implementation
 

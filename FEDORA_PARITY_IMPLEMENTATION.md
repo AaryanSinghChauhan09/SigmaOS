@@ -76,12 +76,13 @@ impl SigmaDNF {
 ```
 
 **Key Features:**
-- Module stream management
-- Transaction-based operations
-- GPG signature verification
-- Dependency resolution
-- Scriptlet execution
-- Rollback capability
+
+*   Module stream management
+*   Transaction-based operations
+*   GPG signature verification
+*   Dependency resolution
+*   Scriptlet execution
+*   Rollback capability
 
 ### 2. SigmaSELinux Security Framework
 
@@ -133,12 +134,13 @@ impl SigmaSELinux {
 ```
 
 **Key Features:**
-- Type enforcement
-- Role-based access control
-- Multi-level security
-- Policy modules
-- Boolean configuration
-- Context management
+
+*   Type enforcement
+*   Role-based access control
+*   Multi-level security
+*   Policy modules
+*   Boolean configuration
+*   Context management
 
 ### 3. SigmaWayland Display Server
 
@@ -168,11 +170,12 @@ impl SigmaWayland {
 ```
 
 **Key Features:**
-- Protocol binding
-- Surface management
-- Input handling
-- Output configuration
-- Frame synchronization
+
+*   Protocol binding
+*   Surface management
+*   Input handling
+*   Output configuration
+*   Frame synchronization
 
 ### 4. SigmaPipeWire Audio System
 
@@ -203,11 +206,12 @@ impl SigmaPipeWire {
 ```
 
 **Key Features:**
-- Graph-based audio routing
-- Real-time processing
-- Low-latency audio
-- Video processing
-- Session management
+
+*   Graph-based audio routing
+*   Real-time processing
+*   Low-latency audio
+*   Video processing
+*   Session management
 
 ## Module System
 
@@ -238,10 +242,11 @@ pub struct Stream {
 ```
 
 **Key Features:**
-- Multiple version streams
-- Profile selection
-- Dependency management
-- Automatic conflict resolution
+
+*   Multiple version streams
+*   Profile selection
+*   Dependency management
+*   Automatic conflict resolution
 
 ## Container Integration
 
@@ -278,11 +283,12 @@ impl SigmaPodman {
 ```
 
 **Key Features:**
-- Daemonless operation
-- Rootless containers
-- Pod management
-- Volume management
-- Network isolation
+
+*   Daemonless operation
+*   Rootless containers
+*   Pod management
+*   Volume management
+*   Network isolation
 
 ## Desktop Environment Integration
 
@@ -297,10 +303,11 @@ pub struct FedoraWorkstation {
 ```
 
 **Key Features:**
-- GNOME desktop integration
-- System configuration
-- Application management
-- User experience optimization
+
+*   GNOME desktop integration
+*   System configuration
+*   Application management
+*   User experience optimization
 
 ### Fedora Server
 
@@ -313,10 +320,11 @@ pub struct FedoraServer {
 ```
 
 **Key Features:**
-- Firewall management
-- Service configuration
-- Role-based deployment
-- Security hardening
+
+*   Firewall management
+*   Service configuration
+*   Role-based deployment
+*   Security hardening
 
 ## Security Implementation
 
@@ -331,10 +339,11 @@ pub struct SelinuxPolicyManager {
 ```
 
 **Key Features:**
-- Policy compilation
-- Context mapping
-- Boolean management
-- Policy debugging
+
+*   Policy compilation
+*   Context mapping
+*   Boolean management
+*   Policy debugging
 
 ## Testing
 
@@ -430,19 +439,19 @@ cache.prune_old_modules()?;
 
 ## Documentation Resources
 
-- [Fedora Documentation](https://docs.fedoraproject.org/)
-- [DNF Documentation](https://dnf.readthedocs.io/)
-- [SELinux Project](https://selinuxproject.org/)
-- [Wayland Documentation](https://wayland.freedesktop.org/)
-- [PipeWire Documentation](https://docs.pipewire.org/)
+*   [Fedora Documentation](https://docs.fedoraproject.org/)
+*   [DNF Documentation](https://dnf.readthedocs.io/)
+*   [SELinux Project](https://selinuxproject.org/)
+*   [Wayland Documentation](https://wayland.freedesktop.org/)
+*   [PipeWire Documentation](https://docs.pipewire.org/)
 
 ## Best Practices
 
-1. **Security First**: Always use SELinux enforcing mode
-2. **Module Management**: Use modules for alternative versions
-3. **Container Security**: Prefer rootless containers
-4. **Update Regularly**: Keep system current with Fedora updates
-5. **Performance**: Use parallel operations for bulk actions
+1.  **Security First**: Always use SELinux enforcing mode
+2.  **Module Management**: Use modules for alternative versions
+3.  **Container Security**: Prefer rootless containers
+4.  **Update Regularly**: Keep system current with Fedora updates
+5.  **Performance**: Use parallel operations for bulk actions
 
 ## Migration Tools
 
@@ -454,19 +463,20 @@ assistant.migrate_from(DistroType::Ubuntu)?;
 ```
 
 **Supported Source Distributions:**
-- Ubuntu
-- Debian
-- Arch Linux
-- CentOS/RHEL
+
+*   Ubuntu
+*   Debian
+*   Arch Linux
+*   CentOS/RHEL
 
 ## Future Enhancements
 
-- Enhanced SELinux policy generation
-- Improved Wayland protocol support
-- Advanced PipeWire graph management
-- Better container orchestration
-- Enhanced security auditing
+*   Enhanced SELinux policy generation
+*   Improved Wayland protocol support
+*   Advanced PipeWire graph management
+*   Better container orchestration
+*   Enhanced security auditing
 
----
+***
 
 *Last updated: August 21, 2026*

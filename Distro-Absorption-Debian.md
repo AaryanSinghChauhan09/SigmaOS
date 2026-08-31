@@ -2,7 +2,7 @@
 
 > **Status**: 🟢 Active & Tested | **Source Paradigm**: Debian GNU/Linux | **Target Shard**: `SigmaOS Stable Release Engineering`
 
----
+***
 
 ## 1. Executive Summary
 
@@ -10,7 +10,7 @@ Debian is the gold standard for stability-first Linux distributions. Its legenda
 
 SigmaOS adopts, implements, and expands Debian's **three-tier release model**, **Social Contract**, and **freeze-based stabilization** process as first-class citizens in our systems core to ensure production reliability alongside rolling-edge experimental channels.
 
----
+***
 
 ## 2. Key Absorbed Features
 
@@ -41,36 +41,40 @@ $ sigma-pkg channel set sigma.stable
 
 Our `DebianSocialContract` class validates system and package compliance against a formal Social Contract committing to:
 
-1. **100% Free & Open Source**: Only software matching DFSG-compliant licenses (such as `MIT`, `Apache-2.0`, `GPL-2.0`, `GPL-3.0`, `BSD-2-Clause`, `BSD-3-Clause`) is enabled by default.
-2. **Giving Back**: Contributing patches and tools back to upstream communities.
-3. **Radical Transparency**: Keeping all bugs open and public.
-4. **Prioritizing Users**: Designing capabilities and system updates strictly for user empowerment.
+1.  **100% Free & Open Source**: Only software matching DFSG-compliant licenses (such as `MIT`, `Apache-2.0`, `GPL-2.0`, `GPL-3.0`, `BSD-2-Clause`, `BSD-3-Clause`) is enabled by default.
+2.  **Giving Back**: Contributing patches and tools back to upstream communities.
+3.  **Radical Transparency**: Keeping all bugs open and public.
+4.  **Prioritizing Users**: Designing capabilities and system updates strictly for user empowerment.
 
 ### 2.3 Universal Init System Control & Socket Activation
 
 Integrated into [`src/init/init_abstraction.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/init/init_abstraction.rs):
-- **Socket Activation (`SocketActivationConfig`)**: systemd and launchd inspired socket-on-demand service spawning.
-- **Cgroup Resource Limits (`CgroupResourceLimits`)**: Memory, CPU quota, and PID cap enforcement per service unit.
-- **Parallel Boot Dependency Ordering (`ServiceDependencyNode`)**: Topological dependency sorting for fast parallel boot sequences.
+
+*   **Socket Activation (`SocketActivationConfig`)**: systemd and launchd inspired socket-on-demand service spawning.
+*   **Cgroup Resource Limits (`CgroupResourceLimits`)**: Memory, CPU quota, and PID cap enforcement per service unit.
+*   **Parallel Boot Dependency Ordering (`ServiceDependencyNode`)**: Topological dependency sorting for fast parallel boot sequences.
 
 ### 2.4 Freeze-Based Stabilization Lifecycle
 
 Before every major stable release, a strict freeze-based stabilization window is enforced via `FreezeBasedStabilization`:
 
-- **Unfrozen (Default)**: All updates (features, bugfixes, security, documentation) are allowed.
-- **Frozen (Release Freeze)**: Only `security` and `critical-bugfix` update types are allowed to merge into the branch; standard features and cosmetic patches are blocked to guarantee absolute runtime regression resistance.
+*   **Unfrozen (Default)**: All updates (features, bugfixes, security, documentation) are allowed.
+*   **Frozen (Release Freeze)**: Only `security` and `critical-bugfix` update types are allowed to merge into the branch; standard features and cosmetic patches are blocked to guarantee absolute runtime regression resistance.
 
----
+***
 
 ## 3. Class Specifications (OOP-Implementation)
 
 The model is programmatically implemented in `src/distro/specialized.rs` with zero-allocation structures:
 
 ### `ThreeTierReleaseModel`
+
 Manages the active channel, ensuring robust, validated switching.
 
 ### `DebianSocialContract`
+
 Evaluates system compliance and DFSG license verification.
 
 ### `FreezeBasedStabilization`
+
 Models update blocks and lifecycle stages of release engineering freezes.

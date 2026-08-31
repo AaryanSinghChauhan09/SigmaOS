@@ -1,36 +1,26 @@
-﻿# Cookie Handling
+# Cookie Handling
 
 ## `Cookie` interface
 
-- **name** `string`
+*   **name** `string`
 
+*   **value** `string`
 
-- **value** `string`
+*   **expires** `Date|number` (optional)
 
+*   **maxAge** `number` (optional)
 
-- **expires** `Date|number` (optional)
+*   **domain** `string` (optional)
 
+*   **path** `string` (optional)
 
-- **maxAge** `number` (optional)
+*   **secure** `boolean` (optional)
 
+*   **httpOnly** `boolean` (optional)
 
-- **domain** `string` (optional)
+*   **sameSite** `'String'|'Lax'|'None'` (optional)
 
-
-- **path** `string` (optional)
-
-
-- **secure** `boolean` (optional)
-
-
-- **httpOnly** `boolean` (optional)
-
-
-- **sameSite** `'String'|'Lax'|'None'` (optional)
-
-
-- **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
-
+*   **unparsed** `string[]` (optional) Left over attributes that weren't parsed.
 
 ## `deleteCookie(headers, name[, attributes])`
 
@@ -47,14 +37,11 @@ console.log(headers.get('set-cookie')) // name=; Expires=Thu, 01 Jan 1970 00:00:
 
 Arguments:
 
-- **headers** `Headers`
+*   **headers** `Headers`
 
+*   **name** `string`
 
-- **name** `string`
-
-
-- **attributes** `{ path?: string, domain?: string }` (optional)
-
+*   **attributes** `{ path?: string, domain?: string }` (optional)
 
 Returns: `void`
 
@@ -74,8 +61,7 @@ console.log(getCookies(headers)) // { get: 'cookies', and: 'attributes' }
 
 Arguments:
 
-- **headers** `Headers`
-
+*   **headers** `Headers`
 
 Returns: `Record<string, string>`
 
@@ -101,8 +87,7 @@ console.log(getSetCookies(headers))
 
 Arguments:
 
-- **headers** `Headers`
-
+*   **headers** `Headers`
 
 Returns: `Cookie[]`
 
@@ -124,16 +109,13 @@ console.log(parseCookie('undici=getSetCookies; Secure; SameSite=Lax'))
 
 Notes:
 
-- The cookie value is returned as it appears in the header. Percent-encoded sequences such as `%20` or `%0D%0A` are **not** decoded.
+*   The cookie value is returned as it appears in the header. Percent-encoded sequences such as `%20` or `%0D%0A` are **not** decoded.
 
-
-- `sameSite` is only set for exact case-insensitive matches of `Strict`, `Lax`, or `None`.
-
+*   `sameSite` is only set for exact case-insensitive matches of `Strict`, `Lax`, or `None`.
 
 Arguments:
 
-- **cookie** `string`
-
+*   **cookie** `string`
 
 Returns: `Cookie | null`
 
@@ -152,10 +134,8 @@ console.log(headers.get('Set-Cookie')) // undici=setCookie
 
 Arguments:
 
-- **headers** `Headers`
+*   **headers** `Headers`
 
-
-- **cookie** `Cookie`
-
+*   **cookie** `Cookie`
 
 Returns: `void`

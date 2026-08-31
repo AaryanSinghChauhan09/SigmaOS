@@ -4,48 +4,45 @@
 > This document records every branch, its purpose, what it contributed, and how
 > it was integrated with the rest of the tree.
 
----
+***
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Branch 1 – `feature/klib-zero-dep`](#branch-1--featureklib-zero-dep)
-3. [Branch 2 – `feature/linux-bsd-inspirations`](#branch-2--featurelinux-bsd-inspirations)
-4. [Branch 3 – `feature/security-hardening`](#branch-3--featuresecurity-hardening)
-5. [Branch 4 – `feature/sigpkg-maturity`](#branch-4--featuresigpkg-maturity)
-6. [Branch 5 – `feature/compliance-modules`](#branch-5--featurecompliance-modules)
-7. [Branch 6 – `feature/networking-stack`](#branch-6--featurenetworking-stack)
-8. [Conflict Resolution Strategy](#conflict-resolution-strategy)
-9. [Post-Merge Verification](#post-merge-verification)
+1.  [Overview](#overview)
+2.  [Branch 1 – `feature/klib-zero-dep`](#branch-1--featureklib-zero-dep)
+3.  [Branch 2 – `feature/linux-bsd-inspirations`](#branch-2--featurelinux-bsd-inspirations)
+4.  [Branch 3 – `feature/security-hardening`](#branch-3--featuresecurity-hardening)
+5.  [Branch 4 – `feature/sigpkg-maturity`](#branch-4--featuresigpkg-maturity)
+6.  [Branch 5 – `feature/compliance-modules`](#branch-5--featurecompliance-modules)
+7.  [Branch 6 – `feature/networking-stack`](#branch-6--featurenetworking-stack)
+8.  [Conflict Resolution Strategy](#conflict-resolution-strategy)
+9.  [Post-Merge Verification](#post-merge-verification)
 10. [Lessons Learned](#lessons-learned)
 
----
+***
 
 ## Overview
 
 SigmaOS development proceeded in parallel across six feature branches during Q2–Q3 2026.
 Each branch was maintained by a dedicated sub-team and followed the branch lifecycle:
 
-```
-feature/* --> PR review --> conflict resolution --> squash-merge into main
-```
+    feature/* --> PR review --> conflict resolution --> squash-merge into main
 
 The merge order was carefully chosen to minimise conflicts:
 
-```
-1. feature/klib-zero-dep          (foundation – touches klib/ only)
-2. feature/security-hardening     (builds on klib, touches src/security/)
-3. feature/compliance-modules     (builds on security)
-4. feature/linux-bsd-inspirations (cross-cutting, mostly new files)
-5. feature/sigpkg-maturity        (touches src/sigpkg/, no dep on compliance)
-6. feature/networking-stack       (largest branch, touches src/net/ and kernel/)
-```
+    1. feature/klib-zero-dep          (foundation – touches klib/ only)
+    2. feature/security-hardening     (builds on klib, touches src/security/)
+    3. feature/compliance-modules     (builds on security)
+    4. feature/linux-bsd-inspirations (cross-cutting, mostly new files)
+    5. feature/sigpkg-maturity        (touches src/sigpkg/, no dep on compliance)
+    6. feature/networking-stack       (largest branch, touches src/net/ and kernel/)
 
----
+***
 
 ## Branch 1 – `feature/klib-zero-dep`
 
 ### Purpose
+
 Eliminate every dependency on `std` and external crates from `src/klib/`.
 Replace them with hand-written, `no_std`-compatible implementations that can run
 both in the kernel (ring 0, no OS beneath) and in userspace.
@@ -70,23 +67,26 @@ both in the kernel (ring 0, no OS beneath) and in userspace.
 | `src/klib/mod.rs`              | Modified | Wired up all new modules |
 
 ### Key Design Decisions
-- All allocators are `#[no_std]` – they implement `core::alloc::GlobalAlloc` directly.
-- Zero calls to `libc`, `libstdc++`, or any Rust crate with transitive std deps.
-- Compile-time feature flags (`cfg(feature = "kernel")`) select the right allocator
-  for each build target.
-- `SigmaString` stores data in a `SigmaVec<u8>` and supports `Display`, `PartialEq`,
-  `Clone`, `From<&str>`, and `From<[u8]>` without touching `std::fmt`.
+
+*   All allocators are `#[no_std]` – they implement `core::alloc::GlobalAlloc` directly.
+*   Zero calls to `libc`, `libstdc++`, or any Rust crate with transitive std deps.
+*   Compile-time feature flags (`cfg(feature = "kernel")`) select the right allocator
+    for each build target.
+*   `SigmaString` stores data in a `SigmaVec<u8>` and supports `Display`, `PartialEq`,
+    `Clone`, `From<&str>`, and `From<[u8]>` without touching `std::fmt`.
 
 ### Metrics
-- **Crate dependencies reduced:** from 14 to 3 (only `core`, `compiler_builtins`, `rlibc`)
-- **Binary size reduction (kernel image):** ~180 KB
-- **Lines of code:** +4 200
 
----
+*   **Crate dependencies reduced:** from 14 to 3 (only `core`, `compiler_builtins`, `rlibc`)
+*   **Binary size reduction (kernel image):** ~180 KB
+*   **Lines of code:** +4 200
+
+***
 
 ## Branch 2 – `feature/linux-bsd-inspirations`
 
 ### Purpose
+
 Absorb proven security and reliability patterns from Linux distributions and BSD
 variants into SigmaOS. This was a research-and-implement branch: each distro
 concept was studied, its kernel-level mechanism understood, and then a SigmaOS
@@ -110,35 +110,40 @@ analogue implemented.
 | `src/performance/mglru.rs`       | Linux MGLRU page reclaim |
 
 ### Key Design Decisions
-- `sigma_pledge` mirrors OpenBSD's syscall restriction model: a process declares
-  which pledge groups it needs; the kernel enforces violations with SIGABRT.
-- `sigma_unveil` implements a per-process VFS view: paths not unveiled are
-  invisible (ENOENT) rather than EPERM, preventing directory-traversal probing.
-- FreeBSD Jails are implemented as lightweight containers sharing the host kernel
-  but with separate network stacks, UIDs, and filesystem roots.
-- NixOS-style reproducibility: every package build is content-addressed;
-  `sigma_repro_build.sh` verifies bit-for-bit reproducibility.
+
+*   `sigma_pledge` mirrors OpenBSD's syscall restriction model: a process declares
+    which pledge groups it needs; the kernel enforces violations with SIGABRT.
+*   `sigma_unveil` implements a per-process VFS view: paths not unveiled are
+    invisible (ENOENT) rather than EPERM, preventing directory-traversal probing.
+*   FreeBSD Jails are implemented as lightweight containers sharing the host kernel
+    but with separate network stacks, UIDs, and filesystem roots.
+*   NixOS-style reproducibility: every package build is content-addressed;
+    `sigma_repro_build.sh` verifies bit-for-bit reproducibility.
 
 ### Metrics
-- **New syscalls added:** 6 (`pledge`, `unveil`, `jail_create`, `jail_attach`, `jail_remove`, `securelevel_set`)
-- **Security test cases:** +38
-- **Lines of code:** +9 800
 
----
+*   **New syscalls added:** 6 (`pledge`, `unveil`, `jail_create`, `jail_attach`, `jail_remove`, `securelevel_set`)
+*   **Security test cases:** +38
+*   **Lines of code:** +9 800
+
+***
 
 ## Branch 3 – `feature/security-hardening`
 
 ### Purpose
+
 Address all GitHub code-scanning alerts (CodeQL, Dependabot, OSSF Scorecard) and
 apply structural hardening across the codebase.
 
 ### Key Changes
 
 #### CodeQL / Unused-Variable Fixes
+
 Every module that had `unused_variables` warnings received one of:
-1. `#![allow(unused_variables)]` at the crate/module root (for intentional stubs).
-2. Proper use of the variable (for logic bugs caught by the scanner).
-3. Prefixing with `_` to signal intentional non-use.
+
+1.  `#![allow(unused_variables)]` at the crate/module root (for intentional stubs).
+2.  Proper use of the variable (for logic bugs caught by the scanner).
+3.  Prefixing with `_` to signal intentional non-use.
 
 #### Hardening Applied
 
@@ -152,23 +157,26 @@ Every module that had `unused_variables` warnings received one of:
 | Crypto | Replaced deprecated SHA-1 with SHA-3-256 everywhere |
 
 ### Files Modified
-- `src/security/hardening.rs` – compile-time hardening flags
-- `src/security/audit.rs` – audit log with tamper-evident chaining
-- `src/security/lsm.rs` – Linux Security Module analogue
-- `src/boot/secure.rs` – verified boot improvements
-- `src/boot/verified.rs` – TPM-based attestation
-- `src/klib/custom_allocator.rs` – heap integrity checks (canary words)
+
+*   `src/security/hardening.rs` – compile-time hardening flags
+*   `src/security/audit.rs` – audit log with tamper-evident chaining
+*   `src/security/lsm.rs` – Linux Security Module analogue
+*   `src/boot/secure.rs` – verified boot improvements
+*   `src/boot/verified.rs` – TPM-based attestation
+*   `src/klib/custom_allocator.rs` – heap integrity checks (canary words)
 
 ### Metrics
-- **CodeQL alerts resolved:** 47
-- **Dependabot alerts resolved:** 12
-- **Lines of code:** +3 100
 
----
+*   **CodeQL alerts resolved:** 47
+*   **Dependabot alerts resolved:** 12
+*   **Lines of code:** +3 100
+
+***
 
 ## Branch 4 – `feature/sigpkg-maturity`
 
 ### Purpose
+
 Advance `sigpkg` (SigmaOS's package manager) from prototype to production-quality,
 reaching feature parity with `apt`, `pacman`, and `nix`.
 
@@ -202,35 +210,36 @@ reaching feature parity with `apt`, `pacman`, and `nix`.
 | `src/sigpkg/zero_alloc_resolver.rs` | Resolver using klib (no std) |
 
 ### Metrics
-- **Packages resolvable:** 95% of Arch AUR (tested against 80 000-package mirror)
-- **Install speed vs apt:** 2.3× faster (parallel fetch + klib hash verification)
-- **Lines of code:** +18 000
 
----
+*   **Packages resolvable:** 95% of Arch AUR (tested against 80 000-package mirror)
+*   **Install speed vs apt:** 2.3× faster (parallel fetch + klib hash verification)
+*   **Lines of code:** +18 000
+
+***
 
 ## Branch 5 – `feature/compliance-modules`
 
 ### Purpose
+
 Build GDPR, HIPAA, SOC 2, and India DPDP Act compliance modules directly into the
 OS kernel and userspace, so that applications can request "compliance contexts"
 without writing their own audit/retention/consent logic.
 
 ### Architecture
-```
-Application
-    │
-    ▼
-ComplianceContext::enter(framework: GdprMode)
-    │ sets active policy in thread-local storage
-    ▼
-Kernel intercepts FS/net syscalls
-    │ attaches compliance metadata
-    ▼
-AuditLog::append(ComplianceRecord { ... })
-    │ tamper-evident, encrypted
-    ▼
-ComplianceDashboard (web UI) shows live status
-```
+
+    Application
+        │
+        ▼
+    ComplianceContext::enter(framework: GdprMode)
+        │ sets active policy in thread-local storage
+        ▼
+    Kernel intercepts FS/net syscalls
+        │ attaches compliance metadata
+        ▼
+    AuditLog::append(ComplianceRecord { ... })
+        │ tamper-evident, encrypted
+        ▼
+    ComplianceDashboard (web UI) shows live status
 
 ### Files Added
 
@@ -243,15 +252,17 @@ ComplianceDashboard (web UI) shows live status
 | `src/compatibility/india_stack.rs`   | Core India Stack primitives |
 
 ### Metrics
-- **Compliance frameworks supported:** GDPR, HIPAA, SOC 2 Type II, PCI-DSS, India DPDP
-- **Audit log throughput:** 2M events/sec (lock-free ring buffer)
-- **Lines of code:** +6 500
 
----
+*   **Compliance frameworks supported:** GDPR, HIPAA, SOC 2 Type II, PCI-DSS, India DPDP
+*   **Audit log throughput:** 2M events/sec (lock-free ring buffer)
+*   **Lines of code:** +6 500
+
+***
 
 ## Branch 6 – `feature/networking-stack`
 
 ### Purpose
+
 Complete the TCP/IP stack from scratch (no LWIP, no smoltcp at runtime), add
 WireGuard VPN, DNS-over-TLS, IPv6, and a sovereign browser core.
 
@@ -291,51 +302,52 @@ WireGuard VPN, DNS-over-TLS, IPv6, and a sovereign browser core.
 | `net/tcp.c`                  | Reference C implementation |
 
 ### Metrics
-- **Throughput (TCP loopback):** 28 Gbps on Ryzen 9 7950X
-- **Latency (TCP RTT loopback):** 42 µs p99
-- **Lines of code:** +22 000
 
----
+*   **Throughput (TCP loopback):** 28 Gbps on Ryzen 9 7950X
+*   **Latency (TCP RTT loopback):** 42 µs p99
+*   **Lines of code:** +22 000
+
+***
 
 ## Conflict Resolution Strategy
 
 Merge conflicts were resolved using `scripts/fix_conflicts_v2.py`:
-1. Parse conflict markers (`<<<<<<`, `=======`, `>>>>>>>`).
-2. For `.rs` files: prefer the incoming branch if it is more recent and passes
-   `cargo check`; otherwise prefer base and log a warning.
-3. For `.md` files: always merge both sides by appending sections.
-4. For `Cargo.toml`/`Cargo.lock`: union of dependencies, then `cargo update --dry-run`
-   to verify compatibility.
+
+1.  Parse conflict markers (`<<<<<<`, `=======`, `>>>>>>>`).
+2.  For `.rs` files: prefer the incoming branch if it is more recent and passes
+    `cargo check`; otherwise prefer base and log a warning.
+3.  For `.md` files: always merge both sides by appending sections.
+4.  For `Cargo.toml`/`Cargo.lock`: union of dependencies, then `cargo update --dry-run`
+    to verify compatibility.
 
 Manual resolution was required for:
-- `src/klib/mod.rs` (multiple branches added `pub mod` lines)
-- `src/security/mod.rs` (pledge/unveil vs hardening exports)
-- `Cargo.toml` (duplicate dependency versions)
 
----
+*   `src/klib/mod.rs` (multiple branches added `pub mod` lines)
+*   `src/security/mod.rs` (pledge/unveil vs hardening exports)
+*   `Cargo.toml` (duplicate dependency versions)
+
+***
 
 ## Post-Merge Verification
 
-```
-cargo check --all-targets --all-features    # 0 errors, 0 warnings
-cargo test  --all-targets                   # 412 passed, 0 failed
-./scripts/smoke-test.sh                     # QEMU boot: OK
-./scripts/sigma_builtins_test.sh            # All 87 builtins: PASS
-```
+    cargo check --all-targets --all-features    # 0 errors, 0 warnings
+    cargo test  --all-targets                   # 412 passed, 0 failed
+    ./scripts/smoke-test.sh                     # QEMU boot: OK
+    ./scripts/sigma_builtins_test.sh            # All 87 builtins: PASS
 
----
+***
 
 ## Lessons Learned
 
-1. **Merge order matters.** Merging `klib-zero-dep` first established the zero-std
-   foundation that all other branches built on.
-2. **Automated conflict resolution** saves ~4 h per merge when branches diverge for
-   >2 weeks.
-3. **Module pub declarations** in `mod.rs` are the most common conflict site — use a
-   sorted, canonical order and conflicts become trivial to auto-resolve.
-4. **Integration tests should live in `tests/integration_test.rs`** (which they do)
-   so they catch cross-branch regressions immediately.
+1.  **Merge order matters.** Merging `klib-zero-dep` first established the zero-std
+    foundation that all other branches built on.
+2.  **Automated conflict resolution** saves ~4 h per merge when branches diverge for
+    > 2 weeks.
+3.  **Module pub declarations** in `mod.rs` are the most common conflict site — use a
+    sorted, canonical order and conflicts become trivial to auto-resolve.
+4.  **Integration tests should live in `tests/integration_test.rs`** (which they do)
+    so they catch cross-branch regressions immediately.
 
----
+***
 
 *Last updated: 2026-08-04 by the SigmaOS core team.*

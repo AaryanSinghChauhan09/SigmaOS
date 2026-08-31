@@ -3,39 +3,37 @@
 > **"Autonomy is validated through complete transparency and absolute auditability."**
 > This master document defines the ultimate architecture, design patterns, and phased development plans to integrate **Defensive Forensic Auditing and Real-Time Anomaly Detection** into the core of **SigmaOS**. It ensures tamper-proof compliance logging (exceeding SOC 2 and ISO 27001 requirements) while maintaining zero external dependencies.
 
----
+***
 
 ## 🏗️ Audit System Architecture
 
-```
-+-------------------------------------------------------------------------------+
-|                             S-SEC SECURITY SHARD                              |
-|           Mandatory Access Control, Privilege Escalation Interception         |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 1: FORENSIC AUDIT TRAIL LOGGER (Block-Chained Ledger)                     |
-| - Serializes system transitions, sys-calls, and IPC events                    |
-| - Chains block metadata using SHA-256 equivalent FNV-1a hashes                 |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 2: ANOMALY SCORING ENGINE (Real-Time Heuristic Analyzer)                 |
-| - Calculates risk indices based on payload sizes and frequency rates          |
-| - Automatically triggers self-healing sandboxing on threshold breach         |
-+-------------------------------------------------------------------------------+
-                                       |
-                                       v
-+-------------------------------------------------------------------------------+
-| TIER 3: DYNAMIC SIGNATURE CHECKER (Intrusion Prevention Shunt)                 |
-| - Filters command payloads against customizable malicious sequence signatures |
-| - Blocks execution prior to microkernel resource allocation                   |
-+-------------------------------------------------------------------------------+
-```
+    +-------------------------------------------------------------------------------+
+    |                             S-SEC SECURITY SHARD                              |
+    |           Mandatory Access Control, Privilege Escalation Interception         |
+    +-------------------------------------------------------------------------------+
+                                           |
+                                           v
+    +-------------------------------------------------------------------------------+
+    | TIER 1: FORENSIC AUDIT TRAIL LOGGER (Block-Chained Ledger)                     |
+    | - Serializes system transitions, sys-calls, and IPC events                    |
+    | - Chains block metadata using SHA-256 equivalent FNV-1a hashes                 |
+    +-------------------------------------------------------------------------------+
+                                           |
+                                           v
+    +-------------------------------------------------------------------------------+
+    | TIER 2: ANOMALY SCORING ENGINE (Real-Time Heuristic Analyzer)                 |
+    | - Calculates risk indices based on payload sizes and frequency rates          |
+    | - Automatically triggers self-healing sandboxing on threshold breach         |
+    +-------------------------------------------------------------------------------+
+                                           |
+                                           v
+    +-------------------------------------------------------------------------------+
+    | TIER 3: DYNAMIC SIGNATURE CHECKER (Intrusion Prevention Shunt)                 |
+    | - Filters command payloads against customizable malicious sequence signatures |
+    | - Blocks execution prior to microkernel resource allocation                   |
+    +-------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Reference Implementation
 
@@ -224,59 +222,62 @@ impl DefensiveAuditSystem {
     }
 }
 ```
+
 # 🛡️ SigmaOS: Sovereign Defensive Auditing & Sandbox Checking System (SigmaAudit)
 
 This document details the complete, industrial-grade development plans, architectural specifications, and fully executable reference implementations for **SigmaOS's Defensive Auditing & Sandbox Checking Subsystem (SigmaAudit)**.
 
 Designed to prevent, record, and remediate unauthorized hardware or system operations, SigmaAudit ensures that all sandboxed components execute under strict compliance policies, with zero-overhead logging, on top of the sovereign microkernel.
 
----
+***
 
 ## 🏗️ 1. Core Architectural Vision
 
 SigmaAudit decouples traditional monolithic kernel auditing into isolated, secure **Audit-Collector Shards** overseen by the core security validator.
 
 ### Key Design Pillars
-1. **Capability-Gated Logging**: Record every capability delegation and transition securely across the transaction bus, keeping records tamper-proof.
-2. **Page-Table Memory Auditing**: Validate paging permissions (`W^X` enforcement) at regular kernel ticks to detect and prevent privilege-escalation attempts.
-3. **PQC Attestation Signatures**: Secure audit log archives using post-quantum Dilithium-5 signatures (NIST FIPS 204), rendering them cryptographically immutable.
-4. **Self-Healing Integration**: Automatically trigger system rollback workflows in under 1ms if any critical sandbox or capability violation is detected.
 
----
+1.  **Capability-Gated Logging**: Record every capability delegation and transition securely across the transaction bus, keeping records tamper-proof.
+2.  **Page-Table Memory Auditing**: Validate paging permissions (`W^X` enforcement) at regular kernel ticks to detect and prevent privilege-escalation attempts.
+3.  **PQC Attestation Signatures**: Secure audit log archives using post-quantum Dilithium-5 signatures (NIST FIPS 204), rendering them cryptographically immutable.
+4.  **Self-Healing Integration**: Automatically trigger system rollback workflows in under 1ms if any critical sandbox or capability violation is detected.
+
+***
 
 ## 🚀 2. Master Defensive Auditing Roadmap
 
 The auditing subsystem transitions from basic in-memory circular buffers to complete post-quantum-secured log aggregations.
 
-```
-                      +-----------------------------+
-                      |    Audit Collector Bus      |
-                      +-----------------------------+
-                                     |
-         +---------------------------+---------------------------+
-         |                           |                           |
-         v                           v                           v
-+-------------------+       +-------------------+       +-------------------+
-| Memory Audit Shard|       | Sandbox Audit Sh  |       | Cryptographic Sh  |
-| - W^X Validation  |       | - Pledge Monitors |       | - Dilithium Logs  |
-| - Page-Table Scans|       | - Cap Decisions   |       | - Key Attestation |
-+-------------------+       +-------------------+       +-------------------+
-```
+                          +-----------------------------+
+                          |    Audit Collector Bus      |
+                          +-----------------------------+
+                                         |
+             +---------------------------+---------------------------+
+             |                           |                           |
+             v                           v                           v
+    +-------------------+       +-------------------+       +-------------------+
+    | Memory Audit Shard|       | Sandbox Audit Sh  |       | Cryptographic Sh  |
+    | - W^X Validation  |       | - Pledge Monitors |       | - Dilithium Logs  |
+    | - Page-Table Scans|       | - Cap Decisions   |       | - Key Attestation |
+    +-------------------+       +-------------------+       +-------------------+
 
 ### 2.1 Paging & Memory Protection Audits (W^X Enforcement)
-- **Objective**: Maintain a strict scanner to walk CPU page tables (PML4 -> PDPT -> PD -> PT) and audit paging attributes.
-- **Goal**: Instantly panic or quarantine tasks that attempt to bypass `W^X` boundaries (Write-XOR-Execute).
-- **Validation**: Verified during APIC timer ticks with zero-copy overhead.
+
+*   **Objective**: Maintain a strict scanner to walk CPU page tables (PML4 -> PDPT -> PD -> PT) and audit paging attributes.
+*   **Goal**: Instantly panic or quarantine tasks that attempt to bypass `W^X` boundaries (Write-XOR-Execute).
+*   **Validation**: Verified during APIC timer ticks with zero-copy overhead.
 
 ### 2.2 Sandboxed Execution & Pledge Monitors (Pledge & Unveil)
-- **Objective**: Track active process pledges (`sigma_pledge` and `sigma_unveil` states) and log blocked syscalls.
-- **Goal**: Integrate directly with the self-healing module to automatically quarantine misbehaving processes.
+
+*   **Objective**: Track active process pledges (`sigma_pledge` and `sigma_unveil` states) and log blocked syscalls.
+*   **Goal**: Integrate directly with the self-healing module to automatically quarantine misbehaving processes.
 
 ### 2.3 Post-Quantum Audit Log Chains (Tamper-Proof Ledger)
-- **Objective**: Sign log entries using post-quantum Dilithium-5 asymmetric cryptosystems.
-- **Goal**: Protect diagnostic telemetry records from manipulation by internal or external threats.
 
----
+*   **Objective**: Sign log entries using post-quantum Dilithium-5 asymmetric cryptosystems.
+*   **Goal**: Protect diagnostic telemetry records from manipulation by internal or external threats.
+
+***
 
 ## 💻 3. Executable Reference Implementation
 
@@ -421,13 +422,14 @@ impl SecurityAuditor for SandboxAuditor {
 }
 ```
 
----
+***
 
 ## 🔬 4. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the defensive auditing framework:
-1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2. **Deterministic Logging Verification**: Under APIC ticks, the `DefensiveAuditLogger` uses pre-allocated circular buffers, guaranteeing O(1) constant time logging without heap-allocation overhead.
-3. **Continuous Attestation**: Attestation results feed directly into Zenith's diagnostic widget panels, showing real-time security postures.
+
+1.  **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
+2.  **Deterministic Logging Verification**: Under APIC ticks, the `DefensiveAuditLogger` uses pre-allocated circular buffers, guaranteeing O(1) constant time logging without heap-allocation overhead.
+3.  **Continuous Attestation**: Attestation results feed directly into Zenith's diagnostic widget panels, showing real-time security postures.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized defensive security auditing pipeline that completely surpasses legacy logging engines.

@@ -5,99 +5,107 @@
 ## Features
 
 ### SigmaCRM (Customer Relationship Management)
+
 Customer relationship management:
-- Contact and lead management
-- Sales pipeline tracking
-- Opportunity management
-- Customer communication history
-- Email integration with SigmaMail
-- Calendar integration with SigmaCalendar
-- Sales forecasting and reporting
-- AI-powered lead scoring
-- Customer segmentation
-- Mobile CRM app
+
+*   Contact and lead management
+*   Sales pipeline tracking
+*   Opportunity management
+*   Customer communication history
+*   Email integration with SigmaMail
+*   Calendar integration with SigmaCalendar
+*   Sales forecasting and reporting
+*   AI-powered lead scoring
+*   Customer segmentation
+*   Mobile CRM app
 
 ### SigmaAccounting (Accounting & Finance)
+
 Ledger, invoicing, and expenses:
-- Double-entry bookkeeping
-- General ledger and chart of accounts
-- Accounts payable and receivable
-- Invoice generation and tracking
-- Expense management
-- Financial reporting (balance sheet, P&L, cash flow)
-- Tax compliance (GST, TDS, VAT)
-- Bank reconciliation
-- Multi-currency support
-- AI-powered anomaly detection for fraud
+
+*   Double-entry bookkeeping
+*   General ledger and chart of accounts
+*   Accounts payable and receivable
+*   Invoice generation and tracking
+*   Expense management
+*   Financial reporting (balance sheet, P\&L, cash flow)
+*   Tax compliance (GST, TDS, VAT)
+*   Bank reconciliation
+*   Multi-currency support
+*   AI-powered anomaly detection for fraud
 
 ### SigmaInventory (Inventory Management)
+
 Comprehensive inventory tracking:
-- Product catalog management
-- Stock level monitoring
-- Purchase order management
-- Sales order processing
-- Warehouse management
-- Barcode/QR code scanning
-- Serial number tracking
-- Lot and batch tracking
-- Inventory valuation (FIFO, LIFO, weighted average)
-- AI-powered demand forecasting
+
+*   Product catalog management
+*   Stock level monitoring
+*   Purchase order management
+*   Sales order processing
+*   Warehouse management
+*   Barcode/QR code scanning
+*   Serial number tracking
+*   Lot and batch tracking
+*   Inventory valuation (FIFO, LIFO, weighted average)
+*   AI-powered demand forecasting
 
 ### SigmaHR (Human Resources)
+
 Human resources management:
-- Employee records and profiles
-- Attendance and time tracking
-- Payroll processing
-- Leave management
-- Performance reviews
-- Recruitment and onboarding
-- Training and development
-- Employee self-service portal
-- Compliance and reporting
-- AI-powered talent matching
+
+*   Employee records and profiles
+*   Attendance and time tracking
+*   Payroll processing
+*   Leave management
+*   Performance reviews
+*   Recruitment and onboarding
+*   Training and development
+*   Employee self-service portal
+*   Compliance and reporting
+*   AI-powered talent matching
 
 ### SigmaProjects (Project Management)
+
 Project management and tracking:
-- Project planning and scheduling
-- Task management and assignment
-- Gantt charts and timelines
-- Resource allocation
-- Time tracking and billing
-- Milestone tracking
-- Collaboration tools
-- Project reporting and analytics
-- AI-powered risk assessment
+
+*   Project planning and scheduling
+*   Task management and assignment
+*   Gantt charts and timelines
+*   Resource allocation
+*   Time tracking and billing
+*   Milestone tracking
+*   Collaboration tools
+*   Project reporting and analytics
+*   AI-powered risk assessment
 
 ## Architecture
 
-```
-SigmaBusiness Suite
-   ├─ SigmaCRM (CRM engine)
-   │   ├─ Contact database
-   │   ├─ Sales pipeline tracker
-   │   ├─ Lead scoring engine (AI)
-   │   └─ Communication logger
-   ├─ SigmaAccounting (accounting engine)
-   │   ├─ General ledger
-   │   ├─ Invoice generator
-   │   ├─ Tax calculator
-   │   └─ Financial reporter
-   ├─ SigmaInventory (inventory engine)
-   │   ├─ Product catalog
-   │   ├─ Stock monitor
-   │   ├─ Purchase order processor
-   │   └─ Demand forecaster (AI)
-   ├─ SigmaHR (HR engine)
-   │   ├─ Employee database
-   │   ├─ Payroll processor
-   │   ├─ Attendance tracker
-   │   └─ Recruitment manager
-   └─ SigmaProjects (project engine)
-       ├─ Project scheduler
-       ├─ Task manager
-       ├─ Resource allocator
-       └─ Risk assessor (AI)
-```
+    SigmaBusiness Suite
+       ├─ SigmaCRM (CRM engine)
+       │   ├─ Contact database
+       │   ├─ Sales pipeline tracker
+       │   ├─ Lead scoring engine (AI)
+       │   └─ Communication logger
+       ├─ SigmaAccounting (accounting engine)
+       │   ├─ General ledger
+       │   ├─ Invoice generator
+       │   ├─ Tax calculator
+       │   └─ Financial reporter
+       ├─ SigmaInventory (inventory engine)
+       │   ├─ Product catalog
+       │   ├─ Stock monitor
+       │   ├─ Purchase order processor
+       │   └─ Demand forecaster (AI)
+       ├─ SigmaHR (HR engine)
+       │   ├─ Employee database
+       │   ├─ Payroll processor
+       │   ├─ Attendance tracker
+       │   └─ Recruitment manager
+       └─ SigmaProjects (project engine)
+           ├─ Project scheduler
+           ├─ Task manager
+           ├─ Resource allocator
+           └─ Risk assessor (AI)
 
 ## API Interface
 
@@ -140,19 +148,19 @@ int sigma_projects_generate_report(const char *project_id, project_report_t *rep
 
 ## Integration
 
-- **SigmaOffice Integration**: Document generation with SigmaWriter, spreadsheets with SigmaSheet
-- **SigmaCloud Integration**: Email via SigmaMail, calendar via SigmaCalendar, file storage via SigmaDrive
-- **SigmaAI Integration**: AI-powered lead scoring, demand forecasting, risk assessment, fraud detection
-- **SigmaFS Integration**: Document storage with SovereignFS snapshots
-- **Zenith Desktop Integration**: Native Zenith UI with dashboards and reports
+*   **SigmaOffice Integration**: Document generation with SigmaWriter, spreadsheets with SigmaSheet
+*   **SigmaCloud Integration**: Email via SigmaMail, calendar via SigmaCalendar, file storage via SigmaDrive
+*   **SigmaAI Integration**: AI-powered lead scoring, demand forecasting, risk assessment, fraud detection
+*   **SigmaFS Integration**: Document storage with SovereignFS snapshots
+*   **Zenith Desktop Integration**: Native Zenith UI with dashboards and reports
 
 ## Compliance
 
-- **GST Compliance**: Indian GST filing and reporting (GSTR-1, GSTR-3B)
-- **TDS Compliance**: Tax deduction at source calculation and reporting
-- **Accounting Standards**: Compliance with IFRS and local accounting standards
-- **Labor Laws**: Compliance with local labor regulations
-- **Data Privacy**: GDPR and local data protection law compliance
+*   **GST Compliance**: Indian GST filing and reporting (GSTR-1, GSTR-3B)
+*   **TDS Compliance**: Tax deduction at source calculation and reporting
+*   **Accounting Standards**: Compliance with IFRS and local accounting standards
+*   **Labor Laws**: Compliance with local labor regulations
+*   **Data Privacy**: GDPR and local data protection law compliance
 
 ## Performance Characteristics
 
@@ -166,21 +174,21 @@ int sigma_projects_generate_report(const char *project_id, project_report_t *rep
 
 ## Roadmap
 
-- [x] Architecture design and component specification
-- [ ] SigmaCRM contact and pipeline implementation
-- [ ] SigmaAccounting ledger and invoicing implementation
-- [ ] SigmaInventory stock and PO implementation
-- [ ] SigmaHR payroll and attendance implementation
-- [ ] SigmaProjects task and resource implementation
-- [ ] GST/TDS compliance modules
-- [ ] AI-powered features (lead scoring, demand forecasting, risk assessment)
-- [ ] Mobile apps (SigmaOS Mobile, iOS, Android)
-- [ ] Web interface (SigmaOS Cloud)
-- [ ] Multi-tenant SaaS version
+*   \[x] Architecture design and component specification
+*   \[ ] SigmaCRM contact and pipeline implementation
+*   \[ ] SigmaAccounting ledger and invoicing implementation
+*   \[ ] SigmaInventory stock and PO implementation
+*   \[ ] SigmaHR payroll and attendance implementation
+*   \[ ] SigmaProjects task and resource implementation
+*   \[ ] GST/TDS compliance modules
+*   \[ ] AI-powered features (lead scoring, demand forecasting, risk assessment)
+*   \[ ] Mobile apps (SigmaOS Mobile, iOS, Android)
+*   \[ ] Web interface (SigmaOS Cloud)
+*   \[ ] Multi-tenant SaaS version
 
 ## Related Modules
 
-- [`suites/SigmaOffice`](../SigmaOffice/README.md) — Office suite integration
-- [`suites/SigmaCloud`](../SigmaCloud/README.md) — Cloud suite integration
-- [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration
-- [`security/pqc/README.md`](../../security/pqc/README.md) — Cryptographic security
+*   [`suites/SigmaOffice`](../SigmaOffice/README.md) — Office suite integration
+*   [`suites/SigmaCloud`](../SigmaCloud/README.md) — Cloud suite integration
+*   [`modules/core/fs`](../../modules/core/fs/README.md) — Filesystem integration
+*   [`security/pqc/README.md`](../../security/pqc/README.md) — Cryptographic security

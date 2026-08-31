@@ -4,7 +4,7 @@ This document details the master plan, workflows, and implementations to achieve
 
 By ensuring that 100% of desktop, administrative, and configuration tasks can be driven headless via highly optimized commands, SigmaOS becomes the ultimate powerhouse for developers, server administrators, and automated build pipelines.
 
----
+***
 
 ## 🗺️ Parity Matrix: GUI vs. CLI
 
@@ -16,35 +16,40 @@ By ensuring that 100% of desktop, administrative, and configuration tasks can be
 | **Standards Compliance** | Settings -> Standards tab | `sigstandards verify <path>`, `sigstandards posix` | **Implemented** |
 | **Real-Time Scheduler** | Control Panel -> Performance modes toggles | `sigsched rt`, `sigsched hpc`, `sigsched show` | **Implemented** |
 
----
+***
 
 ## 🛠️ 1. Native CLI Commands & Syntax Specification
 
 To support these workflows directly, the microkernel shell parses and validates the following structured system commands:
 
 ### 1.1 Package Management: `sigpkg`
-- **Install Package**: `sigpkg install <package_name>`
-  - Triggers the Universal Package Manager to resolve dependencies and verify Dilithium-5 signatures.
-- **Uninstall Package**: `sigpkg remove <package_name>`
-  - Safe removal and dependency pruning.
+
+*   **Install Package**: `sigpkg install <package_name>`
+    *   Triggers the Universal Package Manager to resolve dependencies and verify Dilithium-5 signatures.
+*   **Uninstall Package**: `sigpkg remove <package_name>`
+    *   Safe removal and dependency pruning.
 
 ### 1.2 System Observability: `sigtrace`
-- **Trace Event**: `sigtrace trace <event> <payload>`
-  - Registers dynamic eBPF-like tracing hooks inside kernel context spans.
+
+*   **Trace Event**: `sigtrace trace <event> <payload>`
+    *   Registers dynamic eBPF-like tracing hooks inside kernel context spans.
 
 ### 1.3 Telemetry Exporter: `sigmetrics`
-- **Prometheus Export**: `sigmetrics export`
-  - Formats current memory allocations, CPU loads, and queue states to raw text endpoints.
+
+*   **Prometheus Export**: `sigmetrics export`
+    *   Formats current memory allocations, CPU loads, and queue states to raw text endpoints.
 
 ### 1.4 Standard Verification: `sigstandards`
-- **FHS Compliance**: `sigstandards verify <path_name>`
-  - Evaluates standard path routes against the FHS specification.
+
+*   **FHS Compliance**: `sigstandards verify <path_name>`
+    *   Evaluates standard path routes against the FHS specification.
 
 ### 1.5 Performance Scheduling Profile: `sigsched`
-- **Toggles Profiles**: `sigsched rt` or `sigsched hpc`
-  - Tunes preemption limits and context-switch bypass channels.
 
----
+*   **Toggles Profiles**: `sigsched rt` or `sigsched hpc`
+    *   Tunes preemption limits and context-switch bypass channels.
+
+***
 
 ## 📅 2. Integration & Synchronization
 

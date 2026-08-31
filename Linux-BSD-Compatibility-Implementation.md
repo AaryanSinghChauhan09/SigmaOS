@@ -10,10 +10,10 @@ SigmaOS implements comprehensive compatibility with major Linux distributions an
 
 Located in `src/network/npf.rs`, the NetBSD NPF-inspired stateful packet filtering engine provides:
 
-- **Stateful Inspection**: Maintains connection state for TCP/UDP/ICMP protocols
-- **NAT Translation**: Network address translation with port mapping
-- **Rule-Based Filtering**: Configurable allow/deny rules with direction support
-- **Zero-Dependency**: Built with no external dependencies for sovereign operation
+*   **Stateful Inspection**: Maintains connection state for TCP/UDP/ICMP protocols
+*   **NAT Translation**: Network address translation with port mapping
+*   **Rule-Based Filtering**: Configurable allow/deny rules with direction support
+*   **Zero-Dependency**: Built with no external dependencies for sovereign operation
 
 ### Key Components
 
@@ -43,11 +43,11 @@ engine.add_rule(NpfStateRule {
 
 ### Features
 
-- **Protocol Support**: TCP (6), UDP (17), ICMP (1)
-- **Direction Control**: Inbound, Outbound, Both
-- **State Tracking**: Automatic session state management
-- **NAT Support**: Source NAT with port translation
-- **Performance**: BTreeMap for O(log n) lookups
+*   **Protocol Support**: TCP (6), UDP (17), ICMP (1)
+*   **Direction Control**: Inbound, Outbound, Both
+*   **State Tracking**: Automatic session state management
+*   **NAT Support**: Source NAT with port translation
+*   **Performance**: BTreeMap for O(log n) lookups
 
 ## FreeBSD GEOM Implementation
 
@@ -55,10 +55,10 @@ engine.add_rule(NpfStateRule {
 
 Located in `src/filesystem/geom.rs`, the FreeBSD GEOM-inspired storage framework provides:
 
-- **Modular Storage Classes**: Pluggable storage transformation modules
-- **Provider/Consumer Model**: Clear separation between storage providers and consumers
-- **RAID Support**: Stripe (RAID0) and mirror (RAID1) transformations
-- **Access Control**: Read, Write, and Exclusive access rights
+*   **Modular Storage Classes**: Pluggable storage transformation modules
+*   **Provider/Consumer Model**: Clear separation between storage providers and consumers
+*   **RAID Support**: Stripe (RAID0) and mirror (RAID1) transformations
+*   **Access Control**: Read, Write, and Exclusive access rights
 
 ### Key Components
 
@@ -94,11 +94,11 @@ let stripe = geom_stripe_class
 
 ### Features
 
-- **Storage Topology**: Hierarchical provider/consumer relationships
-- **Transformations**: RAID0 striping, RAID1 mirroring
-- **Capacity Management**: Automatic capacity calculation
-- **Access Control**: Fine-grained access rights management
-- **Extensibility**: Easy to add new transformation types
+*   **Storage Topology**: Hierarchical provider/consumer relationships
+*   **Transformations**: RAID0 striping, RAID1 mirroring
+*   **Capacity Management**: Automatic capacity calculation
+*   **Access Control**: Fine-grained access rights management
+*   **Extensibility**: Easy to add new transformation types
 
 ## Alpine BusyBox Implementation
 
@@ -106,10 +106,10 @@ let stripe = geom_stripe_class
 
 Located in `src/shell/busybox_applet.rs`, the Alpine BusyBox-inspired multi-call binary system provides:
 
-- **Command Multiplexing**: Single binary handles multiple commands
-- **Zero-Dependency**: No external command dependencies
-- **Extensible**: Easy to add new applets
-- **Safe**: Rust-based implementation with memory safety
+*   **Command Multiplexing**: Single binary handles multiple commands
+*   **Zero-Dependency**: No external command dependencies
+*   **Extensible**: Easy to add new applets
+*   **Safe**: Rust-based implementation with memory safety
 
 ### Key Components
 
@@ -133,19 +133,19 @@ let cat_out = dispatcher.dispatch("cat", &["/etc/hostname"]).unwrap();
 
 ### Default Applets
 
-- **ls**: Directory listing
-- **cat**: File content display
-- **echo**: Text output
-- **grep**: Pattern matching
-- **cp**: File copying
+*   **ls**: Directory listing
+*   **cat**: File content display
+*   **echo**: Text output
+*   **grep**: Pattern matching
+*   **cp**: File copying
 
 ### Features
 
-- **Multi-Call Architecture**: Single binary, multiple commands
-- **Extensible Design**: Easy to add custom applets
-- **Error Handling**: Comprehensive error reporting
-- **Memory Safe**: Rust-based implementation
-- **Sovereign**: No external dependencies
+*   **Multi-Call Architecture**: Single binary, multiple commands
+*   **Extensible Design**: Easy to add custom applets
+*   **Error Handling**: Comprehensive error reporting
+*   **Memory Safe**: Rust-based implementation
+*   **Sovereign**: No external dependencies
 
 ## Integration with SigmaOS
 
@@ -179,24 +179,28 @@ pub use busybox_applet::{BusyBoxAppletDispatcher, AppletHandler};
 ## Benefits of Linux/BSD Compatibility
 
 ### 1. Proven Architectures
-- **NPF**: Battle-tested packet filtering from NetBSD
-- **GEOM**: Flexible storage transformation from FreeBSD
-- **BusyBox**: Proven multi-call binary from Alpine
+
+*   **NPF**: Battle-tested packet filtering from NetBSD
+*   **GEOM**: Flexible storage transformation from FreeBSD
+*   **BusyBox**: Proven multi-call binary from Alpine
 
 ### 2. Zero Dependency
-- **Sovereign Operation**: No external library dependencies
-- **Self-Contained**: Complete implementations in Rust
-- **Maintainable**: Full control over codebase
+
+*   **Sovereign Operation**: No external library dependencies
+*   **Self-Contained**: Complete implementations in Rust
+*   **Maintainable**: Full control over codebase
 
 ### 3. Security Focus
-- **Stateful Inspection**: Advanced packet filtering
-- **Access Control**: Fine-grained permissions
-- **Memory Safety**: Rust-based implementations
+
+*   **Stateful Inspection**: Advanced packet filtering
+*   **Access Control**: Fine-grained permissions
+*   **Memory Safety**: Rust-based implementations
 
 ### 4. Performance
-- **Efficient Data Structures**: BTreeMap for fast lookups
-- **Zero-Copy**: Minimized data copying
-- **Optimized Algorithms**: Proven BSD algorithms
+
+*   **Efficient Data Structures**: BTreeMap for fast lookups
+*   **Zero-Copy**: Minimized data copying
+*   **Optimized Algorithms**: Proven BSD algorithms
 
 ## Testing
 
@@ -250,20 +254,20 @@ fn test_busybox_integration() {
 
 ### Planned Features
 
-1. **Advanced NPF Features**
-   - QoS support
-   - Advanced NAT rules
-   - IPv6 support
+1.  **Advanced NPF Features**
+    *   QoS support
+    *   Advanced NAT rules
+    *   IPv6 support
 
-2. **Extended GEOM Transformations**
-   - RAID5 support
-   - Encryption layers
-   - Compression
+2.  **Extended GEOM Transformations**
+    *   RAID5 support
+    *   Encryption layers
+    *   Compression
 
-3. **BusyBox Applets**
-   - Additional core utilities
-   - System administration tools
-   - Network utilities
+3.  **BusyBox Applets**
+    *   Additional core utilities
+    *   System administration tools
+    *   Network utilities
 
 ## Conclusion
 

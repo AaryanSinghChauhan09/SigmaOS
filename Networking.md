@@ -4,32 +4,30 @@
 
 SigmaOS uses a modern, eBPF-first networking architecture:
 
-```
-Application Layer
-    │
-    ▼
-Socket API (AF_INET, AF_INET6, AF_UNIX, io_uring)
-    │
-    ▼
-NetworkBolt Daemon (sigma-net)
-    │
-    ├── WireGuard VPN
-    ├── DNS Resolver (DoH/DoT)
-    ├── Network Manager
-    └── Zero-Trust Agent
-    │
-    ▼
-Kernel Network Stack
-    │
-    ├── eBPF TC (Traffic Control)
-    ├── eBPF XDP (Express Data Path)
-    └── netfilter (legacy compat)
-    │
-    ▼
-Network Hardware Drivers
-    │
-    └── (WiFi/Ethernet/Bluetooth)
-```
+    Application Layer
+        │
+        ▼
+    Socket API (AF_INET, AF_INET6, AF_UNIX, io_uring)
+        │
+        ▼
+    NetworkBolt Daemon (sigma-net)
+        │
+        ├── WireGuard VPN
+        ├── DNS Resolver (DoH/DoT)
+        ├── Network Manager
+        └── Zero-Trust Agent
+        │
+        ▼
+    Kernel Network Stack
+        │
+        ├── eBPF TC (Traffic Control)
+        ├── eBPF XDP (Express Data Path)
+        └── netfilter (legacy compat)
+        │
+        ▼
+    Network Hardware Drivers
+        │
+        └── (WiFi/Ethernet/Bluetooth)
 
 ## NetworkBolt (`sigma-net`)
 
@@ -88,16 +86,18 @@ sigma-net wg add-peer wg0 \
 ## Zero-Trust Network Access
 
 SigmaOS implements Zero-Trust principles:
-- Every connection authenticated and authorized
-- Mutual TLS for all internal services
-- Policy-based access control via Sentinel
-- Continuous verification (not just at login)
+
+*   Every connection authenticated and authorized
+*   Mutual TLS for all internal services
+*   Policy-based access control via Sentinel
+*   Continuous verification (not just at login)
 
 ## DNS Resolution
 
 Multi-layer DNS with privacy protection:
-1. Local cache (dnsmasq)
-2. DNS-over-HTTPS (Cloudflare/Quad9/custom)
-3. DNS-over-TLS fallback
-4. DNSSEC validation
-5. Split-horizon DNS for VPN
+
+1.  Local cache (dnsmasq)
+2.  DNS-over-HTTPS (Cloudflare/Quad9/custom)
+3.  DNS-over-TLS fallback
+4.  DNSSEC validation
+5.  Split-horizon DNS for VPN

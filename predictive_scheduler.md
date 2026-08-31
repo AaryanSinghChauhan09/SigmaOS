@@ -2,7 +2,7 @@
 
 Inspired by **Linux's Completely Fair Scheduler (CFS)**, **RT-PREEMPT**, and modern predictive scheduling, this document defines a complete, functional, `#![no_std]` predictive Multi-Level Feedback Queue (MLFQ) scheduler. It uses Object-Oriented Programming (OOP) principles, contains zero external dependencies, and implements dynamic task scaling and wait times.
 
----
+***
 
 ## 🏗️ Component Implementation Source Code
 

@@ -2,16 +2,16 @@
 
 ## Overview
 
-SigmaOS provides a clean-room hardware execution and userland CPU architecture emulator capable of executing foreign binaries (e.g., AArch64 on x86_64, RISC-V on x86_64) without QEMU or foreign dynamic libraries.
+SigmaOS provides a clean-room hardware execution and userland CPU architecture emulator capable of executing foreign binaries (e.g., AArch64 on x86\_64, RISC-V on x86\_64) without QEMU or foreign dynamic libraries.
 
----
+***
 
 ## Key Modules
 
-- [`src/docs/Sovereign-Processor-State-Emulator.md`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/docs/Sovereign-Processor-State-Emulator.md): ISA translation and register mapping specification.
-- [`src/compatibility/wasm_sandbox.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/compatibility/wasm_sandbox.rs): WebAssembly / bytecode universal execution engine.
+*   [`src/docs/Sovereign-Processor-State-Emulator.md`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/docs/Sovereign-Processor-State-Emulator.md): ISA translation and register mapping specification.
+*   [`src/compatibility/wasm_sandbox.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/compatibility/wasm_sandbox.rs): WebAssembly / bytecode universal execution engine.
 
----
+***
 
 ## Capabilities
 

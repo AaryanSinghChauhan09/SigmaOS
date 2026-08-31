@@ -2,14 +2,14 @@
 
 A comprehensive catalog of all architectural components and subsystems implemented in SigmaOS, mapped to their Linux and BSD counterparts with implementation files and readiness statuses.
 
----
+***
 
 ## 📊 Core Subsystems & Components Matrix
 
 | Component | Subsystem | Module Path | Status | Description | Linux Equivalent | BSD Equivalent | Primary Implementation File |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Microkernel Core** | Core Kernel | `src/kernel/` | ✅ Production Ready | Microkernel architecture, task lifecycle, capabilities | `vmlinux` / `kernel/` | `sys/kern/` | [`src/kernel/main.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/kernel/main.rs) |
-| **Hardware Abstraction (HAL)** | Hardware | `src/hal/` | ✅ Production Ready | Multi-arch hardware abstraction (x86_64, aarch64, riscv64) | `arch/` | `sys/arch/` | [`src/hal/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/hal/mod.rs) |
+| **Hardware Abstraction (HAL)** | Hardware | `src/hal/` | ✅ Production Ready | Multi-arch hardware abstraction (x86\_64, aarch64, riscv64) | `arch/` | `sys/arch/` | [`src/hal/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/hal/mod.rs) |
 | **Virtual Memory Manager** | Memory | `src/memory/` | ✅ Production Ready | 4-level paging, 2MB superpages, heap alloc, copy-on-write | `mm/` | `sys/vm/` | [`src/memory/vmm.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/memory/vmm.rs) |
 | **Sentinel Security Engine** | Security | `src/security/` | ✅ Production Ready | Capability tokens, pledge/unveil, path traversal protection | SELinux / AppArmor | Capsicum / OpenBSD pledge | [`src/security/sentinel.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/security/sentinel.rs) |
 | **Virtual Filesystem (VFS)** | Storage | `src/filesystem/` | ✅ Production Ready | Multi-format VFS, mount namespaces, caching | `fs/` | `sys/vfs/` | [`src/filesystem/vfs.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/filesystem/vfs.rs) |
@@ -37,39 +37,37 @@ A comprehensive catalog of all architectural components and subsystems implement
 | **Open-Source Obsoletion Engines** | Self-Sufficiency | `src/open_source_obsoletion.rs` | ✅ Production Ready | Zero-dependency safe-Rust engines replacing 500+ legacy software packages | - | - | [`src/open_source_obsoletion.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/open_source_obsoletion.rs) |
 | **Bootloader & Secure Boot** | Boot | `src/boot/` | ✅ Production Ready | UEFI multi-bootloader, Stage 1/2 payload, kernel handoff | GRUB2 / systemd-boot | FreeBSD loader | [`src/boot/bootloader.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/boot/bootloader.rs) |
 
----
+***
 
 ## 🏛️ Architecture Shard Hierarchy
 
-```
-+---------------------------------------------------------------------------------------------------+
-|                                ZENITH DESKTOP COMPOSITOR & SHELL                                  |
-|                            (Wayland Protocol + SIMD UI Vector Renderer)                           |
-+---------------------------------------------------------------------------------------------------+
-                                                  |
-                                                  v [Zero-Copy IPC Capability Tokens]
-+---------------------------------------------------------------------------------------------------+
-|                                  RING 3 SYSTEM SERVICE SHARDS                                     |
-|                                                                                                   |
-|  [S-MEDIA]    [S-OFFICE]   [S-CONNECT]   [S-VIRT]     [S-AI]       [S-DATA]     [S-CODEC]         |
-|  Audio/Video  Docs/Markup  P2P/Net/Tor   Hypervisor   MoE Router   Relational   Bitstream         |
-|  Synthesis    AST Engine   HTTP/3 Web    Containers   Inference    & Spatial    Decoders          |
-|                                                                                                   |
-|  [S-SCIENCE]  [S-SIM]      [S-ROBO]      [S-SECURE]   [S-ML]       [S-PKG]                        |
-|  Numerical    FEA / CFD    Autopilot     Sentinel     Tensor Auto  sigpkg / Nix                   |
-|  Matrix JIT   Solvers      PID Loops     PQ-Crypto    Diff & GBDT  Profiles                       |
-+---------------------------------------------------------------------------------------------------+
-                                                  |
-                                                  v [Hardware Boundary Syscall Gates]
-+---------------------------------------------------------------------------------------------------+
-|                                RING 0 SOVEREIGN MICROKERNEL                                       |
-|                                                                                                   |
-|  - EEVDF Scheduler + BORE Latency Enhancer     - 2MB Superpage & Heap Memory Manager              |
-|  - Capability Token Verification Engine        - Virtual Filesystem (VFS) Dispatcher              |
-|  - ACPI / PCIe Device Bus Root                 - Multi-Arch Hardware Abstraction Layer (HAL)      |
-+---------------------------------------------------------------------------------------------------+
-```
+    +---------------------------------------------------------------------------------------------------+
+    |                                ZENITH DESKTOP COMPOSITOR & SHELL                                  |
+    |                            (Wayland Protocol + SIMD UI Vector Renderer)                           |
+    +---------------------------------------------------------------------------------------------------+
+                                                      |
+                                                      v [Zero-Copy IPC Capability Tokens]
+    +---------------------------------------------------------------------------------------------------+
+    |                                  RING 3 SYSTEM SERVICE SHARDS                                     |
+    |                                                                                                   |
+    |  [S-MEDIA]    [S-OFFICE]   [S-CONNECT]   [S-VIRT]     [S-AI]       [S-DATA]     [S-CODEC]         |
+    |  Audio/Video  Docs/Markup  P2P/Net/Tor   Hypervisor   MoE Router   Relational   Bitstream         |
+    |  Synthesis    AST Engine   HTTP/3 Web    Containers   Inference    & Spatial    Decoders          |
+    |                                                                                                   |
+    |  [S-SCIENCE]  [S-SIM]      [S-ROBO]      [S-SECURE]   [S-ML]       [S-PKG]                        |
+    |  Numerical    FEA / CFD    Autopilot     Sentinel     Tensor Auto  sigpkg / Nix                   |
+    |  Matrix JIT   Solvers      PID Loops     PQ-Crypto    Diff & GBDT  Profiles                       |
+    +---------------------------------------------------------------------------------------------------+
+                                                      |
+                                                      v [Hardware Boundary Syscall Gates]
+    +---------------------------------------------------------------------------------------------------+
+    |                                RING 0 SOVEREIGN MICROKERNEL                                       |
+    |                                                                                                   |
+    |  - EEVDF Scheduler + BORE Latency Enhancer     - 2MB Superpage & Heap Memory Manager              |
+    |  - Capability Token Verification Engine        - Virtual Filesystem (VFS) Dispatcher              |
+    |  - ACPI / PCIe Device Bus Root                 - Multi-Arch Hardware Abstraction Layer (HAL)      |
+    +---------------------------------------------------------------------------------------------------+
 
----
+***
 
 *Generated and synchronized with repository source modules — SigmaOS Core Team*

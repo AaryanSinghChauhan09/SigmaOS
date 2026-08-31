@@ -4,7 +4,7 @@
 
 This document tracks known issues, limitations, and technical debt across the codebase.
 
----
+***
 
 ## Critical (P0) — Blocks Boot/Functionality
 
@@ -14,7 +14,7 @@ This document tracks known issues, limitations, and technical debt across the co
 | BUG-002 | Scheduler | Work-stealing uses O(n) scan; may cause latency spikes on >8 CPUs | Limit to single-CPU in current builds |
 | BUG-003 | UEFI Boot | `sigma_efi_entry.c` ELF segment loading is a stub — kernel not actually mapped from ELF | Use flat binary load for testing |
 
----
+***
 
 ## High (P1) — Significant Limitations
 
@@ -28,7 +28,7 @@ This document tracks known issues, limitations, and technical debt across the co
 | ~~BUG-009~~ | ~~Init System~~ | ~~`sigma_init.rs` service dependency graph not built; all services start sequentially~~ | **RESOLVED v15.1** — Kahn's BFS topological sort implemented via `SigmaDepGraph` |
 | BUG-010 | AI Agent | Inference is a heuristic stub; no real LLM model loaded | v15.2 |
 
----
+***
 
 ## Medium (P2) — Functional Gaps
 
@@ -41,7 +41,7 @@ This document tracks known issues, limitations, and technical debt across the co
 | BUG-015 | Seccomp | `sigma_seccomp.rs` BPF JIT not implemented; filters not applied | v15.2 |
 | BUG-016 | Locale | Locale packs are TOML stubs; not loaded by the display system | v15.2 |
 
----
+***
 
 ## Low (P3) — Polish / Optimization
 
@@ -54,7 +54,7 @@ This document tracks known issues, limitations, and technical debt across the co
 | BUG-021 | SigmaFS | Indirect block pointers for large files not implemented | Open |
 | BUG-022 | i915 | Display mode setting relies on GOP pre-configuration; custom resolution not supported | Open |
 
----
+***
 
 ## Technical Debt
 
@@ -66,7 +66,7 @@ This document tracks known issues, limitations, and technical debt across the co
 | Error propagation | Most functions return `bool` or `Option`; should migrate to `Result<T, SigmaError>` |
 | Documentation | Inline doc comments missing from most public functions |
 
----
+***
 
 ## Reporting New Issues
 

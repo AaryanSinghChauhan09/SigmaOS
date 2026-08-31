@@ -73,7 +73,7 @@
 | Security defaults | ✅ |
 | Small footprint | 🚧 |
 
-## Pop!_OS
+## Pop!\_OS
 
 | Feature | Status |
 |---------|--------|
@@ -129,7 +129,8 @@
 | AnonSurf (Tor) | 🔬 |
 | Privacy tools | 🚧 |
 
----
+***
 
 ## Legend
+
 ✅ Fully implemented | 🚧 In progress | 🔬 Experimental | 📋 Planned

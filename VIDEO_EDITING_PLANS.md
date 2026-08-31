@@ -4,60 +4,63 @@ This document details the complete, industrial-grade development plans, architec
 
 Inspired by Kdenlive, DaVinci Resolve, and modern GPU-accelerated video compositing architectures, this blueprint establishes a sovereign, zero-dependency, and capability-gated timeline rendering model designed for absolute digital autonomy.
 
----
+***
 
 ## 🏗️ 1. Core Architectural Vision
 
 SigmaCut discards bloated third-party media pipelines and legacy POSIX rendering assumptions to build a fast, memory-safe, and parallelized timeline processing pipeline directly in `#![no_std]` Rust.
 
 ### Key Design Pillars
-1. **Object-Oriented Timeline Representation**: Model tracks, video clips, transition effects, and audio layers as strictly typed, modular OOP components.
-2. **YUV-to-RGB Parallel Conversion**: Perform hardware-vectorized color translation in real-time, eliminating frames decoding overhead.
-3. **PQC & Sandbox Enforced Effects**: Enforce secure execution of custom video filters (UDFs) and AI-driven background removal/upscaling models via capability-gated sandbox boundaries.
-4. **Multithreaded Decimation & Composition**: Leverage predictive MLFQ threads to orchestrate frame compositing pipelines across multi-core architectures.
 
----
+1.  **Object-Oriented Timeline Representation**: Model tracks, video clips, transition effects, and audio layers as strictly typed, modular OOP components.
+2.  **YUV-to-RGB Parallel Conversion**: Perform hardware-vectorized color translation in real-time, eliminating frames decoding overhead.
+3.  **PQC & Sandbox Enforced Effects**: Enforce secure execution of custom video filters (UDFs) and AI-driven background removal/upscaling models via capability-gated sandbox boundaries.
+4.  **Multithreaded Decimation & Composition**: Leverage predictive MLFQ threads to orchestrate frame compositing pipelines across multi-core architectures.
+
+***
 
 ## 🚀 2. Master Video Editor Development Plan
 
 The video processing suite is organized into **four core technology layers**, mapping out integration pathways, Kdenlive/Resolve equivalents, and precise capability gates.
 
-```
-                    +------------------------------+
-                    |    Zenith UI Compositor      |
-                    +------------------------------+
-                                   |
-         +-------------------------+-------------------------+
-         |                                                   |
-         v                                                   v
-+------------------+                               +------------------+
-|  Timeline Shard  | <--- (Zero-Copy Blitting) --->| Video Effect Sh  |
-| - Track Layer    |                               | - YUV to RGB     |
-| - Clip Splice    |                               | - Subtitle Overlay|
-| - Compositor Bus |                               | - Frame Interpol |
-+------------------+                               +------------------+
-```
+                        +------------------------------+
+                        |    Zenith UI Compositor      |
+                        +------------------------------+
+                                       |
+             +-------------------------+-------------------------+
+             |                                                   |
+             v                                                   v
+    +------------------+                               +------------------+
+    |  Timeline Shard  | <--- (Zero-Copy Blitting) --->| Video Effect Sh  |
+    | - Track Layer    |                               | - YUV to RGB     |
+    | - Clip Splice    |                               | - Subtitle Overlay|
+    | - Compositor Bus |                               | - Frame Interpol |
+    +------------------+                               +------------------+
 
 ### 2.1 Multitrack Timeline and Composition Bus (Kdenlive Equivalent)
-- **Objective**: Standardized multitrack timeline supporting overlapping video and audio tracks, clip slicing, frame offset alignments, and volume mixing.
-- **Inspiration**: Kdenlive MLT (Media Lovin' Toolkit) engine.
-- **Efficiency**: Lock-free timeline trees allowing real-time preview playback.
+
+*   **Objective**: Standardized multitrack timeline supporting overlapping video and audio tracks, clip slicing, frame offset alignments, and volume mixing.
+*   **Inspiration**: Kdenlive MLT (Media Lovin' Toolkit) engine.
+*   **Efficiency**: Lock-free timeline trees allowing real-time preview playback.
 
 ### 2.2 YUV to RGB Hardware-Friendly Color Space (Linux LibYUV Equivalent)
-- **Objective**: Extreme high-performance, zero-dependency color translation for popular camera streams (YUV420p to RGBA).
-- **Inspiration**: Google LibYUV used widely across Linux media pipelines.
-- **Accuracy**: Fixed-point integer math to maximize speed and bypass floating-point bottlenecks on low-power devices.
+
+*   **Objective**: Extreme high-performance, zero-dependency color translation for popular camera streams (YUV420p to RGBA).
+*   **Inspiration**: Google LibYUV used widely across Linux media pipelines.
+*   **Accuracy**: Fixed-point integer math to maximize speed and bypass floating-point bottlenecks on low-power devices.
 
 ### 2.3 Subtitle Rendering and Overlay Engine (Linux LibASS Equivalent)
-- **Objective**: High-fidelity text and subtitle rasterization, blending overlays directly into video frames with alpha compositing.
-- **Inspiration**: LibASS (Advanced Substation Alpha) subtitle renderer.
-- **Performance**: Zero-copy glyph cache blitting directly to active timeline frames.
+
+*   **Objective**: High-fidelity text and subtitle rasterization, blending overlays directly into video frames with alpha compositing.
+*   **Inspiration**: LibASS (Advanced Substation Alpha) subtitle renderer.
+*   **Performance**: Zero-copy glyph cache blitting directly to active timeline frames.
 
 ### 2.4 AI-Native Video Assist (Local Masking & Segmentation)
-- **Objective**: Seamless local LLM/ML orchestration for automatic subtitle transcription, video segmentation, and keyframe generation.
-- **Inspiration**: DaVinci Resolve Magic Mask neural engine.
 
----
+*   **Objective**: Seamless local LLM/ML orchestration for automatic subtitle transcription, video segmentation, and keyframe generation.
+*   **Inspiration**: DaVinci Resolve Magic Mask neural engine.
+
+***
 
 ## 💻 3. Executable Reference Implementation
 
@@ -242,13 +245,14 @@ impl TimelineClip for VideoClip {
 }
 ```
 
----
+***
 
 ## 🔬 4. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the video editor suite:
-1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2. **Throughput Benchmarking**: Under `Bolt` optimization guidelines, YUV to RGB fixed-point color space conversion processes 1080p frames at 60fps under predictable CPU scheduler allocations.
-3. **Secure Enclave Compositing**: Subtitle blending and custom effects are isolated inside capability-gated boundaries, completely eliminating raw pointer stack leakage vectors.
+
+1.  **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
+2.  **Throughput Benchmarking**: Under `Bolt` optimization guidelines, YUV to RGB fixed-point color space conversion processes 1080p frames at 60fps under predictable CPU scheduler allocations.
+3.  **Secure Enclave Compositing**: Subtitle blending and custom effects are isolated inside capability-gated boundaries, completely eliminating raw pointer stack leakage vectors.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized video editor pipeline that completely surpasses legacy desktop toolkits.

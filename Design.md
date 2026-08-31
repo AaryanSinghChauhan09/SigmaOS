@@ -10,11 +10,11 @@ Every subsystem is designed to function without external dependencies. The kerne
 
 Security is not a configuration option — it is structurally enforced:
 
-- W^X: hardware enforcement, not compiler convention
+*   W^X: hardware enforcement, not compiler convention
 
-- sigma_pledge / sigma_unveil: kernel-enforced capability restriction
+*   sigma\_pledge / sigma\_unveil: kernel-enforced capability restriction
 
-- PQC: baked into TLS, package signing, boot chain — not optional
+*   PQC: baked into TLS, package signing, boot chain — not optional
 
 ### 3. Honest Implementation
 
@@ -28,7 +28,7 @@ The codebase distinguishes clearly between what is implemented and what is stubb
 
 600+ atomic capability shards — each independently testable, deployable, and replaceable. A broken shard does not break the OS; it is isolated and can be reloaded.
 
----
+***
 
 ## Architecture Decisions
 
@@ -52,16 +52,16 @@ Web technologies compose better than native widgets for rapid iteration. The ent
 
 NIST finalised FIPS 203/204 in 2024. Harvest-now-decrypt-later attacks mean data protected with classical crypto today is at future risk. Retrofitting PQC after deployment is orders of magnitude harder than designing it in from the start.
 
----
+***
 
 ## What SigmaOS is NOT
 
-- **Not another Linux distribution** — entirely custom kernel, not a Linux fork
+*   **Not another Linux distribution** — entirely custom kernel, not a Linux fork
 
-- **Not a research toy** — production deployment targets (cloud, RTOS, mobile) with real hardware support roadmap
+*   **Not a research toy** — production deployment targets (cloud, RTOS, mobile) with real hardware support roadmap
 
-- **Not vapourware** — each claimed feature maps to a source file; unimplemented features are explicitly marked
+*   **Not vapourware** — each claimed feature maps to a source file; unimplemented features are explicitly marked
 
----
+***
 
-*See also: [Architecture-Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview) · [ARCHITECTURE.md](../ARCHITECTURE.md) · [STRATEGIC_VISION.md](../STRATEGIC_VISION.md)*
+*See also: [Architecture-Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture-Overview) · [ARCHITECTURE.md](../ARCHITECTURE.md) · [STRATEGIC\_VISION.md](../STRATEGIC_VISION.md)*

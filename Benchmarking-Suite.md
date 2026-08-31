@@ -66,24 +66,24 @@ on:
 
 ## Roadmap
 
-- [ ] Syscall round-trip benchmark
+*   \[ ] Syscall round-trip benchmark
 
-- [ ] IPC throughput benchmark
+*   \[ ] IPC throughput benchmark
 
-- [ ] Memory allocator latency suite
+*   \[ ] Memory allocator latency suite
 
-- [ ] Filesystem IOPS benchmark
+*   \[ ] Filesystem IOPS benchmark
 
-- [ ] Network TCP throughput benchmark
+*   \[ ] Network TCP throughput benchmark
 
-- [ ] Automated regression detection (± 5% threshold)
+*   \[ ] Automated regression detection (± 5% threshold)
 
-- [ ] Flamegraph generation pipeline
+*   \[ ] Flamegraph generation pipeline
 
-- [ ] Historical results dashboard (GitHub Pages)
+*   \[ ] Historical results dashboard (GitHub Pages)
 
 ## Related Modules
 
-- [`modules/perf/scheduler`](../scheduler/README.md) — Scheduler performance
+*   [`modules/perf/scheduler`](../scheduler/README.md) — Scheduler performance
 
-- [`modules/perf/mm`](../mm/README.md) — Memory manager benchmarks
+*   [`modules/perf/mm`](../mm/README.md) — Memory manager benchmarks

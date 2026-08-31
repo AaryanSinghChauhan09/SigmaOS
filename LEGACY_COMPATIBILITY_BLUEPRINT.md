@@ -3,29 +3,27 @@
 > **"Next-generation modularity is measured by its capacity to safely wrap, isolate, and optimize legacy systems."**
 > This master blueprint defines the complete architectural design and high-performance, object-oriented implementation models for **SigmaOS's Legacy Subsystem Compatibility layers (KernelPersonaVM, BinaryCompatMatrix, DriverBridge, FSRevival, APITimelineManager, WorkloadOptimizer, and LegacyPluginManager)**. It guarantees seamless execution of ancient workloads on modern microkernel cores.
 
----
+***
 
 ## 🏗️ Legacy Compatibility Architecture
 
-```
-+---------------------------------------------------------------------------------+
-|                                 PERSONALITY VM                                  |
-|         (KernelPersonaVM: Hot-swappable target ABI contexts at runtime)         |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| BINARY & API TIMELINE MATRIX                                                    |
-| - Decodes expected system call layouts across historical kernel timelines       |
-| - Automatically adapts multi-generational parameters using APITimelineManager   |
-+---------------------------------------------------------------------------------+
-| HARDWARE & FS BRIDGES                                                           |
-| - DriverBridge: Subclasses legacy interfaces to match UnifiedPeripheral models  |
-| - FSRevival: Decorates ReiserFS and Minix disks with safe auditing wrappers     |
-+---------------------------------------------------------------------------------+
-```
+    +---------------------------------------------------------------------------------+
+    |                                 PERSONALITY VM                                  |
+    |         (KernelPersonaVM: Hot-swappable target ABI contexts at runtime)         |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | BINARY & API TIMELINE MATRIX                                                    |
+    | - Decodes expected system call layouts across historical kernel timelines       |
+    | - Automatically adapts multi-generational parameters using APITimelineManager   |
+    +---------------------------------------------------------------------------------+
+    | HARDWARE & FS BRIDGES                                                           |
+    | - DriverBridge: Subclasses legacy interfaces to match UnifiedPeripheral models  |
+    | - FSRevival: Decorates ReiserFS and Minix disks with safe auditing wrappers     |
+    +---------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Reference Implementation
 
@@ -328,12 +326,12 @@ pub static GLOBAL_WORKLOAD_OPTIMIZER: WorkloadOptimizer = WorkloadOptimizer::new
 pub static GLOBAL_PLUGIN_MANAGER: LegacyPluginManager = LegacyPluginManager::new();
 ```
 
----
+***
 
 ## 💎 Community Plugin & Integration Guidelines
 
 To submit a new community-contributed compatibility plugin mapping ancient software ABI translations:
 
-1. Package your custom conversion routine as a static plugin inside `LegacyPluginManager`.
-2. Map historical system calls using `APITimelineManager`.
-3. Load and switch your target environment dynamically via `KernelPersonaVM` at runtime.
+1.  Package your custom conversion routine as a static plugin inside `LegacyPluginManager`.
+2.  Map historical system calls using `APITimelineManager`.
+3.  Load and switch your target environment dynamically via `KernelPersonaVM` at runtime.

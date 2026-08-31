@@ -3,13 +3,14 @@
 Inspired by **BusyBox's multi-call binary architecture** and **GNU Coreutils' high-performance file and system utilities**, this document defines a complete, functional, `#![no_std]` command-line utility manager. It implements core POSIX-equivalent commands (`ls`, `cat`, `grep`, and `ps`) natively in Rust using OOP concepts, without external dependencies, and enforces security capabilities.
 
 Additionally, to defeat traditional graphic requirements and fully enable **GUI tasks directly via CLI command streams**, we have added **5 advanced administrative utility tools**:
-1. **`draw`**: Directly blits geometric shapes and text into VESA/GPU framebuffers via terminal parameters, bypassing standard GUI layout systems.
-2. **`play`**: Direct PCM audio packet streaming and frequency signal wave synthesizer streaming straight to the sound card.
-3. **`netcfg`**: Declarative network interface, subnet routing, and post-quantum firewall rules manager.
-4. **`perf`**: CPU core temperature, cache misses, and scheduling queue telemetry diagnostics viewer.
-5. **`theme`**: Command-line visual profile, contrast, and task-driven adaptive automation routine manager.
 
----
+1.  **`draw`**: Directly blits geometric shapes and text into VESA/GPU framebuffers via terminal parameters, bypassing standard GUI layout systems.
+2.  **`play`**: Direct PCM audio packet streaming and frequency signal wave synthesizer streaming straight to the sound card.
+3.  **`netcfg`**: Declarative network interface, subnet routing, and post-quantum firewall rules manager.
+4.  **`perf`**: CPU core temperature, cache misses, and scheduling queue telemetry diagnostics viewer.
+5.  **`theme`**: Command-line visual profile, contrast, and task-driven adaptive automation routine manager.
+
+***
 
 ## 🏗️ Component Implementation Source Code
 

@@ -1,4 +1,4 @@
-# Σ security/access_control — Mandatory Access Control & Audit
+# Σ security/access\_control — Mandatory Access Control & Audit
 
 Sovereign alternative to SELinux and AppArmor with **deterministic, lattice-based
 policy evaluation** and an immutable audit chain.
@@ -13,11 +13,11 @@ policy evaluation** and an immutable audit chain.
 
 SigmaOS uses a **Lattice-Based Access Control** (LBAC) model:
 
-- Every **subject** (shard) carries a clearance label `{confidentiality, integrity}`.
+*   Every **subject** (shard) carries a clearance label `{confidentiality, integrity}`.
 
-- Every **object** (file, socket, IPC endpoint) carries a sensitivity label.
+*   Every **object** (file, socket, IPC endpoint) carries a sensitivity label.
 
-- Operations are permitted only when the lattice partial order is satisfied.
+*   Operations are permitted only when the lattice partial order is satisfied.
 
 ```
 ALLOW browser_shard READ  /media          # read public data
@@ -32,9 +32,7 @@ ALLOW ssh_daemon    BIND  net:22          # bind privileged port
 
 Every policy decision is appended to a BLAKE3-linked chain:
 
-```
-Entry N: { timestamp, subject, object, action, decision, hash(Entry N-1) }
-```
+    Entry N: { timestamp, subject, object, action, decision, hash(Entry N-1) }
 
 This makes the audit log **tamper-evident** — any modification breaks the hash
 chain and is detected at verification time.
@@ -76,20 +74,20 @@ DENY  web_shard   BIND    net:*
 
 ## Roadmap
 
-- [x] Audit chain with BLAKE3 linking (`audit_chain.rs`)
+*   \[x] Audit chain with BLAKE3 linking (`audit_chain.rs`)
 
-- [ ] Policy compiler (text → binary rule table)
+*   \[ ] Policy compiler (text → binary rule table)
 
-- [ ] Kernel enforcement hook in syscall dispatcher
+*   \[ ] Kernel enforcement hook in syscall dispatcher
 
-- [ ] Label assignment to all shards at boot
+*   \[ ] Label assignment to all shards at boot
 
-- [ ] Policy hot-reload (without reboot)
+*   \[ ] Policy hot-reload (without reboot)
 
-- [ ] GUI policy editor for Zenith Desktop
+*   \[ ] GUI policy editor for Zenith Desktop
 
 ## Related Modules
 
-- [`modules/security/isolation`](../isolation/README.md) — Process isolation
+*   [`modules/security/isolation`](../isolation/README.md) — Process isolation
 
-- [`modules/core/kernel`](../../core/kernel/README.md) — Syscall enforcement hooks
+*   [`modules/core/kernel`](../../core/kernel/README.md) — Syscall enforcement hooks

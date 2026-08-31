@@ -5,43 +5,43 @@
 > with code examples and cross-references to analogous mechanisms in Linux, OpenBSD,
 > FreeBSD, and Qubes OS.
 
----
+***
 
 ## Table of Contents
 
-1. [Security Philosophy](#security-philosophy)
-2. [Capability-Based Security](#capability-based-security)
-3. [pledge / unveil — Syscall & Path Restriction](#pledge--unveil)
-4. [Mandatory Access Control (MAC)](#mandatory-access-control)
-5. [Memory Safety](#memory-safety)
-6. [Cryptography](#cryptography)
-7. [Network Security](#network-security)
-8. [Qubes-Style Isolation](#qubes-style-isolation)
-9. [Audit Logging](#audit-logging)
+1.  [Security Philosophy](#security-philosophy)
+2.  [Capability-Based Security](#capability-based-security)
+3.  [pledge / unveil — Syscall & Path Restriction](#pledge--unveil)
+4.  [Mandatory Access Control (MAC)](#mandatory-access-control)
+5.  [Memory Safety](#memory-safety)
+6.  [Cryptography](#cryptography)
+7.  [Network Security](#network-security)
+8.  [Qubes-Style Isolation](#qubes-style-isolation)
+9.  [Audit Logging](#audit-logging)
 10. [Exploit Mitigations](#exploit-mitigations)
 11. [Supply Chain Security](#supply-chain-security)
 12. [Security Checklist](#security-checklist)
 
----
+***
 
 ## Security Philosophy
 
 SigmaOS follows the **principle of least privilege** at every layer:
 
-- **No ambient authority** — processes have no implicit permissions
-- **Explicit grants** — capabilities, pledge promises, and unveil paths must be
-  explicitly granted before use
-- **Fail secure** — security violations cause immediate process termination
-  (not graceful errors that can be exploited)
-- **Defense in depth** — multiple independent security layers; compromise of one
-  does not break the others
-- **Zero-trust kernel** — even privileged userland processes cannot bypass MAC policies
+*   **No ambient authority** — processes have no implicit permissions
+*   **Explicit grants** — capabilities, pledge promises, and unveil paths must be
+    explicitly granted before use
+*   **Fail secure** — security violations cause immediate process termination
+    (not graceful errors that can be exploited)
+*   **Defense in depth** — multiple independent security layers; compromise of one
+    does not break the others
+*   **Zero-trust kernel** — even privileged userland processes cannot bypass MAC policies
 
----
+***
 
 ## Capability-Based Security
 
-**Source**: `src/security/capability.rs`  
+**Source**: `src/security/capability.rs`\
 **Inspired by**: FreeBSD Capsicum, seL4, CHERI
 
 ### Concept
@@ -104,13 +104,13 @@ capability::enter_cap_mode();
 // Any attempt to open a new path -> ECAP error
 ```
 
----
+***
 
 ## pledge / unveil
 
 ### pledge — Syscall Promise Restriction
 
-**Source**: `src/pledge.rs`  
+**Source**: `src/pledge.rs`\
 **Inspired by**: OpenBSD `pledge(2)`
 
 Once a process calls `pledge`, it **permanently** restricts itself to the listed
@@ -129,12 +129,12 @@ sigma_pledge("stdio rpath inet dns", "stdio");
 | Promise | Syscalls Allowed |
 |---------|-----------------|
 | `stdio` | read, write, close, fstat, ioctl (tty only) |
-| `rpath` | open(O_RDONLY), stat, getdents, readlink |
-| `wpath` | open(O_WRONLY), truncate, ftruncate |
-| `cpath` | open(O_CREAT), mkdir, rename |
+| `rpath` | open(O\_RDONLY), stat, getdents, readlink |
+| `wpath` | open(O\_WRONLY), truncate, ftruncate |
+| `cpath` | open(O\_CREAT), mkdir, rename |
 | `dpath` | unlink, rmdir, symlink |
-| `inet` | socket(AF_INET/6), connect, bind, accept, send, recv |
-| `unix` | socket(AF_UNIX), connect, bind |
+| `inet` | socket(AF\_INET/6), connect, bind, accept, send, recv |
+| `unix` | socket(AF\_UNIX), connect, bind |
 | `dns` | getaddrinfo equivalent (restricted socket use) |
 | `proc` | fork, kill, getpid, getpgid |
 | `exec` | execve (with inherited execpromises) |
@@ -177,11 +177,11 @@ pub fn check_pledge(task: &Task, syscall_nr: u64) -> Result<(), SigmaError> {
 }
 ```
 
----
+***
 
 ### unveil — Filesystem Visibility Restriction
 
-**Source**: `src/security/mac.rs`  
+**Source**: `src/security/mac.rs`\
 **Inspired by**: OpenBSD `unveil(2)`
 
 `unveil` makes the filesystem appear to have only the paths you explicitly reveal.
@@ -197,11 +197,11 @@ sigma_unveil(NULL, NULL);               // Lock: no more paths can be added
 // Now: /etc/passwd, /home/*, /bin/sh etc. are all invisible
 ```
 
----
+***
 
 ## Mandatory Access Control
 
-**Source**: `src/security/mac.rs`  
+**Source**: `src/security/mac.rs`\
 **Inspired by**: SELinux (NSA), AppArmor (Immunix/Canonical)
 
 ### Security Contexts
@@ -209,18 +209,14 @@ sigma_unveil(NULL, NULL);               // Lock: no more paths can be added
 Every process, file, and socket has a **security context** — a label that determines
 what it can interact with.
 
-```
-user_u:role_r:type_t:s0  (SELinux format)
-```
+    user_u:role_r:type_t:s0  (SELinux format)
 
 SigmaOS uses simplified context triples: `domain:type:level`
 
-```
-sigma_kernel:kernel_t:s0
-web_server:httpd_t:s0
-user_browser:browser_t:s0
-database:db_t:s0-s3
-```
+    sigma_kernel:kernel_t:s0
+    web_server:httpd_t:s0
+    user_browser:browser_t:s0
+    database:db_t:s0-s3
 
 ### MAC Policy Rules
 
@@ -260,7 +256,7 @@ pub fn mac_check(
 }
 ```
 
----
+***
 
 ## Memory Safety
 
@@ -268,10 +264,10 @@ pub fn mac_check(
 
 SigmaOS leverages Rust's ownership system for compile-time memory safety:
 
-- **No null pointer dereferences** — `Option<T>` instead of nullable pointers
-- **No buffer overflows** — bounds-checked slice indexing
-- **No use-after-free** — borrow checker prevents dangling references
-- **No data races** — `Send`/`Sync` trait constraints on shared state
+*   **No null pointer dereferences** — `Option<T>` instead of nullable pointers
+*   **No buffer overflows** — bounds-checked slice indexing
+*   **No use-after-free** — borrow checker prevents dangling references
+*   **No data races** — `Send`/`Sync` trait constraints on shared state
 
 ### unsafe Code Policy
 
@@ -324,11 +320,11 @@ pub fn map_page(vaddr: VirtAddr, paddr: PhysAddr, flags: PageFlags) {
 }
 ```
 
----
+***
 
 ## Cryptography
 
-**Source**: `src/crypto/vectorized_pqc.rs`  
+**Source**: `src/crypto/vectorized_pqc.rs`\
 **Algorithms**: Post-quantum algorithms from NIST PQC competition (finalized 2024)
 
 | Algorithm | Type | Security Level | Source File |
@@ -359,35 +355,33 @@ let signature = Dilithium5::sign(&keypair.secret, b"message");
 assert!(Dilithium5::verify(&keypair.public, b"message", &signature));
 ```
 
----
+***
 
 ## Network Security
 
 ### PF Firewall
 
-**Source**: `src/net/firewall.rs`  
+**Source**: `src/net/firewall.rs`\
 **Inspired by**: OpenBSD PF (Packet Filter)
 
-```
-# /etc/sigma/pf.conf — SigmaOS firewall rules
+    # /etc/sigma/pf.conf — SigmaOS firewall rules
 
-# Default deny all
-block all
+    # Default deny all
+    block all
 
-# Allow established connections
-pass in  all keep state
-pass out all keep state
+    # Allow established connections
+    pass in  all keep state
+    pass out all keep state
 
-# Allow HTTPS
-pass in on em0 proto tcp to port 443
+    # Allow HTTPS
+    pass in on em0 proto tcp to port 443
 
-# Block all to port 22 except trusted subnet
-pass in on em0 proto tcp from 192.168.1.0/24 to port 22
-block in on em0 proto tcp to port 22
+    # Block all to port 22 except trusted subnet
+    pass in on em0 proto tcp from 192.168.1.0/24 to port 22
+    block in on em0 proto tcp to port 22
 
-# Rate limit ICMP
-pass in inet proto icmp max-pkt-rate 10/1
-```
+    # Rate limit ICMP
+    pass in inet proto icmp max-pkt-rate 10/1
 
 ### TLS 1.3 Integration
 
@@ -407,11 +401,11 @@ let tls_config = TlsConfig::new()
     .build();
 ```
 
----
+***
 
 ## Qubes-Style Isolation
 
-**Source**: `src/security/qubes_isolation.rs`  
+**Source**: `src/security/qubes_isolation.rs`\
 **Inspired by**: Qubes OS (Invisible Things Lab)
 
 Qubes OS runs each application in a separate VM. SigmaOS implements this model
@@ -438,7 +432,7 @@ let channel = IsolationChannel::new(browser_cell.id(), documents_cell.id());
 channel.send(b"file contents"); // Validated, no arbitrary code execution
 ```
 
----
+***
 
 ## Audit Logging
 
@@ -475,7 +469,7 @@ All security-relevant events are logged to the kernel audit trail:
 }
 ```
 
----
+***
 
 ## Exploit Mitigations
 
@@ -493,35 +487,35 @@ All security-relevant events are logged to the kernel audit trail:
 | Spectre/Meltdown mitigations | ✅ | LFENCE, IBRS, STIBP, IBPB |
 | Retpoline (indirect branch) | ✅ | Compiler retpoline mode |
 
----
+***
 
 ## Supply Chain Security
 
 SigmaOS takes supply chain security seriously:
 
-1. **Reproducible builds** — identical source → identical binary (Nix-inspired)
-2. **Content-addressed packages** — packages identified by hash, not name/version
-3. **Signed packages** — Dilithium-5 signatures on all packages
-4. **Minimal dependencies** — `uuid` and `rand` crates are the ONLY external deps
-   in Cargo.toml, and roadmap is to remove both by using `klib::uuid` and `klib::rng`
-5. **Dependency audit** — `cargo audit` runs in CI on every push
-6. **Vendor directory** — all sources vendored; no network fetches at build time
+1.  **Reproducible builds** — identical source → identical binary (Nix-inspired)
+2.  **Content-addressed packages** — packages identified by hash, not name/version
+3.  **Signed packages** — Dilithium-5 signatures on all packages
+4.  **Minimal dependencies** — `uuid` and `rand` crates are the ONLY external deps
+    in Cargo.toml, and roadmap is to remove both by using `klib::uuid` and `klib::rng`
+5.  **Dependency audit** — `cargo audit` runs in CI on every push
+6.  **Vendor directory** — all sources vendored; no network fetches at build time
 
----
+***
 
 ## Security Checklist
 
 For every new module or PR, verify:
 
-- [ ] No `use std::` imports (use `klib` equivalents)
-- [ ] All `unsafe` blocks have `// SAFETY:` comments
-- [ ] No `unwrap()` without `// SAFETY:` justification
-- [ ] Security-sensitive operations checked against pledge/unveil/caps
-- [ ] New syscalls added to pledge permission table
-- [ ] Network code uses TLS 1.3
-- [ ] Cryptographic operations use post-quantum algorithms
-- [ ] Audit log entries for security events
-- [ ] Tests for security properties (not just happy path)
-- [ ] No hardcoded secrets, passwords, or keys
-- [ ] Error messages don't leak sensitive information
-- [ ] Integer overflow checked (use `checked_add`, `saturating_add`)
+*   \[ ] No `use std::` imports (use `klib` equivalents)
+*   \[ ] All `unsafe` blocks have `// SAFETY:` comments
+*   \[ ] No `unwrap()` without `// SAFETY:` justification
+*   \[ ] Security-sensitive operations checked against pledge/unveil/caps
+*   \[ ] New syscalls added to pledge permission table
+*   \[ ] Network code uses TLS 1.3
+*   \[ ] Cryptographic operations use post-quantum algorithms
+*   \[ ] Audit log entries for security events
+*   \[ ] Tests for security properties (not just happy path)
+*   \[ ] No hardcoded secrets, passwords, or keys
+*   \[ ] Error messages don't leak sensitive information
+*   \[ ] Integer overflow checked (use `checked_add`, `saturating_add`)

@@ -1,4 +1,4 @@
-﻿# Undici Module vs. Node.js Built-in Fetch
+# Undici Module vs. Node.js Built-in Fetch
 
 Node.js has shipped a built-in `fetch()` implementation powered by undici since
 Node.js v18. This guide explains the relationship between the `undici` npm
@@ -111,23 +111,21 @@ Using matching pairs keeps multipart handling predictable.
 If all of the following are true, you can rely on the built-in globals and skip
 adding undici to your dependencies:
 
-- You only need the standard Fetch API (`fetch`, `Request`, `Response`,
+*   You only need the standard Fetch API (`fetch`, `Request`, `Response`,
 
-  `Headers`, `FormData`).
+    `Headers`, `FormData`).
 
-- You are running Node.js v18 or later.
+*   You are running Node.js v18 or later.
 
+*   You do not depend on features or bug fixes introduced in a version of undici
 
-- You do not depend on features or bug fixes introduced in a version of undici
+    newer than the one bundled with your Node.js release.
 
-  newer than the one bundled with your Node.js release.
+*   You want zero additional runtime dependencies.
 
-- You want zero additional runtime dependencies.
+*   You want cross-platform interoperability with browsers and other runtimes
 
-
-- You want cross-platform interoperability with browsers and other runtimes
-
-  (Deno, Bun, Cloudflare Workers, etc.) using the same Fetch API surface.
+    (Deno, Bun, Cloudflare Workers, etc.) using the same Fetch API surface.
 
 This is common in applications that make straightforward HTTP requests or in
 libraries that target multiple JavaScript runtimes.
@@ -225,19 +223,14 @@ import { fetch } from 'undici' // uses your installed version, not the built-in
 
 ## Further reading
 
-- [API Reference: Fetch](/docs/api/Fetch.md)
+*   [API Reference: Fetch](/docs/api/Fetch.md)
 
+*   [API Reference: Client](/docs/api/Client.md)
 
-- [API Reference: Client](/docs/api/Client.md)
+*   [API Reference: Pool](/docs/api/Pool.md)
 
+*   [API Reference: ProxyAgent](/docs/api/ProxyAgent.md)
 
-- [API Reference: Pool](/docs/api/Pool.md)
+*   [API Reference: MockAgent](/docs/api/MockAgent.md)
 
-
-- [API Reference: ProxyAgent](/docs/api/ProxyAgent.md)
-
-
-- [API Reference: MockAgent](/docs/api/MockAgent.md)
-
-
-- [API Reference: Global Installation](/docs/api/GlobalInstallation.md)
+*   [API Reference: Global Installation](/docs/api/GlobalInstallation.md)

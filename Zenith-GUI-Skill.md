@@ -1,9 +1,10 @@
 # SKILL
 
----
+***
+
 name: zenith-gui
 description: Control Zenith Desktop GUI apps via CLI — layout, theme, settings, files, browser, dashboard.
----
+----------------------------------------------------------------------------------------------------------
 
 # zenith-gui
 
@@ -12,17 +13,17 @@ Use this skill when the user wants to do something they would normally click in 
 
 ## When to use
 
-- Change layout, theme, or workspace
+*   Change layout, theme, or workspace
 
-- Launch or close apps (settings, files, browser, terminal, dashboard)
+*   Launch or close apps (settings, files, browser, terminal, dashboard)
 
-- Read/write settings (language, accessibility, network)
+*   Read/write settings (language, accessibility, network)
 
-- Semantic file search, tree view, open files
+*   Semantic file search, tree view, open files
 
-- Browser navigation
+*   Browser navigation
 
-- System dashboard metrics and AI diagnosis
+*   System dashboard metrics and AI diagnosis
 
 ## CLI (preferred)
 

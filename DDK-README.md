@@ -19,17 +19,15 @@ so a faulty NIC driver can't corrupt the filesystem or scheduler.
 
 ## Directory Layout
 
-```
-drivers/ddk/
-  ddk_stub.c        ← Minimal compilable template
-  ddk_api.h         ← Public DDK header (TODO)
-  tests/            ← Formal property tests (TODO)
-```
+    drivers/ddk/
+      ddk_stub.c        ← Minimal compilable template
+      ddk_api.h         ← Public DDK header (TODO)
+      tests/            ← Formal property tests (TODO)
 
 ## Roadmap
 
-- [ ] DMA management API
+*   \[ ] DMA management API
 
-- [ ] IRQ arbitration layer
+*   \[ ] IRQ arbitration layer
 
-- [ ] Formal verification harness (CBMC / Frama-C integration)
+*   \[ ] Formal verification harness (CBMC / Frama-C integration)

@@ -6,17 +6,17 @@ SPM manages isolated **shards** using a recipe-based, reproducible build system.
 
 ## Core Principles
 
-1. **Cryptographic Verifiability:** No shard is installed without passing a
-   strict Ed25519 digital signature check against the Sovereign Trust Root.
+1.  **Cryptographic Verifiability:** No shard is installed without passing a
+    strict Ed25519 digital signature check against the Sovereign Trust Root.
 
-1. **Deterministic Rollbacks:** Upgrades are atomic. Any failure immediately
-   reverts the state pointer via SovereignFS CoW snapshots.
+2.  **Deterministic Rollbacks:** Upgrades are atomic. Any failure immediately
+    reverts the state pointer via SovereignFS CoW snapshots.
 
-1. **Dependency Isolation:** Shards do not pollute a global `/usr/lib`.
-   Dependencies are strictly mapped via the Shard Manifest.
+3.  **Dependency Isolation:** Shards do not pollute a global `/usr/lib`.
+    Dependencies are strictly mapped via the Shard Manifest.
 
-1. **Reproducible Builds:** The same `.srecipe` file + same source commit
-   always produces a bit-for-bit identical shard binary.
+4.  **Reproducible Builds:** The same `.srecipe` file + same source commit
+    always produces a bit-for-bit identical shard binary.
 
 ## Components
 
@@ -71,24 +71,24 @@ sigpkg list --installed
 
 ## Roadmap
 
-- [x] CLI skeleton (`sigpkg install`, `remove`, `rollback`)
+*   \[x] CLI skeleton (`sigpkg install`, `remove`, `rollback`)
 
-- [x] Signature verifier (`verifier.py`)
+*   \[x] Signature verifier (`verifier.py`)
 
-- [x] Shard manifest schema
+*   \[x] Shard manifest schema
 
-- [ ] Registry server implementation
+*   \[ ] Registry server implementation
 
-- [ ] Reproducible build toolchain integration
+*   \[ ] Reproducible build toolchain integration
 
-- [ ] Delta updates (only ship changed extents)
+*   \[ ] Delta updates (only ship changed extents)
 
-- [ ] Multi-architecture cross-build support
+*   \[ ] Multi-architecture cross-build support
 
-- [ ] GUI package browser for Zenith Desktop
+*   \[ ] GUI package browser for Zenith Desktop
 
 ## Related Modules
 
-- [`modules/tools/loader`](../../modules/tools/loader/README.md) — Module loader
+*   [`modules/tools/loader`](../../modules/tools/loader/README.md) — Module loader
 
-- [`modules/security/secure_boot`](../../modules/security/secure_boot/README.md) — Signature verification
+*   [`modules/security/secure_boot`](../../modules/security/secure_boot/README.md) — Signature verification

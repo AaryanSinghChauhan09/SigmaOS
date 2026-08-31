@@ -690,11 +690,11 @@ impl SigmaUpdateManager {
 
 ## Best Practices
 
-1. **Security First**: Implement SELinux and other security features by default
-2. **Cutting Edge**: Use latest technologies while maintaining stability
-3. **Developer Friendly**: Provide comprehensive development tools
-4. **Container Ready**: Optimize for container-based workflows
-5. **Cloud Native**: Support cloud deployment scenarios
+1.  **Security First**: Implement SELinux and other security features by default
+2.  **Cutting Edge**: Use latest technologies while maintaining stability
+3.  **Developer Friendly**: Provide comprehensive development tools
+4.  **Container Ready**: Optimize for container-based workflows
+5.  **Cloud Native**: Support cloud deployment scenarios
 
 ## Migration Tools
 
@@ -738,18 +738,19 @@ impl FedoraMigrationAssistant {
 
 ## References
 
-- [Fedora Documentation](https://docs.fedoraproject.org/)
-- [DNF Documentation](https://dnf.readthedocs.io/)
-- [SELinux Project Wiki](https://selinuxproject.org/)
-- [Fedora Silverblue Documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/)
-- [Podman Documentation](https://docs.podman.io/)
+*   [Fedora Documentation](https://docs.fedoraproject.org/)
+*   [DNF Documentation](https://dnf.readthedocs.io/)
+*   [SELinux Project Wiki](https://selinuxproject.org/)
+*   [Fedora Silverblue Documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/)
+*   [Podman Documentation](https://docs.podman.io/)
 
 ## Implementation Status (Fully Implemented in Safe Rust)
 
 SigmaOS natively implements all Fedora Linux features outlined in this specification:
-1. **Silverblue & OSTree Atomic Deployment Engine (`SovereignOstreeDeployer`)**: Implemented in `src/compatibility/fedora.rs` & `src/compatibility/atomic_distribution.rs` supporting deployment staging, commit switching, package layering, and generation rollback.
-2. **SELinux Policy & Context Engine (`SovereignSeLinuxEngine`, `SeLinuxEnforcer`)**: Implemented in `src/compatibility/fedora.rs` enforcing fine-grained user:role:type:sensitivity contexts, policy authorization, and domain transition rules.
-3. **Firewalld Network Security Manager (`SovereignFirewalldManager`)**: Implemented in `src/compatibility/fedora.rs` managing dynamic security zones, network interface bindings, and port filter rules.
-4. **Cockpit Web Management Server (`SovereignCockpitConsole`)**: Implemented in `src/compatibility/fedora.rs` providing live system metric streaming, client session management, and remote admin capabilities.
-5. **Fedora Toolbox OCI Development Environment (`FedoraToolboxContainerEngine`)**: Implemented in `src/expanded_wiki_innovations.rs` & `src/unimplemented_tools.rs` facilitating OCI container spawn, image pulling, and isolated dev shell execution.
-6. **DNF, Koji & Bodhi Infrastructure (`DnfPackageResolver`, `MockChrootBuilder`, `KojiBuildServer`, `BodhiUpdateTriage`, `CoprRepositoryManager`, `AnacondaInstaller`)**: Implemented in `src/compatibility/fedora.rs` and `src/sigpkg/fedora_rpm_engine.rs` supporting RPM dependency resolution, mock chroot builds, Koji task dispatching, Bodhi karma triage, and Anaconda Kickstart installation.
+
+1.  **Silverblue & OSTree Atomic Deployment Engine (`SovereignOstreeDeployer`)**: Implemented in `src/compatibility/fedora.rs` & `src/compatibility/atomic_distribution.rs` supporting deployment staging, commit switching, package layering, and generation rollback.
+2.  **SELinux Policy & Context Engine (`SovereignSeLinuxEngine`, `SeLinuxEnforcer`)**: Implemented in `src/compatibility/fedora.rs` enforcing fine-grained user:role:type:sensitivity contexts, policy authorization, and domain transition rules.
+3.  **Firewalld Network Security Manager (`SovereignFirewalldManager`)**: Implemented in `src/compatibility/fedora.rs` managing dynamic security zones, network interface bindings, and port filter rules.
+4.  **Cockpit Web Management Server (`SovereignCockpitConsole`)**: Implemented in `src/compatibility/fedora.rs` providing live system metric streaming, client session management, and remote admin capabilities.
+5.  **Fedora Toolbox OCI Development Environment (`FedoraToolboxContainerEngine`)**: Implemented in `src/expanded_wiki_innovations.rs` & `src/unimplemented_tools.rs` facilitating OCI container spawn, image pulling, and isolated dev shell execution.
+6.  **DNF, Koji & Bodhi Infrastructure (`DnfPackageResolver`, `MockChrootBuilder`, `KojiBuildServer`, `BodhiUpdateTriage`, `CoprRepositoryManager`, `AnacondaInstaller`)**: Implemented in `src/compatibility/fedora.rs` and `src/sigpkg/fedora_rpm_engine.rs` supporting RPM dependency resolution, mock chroot builds, Koji task dispatching, Bodhi karma triage, and Anaconda Kickstart installation.

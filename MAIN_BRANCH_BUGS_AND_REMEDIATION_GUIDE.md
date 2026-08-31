@@ -2,12 +2,14 @@
 
 This guide details a critical logical bug discovered inside the main branch, analyzes why it occurs, and documents the high-fidelity safe-Rust fix implemented to resolve it.
 
----
+***
 
 ## 🐜 1. Sequential Out-of-Order DAG Node Execution Bug (`src/ai/sai.rs`)
 
 ### A. Symptom & Bug Description
+
 When running `cargo test`, the test suite returned a deterministic panic in `ai::sai::tests::test_roadmap_phase2_workflows`:
+
 ```text
 ---- ai::sai::tests::test_roadmap_phase2_workflows stdout ----
 
@@ -18,7 +20,9 @@ assertion `left == right` failed
 ```
 
 ### B. Root Cause Analysis
+
 In `SovereignWorkflowEngine::execute_workflow()`, sequential nodes of the DAG pipeline are run sequentially inside a loop. The loop modifies each node's `state_executed` status *inline*:
+
 ```rust
     pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
         let mut executed_count = 0;
@@ -48,13 +52,17 @@ In `SovereignWorkflowEngine::execute_workflow()`, sequential nodes of the DAG pi
         Ok(executed_count)
     }
 ```
+
 When `execute_workflow()` is called for the very first time:
-1. `i = 0` (Node 1, depends_on = None): `can_execute` evaluates to `true`. It sets `self.nodes[0].state_executed = true` inline.
-2. `i = 1` (Node 2, depends_on = Some(1)): its dependency inner loop checks if any node with `id == 1` has `state_executed == true`. Since Node 1 was *just* executed and set `state_executed = true` on the previous step of the same loop, `self.nodes[0].state_executed` is indeed `true`!
-As a result, Node 2 is also executed *in the very first pass*, violating the sequential execution constraints of the workflow engine!
+
+1.  `i = 0` (Node 1, depends\_on = None): `can_execute` evaluates to `true`. It sets `self.nodes[0].state_executed = true` inline.
+2.  `i = 1` (Node 2, depends\_on = Some(1)): its dependency inner loop checks if any node with `id == 1` has `state_executed == true`. Since Node 1 was *just* executed and set `state_executed = true` on the previous step of the same loop, `self.nodes[0].state_executed` is indeed `true`!
+    As a result, Node 2 is also executed *in the very first pass*, violating the sequential execution constraints of the workflow engine!
 
 ### C. The Safe-Rust Fix
+
 We resolved this by capturing an initial snapshot of the execution states before the pass starts, and evaluating dependencies strictly against the initial states:
+
 ```rust
     pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
         let mut executed_count = 0;
@@ -93,8 +101,9 @@ We resolved this by capturing an initial snapshot of the execution states before
         Ok(executed_count)
     }
 ```
+
 This guarantees that dependent nodes must wait for a subsequent run of `execute_workflow()` before executing, fully passing all unit and integration tests!
 
----
+***
 
 ### 👑 The Sovereign OS Paradigm: High-Fidelity. Robust. Warning-Free.

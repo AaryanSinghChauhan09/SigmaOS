@@ -6,4 +6,4 @@ This module provides support for Subresource Integrity (SRI) in the context of w
 
 ## Links
 
-- [Subresource Integrity](https://w3c.github.io/webappsec-subresource-integrity/)
+*   [Subresource Integrity](https://w3c.github.io/webappsec-subresource-integrity/)

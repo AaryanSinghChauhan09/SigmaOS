@@ -607,11 +607,11 @@ impl SigmaUserGuide {
 
 ## Best Practices
 
-1. **User-Friendly**: Prioritize ease of use over technical complexity
-2. **Multimedia Ready**: Include multimedia codecs out of the box
-3. **Safety First**: Implement safety levels for updates
-4. **Backup Solutions**: Provide easy backup and restore functionality
-5. **Customization**: Allow extensive desktop customization
+1.  **User-Friendly**: Prioritize ease of use over technical complexity
+2.  **Multimedia Ready**: Include multimedia codecs out of the box
+3.  **Safety First**: Implement safety levels for updates
+4.  **Backup Solutions**: Provide easy backup and restore functionality
+5.  **Customization**: Allow extensive desktop customization
 
 ## Migration Tools
 
@@ -675,8 +675,8 @@ impl MintMigrationAssistant {
 
 ## References
 
-- [Linux Mint Documentation](https://linuxmint.com/documentation.php)
-- [Cinnamon Spices](https://cinnamon-spices.linuxmint.com/)
-- [Timeshift Documentation](https://github.com/teejee2008/timeshift)
-- [Mint User Guide](https://linuxmint.com/download.php)
-- [Mint Community](https://forums.linuxmint.com/)
+*   [Linux Mint Documentation](https://linuxmint.com/documentation.php)
+*   [Cinnamon Spices](https://cinnamon-spices.linuxmint.com/)
+*   [Timeshift Documentation](https://github.com/teejee2008/timeshift)
+*   [Mint User Guide](https://linuxmint.com/download.php)
+*   [Mint Community](https://forums.linuxmint.com/)

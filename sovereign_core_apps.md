@@ -2,26 +2,24 @@
 
 This document defines the ultimate built-in application suite for the **SigmaOS** ecosystem. It establishes a complete, secure, and AI-native application layers that cover package management, desktop UX, security, AI automation, networking, multimedia, developer tools, and productivity, outclassing legacy Linux distributions in out-of-the-box capability.
 
----
+***
 
 ## 🎯 Core Application Matrix
 
-```
-+-----------------------------------------------------------------------------------------------+
-|                                 SOVEREIGN CORE APPLICATION MATRIX                             |
-+-----------------------------------------------------------------------------------------------+
-| [Core System] -> SigmaPkg Manager, SigmaFS Snapshot Tool, SigmaTop (Monitor), SigmaBackup     |
-| [Desktop UX]  -> Zenith Control Center, SigmaProfiles, SigmaSync, SigmaGestures, SigmaVoice   |
-| [Security]    -> SigmaShield, SigmaVault, SigmaPrivacy Dashboard, SigmaForensics              |
-| [AI Automation]-> SigmaShell, SigmaOrchestrator, SigmaCompliance, SigmaOrganizer               |
-| [Networking]  -> SigmaNet, SigmaRemote, SigmaSync Cloud, SigmaIoT Manager                     |
-| [Multimedia]  -> SigmaVideo, SigmaAudio, SigmaStream, SigmaGameHub, SigmaVR                   |
-| [Dev Tools]   -> SigmaDev IDE, SigmaContainer, SigmaBuild, SigmaAPI Tester, SigmaProfiler     |
-| [Productivity]-> SigmaOffice, SigmaTasks, SigmaMindMap, SigmaPDF, SigmaScanner                |
-+-----------------------------------------------------------------------------------------------+
-```
+    +-----------------------------------------------------------------------------------------------+
+    |                                 SOVEREIGN CORE APPLICATION MATRIX                             |
+    +-----------------------------------------------------------------------------------------------+
+    | [Core System] -> SigmaPkg Manager, SigmaFS Snapshot Tool, SigmaTop (Monitor), SigmaBackup     |
+    | [Desktop UX]  -> Zenith Control Center, SigmaProfiles, SigmaSync, SigmaGestures, SigmaVoice   |
+    | [Security]    -> SigmaShield, SigmaVault, SigmaPrivacy Dashboard, SigmaForensics              |
+    | [AI Automation]-> SigmaShell, SigmaOrchestrator, SigmaCompliance, SigmaOrganizer               |
+    | [Networking]  -> SigmaNet, SigmaRemote, SigmaSync Cloud, SigmaIoT Manager                     |
+    | [Multimedia]  -> SigmaVideo, SigmaAudio, SigmaStream, SigmaGameHub, SigmaVR                   |
+    | [Dev Tools]   -> SigmaDev IDE, SigmaContainer, SigmaBuild, SigmaAPI Tester, SigmaProfiler     |
+    | [Productivity]-> SigmaOffice, SigmaTasks, SigmaMindMap, SigmaPDF, SigmaScanner                |
+    +-----------------------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Core Application Implementations
 
