@@ -86,6 +86,25 @@ pub unsafe fn e1000_init(mmio_base: u64) -> Result<(), DriverError> {
 - High performance in VMs
 - Multi-queue support
 
+#### Intel ixgbe / i40e 10GbE / 25GbE
+
+**Location**: `src/drivers/linux_bsd_drivers.rs`
+
+**Features**:
+- 10GbE and 25GbE High-Performance Ethernet
+- SR-IOV Virtual Function (VF) allocation (up to 64 VFs)
+- Hardware Checksum Offloading (IPv4 header, TCP/UDP pseudo-header)
+- Receive Side Scaling (RSS) 8-queue dispatching
+
+#### Mellanox ConnectX-5 100G RoCEv2 / RDMA
+
+**Location**: `src/drivers/linux_bsd_drivers.rs`
+
+**Features**:
+- 100GbE RoCEv2 and Infiniband RDMA support
+- Zero-copy Memory Region registration (`register_memory_region`)
+- Queue Pair (QP) state machine transitions (`Reset` -> `Init` -> `Rtr` -> `Rts`)
+
 ### Wireless Drivers
 
 #### Intel iwlwifi

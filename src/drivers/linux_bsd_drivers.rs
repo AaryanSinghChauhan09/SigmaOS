@@ -268,6 +268,211 @@ impl IntelXeDrmDriver {
 }
 
 // =========================================================================
+// 16. Intel 10GbE / 25GbE ixgbe & i40e Ethernet NIC Driver
+// =========================================================================
+
+pub struct IntelIxgbe40eDriver {
+    pub mac_address: [u8; 6],
+    pub link_speed_gbps: u32,
+    pub sriov_vfs_enabled: u8,
+    pub checksum_offload_enabled: bool,
+    pub rss_queues: u8,
+}
+
+impl IntelIxgbe40eDriver {
+    pub fn new(mac: [u8; 6], speed_gbps: u32) -> Self {
+        Self {
+            mac_address: mac,
+            link_speed_gbps: speed_gbps,
+            sriov_vfs_enabled: 0,
+            checksum_offload_enabled: true,
+            rss_queues: 8,
+        }
+    }
+
+    pub fn enable_sriov_vfs(&mut self, num_vfs: u8) -> Result<(), &'static str> {
+        if num_vfs > 64 {
+            return Err("ixgbe/i40e: Max SR-IOV VFs is 64");
+        }
+        self.sriov_vfs_enabled = num_vfs;
+        Ok(())
+    }
+
+    pub fn compute_hardware_checksum(&self, ip_header: &[u8], tcp_payload: &[u8]) -> u16 {
+        let mut sum: u32 = 0;
+        for chunk in ip_header.chunks(2) {
+            let word = if chunk.len() == 2 {
+                ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+            } else {
+                (chunk[0] as u32) << 8
+            };
+            sum += word;
+        }
+        for chunk in tcp_payload.chunks(2) {
+            let word = if chunk.len() == 2 {
+                ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+            } else {
+                (chunk[0] as u32) << 8
+            };
+            sum += word;
+        }
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+        !(sum as u16)
+    }
+}
+
+// =========================================================================
+// 17. ASMedia & Renesas xHCI USB 3.2 Gen 2x2 20Gbps Controller Driver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Usb32LinkSpeed {
+    SuperSpeed5Gbps,
+    SuperSpeedPlus10Gbps,
+    SuperSpeedPlus20Gbps,
+}
+
+pub struct AsmediaXhciUsb32Driver {
+    pub pci_id: u16,
+    pub link_speed: Usb32LinkSpeed,
+    pub active_endpoints: u8,
+}
+
+impl AsmediaXhciUsb32Driver {
+    pub fn new(pci_id: u16) -> Self {
+        Self {
+            pci_id,
+            link_speed: Usb32LinkSpeed::SuperSpeedPlus20Gbps,
+            active_endpoints: 0,
+        }
+    }
+
+    pub fn configure_endpoint_trb_ring(&mut self, ep_id: u8) -> Result<(), &'static str> {
+        if ep_id > 31 {
+            return Err("xHCI: Invalid endpoint ID");
+        }
+        self.active_endpoints += 1;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 18. Mellanox ConnectX-5 100G RoCEv2 / Infiniband RDMA NIC Driver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RdmaQpState {
+    Reset,
+    Init,
+    ReadyToReceive,
+    ReadyToSend,
+}
+
+pub struct MellanoxMlx5RdmaDriver {
+    pub mac_address: [u8; 6],
+    pub qp_state: RdmaQpState,
+    pub registered_memory_regions: usize,
+    pub completion_queue_entries: usize,
+}
+
+impl MellanoxMlx5RdmaDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            qp_state: RdmaQpState::Reset,
+            registered_memory_regions: 0,
+            completion_queue_entries: 0,
+        }
+    }
+
+    pub fn register_memory_region(&mut self, _virt_addr: u64, size_bytes: usize) -> Result<u32, &'static str> {
+        if size_bytes == 0 {
+            return Err("MLX5 RDMA: Invalid memory region size");
+        }
+        self.registered_memory_regions += 1;
+        Ok(self.registered_memory_regions as u32)
+    }
+
+    pub fn transition_qp(&mut self, next_state: RdmaQpState) {
+        self.qp_state = next_state;
+    }
+}
+
+// =========================================================================
+// 19. Cirrus / Realtek High-Definition ALC Smart-Amp Audio Codec Driver
+// =========================================================================
+
+pub struct AlcSmartAmpCodecDriver {
+    pub codec_id: u32,
+    pub amp_gain_db: i8,
+    pub jack_detected: bool,
+    pub eq_dsp_enabled: bool,
+}
+
+impl AlcSmartAmpCodecDriver {
+    pub fn new(codec_id: u32) -> Self {
+        Self {
+            codec_id,
+            amp_gain_db: 0,
+            jack_detected: false,
+            eq_dsp_enabled: true,
+        }
+    }
+
+    pub fn set_gain(&mut self, gain_db: i8) {
+        self.amp_gain_db = gain_db.clamp(-12, 18);
+    }
+
+    pub fn update_jack_sense(&mut self, inserted: bool) {
+        self.jack_detected = inserted;
+    }
+}
+
+// =========================================================================
+// 20. Synaptics & Elan I2C Precision Touchpad & Trackpoint Driver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TouchContact {
+    pub id: u8,
+    pub x: u16,
+    pub y: u16,
+    pub pressure: u8,
+}
+
+pub struct I2cPrecisionTouchpadDriver {
+    pub bus_id: u8,
+    pub active_contacts: Vec<TouchContact>,
+    pub palm_rejection_active: bool,
+}
+
+impl I2cPrecisionTouchpadDriver {
+    pub fn new(bus_id: u8) -> Self {
+        Self {
+            bus_id,
+            active_contacts: Vec::new(),
+            palm_rejection_active: false,
+        }
+    }
+
+    pub fn update_contact(&mut self, contact: TouchContact) {
+        // Palm rejection heuristic: contact with large area / high pressure at edge
+        if contact.pressure > 240 || contact.x < 50 || contact.x > 3950 {
+            self.palm_rejection_active = true;
+            return;
+        }
+        self.palm_rejection_active = false;
+        if let Some(c) = self.active_contacts.iter_mut().find(|c| c.id == contact.id) {
+            *c = contact;
+        } else {
+            self.active_contacts.push(contact);
+        }
+    }
+}
+
+// =========================================================================
 // 5. Intel iwlwifi & Realtek rtw89 Wireless Wi-Fi Driver
 // =========================================================================
 
@@ -1152,6 +1357,45 @@ mod tests {
         assert_eq!(bound_gpu, "AMDGPU DRM/KMS Driver");
         assert_eq!(bound_net, "Intel igc 2.5GbE Ethernet Driver");
         assert_eq!(bound_usb, "Wacom Precision Tablet Driver");
+    }
+
+    #[test]
+    fn test_ixgbe_xhci_mlx5_smartamp_and_touchpad_drivers() {
+        // 1. Intel 10GbE / 25GbE ixgbe/i40e
+        let mut ixgbe = IntelIxgbe40eDriver::new([0x00, 0x1B, 0x21, 0x00, 0x10, 0x20], 25);
+        assert!(ixgbe.enable_sriov_vfs(16).is_ok());
+        assert_eq!(ixgbe.sriov_vfs_enabled, 16);
+        let csum = ixgbe.compute_hardware_checksum(&[0x45, 0x00, 0x00, 0x28], &[0x00, 0x50, 0x00, 0x00]);
+        assert_ne!(csum, 0);
+
+        // 2. ASMedia USB 3.2 20Gbps xHCI
+        let mut xhci = AsmediaXhciUsb32Driver::new(0x2142);
+        assert!(xhci.configure_endpoint_trb_ring(1).is_ok());
+        assert_eq!(xhci.active_endpoints, 1);
+
+        // 3. Mellanox ConnectX-5 RDMA
+        let mut mlx5 = MellanoxMlx5RdmaDriver::new([0x00, 0x02, 0xC9, 0x01, 0x02, 0x03]);
+        let mr_id = mlx5.register_memory_region(0x7000_0000, 4096).unwrap();
+        assert_eq!(mr_id, 1);
+        mlx5.transition_qp(RdmaQpState::ReadyToSend);
+        assert_eq!(mlx5.qp_state, RdmaQpState::ReadyToSend);
+
+        // 4. ALC Smart Amp
+        let mut amp = AlcSmartAmpCodecDriver::new(0x10ec0285);
+        amp.set_gain(12);
+        assert_eq!(amp.amp_gain_db, 12);
+        amp.update_jack_sense(true);
+        assert!(amp.jack_detected);
+
+        // 5. I2C Precision Touchpad
+        let mut touchpad = I2cPrecisionTouchpadDriver::new(1);
+        touchpad.update_contact(TouchContact { id: 1, x: 1000, y: 1500, pressure: 80 });
+        assert_eq!(touchpad.active_contacts.len(), 1);
+        assert!(!touchpad.palm_rejection_active);
+
+        // Palm rejection test
+        touchpad.update_contact(TouchContact { id: 2, x: 10, y: 1500, pressure: 250 });
+        assert!(touchpad.palm_rejection_active);
     }
 }
 
