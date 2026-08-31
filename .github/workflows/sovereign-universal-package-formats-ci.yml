@@ -1,5 +1,8 @@
 name: Universal Package Manager Multi-Format CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]
