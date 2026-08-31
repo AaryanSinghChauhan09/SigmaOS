@@ -71,11 +71,8 @@ mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 
-use wiki_ideas_implementation::SystemdUnitActiveState;
-use bsd_compat::*;
-use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-use unveil::{UnveilManager, UnveilPermission};
+use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
+use wiki_ideas_implementation as wiki_ideas;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

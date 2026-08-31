@@ -274,7 +274,7 @@ impl SimpleVMM {
 
     pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
-        let _pdpt_idx = self.get_pdpt_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
@@ -282,13 +282,14 @@ impl SimpleVMM {
             return Err(PageFaultError::NotPresent);
         }
 
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = ((pdpt_phys / 4096) * 512 + pdpt_idx) * 512 + pd_idx;
+
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx_in_vec).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
-            if pt_entry.is_present() {
-                pt_entry.set_writable(false);
-                pt_entry.set_cow(true);
-                return Ok(());
-            }
+            pt_entry.set_cow(true);
+            pt_entry.set_writable(false);
+            return Ok(());
         }
         Err(PageFaultError::NotPresent)
     }
@@ -458,7 +459,16 @@ impl VirtualMemoryManager for SimpleVMM {
         while self.pd_tables.len() <= pdpt_idx {
             self.pd_tables.push(None);
         }
-        if self.pd_tables[pdpt_idx].is_none() {
+
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pdpt_entry_idx = (pdpt_phys / 4096) * 512 + pdpt_idx;
+        let pd_idx_in_vec = pdpt_entry_idx * 512 + pd_idx;
+
+        while self.pd_tables.len() <= pdpt_entry_idx {
+            self.pd_tables.push(None);
+        }
+
+        if self.pd_tables[pdpt_entry_idx].is_none() {
             let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pd_entry = SimplePageTableEntry::new();
             pd_entry.set_present(true);
@@ -466,13 +476,15 @@ impl VirtualMemoryManager for SimpleVMM {
             pd_entry.set_user_accessible(false);
             pd_entry.set_physical_address(pd_phys);
 
-            self.pd_tables[pdpt_idx] = Some(SimplePageTable::new(pd_phys));
+            let pd_table = SimplePageTable::new(pd_phys);
+            self.pd_tables[pdpt_entry_idx] = Some(pd_table);
+
             if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
         }
 
-        while self.pt_tables.len() <= pd_idx {
+        while self.pt_tables.len() <= pd_idx_in_vec {
             self.pt_tables.push(None);
         }
         if self.pt_tables[pd_idx].is_none() {
@@ -483,8 +495,10 @@ impl VirtualMemoryManager for SimpleVMM {
             pt_entry.set_user_accessible(false);
             pt_entry.set_physical_address(pt_phys);
 
-            self.pt_tables[pd_idx] = Some(SimplePageTable::new(pt_phys));
-            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
+            let pt_table = SimplePageTable::new(pt_phys);
+            self.pt_tables[pd_idx_in_vec] = Some(pt_table);
+
+            if let Some(ref mut pd) = self.pd_tables[pdpt_entry_idx] {
                 pd.set_entry(pd_idx, pt_entry);
             }
         }
@@ -505,7 +519,14 @@ impl VirtualMemoryManager for SimpleVMM {
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
+        if !self.pml4.get_entry(pml4_idx).is_present() {
+            return Err(PageFaultError::NotPresent);
+        }
+
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = ((pdpt_phys / 4096) * 512 + pdpt_idx) * 512 + pd_idx;
+
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx_in_vec).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
             pt_entry.set_present(false);
             return Ok(());

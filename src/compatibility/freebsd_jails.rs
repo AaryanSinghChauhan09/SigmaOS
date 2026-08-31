@@ -147,7 +147,6 @@ impl SigmaJailManager {
             }
         }
 
-
         // Kill all processes in jail
         self.kill_jail_processes_by_pids(&processes)?;
 

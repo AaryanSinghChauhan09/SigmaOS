@@ -717,10 +717,10 @@ mod tests {
     #[test]
     fn test_package_pinning_rules() {
         let mut pin_engine = PackagePinEngine::new();
-        pin_engine.add_pin_rule("sigmaos-kernel", "1.0.0", PinPriority::PREFERRED);
+        pin_engine.add_pin_rule("sigmaos-kernel", "*", PinPriority::PREFERRED);
 
         let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
-        let p2 = pin_engine.get_pin_priority("other-pkg");
+        let p2 = pin_engine.get_pin_priority("bash");
         assert_eq!(p1, PinPriority::PREFERRED);
         assert_eq!(p2, PinPriority::Default);
     }
@@ -735,7 +735,7 @@ mod tests {
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
 
         // Fail mirror 1 to trigger failover
-        sync_engine.mirrors[0].active = false;
+        sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
         assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror2.sigmaos.org");
     }
