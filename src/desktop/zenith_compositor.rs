@@ -7,13 +7,13 @@
 //!
 //! ## Architecture
 //!
-//! ```
-//! Application renders → wl_buffer (DMA-BUF or SHM)
-//!     → ZenithCompositor (damage tracking)
-//!     → Scene graph (sorted by z-order)
-//!     → GPU backend (Vulkan render pass)
-//!     → KMS/DRM (vsync atomic commit)
-//!     → Display
+//! ```text
+//! Application renders -> wl_buffer (DMA-BUF or SHM)
+//!     -> ZenithCompositor (damage tracking)
+//!     -> Scene graph (sorted by z-order)
+//!     -> GPU backend (Vulkan render pass)
+//!     -> KMS/DRM (vsync atomic commit)
+//!     -> Display
 //! ```
 extern crate alloc;
 use alloc::string::{String, ToString};

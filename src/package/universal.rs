@@ -1,3 +1,4 @@
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -927,9 +928,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in current_keys {
-                if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+            for key in &current_keys {
+                if !checkpoint.installed_keys.contains(key) {
+                    self.remove(key)?;
                 }
             }
             Ok(())
