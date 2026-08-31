@@ -1,5 +1,3 @@
-//! Display Manager (GDM/LightDM Inspiration)
-//! Login screen, session management, and display server spawning
 extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -196,6 +194,58 @@ pub enum DMError {
     StartFailed,
 }
 
+/// Linux Mint MDM greeter theme style engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GreeterEngineStyle {
+    Html5,
+    Qml,
+    Gtk,
+}
+
+/// Linux Mint MDM (Mint Display Manager) inspired greeter theme specification
+#[derive(Debug, Clone)]
+pub struct MdmGreeterTheme {
+    pub theme_name: String,
+    pub background_wallpaper: String,
+    pub font_family: String,
+    pub engine_style: GreeterEngineStyle,
+    pub logo_icon_path: String,
+}
+
+impl Default for MdmGreeterTheme {
+    fn default() -> Self {
+        Self {
+            theme_name: "Mint-MDM-Default".to_string(),
+            background_wallpaper: "/usr/share/backgrounds/mint.png".to_string(),
+            font_family: "Ubuntu".to_string(),
+            engine_style: GreeterEngineStyle::Html5,
+            logo_icon_path: "/usr/share/pixmaps/mint-logo.svg".to_string(),
+        }
+    }
+}
+
+/// Remembers last selected user session and avatar icon (MDM / LightDM parity)
+#[derive(Debug, Clone)]
+pub struct UserSessionMemory {
+    pub user_id: u32,
+    pub last_session_name: String,
+    pub avatar_image_path: String,
+}
+
+/// Accessibility controls overlay for MDM login greeter
+#[derive(Debug, Clone, Default)]
+pub struct GreeterAccessibilityOverlay {
+    pub onscreen_keyboard: bool,
+    pub high_contrast: bool,
+    pub screen_reader: bool,
+}
+
+impl Default for DisplayManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -216,34 +266,20 @@ mod tests {
 
     #[test]
     fn test_mdm_greeter_theme() {
-        let theme = MdmGreeterTheme::new("Mint-Metallic", GreeterEngineStyle::Html5WebKit);
-        assert_eq!(theme.name, "Mint-Metallic");
-        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5WebKit);
-    }
-
-    #[test]
-    fn test_user_session_memory() {
-        let memory = UserSessionMemory {
-            user_id: 1000,
-            face_icon_path: "/var/lib/AccountsService/icons/user.png".to_string(),
-            last_selected_session: "Wayland".to_string(),
-        };
-        assert_eq!(memory.user_id, 1000);
-        assert_eq!(memory.last_selected_session, "Wayland");
-    }
-
-    #[test]
-    fn test_greeter_accessibility_overlay() {
-        let mut overlay = GreeterAccessibilityOverlay::new();
-        assert!(!overlay.onscreen_keyboard_enabled);
-        overlay.toggle_onscreen_keyboard();
-        assert!(overlay.onscreen_keyboard_enabled);
         let theme = MdmGreeterTheme::default();
-        assert_eq!(theme.name, "Mint-MDM-Default");
+        assert_eq!(theme.theme_name, "Mint-MDM-Default");
+        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5);
+
+        let user_mem = UserSessionMemory {
+            user_id: 1000,
+            last_session_name: "Cinnamon".to_string(),
+            avatar_image_path: "/var/lib/AccountsService/icons/jules".to_string(),
+        };
+        assert_eq!(user_mem.last_session_name, "Cinnamon");
 
         let mut a11y = GreeterAccessibilityOverlay::default();
-        assert!(!a11y.high_contrast_enabled);
-        a11y.high_contrast_enabled = true;
-        assert!(a11y.high_contrast_enabled);
+        assert!(!a11y.high_contrast);
+        a11y.high_contrast = true;
+        assert!(a11y.high_contrast);
     }
 }

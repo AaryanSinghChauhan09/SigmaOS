@@ -34,7 +34,10 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::klib::HashMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
+use crate::klib::HashMap;
+
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap;
 
 use alloc::sync::Arc;
 
