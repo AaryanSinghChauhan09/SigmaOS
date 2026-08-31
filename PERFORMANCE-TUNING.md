@@ -2,22 +2,24 @@
 
 > Comprehensive guide to optimizing SigmaOS for maximum performance across all hardware profiles.
 
----
+***
 
 ## ⚡ Performance Philosophy
 
 SigmaOS takes a **profile-based performance approach** inspired by:
-- **Arch Linux**: User-controlled performance tuning
-- **Gentoo**: Source-level optimization with compiler flags
-- **RHEL/Fedora**: Enterprise-grade performance tuning tools
-- **Clear Linux**: Intel-optimized defaults
-- **Fedora Workstation**: Game mode integration
 
----
+*   **Arch Linux**: User-controlled performance tuning
+*   **Gentoo**: Source-level optimization with compiler flags
+*   **RHEL/Fedora**: Enterprise-grade performance tuning tools
+*   **Clear Linux**: Intel-optimized defaults
+*   **Fedora Workstation**: Game mode integration
+
+***
 
 ## 🔧 Kernel Tuning
 
 ### CPU Governor
+
 ```bash
 # Performance mode (max frequency always)
 echo performance > /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
@@ -30,6 +32,7 @@ echo schedutil > /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 ```
 
 ### I/O Schedulers
+
 ```bash
 # For NVMe SSDs (none = no scheduler, pass-through)
 echo none > /sys/block/nvme0n1/queue/scheduler
@@ -42,6 +45,7 @@ echo bfq > /sys/block/sdb/queue/scheduler
 ```
 
 ### Memory Tuning
+
 ```bash
 # Reduce swap tendency (0-100, lower = use RAM more)
 echo 10 > /proc/sys/vm/swappiness
@@ -54,11 +58,12 @@ sigma-ctl configure zram --size 8G --algo zstd
 echo always > /sys/kernel/mm/transparent_hugepage/enabled
 ```
 
----
+***
 
 ## 🎮 Gaming Optimization
 
 ### GameMode
+
 ```bash
 # Install and enable SigmaOS GameMode (inspired by Feral's gamemode)
 sigma-pkg install sigmagamemode
@@ -69,6 +74,7 @@ gamemoderun %command%  # Steam launch options
 ```
 
 ### WINE/Proton Optimization
+
 ```bash
 # Enable esync (eventfd-based synchronization)
 export WINEESYNC=1
@@ -84,6 +90,7 @@ export DXVK_ASYNC=1
 ```
 
 ### GPU Performance
+
 ```bash
 # NVIDIA power management
 nvidia-settings -a GPUPowerMizerMode=1  # Prefer maximum performance
@@ -95,11 +102,12 @@ echo high > /sys/class/drm/card0/device/power_dpm_force_performance_level
 echo 0 > /sys/module/i915/parameters/enable_rc6
 ```
 
----
+***
 
 ## 💾 Storage Performance
 
 ### Btrfs Optimization
+
 ```bash
 # Mount options for performance
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async /dev/nvme0n1p1 /
@@ -110,6 +118,7 @@ btrfs balance start -dusage=50 -musage=50 /
 ```
 
 ### ext4 Optimization
+
 ```bash
 # Enable lazy initialization
 mke2fs -E lazy_itable_init=0,lazy_journal_init=0 /dev/sda1
@@ -119,6 +128,7 @@ mount -o noatime,data=writeback,barrier=0 /dev/sda1 /
 ```
 
 ### ZFS Tuning
+
 ```bash
 # Set ARC cache size (50% of RAM)
 echo 17179869184 > /sys/module/zfs/parameters/zfs_arc_max
@@ -127,11 +137,12 @@ echo 17179869184 > /sys/module/zfs/parameters/zfs_arc_max
 echo 1 > /sys/module/zfs/parameters/zfetch_array_rd_sz
 ```
 
----
+***
 
 ## 📶 Network Performance
 
 ### TCP Stack Tuning
+
 ```bash
 # Increase buffer sizes
 sysctl -w net.core.rmem_max=134217728
@@ -148,17 +159,19 @@ sysctl -w net.ipv4.tcp_fastopen=3
 ```
 
 ### IRQ Affinity
+
 ```bash
 # Pin network IRQ to specific CPUs
 irqbalance --oneshot
 echo f > /proc/irq/$(grep eth0 /proc/interrupts | cut -d: -f1)/smp_affinity
 ```
 
----
+***
 
 ## 🧠 AI/ML Performance
 
 ### GPU Acceleration
+
 ```bash
 # Enable CUDA for NVIDIA
 sigma-pkg install cuda-runtime
@@ -173,6 +186,7 @@ export VULKAN_SDK=/opt/vulkan
 ```
 
 ### LLM Inference Optimization
+
 ```bash
 # Use llama.cpp with optimal threads
 sigma-llm run --model llama3-8b --threads $(nproc) --ctx-size 4096
@@ -181,11 +195,12 @@ sigma-llm run --model llama3-8b --threads $(nproc) --ctx-size 4096
 sigma-llm run --model llama3-8b --quant q4_0
 ```
 
----
+***
 
 ## 📊 Performance Monitoring
 
 ### Built-in Tools
+
 ```bash
 # SigmaOS performance dashboard
 sigma-perf dashboard
@@ -201,6 +216,7 @@ sigma-perf io --live
 ```
 
 ### Integration with Standard Tools
+
 ```bash
 # perf (Linux perf events)
 perf top -g
@@ -214,11 +230,12 @@ cargo flamegraph --bin sigmaos-kernel
 bpftrace -e 'kprobe:sys_read { @[comm] = count(); }'
 ```
 
----
+***
 
 ## 🚀 Compilation Optimization
 
 ### Rust Compiler Flags
+
 ```toml
 # Cargo.toml profile for maximum performance
 [profile.release]
@@ -233,6 +250,7 @@ opt-level = 3
 ```
 
 ### Target CPU Optimization
+
 ```bash
 # Build for native CPU (not portable!)
 RUSTFLAGS="-C target-cpu=native" cargo build --release
@@ -242,6 +260,6 @@ RUSTFLAGS="-C target-cpu=znver4" cargo build --release  # AMD Zen 4
 RUSTFLAGS="-C target-cpu=sapphirerapids" cargo build --release  # Intel Sapphire Rapids
 ```
 
----
+***
 
 *SigmaOS Performance Tuning Guide | Updated: 2026-08-23*

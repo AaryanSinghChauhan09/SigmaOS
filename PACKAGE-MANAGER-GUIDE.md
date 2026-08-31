@@ -4,7 +4,7 @@
 
 `sigpkg` is the native SigmaOS package manager. It is inspired by Arch's pacman, Gentoo's portage, and NixOS's nix, combining the best of all three while maintaining full compatibility with `.deb`, `.rpm`, `.pkg.tar.zst`, and AppImage formats.
 
----
+***
 
 ## Quick Reference
 
@@ -37,7 +37,7 @@ sigpkg build ./RECIPE
 sigpkg repo add <url>
 ```
 
----
+***
 
 ## Package Formats Supported
 
@@ -52,26 +52,24 @@ sigpkg repo add <url>
 | Flatpak | Cross-platform | ✅ Full support |
 | Snap | Ubuntu | 🔄 Partial |
 
----
+***
 
 ## Architecture
 
-```
-sigpkg CLI
-    │
-    ├── src/package/mod.rs       — Core package management logic
-    ├── src/package/universal.rs — Universal cross-format adapter
-    ├── src/package/store.rs     — Local package database
-    │
-    ├── src/sigpkg/mod.rs        — Native .sig package format
-    ├── src/sigpkg/recipe.rs     — Build recipe DSL (PKGBUILD-like)
-    ├── src/sigpkg/makepkg.rs    — Build system
-    ├── src/sigpkg/spec.rs       — USE flags and feature spec
-    ├── src/sigpkg/store.rs      — Package store (hash-addressed)
-    └── src/sigpkg/universal_adapter.rs — .deb/.rpm/.pkg adapter
-```
+    sigpkg CLI
+        │
+        ├── src/package/mod.rs       — Core package management logic
+        ├── src/package/universal.rs — Universal cross-format adapter
+        ├── src/package/store.rs     — Local package database
+        │
+        ├── src/sigpkg/mod.rs        — Native .sig package format
+        ├── src/sigpkg/recipe.rs     — Build recipe DSL (PKGBUILD-like)
+        ├── src/sigpkg/makepkg.rs    — Build system
+        ├── src/sigpkg/spec.rs       — USE flags and feature spec
+        ├── src/sigpkg/store.rs      — Package store (hash-addressed)
+        └── src/sigpkg/universal_adapter.rs — .deb/.rpm/.pkg adapter
 
----
+***
 
 ## Native Package Recipe Format
 
@@ -110,7 +108,7 @@ post_install() {
 }
 ```
 
----
+***
 
 ## USE Flags (Gentoo-inspired)
 
@@ -130,26 +128,25 @@ sigpkg info --use-flags firefox
 USE="wayland pulseaudio" sigpkg build firefox.recipe
 ```
 
----
+***
 
 ## Package Store (NixOS-inspired)
 
 SigmaOS uses a content-addressable package store:
 
-```
-/sigma/store/
-├── abc123def456-firefox-125.0/     # Hash-addressed install
-├── 789xyz012abc-gtk-4.12.0/
-└── 345mno678pqr-libdbus-1.16.2/
-```
+    /sigma/store/
+    ├── abc123def456-firefox-125.0/     # Hash-addressed install
+    ├── 789xyz012abc-gtk-4.12.0/
+    └── 345mno678pqr-libdbus-1.16.2/
 
 Benefits:
-- **Multiple versions** of the same package coexist
-- **Atomic rollbacks** — switch to any previous generation
-- **No dependency conflicts** — each package has its own deps
-- **Reproducible builds** — same inputs always produce same output
 
----
+*   **Multiple versions** of the same package coexist
+*   **Atomic rollbacks** — switch to any previous generation
+*   **No dependency conflicts** — each package has its own deps
+*   **Reproducible builds** — same inputs always produce same output
+
+***
 
 ## Repositories
 
@@ -178,7 +175,7 @@ sigpkg repo list
 sigpkg repo update
 ```
 
----
+***
 
 ## Security & Signing
 
@@ -195,18 +192,18 @@ sigpkg key import --id ABC123DEF456
 sigpkg key list
 ```
 
----
+***
 
 ## Build Farm
 
 SigmaOS has a distributed build farm (`src/buildfarm/`) similar to Fedora's Koji:
 
-- All packages built in isolated containers
-- Reproducible build verification
-- Binary transparency log
-- Multi-architecture (x86_64, aarch64, riscv64)
+*   All packages built in isolated containers
+*   Reproducible build verification
+*   Binary transparency log
+*   Multi-architecture (x86\_64, aarch64, riscv64)
 
----
+***
 
 ## Rollbacks & Generations
 
@@ -224,6 +221,6 @@ sigpkg gen switch 42
 sigpkg gen gc --keep 3
 ```
 
----
+***
 
 *Last updated: 2026-08-23 | SigmaOS Package Management Team*

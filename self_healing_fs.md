@@ -2,7 +2,7 @@
 
 Inspired by **ZFS's Copy-on-Write (CoW)** snapshots, transactional metadata structures, and Merkle-tree integrity checks, this document defines a complete, functional, `#![no_std]` transactional storage and self-healing system. It includes complete journal replay, state hashes, and sub-millisecond atomic rollbacks.
 
----
+***
 
 ## 🏗️ Component Implementation Source Code
 

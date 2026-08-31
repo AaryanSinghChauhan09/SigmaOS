@@ -8,33 +8,31 @@ SigmaOS is built on a philosophy of **radical self-sufficiency**: the kernel and
 
 SigmaOS eliminates entire categories of supply-chain attacks by implementing core functionality from scratch in Rust, with zero `extern crate std` and zero `libc` linkage in the kernel.
 
----
+***
 
 ## Dependency Hierarchy
 
-```
-┌────────────────────────────────────────────────────┐
-│                  User Applications                 │
-│           (may use std, glibc, etc.)               │
-├────────────────────────────────────────────────────┤
-│              SigmaOS userland (sigmalib)            │
-│        (Rust + selective POSIX compatibility)       │
-├────────────────────────────────────────────────────┤
-│                  sigma-syscall ABI                  │
-│         (stable syscall interface, C-FFI safe)      │
-├────────────────────────────────────────────────────┤
-│              SigmaOS Kernel (no_std)                │
-│         NO external dependencies below here         │
-│                                                    │
-│  klib::Vec    klib::String   klib::BTreeMap         │
-│  klib::Arc    klib::Mutex    klib::RwLock           │
-│  klib::Rc     klib::Box      klib::HashMap          │
-└────────────────────────────────────────────────────┘
-              ↑ Everything in this box is
-              ↑ implemented from scratch in Rust
-```
+    ┌────────────────────────────────────────────────────┐
+    │                  User Applications                 │
+    │           (may use std, glibc, etc.)               │
+    ├────────────────────────────────────────────────────┤
+    │              SigmaOS userland (sigmalib)            │
+    │        (Rust + selective POSIX compatibility)       │
+    ├────────────────────────────────────────────────────┤
+    │                  sigma-syscall ABI                  │
+    │         (stable syscall interface, C-FFI safe)      │
+    ├────────────────────────────────────────────────────┤
+    │              SigmaOS Kernel (no_std)                │
+    │         NO external dependencies below here         │
+    │                                                    │
+    │  klib::Vec    klib::String   klib::BTreeMap         │
+    │  klib::Arc    klib::Mutex    klib::RwLock           │
+    │  klib::Rc     klib::Box      klib::HashMap          │
+    └────────────────────────────────────────────────────┘
+                  ↑ Everything in this box is
+                  ↑ implemented from scratch in Rust
 
----
+***
 
 ## Custom `klib` — The Kernel Standard Library
 
@@ -51,33 +49,38 @@ All `std`-like functionality is re-implemented in `src/klib/`:
 | `Box<T>` | `klib::Box<T>` | Allocates via global kernel allocator |
 | `HashMap<K,V>` | `klib::HashMap<K,V>` | Robin Hood hashing |
 
----
+***
 
 ## Eliminated External Dependencies
 
 ### Removed: `libc`
-- **What was using it**: Memory allocation, printf-style logging, POSIX thread primitives
-- **Replacement**: Custom allocator (`src/klib/buddy_allocator.rs`), custom serial/VGA logging, custom spinlock
+
+*   **What was using it**: Memory allocation, printf-style logging, POSIX thread primitives
+*   **Replacement**: Custom allocator (`src/klib/buddy_allocator.rs`), custom serial/VGA logging, custom spinlock
 
 ### Removed: `std::collections`
-- **Replacement**: `klib::Vec`, `klib::BTreeMap`, `klib::HashMap`
+
+*   **Replacement**: `klib::Vec`, `klib::BTreeMap`, `klib::HashMap`
 
 ### Removed: OpenSSL / ring / RustCrypto
-- **Replacement**: Custom crypto primitives in `src/crypto/`:
-  - AES-256-GCM: `src/crypto/aes_gcm.rs`
-  - ChaCha20-Poly1305: `src/crypto/chacha20.rs`
-  - SHA-256/512: `src/crypto/sha.rs`
-  - Argon2id: `src/crypto/argon2.rs`
-  - X25519 ECDH: `src/crypto/x25519.rs`
-  - Ed25519 signatures: `src/crypto/ed25519.rs`
+
+*   **Replacement**: Custom crypto primitives in `src/crypto/`:
+    *   AES-256-GCM: `src/crypto/aes_gcm.rs`
+    *   ChaCha20-Poly1305: `src/crypto/chacha20.rs`
+    *   SHA-256/512: `src/crypto/sha.rs`
+    *   Argon2id: `src/crypto/argon2.rs`
+    *   X25519 ECDH: `src/crypto/x25519.rs`
+    *   Ed25519 signatures: `src/crypto/ed25519.rs`
 
 ### Removed: `log` crate
-- **Replacement**: `src/klib/log.rs` — direct serial output with log levels
+
+*   **Replacement**: `src/klib/log.rs` — direct serial output with log levels
 
 ### Removed: `alloc` crate (partially)
-- **Replacement**: All allocation goes through `klib::GlobalAllocator` which uses the buddy allocator
 
----
+*   **Replacement**: All allocation goes through `klib::GlobalAllocator` which uses the buddy allocator
+
+***
 
 ## Cargo.toml Policy
 
@@ -96,7 +99,7 @@ codegen-units = 1
 
 Running `cargo tree --edges features` should show **zero** non-workspace crates for the kernel library target.
 
----
+***
 
 ## Verifying Zero External Dependencies
 
@@ -111,7 +114,7 @@ grep -r "extern crate libc" src/ && echo "❌ libc found" || echo "✅ No libc"
 grep -r "use std::" src/ --include="*.rs" && echo "❌ std found" || echo "✅ No std in kernel"
 ```
 
----
+***
 
 ## Trade-offs and Decisions
 
@@ -122,22 +125,23 @@ grep -r "use std::" src/ --include="*.rs" && echo "❌ std found" || echo "✅ N
 | No log crate | Less ecosystem tooling | Log is a leaf dependency — easy to reimplement |
 | Custom allocator | Performance tuning effort | Kernel needs predictable allocation latency |
 
----
+***
 
 ## Contributing
 
 When adding new kernel code:
-1. **Never** `use std::` in `src/` kernel files
-2. **Always** prefer `klib::` types over reinventing inline
-3. If a new data structure is needed, add it to `klib/` first
-4. All `unsafe` code must have a `// SAFETY:` comment
-5. Run `cargo clippy -- -D clippy::std_instead_of_core` to catch accidental `std` usage
 
----
+1.  **Never** `use std::` in `src/` kernel files
+2.  **Always** prefer `klib::` types over reinventing inline
+3.  If a new data structure is needed, add it to `klib/` first
+4.  All `unsafe` code must have a `// SAFETY:` comment
+5.  Run `cargo clippy -- -D clippy::std_instead_of_core` to catch accidental `std` usage
+
+***
 
 ## See Also
 
-- [klib API Reference](klib-API-Reference.md)
-- [Custom Crypto Primitives](Crypto-Primitives.md)
-- [Memory Management](Memory-Management.md)
-- [Kernel Architecture](Architecture.md)
+*   [klib API Reference](klib-API-Reference)
+*   [Custom Crypto Primitives](Crypto-Primitives)
+*   [Memory Management](Memory-Management)
+*   [Kernel Architecture](Architecture)

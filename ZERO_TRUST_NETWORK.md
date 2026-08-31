@@ -2,35 +2,34 @@
 
 ## Principles
 
-1. **Never trust, always verify** — no implicit trust from network location
-2. **Least privilege** — grant only needed access
-3. **Micro-segmentation** — divide network into small isolated zones
-4. **Assume breach** — design as if attacker is already inside
-5. **Continuous monitoring** — verify every request
+1.  **Never trust, always verify** — no implicit trust from network location
+2.  **Least privilege** — grant only needed access
+3.  **Micro-segmentation** — divide network into small isolated zones
+4.  **Assume breach** — design as if attacker is already inside
+5.  **Continuous monitoring** — verify every request
 
 ## Implementation
 
 ### mTLS (Mutual TLS) for All Services
 
-```
-Service A                     Service B
-   │─── ClientHello ──────────→│
-   │←── ServerHello ───────────│
-   │←── Server Certificate ────│
-   │─── Client Certificate ───→│
-   │─── CertificateVerify ────→│
-   │←── Finished ──────────────│
-   │   (Encrypted + Authenticated)
-   │─── Request ──────────────→│
-   │←── Response ──────────────│
-```
+    Service A                     Service B
+       │─── ClientHello ──────────→│
+       │←── ServerHello ───────────│
+       │←── Server Certificate ────│
+       │─── Client Certificate ───→│
+       │─── CertificateVerify ────→│
+       │←── Finished ──────────────│
+       │   (Encrypted + Authenticated)
+       │─── Request ──────────────→│
+       │←── Response ──────────────│
 
 ### Identity-Based Access
 
 Every workload has a cryptographic identity:
-- **SPIFFE ID**: `spiffe://sigmaos.local/ns/default/sa/nginx`
-- **Certificate**: X.509 + Dilithium-5 (post-quantum)
-- **Short-lived**: Rotated every 24 hours
+
+*   **SPIFFE ID**: `spiffe://sigmaos.local/ns/default/sa/nginx`
+*   **Certificate**: X.509 + Dilithium-5 (post-quantum)
+*   **Short-lived**: Rotated every 24 hours
 
 ### Network Policy
 

@@ -4,85 +4,88 @@ This document outlines the strategic architectural blueprint and step-by-step im
 
 By employing **Object-Oriented Programming (OOP) principles**, **User-Defined Functions (UDFs)**, and **Aggressive Footprint Optimization techniques**, this blueprint ensures universal hardware compatibility with a near-zero disk and memory footprint.
 
----
+***
 
 ## 🎯 1. Architectural Vision
 
 Operating systems traditionally suffer from driver bloat, where supporting decades of legacy hardware (e.g., ISA, serial ports, PS/2, IDE, PIO) alongside modern equivalents (e.g., PCIe, NVMe, USB 3.x/4, xHCI, MMIO, MSI-X) inflates the disk footprint to gigabytes.
 
 **SigmaOS** solves this conflict by establishing a **Unified Polymorphic Device Model**:
-1. **Unified Device Interface (OOP)**: Decouples physical transport mechanisms from device class operations.
-2. **Dual-Generation Auto-Negotiation**: Automatically detects, matches, and falls back to legacy/modern interfaces transparently.
-3. **Sandboxed UDF Extensibility (Micro-Interpreter)**: Executes user-defined or vendor-supplied custom driver logic in a high-density, secure bytecode VM (e.g., eBPF or stack-based micro-VM) measuring only a few kilobytes.
-4. **On-Demand Hot Decompression**: Stores dormant driver modules in highly-compressed formats (LZ4/ZSTD) on disk and decompresses them directly into memory only when physical devices are hotplugged.
 
----
+1.  **Unified Device Interface (OOP)**: Decouples physical transport mechanisms from device class operations.
+2.  **Dual-Generation Auto-Negotiation**: Automatically detects, matches, and falls back to legacy/modern interfaces transparently.
+3.  **Sandboxed UDF Extensibility (Micro-Interpreter)**: Executes user-defined or vendor-supplied custom driver logic in a high-density, secure bytecode VM (e.g., eBPF or stack-based micro-VM) measuring only a few kilobytes.
+4.  **On-Demand Hot Decompression**: Stores dormant driver modules in highly-compressed formats (LZ4/ZSTD) on disk and decompresses them directly into memory only when physical devices are hotplugged.
+
+***
 
 ## 🏗️ 2. Core OOP Design Patterns
 
 SigmaOS leverages Rust’s trait-based object-oriented design to encapsulate polymorphic device behaviors.
 
-```
-                  +--------------------------+
-                  |    UnifiedPeripheral     |  <--- Base OOP Abstraction
-                  +--------------------------+
-                               |
-            +------------------+------------------+
-            |                                     |
-            v                                     v
-  +------------------+                  +------------------+
-  |   LegacyDevice   |                  |   ModernDevice   |
-  +------------------+                  +------------------+
-  | - Port I/O (PIO) |                  | - Memory Mapped  |
-  | - Poll / PIC IRQ |                  | - DMA / MSI-X    |
-  +------------------+                  +------------------+
-```
+                      +--------------------------+
+                      |    UnifiedPeripheral     |  <--- Base OOP Abstraction
+                      +--------------------------+
+                                   |
+                +------------------+------------------+
+                |                                     |
+                v                                     v
+      +------------------+                  +------------------+
+      |   LegacyDevice   |                  |   ModernDevice   |
+      +------------------+                  +------------------+
+      | - Port I/O (PIO) |                  | - Memory Mapped  |
+      | - Poll / PIC IRQ |                  | - DMA / MSI-X    |
+      +------------------+                  +------------------+
 
 ### 2.1 The Polymorphic Interface (`UnifiedPeripheral`)
+
 A clean abstract trait represents any peripheral. It exposes unified methods for initialization, read, write, execution of user-defined control functions (ioctl/UDF), and power-state transitions.
 
 ### 2.2 Device Inheritance & Dispatch Strategy
-- **Static Polymorphism (Enums/Generics)**: Used for compile-time performance-sensitive paths (e.g., storage, networking) to avoid vtable indirection overhead.
-- **Dynamic Polymorphism (Trait Objects `dyn`)**: Used for flexible, hot-swappable devices (e.g., USB, character devices, serial devices) to enable runtime loading and unloading.
 
----
+*   **Static Polymorphism (Enums/Generics)**: Used for compile-time performance-sensitive paths (e.g., storage, networking) to avoid vtable indirection overhead.
+*   **Dynamic Polymorphism (Trait Objects `dyn`)**: Used for flexible, hot-swappable devices (e.g., USB, character devices, serial devices) to enable runtime loading and unloading.
+
+***
 
 ## ⚡ 3. User-Defined Functions (UDF) & Virtualization Engine
 
 To avoid hardcoding thousands of vendor-specific device profiles on disk, SigmaOS introduces a **User-Defined Function (UDF) Interpreter**.
 
-```
-+-------------------------------------------------------------------------+
-|                              SigmaOS Kernel                             |
-|                                                                         |
-|  +---------------------------+       +-------------------------------+  |
-|  |   Unified Peripheral Bus  | <---> | UDF Micro-Interpreter Runtime |  |
-|  +---------------------------+       +-------------------------------+  |
-+----------------------------------------------|--------------------------+
-                                               v
-                                    +----------------------+
-                                    | Light Bytecode Block | (e.g., < 2KB)
-                                    | - custom parsing     |
-                                    | - command conversion |
-                                    +----------------------+
-```
+    +-------------------------------------------------------------------------+
+    |                              SigmaOS Kernel                             |
+    |                                                                         |
+    |  +---------------------------+       +-------------------------------+  |
+    |  |   Unified Peripheral Bus  | <---> | UDF Micro-Interpreter Runtime |  |
+    |  +---------------------------+       +-------------------------------+  |
+    +----------------------------------------------|--------------------------+
+                                                   v
+                                        +----------------------+
+                                        | Light Bytecode Block | (e.g., < 2KB)
+                                        | - custom parsing     |
+                                        | - command conversion |
+                                        +----------------------+
 
 ### 3.1 Why UDFs?
+
 Instead of ship-compiling separate kernel modules for every variation of serial mouse or custom industrial controller:
-- The OS ships a single, highly-optimized standard class driver (e.g., HID Character Driver).
-- Peripherals or users register a tiny **UDF bytecode snippet** (less than 2 KB) containing device-specific command mapping, register offsets, or packet parsing logic.
-- This snippet is run within a safe, zero-allocation micro-interpreter inside the kernel or driver sandbox.
+
+*   The OS ships a single, highly-optimized standard class driver (e.g., HID Character Driver).
+*   Peripherals or users register a tiny **UDF bytecode snippet** (less than 2 KB) containing device-specific command mapping, register offsets, or packet parsing logic.
+*   This snippet is run within a safe, zero-allocation micro-interpreter inside the kernel or driver sandbox.
 
 ### 3.2 Sandboxed Micro-VM Architecture
+
 The micro-VM operates on standard virtual registers:
-- `R0` (Accumulator / Return)
-- `R1` (Buffer/Payload Pointer)
-- `R2` (I/O Port or MMIO Base)
-- `R3` (Length of transaction)
+
+*   `R0` (Accumulator / Return)
+*   `R1` (Buffer/Payload Pointer)
+*   `R2` (I/O Port or MMIO Base)
+*   `R3` (Length of transaction)
 
 It executes secure instructions (`READ_REG`, `WRITE_REG`, `MATH_OP`, `JUMP`) ensuring no invalid memory access (sandbox-enforced bounds check).
 
----
+***
 
 ## 💾 4. Disk & Memory Footprint Optimization Strategy
 
@@ -96,31 +99,34 @@ To fit the operating system on low-cost older devices and save valuable NVMe sto
 | **Dynamic Devirtualization** | Compiles out unused vtables into static dispatches when driver options are fixed. | -15% | -10% |
 | **Zero-Copy Architecture** | Drivers read directly into user-provided buffers, eliminating kernel intermediate copies. | 0% | -50% |
 
----
+***
 
 ## 📅 5. Step-by-Step Implementation Roadmap
 
 ### Phase 1: Establish OOP Unified Peripheral Abstraction
-- Define the `UnifiedPeripheral` interface trait in `src/driver/device.rs`.
-- Implement concrete structs `LegacyDevice` (encapsulating x86 `inb`/`outb` instructions or equivalent base-level port communications) and `ModernDevice` (encapsulating MMIO base addresses and memory offsets).
-- Add an enumerator wrapper `PeripheralChannel` to safely abstract Port I/O and Memory-Mapped I/O operations under a single API.
+
+*   Define the `UnifiedPeripheral` interface trait in `src/driver/device.rs`.
+*   Implement concrete structs `LegacyDevice` (encapsulating x86 `inb`/`outb` instructions or equivalent base-level port communications) and `ModernDevice` (encapsulating MMIO base addresses and memory offsets).
+*   Add an enumerator wrapper `PeripheralChannel` to safely abstract Port I/O and Memory-Mapped I/O operations under a single API.
 
 ### Phase 2: Design the UDF Micro-Interpreter Engine
-- Create a lightweight stack-based or register-based bytecode interpreter struct (`UdfInterpreter`) inside `src/driver/device.rs`.
-- Define a clean bytecode instruction set:
-  - `0x01` (Read Port I/O / MMIO)
-  - `0x02` (Write Port I/O / MMIO)
-  - `0x03` (Arithmetic transformation)
-  - `0x04` (Halting & returning status)
-- Implement execution bounds-checking to guarantee that a user-defined function cannot read or write memory outside the peripheral's assigned I/O range.
 
----
+*   Create a lightweight stack-based or register-based bytecode interpreter struct (`UdfInterpreter`) inside `src/driver/device.rs`.
+*   Define a clean bytecode instruction set:
+    *   `0x01` (Read Port I/O / MMIO)
+    *   `0x02` (Write Port I/O / MMIO)
+    *   `0x03` (Arithmetic transformation)
+    *   `0x04` (Halting & returning status)
+*   Implement execution bounds-checking to guarantee that a user-defined function cannot read or write memory outside the peripheral's assigned I/O range.
+
+***
 
 ## 🛡️ 6. Executable Implementation Reference
 
 To guarantee 100% consistency with the codebase, here are the actual executable-grade Rust implementations for the multi-generation driver abstractions.
 
 ### 6.1 PortAddress & UnifiedPeripheral (from `src/driver/device.rs`)
+
 ```rust
 /// Unified representation of communication channels (OOP Abstraction)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -138,6 +144,7 @@ pub trait UnifiedPeripheral: Device {
 ```
 
 ### 6.2 Legacy & Modern Devices (from `src/driver/device.rs`)
+
 ```rust
 /// Legacy implementation of a peripheral using Port I/O
 pub struct LegacyDevice {
@@ -237,6 +244,7 @@ impl UnifiedPeripheral for ModernDevice {
 ```
 
 ### 6.3 UdfInterpreter (from `src/driver/device.rs`)
+
 ```rust
 /// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)
 /// Solves driver-bloat and provides ultra-low disk footprint driver customization
@@ -304,7 +312,7 @@ impl UdfInterpreter {
 }
 ```
 
----
+***
 
 ## 🛡️ 7. Conclusion
 

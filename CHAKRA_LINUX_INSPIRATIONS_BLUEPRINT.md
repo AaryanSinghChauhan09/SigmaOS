@@ -3,29 +3,27 @@
 > **"A microkernel achieves elegance by adopting specialized application bundles, modular installers, and intuitive first-boot assistants."**
 > This blueprint specifies the adaptation and integration of **Chakra Linux's unique desktop ecosystem architectures (Akabei, Tribe, Kapudan, and CCR)** into the decentralized, zero-dependency, and `#![no_std]` environment of **SigmaOS**.
 
----
+***
 
 ## 🏗️ Architectural Foundations & Inspirations
 
-```
-+---------------------------------------------------------------------------------+
-|                                 AKABEI SYSTEM                                   |
-|      (Modular GTK isolation, Half-Rolling dependency resolution, Bundler)       |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| KAPUDAN CONFIGURATION ENGINE                                                    |
-| - Welcomes users and drives desktop-level theme modifications via CLI          |
-| - Supports keyboard layout and extra administrative widget toggles            |
-+---------------------------------------------------------------------------------+
-| TRIBE MODULAR INSTALLER                                                         |
-| - Probes system disk devices and provisions partition layouts                  |
-| - Extracts core files and triggers administrative user setup hooks in Rust       |
-+---------------------------------------------------------------------------------+
-```
+    +---------------------------------------------------------------------------------+
+    |                                 AKABEI SYSTEM                                   |
+    |      (Modular GTK isolation, Half-Rolling dependency resolution, Bundler)       |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | KAPUDAN CONFIGURATION ENGINE                                                    |
+    | - Welcomes users and drives desktop-level theme modifications via CLI          |
+    | - Supports keyboard layout and extra administrative widget toggles            |
+    +---------------------------------------------------------------------------------+
+    | TRIBE MODULAR INSTALLER                                                         |
+    | - Probes system disk devices and provisions partition layouts                  |
+    | - Extracts core files and triggers administrative user setup hooks in Rust       |
+    +---------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Reference Implementation
 
@@ -192,12 +190,12 @@ pub static GLOBAL_KAPUDAN: KapudanAssistant = KapudanAssistant::new();
 pub static GLOBAL_TRIBE: TribeInstaller = TribeInstaller::new(240);
 ```
 
----
+***
 
 ## 💎 The CCR & Oktopi Roadmap
 
 To establish a fully functional **CCR (Chakra Community Repository)** analog under the **SigmaOS** package namespace, the implementation focuses on:
 
-1. **Sovereign Recipe Parsing**: Compiling declarative build scripts (similar to `PKGBUILD` scripts) that leverage native Sandboxed compiler shunts.
-2. **GTK/Core Bundle Sandboxing**: Standardizing container boundaries around extra applications to preserve the clean microkernel baseline of SigmaOS.
-3. **Oktopi Visual Parity**: Utilizing the VESA visual framebuffer driver to present local package statuses, search functions, and dependency tree hierarchies directly.
+1.  **Sovereign Recipe Parsing**: Compiling declarative build scripts (similar to `PKGBUILD` scripts) that leverage native Sandboxed compiler shunts.
+2.  **GTK/Core Bundle Sandboxing**: Standardizing container boundaries around extra applications to preserve the clean microkernel baseline of SigmaOS.
+3.  **Oktopi Visual Parity**: Utilizing the VESA visual framebuffer driver to present local package statuses, search functions, and dependency tree hierarchies directly.

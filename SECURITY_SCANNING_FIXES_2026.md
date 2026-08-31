@@ -41,17 +41,22 @@ This document tracks all GitHub CodeQL security alert resolutions for SigmaOS.
 ## Fix Methodology
 
 ### Hard-coded Cryptographic Values (#4231, #4129)
+
 These are high-priority security issues. The fix pattern:
-1. Replace literal secret with a compile-time expression that **derives** a value without embedding it
-2. For test-only code: use byte arrays from benign, constant string XOR'd with a constant (no semantic secret)
-3. For production code: generate dynamically from the kernel CSPRNG at runtime
+
+1.  Replace literal secret with a compile-time expression that **derives** a value without embedding it
+2.  For test-only code: use byte arrays from benign, constant string XOR'd with a constant (no semantic secret)
+3.  For production code: generate dynamically from the kernel CSPRNG at runtime
 
 ### Unused Variables (#4126–#4294)
+
 These are informational lint warnings. Two fix patterns:
-1. **Prefix with `_`**: When the variable is a loop counter or local let-binding (e.g. `let _i = 0`)
-2. **Module-level attribute**: When the unused variable is a function parameter (can't prefix), add `#![allow(unused_variables)]` at the top of the file
+
+1.  **Prefix with `_`**: When the variable is a loop counter or local let-binding (e.g. `let _i = 0`)
+2.  **Module-level attribute**: When the unused variable is a function parameter (can't prefix), add `#![allow(unused_variables)]` at the top of the file
 
 ## Related Wiki Pages
-- [Security Policy](SECURITY.md)
-- [Security Hardening Guide](Security-Hardening-Guide.md)
-- [Architecture](ARCHITECTURE.md)
+
+*   [Security Policy](SECURITY)
+*   [Security Hardening Guide](Security-Hardening-Guide)
+*   [Architecture](ARCHITECTURE)

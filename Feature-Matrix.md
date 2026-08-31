@@ -12,7 +12,7 @@
 | ❌ | Not started |
 | N/A | Not applicable to this profile |
 
----
+***
 
 ## Core Kernel
 
@@ -33,7 +33,7 @@
 | Btrfs Snapshots/Rollback | 🔧 | `fs/btrfs/sigma_btrfs.rs` |
 | UEFI EFI Boot Entry | ✅ | `sigma-boot/sigma_efi_entry.c` |
 
----
+***
 
 ## Hardware Drivers
 
@@ -52,7 +52,7 @@
 | NVMe | ❌ | Planned Phase 2.1 |
 | SATA AHCI | ❌ | Planned Phase 2.1 |
 
----
+***
 
 ## Package Ecosystem
 
@@ -65,7 +65,7 @@
 | GUI Front-end | 🔧 | `sigma-pkg/sigma_pkg_gui.rs` |
 | AI Recommender | 🔧 | `sigma-pkg/sigma_pkg_ai_recommender.rs` |
 
----
+***
 
 ## Desktop & UI
 
@@ -79,7 +79,7 @@
 | KDE Compatibility | 🔧 | `desktop/sigma_de_kde_compat.rs` |
 | Wayland Compositor (Zenith) | 🚧 | `userland/zenith/` |
 
----
+***
 
 ## Security
 
@@ -92,7 +92,7 @@
 | MAC (Mandatory Access Control) | 🔧 | `kernel/security/sigma_mac.rs` |
 | Seccomp Filter | 🔧 | `kernel/security/sigma_seccomp.rs` |
 
----
+***
 
 ## AI & Automation
 
@@ -104,7 +104,7 @@
 | Adaptive CLI | ✅ | `agents/sigma_adaptive_cli.rs` |
 | Error Explainer | ✅ | `agents/sigma_error_explainer.rs` |
 
----
+***
 
 ## Init System
 
@@ -114,7 +114,7 @@
 | .service Parser | 🔧 | `init/sigma_service.rs` |
 | Structured Logging | 🔧 | `init/sigma_journal.rs` |
 
----
+***
 
 ## CI/CD & Tests
 
@@ -127,7 +127,7 @@
 | VFS Tests | 🔧 | `tests/fs/test_vfs.rs` |
 | Makefile Targets | ✅ | `Makefile` |
 
----
+***
 
 ## Deployment Profile Support
 

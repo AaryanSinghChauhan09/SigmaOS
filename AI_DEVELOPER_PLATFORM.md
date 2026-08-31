@@ -8,7 +8,7 @@ SigmaOS ships a first-class AI developer platform built entirely in Rust with ze
 
 ## Key Subsystems
 
-### 1. ML Experiment Tracker (src/ai/developer_platform.rs)
+### 1. ML Experiment Tracker (src/ai/developer\_platform.rs)
 
 Tracks ML experiment runs with full parameter/metric logging, model checkpointing, and best-run selection.
 
@@ -18,8 +18,8 @@ Enforces safety policies at the OS level:
 
 | Policy | Default |
 |--------|---------|
-| max_file_write_bytes | 100 MB |
-| enforce_sandbox | true |
+| max\_file\_write\_bytes | 100 MB |
+| enforce\_sandbox | true |
 | Blocked commands | rm -rf /, dd if=/dev/zero |
 
 ### 3. Signed Model Marketplace
@@ -28,16 +28,16 @@ Verifies model signatures using BLAKE3 hashes before loading. Prevents supply-ch
 
 ### 4. Neural Network Inference Engine (src/ml/inference.rs)
 
-- Pure Rust, no-std compatible
-- OOP trait-based: MLModel, InferenceEngine
-- Safe enum dispatch (no mem::transmute)
-- Forward pass with configurable weight matrices
+*   Pure Rust, no-std compatible
+*   OOP trait-based: MLModel, InferenceEngine
+*   Safe enum dispatch (no mem::transmute)
+*   Forward pass with configurable weight matrices
 
 ### 5. Model Training Engine (src/ml/training.rs)
 
-- SGD, Adam, RMSProp optimizers (pure Rust)
-- Safe OptimizerType::from_usize() dispatch
-- Gradient descent on arbitrary weight tensors
+*   SGD, Adam, RMSProp optimizers (pure Rust)
+*   Safe OptimizerType::from\_usize() dispatch
+*   Gradient descent on arbitrary weight tensors
 
 ### 6. SerenityOS-Inspired Terminal Tabs
 
@@ -45,10 +45,10 @@ SigmaOS adopts SerenityOS's multi-tab terminal model into the Zenith Desktop she
 
 ## Security Guarantees
 
-- No unsafe transmute: All enum conversions use match-based from_usize() methods
-- Sandboxed execution: AI agents run under Landlock + Pledge constraints
-- Signed models: All marketplace models require BLAKE3 hash verification
-- No network by default: AI subsystem runs air-gapped unless explicitly granted AF_INET capability
+*   No unsafe transmute: All enum conversions use match-based from\_usize() methods
+*   Sandboxed execution: AI agents run under Landlock + Pledge constraints
+*   Signed models: All marketplace models require BLAKE3 hash verification
+*   No network by default: AI subsystem runs air-gapped unless explicitly granted AF\_INET capability
 
 ## Dependency Reduction
 
@@ -70,5 +70,6 @@ SigmaOS adopts SerenityOS's multi-tab terminal model into the Zenith Desktop she
 | 99. Distributed training | Planned |
 | 100. Federated learning | Planned |
 
----
-Part of the SigmaOS Zero-Dependency Architecture. See ZERO_DEPENDENCY_ARCHITECTURE.md
+***
+
+Part of the SigmaOS Zero-Dependency Architecture. See ZERO\_DEPENDENCY\_ARCHITECTURE.md

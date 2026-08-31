@@ -11,12 +11,14 @@ SigmaOS incorporates package management features from multiple Linux distributio
 ### Arch Linux (pacman)
 
 **Features:**
-- Rolling release model
-- Fast, dependency-aware package manager
-- AUR (Arch User Repository) support
-- Binary package format (.pkg.tar.xz)
+
+*   Rolling release model
+*   Fast, dependency-aware package manager
+*   AUR (Arch User Repository) support
+*   Binary package format (.pkg.tar.xz)
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaPacman {
     pub local_db: LocalDatabase,
@@ -48,12 +50,14 @@ impl SigmaPacman {
 ### Debian/Ubuntu (APT)
 
 **Features:**
-- Sophisticated dependency resolution
-- Repository management
-- Package signing and verification
-- .deb package format
+
+*   Sophisticated dependency resolution
+*   Repository management
+*   Package signing and verification
+*   .deb package format
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaAPT {
     pub database: PackageDatabase,
@@ -77,12 +81,14 @@ impl SigmaAPT {
 ### Fedora (DNF)
 
 **Features:**
-- Based on RPM (Red Hat Package Manager)
-- Modular package management
-- Plugin system
-- Transaction management
+
+*   Based on RPM (Red Hat Package Manager)
+*   Modular package management
+*   Plugin system
+*   Transaction management
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaDNF {
     pub backend: PackageBackend,
@@ -103,12 +109,14 @@ impl SigmaDNF {
 ### Gentoo (Portage)
 
 **Features:**
-- Source-based package management
-- USE flags for build-time configuration
-- Ebuild system
-- Custom compilation flags
+
+*   Source-based package management
+*   USE flags for build-time configuration
+*   Ebuild system
+*   Custom compilation flags
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaPortage {
     pub tree: PortageTree,
@@ -140,12 +148,14 @@ impl SigmaPortage {
 ### Snap (Ubuntu)
 
 **Features:**
-- Universal packages across distributions
-- Automatic updates
-- Sandboxed execution
-- Confined permissions
+
+*   Universal packages across distributions
+*   Automatic updates
+*   Sandboxed execution
+*   Confined permissions
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaSnap {
     pub database: SnapDatabase,
@@ -168,12 +178,14 @@ impl SigmaSnap {
 ### Flatpak
 
 **Features:**
-- Desktop application sandboxing
-- Runtime dependencies
-- Distribution-independent
-- Portal system for host access
+
+*   Desktop application sandboxing
+*   Runtime dependencies
+*   Distribution-independent
+*   Portal system for host access
 
 **SigmaOS Implementation:**
+
 ```rust
 pub struct SigmaFlatpak {
     pub installations: Vec<Installation>,
@@ -197,13 +209,15 @@ impl SigmaFlatpak {
 ### SigmaPKG
 
 **Features:**
-- Zero-dependency implementation
-- Capability-based security
-- Native package format (.sig)
-- Delta updates support
-- Sandboxed installations
+
+*   Zero-dependency implementation
+*   Capability-based security
+*   Native package format (.sig)
+*   Delta updates support
+*   Sandboxed installations
 
 **Architecture:**
+
 ```rust
 pub struct SigmaPKG {
     pub database: PackageDatabase,
@@ -303,11 +317,11 @@ sigpkg config import /etc/apt/sources.list
 
 ## Best Practices
 
-1. **Security First**: Always verify package signatures and capabilities
-2. **Sandboxing**: Use sandboxed installations for untrusted packages
-3. **Delta Updates**: Use delta updates to reduce bandwidth
-4. **Dependency Management**: Resolve dependencies before installation
-5. **Rollback**: Maintain rollback capability for system stability
+1.  **Security First**: Always verify package signatures and capabilities
+2.  **Sandboxing**: Use sandboxed installations for untrusted packages
+3.  **Delta Updates**: Use delta updates to reduce bandwidth
+4.  **Dependency Management**: Resolve dependencies before installation
+5.  **Rollback**: Maintain rollback capability for system stability
 
 ## Performance Considerations
 
@@ -337,9 +351,9 @@ sigpkg config import /etc/apt/sources.list
 
 ## References
 
-- [Arch Linux Package Guidelines](https://wiki.archlinux.org/title/Arch_package_guidelines)
-- [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
-- [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/)
-- [Gentoo Development Guide](https://devmanual.gentoo.org/)
-- [Snapcraft Documentation](https://snapcraft.io/docs)
-- [Flatpak Documentation](https://docs.flatpak.org/)
+*   [Arch Linux Package Guidelines](https://wiki.archlinux.org/title/Arch_package_guidelines)
+*   [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
+*   [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/)
+*   [Gentoo Development Guide](https://devmanual.gentoo.org/)
+*   [Snapcraft Documentation](https://snapcraft.io/docs)
+*   [Flatpak Documentation](https://docs.flatpak.org/)

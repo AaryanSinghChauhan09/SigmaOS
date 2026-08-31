@@ -12,15 +12,13 @@ set — not even with a kernel exploit.
 
 ## Isolation Model
 
-```
-Untrusted App (WASM / ELF)
-   └─ sigma_sandbox_create()         ← assigns capability token
-         └─ Shard Boundary (hardware ring separation)
-               ├─ FS namespace  (only allowed paths visible)
-               ├─ Net namespace (only declared ports reachable)
-               ├─ IPC namespace (only approved shard IDs)
-               └─ Memory domain (IOMMU-enforced, no cross-shard DMA)
-```
+    Untrusted App (WASM / ELF)
+       └─ sigma_sandbox_create()         ← assigns capability token
+             └─ Shard Boundary (hardware ring separation)
+                   ├─ FS namespace  (only allowed paths visible)
+                   ├─ Net namespace (only declared ports reachable)
+                   ├─ IPC namespace (only approved shard IDs)
+                   └─ Memory domain (IOMMU-enforced, no cross-shard DMA)
 
 ## API Interface
 
@@ -67,22 +65,22 @@ is blocked at the dispatcher and logged to the audit chain:
 
 ## Roadmap
 
-- [x] Sandbox create / execute / destroy lifecycle (`sandbox.rs`)
+*   \[x] Sandbox create / execute / destroy lifecycle (`sandbox.rs`)
 
-- [x] Syscall allowlist enforcement
+*   \[x] Syscall allowlist enforcement
 
-- [ ] IOMMU-enforced DMA isolation
+*   \[ ] IOMMU-enforced DMA isolation
 
-- [ ] seccomp-BPF equivalent for Sovereign ABI
+*   \[ ] seccomp-BPF equivalent for Sovereign ABI
 
-- [ ] Sandbox live introspection API
+*   \[ ] Sandbox live introspection API
 
-- [ ] Escape detection via invariant checking
+*   \[ ] Escape detection via invariant checking
 
-- [ ] Formal proof: sandbox capability confinement (Isabelle/HOL)
+*   \[ ] Formal proof: sandbox capability confinement (Isabelle/HOL)
 
 ## Related Modules
 
-- [`modules/security/access_control`](../access_control/README.md) — MAC policies
+*   [`modules/security/access_control`](../access_control/README.md) — MAC policies
 
-- [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule sandboxing
+*   [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule sandboxing

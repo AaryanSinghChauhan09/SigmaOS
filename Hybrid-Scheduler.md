@@ -5,14 +5,12 @@ real-time lanes, energy efficiency, and AI-driven workload prediction**.
 
 ## Scheduler Class Hierarchy
 
-```
-SovereignScheduler (abstract)
-  ├─ RoundRobin     — fair-share for interactive tasks
-  ├─ EDF            — Earliest Deadline First for real-time shards
-  ├─ RTLane         — hard real-time, preempts all other lanes
-  ├─ NUMAFair       — CFS analogue, NUMA-topology aware
-  └─ EcoLane        — battery/power-optimised (ARM big.LITTLE)
-```
+    SovereignScheduler (abstract)
+      ├─ RoundRobin     — fair-share for interactive tasks
+      ├─ EDF            — Earliest Deadline First for real-time shards
+      ├─ RTLane         — hard real-time, preempts all other lanes
+      ├─ NUMAFair       — CFS analogue, NUMA-topology aware
+      └─ EcoLane        — battery/power-optimised (ARM big.LITTLE)
 
 ## Scheduling Policy Selection
 
@@ -31,13 +29,13 @@ shard_spawn(SpawnRequest {
 
 `modules/core/kernel/res_alloc_ai.rs` feeds scheduling hints:
 
-- Lightweight LSTM trained on historical shard CPU/memory patterns
+*   Lightweight LSTM trained on historical shard CPU/memory patterns
 
-- Runs in a sandboxed inference shard (no GPU required at boot)
+*   Runs in a sandboxed inference shard (no GPU required at boot)
 
-- Inference latency < 50 µs on baseline x86_64
+*   Inference latency < 50 µs on baseline x86\_64
 
-- Signals pre-warming of cache lines for known bursty workloads
+*   Signals pre-warming of cache lines for known bursty workloads
 
 ## API Interface
 
@@ -66,24 +64,24 @@ void init_perf_scheduler(void);
 
 ## Roadmap
 
-- [x] Round-Robin base scheduler
+*   \[x] Round-Robin base scheduler
 
-- [x] EDF scheduler with deadline enforcement
+*   \[x] EDF scheduler with deadline enforcement
 
-- [ ] RTLane preemption guarantees (< 5 µs verified)
+*   \[ ] RTLane preemption guarantees (< 5 µs verified)
 
-- [ ] NUMA topology detector integration
+*   \[ ] NUMA topology detector integration
 
-- [ ] CPU frequency governor (P-state / DVFS)
+*   \[ ] CPU frequency governor (P-state / DVFS)
 
-- [ ] AI prediction hook from `res_alloc_ai.rs`
+*   \[ ] AI prediction hook from `res_alloc_ai.rs`
 
-- [ ] Formal scheduling analysis (response-time analysis)
+*   \[ ] Formal scheduling analysis (response-time analysis)
 
-- [ ] `schedtool`-compatible CLI for shard priority adjustment
+*   \[ ] `schedtool`-compatible CLI for shard priority adjustment
 
 ## Related Modules
 
-- [`modules/core/kernel`](../../core/kernel/README.md) — Kernel scheduler host
+*   [`modules/core/kernel`](../../core/kernel/README.md) — Kernel scheduler host
 
-- [`modules/perf/bench`](../bench/README.md) — Context-switch benchmark
+*   [`modules/perf/bench`](../bench/README.md) — Context-switch benchmark

@@ -6,7 +6,7 @@
 **Date:** July 2026
 **Status:** Active Implementation Plan
 
----
+***
 
 ## Executive Summary
 
@@ -14,13 +14,13 @@ This roadmap provides a complete implementation plan for all unimplemented featu
 
 **Current State Analysis:**
 
-- **Implemented:** Core architecture, capability tokens, zero-copy IPC, SigmaFS framework, AI integration framework, security framework, Zenith desktop framework
-- **Partially Implemented:** Driver frameworks, HAL implementations, some kernel components
-- **Unimplemented:** Complete kernel boot, full driver support, package management system, atomic updates, performance optimizations, cloud integration
+*   **Implemented:** Core architecture, capability tokens, zero-copy IPC, SigmaFS framework, AI integration framework, security framework, Zenith desktop framework
+*   **Partially Implemented:** Driver frameworks, HAL implementations, some kernel components
+*   **Unimplemented:** Complete kernel boot, full driver support, package management system, atomic updates, performance optimizations, cloud integration
 
 **Implementation Strategy:** Single-branch development with feature flags and phased releases
 
----
+***
 
 ## Phase 1: Critical Kernel Foundation (Weeks 1-12)
 
@@ -260,7 +260,7 @@ iso:
 **Testing:** `qemu -cdrom SigmaOS.iso` → shell
 **Completion:** Week 11-12
 
----
+***
 
 ## Phase 2: Essential Drivers (Weeks 13-24)
 
@@ -396,7 +396,7 @@ pub struct IwlWifi {
 **Testing:** Intel Wi-Fi 6 connectivity
 **Completion:** Week 24
 
----
+***
 
 ## Phase 3: Filesystem Layer (Weeks 25-36)
 
@@ -513,7 +513,7 @@ pub struct ReadAhead {
 **Testing:** Sequential read performance
 **Completion:** Week 36
 
----
+***
 
 ## Phase 4: Package Management (Weeks 37-48)
 
@@ -640,7 +640,7 @@ pub struct DeltaUpdate {
 **Testing:** Delta update application
 **Completion:** Week 48
 
----
+***
 
 ## Phase 5: Atomic Updates (Weeks 49-60)
 
@@ -764,7 +764,7 @@ pub struct SnapshotManager {
 **Testing:** Snapshot creation/restore
 **Completion:** Week 60
 
----
+***
 
 ## Phase 6: Performance Optimization (Weeks 61-72)
 
@@ -826,10 +826,10 @@ pub struct EEVDFScheduler {
 **Testing:** Scheduler fairness
 **Completion:** Week 66
 
-#### Task 6.1.4: io_uring
+#### Task 6.1.4: io\_uring
 
 **File:** `kernel/io/sigma_uring.rs`
-**Inspired by:** Linux io_uring
+**Inspired by:** Linux io\_uring
 **Implementation:**
 
 ```rust
@@ -875,7 +875,7 @@ pub struct PerformanceMonitor {
 **Testing:** Performance data collection
 **Completion:** Week 72
 
----
+***
 
 ## Phase 7: Security Hardening (Weeks 73-84)
 
@@ -985,7 +985,7 @@ pub struct SecurityMonitor {
 **Testing:** Threat detection
 **Completion:** Week 84
 
----
+***
 
 ## Phase 8: Cloud Integration (Weeks 85-96)
 
@@ -1095,7 +1095,7 @@ pub struct CloudAgent {
 **Testing:** Cloud initialization
 **Completion:** Week 96
 
----
+***
 
 ## Phase 9: Desktop Experience (Weeks 97-108)
 
@@ -1188,14 +1188,14 @@ pub struct AccessibilityManager {
 **Inspired by:** GNOME/KDE applications
 **Implementation:**
 
-- File manager
-- Terminal emulator
-- Settings application
-- Text editor
-**Testing:** Application functionality
-**Completion:** Week 108
+*   File manager
+*   Terminal emulator
+*   Settings application
+*   Text editor
+    **Testing:** Application functionality
+    **Completion:** Week 108
 
----
+***
 
 ## Phase 10: Developer Tools (Weeks 109-120)
 
@@ -1299,7 +1299,7 @@ pub struct TestFramework {
 **Testing:** Test execution
 **Completion:** Week 120
 
----
+***
 
 ## Implementation Strategy
 
@@ -1342,11 +1342,11 @@ mod filesystem;
 
 **Version Strategy:**
 
-- v15.1.0: Phase 1-2 completion (Kernel + Drivers)
-- v16.0.0: Phase 3-4 completion (Filesystem + Package Management)
-- v17.0.0: Phase 5-6 completion (Atomic Updates + Performance)
-- v18.0.0: Phase 7-8 completion (Security + Cloud)
-- v19.0.0: Phase 9-10 completion (Desktop + Developer Tools)
+*   v15.1.0: Phase 1-2 completion (Kernel + Drivers)
+*   v16.0.0: Phase 3-4 completion (Filesystem + Package Management)
+*   v17.0.0: Phase 5-6 completion (Atomic Updates + Performance)
+*   v18.0.0: Phase 7-8 completion (Security + Cloud)
+*   v19.0.0: Phase 9-10 completion (Desktop + Developer Tools)
 
 ### CI/CD Integration
 
@@ -1370,7 +1370,7 @@ jobs:
         run: ./scripts/qemu_boot_test.sh
 ```
 
----
+***
 
 ## Success Metrics
 
@@ -1378,65 +1378,65 @@ jobs:
 
 **Phase 1 (Kernel Foundation):**
 
-- [ ] QEMU boots to shell
-- [ ] All kernel components functional
-- [ ] CI passes on every commit
+*   \[ ] QEMU boots to shell
+*   \[ ] All kernel components functional
+*   \[ ] CI passes on every commit
 
 **Phase 2 (Drivers):**
 
-- [ ] Display drivers work on real hardware
-- [ ] Network connectivity functional
-- [ ] Driver framework complete
+*   \[ ] Display drivers work on real hardware
+*   \[ ] Network connectivity functional
+*   \[ ] Driver framework complete
 
 **Phase 3 (Filesystem):**
 
-- [ ] VFS operations work
-- [ ] SigmaFS functional
-- [ ] Ext4 read-only mount works
+*   \[ ] VFS operations work
+*   \[ ] SigmaFS functional
+*   \[ ] Ext4 read-only mount works
 
 **Phase 4 (Package Management):**
 
-- [ ] Package install/remove works
-- [ ] Dependency resolution functional
-- [ ] Repository sync works
+*   \[ ] Package install/remove works
+*   \[ ] Dependency resolution functional
+*   \[ ] Repository sync works
 
 **Phase 5 (Atomic Updates):**
 
-- [ ] OSTree integration complete
-- [ ] Rollback functional
-- [ ] Health checking works
+*   \[ ] OSTree integration complete
+*   \[ ] Rollback functional
+*   \[ ] Health checking works
 
 **Phase 6 (Performance):**
 
-- [ ] 30% performance improvement
-- [ ] Kernel profiles work
-- [ ] Monitoring functional
+*   \[ ] 30% performance improvement
+*   \[ ] Kernel profiles work
+*   \[ ] Monitoring functional
 
 **Phase 7 (Security):**
 
-- [ ] MAC enforcement works
-- [ ] Hardening applied
-- [ ] Monitoring functional
+*   \[ ] MAC enforcement works
+*   \[ ] Hardening applied
+*   \[ ] Monitoring functional
 
 **Phase 8 (Cloud):**
 
-- [ ] Container runtime works
-- [ ] Cloud images build
-- [ ] K8s integration works
+*   \[ ] Container runtime works
+*   \[ ] Cloud images build
+*   \[ ] K8s integration works
 
 **Phase 9 (Desktop):**
 
-- [ ] Zenith desktop functional
-- [ ] Input handling works
-- [ ] Applications run
+*   \[ ] Zenith desktop functional
+*   \[ ] Input handling works
+*   \[ ] Applications run
 
 **Phase 10 (Developer Tools):**
 
-- [ ] SDK functional
-- [ ] Build tools work
-- [ ] Debugging functional
+*   \[ ] SDK functional
+*   \[ ] Build tools work
+*   \[ ] Debugging functional
 
----
+***
 
 ## Risk Mitigation
 
@@ -1444,47 +1444,47 @@ jobs:
 
 **Kernel Boot Complexity:**
 
-- Risk: Kernel boot failures
-- Mitigation: Extensive QEMU testing, gradual feature enablement
+*   Risk: Kernel boot failures
+*   Mitigation: Extensive QEMU testing, gradual feature enablement
 
 **Driver Compatibility:**
 
-- Risk: Hardware incompatibility
-- Mitigation: Focus on common hardware first, expand gradually
+*   Risk: Hardware incompatibility
+*   Mitigation: Focus on common hardware first, expand gradually
 
 **Filesystem Stability:**
 
-- Risk: Data corruption
-- Mitigation: Extensive testing, backup mechanisms
+*   Risk: Data corruption
+*   Mitigation: Extensive testing, backup mechanisms
 
 ### Resource Risks
 
 **Development Time:**
 
-- Risk: Timeline overruns
-- Mitigation: Prioritize critical features, phased delivery
+*   Risk: Timeline overruns
+*   Mitigation: Prioritize critical features, phased delivery
 
 **Expertise Requirements:**
 
-- Risk: Specialized skills needed
-- Mitigation: Training, documentation, community engagement
+*   Risk: Specialized skills needed
+*   Mitigation: Training, documentation, community engagement
 
----
+***
 
 ## Next Immediate Actions
 
-1. **Week 1:** Begin Phase 1.1.1 - Round-Robin Scheduler implementation
-2. **Week 1:** Set up CI/CD pipeline for kernel builds
-3. **Week 1:** Create feature flag system in Cargo.toml
-4. **Week 2:** Implement QEMU boot test automation
-5. **Week 2:** Begin buddy allocator implementation
+1.  **Week 1:** Begin Phase 1.1.1 - Round-Robin Scheduler implementation
+2.  **Week 1:** Set up CI/CD pipeline for kernel builds
+3.  **Week 1:** Create feature flag system in Cargo.toml
+4.  **Week 2:** Implement QEMU boot test automation
+5.  **Week 2:** Begin buddy allocator implementation
 
----
+***
 
 ## References
 
-- Linux Kernel Documentation
-- Arch Linux Development Guidelines
-- Fedora CoreOS Architecture
-- OSTree Documentation
-- Rust Embedded Development Guide
+*   Linux Kernel Documentation
+*   Arch Linux Development Guidelines
+*   Fedora CoreOS Architecture
+*   OSTree Documentation
+*   Rust Embedded Development Guide

@@ -4,7 +4,7 @@
 > `klib` implementations, achieving a fully `#![no_std]` kernel and a
 > `std`-optional userland.
 
----
+***
 
 ## Overview
 
@@ -17,20 +17,18 @@
 | Security modules | 0 std calls ✅ | 0 |
 | Network stack | 0 std calls ✅ | 0 |
 | Package manager (sigpkg) | 3 std calls ⚠️ | 0 |
-| Shell (sigma_sh) | 12 std calls ⚠️ | 0 |
+| Shell (sigma\_sh) | 12 std calls ⚠️ | 0 |
 | Userland tools | 47 std calls ⚠️ | < 5 (allow for I/O) |
 | Test harness | std allowed ✅ | std allowed |
 
 ### Phased Plan
 
-```
-Phase 0 (complete) – Kernel is fully no_std
-Phase 1 (in progress) – Package manager is no_std
-Phase 2 (planned) – Shell is no_std
-Phase 3 (planned) – All userland uses klib with optional std wrapper
-```
+    Phase 0 (complete) – Kernel is fully no_std
+    Phase 1 (in progress) – Package manager is no_std
+    Phase 2 (planned) – Shell is no_std
+    Phase 3 (planned) – All userland uses klib with optional std wrapper
 
----
+***
 
 ## Phase 0 – Kernel (Complete)
 
@@ -38,6 +36,7 @@ The kernel (`src/kernel/`, `src/security/`, `src/network/`) has zero std calls.
 All functionality is provided by klib.
 
 **Evidence:**
+
 ```bash
 cargo check --target x86_64-unknown-none --no-default-features
 # 0 errors, 0 warnings
@@ -56,7 +55,7 @@ cargo check --target x86_64-unknown-none --no-default-features
 | `std::io::Write` | `klib::serial::SerialWriter` |
 | `std::time::Instant` | `klib::time::Timestamp::now()` |
 
----
+***
 
 ## Phase 1 – Package Manager (In Progress)
 
@@ -67,15 +66,14 @@ grep -n 'use std' src/sigpkg/*.rs
 ```
 
 Output:
-```
-src/sigpkg/universal_engine.rs:3:use std::env;        # [1]
-src/sigpkg/importer.rs:8:use std::fs::File;          # [2]
-src/sigpkg/importer.rs:9:use std::io::Read;          # [3]
-```
+
+    src/sigpkg/universal_engine.rs:3:use std::env;        # [1]
+    src/sigpkg/importer.rs:8:use std::fs::File;          # [2]
+    src/sigpkg/importer.rs:9:use std::io::Read;          # [3]
 
 ### Fix Plan
 
-#### [1] `std::env` – Environment Variable Access
+#### \[1] `std::env` – Environment Variable Access
 
 **Replacement:** `klib::env::SigmaEnv`
 
@@ -93,7 +91,7 @@ the process ABI). No OS syscall needed for reads; write uses `setenv` syscall.
 
 **Implementation needed:** `src/klib/env.rs` (new module)
 
-#### [2] `std::fs::File` – File System Access
+#### \[2] `std::fs::File` – File System Access
 
 **Replacement:** `klib::fs::SigmaFile`
 
@@ -110,7 +108,7 @@ let f = SigmaFile::open("/etc/sigpkg/config", OpenMode::ReadOnly)?;
 
 **Implementation needed:** `src/klib/fs.rs` (new module)
 
-#### [3] `std::io::Read` – I/O Trait
+#### \[3] `std::io::Read` – I/O Trait
 
 **Replacement:** `klib::io::KlibRead`
 
@@ -124,25 +122,24 @@ use klib::io::KlibRead;
 f.read_to_string(&mut s)?; // same API, different trait bound
 ```
 
----
+***
 
 ## Phase 2 – Shell (Planned, Q4 2026)
 
 ### Remaining std calls in `src/shell/`
 
-```
-src/shell/repl.rs:       std::io::stdin, stdout, BufReader
-src/shell/command.rs:    std::process::Command, std::env
-src/shell/sigma_sh.rs:   std::io::*, std::env::*
-```
+    src/shell/repl.rs:       std::io::stdin, stdout, BufReader
+    src/shell/command.rs:    std::process::Command, std::env
+    src/shell/sigma_sh.rs:   std::io::*, std::env::*
 
 ### Fix Plan
 
 #### Terminal I/O
 
 The shell needs to read from stdin and write to stdout. In SigmaOS:
-- `stdin` maps to the terminal device (`/dev/tty0`)
-- `stdout` maps to the compositor's output buffer
+
+*   `stdin` maps to the terminal device (`/dev/tty0`)
+*   `stdout` maps to the compositor's output buffer
 
 ```rust
 // klib terminal I/O plan
@@ -167,7 +164,7 @@ klib::process::Command::new("ls").arg("-la").spawn()?
 // internally calls clone3() + execve() syscalls
 ```
 
----
+***
 
 ## Phase 3 – Userland (Planned, Q1 2027)
 
@@ -177,18 +174,16 @@ Userland tools (the shell, text editors, package manager CLI) run on top of
 the SigmaOS kernel. They can use `std` if the kernel provides the necessary
 syscalls. However, SigmaOS implements std compatibility via klib wrappers:
 
-```
-Application
-    │ uses klib::std_compat (opt-in std-like API)
-    ▼
-klib::std_compat::{String, Vec, File, Thread, ...}
-    │ thin wrappers over klib primitives
-    ▼
-klib primitives (no_std)
-    │ direct syscalls
-    ▼
-SigmaOS kernel
-```
+    Application
+        │ uses klib::std_compat (opt-in std-like API)
+        ▼
+    klib::std_compat::{String, Vec, File, Thread, ...}
+        │ thin wrappers over klib primitives
+        ▼
+    klib primitives (no_std)
+        │ direct syscalls
+        ▼
+    SigmaOS kernel
 
 This means applications written for `std` Rust compile against
 `klib::std_compat` with a compatibility shim – no rewrite needed.
@@ -209,6 +204,7 @@ pub mod time;    // Duration, Instant, SystemTime
 ```
 
 Applications simply add to their `Cargo.toml`:
+
 ```toml
 [features]
 default = ["klib-std"]
@@ -218,12 +214,13 @@ sigmaos_klib = { path = "../../src/klib", features = ["std_compat"] }
 ```
 
 And at the top of their `main.rs`:
+
 ```rust
 #[cfg(feature = "klib-std")]
 use sigmaos_klib::std_compat as std;
 ```
 
----
+***
 
 ## New klib Modules Needed
 
@@ -296,20 +293,20 @@ pub trait KlibWrite {
 }
 ```
 
----
+***
 
 ## Migration Timeline
 
 | Milestone | Target Date | Status |
 |-----------|------------|--------|
-| Kernel fully no_std | 2026-Q1 | ✅ Complete |
+| Kernel fully no\_std | 2026-Q1 | ✅ Complete |
 | klib complete | 2026-Q2 | ✅ Complete |
-| sigpkg no_std | 2026-Q3 | ⚠️ 95% done |
-| Shell no_std | 2026-Q4 | 🔲 Planned |
-| std_compat shim | 2027-Q1 | 🔲 Planned |
-| Full userland no_std | 2027-Q2 | 🔲 Planned |
+| sigpkg no\_std | 2026-Q3 | ⚠️ 95% done |
+| Shell no\_std | 2026-Q4 | 🔲 Planned |
+| std\_compat shim | 2027-Q1 | 🔲 Planned |
+| Full userland no\_std | 2027-Q2 | 🔲 Planned |
 
----
+***
 
 ## Tracking std Leakage
 
@@ -337,6 +334,6 @@ echo "=== userland std usage (allowed with wrappers) ==="
 grep -rn 'use std' src/shell src/sigpkg src/tools 2>/dev/null | head -20
 ```
 
----
+***
 
 *Last updated: 2026-08-04*

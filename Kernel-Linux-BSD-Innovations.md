@@ -2,7 +2,7 @@
 
 This page documents the Linux and BSD inspired kernel primitives added to SigmaOS through the `feat/kernel-linux-bsd-innovations` branch series.
 
----
+***
 
 ## 1. Linux-Inspired Kernel Primitives
 
@@ -26,9 +26,9 @@ comp.complete();
 
 A lightweight **RCU** implementation for protecting frequently-read, rarely-written kernel data structures:
 
-- `rcu_read_lock()` / `rcu_read_unlock()` — lock-free reader path
-- `rcu_assign_pointer()` — safely publishes new data
-- `call_rcu()` — deferred reclamation after grace period
+*   `rcu_read_lock()` / `rcu_read_unlock()` — lock-free reader path
+*   `rcu_assign_pointer()` — safely publishes new data
+*   `call_rcu()` — deferred reclamation after grace period
 
 ### Workqueue Subsystem
 
@@ -53,7 +53,7 @@ fifo.push(42);
 let val = fifo.pop(); // Some(42)
 ```
 
----
+***
 
 ## 2. BSD-Inspired Kernel Primitives
 
@@ -61,9 +61,9 @@ let val = fifo.pop(); // Some(42)
 
 Adapted from DragonFly BSD's LWKT subsystem:
 
-- Per-CPU run queues with no global lock
-- Token-based inter-CPU serialization (replaces coarse Big Kernel Lock)
-- Threads yield cooperatively within a CPU, preempted cross-CPU
+*   Per-CPU run queues with no global lock
+*   Token-based inter-CPU serialization (replaces coarse Big Kernel Lock)
+*   Threads yield cooperatively within a CPU, preempted cross-CPU
 
 ### FreeBSD UMA (Universal Memory Allocator) Zone Allocator
 
@@ -91,11 +91,11 @@ Consumed by `sigma-trace` tool for live kernel observability.
 
 All memory pages are enforced to be either writable **or** executable, never both:
 
-- Implemented via page table entry flags at `paging.rs` level
-- JIT code paths use a two-stage: write to RW page → remap as RX
-- Prevents code injection attacks at the hardware level
+*   Implemented via page table entry flags at `paging.rs` level
+*   JIT code paths use a two-stage: write to RW page → remap as RX
+*   Prevents code injection attacks at the hardware level
 
----
+***
 
 ## 3. Driver Trait Improvements
 
@@ -129,7 +129,7 @@ impl DriverBehavior for IntelE1000 {
 }
 ```
 
----
+***
 
 ## 4. Memory Management Improvements
 
@@ -139,23 +139,23 @@ Transparent Huge Page allocation inspired by Linux's THP subsystem:
 
 | Page Size | Architecture | Status |
 |-----------|-------------|--------|
-| 4 KB | x86_64, AArch64 | Stable |
-| 2 MB | x86_64 (PDE) | Supported |
-| 1 GB | x86_64 (PDPTE) | Experimental |
+| 4 KB | x86\_64, AArch64 | Stable |
+| 2 MB | x86\_64 (PDE) | Supported |
+| 1 GB | x86\_64 (PDPTE) | Experimental |
 | 16 KB | AArch64 | Supported |
 
 ### ASLR Improvements
 
-- Stack ASLR entropy increased to 28 bits (from 24)
-- Heap ASLR now randomizes within 1TB virtual address space
-- mmap ASLR randomizes both base address and mapping order
+*   Stack ASLR entropy increased to 28 bits (from 24)
+*   Heap ASLR now randomizes within 1TB virtual address space
+*   mmap ASLR randomizes both base address and mapping order
 
----
+***
 
 ## See Also
 
-- [Scheduler Architecture](Scheduler-Architecture.md)
-- [Memory Management](Memory-Management.md)
-- [Driver Development Guide](Driver-Development-Guide.md)
-- [Gaming Performance Mode](Gaming-Performance-Mode.md)
-- [BSD Securelevels](EndeavourOS-PAM-BSD-Securelevels.md)
+*   [Scheduler Architecture](Scheduler-Architecture)
+*   [Memory Management](Memory-Management)
+*   [Driver Development Guide](Driver-Development-Guide)
+*   [Gaming Performance Mode](Gaming-Performance-Mode)
+*   [BSD Securelevels](EndeavourOS-PAM-BSD-Securelevels)

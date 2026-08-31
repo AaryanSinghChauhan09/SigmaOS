@@ -41,21 +41,22 @@ bitflags::bitflags! {
 ### Capability Mode
 
 Once a process enters capability mode (`cap_enter()`), it can no longer use global namespaces:
-- No `open()` with absolute paths (must use `openat()` relative to a capability)
-- No `socket()` system call (must receive socket fd from parent)
-- No `getpid()` of other processes
 
-```
-Normal Mode                    Capability Mode
-┌──────────────────┐          ┌──────────────────┐
-│ open("/etc/conf") │          │ open("/etc/conf") │
-│       ✓           │          │       ✗ (ECAPMODE)│
-│                  │          │                  │
-│ openat(dir_fd,   │          │ openat(dir_fd,   │
-│   "conf")        │          │   "conf")        │
-│       ✓           │          │       ✓           │
-└──────────────────┘          └──────────────────┘
-```
+*   No `open()` with absolute paths (must use `openat()` relative to a capability)
+*   No `socket()` system call (must receive socket fd from parent)
+*   No `getpid()` of other processes
+
+<!---->
+
+    Normal Mode                    Capability Mode
+    ┌──────────────────┐          ┌──────────────────┐
+    │ open("/etc/conf") │          │ open("/etc/conf") │
+    │       ✓           │          │       ✗ (ECAPMODE)│
+    │                  │          │                  │
+    │ openat(dir_fd,   │          │ openat(dir_fd,   │
+    │   "conf")        │          │   "conf")        │
+    │       ✓           │          │       ✓           │
+    └──────────────────┘          └──────────────────┘
 
 ## SigmaOS Implementation
 
@@ -134,14 +135,13 @@ impl ProcessCapTable {
 
 SigmaOS uses a layered approach:
 
-```
-syscall → pledge check → unveil check → capsicum cap check → execute
-```
+    syscall → pledge check → unveil check → capsicum cap check → execute
 
 This is more restrictive than any single mechanism:
-- **pledge**: what syscalls can be called
-- **unveil**: what paths can be accessed
-- **capsicum**: what rights each fd has
+
+*   **pledge**: what syscalls can be called
+*   **unveil**: what paths can be accessed
+*   **capsicum**: what rights each fd has
 
 ## Comparison with Other Mechanisms
 
@@ -155,8 +155,8 @@ This is more restrictive than any single mechanism:
 
 ## References
 
-- FreeBSD `cap_enter(2)`, `cap_rights_limit(2)` manpages
-- [Capsicum: practical capabilities for UNIX](https://www.usenix.org/legacy/event/sec10/tech/full_papers/Watson.pdf)
-- `src/security/capsicum.rs`
-- `src/security/capability.rs`
-- `src/security/capability_token.rs`
+*   FreeBSD `cap_enter(2)`, `cap_rights_limit(2)` manpages
+*   [Capsicum: practical capabilities for UNIX](https://www.usenix.org/legacy/event/sec10/tech/full_papers/Watson.pdf)
+*   `src/security/capsicum.rs`
+*   `src/security/capability.rs`
+*   `src/security/capability_token.rs`

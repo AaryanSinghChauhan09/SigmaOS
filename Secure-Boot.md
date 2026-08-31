@@ -1,31 +1,29 @@
-# Σ security/secure_boot — Cryptographic Secure Boot
+# Σ security/secure\_boot — Cryptographic Secure Boot
 
 Ensures that every component loaded during the SigmaOS boot sequence is
 **cryptographically verified** against the Sovereign Trust Root before execution.
 
 ## Boot Chain of Trust
 
-```
-UEFI Firmware (OEM key)
-   └─ SigmaOS UEFI shim (signed with Sovereign Root CA)
-         └─ sigma-boot (Rust UEFI bootloader)
-               └─ Kernel image verification (Ed25519 + SHA-512)
-                     └─ initramfs verification (BLAKE3)
-                           └─ kernel_main()
-```
+    UEFI Firmware (OEM key)
+       └─ SigmaOS UEFI shim (signed with Sovereign Root CA)
+             └─ sigma-boot (Rust UEFI bootloader)
+                   └─ Kernel image verification (Ed25519 + SHA-512)
+                         └─ initramfs verification (BLAKE3)
+                               └─ kernel_main()
 
 ## Verification Algorithm
 
-1. Load component into memory.
+1.  Load component into memory.
 
-2. Compute BLAKE3 hash of the raw bytes.
+2.  Compute BLAKE3 hash of the raw bytes.
 
-3. Verify Ed25519 signature (from the Sovereign Root CA public key embedded
-   in the bootloader).
+3.  Verify Ed25519 signature (from the Sovereign Root CA public key embedded
+    in the bootloader).
 
-1. If verification fails → halt with error code and log to TPM event log.
+4.  If verification fails → halt with error code and log to TPM event log.
 
-2. If verification passes → transfer execution.
+5.  If verification passes → transfer execution.
 
 ## Rollback Protection
 
@@ -66,20 +64,20 @@ void init_security_secure_boot(void);
 
 ## Roadmap
 
-- [ ] Ed25519 signature verification (UEFI phase)
+*   \[ ] Ed25519 signature verification (UEFI phase)
 
-- [ ] BLAKE3 hash chain (initramfs → kernel → rootfs)
+*   \[ ] BLAKE3 hash chain (initramfs → kernel → rootfs)
 
-- [ ] TPM 2.0 PCR extension and measurement log
+*   \[ ] TPM 2.0 PCR extension and measurement log
 
-- [ ] Rollback counter in TPM NV
+*   \[ ] Rollback counter in TPM NV
 
-- [ ] Measured Boot report (for remote attestation)
+*   \[ ] Measured Boot report (for remote attestation)
 
-- [ ] Post-quantum upgrade path (Dilithium3 signatures)
+*   \[ ] Post-quantum upgrade path (Dilithium3 signatures)
 
 ## Related Modules
 
-- [`modules/security/access_control`](../access_control/README.md) — Runtime MAC
+*   [`modules/security/access_control`](../access_control/README.md) — Runtime MAC
 
-- [`modules/security/isolation`](../isolation/README.md) — Process sandbox
+*   [`modules/security/isolation`](../isolation/README.md) — Process sandbox

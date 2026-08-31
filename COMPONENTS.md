@@ -9,7 +9,7 @@ This document provides a comprehensive overview of all major components in the S
 | Sigma Kernel (σ-kernel) | Rust/C | Hybrid microkernel/monolithic core with eBPF-native design | Active |
 | Memory Manager | Rust | NUMA-aware allocator with zRAM+zSwap support | Active |
 | Scheduler (EEVDF) | Rust/C | Energy-efficient virtual deadline-first scheduler | Active |
-| IPC Bus | Rust | High-speed inter-process communication via io_uring | Active |
+| IPC Bus | Rust | High-speed inter-process communication via io\_uring | Active |
 | VFS Layer | Rust | Virtual filesystem with eBPF hooks | Active |
 | eBPF Runtime | C/Rust | Native extended Berkeley Packet Filter runtime | Active |
 | Crash Reporter | Rust | Kernel panic and oops handler with telemetry | Active |
@@ -128,4 +128,4 @@ This document provides a comprehensive overview of all major components in the S
 | WiFi Drivers | C | mac80211-based wireless stack | Active |
 | RISC-V Port | Rust/C | RISC-V 64-bit architecture support | Experimental |
 | ARM64 Port | Rust/C | AArch64 architecture support | Active |
-| x86_64 Primary | Rust/C | Primary x86-64 target | Active |
+| x86\_64 Primary | Rust/C | Primary x86-64 target | Active |

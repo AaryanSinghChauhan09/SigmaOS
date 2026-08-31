@@ -2,33 +2,37 @@
 
 This page documents SigmaOS's compatibility and parity with EndeavourOS, the Linux PAM authentication framework, and BSD securelevels — all merged in the `improve-security-and-access-control` series of branches.
 
----
+***
 
 ## 1. EndeavourOS Compatibility Parity
 
 EndeavourOS is a rolling-release, Arch-based distro focused on minimalism and community. SigmaOS achieves feature parity in the following areas:
 
 ### Package Management
-- `sigpkg install <pkg>` mirrors `yay`/`paru` AUR-style package resolution
-- Rolling release channel available via `sigma-rolling.toml`
-- AUR PKGBUILD import tool: `sigpkg import-pkgbuild <url>`
+
+*   `sigpkg install <pkg>` mirrors `yay`/`paru` AUR-style package resolution
+*   Rolling release channel available via `sigma-rolling.toml`
+*   AUR PKGBUILD import tool: `sigpkg import-pkgbuild <url>`
 
 ### System Configuration
-- `sigma-ctl` mirrors `systemctl` for service management
-- Hook-based `.hook` files (analogous to pacman hooks) run on package events
-- Auto-detection of hardware via udev-compatible event bus
+
+*   `sigma-ctl` mirrors `systemctl` for service management
+*   Hook-based `.hook` files (analogous to pacman hooks) run on package events
+*   Auto-detection of hardware via udev-compatible event bus
 
 ### Desktop Environment Support
-- KDE Plasma, XFCE, i3, Sway, Hyprland window managers supported
-- Theme/wallpaper sync via `sigma-theme` CLI
-- Display manager: Sigma Zenith Login (analogous to SDDM)
+
+*   KDE Plasma, XFCE, i3, Sway, Hyprland window managers supported
+*   Theme/wallpaper sync via `sigma-theme` CLI
+*   Display manager: Sigma Zenith Login (analogous to SDDM)
 
 ### EndeavourOS Welcome App Equivalent
-- `sigma-welcome` app for first-boot configuration
-- Hardware wizard, driver selection, locale & keyboard setup
-- Online/offline installer modes
 
----
+*   `sigma-welcome` app for first-boot configuration
+*   Hardware wizard, driver selection, locale & keyboard setup
+*   Online/offline installer modes
+
+***
 
 ## 2. Linux PAM (Pluggable Authentication Modules)
 
@@ -36,34 +40,31 @@ SigmaOS implements a **PAM-compatible authentication stack** built in pure Rust 
 
 ### Architecture
 
-```
-Login / sudo / lock-screen
-         │
-         ▼
-  SigmaPAM Dispatcher
-         │
-    ┌────┴─────────────────────────────┐
-    │                                  │
- pam_sigma_unix          pam_sigma_biometric
- (password/shadow)       (fingerprint/FaceID)
-    │                                  │
- pam_sigma_totp          pam_sigma_smartcard
- (TOTP/HOTP 2FA)         (YubiKey/FIDO2)
-    └────────────────────────────────┘
-         │
-    PAM Result (Success / Failure)
-```
+    Login / sudo / lock-screen
+             │
+             ▼
+      SigmaPAM Dispatcher
+             │
+        ┌────┴─────────────────────────────┐
+        │                                  │
+     pam_sigma_unix          pam_sigma_biometric
+     (password/shadow)       (fingerprint/FaceID)
+        │                                  │
+     pam_sigma_totp          pam_sigma_smartcard
+     (TOTP/HOTP 2FA)         (YubiKey/FIDO2)
+        └────────────────────────────────┘
+             │
+        PAM Result (Success / Failure)
 
 ### PAM Stack Configuration
 
 `/etc/sigma/pam.d/login`:
-```
-auth    required    pam_sigma_unix.so
-auth    optional    pam_sigma_biometric.so try_first_pass
-auth    optional    pam_sigma_totp.so
-account required    pam_sigma_unix.so
-session required    pam_sigma_unix.so
-```
+
+    auth    required    pam_sigma_unix.so
+    auth    optional    pam_sigma_biometric.so try_first_pass
+    auth    optional    pam_sigma_totp.so
+    account required    pam_sigma_unix.so
+    session required    pam_sigma_unix.so
 
 ### Key Modules
 
@@ -79,12 +80,13 @@ session required    pam_sigma_unix.so
 ### Password Storage
 
 Passwords are stored using **Argon2id** key derivation, not crypt/bcrypt:
-- Memory cost: 64MB
-- Iterations: 3
-- Parallelism: 4
-- Salt: 16 bytes random, stored alongside hash
 
----
+*   Memory cost: 64MB
+*   Iterations: 3
+*   Parallelism: 4
+*   Salt: 16 bytes random, stored alongside hash
+
+***
 
 ## 3. BSD Securelevels
 
@@ -128,15 +130,16 @@ state.load_kernel_module("evil.ko")?;  // Err(SecureLevelViolation)
 ### Integration with PAM
 
 When the system securelevel is ≥ 2, PAM modules automatically require:
-- Multi-factor authentication for root
-- All login events logged to immutable audit log
-- No `pam_exec` or shell-spawning modules permitted
 
----
+*   Multi-factor authentication for root
+*   All login events logged to immutable audit log
+*   No `pam_exec` or shell-spawning modules permitted
+
+***
 
 ## See Also
 
-- [Security Architecture](Security-Architecture.md)
-- [Arch Linux and AUR Parity](Arch-Linux-and-AUR-Parity.md)
-- [Authentication & Identity](Authentication.md)
-- [eBPF, Splice, and Landlock](eBPF-Splice-Landlock-Unveil.md)
+*   [Security Architecture](Security-Architecture)
+*   [Arch Linux and AUR Parity](Arch-Linux-and-AUR-Parity)
+*   [Authentication & Identity](Authentication)
+*   [eBPF, Splice, and Landlock](eBPF-Splice-Landlock-Unveil)

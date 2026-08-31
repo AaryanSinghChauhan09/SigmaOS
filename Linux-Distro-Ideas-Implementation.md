@@ -1,13 +1,13 @@
 # 🐧 Linux Distro Ideas — Implementation in SigmaOS
 
-> **Wiki page** — This is the GitHub Wiki version.  
-> Source: [LINUX_DISTRO_IDEAS_IMPLEMENTATION.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LINUX_DISTRO_IDEAS_IMPLEMENTATION.md)
+> **Wiki page** — This is the GitHub Wiki version.\
+> Source: [LINUX\_DISTRO\_IDEAS\_IMPLEMENTATION.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LINUX_DISTRO_IDEAS_IMPLEMENTATION.md)
 
----
+***
 
 SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This page tracks which ideas have been implemented and which are planned.
 
----
+***
 
 ## Implementation Summary by Distro
 
@@ -28,7 +28,7 @@ SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This p
 | FreeBSD/BSDs | 12 | 8 | 4 | 67% |
 | **TOTAL** | **123** | **68 (55%)** | **55 (45%)** | **55%** |
 
----
+***
 
 ## Arch Linux Ideas
 
@@ -46,7 +46,7 @@ SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This p
 | Encrypted `/home` with LUKS | ✅ | SigmaFS LUKS2 volume encryption |
 | `paru` AUR helpers | 🔄 | `sigma-aur` AUR compatibility layer |
 
----
+***
 
 ## CachyOS / Zen Kernel Ideas (Highest Coverage)
 
@@ -63,7 +63,7 @@ SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This p
 | `hardened_malloc` allocator | ✅ | `SigmaAlloc` security-hardened heap |
 | CachyOS kernel patchset | ✅ | SigmaKernel custom patchset |
 
----
+***
 
 ## FreeBSD / OpenBSD / NetBSD Ideas
 
@@ -82,7 +82,7 @@ SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This p
 | `relayd` load balancer | 🔄 | `SigmaRelay` TCP load balancer |
 | `sysctl` tunable parameters | ✅ | `sigma-sysctl` kernel parameter tool |
 
----
+***
 
 ## NixOS Ideas (Declarative OS Design)
 
@@ -99,7 +99,7 @@ SigmaOS synthesizes the best ideas from 13+ Linux distributions and BSDs. This p
 | Module system for config | ✅ | `sigma-module` system |
 | `nix-shell` dev environments | 🔄 | `sigma-shell` ephemeral shells |
 
----
+***
 
 > For full details on every distro idea, see the [main repository doc](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LINUX_DISTRO_IDEAS_IMPLEMENTATION.md).
 

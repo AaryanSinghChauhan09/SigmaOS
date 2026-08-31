@@ -725,11 +725,11 @@ impl MigrationTool {
 
 ## Best Practices
 
-1. **Capability-Based Security**: Always use capability tokens for authorization
-2. **Zero-Dependency**: Maintain independence from standard library
-3. **Backward Compatibility**: Provide compatibility layers for existing tools
-4. **Performance**: Optimize for kernel-space performance
-5. **Security**: Follow security best practices for each subsystem
+1.  **Capability-Based Security**: Always use capability tokens for authorization
+2.  **Zero-Dependency**: Maintain independence from standard library
+3.  **Backward Compatibility**: Provide compatibility layers for existing tools
+4.  **Performance**: Optimize for kernel-space performance
+5.  **Security**: Follow security best practices for each subsystem
 
 ## Troubleshooting
 
@@ -761,7 +761,7 @@ sigmactl package depends <package>
 
 ## References
 
-- [systemd Architecture](https://systemd.io/ARCHITECTURE/)
-- [Package Management Best Practices](https://wiki.debian.org/Packaging)
-- [Linux Device Model](https://www.kernel.org/doc/html/latest/driver-api/driver-model/)
-- [Boot Protocol](https://www.kernel.org/doc/html/latest/x86/boot.html)
+*   [systemd Architecture](https://systemd.io/ARCHITECTURE/)
+*   [Package Management Best Practices](https://wiki.debian.org/Packaging)
+*   [Linux Device Model](https://www.kernel.org/doc/html/latest/driver-api/driver-model/)
+*   [Boot Protocol](https://www.kernel.org/doc/html/latest/x86/boot.html)

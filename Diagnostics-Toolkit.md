@@ -25,9 +25,8 @@ sigma_log!(WARN, "net", "tcp_retransmit";
 ```
 
 Output format (journal-compatible):
-```
-2026-07-05T14:30:00.000Z INFO  kernel  shard 42 started in 1200µs
-```
+
+    2026-07-05T14:30:00.000Z INFO  kernel  shard 42 started in 1200µs
 
 ## Profiler
 
@@ -80,22 +79,22 @@ void tracer_dump(const char *path);
 
 ## Roadmap
 
-- [x] Ring-buffer structured logger (`logger.rs`)
+*   \[x] Ring-buffer structured logger (`logger.rs`)
 
-- [x] PMU-based profiler stub (`profiler.rs`)
+*   \[x] PMU-based profiler stub (`profiler.rs`)
 
-- [x] Syscall tracer stub (`syscall_tracer.rs`)
+*   \[x] Syscall tracer stub (`syscall_tracer.rs`)
 
-- [ ] Flamegraph generation (Brendan Gregg format)
+*   \[ ] Flamegraph generation (Brendan Gregg format)
 
-- [ ] Log shipping to Sovereign Audit Chain
+*   \[ ] Log shipping to Sovereign Audit Chain
 
-- [ ] Distributed tracing (OpenTelemetry-compatible spans)
+*   \[ ] Distributed tracing (OpenTelemetry-compatible spans)
 
-- [ ] Interactive TUI dashboard (`sigma-top`)
+*   \[ ] Interactive TUI dashboard (`sigma-top`)
 
 ## Related Modules
 
-- [`modules/core/kernel`](../../core/kernel/README.md) — Kernel log sources
+*   [`modules/core/kernel`](../../core/kernel/README.md) — Kernel log sources
 
-- [`modules/security/access_control`](../../security/access_control/README.md) — Audit chain
+*   [`modules/security/access_control`](../../security/access_control/README.md) — Audit chain

@@ -1,19 +1,22 @@
 # SigmaOS Configuration Guide
 
 ## Table of Contents
-1. [System Configuration](#system-configuration)
-2. [Network Configuration](#network-configuration)
-3. [User Management](#user-management)
-4. [Service Management](#service-management)
-5. [Desktop Configuration](#desktop-configuration)
-6. [Audio Configuration](#audio-configuration)
-7. [Printer Configuration](#printer-configuration)
-8. [Kernel Configuration](#kernel-configuration)
+
+1.  [System Configuration](#system-configuration)
+2.  [Network Configuration](#network-configuration)
+3.  [User Management](#user-management)
+4.  [Service Management](#service-management)
+5.  [Desktop Configuration](#desktop-configuration)
+6.  [Audio Configuration](#audio-configuration)
+7.  [Printer Configuration](#printer-configuration)
+8.  [Kernel Configuration](#kernel-configuration)
 
 ## System Configuration
 
 ### Hostname
+
 Set the system hostname:
+
 ```bash
 # Set hostname
 sighostname my-sigmaos-system
@@ -23,7 +26,9 @@ hostname
 ```
 
 ### Locale
+
 Configure system locale:
+
 ```bash
 # List available locales
 siglocale list
@@ -36,7 +41,9 @@ siglocale generate
 ```
 
 ### Timezone
+
 Configure system timezone:
+
 ```bash
 # List timezones
 sigtimezone list
@@ -49,7 +56,9 @@ sigtime ntp enable
 ```
 
 ### Kernel Parameters
+
 Configure kernel parameters:
+
 ```bash
 # View current parameters
 sysctl -a
@@ -64,7 +73,9 @@ echo "kernel.max_files=65536" >> /etc/sysctl.conf
 ## Network Configuration
 
 ### Wired Network
+
 Configure wired network interfaces:
+
 ```bash
 # Automatic DHCP
 nmcli device connect eth0
@@ -76,7 +87,9 @@ nmcli connection modify eth0 ipv4.dns "8.8.8.8 8.8.4.4"
 ```
 
 ### Wireless Network
+
 Configure wireless network:
+
 ```bash
 # Scan for networks
 nmcli device wifi list
@@ -89,7 +102,9 @@ nmcli connection modify "SSID" connection.autoconnect yes
 ```
 
 ### Firewall
+
 Configure firewall rules:
+
 ```bash
 # Enable firewall
 sigfirewall enable
@@ -107,7 +122,9 @@ sigfirewall list
 ## User Management
 
 ### User Accounts
+
 Manage user accounts:
+
 ```bash
 # Create user
 siguser add username
@@ -123,7 +140,9 @@ siguser list
 ```
 
 ### User Groups
+
 Manage user groups:
+
 ```bash
 # Add user to group
 siguser group-add username wheel
@@ -136,7 +155,9 @@ siguser group-list
 ```
 
 ### Sudo Configuration
+
 Configure sudo access:
+
 ```bash
 # Edit sudoers file
 visudo
@@ -151,7 +172,9 @@ username ALL=(ALL) /usr/bin/pacman
 ## Service Management
 
 ### Systemd-Style Service Management
+
 Manage services using SigmaInit:
+
 ```bash
 # Start service
 siginit start service-name
@@ -176,7 +199,9 @@ siginit list
 ```
 
 ### Common Services
+
 Essential services to enable:
+
 ```bash
 # Network service
 siginit enable NetworkManager
@@ -194,7 +219,9 @@ siginit enable sigma-bluetooth
 ## Desktop Configuration
 
 ### Display Manager
+
 Configure display manager:
+
 ```bash
 # Set default display manager
 sigset-display-manager zenith
@@ -207,7 +234,9 @@ sigdisplay session zenith
 ```
 
 ### Window Manager
+
 Configure window manager behavior:
+
 ```bash
 # Set window mode (tiling/stacking/floating)
 sigwm mode tiling
@@ -221,7 +250,9 @@ sigwm workspace add 2
 ```
 
 ### Theme Configuration
+
 Configure system theme:
+
 ```bash
 # Set GTK theme
 sigtheme gtk sigmaos-dark
@@ -237,7 +268,9 @@ sigfont "DejaVu Sans" 12
 ```
 
 ### Panel Configuration
+
 Configure desktop panel:
+
 ```bash
 # Add applet
 sigpanel add applet clock
@@ -254,7 +287,9 @@ sigpanel size 48
 ## Audio Configuration
 
 ### Audio Device Configuration
+
 Configure audio devices:
+
 ```bash
 # List audio devices
 sigaudio list
@@ -270,7 +305,9 @@ sigaudio mute
 ```
 
 ### Audio Mixer
+
 Configure audio mixer:
+
 ```bash
 # Open audio mixer
 sigaudio-mixer
@@ -281,7 +318,9 @@ sigaudio-mixer channel PCM 70
 ```
 
 ### Bluetooth Audio
+
 Configure Bluetooth audio:
+
 ```bash
 # Pair device
 sigbluetooth pair device-mac
@@ -296,7 +335,9 @@ sigbluetooth audio device-mac
 ## Printer Configuration
 
 ### CUPS Configuration
+
 Configure printing system:
+
 ```bash
 # Start CUPS service
 siginit start cups
@@ -309,7 +350,9 @@ siginit enable cups
 ```
 
 ### Printer Setup
+
 Add and configure printers:
+
 ```bash
 # List printers
 sigprinter list
@@ -327,7 +370,9 @@ sigprinter test "Printer Name"
 ## Kernel Configuration
 
 ### Custom Kernel Parameters
+
 Configure custom kernel parameters:
+
 ```bash
 # Edit kernel command line
 edit /etc/kernel/cmdline
@@ -337,7 +382,9 @@ quiet splash
 ```
 
 ### Kernel Modules
+
 Load kernel modules:
+
 ```bash
 # List loaded modules
 lsmod
@@ -353,7 +400,9 @@ echo "module-name" >> /etc/modules-load.d/custom.conf
 ```
 
 ### Kernel Updates
+
 Update kernel:
+
 ```bash
 # Update kernel
 sigpkg update kernel
@@ -368,7 +417,9 @@ sigupdate-bootloader
 ## Additional Configuration
 
 ### Environment Variables
+
 Set environment variables:
+
 ```bash
 # User environment
 export EDITOR=vim
@@ -379,7 +430,9 @@ echo "export EDITOR=vim" >> /etc/environment
 ```
 
 ### Automatic Startup
+
 Configure applications to start automatically:
+
 ```bash
 # Add autostart entry
 sigautostart add "Application Name" /usr/bin/app
@@ -392,7 +445,9 @@ sigautostart list
 ```
 
 ### Performance Tuning
+
 Optimize system performance:
+
 ```bash
 # Set CPU governor
 sigcpu governor performance
@@ -407,18 +462,22 @@ echo "vm.swappiness=10" >> /etc/sysctl.conf
 ## Configuration Files
 
 ### System Configuration Files
-- `/etc/sigmaos/config` - Main system configuration
-- `/etc/sigmaos/network` - Network configuration
-- `/etc/sigmaos/users` - User configuration
-- `/etc/sigmaos/services` - Service configuration
+
+*   `/etc/sigmaos/config` - Main system configuration
+*   `/etc/sigmaos/network` - Network configuration
+*   `/etc/sigmaos/users` - User configuration
+*   `/etc/sigmaos/services` - Service configuration
 
 ### Desktop Configuration Files
-- `~/.config/zenith/` - Zenith desktop configuration
-- `~/.config/sigwm/` - Window manager configuration
-- `~/.config/sigtheme/` - Theme configuration
+
+*   `~/.config/zenith/` - Zenith desktop configuration
+*   `~/.config/sigwm/` - Window manager configuration
+*   `~/.config/sigtheme/` - Theme configuration
 
 ## Backup Configuration
+
 Backup important configuration files:
+
 ```bash
 # Backup system configuration
 tar -czf sigmaos-config-backup.tar.gz /etc/sigmaos
@@ -432,7 +491,7 @@ tar -xzf sigmaos-config-backup.tar.gz -C /
 
 ## Additional Resources
 
-- [Installation Guide](./INSTALLATION.md)
-- [Package Management Guide](./PACKAGE_MANAGEMENT.md)
-- [Security Hardening Guide](./SECURITY.md)
-- [Development Guide](./DEVELOPMENT.md)
+*   [Installation Guide](./INSTALLATION)
+*   [Package Management Guide](./PACKAGE_MANAGEMENT)
+*   [Security Hardening Guide](./SECURITY)
+*   [Development Guide](./DEVELOPMENT)

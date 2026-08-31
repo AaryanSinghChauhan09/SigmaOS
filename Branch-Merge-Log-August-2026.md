@@ -19,36 +19,35 @@ This page documents all branch merges into the `main` branch during the August 2
 
 ## Total Statistics
 
-- **Branches merged**: 15+
-- **Files changed**: 200+
-- **Insertions**: 15,000+
-- **Deletions**: 12,000+
-- **Remaining remote branches**: 0 (only `main`)
+*   **Branches merged**: 15+
+*   **Files changed**: 200+
+*   **Insertions**: 15,000+
+*   **Deletions**: 12,000+
+*   **Remaining remote branches**: 0 (only `main`)
 
 ## Conflict Resolution Strategy
 
 All merge conflicts were resolved using the **incoming improvements** strategy:
-- When in conflict, the more feature-complete or security-hardened version was preferred
-- Duplicate definitions were merged into unified canonical versions
-- Dead code was removed during conflict resolution
+
+*   When in conflict, the more feature-complete or security-hardened version was preferred
+*   Duplicate definitions were merged into unified canonical versions
+*   Dead code was removed during conflict resolution
 
 ## Post-Merge State
 
-```
-main branch
-├── Security improvements (PAM, securelevels, eBPF verifier)
-├── Gaming performance mode (LWKT, UKSM, QoS)
-├── Kernel primitives (completions, RCU, workqueues)
-├── EndeavourOS compatibility parity
-├── Zero-copy splice implementation
-├── Landlock + Unveil hybrid security
-├── Driver trait macro system
-└── Vulnerability scanner with zero duplicates
-```
+    main branch
+    ├── Security improvements (PAM, securelevels, eBPF verifier)
+    ├── Gaming performance mode (LWKT, UKSM, QoS)
+    ├── Kernel primitives (completions, RCU, workqueues)
+    ├── EndeavourOS compatibility parity
+    ├── Zero-copy splice implementation
+    ├── Landlock + Unveil hybrid security
+    ├── Driver trait macro system
+    └── Vulnerability scanner with zero duplicates
 
 ## Next Steps
 
-- [ ] Open Pull Requests merged or closed
-- [ ] GitHub Wiki updated with all new feature pages
-- [ ] CodeQL security alerts resolved
-- [ ] `CHANGELOG.md` updated
+*   \[ ] Open Pull Requests merged or closed
+*   \[ ] GitHub Wiki updated with all new feature pages
+*   \[ ] CodeQL security alerts resolved
+*   \[ ] `CHANGELOG.md` updated

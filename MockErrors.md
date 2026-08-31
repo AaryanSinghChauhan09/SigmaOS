@@ -8,7 +8,7 @@ import { mockErrors } from 'undici'
 
 ```
 
-| Mock Error            | Mock Error Codes                | Description                                                | 
-| --------------------- | ------------------------------- | ---------------------------------------------------------- | 
+| Mock Error            | Mock Error Codes                | Description                                                |
+| --------------------- | ------------------------------- | ---------------------------------------------------------- |
 
 | `MockNotMatchedError` | `UND_MOCK_ERR_MOCK_NOT_MATCHED` | The request does not match any registered mock dispatches. |

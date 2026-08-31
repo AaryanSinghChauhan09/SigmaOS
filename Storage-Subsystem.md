@@ -4,19 +4,17 @@ Sovereign isolation layer for storage operations.
 
 ## Architecture
 
-```
-Application Layer
-   └─ Storage API (POSIX-compatible)
-         └─ Storage Manager
-               ├─ SovereignFS (default, CoW, journaling)
-               ├─ Ext4 (Linux compatibility)
-               ├─ FAT32 (removable media)
-               └─ Web3FS (IPFS-backed)
-                     └─ Block Device Layer
-                           ├─ NVMe driver
-                           ├─ AHCI SATA driver
-                           └─ USB storage driver
-```
+    Application Layer
+       └─ Storage API (POSIX-compatible)
+             └─ Storage Manager
+                   ├─ SovereignFS (default, CoW, journaling)
+                   ├─ Ext4 (Linux compatibility)
+                   ├─ FAT32 (removable media)
+                   └─ Web3FS (IPFS-backed)
+                         └─ Block Device Layer
+                               ├─ NVMe driver
+                               ├─ AHCI SATA driver
+                               └─ USB storage driver
 
 ## Supported Filesystems
 
@@ -64,46 +62,53 @@ void init_storage(void);
 ## SovereignFS Features
 
 ### Copy-on-Write (CoW)
-- Every write creates a new extent
-- Old data preserved until explicitly pruned
-- Enables instant snapshots without data duplication
+
+*   Every write creates a new extent
+*   Old data preserved until explicitly pruned
+*   Enables instant snapshots without data duplication
 
 ### Journaling
-- Write-ahead logging for crash consistency
-- Atomic operations for metadata updates
-- Fast recovery after power failure
+
+*   Write-ahead logging for crash consistency
+*   Atomic operations for metadata updates
+*   Fast recovery after power failure
 
 ### Block Integrity
-- Each 4 KB block carries a BLAKE3 checksum
-- Kernel rejects tampered blocks at read time
-- Detects silent data corruption
+
+*   Each 4 KB block carries a BLAKE3 checksum
+*   Kernel rejects tampered blocks at read time
+*   Detects silent data corruption
 
 ### Snapshots
-- Instant point-in-time filesystem state
-- Minimal space overhead (CoW)
-- Tag-based snapshot management
-- Automatic snapshot retention policy
+
+*   Instant point-in-time filesystem state
+*   Minimal space overhead (CoW)
+*   Tag-based snapshot management
+*   Automatic snapshot retention policy
 
 ## Block Device Drivers
 
 ### NVMe Driver
-- NVMe 1.4 specification compliance
-- Multiple I/O queues (up to 64K queues)
-- 64KB maximum transfer size per command
-- Namespace management
-- Power management and thermal throttling
+
+*   NVMe 1.4 specification compliance
+*   Multiple I/O queues (up to 64K queues)
+*   64KB maximum transfer size per command
+*   Namespace management
+*   Power management and thermal throttling
 
 ### AHCI SATA Driver
-- SATA 3.0 (6 Gbps) support
-- NCQ (Native Command Queuing)
-- SMART monitoring
-- Hot-plug support
+
+*   SATA 3.0 (6 Gbps) support
+*   NCQ (Native Command Queuing)
+*   SMART monitoring
+*   Hot-plug support
 
 ### USB Storage Driver
-- USB Mass Storage Class (MSC) support
-- Bulk-only transport (BOT)
-- UASP (USB Attached SCSI Protocol)
-- Automatic device detection
+
+*   USB Mass Storage Class (MSC) support
+*   Bulk-only transport (BOT)
+*   UASP (USB Attached SCSI Protocol)
+*   Automatic device detection
 
 ## Performance Characteristics
 
@@ -117,30 +122,30 @@ void init_storage(void);
 
 ## Security Features
 
-- **Capability-based access**: File operations require capability tokens
-- **Namespace isolation**: Each shard has isolated filesystem view
-- **Encryption at rest**: Optional AES-256-XTS encryption
-- **Secure erase**: Cryptographically secure data deletion
-- **Audit logging**: All storage operations logged to audit chain
+*   **Capability-based access**: File operations require capability tokens
+*   **Namespace isolation**: Each shard has isolated filesystem view
+*   **Encryption at rest**: Optional AES-256-XTS encryption
+*   **Secure erase**: Cryptographically secure data deletion
+*   **Audit logging**: All storage operations logged to audit chain
 
 ## Roadmap
 
-- [x] SovereignFS basic implementation
-- [x] Ext4 read-only driver
-- [x] FAT32 read/write driver
-- [x] NVMe driver
-- [x] AHCI SATA driver
-- [ ] Web3FS IPFS integration
-- [ ] Btrfs support
-- [ ] ZFS support (ZOL)
-- [ ] RAID support (0, 1, 5, 6, 10)
-- [ ] Distributed storage (Ceph-like)
-- [ ] Storage tiering (SSD cache + HDD archive)
-- [ ] Compression (zstd, lz4)
-- [ ] Deduplication
+*   \[x] SovereignFS basic implementation
+*   \[x] Ext4 read-only driver
+*   \[x] FAT32 read/write driver
+*   \[x] NVMe driver
+*   \[x] AHCI SATA driver
+*   \[ ] Web3FS IPFS integration
+*   \[ ] Btrfs support
+*   \[ ] ZFS support (ZOL)
+*   \[ ] RAID support (0, 1, 5, 6, 10)
+*   \[ ] Distributed storage (Ceph-like)
+*   \[ ] Storage tiering (SSD cache + HDD archive)
+*   \[ ] Compression (zstd, lz4)
+*   \[ ] Deduplication
 
 ## Related Modules
 
-- [`modules/core/fs`](../modules/core/fs/README.md) — VFS layer
-- [`modules/core/drivers`](../modules/core/drivers/README.md) — Block device drivers
-- [`security/pqc/README.md`](../security/pqc/README.md) — Cryptographic integrity
+*   [`modules/core/fs`](../modules/core/fs/README.md) — VFS layer
+*   [`modules/core/drivers`](../modules/core/drivers/README.md) — Block device drivers
+*   [`security/pqc/README.md`](../security/pqc/README.md) — Cryptographic integrity

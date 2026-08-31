@@ -2,7 +2,7 @@
 
 This document defines the zero-dependency, `#![no_std]`, capability-gated Rust driver implementation for the **CH340/CH341 USB-to-Serial UART adapter**. It maps standard USB bulk transfer endpoints, configures baud rates using standard USB control frames, and handles incoming/outgoing serial characters.
 
----
+***
 
 ## 🏗️ Driver Source Code Implementation
 

@@ -1,21 +1,25 @@
 # ⚡ Immediate Technical Actions
+
 ## 30-Day Sprint Plan for SigmaOS Competitive Advancement
 
 > **"Speed of execution determines speed of success."**
 
----
+***
 
 ## 🎯 Week 1-2: Foundation & Build Fixes
 
 ### Day 1-3: Critical Build Issues Resolution
 
 #### Priority 1: Fix Duplicate Module Definitions
+
 **Files to Fix**:
-1. `src/resilience/mod.rs` - Remove duplicate `backup` module
-2. `src/lib.rs` - Remove duplicate `ai` module (line 176)
-3. `src/compatibility/mod.rs` - Remove duplicate imports
+
+1.  `src/resilience/mod.rs` - Remove duplicate `backup` module
+2.  `src/lib.rs` - Remove duplicate `ai` module (line 176)
+3.  `src/compatibility/mod.rs` - Remove duplicate imports
 
 **Commands to Run**:
+
 ```bash
 # Fix duplicate backup module
 cd SigmaOS
@@ -29,14 +33,17 @@ cd SigmaOS
 ```
 
 **Verification**:
+
 ```bash
 cargo check --lib 2>&1 | grep -E "(error|warning)" | head -20
 ```
 
 #### Priority 2: Fix Type Inference Errors
+
 **Pattern**: Add explicit type annotations where needed
 
 **Common Fix Pattern**:
+
 ```rust
 // Before (type inference error)
 let results = vec![];
@@ -46,16 +53,19 @@ let results: Vec<(DeviceId, TestResult)> = vec![];
 ```
 
 **Files Requiring Type Annotations** (based on compilation errors):
-- `src/graphics/compositor.rs` - Add Window type annotations
-- `src/graphics/paint.rs` - Add ColorRgba type annotations  
-- `src/hardware/compatibility.rs` - Add Device type annotations
-- `src/power/governor.rs` - Add CPUState type annotations
-- `src/ai/agent.rs` - Add pattern and response type annotations
+
+*   `src/graphics/compositor.rs` - Add Window type annotations
+*   `src/graphics/paint.rs` - Add ColorRgba type annotations
+*   `src/hardware/compatibility.rs` - Add Device type annotations
+*   `src/power/governor.rs` - Add CPUState type annotations
+*   `src/ai/agent.rs` - Add pattern and response type annotations
 
 #### Priority 3: Establish Build Baseline
+
 **Goal**: Clean build with known error count
 
 **Script**:
+
 ```bash
 #!/bin/bash
 # build_baseline.sh
@@ -82,27 +92,28 @@ echo "Total Errors: $((ERROR_COUNT + TEST_ERROR_COUNT))"
 ### Day 4-5: Benchmarking Infrastructure
 
 #### Create Benchmark Framework
+
 **Directory Structure**:
-```
-SigmaOS/benchmark/
-├── Cargo.toml
-├── src/
-│   ├── main.rs
-│   ├── lib.rs
-│   ├── kernel/
-│   │   ├── ipc.rs
-│   │   ├── scheduler.rs
-│   │   └── memory.rs
-│   ├── filesystem/
-│   │   ├── sigma_fs.rs
-│   │   └── competitors.rs
-│   └── utils/
-│       ├── timing.rs
-│       └── reporting.rs
-└── results/
-```
+
+    SigmaOS/benchmark/
+    ├── Cargo.toml
+    ├── src/
+    │   ├── main.rs
+    │   ├── lib.rs
+    │   ├── kernel/
+    │   │   ├── ipc.rs
+    │   │   ├── scheduler.rs
+    │   │   └── memory.rs
+    │   ├── filesystem/
+    │   │   ├── sigma_fs.rs
+    │   │   └── competitors.rs
+    │   └── utils/
+    │       ├── timing.rs
+    │       └── reporting.rs
+    └── results/
 
 **Core Benchmark Implementation**:
+
 ```rust
 // benchmark/src/lib.rs
 use std::time::{Duration, Instant};
@@ -152,6 +163,7 @@ impl BenchmarkRunner {
 ```
 
 #### IPC Latency Benchmark
+
 ```rust
 // benchmark/src/kernel/ipc.rs
 use crate::{Benchmark, BenchmarkResult};
@@ -211,24 +223,25 @@ impl Benchmark for IPCBenchmark {
 ### Day 6-7: Test Infrastructure
 
 #### Create Core Test Suite
+
 **Test Structure**:
-```
-SigmaOS/tests/
-├── kernel/
-│   ├── mod.rs
-│   ├── shard_recovery.rs
-│   ├── ipc_tests.rs
-│   └── scheduler_tests.rs
-├── security/
-│   ├── mod.rs
-│   ├── capability_tests.rs
-│   └── crypto_tests.rs
-└── integration/
-    ├── mod.rs
-    └── system_tests.rs
-```
+
+    SigmaOS/tests/
+    ├── kernel/
+    │   ├── mod.rs
+    │   ├── shard_recovery.rs
+    │   ├── ipc_tests.rs
+    │   └── scheduler_tests.rs
+    ├── security/
+    │   ├── mod.rs
+    │   ├── capability_tests.rs
+    │   └── crypto_tests.rs
+    └── integration/
+        ├── mod.rs
+        └── system_tests.rs
 
 **Kernel Shard Recovery Test**:
+
 ```rust
 // tests/kernel/shard_recovery.rs
 use sigmaos::kernel::{ShardManager, ShardId, ShardStatus};
@@ -267,13 +280,14 @@ fn test_shard_recovery() {
 }
 ```
 
----
+***
 
 ## 🎯 Week 3-4: Performance Implementation
 
 ### Day 8-10: Lock-Free IPC Implementation
 
 #### Implement Lock-Free Ring Buffer
+
 **File**: `src/kernel/ipc/lockfree_ring.rs`
 
 ```rust
@@ -356,6 +370,7 @@ pub enum PopError {
 ```
 
 #### Performance Test for Lock-Free IPC
+
 ```rust
 // benchmark/src/kernel/lockfree_ipc.rs
 use crate::{Benchmark, BenchmarkResult};
@@ -399,6 +414,7 @@ impl Benchmark for LockFreeIPCBenchmark {
 ### Day 11-12: Kernel Shard Recovery
 
 #### Implement Hot-Swap Mechanism
+
 **File**: `src/kernel/shard/manager.rs`
 
 ```rust
@@ -473,6 +489,7 @@ impl ShardManager {
 ### Day 13-14: Performance Baseline
 
 #### Run Comprehensive Benchmarks
+
 **Script**: `benchmark/run_all.sh`
 
 ```bash
@@ -500,13 +517,14 @@ echo "=== Benchmark Results ==="
 cat benchmark_report.json | jq '.'
 ```
 
----
+***
 
 ## 🎯 Week 5-6: Validation & Documentation
 
 ### Day 15-17: Competitive Comparison
 
 #### Create Competitor Benchmark Suite
+
 **File**: `benchmark/src/competitor/linux.rs`
 
 ```rust
@@ -547,6 +565,7 @@ impl Benchmark for LinuxIPCBenchmark {
 ```
 
 #### Comparison Dashboard
+
 **File**: `benchmark/results/generate_dashboard.py`
 
 ```python
@@ -590,6 +609,7 @@ if __name__ == '__main__':
 ### Day 18-21: Documentation
 
 #### Create Getting Started Guide
+
 **File**: `docs/getting-started/installation.md`
 
 ```markdown
@@ -633,6 +653,7 @@ sigmactl benchmark --quick
 ```
 
 #### Create API Documentation
+
 **File**: `docs/api/kernel-api.md`
 
 ```markdown
@@ -668,11 +689,12 @@ Lock-free inter-process communication with <100ns latency.
 - Throughput: >10M operations/second
 ```
 
----
+***
 
 ## 📊 Daily Progress Tracking
 
 ### Progress Dashboard Template
+
 **File**: `PROGRESS.md`
 
 ```markdown
@@ -703,52 +725,59 @@ Lock-free inter-process communication with <100ns latency.
 - Benchmark Baseline: Not established → Target: Complete
 ```
 
----
+***
 
 ## 🚨 Immediate Problem-Solving
 
 ### Common Build Issues & Solutions
 
 #### Issue: Duplicate Module Definitions
-**Error**: `error[E0428]: the name \`backup\` is defined multiple times`
+
+**Error**: `error[E0428]: the name \`backup\` is defined multiple times\`
 **Solution**: Remove duplicate module declarations
 
 #### Issue: Type Inference Errors
+
 **Error**: `error[E0282]: type annotations needed`
 **Solution**: Add explicit type annotations to problematic variables
 
 #### Issue: Missing Dependencies
+
 **Error**: `error[E0433]: failed to resolve`
 **Solution**: Add missing dependencies to Cargo.toml
 
----
+***
 
 ## 🎯 Success Criteria for 30-Day Sprint
 
 ### Technical Goals
-- [ ] Build success rate: >90%
-- [ ] Test coverage: >60%
-- [ ] Benchmark framework: Operational
-- [ ] Lock-free IPC: Implemented and benchmarked
-- [ ] Shard recovery: <1ms target achieved
+
+*   \[ ] Build success rate: >90%
+*   \[ ] Test coverage: >60%
+*   \[ ] Benchmark framework: Operational
+*   \[ ] Lock-free IPC: Implemented and benchmarked
+*   \[ ] Shard recovery: <1ms target achieved
 
 ### Documentation Goals
-- [ ] Installation guide: Complete
-- [ ] API documentation: Core APIs documented
-- [ ] Benchmark results: Baseline established
-- [ ] Competitive comparison: Initial data collected
+
+*   \[ ] Installation guide: Complete
+*   \[ ] API documentation: Core APIs documented
+*   \[ ] Benchmark results: Baseline established
+*   \[ ] Competitive comparison: Initial data collected
 
 ### Community Goals
-- [ ] Contributor guidelines: Published
-- [ ] Issue templates: Created
-- [ ] PR templates: Implemented
-- [ ] Discord/Community: Established
 
----
+*   \[ ] Contributor guidelines: Published
+*   \[ ] Issue templates: Created
+*   \[ ] PR templates: Implemented
+*   \[ ] Discord/Community: Established
+
+***
 
 ## 🔄 Continuous Integration Setup
 
 ### GitHub Actions Workflow
+
 **File**: `.github/workflows/ci.yml`
 
 ```yaml
@@ -786,22 +815,24 @@ jobs:
         uses: github/codeql-action/init@v2
 ```
 
----
+***
 
 ## 📞 Support & Resources
 
 ### Getting Help
-- **Documentation**: See `docs/` directory
-- **Issues**: GitHub Issues
-- **Discord**: [Link to Discord]
-- **Email**: [Support email]
+
+*   **Documentation**: See `docs/` directory
+*   **Issues**: GitHub Issues
+*   **Discord**: \[Link to Discord]
+*   **Email**: \[Support email]
 
 ### Contributing
-- **Guidelines**: `CONTRIBUTING.md`
-- **Code of Conduct**: `CODE_OF_CONDUCT.md`
-- **Development Setup**: `docs/development/setup.md`
 
----
+*   **Guidelines**: `CONTRIBUTING.md`
+*   **Code of Conduct**: `CODE_OF_CONDUCT.md`
+*   **Development Setup**: `docs/development/setup.md`
+
+***
 
 **Next Immediate Action**: Begin Day 1-3 tasks with fixing compilation errors to establish a clean build baseline.
 

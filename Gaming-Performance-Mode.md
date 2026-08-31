@@ -4,51 +4,54 @@ SigmaOS includes a dedicated **Gaming Performance Mode** subsystem, inspired by 
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────┐
-│          Gaming Performance Mode             │
-│                                              │
-│  ┌─────────────┐  ┌──────────────────────┐   │
-│  │  Game       │  │  Scheduler Boost     │   │
-│  │  Detector   │  │  (LWKT/CFS tuning)   │   │
-│  └─────────────┘  └──────────────────────┘   │
-│  ┌─────────────┐  ┌──────────────────────┐   │
-│  │  Memory     │  │  GPU Priority        │   │
-│  │  UKSM / THP │  │  Boost               │   │
-│  └─────────────┘  └──────────────────────┘   │
-│  ┌─────────────┐  ┌──────────────────────┐   │
-│  │  Network    │  │  Power Governor      │   │
-│  │  QoS        │  │  (Performance)       │   │
-│  └─────────────┘  └──────────────────────┘   │
-└──────────────────────────────────────────────┘
-```
+    ┌──────────────────────────────────────────────┐
+    │          Gaming Performance Mode             │
+    │                                              │
+    │  ┌─────────────┐  ┌──────────────────────┐   │
+    │  │  Game       │  │  Scheduler Boost     │   │
+    │  │  Detector   │  │  (LWKT/CFS tuning)   │   │
+    │  └─────────────┘  └──────────────────────┘   │
+    │  ┌─────────────┐  ┌──────────────────────┐   │
+    │  │  Memory     │  │  GPU Priority        │   │
+    │  │  UKSM / THP │  │  Boost               │   │
+    │  └─────────────┘  └──────────────────────┘   │
+    │  ┌─────────────┐  ┌──────────────────────┐   │
+    │  │  Network    │  │  Power Governor      │   │
+    │  │  QoS        │  │  (Performance)       │   │
+    │  └─────────────┘  └──────────────────────┘   │
+    └──────────────────────────────────────────────┘
 
 ## Key Features
 
 ### DragonFly BSD Lightweight Kernel Thread (LWKT) SMP Queues
-- Per-CPU ready queues eliminate cross-CPU locking overhead
-- Game threads are pinned to performance cores (P-cores) automatically
-- Inter-CPU migration is minimized during frame rendering windows
+
+*   Per-CPU ready queues eliminate cross-CPU locking overhead
+*   Game threads are pinned to performance cores (P-cores) automatically
+*   Inter-CPU migration is minimized during frame rendering windows
 
 ### UKSM (Ultra Kernel Same-page Merging)
-- Merges duplicate memory pages across game processes
-- Reduces RAM footprint of large open-world games by up to 20%
-- Operates transparently without modifying game code
+
+*   Merges duplicate memory pages across game processes
+*   Reduces RAM footprint of large open-world games by up to 20%
+*   Operates transparently without modifying game code
 
 ### CPU Scheduler Tuning
-- Scheduler time quantum reduced from 4ms → 1ms for game processes
-- `SCHED_FIFO` priority available for audio and input threads
-- Load balancer suppressed during active rendering frames
+
+*   Scheduler time quantum reduced from 4ms → 1ms for game processes
+*   `SCHED_FIFO` priority available for audio and input threads
+*   Load balancer suppressed during active rendering frames
 
 ### Network QoS for Gaming
-- UDP game packets prioritized above background traffic
-- Nagle algorithm disabled for game sockets automatically
-- DSCP marking for cloud gaming traffic (GeForce NOW, Stadia, Xbox Cloud)
+
+*   UDP game packets prioritized above background traffic
+*   Nagle algorithm disabled for game sockets automatically
+*   DSCP marking for cloud gaming traffic (GeForce NOW, Stadia, Xbox Cloud)
 
 ### Power Governor Integration
-- Automatically switches to `performance` governor on game launch
-- Returns to `ondemand/schedutil` after game exits
-- CPU boost (Turbo/XFR) forced on during active play
+
+*   Automatically switches to `performance` governor on game launch
+*   Returns to `ondemand/schedutil` after game exits
+*   CPU boost (Turbo/XFR) forced on during active play
 
 ## Activation
 
@@ -102,7 +105,7 @@ Measured on i7-12700K + RTX 3080 vs default mode:
 
 ## See Also
 
-- [Scheduler Architecture](Scheduler-Architecture.md)
-- [Memory Management](Memory-Management.md)
-- [Power Management](Power-Management.md)
-- [GPU Support](GPU-Support.md)
+*   [Scheduler Architecture](Scheduler-Architecture)
+*   [Memory Management](Memory-Management)
+*   [Power Management](Power-Management)
+*   [GPU Support](GPU-Support)

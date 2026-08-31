@@ -4,60 +4,63 @@ This document details the complete, industrial-grade development plans, architec
 
 Inspired by GIMP, Krita, and modern GPU-accelerated graphics pipelines, this blueprint establishes a sovereign, zero-dependency, and capability-gated raster image processing model designed for absolute digital autonomy.
 
----
+***
 
 ## 🏗️ 1. Core Architectural Vision
 
 SigmaPaint discards heavy third-party graphics toolkits and legacy POSIX pipeline assumptions to build a fast, memory-safe, and parallelized pixel manipulation pipeline directly in `#![no_std]` Rust.
 
 ### Key Design Pillars
-1. **Object-Oriented Image Representation**: Represent canvas layers, selection paths, color palettes, and processing filters as unified, strictly typed OOP components.
-2. **Zero-Copy Canvas Blitting**: Avoid overhead by blitting layers directly into the Zenith Desktop Compositor's shared memory framebuffers.
-3. **PQC & Sandbox Enforced Actions**: Enforce secure execution of user-defined filter modules (UDFs) and AI-based image enhancement networks via capability-gated sandbox boundaries.
-4. **SIMD & Multithreaded Acceleration**: Leverage hardware vectorization (AVX-512 / Neon) and predictive scheduling threads to split rasterization workloads across multi-core systems.
 
----
+1.  **Object-Oriented Image Representation**: Represent canvas layers, selection paths, color palettes, and processing filters as unified, strictly typed OOP components.
+2.  **Zero-Copy Canvas Blitting**: Avoid overhead by blitting layers directly into the Zenith Desktop Compositor's shared memory framebuffers.
+3.  **PQC & Sandbox Enforced Actions**: Enforce secure execution of user-defined filter modules (UDFs) and AI-based image enhancement networks via capability-gated sandbox boundaries.
+4.  **SIMD & Multithreaded Acceleration**: Leverage hardware vectorization (AVX-512 / Neon) and predictive scheduling threads to split rasterization workloads across multi-core systems.
+
+***
 
 ## 🚀 2. Master Photo Editor Development Plan
 
 The image processing suite is organized into **four core technology layers**, mapping out integration pathways, GIMP/Krita equivalents, and precise capability gates.
 
-```
-                    +------------------------------+
-                    |    Zenith UI Compositor      |
-                    +------------------------------+
-                                   |
-         +-------------------------+-------------------------+
-         |                                                   |
-         v                                                   v
-+------------------+                               +------------------+
-|   Layer Shard    | <--- (Zero-Copy Blitting) --->|   Filter Shard   |
-| - Canvas Layer   |                               | - Color Space    |
-| - Opacity, Alpha |                               | - Gaussian Blur  |
-| - Blit Compositor|                               | - Custom UDF     |
-+------------------+                               +------------------+
-```
+                        +------------------------------+
+                        |    Zenith UI Compositor      |
+                        +------------------------------+
+                                       |
+             +-------------------------+-------------------------+
+             |                                                   |
+             v                                                   v
+    +------------------+                               +------------------+
+    |   Layer Shard    | <--- (Zero-Copy Blitting) --->|   Filter Shard   |
+    | - Canvas Layer   |                               | - Color Space    |
+    | - Opacity, Alpha |                               | - Gaussian Blur  |
+    | - Blit Compositor|                               | - Custom UDF     |
+    +------------------+                               +------------------+
 
 ### 2.1 Raster Canvas and Layer Management (Krita Equivalent)
-- **Objective**: Standardized canvas with infinite layers, custom blend modes (Normal, Multiply, Screen, Overlay), opacity channels, and transparency.
-- **Inspiration**: Krita layer stack model and GIMP paint core.
-- **Efficiency**: Zero-copy pixel array sharing with framebuffers.
+
+*   **Objective**: Standardized canvas with infinite layers, custom blend modes (Normal, Multiply, Screen, Overlay), opacity channels, and transparency.
+*   **Inspiration**: Krita layer stack model and GIMP paint core.
+*   **Efficiency**: Zero-copy pixel array sharing with framebuffers.
 
 ### 2.2 Color Space Conversion Engine (Linux LittleCMS Equivalent)
-- **Objective**: Extreme high-performance, zero-dependency color translations between RGB, RGBA, CMYK, and Grayscale.
-- **Inspiration**: LittleCMS (Little Color Management System) used in Linux graphics software.
-- **Accuracy**: Fixed-point arithmetic to guarantee hard real-time precision on embedded systems.
+
+*   **Objective**: Extreme high-performance, zero-dependency color translations between RGB, RGBA, CMYK, and Grayscale.
+*   **Inspiration**: LittleCMS (Little Color Management System) used in Linux graphics software.
+*   **Accuracy**: Fixed-point arithmetic to guarantee hard real-time precision on embedded systems.
 
 ### 2.3 Image Convolution and Filter Kernels (GEGL Equivalent)
-- **Objective**: Fast 2D matrix convolution filters (Gaussian blur, sharpening, edge detection, box filters) with multithreading support.
-- **Inspiration**: GEGL (Generic Graphics Library) backing GIMP's processing pipelines.
-- **Acceleration**: Highly parallelized slice processing with predictable cache locality.
+
+*   **Objective**: Fast 2D matrix convolution filters (Gaussian blur, sharpening, edge detection, box filters) with multithreading support.
+*   **Inspiration**: GEGL (Generic Graphics Library) backing GIMP's processing pipelines.
+*   **Acceleration**: Highly parallelized slice processing with predictable cache locality.
 
 ### 2.4 AI-Native Painting Assist (Stable Diffusion Local Assist)
-- **Objective**: Integrate local LLM/Diffusion inference gates to suggest smart brush strokes, upscaling, or localized inpainting.
-- **Inspiration**: Krita AI Diffusion plugins.
 
----
+*   **Objective**: Integrate local LLM/Diffusion inference gates to suggest smart brush strokes, upscaling, or localized inpainting.
+*   **Inspiration**: Krita AI Diffusion plugins.
+
+***
 
 ## 💻 3. Executable Reference Implementation
 
@@ -242,13 +245,14 @@ impl ImageFilter for GrayscaleConversionFilter {
 }
 ```
 
----
+***
 
 ## 🔬 5. Validation and Verification Strategy
 
 To guarantee absolute synchronicity and correctness of the photo editor suite:
-1. **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
-2. **Execution Benchmarks**: Filters under `GaussianBlurFilter` operate with strict cache locality to guarantee sub-millisecond response times under active high-dpi composite layers.
-3. **Sovereign Sandboxing**: All user-defined editing filters (UDFs) run under capability-gated security boundaries, completely eliminating raw memory exploit vulnerabilities.
+
+1.  **Compilation Audit**: Every code snippet within this development plans document is formatted using `cargo fmt` standards and is syntactically validated in our unified test suites.
+2.  **Execution Benchmarks**: Filters under `GaussianBlurFilter` operate with strict cache locality to guarantee sub-millisecond response times under active high-dpi composite layers.
+3.  **Sovereign Sandboxing**: All user-defined editing filters (UDFs) run under capability-gated security boundaries, completely eliminating raw memory exploit vulnerabilities.
 
 By implementing this comprehensive blueprint, **SigmaOS** delivers a pristine, ultra-lightweight, and fully optimized photo editor pipeline that completely surpasses legacy desktop toolkits.

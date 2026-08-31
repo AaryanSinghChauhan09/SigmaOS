@@ -4,7 +4,7 @@ We are going to be looking at some peculiar and potentially dangerous implicatio
 
 Square bracket notation for objects in JavaScript provides a very convenient way to dynamically access a specific property or method based on the contents of a variable. The end result of this feature is something that is very similar to Ruby's Mass Assignment: Given an object, you are able to dynamically assign and retrieve properties of this object without specifying this property should be accessible.
 
-_Note: These examples are simple, and seemingly obvious - we will take a look at that later. For now, disregard the practicality of the examples and focus on the dangerous patterns that they reveal._
+*Note: These examples are simple, and seemingly obvious - we will take a look at that later. For now, disregard the practicality of the examples and focus on the dangerous patterns that they reveal.*
 
 Let's take a look at why this could be a problem.
 
@@ -17,7 +17,7 @@ exampleClass[userInput[0]] = userInput[1];
 
 I won't spend much time here, as I believe this is fairly well known. If exampleClass contains a sensitive property, the above code will allow it to be edited.
 
-## Issue #2: Bracket object notation with user input grants access to every property available on the object, **_including prototypes._**
+## Issue #2: Bracket object notation with user input grants access to every property available on the object, ***including prototypes.***
 
 ```js
 userInput = ['constructor', '{}'];
@@ -27,7 +27,7 @@ exampleClass[userInput[0]] = userInput[1];
 
 This looks pretty innocuous, even if it is an uncommon pattern. The problem here is that we can access or overwrite prototypes such as `constructor` or `__defineGetter__`, which may be used later on. The most likely outcome of this scenario would be an application crash, when a string is attempted to be called as a function.
 
-## Issue #3: Bracket object notation with user input grants access to every property available on the object, including prototypes, **_which can lead to Remote Code Execution._**
+## Issue #3: Bracket object notation with user input grants access to every property available on the object, including prototypes, ***which can lead to Remote Code Execution.***
 
 Now here's where things get really dangerous. It's also where example code gets really implausible - bear with me.
 
@@ -93,7 +93,7 @@ What we end up with is this:
 
 ![Exploiting date screenshot](https://cldup.com/lR_Xp0PwU9.png)
 
-Remote Code Execution. The biggest problem here is that there is very little indication in the code that this is what is going on. With something so serious, method calls tend to be very explicit - eval, child_process, etc. It's pretty difficult in node to accidentally introduce one of those into your application. Here though, without having either deep knowledge of JavaScript builtins or having done previous research, it is very easy to accidentally introduce this into your application.
+Remote Code Execution. The biggest problem here is that there is very little indication in the code that this is what is going on. With something so serious, method calls tend to be very explicit - eval, child\_process, etc. It's pretty difficult in node to accidentally introduce one of those into your application. Here though, without having either deep knowledge of JavaScript builtins or having done previous research, it is very easy to accidentally introduce this into your application.
 
 ## Isn't this so obscure that it doesn't matter a whole lot?
 

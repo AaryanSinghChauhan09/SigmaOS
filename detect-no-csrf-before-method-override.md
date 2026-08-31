@@ -1,6 +1,6 @@
 # Detects Express "csrf" middleware setup before "method-override" middleware (`security/detect-no-csrf-before-method-override`)
 
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+⚠️ This rule *warns* in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 

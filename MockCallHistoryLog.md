@@ -1,4 +1,4 @@
-﻿# Class: MockCallHistoryLog
+# Class: MockCallHistoryLog
 
 Access to an instance with :
 
@@ -9,41 +9,29 @@ mockAgent.getCallHistory()?.firstCall()
 
 ## class properties
 
-- body `mockAgent.getCallHistory()?.firstCall()?.body`
+*   body `mockAgent.getCallHistory()?.firstCall()?.body`
 
+*   headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
 
-- headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
+*   method `mockAgent.getCallHistory()?.firstCall()?.method` a string
 
+*   fullUrl `mockAgent.getCallHistory()?.firstCall()?.fullUrl` a string containing the protocol, origin, path, query and hash
 
-- method `mockAgent.getCallHistory()?.firstCall()?.method` a string
+*   origin `mockAgent.getCallHistory()?.firstCall()?.origin` a string containing the protocol and the host
 
+*   headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
 
-- fullUrl `mockAgent.getCallHistory()?.firstCall()?.fullUrl` a string containing the protocol, origin, path, query and hash
+*   path `mockAgent.getCallHistory()?.firstCall()?.path` a string always starting with `/`
 
+*   searchParams `mockAgent.getCallHistory()?.firstCall()?.searchParams` an object
 
-- origin `mockAgent.getCallHistory()?.firstCall()?.origin` a string containing the protocol and the host
+*   protocol `mockAgent.getCallHistory()?.firstCall()?.protocol` a string (`https:`)
 
+*   host `mockAgent.getCallHistory()?.firstCall()?.host` a string
 
-- headers `mockAgent.getCallHistory()?.firstCall()?.headers` an object
+*   port `mockAgent.getCallHistory()?.firstCall()?.port` an empty string or a string containing numbers
 
-
-- path `mockAgent.getCallHistory()?.firstCall()?.path` a string always starting with `/`
-
-
-- searchParams `mockAgent.getCallHistory()?.firstCall()?.searchParams` an object
-
-
-- protocol `mockAgent.getCallHistory()?.firstCall()?.protocol` a string (`https:`)
-
-
-- host `mockAgent.getCallHistory()?.firstCall()?.host` a string
-
-
-- port `mockAgent.getCallHistory()?.firstCall()?.port` an empty string or a string containing numbers
-
-
-- hash `mockAgent.getCallHistory()?.firstCall()?.hash` an empty string or a string starting with `#`
-
+*   hash `mockAgent.getCallHistory()?.firstCall()?.hash` an empty string or a string starting with `#`
 
 ## class methods
 

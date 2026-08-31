@@ -16,23 +16,21 @@ SigmaOS minimizes dependence on Rust's standard library (`std`) and pre-defined 
 
 ## Architecture Layers
 
-```
-┌───────────────────────────────────────────┐
-│           Userspace Applications          │
-├───────────────────────────────────────────┤
-│         SigmaOS System Libraries          │
-│  (sigpkg, sigma-sh, kabi) - zero ext deps │
-├───────────────────────────────────────────┤
-│           Core Kernel (src/)              │
-│  Uses: #![no_std] + extern crate alloc   │
-├───────────────────────────────────────────┤
-│            src/klib/ Layer                │
-│  Vec, BTreeMap, BuddyAllocator, Paging   │
-├───────────────────────────────────────────┤
-│       Hardware Abstraction Layer          │
-│  (raw pointers, MMIO, assembly)           │
-└───────────────────────────────────────────┘
-```
+    ┌───────────────────────────────────────────┐
+    │           Userspace Applications          │
+    ├───────────────────────────────────────────┤
+    │         SigmaOS System Libraries          │
+    │  (sigpkg, sigma-sh, kabi) - zero ext deps │
+    ├───────────────────────────────────────────┤
+    │           Core Kernel (src/)              │
+    │  Uses: #![no_std] + extern crate alloc   │
+    ├───────────────────────────────────────────┤
+    │            src/klib/ Layer                │
+    │  Vec, BTreeMap, BuddyAllocator, Paging   │
+    ├───────────────────────────────────────────┤
+    │       Hardware Abstraction Layer          │
+    │  (raw pointers, MMIO, assembly)           │
+    └───────────────────────────────────────────┘
 
 ## The `src/klib/` Custom Library
 
@@ -65,22 +63,25 @@ use crate::klib::hashmap::BTreeMap;
 ## Migration Status
 
 ### ✅ Completed (no std dependency)
-- `src/security/pledge.rs` - Full no_std with alloc
-- `src/security/unveil.rs` - Full no_std with alloc
-- `src/memory/kswapd.rs` - Full no_std with alloc
-- `src/klib/buddy_allocator.rs` - Core-only
-- `src/crypto/pqc_dilithium.rs` - alloc only
+
+*   `src/security/pledge.rs` - Full no\_std with alloc
+*   `src/security/unveil.rs` - Full no\_std with alloc
+*   `src/memory/kswapd.rs` - Full no\_std with alloc
+*   `src/klib/buddy_allocator.rs` - Core-only
+*   `src/crypto/pqc_dilithium.rs` - alloc only
 
 ### 🚧 In Progress
-- `src/net/` - Some modules still use `std::net` types
-- `src/filesystem/` - VFS layer in transition
+
+*   `src/net/` - Some modules still use `std::net` types
+*   `src/filesystem/` - VFS layer in transition
 
 ### ❌ TODO
-- `tools/` - CLI tools (may legitimately use std for host tooling)
-- Test harnesses (`#[cfg(test)]` blocks may use std)
+
+*   `tools/` - CLI tools (may legitimately use std for host tooling)
+*   Test harnesses (`#[cfg(test)]` blocks may use std)
 
 ## References
 
-- [Kernel Architecture](Kernel-Architecture.md)
-- [BSD Inspirations and Parity](BSD-Inspirations-and-Parity.md)
-- [Zero-Dependency Subsystems](Zero-Dependency-Subsystems.md)
+*   [Kernel Architecture](Kernel-Architecture)
+*   [BSD Inspirations and Parity](BSD-Inspirations-and-Parity)
+*   [Zero-Dependency Subsystems](Zero-Dependency-Subsystems)

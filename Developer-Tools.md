@@ -11,20 +11,23 @@ SigmaOS provides a comprehensive suite of developer tools designed to enhance pr
 The SigmaOS VS Code extension provides seamless integration with the SigmaOS development environment.
 
 **Features:**
-- Syntax highlighting for SigmaOS-specific file types
-- IntelliSense for SigmaOS kernel APIs
-- Build system integration
-- Debugging support with GDB integration
-- Kernel module development templates
-- Package manager integration (sigma-pkg)
-- Remote development support for SigmaOS targets
+
+*   Syntax highlighting for SigmaOS-specific file types
+*   IntelliSense for SigmaOS kernel APIs
+*   Build system integration
+*   Debugging support with GDB integration
+*   Kernel module development templates
+*   Package manager integration (sigma-pkg)
+*   Remote development support for SigmaOS targets
 
 **Installation:**
+
 ```bash
 code --install-extension sigmaos.sigmaos-vscode
 ```
 
 **Configuration:**
+
 ```json
 {
   "sigmaos.toolchain": "/usr/local/sigmaos",
@@ -39,12 +42,13 @@ code --install-extension sigmaos.sigmaos-vscode
 The JetBrains plugin supports CLion, IntelliJ IDEA, and other JetBrains IDEs.
 
 **Features:**
-- CMake project integration
-- Rust support for kernel development
-- Debugger integration
-- Code completion and navigation
-- Refactoring support
-- Version control integration
+
+*   CMake project integration
+*   Rust support for kernel development
+*   Debugger integration
+*   Code completion and navigation
+*   Refactoring support
+*   Version control integration
 
 **Installation:**
 Install from the JetBrains Marketplace or download from the SigmaOS releases page.
@@ -54,11 +58,12 @@ Install from the JetBrains Marketplace or download from the SigmaOS releases pag
 The Eclipse plugin provides CDT integration for SigmaOS development.
 
 **Features:**
-- C/C++ Development Tooling (CDT) integration
-- Makefile project support
-- Remote debugging
-- Memory analysis
-- Static analysis integration
+
+*   C/C++ Development Tooling (CDT) integration
+*   Makefile project support
+*   Remote debugging
+*   Memory analysis
+*   Static analysis integration
 
 ## Build System
 
@@ -67,14 +72,16 @@ The Eclipse plugin provides CDT integration for SigmaOS development.
 SigmaOS uses a modular build system based on CMake with custom configurations for different deployment profiles.
 
 **Build Profiles:**
-- `desktop` - Full desktop profile with all features
-- `microkernel` - Minimal microkernel profile (< 512 KB)
-- `cloud` - Cloud/container headless profile
-- `mobile` - ARM64/RISC-V mobile profile
-- `rtos` - Hard real-time profile
-- `distributed` - Multi-node distributed cluster
+
+*   `desktop` - Full desktop profile with all features
+*   `microkernel` - Minimal microkernel profile (< 512 KB)
+*   `cloud` - Cloud/container headless profile
+*   `mobile` - ARM64/RISC-V mobile profile
+*   `rtos` - Hard real-time profile
+*   `distributed` - Multi-node distributed cluster
 
 **Configuration:**
+
 ```bash
 # Configure build
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DSIGMAOS_PROFILE=desktop
@@ -87,6 +94,7 @@ sudo cmake --install build
 ```
 
 **Modular Components:**
+
 ```cmake
 # Enable/disable components
 cmake -DSIGMAOS_ENABLE_GPU=ON \
@@ -97,6 +105,7 @@ cmake -DSIGMAOS_ENABLE_GPU=ON \
 ```
 
 **Cross-Compilation:**
+
 ```bash
 # ARM64
 cmake -DCMAKE_TOOLCHAIN_FILE=toolchains/arm64-sigmaos.cmake
@@ -112,16 +121,18 @@ cmake -DCMAKE_TOOLCHAIN_FILE=toolchains/riscv64-sigmaos.cmake
 SigmaOS provides comprehensive kernel logging with multiple log levels and filtering capabilities.
 
 **Log Levels:**
-- `EMERG` - Emergency (system is unusable)
-- `ALERT` - Alert (action must be taken immediately)
-- `CRIT` - Critical (critical conditions)
-- `ERR` - Error (error conditions)
-- `WARNING` - Warning (warning conditions)
-- `NOTICE` - Notice (normal but significant condition)
-- `INFO` - Informational (informational messages)
-- `DEBUG` - Debug (debug-level messages)
+
+*   `EMERG` - Emergency (system is unusable)
+*   `ALERT` - Alert (action must be taken immediately)
+*   `CRIT` - Critical (critical conditions)
+*   `ERR` - Error (error conditions)
+*   `WARNING` - Warning (warning conditions)
+*   `NOTICE` - Notice (normal but significant condition)
+*   `INFO` - Informational (informational messages)
+*   `DEBUG` - Debug (debug-level messages)
 
 **Usage:**
+
 ```bash
 # View kernel logs
 sigma-klog
@@ -140,6 +151,7 @@ sigma-klog --export=kernel.log
 ```
 
 **Kernel Log API:**
+
 ```c
 #include <sigmaos/log.h>
 
@@ -153,14 +165,16 @@ sigma_log(KERN_ERR, "Failed to allocate memory: %d", error);
 SigmaOS includes advanced crash analysis tools for debugging kernel panics and user-space crashes.
 
 **Features:**
-- Automatic crash dump generation
-- Stack trace analysis
-- Memory inspection
-- Register state display
-- Symbol resolution
-- Crash report generation
+
+*   Automatic crash dump generation
+*   Stack trace analysis
+*   Memory inspection
+*   Register state display
+*   Symbol resolution
+*   Crash report generation
 
 **Usage:**
+
 ```bash
 # Analyze kernel crash dump
 sigma-crash-analyze /var/crash/kernel.0
@@ -176,6 +190,7 @@ sigma-crash-analyze --interactive /var/crash/kernel.0
 ```
 
 **Crash Dump Configuration:**
+
 ```bash
 # Enable crash dumps
 sudo sysctl kernel.core_pattern=/var/crash/core.%e.%p.%t
@@ -189,6 +204,7 @@ sudo sysctl kernel.core_dump_filter=0x3f
 SigmaOS provides multiple profiling tools for performance analysis and optimization.
 
 **CPU Profiler:**
+
 ```bash
 # Profile CPU usage
 sigma-prof cpu --pid=1234 --duration=30
@@ -201,6 +217,7 @@ sigma-prof cpu --flamegraph --output=flamegraph.svg
 ```
 
 **Memory Profiler:**
+
 ```bash
 # Profile memory usage
 sigma-prof memory --pid=1234
@@ -213,6 +230,7 @@ sigma-prof memory --kernel
 ```
 
 **I/O Profiler:**
+
 ```bash
 # Profile I/O operations
 sigma-prof io --pid=1234
@@ -225,6 +243,7 @@ sigma-prof io --network
 ```
 
 **Lock Contention Profiler:**
+
 ```bash
 # Profile lock contention
 sigma-prof lock --pid=1234
@@ -238,6 +257,7 @@ sigma-prof lock --kernel
 SigmaOS includes comprehensive benchmarking tools for measuring system performance.
 
 **CPU Benchmarks:**
+
 ```bash
 # CPU performance benchmark
 sigma-bench cpu --iterations=1000
@@ -250,6 +270,7 @@ sigma-bench context-switch --iterations=100000
 ```
 
 **Memory Benchmarks:**
+
 ```bash
 # Memory bandwidth benchmark
 sigma-bench memory --bandwidth
@@ -262,6 +283,7 @@ sigma-bench cache
 ```
 
 **I/O Benchmarks:**
+
 ```bash
 # Disk I/O benchmark
 sigma-bench disk --device=/dev/nvme0n1
@@ -274,6 +296,7 @@ sigma-bench filesystem --path=/mnt/sigmafs
 ```
 
 **System Benchmarks:**
+
 ```bash
 # Full system benchmark
 sigma-bench system --all
@@ -292,6 +315,7 @@ sigma-bench startup
 The sigma-pkg command-line tool provides comprehensive package management.
 
 **Basic Operations:**
+
 ```bash
 # Search packages
 sigma-pkg search firefox
@@ -313,6 +337,7 @@ sigma-pkg list --installed
 ```
 
 **Advanced Operations:**
+
 ```bash
 # View package information
 sigma-pkg info firefox
@@ -331,6 +356,7 @@ sigma-pkg sbom firefox
 ```
 
 **Development Operations:**
+
 ```bash
 # Build package from source
 sigma-pkg build ./package-spec.yaml
@@ -352,6 +378,7 @@ sigma-pkg upload ./package.spkg
 SigmaOS includes an AI-powered natural language to CLI translator that helps developers find the right commands.
 
 **Usage:**
+
 ```bash
 # Translate natural language to command
 sigma-nl2cli "install firefox browser"
@@ -368,6 +395,7 @@ sigma-nl2cli --interactive
 The AI error explanation tool provides detailed explanations of error messages and suggests fixes.
 
 **Usage:**
+
 ```bash
 # Explain error
 sigma-explain "segmentation fault"
@@ -386,6 +414,7 @@ sigma-explain --kernel "page fault"
 SigmaOS includes comprehensive man pages for all system tools and APIs.
 
 **Usage:**
+
 ```bash
 # View man page
 man sigma-pkg
@@ -405,6 +434,7 @@ man 3 printf
 SigmaOS uses Doxygen for API documentation generation.
 
 **Generate Documentation:**
+
 ```bash
 # Generate HTML documentation
 cmake --build build --target docs
@@ -417,6 +447,7 @@ cmake --build build --target docs-man
 ```
 
 **View Documentation:**
+
 ```bash
 # Open in browser
 xdg-open build/docs/html/index.html
@@ -432,6 +463,7 @@ python3 -m http.server 8000 --directory build/docs/html
 SigmaOS uses a custom unit testing framework for kernel and user-space testing.
 
 **Usage:**
+
 ```bash
 # Run all tests
 sigma-test
@@ -454,6 +486,7 @@ sigma-test --coverage
 Integration tests verify the interaction between different system components.
 
 **Usage:**
+
 ```bash
 # Run integration tests
 sigma-integration-test
@@ -470,6 +503,7 @@ sigma-integration-test --mock-hardware
 SigmaOS includes fuzz testing tools for finding security vulnerabilities.
 
 **Usage:**
+
 ```bash
 # Fuzz test syscall handler
 sigma-fuzz --target=syscall --input=syscalls.txt
@@ -488,6 +522,7 @@ sigma-fuzz --target=network --input=packets.bin
 SigmaOS includes static analysis tools for detecting security vulnerabilities.
 
 **Usage:**
+
 ```bash
 # Run static analysis
 sigma-static-analyze kernel/
@@ -504,6 +539,7 @@ sigma-static-analyze --check=buffer-overflow kernel/
 Dynamic analysis tools monitor program execution for security issues.
 
 **Usage:**
+
 ```bash
 # Monitor for memory safety violations
 sigma-dynamic-analyze --memory-safety ./program
@@ -520,6 +556,7 @@ sigma-dynamic-analyze --privilege-escalation ./program
 ### Developer Environment Setup
 
 **Install Development Tools:**
+
 ```bash
 # Install all development tools
 sigma-pkg install sigmaos-dev-tools
@@ -531,6 +568,7 @@ sigma-pkg install sigmaos-profiling-tools
 ```
 
 **Configure Environment:**
+
 ```bash
 # Set environment variables
 export SIGMAOS_TOOLCHAIN=/usr/local/sigmaos
@@ -544,6 +582,7 @@ source /etc/sigmaos-dev.conf
 ### IDE Configuration
 
 **VS Code:**
+
 ```json
 {
   "sigmaos.toolchain": "/usr/local/sigmaos",
@@ -556,6 +595,7 @@ source /etc/sigmaos-dev.conf
 ```
 
 **JetBrains:**
+
 ```properties
 # idea.properties
 sigmaos.toolchain=/usr/local/sigmaos
@@ -568,6 +608,7 @@ sigmaos.cmake.options=-DSIGMAOS_PROFILE=desktop
 ### Build Issues
 
 **Missing Dependencies:**
+
 ```bash
 # Check for missing dependencies
 sigma-build-check
@@ -577,6 +618,7 @@ sigma-build-install-deps
 ```
 
 **Configuration Errors:**
+
 ```bash
 # Reset build configuration
 cmake --build build --target clean
@@ -587,6 +629,7 @@ cmake -B build
 ### Debugging Issues
 
 **GDB Connection Failed:**
+
 ```bash
 # Check GDB installation
 gdb-multiarch --version
@@ -596,6 +639,7 @@ sigma-gdb-check --target=localhost:1234
 ```
 
 **Symbol Loading Failed:**
+
 ```bash
 # Rebuild with debug symbols
 cmake -DCMAKE_BUILD_TYPE=Debug -B build
@@ -608,6 +652,7 @@ sigma-symbols-check ./kernel.elf
 ### Performance Issues
 
 **Slow Build Times:**
+
 ```bash
 # Use ccache
 export CC="ccache gcc"
@@ -618,6 +663,7 @@ cmake --build build -j$(nproc)
 ```
 
 **Profiling Not Working:**
+
 ```bash
 # Check profiler permissions
 sudo sigma-perf-check
@@ -628,11 +674,11 @@ sudo sysctl kernel.perf_event_paranoid=0
 
 ## References
 
-- [Kernel Architecture](Kernel-Architecture.md)
-- [Driver Development Guide](Driver-Development-Guide.md)
-- [Package Manager Usage](Package-Manager-Usage.md)
-- [Security Documentation](Security.md)
-- [API Documentation](https://sigmaos.dev/docs/api)
+*   [Kernel Architecture](Kernel-Architecture)
+*   [Driver Development Guide](Driver-Development-Guide)
+*   [Package Manager Usage](Package-Manager-Usage)
+*   [Security Documentation](Security)
+*   [API Documentation](https://sigmaos.dev/docs/api)
 
 ## License
 

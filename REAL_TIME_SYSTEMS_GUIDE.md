@@ -6,14 +6,14 @@ This guide provides comprehensive information about using SigmaOS for real-time 
 
 ## Table of Contents
 
-1. [Real-Time Capabilities](#real-time-capabilities)
-2. [Deterministic Scheduling](#deterministic-scheduling)
-3. [Memory Management for Real-Time](#memory-management-for-real-time)
-4. [Interrupt Handling](#interrupt-handling)
-5. [Low-Latency I/O](#low-latency-io)
-6. [Real-Time Configuration](#real-time-configuration)
-7. [Performance Benchmarking](#performance-benchmarking)
-8. [Case Studies](#case-studies)
+1.  [Real-Time Capabilities](#real-time-capabilities)
+2.  [Deterministic Scheduling](#deterministic-scheduling)
+3.  [Memory Management for Real-Time](#memory-management-for-real-time)
+4.  [Interrupt Handling](#interrupt-handling)
+5.  [Low-Latency I/O](#low-latency-io)
+6.  [Real-Time Configuration](#real-time-configuration)
+7.  [Performance Benchmarking](#performance-benchmarking)
+8.  [Case Studies](#case-studies)
 
 ## Real-Time Capabilities
 
@@ -21,11 +21,11 @@ This guide provides comprehensive information about using SigmaOS for real-time 
 
 SigmaOS provides hard real-time capabilities through:
 
-- **Preemptive Kernel**: Full kernel preemption for minimal latency
-- **Priority Inheritance**: Prevents priority inversion
-- **Deadline Monotonic Scheduling**: Optimal for periodic tasks
-- **Bounded Execution Times**: Guaranteed worst-case execution times
-- **Memory Locking**: Prevents paging delays
+*   **Preemptive Kernel**: Full kernel preemption for minimal latency
+*   **Priority Inheritance**: Prevents priority inversion
+*   **Deadline Monotonic Scheduling**: Optimal for periodic tasks
+*   **Bounded Execution Times**: Guaranteed worst-case execution times
+*   **Memory Locking**: Prevents paging delays
 
 ### Real-Time Profiles
 
@@ -789,22 +789,22 @@ impl RobotController {
 
 ### Common Real-Time Issues
 
-1. **Missed Deadlines**
-   - Check CPU utilization
-   - Verify interrupt priorities
-   - Review memory locking
-   - Profile execution times
+1.  **Missed Deadlines**
+    *   Check CPU utilization
+    *   Verify interrupt priorities
+    *   Review memory locking
+    *   Profile execution times
 
-2. **High Jitter**
-   - Disable background processes
-   - Use CPU affinity
-   - Lock memory regions
-   - Optimize interrupt handlers
+2.  **High Jitter**
+    *   Disable background processes
+    *   Use CPU affinity
+    *   Lock memory regions
+    *   Optimize interrupt handlers
 
-3. **Priority Inversion**
-   - Enable priority inheritance
-   - Use proper mutex implementation
-   - Avoid long critical sections
+3.  **Priority Inversion**
+    *   Enable priority inheritance
+    *   Use proper mutex implementation
+    *   Avoid long critical sections
 
 ### Debugging Tools
 
@@ -847,20 +847,20 @@ impl RtDebugger {
 
 ## Resources
 
-- [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE.md)
-- [Device Driver Guide](DEVICE_DRIVER_GUIDE.md)
-- [Performance Tuning Guide](PERFORMANCE_TUNING_GUIDE.md)
-- [API Reference](API_REFERENCE.md)
+*   [Kernel Customization Guide](KERNEL_CUSTOMIZATION_GUIDE)
+*   [Device Driver Guide](DEVICE_DRIVER_GUIDE)
+*   [Performance Tuning Guide](PERFORMANCE_TUNING_GUIDE)
+*   [API Reference](API_REFERENCE)
 
 ## Contributing
 
 When contributing real-time features:
 
-1. Provide worst-case execution time analysis
-2. Include schedulability analysis
-3. Add latency benchmarks
-4. Document priority assignments
-5. Test under worst-case conditions
+1.  Provide worst-case execution time analysis
+2.  Include schedulability analysis
+3.  Add latency benchmarks
+4.  Document priority assignments
+5.  Test under worst-case conditions
 
 ## License
 

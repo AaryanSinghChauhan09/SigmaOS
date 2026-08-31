@@ -11,24 +11,22 @@ kernel modules and user-space shards at runtime.
 
 ## Loading Pipeline
 
-```
-Request: load("sigma-net.shard")
-   │
-   ├─ 1. Fetch from Sovereign Package Registry (or local path)
-   │
-   ├─ 2. Verify Ed25519 signature against Trust Root
-   │
-   ├─ 3. Parse ELF / WASM headers
-   │
-   ├─ 4. Resolve capability requirements
-   │       └─ Query kernel: does caller hold CAP_MODULE_LOAD?
-   │
-   ├─ 5. Map code into isolated memory domain (IOMMU-backed)
-   │
-   ├─ 6. Patch relocations + link against sovereign libc
-   │
-   └─ 7. Call module entry point with capability token
-```
+    Request: load("sigma-net.shard")
+       │
+       ├─ 1. Fetch from Sovereign Package Registry (or local path)
+       │
+       ├─ 2. Verify Ed25519 signature against Trust Root
+       │
+       ├─ 3. Parse ELF / WASM headers
+       │
+       ├─ 4. Resolve capability requirements
+       │       └─ Query kernel: does caller hold CAP_MODULE_LOAD?
+       │
+       ├─ 5. Map code into isolated memory domain (IOMMU-backed)
+       │
+       ├─ 6. Patch relocations + link against sovereign libc
+       │
+       └─ 7. Call module entry point with capability token
 
 ## API Interface
 
@@ -71,30 +69,30 @@ Every loadable module ships with `module.json`:
 
 The loader supports **hot-module replacement** for non-critical modules:
 
-1. Load new version into a shadow domain.
+1.  Load new version into a shadow domain.
 
-2. Quiesce the old version (drain in-flight requests).
+2.  Quiesce the old version (drain in-flight requests).
 
-3. Atomically swap the dispatch table pointer.
+3.  Atomically swap the dispatch table pointer.
 
-4. Unload the old version.
+4.  Unload the old version.
 
 ## Roadmap
 
-- [x] ELF loader + relocation (`module_loader.rs`)
+*   \[x] ELF loader + relocation (`module_loader.rs`)
 
-- [ ] WASM capsule loader (Cranelift JIT)
+*   \[ ] WASM capsule loader (Cranelift JIT)
 
-- [ ] Signature verification integration
+*   \[ ] Signature verification integration
 
-- [ ] Hot-reload (shadow domain swap)
+*   \[ ] Hot-reload (shadow domain swap)
 
-- [ ] Dependency graph resolver (topological sort)
+*   \[ ] Dependency graph resolver (topological sort)
 
-- [ ] Module version compatibility checks (semver)
+*   \[ ] Module version compatibility checks (semver)
 
 ## Related Modules
 
-- [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule format
+*   [`modules/ext/plugins`](../../ext/plugins/README.md) — Plugin capsule format
 
-- [`modules/security/isolation`](../../security/isolation/README.md) — Module sandboxing
+*   [`modules/security/isolation`](../../security/isolation/README.md) — Module sandboxing

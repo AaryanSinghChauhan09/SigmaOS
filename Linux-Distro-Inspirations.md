@@ -1,6 +1,6 @@
 # Linux Distro Inspirations
 
-> Full catalog: [docs/LINUX_DISTRO_INSPIRATIONS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/LINUX_DISTRO_INSPIRATIONS.md)
+> Full catalog: [docs/LINUX\_DISTRO\_INSPIRATIONS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/LINUX_DISTRO_INSPIRATIONS.md)
 
 SigmaOS absorbs the best ideas from 25+ Linux distributions, all reimplemented natively in safe Rust.
 
@@ -31,7 +31,9 @@ SigmaOS absorbs the best ideas from 25+ Linux distributions, all reimplemented n
 ## Implementation Highlights
 
 ### Arch: Rolling Dependency Resolution
+
 Kahn's topological sort with cycle detection, entirely native (no std::collections):
+
 ```rust
 let mut r = NativeDependencyResolver::new();
 r.add_package("libssl".into(), vec![]);
@@ -40,7 +42,9 @@ let order = r.resolve_order().unwrap(); // ["libssl", "curl"]
 ```
 
 ### NixOS: Content-Addressed Store
+
 FNV-inspired hash for deduplication without external crates:
+
 ```rust
 let mut store = NixStyleStore::new();
 let idx = store.intern("pkg".into(), "1.0".into(), b"content");
@@ -48,7 +52,9 @@ let idx = store.intern("pkg".into(), "1.0".into(), b"content");
 ```
 
 ### Gentoo: USE Flags
+
 Type-safe feature flags as bitmask:
+
 ```rust
 let flags = UseFlags::NONE
     .enable(UseFlags::IPV6)
@@ -58,22 +64,23 @@ assert!(flags.has(UseFlags::HARDENED));
 ```
 
 ### Fedora: Atomic A/B Updates
+
 Full state machine for transactional OS updates:
-```
-Idle → Downloading → Staging → ReadyToApply → Applying → Applied
-                                                              ↓
-                                                     (health check fails)
-                                                              ↓
-                                                         RollingBack
-```
+
+    Idle → Downloading → Staging → ReadyToApply → Applying → Applied
+                                                                  ↓
+                                                         (health check fails)
+                                                                  ↓
+                                                             RollingBack
 
 ## Native String Utilities (Reduce stdlib Dependency)
 
 `src/distro/linux_ideas.rs::NativeStr` provides:
-- `starts_with_bytes` / `ends_with_bytes`
-- `trim_ascii`
-- `split_on`
-- `eq_ignore_ascii_case`
-- `parse_u64` (no `FromStr` trait required)
+
+*   `starts_with_bytes` / `ends_with_bytes`
+*   `trim_ascii`
+*   `split_on`
+*   `eq_ignore_ascii_case`
+*   `parse_u64` (no `FromStr` trait required)
 
 All implemented without `std::str` or `std::string`.

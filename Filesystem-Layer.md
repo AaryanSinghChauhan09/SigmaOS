@@ -5,15 +5,13 @@ filesystem backends without kernel recompilation.
 
 ## Architecture
 
-```
-User Process
-   └─ sigma_vfs_open("/data/file.txt")
-         └─ VFS Router (vfs.rs)
-               ├─ SigmaFS  (sigmafs.rs)   ← default sovereign FS
-               ├─ Ext4     (ext4.rs)       ← Linux compat layer
-               ├─ FAT32    (fat32.rs)      ← removable media
-               └─ Web3FS   (web3_persistence.rs) ← IPFS-backed
-```
+    User Process
+       └─ sigma_vfs_open("/data/file.txt")
+             └─ VFS Router (vfs.rs)
+                   ├─ SigmaFS  (sigmafs.rs)   ← default sovereign FS
+                   ├─ Ext4     (ext4.rs)       ← Linux compat layer
+                   ├─ FAT32    (fat32.rs)      ← removable media
+                   └─ Web3FS   (web3_persistence.rs) ← IPFS-backed
 
 ## Source Files
 
@@ -48,38 +46,36 @@ int sigma_vfs_rollback(const char *tag);
 
 ## SovereignFS On-Disk Layout
 
-```
-[Superblock 4K] [Journal 64MB] [Inode Table] [Data Extents ...]
-```
+    [Superblock 4K] [Journal 64MB] [Inode Table] [Data Extents ...]
 
-- **Copy-on-Write:** every write creates a new extent; old data preserved until
-  explicitly pruned — enables instant snapshots.
+*   **Copy-on-Write:** every write creates a new extent; old data preserved until
+    explicitly pruned — enables instant snapshots.
 
-- **Block Integrity:** each 4 KB block carries a BLAKE3 checksum; the kernel
-  rejects tampered blocks at read time.
+*   **Block Integrity:** each 4 KB block carries a BLAKE3 checksum; the kernel
+    rejects tampered blocks at read time.
 
 ## Roadmap
 
-- [x] VFS router (`vfs.rs`)
+*   \[x] VFS router (`vfs.rs`)
 
-- [x] SovereignFS basic CoW layout (`sigmafs.rs`)
+*   \[x] SovereignFS basic CoW layout (`sigmafs.rs`)
 
-- [x] Ext4 read-only driver (`ext4.rs`)
+*   \[x] Ext4 read-only driver (`ext4.rs`)
 
-- [x] FAT32 r/w driver (`fat32.rs`)
+*   \[x] FAT32 r/w driver (`fat32.rs`)
 
-- [ ] SovereignFS journal format spec
+*   \[ ] SovereignFS journal format spec
 
-- [ ] `sfs_mkfs` userland tool
+*   \[ ] `sfs_mkfs` userland tool
 
-- [ ] SPARK formal proofs for journal replay
+*   \[ ] SPARK formal proofs for journal replay
 
-- [ ] OverlayFS shim for container layers
+*   \[ ] OverlayFS shim for container layers
 
-- [ ] NVMe queue-depth optimisation in VFS
+*   \[ ] NVMe queue-depth optimisation in VFS
 
 ## Related Modules
 
-- [`modules/core/kernel`](../kernel/README.md) — Kernel memory management
+*   [`modules/core/kernel`](../kernel/README.md) — Kernel memory management
 
-- [`modules/security/isolation`](../../security/isolation/README.md) — FS namespace isolation
+*   [`modules/security/isolation`](../../security/isolation/README.md) — FS namespace isolation

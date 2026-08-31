@@ -3,32 +3,30 @@
 > **"True isolation is achieved at the microkernel boundary, not retrofitted in user space."**
 > This master document defines the ultimate architecture, design patterns, and phased development plans to integrate an **OCI-Compliant Container Runtime Subsystem** natively into the **SigmaOS** microkernel. It establishes namespaces, bridge networking, volume mounts, and seccomp filters using Object-Oriented `#![no_std]` Rust with zero dependencies.
 
----
+***
 
 ## 🏗️ Container Runtime Architecture
 
-```
-+---------------------------------------------------------------------------------+
-|                                 USER LAND CONTAINER                             |
-|          (OCI Spec Config: Hostname, Mounts, Seccomp, Namespaces)               |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| TIER 1: NAMESPACE & VOLUME MOUNT MANAGER                                        |
-| - Isolates Mounts, PID spaces, and Virtual Bridge network interface layers       |
-| - Verifies and maps host paths to sandboxed containers securely                 |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-| TIER 2: SECCOMP SYSCALL FILTER ENGINE                                           |
-| - Binds allowed system call matrices to the calling process thread context     |
-| - Intercepts and blocks unauthorized syscalls before microkernel dispatch       |
-+---------------------------------------------------------------------------------+
-```
+    +---------------------------------------------------------------------------------+
+    |                                 USER LAND CONTAINER                             |
+    |          (OCI Spec Config: Hostname, Mounts, Seccomp, Namespaces)               |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | TIER 1: NAMESPACE & VOLUME MOUNT MANAGER                                        |
+    | - Isolates Mounts, PID spaces, and Virtual Bridge network interface layers       |
+    | - Verifies and maps host paths to sandboxed containers securely                 |
+    +---------------------------------------------------------------------------------+
+                                            |
+                                            v
+    +---------------------------------------------------------------------------------+
+    | TIER 2: SECCOMP SYSCALL FILTER ENGINE                                           |
+    | - Binds allowed system call matrices to the calling process thread context     |
+    | - Intercepts and blocks unauthorized syscalls before microkernel dispatch       |
+    +---------------------------------------------------------------------------------+
 
----
+***
 
 ## 🏗️ Reference Implementation
 
