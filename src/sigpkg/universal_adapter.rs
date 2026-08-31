@@ -486,6 +486,46 @@ impl UniversalPackageAdapter {
             format!("SHA256:{}", name),
         ))
     }
+
+    /// Auto-detects package format by extension or text heuristics and parses & translates into native Package
+    pub fn parse_and_translate_manifest(&self, filename: &str, raw_text: &str) -> Result<Package, &'static str> {
+        let fmt = self.detect_format_by_extension(filename);
+        match fmt {
+            Some(PackageFormat::Apt) | Some(PackageFormat::Superdeb) => {
+                let deb = self.parse_apt_control(raw_text)?;
+                self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
+            }
+            Some(PackageFormat::Pacman) => {
+                let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
+                self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+            }
+            Some(PackageFormat::Yum) | Some(PackageFormat::Pisi) => {
+                let spec = self.parse_rpm_spec(raw_text)?;
+                self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
+            }
+            _ => {
+                // Heuristic inspection if extension detection wasn't definitive
+                if raw_text.contains("Package:") && raw_text.contains("Version:") {
+                    let deb = self.parse_apt_control(raw_text)?;
+                    self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
+                } else if raw_text.contains("pkgname=") && raw_text.contains("pkgver=") {
+                    let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
+                    self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+                } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
+                    let spec = self.parse_rpm_spec(raw_text)?;
+                    self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
+                } else if raw_text.contains("name:") && raw_text.contains("confinement:") {
+                    let snap = self.parse_snapcraft_yaml(raw_text)?;
+                    self.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
+                } else if raw_text.contains("\"app-id\"") {
+                    let flatpak = self.parse_flatpak_json(raw_text)?;
+                    self.translate_to_native_package(&flatpak.app_id, "1.0.0", "Flatpak Sandboxed App", &flatpak.finish_args)
+                } else {
+                    Err("Unrecognized package manifest format")
+                }
+            }
+        }
+    }
 }
 
 impl Default for UniversalPackageAdapter {
