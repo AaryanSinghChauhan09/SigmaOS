@@ -1,3 +1,8 @@
+#![allow(non_camel_case_types)]
+#![allow(unpredictable_function_pointer_comparisons)]
+#![allow(static_mut_refs)]
+#![allow(dead_code)]
+
 use alloc::vec;
 extern crate alloc;
 // Windows Driver Compatibility, Emulation, and PE Loading Framework for SigmaOS
