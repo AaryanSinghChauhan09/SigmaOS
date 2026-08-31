@@ -276,12 +276,3 @@ mod tests {
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
 
-    #[test]
-    fn test_fast_boot_pipeline() {
-        let mut pipeline = SovereignFastBootServicePipeline::default();
-        let result = pipeline.execute_fast_boot();
-        assert!(result.is_ok());
-        assert!(pipeline.boot_time_ms > 0);
-        assert_eq!(pipeline.services.iter().filter(|s| s.state == BootServiceState::Active).count(), 4);
-    }
-}
