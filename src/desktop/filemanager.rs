@@ -29,7 +29,7 @@ use core::mem;
 pub type FileID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FileType { Directory = 0, File = 1, Symlink = 2 }
 
 #[repr(C)]
@@ -76,7 +76,13 @@ impl FileEntry for SimpleFileEntry {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
     }
-    fn file_type(&self) -> FileType { unsafe { core::mem::transmute(self.file_type.load(Ordering::SeqCst)) } }
+    fn file_type(&self) -> FileType {
+        match self.file_type.load(Ordering::SeqCst) {
+            0 => FileType::Directory,
+            1 => FileType::File,
+            _ => FileType::Symlink,
+        }
+    }
     fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
     fn is_hidden(&self) -> bool { self.hidden.load(Ordering::SeqCst) == 1 }
 }
@@ -102,6 +108,17 @@ impl SimpleFileManager {
             next_id: AtomicUsize::new(1),
         }
     }
+
+    pub fn get_file(&self, id: FileID) -> Option<&dyn FileEntry> {
+        for file_option in &self.files {
+            if let Some(ref file) = *file_option {
+                if file.id() == id {
+                    return Some(file.as_ref());
+                }
+            }
+        }
+        None
+    }
 }
 
 impl FileManager for SimpleFileManager {
@@ -114,14 +131,14 @@ impl FileManager for SimpleFileManager {
         }
         Ok(entries)
     }
-    
+
     fn create_directory(&mut self, _path: &[u8], name: &[u8]) -> Result<FileID, FileManagerError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let entry = SimpleFileEntry::new(id, name, FileType::Directory, 4096);
         self.files.push(Some(Box::new(entry)));
         Ok(id)
     }
-    
+
     fn delete_file(&mut self, id: FileID) -> Result<(), FileManagerError> {
         for file_option in &mut self.files {
             if let Some(ref file) = *file_option {
@@ -132,7 +149,7 @@ impl FileManager for SimpleFileManager {
         }
         Err(FileManagerError::NotFound)
     }
-    
+
     fn copy_file(&mut self, source_id: FileID, _dest_path: &[u8]) -> Result<(), FileManagerError> {
         if self.get_file(source_id).is_some() {
             Ok(())
@@ -140,14 +157,140 @@ impl FileManager for SimpleFileManager {
             Err(FileManagerError::NotFound)
         }
     }
-    
-    fn get_file(&self, id: FileID) -> Option<&dyn FileEntry> {
-        for file_option in &self.files {
-            if let Some(ref file) *file_option {
-                if file.id() == id { return Some(file.as_ref()); }
+}
+
+/// Midnight Commander / Ranger inspired Dual-Pane Split Navigation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ActivePane {
+    Left,
+    Right,
+}
+
+pub struct DualPaneView {
+    pub left_path: [u8; 256],
+    pub right_path: [u8; 256],
+    pub active_pane: ActivePane,
+}
+
+impl DualPaneView {
+    pub fn new(left_path: &[u8], right_path: &[u8]) -> Self {
+        let mut l = [0u8; 256];
+        let mut r = [0u8; 256];
+        let llen = left_path.len().min(255);
+        let rlen = right_path.len().min(255);
+        l[..llen].copy_from_slice(&left_path[..llen]);
+        r[..rlen].copy_from_slice(&right_path[..rlen]);
+
+        DualPaneView {
+            left_path: l,
+            right_path: r,
+            active_pane: ActivePane::Left,
+        }
+    }
+
+    pub fn switch_active_pane(&mut self) {
+        self.active_pane = match self.active_pane {
+            ActivePane::Left => ActivePane::Right,
+            ActivePane::Right => ActivePane::Left,
+        };
+    }
+}
+
+/// KDE Dolphin / GNOME Nautilus File Tagging Entry
+pub struct FileTagEntry {
+    pub file_id: FileID,
+    pub tag_name: [u8; 32],
+}
+
+pub struct FileTagStore {
+    pub tags: Vec<FileTagEntry>,
+}
+
+impl FileTagStore {
+    pub fn new() -> Self {
+        FileTagStore { tags: Vec::new() }
+    }
+
+    pub fn add_tag(&mut self, file_id: FileID, tag: &[u8]) {
+        let mut tag_arr = [0u8; 32];
+        let len = tag.len().min(31);
+        tag_arr[..len].copy_from_slice(&tag[..len]);
+        self.tags.push(FileTagEntry {
+            file_id,
+            tag_name: tag_arr,
+        });
+    }
+
+    pub fn has_tag(&self, file_id: FileID, tag: &[u8]) -> bool {
+        let len = tag.len().min(31);
+        for entry in self.tags.iter() {
+            if entry.file_id == file_id {
+                let mut matches = true;
+                for i in 0..len {
+                    if entry.tag_name[i] != tag[i] {
+                        matches = false;
+                        break;
+                    }
+                }
+                if matches && (entry.tag_name[len] == 0 || len == 31) {
+                    return true;
+                }
             }
         }
-        None
+        false
+    }
+}
+
+/// macOS Finder / Pantheon Miller Columns View Column
+pub struct MillerColumn {
+    pub depth: usize,
+    pub parent_id: FileID,
+    pub selected_id: Option<FileID>,
+}
+
+pub struct MillerColumnsView {
+    pub columns: Vec<MillerColumn>,
+}
+
+impl MillerColumnsView {
+    pub fn new() -> Self {
+        MillerColumnsView {
+            columns: Vec::new(),
+        }
+    }
+
+    pub fn push_column(&mut self, parent_id: FileID) {
+        let depth = self.columns.len();
+        self.columns.push(MillerColumn {
+            depth,
+            parent_id,
+            selected_id: None,
+        });
+    }
+
+    pub fn select_item(&mut self, depth: usize, file_id: FileID) {
+        if depth < self.columns.len() {
+            self.columns[depth].selected_id = Some(file_id);
+        }
+    }
+}
+
+/// openSUSE Snapper CoW File Snapshot Comparison
+pub struct FileSnapshotDiff {
+    pub snapshot_a_id: u64,
+    pub snapshot_b_id: u64,
+    pub file_id: FileID,
+    pub is_modified: bool,
+}
+
+impl FileSnapshotDiff {
+    pub fn compare(snapshot_a_id: u64, snapshot_b_id: u64, file_id: FileID, size_a: u64, size_b: u64) -> Self {
+        FileSnapshotDiff {
+            snapshot_a_id,
+            snapshot_b_id,
+            file_id,
+            is_modified: size_a != size_b,
+        }
     }
 }
 
@@ -172,14 +315,20 @@ impl FileSearch for SimpleFileSearch {
         let mut results = Vec::new();
         for file_option in &self.manager.files {
             if let Some(ref file) = *file_option {
-                if file.name().contains(query) {
-                    results.push(file.id());
+                let name = file.name();
+                if query.len() <= name.len() {
+                    for i in 0..=(name.len() - query.len()) {
+                        if &name[i..i + query.len()] == query {
+                            results.push(file.id());
+                            break;
+                        }
+                    }
                 }
             }
         }
         results
     }
-    
+
     fn filter_by_type(&self, file_type: FileType) -> Vec<FileID> {
         let mut results = Vec::new();
         for file_option in &self.manager.files {
@@ -193,11 +342,11 @@ impl FileSearch for SimpleFileSearch {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -218,8 +367,56 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
 
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        use std::alloc::{dealloc, Layout};
+        let layout = Layout::from_size_align(1, 8).unwrap();
+        dealloc(ptr, layout);
+    }
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -252,7 +449,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -260,5 +456,40 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dual_pane_view() {
+        let mut dp = DualPaneView::new(b"/home/user", b"/var/log");
+        assert_eq!(dp.active_pane, ActivePane::Left);
+        dp.switch_active_pane();
+        assert_eq!(dp.active_pane, ActivePane::Right);
+    }
+
+    #[test]
+    fn test_file_tag_store() {
+        let mut store = FileTagStore::new();
+        store.add_tag(101, b"important");
+        assert!(store.has_tag(101, b"important"));
+        assert!(!store.has_tag(101, b"work"));
+    }
+
+    #[test]
+    fn test_miller_columns_navigation() {
+        let mut mc = MillerColumnsView::new();
+        mc.push_column(0);
+        mc.select_item(0, 42);
+        assert_eq!(mc.columns[0].selected_id, Some(42));
+    }
+
+    #[test]
+    fn test_file_snapshot_diff() {
+        let diff = FileSnapshotDiff::compare(1, 2, 10, 1024, 2048);
+        assert!(diff.is_modified);
     }
 }

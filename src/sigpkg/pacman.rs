@@ -94,10 +94,99 @@ pub struct PacmanTransactionCheckpoint {
     pub active_packages_count: usize,
 }
 
+/// Arch Linux mirror server entry with latency measurement
+#[derive(Debug, Clone)]
+pub struct PacmanMirror {
+    pub url: [u8; 64],
+    pub latency_ms: u32,
+    pub active: bool,
+}
+
+impl PacmanMirror {
+    pub fn new(url_bytes: &[u8], latency_ms: u32) -> Self {
+        let mut arr = [0u8; 64];
+        let len = url_bytes.len().min(63);
+        arr[..len].copy_from_slice(&url_bytes[..len]);
+        PacmanMirror {
+            url: arr,
+            latency_ms,
+            active: true,
+        }
+    }
+}
+
+/// Arch Linux mirrorlist selector with dynamic latency sorting
+pub struct PacmanMirrorlist {
+    pub mirrors: Vec<PacmanMirror>,
+}
+
+impl PacmanMirrorlist {
+    pub fn new() -> Self {
+        PacmanMirrorlist {
+            mirrors: Vec::new(),
+        }
+    }
+
+    pub fn add_mirror(&mut self, mirror: PacmanMirror) {
+        self.mirrors.push(mirror);
+    }
+
+    /// Sort mirrors by latency (fastest first)
+    pub fn sort_by_latency(&mut self) {
+        for i in 0..self.mirrors.len {
+            for j in (i + 1)..self.mirrors.len {
+                if self.mirrors[j].latency_ms < self.mirrors[i].latency_ms {
+                    let temp = self.mirrors[i].clone();
+                    self.mirrors[i] = self.mirrors[j].clone();
+                    self.mirrors[j] = temp;
+                }
+            }
+        }
+    }
+}
+
+/// Arch Build System (ABS) tree fallback manager
+pub struct AbsTreeEngine {
+    pub repositories: Vec<PkgBuildScript>,
+}
+
+impl AbsTreeEngine {
+    pub fn new() -> Self {
+        AbsTreeEngine {
+            repositories: Vec::new(),
+        }
+    }
+
+    pub fn register_recipe(&mut self, recipe: PkgBuildScript) {
+        self.repositories.push(recipe);
+    }
+
+    pub fn find_recipe_by_name(&self, name: &[u8]) -> Option<PkgBuildScript> {
+        let name_len = name.len().min(31);
+        for i in 0..self.repositories.len {
+            let pkg = &self.repositories[i];
+            let mut matches = true;
+            for k in 0..name_len {
+                if pkg.pkgname[k] != name[k] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches && (pkg.pkgname[name_len] == 0 || name_len == 31) {
+                return Some(*pkg);
+            }
+        }
+        None
+    }
+}
+
 /// Arch Linux-inspired rolling release Pacman package manager database
 pub struct PacmanManager {
     pub installed_packages: Vec<Option<PkgBuildScript>>,
     pub checkpoints: Vec<PacmanTransactionCheckpoint>,
+    pub parallel_downloads: usize,
+    pub mirrorlist: PacmanMirrorlist,
+    pub abs_tree: AbsTreeEngine,
 }
 
 impl PacmanManager {
@@ -105,7 +194,14 @@ impl PacmanManager {
         PacmanManager {
             installed_packages: Vec::new(),
             checkpoints: Vec::new(),
+            parallel_downloads: 5, // Arch default ParallelDownloads = 5
+            mirrorlist: PacmanMirrorlist::new(),
+            abs_tree: AbsTreeEngine::new(),
         }
+    }
+
+    pub fn set_parallel_downloads(&mut self, count: usize) {
+        self.parallel_downloads = count;
     }
 
     /// Creates an atomic checkpoint before running rolling upgrades (defeats Arch update breakage)
@@ -244,7 +340,11 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+    if !ptr.is_null() {
+        use std::alloc::{dealloc, Layout};
+        let layout = Layout::from_size_align(1, 8).unwrap();
+        dealloc(ptr, layout);
+    }
 }
 
 #[cfg(target_os = "none")]
@@ -319,5 +419,41 @@ mod tests {
         // Rollback to checkpoint 1
         assert!(pacman.rollback_checkpoint(cp_id).is_ok());
         assert_eq!(pacman.installed_packages.len, 1);
+    }
+
+    #[test]
+    fn test_pacman_mirrorlist_sorting() {
+        let mut mirrorlist = PacmanMirrorlist::new();
+        mirrorlist.add_mirror(PacmanMirror::new(b"https://slow.archlinux.org/repo", 250));
+        mirrorlist.add_mirror(PacmanMirror::new(b"https://fast.archlinux.org/repo", 20));
+        mirrorlist.add_mirror(PacmanMirror::new(b"https://medium.archlinux.org/repo", 80));
+
+        mirrorlist.sort_by_latency();
+        assert_eq!(mirrorlist.mirrors[0].latency_ms, 20);
+        assert_eq!(mirrorlist.mirrors[1].latency_ms, 80);
+        assert_eq!(mirrorlist.mirrors[2].latency_ms, 250);
+    }
+
+    #[test]
+    fn test_pacman_parallel_download_config() {
+        let mut pacman = PacmanManager::new();
+        assert_eq!(pacman.parallel_downloads, 5);
+        pacman.set_parallel_downloads(10);
+        assert_eq!(pacman.parallel_downloads, 10);
+    }
+
+    #[test]
+    fn test_abs_tree_fallback() {
+        let mut abs = AbsTreeEngine::new();
+        let mock_sha = [0u8; 32];
+        let recipe = PkgBuildScript::new(b"neofetch", b"7.1.0", 1, b"https://arch.org", &mock_sha);
+        abs.register_recipe(recipe);
+
+        let found = abs.find_recipe_by_name(b"neofetch");
+        assert!(found.is_some());
+        assert_eq!(found.unwrap().pkgrel, 1);
+
+        let missing = abs.find_recipe_by_name(b"nonexistent");
+        assert!(missing.is_none());
     }
 }
