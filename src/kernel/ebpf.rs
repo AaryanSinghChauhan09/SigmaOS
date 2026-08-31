@@ -2,16 +2,7 @@
 // Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
 // and execution over standard in-kernel maps.
 
-extern crate alloc;
-
-#[cfg(test)]
-#[path = "../klib/mod.rs"]
-mod klib;
-
-#[cfg(not(test))]
-use crate::klib;
-
-use klib::HashMap;
+use crate::klib::HashMap;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
