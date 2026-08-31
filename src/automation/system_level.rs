@@ -946,7 +946,7 @@ mod tests {
             revision: 2,
             hostname: "sigma-node".to_string(),
             services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
-            packages: vec!["coreutils".to_string(), "nginx".to_string()],
+            packages: vec!["coreutils".to_string()],
         };
         assert_eq!(engine.apply_declarative_spec(spec2).unwrap(), 2);
 
