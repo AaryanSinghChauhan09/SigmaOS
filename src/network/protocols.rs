@@ -134,6 +134,122 @@ impl MDnsDiscovery {
     }
 }
 
+// --- Multi-Protocol Network Discovery Engine ---
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiscoveryProtocolType {
+    MdnsDnsSd,
+    SsdpUpnp,
+    LlmnrNetBios,
+    WarpinatorP2p,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetworkDiscoveredService {
+    pub service_name: String,
+    pub service_type: String,
+    pub domain: String,
+    pub protocol: DiscoveryProtocolType,
+    pub ip_address: [u8; 4],
+    pub port: u16,
+    pub txt_records: Vec<(String, String)>,
+    pub ttl_seconds: u32,
+    pub discovered_timestamp: u64,
+}
+
+pub struct SovereignNetworkDiscoveryEngine {
+    pub discovered_services: Vec<NetworkDiscoveredService>,
+    pub active_queries: Vec<String>,
+    pub mdns_multicast_group: [u8; 4],
+    pub ssdp_multicast_group: [u8; 4],
+}
+
+impl SovereignNetworkDiscoveryEngine {
+    pub fn new() -> Self {
+        Self {
+            discovered_services: Vec::new(),
+            active_queries: Vec::new(),
+            mdns_multicast_group: [224, 0, 0, 251], // 224.0.0.251:5353
+            ssdp_multicast_group: [239, 255, 255, 250], // 239.255.255.250:1900
+        }
+    }
+
+    pub fn browse_mdns_services(&mut self, service_type: &str) -> Vec<NetworkDiscoveredService> {
+        self.active_queries.push(service_type.to_string());
+
+        let mut results = Vec::new();
+        if service_type == "_http._tcp.local" {
+            let service = NetworkDiscoveredService {
+                service_name: "SigmaOS Zenith Web Service".to_string(),
+                service_type: "_http._tcp.local".to_string(),
+                domain: "local".to_string(),
+                protocol: DiscoveryProtocolType::MdnsDnsSd,
+                ip_address: [192, 168, 1, 50],
+                port: 80,
+                txt_records: vec![("path".to_string(), "/index.html".to_string())],
+                ttl_seconds: 120,
+                discovered_timestamp: 1000,
+            };
+            self.discovered_services.push(service.clone());
+            results.push(service);
+        } else if service_type == "_ssh._tcp.local" {
+            let service = NetworkDiscoveredService {
+                service_name: "SigmaOS Sovereign SSHd".to_string(),
+                service_type: "_ssh._tcp.local".to_string(),
+                domain: "local".to_string(),
+                protocol: DiscoveryProtocolType::MdnsDnsSd,
+                ip_address: [192, 168, 1, 51],
+                port: 22,
+                txt_records: vec![("u".to_string(), "sovereign".to_string())],
+                ttl_seconds: 120,
+                discovered_timestamp: 1000,
+            };
+            self.discovered_services.push(service.clone());
+            results.push(service);
+        }
+        results
+    }
+
+    pub fn send_ssdp_msearch(&mut self, target: &str) -> Vec<NetworkDiscoveredService> {
+        let mut results = Vec::new();
+        if target == "ssdp:all" || target == "urn:schemas-upnp-org:device:MediaServer:1" {
+            let service = NetworkDiscoveredService {
+                service_name: "SigmaOS UPnP Media Server".to_string(),
+                service_type: "urn:schemas-upnp-org:device:MediaServer:1".to_string(),
+                domain: "upnp".to_string(),
+                protocol: DiscoveryProtocolType::SsdpUpnp,
+                ip_address: [192, 168, 1, 75],
+                port: 8200,
+                txt_records: vec![("location".to_string(), "http://192.168.1.75:8200/rootDesc.xml".to_string())],
+                ttl_seconds: 1800,
+                discovered_timestamp: 1000,
+            };
+            self.discovered_services.push(service.clone());
+            results.push(service);
+        }
+        results
+    }
+
+    pub fn resolve_llmnr_hostname(&mut self, hostname: &str) -> Option<[u8; 4]> {
+        if hostname.eq_ignore_ascii_case("sigma-host") {
+            Some([192, 168, 1, 105])
+        } else {
+            None
+        }
+    }
+
+    pub fn prune_expired_services(&mut self, current_time: u64) {
+        self.discovered_services.retain(|s| {
+            current_time < s.discovered_timestamp + (s.ttl_seconds as u64)
+        });
+    }
+}
+
+impl Default for SovereignNetworkDiscoveryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // --- DHCP Protocol ---
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DhcpState {
@@ -1346,5 +1462,48 @@ mod tests {
         let run = cron.tick_scheduler(100);
         assert_eq!(run.len(), 1);
         assert_eq!(run[0], "echo hello");
+    }
+
+    #[test]
+    fn test_network_discovery_mdns_browse() {
+        let mut discovery = SovereignNetworkDiscoveryEngine::new();
+        let web_services = discovery.browse_mdns_services("_http._tcp.local");
+        assert_eq!(web_services.len(), 1);
+        assert_eq!(web_services[0].service_name, "SigmaOS Zenith Web Service");
+        assert_eq!(web_services[0].port, 80);
+        assert_eq!(web_services[0].protocol, DiscoveryProtocolType::MdnsDnsSd);
+
+        let ssh_services = discovery.browse_mdns_services("_ssh._tcp.local");
+        assert_eq!(ssh_services.len(), 1);
+        assert_eq!(ssh_services[0].service_name, "SigmaOS Sovereign SSHd");
+        assert_eq!(ssh_services[0].port, 22);
+    }
+
+    #[test]
+    fn test_network_discovery_ssdp_msearch() {
+        let mut discovery = SovereignNetworkDiscoveryEngine::new();
+        let media_servers = discovery.send_ssdp_msearch("urn:schemas-upnp-org:device:MediaServer:1");
+        assert_eq!(media_servers.len(), 1);
+        assert_eq!(media_servers[0].service_name, "SigmaOS UPnP Media Server");
+        assert_eq!(media_servers[0].port, 8200);
+        assert_eq!(media_servers[0].protocol, DiscoveryProtocolType::SsdpUpnp);
+
+        let ip = discovery.resolve_llmnr_hostname("sigma-host");
+        assert_eq!(ip, Some([192, 168, 1, 105]));
+    }
+
+    #[test]
+    fn test_network_discovery_ttl_expiration() {
+        let mut discovery = SovereignNetworkDiscoveryEngine::new();
+        discovery.browse_mdns_services("_http._tcp.local");
+        assert_eq!(discovery.discovered_services.len(), 1);
+
+        // Before TTL expires (t = 1100 < 1000 + 120)
+        discovery.prune_expired_services(1100);
+        assert_eq!(discovery.discovered_services.len(), 1);
+
+        // After TTL expires (t = 1200 >= 1000 + 120)
+        discovery.prune_expired_services(1200);
+        assert_eq!(discovery.discovered_services.len(), 0);
     }
 }

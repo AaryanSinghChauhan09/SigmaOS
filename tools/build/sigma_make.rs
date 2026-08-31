@@ -2,9 +2,9 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code, non_snake_case, static_mut_refs)]
 
-/// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
+// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
+// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+// All types hand-defined. OOP via struct + impl + trait patterns.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -176,6 +176,7 @@ impl SigmaMakeEngine {
 
 /// # Safety
 /// Copies elements from `src` slice into `dest` slice up to the minimum length of both.
+/// Caller must ensure `dest` slice has sufficient allocated capacity.
 pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
     let len = src.len().min(dest.len());
     dest[..len].copy_from_slice(&src[..len]);
@@ -185,6 +186,7 @@ static mut GLOBAL_MAKE: SigmaMakeEngine = SigmaMakeEngine::new();
 
 /// # Safety
 /// Legacy C ABI compatibility helper.
+/// Empty C-ABI string copy symbol helper.
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {}
 
@@ -195,6 +197,10 @@ pub unsafe extern "C" fn sigma_make_register_c_target() {
     let global = &raw mut GLOBAL_MAKE;
     if let Some(make) = unsafe { global.as_mut() } {
         let _ = make.register_target(b"c_target", b"gcc c_target.c -o c_target");
+/// Caller must ensure single-threaded execution when modifying global make engine static.
+    unsafe {
+        let _ = (&mut *core::ptr::addr_of_mut!(GLOBAL_MAKE))
+            .register_target(b"c_target", b"gcc c_target.c -o c_target");
     }
 }
 
