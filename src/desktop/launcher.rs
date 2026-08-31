@@ -668,6 +668,9 @@ mod tests {
         assert_eq!(app.exec_len, 17);
         assert_eq!(app.icon_len, 18);
 
+    }
+
+    #[test]
     fn test_simple_application_launcher() {
         let mut launcher = SimpleApplicationLauncher::new();
         let app1 = SimpleApplication::new(10, b"Browser", b"/usr/bin/browser", b"web-browser");
