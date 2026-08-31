@@ -274,3 +274,4 @@ mod tests {
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
 }
+
