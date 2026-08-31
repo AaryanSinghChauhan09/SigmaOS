@@ -47,8 +47,11 @@ pub trait Application {
 pub struct SimpleApplication {
     pub id: AppID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub executable: [u8; 256],
+    pub exec_len: u16,
     pub icon: [u8; 256],
+    pub icon_len: u16,
 }
 
 impl SimpleApplication {
@@ -57,8 +60,8 @@ impl SimpleApplication {
         let mut exec_array = [0u8; 256];
         let mut icon_array = [0u8; 256];
         let name_len = name.len().min(63);
-        let exec_len = executable.len().min(255);
-        let icon_len = icon.len().min(255);
+        let exec_len = executable.len().min(256);
+        let icon_len = icon.len().min(256);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
             core::ptr::copy_nonoverlapping(executable.as_ptr(), exec_array.as_mut_ptr(), exec_len);
@@ -67,8 +70,11 @@ impl SimpleApplication {
         SimpleApplication {
             id,
             name: name_array,
+            name_len: name_len as u8,
             executable: exec_array,
+            exec_len: exec_len as u16,
             icon: icon_array,
+            icon_len: icon_len as u16,
         }
     }
 }
@@ -76,16 +82,16 @@ impl SimpleApplication {
 impl Application for SimpleApplication {
     fn id(&self) -> AppID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt performance optimization: explicit stored byte length replaces O(N) zero-byte linear scan
+        &self.name[..self.name_len as usize]
     }
     fn executable(&self) -> &[u8] {
-        let len = self.executable.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.executable[..len]
+        // Bolt performance optimization: explicit stored byte length replaces O(N) zero-byte linear scan
+        &self.executable[..self.exec_len as usize]
     }
     fn icon(&self) -> &[u8] {
-        let len = self.icon.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.icon[..len]
+        // Bolt performance optimization: explicit stored byte length replaces O(N) zero-byte linear scan
+        &self.icon[..self.icon_len as usize]
     }
 }
 
@@ -456,6 +462,19 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use alloc::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 
@@ -498,5 +517,43 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_application_cached_lengths() {
+        let app = SimpleApplication::new(1, b"Terminal", b"/usr/bin/terminal", b"utilities-terminal");
+        assert_eq!(app.id(), 1);
+        assert_eq!(app.name(), b"Terminal");
+        assert_eq!(app.executable(), b"/usr/bin/terminal");
+        assert_eq!(app.icon(), b"utilities-terminal");
+        assert_eq!(app.name_len, 8);
+        assert_eq!(app.exec_len, 17);
+        assert_eq!(app.icon_len, 18);
+    }
+
+    #[test]
+    fn test_simple_application_launcher() {
+        let mut launcher = SimpleApplicationLauncher::new();
+        let app1 = SimpleApplication::new(10, b"Browser", b"/usr/bin/browser", b"web-browser");
+        let app2 = SimpleApplication::new(20, b"Calculator", b"/usr/bin/calc", b"calc-icon");
+
+        assert_eq!(launcher.register_app(Box::new(app1)), Ok(10));
+        assert_eq!(launcher.register_app(Box::new(app2)), Ok(20));
+
+        let retrieved = launcher.get_app(10).unwrap();
+        assert_eq!(retrieved.name(), b"Browser");
+        assert_eq!(retrieved.executable(), b"/usr/bin/browser");
+
+        let search_results = launcher.search_apps(b"Calc");
+        assert_eq!(search_results.len(), 1);
+        assert_eq!(search_results[0], 20);
+
+        assert_eq!(launcher.unregister_app(10), Ok(()));
+        assert!(launcher.get_app(10).is_none());
     }
 }
