@@ -468,41 +468,54 @@ impl SystemdUnitFileParser {
                     }
                     ("Service", "NoNewPrivileges") => {
                         parsed.hardening_profile.no_new_privileges = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "ProtectSystem") => {
                         parsed.hardening_profile.protect_system = match val.to_lowercase().as_str() {
                             "strict" => ProtectSystemLevel::Strict,
                             "full" | "yes" | "true" => ProtectSystemLevel::Full,
                             _ => ProtectSystemLevel::Off,
                         };
+                        parsed.protect_system = val.to_string();
+                    }
                     ("Service", "ProtectHome") => {
                         parsed.hardening_profile.protect_home = match val.to_lowercase().as_str() {
                             "read-only" => ProtectHomeLevel::ReadOnly,
                             "tmpfs" => ProtectHomeLevel::Tmpfs,
                             "yes" | "true" => ProtectHomeLevel::Bool,
                             _ => ProtectHomeLevel::Off,
+                        };
+                        parsed.protect_home = val.to_string();
+                    }
                     ("Service", "PrivateTmp") => {
                         parsed.hardening_profile.private_tmp = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "PrivateDevices") => {
                         parsed.hardening_profile.private_devices = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "ProtectKernelTunables") => {
                         parsed.hardening_profile.protect_kernel_tunables = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "ProtectKernelModules") => {
                         parsed.hardening_profile.protect_kernel_modules = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "MemoryDenyWriteExecute") => {
                         parsed.hardening_profile.memory_deny_write_execute = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
+                    }
                     ("Service", "Pledge") => {
                         parsed.hardening_profile.pledge_promises = val.to_string();
+                    }
                     ("Service", "Unveil") => {
                         if let Some(space_idx) = val.find(' ') {
                             let p = val[..space_idx].trim().to_string();
                             let perm = val[space_idx + 1..].trim().to_string();
                             parsed.hardening_profile.unveil_paths.push((p, perm));
+                        }
+                    }
                     ("Socket", "ListenStream") => parsed.listen_stream = val.to_string(),
                     ("Timer", "OnCalendar") => parsed.on_calendar = val.to_string(),
                     ("Service", "OOMScoreAdjust") => {
                         parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
-                    ("Service", "ProtectSystem") => parsed.protect_system = val.to_string(),
-                    ("Service", "ProtectHome") => parsed.protect_home = val.to_string(),
+                    }
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -1981,10 +1994,13 @@ mod tests {
         assert_eq!(chain[0].unit_name, "graphical.target");
         assert_eq!(chain[1].unit_name, "display-manager.service");
         assert_eq!(chain[2].unit_name, "network.target");
+    }
 
+    #[test]
     fn test_requisite_and_on_failure_cascade() {
+        let mut engine = SystemdEngine::new();
 
-        let mut backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
+        let backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
         engine.register_unit(backup_service);
 
         let mut dep = SystemdUnit::new(1, b"db.service", UnitType::Service);
@@ -2000,7 +2016,9 @@ mod tests {
         assert!(res.is_err());
         assert_eq!(engine.systemctl_status(2), Some(UnitState::Failed));
         assert_eq!(engine.systemctl_status(99), Some(UnitState::Active));
+    }
 
+    #[test]
     fn test_systemd_unit_file_parser_extended() {
         let unit_content = r#"
 [Unit]
@@ -2041,7 +2059,11 @@ WantedBy=multi-user.target
         assert_eq!(parsed.hardening_profile.pledge_promises, "stdio rpath wpath inet");
         assert_eq!(parsed.hardening_profile.unveil_paths.len(), 1);
         assert_eq!(parsed.environment, vec![("PORT".to_string(), "8080".to_string())]);
+    }
+
+    #[test]
     fn test_systemd_socket_activation_manager() {
+        let mut engine = SystemdEngine::new();
         let srv = SystemdUnit::new(10, b"httpd.service", UnitType::Service);
         engine.register_unit(srv);
 
@@ -2060,13 +2082,17 @@ WantedBy=multi-user.target
         assert_eq!(fds, vec![5]);
 
         let event = SocketActivationEvent {
+            socket_id: 1,
             incoming_bytes: 128,
             client_addr: "192.168.1.5:54321".to_string(),
+        };
 
         let fd = mgr.handle_incoming_connection(&mut engine, &event).unwrap();
         assert_eq!(fd, 5);
         assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
+    }
 
+    #[test]
     fn test_declarative_unit_generator() {
         let mut spec = DeclarativeUnitSpec::new("my-service", "/usr/bin/my-service --daemon");
         spec.description = "My Custom Declarative Service".to_string();
@@ -2080,8 +2106,11 @@ WantedBy=multi-user.target
         let parsed = SystemdUnitFileParser::parse_unit_file(&unit_file);
         assert_eq!(parsed.unit_description, "My Custom Declarative Service");
         assert_eq!(parsed.exec_start, "/usr/bin/my-service --daemon");
+    }
 
+    #[test]
     fn test_bsd_rc_parallel_stage_solver() {
+        let mut engine = SystemdEngine::new();
 
         let mut u1 = SystemdUnit::new(1, b"mount.service", UnitType::Service);
         u1.before.push(2);
@@ -2104,8 +2133,11 @@ WantedBy=multi-user.target
         assert_eq!(stages[0], vec![1]);
         assert_eq!(stages[1], vec![2, 3]);
         assert_eq!(stages[2], vec![4]);
+    }
 
+    #[test]
     fn test_extended_unit_dependencies() {
+        let mut engine = SystemdEngine::new();
 
         let req_unit = SystemdUnit::new(1, b"dep.service", UnitType::Service);
         let mut main_unit = SystemdUnit::new(2, b"main.service", UnitType::Service);
