@@ -5549,6 +5549,372 @@ mod tests {
         assert!(ubuntu.is_some());
         assert_eq!(ubuntu.unwrap().package_management_model, "deb/apt");
     }
+
+    #[test]
+    fn test_guix_and_shepherd_service_manager() {
+        let mut guix = GuixDerivationEngine::new("/gnu/store");
+        let glibc_out = guix.register_derivation("glibc", "gcc-builder", &[]);
+        let _hello_out = guix.register_derivation("hello", "gcc-builder", &[&glibc_out]);
+
+        // Build glibc first
+        assert!(guix.build_derivation("glibc").is_ok());
+
+        // Now build hello
+        let hello_built = guix.build_derivation("hello");
+        assert!(hello_built.is_ok());
+        assert!(hello_built.unwrap().contains("/gnu/store/"));
+
+        let mut shepherd = ShepherdServiceManager::new();
+        shepherd.register_service("networking", &["net"], &[], true);
+        shepherd.register_service("sshd", &["ssh"], &["net"], true);
+
+        assert!(!shepherd.is_provisioned("net"));
+        assert!(shepherd.start_service("sshd").is_ok());
+        assert!(shepherd.is_provisioned("net"));
+        assert!(shepherd.is_provisioned("ssh"));
+    }
+
+    #[test]
+    fn test_apk_xbps_hooks_and_rollback() {
+        let mut hook_engine = ApkXbpsHookEngine::new();
+        hook_engine.register_hook("font-cache", "font", "fc-cache -fv", "fc-cache -s");
+
+        assert_eq!(hook_engine.run_pre_hooks("ttf-dejavu-font"), 1);
+        assert_eq!(hook_engine.run_post_hooks("ttf-dejavu-font"), 1);
+
+        assert_eq!(hook_engine.executed_actions.len(), 2);
+        assert_eq!(hook_engine.rollback_transaction(), 2);
+        assert!(hook_engine.executed_actions.is_empty());
+    }
+
+    #[test]
+    fn test_openbsd_retguard_and_map_stack() {
+        let mut retguard = OpenBsdRetguardEngine::new();
+        retguard.register_map_stack_region(0x7FFF0000, 0x10000); // 64KB stack region
+
+        let secret_key = 0x123456789ABCDEF0;
+        let canary = retguard.enter_function("kernel_sys_read", secret_key, 0x7FFF1000);
+
+        // Valid exit
+        assert!(retguard.verify_exit_function("kernel_sys_read", canary, 0x7FFF1000).is_ok());
+
+        // Bad stack pointer outside MAP_STACK
+        let canary2 = retguard.enter_function("kernel_sys_write", secret_key, 0x7FFF2000);
+        assert!(retguard.verify_exit_function("kernel_sys_write", canary2, 0x10000000).is_err());
+        assert_eq!(retguard.violations.len(), 1);
+        assert!(retguard.violations[0].contains("MAP_STACK Violation"));
+    }
+}
+
+// ==========================================
+// 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GuixDerivation {
+    pub name: String,
+    pub builder: String,
+    pub inputs: Vec<String>,
+    pub outputs: Vec<String>,
+    pub build_hash: String,
+}
+
+pub struct GuixDerivationEngine {
+    pub store_prefix: String,
+    pub derivations: Vec<GuixDerivation>,
+    pub built_outputs: Vec<String>,
+}
+
+impl GuixDerivationEngine {
+    pub fn new(store_prefix: &str) -> Self {
+        Self {
+            store_prefix: store_prefix.to_string(),
+            derivations: Vec::new(),
+            built_outputs: Vec::new(),
+        }
+    }
+
+    pub fn compute_derivation_hash(name: &str, builder: &str, inputs: &[&str]) -> String {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in name.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for &b in builder.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for input in inputs {
+            for &b in input.as_bytes() {
+                hash ^= b as u64;
+                hash = hash.wrapping_mul(0x100000001b3);
+            }
+        }
+        format!("{:016x}", hash)
+    }
+
+    pub fn register_derivation(&mut self, name: &str, builder: &str, inputs: &[&str]) -> String {
+        let build_hash = Self::compute_derivation_hash(name, builder, inputs);
+        let output_path = format!("{}/{}-{}", self.store_prefix, build_hash, name);
+
+        let drv = GuixDerivation {
+            name: name.to_string(),
+            builder: builder.to_string(),
+            inputs: inputs.iter().map(|s| s.to_string()).collect(),
+            outputs: vec![output_path.clone()],
+            build_hash,
+        };
+
+        self.derivations.push(drv);
+        output_path
+    }
+
+    pub fn build_derivation(&mut self, name: &str) -> Result<String, &'static str> {
+        let drv = self.derivations.iter().find(|d| d.name == name)
+            .ok_or("Derivation not found")?
+            .clone();
+
+        for input in &drv.inputs {
+            if !self.built_outputs.contains(input) {
+                return Err("Missing required input derivation build dependency");
+            }
+        }
+
+        let output_path = &drv.outputs[0];
+        if !self.built_outputs.contains(output_path) {
+            self.built_outputs.push(output_path.clone());
+        }
+
+        Ok(output_path.clone())
+    }
+}
+
+impl Default for GuixDerivationEngine {
+    fn default() -> Self {
+        Self::new("/gnu/store")
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShepherdService {
+    pub name: String,
+    pub provision: Vec<String>,
+    pub requirement: Vec<String>,
+    pub running: bool,
+    pub respawn: bool,
+}
+
+pub struct ShepherdServiceManager {
+    pub services: Vec<ShepherdService>,
+}
+
+impl ShepherdServiceManager {
+    pub fn new() -> Self {
+        Self { services: Vec::new() }
+    }
+
+    pub fn register_service(&mut self, name: &str, provision: &[&str], requirement: &[&str], respawn: bool) {
+        self.services.push(ShepherdService {
+            name: name.to_string(),
+            provision: provision.iter().map(|s| s.to_string()).collect(),
+            requirement: requirement.iter().map(|s| s.to_string()).collect(),
+            running: false,
+            respawn,
+        });
+    }
+
+    pub fn is_provisioned(&self, symbol: &str) -> bool {
+        self.services.iter().any(|s| s.running && s.provision.iter().any(|p| p == symbol))
+    }
+
+    pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc_idx = self.services.iter().position(|s| s.name == name)
+            .ok_or("Service not found in Shepherd graph")?;
+
+        let reqs = self.services[svc_idx].requirement.clone();
+
+        for req in reqs {
+            if !self.is_provisioned(&req) {
+                let provider_name = self.services.iter()
+                    .find(|s| s.provision.contains(&req))
+                    .map(|s| s.name.clone());
+
+                if let Some(pname) = provider_name {
+                    self.start_service(&pname)?;
+                } else {
+                    return Err("Unsatisfied Shepherd requirement dependency");
+                }
+            }
+        }
+
+        self.services[svc_idx].running = true;
+        Ok(())
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc = self.services.iter_mut().find(|s| s.name == name)
+            .ok_or("Service not found")?;
+        svc.running = false;
+        Ok(())
+    }
+}
+
+impl Default for ShepherdServiceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 29. VOID XBPS / ALPINE APK TRANSACTION HOOK ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackageHook {
+    pub name: String,
+    pub trigger_pattern: String,
+    pub pre_action: String,
+    pub post_action: String,
+}
+
+pub struct ApkXbpsHookEngine {
+    pub registered_hooks: Vec<PackageHook>,
+    pub executed_actions: Vec<String>,
+    pub transaction_log: Vec<String>,
+}
+
+impl ApkXbpsHookEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_hooks: Vec::new(),
+            executed_actions: Vec::new(),
+            transaction_log: Vec::new(),
+        }
+    }
+
+    pub fn register_hook(&mut self, name: &str, pattern: &str, pre_action: &str, post_action: &str) {
+        self.registered_hooks.push(PackageHook {
+            name: name.to_string(),
+            trigger_pattern: pattern.to_string(),
+            pre_action: pre_action.to_string(),
+            post_action: post_action.to_string(),
+        });
+    }
+
+    pub fn run_pre_hooks(&mut self, pkg_name: &str) -> usize {
+        let mut count = 0;
+        let hooks = self.registered_hooks.clone();
+        for hook in hooks {
+            if pkg_name.contains(&hook.trigger_pattern) || hook.trigger_pattern == "*" {
+                self.executed_actions.push(format!("PRE:{}", hook.pre_action));
+                self.transaction_log.push(format!("Executed pre-hook {} for {}", hook.name, pkg_name));
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn run_post_hooks(&mut self, pkg_name: &str) -> usize {
+        let mut count = 0;
+        let hooks = self.registered_hooks.clone();
+        for hook in hooks {
+            if pkg_name.contains(&hook.trigger_pattern) || hook.trigger_pattern == "*" {
+                self.executed_actions.push(format!("POST:{}", hook.post_action));
+                self.transaction_log.push(format!("Executed post-hook {} for {}", hook.name, pkg_name));
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn rollback_transaction(&mut self) -> usize {
+        let count = self.executed_actions.len();
+        self.executed_actions.clear();
+        self.transaction_log.push("Rolled back transaction actions".to_string());
+        count
+    }
+}
+
+impl Default for ApkXbpsHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 30. OPENBSD RETGUARD & MAP_STACK MEMORY GUARD ENGINE
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct RetguardFrame {
+    pub function_symbol: String,
+    pub expected_canary: u64,
+    pub stack_base: u64,
+    pub stack_size: usize,
+}
+
+pub struct OpenBsdRetguardEngine {
+    pub frames: Vec<RetguardFrame>,
+    pub map_stack_ranges: Vec<(u64, u64)>,
+    pub violations: Vec<String>,
+}
+
+impl OpenBsdRetguardEngine {
+    pub fn new() -> Self {
+        Self {
+            frames: Vec::new(),
+            map_stack_ranges: Vec::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn generate_canary(function_symbol: &str, secret_key: u64) -> u64 {
+        let mut canary = secret_key;
+        for &b in function_symbol.as_bytes() {
+            canary = canary.wrapping_mul(6364136223846793005).wrapping_add(b as u64);
+        }
+        canary ^ 0xDEADBEEFCAFEBABE
+    }
+
+    pub fn register_map_stack_region(&mut self, start_addr: u64, size: usize) {
+        self.map_stack_ranges.push((start_addr, start_addr + size as u64));
+    }
+
+    pub fn enter_function(&mut self, symbol: &str, secret_key: u64, stack_ptr: u64) -> u64 {
+        let canary = Self::generate_canary(symbol, secret_key);
+        self.frames.push(RetguardFrame {
+            function_symbol: symbol.to_string(),
+            expected_canary: canary,
+            stack_base: stack_ptr,
+            stack_size: 4096,
+        });
+        canary
+    }
+
+    pub fn verify_exit_function(&mut self, symbol: &str, canary_present: u64, stack_ptr: u64) -> Result<(), &'static str> {
+        let is_valid_stack = self.map_stack_ranges.iter().any(|(start, end)| stack_ptr >= *start && stack_ptr < *end);
+        if !is_valid_stack {
+            self.violations.push(format!("MAP_STACK Violation: Stack pointer {:#X} outside valid MAP_STACK region", stack_ptr));
+            return Err("MAP_STACK boundary violation");
+        }
+
+        if let Some(pos) = self.frames.iter().position(|f| f.function_symbol == symbol) {
+            let frame = self.frames.remove(pos);
+            if frame.expected_canary != canary_present {
+                self.violations.push(format!("RETGUARD Violation: Stack canary mismatch in function {}", symbol));
+                return Err("RETGUARD canary mismatch");
+            }
+            Ok(())
+        } else {
+            Err("Stack frame not found in RETGUARD table")
+        }
+    }
+}
+
+impl Default for OpenBsdRetguardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ==========================================

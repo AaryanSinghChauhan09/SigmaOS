@@ -9,15 +9,20 @@ pub use mate_betsy::{
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
 pub mod screensaver;
-
 pub use screensaver::{
     DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
 pub mod mate_packages;
-
 pub use mate_packages::{
     AppletKind, BetsyBundleHeader, BetsyPackageBundleExporter, MateAptUrlProtocolHandler,
     MateDesktopApplet, MatePanelLayout, MatePkgPpaRepositoryManager, MateSoftwareStoreManager,
     MateStoreAppEntry, PanelPosition, PpaRepositorySource,
+pub mod desktop_portal;
+pub use desktop_portal::{
+    AppChooserChoice, AppPermissionRule, CaptureSourceType, ContractorAppChooserPortal,
+    FileDialogMode, FileDialogPortal, FileDialogRequest, FileDialogResponse, FileFilter,
+    InhibitFlag, InhibitPortal, Inhibitor, OpenUriPortal, PermissionCategory, PermissionState,
+    PermissionStorePortal, ScreenCastScreenshotPortal, ScreenCastSession, SecretItem,
+    SecretKeyringPortal, UriHandler, XdgDesktopPortalEngine,
 };
 
 pub use pantheon::{
