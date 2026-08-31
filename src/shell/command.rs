@@ -25,14 +25,16 @@ pub trait ShellCommand {
 pub struct SimpleShellCommand {
     pub name: [u8; 32],
     pub description: [u8; 128],
+    pub name_len: u8,
+    pub description_len: u8,
 }
 
 impl SimpleShellCommand {
     pub fn new(name: &[u8], description: &[u8]) -> Self {
         let mut name_array = [0u8; 32];
         let mut desc_array = [0u8; 128];
-        let name_len = name.len().min(31);
-        let desc_len = description.len().min(127);
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len()).min(31);
+        let desc_len = description.iter().position(|&b| b == 0).unwrap_or(description.len()).min(127);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
             core::ptr::copy_nonoverlapping(description.as_ptr(), desc_array.as_mut_ptr(), desc_len);
@@ -40,13 +42,18 @@ impl SimpleShellCommand {
         SimpleShellCommand {
             name: name_array,
             description: desc_array,
+            name_len: name_len as u8,
+            description_len: desc_len as u8,
         }
     }
 }
 
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
+        // Bolt ⚡ Optimization: Cache explicit string lengths during construction to eliminate
+        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every command name access,
+        // reducing slice lookup to bounds-checked O(1) constant time.
+        let len = (self.name_len as usize).min(32);
         &self.name[..len]
     }
 
@@ -65,7 +72,10 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn help(&self) -> &[u8] {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(128);
+        // Bolt ⚡ Optimization: Cache explicit string lengths during construction to eliminate
+        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every command help access,
+        // reducing slice lookup to bounds-checked O(1) constant time.
+        let len = (self.description_len as usize).min(128);
         &self.description[..len]
     }
 }
