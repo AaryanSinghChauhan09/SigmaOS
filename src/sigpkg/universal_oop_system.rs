@@ -38,8 +38,8 @@ use crate::klib::HashMap;
 use alloc::collections::BTreeMap as HashMap;
 use crate::klib::HashMap;
 
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::collections::BTreeMap as HashMap;
 
 use alloc::sync::Arc;
 
