@@ -251,7 +251,7 @@ impl SigmaString {
         P: Pattern,
     {
         Split {
-            string: self,
+            haystack: self.as_str(),
             pat,
         }
     }
@@ -389,7 +389,7 @@ impl Pattern for &str {
 
 /// Split iterator for SigmaString
 pub struct Split<'a, P> {
-    string: &'a SigmaString,
+    haystack: &'a str,
     pat: P,
 }
 
@@ -400,17 +400,19 @@ where
     type Item = SigmaString;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let haystack = self.string.as_str();
-        let start = 0;
+        if self.haystack.is_empty() {
+            return None;
+        }
         
-        if let Some(idx) = self.pat.find_in(self.string) {
+        let temp_string = SigmaString::from_str(self.haystack);
+        if let Some(idx) = self.pat.find_in(&temp_string) {
             let end = idx + self.pat.pattern_len();
-            let result = SigmaString::from_str(&haystack[start..idx]);
-            self.string = &SigmaString::from_str(&haystack[end..]);
+            let result = SigmaString::from_str(&self.haystack[..idx]);
+            self.haystack = &self.haystack[end..];
             Some(result)
         } else {
-            let result = SigmaString::from_str(haystack);
-            self.string = &SigmaString::new();
+            let result = SigmaString::from_str(self.haystack);
+            self.haystack = "";
             Some(result)
         }
     }

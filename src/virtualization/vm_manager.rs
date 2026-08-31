@@ -4,7 +4,10 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::HashMap;
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 use alloc::format;
 
 #[cfg(test)]
@@ -200,11 +203,6 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-=======
-    Mmio,
-    Hypercall,
-    Interrupt,
->>>>>>> origin/fix/kernel-algorithm-tests-16856064292844607661
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
     Mmio,
@@ -865,7 +863,6 @@ impl AmdViIommuManager {
 // KVM & QEMU INSPIRED ADVANCED VIRTUALIZATION ENGINE
 // ==============================================================================
 
-<<<<<<< HEAD
 /// KVM vCPU register state
 #[derive(Debug, Clone, Default)]
 pub struct KvmVcpuRegisters {

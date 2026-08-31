@@ -40,7 +40,7 @@ mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 
-<<<<<<< HEAD
+
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
 
@@ -49,6 +49,12 @@ mod unimplemented_features;
 
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
+
+use bsd::*;
+use kvm_vcpu::*;
+use unveil::*;
+use gap_closure::*;
+use unimplemented_features::*;
 
 
 #[test]
