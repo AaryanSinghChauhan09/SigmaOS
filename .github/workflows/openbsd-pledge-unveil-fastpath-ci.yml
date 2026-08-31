@@ -1,5 +1,8 @@
 name: OpenBSD Pledge & Unveil Security Sandboxing CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]

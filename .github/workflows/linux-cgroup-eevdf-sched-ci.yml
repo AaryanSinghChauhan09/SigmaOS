@@ -1,5 +1,8 @@
 name: Linux Cgroups v2 & EEVDF Scheduler CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]
