@@ -3,6 +3,9 @@
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 #[cfg(test)]
 use crate::klib::HashMap;
