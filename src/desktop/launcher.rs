@@ -49,9 +49,9 @@ pub struct SimpleApplication {
     pub name: [u8; 64],
     pub name_len: u8,
     pub executable: [u8; 256],
-    pub exec_len: u8,
+    pub exec_len: u16,
     pub icon: [u8; 256],
-    pub icon_len: u8,
+    pub icon_len: u16,
 }
 
 impl SimpleApplication {
@@ -60,8 +60,8 @@ impl SimpleApplication {
         let mut exec_array = [0u8; 256];
         let mut icon_array = [0u8; 256];
         let name_len = name.len().min(63);
-        let exec_len = executable.len().min(255);
-        let icon_len = icon.len().min(255);
+        let exec_len = executable.len().min(256);
+        let icon_len = icon.len().min(256);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
             core::ptr::copy_nonoverlapping(executable.as_ptr(), exec_array.as_mut_ptr(), exec_len);
@@ -72,9 +72,9 @@ impl SimpleApplication {
             name: name_array,
             name_len: name_len as u8,
             executable: exec_array,
-            exec_len: exec_len as u8,
+            exec_len: exec_len as u16,
             icon: icon_array,
-            icon_len: icon_len as u8,
+            icon_len: icon_len as u16,
         }
     }
 }
