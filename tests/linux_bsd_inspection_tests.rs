@@ -88,6 +88,8 @@ mod linux_bsd_inspirations;
 mod community_foundation;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
@@ -744,6 +746,39 @@ fn test_systemd_unit_dependency_engine_inspection() {
     assert!(!engine.detect_circular_dependencies());
     let seq = engine.compute_startup_sequence().unwrap();
     assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
+
+    // Systemd Init Innovations Security & Diagnostics Inspection Test
+    use systemd_init::{
+        SystemdEngine, SystemdUnit as SovSystemdUnit, UnitType as SovUnitType,
+        SystemdSecurityAuditor, SystemdUnitHardeningProfile, ProtectSystemLevel, ProtectHomeLevel,
+    };
+
+    let mut sys_engine = SystemdEngine::new();
+    let mut srv = SovSystemdUnit::new(1, b"secure.service", SovUnitType::Service);
+    srv.duration_ms = 350;
+    srv.hardening_profile = SystemdUnitHardeningProfile {
+        no_new_privileges: true,
+        protect_system: ProtectSystemLevel::Strict,
+        protect_home: ProtectHomeLevel::ReadOnly,
+        private_tmp: true,
+        private_devices: true,
+        protect_kernel_tunables: true,
+        protect_kernel_modules: true,
+        restrict_namespaces: true,
+        memory_deny_write_execute: true,
+        lock_personality: true,
+        restrict_realtime: true,
+        capability_bounding_set: vec!["CAP_NET_BIND_SERVICE".to_string()],
+        system_call_filter: vec!["@default".to_string()],
+        unveil_paths: vec![("/etc/ssl".to_string(), "r".to_string())],
+        pledge_promises: "stdio rpath inet".to_string(),
+    };
+    sys_engine.register_unit(srv);
+
+    let sec_reports = sys_engine.systemd_analyze_security();
+    assert_eq!(sec_reports.len(), 1);
+    assert_eq!(sec_reports[0].rating, "OK");
+    assert!(sec_reports[0].exposure_score <= 2.5);
 }
 
 #[test]

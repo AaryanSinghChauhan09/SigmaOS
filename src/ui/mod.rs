@@ -21,8 +21,10 @@ pub use control_center::{
 };
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
-    LayoutCapability, LayoutStats, SimpleUILayout, SimpleWidget, UIError, UILayout, Widget,
-    WidgetCapability, WidgetID, WidgetInfo, WidgetState, WidgetType,
+    GtkAccessibilityRole, GtkBox, GtkDisplayMetrics, GtkHeaderBar, GtkOrientation,
+    GtkSignalDispatcher, GtkSignalEvent, GtkStyleContext, LayoutCapability, LayoutStats,
+    SimpleUILayout, SimpleWidget, UIError, UILayout, Widget, WidgetCapability, WidgetID,
+    WidgetInfo, WidgetState, WidgetType,
 };
 pub use control_center::{
     UnifiedControlCenter, SwitchboardPlug, ControlCenterCategory, SystemSettingItem,

@@ -1291,11 +1291,12 @@ impl SystemdEngine {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }
-                self.log_journal(
+                self.log_journal_with_priority(
                     id,
                     b"Requisite dependency is not active",
                     UnitState::Inactive,
                     UnitState::Failed,
+                    JournalPriority::Error,
                 );
                 return Err("Requisite dependency is not active");
             }
@@ -2280,6 +2281,7 @@ mod tests {
         let mut engine = SystemdEngine::new();
 
         let backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
+        let mut backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
         engine.register_unit(backup_service);
 
         let mut dep = SystemdUnit::new(1, b"db.service", UnitType::Service);
