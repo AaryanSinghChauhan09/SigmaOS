@@ -112,6 +112,9 @@ pub struct ParsedSystemdUnitFile {
     pub wanted_by: String,
     pub watchdog_sec: u32,
     pub slice: String,
+    pub oom_score_adjust: i32,
+    pub protect_system: String,
+    pub protect_home: String,
 }
 
 pub struct SystemdUnitFileParser;
@@ -145,6 +148,11 @@ impl SystemdUnitFileParser {
                         parsed.watchdog_sec = sec_str.parse::<u32>().unwrap_or(0);
                     }
                     ("Service", "Slice") => parsed.slice = val.to_string(),
+                    ("Service", "OOMScoreAdjust") => {
+                        parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
+                    }
+                    ("Service", "ProtectSystem") => parsed.protect_system = val.to_string(),
+                    ("Service", "ProtectHome") => parsed.protect_home = val.to_string(),
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -152,6 +160,125 @@ impl SystemdUnitFileParser {
         }
 
         parsed
+    }
+}
+
+// ================= NixOS / Declarative Unit Generator =================
+
+#[derive(Debug, Clone, Default)]
+pub struct DeclarativeUnitSpec {
+    pub name: String,
+    pub description: String,
+    pub exec_command: String,
+    pub dependencies: Vec<String>,
+    pub environment: Vec<(String, String)>,
+    pub restart_policy: String,
+}
+
+impl DeclarativeUnitSpec {
+    pub fn new(name: &str, exec_command: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            description: String::new(),
+            exec_command: exec_command.to_string(),
+            dependencies: Vec::new(),
+            environment: Vec::new(),
+            restart_policy: "on-failure".to_string(),
+        }
+    }
+
+    pub fn generate_unit_file(&self) -> String {
+        let mut out = String::new();
+        out.push_str("[Unit]\nDescription=");
+        out.push_str(&self.description);
+        out.push_str("\n\n[Service]\nExecStart=");
+        out.push_str(&self.exec_command);
+        out.push_str("\nRestart=");
+        out.push_str(&self.restart_policy);
+        for (k, v) in &self.environment {
+            out.push_str("\nEnvironment=");
+            out.push_str(k);
+            out.push_str("=");
+            out.push_str(v);
+        }
+        out.push_str("\n\n[Install]\nWantedBy=multi-user.target\n");
+        out
+    }
+}
+
+// ================= Systemd Socket Activation FD Manager =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketKind {
+    Stream,
+    Datagram,
+    SequentialPacket,
+}
+
+#[derive(Debug, Clone)]
+pub struct SystemdSocketConfig {
+    pub socket_id: UnitID,
+    pub listen_address: String,
+    pub port: u16,
+    pub kind: SocketKind,
+    pub bound_fd: i32,
+    pub target_service_id: UnitID,
+}
+
+#[derive(Debug, Clone)]
+pub struct SocketActivationEvent {
+    pub socket_id: UnitID,
+    pub incoming_bytes: usize,
+    pub client_addr: String,
+}
+
+pub struct SystemdSocketActivationManager {
+    pub sockets: Vec<SystemdSocketConfig>,
+    pub active_fds: Vec<(i32, UnitID)>,
+}
+
+impl Default for SystemdSocketActivationManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SystemdSocketActivationManager {
+    pub fn new() -> Self {
+        Self {
+            sockets: Vec::new(),
+            active_fds: Vec::new(),
+        }
+    }
+
+    pub fn register_socket(&mut self, config: SystemdSocketConfig) {
+        self.active_fds.push((config.bound_fd, config.socket_id));
+        self.sockets.push(config);
+    }
+
+    pub fn handle_incoming_connection(
+        &mut self,
+        engine: &mut SystemdEngine,
+        event: &SocketActivationEvent,
+    ) -> Result<i32, &'static str> {
+        let socket_config = self
+            .sockets
+            .iter()
+            .find(|s| s.socket_id == event.socket_id)
+            .ok_or("Socket configuration not found")?;
+        let target_srv = socket_config.target_service_id;
+        let fd = socket_config.bound_fd;
+
+        engine.systemctl_start(target_srv)?;
+        Ok(fd)
+    }
+
+    pub fn get_passed_fds_for_service(&self, service_id: UnitID) -> Vec<i32> {
+        self.sockets
+            .iter()
+            .filter(|s| s.target_service_id == service_id)
+            .map(|s| s.bound_fd)
+            .collect()
     }
 }
 
@@ -265,7 +392,9 @@ pub struct SystemdUnit {
     pub unit_type: UnitType,
     pub state: UnitState,
     pub requires: Vec<UnitID>,
+    pub requisites: Vec<UnitID>,
     pub wants: Vec<UnitID>,
+    pub upholds: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
     pub conflicts: Vec<UnitID>,
@@ -277,6 +406,7 @@ pub struct SystemdUnit {
     pub duration_ms: u64,
     pub is_enabled: bool,
     pub triggered_unit: Option<UnitID>,
+    pub oom_score_adjust: i32,
 }
 
 impl SystemdUnit {
@@ -290,7 +420,9 @@ impl SystemdUnit {
             unit_type,
             state: UnitState::Inactive,
             requires: Vec::new(),
+            requisites: Vec::new(),
             wants: Vec::new(),
+            upholds: Vec::new(),
             before: Vec::new(),
             after: Vec::new(),
             conflicts: Vec::new(),
@@ -302,7 +434,59 @@ impl SystemdUnit {
             duration_ms: 0,
             is_enabled: true,
             triggered_unit: None,
+            oom_score_adjust: 0,
         }
+    }
+}
+
+// ================= BSD rc.d Parallel Stage Execution Solver =================
+
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = units.to_vec();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let unit = match engine.find_unit(id) {
+                    Some(u) => u,
+                    None => continue,
+                };
+
+                let has_unresolved_prereq = remaining.iter().any(|&other| {
+                    if other == id {
+                        return false;
+                    }
+                    if unit.after.contains(&other) {
+                        return true;
+                    }
+                    if let Some(other_u) = engine.find_unit(other) {
+                        if other_u.before.contains(&id) {
+                            return true;
+                        }
+                    }
+                    false
+                });
+
+                if !has_unresolved_prereq {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                // Cycle or unresolvable stage, break remaining as final stage
+                stages.push(remaining);
+                break;
+            }
+
+            remaining.retain(|id| !current_stage.contains(id));
+            stages.push(current_stage);
+        }
+
+        stages
     }
 }
 
@@ -505,6 +689,28 @@ impl SystemdEngine {
             self.systemctl_stop(stop_id)?;
         }
 
+        let requisites = if let Some(u) = self.find_unit(id) {
+            u.requisites.clone()
+        } else {
+            Vec::new()
+        };
+
+        for &req_id in requisites.iter() {
+            let is_active = self.find_unit(req_id).map(|u| u.state == UnitState::Active).unwrap_or(false);
+            if !is_active {
+                if let Some(u) = self.find_unit_mut(id) {
+                    u.state = UnitState::Failed;
+                }
+                self.log_journal(
+                    id,
+                    b"Requisite dependency is not active",
+                    UnitState::Inactive,
+                    UnitState::Failed,
+                );
+                return Err("Requisite dependency is not active");
+            }
+        }
+
         for &req_id in requires.iter() {
             if self.systemctl_start(req_id).is_err() {
                 if let Some(u) = self.find_unit_mut(id) {
@@ -522,6 +728,16 @@ impl SystemdEngine {
 
         for &want_id in wants.iter() {
             let _ = self.systemctl_start(want_id);
+        }
+
+        let upholds = if let Some(u) = self.find_unit(id) {
+            u.upholds.clone()
+        } else {
+            Vec::new()
+        };
+
+        for &uphold_id in upholds.iter() {
+            let _ = self.systemctl_start(uphold_id);
         }
 
         if let Some(u) = self.find_unit_mut(id) {
@@ -1220,5 +1436,102 @@ mod tests {
 
         let runit_script = bridge.convert_runit_service_script("apache2");
         assert!(&runit_script[..].starts_with(b"#!/bin/sh\nexec apache2 --foreground\n"));
+    }
+
+    #[test]
+    fn test_systemd_socket_activation_manager() {
+        let mut engine = SystemdEngine::new();
+        let srv = SystemdUnit::new(10, b"httpd.service", UnitType::Service);
+        engine.register_unit(srv);
+
+        let mut mgr = SystemdSocketActivationManager::new();
+        let socket_cfg = SystemdSocketConfig {
+            socket_id: 1,
+            listen_address: "0.0.0.0".to_string(),
+            port: 80,
+            kind: SocketKind::Stream,
+            bound_fd: 5,
+            target_service_id: 10,
+        };
+        mgr.register_socket(socket_cfg);
+
+        let fds = mgr.get_passed_fds_for_service(10);
+        assert_eq!(fds, vec![5]);
+
+        let event = SocketActivationEvent {
+            socket_id: 1,
+            incoming_bytes: 128,
+            client_addr: "192.168.1.5:54321".to_string(),
+        };
+
+        let fd = mgr.handle_incoming_connection(&mut engine, &event).unwrap();
+        assert_eq!(fd, 5);
+        assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
+    }
+
+    #[test]
+    fn test_declarative_unit_generator() {
+        let mut spec = DeclarativeUnitSpec::new("my-service", "/usr/bin/my-service --daemon");
+        spec.description = "My Custom Declarative Service".to_string();
+        spec.environment.push(("PORT".to_string(), "8080".to_string()));
+
+        let unit_file = spec.generate_unit_file();
+        assert!(unit_file.contains("Description=My Custom Declarative Service"));
+        assert!(unit_file.contains("ExecStart=/usr/bin/my-service --daemon"));
+        assert!(unit_file.contains("Environment=PORT=8080"));
+
+        let parsed = SystemdUnitFileParser::parse_unit_file(&unit_file);
+        assert_eq!(parsed.unit_description, "My Custom Declarative Service");
+        assert_eq!(parsed.exec_start, "/usr/bin/my-service --daemon");
+    }
+
+    #[test]
+    fn test_bsd_rc_parallel_stage_solver() {
+        let mut engine = SystemdEngine::new();
+
+        let mut u1 = SystemdUnit::new(1, b"mount.service", UnitType::Service);
+        u1.before.push(2);
+        u1.before.push(3);
+
+        let u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
+        let u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
+
+        let mut u4 = SystemdUnit::new(4, b"app.service", UnitType::Service);
+        u4.after.push(2);
+        u4.after.push(3);
+
+        engine.register_unit(u1);
+        engine.register_unit(u2);
+        engine.register_unit(u3);
+        engine.register_unit(u4);
+
+        let stages = BsdRcParallelStageSolver::compute_parallel_stages(&engine, &[1, 2, 3, 4]);
+        assert_eq!(stages.len(), 3);
+        assert_eq!(stages[0], vec![1]);
+        assert_eq!(stages[1], vec![2, 3]);
+        assert_eq!(stages[2], vec![4]);
+    }
+
+    #[test]
+    fn test_extended_unit_dependencies() {
+        let mut engine = SystemdEngine::new();
+
+        let req_unit = SystemdUnit::new(1, b"dep.service", UnitType::Service);
+        let mut main_unit = SystemdUnit::new(2, b"main.service", UnitType::Service);
+        main_unit.requisites.push(1);
+
+        engine.register_unit(req_unit);
+        engine.register_unit(main_unit);
+
+        // Fail to start because requisite unit 1 is inactive
+        assert!(engine.systemctl_start(2).is_err());
+
+        // Start requisite unit 1 first
+        engine.systemctl_start(1).unwrap();
+        assert_eq!(engine.systemctl_status(1), Some(UnitState::Active));
+
+        // Now main unit 2 starts successfully
+        engine.systemctl_start(2).unwrap();
+        assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
     }
 }

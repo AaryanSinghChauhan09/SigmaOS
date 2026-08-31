@@ -266,3 +266,188 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
         self.deref_mut().iter_mut()
     }
 }
+
+// --- Distro-Inspired UI/UX Theme Engine ---
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroDesktopThemePreset {
+    UbuntuYaruDark,
+    PopOsTealDark,
+    LinuxMintMintY,
+    FedoraAdwaitaDark,
+    ElementaryOsGranite,
+    FreeBsdDaemonDark,
+    OpenBsdOnyx,
+    ArchCyanDark,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroAccentPalette {
+    pub primary_accent_rgba: u32,
+    pub secondary_accent_rgba: u32,
+    pub background_rgba: u32,
+    pub surface_rgba: u32,
+    pub text_rgba: u32,
+    pub accent_hex_code: String,
+}
+
+pub struct SovereignThemeEngine {
+    pub active_preset: DistroDesktopThemePreset,
+    pub is_dark_mode: bool,
+    pub high_contrast_enabled: bool,
+    pub font_scale_factor: f32,
+    pub corner_radius_px: u32,
+}
+
+impl SovereignThemeEngine {
+    pub fn new() -> Self {
+        Self {
+            active_preset: DistroDesktopThemePreset::UbuntuYaruDark,
+            is_dark_mode: true,
+            high_contrast_enabled: false,
+            font_scale_factor: 1.0,
+            corner_radius_px: 8,
+        }
+    }
+
+    pub fn set_preset(&mut self, preset: DistroDesktopThemePreset) {
+        self.active_preset = preset;
+        match preset {
+            DistroDesktopThemePreset::UbuntuYaruDark |
+            DistroDesktopThemePreset::PopOsTealDark |
+            DistroDesktopThemePreset::FedoraAdwaitaDark |
+            DistroDesktopThemePreset::FreeBsdDaemonDark |
+            DistroDesktopThemePreset::OpenBsdOnyx |
+            DistroDesktopThemePreset::ArchCyanDark => {
+                self.is_dark_mode = true;
+            }
+            DistroDesktopThemePreset::LinuxMintMintY |
+            DistroDesktopThemePreset::ElementaryOsGranite => {
+                self.is_dark_mode = false;
+            }
+        }
+    }
+
+    pub fn get_palette(&self) -> DistroAccentPalette {
+        match self.active_preset {
+            DistroDesktopThemePreset::UbuntuYaruDark => DistroAccentPalette {
+                primary_accent_rgba: 0xE95420FF,
+                secondary_accent_rgba: 0x77216F_FF,
+                background_rgba: 0x111111FF,
+                surface_rgba: 0x222222FF,
+                text_rgba: 0xFFFFFFFF,
+                accent_hex_code: "#E95420".to_string(),
+            },
+            DistroDesktopThemePreset::PopOsTealDark => DistroAccentPalette {
+                primary_accent_rgba: 0x48B9C7FF,
+                secondary_accent_rgba: 0xF08250FF,
+                background_rgba: 0x1E1E1EFF,
+                surface_rgba: 0x2D2D2DFF,
+                text_rgba: 0xF6F6F6FF,
+                accent_hex_code: "#48B9C7".to_string(),
+            },
+            DistroDesktopThemePreset::LinuxMintMintY => DistroAccentPalette {
+                primary_accent_rgba: 0x2A9D8FFF,
+                secondary_accent_rgba: 0x9B51E0FF,
+                background_rgba: 0xF5F5F5FF,
+                surface_rgba: 0xFFFFFFFF,
+                text_rgba: 0x222222FF,
+                accent_hex_code: "#2A9D8F".to_string(),
+            },
+            DistroDesktopThemePreset::FedoraAdwaitaDark => DistroAccentPalette {
+                primary_accent_rgba: 0x3584E4FF,
+                secondary_accent_rgba: 0x1C71D8FF,
+                background_rgba: 0x1E1E1EFF,
+                surface_rgba: 0x303030FF,
+                text_rgba: 0xFFFFFFFF,
+                accent_hex_code: "#3584E4".to_string(),
+            },
+            DistroDesktopThemePreset::ElementaryOsGranite => DistroAccentPalette {
+                primary_accent_rgba: 0x388E3CFF,
+                secondary_accent_rgba: 0x0288D1FF,
+                background_rgba: 0xFAFAFAFF,
+                surface_rgba: 0xFFFFFFFF,
+                text_rgba: 0x333333FF,
+                accent_hex_code: "#388E3C".to_string(),
+            },
+            DistroDesktopThemePreset::FreeBsdDaemonDark => DistroAccentPalette {
+                primary_accent_rgba: 0xAB1212FF,
+                secondary_accent_rgba: 0x880E0EFF,
+                background_rgba: 0x121212FF,
+                surface_rgba: 0x1E1E1EFF,
+                text_rgba: 0xEEEEEEFF,
+                accent_hex_code: "#AB1212".to_string(),
+            },
+            DistroDesktopThemePreset::OpenBsdOnyx => DistroAccentPalette {
+                primary_accent_rgba: 0x222222FF,
+                secondary_accent_rgba: 0x444444FF,
+                background_rgba: 0x0A0A0AFF,
+                surface_rgba: 0x161616FF,
+                text_rgba: 0xDDDDDDFF,
+                accent_hex_code: "#222222".to_string(),
+            },
+            DistroDesktopThemePreset::ArchCyanDark => DistroAccentPalette {
+                primary_accent_rgba: 0x1793D1FF,
+                secondary_accent_rgba: 0x0D6EFDFF,
+                background_rgba: 0x0F1419FF,
+                surface_rgba: 0x1A232AFF,
+                text_rgba: 0xE6EDF3FF,
+                accent_hex_code: "#1793D1".to_string(),
+            },
+        }
+    }
+
+    pub fn toggle_dark_mode(&mut self) {
+        self.is_dark_mode = !self.is_dark_mode;
+    }
+}
+
+impl Default for SovereignThemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_distro_desktop_theme_presets() {
+        let mut engine = SovereignThemeEngine::new();
+        assert_eq!(engine.active_preset, DistroDesktopThemePreset::UbuntuYaruDark);
+        assert!(engine.is_dark_mode);
+
+        engine.set_preset(DistroDesktopThemePreset::PopOsTealDark);
+        assert_eq!(engine.active_preset, DistroDesktopThemePreset::PopOsTealDark);
+        assert!(engine.is_dark_mode);
+
+        engine.set_preset(DistroDesktopThemePreset::LinuxMintMintY);
+        assert_eq!(engine.active_preset, DistroDesktopThemePreset::LinuxMintMintY);
+        assert!(!engine.is_dark_mode);
+    }
+
+    #[test]
+    fn test_accent_color_palette_queries() {
+        let mut engine = SovereignThemeEngine::new();
+        let ubuntu_palette = engine.get_palette();
+        assert_eq!(ubuntu_palette.accent_hex_code, "#E95420");
+        assert_eq!(ubuntu_palette.primary_accent_rgba, 0xE95420FF);
+
+        engine.set_preset(DistroDesktopThemePreset::ArchCyanDark);
+        let arch_palette = engine.get_palette();
+        assert_eq!(arch_palette.accent_hex_code, "#1793D1");
+        assert_eq!(arch_palette.primary_accent_rgba, 0x1793D1FF);
+    }
+
+    #[test]
+    fn test_dark_light_mode_switching() {
+        let mut engine = SovereignThemeEngine::new();
+        assert!(engine.is_dark_mode);
+
+        engine.toggle_dark_mode();
+        assert!(!engine.is_dark_mode);
+
+        engine.toggle_dark_mode();
+        assert!(engine.is_dark_mode);
+    }
+}
