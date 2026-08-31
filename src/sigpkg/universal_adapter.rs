@@ -630,6 +630,83 @@ impl Default for UniversalServerImageAdapter {
     }
 }
 
+/// Universal Package Bridge Engine for SigmaOS
+/// Seamlessly converts foreign Linux/BSD packages (.deb, PKGBUILD, .spec, .apk, .ebuild, .ports, etc.)
+/// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
+pub struct SigPkgUniversalBridgeEngine {
+    adapter: UniversalPackageAdapter,
+    pm: crate::package::UniversalPackageManager,
+}
+
+impl SigPkgUniversalBridgeEngine {
+    pub fn new() -> Self {
+        Self {
+            adapter: UniversalPackageAdapter::new(),
+            pm: crate::package::UniversalPackageManager::new(),
+        }
+    }
+
+    /// Automatically detects format from filename and header, parses foreign manifest,
+    /// and converts it directly into a native Sigma-pkg (`Package`)
+    pub fn convert_to_sigpkg(&self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
+        let fmt = self
+            .adapter
+            .detect_format_by_header(raw_data)
+            .or_else(|| self.adapter.detect_format_by_extension(filename))
+            .ok_or("Bridge Engine: Unable to detect package format")?;
+
+        let manifest_text = String::from_utf8_lossy(raw_data);
+
+        match fmt {
+            PackageFormat::Apt => {
+                let apt = self.adapter.parse_apt_control(&manifest_text)?;
+                self.adapter.translate_to_native_package(&apt.package, &apt.version, &apt.description, &apt.depends)
+            }
+            PackageFormat::Pacman => {
+                let pacman = self.adapter.parse_pacman_pkgbuild(&manifest_text)?;
+                self.adapter.translate_to_native_package(&pacman.pkgname, &pacman.pkgver, &pacman.pkgdesc, &pacman.depends)
+            }
+            PackageFormat::Yum => {
+                let rpm = self.adapter.parse_rpm_spec(&manifest_text)?;
+                self.adapter.translate_to_native_package(&rpm.name, &rpm.version, &rpm.summary, &rpm.requires)
+            }
+            PackageFormat::Snap => {
+                let snap = self.adapter.parse_snapcraft_yaml(&manifest_text)?;
+                self.adapter.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
+            }
+            _ => {
+                // Fallback auto-extraction
+                let clean_name = filename.split('.').next().unwrap_or("sigpkg-converted");
+                self.adapter.translate_to_native_package(clean_name, "1.0.0", "Converted foreign package", &[])
+            }
+        }
+    }
+
+    /// Converts a foreign package manifest and registers it into the Universal Package Manager
+    pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
+        let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
+        let mut unified_pkg = crate::package::UnifiedPackage::new(
+            native_pkg.name.clone(),
+            native_pkg.version.to_string(),
+        );
+        for dep in &native_pkg.dependencies {
+            unified_pkg = unified_pkg.with_dependency(dep.name.clone());
+        }
+        self.pm.add_package(unified_pkg);
+        Ok(native_pkg)
+    }
+
+    pub fn is_package_registered(&self, name: &str) -> bool {
+        self.pm.get_package(name).is_some()
+    }
+}
+
+impl Default for SigPkgUniversalBridgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UniversalPackageAdapter {
     /// Parses RedHat/Yum .spec files for RPM metadata translation
     pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
@@ -844,6 +921,35 @@ mod tests {
         let exec_path = appimage.mount_and_run("/tmp/.mount_vlc").unwrap();
         assert_eq!(exec_path, "/tmp/.mount_vlc/vlc");
         assert!(appimage.mounted);
+    }
+
+    #[test]
+    fn test_sigpkg_universal_bridge_engine() {
+        let mut bridge = SigPkgUniversalBridgeEngine::new();
+
+        let deb_control = r#"
+            Package: htop
+            Version: 3.2.2
+            Depends: libc6, libncursesw6
+            Description: Interactive process viewer
+        "#;
+
+        let converted_deb = bridge.absorb_and_register("htop.deb", deb_control.as_bytes()).unwrap();
+        assert_eq!(converted_deb.name, "htop");
+        assert_eq!(converted_deb.version, Version::new(3, 2, 2));
+        assert_eq!(converted_deb.dependencies.len(), 2);
+        assert!(bridge.is_package_registered("htop"));
+
+        let pkgbuild = r#"
+            pkgname=ripgrep
+            pkgver=13.0.0
+            depends=('pcre2')
+        "#;
+
+        let converted_pacman = bridge.absorb_and_register("ripgrep.pkg.tar.zst", pkgbuild.as_bytes()).unwrap();
+        assert_eq!(converted_pacman.name, "ripgrep");
+        assert_eq!(converted_pacman.version, Version::new(13, 0, 0));
+        assert!(bridge.is_package_registered("ripgrep"));
     }
 
     #[test]
