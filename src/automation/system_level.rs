@@ -913,7 +913,9 @@ mod tests {
             panic!("Expected ThrottleProcesses action");
         }
         assert!(engine.racct_policies[0].is_throttled);
+    }
 
+    #[test]
     fn test_distro_inspired_auto_sandbox() {
     }
 
@@ -925,7 +927,9 @@ mod tests {
         assert!(policy.allowed_promises.contains(&"exec".to_string()));
         assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/usr" && perm == "r"));
         assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/bin" && perm == "rx"));
+    }
 
+    #[test]
     fn test_distro_inspired_declarative_reconciliation() {
     }
 
@@ -946,6 +950,7 @@ mod tests {
 
         let spec2 = DeclarativeSpecState {
             revision: 2,
+            hostname: "sigma-node".to_string(),
             services: vec!["db".to_string(), "logger".to_string(), "nginx".to_string()],
             packages: vec!["coreutils".to_string(), "nginx".to_string()],
             hostname: "sigma-node".to_string(),
@@ -956,7 +961,9 @@ mod tests {
         // Rollback
         assert_eq!(engine.rollback_declarative_state().unwrap(), 1);
         assert_eq!(engine.active_spec.as_ref().unwrap().revision, 1);
+    }
 
+    #[test]
     fn test_distro_inspired_transactional_hooks() {
     }
 
@@ -978,7 +985,9 @@ mod tests {
         let undos = engine.rollback_hooks();
         assert_eq!(undos.len(), 1);
         assert_eq!(undos[0], "UNDO:undo_install_nginx");
+    }
 
+    #[test]
     fn test_distro_inspired_storage_tiering_and_scrubbing() {
     }
 
@@ -1000,6 +1009,9 @@ mod tests {
         assert_eq!(checked, 1);
         assert_eq!(corrupted, 0);
 
+    }
+
+    #[test]
     fn test_linux_bsd_automation_triggers() {
         let mut manager = SystemAutomationManager::new();
         let rule = SystemAutomationRule::new(

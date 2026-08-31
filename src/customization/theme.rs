@@ -1253,6 +1253,7 @@ mod tests {
         index.add_inherits("oxygen");
         let chain = IconInheritsResolver::resolve_lookup_chain(&index);
         assert_eq!(chain, vec!["Breeze".to_string(), "oxygen".to_string(), "hicolor".to_string()]);
+    }
 
     }
 
@@ -1262,6 +1263,9 @@ mod tests {
         let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
         assert_eq!(tinted, "<path fill=\"#3584E4\" d=\"M0 0h24v24H0z\"/>");
 
+    }
+
+    #[test]
     fn test_yaru_theme_spec() {
         let yaru = YaruThemeSpec::new(YaruThemeStyle::Dark, YaruAccentColor::Aubergine);
         assert_eq!(yaru.accent_hex(), "#77216F");

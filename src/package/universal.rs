@@ -26,17 +26,49 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(test))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 
-#[cfg(test)]
-use crate::klib::HashMap;
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
+
+#[cfg(feature = "standalone_test")]
+pub mod node_distribution_dummy {
+    #[derive(Debug, Clone)]
+    pub enum LibcFlavor { Musl, Glibc }
+    #[derive(Debug, Clone)]
+    pub enum NodeReleaseStream { Lts, Current }
+    #[derive(Debug, Clone)]
+    pub enum NodeTargetArch { X86_64, Aarch64 }
+    #[derive(Debug, Clone)]
+    pub struct NodeBinaryPackage {
+        pub version: String,
+    }
+    impl NodeBinaryPackage {
+        pub fn new(version: &str, _stream: NodeReleaseStream, _arch: NodeTargetArch, _flavor: LibcFlavor, _url: &str, _hash: [u8; 32], _sig: [u8; 64], _size: u64) -> Self {
+            Self { version: version.to_string() }
+        }
+    }
+    #[derive(Debug, Clone)]
+    pub struct NodeBinaryDistroEngine;
+    impl NodeBinaryDistroEngine {
+        pub fn new() -> Self { Self }
+        pub fn install_to_store(&self, pkg: &NodeBinaryPackage, _bytes: &[u8], _npm: &str) -> Result<String, &'static str> {
+            Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
+        }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+use node_distribution_dummy::*;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

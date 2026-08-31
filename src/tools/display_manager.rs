@@ -273,6 +273,7 @@ mod tests {
         };
         assert_eq!(memory.user_id, 1000);
         assert_eq!(memory.last_selected_session, "Wayland");
+    }
 
     }
 
@@ -301,5 +302,10 @@ mod tests {
         assert!(!a11y.high_contrast);
         a11y.high_contrast = true;
         assert!(a11y.high_contrast);
+
+        let mut a11y = GreeterAccessibilityOverlay::default();
+        assert!(!a11y.high_contrast_enabled);
+        a11y.high_contrast_enabled = true;
+        assert!(a11y.high_contrast_enabled);
     }
 }

@@ -349,10 +349,6 @@ pub enum LocaleCategory {
     Collate,
     Monetary,
     Messages,
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
 }
 
 pub struct SovereignLocaleEngine {
