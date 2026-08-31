@@ -1,8 +1,18 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
+#[path = "../src/security/mod.rs"]
+pub mod security;
+#[path = "../src/package/universal.rs"]
+pub mod package;
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
@@ -12,10 +22,13 @@ mod unimplemented_features;
 mod firmware;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
+use distro::linux_bsd_parity;
+use distro::linux_bsd_inspirations;
+use distro::ready_to_use;
+use distro::wiki_ideas_implementation;
+use distro::missing_distro_innovations;
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
@@ -28,8 +41,6 @@ mod distro_bridge;
 mod protocols;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
 #[path = "../src/compatibility/garuda_zen.rs"]
 mod garuda_zen;
 #[path = "../src/virtualization/vm_manager.rs"]
@@ -42,8 +53,6 @@ mod advanced_process_control;
 mod freebsd_jails;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
@@ -68,8 +77,6 @@ mod sovereign_shell_parity;
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
 
 use wiki_ideas_implementation::SystemdUnitActiveState;
 use bsd_compat::*;
@@ -116,7 +123,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
     use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
@@ -238,7 +244,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass,
+        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
     };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });

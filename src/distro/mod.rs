@@ -15,6 +15,7 @@ pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
+pub mod linux_bsd_parity_extended;
 pub mod linux_bsd_distro_gaps;
 
 pub use linux_bsd_distro_gaps::{
