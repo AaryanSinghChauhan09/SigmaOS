@@ -343,7 +343,6 @@ mod tests {
         let cfg = boot.generate_bootloader_config();
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
-}
 
     #[test]
     fn test_fast_boot_pipeline() {
@@ -354,4 +353,3 @@ mod tests {
         assert_eq!(pipeline.services.iter().filter(|s| s.state == BootServiceState::Active).count(), 4);
     }
 }
-
