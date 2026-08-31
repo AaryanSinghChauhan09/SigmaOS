@@ -201,6 +201,7 @@ mod tests {
             critical_temp_c: 100.0,
             passive_delay_ms: 100,
         });
+        sched.update_temperature(0, 95.0);
         assert!(sched.is_throttling());
     }
 

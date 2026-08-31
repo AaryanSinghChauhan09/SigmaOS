@@ -126,14 +126,14 @@ pub struct AudioTrack {
     pub volume: f32, // 0.0 to 1.0
 }
 
-pub struct SigmaMediaEngine {
+pub struct SigmaMediaPlayer {
     pub current_track: Option<AudioTrack>,
     pub state: PlaybackState,
 }
 
-impl SigmaMediaEngine {
+impl SigmaMediaPlayer {
     pub fn new() -> Self {
-        SigmaMediaEngine {
+        SigmaMediaPlayer {
             current_track: None,
             state: PlaybackState::Stopped,
         }
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_media_playback() {
-        let mut engine = SigmaMediaEngine::new();
+        let mut engine = SigmaMediaPlayer::new();
         assert_eq!(engine.state, PlaybackState::Stopped);
         assert!(engine.play().is_err());
 

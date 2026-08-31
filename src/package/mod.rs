@@ -38,5 +38,5 @@ pub use debian::{
     DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
 };
 pub use store::{
-    StoreError, StoreApp, SigmaSoftwareStore,
+    StoreError, StoreApp,
 };

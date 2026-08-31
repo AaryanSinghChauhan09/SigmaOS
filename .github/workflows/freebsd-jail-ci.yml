@@ -1,0 +1,20 @@
+name: Verify FreeBSD Jail Isolation & UMA Allocator
+
+on:
+  push:
+    branches: [ main, master, "feature/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  freebsd-jail-verify:
+    name: Verify FreeBSD Jail Isolation & UMA Allocator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run FreeBSD Jail & UMA Allocator Tests
+        run: cargo test --lib freebsd_jails

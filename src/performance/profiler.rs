@@ -24,6 +24,7 @@ pub trait Profile {
     fn start_time(&self) -> u64;
     fn end_time(&self) -> u64;
     fn duration(&self) -> u64;
+    fn stop_profile(&mut self);
 }
 
 #[repr(C)]
@@ -45,6 +46,45 @@ impl SimpleProfile {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 impl Profile for SimpleProfile {
     fn id(&self) -> ProfileID { self.id }
     fn profile_type(&self) -> ProfileType { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
@@ -54,6 +94,9 @@ impl Profile for SimpleProfile {
         let end = self.end_time();
         let start = self.start_time();
         if end > start { end - start } else { 0 }
+    }
+    fn stop_profile(&mut self) {
+        self.end_time.store(2000000, Ordering::SeqCst);
     }
 }
 
@@ -96,7 +139,7 @@ impl Profiler for SimpleProfiler {
         for profile_option in &mut self.profiles {
             if let Some(ref mut profile) = *profile_option {
                 if profile.id() == id {
-                    profile.end_time.store(2000000, Ordering::SeqCst);
+                    profile.stop_profile();
                     return Ok(());
                 }
             }

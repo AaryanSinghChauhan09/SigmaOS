@@ -225,11 +225,11 @@ impl Component {
     /// Check if component has specific capability rights
     pub fn has_capability_rights(&self, handle_id: u32, required_rights: CapabilityRights) -> bool {
         if let Some(&rights) = self.capabilities.get(&handle_id) {
-            (required_rights.can_read || !rights.can_read) &&
-            (required_rights.can_write || !rights.can_write) &&
-            (required_rights.can_execute || !rights.can_execute) &&
-            (required_rights.can_delegate || !rights.can_delegate) &&
-            (required_rights.can_create_child || !rights.can_create_child)
+            (!required_rights.can_read || rights.can_read) &&
+            (!required_rights.can_write || rights.can_write) &&
+            (!required_rights.can_execute || rights.can_execute) &&
+            (!required_rights.can_delegate || rights.can_delegate) &&
+            (!required_rights.can_create_child || rights.can_create_child)
         } else {
             false
         }
@@ -478,7 +478,7 @@ mod tests {
 
     #[test]
     fn test_component_creation() {
-        let tree = ComponentTree::new();
+        let mut tree = ComponentTree::new();
         let child_id = tree.create_component(0, "test_child").unwrap();
         assert!(tree.get_component(child_id).is_ok());
     }
@@ -487,6 +487,7 @@ mod tests {
     fn test_capability_delegation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let rights = CapabilityRights::full();
@@ -500,6 +501,7 @@ mod tests {
     fn test_resource_propagation() {
         let mut tree = ComponentTree::new();
         let parent_id = tree.create_component(0, "parent").unwrap();
+        tree.allocate_capability(parent_id, CapabilityRights::full()).unwrap();
         let child_id = tree.create_component(parent_id, "child").unwrap();
 
         let resource = ResourceAllocation::new(ResourceType::Memory, 1024, 0, 1024);

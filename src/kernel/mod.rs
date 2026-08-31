@@ -18,9 +18,13 @@ pub mod scheduler;
 pub mod subsystem;
 pub mod vmm_paging;
 pub mod processor_management;
+pub mod hal;
+
+pub use hal::{MultiArchHal, TargetArch};
 pub mod cpufreq;
 pub mod structures;
 pub mod object;
+pub mod performance;
 
 pub use vmm_paging::{PageTableFlags as VmmPageFlags, PageTableManager as VmmPageTableManager, VirtualMemoryManager as VmmManager, VmArea, VmProtection};
 
@@ -44,6 +48,6 @@ pub use scheduler::{Priority, Process, ProcessState};
 pub use structures::{
     AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
     CpuContext, EdfTask, IrqlLevel, IrqlState, LcgRandom, LotteryTask,
-    SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, ThreadState, WorkItem,
+    SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, WorkItem,
 };
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

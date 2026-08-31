@@ -8,12 +8,13 @@ pub mod wireless;
 pub mod zero_trust;
 pub mod legacy_net;
 pub mod revival;
+pub mod dhcp_dns;
+
+pub use dhcp_dns::{CloudSyncEngine, DhcpClient, DhcpState, DnsResolver};
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use analyzer::{
-    NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    TrafficPacket, Protocol, TrafficAlert, AlertType, AlertSeverity,
     AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
     KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
     ClearLinuxFlowLoadBalancer,

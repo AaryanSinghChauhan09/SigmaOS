@@ -14,6 +14,9 @@ pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 pub mod distro_readiness;
+pub mod pcie;
+
+pub use pcie::{PcieBusDriver, PcieDeviceInfo};
 
 // Expose rich hidden Linux/BSD-inspired drivers
 pub mod ch340_usb;

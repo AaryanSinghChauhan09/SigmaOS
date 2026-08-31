@@ -1,4 +1,5 @@
 // SigmaOS Compatibility Module
+pub mod historic_linux;
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod interim;
@@ -18,6 +19,9 @@ pub mod lattice;
 pub mod prism;
 pub mod canonical;
 pub mod fedora;
+pub mod gap_closure;
+
+pub use gap_closure::*;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -27,7 +31,7 @@ pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
+    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
     Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
     UmsThreadState, UmsContext, SovereignKernelInternals,
 };
@@ -35,7 +39,7 @@ pub use cross_platform_kernel::{
 pub use historic_linux::{
     LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
     Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
 };
 pub use linux_adapter::{
@@ -54,8 +58,9 @@ pub use prism::{
     PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };
 pub use canonical::{
-    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+    SigmaLivepatch, SigmaLivepatchPatch, CloudOrchestrator, ContinuityCoordinator, EcosystemSnapshot, SnapshotManager,
 };
 pub use fedora::{
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FedoraAlu, FedoraAluFlags, SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel,
 };

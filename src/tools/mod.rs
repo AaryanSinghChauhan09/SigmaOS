@@ -3,6 +3,9 @@
 
 pub mod sigmatools;
 pub mod sigma_core_utils;
+pub mod sigma_cli;
+
+pub use sigma_cli::{SigmaBuildAttestation, SigmaCliCommand, SigmaMasterCli};
 
 pub use sigmatools::{
     AccessibilityFeature, AlmeidaCmosRtc, AlmeidaCoreDump, ClusterNode, NodeState, SigmaAccess,

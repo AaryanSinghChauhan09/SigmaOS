@@ -1,7 +1,7 @@
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer
 
-use crate::klib::{custom_string::SigmaString, Vec};
+use crate::klib::{String, Vec};
 use core::cell::Cell;
 
 /// Bundle types for Chakra-inspired package management
@@ -15,8 +15,8 @@ pub enum BundleType {
 /// Akabei bundle for package management
 #[derive(Debug, Clone)]
 pub struct AkabeiBundle {
-    pub name: SigmaString,
-    pub version: SigmaString,
+    pub name: String,
+    pub version: String,
     pub bundle_type: BundleType,
     pub is_isolated: bool,
 }
@@ -60,7 +60,7 @@ pub enum DesktopTheme {
 /// Kapudan first-boot assistant
 pub struct KapudanAssistant {
     pub active_theme: Cell<DesktopTheme>,
-    pub selected_keyboard_layout: SigmaString,
+    pub selected_keyboard_layout: String,
     pub enable_desktop_widgets: Cell<bool>,
 }
 
@@ -68,7 +68,7 @@ impl KapudanAssistant {
     pub fn new() -> Self {
         KapudanAssistant {
             active_theme: Cell::new(DesktopTheme::CaledoniaDark),
-            selected_keyboard_layout: SigmaString::from_str("us"),
+            selected_keyboard_layout: String::from("us"),
             enable_desktop_widgets: Cell::new(true),
         }
     }
@@ -86,7 +86,7 @@ impl KapudanAssistant {
 
     /// Set keyboard layout
     pub fn set_keyboard_layout(&mut self, layout: &str) {
-        self.selected_keyboard_layout = SigmaString::from_str(layout);
+        self.selected_keyboard_layout = String::from(layout);
     }
 
     /// Toggle desktop widgets
