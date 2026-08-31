@@ -7,7 +7,7 @@
 //!
 //! ## Architecture
 //!
-//! ```
+//! ```text
 //! Application renders → wl_buffer (DMA-BUF or SHM)
 //!     → ZenithCompositor (damage tracking)
 //!     → Scene graph (sorted by z-order)
@@ -21,6 +21,10 @@ use alloc::vec::Vec;
 use alloc::format;
 
 
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 
 /// Stub capability token for security-aware windowing
