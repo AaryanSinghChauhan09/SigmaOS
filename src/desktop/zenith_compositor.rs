@@ -21,7 +21,9 @@ use alloc::vec::Vec;
 use alloc::format;
 
 
-use crate::klib::HashMap;
+#[path = "../klib/mod.rs"]
+pub mod klib;
+use klib::HashMap;
 
 /// Stub capability token for security-aware windowing
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
