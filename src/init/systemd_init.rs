@@ -472,6 +472,7 @@ impl SystemdUnitFileParser {
                             "full" | "yes" | "true" => ProtectSystemLevel::Full,
                             _ => ProtectSystemLevel::Off,
                         };
+                        parsed.protect_system = val.to_string();
                     }
                     ("Service", "ProtectHome") => {
                         parsed.hardening_profile.protect_home = match val.to_lowercase().as_str() {
@@ -480,6 +481,7 @@ impl SystemdUnitFileParser {
                             "yes" | "true" => ProtectHomeLevel::Bool,
                             _ => ProtectHomeLevel::Off,
                         };
+                        parsed.protect_home = val.to_string();
                     }
                     ("Service", "PrivateTmp") => {
                         parsed.hardening_profile.private_tmp = val.eq_ignore_ascii_case("yes") || val == "1" || val.eq_ignore_ascii_case("true");
@@ -508,6 +510,9 @@ impl SystemdUnitFileParser {
                     }
                     ("Socket", "ListenStream") => parsed.listen_stream = val.to_string(),
                     ("Timer", "OnCalendar") => parsed.on_calendar = val.to_string(),
+                    ("Service", "OOMScoreAdjust") => {
+                        parsed.oom_score_adjust = val.parse::<i32>().unwrap_or(0);
+                    }
                     ("Install", "WantedBy") => parsed.wanted_by = val.to_string(),
                     _ => {}
                 }
@@ -2141,7 +2146,7 @@ mod tests {
     fn test_requisite_and_on_failure_cascade() {
         let mut engine = SystemdEngine::new();
 
-        let mut backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
+        let backup_service = SystemdUnit::new(99, b"fallback.service", UnitType::Service);
         engine.register_unit(backup_service);
 
         let mut dep = SystemdUnit::new(1, b"db.service", UnitType::Service);
@@ -2200,5 +2205,102 @@ WantedBy=multi-user.target
         assert_eq!(parsed.hardening_profile.pledge_promises, "stdio rpath wpath inet");
         assert_eq!(parsed.hardening_profile.unveil_paths.len(), 1);
         assert_eq!(parsed.environment, vec![("PORT".to_string(), "8080".to_string())]);
+    }
+
+    #[test]
+    fn test_systemd_socket_activation_manager() {
+        let mut engine = SystemdEngine::new();
+        let srv = SystemdUnit::new(10, b"httpd.service", UnitType::Service);
+        engine.register_unit(srv);
+
+        let mut mgr = SystemdSocketActivationManager::new();
+        let socket_cfg = SystemdSocketConfig {
+            socket_id: 1,
+            listen_address: "0.0.0.0".to_string(),
+            port: 80,
+            kind: SocketKind::Stream,
+            bound_fd: 5,
+            target_service_id: 10,
+        };
+        mgr.register_socket(socket_cfg);
+
+        let fds = mgr.get_passed_fds_for_service(10);
+        assert_eq!(fds, vec![5]);
+
+        let event = SocketActivationEvent {
+            socket_id: 1,
+            incoming_bytes: 128,
+            client_addr: "192.168.1.5:54321".to_string(),
+        };
+
+        let fd = mgr.handle_incoming_connection(&mut engine, &event).unwrap();
+        assert_eq!(fd, 5);
+        assert_eq!(engine.systemctl_status(10), Some(UnitState::Active));
+    }
+
+    #[test]
+    fn test_declarative_unit_generator() {
+        let mut spec = DeclarativeUnitSpec::new("my-service", "/usr/bin/my-service --daemon");
+        spec.description = "My Custom Declarative Service".to_string();
+        spec.environment.push(("PORT".to_string(), "8080".to_string()));
+
+        let unit_file = spec.generate_unit_file();
+        assert!(unit_file.contains("Description=My Custom Declarative Service"));
+        assert!(unit_file.contains("ExecStart=/usr/bin/my-service --daemon"));
+        assert!(unit_file.contains("Environment=PORT=8080"));
+
+        let parsed = SystemdUnitFileParser::parse_unit_file(&unit_file);
+        assert_eq!(parsed.unit_description, "My Custom Declarative Service");
+        assert_eq!(parsed.exec_start, "/usr/bin/my-service --daemon");
+    }
+
+    #[test]
+    fn test_bsd_rc_parallel_stage_solver() {
+        let mut engine = SystemdEngine::new();
+
+        let mut u1 = SystemdUnit::new(1, b"mount.service", UnitType::Service);
+        u1.before.push(2);
+        u1.before.push(3);
+
+        let u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
+        let u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
+
+        let mut u4 = SystemdUnit::new(4, b"app.service", UnitType::Service);
+        u4.after.push(2);
+        u4.after.push(3);
+
+        engine.register_unit(u1);
+        engine.register_unit(u2);
+        engine.register_unit(u3);
+        engine.register_unit(u4);
+
+        let stages = BsdRcParallelStageSolver::compute_parallel_stages(&engine, &[1, 2, 3, 4]);
+        assert_eq!(stages.len(), 3);
+        assert_eq!(stages[0], vec![1]);
+        assert_eq!(stages[1], vec![2, 3]);
+        assert_eq!(stages[2], vec![4]);
+    }
+
+    #[test]
+    fn test_extended_unit_dependencies() {
+        let mut engine = SystemdEngine::new();
+
+        let req_unit = SystemdUnit::new(1, b"dep.service", UnitType::Service);
+        let mut main_unit = SystemdUnit::new(2, b"main.service", UnitType::Service);
+        main_unit.requisites.push(1);
+
+        engine.register_unit(req_unit);
+        engine.register_unit(main_unit);
+
+        // Fail to start because requisite unit 1 is inactive
+        assert!(engine.systemctl_start(2).is_err());
+
+        // Start requisite unit 1 first
+        engine.systemctl_start(1).unwrap();
+        assert_eq!(engine.systemctl_status(1), Some(UnitState::Active));
+
+        // Now main unit 2 starts successfully
+        engine.systemctl_start(2).unwrap();
+        assert_eq!(engine.systemctl_status(2), Some(UnitState::Active));
     }
 }

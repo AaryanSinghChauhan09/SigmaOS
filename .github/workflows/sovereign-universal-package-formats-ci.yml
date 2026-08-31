@@ -19,4 +19,6 @@ jobs:
 
       - name: Test Universal Package Manager Submodule
         run: |
-          cargo test --lib package::universal
+          mkdir -p build
+          rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/package/universal.rs -o build/package_test
+          ./build/package_test
