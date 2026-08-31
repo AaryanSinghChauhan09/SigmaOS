@@ -36,21 +36,91 @@ pub enum HandoffProtocol {
 }
 
 #[derive(Debug, Clone)]
+pub struct BootStageDescriptor {
+    pub protocol: HandoffProtocol,
+    pub kernel_addr: u64,
+    pub cmdline: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct SovereignDistroBootStageHandoff {
     pub protocol: HandoffProtocol,
     pub root_uuid: String,
+    pub initramfs_mounted: bool,
     pub live_overlay_mounted: bool,
     pub kernel_entry_point_addr: u64,
+    pub stage_descriptor: Option<BootStageDescriptor>,
+    pub emergency_rescue_active: bool,
+    pub last_error_log: Option<String>,
 }
 
 impl SovereignDistroBootStageHandoff {
-    pub fn new(protocol: HandoffProtocol, root_uuid: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            protocol,
-            root_uuid: root_uuid.to_string(),
+            protocol: HandoffProtocol::LinuxEfiStub,
+            root_uuid: String::new(),
+            initramfs_mounted: false,
             live_overlay_mounted: false,
             kernel_entry_point_addr: 0x0010_0000,
+            stage_descriptor: None,
+            emergency_rescue_active: false,
+            last_error_log: None,
         }
+    }
+
+    pub fn setup_linux_efistub(&mut self, kernel_addr: u64, cmdline: &str, _initrd_addr: Option<u64>, _initrd_size: usize) {
+        self.protocol = HandoffProtocol::LinuxEfiStub;
+        self.kernel_entry_point_addr = kernel_addr;
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::LinuxEfiStub,
+            kernel_addr,
+            cmdline: cmdline.to_string(),
+        });
+    }
+
+    pub fn setup_multiboot2(&mut self, kernel_addr: u64, cmdline: &str) {
+        self.protocol = HandoffProtocol::Multiboot2;
+        self.kernel_entry_point_addr = kernel_addr;
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::Multiboot2,
+            kernel_addr,
+            cmdline: cmdline.to_string(),
+        });
+    }
+
+    pub fn setup_freebsd_btx_elf(&mut self, kernel_addr: u64, cmdline: &str) {
+        self.protocol = HandoffProtocol::FreeBsdBtxElf;
+        self.kernel_entry_point_addr = kernel_addr;
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::FreeBsdBtxElf,
+            kernel_addr,
+            cmdline: cmdline.to_string(),
+        });
+    }
+
+    pub fn parse_openbsd_boot_conf(&mut self, conf: &str) -> usize {
+        self.protocol = HandoffProtocol::OpenBsdBootConf;
+        self.kernel_entry_point_addr = 0x100000;
+        conf.lines().filter(|l| !l.trim().is_empty()).count()
+    }
+
+    pub fn prepare_live_iso_overlay(&mut self, _squashfs_path: &str, _mem_mb: usize) -> Result<(), &'static str> {
+        self.protocol = HandoffProtocol::LiveIsoOverlayFs;
+        self.live_overlay_mounted = true;
+        self.kernel_entry_point_addr = 0x200000;
+        Ok(())
+    }
+
+    pub fn trigger_emergency_rescue(&mut self, reason: &str) {
+        self.emergency_rescue_active = true;
+        self.last_error_log = Some(reason.to_string());
+    }
+
+    pub fn execute_handoff(&self) -> Result<u64, &'static str> {
+        if self.emergency_rescue_active {
+            return Err("Emergency rescue active");
+        }
+        Ok(self.kernel_entry_point_addr)
     }
 
     pub fn mount_initramfs_vfs(&mut self) -> Result<(), &'static str> {
