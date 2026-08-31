@@ -217,7 +217,9 @@ impl BootManager {
     }
 
     pub fn generate_bootloader_config(&self) -> String {
-        let mut cfg = String::new();
+        // Optimization: Pre-allocate buffer capacity to avoid incremental heap re-allocations
+        let estimated_size = 64 + self.entries.len() * 128;
+        let mut cfg = String::with_capacity(estimated_size);
         cfg.push_str("# SigmaOS Boot Configuration\n");
         cfg.push_str("timeout ");
         cfg.push_str(&self.timeout_seconds.to_string());
@@ -286,9 +288,8 @@ impl SovereignFastBootServicePipeline {
         self.services.sort_by_key(|s| s.priority);
 
         for i in 0..self.services.len() {
-            // Check dependency readiness
-            let deps = self.services[i].dependencies.clone();
-            for dep in &deps {
+            // Optimization: Iterate directly over borrowed dependency names to avoid heap allocations in fast boot loop
+            for dep in &self.services[i].dependencies {
                 let dep_ready = self.services.iter().any(|s| &s.name == dep && s.state == BootServiceState::Active);
                 if !dep_ready {
                     self.services[i].state = BootServiceState::Failed;
@@ -343,7 +344,6 @@ mod tests {
         let cfg = boot.generate_bootloader_config();
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
-}
 
     #[test]
     fn test_fast_boot_pipeline() {
