@@ -68,6 +68,7 @@ pub mod linuxulator;
 pub mod localsend;
 pub mod lubuntu;
 pub mod macos_darwin;
+pub mod mate_betsy;
 pub mod mesh_hub;
 pub mod mint_linux;
 pub mod mobile_desktop_parity;
@@ -145,6 +146,9 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
+pub use mate_betsy::{
+    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
+};
 pub use mint_linux::{
     MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,

@@ -60,6 +60,8 @@ mod sigma_fs_extended;
 mod epoll;
 #[path = "../src/loader/elf/relocation.rs"]
 mod elf_relocation;
+#[path = "../src/security/mod.rs"]
+pub mod security;
 #[path = "../src/sigpkg/mod.rs"]
 mod sigpkg;
 #[path = "../src/device/manager.rs"]

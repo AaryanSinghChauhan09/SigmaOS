@@ -4,11 +4,7 @@ use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-
-#[cfg(test)]
-use alloc::collections::BTreeMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -1376,6 +1372,10 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
         assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
         assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("package.pkg.tar.zst"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
+        assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
+        assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
     }
 
     #[test]

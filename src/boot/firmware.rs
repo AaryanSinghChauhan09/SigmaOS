@@ -1,3 +1,4 @@
+extern crate core;
 extern crate alloc;
 
 use core::convert::TryInto;

@@ -452,6 +452,7 @@ impl CachyosRepoMirrorSelector {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_bore_scheduler_ticks() {

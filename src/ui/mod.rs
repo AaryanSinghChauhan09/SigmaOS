@@ -3,6 +3,7 @@
 pub mod math_plotter;
 pub mod toolkit;
 pub mod control_center;
+pub mod folder_color;
 
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
@@ -11,4 +12,7 @@ pub use toolkit::{
 };
 pub use control_center::{
     UnifiedControlCenter, SwitchboardPlug, ControlCenterCategory, SystemSettingItem,
+};
+pub use folder_color::{
+    FolderColor, FolderColorSwitcherEngine, FolderCustomization, FolderEmblem,
 };
