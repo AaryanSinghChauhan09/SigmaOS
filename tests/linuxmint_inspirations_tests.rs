@@ -88,7 +88,7 @@ fn bulky_renames_multiple_files() {
     b.add_file("photo (2).jpg");
     b.add_rule(RenameRule::FindReplace { find: " (".into(), replace: "_".into() });
     b.add_rule(RenameRule::FindReplace { find: ")".into(), replace: "".into() });
-    let renamed = b.execute();
+    let renamed = b.execute().unwrap();
     assert_eq!(renamed.len(), 2);
     assert_eq!(renamed[0].renamed, "photo_1.jpg");
     assert_eq!(renamed[1].renamed, "photo_2.jpg");

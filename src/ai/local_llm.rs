@@ -12,6 +12,7 @@ use alloc::vec::Vec;
 #[allow(non_camel_case_types)]
 pub enum QuantizationType {
     Q4KM,
+    Q4_K_M,
     Q8_0,
     F16,
 }

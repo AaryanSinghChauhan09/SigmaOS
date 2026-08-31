@@ -4,6 +4,7 @@ pub mod math_plotter;
 pub mod toolkit;
 pub mod control_center;
 pub mod folder_color;
+pub mod gtk;
 
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
