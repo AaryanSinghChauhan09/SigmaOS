@@ -2295,6 +2295,212 @@ impl DragonFlyHammer2FsSnapshotV2 {
     }
 }
 
+
+// ============================================================================
+// Android APEX Dynamic Containerized System Module Engine (from 9to5Google / Android Authority)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AndroidApexModule {
+    pub package_name: String,
+    pub version_code: u64,
+    pub mount_point: String,
+    pub is_active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AndroidApexContainerModuleEngine {
+    pub modules: Vec<AndroidApexModule>,
+    pub active_mounts: usize,
+}
+
+impl AndroidApexContainerModuleEngine {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+            active_mounts: 0,
+        }
+    }
+
+    pub fn register_apex_module(&mut self, package_name: &str, version_code: u64, mount_point: &str) -> bool {
+        if self.modules.iter().any(|m| m.package_name == package_name && m.version_code == version_code) {
+            return false;
+        }
+        self.modules.push(AndroidApexModule {
+            package_name: package_name.to_string(),
+            version_code,
+            mount_point: mount_point.to_string(),
+            is_active: false,
+        });
+        true
+    }
+
+    pub fn activate_module(&mut self, package_name: &str, version_code: u64) -> Result<(), &'static str> {
+        let module = self.modules.iter_mut().find(|m| m.package_name == package_name && m.version_code == version_code)
+            .ok_or("Module not found")?;
+        if !module.is_active {
+            module.is_active = true;
+            self.active_mounts += 1;
+        }
+        Ok(())
+    }
+
+    pub fn rollback_module(&mut self, package_name: &str) -> Result<u64, &'static str> {
+        let active = self.modules.iter_mut().find(|m| m.package_name == package_name && m.is_active)
+            .ok_or("No active module for package")?;
+        active.is_active = false;
+        if self.active_mounts > 0 {
+            self.active_mounts -= 1;
+        }
+        Ok(active.version_code)
+    }
+}
+
+// ============================================================================
+// Rosetta 2 Style Dynamic Binary Translator (from 9to5Mac / XDA)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TargetArch {
+    AArch64,
+    RiscV64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RosettaTranslationBlock {
+    pub guest_pc: u64,
+    pub host_code_bytes: Vec<u8>,
+    pub hit_count: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RosettaDynamicBinaryTranslator {
+    pub target_arch: TargetArch,
+    pub translation_cache: Vec<RosettaTranslationBlock>,
+    pub total_translations: u64,
+}
+
+impl RosettaDynamicBinaryTranslator {
+    pub fn new(target_arch: TargetArch) -> Self {
+        Self {
+            target_arch,
+            translation_cache: Vec::new(),
+            total_translations: 0,
+        }
+    }
+
+    pub fn translate_instruction_block(&mut self, guest_pc: u64, x86_bytes: &[u8]) -> Vec<u8> {
+        if let Some(block) = self.translation_cache.iter_mut().find(|b| b.guest_pc == guest_pc) {
+            block.hit_count += 1;
+            return block.host_code_bytes.clone();
+        }
+
+        // Emit simulated JIT instructions for target arch
+        let mut host_bytes = Vec::new();
+        match self.target_arch {
+            TargetArch::AArch64 => {
+                host_bytes.extend_from_slice(&[0xd5, 0x03, 0x20, 0x1f]); // NOP on AArch64
+                host_bytes.extend_from_slice(x86_bytes);
+            }
+            TargetArch::RiscV64 => {
+                host_bytes.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]); // NOP on RISC-V
+                host_bytes.extend_from_slice(x86_bytes);
+            }
+        }
+
+        let block = RosettaTranslationBlock {
+            guest_pc,
+            host_code_bytes: host_bytes.clone(),
+            hit_count: 1,
+        };
+        self.translation_cache.push(block);
+        self.total_translations += 1;
+        host_bytes
+    }
+}
+
+// ============================================================================
+// Phoronix Automated Benchmark Engine (from Phoronix / TechPowerUp)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PhoronixTestResult {
+    pub test_name: String,
+    pub score: f64,
+    pub unit: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct PhoronixAutomatedBenchmarkEngine {
+    pub suite_name: String,
+    pub results: Vec<PhoronixTestResult>,
+}
+
+impl PhoronixAutomatedBenchmarkEngine {
+    pub fn new(suite_name: &str) -> Self {
+        Self {
+            suite_name: suite_name.to_string(),
+            results: Vec::new(),
+        }
+    }
+
+    pub fn run_test(&mut self, name: &str, unit: &str, raw_metric: f64) {
+        self.results.push(PhoronixTestResult {
+            test_name: name.to_string(),
+            score: raw_metric,
+            unit: unit.to_string(),
+        });
+    }
+
+    pub fn compute_composite_index(&self) -> f64 {
+        if self.results.is_empty() {
+            return 0.0;
+        }
+        let sum: f64 = self.results.iter().map(|r| r.score).sum();
+        sum / (self.results.len() as f64)
+    }
+}
+
+// ============================================================================
+// DistroWatch Parity Metrics Hub (from DistroWatch / ItsFOSS)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DistroParityScore {
+    pub distro_name: String,
+    pub feature_coverage_percent: u8,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroWatchParityMetricsHub {
+    pub distros: Vec<DistroParityScore>,
+}
+
+impl DistroWatchParityMetricsHub {
+    pub fn new() -> Self {
+        Self { distros: Vec::new() }
+    }
+
+    pub fn record_distro_parity(&mut self, name: &str, coverage: u8) {
+        if let Some(d) = self.distros.iter_mut().find(|d| d.distro_name == name) {
+            d.feature_coverage_percent = coverage;
+        } else {
+            self.distros.push(DistroParityScore {
+                distro_name: name.to_string(),
+                feature_coverage_percent: coverage,
+            });
+        }
+    }
+
+    pub fn average_ecosystem_parity(&self) -> f64 {
+        if self.distros.is_empty() {
+            return 0.0;
+        }
+        let sum: u64 = self.distros.iter().map(|d| d.feature_coverage_percent as u64).sum();
+        (sum as f64) / (self.distros.len() as f64)
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -2594,5 +2800,51 @@ mod extra_unimplemented_tests {
         assert!(loop_engine.is_running);
     }
 
-}
 
+    #[test]
+    fn test_android_apex_container_module_engine() {
+        let mut engine = AndroidApexContainerModuleEngine::new();
+        assert!(engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+        assert!(!engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+
+        assert!(engine.activate_module("com.android.runtime", 330000000).is_ok());
+        assert_eq!(engine.active_mounts, 1);
+
+        let version = engine.rollback_module("com.android.runtime").unwrap();
+        assert_eq!(version, 330000000);
+        assert_eq!(engine.active_mounts, 0);
+    }
+
+    #[test]
+    fn test_rosetta_dynamic_binary_translator() {
+        let mut translator = RosettaDynamicBinaryTranslator::new(TargetArch::AArch64);
+        let x86_code = [0x90, 0x90, 0xc3]; // NOP NOP RET
+        let translated1 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 1);
+
+        let translated2 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translated1, translated2);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 2);
+    }
+
+    #[test]
+    fn test_phoronix_automated_benchmark_engine() {
+        let mut phoronix = PhoronixAutomatedBenchmarkEngine::new("Kernel Scheduler Suite");
+        phoronix.run_test("7-Zip Compression", "MIPS", 45000.0);
+        phoronix.run_test("Sysbench CPU", "events/sec", 15000.0);
+        assert_eq!(phoronix.results.len(), 2);
+        assert_eq!(phoronix.compute_composite_index(), 30000.0);
+    }
+
+    #[test]
+    fn test_distrowatch_parity_metrics_hub() {
+        let mut hub = DistroWatchParityMetricsHub::new();
+        hub.record_distro_parity("Arch Linux", 100);
+        hub.record_distro_parity("FreeBSD", 90);
+        assert_eq!(hub.distros.len(), 2);
+        assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+}
