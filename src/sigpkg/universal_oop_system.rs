@@ -2828,6 +2828,128 @@ impl Default for DebianTriggerManager {
     }
 }
 
+// ============================================================================
+// Portage USE Flag Pipeline & Nix Derivation Engine & Alpine Apk Cache
+// ============================================================================
+
+pub struct PortageUseFlagPipeline {
+    pub active_flags: HashMap<String, bool>,
+}
+
+impl PortageUseFlagPipeline {
+    pub fn new() -> Self {
+        Self {
+            active_flags: HashMap::new(),
+        }
+    }
+
+    pub fn set_flag(&mut self, flag: &str, state: bool) {
+        self.active_flags.insert(flag.to_string(), state);
+    }
+
+    pub fn is_flag_active(&self, flag: &str) -> bool {
+        self.active_flags.get(flag).cloned().unwrap_or(false)
+    }
+
+    pub fn evaluate_package_dependencies(&self, package: &dyn IPackage) -> Vec<Dependency> {
+        let mut deps = package.dependencies().to_vec();
+        for cond in package.conditional_dependencies() {
+            if self.is_flag_active(&cond.required_use_flag) {
+                deps.push(cond.dependency.clone());
+            }
+        }
+        deps
+    }
+}
+
+impl Default for PortageUseFlagPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NixDerivationNode {
+    pub drv_path: String,
+    pub output_hash: String,
+    pub input_drvs: Vec<String>,
+}
+
+pub struct NixDerivationEngine {
+    pub nodes: HashMap<String, NixDerivationNode>,
+}
+
+impl NixDerivationEngine {
+    pub fn new() -> Self {
+        Self {
+            nodes: HashMap::new(),
+        }
+    }
+
+    pub fn register_derivation(&mut self, node: NixDerivationNode) {
+        self.nodes.insert(node.drv_path.clone(), node);
+    }
+
+    pub fn verify_closure_integrity(&self, root_drv: &str) -> Result<usize, &'static str> {
+        let mut visited = alloc::collections::BTreeSet::new();
+        let mut stack = vec![root_drv.to_string()];
+
+        while let Some(current) = stack.pop() {
+            if visited.contains(&current) {
+                continue;
+            }
+            let node = self.nodes.get(&current).ok_or("Missing derivation in closure graph")?;
+            visited.insert(current);
+            for input in &node.input_drvs {
+                if !visited.contains(input) {
+                    stack.push(input.clone());
+                }
+            }
+        }
+
+        Ok(visited.len())
+    }
+}
+
+impl Default for NixDerivationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedApkPackage {
+    pub package_name: String,
+    pub version_str: String,
+    pub cached_tarball_path: String,
+}
+
+pub struct AlpineApkCacheManager {
+    pub cached_packages: HashMap<String, CachedApkPackage>,
+}
+
+impl AlpineApkCacheManager {
+    pub fn new() -> Self {
+        Self {
+            cached_packages: HashMap::new(),
+        }
+    }
+
+    pub fn cache_package(&mut self, pkg: CachedApkPackage) {
+        self.cached_packages.insert(pkg.package_name.clone(), pkg);
+    }
+
+    pub fn get_cached(&self, package_name: &str) -> Option<&CachedApkPackage> {
+        self.cached_packages.get(package_name)
+    }
+}
+
+impl Default for AlpineApkCacheManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3410,5 +3532,44 @@ Description: Hook test";
 
         // Confirm executing logic was triggered successfully
         assert!(executed.load(core::sync::atomic::Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_portage_pipeline_nix_engine_alpine_cache() {
+        // 1. Portage USE Flag Pipeline Test
+        let mut use_pipeline = PortageUseFlagPipeline::new();
+        use_pipeline.set_flag("wayland", true);
+        use_pipeline.set_flag("x11", false);
+
+        assert!(use_pipeline.is_flag_active("wayland"));
+        assert!(!use_pipeline.is_flag_active("x11"));
+
+        // 2. Nix Derivation Engine Test
+        let mut nix_engine = NixDerivationEngine::new();
+        nix_engine.register_derivation(NixDerivationNode {
+            drv_path: "/nix/store/pkg-a.drv".to_string(),
+            output_hash: "hash-a".to_string(),
+            input_drvs: vec!["/nix/store/pkg-b.drv".to_string()],
+        });
+        nix_engine.register_derivation(NixDerivationNode {
+            drv_path: "/nix/store/pkg-b.drv".to_string(),
+            output_hash: "hash-b".to_string(),
+            input_drvs: Vec::new(),
+        });
+
+        let closure_count = nix_engine.verify_closure_integrity("/nix/store/pkg-a.drv").unwrap();
+        assert_eq!(closure_count, 2);
+
+        // 3. Alpine APK Cache Manager Test
+        let mut apk_cache = AlpineApkCacheManager::new();
+        apk_cache.cache_package(CachedApkPackage {
+            package_name: "musl".to_string(),
+            version_str: "1.2.4".to_string(),
+            cached_tarball_path: "/var/cache/apk/musl-1.2.4.apk".to_string(),
+        });
+
+        let cached = apk_cache.get_cached("musl").unwrap();
+        assert_eq!(cached.version_str, "1.2.4");
+        assert_eq!(cached.cached_tarball_path, "/var/cache/apk/musl-1.2.4.apk");
     }
 }
