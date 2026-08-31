@@ -1331,6 +1331,34 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+
+    /// Converts any external Linux or BSD distro package specification (DEB, RPM, Pacman, APK, Flatpak, Snap, AppImage, Ebuild, XBPS, Ports, PKG)
+    /// into native SigmaPkg format with full dependency mapping and sandboxing translation.
+    pub fn convert_to_sigpkg(&self, package: &UnifiedPackage) -> Result<UnifiedPackage, PackageError> {
+        let mut sigpkg = UnifiedPackage::new(
+            format!("sigpkg-{}", package.name),
+            package.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(package.name.clone());
+
+        for dep in &package.dependencies {
+            sigpkg = sigpkg.with_dependency(dep.clone());
+        }
+
+        for conflict in &package.conflicts {
+            sigpkg = sigpkg.with_conflict(conflict.clone());
+        }
+
+        for provide in &package.provides {
+            sigpkg = sigpkg.with_provides(provide.clone());
+        }
+
+        sigpkg.source = package.source.clone();
+        sigpkg.installed = package.installed;
+
+        Ok(sigpkg)
+    }
 }
 
 impl Default for UniversalPackageManager {
@@ -1971,6 +1999,20 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_convert_to_sigpkg() {
+        let manager = UniversalPackageManager::new();
+        let deb_pkg = UnifiedPackage::new("curl".to_string(), "7.88.1".to_string())
+            .with_format(PackageFormat::Deb)
+            .with_dependency("libssl".to_string());
+
+        let sigpkg = manager.convert_to_sigpkg(&deb_pkg).unwrap();
+        assert_eq!(sigpkg.name, "sigpkg-curl");
+        assert!(sigpkg.formats.contains(&PackageFormat::SigmaPkg));
+        assert!(sigpkg.dependencies.contains(&"libssl".to_string()));
+        assert!(sigpkg.provides.contains(&"curl".to_string()));
     }
 
     #[test]

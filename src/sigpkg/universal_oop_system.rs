@@ -2316,6 +2316,32 @@ impl PackageDeltaEngine {
     }
 }
 
+/// Universal Format Adapter Router providing single-pass conversion of any
+/// external Linux/BSD package into native `PackageFormat::Sigma`.
+pub struct UniversalFormatAdapterRouter {
+    translator: SigmaPackageTranslator,
+}
+
+impl UniversalFormatAdapterRouter {
+    pub fn new() -> Self {
+        Self {
+            translator: SigmaPackageTranslator::new(),
+        }
+    }
+
+    pub fn convert_to_sigma_package(&self, package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+        self.translator
+            .translate(package, PackageFormat::Sigma)
+            .map_err(|e| ParseError::IoError(format!("Format translation error: {:?}", e)))
+    }
+}
+
+impl Default for UniversalFormatAdapterRouter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for PackageDeltaEngine {
     fn default() -> Self {
         Self::new()
@@ -3145,6 +3171,18 @@ Depends: kernel-base";
         assert_eq!(package.name(), "test-sigma");
         assert_eq!(package.format(), PackageFormat::Sigma);
         assert_eq!(package.dependencies().len(), 1);
+    }
+
+    #[test]
+    fn test_universal_format_adapter_router() {
+        let router = UniversalFormatAdapterRouter::new();
+        let deb_adapter = DebAdapter::new();
+        let deb_data = b"Package: htop\nVersion: 3.2.1\nDescription: Interactive process viewer";
+        let parsed_deb = deb_adapter.parse(deb_data).unwrap();
+
+        let sigma_pkg = router.convert_to_sigma_package(parsed_deb.as_ref()).unwrap();
+        assert_eq!(sigma_pkg.name(), "htop");
+        assert_eq!(sigma_pkg.format(), PackageFormat::Sigma);
     }
 
     #[test]
