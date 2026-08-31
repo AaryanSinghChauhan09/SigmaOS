@@ -2,10 +2,10 @@
 
 extern crate alloc;
 
-#[path = "../src/klib/mod.rs"]
-pub mod klib;
 #[path = "../src/process/activity_manager.rs"]
 mod activity_manager;
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
 

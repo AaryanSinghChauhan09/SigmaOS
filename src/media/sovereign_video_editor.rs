@@ -6,10 +6,10 @@
 use alloc::boxed::Box;
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EditorError {
@@ -41,9 +41,15 @@ impl AscCdl {
 
     /// Color Grading Transform: out = clamp((in * slope) + offset) ^ power
     pub fn grade_pixel(&self, r: f32, g: f32, b: f32) -> (f32, f32, f32) {
-        let r_graded = ((r * self.slope[0]) + self.offset[0]).max(0.0).powf(self.power[0]);
-        let g_graded = ((g * self.slope[1]) + self.offset[1]).max(0.0).powf(self.power[1]);
-        let b_graded = ((b * self.slope[2]) + self.offset[2]).max(0.0).powf(self.power[2]);
+        let r_graded = ((r * self.slope[0]) + self.offset[0])
+            .max(0.0)
+            .powf(self.power[0]);
+        let g_graded = ((g * self.slope[1]) + self.offset[1])
+            .max(0.0)
+            .powf(self.power[1]);
+        let b_graded = ((b * self.slope[2]) + self.offset[2])
+            .max(0.0)
+            .powf(self.power[2]);
         (r_graded.min(1.0), g_graded.min(1.0), b_graded.min(1.0))
     }
 }
@@ -123,7 +129,11 @@ impl<T: Copy> Keyframe<T> {
 }
 
 /// Interpolates float keyframes across timeline frames
-pub fn interpolate_f32_keyframes(keyframes: &[Keyframe<f32>], current_frame: u64, default_val: f32) -> f32 {
+pub fn interpolate_f32_keyframes(
+    keyframes: &[Keyframe<f32>],
+    current_frame: u64,
+    default_val: f32,
+) -> f32 {
     if keyframes.is_empty() {
         return default_val;
     }
@@ -154,7 +164,11 @@ pub fn interpolate_f32_keyframes(keyframes: &[Keyframe<f32>], current_frame: u64
                     t = t * (2.0 - t);
                 }
                 InterpolationType::EaseInOut => {
-                    t = if t < 0.5 { 2.0 * t * t } else { -1.0 + (4.0 - 2.0 * t) * t };
+                    t = if t < 0.5 {
+                        2.0 * t * t
+                    } else {
+                        -1.0 + (4.0 - 2.0 * t) * t
+                    };
                 }
                 InterpolationType::Bezier => {
                     t = t * t * (3.0 - 2.0 * t); // Smoothstep cubic bezier curve
@@ -210,12 +224,12 @@ pub struct SpeedRampKeyframe {
 pub struct TimelineClip {
     pub id: u32,
     pub name: String,
-    pub in_point_frames: u64,    // Source media start offset
-    pub out_point_frames: u64,   // Source media end offset
-    pub start_frame: u64,        // Timeline position start
-    pub duration_frames: u64,     // Timeline duration
-    pub speed_multiplier: f32,   // Constant or base speed
-    pub is_reversed: bool,       // Reverse playback flag
+    pub in_point_frames: u64,  // Source media start offset
+    pub out_point_frames: u64, // Source media end offset
+    pub start_frame: u64,      // Timeline position start
+    pub duration_frames: u64,  // Timeline duration
+    pub speed_multiplier: f32, // Constant or base speed
+    pub is_reversed: bool,     // Reverse playback flag
     pub transform: ClipTransform,
     pub opacity_keyframes: Vec<Keyframe<f32>>,
     pub speed_ramps: Vec<SpeedRampKeyframe>,
@@ -274,7 +288,11 @@ pub enum VideoEffect {
 impl VideoEffect {
     pub fn apply_effect(&self, rgba_pixels: &mut [u8], width: u32, height: u32) {
         match self {
-            VideoEffect::ChromaKey { key_color_rgb, tolerance, softness } => {
+            VideoEffect::ChromaKey {
+                key_color_rgb,
+                tolerance,
+                softness,
+            } => {
                 let kr = key_color_rgb.0 as f32 / 255.0;
                 let kg = key_color_rgb.1 as f32 / 255.0;
                 let kb = key_color_rgb.2 as f32 / 255.0;
@@ -453,7 +471,11 @@ impl VideoTrack {
 
     /// Ripple Trim: Trims a clip's duration and ripples all subsequent clips on the track
     pub fn ripple_trim(&mut self, clip_id: u32, delta_frames: i64) -> Result<(), EditorError> {
-        let clip_idx = self.clips.iter().position(|c| c.id == clip_id).ok_or(EditorError::ClipOutOfRange)?;
+        let clip_idx = self
+            .clips
+            .iter()
+            .position(|c| c.id == clip_id)
+            .ok_or(EditorError::ClipOutOfRange)?;
 
         let clip = &mut self.clips[clip_idx];
         let new_duration = (clip.duration_frames as i64 + delta_frames).max(1) as u64;
@@ -470,9 +492,22 @@ impl VideoTrack {
     }
 
     /// Roll Trim: Adjusts the edit point between two adjacent clips without altering total timeline length
-    pub fn roll_trim(&mut self, left_clip_id: u32, right_clip_id: u32, delta_frames: i64) -> Result<(), EditorError> {
-        let left_idx = self.clips.iter().position(|c| c.id == left_clip_id).ok_or(EditorError::ClipOutOfRange)?;
-        let right_idx = self.clips.iter().position(|c| c.id == right_clip_id).ok_or(EditorError::ClipOutOfRange)?;
+    pub fn roll_trim(
+        &mut self,
+        left_clip_id: u32,
+        right_clip_id: u32,
+        delta_frames: i64,
+    ) -> Result<(), EditorError> {
+        let left_idx = self
+            .clips
+            .iter()
+            .position(|c| c.id == left_clip_id)
+            .ok_or(EditorError::ClipOutOfRange)?;
+        let right_idx = self
+            .clips
+            .iter()
+            .position(|c| c.id == right_clip_id)
+            .ok_or(EditorError::ClipOutOfRange)?;
 
         if left_idx + 1 != right_idx {
             return Err(EditorError::ClipOutOfRange);
@@ -486,18 +521,24 @@ impl VideoTrack {
         let new_right_dur = (right_clip.duration_frames as i64 - delta_frames).max(1) as u64;
 
         left_clip.duration_frames = new_left_dur;
-        left_clip.out_point_frames = (left_clip.out_point_frames as i64 + delta_frames).max(1) as u64;
+        left_clip.out_point_frames =
+            (left_clip.out_point_frames as i64 + delta_frames).max(1) as u64;
 
         right_clip.start_frame = (right_clip.start_frame as i64 + delta_frames).max(0) as u64;
         right_clip.duration_frames = new_right_dur;
-        right_clip.in_point_frames = (right_clip.in_point_frames as i64 + delta_frames).max(0) as u64;
+        right_clip.in_point_frames =
+            (right_clip.in_point_frames as i64 + delta_frames).max(0) as u64;
 
         Ok(())
     }
 
     /// Slip Edit: Changes clip's in/out points without altering its timeline position or duration
     pub fn slip_edit(&mut self, clip_id: u32, delta_frames: i64) -> Result<(), EditorError> {
-        let clip = self.clips.iter_mut().find(|c| c.id == clip_id).ok_or(EditorError::ClipOutOfRange)?;
+        let clip = self
+            .clips
+            .iter_mut()
+            .find(|c| c.id == clip_id)
+            .ok_or(EditorError::ClipOutOfRange)?;
         clip.in_point_frames = (clip.in_point_frames as i64 + delta_frames).max(0) as u64;
         clip.out_point_frames = (clip.out_point_frames as i64 + delta_frames).max(1) as u64;
         Ok(())
@@ -505,16 +546,24 @@ impl VideoTrack {
 
     /// Slide Edit: Moves clip on timeline, adjusting previous clip's duration and next clip's start/duration
     pub fn slide_edit(&mut self, clip_id: u32, delta_frames: i64) -> Result<(), EditorError> {
-        let idx = self.clips.iter().position(|c| c.id == clip_id).ok_or(EditorError::ClipOutOfRange)?;
+        let idx = self
+            .clips
+            .iter()
+            .position(|c| c.id == clip_id)
+            .ok_or(EditorError::ClipOutOfRange)?;
 
         if idx == 0 || idx + 1 >= self.clips.len() {
             return Err(EditorError::ClipOutOfRange);
         }
 
-        self.clips[idx - 1].duration_frames = (self.clips[idx - 1].duration_frames as i64 + delta_frames).max(1) as u64;
-        self.clips[idx].start_frame = (self.clips[idx].start_frame as i64 + delta_frames).max(0) as u64;
-        self.clips[idx + 1].start_frame = (self.clips[idx + 1].start_frame as i64 + delta_frames).max(0) as u64;
-        self.clips[idx + 1].duration_frames = (self.clips[idx + 1].duration_frames as i64 - delta_frames).max(1) as u64;
+        self.clips[idx - 1].duration_frames =
+            (self.clips[idx - 1].duration_frames as i64 + delta_frames).max(1) as u64;
+        self.clips[idx].start_frame =
+            (self.clips[idx].start_frame as i64 + delta_frames).max(0) as u64;
+        self.clips[idx + 1].start_frame =
+            (self.clips[idx + 1].start_frame as i64 + delta_frames).max(0) as u64;
+        self.clips[idx + 1].duration_frames =
+            (self.clips[idx + 1].duration_frames as i64 - delta_frames).max(1) as u64;
 
         Ok(())
     }
@@ -902,8 +951,17 @@ impl SovereignVideoEditor {
     }
 
     /// Render composite frames with color correction, CDL, and active video effects
-    pub fn render_frame_composite(&self, track_id: u32, width: u32, height: u32, raw_frame_rgba: &[u8]) -> Result<Vec<u8>, EditorError> {
-        let track = self.tracks.get(&track_id).ok_or(EditorError::TrackNotFound)?;
+    pub fn render_frame_composite(
+        &self,
+        track_id: u32,
+        width: u32,
+        height: u32,
+        raw_frame_rgba: &[u8],
+    ) -> Result<Vec<u8>, EditorError> {
+        let track = self
+            .tracks
+            .get(&track_id)
+            .ok_or(EditorError::TrackNotFound)?;
 
         let mut graded_buffer = Vec::with_capacity(raw_frame_rgba.len());
 
@@ -1040,10 +1098,10 @@ mod tests {
             softness: 0.0,
         };
 
-        let mut pixels = vec![0, 255, 0, 255,  255, 0, 0, 255]; // Pure green and pure red
+        let mut pixels = vec![0, 255, 0, 255, 255, 0, 0, 255]; // Pure green and pure red
         effect.apply_effect(&mut pixels, 2, 1);
 
-        assert_eq!(pixels[3], 0);   // Green pixel keyed out (alpha = 0)
+        assert_eq!(pixels[3], 0); // Green pixel keyed out (alpha = 0)
         assert_eq!(pixels[7], 255); // Red pixel intact
     }
 

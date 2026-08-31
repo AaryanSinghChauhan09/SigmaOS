@@ -1,10 +1,9 @@
 extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
 /// Access Control Matrix (ACM), Extended POSIX ACLs, Capability Bounding Sets,
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
-
 use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::format;
 
 pub type RoleID = usize;
 pub type PermissionID = usize;
@@ -337,7 +336,12 @@ impl DacPermission {
         (self.mode_bits & 0o1000) != 0
     }
 
-    pub fn evaluate_access(&self, subject_uid: UserID, subject_gid: GroupID, requested_mode: u16) -> bool {
+    pub fn evaluate_access(
+        &self,
+        subject_uid: UserID,
+        subject_gid: GroupID,
+        requested_mode: u16,
+    ) -> bool {
         let allowed_bits = if subject_uid == 0 {
             0o777 // Root bypasses standard DAC
         } else if subject_uid == self.owner_uid {
@@ -352,7 +356,11 @@ impl DacPermission {
     }
 
     /// Evaluates SUID/SGID execution transitions (returns effective UID and GID)
-    pub fn evaluate_execution_credentials(&self, subject_uid: UserID, subject_gid: GroupID) -> (UserID, GroupID) {
+    pub fn evaluate_execution_credentials(
+        &self,
+        subject_uid: UserID,
+        subject_gid: GroupID,
+    ) -> (UserID, GroupID) {
         if !self.evaluate_access(subject_uid, subject_gid, dac_flags::EXECUTE) {
             return (subject_uid, subject_gid);
         }
@@ -390,19 +398,19 @@ impl DacPermission {
 
 pub mod file_flags {
     // BSD user flags
-    pub const NODUMP: u32   = 0x0000_0001; // Do not dump file
-    pub const UIMMUT: u32   = 0x0000_0002; // User immutable (uchg)
-    pub const UAPPEND: u32  = 0x0000_0004; // User append-only (uappend)
-    pub const OPAQUE: u32   = 0x0000_0008; // Directory is opaque for unionfs
-    pub const UNOUNLINK: u32= 0x0000_0010; // User undeletable (uuunlink)
+    pub const NODUMP: u32 = 0x0000_0001; // Do not dump file
+    pub const UIMMUT: u32 = 0x0000_0002; // User immutable (uchg)
+    pub const UAPPEND: u32 = 0x0000_0004; // User append-only (uappend)
+    pub const OPAQUE: u32 = 0x0000_0008; // Directory is opaque for unionfs
+    pub const UNOUNLINK: u32 = 0x0000_0010; // User undeletable (uuunlink)
 
     // BSD system flags (require superuser / securelevel <= 0)
-    pub const SIMMUT: u32   = 0x0002_0000; // System immutable (schg)
-    pub const SAPPEND: u32  = 0x0004_0000; // System append-only (sappend)
-    pub const SNOUNLINK: u32= 0x0010_0000; // System undeletable (sunlink)
+    pub const SIMMUT: u32 = 0x0002_0000; // System immutable (schg)
+    pub const SAPPEND: u32 = 0x0004_0000; // System append-only (sappend)
+    pub const SNOUNLINK: u32 = 0x0010_0000; // System undeletable (sunlink)
 
     // Linux chattr flags parity
-    pub const LINUX_APPEND: u32    = UAPPEND | SAPPEND;
+    pub const LINUX_APPEND: u32 = UAPPEND | SAPPEND;
     pub const LINUX_IMMUTABLE: u32 = UIMMUT | SIMMUT;
 }
 
@@ -460,7 +468,10 @@ impl FileAttributeAccessControl {
             if subject_uid != 0 {
                 return false; // Only root can change system flags
             }
-            if securelevel > 0 && (self.flags & file_flags::SIMMUT) != 0 && (new_flags & file_flags::SIMMUT) == 0 {
+            if securelevel > 0
+                && (self.flags & file_flags::SIMMUT) != 0
+                && (new_flags & file_flags::SIMMUT) == 0
+            {
                 return false; // Cannot clear system immutable in securelevel > 0
             }
         }
@@ -478,21 +489,21 @@ impl FileAttributeAccessControl {
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub mod capsicum_rights {
-    pub const CAP_READ: u64         = 0x0000_0001;
-    pub const CAP_WRITE: u64        = 0x0000_0002;
-    pub const CAP_SEEK: u64         = 0x0000_0004;
-    pub const CAP_MMAP: u64         = 0x0000_0008;
-    pub const CAP_MMAP_R: u64       = 0x0000_0010;
-    pub const CAP_MMAP_W: u64       = 0x0000_0020;
-    pub const CAP_MMAP_X: u64       = 0x0000_0040;
-    pub const CAP_FSTAT: u64        = 0x0000_0080;
-    pub const CAP_FCNTL: u64        = 0x0000_0100;
-    pub const CAP_ACCEPT: u64       = 0x0000_0200;
-    pub const CAP_CONNECT: u64      = 0x0000_0400;
-    pub const CAP_BIND: u64         = 0x0000_0800;
-    pub const CAP_IOCTL: u64        = 0x0000_1000;
+    pub const CAP_READ: u64 = 0x0000_0001;
+    pub const CAP_WRITE: u64 = 0x0000_0002;
+    pub const CAP_SEEK: u64 = 0x0000_0004;
+    pub const CAP_MMAP: u64 = 0x0000_0008;
+    pub const CAP_MMAP_R: u64 = 0x0000_0010;
+    pub const CAP_MMAP_W: u64 = 0x0000_0020;
+    pub const CAP_MMAP_X: u64 = 0x0000_0040;
+    pub const CAP_FSTAT: u64 = 0x0000_0080;
+    pub const CAP_FCNTL: u64 = 0x0000_0100;
+    pub const CAP_ACCEPT: u64 = 0x0000_0200;
+    pub const CAP_CONNECT: u64 = 0x0000_0400;
+    pub const CAP_BIND: u64 = 0x0000_0800;
+    pub const CAP_IOCTL: u64 = 0x0000_1000;
 
-    pub const CAP_ALL: u64          = 0xFFFF_FFFF_FFFF_FFFF;
+    pub const CAP_ALL: u64 = 0xFFFF_FFFF_FFFF_FFFF;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -502,7 +513,9 @@ pub struct CapsicumRights {
 
 impl CapsicumRights {
     pub fn full() -> Self {
-        Self { rights_mask: capsicum_rights::CAP_ALL }
+        Self {
+            rights_mask: capsicum_rights::CAP_ALL,
+        }
     }
 
     pub fn new(rights_mask: u64) -> Self {
@@ -531,30 +544,30 @@ pub enum Nfs4AceType {
 }
 
 pub mod nfs4_ace_masks {
-    pub const READ_DATA: u32         = 0x0000_0001;
-    pub const WRITE_DATA: u32        = 0x0000_0002;
-    pub const APPEND_DATA: u32       = 0x0000_0004;
-    pub const READ_NAMED_ATTRS: u32  = 0x0000_0008;
+    pub const READ_DATA: u32 = 0x0000_0001;
+    pub const WRITE_DATA: u32 = 0x0000_0002;
+    pub const APPEND_DATA: u32 = 0x0000_0004;
+    pub const READ_NAMED_ATTRS: u32 = 0x0000_0008;
     pub const WRITE_NAMED_ATTRS: u32 = 0x0000_0010;
-    pub const EXECUTE: u32           = 0x0000_0020;
-    pub const DELETE_CHILD: u32      = 0x0000_0040;
-    pub const READ_ATTRIBUTES: u32   = 0x0000_0080;
-    pub const WRITE_ATTRIBUTES: u32  = 0x0000_0100;
-    pub const DELETE: u32            = 0x0001_0000;
-    pub const READ_ACL: u32           = 0x0002_0000;
-    pub const WRITE_ACL: u32          = 0x0004_0000;
-    pub const WRITE_OWNER: u32        = 0x0008_0000;
-    pub const SYNCHRONIZE: u32       = 0x0010_0000;
+    pub const EXECUTE: u32 = 0x0000_0020;
+    pub const DELETE_CHILD: u32 = 0x0000_0040;
+    pub const READ_ATTRIBUTES: u32 = 0x0000_0080;
+    pub const WRITE_ATTRIBUTES: u32 = 0x0000_0100;
+    pub const DELETE: u32 = 0x0001_0000;
+    pub const READ_ACL: u32 = 0x0002_0000;
+    pub const WRITE_ACL: u32 = 0x0004_0000;
+    pub const WRITE_OWNER: u32 = 0x0008_0000;
+    pub const SYNCHRONIZE: u32 = 0x0010_0000;
 }
 
 pub mod nfs4_ace_flags {
-    pub const FILE_INHERIT_ACE: u32    = 0x0000_0001;
+    pub const FILE_INHERIT_ACE: u32 = 0x0000_0001;
     pub const DIRECTORY_INHERIT_ACE: u32 = 0x0000_0002;
     pub const NO_PROPAGATE_INHERIT_ACE: u32 = 0x0000_0004;
-    pub const INHERIT_ONLY_ACE: u32     = 0x0000_0008;
+    pub const INHERIT_ONLY_ACE: u32 = 0x0000_0008;
     pub const SUCCESSFUL_ACCESS_ACE_FLAG: u32 = 0x0000_0010;
-    pub const FAILED_ACCESS_ACE_FLAG: u32     = 0x0000_0020;
-    pub const IDENTIFIER_GROUP: u32    = 0x0000_0040;
+    pub const FAILED_ACCESS_ACE_FLAG: u32 = 0x0000_0020;
+    pub const IDENTIFIER_GROUP: u32 = 0x0000_0040;
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -567,7 +580,12 @@ pub struct Nfs4Ace {
 
 impl Nfs4Ace {
     pub fn new(ace_type: Nfs4AceType, flags: u32, mask: u32, who_id: u32) -> Self {
-        Self { ace_type, flags, mask, who_id }
+        Self {
+            ace_type,
+            flags,
+            mask,
+            who_id,
+        }
     }
 }
 
@@ -690,7 +708,13 @@ impl AppArmorProfile {
         }
 
         if !allowed {
-            let log_msg = alloc::format!("AppArmor [{:?}] profile='{}' path='{}' perm={}", self.mode, self.name, target_path, requested_perm);
+            let log_msg = alloc::format!(
+                "AppArmor [{:?}] profile='{}' path='{}' perm={}",
+                self.mode,
+                self.name,
+                target_path,
+                requested_perm
+            );
             self.audit_log.push(log_msg);
 
             if self.mode == AppArmorMode::Complain {
@@ -927,14 +951,22 @@ mod tests {
         assert!(suid_dac.is_suid());
         assert!(!suid_dac.is_sgid());
         assert!(!suid_dac.is_sticky());
-        assert!(suid_dac.evaluate_access(1000, 2000, dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE));
+        assert!(suid_dac.evaluate_access(
+            1000,
+            2000,
+            dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE
+        ));
         assert!(suid_dac.evaluate_access(1001, 2000, dac_flags::READ | dac_flags::EXECUTE));
 
         let sgid_dac = DacPermission::from_octal(1000, 2000, 0o2770);
         assert!(!sgid_dac.is_suid());
         assert!(sgid_dac.is_sgid());
         assert!(!sgid_dac.is_sticky());
-        assert!(sgid_dac.evaluate_access(1001, 2000, dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE));
+        assert!(sgid_dac.evaluate_access(
+            1001,
+            2000,
+            dac_flags::READ | dac_flags::WRITE | dac_flags::EXECUTE
+        ));
         assert!(!sgid_dac.evaluate_access(1001, 2001, dac_flags::READ));
 
         let sticky_dac = DacPermission::from_octal(0, 0, 0o1777);
@@ -1013,7 +1045,9 @@ mod tests {
         assert!(rights.is_right_permitted(capsicum_rights::CAP_WRITE));
 
         // Limit rights to read-only
-        rights.limit_rights(CapsicumRights::new(capsicum_rights::CAP_READ | capsicum_rights::CAP_SEEK));
+        rights.limit_rights(CapsicumRights::new(
+            capsicum_rights::CAP_READ | capsicum_rights::CAP_SEEK,
+        ));
         assert!(rights.is_right_permitted(capsicum_rights::CAP_READ));
         assert!(!rights.is_right_permitted(capsicum_rights::CAP_WRITE));
     }
@@ -1022,9 +1056,19 @@ mod tests {
     fn test_nfs4_rich_acl_deny_priority() {
         let mut acl = Nfs4Acl::new();
         // Allow user 1000 READ_DATA and WRITE_DATA
-        acl.add_ace(Nfs4Ace::new(Nfs4AceType::Allow, 0, nfs4_ace_masks::READ_DATA | nfs4_ace_masks::WRITE_DATA, 1000));
+        acl.add_ace(Nfs4Ace::new(
+            Nfs4AceType::Allow,
+            0,
+            nfs4_ace_masks::READ_DATA | nfs4_ace_masks::WRITE_DATA,
+            1000,
+        ));
         // Deny user 1000 WRITE_DATA explicitly
-        acl.add_ace(Nfs4Ace::new(Nfs4AceType::Deny, 0, nfs4_ace_masks::WRITE_DATA, 1000));
+        acl.add_ace(Nfs4Ace::new(
+            Nfs4AceType::Deny,
+            0,
+            nfs4_ace_masks::WRITE_DATA,
+            1000,
+        ));
 
         // Read request -> Allowed
         assert!(acl.evaluate_access(1000, 1000, nfs4_ace_masks::READ_DATA));

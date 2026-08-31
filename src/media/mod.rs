@@ -3,8 +3,8 @@
 
 pub mod browser;
 pub mod sovereign_screen_recorder;
-pub mod sovereign_video_player;
 pub mod sovereign_video_editor;
+pub mod sovereign_video_player;
 
 pub use sovereign_screen_recorder::{
     CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,
@@ -12,11 +12,10 @@ pub use sovereign_screen_recorder::{
 
 pub use browser::{
     AdBlockFilter, BraveShieldsEngine, BrowserContainerType, BrowserProcess, BrowserProcessType,
-    BrowserTabInstance, ChromiumIpcChannelEngine, GlobalPrivacyControl, OnionCircuitNode,
-    PartitionAllocEngine, QuantumStyleEngine, ResistFingerprintingEngine, SearchEngineType,
-    SearchSwitcher, SecureStorageContainer, SigmaWebBrowser, SovereignBrowserEngine,
-    TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager, TorSecurityLevel,
-    ZenWorkspaceTreeEngine, uBlockFilterOption, uBlockOriginFilterEngine,
+    BrowserTabInstance, GlobalPrivacyControl, OnionCircuitNode, ResistFingerprintingEngine,
+    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
+    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
+    TorSecurityLevel,
 };
 
 pub use sovereign_video_player::{
@@ -25,5 +24,5 @@ pub use sovereign_video_player::{
 };
 
 pub use sovereign_video_editor::{
-    SovereignVideoEditor, VideoTrack, TimelineClip, AscCdl, EditorError,
+    AscCdl, EditorError, SovereignVideoEditor, TimelineClip, VideoTrack,
 };

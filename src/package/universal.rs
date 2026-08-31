@@ -1,9 +1,8 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
@@ -21,25 +20,52 @@ use crate::runtime::node_distribution::{
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
     #[derive(Debug, Clone)]
-    pub enum LibcFlavor { Musl, Glibc }
+    pub enum LibcFlavor {
+        Musl,
+        Glibc,
+    }
     #[derive(Debug, Clone)]
-    pub enum NodeReleaseStream { Lts, Current }
+    pub enum NodeReleaseStream {
+        Lts,
+        Current,
+    }
     #[derive(Debug, Clone)]
-    pub enum NodeTargetArch { X86_64, Aarch64 }
+    pub enum NodeTargetArch {
+        X86_64,
+        Aarch64,
+    }
     #[derive(Debug, Clone)]
     pub struct NodeBinaryPackage {
         pub version: String,
     }
     impl NodeBinaryPackage {
-        pub fn new(version: &str, _stream: NodeReleaseStream, _arch: NodeTargetArch, _flavor: LibcFlavor, _url: &str, _hash: [u8; 32], _sig: [u8; 64], _size: u64) -> Self {
-            Self { version: version.to_string() }
+        pub fn new(
+            version: &str,
+            _stream: NodeReleaseStream,
+            _arch: NodeTargetArch,
+            _flavor: LibcFlavor,
+            _url: &str,
+            _hash: [u8; 32],
+            _sig: [u8; 64],
+            _size: u64,
+        ) -> Self {
+            Self {
+                version: version.to_string(),
+            }
         }
     }
     #[derive(Debug, Clone)]
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
-        pub fn new() -> Self { Self }
-        pub fn install_to_store(&self, pkg: &NodeBinaryPackage, _bytes: &[u8], _npm: &str) -> Result<String, &'static str> {
+        pub fn new() -> Self {
+            Self
+        }
+        pub fn install_to_store(
+            &self,
+            pkg: &NodeBinaryPackage,
+            _bytes: &[u8],
+            _npm: &str,
+        ) -> Result<String, &'static str> {
             Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
         }
     }
@@ -110,7 +136,10 @@ impl PackageFormat {
             Some(PackageFormat::Deb)
         } else if name.ends_with(".rpm") {
             Some(PackageFormat::Rpm)
-        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
+        } else if name.ends_with(".pkg.tar.zst")
+            || name.ends_with(".pkg.tar.xz")
+            || name.ends_with(".pkg.tar.gz")
+        {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".snap") {
             Some(PackageFormat::Snap)
@@ -213,7 +242,8 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler:
+        alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -270,7 +300,6 @@ pub struct UnifiedPackage {
     pub source: PackageSource,
     pub installed: bool,
 }
-
 
 impl UnifiedPackage {
     pub fn new(name: String, version: String) -> Self {
@@ -339,13 +368,19 @@ impl UniversalPackageTranslator {
         match clean {
             // C Library & Compilers
             "libc6" | "glibc" | "musl" | "libc" => "sovereign-libc".to_string(),
-            "gcc" | "gcc-c++" | "g++" | "clang" | "build-base" => "sovereign-build-essential".to_string(),
+            "gcc" | "gcc-c++" | "g++" | "clang" | "build-base" => {
+                "sovereign-build-essential".to_string()
+            }
 
             // SSL & Security Libraries
-            "libssl-dev" | "openssl-devel" | "openssl-dev" | "libssl3" => "sovereign-openssl".to_string(),
+            "libssl-dev" | "openssl-devel" | "openssl-dev" | "libssl3" => {
+                "sovereign-openssl".to_string()
+            }
 
             // Python Runtimes
-            "python3" | "python" | "python3-minimal" | "python3-base" => "sovereign-python3".to_string(),
+            "python3" | "python" | "python3-minimal" | "python3-base" => {
+                "sovereign-python3".to_string()
+            }
 
             // Node.js Runtimes & Package Managers
             "nodejs" | "node" | "nodejs-lts" | "node20" => "sovereign-nodejs".to_string(),
@@ -355,7 +390,9 @@ impl UniversalPackageTranslator {
             "libwayland-dev" | "wayland-devel" | "wayland" => "sovereign-wayland".to_string(),
 
             // Audio Subsystems
-            "libpipewire-0.3-dev" | "pipewire-devel" | "pipewire" => "sovereign-pipewire".to_string(),
+            "libpipewire-0.3-dev" | "pipewire-devel" | "pipewire" => {
+                "sovereign-pipewire".to_string()
+            }
 
             // Compression Utilities
             "zlib1g-dev" | "zlib-devel" | "zlib" => "sovereign-zlib".to_string(),
@@ -854,10 +891,7 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(
-        &self,
-        package_name: &str,
-    ) -> Result<Vec<String>, PackageError> {
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved: Vec<String> = Vec::new();
         let mut to_visit: Vec<String> = Vec::new();
         to_visit.push(package_name.to_string());
@@ -971,7 +1005,6 @@ impl Default for DependencyResolver {
     }
 }
 
-
 /// Transactional package manager checkpoint
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageCheckpoint {
@@ -1071,9 +1104,12 @@ impl UniversalPackageManager {
             .install_to_store(package, bytes, npm_version)
             .map_err(|e: &'static str| PackageError::InstallationFailed(e.to_string()))?;
 
-        let mut pkg = UnifiedPackage::new(format!("nodejs-{}", package.version), package.version.clone())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_provides("nodejs".to_string());
+        let mut pkg = UnifiedPackage::new(
+            format!("nodejs-{}", package.version),
+            package.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides("nodejs".to_string());
         pkg.installed = true;
 
         self.installed_packages
@@ -1095,7 +1131,11 @@ impl UniversalPackageManager {
     }
 
     /// Triggers user-defined hooks matching the requested lifecycle stage
-    pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
+    pub fn trigger_user_hooks(
+        &self,
+        timing: HookTiming,
+        package: &UnifiedPackage,
+    ) -> Result<(), PackageError> {
         for hook in &self.user_hooks {
             if hook.timing() == timing {
                 hook.execute(package)?;
@@ -1106,15 +1146,19 @@ impl UniversalPackageManager {
 
     /// Installs a package file directly by inferring format from filename
     pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
-        let format = UniversalPackageManifestParser::detect_format_from_filename(filepath).ok_or_else(|| {
-            PackageError::InstallationFailed(format!("Unsupported file format extension for file: {}", filepath))
-        })?;
+        let format = UniversalPackageManifestParser::detect_format_from_filename(filepath)
+            .ok_or_else(|| {
+                PackageError::InstallationFailed(format!(
+                    "Unsupported file format extension for file: {}",
+                    filepath
+                ))
+            })?;
 
         let file_name = filepath.split('/').last().unwrap_or(filepath);
         let pkg_name = file_name.split('.').next().unwrap_or(file_name);
 
-        let package = UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string())
-            .with_format(format);
+        let package =
+            UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string()).with_format(format);
 
         self.add_package(package);
         self.install(pkg_name)
@@ -1153,47 +1197,144 @@ impl UniversalPackageManager {
             PackageFormat::Flatpak,
             PackageAdapter::new(PackageFormat::Flatpak, String::from("Flatpak")),
         );
-        self.adapters.insert(
-            PackageFormat::AppImage,
-            appimage_adapter,
-        );
+        self.adapters
+            .insert(PackageFormat::AppImage, appimage_adapter);
         self.adapters.insert(
             PackageFormat::SigmaPkg,
             PackageAdapter::new(PackageFormat::SigmaPkg, String::from("SigmaPkg")),
         );
-        self.adapters.insert(PackageFormat::Air, PackageAdapter::new(PackageFormat::Air, "air".to_string()));
-        self.adapters.insert(PackageFormat::Bottle, PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()));
-        self.adapters.insert(PackageFormat::Ipa, PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()));
-        self.adapters.insert(PackageFormat::Ports, PackageAdapter::new(PackageFormat::Ports, "ports".to_string()));
-        self.adapters.insert(PackageFormat::Pkg, PackageAdapter::new(PackageFormat::Pkg, "pkg".to_string()));
-        self.adapters.insert(PackageFormat::Aab, PackageAdapter::new(PackageFormat::Aab, "aab".to_string()));
-        self.adapters.insert(PackageFormat::Apk, PackageAdapter::new(PackageFormat::Apk, "apk".to_string()));
-        self.adapters.insert(PackageFormat::Eopkg, PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string()));
-        self.adapters.insert(PackageFormat::Nixpkg, PackageAdapter::new(PackageFormat::Nixpkg, "nixpkg".to_string()));
-        self.adapters.insert(PackageFormat::Ebuild, PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string()));
-        self.adapters.insert(PackageFormat::TarGz, PackageAdapter::new(PackageFormat::TarGz, "targz".to_string()));
-        self.adapters.insert(PackageFormat::Xz, PackageAdapter::new(PackageFormat::Xz, "xz".to_string()));
-        self.adapters.insert(PackageFormat::App, PackageAdapter::new(PackageFormat::App, "app".to_string()));
-        self.adapters.insert(PackageFormat::Hap, PackageAdapter::new(PackageFormat::Hap, "hap".to_string()));
-        self.adapters.insert(PackageFormat::Pisi, PackageAdapter::new(PackageFormat::Pisi, "pisi".to_string()));
-        self.adapters.insert(PackageFormat::Superdeb, PackageAdapter::new(PackageFormat::Superdeb, "superdeb".to_string()));
-        self.adapters.insert(PackageFormat::Lzm, PackageAdapter::new(PackageFormat::Lzm, "lzm".to_string()));
-        self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
-        self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
-        self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
-        self.adapters.insert(PackageFormat::Xbps, PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()));
-        self.adapters.insert(PackageFormat::Zypper, PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()));
-        self.adapters.insert(PackageFormat::Guix, PackageAdapter::new(PackageFormat::Guix, "guix".to_string()));
-        self.adapters.insert(PackageFormat::Moss, PackageAdapter::new(PackageFormat::Moss, "moss".to_string()));
-        self.adapters.insert(PackageFormat::Hpkg, PackageAdapter::new(PackageFormat::Hpkg, "hpkg".to_string()));
-        self.adapters.insert(PackageFormat::Tcz, PackageAdapter::new(PackageFormat::Tcz, "tcz".to_string()));
-        self.adapters.insert(PackageFormat::Gobo, PackageAdapter::new(PackageFormat::Gobo, "gobo".to_string()));
-        self.adapters.insert(PackageFormat::Ostree, PackageAdapter::new(PackageFormat::Ostree, "ostree".to_string()));
-        self.adapters.insert(PackageFormat::Pkgsrc, PackageAdapter::new(PackageFormat::Pkgsrc, "pkgsrc".to_string()));
-        self.adapters.insert(PackageFormat::Sfs, PackageAdapter::new(PackageFormat::Sfs, "sfs".to_string()));
-        self.adapters.insert(PackageFormat::Puk, PackageAdapter::new(PackageFormat::Puk, "puk".to_string()));
-        self.adapters.insert(PackageFormat::Dmg, PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()));
-        self.adapters.insert(PackageFormat::Cports, PackageAdapter::new(PackageFormat::Cports, "cports".to_string()));
+        self.adapters.insert(
+            PackageFormat::Air,
+            PackageAdapter::new(PackageFormat::Air, "air".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Bottle,
+            PackageAdapter::new(PackageFormat::Bottle, "bottle".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Ipa,
+            PackageAdapter::new(PackageFormat::Ipa, "ipa".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Ports,
+            PackageAdapter::new(PackageFormat::Ports, "ports".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Pkg,
+            PackageAdapter::new(PackageFormat::Pkg, "pkg".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Aab,
+            PackageAdapter::new(PackageFormat::Aab, "aab".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Apk,
+            PackageAdapter::new(PackageFormat::Apk, "apk".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Eopkg,
+            PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Nixpkg,
+            PackageAdapter::new(PackageFormat::Nixpkg, "nixpkg".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Ebuild,
+            PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::TarGz,
+            PackageAdapter::new(PackageFormat::TarGz, "targz".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Xz,
+            PackageAdapter::new(PackageFormat::Xz, "xz".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::App,
+            PackageAdapter::new(PackageFormat::App, "app".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Hap,
+            PackageAdapter::new(PackageFormat::Hap, "hap".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Pisi,
+            PackageAdapter::new(PackageFormat::Pisi, "pisi".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Superdeb,
+            PackageAdapter::new(PackageFormat::Superdeb, "superdeb".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Lzm,
+            PackageAdapter::new(PackageFormat::Lzm, "lzm".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Pup,
+            PackageAdapter::new(PackageFormat::Pup, "pup".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Pet,
+            PackageAdapter::new(PackageFormat::Pet, "pet".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Tar,
+            PackageAdapter::new(PackageFormat::Tar, "tar".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Xbps,
+            PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Zypper,
+            PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Guix,
+            PackageAdapter::new(PackageFormat::Guix, "guix".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Moss,
+            PackageAdapter::new(PackageFormat::Moss, "moss".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Hpkg,
+            PackageAdapter::new(PackageFormat::Hpkg, "hpkg".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Tcz,
+            PackageAdapter::new(PackageFormat::Tcz, "tcz".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Gobo,
+            PackageAdapter::new(PackageFormat::Gobo, "gobo".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Ostree,
+            PackageAdapter::new(PackageFormat::Ostree, "ostree".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Pkgsrc,
+            PackageAdapter::new(PackageFormat::Pkgsrc, "pkgsrc".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Sfs,
+            PackageAdapter::new(PackageFormat::Sfs, "sfs".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Puk,
+            PackageAdapter::new(PackageFormat::Puk, "puk".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Dmg,
+            PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Cports,
+            PackageAdapter::new(PackageFormat::Cports, "cports".to_string()),
+        );
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -1308,13 +1449,14 @@ impl UniversalPackageManager {
 
     /// Converts any external Linux or BSD distro package specification (DEB, RPM, Pacman, APK, Flatpak, Snap, AppImage, Ebuild, XBPS, Ports, PKG)
     /// into native SigmaPkg format with full dependency mapping and sandboxing translation.
-    pub fn convert_to_sigpkg(&self, package: &UnifiedPackage) -> Result<UnifiedPackage, PackageError> {
-        let mut sigpkg = UnifiedPackage::new(
-            format!("sigpkg-{}", package.name),
-            package.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(package.name.clone());
+    pub fn convert_to_sigpkg(
+        &self,
+        package: &UnifiedPackage,
+    ) -> Result<UnifiedPackage, PackageError> {
+        let mut sigpkg =
+            UnifiedPackage::new(format!("sigpkg-{}", package.name), package.version.clone())
+                .with_format(PackageFormat::SigmaPkg)
+                .with_provides(package.name.clone());
 
         for dep in &package.dependencies {
             sigpkg = sigpkg.with_dependency(dep.clone());
@@ -1437,15 +1579,14 @@ impl UniversalPackageManifestParser {
         }
     }
 
-    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+    pub fn parse_manifest_auto(
+        filename: &str,
+        raw_data: &[u8],
+    ) -> Result<UnifiedPackage, &'static str> {
         let fmt = Self::detect_format_from_filename(filename)
             .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
 
-        let pkg_name = filename
-            .split('.')
-            .next()
-            .unwrap_or("unknown")
-            .to_string();
+        let pkg_name = filename.split('.').next().unwrap_or("unknown").to_string();
 
         let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
         if !raw_data.is_empty() {
@@ -1458,11 +1599,11 @@ impl UniversalPackageManifestParser {
 /// Linux & BSD Distro Inspired Rollback Mechanics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRollbackType {
-    NixOsGeneration,       // NixOS atomic generation profile rollback
-    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
-    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
-    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
-    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
+    NixOsGeneration,   // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv, // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,   // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,   // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,    // Alpine Linux local apk tarball cache rollback
 }
 
 #[derive(Debug, Clone)]
@@ -1513,7 +1654,11 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
-        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
+        let snap = self
+            .snapshots
+            .iter()
+            .find(|s| s.snapshot_id == snapshot_id)
+            .ok_or("Rollback Engine: Snapshot not found")?;
         self.active_snapshot_id = Some(snapshot_id);
         Ok(snap.installed_packages_state.clone())
     }
@@ -1619,8 +1764,14 @@ mod tests {
         };
 
         // Pre-seed dependencies
-        manager.add_package(UnifiedPackage::new("sovereign-openssl".to_string(), "3.0.0".to_string()).with_format(PackageFormat::SigmaPkg));
-        manager.add_package(UnifiedPackage::new("sovereign-libc".to_string(), "2.38.0".to_string()).with_format(PackageFormat::SigmaPkg));
+        manager.add_package(
+            UnifiedPackage::new("sovereign-openssl".to_string(), "3.0.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        );
+        manager.add_package(
+            UnifiedPackage::new("sovereign-libc".to_string(), "2.38.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        );
 
         assert!(manager.install_foreign_distro_package(foreign_deb).is_ok());
         assert!(manager.installed_packages.get("sigpkg-curl").is_some());
@@ -1628,15 +1779,25 @@ mod tests {
         let installed = manager.installed_packages.get("sigpkg-curl").unwrap();
         assert_eq!(installed.version, "8.5.0");
         assert!(installed.provides.contains(&"curl".to_string()));
-        assert!(installed.dependencies.contains(&"sovereign-openssl".to_string()));
-        assert!(installed.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(installed
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
+        assert!(installed
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
     fn test_distro_repo_sync_engine() {
         let mut sync = DistroRepoSyncEngine::new();
-        assert!(sync.registered_repos.iter().any(|r| r.distro_name == "Debian"));
-        assert!(sync.registered_repos.iter().any(|r| r.distro_name == "ArchLinux"));
+        assert!(sync
+            .registered_repos
+            .iter()
+            .any(|r| r.distro_name == "Debian"));
+        assert!(sync
+            .registered_repos
+            .iter()
+            .any(|r| r.distro_name == "ArchLinux"));
 
         let foreign_rpm = ForeignDistroManifest {
             raw_format: PackageFormat::Rpm,
@@ -1654,7 +1815,9 @@ mod tests {
 
         let translated = sync.find_and_translate("nginx").unwrap();
         assert_eq!(translated.name, "sigpkg-nginx");
-        assert!(translated.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(translated
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
     }
 
     #[test]
@@ -1804,7 +1967,8 @@ mod tests {
             Some(PackageFormat::Flatpak)
         );
 
-        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        let pkg =
+            UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }
@@ -1849,7 +2013,9 @@ mod tests {
             120,
         );
 
-        let path = manager.install_node_runtime(&node_pkg, &bytes, "10.2.4").unwrap();
+        let path = manager
+            .install_node_runtime(&node_pkg, &bytes, "10.2.4")
+            .unwrap();
         assert!(path.starts_with("/sovereign/store/node-v20.11.0-"));
 
         let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();

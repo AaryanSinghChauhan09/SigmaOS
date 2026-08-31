@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Console I/O module for SigmaOS
 // Replaces std::io functionality for terminal I/O
 
@@ -117,4 +117,3 @@ macro_rules! eprintln {
         $crate::klib::console::CONSOLE.eprintln(&msg);
     };
 }
-

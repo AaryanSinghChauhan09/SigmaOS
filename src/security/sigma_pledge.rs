@@ -129,7 +129,6 @@ macro_rules! sigma_pledge {
     };
 }
 
-
 /// Syscall filter that checks pledges
 pub struct SyscallFilter {
     process_promises: alloc::collections::BTreeMap<u64, PledgePromise>,

@@ -3,7 +3,6 @@ extern crate alloc;
 // SigmaOS Advanced Zsh, Bash, Fish & BSD Shell Parity Engine
 // Zero-dependency, #![no_std] compliant, zero-allocation shell enhancements
 
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -304,7 +303,10 @@ impl FuzzyCompletionEngine {
 
         let mut unique = Vec::new();
         for c in candidates {
-            if !unique.iter().any(|existing: &CompletionCandidate| existing.text == c.text) {
+            if !unique
+                .iter()
+                .any(|existing: &CompletionCandidate| existing.text == c.text)
+            {
                 unique.push(c);
             }
         }
@@ -371,8 +373,25 @@ impl ZshSyntaxHighlighter {
 
         // Builtins & common commands
         let common = [
-            "ls", "cd", "pwd", "echo", "cat", "rm", "mkdir", "touch", "grep", "find",
-            "systemctl", "sigpkg", "sysctl", "pushd", "popd", "dirs", "jobs", "ps", "whoami",
+            "ls",
+            "cd",
+            "pwd",
+            "echo",
+            "cat",
+            "rm",
+            "mkdir",
+            "touch",
+            "grep",
+            "find",
+            "systemctl",
+            "sigpkg",
+            "sysctl",
+            "pushd",
+            "popd",
+            "dirs",
+            "jobs",
+            "ps",
+            "whoami",
         ];
         for c in &common {
             highlighter.valid_commands.push(c.to_string());
@@ -388,13 +407,22 @@ impl ZshSyntaxHighlighter {
         for (idx, &part) in parts.iter().enumerate() {
             let (kind, color) = if part.starts_with('#') {
                 (SyntaxTokenKind::Comment, "\x1b[90m") // Gray
-            } else if idx == 0 || parts.get(idx.saturating_sub(1)) == Some(&"|") || parts.get(idx.saturating_sub(1)) == Some(&"&&") {
+            } else if idx == 0
+                || parts.get(idx.saturating_sub(1)) == Some(&"|")
+                || parts.get(idx.saturating_sub(1)) == Some(&"&&")
+            {
                 if self.valid_commands.contains(&part.to_string()) {
                     (SyntaxTokenKind::CommandValid, "\x1b[32m") // Green
                 } else {
                     (SyntaxTokenKind::CommandUnknown, "\x1b[31m") // Red
                 }
-            } else if part == "|" || part == ">" || part == ">>" || part == "<" || part == "&&" || part == "||" {
+            } else if part == "|"
+                || part == ">"
+                || part == ">>"
+                || part == "<"
+                || part == "&&"
+                || part == "||"
+            {
                 (SyntaxTokenKind::Operator, "\x1b[34m") // Blue
             } else if part.starts_with('-') {
                 (SyntaxTokenKind::OptionFlag, "\x1b[36m") // Cyan
@@ -632,7 +660,12 @@ impl ShellPipelineParser {
             while i < tokens.len() {
                 let tok = tokens[i];
                 if tok == "<<<" && i + 1 < tokens.len() {
-                    here_string = Some(tokens[i + 1].trim_matches('"').trim_matches('\'').to_string());
+                    here_string = Some(
+                        tokens[i + 1]
+                            .trim_matches('"')
+                            .trim_matches('\'')
+                            .to_string(),
+                    );
                     i += 2;
                 } else if tok == "<" && i + 1 < tokens.len() {
                     stdin_file = Some(tokens[i + 1].to_string());
@@ -768,7 +801,10 @@ impl ShellJobControl {
                 JobState::Stopped => "Stopped",
                 JobState::Terminated => "Terminated",
             };
-            out.push_str(&format!("[{}] PID {}  {}  {}\n", job.id, job.pid, state_str, job.command));
+            out.push_str(&format!(
+                "[{}] PID {}  {}  {}\n",
+                job.id, job.pid, state_str, job.command
+            ));
         }
         out
     }
@@ -776,7 +812,10 @@ impl ShellJobControl {
     pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.state = JobState::Running;
-            Ok(format!("[{}] Job '{}' (PID {}) brought to foreground.", job.id, job.command, job.pid))
+            Ok(format!(
+                "[{}] Job '{}' (PID {}) brought to foreground.",
+                job.id, job.command, job.pid
+            ))
         } else {
             Err(format!("Job %{} not found", id))
         }
@@ -785,7 +824,10 @@ impl ShellJobControl {
     pub fn send_to_background(&mut self, id: usize) -> Result<String, String> {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.state = JobState::Running;
-            Ok(format!("[{}] Job '{}' (PID {}) running in background.", job.id, job.command, job.pid))
+            Ok(format!(
+                "[{}] Job '{}' (PID {}) running in background.",
+                job.id, job.command, job.pid
+            ))
         } else {
             Err(format!("Job %{} not found", id))
         }
@@ -888,7 +930,11 @@ impl ShellArithmeticEvaluator {
     pub fn evaluate(expr: &str) -> Result<i64, &'static str> {
         let clean = expr.trim();
         let inner = if clean.starts_with("$(( ") || clean.starts_with("$(((") {
-            clean.trim_start_matches("$(( ").trim_start_matches("$(((").trim_end_matches(" ))").trim_end_matches(")))")
+            clean
+                .trim_start_matches("$(( ")
+                .trim_start_matches("$(((")
+                .trim_end_matches(" ))")
+                .trim_end_matches(")))")
         } else if clean.starts_with("$(( ") || clean.starts_with("$(( ") {
             clean.trim_start_matches("$(( ").trim_end_matches(" ))")
         } else if clean.starts_with("$((") && clean.ends_with("))") {
@@ -907,9 +953,13 @@ impl ShellArithmeticEvaluator {
         }
 
         if tokens.len() == 3 {
-            let left = tokens[0].parse::<i64>().map_err(|_| "Invalid left operand")?;
+            let left = tokens[0]
+                .parse::<i64>()
+                .map_err(|_| "Invalid left operand")?;
             let op = tokens[1];
-            let right = tokens[2].parse::<i64>().map_err(|_| "Invalid right operand")?;
+            let right = tokens[2]
+                .parse::<i64>()
+                .map_err(|_| "Invalid right operand")?;
 
             match op {
                 "+" => Ok(left + right),
@@ -964,7 +1014,8 @@ impl FishAbbreviationEngine {
     }
 
     pub fn add_abbreviation(&mut self, abbr: &str, expansion: &str) {
-        self.abbreviations.push((abbr.to_string(), expansion.to_string()));
+        self.abbreviations
+            .push((abbr.to_string(), expansion.to_string()));
     }
 
     pub fn expand_line(&self, line: &str) -> String {
@@ -1086,7 +1137,12 @@ impl KshParameterExpansionEngine {
                         for (k, v) in env {
                             if k == var_name {
                                 let substituted = v.replace(search, replace);
-                                return format!("{}{}{}", &expr[..start], substituted, &expr[end + 1..]);
+                                return format!(
+                                    "{}{}{}",
+                                    &expr[..start],
+                                    substituted,
+                                    &expr[end + 1..]
+                                );
                             }
                         }
                     }
@@ -1106,191 +1162,31 @@ impl DashPosixShValidator {
         for (line_num, line) in script.lines().enumerate() {
             let l = line.trim();
             if l.contains("[[") {
-                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX conditional [[ ]]; use [ ] instead"));
+                non_posix_warnings.push((
+                    (line_num + 1) as u32,
+                    "Non-POSIX conditional [[ ]]; use [ ] instead",
+                ));
             }
             if l.contains("<<<") {
-                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX here-string <<<; use echo | or cat <<"));
+                non_posix_warnings.push((
+                    (line_num + 1) as u32,
+                    "Non-POSIX here-string <<<; use echo | or cat <<",
+                ));
             }
             if l.starts_with("function ") {
-                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX 'function' keyword; use foo() { ... }"));
+                non_posix_warnings.push((
+                    (line_num + 1) as u32,
+                    "Non-POSIX 'function' keyword; use foo() { ... }",
+                ));
             }
             if l.contains("=(") {
-                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX array syntax foo=(...); arrays not supported in dash/sh"));
+                non_posix_warnings.push((
+                    (line_num + 1) as u32,
+                    "Non-POSIX array syntax foo=(...); arrays not supported in dash/sh",
+                ));
             }
         }
         non_posix_warnings
-    }
-}
-
-// =========================================================================
-// 7. UNIVERSAL SCRIPT TRANSPILER & CROSS-SHELL DIALECT BRIDGE
-// =========================================================================
-
-pub struct UniversalScriptTranspiler;
-
-impl UniversalScriptTranspiler {
-    /// Transpiles non-POSIX syntax constructs from Bash, Zsh, Fish, Tcsh, Ksh into universal POSIX `sh` lines
-    pub fn transpile_line_to_posix(line: &str, dialect: ShellDialect) -> String {
-        let trimmed = line.trim();
-        if trimmed.is_empty() || trimmed.starts_with('#') {
-            return line.to_string();
-        }
-
-        let mut res = line.to_string();
-
-        match dialect {
-            ShellDialect::Fish => {
-                // 1. `set -g VAR val` / `set -x VAR val` -> `export VAR="val"`
-                if res.trim().starts_with("set -g ") || res.trim().starts_with("set -x ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 4 {
-                        let var_name = parts[2];
-                        let val = parts[3..].join(" ");
-                        let clean_val = val.trim_matches('"').trim_matches('\'');
-                        res = format!("export {}=\"{}\"", var_name, clean_val);
-                    }
-                } else if res.trim().starts_with("set -e ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 3 {
-                        res = format!("unset {}", parts[2]);
-                    }
-                } else if res.trim().starts_with("unset ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 2 {
-                        res = format!("unset {}", parts[1]);
-                    }
-                }
-                // 2. `and command` -> `&& command`
-                if res.trim().starts_with("and ") {
-                    res = format!("&& {}", &res.trim()[4..]);
-                }
-                // 3. `or command` -> `|| command`
-                if res.trim().starts_with("or ") {
-                    res = format!("|| {}", &res.trim()[3..]);
-                }
-                // 4. `end` keyword in Fish -> `}` or `done` or `fi`
-                if res.trim() == "end" {
-                    res = "}".to_string();
-                }
-            }
-            ShellDialect::Tcsh => {
-                // 1. `setenv VAR val` -> `export VAR="val"`
-                if res.trim().starts_with("setenv ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 3 {
-                        let val = parts[2..].join(" ");
-                        let clean_val = val.trim_matches('"').trim_matches('\'');
-                        res = format!("export {}=\"{}\"", parts[1], clean_val);
-                    } else if parts.len() == 2 {
-                        res = format!("export {}=\"\"", parts[1]);
-                    }
-                }
-                // 2. `unsetenv VAR` -> `unset VAR`
-                if res.trim().starts_with("unsetenv ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 2 {
-                        res = format!("unset {}", parts[1]);
-                    }
-                }
-                // 3. `set VAR = val` -> `VAR="val"`
-                if res.trim().starts_with("set ") && res.contains('=') {
-                    let after_set = res.trim()[4..].trim();
-                    if let Some(eq_idx) = after_set.find('=') {
-                        let var_name = after_set[..eq_idx].trim();
-                        let val = after_set[eq_idx + 1..].trim().trim_matches('"').trim_matches('\'');
-                        res = format!("{}=\"{}\"", var_name, val);
-                    }
-                }
-                // 4. `alias foo 'bar'` -> `alias foo="bar"`
-                if res.trim().starts_with("alias ") {
-                    let parts: Vec<&str> = res.trim().split_whitespace().collect();
-                    if parts.len() >= 3 {
-                        let name = parts[1];
-                        let target = parts[2..].join(" ").trim_matches('\'').trim_matches('"').to_string();
-                        res = format!("alias {}='{}'", name, target);
-                    }
-                }
-                // 5. `endif` -> `fi`
-                if res.trim() == "endif" {
-                    res = "fi".to_string();
-                }
-            }
-            ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh | ShellDialect::Dash | ShellDialect::BsdSh => {
-                // 1. `[[ expr ]]` -> `[ expr ]` converting internal `&&` / `||` to POSIX test `-a` / `-o` or `] && [`
-                if res.contains("[[") && res.contains("]]") {
-                    let mut inner = res.replace("[[", "[").replace("]]", "]");
-                    if inner.contains(" && ") {
-                        inner = inner.replace(" && ", " ] && [ ");
-                    }
-                    if inner.contains(" || ") {
-                        inner = inner.replace(" || ", " ] || [ ");
-                    }
-                    res = inner;
-                }
-                // 2. `function foo() {` or `function foo {` -> `foo() {`
-                if res.trim().starts_with("function ") {
-                    let rest = res.trim()[9..].trim();
-                    if let Some(space_idx) = rest.find(|c: char| c == ' ' || c == '{' || c == '(') {
-                        let name = &rest[..space_idx];
-                        res = format!("{}() {{", name);
-                    }
-                }
-                // 3. `print -r --` -> `echo`
-                if res.trim().starts_with("print -r --") {
-                    res = format!("echo {}", &res.trim()[11..].trim());
-                }
-            }
-        }
-
-        res
-    }
-
-    /// Transpiles an entire multi-line script into universal executable POSIX shell lines
-    pub fn transpile_script(script: &str) -> (ShellDialect, Vec<String>) {
-        let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(script);
-        let mut lines = Vec::new();
-
-        for line in script.lines() {
-            if line.trim().starts_with("#!") {
-                continue; // Skip shebang
-            }
-            let transpiled = Self::transpile_line_to_posix(line, dialect);
-            if !transpiled.trim().is_empty() {
-                lines.push(transpiled);
-            }
-        }
-
-        (dialect, lines)
-    }
-}
-
-pub struct CrossShellDialectBridge {
-    pub engine: UniversalShellCompatibilityEngine,
-}
-
-impl CrossShellDialectBridge {
-    pub fn new() -> Self {
-        Self {
-            engine: UniversalShellCompatibilityEngine::new(),
-        }
-    }
-
-    pub fn execute_universal_script(&mut self, script: &str) -> Result<Vec<ShellPipeline>, &'static str> {
-        let (_dialect, lines) = UniversalScriptTranspiler::transpile_script(script);
-        let mut pipelines = Vec::new();
-
-        for line in lines {
-            let pipeline = self.engine.process_input_line(&line)?;
-            pipelines.push(pipeline);
-        }
-
-        Ok(pipelines)
-    }
-}
-
-impl Default for CrossShellDialectBridge {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -1298,7 +1194,6 @@ pub struct UniversalShellCompatibilityEngine {
     pub fish_abbr: FishAbbreviationEngine,
     pub tcsh_history: TcshHistorySubstitutionEngine,
     pub environment: Vec<(String, String)>,
-    pub transpiler: UniversalScriptTranspiler,
 }
 
 impl UniversalShellCompatibilityEngine {
@@ -1307,7 +1202,6 @@ impl UniversalShellCompatibilityEngine {
             fish_abbr: FishAbbreviationEngine::new(),
             tcsh_history: TcshHistorySubstitutionEngine::new(),
             environment: Vec::new(),
-            transpiler: UniversalScriptTranspiler,
         }
     }
 
@@ -1338,7 +1232,8 @@ impl UniversalShellCompatibilityEngine {
     pub fn process_input_line(&mut self, line: &str) -> Result<ShellPipeline, &'static str> {
         let hist_sub = self.tcsh_history.substitute(line)?;
         let abbr_expanded = self.fish_abbr.expand_line(&hist_sub);
-        let param_expanded = KshParameterExpansionEngine::expand_parameter(&abbr_expanded, &self.environment);
+        let param_expanded =
+            KshParameterExpansionEngine::expand_parameter(&abbr_expanded, &self.environment);
         self.tcsh_history.push_history(line);
         Ok(ShellPipelineParser::parse(&param_expanded))
     }
@@ -1380,7 +1275,9 @@ mod tests {
     fn test_fuzzy_completion_engine() {
         let mut engine = FuzzyCompletionEngine::new();
         engine.history.push("systemctl status nginx".to_string());
-        engine.aliases.insert("ll".to_string(), "ls -la".to_string());
+        engine
+            .aliases
+            .insert("ll".to_string(), "ls -la".to_string());
 
         // Exact matches
         let comps_sys = engine.get_completions("sys");
@@ -1423,20 +1320,35 @@ mod tests {
         env.insert("PREFIX_PATH".to_string(), "/usr/local/bin".to_string());
 
         // Default value
-        assert_eq!(BashParameterExpansion::expand("${USER:-guest}", &env), "sovereign");
-        assert_eq!(BashParameterExpansion::expand("${EMPTY:-default}", &env), "default");
+        assert_eq!(
+            BashParameterExpansion::expand("${USER:-guest}", &env),
+            "sovereign"
+        );
+        assert_eq!(
+            BashParameterExpansion::expand("${EMPTY:-default}", &env),
+            "default"
+        );
 
         // String length
         assert_eq!(BashParameterExpansion::expand("${#USER}", &env), "9");
 
         // Prefix stripping
-        assert_eq!(BashParameterExpansion::expand("${PREFIX_PATH#/usr/local/}", &env), "bin");
+        assert_eq!(
+            BashParameterExpansion::expand("${PREFIX_PATH#/usr/local/}", &env),
+            "bin"
+        );
 
         // Suffix stripping
-        assert_eq!(BashParameterExpansion::expand("${FILE%.txt}", &env), "document");
+        assert_eq!(
+            BashParameterExpansion::expand("${FILE%.txt}", &env),
+            "document"
+        );
 
         // Global replacement
-        assert_eq!(BashParameterExpansion::expand("${FILE//doc/file}", &env), "fileument.txt");
+        assert_eq!(
+            BashParameterExpansion::expand("${FILE//doc/file}", &env),
+            "fileument.txt"
+        );
 
         // Substring slicing
         assert_eq!(BashParameterExpansion::expand("${USER:0:5}", &env), "sover");
@@ -1456,7 +1368,9 @@ mod tests {
 
     #[test]
     fn test_pipeline_parser_and_redirections() {
-        let pipeline = ShellPipelineParser::parse("cat < input.txt | grep -i \"error\" > output.txt 2> error.log &");
+        let pipeline = ShellPipelineParser::parse(
+            "cat < input.txt | grep -i \"error\" > output.txt 2> error.log &",
+        );
 
         assert!(pipeline.run_in_background);
         assert_eq!(pipeline.stages.len(), 2);
@@ -1476,7 +1390,10 @@ mod tests {
     fn test_here_string_parsing() {
         let pipeline = ShellPipelineParser::parse("grep hello <<< \"hello_world\"");
         assert_eq!(pipeline.stages[0].program, "grep");
-        assert_eq!(pipeline.stages[0].here_string, Some("hello_world".to_string()));
+        assert_eq!(
+            pipeline.stages[0].here_string,
+            Some("hello_world".to_string())
+        );
     }
 
     #[test]
@@ -1523,7 +1440,10 @@ mod tests {
 
         assert_eq!(hooks.trigger_precmd(), vec!["update_status_line"]);
         assert_eq!(hooks.trigger_preexec("ls -l"), vec!["log_cmd ls -l"]);
-        assert_eq!(hooks.trigger_chpwd("/home", "/etc"), vec!["auto_ls /home /etc"]);
+        assert_eq!(
+            hooks.trigger_chpwd("/home", "/etc"),
+            vec!["auto_ls /home /etc"]
+        );
     }
 
     #[test]
@@ -1532,7 +1452,10 @@ mod tests {
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 50 - 15 ))"), Ok(35));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 6 * 7 ))"), Ok(42));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 5 ))"), Ok(20));
-        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 0 ))"), Err("Division by zero"));
+        assert_eq!(
+            ShellArithmeticEvaluator::evaluate("$(( 100 / 0 ))"),
+            Err("Division by zero")
+        );
     }
 
     #[test]
@@ -1541,8 +1464,14 @@ mod tests {
         abbr_engine.add_abbreviation("g", "git");
         abbr_engine.add_abbreviation("gc", "git commit -m");
 
-        assert_eq!(abbr_engine.expand_line("g checkout main"), "git checkout main");
-        assert_eq!(abbr_engine.expand_line("gc 'initial commit'"), "git commit -m 'initial commit'");
+        assert_eq!(
+            abbr_engine.expand_line("g checkout main"),
+            "git checkout main"
+        );
+        assert_eq!(
+            abbr_engine.expand_line("gc 'initial commit'"),
+            "git commit -m 'initial commit'"
+        );
         assert_eq!(abbr_engine.expand_line("ls -la"), "ls -la");
     }
 
@@ -1554,7 +1483,10 @@ mod tests {
         assert_eq!(tcsh_hist.substitute("!!").unwrap(), "cargo build --release");
         assert_eq!(tcsh_hist.substitute("!$").unwrap(), "--release");
         assert_eq!(tcsh_hist.substitute("!*").unwrap(), "build --release");
-        assert_eq!(tcsh_hist.substitute("!car").unwrap(), "cargo build --release");
+        assert_eq!(
+            tcsh_hist.substitute("!car").unwrap(),
+            "cargo build --release"
+        );
     }
 
     #[test]
@@ -1598,48 +1530,24 @@ mod tests {
     fn test_universal_shell_compatibility_engine() {
         let mut engine = UniversalShellCompatibilityEngine::new();
         engine.fish_abbr.add_abbreviation("co", "checkout");
-        engine.environment.push(("NAME".to_string(), "SigmaOS".to_string()));
+        engine
+            .environment
+            .push(("NAME".to_string(), "SigmaOS".to_string()));
 
         let bash_script = "#!/bin/bash\necho hello";
-        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(bash_script), ShellDialect::Bash);
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(bash_script),
+            ShellDialect::Bash
+        );
 
         let fish_script = "#!/usr/bin/env fish\nco main";
-        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(fish_script), ShellDialect::Fish);
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(fish_script),
+            ShellDialect::Fish
+        );
 
         let pipeline = engine.process_input_line("co ${NAME:-default}").unwrap();
         assert_eq!(pipeline.stages[0].program, "checkout");
         assert_eq!(pipeline.stages[0].args, vec!["SigmaOS".to_string()]);
-    }
-
-    #[test]
-    fn test_universal_script_transpiler_and_bridge() {
-        // Test Fish transpilation
-        let fish_script = "#!/usr/bin/env fish\nset -g VAR1 hello\nand echo ok\nend";
-        let (dialect_fish, fish_lines) = UniversalScriptTranspiler::transpile_script(fish_script);
-        assert_eq!(dialect_fish, ShellDialect::Fish);
-        assert_eq!(fish_lines[0], "export VAR1=\"hello\"");
-        assert_eq!(fish_lines[1], "&& echo ok");
-        assert_eq!(fish_lines[2], "}");
-
-        // Test Tcsh transpilation
-        let tcsh_script = "#!/bin/tcsh\nsetenv HOSTNAME sigma_box\nalias ll 'ls -la'\nendif";
-        let (dialect_tcsh, tcsh_lines) = UniversalScriptTranspiler::transpile_script(tcsh_script);
-        assert_eq!(dialect_tcsh, ShellDialect::Tcsh);
-        assert_eq!(tcsh_lines[0], "export HOSTNAME=\"sigma_box\"");
-        assert_eq!(tcsh_lines[1], "alias ll='ls -la'");
-        assert_eq!(tcsh_lines[2], "fi");
-
-        // Test Bash transpilation
-        let bash_script = "#!/bin/bash\n[[ -f /etc/sigmaos ]] && function start_app() { echo running; }";
-        let (dialect_bash, bash_lines) = UniversalScriptTranspiler::transpile_script(bash_script);
-        assert_eq!(dialect_bash, ShellDialect::Bash);
-        assert!(bash_lines[0].contains("[ -f /etc/sigmaos ]"));
-
-        // Test CrossShellDialectBridge execution
-        let mut bridge = CrossShellDialectBridge::new();
-        let pipelines = bridge.execute_universal_script("#!/bin/tcsh\nsetenv PORT 8080").unwrap();
-        assert_eq!(pipelines.len(), 1);
-        assert_eq!(pipelines[0].stages[0].program, "export");
-        assert_eq!(pipelines[0].stages[0].args, vec!["PORT=\"8080\"".to_string()]);
     }
 }

@@ -61,7 +61,11 @@ pub fn is_valid_utf8(data: &[u8]) -> bool {
 /// Trim ASCII whitespace (space, tab, newline, carriage return) from both ends
 pub fn trim_ascii_whitespace(data: &[u8]) -> &[u8] {
     let start = data.iter().take_while(|b| is_ascii_whitespace(**b)).count();
-    let end = data.iter().rev().take_while(|b| is_ascii_whitespace(**b)).count();
+    let end = data
+        .iter()
+        .rev()
+        .take_while(|b| is_ascii_whitespace(**b))
+        .count();
     if start + end >= data.len() {
         &[]
     } else {
@@ -122,7 +126,10 @@ pub fn count_leading_whitespace(data: &[u8]) -> usize {
 
 /// Count ASCII whitespace characters at the end of a slice
 pub fn count_trailing_whitespace(data: &[u8]) -> usize {
-    data.iter().rev().take_while(|b| is_ascii_whitespace(**b)).count()
+    data.iter()
+        .rev()
+        .take_while(|b| is_ascii_whitespace(**b))
+        .count()
 }
 
 const fn is_ascii_whitespace(byte: u8) -> bool {

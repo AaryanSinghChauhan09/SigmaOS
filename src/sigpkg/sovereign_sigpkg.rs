@@ -704,7 +704,9 @@ impl UnifiedRuntimeManager {
     }
 
     pub fn get_runtime_version(&self, runtime: LanguageRuntime) -> Option<&str> {
-        self.active_runtimes.get(&runtime).map(|s: &String| s.as_str())
+        self.active_runtimes
+            .get(&runtime)
+            .map(|s: &String| s.as_str())
     }
 }
 
@@ -1047,7 +1049,8 @@ impl OpenBsdPkgSignifyVerifier {
     }
 
     pub fn verify_signify_signature(&self, pkg_bytes: &[u8], signature_header: &str) -> bool {
-        if pkg_bytes.is_empty() || !signature_header.starts_with("untrusted comment: verify with ") {
+        if pkg_bytes.is_empty() || !signature_header.starts_with("untrusted comment: verify with ")
+        {
             return false;
         }
         // Extract key identifier from signify untrusted comment header
@@ -1063,7 +1066,9 @@ impl OpenBsdPkgSignifyVerifier {
         }
 
         // Validate that key identifier matches one of registered trusted signify pubkeys
-        self.signify_pubkeys.iter().any(|k| k.contains(key_id) || key_id.contains(k.as_str()))
+        self.signify_pubkeys
+            .iter()
+            .any(|k| k.contains(key_id) || key_id.contains(k.as_str()))
     }
 
     pub fn validate_path_unveiled(&self, path: &str, required_perm: &str) -> bool {
@@ -1132,7 +1137,10 @@ impl SovereignAppDirContainer {
         if !self.is_mounted {
             return Err("Cannot launch AppRun: AppDir bundle is not mounted");
         }
-        Ok(format!("{}/{}", self.mount_point, self.desktop_entry.exec_binary))
+        Ok(format!(
+            "{}/{}",
+            self.mount_point, self.desktop_entry.exec_binary
+        ))
     }
 }
 
@@ -1208,7 +1216,12 @@ impl SovereignPortagePackageMaskEngine {
             target_arch: target_arch.to_string(),
             keyword_accept_unstable: false,
             masked_packages: Vec::new(),
-            accepted_licenses: vec!["GPL-2".to_string(), "MIT".to_string(), "Apache-2.0".to_string(), "*".to_string()],
+            accepted_licenses: vec![
+                "GPL-2".to_string(),
+                "MIT".to_string(),
+                "Apache-2.0".to_string(),
+                "*".to_string(),
+            ],
         }
     }
 
@@ -1219,7 +1232,12 @@ impl SovereignPortagePackageMaskEngine {
         });
     }
 
-    pub fn evaluate_installability(&self, pkg_name: &str, arch_keyword: &str, license: &str) -> Result<(), &'static str> {
+    pub fn evaluate_installability(
+        &self,
+        pkg_name: &str,
+        arch_keyword: &str,
+        license: &str,
+    ) -> Result<(), &'static str> {
         // Check mask rules
         for rule in &self.masked_packages {
             if rule.package_pattern == pkg_name || rule.package_pattern == "*" {
@@ -1228,7 +1246,9 @@ impl SovereignPortagePackageMaskEngine {
         }
 
         // Check license acceptance
-        if !self.accepted_licenses.contains(&license.to_string()) && !self.accepted_licenses.contains(&"*".to_string()) {
+        if !self.accepted_licenses.contains(&license.to_string())
+            && !self.accepted_licenses.contains(&"*".to_string())
+        {
             return Err("Package license not accepted in portage config");
         }
 
@@ -1419,18 +1439,23 @@ mod tests {
 
     #[test]
     fn test_slsa_provenance_attestation() {
-        let att = SlsaProvenanceAttestation::new("builder-01", "github.com/org/repo", "abc1234", 1000);
+        let att =
+            SlsaProvenanceAttestation::new("builder-01", "github.com/org/repo", "abc1234", 1000);
         assert!(att.verify_provenance());
     }
 
     #[test]
     fn test_local_package_proxy_cache() {
         let mut cache = LocalPackageProxyCache::new();
-        let bytes = cache.get_or_download("https://pkg.org/a.spkg", || Ok(vec![9, 9, 9])).unwrap();
+        let bytes = cache
+            .get_or_download("https://pkg.org/a.spkg", || Ok(vec![9, 9, 9]))
+            .unwrap();
         assert_eq!(bytes, vec![9, 9, 9]);
 
         // Second call should hit cache
-        let cached_bytes = cache.get_or_download("https://pkg.org/a.spkg", || Err("should not run")).unwrap();
+        let cached_bytes = cache
+            .get_or_download("https://pkg.org/a.spkg", || Err("should not run"))
+            .unwrap();
         assert_eq!(cached_bytes, vec![9, 9, 9]);
         assert_eq!(cache.total_hits, 1);
     }
@@ -1456,12 +1481,16 @@ mod tests {
     fn test_unified_runtime_manager() {
         let mut mgr = UnifiedRuntimeManager::new();
         mgr.set_runtime_version(LanguageRuntime::Rust, "1.78.0");
-        assert_eq!(mgr.get_runtime_version(LanguageRuntime::Rust), Some("1.78.0"));
+        assert_eq!(
+            mgr.get_runtime_version(LanguageRuntime::Rust),
+            Some("1.78.0")
+        );
     }
 
     #[test]
     fn test_flatpak_container_integration() {
-        let mut flatpak = FlatpakContainerIntegration::new("org.gimp.GIMP", ApplicationType::FlatpakSandbox);
+        let mut flatpak =
+            FlatpakContainerIntegration::new("org.gimp.GIMP", ApplicationType::FlatpakSandbox);
         flatpak.add_permission("--socket=x11");
         assert_eq!(flatpak.sandbox_flags.len(), 1);
     }
@@ -1475,12 +1504,18 @@ mod tests {
     #[test]
     fn test_binary_compatibility_layer() {
         let compat = BinaryCompatibilityLayer::new(CRuntimeProvider::Glibc);
-        assert_eq!(compat.resolve_symbol_shim("malloc"), Some("sovereign_malloc"));
+        assert_eq!(
+            compat.resolve_symbol_shim("malloc"),
+            Some("sovereign_malloc")
+        );
     }
 
     #[test]
     fn test_developer_package_template_manager() {
-        let spec = DeveloperPackageTemplateManager::generate_spec_template("ripgrep", TemplateKind::RustCargo);
+        let spec = DeveloperPackageTemplateManager::generate_spec_template(
+            "ripgrep",
+            TemplateKind::RustCargo,
+        );
         assert!(spec.contains("cargo"));
     }
 
@@ -1526,16 +1561,20 @@ mod tests {
         verifier.add_signify_pubkey("RWT1234567890...");
         verifier.add_unveil_rule("/usr/local", "rx");
 
-        assert!(verifier.verify_signify_signature(b"data", "untrusted comment: verify with RWT1234567890..."));
-        assert!(!verifier.verify_signify_signature(b"", "untrusted comment: verify with RWT1234567890..."));
-        assert!(!verifier.verify_signify_signature(b"data", "untrusted comment: verify with unknown_key"));
+        assert!(verifier
+            .verify_signify_signature(b"data", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier
+            .verify_signify_signature(b"", "untrusted comment: verify with RWT1234567890..."));
+        assert!(!verifier
+            .verify_signify_signature(b"data", "untrusted comment: verify with unknown_key"));
         assert!(verifier.validate_path_unveiled("/usr/local/bin/git", "r"));
         assert!(!verifier.validate_path_unveiled("/etc/shadow", "r"));
     }
 
     #[test]
     fn test_appdir_container_mounting() {
-        let mut appdir = SovereignAppDirContainer::new("GIMP", "AppRun", "/usr/share/icons/gimp.png");
+        let mut appdir =
+            SovereignAppDirContainer::new("GIMP", "AppRun", "/usr/share/icons/gimp.png");
         assert_eq!(appdir.mount_point, "/tmp/.mount_GIMP");
         assert!(!appdir.is_mounted);
 
@@ -1574,19 +1613,25 @@ mod tests {
         portage_mask.add_mask_rule("sys-kernel/gentoo-sources", "Experimental kernel");
 
         // Allowed stable package
-        assert!(portage_mask.evaluate_installability("app-editors/vim", "amd64", "VIM-License").is_ok());
+        assert!(portage_mask
+            .evaluate_installability("app-editors/vim", "amd64", "VIM-License")
+            .is_ok());
 
         // Masked package
-        let masked_err = portage_mask.evaluate_installability("sys-kernel/gentoo-sources", "amd64", "GPL-2");
+        let masked_err =
+            portage_mask.evaluate_installability("sys-kernel/gentoo-sources", "amd64", "GPL-2");
         assert!(masked_err.is_err());
 
         // Unstable keyword rejection without ACCEPT_KEYWORDS
-        let unstable_err = portage_mask.evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0");
+        let unstable_err =
+            portage_mask.evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0");
         assert!(unstable_err.is_err());
 
         // Enable unstable keyword acceptance
         portage_mask.keyword_accept_unstable = true;
-        assert!(portage_mask.evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0").is_ok());
+        assert!(portage_mask
+            .evaluate_installability("app-editors/neovim", "~amd64", "Apache-2.0")
+            .is_ok());
     }
 
     #[test]
