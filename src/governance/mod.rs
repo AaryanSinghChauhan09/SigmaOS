@@ -9,6 +9,11 @@ pub mod rfc;
 pub mod strategic_vision;
 
 pub use okr::*;
+pub use strategic_vision::{
+    AdaptiveWorkloadType, CommunityPackageAuditRecord, ComplianceAuditVerdict,
+    RegulatedIndustryFramework, StrategicDifferentiationEngine, VisualDashboardOverlay,
+    VisualOverlayKind,
+};
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,

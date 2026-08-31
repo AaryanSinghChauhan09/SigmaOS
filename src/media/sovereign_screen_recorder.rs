@@ -29,7 +29,14 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
-use crate::gpu::driver::{GPUDeviceID, GPUVendor};
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GPUVendor {
+    Intel,
+    AMD,
+    NVIDIA,
+    Other,
+}
+pub type GPUDeviceID = usize;
 use crate::graphics::video::{PixelRgba, VideoFrame};
 
 /// Screen recorder status states
