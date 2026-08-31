@@ -54,6 +54,9 @@ pub use unimplemented_features::{
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+    SlackwarePkgtoolEngine, SlackwarePackage, SolusEopkgRavenGovernor, SolusEopkgDeltaPackage, RavenWidgetState,
+    MageiaUrpmiMccResolver, MageiaSynthesisPackage, MageiaMirror, DragonFlyHammer2DeduplicationEngine, Hammer2Block,
+    NetBsdRumpComponentEngine, RumpComponent, RumpComponentType,
 };
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
