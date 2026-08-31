@@ -125,10 +125,6 @@ impl NixDeclarativeSystemState {
         }
         Err(String::from("Rollback target unavailable"))
     }
-
-    pub fn active_generation(&self) -> Option<&Generation> {
-        self.generations.iter().find(|g| g.id == self.active_generation_id)
-    }
 }
 
 impl Default for NixDeclarativeSystemState {
@@ -146,12 +142,6 @@ pub struct SigpkgRecipe {
     pub arch: String,
     pub depends: Vec<String>,
     pub build_cmd: String,
-}
-
-impl SigpkgRecipe {
-    pub fn is_valid(&self) -> bool {
-        !self.pkgname.is_empty() && !self.pkgver.is_empty() && self.pkgrel > 0
-    }
 }
 
 pub struct ArchRecipeSandboxCompiler;
@@ -547,18 +537,6 @@ pub enum SchedulerClass {
     Idle,
 }
 
-impl SchedulerClass {
-    /// Lower value == more urgent, so classes sort naturally.
-    pub fn urgency(&self) -> u8 {
-        match self {
-            SchedulerClass::RTLane => 0,
-            SchedulerClass::Interactive => 1,
-            SchedulerClass::Normal => 2,
-            SchedulerClass::Idle => 3,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DvfsPowerGovernor {
     Performance,
@@ -601,7 +579,7 @@ pub struct SovereignHybridSchedulerInnovations {
 
 impl SovereignHybridSchedulerInnovations {
     pub fn new() -> Self {
-        let mut nodes: Vec<NumaNodeAffinity> = Vec::new();
+        let mut nodes = Vec::new();
         nodes.push(NumaNodeAffinity {
             node_id: 0,
             cpu_cores: Vec::from([0, 1, 2, 3]),
@@ -627,41 +605,8 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.insert(tid, task);
     }
 
-    /// Earliest-Deadline-First selection, modelled on Linux `SCHED_DEADLINE`.
-    ///
-    /// Ordering is (1) scheduling class urgency, (2) earliest absolute deadline,
-    /// (3) pid as a deterministic tie-break so the choice never depends on hash
-    /// map iteration order.
     pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
-        let mut best: Option<&RealtimeTask> = None;
-        for task in self.rt_tasks.values() {
-            best = match best {
-                None => Some(task),
-                Some(current) => {
-                    let task_key = (task.class.urgency(), task.deadline_us, task.pid);
-                    let cur_key = (current.class.urgency(), current.deadline_us, current.pid);
-                    if task_key < cur_key {
-                        Some(task)
-                    } else {
-                        Some(current)
-                    }
-                }
-            };
-        }
-        best
-    }
-
-    /// Reject any task whose worst-case execution time cannot fit its deadline,
-    /// the admission test Linux performs before accepting a SCHED_DEADLINE job.
-    pub fn admit_rt_task(&mut self, tid: usize, task: RealtimeTask) -> Result<(), &'static str> {
-        if task.wcet_us == 0 {
-            return Err("RT admission: wcet_us must be greater than zero");
-        }
-        if task.wcet_us > task.deadline_us {
-            return Err("RT admission: wcet_us exceeds deadline_us");
-        }
-        self.rt_tasks.insert(tid, task);
-        Ok(())
+        self.rt_tasks.values().next()
     }
 
     /// Selects optimal NUMA node for memory and thread affinity binding.
@@ -791,26 +736,5 @@ mod tests {
         sched.set_governor(DvfsPowerGovernor::Performance);
         assert_eq!(sched.current_governor, DvfsPowerGovernor::Performance);
         assert!(sched.verify_rt_lane_preemption_latency());
-    }
-
-    #[test]
-    fn test_nix_declarative_active_generation() {
-        let nix = NixDeclarativeSystemState::new();
-        let active = nix.active_generation();
-        assert!(active.is_some());
-        assert_eq!(active.unwrap().id, 1);
-    }
-
-    #[test]
-    fn test_sigpkg_recipe_validation() {
-        let recipe = SigpkgRecipe {
-            pkgname: String::from("htop"),
-            pkgver: String::from("3.2.0"),
-            pkgrel: 1,
-            arch: String::from("x86_64"),
-            depends: Vec::new(),
-            build_cmd: String::from("make"),
-        };
-        assert!(recipe.is_valid());
     }
 }

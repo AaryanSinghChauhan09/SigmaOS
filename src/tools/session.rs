@@ -1,11 +1,13 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 //! Session Manager (systemd-logind Inspiration)
 //! Session tracking, seat management, and device assignment
 
 
 
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Session type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -350,5 +352,93 @@ mod tests {
         manager.add_user(user);
         let session_id = manager.create_session(1000, "seat0").unwrap();
         assert!(manager.get_session(&session_id).is_some());
+    }
+
+    #[test]
+    fn test_sovereign_session_inhibitor() {
+        let mut manager = SovereignSessionInhibitorManager::new();
+        let id = manager.take_inhibitor("update_mgr", InhibitWhat::Shutdown, InhibitMode::Block, "Applying system updates");
+        assert_eq!(id, 1);
+        assert!(manager.is_shutdown_inhibited());
+
+        let released = manager.release_inhibitor(id);
+        assert!(released.is_ok());
+        assert!(!manager.is_shutdown_inhibited());
+    }
+}
+
+/// Linux systemd-logind & FreeBSD seatd inspired Session Inhibitor Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InhibitWhat {
+    Shutdown,
+    Sleep,
+    Idle,
+    HandlePowerKey,
+    HandleLidSwitch,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InhibitMode {
+    Block,
+    Delay,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSessionInhibitor {
+    pub id: u32,
+    pub who: String,
+    pub what: InhibitWhat,
+    pub mode: InhibitMode,
+    pub reason: String,
+}
+
+pub struct SovereignSessionInhibitorManager {
+    pub inhibitors: Vec<SovereignSessionInhibitor>,
+    pub next_id: u32,
+}
+
+impl SovereignSessionInhibitorManager {
+    pub fn new() -> Self {
+        Self {
+            inhibitors: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn take_inhibitor(&mut self, who: &str, what: InhibitWhat, mode: InhibitMode, reason: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.inhibitors.push(SovereignSessionInhibitor {
+            id,
+            who: who.to_string(),
+            what,
+            mode,
+            reason: reason.to_string(),
+        });
+        id
+    }
+
+    pub fn release_inhibitor(&mut self, id: u32) -> Result<(), &'static str> {
+        let initial_len = self.inhibitors.len();
+        self.inhibitors.retain(|i| i.id != id);
+        if self.inhibitors.len() < initial_len {
+            Ok(())
+        } else {
+            Err("Inhibitor not found")
+        }
+    }
+
+    pub fn is_shutdown_inhibited(&self) -> bool {
+        self.inhibitors.iter().any(|i| i.what == InhibitWhat::Shutdown)
+    }
+
+    pub fn is_sleep_inhibited(&self) -> bool {
+        self.inhibitors.iter().any(|i| i.what == InhibitWhat::Sleep)
+    }
+}
+
+impl Default for SovereignSessionInhibitorManager {
+    fn default() -> Self {
+        Self::new()
     }
 }

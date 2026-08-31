@@ -471,15 +471,15 @@ impl DriverManager for SimpleDriverManager {
     }
 
     fn get_driver_status(&self, device_id: DeviceID) -> bool {
-            self.loaded_drivers.contains(&device_id)
+        self.loaded_drivers.contains(&device_id)
     }
 }
 
 pub trait CompatibilityCheck {
     fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
-    fn check_component(&self, name: &str) -> bool;
     fn run_full_scan(&self) -> CompatibilityReport;
 }
+
 
 pub struct SimpleDiagnostics {
     pub matrix: SimpleCompatibilityMatrix,
@@ -503,10 +503,6 @@ impl CompatibilityCheck for SimpleDiagnostics {
         } else {
             CompatibilityResult::Unknown
         }
-    }
-
-    fn check_component(&self, name: &str) -> bool {
-        self.matrix.devices.iter().any(|d| (**d).name() == name)
     }
 
     fn run_full_scan(&self) -> CompatibilityReport {

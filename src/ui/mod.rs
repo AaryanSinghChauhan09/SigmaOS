@@ -1,11 +1,16 @@
 // SigmaOS Native UI and Mathematical Visualisation Subsystem Mod
 
+pub mod control_center;
 pub mod math_plotter;
 pub mod toolkit;
 pub mod control_center;
 pub mod folder_color;
 pub mod gtk;
 
+pub use control_center::{
+    ControlCenterCategory, DisplaySettingsPlug, NetworkSettingsPlug, SwitchboardPlug,
+    UnifiedControlCenter,
+};
 pub use math_plotter::{PlotFunction, SovereignMathPlotter};
 pub use toolkit::{
     LayoutCapability, LayoutStats, SimpleUILayout, SimpleWidget, UIError, UILayout, Widget,

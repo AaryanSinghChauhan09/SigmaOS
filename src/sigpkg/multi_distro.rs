@@ -580,6 +580,95 @@ impl Default for SovereignMultiDistroPackageManager {
     }
 }
 
+// =========================================================================
+// MULTI-DISTRO PACKAGE DEPENDENCY INSTALLER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum DistroPackageManagerKind {
+    Apt,     // Debian/Ubuntu/Mint
+    Dnf,     // Fedora/RHEL
+    Pacman,  // Arch/Manjaro
+    Portage, // Gentoo
+    Xbps,    // Void
+    PkgNg,   // FreeBSD
+    Apk,     // Alpine
+}
+
+pub struct MultiDistroDependencyInstaller {
+    pub active_manager: DistroPackageManagerKind,
+    pub package_mappings: BTreeMap<String, BTreeMap<DistroPackageManagerKind, String>>, // canonical -> (mgr -> distro_pkg_name)
+}
+
+impl MultiDistroDependencyInstaller {
+    pub fn new(active_manager: DistroPackageManagerKind) -> Self {
+        let mut installer = Self {
+            active_manager,
+            package_mappings: BTreeMap::new(),
+        };
+
+        // Seed canonical library dependency mappings
+        installer.register_mapping("openssl", DistroPackageManagerKind::Apt, "libssl-dev");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Dnf, "openssl-devel");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Pacman, "openssl");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Portage, "dev-libs/openssl");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Xbps, "openssl-devel");
+        installer.register_mapping("openssl", DistroPackageManagerKind::PkgNg, "security/openssl");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Apk, "openssl-dev");
+
+        installer.register_mapping("zlib", DistroPackageManagerKind::Apt, "zlib1g-dev");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Dnf, "zlib-devel");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Pacman, "zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Portage, "sys-libs/zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Xbps, "zlib-devel");
+        installer.register_mapping("zlib", DistroPackageManagerKind::PkgNg, "devel/zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Apk, "zlib-dev");
+
+        installer
+    }
+
+    pub fn register_mapping(&mut self, canonical_name: &str, manager: DistroPackageManagerKind, distro_pkg_name: &str) {
+        self.package_mappings
+            .entry(canonical_name.to_string())
+            .or_default()
+            .insert(manager, distro_pkg_name.to_string());
+    }
+
+    pub fn resolve_package_name(&self, canonical_name: &str) -> String {
+        if let Some(mgr_map) = self.package_mappings.get(canonical_name) {
+            if let Some(distro_name) = mgr_map.get(&self.active_manager) {
+                return distro_name.clone();
+            }
+        }
+        canonical_name.to_string()
+    }
+
+    /// Generate command string for installing a list of canonical dependencies
+    pub fn generate_install_command(&self, canonical_deps: &[&str]) -> String {
+        let distro_pkgs: Vec<String> = canonical_deps
+            .iter()
+            .map(|&dep| self.resolve_package_name(dep))
+            .collect();
+        let pkg_list = distro_pkgs.join(" ");
+
+        match self.active_manager {
+            DistroPackageManagerKind::Apt => format!("apt-get install -y {}", pkg_list),
+            DistroPackageManagerKind::Dnf => format!("dnf install -y {}", pkg_list),
+            DistroPackageManagerKind::Pacman => format!("pacman -S --noconfirm {}", pkg_list),
+            DistroPackageManagerKind::Portage => format!("emerge --ask=n {}", pkg_list),
+            DistroPackageManagerKind::Xbps => format!("xbps-install -Sy {}", pkg_list),
+            DistroPackageManagerKind::PkgNg => format!("pkg install -y {}", pkg_list),
+            DistroPackageManagerKind::Apk => format!("apk add --no-cache {}", pkg_list),
+        }
+    }
+}
+
+impl Default for MultiDistroDependencyInstaller {
+    fn default() -> Self {
+        Self::new(DistroPackageManagerKind::Apt)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -732,5 +821,22 @@ mod tests {
         let uris = engine.resolve_active_uris("sys-libs/zlib", &active_flags);
         assert_eq!(uris.len(), 2);
         assert!(uris.contains(&"https://zlib.net/minizip.tar.gz".to_string()));
+    }
+
+    #[test]
+    fn test_multi_distro_dependency_installer() {
+        let apt_installer = MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Apt);
+        assert_eq!(apt_installer.resolve_package_name("openssl"), "libssl-dev");
+        let apt_cmd = apt_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(apt_cmd, "apt-get install -y libssl-dev zlib1g-dev");
+
+        let dnf_installer = MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Dnf);
+        assert_eq!(dnf_installer.resolve_package_name("openssl"), "openssl-devel");
+        let dnf_cmd = dnf_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(dnf_cmd, "dnf install -y openssl-devel zlib-devel");
+
+        let pacman_installer = MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Pacman);
+        let pac_cmd = pacman_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(pac_cmd, "pacman -S --noconfirm openssl zlib");
     }
 }

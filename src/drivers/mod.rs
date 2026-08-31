@@ -15,22 +15,17 @@ pub mod modern_nvme;
 pub mod modern_usb;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
-pub mod printing;
 pub mod network;
 pub mod peripheral;
 pub mod storage;
 pub mod touch_jingos;
+pub mod printing;
 pub mod usb_hid;
 pub mod vesa;
-pub mod ch340_usb;
-pub mod e1000_nic;
-pub mod intel_e1000;
-pub mod intel_hda;
-pub mod nvme_storage;
 
-pub use gpu::{
-    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuShader, ShaderStage,
-};
+pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
+
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;
@@ -50,11 +45,6 @@ pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use linux_bsd_drivers::*;
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-pub use ch340_usb::Ch340Driver;
-pub use e1000_nic::E1000Driver as E1000NicDriver;
-pub use intel_e1000::E1000Driver;
-pub use intel_hda::IntelHdaDriver;
-pub use nvme_storage::NvmeDriver;
 
 pub use distro_device_expansion::{
     CanBusSocketDriver, IntelI2cSmbusControllerDriver, IntelIgbNicDriver, IntelIwfWifiDriver,
