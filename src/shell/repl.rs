@@ -30,8 +30,9 @@ use crate::accessibility::{
     AccessibilitySetting,
 };
 use crate::shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ZshPromptFormatter,
+    BashParameterExpansion, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
+    ParameterExpansionEngine, PipelineExecutor, ShellArithmeticEvaluator, WildcardGlobMatcher,
+    ZshPromptFormatter,
 };
 use crate::compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
@@ -207,10 +208,32 @@ pub enum ShellCommand {
     AuditLog,
     AuditCheck,
 
-    // Ksh/BSD Job Control commands
+    // Ksh/BSD Job Control & Directory Stack commands
     Jobs,
     JobFg {
         job_id: u32,
+    },
+    JobBg {
+        job_id: u32,
+    },
+    Export {
+        key: String,
+        value: String,
+    },
+    Unset {
+        key: String,
+    },
+    Pushd {
+        dir: String,
+    },
+    Popd,
+    Dirs,
+    Pledge {
+        mask: u32,
+    },
+    Unveil {
+        path: String,
+        permissions: String,
     },
 
     Unknown(String),
@@ -298,27 +321,18 @@ impl ShellRepl {
         shell
     }
 
+    /// Renders powerline/starship styled prompt string
+    pub fn get_rendered_prompt(&self) -> String {
+        let mut builder = PowerlinePromptBuilder::new();
+        builder.user = self.current_user.clone();
+        builder.current_dir = self.current_dir.clone();
+        builder.home_dir = "/home/ubuntu".to_string();
+        builder.render_prompt()
+    }
+
     pub fn run(&mut self) {
         println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
         println!("Type 'help' for available commands\n");
-
-        let stdin = io::stdin();
-        let mut stdout = io::stdout();
-
-        while self.running {
-            print!("{}", self.prompt);
-            stdout.flush().unwrap();
-
-            let mut input = String::new();
-            stdin.lock().read_line(&mut input).unwrap();
-
-            let input = input.trim();
-            if !input.is_empty() {
-                self.execute_line(input);
-            }
-        }
-
-        println!("Goodbye!");
     }
 
     pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
@@ -357,12 +371,15 @@ impl ShellRepl {
     }
 
     fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
-        self.command_history.push(line.to_string());
+        // 1. History Expansion (!1, !!, !$)
+        let expanded_history = HistoryExpansionEngine::expand_history(line, &self.command_history);
 
-        // Perform Bash-style Alias Substitution
-        let mut final_line = line.to_string();
-        let parts: Vec<&str> = line.split_whitespace().collect();
+        // Save command history (Fish style)
+        self.command_history.push(expanded_history.clone());
+
+        // 2. Perform Bash-style Alias Substitution
+        let mut alias_expanded = expanded_history.clone();
+        let parts: Vec<&str> = expanded_history.split_whitespace().collect();
         if !parts.is_empty() {
             if let Some(aliased) = self.aliases.get(parts[0]) {
                 let mut statement = aliased.clone();
@@ -370,11 +387,26 @@ impl ShellRepl {
                     statement.push(' ');
                     statement.push_str(&parts[1..].join(" "));
                 }
-                final_line = statement;
+                alias_expanded = statement;
             }
         }
 
-        let command = self.parse_command(&final_line);
+        // 3. Parameter Expansion & Arithmetic Evaluation (${VAR:-default}, $(( expr )))
+        let mut env_map = alloc::collections::BTreeMap::new();
+        for (k, v) in &self.variables {
+            env_map.insert(k.clone(), v.clone());
+        }
+        env_map.insert("USER".to_string(), self.current_user.clone());
+        env_map.insert("PWD".to_string(), self.current_dir.clone());
+
+        let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
+        if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
+            if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
+                fully_expanded = val.to_string();
+            }
+        }
+
+        let command = self.parse_command(&fully_expanded);
         let result = self.execute_command(command);
 
         match result {
@@ -754,6 +786,69 @@ impl ShellRepl {
                 };
                 ShellCommand::JobFg { job_id }
             }
+            "bg" => {
+                let job_id = if parts.len() >= 2 {
+                    parts[1].trim_start_matches('%').parse::<u32>().unwrap_or(1)
+                } else {
+                    1
+                };
+                ShellCommand::JobBg { job_id }
+            }
+            "export" => {
+                if parts.len() >= 2 {
+                    let expr = parts[1..].join(" ");
+                    if let Some((k, v)) = expr.split_once('=') {
+                        ShellCommand::Export {
+                            key: k.trim().to_string(),
+                            value: v.trim().to_string(),
+                        }
+                    } else {
+                        ShellCommand::Export {
+                            key: parts[1].to_string(),
+                            value: String::new(),
+                        }
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "unset" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Unset {
+                        key: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "pushd" => {
+                let dir = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "/home/ubuntu".to_string()
+                };
+                ShellCommand::Pushd { dir }
+            }
+            "popd" => ShellCommand::Popd,
+            "dirs" => ShellCommand::Dirs,
+            "pledge" => {
+                let mask = if parts.len() >= 2 {
+                    parts[1].parse::<u32>().unwrap_or(0x7f)
+                } else {
+                    0x7f
+                };
+                ShellCommand::Pledge { mask }
+            }
+            "unveil" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Unveil {
+                        path: parts[1].to_string(),
+                        permissions: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -910,7 +1005,7 @@ impl ShellRepl {
                         if results.is_empty() {
                             Ok("No matching packages found.".to_string())
                         } else {
-                            Ok(format!("{}/{}", results, "\n"))
+                            Ok(results.join("\n"))
                         }
                     }
                 } else if subcommand == "install" {
@@ -1303,6 +1398,46 @@ impl ShellRepl {
                     Ok(msg) => Ok(msg),
                     Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
                 }
+            }
+            ShellCommand::JobBg { job_id } => {
+                match self.job_control.send_to_background(job_id as usize) {
+                    Ok(msg) => Ok(msg),
+                    Err(_) => Err(format!("bg: Job %{} not found.", job_id)),
+                }
+            }
+            ShellCommand::Export { key, value } => {
+                self.variables.insert(key.clone(), value.clone());
+                Ok(format!("Exported {}={}", key, value))
+            }
+            ShellCommand::Unset { key } => {
+                if self.variables.remove(&key).is_some() {
+                    Ok(format!("Unset variable '{}'", key))
+                } else {
+                    Ok(format!("Variable '{}' was not set", key))
+                }
+            }
+            ShellCommand::Pushd { dir } => {
+                let formatted = self.dir_stack.pushd(&dir);
+                self.current_dir = dir;
+                Ok(formatted)
+            }
+            ShellCommand::Popd => {
+                match self.dir_stack.popd() {
+                    Ok(formatted) => {
+                        self.current_dir = self.dir_stack.current_dir.clone();
+                        Ok(formatted)
+                    }
+                    Err(err) => Err(err.to_string()),
+                }
+            }
+            ShellCommand::Dirs => {
+                Ok(self.dir_stack.dirs())
+            }
+            ShellCommand::Pledge { mask } => {
+                Ok(format!("Pledged syscall mask 0x{:x}", mask))
+            }
+            ShellCommand::Unveil { path, permissions } => {
+                Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
@@ -1798,5 +1933,56 @@ mod tests {
         assert!(matches!(fg_cmd, ShellCommand::JobFg { .. }));
         let fg_res = repl.execute_command(fg_cmd).unwrap();
         assert!(fg_res.contains("brought to foreground"));
+    }
+
+    #[test]
+    fn test_shell_repl_enhancements() {
+        let mut repl = ShellRepl::new();
+
+        // Test export & unset
+        let export_cmd = repl.parse_command("export MY_VAR=hello_world");
+        assert!(matches!(export_cmd, ShellCommand::Export { .. }));
+        let exp_res = repl.execute_command(export_cmd).unwrap();
+        assert!(exp_res.contains("Exported MY_VAR=hello_world"));
+        assert_eq!(repl.variables.get("MY_VAR").unwrap(), "hello_world");
+
+        let unset_cmd = repl.parse_command("unset MY_VAR");
+        assert!(matches!(unset_cmd, ShellCommand::Unset { .. }));
+        let unset_res = repl.execute_command(unset_cmd).unwrap();
+        assert!(unset_res.contains("Unset variable 'MY_VAR'"));
+        assert!(repl.variables.get("MY_VAR").is_none());
+
+        // Test pushd, popd, dirs
+        let pushd_cmd = repl.parse_command("pushd /tmp");
+        assert!(matches!(pushd_cmd, ShellCommand::Pushd { .. }));
+        let push_res = repl.execute_command(pushd_cmd).unwrap();
+        assert!(push_res.contains("/tmp"));
+        assert_eq!(repl.current_dir, "/tmp");
+
+        let dirs_cmd = repl.parse_command("dirs");
+        assert!(matches!(dirs_cmd, ShellCommand::Dirs));
+        let dirs_res = repl.execute_command(dirs_cmd).unwrap();
+        assert!(dirs_res.contains("/tmp"));
+
+        let popd_cmd = repl.parse_command("popd");
+        assert!(matches!(popd_cmd, ShellCommand::Popd));
+        let pop_res = repl.execute_command(popd_cmd).unwrap();
+        assert!(pop_res.contains("/home/ubuntu"));
+        assert_eq!(repl.current_dir, "/home/ubuntu");
+
+        // Test pledge & unveil
+        let pledge_cmd = repl.parse_command("pledge 127");
+        assert!(matches!(pledge_cmd, ShellCommand::Pledge { .. }));
+        let pledge_res = repl.execute_command(pledge_cmd).unwrap();
+        assert!(pledge_res.contains("Pledged syscall mask"));
+
+        let unveil_cmd = repl.parse_command("unveil /usr/bin rwc");
+        assert!(matches!(unveil_cmd, ShellCommand::Unveil { .. }));
+        let unveil_res = repl.execute_command(unveil_cmd).unwrap();
+        assert!(unveil_res.contains("Unveiled path '/usr/bin'"));
+
+        // Test prompt rendering
+        let rendered_prompt = repl.get_rendered_prompt();
+        assert!(rendered_prompt.contains("ubuntu@sigmaos"));
     }
 }

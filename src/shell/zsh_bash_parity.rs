@@ -782,6 +782,15 @@ impl ShellJobControl {
         }
     }
 
+    pub fn send_to_background(&mut self, id: usize) -> Result<String, String> {
+        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
+            job.state = JobState::Running;
+            Ok(format!("[{}] Job '{}' (PID {}) running in background.", job.id, job.command, job.pid))
+        } else {
+            Err(format!("Job %{} not found", id))
+        }
+    }
+
     pub fn stop_job(&mut self, id: usize) -> bool {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.state = JobState::Stopped;

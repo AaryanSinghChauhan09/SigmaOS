@@ -26,7 +26,15 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(feature = "standalone_test"))]
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::format;
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+
+#[cfg(test)]
 use crate::klib::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
@@ -280,6 +288,12 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        UniversalPackageManifestParser::detect_format_from_filename(filename)
+    }
 }
 
 impl UnifiedPackage {
@@ -867,11 +881,11 @@ impl DependencyResolver {
     pub fn resolve_dependencies(
         &self,
         package_name: &str,
-    ) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+    ) -> Result<Vec<String>, PackageError> {
+        let mut resolved: Vec<String> = Vec::new();
+        let mut to_visit: Vec<String> = Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+        let mut visited = crate::klib::hashset::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -981,6 +995,19 @@ impl Default for DependencyResolver {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookTiming {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+}
+
+pub trait PackageHook: Send + Sync {
+    fn timing(&self) -> HookTiming;
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
 /// Transactional package manager checkpoint
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageCheckpoint {
@@ -1007,7 +1034,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut keys: Vec<String> = Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());

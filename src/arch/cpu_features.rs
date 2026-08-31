@@ -828,4 +828,3 @@ mod tests {
         assert!(xcr0.sse_enabled);
     }
 }
-
