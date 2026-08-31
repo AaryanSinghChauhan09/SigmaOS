@@ -3,6 +3,12 @@
 
 pub mod sigmatools;
 pub mod sovereign_commands;
+pub mod simple_scan;
+
+pub use simple_scan::{
+    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource,
+    ScannedPage, SovereignSimpleScanEngine,
+};
 
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,

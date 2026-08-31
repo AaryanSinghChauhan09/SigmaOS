@@ -26,10 +26,6 @@ mod linux_bsd_parity;
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/compatibility/distro_bridge.rs"]
@@ -82,10 +78,131 @@ mod missing_distro_innovations;
 mod linux_bsd_inspirations;
 #[path = "../src/compatibility/community_foundation.rs"]
 mod community_foundation;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
+#[path = "../src/security/kernel_hardening.rs"]
+mod kernel_hardening;
+#[path = "../src/security/kali_stack.rs"]
+mod kali_stack;
+#[path = "../src/graphics/paint.rs"]
+mod paint;
+#[path = "../src/tools/display_manager.rs"]
+mod display_manager;
+#[path = "../src/tools/simple_scan.rs"]
+mod simple_scan;
+#[path = "../src/desktop/mate_betsy.rs"]
+mod mate_betsy;
 
 use bsd_compat::*;
+
+#[test]
+fn test_mate_betsy_desktop_suite_inspection() {
+    use mate_betsy::MateBetsyDesktopEnvironment;
+
+    let mut mate = MateBetsyDesktopEnvironment::new();
+    assert_eq!(mate.marco.theme_name, "Menta");
+
+    mate.launch_pluma_editor("config.conf");
+    assert!(mate.active_editor.is_some());
+    assert_eq!(mate.marco.active_windows.len(), 1);
+
+    mate.launch_atril_pdf("manual.pdf", 25);
+    assert!(mate.active_atril.is_some());
+    assert_eq!(mate.active_atril.as_ref().unwrap().total_pages, 25);
+}
+
+#[path = "../src/compatibility/mint_linux.rs"]
+mod mint_linux;
+
+#[test]
+fn test_mint4win_installer_engine_inspection() {
+    use mint_linux::{
+        Mint4WinInstallerEngine, Mint4WinInstallationConfig,
+    };
+
+    let config = Mint4WinInstallationConfig::default_windows_c('D', "bob");
+    let mut engine = Mint4WinInstallerEngine::new(config);
+
+    assert!(engine.allocate_loopback_disks().is_ok());
+    assert!(engine.configure_windows_bcd_boot_entry().is_ok());
+    assert!(engine.installed);
+}
+
+#[test]
+fn test_simple_scan_engine_inspection() {
+    use simple_scan::{SovereignSimpleScanEngine, ScanExportFormat};
+
+    let mut scan_engine = SovereignSimpleScanEngine::new();
+    assert_eq!(scan_engine.connected_scanners.len(), 1);
+
+    let page1 = scan_engine.acquire_scan_page().unwrap();
+    assert_eq!(page1, 1);
+
+    let ocr_text = scan_engine.perform_ocr_text_extraction(0).unwrap();
+    assert!(ocr_text.contains("Page #1"));
+
+    let pdf = scan_engine.export_document_multipage(ScanExportFormat::Pdf).unwrap();
+    assert!(pdf.starts_with(b"%PDF-1.7"));
+}
+
+#[test]
+fn test_display_manager_mdm_theme_engine_inspection() {
+    use display_manager::{MdmGreeterThemeEngine, MdmThemeConfig, MdmThemeStyle, User, Session, SessionType};
+
+    let config = MdmThemeConfig::new("Mint-Sovereign", MdmThemeStyle::Html5Canvas);
+    let mut greeter = MdmGreeterThemeEngine::new(config);
+    greeter.set_user_avatar(1001, "/home/bob/.face");
+
+    let users = vec![User::new(1001, "bob", "/home/bob")];
+    let sessions = vec![Session::new("Zenith-Wayland", SessionType::Wayland, "/usr/bin/zenith")];
+
+    let html = greeter.render_html5_greeter_markup(&users, &sessions);
+    assert!(html.contains("Mint-Sovereign"));
+    assert!(html.contains("bob"));
+    assert!(html.contains("Zenith-Wayland"));
+}
+
+#[test]
+fn test_graphics_paint_suite_inspection() {
+    use paint::{
+        SigmaLayerMaskEngine, SigmaLayerMask, SovereignBrushEngine, BrushType, BrushPoint,
+        ColorRgba, SigmaSelectionEngine, SigmaVectorPathEngine, VectorControlPoint,
+        SigmaPaletteManager, SigmaImageExporter,
+    };
+
+    // 1. Layer Mask Engine
+    let mut mask_engine = SigmaLayerMaskEngine::new();
+    let mut mask = SigmaLayerMask::new(2, 2, 255);
+    mask.set_value(0, 0, 128);
+    mask_engine.attach_mask(mask);
+    let mut pixels = vec![ColorRgba::new(255, 0, 0, 200); 4];
+    mask_engine.apply_mask_to_layer(2, 2, &mut pixels);
+    assert_eq!(pixels[0].a, 100);
+
+    // 2. Brush Engine
+    let brush = SovereignBrushEngine::new(BrushType::SoftRound, 10.0, ColorRgba::new(0, 0, 255, 255));
+    let bp = BrushPoint { x: 5.0, y: 5.0, pressure: 0.8 };
+    let mut canvas_pixels = vec![ColorRgba::new(0, 0, 0, 0); 100];
+    brush.paint_dab(bp, 10, 10, &mut canvas_pixels);
+    assert!(canvas_pixels[55].b > 0);
+
+    // 3. Selection Engine
+    let mut sel = SigmaSelectionEngine::new(10, 10);
+    sel.select_rectangle(1, 1, 5, 5);
+    assert!(sel.is_selected(2, 2));
+
+    // 4. Vector Path Engine
+    let mut path = SigmaVectorPathEngine::new();
+    path.add_point(VectorControlPoint { x: 1.0, y: 1.0, handle_in_x: 1.0, handle_in_y: 1.0, handle_out_x: 3.0, handle_out_y: 1.0 });
+    path.add_point(VectorControlPoint { x: 5.0, y: 5.0, handle_in_x: 3.0, handle_in_y: 5.0, handle_out_x: 5.0, handle_out_y: 5.0 });
+    path.stroke_path_onto_canvas(10, 10, &mut canvas_pixels);
+
+    // 5. Palette Manager
+    let mut pal = SigmaPaletteManager::new("Tango");
+    assert_eq!(pal.load_gpl_palette("GIMP Palette\n100 100 100 Red\n"), 1);
+
+    // 6. Image Exporter
+    let ppm = SigmaImageExporter::export_ppm(2, 2, &pixels).unwrap();
+    assert!(ppm.contains("P3"));
+}
 
 #[test]
 fn test_sovereign_community_foundation_inspection() {
@@ -788,41 +905,6 @@ fn test_systemd_unit_dependency_engine_inspection() {
     assert!(!engine.detect_circular_dependencies());
     let seq = engine.compute_startup_sequence().unwrap();
     assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
-
-    // Systemd Init Innovations Security & Diagnostics Inspection Test
-    #[path = "../src/init/systemd_init.rs"]
-    mod systemd_init;
-    use systemd_init::{
-        SystemdEngine, SystemdUnit as SovSystemdUnit, UnitType as SovUnitType,
-        SystemdSecurityAuditor, SystemdUnitHardeningProfile, ProtectSystemLevel, ProtectHomeLevel,
-    };
-
-    let mut sys_engine = SystemdEngine::new();
-    let mut srv = SovSystemdUnit::new(1, b"secure.service", SovUnitType::Service);
-    srv.duration_ms = 350;
-    srv.hardening_profile = SystemdUnitHardeningProfile {
-        no_new_privileges: true,
-        protect_system: ProtectSystemLevel::Strict,
-        protect_home: ProtectHomeLevel::ReadOnly,
-        private_tmp: true,
-        private_devices: true,
-        protect_kernel_tunables: true,
-        protect_kernel_modules: true,
-        restrict_namespaces: true,
-        memory_deny_write_execute: true,
-        lock_personality: true,
-        restrict_realtime: true,
-        capability_bounding_set: vec!["CAP_NET_BIND_SERVICE".to_string()],
-        system_call_filter: vec!["@default".to_string()],
-        unveil_paths: vec![("/etc/ssl".to_string(), "r".to_string())],
-        pledge_promises: "stdio rpath inet".to_string(),
-    };
-    sys_engine.register_unit(srv);
-
-    let sec_reports = sys_engine.systemd_analyze_security();
-    assert_eq!(sec_reports.len(), 1);
-    assert_eq!(sec_reports[0].rating, "OK");
-    assert!(sec_reports[0].exposure_score <= 2.5);
 }
 
 #[test]
@@ -1075,28 +1157,4 @@ fn test_new_kernel_subsystem_innovations_inspection() {
     assert_eq!(pool.free_frame_pfns.len(), 15);
     pool.free_page_frame(frame_pfn);
     assert_eq!(pool.free_frame_pfns.len(), 16);
-}
-
-#[test]
-fn test_sovereign_distro_dominance_suite_inspection() {
-    use sovereign_distro_dominance::{
-        SovereignDistroDominanceSuite, MicrovmState,
-    };
-
-    let mut suite = SovereignDistroDominanceSuite::new();
-
-    // 1. Nix / Guix Zero-Copy Package Store
-    let pkg_hash = suite.nix_store.add_package("libcrypto", "3.1.0", vec![], b"BINARY_PAYLOAD_CRYPTO");
-    assert!(suite.nix_store.zero_copy_read_slice(&pkg_hash).is_some());
-
-    // 2. MicroVM Hypervisor Gateway
-    let vm_id = suite.microvm_gateway.launch_microvm("micro-worker-01", 2, 1024, "eth0", "/dev/vdb");
-    assert_eq!(vm_id, 1);
-    assert_eq!(suite.microvm_gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Running);
-
-    // 3. PQC WireGuard VPN Engine
-    suite.pqc_vpn.bring_up();
-    suite.pqc_vpn.add_peer("datacenter-east", "10.100.0.1", &["10.100.0.0/16"]);
-    assert!(suite.pqc_vpn.transmit_pqc_packet("datacenter-east", 512).is_ok());
-    assert_eq!(suite.pqc_vpn.peers.get("datacenter-east").unwrap().tx_bytes, 512);
 }

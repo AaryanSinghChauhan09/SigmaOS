@@ -2,10 +2,11 @@
 pub mod zenith_compositor;
 pub mod moksha;
 pub mod pantheon;
-pub mod screensaver;
+pub mod mate_betsy;
 
-pub use screensaver::{
-    DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+pub use mate_betsy::{
+    AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
+    MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
 
 pub use pantheon::{

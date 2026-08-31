@@ -146,8 +146,10 @@ pub use historic_linux::{
 };
 
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    LoopbackDiskFormat, Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata,
+    MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    WindowsBootloaderType,
 };
 pub use legacy_adapters::{
     LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
