@@ -8,8 +8,124 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::distro::sovereign_distro_dominance::SovereignDistroDominanceSuite;
-use crate::distro::universal_distro_super_matrix::UniversalDistroSuperMatrix;
+// When compiled as part of the full crate, use super:: to reference sibling modules.
+// For standalone test compilation, these types are defined locally below.
+#[cfg(not(test))]
+use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;
+#[cfg(not(test))]
+use super::universal_distro_super_matrix::UniversalDistroSuperMatrix;
+
+// ---- Standalone fallback definitions for test compilation ----
+
+#[cfg(test)]
+mod test_stubs {
+    extern crate alloc;
+    use alloc::collections::BTreeMap;
+    use alloc::string::{String, ToString};
+    use alloc::vec::Vec;
+
+    // --- NixGuixZeroCopyStore stub ---
+    #[derive(Debug, Clone)]
+    pub struct NixGuixZeroCopyStore {
+        packages: BTreeMap<String, Vec<u8>>,
+        generations: BTreeMap<String, Vec<String>>,
+    }
+    impl NixGuixZeroCopyStore {
+        pub fn new() -> Self {
+            Self { packages: BTreeMap::new(), generations: BTreeMap::new() }
+        }
+        pub fn add_package(&mut self, name: &str, version: &str, _deps: Vec<String>, binary_payload: &[u8]) -> String {
+            let hash_id = alloc::format!("{}-{}-hash", name, version);
+            self.packages.insert(hash_id.clone(), binary_payload.to_vec());
+            hash_id
+        }
+        pub fn register_in_generation(&mut self, name: &str, hash_id: &str) -> Result<usize, String> {
+            let gen = self.generations.entry(name.to_string()).or_insert_with(Vec::new);
+            gen.push(hash_id.to_string());
+            Ok(gen.len())
+        }
+        pub fn zero_copy_read_slice(&self, hash_id: &str) -> Option<&[u8]> {
+            self.packages.get(hash_id).map(|v| v.as_slice())
+        }
+    }
+
+    // --- CachyBoreDynamicAiScheduler stub ---
+    #[derive(Debug, Clone)]
+    pub struct CachyBoreDynamicAiScheduler {
+        tasks: Vec<(usize, String, u64)>,
+    }
+    impl CachyBoreDynamicAiScheduler {
+        pub fn new() -> Self { Self { tasks: Vec::new() } }
+        pub fn register_task(&mut self, pid: usize, name: &str, burst_us: u64) {
+            self.tasks.push((pid, name.to_string(), burst_us));
+        }
+        pub fn schedule_next(&self) -> Option<usize> {
+            self.tasks.last().map(|(pid, _, _)| *pid)
+        }
+    }
+
+    // --- ZfsBtrfsHybridSelfHealingCoW stub ---
+    #[derive(Debug, Clone)]
+    pub struct ZfsBtrfsHybridSelfHealingCoW;
+    impl ZfsBtrfsHybridSelfHealingCoW {
+        pub fn new() -> Self { Self }
+        pub fn verify_and_self_heal(&mut self, _subvol: &str, _filepath: &str, _expected_data: &[u8]) -> Result<bool, String> {
+            Ok(false)
+        }
+    }
+
+    // --- SovereignDistroDominanceSuite stub ---
+    #[derive(Debug, Clone)]
+    pub struct SovereignDistroDominanceSuite {
+        pub nix_store: NixGuixZeroCopyStore,
+        pub scheduler: CachyBoreDynamicAiScheduler,
+        pub filesystem_cow: ZfsBtrfsHybridSelfHealingCoW,
+    }
+    impl SovereignDistroDominanceSuite {
+        pub fn new() -> Self {
+            Self {
+                nix_store: NixGuixZeroCopyStore::new(),
+                scheduler: CachyBoreDynamicAiScheduler::new(),
+                filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
+            }
+        }
+    }
+
+    // --- DistroProfile for UniversalDistroSuperMatrix ---
+    #[derive(Debug, Clone)]
+    pub struct DistroProfile {
+        pub package_management_model: String,
+    }
+
+    // --- UniversalDistroSuperMatrix stub ---
+    #[derive(Debug, Clone)]
+    pub struct UniversalDistroSuperMatrix {
+        domains: Vec<String>,
+        profiles: BTreeMap<String, DistroProfile>,
+    }
+    impl UniversalDistroSuperMatrix {
+        pub fn new() -> Self {
+            let mut profiles = BTreeMap::new();
+            profiles.insert("Ubuntu/Debian".to_string(), DistroProfile { package_management_model: "deb/apt".to_string() });
+            profiles.insert("Fedora/RHEL".to_string(), DistroProfile { package_management_model: "rpm/dnf".to_string() });
+            profiles.insert("Arch".to_string(), DistroProfile { package_management_model: "pacman".to_string() });
+            Self { domains: Vec::new(), profiles }
+        }
+        pub fn create_qubes_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
+            if self.domains.contains(&domain_name.to_string()) {
+                return Err("Domain already exists");
+            }
+            self.domains.push(domain_name.to_string());
+            Ok(())
+        }
+        pub fn get_profile(&self, name: &str) -> Option<&DistroProfile> {
+            self.profiles.get(name)
+        }
+    }
+}
+
+#[cfg(test)]
+use test_stubs::{SovereignDistroDominanceSuite, UniversalDistroSuperMatrix};
 
 // ==========================================
 // 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE
