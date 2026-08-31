@@ -1,5 +1,8 @@
 name: eBPF XDP Programmable Networking CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]
