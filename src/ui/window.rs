@@ -23,6 +23,10 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 686
 /// Implements window creation, management, and composition
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -89,7 +93,15 @@ impl Window for SimpleWindow {
     fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn state(&self) -> WindowState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> WindowState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => WindowState::Normal,
+            1 => WindowState::Minimized,
+            2 => WindowState::Maximized,
+            3 => WindowState::Fullscreen,
+            _ => WindowState::Hidden,
+        }
+    }
 
     fn set_state(&mut self, state: WindowState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -214,77 +226,85 @@ impl WindowDecoration for SimpleWindowDecoration {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+/// Linux (i3/sway/bspwm) & BSD inspired Zenith Dynamic Tiling Layout Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TilingMode {
+    HorizontalSplit,
+    VerticalSplit,
+    BinarySpacePartition,
+    FloatingSnap,
+}
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+pub struct ZenithTilingLayout {
+    pub screen_width: u32,
+    pub screen_height: u32,
+    pub gap_px: u32,
+    pub mode: TilingMode,
+}
+
+impl ZenithTilingLayout {
+    pub fn new(screen_width: u32, screen_height: u32, gap_px: u32) -> Self {
+        Self {
+            screen_width,
+            screen_height,
+            gap_px,
+            mode: TilingMode::HorizontalSplit,
+        }
+    }
+
+    /// Calculate window bounds dynamically for tiling
+    pub fn calculate_bounds(&self, window_count: usize, index: usize) -> (i32, i32, u32, u32) {
+        if window_count == 0 {
+            return (0, 0, self.screen_width, self.screen_height);
+        }
+
+        match self.mode {
+            TilingMode::HorizontalSplit => {
+                let avail_width = self.screen_width.saturating_sub(self.gap_px * (window_count as u32 + 1));
+                let win_width = avail_width / window_count as u32;
+                let x = self.gap_px + index as u32 * (win_width + self.gap_px);
+                let y = self.gap_px;
+                let h = self.screen_height.saturating_sub(self.gap_px * 2);
+                (x as i32, y as i32, win_width, h)
             }
-        }
-    }
-    fn as_slice(&self) -> &[T] {
-        if self.data.is_null() { &[] } else { unsafe { core::slice::from_raw_parts(self.data, self.len) } }
-    }
-    fn as_slice_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() { &mut [] } else { unsafe { core::slice::from_raw_parts_mut(self.data, self.len) } }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        self.as_slice()
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_slice_mut()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice_mut().iter_mut()
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
+            TilingMode::VerticalSplit => {
+                let avail_height = self.screen_height.saturating_sub(self.gap_px * (window_count as u32 + 1));
+                let win_height = avail_height / window_count as u32;
+                let y = self.gap_px + index as u32 * (win_height + self.gap_px);
+                let x = self.gap_px;
+                let w = self.screen_width.saturating_sub(self.gap_px * 2);
+                (x as i32, y as i32, w, win_height)
+            }
+            TilingMode::BinarySpacePartition | TilingMode::FloatingSnap => {
+                let half_w = (self.screen_width / 2).saturating_sub(self.gap_px * 2);
+                let half_h = (self.screen_height / 2).saturating_sub(self.gap_px * 2);
+                let x = if index % 2 == 0 { self.gap_px as i32 } else { (self.screen_width / 2) as i32 + self.gap_px as i32 };
+                let y = if index < 2 { self.gap_px as i32 } else { (self.screen_height / 2) as i32 + self.gap_px as i32 };
+                (x, y, half_w, half_h)
             }
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+impl Default for ZenithTilingLayout {
+    fn default() -> Self {
+        Self::new(1920, 1080, 10)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_zenith_tiling_bounds() {
+        let layout = ZenithTilingLayout::new(1920, 1080, 10);
+        let (x, y, w, h) = layout.calculate_bounds(2, 0);
+        assert_eq!(x, 10);
+        assert_eq!(y, 10);
+        assert!(w > 900);
+        assert_eq!(h, 1060);
+    }
+}
+
+

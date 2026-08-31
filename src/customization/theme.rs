@@ -20,7 +20,13 @@
 // OOP-based declarative theming with light/dark/auto modes
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
 
-use crate::klib::BTreeMap;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Color palette
 #[derive(Debug, Clone)]
@@ -533,6 +539,96 @@ pub enum ThemeError {
     LoadError(String),
 }
 
+// =========================================================================
+// CINNAMON DESKTOP THEME & GTK/METACITY CSS STYLING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CinnamonThemeType {
+    CinnamonCss,
+    Gtk3Css,
+    Gtk4Css,
+    MetacityXml,
+    Xfwm4Xml,
+}
+
+#[derive(Debug, Clone)]
+pub struct CinnamonThemeConfig {
+    pub theme_name: String,
+    pub accent_color_hex: String,
+    pub panel_transparency: f32,
+    pub is_dark_mode: bool,
+    pub font_family: String,
+    pub font_size_pt: u32,
+}
+
+pub struct SovereignCinnamonThemeEngine {
+    pub active_config: CinnamonThemeConfig,
+    pub loaded_styles: BTreeMap<String, String>, // selector -> CSS rule string
+}
+
+impl SovereignCinnamonThemeEngine {
+    pub fn new(theme_name: &str) -> Self {
+        let mut engine = Self {
+            active_config: CinnamonThemeConfig {
+                theme_name: theme_name.to_string(),
+                accent_color_hex: "#87A922".to_string(), // Mint Green
+                panel_transparency: 0.85,
+                is_dark_mode: true,
+                font_family: "Ubuntu".to_string(),
+                font_size_pt: 10,
+            },
+            loaded_styles: BTreeMap::new(),
+        };
+
+        // Seed default Cinnamon desktop theme CSS styles
+        engine.compile_cinnamon_css();
+        engine
+    }
+
+    pub fn set_accent_color(&mut self, hex_color: &str) {
+        self.active_config.accent_color_hex = hex_color.to_string();
+        self.compile_cinnamon_css();
+    }
+
+    /// Compile cinnamon.css rules for panel, applets, menu, and window decorations
+    pub fn compile_cinnamon_css(&mut self) {
+        let accent = &self.active_config.accent_color_hex;
+
+        self.loaded_styles.insert(
+            ".panel-bottom".to_string(),
+            format!("background-color: rgba(30, 30, 30, {:.2}); border-top: 1px solid {};",
+                    self.active_config.panel_transparency, accent),
+        );
+
+        self.loaded_styles.insert(
+            ".menu-category-button:hover".to_string(),
+            format!("background-color: {}; color: #ffffff;", accent),
+        );
+
+        self.loaded_styles.insert(
+            ".window-titlebar".to_string(),
+            format!("font-family: '{}'; font-size: {}pt; background-color: #2b2b2b;",
+                    self.active_config.font_family, self.active_config.font_size_pt),
+        );
+    }
+
+    pub fn render_css_stylesheet(&self) -> String {
+        let mut stylesheet = String::new();
+        stylesheet.push_str("/* SigmaOS Cinnamon Sovereign Theme Stylesheet */\n");
+        for (selector, rules) in &self.loaded_styles {
+            stylesheet.push_str(&format!("{} {{\n  {}\n}}\n\n", selector, rules));
+        }
+        stylesheet
+    }
+}
+
+impl Default for SovereignCinnamonThemeEngine {
+    fn default() -> Self {
+        Self::new("Mint-Y-Dark-Sovereign")
+    }
+}
+
 // ==========================================
 // ADDITIONAL REQUIRED CUSTOMIZATION TOOLS
 // ==========================================
@@ -783,5 +879,18 @@ mod tests {
     fn test_icon_theme_scaling() {
         let pack = IconThemeEngine::new("SovereignIcons", 144.0); // 1.5x scaling
         assert_eq!(pack.get_scaled_icon_size(), 72);
+    }
+
+    #[test]
+    fn test_cinnamon_theme_engine() {
+        let mut engine = SovereignCinnamonThemeEngine::new("Mint-Y-Teal");
+        assert_eq!(engine.active_config.accent_color_hex, "#87A922");
+
+        engine.set_accent_color("#00adb5");
+        assert_eq!(engine.active_config.accent_color_hex, "#00adb5");
+
+        let css = engine.render_css_stylesheet();
+        assert!(css.contains(".panel-bottom"));
+        assert!(css.contains("#00adb5"));
     }
 }
