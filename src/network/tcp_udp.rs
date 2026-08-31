@@ -63,7 +63,11 @@ pub trait BsdSocket: Socket {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketOption {
     ReuseAddr,
+    ReusePort,
+    KeepAlive,
+    BindToDevice,
     TcpNoDelay,
+    TcpCongestion,
     RcvBuf,
     SndBuf,
 }
@@ -75,9 +79,13 @@ pub struct SimpleSocket {
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
-    // Linux Socket Options
+    // Linux/BSD Socket Options
     pub reuse_addr: AtomicUsize,
+    pub reuse_port: AtomicUsize,
+    pub keep_alive: AtomicUsize,
+    pub bind_to_device: AtomicUsize,
     pub tcp_nodelay: AtomicUsize,
+    pub tcp_congestion: AtomicUsize,
     pub rcvbuf: AtomicUsize,
     pub sndbuf: AtomicUsize,
 }
@@ -91,7 +99,11 @@ impl SimpleSocket {
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
             reuse_addr: AtomicUsize::new(0),
+            reuse_port: AtomicUsize::new(0),
+            keep_alive: AtomicUsize::new(0),
+            bind_to_device: AtomicUsize::new(0),
             tcp_nodelay: AtomicUsize::new(0),
+            tcp_congestion: AtomicUsize::new(0),
             rcvbuf: AtomicUsize::new(65536),
             sndbuf: AtomicUsize::new(65536),
         }
@@ -119,8 +131,20 @@ impl BsdSocket for SimpleSocket {
             SocketOption::ReuseAddr => {
                 self.reuse_addr.store(val, Ordering::SeqCst);
             }
+            SocketOption::ReusePort => {
+                self.reuse_port.store(val, Ordering::SeqCst);
+            }
+            SocketOption::KeepAlive => {
+                self.keep_alive.store(val, Ordering::SeqCst);
+            }
+            SocketOption::BindToDevice => {
+                self.bind_to_device.store(val, Ordering::SeqCst);
+            }
             SocketOption::TcpNoDelay => {
                 self.tcp_nodelay.store(val, Ordering::SeqCst);
+            }
+            SocketOption::TcpCongestion => {
+                self.tcp_congestion.store(val, Ordering::SeqCst);
             }
             SocketOption::RcvBuf => {
                 self.rcvbuf.store(val, Ordering::SeqCst);
@@ -135,7 +159,11 @@ impl BsdSocket for SimpleSocket {
     fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
         match opt {
             SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::ReusePort => Ok(self.reuse_port.load(Ordering::SeqCst)),
+            SocketOption::KeepAlive => Ok(self.keep_alive.load(Ordering::SeqCst)),
+            SocketOption::BindToDevice => Ok(self.bind_to_device.load(Ordering::SeqCst)),
             SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::TcpCongestion => Ok(self.tcp_congestion.load(Ordering::SeqCst)),
             SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
             SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
         }
@@ -278,6 +306,275 @@ impl CongestionControl for RenoCongestionControl {
     }
     fn get_cwnd(&self) -> usize {
         self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+/// Linux TCP CUBIC Congestion Control Engine
+/// Implements W_cubic(t) = C * (t - K)^3 + W_max with TCP Reno fallback mode.
+#[repr(C)]
+pub struct CubicCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub w_max: AtomicUsize,
+    pub ssthresh: AtomicUsize,
+    pub epoch_start_ms: AtomicUsize,
+    pub k_factor: AtomicUsize, // K = (W_max * beta / C)^(1/3) represented in ms
+}
+
+impl Default for CubicCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CubicCongestionControl {
+    pub fn new() -> Self {
+        CubicCongestionControl {
+            cwnd: AtomicUsize::new(10),
+            w_max: AtomicUsize::new(0),
+            ssthresh: AtomicUsize::new(65535),
+            epoch_start_ms: AtomicUsize::new(0),
+            k_factor: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn calculate_cubic_cwnd(&self, elapsed_ms: u64) -> usize {
+        let w_max = self.w_max.load(Ordering::SeqCst) as f64;
+        if w_max == 0.0 {
+            return self.cwnd.load(Ordering::SeqCst);
+        }
+        let k = self.k_factor.load(Ordering::SeqCst) as f64 / 1000.0;
+        let t = elapsed_ms as f64 / 1000.0;
+        let c = 0.4;
+        let diff = t - k;
+        let cubic_w = c * (diff * diff * diff) + w_max;
+        cubic_w.max(10.0) as usize
+    }
+}
+
+impl CongestionControl for CubicCongestionControl {
+    fn update_cwnd(&mut self, acked: usize) {
+        let current = self.cwnd.load(Ordering::SeqCst);
+        let ssthresh = self.ssthresh.load(Ordering::SeqCst);
+        if current < ssthresh {
+            // Slow start mode
+            self.cwnd.fetch_add(acked, Ordering::SeqCst);
+        } else {
+            // Congestion avoidance CUBIC phase
+            let elapsed = 100u64; // Simulated 100ms delta
+            let target_w = self.calculate_cubic_cwnd(elapsed);
+            if target_w > current {
+                self.cwnd.store(target_w, Ordering::SeqCst);
+            } else {
+                self.cwnd.fetch_add(1, Ordering::SeqCst);
+            }
+        }
+    }
+
+    fn on_loss(&mut self) {
+        let current = self.cwnd.load(Ordering::SeqCst);
+        self.w_max.store(current, Ordering::SeqCst);
+        let beta = 0.7; // CUBIC multiplication factor
+        let new_ssthresh = ((current as f64) * beta).max(2.0) as usize;
+        self.ssthresh.store(new_ssthresh, Ordering::SeqCst);
+        self.cwnd.store(new_ssthresh, Ordering::SeqCst);
+
+        // K = (W_max * (1 - beta) / C)^(1/3)
+        let k = (((current as f64) * 0.3) / 0.4).powf(1.0 / 3.0);
+        self.k_factor.store((k * 1000.0) as usize, Ordering::SeqCst);
+    }
+
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+/// FreeBSD NewReno + SACK (Selective Acknowledgement) Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SackBlock {
+    pub left_edge: u32,
+    pub right_edge: u32,
+}
+
+pub struct NewRenoSackCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub ssthresh: AtomicUsize,
+    pub in_fast_recovery: bool,
+    pub sack_blocks: Vec<SackBlock>,
+}
+
+impl Default for NewRenoSackCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NewRenoSackCongestionControl {
+    pub fn new() -> Self {
+        NewRenoSackCongestionControl {
+            cwnd: AtomicUsize::new(10),
+            ssthresh: AtomicUsize::new(65535),
+            in_fast_recovery: false,
+            sack_blocks: Vec::new(),
+        }
+    }
+
+    pub fn process_sack(&mut self, left: u32, right: u32) {
+        self.sack_blocks.push(SackBlock { left_edge: left, right_edge: right });
+    }
+
+    pub fn enter_fast_recovery(&mut self) {
+        let current = self.cwnd.load(Ordering::SeqCst);
+        self.ssthresh.store(current / 2, Ordering::SeqCst);
+        self.cwnd.store(current / 2 + 3, Ordering::SeqCst); // Fast retransmit + 3 dup ACKs
+        self.in_fast_recovery = true;
+    }
+
+    pub fn exit_fast_recovery(&mut self) {
+        let ssthresh = self.ssthresh.load(Ordering::SeqCst);
+        self.cwnd.store(ssthresh, Ordering::SeqCst);
+        self.in_fast_recovery = false;
+        self.sack_blocks.clear();
+    }
+}
+
+impl CongestionControl for NewRenoSackCongestionControl {
+    fn update_cwnd(&mut self, acked: usize) {
+        if self.in_fast_recovery {
+            self.cwnd.fetch_add(acked, Ordering::SeqCst);
+        } else {
+            let current = self.cwnd.load(Ordering::SeqCst);
+            if current < self.ssthresh.load(Ordering::SeqCst) {
+                self.cwnd.fetch_add(acked, Ordering::SeqCst);
+            } else {
+                self.cwnd.fetch_add(1, Ordering::SeqCst);
+            }
+        }
+    }
+
+    fn on_loss(&mut self) {
+        self.enter_fast_recovery();
+    }
+
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+/// TCP Options Parser (MSS, Window Scale, Timestamps, SACK)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TcpOption {
+    Mss(u16),
+    WindowScale(u8),
+    SackPermitted,
+    Sack(Vec<SackBlock>),
+    Timestamps { val: u32, ecr: u32 },
+}
+
+pub struct TcpOptionParser;
+
+impl TcpOptionParser {
+    pub fn parse(raw_options: &[u8]) -> Vec<TcpOption> {
+        let mut opts = Vec::new();
+        let mut idx = 0;
+        let len = raw_options.len();
+
+        while idx < len {
+            let kind = raw_options[idx];
+            if kind == 0 {
+                break; // End of Option List
+            }
+            if kind == 1 {
+                idx += 1; // NOP
+                continue;
+            }
+
+            if idx + 1 >= len {
+                break;
+            }
+            let opt_len = raw_options[idx + 1] as usize;
+            if opt_len < 2 || idx + opt_len > len {
+                break;
+            }
+
+            match kind {
+                2 if opt_len == 4 => {
+                    let mss = u16::from_be_bytes([raw_options[idx + 2], raw_options[idx + 3]]);
+                    opts.push(TcpOption::Mss(mss));
+                }
+                3 if opt_len == 3 => {
+                    let scale = raw_options[idx + 2];
+                    opts.push(TcpOption::WindowScale(scale));
+                }
+                4 if opt_len == 2 => {
+                    opts.push(TcpOption::SackPermitted);
+                }
+                5 if (opt_len - 2) % 8 == 0 => {
+                    let mut blocks = Vec::new();
+                    let mut b_idx = idx + 2;
+                    while b_idx + 8 <= idx + opt_len {
+                        let left = u32::from_be_bytes([raw_options[b_idx], raw_options[b_idx + 1], raw_options[b_idx + 2], raw_options[b_idx + 3]]);
+                        let right = u32::from_be_bytes([raw_options[b_idx + 4], raw_options[b_idx + 5], raw_options[b_idx + 6], raw_options[b_idx + 7]]);
+                        blocks.push(SackBlock { left_edge: left, right_edge: right });
+                        b_idx += 8;
+                    }
+                    opts.push(TcpOption::Sack(blocks));
+                }
+                8 if opt_len == 10 => {
+                    let val = u32::from_be_bytes([raw_options[idx + 2], raw_options[idx + 3], raw_options[idx + 4], raw_options[idx + 5]]);
+                    let ecr = u32::from_be_bytes([raw_options[idx + 6], raw_options[idx + 7], raw_options[idx + 8], raw_options[idx + 9]]);
+                    opts.push(TcpOption::Timestamps { val, ecr });
+                }
+                _ => {}
+            }
+
+            idx += opt_len;
+        }
+
+        opts
+    }
+}
+
+/// UDP Pseudo-Header Checksum Engine
+pub struct UdpChecksumEngine;
+
+impl UdpChecksumEngine {
+    pub fn compute_checksum(src_ip: [u8; 4], dst_ip: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8]) -> u16 {
+        let mut sum = 0u32;
+
+        // Pseudo-Header
+        sum += u16::from_be_bytes([src_ip[0], src_ip[1]]) as u32;
+        sum += u16::from_be_bytes([src_ip[2], src_ip[3]]) as u32;
+        sum += u16::from_be_bytes([dst_ip[0], dst_ip[1]]) as u32;
+        sum += u16::from_be_bytes([dst_ip[2], dst_ip[3]]) as u32;
+        sum += 17u32; // Protocol UDP
+        let udp_len = 8 + payload.len();
+        sum += udp_len as u32;
+
+        // UDP Header
+        sum += src_port as u32;
+        sum += dst_port as u32;
+        sum += udp_len as u32;
+
+        // Payload
+        for chunk in payload.chunks(2) {
+            if chunk.len() == 2 {
+                sum += u16::from_be_bytes([chunk[0], chunk[1]]) as u32;
+            } else {
+                sum += u16::from_be_bytes([chunk[0], 0]) as u32;
+            }
+        }
+
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+
+        let checksum = !(sum as u16);
+        if checksum == 0 { 0xFFFF } else { checksum }
+    }
+
+    pub fn verify_checksum(src_ip: [u8; 4], dst_ip: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8], expected_checksum: u16) -> bool {
+        let computed = Self::compute_checksum(src_ip, dst_ip, src_port, dst_port, payload);
+        computed == expected_checksum
     }
 }
 
@@ -731,8 +1028,68 @@ mod tests {
         socket.set_opt(SocketOption::ReuseAddr, 1).unwrap();
         assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 1);
 
+        socket.set_opt(SocketOption::ReusePort, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::ReusePort).unwrap(), 1);
+
+        socket.set_opt(SocketOption::KeepAlive, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::KeepAlive).unwrap(), 1);
+
         socket.set_opt(SocketOption::RcvBuf, 131072).unwrap();
         assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 131072);
+    }
+
+    #[test]
+    fn test_cubic_congestion_control() {
+        let mut cubic = CubicCongestionControl::new();
+        assert_eq!(cubic.get_cwnd(), 10);
+
+        cubic.on_loss();
+        assert_eq!(cubic.w_max.load(Ordering::SeqCst), 10);
+        assert!(cubic.get_cwnd() < 10);
+
+        let initial_cwnd = cubic.get_cwnd();
+        cubic.update_cwnd(1);
+        assert!(cubic.get_cwnd() >= initial_cwnd);
+    }
+
+    #[test]
+    fn test_newreno_sack_congestion_control() {
+        let mut sack_cc = NewRenoSackCongestionControl::new();
+        assert_eq!(sack_cc.get_cwnd(), 10);
+
+        sack_cc.process_sack(1000, 2000);
+        assert_eq!(sack_cc.sack_blocks.len(), 1);
+
+        sack_cc.enter_fast_recovery();
+        assert!(sack_cc.in_fast_recovery);
+
+        sack_cc.exit_fast_recovery();
+        assert!(!sack_cc.in_fast_recovery);
+        assert!(sack_cc.sack_blocks.is_empty());
+    }
+
+    #[test]
+    fn test_tcp_option_parser() {
+        // Raw options: MSS = 1460 (kind 2, len 4, val 0x05B4), WindowScale = 7 (kind 3, len 3, val 7), SackPermitted (kind 4, len 2)
+        let raw = [2, 4, 0x05, 0xB4, 3, 3, 7, 4, 2, 0];
+        let parsed = TcpOptionParser::parse(&raw);
+        assert_eq!(parsed.len(), 3);
+        assert_eq!(parsed[0], TcpOption::Mss(1460));
+        assert_eq!(parsed[1], TcpOption::WindowScale(7));
+        assert_eq!(parsed[2], TcpOption::SackPermitted);
+    }
+
+    #[test]
+    fn test_udp_checksum_engine() {
+        let src = [192, 168, 1, 10];
+        let dst = [192, 168, 1, 20];
+        let payload = b"Hello, SigmaOS UDP Checksum!";
+
+        let csum = UdpChecksumEngine::compute_checksum(src, dst, 12345, 8080, payload);
+        assert_ne!(csum, 0);
+
+        assert!(UdpChecksumEngine::verify_checksum(src, dst, 12345, 8080, payload, csum));
+        assert!(!UdpChecksumEngine::verify_checksum(src, dst, 12345, 8080, payload, csum ^ 0xFFFF));
     }
 
     #[test]

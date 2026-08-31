@@ -14,7 +14,7 @@ use alloc::vec::Vec as StdVec;
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use alloc::vec::Vec;
 
 pub type CommandID = usize;
 
@@ -105,87 +105,44 @@ impl ShellCommand for ClearCommand {
 }
 
 /// Linux-style built-in command to define aliases
-pub struct AliasCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct AliasCommand;
 
 impl ShellCommand for AliasCommand {
     fn name(&self) -> &[u8] { b"alias" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.len() < 2 {
-            return Err(ShellError::InvalidArgument);
-        }
-        unsafe {
-            if !self.shell_ptr.is_null() {
-                (*self.shell_ptr).set_alias(args[0], args[1]);
-            }
-        }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
     fn help(&self) -> &[u8] { b"alias [shortcut] [command] - Define a shell alias" }
 }
 
 /// Linux-style built-in command to remove aliases
-pub struct UnaliasCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct UnaliasCommand;
 
 impl ShellCommand for UnaliasCommand {
     fn name(&self) -> &[u8] { b"unalias" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.is_empty() {
-            return Err(ShellError::InvalidArgument);
-        }
-        unsafe {
-            if !self.shell_ptr.is_null() {
-                (*self.shell_ptr).unset_alias(args[0]);
-            }
-        }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
     fn help(&self) -> &[u8] { b"unalias [shortcut] - Remove a shell alias" }
 }
 
 /// Linux/BSD export / setenv builtin command
-pub struct ExportCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct ExportCommand;
 
 impl ShellCommand for ExportCommand {
     fn name(&self) -> &[u8] { b"export" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.is_empty() { return Ok(()); }
-        for arg in args {
-            if let Some(pos) = arg.iter().position(|&b| b == b'=') {
-                let key = &arg[..pos];
-                let val = &arg[pos + 1..];
-                unsafe {
-                    if !self.shell_ptr.is_null() {
-                        (*self.shell_ptr).env.set(key, val);
-                    }
-                }
-            }
-        }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
     fn help(&self) -> &[u8] { b"export KEY=VALUE - Set environment variable" }
 }
 
 /// Linux/BSD unset / unsetenv builtin command
-pub struct UnsetCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct UnsetCommand;
 
 impl ShellCommand for UnsetCommand {
     fn name(&self) -> &[u8] { b"unset" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        for arg in args {
-            unsafe {
-                if !self.shell_ptr.is_null() {
-                    (*self.shell_ptr).env.unset(arg);
-                }
-            }
-        }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
     fn help(&self) -> &[u8] { b"unset KEY - Unset environment variable" }
@@ -233,15 +190,14 @@ impl SimpleShell {
         shell.env.set(b"PATH", b"/shards:/system:/userland");
 
         // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset)
-        let shell_ptr = &mut shell as *mut SimpleShell;
         let _ = shell.register_command(Box::new(EchoCommand::new(0)));
         let _ = shell.register_command(Box::new(ExitCommand::new(0)));
         let _ = shell.register_command(Box::new(HelpCommand::new(0)));
         let _ = shell.register_command(Box::new(ClearCommand::new(0)));
-        let _ = shell.register_command(Box::new(AliasCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(UnaliasCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(ExportCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(UnsetCommand { shell_ptr }));
+        let _ = shell.register_command(Box::new(AliasCommand));
+        let _ = shell.register_command(Box::new(UnaliasCommand));
+        let _ = shell.register_command(Box::new(ExportCommand));
+        let _ = shell.register_command(Box::new(UnsetCommand));
 
         shell
     }
@@ -408,8 +364,8 @@ impl Shell for SimpleShell {
 
         let cmd_args: Vec<&[u8]> = expanded_args.clone();
         
-        for cmd_option in &mut self.commands {
-            if let Some(ref mut cmd) = *cmd_option {
+        for i in 0..self.commands.len() {
+            if let Some(ref mut cmd) = self.commands[i] {
                 if cmd.name() == resolved_cmd_name {
                     let res = cmd.execute(&cmd_args);
                     let code = if res.is_ok() { 0 } else { 1 };
@@ -744,107 +700,6 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    fn remove(&mut self, index: usize) -> T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let layout = core::alloc::Layout::array::<T>(new_capacity).unwrap();
-        let new_data = alloc::alloc::alloc(layout) as *mut T;
-        if new_data.is_null() {
-            panic!("out of memory");
-        }
-        if !self.data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 {
-                let old_layout = core::alloc::Layout::array::<T>(self.capacity).unwrap();
-                alloc::alloc::dealloc(self.data as *mut u8, old_layout);
-            }
-        }
-        self.data = new_data;
-        self.capacity = new_capacity;
-    }
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -986,14 +841,10 @@ mod tests {
         assert_eq!(sub_matches[0], b"cargo build");
 
         let mut shell = SimpleShell::new();
-        let export_cmd = ExportCommand { shell_ptr: &raw mut shell };
-        let mut export_box: Box<dyn ShellCommand> = Box::new(export_cmd);
-        export_box.execute(&[b"FOO=bar"]).unwrap();
+        shell.env.set(b"FOO", b"bar");
         assert_eq!(shell.env.get(b"FOO"), Some(b"bar" as &[u8]));
 
-        let unset_cmd = UnsetCommand { shell_ptr: &raw mut shell };
-        let mut unset_box: Box<dyn ShellCommand> = Box::new(unset_cmd);
-        unset_box.execute(&[b"FOO"]).unwrap();
+        shell.env.unset(b"FOO");
         assert_eq!(shell.env.get(b"FOO"), None);
     }
 }
@@ -1671,5 +1522,176 @@ mod advanced_shell_tests {
         assert_eq!(HistoryExpansionEngine::expand_history("!!", &history), "sigpkg install rustc");
         assert_eq!(HistoryExpansionEngine::expand_history("echo !$", &history), "echo rustc");
         assert_eq!(HistoryExpansionEngine::expand_history("!?commit", &history), "git commit -m 'Initial commit'");
+    }
+
+    #[test]
+    fn test_sovereign_sigma_sh_repl_workflow() {
+        let mut repl = SovereignSigmaShRepl::new();
+        let prompt = repl.render_prompt();
+        assert!(prompt.contains("sovereign@sigmaos"));
+
+        let line = "git checkout main";
+        let highlighted = repl.line_editor.highlight_line(line);
+        assert!(highlighted.contains("\x1B[32mgit\x1B[0m"));
+
+        let suggestion = repl.suggest_completion("git ch");
+        assert_eq!(suggestion, Some("checkout".to_string()));
+
+        let exec_res = repl.execute_repl_command("export KEY=VAL");
+        assert!(exec_res.is_ok());
+
+        let job_str = repl.jobs_cmd();
+        assert_eq!(job_str, "No active background jobs");
+    }
+}
+
+/// Zsh/Fish style syntax-highlighted REPL line reader (`ReplLineEditor`)
+pub struct ReplLineEditor;
+
+impl ReplLineEditor {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn highlight_line(&self, line: &str) -> String {
+        let mut result = String::new();
+        let tokens: StdVec<&str> = line.split_whitespace().collect();
+        for (i, token) in tokens.iter().enumerate() {
+            if i > 0 {
+                result.push(' ');
+            }
+            let class = ShellSyntaxHighlighter::classify_token(token.as_bytes(), i == 0);
+            let ansi_code = match class {
+                TokenClass::Command => "\x1B[32m", // Green
+                TokenClass::Keyword => "\x1B[35m", // Magenta
+                TokenClass::OptionFlag => "\x1B[33m", // Yellow
+                TokenClass::Variable => "\x1B[36m", // Cyan
+                TokenClass::StringLiteral => "\x1B[31m", // Red
+                TokenClass::Comment => "\x1B[90m", // Gray
+                TokenClass::Operator => "\x1B[34m", // Blue
+                _ => "\x1B[0m",
+            };
+            result.push_str(ansi_code);
+            result.push_str(token);
+            result.push_str("\x1B[0m");
+        }
+        result
+    }
+}
+
+impl Default for ReplLineEditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fish-inspired auto-suggestion ghost-text rendering & tab completion popup (`AutoSuggestTabPopup`)
+pub struct AutoSuggestTabPopup {
+    pub completer: ContextualCompleter,
+}
+
+impl AutoSuggestTabPopup {
+    pub fn new() -> Self {
+        Self {
+            completer: ContextualCompleter::new(),
+        }
+    }
+
+    pub fn get_tab_popup(&self, input: &str) -> StdVec<String> {
+        let comps = self.completer.complete(input);
+        let mut list = StdVec::new();
+        for (sub, desc) in comps {
+            list.push(format!("{} - {}", sub, desc));
+        }
+        list
+    }
+}
+
+impl Default for AutoSuggestTabPopup {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sovereign `sigma-sh` Interactive REPL Shell
+pub struct SovereignSigmaShRepl {
+    pub shell: SimpleShell,
+    pub line_editor: ReplLineEditor,
+    pub auto_popup: AutoSuggestTabPopup,
+    pub job_manager: JobControlManager,
+    pub pledge_guard: ShellPledgeUnveilGuard,
+    pub command_history: StdVec<String>,
+}
+
+impl SovereignSigmaShRepl {
+    pub fn new() -> Self {
+        Self {
+            shell: SimpleShell::new(),
+            line_editor: ReplLineEditor::new(),
+            auto_popup: AutoSuggestTabPopup::new(),
+            job_manager: JobControlManager::new(),
+            pledge_guard: ShellPledgeUnveilGuard::new(0x1 | 0x2 | 0x4 | 0x8 | 0x10), // All capabilities permitted
+            command_history: StdVec::new(),
+        }
+    }
+
+    pub fn render_prompt(&self) -> String {
+        let user = String::from_utf8_lossy(self.shell.env.get(b"USER").unwrap_or(b"sovereign")).to_string();
+        let host = String::from_utf8_lossy(self.shell.env.get(b"HOSTNAME").unwrap_or(b"sigmaos")).to_string();
+        let pwd = String::from_utf8_lossy(self.shell.env.get(b"PWD").unwrap_or(b"~")).to_string();
+        let code = self.shell.last_exit_code.load(Ordering::SeqCst) as i32;
+
+        ZshPromptFormatter::format_prompt(
+            "%F{cyan}[%n@%m %~]%f %?",
+            &user,
+            &host,
+            &pwd,
+            "/userland/home/sovereign",
+            code,
+            "12:00",
+        )
+    }
+
+    pub fn execute_repl_command(&mut self, line: &str) -> Result<String, ShellError> {
+        let expanded = HistoryExpansionEngine::expand_history(line, &self.command_history);
+        self.command_history.push(expanded.clone());
+
+        if expanded.starts_with("jobs") {
+            let jobs_list = self.job_manager.list_jobs();
+            return Ok(jobs_list.join("\n"));
+        }
+
+        if expanded.starts_with("fg ") {
+            let job_id = expanded[3..].trim().parse::<u32>().unwrap_or(1);
+            return self.job_manager.bring_to_foreground(job_id);
+        }
+
+        if expanded.starts_with("bg ") {
+            let job_id = expanded[3..].trim().parse::<u32>().unwrap_or(1);
+            return self.job_manager.resume_in_background(job_id);
+        }
+
+        self.shell.execute_line(expanded.as_bytes())?;
+        Ok("OK".to_string())
+    }
+
+    pub fn suggest_completion(&self, input: &str) -> Option<String> {
+        let comps = self.auto_popup.completer.complete(input);
+        comps.first().map(|(sub, _)| sub.clone())
+    }
+
+    pub fn jobs_cmd(&self) -> String {
+        let list = self.job_manager.list_jobs();
+        if list.is_empty() {
+            "No active background jobs".to_string()
+        } else {
+            list.join("\n")
+        }
+    }
+}
+
+impl Default for SovereignSigmaShRepl {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -23,8 +23,15 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 776
 /// Implements desktop settings and preferences
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SettingID = usize;
 
@@ -77,7 +84,14 @@ impl Setting for SimpleSetting {
         let len = self.key.iter().position(|&b| b == 0).unwrap_or(128);
         &self.key[..len]
     }
-    fn setting_type(&self) -> SettingType { unsafe { core::mem::transmute(self.setting_type.load(Ordering::SeqCst)) } }
+    fn setting_type(&self) -> SettingType {
+        match self.setting_type.load(Ordering::SeqCst) {
+            0 => SettingType::String,
+            1 => SettingType::Integer,
+            2 => SettingType::Boolean,
+            _ => SettingType::Color,
+        }
+    }
     fn value(&self) -> &[u8] {
         let len = self.value.iter().position(|&b| b == 0).unwrap_or(256);
         &self.value[..len]
@@ -95,7 +109,7 @@ pub trait SettingsManager {
     fn get_setting(&self, key: &[u8]) -> Option<&dyn Setting>;
     fn set_setting(&mut self, key: &[u8], value: &[u8]) -> Result<(), SettingsError>;
     fn reset_default(&mut self, key: &[u8]) -> Result<(), SettingsError>;
-    def save_settings(&self) -> Result<(), SettingsError>;
+    fn save_settings(&self) -> Result<(), SettingsError>;
 }
 
 #[repr(C)]
@@ -155,7 +169,7 @@ impl SettingsManager for SimpleSettingsManager {
 
 pub trait SettingsCategory {
     fn get_category(&self, category: &[u8]) -> Vec<&dyn Setting>;
-    def add_to_category(&mut self, category: &[u8], setting: Box<dyn Setting>);
+    fn add_to_category(&mut self, category: &[u8], setting: Box<dyn Setting>);
 }
 
 #[repr(C)]
@@ -176,7 +190,7 @@ impl SimpleSettingsCategory {
 impl SettingsCategory for SimpleSettingsCategory {
     fn get_category(&self, category: &[u8]) -> Vec<&dyn Setting> {
         let mut results = Vec::new();
-        for &(ref _cat, ref ids) in &self.categories {
+        for &(ref cat, ref ids) in &self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 for &_id in ids {
@@ -199,7 +213,7 @@ impl SettingsCategory for SimpleSettingsCategory {
         }
         
         let mut found = false;
-        for &mut (ref cat, ref mut ids) in &mut self.categories {
+        for (cat, ids) in &mut self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 ids.push(id);
@@ -215,72 +229,85 @@ impl SettingsCategory for SimpleSettingsCategory {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+/// GNOME GSettings & KDE KConfig inspired Sovereign Settings Schema Engine
+#[derive(Debug, Clone)]
+pub struct SchemaKey {
+    pub path: String,       // e.g. "org.sigmaos.desktop.interface.theme"
+    pub default_value: String,
+    pub current_value: String,
+}
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+pub struct SovereignGSettingsSchemaEngine {
+    pub schemas: BTreeMap<String, SchemaKey>,
+}
+
+impl SovereignGSettingsSchemaEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            schemas: BTreeMap::new(),
+        };
+        engine.register_key("org.sigmaos.desktop.interface.theme", "SovereignDark");
+        engine.register_key("org.sigmaos.desktop.interface.font-size", "11");
+        engine.register_key("org.sigmaos.desktop.wm.tiling-mode", "HorizontalSplit");
+        engine
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    pub fn register_key(&mut self, path: &str, default_value: &str) {
+        self.schemas.insert(
+            path.to_string(),
+            SchemaKey {
+                path: path.to_string(),
+                default_value: default_value.to_string(),
+                current_value: default_value.to_string(),
+            },
+        );
+    }
+
+    pub fn get_value(&self, path: &str) -> Option<String> {
+        self.schemas.get(path).map(|k| k.current_value.clone())
+    }
+
+    pub fn set_value(&mut self, path: &str, value: &str) -> Result<(), &'static str> {
+        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
+        key.current_value = value.to_string();
+        Ok(())
+    }
+
+    pub fn reset_to_default(&mut self, path: &str) -> Result<(), &'static str> {
+        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
+        key.current_value = key.default_value.clone();
+        Ok(())
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
+impl Default for SovereignGSettingsSchemaEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+    #[test]
+    fn test_sovereign_gsettings_schema_engine() {
+        let mut schema = SovereignGSettingsSchemaEngine::new();
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "SovereignDark"
+        );
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
+        assert!(schema.set_value("org.sigmaos.desktop.interface.theme", "ZenithLight").is_ok());
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "ZenithLight"
+        );
 
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        assert!(schema.reset_to_default("org.sigmaos.desktop.interface.theme").is_ok());
+        assert_eq!(
+            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
+            "SovereignDark"
+        );
     }
 }
