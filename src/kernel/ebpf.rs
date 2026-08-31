@@ -1,9 +1,12 @@
+extern crate alloc;
+
 // Linux-inspired eBPF (Extended Berkeley Packet Filter) Engine and Instruction Verifier
 // Features static bytecode validation (bounds, division-by-zero, stack alignment, backward jump loop-prevention)
 // and execution over standard in-kernel maps.
 
 use crate::klib::HashMap;
 use alloc::vec::Vec;
+use alloc::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EbpfInstruction {
