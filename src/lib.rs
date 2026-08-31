@@ -82,7 +82,16 @@ pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
     PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
     KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
-    PcapPacketHeader, WifiFrameType,
+    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use driver::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
@@ -147,4 +156,9 @@ pub use distro_inspirations::{
 
 pub use compatibility::fedora::{
     CryptoPolicyLevel, FedoraCryptoPoliciesEngine, FedoraSilverblueRpmOstreeEngine,
+};
+pub use tools::installer::{
+    BootloaderType, CpuArchitecture, DeviceTargetProfile, FilesystemType, HardwareInfo,
+    InstallerConfig, InstallerError, InstallerResponseFile, InstallerStage, PartitioningMode,
+    SovereignUniversalInstaller, StorageMediaType, SystemInstaller,
 };

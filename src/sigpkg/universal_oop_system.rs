@@ -178,6 +178,26 @@ pub enum PackageFormat {
     Pup,
     // Puppy Extra Tarball / Pet (.pet)
     Pet,
+    // Solus Moss (.moss)
+    Moss,
+    // Haiku Package (.hpkg)
+    Hpkg,
+    // Tiny Core Linux extension (.tcz)
+    Tcz,
+    // GoboLinux package (.gobo)
+    Gobo,
+    // OSTree commit (.commit)
+    Ostree,
+    // NetBSD pkgsrc (.pkgsrc)
+    Pkgsrc,
+    // SquashFS package (.sfs)
+    Sfs,
+    // Portable package (.puk)
+    Puk,
+    // macOS Disk Image (.dmg)
+    Dmg,
+    // Chimera Linux (.cports)
+    Cports,
 }
 
 /// Package metadata structure
@@ -525,6 +545,16 @@ impl_generic_package_adapter!(SuperdebAdapter, Superdeb, "Superdeb-Package:", "S
 impl_generic_package_adapter!(LzmAdapter, Lzm, "lzm-module:", "lzm-module: ", "lzm-version: ");
 impl_generic_package_adapter!(PupAdapter, Pup, "pup-name:", "pup-name: ", "pup-version: ");
 impl_generic_package_adapter!(PetAdapter, Pet, "pet-package:", "pet-package: ", "pet-version: ");
+impl_generic_package_adapter!(MossAdapter, Moss, "moss-package:", "moss-package: ", "moss-version: ");
+impl_generic_package_adapter!(HpkgAdapter, Hpkg, "hpkg-package:", "hpkg-package: ", "hpkg-version: ");
+impl_generic_package_adapter!(TczAdapter, Tcz, "tcz-package:", "tcz-package: ", "tcz-version: ");
+impl_generic_package_adapter!(GoboAdapter, Gobo, "gobo-package:", "gobo-package: ", "gobo-version: ");
+impl_generic_package_adapter!(OstreeAdapter, Ostree, "ostree-commit:", "ostree-commit: ", "ostree-version: ");
+impl_generic_package_adapter!(PkgsrcAdapter, Pkgsrc, "pkgsrc-package:", "pkgsrc-package: ", "pkgsrc-version: ");
+impl_generic_package_adapter!(SfsAdapter, Sfs, "sfs-module:", "sfs-module: ", "sfs-version: ");
+impl_generic_package_adapter!(PukAdapter, Puk, "puk-package:", "puk-package: ", "puk-version: ");
+impl_generic_package_adapter!(DmgAdapter, Dmg, "dmg-image:", "dmg-image: ", "dmg-version: ");
+impl_generic_package_adapter!(CportsAdapter, Cports, "cports-package:", "cports-package: ", "cports-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2194,6 +2224,16 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(LzmAdapter::new()));
         factory.register_parser(Box::new(PupAdapter::new()));
         factory.register_parser(Box::new(PetAdapter::new()));
+        factory.register_parser(Box::new(MossAdapter::new()));
+        factory.register_parser(Box::new(HpkgAdapter::new()));
+        factory.register_parser(Box::new(TczAdapter::new()));
+        factory.register_parser(Box::new(GoboAdapter::new()));
+        factory.register_parser(Box::new(OstreeAdapter::new()));
+        factory.register_parser(Box::new(PkgsrcAdapter::new()));
+        factory.register_parser(Box::new(SfsAdapter::new()));
+        factory.register_parser(Box::new(PukAdapter::new()));
+        factory.register_parser(Box::new(DmgAdapter::new()));
+        factory.register_parser(Box::new(CportsAdapter::new()));
 
         factory
     }
