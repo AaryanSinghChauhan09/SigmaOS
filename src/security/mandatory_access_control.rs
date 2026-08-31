@@ -28,12 +28,35 @@ impl SelinuxSecurityContext {
         }
     }
 
-    /// Parse security context from string format
+    /// Parse security context from string format using sovereign byte-splitting
     pub fn from_str(s: &str) -> Result<Self, MacError> {
-        let parts: Vec<&str> = s.split(':').collect();
-        if parts.len() != 4 {
+        let mut parts = [""; 4];
+        let mut count = 0;
+        let bytes = s.as_bytes();
+        let mut start = 0;
+
+        for (i, &b) in bytes.iter().enumerate() {
+            if b == b':' {
+                if count >= 4 {
+                    return Err(MacError::InvalidContext);
+                }
+                parts[count] = core::str::from_utf8(&bytes[start..i]).map_err(|_| MacError::InvalidContext)?;
+                count += 1;
+                start = i + 1;
+            }
+        }
+
+        if count < 4 && start <= bytes.len() {
+            if count == 3 {
+                parts[count] = core::str::from_utf8(&bytes[start..]).map_err(|_| MacError::InvalidContext)?;
+                count += 1;
+            }
+        }
+
+        if count != 4 {
             return Err(MacError::InvalidContext);
         }
+
         Ok(Self::new(parts[0], parts[1], parts[2], parts[3]))
     }
 
@@ -301,7 +324,7 @@ pub fn setup_selinux_default_policy() -> SelinuxMacPolicyEngine {
     let system_file_context = SelinuxSecurityContext::new("system_u", "object_r", "system_file_t", "s0");
     policy.add_rule(SelinuxAccessRule {
         source: system_context.clone(),
-        target: system_file_context,
+        target: system_file_context.clone(),
         class: AccessClass::File,
         permissions: 0xFFFFFFFF, // All permissions
     });
@@ -324,4 +347,250 @@ pub fn setup_selinux_default_policy() -> SelinuxMacPolicyEngine {
     });
     
     policy
+}
+
+// ============================================================================
+// LSM-Style Kernel Hook API for Inode, Ptrace, and Network Operations
+// ============================================================================
+
+/// Types of kernel operations guarded by MAC hooks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MacHookType {
+    // Inode operations
+    InodeCreate,
+    InodeOpen,
+    InodeUnlink,
+    // Process / Ptrace operations
+    PtraceAccessCheck,
+    PtraceTraced,
+    // Network / Socket operations
+    SocketCreate,
+    SocketConnect,
+    SocketBind,
+}
+
+/// Evaluation result from a MAC kernel hook
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MacHookResult {
+    Allow,
+    Deny,
+    AuditLog,
+}
+
+/// Parameters passed to an Inode operation hook
+#[derive(Debug, Clone)]
+pub struct InodeHookParams {
+    pub process_context: SelinuxSecurityContext,
+    pub inode_path: String,
+    pub requested_mask: u32, // Read = 0x1, Write = 0x2, Exec = 0x4
+}
+
+/// Parameters passed to a Ptrace operation hook
+#[derive(Debug, Clone)]
+pub struct PtraceHookParams {
+    pub tracer_context: SelinuxSecurityContext,
+    pub tracee_context: SelinuxSecurityContext,
+    pub tracer_pid: u64,
+    pub tracee_pid: u64,
+    pub is_attach: bool,
+}
+
+/// Parameters passed to a Socket operation hook
+#[derive(Debug, Clone)]
+pub struct SocketHookParams {
+    pub process_context: SelinuxSecurityContext,
+    pub domain: u32,  // AF_INET = 2, AF_INET6 = 10, AF_UNIX = 1
+    pub type_: u32,   // SOCK_STREAM = 1, SOCK_DGRAM = 2
+    pub protocol: u32,// IPPROTO_TCP = 6, IPPROTO_UDP = 17
+    pub target_ip: [u8; 4],
+    pub target_port: u16,
+}
+
+/// Sovereign MAC LSM Kernel Hook Registry
+pub struct SovereignMacLsmHookRegistry {
+    pub policy_engine: SelinuxMacPolicyEngine,
+    pub blocked_ptrace_targets: Vec<String>, // Type strings blocked from ptrace
+    pub audit_log: Vec<String>,
+}
+
+impl SovereignMacLsmHookRegistry {
+    pub fn new(policy_engine: SelinuxMacPolicyEngine) -> Self {
+        Self {
+            policy_engine,
+            blocked_ptrace_targets: Vec::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    /// Register a security type whose processes cannot be traced/attached via ptrace
+    pub fn block_ptrace_target_type(&mut self, target_type: &str) {
+        self.blocked_ptrace_targets.push(target_type.to_string());
+    }
+
+    /// Hook for Inode operations (open, create, unlink)
+    pub fn hook_inode_access(&mut self, hook_type: MacHookType, params: &InodeHookParams) -> MacHookResult {
+        let file_context = SelinuxSecurityContext::new("system_u", "object_r", "system_file_t", "s0");
+        let res = self.policy_engine.check_access(
+            &params.process_context,
+            &file_context,
+            AccessClass::File,
+            params.requested_mask,
+        );
+
+        match res {
+            Ok(()) => MacHookResult::Allow,
+            Err(_) => {
+                self.audit_log.push(format!(
+                    "MAC_AUDIT: DENY inode {:?} on path '{}' for context {}",
+                    hook_type,
+                    params.inode_path,
+                    params.process_context.to_string()
+                ));
+                MacHookResult::Deny
+            }
+        }
+    }
+
+    /// Hook for Ptrace operations (debugging, process inspection, memory injection)
+    pub fn hook_ptrace_access(&mut self, params: &PtraceHookParams) -> MacHookResult {
+        // 1. Check if tracee belongs to a restricted security type
+        if self.blocked_ptrace_targets.contains(&params.tracee_context.type_) {
+            self.audit_log.push(format!(
+                "MAC_AUDIT: DENY ptrace attach from PID {} ({}) to protected PID {} ({})",
+                params.tracer_pid,
+                params.tracer_context.to_string(),
+                params.tracee_pid,
+                params.tracee_context.to_string()
+            ));
+            return MacHookResult::Deny;
+        }
+
+        // 2. Check policy engine permission
+        let res = self.policy_engine.check_access(
+            &params.tracer_context,
+            &params.tracee_context,
+            AccessClass::Process,
+            0x8, // PTRACE permission flag
+        );
+
+        match res {
+            Ok(()) => MacHookResult::Allow,
+            Err(_) => MacHookResult::Deny,
+        }
+    }
+
+    /// Hook for Socket / Network operations (socket creation, bind, connect)
+    pub fn hook_socket_operation(&mut self, hook_type: MacHookType, params: &SocketHookParams) -> MacHookResult {
+        let net_context = SelinuxSecurityContext::new("system_u", "object_r", "network_t", "s0");
+        let mask = match hook_type {
+            MacHookType::SocketCreate => 0x1,
+            MacHookType::SocketBind => 0x2,
+            MacHookType::SocketConnect => 0x4,
+            _ => 0x1,
+        };
+
+        let res = self.policy_engine.check_access(
+            &params.process_context,
+            &net_context,
+            AccessClass::Network,
+            mask,
+        );
+
+        match res {
+            Ok(()) => MacHookResult::Allow,
+            Err(_) => {
+                self.audit_log.push(format!(
+                    "MAC_AUDIT: DENY socket {:?} to {}:{} for context {}",
+                    hook_type,
+                    format!("{}.{}.{}.{}", params.target_ip[0], params.target_ip[1], params.target_ip[2], params.target_ip[3]),
+                    params.target_port,
+                    params.process_context.to_string()
+                ));
+                MacHookResult::Deny
+            }
+        }
+    }
+}
+
+impl Default for SovereignMacLsmHookRegistry {
+    fn default() -> Self {
+        Self::new(setup_selinux_default_policy())
+    }
+}
+
+#[cfg(test)]
+mod mac_hook_tests {
+    use super::*;
+
+    #[test]
+    fn test_mac_lsm_inode_hooks() {
+        let policy = setup_selinux_default_policy();
+        let mut registry = SovereignMacLsmHookRegistry::new(policy);
+
+        let system_ctx = SelinuxSecurityContext::new("system_u", "system_r", "system_t", "s0");
+        let user_ctx = SelinuxSecurityContext::new("user_u", "user_r", "user_t", "s0");
+
+        let inode_params_system = InodeHookParams {
+            process_context: system_ctx,
+            inode_path: "/etc/shadow".to_string(),
+            requested_mask: 0x1, // Read
+        };
+        assert_eq!(registry.hook_inode_access(MacHookType::InodeOpen, &inode_params_system), MacHookResult::Allow);
+
+        let inode_params_user = InodeHookParams {
+            process_context: user_ctx,
+            inode_path: "/etc/shadow".to_string(),
+            requested_mask: 0x2, // Write
+        };
+        assert_eq!(registry.hook_inode_access(MacHookType::InodeOpen, &inode_params_user), MacHookResult::Deny);
+        assert!(!registry.audit_log.is_empty());
+    }
+
+    #[test]
+    fn test_mac_lsm_ptrace_hooks() {
+        let policy = setup_selinux_default_policy();
+        let mut registry = SovereignMacLsmHookRegistry::new(policy);
+        registry.block_ptrace_target_type("system_t");
+
+        let tracer_ctx = SelinuxSecurityContext::new("user_u", "user_r", "user_t", "s0");
+        let tracee_ctx = SelinuxSecurityContext::new("system_u", "system_r", "system_t", "s0");
+
+        let ptrace_params = PtraceHookParams {
+            tracer_context: tracer_ctx,
+            tracee_context: tracee_ctx,
+            tracer_pid: 1001,
+            tracee_pid: 1,
+            is_attach: true,
+        };
+
+        assert_eq!(registry.hook_ptrace_access(&ptrace_params), MacHookResult::Deny);
+        assert!(registry.audit_log[0].contains("DENY ptrace attach"));
+    }
+
+    #[test]
+    fn test_mac_lsm_socket_hooks() {
+        let mut policy = setup_selinux_default_policy();
+        let system_ctx = SelinuxSecurityContext::new("system_u", "system_r", "system_t", "s0");
+        let net_ctx = SelinuxSecurityContext::new("system_u", "object_r", "network_t", "s0");
+
+        policy.add_rule(SelinuxAccessRule {
+            source: system_ctx.clone(),
+            target: net_ctx,
+            class: AccessClass::Network,
+            permissions: 0x7, // Create, Bind, Connect
+        });
+
+        let mut registry = SovereignMacLsmHookRegistry::new(policy);
+
+        let sock_params = SocketHookParams {
+            process_context: system_ctx,
+            domain: 2,
+            type_: 1,
+            protocol: 6,
+            target_ip: [127, 0, 0, 1],
+            target_port: 8080,
+        };
+
+        assert_eq!(registry.hook_socket_operation(MacHookType::SocketBind, &sock_params), MacHookResult::Allow);
+    }
 }
