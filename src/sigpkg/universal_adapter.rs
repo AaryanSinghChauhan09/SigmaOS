@@ -381,7 +381,31 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".snap") {
             Some(PackageFormat::Apt)
         } else if f.ends_with(".appimage") {
-            Some(PackageFormat::Sovereign)
+            Some(PackageFormat::AppImage)
+        } else if f.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if f.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if f.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if f.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if f.ends_with(".commit") || f.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if f.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if f.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if f.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if f.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if f.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if f.ends_with(".guix") || f.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if f.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
         } else {
             None
         }
@@ -396,6 +420,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Apt) // .deb AR archive
         } else if data[0] == 0xED && data[1] == 0xAB && data[2] == 0xEE && data[3] == 0xDB {
             Some(PackageFormat::Yum) // .rpm magic
+        } else if data.starts_with(b"hpkg") {
+            Some(PackageFormat::Hpkg) // Haiku package magic
+        } else if data.starts_with(b"MOSS") {
+            Some(PackageFormat::Moss) // Solus Moss package magic
+        } else if data.starts_with(b"hsqs") || data.starts_with(b"sqsh") {
+            Some(PackageFormat::Tcz) // SquashFS magic (TinyCore .tcz / SquashFS .sfs)
+        } else if data.starts_with(b"koly") {
+            Some(PackageFormat::Dmg) // Apple DMG disk image trailer magic
+        } else if data.starts_with(b"cports") {
+            Some(PackageFormat::Cports) // Chimera Linux cports magic
         } else if data.starts_with(b"\x1f\x8b") {
             Some(PackageFormat::TarGz) // gzip magic
         } else if data.starts_with(b"\xfd7zXZ\x00") {
@@ -843,7 +877,7 @@ mod tests {
         assert_eq!(adapter.detect_format_by_extension("base.pkg"), Some(PackageFormat::Pkg));
         assert_eq!(adapter.detect_format_by_extension("mobile.aab"), Some(PackageFormat::Aab));
         assert_eq!(adapter.detect_format_by_extension("alpine.apk"), Some(PackageFormat::Apk));
-        assert_eq!(adapter.detect_format_by_extension("app.appimage"), Some(PackageFormat::Sovereign));
+        assert_eq!(adapter.detect_format_by_extension("app.appimage"), Some(PackageFormat::AppImage));
         assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Pisi));
         assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
         assert_eq!(adapter.detect_format_by_extension("ubuntu.deb"), Some(PackageFormat::Apt));
@@ -854,8 +888,24 @@ mod tests {
         assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(PackageFormat::Pup));
         assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
 
+        assert_eq!(adapter.detect_format_by_extension("solus.moss"), Some(PackageFormat::Moss));
+        assert_eq!(adapter.detect_format_by_extension("haiku.hpkg"), Some(PackageFormat::Hpkg));
+        assert_eq!(adapter.detect_format_by_extension("extension.tcz"), Some(PackageFormat::Tcz));
+        assert_eq!(adapter.detect_format_by_extension("app.gobo"), Some(PackageFormat::Gobo));
+        assert_eq!(adapter.detect_format_by_extension("commit.ostree"), Some(PackageFormat::Ostree));
+        assert_eq!(adapter.detect_format_by_extension("tool.pkgsrc"), Some(PackageFormat::Pkgsrc));
+        assert_eq!(adapter.detect_format_by_extension("module.sfs"), Some(PackageFormat::Sfs));
+        assert_eq!(adapter.detect_format_by_extension("portable.puk"), Some(PackageFormat::Puk));
+        assert_eq!(adapter.detect_format_by_extension("image.dmg"), Some(PackageFormat::Dmg));
+        assert_eq!(adapter.detect_format_by_extension("recipe.cports"), Some(PackageFormat::Cports));
+
         // Check format detection by header signature magic
         assert_eq!(adapter.detect_format_by_header(b"!<arch>\ncontrol.tar.xz"), Some(PackageFormat::Apt));
+        assert_eq!(adapter.detect_format_by_header(b"hpkg1234"), Some(PackageFormat::Hpkg));
+        assert_eq!(adapter.detect_format_by_header(b"MOSS1234"), Some(PackageFormat::Moss));
+        assert_eq!(adapter.detect_format_by_header(b"hsqs1234"), Some(PackageFormat::Tcz));
+        assert_eq!(adapter.detect_format_by_header(b"koly1234"), Some(PackageFormat::Dmg));
+        assert_eq!(adapter.detect_format_by_header(b"cports123"), Some(PackageFormat::Cports));
         assert_eq!(adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]), Some(PackageFormat::Yum));
         assert_eq!(adapter.detect_format_by_header(b"PK\x03\x04payload"), Some(PackageFormat::Aab));
         assert_eq!(adapter.detect_format_by_header(b"SPKG0001header"), Some(PackageFormat::Sovereign));
