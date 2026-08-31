@@ -162,3 +162,17 @@ pub use desktop::mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
+
+pub use ui::gtk::{
+    AdwBanner, AdwBannerSeverity, AdwNavigationSplitView, AdwPreferencesEngine, AdwViewSwitcher,
+    BsdGtkSandboxGuard, FreeBsdCapsicumGtkGuard, GtkAccentColor, GtkCssProvider, GtkHeaderBar,
+    GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine, XAppStatusIconManager,
+};
+
+pub use customization::{
+    MdmAccessibilitySettings, MdmBackgroundType, MdmMonitorPosition, MdmMultiMonitorConfig,
+    MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind, MdmThemeInfo, MdmUserAvatar,
+    SovereignMdmThemeEngine,
+};
+
+pub use tools::display_manager::{DMError, DisplayManager, Session, SessionType, User};

@@ -26,16 +26,13 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
-
-#[cfg(not(test))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 
-#[cfg(test)]
-use crate::klib::HashMap;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
@@ -88,7 +85,7 @@ pub enum PackagePriority {
     Optional,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
     Deb,      // apt/dpkg
     Rpm,      // yum/dnf/zypper
@@ -894,7 +891,7 @@ impl DependencyResolver {
         let mut resolved: Vec<String> = Vec::new();
         let mut to_visit: Vec<String> = Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = crate::klib::hashset::HashSet::<String>::new();
+        let mut visited: Vec<String> = Vec::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -902,7 +899,7 @@ impl DependencyResolver {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.push(current.clone());
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
@@ -1082,6 +1079,7 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    #[cfg(not(feature = "standalone_test"))]
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1096,6 +1094,7 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
+            #[cfg(not(feature = "standalone_test"))]
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };
@@ -1105,6 +1104,7 @@ impl UniversalPackageManager {
     }
 
     /// Register and install a Node.js binary distribution runtime into the isolated store
+    #[cfg(not(feature = "standalone_test"))]
     pub fn install_node_runtime(
         &mut self,
         package: &NodeBinaryPackage,
@@ -1993,6 +1993,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(feature = "standalone_test"))]
     fn test_universal_package_manager_node_runtime_integration() {
         let mut manager = UniversalPackageManager::new();
         let bytes = vec![0x42u8; 120];
