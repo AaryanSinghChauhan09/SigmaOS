@@ -13,6 +13,12 @@ pub use zsh_bash_parity::{
     UniversalShellCompatibilityEngine,
 };
 
+pub use zsh_bash_parity::{
+    DashPosixShValidator, FishAbbreviationEngine, KshParameterExpansionEngine, ShellDialect,
+    ShellPipeline, ShellPipelineParser, TcshHistorySubstitutionEngine,
+    UniversalShellCompatibilityEngine,
+};
+
 pub use sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ZshPromptFormatter,

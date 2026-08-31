@@ -348,6 +348,7 @@ impl OpenBsdPledge {
 
 // ============================================================================
 // 1. Linux `perf_event_open` Hardware PMU Performance Counters
+// ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PerfHardwareCounterType {
@@ -408,8 +409,11 @@ impl LinuxPerfEventsEngine {
     }
 }
 
+// ============================================================================
 // 2. FreeBSD `racct(9)` Resource Accounting & `rctl(8)` Resource Limits
+// ============================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RacctResource {
     CputimeSec,
     MemoryBytes,
@@ -435,13 +439,19 @@ pub struct RctlRule {
 pub struct FreeBsdRacctRctlEngine {
     pub rules: Vec<RctlRule>,
     pub accounting: Vec<(u32, RacctResource, u64)>,
+}
 
 impl FreeBsdRacctRctlEngine {
+    pub fn new() -> Self {
+        Self {
             rules: Vec::new(),
             accounting: Vec::new(),
+        }
+    }
 
     pub fn add_rule(&mut self, rule: RctlRule) {
         self.rules.push(rule);
+    }
 
     pub fn record_usage(&mut self, pid: u32, resource: RacctResource, amount: u64) -> Option<RctlAction> {
         let mut new_val = amount;
@@ -454,10 +464,16 @@ impl FreeBsdRacctRctlEngine {
             if rule.subject_pid == pid && rule.resource == resource && new_val >= rule.limit_value {
                 return Some(rule.action);
             }
+        }
         None
+    }
+}
 
+// ============================================================================
 // 3. Linux `inotify`/`fanotify` Filesystem Event Monitoring
+// ============================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FsEventMask {
     Access,
     Modify,
@@ -478,11 +494,16 @@ pub struct LinuxInotifyFanotifyEngine {
     pub watches: Vec<(i32, String, Vec<FsEventMask>)>,
     pub pending_events: Vec<FsEventNotification>,
     pub next_wd: i32,
+}
 
 impl LinuxInotifyFanotifyEngine {
+    pub fn new() -> Self {
+        Self {
             watches: Vec::new(),
             pending_events: Vec::new(),
             next_wd: 1,
+        }
+    }
 
     pub fn add_watch(&mut self, path: &str, masks: Vec<FsEventMask>) -> i32 {
         let wd = self.next_wd;
@@ -502,9 +523,17 @@ impl LinuxInotifyFanotifyEngine {
     pub fn pop_event(&mut self) -> Option<FsEventNotification> {
         if !self.pending_events.is_empty() {
             Some(self.pending_events.remove(0))
+        } else {
+            None
+        }
+    }
+}
 
+// ============================================================================
 // 4. NetBSD `sysmon(4)` Hardware Environmental Sensor Monitoring
+// ============================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SensorType {
     TemperatureCelsius,
     FanRpm,
@@ -517,15 +546,22 @@ pub struct EnvironmentalSensor {
     pub current_value: f64,
     pub warning_threshold: f64,
     pub critical_threshold: f64,
+}
 
 pub struct NetBsdSysmonPowerPwmEngine {
     pub sensors: Vec<EnvironmentalSensor>,
+}
 
 impl NetBsdSysmonPowerPwmEngine {
+    pub fn new() -> Self {
+        Self {
             sensors: Vec::new(),
+        }
+    }
 
     pub fn register_sensor(&mut self, sensor: EnvironmentalSensor) {
         self.sensors.push(sensor);
+    }
 
     pub fn update_sensor_value(&mut self, name: &str, val: f64) {
         if let Some(s) = self.sensors.iter_mut().find(|s| s.name == name) {
@@ -538,20 +574,33 @@ impl NetBsdSysmonPowerPwmEngine {
                 alerts.push((sensor.name.clone(), "CRITICAL"));
             } else if sensor.current_value >= sensor.warning_threshold {
                 alerts.push((sensor.name.clone(), "WARNING"));
+            }
+        }
         alerts
+    }
+}
 
+// ============================================================================
 // 5. Linux Kernel Livepatch (`kpatch`/`livepatch`) fentry Trampoline
+// ============================================================================
 
 pub struct LivepatchFunctionSymbol {
+    pub name: String,
     pub original_address: u64,
     pub new_address: u64,
     pub is_patched: bool,
+}
 
 pub struct LinuxKernelLivepatchEngine {
     pub patches: Vec<LivepatchFunctionSymbol>,
+}
 
 impl LinuxKernelLivepatchEngine {
+    pub fn new() -> Self {
+        Self {
             patches: Vec::new(),
+        }
+    }
 
     pub fn register_patch(&mut self, name: &str, orig_addr: u64, new_addr: u64) {
         self.patches.push(LivepatchFunctionSymbol {

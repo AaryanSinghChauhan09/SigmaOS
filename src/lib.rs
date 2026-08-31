@@ -51,6 +51,26 @@ pub use unimplemented_features::{
     SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
     ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
 };
+pub use distro::{
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
+};
+pub use security::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use driver::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
+};
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
 
