@@ -242,6 +242,37 @@ pub struct BsdConsoleColorPalette {
     pub cursor_rgb: (u8, u8, u8),
 }
 
+/// Linux & BSD Pseudo-Terminal (PTY) Controller & Signal Propagation Engine
+#[derive(Debug, Clone)]
+pub struct PtySessionController {
+    pub master_fd: i32,
+    pub slave_fd: i32,
+    pub foreground_pgid: usize,
+    pub termios_raw_mode: bool,
+    pub last_signal_propagated: Option<String>,
+}
+
+impl PtySessionController {
+    pub fn new(master_fd: i32, slave_fd: i32, initial_pgid: usize) -> Self {
+        Self {
+            master_fd,
+            slave_fd,
+            foreground_pgid: initial_pgid,
+            termios_raw_mode: false,
+            last_signal_propagated: None,
+        }
+    }
+
+    pub fn set_raw_mode(&mut self, enable: bool) {
+        self.termios_raw_mode = enable;
+    }
+
+    pub fn propagate_signal(&mut self, signal_name: &str) -> bool {
+        self.last_signal_propagated = Some(signal_name.to_string());
+        true
+    }
+}
+
 impl BsdConsoleTheme {
     pub fn palette(self) -> BsdConsoleColorPalette {
         match self {
