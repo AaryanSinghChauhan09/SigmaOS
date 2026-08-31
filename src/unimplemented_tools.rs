@@ -2834,6 +2834,83 @@ impl Default for SysinternalsProcMon {
     }
 }
 
+/// FreeBSD bhyve virtio & PCI passthrough hypervisor engine
+pub struct FreeBsdBhyveHypervisorEngine {
+    pub vm_name: String,
+    pub memory_mb: u64,
+    pub vcpus: u32,
+    pub is_running: bool,
+    pub passthrough_pci_devices: Vec<String>,
+}
+
+impl FreeBsdBhyveHypervisorEngine {
+    pub fn new(vm_name: &str, memory_mb: u64, vcpus: u32) -> Self {
+        Self {
+            vm_name: vm_name.to_string(),
+            memory_mb,
+            vcpus,
+            is_running: false,
+            passthrough_pci_devices: Vec::new(),
+        }
+    }
+
+    pub fn register_pci_passthrough(&mut self, pci_addr: &str) {
+        self.passthrough_pci_devices.push(pci_addr.to_string());
+    }
+
+    pub fn spawn_vm(&mut self) -> Result<(), &'static str> {
+        if self.is_running {
+            return Err("VM already running");
+        }
+        self.is_running = true;
+        Ok(())
+    }
+
+    pub fn stop_vm(&mut self) -> Result<(), &'static str> {
+        if !self.is_running {
+            return Err("VM not running");
+        }
+        self.is_running = false;
+        Ok(())
+    }
+}
+
+/// NetBSD Rump Kernel isolated driver and subsystem runner
+pub struct NetBsdRumpKernelServer {
+    pub active_components: Vec<String>,
+    pub sysproxy_socket: String,
+}
+
+impl NetBsdRumpKernelServer {
+    pub fn new(sysproxy_socket: &str) -> Self {
+        Self {
+            active_components: Vec::new(),
+            sysproxy_socket: sysproxy_socket.to_string(),
+        }
+    }
+
+    pub fn load_component(&mut self, component_name: &str) -> bool {
+        if self.active_components.iter().any(|c| c == component_name) {
+            return false;
+        }
+        self.active_components.push(component_name.to_string());
+        true
+    }
+
+    pub fn unload_component(&mut self, component_name: &str) -> bool {
+        if let Some(idx) = self.active_components.iter().position(|c| c == component_name) {
+            self.active_components.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_component_loaded(&self, component_name: &str) -> bool {
+        self.active_components.iter().any(|c| c == component_name)
+    }
+}
+
 /// cgroup v2 hierarchical resource monitor [systemd-cgtop Parity]
 #[derive(Debug, Clone)]
 pub struct CgroupNode {
@@ -4852,5 +4929,27 @@ mod tests {
         assert_eq!(engine.sysconfdir_overrides.len(), 1);
         assert_eq!(engine.reset_etc_to_stateless_defaults(), 1);
         assert_eq!(engine.sysconfdir_overrides.len(), 0);
+    }
+
+    #[test]
+    fn test_freebsd_bhyve_hypervisor_engine() {
+        let mut bhyve = FreeBsdBhyveHypervisorEngine::new("freebsd-guest", 4096, 4);
+        bhyve.register_pci_passthrough("00:14.0");
+        assert_eq!(bhyve.passthrough_pci_devices.len(), 1);
+        assert!(!bhyve.is_running);
+        assert!(bhyve.spawn_vm().is_ok());
+        assert!(bhyve.is_running);
+        assert!(bhyve.stop_vm().is_ok());
+        assert!(!bhyve.is_running);
+    }
+
+    #[test]
+    fn test_netbsd_rump_kernel_server() {
+        let mut rump = NetBsdRumpKernelServer::new("/tmp/rump_sysproxy.sock");
+        assert!(rump.load_component("rumpvfs"));
+        assert!(rump.is_component_loaded("rumpvfs"));
+        assert!(!rump.load_component("rumpvfs"));
+        assert!(rump.unload_component("rumpvfs"));
+        assert!(!rump.is_component_loaded("rumpvfs"));
     }
 }

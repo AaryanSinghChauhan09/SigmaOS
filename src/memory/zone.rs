@@ -184,6 +184,23 @@ impl BsdZoneAllocator {
             None
         }
     }
+
+    /// Finds zone index by name (FreeBSD UMA zone lookup)
+    pub fn uma_zfind(&self, name: &str) -> Option<usize> {
+        self.zones.iter().position(|z| z.name == name)
+    }
+
+    /// Drains empty slabs across all zones under memory pressure
+    pub fn uma_zdrain(&mut self) -> usize {
+        let mut freed_slabs = 0;
+        for zone in &mut self.zones {
+            let max_slots_per_slab = 4096 / zone.item_size;
+            let initial_len = zone.slabs.len();
+            zone.slabs.retain(|s| s.free_slots.len() < max_slots_per_slab);
+            freed_slabs += initial_len - zone.slabs.len();
+        }
+        freed_slabs
+    }
 }
 
 #[cfg(test)]
@@ -207,5 +224,20 @@ mod tests {
         allocator.uma_zfree(thread_zone_idx, addr1).unwrap();
         let stats_after_free = allocator.get_zone_stats(thread_zone_idx).unwrap();
         assert_eq!(stats_after_free.allocated_items, 1);
+    }
+
+    #[test]
+    fn test_uma_zone_drain_and_lookup() {
+        let mut allocator = BsdZoneAllocator::new(0x20000000);
+        let idx = allocator.uma_zcreate("VnodeZone", 128, 50);
+
+        assert_eq!(allocator.uma_zfind("VnodeZone"), Some(idx));
+        assert_eq!(allocator.uma_zfind("NonexistentZone"), None);
+
+        let ptr = allocator.uma_zalloc(idx).unwrap();
+        assert!(allocator.uma_zfree(idx, ptr).is_ok());
+
+        let drained = allocator.uma_zdrain();
+        assert_eq!(drained, 1);
     }
 }

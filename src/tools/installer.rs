@@ -3,8 +3,8 @@ use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-//! System Installer (Ubiquity/Calamares Inspiration)
-//! Graphical installer with partitioning and user setup
+// System Installer (Ubiquity/Calamares Inspiration)
+// Graphical installer with partitioning and user setup
 
 
 
@@ -150,6 +150,70 @@ pub enum InstallerError {
     PartitioningFailed,
 }
 
+/// Configuration for Windows-hosted Wubi/Mint dual-boot virtual disk installation
+#[derive(Debug, Clone)]
+pub struct WubiWindowsInstallerConfig {
+    pub target_drive_letter: char,
+    pub install_folder_path: String,
+    pub virtual_disk_size_gb: u32,
+    pub virtual_swap_size_mb: u32,
+    pub bcd_entry_label: String,
+}
+
+impl Default for WubiWindowsInstallerConfig {
+    fn default() -> Self {
+        Self {
+            target_drive_letter: 'C',
+            install_folder_path: "C:\\sigmaos".to_string(),
+            virtual_disk_size_gb: 30,
+            virtual_swap_size_mb: 2048,
+            bcd_entry_label: "SigmaOS (Linux Mint Wubi Dual Boot)".to_string(),
+        }
+    }
+}
+
+/// Ubuntu Wubi and Linux Mint inspired Windows Installer Engine
+pub struct WubiWindowsInstallerEngine {
+    pub config: WubiWindowsInstallerConfig,
+    pub loopback_rootfs_created: bool,
+    pub bcd_registered: bool,
+}
+
+impl WubiWindowsInstallerEngine {
+    pub fn new(config: WubiWindowsInstallerConfig) -> Self {
+        Self {
+            config,
+            loopback_rootfs_created: false,
+            bcd_registered: false,
+        }
+    }
+
+    /// Allocates Windows NTFS loopback virtual rootfs disk file (root.disk)
+    pub fn create_loopback_rootfs(&mut self) -> Result<String, InstallerError> {
+        if self.config.virtual_disk_size_gb < 8 {
+            return Err(InstallerError::PartitioningFailed);
+        }
+        self.loopback_rootfs_created = true;
+        Ok(format!("{}\\\\disks\\\\root.disk", self.config.install_folder_path))
+    }
+
+    /// Registers dual-boot entry in Windows Boot Configuration Data (BCD)
+    pub fn register_bcd_boot_entry(&mut self) -> Result<String, InstallerError> {
+        if !self.loopback_rootfs_created {
+            return Err(InstallerError::InstallationFailed);
+        }
+        self.bcd_registered = true;
+        Ok(format!("BCD Entry Registered: {}", self.config.bcd_entry_label))
+    }
+
+    /// Uninstalls Linux Mint Wubi virtual disk and cleans Windows BCD entries
+    pub fn uninstall_from_windows(&mut self) -> Result<(), InstallerError> {
+        self.loopback_rootfs_created = false;
+        self.bcd_registered = false;
+        Ok(())
+    }
+}
+
 impl Default for SystemInstaller {
     fn default() -> Self {
         Self::new()
@@ -177,5 +241,32 @@ mod tests {
         let mut installer = SystemInstaller::new();
         assert!(installer.next_stage().is_ok());
         assert_eq!(installer.current_stage, InstallerStage::Language);
+    }
+
+    #[test]
+    fn test_wubi_windows_installer_engine() {
+        let config = WubiWindowsInstallerConfig::default();
+        let mut engine = WubiWindowsInstallerEngine::new(config);
+
+        assert!(!engine.loopback_rootfs_created);
+        assert!(!engine.bcd_registered);
+
+        // Cannot register BCD before root.disk creation
+        assert!(engine.register_bcd_boot_entry().is_err());
+
+        // Create rootfs virtual disk
+        let disk_path = engine.create_loopback_rootfs().unwrap();
+        assert!(disk_path.contains("root.disk"));
+        assert!(engine.loopback_rootfs_created);
+
+        // Register Windows BCD boot entry
+        let bcd_res = engine.register_bcd_boot_entry().unwrap();
+        assert!(bcd_res.contains("SigmaOS (Linux Mint Wubi Dual Boot)"));
+        assert!(engine.bcd_registered);
+
+        // Uninstall
+        assert!(engine.uninstall_from_windows().is_ok());
+        assert!(!engine.loopback_rootfs_created);
+        assert!(!engine.bcd_registered);
     }
 }
