@@ -24,6 +24,41 @@ This document presents a comparative dashboard and strategic development roadmap
 
 ---
 
+## 📐 Dependency Flowchart & Systems Map
+
+```
+[Kernel Hybrid]
+      ↓
+[Transactional Filesystem]
+      ↓
+[Adaptive Scheduler]
+      ↓
+[Visual Sandbox GUI]
+      ↓
+[Unified Firewall Dashboard]
+      ↓
+[Native Containers + VM Orchestration]
+      ↓
+[Zenith Desktop Overlays]
+      ↓
+[Compliance Handbook + Community Modules]
+```
+
+---
+
+## 📊 Quarterly Compliance Scorecard (Q1–Q6)
+
+| Quarter | Phase Target | Primary Deliverables | KPI Checkpoint |
+| :--- | :--- | :--- | :--- |
+| **Q1** | Foundation Start | Hybrid microkernel prototype, transactional FS baseline, compliance handbook draft | Boot stability ≥ 95%, Rollback scenarios tested: 50+ |
+| **Q2** | Foundation Complete | Refined microkernel, expanded FS CoW rollbacks, handbook draft coverage | Boot stability ≥ 97%, FS rollback success ≥ 99% |
+| **Q3** | Expansion Start | Adaptive scheduler rollout, visual sandbox GUI prototype, firewall dashboard alpha | Scheduler latency < 10ms, Sandbox policy adoption ≥ 60% |
+| **Q4** | Expansion Complete | Scheduler quantum optimization, visual sandbox refinement, firewall dashboard beta | Scheduler latency < 8ms, Rule accuracy ≥ 99% |
+| **Q5** | Differentiation Start | Native container orchestration, Zenith overlays prototype, distributed FS overlay alpha | Container launch < 2s, Desktop uptime ≥ 90% |
+| **Q6** | Differentiation Complete | Optimized container runtime, Zenith overlays refinement, distributed FS overlay beta | Container launch < 1.5s, Sync accuracy ≥ 99.9% |
+
+---
+
 ## 🚀 Future Development Roadmap for SigmaOS
 
 ### Phase 1 — Stabilization (Months 0–3)

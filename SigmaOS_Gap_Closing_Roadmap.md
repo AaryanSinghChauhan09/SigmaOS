@@ -119,6 +119,75 @@ This document serves as the master engineering roadmap to systematically resolve
 
 ---
 
+## ⚔️ 0.4 SigmaOS Battle Plan & Dependency Flowchart
+
+### ⚔️ Stage-by-Stage Battle Plan
+- **Stage 1 — Kernel & Core System**: Hybrid microkernel with modular services neutralizing Linux/BSD monolithic kernel complexity.
+- **Stage 2 — Filesystem & Storage**: Transactional filesystem with compliance journaling and automatic CoW rollback making ZFS/Btrfs feel niche.
+- **Stage 3 — Scheduling & Performance**: Adaptive scheduler tuned for real-time, batch, and compliance workloads outperforming CFS and ULE.
+- **Stage 4 — Security & Compliance**: Visual sandboxing GUI + immutable system layers replacing CLI SELinux/AppArmor/Capsicum complexity.
+- **Stage 5 — Networking**: Unified firewall dashboard with VPN orchestration simplifying nftables/PF fragmentation.
+- **Stage 6 — Virtualization & Containers**: Native containers + lightweight VM orchestration integrated natively into the OS kernel.
+- **Stage 7 — Desktop & UX**: Zenith adaptive overlays making system management visual-first for non-technical users.
+- **Stage 8 — Documentation & Community**: Compliance handbook + community compliance modules building trust in regulated industries.
+
+---
+
+### 📐 Dependency Flowchart
+```
+[Kernel Hybrid]
+      ↓
+[Transactional Filesystem]
+      ↓
+[Adaptive Scheduler]
+      ↓
+[Visual Sandbox GUI]
+      ↓
+[Unified Firewall Dashboard]
+      ↓
+[Native Containers + VM Orchestration]
+      ↓
+[Zenith Desktop Overlays]
+      ↓
+[Compliance Handbook + Community Modules]
+```
+
+---
+
+### 📅 Q1–Q6 Quarterly Roadmap Tracker
+
+#### Q1 (Foundation Start)
+- Kernel hybrid prototype → Boot stability ≥ 95%
+- Transactional FS baseline → Rollback tested on 50+ scenarios
+- Compliance handbook draft → Coverage ≥ 50% of core modules
+
+#### Q2 (Foundation Completion)
+- Kernel refinement → Boot stability ≥ 97%
+- FS rollback expansion → ≥ 99% success rate
+- Handbook expansion → Coverage ≥ 70%
+
+#### Q3 (Expansion Start)
+- Adaptive scheduler rollout → Latency < 10ms under stress
+- Visual sandbox GUI prototype → Policy adoption ≥ 60% test users
+- Firewall dashboard alpha → Rule accuracy ≥ 95%
+
+#### Q4 (Expansion Completion)
+- Scheduler optimization → Latency < 8ms
+- Sandbox GUI refinement → Policy adoption ≥ 80%
+- Firewall dashboard beta → Rule accuracy ≥ 99%
+
+#### Q5 (Differentiation Start)
+- Native container orchestration → Launch time < 2s
+- Zenith overlays prototype → Stability ≥ 90% uptime
+- Distributed FS overlay alpha → Sync accuracy ≥ 98%
+
+#### Q6 (Differentiation Completion)
+- Container optimization → Launch time < 1.5s
+- Zenith overlays refinement → Stability ≥ 95% uptime
+- Distributed FS overlay beta → Sync accuracy ≥ 99.9%
+
+---
+
 ## 📅 1. Multi-Stage Gap-Closing Milestones
 
 ### 🎯 PHASE 1: FOUNDATION HARDENING (Months 1-6)

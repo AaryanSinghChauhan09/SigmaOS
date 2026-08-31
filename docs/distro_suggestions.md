@@ -22,16 +22,21 @@ This document compiles key architectural strengths, design paradigms, and featur
 
 ---
 
-## ⚔️ 0.1 Competitive Strike Map: Neutralizing Linux & BSD
+## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD
 
-- **Kernel & Core**: Hybrid microkernel neutralizing monolithic complexity by offering resilience + portability.
-- **Filesystem**: Transactional compliance journaling rendering ZFS/Btrfs rollbacks standard and audit-safe.
-- **Scheduler**: Dynamic workload-adaptive scheduling outperforming CFS and ULE in regulated workloads.
-- **Security**: Visual sandboxing GUI + immutable layers eliminating complex CLI SELinux/AppArmor overhead.
-- **Networking**: Unified firewall + VPN dashboard replacing fragmented nftables/PF setups.
-- **Virtualization**: Native micro-containers & lightweight VM orchestration avoiding multi-stack external runtimes.
-- **Desktop/UX**: Zenith adaptive overlays transforming system management into a visual-first experience.
-- **Documentation**: Publisher-grade compliance handbook building trust in regulated enterprise environments.
+- **Stage 1 (Kernel & Core)**: Hybrid microkernel neutralizing monolithic complexity by offering resilience + portability.
+- **Stage 2 (Filesystem)**: Transactional compliance journaling rendering ZFS/Btrfs rollbacks standard and audit-safe.
+- **Stage 3 (Scheduler)**: Dynamic workload-adaptive scheduling outperforming CFS and ULE in regulated workloads.
+- **Stage 4 (Security)**: Visual sandboxing GUI + immutable layers eliminating complex CLI SELinux/AppArmor overhead.
+- **Stage 5 (Networking)**: Unified firewall + VPN dashboard replacing fragmented nftables/PF setups.
+- **Stage 6 (Virtualization)**: Native micro-containers & lightweight VM orchestration avoiding multi-stack external runtimes.
+- **Stage 7 (Desktop/UX)**: Zenith adaptive overlays transforming system management into a visual-first experience.
+- **Stage 8 (Documentation)**: Publisher-grade compliance handbook building trust in regulated enterprise environments.
+
+### 📐 Cascading Dependency Chain
+```
+[Kernel Hybrid] -> [Transactional FS] -> [Adaptive Scheduler] -> [Visual Sandbox] -> [Firewall Dashboard] -> [Native Containers] -> [Zenith UX] -> [Compliance Handbook]
+```
 
 ---
 
