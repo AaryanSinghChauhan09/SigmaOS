@@ -67,7 +67,7 @@ pub unsafe fn cstrcmp(s1: *const i8, s2: *const i8) -> i32 {
 }
 
 /// Custom C string copy
-pub unsafe fn cstrcpy(dest: *mut i8, src: *const i8) -> *mut i8 {
+pub unsafe fn cstrncpy_safe_safe(dest: *mut i8, src: *const i8) -> *mut i8 {
     if dest.is_null() || src.is_null() {
         return dest;
     }

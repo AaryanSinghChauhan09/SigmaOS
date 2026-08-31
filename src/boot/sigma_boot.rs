@@ -39,8 +39,8 @@ pub enum HandoffProtocol {
 pub struct SovereignDistroBootStageHandoff {
     pub protocol: HandoffProtocol,
     pub root_uuid: String,
-    pub is_initramfs_mounted: bool,
-    pub is_overlayfs_active: bool,
+    pub live_overlay_mounted: bool,
+    pub live_overlay_mounted: bool,
     pub kernel_entry_point_addr: u64,
 }
 
@@ -49,8 +49,8 @@ impl SovereignDistroBootStageHandoff {
         Self {
             protocol,
             root_uuid: root_uuid.to_string(),
-            is_initramfs_mounted: false,
-            is_overlayfs_active: false,
+            live_overlay_mounted: false,
+            live_overlay_mounted: false,
             kernel_entry_point_addr: 0x0010_0000,
         }
     }
@@ -59,20 +59,20 @@ impl SovereignDistroBootStageHandoff {
         if self.root_uuid.is_empty() {
             return Err("Boot Handoff: Root UUID cannot be empty");
         }
-        self.is_initramfs_mounted = true;
+        self.live_overlay_mounted = true;
         Ok(())
     }
 
     pub fn setup_live_iso_overlayfs(&mut self) -> Result<(), &'static str> {
-        if !self.is_initramfs_mounted {
+        if !self.live_overlay_mounted {
             return Err("Boot Handoff: Initramfs VFS must be mounted before overlayfs setup");
         }
-        self.is_overlayfs_active = true;
+        self.live_overlay_mounted = true;
         Ok(())
     }
 
     pub fn execute_stage_handoff(&self) -> bool {
-        self.is_initramfs_mounted && self.kernel_entry_point_addr > 0
+        self.live_overlay_mounted && self.kernel_entry_point_addr > 0
     }
 }
 
@@ -276,38 +276,6 @@ pub struct OpenBsdBootDirective {
     pub value: String,
 }
 
-pub struct SovereignDistroBootStageHandoff {
-    pub stage_descriptor: Option<BootStageDescriptor>,
-    pub openbsd_directives: Vec<OpenBsdBootDirective>,
-    pub live_overlay_mounted: bool,
-    pub emergency_rescue_active: bool,
-    pub last_error_log: Option<String>,
-}
-
-impl SovereignDistroBootStageHandoff {
-    pub fn new() -> Self {
-        Self {
-            stage_descriptor: None,
-            openbsd_directives: Vec::new(),
-            live_overlay_mounted: false,
-            emergency_rescue_active: false,
-            last_error_log: None,
-        }
-    }
-
-    /// Prepare Linux EFISTUB or Multiboot2 direct kernel handoff
-    pub fn setup_linux_efistub(&mut self, entry_addr: u64, cmdline: &str, initrd_addr: Option<u64>, initrd_size: usize) {
-        self.stage_descriptor = Some(BootStageDescriptor {
-            protocol: HandoffProtocol::LinuxEfiStub,
-            kernel_entry_addr: entry_addr,
-            cmdline: cmdline.to_string(),
-            initrd_addr,
-            initrd_size,
-            active: true,
-        });
-    }
-
-    /// Prepare Multiboot2 kernel handoff
     pub fn setup_multiboot2(&mut self, entry_addr: u64, cmdline: &str) {
         self.stage_descriptor = Some(BootStageDescriptor {
             protocol: HandoffProtocol::Multiboot2,
@@ -504,10 +472,10 @@ mod tests {
         assert!(!handoff.execute_stage_handoff());
 
         handoff.mount_initramfs_vfs().unwrap();
-        assert!(handoff.is_initramfs_mounted);
+        assert!(handoff.live_overlay_mounted);
 
         handoff.setup_live_iso_overlayfs().unwrap();
-        assert!(handoff.is_overlayfs_active);
+        assert!(handoff.live_overlay_mounted);
         assert!(handoff.execute_stage_handoff());
     }
 }

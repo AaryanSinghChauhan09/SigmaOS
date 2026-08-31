@@ -177,7 +177,7 @@ proc strlen(ptr: cstring): int =
     len += 1
   return len
 
-proc strcpy(dest: cstring, src: cstring): cstring =
+proc strncpy_safe_safe(dest: cstring, src: cstring): cstring =
   var i = 0
   while src[i] != '\0':
     dest[i] = src[i]
@@ -220,5 +220,5 @@ proc strncmp(s1: cstring, s2: cstring, n: int): int =
 
 proc strcat(dest: cstring, src: cstring): cstring =
   let destLen = strlen(dest)
-  strcpy(dest[destLen], src)
+  strncpy_safe_safe(dest[destLen], src)
   return dest
