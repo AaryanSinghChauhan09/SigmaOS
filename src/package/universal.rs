@@ -1,10 +1,10 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+#[cfg(not(test))]
+use crate::klib::HashMap;
+
+#[cfg(test)]
 use crate::klib::HashMap;
 
 /// Package format type
@@ -46,158 +46,6 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
-    Xbps,     // Void Linux (.xbps)
-    Zypper,   // OpenSUSE Zypper (.zypper)
-    Guix,     // GNU Guix (.guix / .scm)
-    Moss,     // Solus Moss (.moss)
-    Hpkg,     // Haiku Package (.hpkg)
-    Tcz,      // Tiny Core Linux (.tcz)
-    Gobo,     // GoboLinux (.gobo)
-    Ostree,   // OSTree commit (.commit)
-    Pkgsrc,   // NetBSD pkgsrc (.pkgsrc)
-    Sfs,      // SquashFS (.sfs)
-    Puk,      // Portable Package (.puk)
-    Dmg,      // macOS Disk Image (.dmg)
-    Cports,   // Chimera Linux (.cports)
-}
-
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".udeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
-            Some(PackageFormat::SigmaPkg)
-        } else if name.ends_with(".air") {
-            Some(PackageFormat::Air)
-        } else if name.ends_with(".bottle") {
-            Some(PackageFormat::Bottle)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if name.ends_with(".zypper") {
-            Some(PackageFormat::Zypper)
-        } else if name.ends_with(".guix") || name.ends_with(".scm") {
-            Some(PackageFormat::Guix)
-        } else if name.ends_with(".moss") {
-            Some(PackageFormat::Moss)
-        } else if name.ends_with(".hpkg") {
-            Some(PackageFormat::Hpkg)
-        } else if name.ends_with(".tcz") {
-            Some(PackageFormat::Tcz)
-        } else if name.ends_with(".gobo") {
-            Some(PackageFormat::Gobo)
-        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
-            Some(PackageFormat::Ostree)
-        } else if name.ends_with(".pkgsrc") {
-            Some(PackageFormat::Pkgsrc)
-        } else if name.ends_with(".sfs") {
-            Some(PackageFormat::Sfs)
-        } else if name.ends_with(".puk") {
-            Some(PackageFormat::Puk)
-        } else if name.ends_with(".dmg") {
-            Some(PackageFormat::Dmg)
-        } else if name.ends_with(".cports") {
-            Some(PackageFormat::Cports)
-        } else if name.ends_with(".cachy") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".superdeb") {
-            Some(PackageFormat::Superdeb)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else {
-            None
-        }
-    }
-}
-
-/// User-defined hook timing
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookTiming {
-    PreInstall,
-    PostInstall,
-    PreRemove,
-    PostRemove,
-}
-
-/// Dynamic user-defined package hook trait (OOP approach for package system lifecycle)
-pub trait PackageHook: Send + Sync {
-    fn name(&self) -> &str;
-    fn timing(&self) -> HookTiming;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
-
-/// Custom closure-based user-defined hook
-pub struct CustomPackageHook {
-    pub name: String,
-    pub timing: HookTiming,
-    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
-}
-
-impl CustomPackageHook {
-    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
-    where
-        F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
-    {
-        Self {
-            name: name.to_string(),
-            timing,
-            handler: alloc::sync::Arc::new(handler),
-        }
-    }
-}
-
-impl PackageHook for CustomPackageHook {
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn timing(&self) -> HookTiming {
-        self.timing
-    }
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        (self.handler)(package)
-    }
 }
 
 /// Package source
@@ -603,11 +451,11 @@ impl DependencyResolver {
     pub fn resolve_dependencies(
         &self,
         package_name: &str,
-    ) -> Result<alloc::vec::Vec<String>, PackageError> {
-        let mut resolved: alloc::vec::Vec<String> = alloc::vec::Vec::new();
-        let mut to_visit: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+    ) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = alloc::collections::BTreeSet::<String>::new();
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -743,7 +591,7 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: alloc::vec::Vec<String> = alloc::vec::Vec::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
             let key: &String = key;
             keys.push(key.clone());
@@ -781,7 +629,6 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
-    pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
 }
 
 impl UniversalPackageManager {
@@ -793,42 +640,10 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
-            user_hooks: Vec::new(),
         };
 
         manager.add_default_adapters();
         manager
-    }
-
-    /// Registers a user-defined lifecycle hook
-    pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
-        self.user_hooks.push(hook);
-    }
-
-    /// Triggers user-defined hooks matching the requested lifecycle stage
-    pub fn trigger_user_hooks(&self, timing: HookTiming, package: &UnifiedPackage) -> Result<(), PackageError> {
-        for hook in &self.user_hooks {
-            if hook.timing() == timing {
-                hook.execute(package)?;
-            }
-        }
-        Ok(())
-    }
-
-    /// Installs a package file directly by inferring format from filename
-    pub fn install_from_file(&mut self, filepath: &str) -> Result<(), PackageError> {
-        let format = PackageFormat::from_filename(filepath).ok_or_else(|| {
-            PackageError::InstallationFailed(format!("Unsupported file format extension for file: {}", filepath))
-        })?;
-
-        let file_name = filepath.split('/').last().unwrap_or(filepath);
-        let pkg_name = file_name.split('.').next().unwrap_or(file_name);
-
-        let package = UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string())
-            .with_format(format);
-
-        self.add_package(package);
-        self.install(pkg_name)
     }
 
     fn add_default_adapters(&mut self) {
@@ -892,28 +707,11 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
         self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
         self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
-        self.adapters.insert(PackageFormat::Xbps, PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()));
-        self.adapters.insert(PackageFormat::Zypper, PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()));
-        self.adapters.insert(PackageFormat::Guix, PackageAdapter::new(PackageFormat::Guix, "guix".to_string()));
-        self.adapters.insert(PackageFormat::Moss, PackageAdapter::new(PackageFormat::Moss, "moss".to_string()));
-        self.adapters.insert(PackageFormat::Hpkg, PackageAdapter::new(PackageFormat::Hpkg, "hpkg".to_string()));
-        self.adapters.insert(PackageFormat::Tcz, PackageAdapter::new(PackageFormat::Tcz, "tcz".to_string()));
-        self.adapters.insert(PackageFormat::Gobo, PackageAdapter::new(PackageFormat::Gobo, "gobo".to_string()));
-        self.adapters.insert(PackageFormat::Ostree, PackageAdapter::new(PackageFormat::Ostree, "ostree".to_string()));
-        self.adapters.insert(PackageFormat::Pkgsrc, PackageAdapter::new(PackageFormat::Pkgsrc, "pkgsrc".to_string()));
-        self.adapters.insert(PackageFormat::Sfs, PackageAdapter::new(PackageFormat::Sfs, "sfs".to_string()));
-        self.adapters.insert(PackageFormat::Puk, PackageAdapter::new(PackageFormat::Puk, "puk".to_string()));
-        self.adapters.insert(PackageFormat::Dmg, PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()));
-        self.adapters.insert(PackageFormat::Cports, PackageAdapter::new(PackageFormat::Cports, "cports".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
         self.packages.insert(package.name.clone(), package);
-    }
-
-    pub fn registered_adapter_count(&self) -> usize {
-        self.adapters.len()
     }
 
     pub fn create_checkpoint(&mut self) -> usize {
@@ -928,9 +726,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in &current_keys {
-                if !checkpoint.installed_keys.contains(key) {
-                    self.remove(key)?;
+            for key in current_keys {
+                if !checkpoint.installed_keys.contains(&key) {
+                    self.remove(&key)?;
                 }
             }
             Ok(())
@@ -959,9 +757,6 @@ impl UniversalPackageManager {
         for dep_name in dependencies {
             let package_opt = self.packages.get(&dep_name).cloned();
             if let Some(package) = package_opt {
-                // Trigger PreInstall user defined hooks
-                self.trigger_user_hooks(HookTiming::PreInstall, &package)?;
-
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
@@ -973,10 +768,7 @@ impl UniversalPackageManager {
 
                 let mut installed = package.clone();
                 installed.installed = true;
-                self.installed_packages.insert(dep_name.clone(), installed.clone());
-
-                // Trigger PostInstall user defined hooks
-                self.trigger_user_hooks(HookTiming::PostInstall, &installed)?;
+                self.installed_packages.insert(dep_name.clone(), installed);
             }
         }
 
@@ -986,9 +778,6 @@ impl UniversalPackageManager {
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
         let package_opt = self.installed_packages.get(package_name).cloned();
         if let Some(package) = package_opt {
-            // Trigger PreRemove user defined hooks
-            self.trigger_user_hooks(HookTiming::PreRemove, &package)?;
-
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     let adapter: &PackageAdapter = adapter;
@@ -997,9 +786,6 @@ impl UniversalPackageManager {
                 }
             }
             self.installed_packages.remove(package_name);
-
-            // Trigger PostRemove user defined hooks
-            self.trigger_user_hooks(HookTiming::PostRemove, &package)?;
         }
         Ok(())
     }
@@ -1277,35 +1063,6 @@ mod tests {
     }
 
     #[test]
-    fn test_user_defined_hooks_and_extension_install() {
-        let mut manager = UniversalPackageManager::new();
-
-        let hook_ran = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
-        let hook_ran_clone = hook_ran.clone();
-
-        let custom_hook = CustomPackageHook::new("log_pre_install", HookTiming::PreInstall, move |_pkg| {
-            hook_ran_clone.store(true, core::sync::atomic::Ordering::SeqCst);
-            Ok(())
-        });
-
-        manager.add_user_hook(alloc::sync::Arc::new(custom_hook));
-
-        // Test format detection from filename (.deb, .rpm, .apk, .snap, .flatpak, etc.)
-        assert_eq!(PackageFormat::from_filename("gcc.deb"), Some(PackageFormat::Deb));
-        assert_eq!(PackageFormat::from_filename("nginx.rpm"), Some(PackageFormat::Rpm));
-        assert_eq!(PackageFormat::from_filename("alpine.apk"), Some(PackageFormat::Apk));
-        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
-        assert_eq!(PackageFormat::from_filename("tool.appimage"), Some(PackageFormat::AppImage));
-
-        // Install from file
-        assert!(manager.install_from_file("/tmp/htop.deb").is_ok());
-        assert!(manager.get_package("htop").is_some());
-
-        // Verify pre-install user defined hook executed
-        assert!(hook_ran.load(core::sync::atomic::Ordering::SeqCst));
-    }
-
-    #[test]
     fn test_transactional_rollback() {
         let mut manager = UniversalPackageManager::new();
         let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
@@ -1480,19 +1237,6 @@ mod tests {
         let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
-    }
-
-    #[test]
-    fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
-        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
-    }
-
-    #[test]
-    fn test_universal_package_manager_adapter_count() {
-        let manager = UniversalPackageManager::new();
-        assert!(manager.registered_adapter_count() >= 20);
     }
 
     #[test]

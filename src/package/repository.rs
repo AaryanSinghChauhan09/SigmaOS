@@ -1,15 +1,15 @@
-#![cfg_attr(not(test), no_std)]
 // SigmaOS Package Repository Management
 // Linux & BSD distro-inspired package repository handling
 // Manages package repositories, sources, APT/DNF-style pinning, signature verification,
 // rankmirrors/reflector mirror failover, drpm delta indexes, and Nix/Guix content-addressed stores.
 
+#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -717,11 +717,11 @@ mod tests {
     #[test]
     fn test_package_pinning_rules() {
         let mut pin_engine = PackagePinEngine::new();
-        pin_engine.add_pin_rule("sigmaos-kernel", "6.6.0", PinPriority::Hold);
+        pin_engine.add_pin_rule("sigmaos-kernel", "*", PinPriority::PREFERRED);
 
         let p1 = pin_engine.get_pin_priority("sigmaos-kernel");
         let p2 = pin_engine.get_pin_priority("bash");
-        assert_eq!(p1, PinPriority::Hold);
+        assert_eq!(p1, PinPriority::PREFERRED);
         assert_eq!(p2, PinPriority::Default);
     }
 

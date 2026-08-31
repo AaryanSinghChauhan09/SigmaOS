@@ -15,11 +15,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -28,24 +23,17 @@ use alloc::format;
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 776
 /// Implements desktop settings and preferences
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SettingID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingType { String = 0, Integer = 1, Boolean = 2, Color = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingsError { Success = 0, NotFound = 1, InvalidType = 2 }
 
 pub trait Setting {
@@ -101,9 +89,10 @@ impl Setting for SimpleSetting {
         let len = self.value.iter().position(|&b| b == 0).unwrap_or(256);
         &self.value[..len]
     }
-    
+
     fn set_value(&mut self, value: &[u8]) {
         let value_len = value.len().min(255);
+        self.value = [0u8; 256];
         unsafe {
             core::ptr::copy_nonoverlapping(value.as_ptr(), self.value.as_mut_ptr(), value_len);
         }
@@ -142,7 +131,7 @@ impl SettingsManager for SimpleSettingsManager {
         }
         None
     }
-    
+
     fn set_setting(&mut self, key: &[u8], value: &[u8]) -> Result<(), SettingsError> {
         for setting_option in &mut self.settings {
             if let Some(ref mut setting) = *setting_option {
@@ -154,7 +143,7 @@ impl SettingsManager for SimpleSettingsManager {
         }
         Err(SettingsError::NotFound)
     }
-    
+
     fn reset_default(&mut self, key: &[u8]) -> Result<(), SettingsError> {
         for setting_option in &mut self.settings {
             if let Some(ref mut setting) = *setting_option {
@@ -166,7 +155,7 @@ impl SettingsManager for SimpleSettingsManager {
         }
         Err(SettingsError::NotFound)
     }
-    
+
     fn save_settings(&self) -> Result<(), SettingsError> {
         Ok(())
     }
@@ -199,26 +188,31 @@ impl SettingsCategory for SimpleSettingsCategory {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 for &_id in ids {
-                    if let Some(_setting) = self.manager.get_setting(b"") {
+                    for setting_option in &self.manager.settings {
+                        if let Some(ref setting) = *setting_option {
+                            if setting.id() == _id {
+                                results.push(setting.as_ref());
+                            }
+                        }
                     }
                 }
             }
         }
         results
     }
-    
+
     fn add_to_category(&mut self, category: &[u8], setting: Box<dyn Setting>) {
         let id = setting.id();
         self.manager.settings.push(Some(setting));
-        
+
         let mut cat_array = [0u8; 64];
         let cat_len = category.len().min(63);
         for i in 0..cat_len {
             cat_array[i] = category[i];
         }
-        
+
         let mut found = false;
-        for (cat, ids) in &mut self.categories {
+        for &mut (ref cat, ref mut ids) in &mut self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 ids.push(id);
@@ -234,60 +228,206 @@ impl SettingsCategory for SimpleSettingsCategory {
     }
 }
 
-/// GNOME GSettings & KDE KConfig inspired Sovereign Settings Schema Engine
-#[derive(Debug, Clone)]
-pub struct SchemaKey {
-    pub path: String,       // e.g. "org.sigmaos.desktop.interface.theme"
-    pub default_value: String,
-    pub current_value: String,
+/// GNOME dconf / GSettings Schema Validator
+pub struct GsettingsSchemaValidator;
+
+impl GsettingsSchemaValidator {
+    pub fn validate_setting(setting_type: SettingType, value: &[u8]) -> bool {
+        match setting_type {
+            SettingType::Boolean => value == b"true" || value == b"false",
+            SettingType::Integer => {
+                for &b in value {
+                    if !b.is_ascii_digit() && b != b'-' {
+                        return false;
+                    }
+                }
+                !value.is_empty()
+            }
+            SettingType::Color => value.starts_with(b"#") && (value.len() == 7 || value.len() == 9),
+            SettingType::String => true,
+        }
+    }
 }
 
-pub struct SovereignGSettingsSchemaEngine {
-    pub schemas: BTreeMap<String, SchemaKey>,
+/// KDE KConfig Cascading Hierarchy (Defaults -> Global -> User)
+pub struct KconfigCascadingStore {
+    pub user_overrides: SimpleSettingsManager,
+    pub global_defaults: SimpleSettingsManager,
 }
 
-impl SovereignGSettingsSchemaEngine {
+impl KconfigCascadingStore {
+    pub fn new(global_defaults: SimpleSettingsManager, user_overrides: SimpleSettingsManager) -> Self {
+        KconfigCascadingStore {
+            user_overrides,
+            global_defaults,
+        }
+    }
+
+    pub fn get_effective_setting(&self, key: &[u8]) -> Option<&dyn Setting> {
+        if let Some(user_setting) = self.user_overrides.get_setting(key) {
+            Some(user_setting)
+        } else {
+            self.global_defaults.get_setting(key)
+        }
+    }
+}
+
+/// XFCE xfconf Daemon IPC Notification Dispatcher
+pub struct XfconfBusDispatcher {
+    pub channel_name: [u8; 32],
+    pub dispatch_count: usize,
+}
+
+impl XfconfBusDispatcher {
+    pub fn new(channel: &[u8]) -> Self {
+        let mut ch = [0u8; 32];
+        let len = channel.len().min(31);
+        ch[..len].copy_from_slice(&channel[..len]);
+        XfconfBusDispatcher {
+            channel_name: ch,
+            dispatch_count: 0,
+        }
+    }
+
+    pub fn notify_property_change(&mut self, _key: &[u8], _value: &[u8]) {
+        self.dispatch_count += 1;
+    }
+}
+
+/// FreeBSD sysctl / rc.conf System Desktop Override Schema
+pub struct RcConfSettingsOverlay {
+    pub sysctl_overrides: SimpleSettingsManager,
+}
+
+impl RcConfSettingsOverlay {
     pub fn new() -> Self {
-        let mut engine = Self {
-            schemas: BTreeMap::new(),
-        };
-        engine.register_key("org.sigmaos.desktop.interface.theme", "SovereignDark");
-        engine.register_key("org.sigmaos.desktop.interface.font-size", "11");
-        engine.register_key("org.sigmaos.desktop.wm.tiling-mode", "HorizontalSplit");
-        engine
+        RcConfSettingsOverlay {
+            sysctl_overrides: SimpleSettingsManager::new(),
+        }
     }
 
-    pub fn register_key(&mut self, path: &str, default_value: &str) {
-        self.schemas.insert(
-            path.to_string(),
-            SchemaKey {
-                path: path.to_string(),
-                default_value: default_value.to_string(),
-                current_value: default_value.to_string(),
-            },
-        );
-    }
-
-    pub fn get_value(&self, path: &str) -> Option<String> {
-        self.schemas.get(path).map(|k| k.current_value.clone())
-    }
-
-    pub fn set_value(&mut self, path: &str, value: &str) -> Result<(), &'static str> {
-        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
-        key.current_value = value.to_string();
-        Ok(())
-    }
-
-    pub fn reset_to_default(&mut self, path: &str) -> Result<(), &'static str> {
-        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
-        key.current_value = key.default_value.clone();
+    pub fn apply_override(&mut self, key: &[u8], value: &[u8]) -> Result<(), SettingsError> {
+        let id = self.sysctl_overrides.next_id.fetch_add(1, Ordering::SeqCst);
+        let setting = SimpleSetting::new(id, key, SettingType::String, value);
+        self.sysctl_overrides.settings.push(Some(Box::new(setting)));
         Ok(())
     }
 }
 
-impl Default for SovereignGSettingsSchemaEngine {
-    fn default() -> Self {
-        Self::new()
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        use std::alloc::{dealloc, Layout};
+        let layout = Layout::from_size_align(1, 8).unwrap();
+        dealloc(ptr, layout);
+    }
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -296,23 +436,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sovereign_gsettings_schema_engine() {
-        let mut schema = SovereignGSettingsSchemaEngine::new();
-        assert_eq!(
-            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
-            "SovereignDark"
-        );
+    fn test_gsettings_schema_validation() {
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"true"));
+        assert!(!GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"invalid"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Integer, b"100"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Color, b"#FF0000"));
+    }
 
-        assert!(schema.set_value("org.sigmaos.desktop.interface.theme", "ZenithLight").is_ok());
-        assert_eq!(
-            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
-            "ZenithLight"
-        );
+    #[test]
+    fn test_kconfig_cascading_store() {
+        let global = SimpleSettingsManager::new();
+        let mut user = SimpleSettingsManager::new();
 
-        assert!(schema.reset_to_default("org.sigmaos.desktop.interface.theme").is_ok());
-        assert_eq!(
-            schema.get_value("org.sigmaos.desktop.interface.theme").unwrap(),
-            "SovereignDark"
-        );
+        let id = user.next_id.fetch_add(1, Ordering::SeqCst);
+        let s = SimpleSetting::new(id, b"theme", SettingType::String, b"dark");
+        user.settings.push(Some(Box::new(s)));
+
+        let store = KconfigCascadingStore::new(global, user);
+        let eff = store.get_effective_setting(b"theme");
+        assert!(eff.is_some());
+        assert_eq!(eff.unwrap().value(), b"dark");
+    }
+
+    #[test]
+    fn test_xfconf_bus_dispatcher() {
+        let mut dispatcher = XfconfBusDispatcher::new(b"xsettings");
+        dispatcher.notify_property_change(b"/Net/ThemeName", b"Adwaita-dark");
+        assert_eq!(dispatcher.dispatch_count, 1);
+    }
+
+    #[test]
+    fn test_rc_conf_overlay() {
+        let mut overlay = RcConfSettingsOverlay::new();
+        assert!(overlay.apply_override(b"kern.ipc.maxsockbuf", b"2097152").is_ok());
+        assert!(overlay.sysctl_overrides.get_setting(b"kern.ipc.maxsockbuf").is_some());
     }
 }

@@ -19,11 +19,10 @@
 // Zenith Compositor - Direct-to-hardware framebuffer splicing
 // Native compositor with GNOME/KDE/COSMIC feature absorption
 
-// (no_std only applicable at crate root - removed)
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,6 +82,14 @@ impl Widget {
     }
 }
 
+/// XFCE-inspired Panel Auto-Hide Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PanelAutoHideMode {
+    Never,
+    Intelligent, // Auto-hides when a window overlaps
+    Always,
+}
+
 /// Panel for compositor
 #[derive(Debug, Clone)]
 pub struct Panel {
@@ -91,6 +98,8 @@ pub struct Panel {
     pub size: (u32, u32),
     pub widgets: Vec<u64>,
     pub orientation: PanelOrientation,
+    pub autohide_mode: PanelAutoHideMode,
+    pub hidden: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -107,6 +116,20 @@ impl Panel {
             size: (1920, 48),
             widgets: Vec::new(),
             orientation,
+            autohide_mode: PanelAutoHideMode::Never,
+            hidden: false,
+        }
+    }
+
+    pub fn set_autohide_mode(&mut self, mode: PanelAutoHideMode) {
+        self.autohide_mode = mode;
+    }
+
+    pub fn update_autohide(&mut self, window_overlapping: bool) {
+        match self.autohide_mode {
+            PanelAutoHideMode::Never => self.hidden = false,
+            PanelAutoHideMode::Always => self.hidden = true,
+            PanelAutoHideMode::Intelligent => self.hidden = window_overlapping,
         }
     }
 
@@ -301,6 +324,39 @@ impl Default for Magnifier {
     }
 }
 
+/// GNOME-style Hot Corner Position
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotCornerPosition {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+}
+
+/// GNOME Hot Corner gesture trigger
+#[derive(Debug, Clone)]
+pub struct GnomeHotCorner {
+    pub position: HotCornerPosition,
+    pub action_command: String,
+    pub enabled: bool,
+}
+
+/// KDE Plasma Activity Workspace
+#[derive(Debug, Clone)]
+pub struct PlasmaActivity {
+    pub id: String,
+    pub name: String,
+    pub icon: String,
+    pub active_widgets: Vec<u64>,
+}
+
+/// Sway / Hyprland dynamic gap configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DesktopGaps {
+    pub inner_gap_px: u32,
+    pub outer_gap_px: u32,
+}
+
 /// Zenith Compositor
 pub struct ZenithCompositor {
     pub layout_style: LayoutStyle,
@@ -310,6 +366,10 @@ pub struct ZenithCompositor {
     pub screen_reader: ScreenReader,
     pub high_contrast: HighContrastMode,
     pub magnifier: Magnifier,
+    pub hot_corners: Vec<GnomeHotCorner>,
+    pub plasma_activities: BTreeMap<String, PlasmaActivity>,
+    pub active_activity: String,
+    pub desktop_gaps: DesktopGaps,
     pub framebuffer_width: u32,
     pub framebuffer_height: u32,
     next_widget_id: u64,
@@ -319,6 +379,17 @@ pub struct ZenithCompositor {
 
 impl ZenithCompositor {
     pub fn new(width: u32, height: u32) -> Self {
+        let mut activities = BTreeMap::new();
+        activities.insert(
+            "default".to_string(),
+            PlasmaActivity {
+                id: "default".to_string(),
+                name: "Main Desktop".to_string(),
+                icon: "desktop".to_string(),
+                active_widgets: Vec::new(),
+            },
+        );
+
         Self {
             layout_style: LayoutStyle::Grid,
             widgets: BTreeMap::new(),
@@ -327,11 +398,69 @@ impl ZenithCompositor {
             screen_reader: ScreenReader::default(),
             high_contrast: HighContrastMode::default(),
             magnifier: Magnifier::default(),
+            hot_corners: Vec::new(),
+            plasma_activities: activities,
+            active_activity: "default".to_string(),
+            desktop_gaps: DesktopGaps {
+                inner_gap_px: 5,
+                outer_gap_px: 10,
+            },
             framebuffer_width: width,
             framebuffer_height: height,
             next_widget_id: 1,
             next_panel_id: 1,
             next_animation_id: 1,
+        }
+    }
+
+    /// Add GNOME Hot Corner gesture
+    pub fn add_hot_corner(&mut self, position: HotCornerPosition, action_command: &str) {
+        self.hot_corners.push(GnomeHotCorner {
+            position,
+            action_command: action_command.to_string(),
+            enabled: true,
+        });
+    }
+
+    /// Trigger hot corner check by cursor position
+    pub fn check_hot_corner(&self, cursor_x: u32, cursor_y: u32) -> Option<String> {
+        for corner in &self.hot_corners {
+            if !corner.enabled {
+                continue;
+            }
+            let triggered = match corner.position {
+                HotCornerPosition::TopLeft => cursor_x == 0 && cursor_y == 0,
+                HotCornerPosition::TopRight => cursor_x >= self.framebuffer_width.saturating_sub(1) && cursor_y == 0,
+                HotCornerPosition::BottomLeft => cursor_x == 0 && cursor_y >= self.framebuffer_height.saturating_sub(1),
+                HotCornerPosition::BottomRight => cursor_x >= self.framebuffer_width.saturating_sub(1) && cursor_y >= self.framebuffer_height.saturating_sub(1),
+            };
+            if triggered {
+                return Some(corner.action_command.clone());
+            }
+        }
+        None
+    }
+
+    /// Register a KDE Plasma activity workspace
+    pub fn create_plasma_activity(&mut self, id: &str, name: &str, icon: &str) {
+        self.plasma_activities.insert(
+            id.to_string(),
+            PlasmaActivity {
+                id: id.to_string(),
+                name: name.to_string(),
+                icon: icon.to_string(),
+                active_widgets: Vec::new(),
+            },
+        );
+    }
+
+    /// Switch active KDE Plasma activity
+    pub fn switch_plasma_activity(&mut self, id: &str) -> bool {
+        if self.plasma_activities.contains_key(id) {
+            self.active_activity = id.to_string();
+            true
+        } else {
+            false
         }
     }
 
@@ -567,5 +696,31 @@ mod tests {
         compositor.magnifier.set_zoom_level(15.0);
 
         assert_eq!(compositor.magnifier.zoom_level, 10.0);
+    }
+
+    #[test]
+    fn test_plasma_activity_switching() {
+        let mut compositor = ZenithCompositor::new(1920, 1080);
+        compositor.create_plasma_activity("work", "Work Activity", "briefcase");
+        assert!(compositor.switch_plasma_activity("work"));
+        assert_eq!(compositor.active_activity, "work");
+    }
+
+    #[test]
+    fn test_gnome_hot_corner_gestures() {
+        let mut compositor = ZenithCompositor::new(1920, 1080);
+        compositor.add_hot_corner(HotCornerPosition::TopLeft, "overview");
+        assert_eq!(compositor.check_hot_corner(0, 0), Some("overview".to_string()));
+        assert_eq!(compositor.check_hot_corner(500, 500), None);
+    }
+
+    #[test]
+    fn test_xfce_panel_autohide() {
+        let mut panel = Panel::new(1, PanelOrientation::Horizontal);
+        panel.set_autohide_mode(PanelAutoHideMode::Intelligent);
+        panel.update_autohide(true);
+        assert!(panel.hidden);
+        panel.update_autohide(false);
+        assert!(!panel.hidden);
     }
 }

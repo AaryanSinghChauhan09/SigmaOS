@@ -1,17 +1,9 @@
-//! Display Manager (GDM/LightDM & Linux Mint MDM Inspiration)
-//! Login screen, session management, display server spawning, and MDM theme engine
-
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-
-use crate::customization::theme::{
-    MdmAccessibilitySettings, MdmPamAuthStage, MdmPowerAction, MdmThemeInfo, MdmUserAvatar,
-    SovereignMdmThemeEngine,
-};
+//! Display Manager (GDM/LightDM Inspiration)
+//! Login screen, session management, and display server spawning
 
 
 
+use crate::klib::{Vec, String};
 
 /// Session type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -56,13 +48,75 @@ impl User {
     }
 }
 
+/// MDM / SDDM Greeter Theme Style Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GreeterEngineStyle {
+    Html5WebKit, // MDM HTML5 animated greeter
+    QmlSddm,     // SDDM QML greeter
+    GtkLightDm,  // LightDM GTK greeter
+}
+
+/// Linux Mint MDM (Mint Display Manager) Greeter Theme Specification
+#[derive(Debug, Clone)]
+pub struct MdmGreeterTheme {
+    pub name: String,
+    pub engine_style: GreeterEngineStyle,
+    pub background_image_path: String,
+    pub logo_path: String,
+    pub show_user_list: bool,
+    pub allow_guest: bool,
+}
+
+impl MdmGreeterTheme {
+    pub fn new(name: &str, engine_style: GreeterEngineStyle) -> Self {
+        Self {
+            name: name.to_string(),
+            engine_style,
+            background_image_path: "/usr/share/mdm/themes/default/background.jpg".to_string(),
+            logo_path: "/usr/share/mdm/themes/default/logo.png".to_string(),
+            show_user_list: true,
+            allow_guest: false,
+        }
+    }
+}
+
+/// User Face Avatar & Session Memory Store
+#[derive(Debug, Clone)]
+pub struct UserSessionMemory {
+    pub user_id: u32,
+    pub face_icon_path: String,
+    pub last_selected_session: String,
+}
+
+/// On-Screen Accessibility Keyboard & High-Contrast Greeter Overlay
+pub struct GreeterAccessibilityOverlay {
+    pub onscreen_keyboard_enabled: bool,
+    pub high_contrast_enabled: bool,
+    pub screen_reader_enabled: bool,
+}
+
+impl GreeterAccessibilityOverlay {
+    pub fn new() -> Self {
+        Self {
+            onscreen_keyboard_enabled: false,
+            high_contrast_enabled: false,
+            screen_reader_enabled: false,
+        }
+    }
+
+    pub fn toggle_onscreen_keyboard(&mut self) {
+        self.onscreen_keyboard_enabled = !self.onscreen_keyboard_enabled;
+    }
+}
+
 /// Display manager
 pub struct DisplayManager {
     pub sessions: Vec<Session>,
     pub users: Vec<User>,
     pub autologin: Option<u32>,
     pub current_session: Option<String>,
-    pub mdm_theme_engine: SovereignMdmThemeEngine,
+    pub active_greeter_theme: Option<MdmGreeterTheme>,
+    pub accessibility_overlay: GreeterAccessibilityOverlay,
 }
 
 impl DisplayManager {
@@ -72,56 +126,9 @@ impl DisplayManager {
             users: Vec::new(),
             autologin: None,
             current_session: None,
-            mdm_theme_engine: SovereignMdmThemeEngine::new(),
+            active_greeter_theme: Some(MdmGreeterTheme::new("Mint-HTML5-Default", GreeterEngineStyle::Html5WebKit)),
+            accessibility_overlay: GreeterAccessibilityOverlay::new(),
         }
-    }
-
-    pub fn set_mdm_theme(&mut self, theme_name: &str) -> Result<(), &'static str> {
-        self.mdm_theme_engine.set_active_theme(theme_name)
-    }
-
-    pub fn get_active_mdm_theme(&self) -> Option<&MdmThemeInfo> {
-        self.mdm_theme_engine.get_active_theme()
-    }
-
-    pub fn discover_user_avatar(
-        &mut self,
-        username: &str,
-        real_name: &str,
-        face_path: &str,
-    ) -> &MdmUserAvatar {
-        self.mdm_theme_engine
-            .discover_user_avatar(username, real_name, face_path)
-    }
-
-    pub fn authenticate_user_pam(
-        &mut self,
-        username: &str,
-        credential: &str,
-        pam_type: &str,
-    ) -> MdmPamAuthStage {
-        self.mdm_theme_engine
-            .authenticate_pam(username, credential, pam_type)
-    }
-
-    pub fn render_greeter_canvas_frame(&mut self, now_ms: u64) -> Vec<(f32, f32, f32)> {
-        self.mdm_theme_engine.render_html5_canvas_frame(now_ms)
-    }
-
-    pub fn evaluate_monitor_layout(
-        &self,
-        monitors_count: u32,
-        active_monitor: u32,
-    ) -> (u32, u32, f32) {
-        self.mdm_theme_engine
-            .evaluate_monitor_layout(monitors_count, active_monitor)
-    }
-
-    pub fn dispatch_power_action(
-        &self,
-        action: MdmPowerAction,
-    ) -> Result<&'static str, &'static str> {
-        self.mdm_theme_engine.dispatch_power_action(action)
     }
 
     pub fn add_session(&mut self, session: Session) {
@@ -188,43 +195,28 @@ mod tests {
     }
 
     #[test]
-    fn test_display_manager_mdm_integration() {
-        let mut dm = DisplayManager::new();
+    fn test_mdm_greeter_theme() {
+        let theme = MdmGreeterTheme::new("Mint-Metallic", GreeterEngineStyle::Html5WebKit);
+        assert_eq!(theme.name, "Mint-Metallic");
+        assert_eq!(theme.engine_style, GreeterEngineStyle::Html5WebKit);
+    }
 
-        // Check active MDM theme
-        let theme = dm.get_active_mdm_theme().unwrap();
-        assert_eq!(theme.name, "Mint-Webkit-Sovereign");
+    #[test]
+    fn test_user_session_memory() {
+        let memory = UserSessionMemory {
+            user_id: 1000,
+            face_icon_path: "/var/lib/AccountsService/icons/user.png".to_string(),
+            last_selected_session: "Wayland".to_string(),
+        };
+        assert_eq!(memory.user_id, 1000);
+        assert_eq!(memory.last_selected_session, "Wayland");
+    }
 
-        // Change active theme
-        assert!(dm.set_mdm_theme("Adwaita-MDM").is_ok());
-        assert_eq!(dm.get_active_mdm_theme().unwrap().name, "Adwaita-MDM");
-
-        // User avatar discovery
-        let avatar = dm.discover_user_avatar("alice", "Alice Smith", "/home/alice/.face");
-        assert_eq!(avatar.username, "alice");
-
-        // PAM authentication
-        let auth = dm.authenticate_user_pam("alice", "correct_pass", "password");
-        assert_eq!(
-            auth,
-            MdmPamAuthStage::Authenticated {
-                username: "alice".to_string()
-            }
-        );
-
-        // Canvas frame rendering
-        let frame = dm.render_greeter_canvas_frame(100);
-        assert_eq!(frame.len(), 16);
-
-        // Monitor alignment evaluation
-        let (mon, scale_pct, scale_f) = dm.evaluate_monitor_layout(2, 0);
-        assert_eq!(mon, 0);
-        assert_eq!(scale_pct, 100);
-        assert_eq!(scale_f, 1.0);
-
-        // Power action dispatch
-        let power_res = dm.dispatch_power_action(MdmPowerAction::Reboot);
-        assert!(power_res.is_ok());
-        assert!(power_res.unwrap().contains("reboot"));
+    #[test]
+    fn test_greeter_accessibility_overlay() {
+        let mut overlay = GreeterAccessibilityOverlay::new();
+        assert!(!overlay.onscreen_keyboard_enabled);
+        overlay.toggle_onscreen_keyboard();
+        assert!(overlay.onscreen_keyboard_enabled);
     }
 }

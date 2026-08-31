@@ -1,8 +1,3 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
@@ -136,221 +131,6 @@ impl MDnsDiscovery {
 
     pub fn service_count(&self) -> usize {
         self.local_services_count.load(Ordering::Relaxed)
-    }
-}
-
-/// Linux (Avahi) & FreeBSD (mdnsd) inspired DNS Service Discovery (DNS-SD) Engine.
-/// Provides service browsing, PTR/SRV/TXT record resolution, and zeroconf service discovery.
-#[derive(Debug, Clone)]
-pub struct ServiceRecord {
-    pub name: String,
-    pub service_type: String,
-    pub domain: String,
-    pub port: u16,
-    pub txt_records: Vec<(String, String)>,
-}
-
-pub struct DnsServiceDiscoveryEngine {
-    pub registered_services: Vec<ServiceRecord>,
-    pub discovered_peers: Vec<ServiceRecord>,
-}
-
-impl DnsServiceDiscoveryEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_services: Vec::new(),
-            discovered_peers: Vec::new(),
-        }
-    }
-
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        service_type: &str,
-        port: u16,
-        txt_records: &[(&str, &str)],
-    ) -> Result<(), &'static str> {
-        if name.is_empty() || service_type.is_empty() {
-            return Err("DNS-SD: Service name and type cannot be empty");
-        }
-        let record = ServiceRecord {
-            name: name.to_string(),
-            service_type: service_type.to_string(),
-            domain: "local".to_string(),
-            port,
-            txt_records: txt_records.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
-        };
-        self.registered_services.push(record);
-        Ok(())
-    }
-
-    pub fn browse_services(&mut self, target_type: &str) -> Vec<ServiceRecord> {
-        let mut found = Vec::new();
-        for svc in &self.registered_services {
-            if target_type == "_services._dns-sd._udp.local" || svc.service_type == target_type {
-                found.push(svc.clone());
-            }
-        }
-        for peer in &self.discovered_peers {
-            if target_type == "_services._dns-sd._udp.local" || peer.service_type == target_type {
-                found.push(peer.clone());
-            }
-        }
-        found
-    }
-
-    pub fn add_peer_announcement(&mut self, record: ServiceRecord) {
-        if !self.discovered_peers.iter().any(|p| p.name == record.name && p.service_type == record.service_type) {
-            self.discovered_peers.push(record);
-        }
-    }
-}
-
-impl Default for DnsServiceDiscoveryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// FreeBSD (rtsold / ndp) & Linux (ip-neighbor) inspired IPv6 Neighbor Discovery Protocol (NDP) Engine.
-/// Handles Neighbor Solicitations (NS), Neighbor Advertisements (NA), and Router Advertisements (RA).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NdpNeighborState {
-    Incomplete,
-    Reachable,
-    Stale,
-    Delay,
-    Probe,
-}
-
-#[derive(Debug, Clone)]
-pub struct NdpNeighborEntry {
-    pub ipv6_addr: [u8; 16],
-    pub mac_addr: [u8; 6],
-    pub state: NdpNeighborState,
-    pub is_router: bool,
-    pub updated_timestamp: u64,
-}
-
-pub struct Ipv6NeighborDiscoveryEngine {
-    pub neighbor_table: Vec<NdpNeighborEntry>,
-    pub router_advertisements_received: usize,
-}
-
-impl Ipv6NeighborDiscoveryEngine {
-    pub fn new() -> Self {
-        Self {
-            neighbor_table: Vec::new(),
-            router_advertisements_received: 0,
-        }
-    }
-
-    pub fn process_neighbor_advertisement(
-        &mut self,
-        ipv6_addr: [u8; 16],
-        mac_addr: [u8; 6],
-        is_router: bool,
-        timestamp: u64,
-    ) {
-        if let Some(entry) = self.neighbor_table.iter_mut().find(|e| e.ipv6_addr == ipv6_addr) {
-            entry.mac_addr = mac_addr;
-            entry.state = NdpNeighborState::Reachable;
-            entry.is_router = is_router;
-            entry.updated_timestamp = timestamp;
-        } else {
-            self.neighbor_table.push(NdpNeighborEntry {
-                ipv6_addr,
-                mac_addr,
-                state: NdpNeighborState::Reachable,
-                is_router,
-                updated_timestamp: timestamp,
-            });
-        }
-    }
-
-    pub fn process_router_advertisement(&mut self, prefix: [u8; 16], router_mac: [u8; 6], timestamp: u64) {
-        self.router_advertisements_received += 1;
-        self.process_neighbor_advertisement(prefix, router_mac, true, timestamp);
-    }
-
-    pub fn lookup_mac(&self, ipv6_addr: &[u8; 16]) -> Option<[u8; 6]> {
-        self.neighbor_table
-            .iter()
-            .find(|e| e.ipv6_addr == *ipv6_addr && e.state == NdpNeighborState::Reachable)
-            .map(|e| e.mac_addr)
-    }
-}
-
-impl Default for Ipv6NeighborDiscoveryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Linux (gupnp / WSD) & OpenBSD network management inspired SSDP / UPnP & WS-Discovery Engine.
-/// Enables local network device enumeration, UPnP media/router discovery, and WS-Discovery printer/PC discovery.
-#[derive(Debug, Clone)]
-pub struct DiscoveredNetworkDevice {
-    pub uuid: String,
-    pub friendly_name: String,
-    pub location_url: String,
-    pub device_type: String,
-    pub discovery_protocol: String, // "SSDP", "UPnP", "WS-Discovery"
-}
-
-pub struct SsdpWsdDiscoveryEngine {
-    pub devices: Vec<DiscoveredNetworkDevice>,
-}
-
-impl SsdpWsdDiscoveryEngine {
-    pub fn new() -> Self {
-        Self { devices: Vec::new() }
-    }
-
-    pub fn send_ssdp_msearch(&mut self, target: &str) -> Vec<DiscoveredNetworkDevice> {
-        let mut results = Vec::new();
-        if target == "ssdp:all" || target == "urn:schemas-upnp-org:device:InternetGatewayDevice:1" {
-            let router = DiscoveredNetworkDevice {
-                uuid: "uuid:sigma-igw-01".to_string(),
-                friendly_name: "SigmaOS Sovereign Router Gateway".to_string(),
-                location_url: "http://192.168.1.1:49152/rootDesc.xml".to_string(),
-                device_type: "urn:schemas-upnp-org:device:InternetGatewayDevice:1".to_string(),
-                discovery_protocol: "SSDP".to_string(),
-            };
-            results.push(router);
-        }
-        for dev in &results {
-            if !self.devices.iter().any(|d| d.uuid == dev.uuid) {
-                self.devices.push(dev.clone());
-            }
-        }
-        results
-    }
-
-    pub fn send_wsd_probe(&mut self, device_type: &str) -> Vec<DiscoveredNetworkDevice> {
-        let mut results = Vec::new();
-        if device_type == "pub:PrintDeviceType" || device_type == "* " || device_type == "wsd:Device" {
-            let printer = DiscoveredNetworkDevice {
-                uuid: "urn:uuid:sigma-wsd-printer-01".to_string(),
-                friendly_name: "SigmaOS Network Laser Printer".to_string(),
-                location_url: "http://192.168.1.150:5357/wsd".to_string(),
-                device_type: "pub:PrintDeviceType".to_string(),
-                discovery_protocol: "WS-Discovery".to_string(),
-            };
-            results.push(printer);
-        }
-        for dev in &results {
-            if !self.devices.iter().any(|d| d.uuid == dev.uuid) {
-                self.devices.push(dev.clone());
-            }
-        }
-        results
-    }
-}
-
-impl Default for SsdpWsdDiscoveryEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -581,7 +361,7 @@ pub struct SshDaemon {
     pub config: SshdConfig,
     pub active_sessions: usize,
     pub max_sessions: usize,
-    pub failed_attempts: alloc::collections::BTreeMap<String, u32>, // IP -> Count
+    pub failed_attempts: std::collections::HashMap<String, u32>, // IP -> Count
     pub blocklisted_ips: Vec<String>,
 }
 
@@ -591,7 +371,7 @@ impl SshDaemon {
             config,
             active_sessions: 0,
             max_sessions,
-            failed_attempts: alloc::collections::BTreeMap::new(),
+            failed_attempts: std::collections::HashMap::new(),
             blocklisted_ips: Vec::new(),
         }
     }
@@ -1188,7 +968,7 @@ impl SnclLedgerProtocol {
 
 /// OpenBSD sshd Fail2ban brute-force protection registry
 pub struct SshdFail2banRegistry {
-    pub failed_attempts: alloc::collections::BTreeMap<String, u32>,
+    pub failed_attempts: std::collections::HashMap<String, u32>,
     pub max_attempts: u32,
     pub blocklisted_ips: Vec<String>,
 }
@@ -1196,7 +976,7 @@ pub struct SshdFail2banRegistry {
 impl SshdFail2banRegistry {
     pub fn new(max_attempts: u32) -> Self {
         Self {
-            failed_attempts: alloc::collections::BTreeMap::new(),
+            failed_attempts: std::collections::HashMap::new(),
             max_attempts,
             blocklisted_ips: Vec::new(),
         }
@@ -1335,40 +1115,6 @@ mod tests {
         assert_eq!(mdns.service_count(), 1);
         let local_ip = mdns.resolve_local_service("zenith.local").unwrap();
         assert_eq!(local_ip, [192, 168, 1, 50]);
-    }
-
-    #[test]
-    fn test_dns_sd_service_discovery_engine() {
-        let mut dns_sd = DnsServiceDiscoveryEngine::new();
-        dns_sd.register_service("Zenith Web", "_http._tcp.local", 8080, &[("path", "/dashboard")]).unwrap();
-        let services = dns_sd.browse_services("_http._tcp.local");
-        assert_eq!(services.len(), 1);
-        assert_eq!(services[0].name, "Zenith Web");
-        assert_eq!(services[0].port, 8080);
-        assert_eq!(services[0].txt_records[0], ("path".to_string(), "/dashboard".to_string()));
-    }
-
-    #[test]
-    fn test_ipv6_neighbor_discovery_engine() {
-        let mut ndp = Ipv6NeighborDiscoveryEngine::new();
-        let ip = [0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
-        let mac = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-        ndp.process_neighbor_advertisement(ip, mac, false, 100);
-        assert_eq!(ndp.lookup_mac(&ip), Some(mac));
-        ndp.process_router_advertisement([0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], mac, 101);
-        assert_eq!(ndp.router_advertisements_received, 1);
-    }
-
-    #[test]
-    fn test_ssdp_wsd_discovery_engine() {
-        let mut discovery = SsdpWsdDiscoveryEngine::new();
-        let ssdp_devices = discovery.send_ssdp_msearch("ssdp:all");
-        assert_eq!(ssdp_devices.len(), 1);
-        assert!(ssdp_devices[0].friendly_name.contains("Router Gateway"));
-
-        let wsd_devices = discovery.send_wsd_probe("wsd:Device");
-        assert_eq!(wsd_devices.len(), 1);
-        assert!(wsd_devices[0].friendly_name.contains("Laser Printer"));
     }
 
     #[test]

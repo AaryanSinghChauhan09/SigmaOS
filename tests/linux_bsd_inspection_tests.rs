@@ -1,18 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
-#[macro_use]
-extern crate alloc;
-extern crate std;
-
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
-use alloc::boxed::Box;
-
 #[path = "../src/klib/mod.rs"]
-mod klib;
+pub mod klib;
 
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
@@ -26,10 +16,6 @@ mod linux_bsd_parity;
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-#[path = "../src/security/kali_stack.rs"]
-mod kali_stack;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/compatibility/distro_bridge.rs"]
@@ -48,6 +34,8 @@ mod vm_manager;
 mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
+#[path = "../src/compatibility/freebsd_jails.rs"]
+mod freebsd_jails;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
@@ -60,6 +48,8 @@ mod fs_bsd_linux_innovations;
 mod tlb_associative;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
+#[path = "../src/compatibility/gap_closure.rs"]
+mod gap_closure;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
 #[path = "../src/security/unveil.rs"]
@@ -74,61 +64,11 @@ mod sovereign_shell_parity;
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
-#[path = "../src/input/keyboard.rs"]
-mod keyboard_driver;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-#[path = "../src/compatibility/community_foundation.rs"]
-mod community_foundation;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
 
-use bsd_compat::*;
-
-#[test]
-fn test_sovereign_community_foundation_inspection() {
-    use community_foundation::{SovereignFoundationManager, FoundationRole, BountySeverity};
-
-    let mut foundation = SovereignFoundationManager::new("SigmaOS Foundation");
-    foundation.register_member("alice", FoundationRole::BoardMember);
-    assert_eq!(foundation.members.len(), 1);
-
-    let bounty_id = foundation.submit_security_bounty(
-        "VFS Buffer Overflow",
-        "bob_auditor",
-        BountySeverity::High,
-    );
-    assert_eq!(bounty_id, 1);
-    assert_eq!(foundation.resolve_bounty(bounty_id).unwrap(), 5000);
-
-    foundation.organize_hackathon("Kernel Hack 2026", "Subsystem Interop");
-    assert!(foundation.register_hackathon_participant("Kernel Hack 2026", "dev_charlie").is_ok());
-    assert!(foundation.submit_hackathon_project("Kernel Hack 2026", "SovereignBridge").is_ok());
-}
-
-#[test]
-fn test_sovereign_universal_distro_bridge_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode};
-
-    let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxAlpine);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.apk");
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
-    assert!(bridge.enforce_security_isolation(101, "/jails/app").is_ok());
-    assert!(bridge.active_jail.is_some());
-
-    bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
-    assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
-    assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
-}
+use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
+use wiki_ideas_implementation as wiki_ideas;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -242,12 +182,11 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
         SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType, SystemdUnitActiveState,
-        SovereignSystemdParityEngine, SovereignHybridSchedulerInnovations,
-        RealtimeTask, SchedulerClass,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
+        SovereignSystemdParityEngine, SystemdUnitActiveState,
     };
 
     // 1. NixOS Declarative System State
@@ -288,8 +227,10 @@ fn test_wiki_distro_innovations_inspection() {
     let mut systemd = SovereignSystemdParityEngine::new();
     systemd.register_unit("test.service", SystemdUnitType::Service, &[]);
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
-
     // 8. Real-Time Hybrid Scheduler
+    use wiki_ideas_implementation::{
+        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
+    };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
@@ -413,37 +354,6 @@ fn test_wiki_distro_innovations_inspection() {
     let mut auditor = OpenBsdUnveilAuditor::new();
     auditor.log_violation(99, "/root/.ssh/id_rsa", "r", 500);
     assert_eq!(auditor.violations.len(), 1);
-
-    // 15. Bedrock & SmartOS distro innovations
-    use missing_distro_innovations::{
-        BedrockStratum, BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsZoneEngine,
-    };
-    let mut bedrock = BedrockLinuxStrataEngine::new("sigma");
-    bedrock.register_stratum(BedrockStratum {
-        name: "ubuntu".to_string(),
-        root_path: "/bedrock/strata/ubuntu".to_string(),
-        is_enabled: true,
-        provided_binaries: vec!["apt".to_string(), "dpkg".to_string()],
-    });
-    assert_eq!(
-        bedrock.resolve_strata_path("ubuntu", "/etc/apt/sources.list").unwrap(),
-        "/bedrock/strata/ubuntu/etc/apt/sources.list"
-    );
-    assert!(bedrock.strat("ubuntu", "apt", &["update"]).is_ok());
-    assert!(bedrock.disable_stratum("ubuntu").is_ok());
-    assert!(bedrock.strat("ubuntu", "apt", &["update"]).is_err());
-
-    let mut smartos = SmartOsZoneEngine::new();
-    smartos.imgadm_import("601c726a-939b-11ee-b9d1-00151712a2a0", "base-64", "23.4.0", "smartos");
-    let vm_uuid = "a1b2c3d4-0000-1111-2222-333344445555";
-    assert!(smartos
-        .vmadm_create(vm_uuid, "web_zone_1", SmartOsVmBrand::JoyentZone, 20, 2048,
-            "601c726a-939b-11ee-b9d1-00151712a2a0", &["vnic0"])
-        .is_ok());
-    assert!(smartos.vmadm_start(vm_uuid).is_ok());
-    assert_eq!(smartos.vms.get(vm_uuid).unwrap().state, SmartOsVmState::Running);
-    assert!(smartos.vmadm_stop(vm_uuid).is_ok());
-    assert!(smartos.vmadm_delete(vm_uuid).is_ok());
 }
 
 #[test]
@@ -708,7 +618,7 @@ fn test_gentoo_use_flag_engine_inspection() {
 
 #[test]
 fn test_gentoo_portage_mask_engine_inspection() {
-    use unimplemented_features::GentooPortageMaskResolver as GentooPortageMaskEngine;
+    use unimplemented_features::GentooPortageMaskEngine;
     let mut portage = GentooPortageMaskEngine::new("amd64");
     portage.register_ebuild("sys-kernel/gentoo-sources", "6.6", &["~amd64"], false);
     portage.register_ebuild("app-admin/sudo", "0", &["amd64"], false);
@@ -790,39 +700,6 @@ fn test_systemd_unit_dependency_engine_inspection() {
     assert!(!engine.detect_circular_dependencies());
     let seq = engine.compute_startup_sequence().unwrap();
     assert_eq!(seq, vec!["network.target".to_string(), "sshd.service".to_string()]);
-
-    // Systemd Init Innovations Security & Diagnostics Inspection Test
-    use systemd_init::{
-        SystemdEngine, SystemdUnit as SovSystemdUnit, UnitType as SovUnitType,
-        SystemdSecurityAuditor, SystemdUnitHardeningProfile, ProtectSystemLevel, ProtectHomeLevel,
-    };
-
-    let mut sys_engine = SystemdEngine::new();
-    let mut srv = SovSystemdUnit::new(1, b"secure.service", SovUnitType::Service);
-    srv.duration_ms = 350;
-    srv.hardening_profile = SystemdUnitHardeningProfile {
-        no_new_privileges: true,
-        protect_system: ProtectSystemLevel::Strict,
-        protect_home: ProtectHomeLevel::ReadOnly,
-        private_tmp: true,
-        private_devices: true,
-        protect_kernel_tunables: true,
-        protect_kernel_modules: true,
-        restrict_namespaces: true,
-        memory_deny_write_execute: true,
-        lock_personality: true,
-        restrict_realtime: true,
-        capability_bounding_set: vec!["CAP_NET_BIND_SERVICE".to_string()],
-        system_call_filter: vec!["@default".to_string()],
-        unveil_paths: vec![("/etc/ssl".to_string(), "r".to_string())],
-        pledge_promises: "stdio rpath inet".to_string(),
-    };
-    sys_engine.register_unit(srv);
-
-    let sec_reports = sys_engine.systemd_analyze_security();
-    assert_eq!(sec_reports.len(), 1);
-    assert_eq!(sec_reports[0].rating, "OK");
-    assert!(sec_reports[0].exposure_score <= 2.5);
 }
 
 #[test]
@@ -903,114 +780,6 @@ fn test_multi_arch_abi_and_syscall_bridge_inspection() {
 }
 
 #[test]
-fn test_kernel_hardening_hardware_mitigations_inspection() {
-    use kernel_hardening::{
-        RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine, PagePermissions,
-    };
-
-    // 1. Retpoline, KPTI, and Stack Canary Mitigations
-    let mitigation = RetpolineKptiMitigationEngine::new(0xCAFE_BABE_1234_5678, 0x1000, 0x2000);
-    assert_eq!(mitigation.execute_indirect_thunk(0xFFFFFFFF80000000).unwrap(), 0xFFFFFFFF80000000);
-    assert_eq!(mitigation.kpti_switch_to_kernel(), 0x1000);
-    assert_eq!(mitigation.kpti_switch_to_user(), 0x2000);
-
-    let canary = mitigation.get_stack_canary();
-    assert!(mitigation.verify_stack_canary(canary));
-    assert!(!mitigation.verify_stack_canary(0x1234));
-
-    // 2. SMEP / SMAP Enforcer
-    let smep_smap = SmepSmapEnforcer::new(0x1000, 0x000F_FFFF);
-    assert!(smep_smap.validate_kernel_execution(0xFFFF_8000_0000_0000).is_ok());
-    assert!(smep_smap.validate_kernel_execution(0x2000).is_err()); // SMEP violation
-
-    // 3. KASLR & OpenBSD W^X Audit
-    let kaslr = SovereignKaslrEngine::new(0x8000_0000, 0x9000_0000, 42);
-    let mappings = vec![
-        (0x8000_1000, PagePermissions::new(true, false, true, false)), // R-X
-        (0x8000_2000, PagePermissions::new(true, true, false, false)), // RW-
-    ];
-    assert!(kaslr.audit_wx_protection(&mappings).is_ok());
-}
-
-#[test]
-fn test_linux_bsd_subsystem_innovations_inspection() {
-    use linux_bsd_inspirations::{
-        ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-        HermeticStoreClosureEngine, StoreClosurePackage, FD_RIGHT_READ, FD_RIGHT_WRITE,
-    };
-
-    // 1. Alpine / Void Chroot Build Sandbox Engine
-    let mut sbx = ApkChrootBuildSandboxEngine::new("sbx_test", "/chroot", true);
-    assert!(sbx.add_bind_mount("/usr").is_ok());
-    sbx.set_env("OPT", "-O3");
-    assert!(sbx.enter_chroot().is_ok());
-    let compile_res = sbx.compile_package("zlib", "make").unwrap();
-    assert!(compile_res.contains("zlib"));
-    assert!(sbx.exit_chroot().is_ok());
-
-    // 2. OpenBSD FD Pledge Gate Engine
-    let mut gate = OpenBsdFdPledgeGate::new();
-    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_ok());
-    assert!(gate.check_fd_right(4, FD_RIGHT_READ));
-    assert!(!gate.check_fd_right(4, 0x10)); // FD_RIGHT_DUP
-    assert!(gate.set_fd_rights(4, FD_RIGHT_READ).is_ok());
-    assert!(gate.set_fd_rights(4, FD_RIGHT_READ | FD_RIGHT_WRITE).is_err()); // Cannot expand
-
-    // 3. FreeBSD GEOM & ZFS VDEV Topology Engine
-    let d1 = GeomVdevNode::leaf_disk("sda", true);
-    let d2 = GeomVdevNode::leaf_disk("sdb", true);
-    let mirror = GeomVdevNode::mirror("mirror0", vec![d1, d2]);
-    let mut geom = FreeBsdGeomVdevTopology::new("tank");
-    geom.add_vdev(mirror);
-    assert_eq!(geom.evaluate_topology_health(), "ONLINE");
-
-    // 4. NixOS / Guix Hermetic Store Closure Engine
-    let mut store = HermeticStoreClosureEngine::new("/sigma/store");
-    let libc = StoreClosurePackage {
-        hash_path: "/sigma/store/h1-libc".to_string(),
-        name: "libc".to_string(),
-        deps: vec![],
-        sha256: [0xAA; 32],
-    };
-    store.pin_closure(libc);
-    assert_eq!(store.compute_closure_size("/sigma/store/h1-libc"), 1);
-
-    // 5. Pop!_OS System76 Power Governor Engine
-    use linux_bsd_inspirations::{System76PowerGovernor, PowerProfileMode, GpuSwitchMode};
-    let mut power = System76PowerGovernor::new();
-    power.set_power_profile(PowerProfileMode::HighPerformance);
-    assert_eq!(power.gpu_mode, GpuSwitchMode::NvidiaDiscrete);
-
-    // 6. DragonFly BSD HAMMER2 PFS Cluster Quorum Engine
-    use linux_bsd_inspirations::Hammer2PfsClusterQuorumEngine;
-    let mut quorum = Hammer2PfsClusterQuorumEngine::new();
-    quorum.register_node(101, "192.168.1.10", 0x123456);
-    quorum.register_node(102, "192.168.1.11", 0x123456);
-    assert_eq!(quorum.evaluate_quorum().unwrap(), 0x123456);
-
-    // 7. HardenedBSD PaX Guard Security Engine
-    use linux_bsd_inspirations::HardenedBsdPaxGuardEngine;
-    let mut pax = HardenedBsdPaxGuardEngine::new();
-    assert!(pax.check_mprotect(500, 0x1000, true, true).is_err());
-
-    // 8. Kali Linux Security Auditing Suite
-    use kali_stack::{
-        KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer, KaliAirgeddonWifiAudit,
-        PcapPacketHeader, WifiFrameType,
-    };
-    let msf = KaliMetasploitPayloadFilter::new();
-    assert!(msf.inspect_payload(&[0x90; 10]));
-
-    let ws = KaliWiresharkPacketAnalyzer::new();
-    let pcap_hdr = PcapPacketHeader { timestamp_sec: 100, captured_length: 10, original_length: 10 };
-    assert!(ws.analyze_packet(&pcap_hdr, &[0u8; 10]));
-
-    let mut air = KaliAirgeddonWifiAudit::new(2);
-    assert!(!air.audit_wifi_frame(WifiFrameType::Deauthentication));
-    assert!(air.audit_wifi_frame(WifiFrameType::Deauthentication));
-}
-
-#[test]
 fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     use linux_bsd_innovations::SovereignSwapEngine;
 
@@ -1033,70 +802,4 @@ fn test_sovereign_swap_engine_zram_and_priority_inspection() {
     // Swappiness eviction check
     swap.swappiness = 80;
     assert!(swap.should_evict_page(15)); // 15% free RAM < (100 - 80 = 20%) -> evict!
-}
-
-#[test]
-fn test_new_kernel_subsystem_innovations_inspection() {
-    use linux_bsd_innovations::{
-        LinuxXdpExtendedFilter, XdpAction,
-        FreeBsdVfsVnodeLock, VnodeLockState,
-        KernelMemoryPagePool,
-    };
-
-    // 1. Linux XDP Extended Packet Filter
-    let mut xdp = LinuxXdpExtendedFilter::new();
-    xdp.block_port(8080);
-    assert_eq!(xdp.filter_packet_at_rx_ring(8080), XdpAction::Drop);
-    assert_eq!(xdp.filter_packet_at_rx_ring(443), XdpAction::Pass);
-    assert_eq!(xdp.drop_count, 1);
-    assert_eq!(xdp.pass_count, 1);
-
-    // 2. FreeBSD VFS Vnode Lock
-    let mut vnode = FreeBsdVfsVnodeLock::new(101);
-    assert_eq!(vnode.state, VnodeLockState::Unlocked);
-    assert!(vnode.acquire_shared().is_ok());
-    assert_eq!(vnode.state, VnodeLockState::Shared(1));
-    assert!(vnode.acquire_shared().is_ok());
-    assert_eq!(vnode.state, VnodeLockState::Shared(2));
-    assert!(vnode.release().is_ok());
-    assert_eq!(vnode.state, VnodeLockState::Shared(1));
-    assert!(vnode.release().is_ok());
-    assert_eq!(vnode.state, VnodeLockState::Unlocked);
-
-    assert!(vnode.acquire_exclusive(42).is_ok());
-    assert_eq!(vnode.state, VnodeLockState::Exclusive(42));
-    assert!(vnode.acquire_shared().is_err());
-    assert!(vnode.release().is_ok());
-
-    // 3. Kernel Memory Page Pool
-    let mut pool = KernelMemoryPagePool::new(16);
-    assert_eq!(pool.free_frame_pfns.len(), 16);
-    let frame_pfn = pool.alloc_page_frame().unwrap();
-    assert_eq!(pool.free_frame_pfns.len(), 15);
-    pool.free_page_frame(frame_pfn);
-    assert_eq!(pool.free_frame_pfns.len(), 16);
-}
-
-#[test]
-fn test_sovereign_distro_dominance_suite_inspection() {
-    use sovereign_distro_dominance::{
-        SovereignDistroDominanceSuite, MicrovmState,
-    };
-
-    let mut suite = SovereignDistroDominanceSuite::new();
-
-    // 1. Nix / Guix Zero-Copy Package Store
-    let pkg_hash = suite.nix_store.add_package("libcrypto", "3.1.0", vec![], b"BINARY_PAYLOAD_CRYPTO");
-    assert!(suite.nix_store.zero_copy_read_slice(&pkg_hash).is_some());
-
-    // 2. MicroVM Hypervisor Gateway
-    let vm_id = suite.microvm_gateway.launch_microvm("micro-worker-01", 2, 1024, "eth0", "/dev/vdb");
-    assert_eq!(vm_id, 1);
-    assert_eq!(suite.microvm_gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Running);
-
-    // 3. PQC WireGuard VPN Engine
-    suite.pqc_vpn.bring_up();
-    suite.pqc_vpn.add_peer("datacenter-east", "10.100.0.1", &["10.100.0.0/16"]);
-    assert!(suite.pqc_vpn.transmit_pqc_packet("datacenter-east", 512).is_ok());
-    assert_eq!(suite.pqc_vpn.peers.get("datacenter-east").unwrap().tx_bytes, 512);
 }

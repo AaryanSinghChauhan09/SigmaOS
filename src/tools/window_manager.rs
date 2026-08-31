@@ -16,6 +16,7 @@ pub struct Window {
     pub workspace: u32,
     pub floating: bool,
     pub fullscreen: bool,
+    pub freebsd_jail_tag: Option<String>,
 }
 
 impl Window {
@@ -27,7 +28,12 @@ impl Window {
             workspace: 1,
             floating: false,
             fullscreen: false,
+            freebsd_jail_tag: None,
         }
+    }
+
+    pub fn set_freebsd_jail_tag(&mut self, jail_name: &str) {
+        self.freebsd_jail_tag = Some(jail_name.to_string());
     }
 
     pub fn set_workspace(&mut self, workspace: u32) {
@@ -233,5 +239,12 @@ mod tests {
         let workspace = Workspace::new(1, "1");
         wm.add_workspace(workspace);
         assert_eq!(wm.workspaces.len(), 1);
+    }
+
+    #[test]
+    fn test_freebsd_jail_window_tag() {
+        let mut window = Window::new("win1", "Firefox Jail", 4001);
+        window.set_freebsd_jail_tag("browser_jail");
+        assert_eq!(window.freebsd_jail_tag, Some("browser_jail".to_string()));
     }
 }

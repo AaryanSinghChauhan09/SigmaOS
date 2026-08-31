@@ -1,6 +1,3 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 // SigmaOS Round-Robin Scheduler
 // Enhanced priority-aware round-robin with process yielding and context tracking
 
@@ -462,11 +459,7 @@ impl SovereignMultiQueueRoundRobin {
         self.total_switches += 1;
 
         // 1. Realtime SCHED_RR / SCHED_FIFO queue
-        if let Some(pos) = self
-            .realtime_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.realtime_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let mut task = self.realtime_queue.remove(pos);
             if task.policy == SchedPolicy::SchedRr {
                 // Re-enqueue at back of RT queue after picking
@@ -478,11 +471,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 2. High priority queue
-        if let Some(pos) = self
-            .high_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.high_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.high_queue.remove(pos);
             let mut queued = task.clone();
             self.high_queue.push(queued);
@@ -490,11 +479,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 3. Normal queue
-        if let Some(pos) = self
-            .normal_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.normal_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.normal_queue.remove(pos);
             let mut queued = task.clone();
             self.normal_queue.push(queued);
@@ -502,11 +487,7 @@ impl SovereignMultiQueueRoundRobin {
         }
 
         // 4. Idle queue
-        if let Some(pos) = self
-            .idle_queue
-            .iter()
-            .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
-        {
+        if let Some(pos) = self.idle_queue.iter().position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready) {
             let task = self.idle_queue.remove(pos);
             let mut queued = task.clone();
             self.idle_queue.push(queued);
@@ -517,11 +498,7 @@ impl SovereignMultiQueueRoundRobin {
     }
 
     pub fn tick_cpu(&mut self, cpu_id: u8) {
-        for queue in [
-            &mut self.realtime_queue,
-            &mut self.high_queue,
-            &mut self.normal_queue,
-        ] {
+        for queue in [&mut self.realtime_queue, &mut self.high_queue, &mut self.normal_queue] {
             for task in queue.iter_mut() {
                 if task.cpu_id == cpu_id && task.state == ProcessState::Running {
                     if task.time_slice_remaining_ms > 0 {
@@ -740,15 +717,9 @@ mod tests {
         assert_eq!(scheduler.dynamic_time_slice(10), 10);
 
         // Add 3 more processes -> ready count = 4
-        scheduler
-            .add_process(Process::new(2, "task2".to_string(), Priority::Normal))
-            .unwrap();
-        scheduler
-            .add_process(Process::new(3, "task3".to_string(), Priority::Normal))
-            .unwrap();
-        scheduler
-            .add_process(Process::new(4, "task4".to_string(), Priority::Normal))
-            .unwrap();
+        scheduler.add_process(Process::new(2, "task2".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(3, "task3".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(4, "task4".to_string(), Priority::Normal)).unwrap();
 
         // 4 ready tasks -> target_latency (40) / 4 = 10
         assert_eq!(scheduler.dynamic_time_slice(10), 10);
