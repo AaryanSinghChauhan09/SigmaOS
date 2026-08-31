@@ -87,6 +87,126 @@ impl Default for SovereignFileManager {
     }
 }
 
+/// Distro-inspired Folder Color representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FolderColor {
+    pub name: String,
+    pub hex_code: String,
+    pub rgb: (u8, u8, u8),
+}
+
+impl FolderColor {
+    pub fn new(name: &str, hex_code: &str, rgb: (u8, u8, u8)) -> Self {
+        Self {
+            name: name.to_string(),
+            hex_code: hex_code.to_string(),
+            rgb,
+        }
+    }
+}
+
+/// Linux and BSD Distro Folder Color Presets
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroFolderColorPreset {
+    UbuntuOrange,
+    PopTeal,
+    MintAqua,
+    FedoraBlue,
+    ElementaryRed,
+    FreeBsdCrimson,
+    OpenBsdOnyx,
+    ManjaroEmerald,
+    ArchCyan,
+}
+
+impl DistroFolderColorPreset {
+    pub fn to_folder_color(self) -> FolderColor {
+        match self {
+            DistroFolderColorPreset::UbuntuOrange => {
+                FolderColor::new("Ubuntu Yaru Orange", "#E95420", (233, 84, 32))
+            }
+            DistroFolderColorPreset::PopTeal => {
+                FolderColor::new("Pop!_OS Teal", "#48B9C7", (72, 185, 199))
+            }
+            DistroFolderColorPreset::MintAqua => {
+                FolderColor::new("Linux Mint Aqua", "#2A9D8F", (42, 157, 143))
+            }
+            DistroFolderColorPreset::FedoraBlue => {
+                FolderColor::new("Fedora Adwaita Blue", "#3584E4", (53, 132, 228))
+            }
+            DistroFolderColorPreset::ElementaryRed => {
+                FolderColor::new("ElementaryOS Red", "#E74C3C", (231, 76, 60))
+            }
+            DistroFolderColorPreset::FreeBsdCrimson => {
+                FolderColor::new("FreeBSD Daemon Crimson", "#AB1212", (171, 18, 18))
+            }
+            DistroFolderColorPreset::OpenBsdOnyx => {
+                FolderColor::new("OpenBSD Onyx", "#222222", (34, 34, 34))
+            }
+            DistroFolderColorPreset::ManjaroEmerald => {
+                FolderColor::new("Manjaro Emerald", "#13A10E", (19, 161, 14))
+            }
+            DistroFolderColorPreset::ArchCyan => {
+                FolderColor::new("Arch Cyan", "#1793D1", (23, 147, 209))
+            }
+        }
+    }
+}
+
+/// Folder Color Switcher Engine inspired by Linux & BSD desktop managers
+pub struct FolderColorSwitcher {
+    pub active_preset: Option<DistroFolderColorPreset>,
+    pub custom_colors: Vec<FolderColor>,
+}
+
+impl FolderColorSwitcher {
+    pub fn new() -> Self {
+        Self {
+            active_preset: None,
+            custom_colors: Vec::new(),
+        }
+    }
+
+    pub fn set_preset(&mut self, preset: DistroFolderColorPreset) {
+        self.active_preset = Some(preset);
+    }
+
+    pub fn get_preset_color(&self, preset: DistroFolderColorPreset) -> FolderColor {
+        preset.to_folder_color()
+    }
+
+    pub fn add_custom_color(&mut self, color: FolderColor) {
+        self.custom_colors.push(color);
+    }
+
+    pub fn colorize_file(&self, file: &mut File, color: &FolderColor) -> Result<(), FMError> {
+        if !file.is_directory {
+            return Err(FMError::OperationFailed);
+        }
+        file.color_tag = Some(color.hex_code.clone());
+        Ok(())
+    }
+
+    pub fn colorize_files_with_preset(
+        &self,
+        files: &mut [File],
+        preset: DistroFolderColorPreset,
+    ) {
+        let color = preset.to_folder_color();
+        for file in files.iter_mut() {
+            if file.is_directory {
+                file.color_tag = Some(color.hex_code.clone());
+            }
+        }
+    }
+}
+
+impl Default for FolderColorSwitcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// File
 #[derive(Debug, Clone)]
 pub struct File {
@@ -95,6 +215,7 @@ pub struct File {
     pub size: u64,
     pub is_directory: bool,
     pub is_hidden: bool,
+    pub color_tag: Option<String>,
 }
 
 impl File {
@@ -105,11 +226,16 @@ impl File {
             size: 0,
             is_directory,
             is_hidden: name.starts_with('.'),
+            color_tag: None,
         }
     }
 
     pub fn set_size(&mut self, size: u64) {
         self.size = size;
+    }
+
+    pub fn set_color_tag(&mut self, color_hex: Option<&str>) {
+        self.color_tag = color_hex.map(|s| s.to_string());
     }
 }
 
@@ -159,6 +285,7 @@ pub struct FileManager {
     pub selected_files: Vec<File>,
     pub clipboard: Clipboard,
     pub bookmarks: Vec<String>,
+    pub folder_color_switcher: FolderColorSwitcher,
 }
 
 impl FileManager {
@@ -172,7 +299,28 @@ impl FileManager {
                 "/".to_string(),
                 "/tmp".to_string(),
             ],
+            folder_color_switcher: FolderColorSwitcher::new(),
         }
+    }
+
+    pub fn set_folder_color(&mut self, file_path: &str, color: FolderColor) -> Result<(), FMError> {
+        if let Some(file) = self.selected_files.iter_mut().find(|f| f.path == file_path) {
+            self.folder_color_switcher.colorize_file(file, &color)
+        } else {
+            Err(FMError::FileNotFound)
+        }
+    }
+
+    pub fn get_folder_color(&self, file_path: &str) -> Option<String> {
+        self.selected_files
+            .iter()
+            .find(|f| f.path == file_path)
+            .and_then(|f| f.color_tag.clone())
+    }
+
+    pub fn apply_distro_folder_theme(&mut self, preset: DistroFolderColorPreset) {
+        self.folder_color_switcher
+            .colorize_files_with_preset(&mut self.selected_files, preset);
     }
 
     pub fn navigate(&mut self, path: &str) {
@@ -273,5 +421,58 @@ mod tests {
         let mut fm = FileManager::new();
         fm.navigate("/tmp");
         assert_eq!(fm.current_directory, "/tmp");
+    }
+
+    #[test]
+    fn test_folder_color_switcher_and_presets() {
+        let switcher = FolderColorSwitcher::new();
+        let ubuntu_color = switcher.get_preset_color(DistroFolderColorPreset::UbuntuOrange);
+        assert_eq!(ubuntu_color.hex_code, "#E95420");
+        assert_eq!(ubuntu_color.rgb, (233, 84, 32));
+
+        let freebsd_color = switcher.get_preset_color(DistroFolderColorPreset::FreeBsdCrimson);
+        assert_eq!(freebsd_color.hex_code, "#AB1212");
+
+        let mut folder = File::new("Documents", "/home/user/Documents", true);
+        let mut reg_file = File::new("file.txt", "/home/user/file.txt", false);
+
+        assert!(switcher.colorize_file(&mut folder, &ubuntu_color).is_ok());
+        assert_eq!(folder.color_tag, Some("#E95420".to_string()));
+
+        assert_eq!(
+            switcher.colorize_file(&mut reg_file, &ubuntu_color),
+            Err(FMError::OperationFailed)
+        );
+    }
+
+    #[test]
+    fn test_file_manager_distro_folder_theme() {
+        let mut fm = FileManager::new();
+        let folder1 = File::new("Photos", "/home/user/Photos", true);
+        let folder2 = File::new("Videos", "/home/user/Videos", true);
+        let file1 = File::new("notes.txt", "/home/user/notes.txt", false);
+
+        fm.select_file(folder1);
+        fm.select_file(folder2);
+        fm.select_file(file1);
+
+        fm.apply_distro_folder_theme(DistroFolderColorPreset::PopTeal);
+
+        assert_eq!(
+            fm.get_folder_color("/home/user/Photos"),
+            Some("#48B9C7".to_string())
+        );
+        assert_eq!(
+            fm.get_folder_color("/home/user/Videos"),
+            Some("#48B9C7".to_string())
+        );
+        assert_eq!(fm.get_folder_color("/home/user/notes.txt"), None);
+
+        let custom_color = FolderColor::new("Custom Purple", "#8E44AD", (142, 68, 173));
+        assert!(fm.set_folder_color("/home/user/Photos", custom_color).is_ok());
+        assert_eq!(
+            fm.get_folder_color("/home/user/Photos"),
+            Some("#8E44AD".to_string())
+        );
     }
 }

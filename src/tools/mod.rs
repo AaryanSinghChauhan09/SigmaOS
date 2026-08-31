@@ -1,9 +1,14 @@
 // SigmaTools Module
 // System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
 
+pub mod file_manager;
 pub mod sigmatools;
 pub mod sovereign_commands;
 
+pub use file_manager::{
+    DistroFolderColorPreset, File as FileManagerFile, FileManager, FMError, FolderColor,
+    FolderColorSwitcher,
+};
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
     SigmaIdentity, SigmaToolError, SovereignAptDuo, SovereignDpkgEtcher, SovereignImageToDataUri,
