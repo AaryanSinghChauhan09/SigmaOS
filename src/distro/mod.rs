@@ -37,6 +37,13 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod wiki_ideas_implementation;
+pub mod sovereign_system_innovations;
+
+pub use sovereign_system_innovations::{
+    AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
+    GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler, UnifiedFirewallVpnOrchestrator,
+    VisualPolicyRule, VisualSandboxPolicyManager, WorkloadType, WmLayoutMode,
+};
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
