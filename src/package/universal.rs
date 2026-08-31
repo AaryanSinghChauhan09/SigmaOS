@@ -5,6 +5,9 @@ use alloc::format;
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 use crate::klib::HashMap;
+use crate::runtime::node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+};
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -744,6 +747,7 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    pub node_distro_engine: NodeBinaryDistroEngine,
 }
 
 impl UniversalPackageManager {
@@ -756,10 +760,33 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
+            node_distro_engine: NodeBinaryDistroEngine::new(),
         };
 
         manager.add_default_adapters();
         manager
+    }
+
+    /// Register and install a Node.js binary distribution runtime into the isolated store
+    pub fn install_node_runtime(
+        &mut self,
+        package: &NodeBinaryPackage,
+        bytes: &[u8],
+        npm_version: &str,
+    ) -> Result<String, PackageError> {
+        let store_path = self
+            .node_distro_engine
+            .install_to_store(package, bytes, npm_version)
+            .map_err(|e| PackageError::InstallationFailed(e.to_string()))?;
+
+        let mut pkg = UnifiedPackage::new(format!("nodejs-{}", package.version), package.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides("nodejs".to_string());
+        pkg.installed = true;
+
+        self.installed_packages
+            .insert(format!("nodejs-{}", package.version), pkg);
+        Ok(store_path)
     }
 
     /// Registers a user-defined lifecycle hook
@@ -1459,5 +1486,36 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_universal_package_manager_node_runtime_integration() {
+        let mut manager = UniversalPackageManager::new();
+        let bytes = vec![0x42u8; 120];
+        let mut hash = [0u8; 32];
+        let mut state: u64 = 0xcbf29ce484222325;
+        for (i, &b) in bytes.iter().enumerate() {
+            state ^= b as u64;
+            state = state.wrapping_mul(0x100000001b3);
+            hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
+        }
+
+        let node_pkg = NodeBinaryPackage::new(
+            "v20.11.0",
+            NodeReleaseStream::Lts,
+            NodeTargetArch::X86_64,
+            LibcFlavor::Musl,
+            "https://dist.sigmaos.org/node/v20.11.0.tar.xz",
+            hash,
+            [0u8; 64],
+            120,
+        );
+
+        let path = manager.install_node_runtime(&node_pkg, &bytes, "10.2.4").unwrap();
+        assert!(path.starts_with("/sovereign/store/node-v20.11.0-"));
+
+        let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
+        assert_eq!(installed_pkg.version, "v20.11.0");
+        assert!(installed_pkg.installed);
     }
 }
