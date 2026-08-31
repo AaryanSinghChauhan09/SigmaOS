@@ -96,13 +96,13 @@ pub use vault::{
     VaultResult,
 };
 pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, PiaDedicatedIpBinding,
+    PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient,
+    SplitTunnelRule, VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler,
+    VpnStatistics, WireGuardHandler,
 };
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
     SimpleVulnerabilityScanner,
 };
-
-

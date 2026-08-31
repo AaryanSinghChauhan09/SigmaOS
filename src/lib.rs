@@ -82,7 +82,9 @@ pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
     PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
     KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
-    PcapPacketHeader, WifiFrameType,
+    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
