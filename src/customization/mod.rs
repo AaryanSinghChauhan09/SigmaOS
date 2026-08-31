@@ -1,5 +1,4 @@
 // SigmaOS Customization Module
-pub mod cursor;
 pub mod profile;
 pub mod routines;
 pub mod theme;
@@ -14,6 +13,9 @@ pub use profile::{
     ProfileSwitcher, ZenithProfile,
 };
 
-pub use cursor::{
-    CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine,
+pub use theme::{
+    CanvasParticle, IconThemeEngine, MdmAccessibilitySettings, MdmBackgroundType,
+    MdmMonitorPosition, MdmMultiMonitorConfig, MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind,
+    MdmThemeInfo, MdmUserAvatar, SigmaSoundscape, SovereignCssColorEngine, SovereignMdmThemeEngine,
+    ThemeEngine, ThemeProvider, ZenithBackdropFilter,
 };

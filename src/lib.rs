@@ -184,3 +184,11 @@ pub use ui::gtk::{
     GtkCssProvider, GtkHeaderBar, GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine,
     XAppStatusIconManager,
 };
+
+pub use customization::{
+    MdmAccessibilitySettings, MdmBackgroundType, MdmMonitorPosition, MdmMultiMonitorConfig,
+    MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind, MdmThemeInfo, MdmUserAvatar,
+    SovereignMdmThemeEngine,
+};
+
+pub use tools::display_manager::{DMError, DisplayManager, Session, SessionType, User};
