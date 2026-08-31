@@ -1005,4 +1005,19 @@ mod tests {
         assert_eq!(checked, 1);
         assert_eq!(corrupted, 0);
     }
+
+    #[test]
+    fn test_linux_bsd_automation_triggers() {
+        let mut manager = SystemAutomationManager::new();
+        let rule = SystemAutomationRule::new(
+            "ebpf_net_rule".to_string(),
+            "eBPF Fast Path Filter Trigger".to_string(),
+            SystemEventType::LinuxEBPFNetworkFilter,
+        )
+        .with_action(SystemAction::BalanceLoad);
+
+        manager.add_rule(rule);
+        let actions = manager.handle_event(SystemEventType::LinuxEBPFNetworkFilter, BTreeMap::new());
+        assert_eq!(actions.len(), 1);
+    }
 }
