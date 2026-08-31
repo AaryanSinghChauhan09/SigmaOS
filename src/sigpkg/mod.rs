@@ -56,6 +56,9 @@ pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
     AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
     RpmSpecManifest, AppImageContainer, ServerImageFormat, UniversalServerImageAdapter,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
 };
 pub use sovereign_sigpkg::*;
 pub use sovereign_sigpkg::{
