@@ -242,6 +242,28 @@ use wiki_ideas_implementation::SystemdUnitActiveState;
 use bsd_compat::*;
 
 #[test]
+fn test_sovereign_universal_distro_bridge_inspection() {
+    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
+
+    let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxGentoo);
+    assert_eq!(bridge.translate_package_specifier("openssl"), "openssl.ebuild");
+    assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::LinuxFedora);
+    assert_eq!(bridge.translate_package_specifier("kernel"), "kernel.rpm");
+    assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::NetBsd);
+    assert_eq!(bridge.translate_package_specifier("pkgin"), "pkgin.tgz");
+    assert!(bridge.enforce_security_isolation(500, "/var/sandbox").is_ok());
+
+    bridge.set_subsystem_mode(DistroSubsystemMode::DragonFlyBsd);
+    assert_eq!(bridge.translate_package_specifier("hammer2-utils"), "hammer2-utils.pkg");
+    assert!(bridge.enforce_security_isolation(501, "/jails/hammer").is_ok());
+    assert!(bridge.active_jail.is_some());
+}
+
+#[test]
 fn test_freebsd_jail_manager_inspection() {
     let mut jail_mgr = FreeBsdJailManager::new();
     let jid = jail_mgr.create_jail("web_jail", "/jails/web", "192.168.1.100").unwrap();
