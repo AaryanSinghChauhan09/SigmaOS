@@ -264,33 +264,20 @@ impl TriggerRule {
 
 impl TerminalSession {
     pub fn new(width: usize, height: usize) -> Self {
-        let mut session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: AutoSuggestionEngine::new(),
-        };
+        let mut suggestion_engine = AutoSuggestionEngine::new();
 
         // Standard Linux distro utilities to beat
-        session.suggestion_engine.register_builtin("ls");
-        session.suggestion_engine.register_builtin("cd");
-        session.suggestion_engine.register_builtin("pwd");
-        session.suggestion_engine.register_builtin("echo");
-        session.suggestion_engine.register_builtin("systemctl");
-        session.suggestion_engine.register_builtin("apt");
-        session.suggestion_engine.register_builtin("sigpkg");
+        suggestion_engine.register_builtin("ls");
+        suggestion_engine.register_builtin("cd");
+        suggestion_engine.register_builtin("pwd");
+        suggestion_engine.register_builtin("echo");
+        suggestion_engine.register_builtin("systemctl");
+        suggestion_engine.register_builtin("apt");
+        suggestion_engine.register_builtin("sigpkg");
 
         let multiplexer = TerminalMultiplexer::new(width, height);
 
-        session = Self {
+        Self {
             cursor_x: 0,
             cursor_y: 0,
             width,
@@ -302,14 +289,12 @@ impl TerminalSession {
             current_line: String::new(),
             aliases: BTreeMap::new(),
             user_functions: BTreeMap::new(),
-            suggestion_engine: session.suggestion_engine,
+            suggestion_engine,
             multiplexer,
             graphics_frames: Vec::new(),
             trigger_rules: Vec::new(),
             visual_bell_active: false,
-        };
-
-        session
+        }
     }
 
     /// OpenBSD wsdisplay-style Visual Bell trigger
