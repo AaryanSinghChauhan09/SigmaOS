@@ -1,6 +1,7 @@
 // SigmaTools Module
 // System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
 
+pub mod file_manager;
 pub mod sigmatools;
 pub mod sovereign_commands;
 

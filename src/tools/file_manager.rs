@@ -4,11 +4,74 @@ extern crate alloc;
 
 
 
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
 
 const MAX_CLIPBOARD_ITEMS: usize = 16;
+
+/// Linux & BSD distro-inspired folder color accent choices
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum FolderColor {
+    /// Ubuntu Yaru Orange (#E95420)
+    UbuntuOrange,
+    /// Pop!_OS Teal (#48B9C7)
+    PopTeal,
+    /// Linux Mint Aqua (#2A9D8F)
+    MintGreen,
+    /// Fedora Adwaita Blue (#3584E4)
+    FedoraBlue,
+    /// ElementaryOS Strawberry Red (#E74C3C)
+    ElementaryRed,
+    /// FreeBSD Daemon Crimson (#AB1212)
+    FreeBsdCrimson,
+    /// OpenBSD Onyx (#222222)
+    OpenBsdOnyx,
+    /// Custom RGB Color
+    CustomRgb(u8, u8, u8),
+}
+
+impl FolderColor {
+    /// Returns HEX string representation of folder color
+    pub fn to_hex(&self) -> String {
+        match self {
+            FolderColor::UbuntuOrange => "#E95420".to_string(),
+            FolderColor::PopTeal => "#48B9C7".to_string(),
+            FolderColor::MintGreen => "#2A9D8F".to_string(),
+            FolderColor::FedoraBlue => "#3584E4".to_string(),
+            FolderColor::ElementaryRed => "#E74C3C".to_string(),
+            FolderColor::FreeBsdCrimson => "#AB1212".to_string(),
+            FolderColor::OpenBsdOnyx => "#222222".to_string(),
+            FolderColor::CustomRgb(r, g, b) => alloc::format!("#{:02X}{:02X}{:02X}", r, g, b),
+        }
+    }
+
+    /// Returns RGB tuple (u8, u8, u8)
+    pub fn to_rgb(&self) -> (u8, u8, u8) {
+        match self {
+            FolderColor::UbuntuOrange => (0xE9, 0x54, 0x20),
+            FolderColor::PopTeal => (0x48, 0xB9, 0xC7),
+            FolderColor::MintGreen => (0x2A, 0x9D, 0x8F),
+            FolderColor::FedoraBlue => (0x35, 0x84, 0xE4),
+            FolderColor::ElementaryRed => (0xE7, 0x4C, 0x3C),
+            FolderColor::FreeBsdCrimson => (0xAB, 0x12, 0x12),
+            FolderColor::OpenBsdOnyx => (0x22, 0x22, 0x22),
+            FolderColor::CustomRgb(r, g, b) => (*r, *g, *b),
+        }
+    }
+}
+
+/// Pre-configured distro folder color themes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroFolderColorPreset {
+    UbuntuYaru,
+    PopOs,
+    LinuxMint,
+    FedoraAdwaita,
+    ElementaryOs,
+    BsdHardened,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FileType {
@@ -95,6 +158,7 @@ pub struct File {
     pub size: u64,
     pub is_directory: bool,
     pub is_hidden: bool,
+    pub color_tag: Option<String>,
 }
 
 impl File {
@@ -105,11 +169,20 @@ impl File {
             size: 0,
             is_directory,
             is_hidden: name.starts_with('.'),
+            color_tag: None,
         }
     }
 
     pub fn set_size(&mut self, size: u64) {
         self.size = size;
+    }
+
+    pub fn set_color_tag(&mut self, color: FolderColor) {
+        self.color_tag = Some(color.to_hex());
+    }
+
+    pub fn clear_color_tag(&mut self) {
+        self.color_tag = None;
     }
 }
 
@@ -159,6 +232,7 @@ pub struct FileManager {
     pub selected_files: Vec<File>,
     pub clipboard: Clipboard,
     pub bookmarks: Vec<String>,
+    pub folder_colors: BTreeMap<String, String>,
 }
 
 impl FileManager {
@@ -172,6 +246,38 @@ impl FileManager {
                 "/".to_string(),
                 "/tmp".to_string(),
             ],
+            folder_colors: BTreeMap::new(),
+        }
+    }
+
+    /// Sets custom folder accent color for directory path
+    pub fn set_folder_color(&mut self, path: &str, color: FolderColor) {
+        self.folder_colors.insert(path.to_string(), color.to_hex());
+    }
+
+    /// Retrieves assigned folder color hex for directory path
+    pub fn get_folder_color(&self, path: &str) -> Option<&String> {
+        self.folder_colors.get(path)
+    }
+
+    /// Removes custom folder color assignment
+    pub fn remove_folder_color(&mut self, path: &str) {
+        self.folder_colors.remove(path);
+    }
+
+    /// Applies a distro-inspired folder theme preset across default system folders
+    pub fn apply_distro_folder_theme(&mut self, preset: DistroFolderColorPreset) {
+        let default_color = match preset {
+            DistroFolderColorPreset::UbuntuYaru => FolderColor::UbuntuOrange,
+            DistroFolderColorPreset::PopOs => FolderColor::PopTeal,
+            DistroFolderColorPreset::LinuxMint => FolderColor::MintGreen,
+            DistroFolderColorPreset::FedoraAdwaita => FolderColor::FedoraBlue,
+            DistroFolderColorPreset::ElementaryOs => FolderColor::ElementaryRed,
+            DistroFolderColorPreset::BsdHardened => FolderColor::FreeBsdCrimson,
+        };
+
+        for bookmark in self.bookmarks.clone() {
+            self.set_folder_color(&bookmark, default_color);
         }
     }
 
@@ -273,5 +379,46 @@ mod tests {
         let mut fm = FileManager::new();
         fm.navigate("/tmp");
         assert_eq!(fm.current_directory, "/tmp");
+    }
+
+    #[test]
+    fn test_folder_color_switcher_and_distro_presets() {
+        let mut fm = FileManager::new();
+
+        // 1. Set custom folder color
+        fm.set_folder_color("/home/user/Documents", FolderColor::UbuntuOrange);
+        assert_eq!(
+            fm.get_folder_color("/home/user/Documents"),
+            Some(&"#E95420".to_string())
+        );
+
+        // 2. Custom RGB
+        fm.set_folder_color("/home/user/Custom", FolderColor::CustomRgb(100, 150, 200));
+        assert_eq!(
+            fm.get_folder_color("/home/user/Custom"),
+            Some(&"#6496C8".to_string())
+        );
+
+        // 3. Remove folder color
+        fm.remove_folder_color("/home/user/Custom");
+        assert_eq!(fm.get_folder_color("/home/user/Custom"), None);
+
+        // 4. File color tags
+        let mut dir = File::new("Projects", "/home/user/Projects", true);
+        dir.set_color_tag(FolderColor::PopTeal);
+        assert_eq!(dir.color_tag, Some("#48B9C7".to_string()));
+        dir.clear_color_tag();
+        assert_eq!(dir.color_tag, None);
+
+        // 5. Distro theme preset
+        fm.apply_distro_folder_theme(DistroFolderColorPreset::LinuxMint);
+        assert_eq!(
+            fm.get_folder_color("/home/user"),
+            Some(&"#2A9D8F".to_string())
+        );
+        assert_eq!(
+            FolderColor::MintGreen.to_rgb(),
+            (0x2A, 0x9D, 0x8F)
+        );
     }
 }
