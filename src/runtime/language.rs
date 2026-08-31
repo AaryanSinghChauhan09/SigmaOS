@@ -18,7 +18,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::vec::Vec as AllocVec;
 use alloc::format;
 
 // (no_std only applicable at crate root - removed)
@@ -331,7 +331,7 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
