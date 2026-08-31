@@ -37,6 +37,7 @@ pub mod remote;
 pub mod resilience;
 pub mod security;
 pub mod shell;
+pub mod runtime;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
@@ -169,9 +170,9 @@ pub use compatibility::fedora::{
     FedoraWelcomeInitialSetupEngine, FolderColor,
 };
 
-pub use crate::access as auth;
-
-pub use crate::desktop as app;
+pub mod auth;
+pub mod app;
+pub mod drivers;
 
 pub use desktop::mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
