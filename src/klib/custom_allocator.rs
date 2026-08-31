@@ -379,9 +379,8 @@ pub unsafe fn free(ptr: *mut u8, size: usize) {
 // Out-of-memory handler
 // ============================================================================
 
-/// Called by the Rust runtime when allocation fails (requires nightly/alloc_error_handler).
+/// Called by the Rust runtime when allocation fails.
 #[cfg(feature = "custom_alloc_error_handler")]
-#[alloc_error_handler]
 fn sigma_oom(layout: Layout) -> ! {
     // In a real kernel this would trigger a kernel panic with diagnostics.
     let _ = layout;

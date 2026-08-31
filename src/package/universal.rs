@@ -1,10 +1,10 @@
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
+use alloc::collections::BTreeMap as HashMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
-
-use crate::klib::HashMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -16,7 +16,7 @@ pub enum PackagePriority {
     Optional,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
     Deb,      // apt/dpkg
     Rpm,      // yum/dnf/zypper
