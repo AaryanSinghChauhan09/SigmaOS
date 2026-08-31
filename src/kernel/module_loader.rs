@@ -7,11 +7,11 @@ extern crate alloc;
 // - Module reference counting and safe unloading
 // - Kernel symbol export table (EXPORT_SYMBOL parity)
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleState {
@@ -138,7 +138,8 @@ impl SovereignKernelModuleManager {
     }
 
     pub fn verify_signature(&self, sig: &ModuleSignature) -> bool {
-        !sig.signature_bytes.is_empty() && (sig.algorithm == "Ed25519" || sig.algorithm == "Dilithium5")
+        !sig.signature_bytes.is_empty()
+            && (sig.algorithm == "Ed25519" || sig.algorithm == "Dilithium5")
     }
 
     /// Registers a core kernel symbol export (EXPORT_SYMBOL parity)
@@ -168,7 +169,10 @@ impl SovereignKernelModuleManager {
         // Verify dependencies
         for dep in &deps {
             if !self.loaded_modules.contains_key(dep) {
-                return Err(format!("Unsatisfied dependency for {}: missing module {}", name, dep));
+                return Err(format!(
+                    "Unsatisfied dependency for {}: missing module {}",
+                    name, dep
+                ));
             }
         }
 
@@ -203,15 +207,24 @@ impl SovereignKernelModuleManager {
     /// Safely unloads a kernel module (rmmod / kldunload parity)
     pub fn unload_module(&mut self, name: &str) -> Result<(), String> {
         let (ref_count, deps) = {
-            let module = self.loaded_modules.get(name).ok_or_else(|| format!("Module {} not found", name))?;
+            let module = self
+                .loaded_modules
+                .get(name)
+                .ok_or_else(|| format!("Module {} not found", name))?;
             if module.ref_count > 0 {
-                return Err(format!("Module {} is in use (ref_count = {})", name, module.ref_count));
+                return Err(format!(
+                    "Module {} is in use (ref_count = {})",
+                    name, module.ref_count
+                ));
             }
             (module.ref_count, module.dependencies.clone())
         };
 
         if ref_count > 0 {
-            return Err(format!("Module {} cannot be unloaded while referenced", name));
+            return Err(format!(
+                "Module {} cannot be unloaded while referenced",
+                name
+            ));
         }
 
         // Decrement reference counts on dependencies
@@ -228,9 +241,19 @@ impl SovereignKernelModuleManager {
     }
 
     /// Modprobe parameter override helper
-    pub fn set_module_parameter(&mut self, name: &str, param_name: &str, value: &str) -> Result<(), String> {
-        let module = self.loaded_modules.get_mut(name).ok_or_else(|| format!("Module {} not found", name))?;
-        module.parameters.insert(param_name.to_string(), value.to_string());
+    pub fn set_module_parameter(
+        &mut self,
+        name: &str,
+        param_name: &str,
+        value: &str,
+    ) -> Result<(), String> {
+        let module = self
+            .loaded_modules
+            .get_mut(name)
+            .ok_or_else(|| format!("Module {} not found", name))?;
+        module
+            .parameters
+            .insert(param_name.to_string(), value.to_string());
         Ok(())
     }
 
@@ -274,7 +297,14 @@ mod tests {
 
         // Load dependent module
         let dep_addr = mgr
-            .load_module("e1000e_netfilter", "1.0.0", "GPL", vec![String::from("e1000e")], BTreeMap::new(), 4096)
+            .load_module(
+                "e1000e_netfilter",
+                "1.0.0",
+                "GPL",
+                vec![String::from("e1000e")],
+                BTreeMap::new(),
+                4096,
+            )
             .unwrap();
         assert!(dep_addr > addr);
 
@@ -295,7 +325,10 @@ mod tests {
         mgr.add_taint(TaintFlag::OutOfTree);
         assert_eq!(mgr.taint_flags, vec![TaintFlag::OutOfTree]);
 
-        let pci_device = DeviceBusType::Pci { vendor_id: 0x8086, device_id: 0x100E };
+        let pci_device = DeviceBusType::Pci {
+            vendor_id: 0x8086,
+            device_id: 0x100E,
+        };
         mgr.register_device_alias(pci_device.clone(), "e1000e");
 
         let matched = mgr.auto_probe_module_for_device(&pci_device);

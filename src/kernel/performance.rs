@@ -3,7 +3,6 @@ extern crate alloc;
 // Kernel Performance - Zero-Copy IPC & UDF Scheduler VM
 // High-speed zero-copy IPC and autonomic UDF CPU scheduling engine
 
-
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -576,15 +575,38 @@ mod tests {
     #[test]
     fn test_udf_sched_vm_metrics() {
         let program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::AddConst, arg1: 0, arg2: 10 },
-            SchedInstruction { opcode: SchedOpcode::MulConst, arg1: 0, arg2: 2 },
-            SchedInstruction { opcode: SchedOpcode::StoreResult, arg1: 0, arg2: 0 },
-            SchedInstruction { opcode: SchedOpcode::Halt, arg1: 0, arg2: 0 },
+            SchedInstruction {
+                opcode: SchedOpcode::LoadPriority,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::AddConst,
+                arg1: 0,
+                arg2: 10,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::MulConst,
+                arg1: 0,
+                arg2: 2,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::StoreResult,
+                arg1: 0,
+                arg2: 0,
+            },
+            SchedInstruction {
+                opcode: SchedOpcode::Halt,
+                arg1: 0,
+                arg2: 0,
+            },
         ];
 
         let mut vm = UdfSchedVm::new(program);
-        let process = ProcessProfile { priority_level: 5, runtime_ms: 100 };
+        let process = ProcessProfile {
+            priority_level: 5,
+            runtime_ms: 100,
+        };
 
         let result = vm.evaluate_priority(&process).unwrap();
         assert_eq!(result, 30); // (5 + 10) * 2 = 30
@@ -597,9 +619,11 @@ mod tests {
         assert_eq!(metrics.estimated_cycles, 9);
 
         // Register index out of bounds triggers error and increments counter
-        let bad_program = vec![
-            SchedInstruction { opcode: SchedOpcode::LoadPriority, arg1: 4, arg2: 0 },
-        ];
+        let bad_program = vec![SchedInstruction {
+            opcode: SchedOpcode::LoadPriority,
+            arg1: 4,
+            arg2: 0,
+        }];
         vm.load_program(bad_program);
         assert!(vm.evaluate_priority(&process).is_err());
         assert_eq!(vm.get_metrics().register_errors, 1);

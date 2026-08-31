@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -270,7 +270,6 @@ impl MemoryDescriptorList {
 }
 
 // 4. Processes & Threads
-
 
 /// Thread Control Block (TCB)
 pub struct Tcb {

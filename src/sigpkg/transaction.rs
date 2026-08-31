@@ -1,9 +1,9 @@
 #![allow(clippy::large_enum_variant)]
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
@@ -14,11 +14,11 @@ use crate::sigpkg::{ContentAddressedStore, Package, SatSolver};
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone)]
 pub struct ContentAddressedStore {
-    pub path: std::path::PathBuf,
+    pub path: String,
 }
 #[cfg(feature = "standalone_test")]
 impl ContentAddressedStore {
-    pub fn new(path: std::path::PathBuf) -> Self {
+    pub fn new(path: String) -> Self {
         Self { path }
     }
     pub fn get(&self, _name: &str) -> Option<Package> {

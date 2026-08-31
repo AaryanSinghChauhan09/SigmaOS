@@ -4,8 +4,6 @@ extern crate alloc;
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-
-
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

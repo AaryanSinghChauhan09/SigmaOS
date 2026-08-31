@@ -3,7 +3,6 @@
 //! Rate-Monotonic Deferrable Server (DS), Sporadic Server (SS), and FreeBSD Taskqueues.
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

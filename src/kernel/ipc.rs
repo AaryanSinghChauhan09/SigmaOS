@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 
@@ -85,7 +85,7 @@ pub struct SovereignPipe {
     pub reader_pid: u64,
     pub writer_pid: u64,
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
-    pub byte_stream: Vec<u8>,       // POSIX/BSD byte stream buffer
+    pub byte_stream: Vec<u8>,      // POSIX/BSD byte stream buffer
     pub max_capacity: usize,
     pub bytes_transferred: u64,
     pub flags: PipeFlags,
@@ -94,7 +94,7 @@ pub struct SovereignPipe {
     pub reader_count: usize,        // OpenBSD/FreeBSD reference counting for readers
     pub writer_count: usize,        // OpenBSD/FreeBSD reference counting for writers
     pub broken_pipe: bool,          // EPIPE flag when no readers remain
-    pub fifo_path: Option<String>,   // POSIX / BSD mkfifo(2) named pipe path
+    pub fifo_path: Option<String>,  // POSIX / BSD mkfifo(2) named pipe path
 }
 
 impl SovereignPipe {
@@ -175,7 +175,9 @@ impl SovereignPipe {
         if self.broken_pipe || self.reader_count == 0 {
             return Err(IpcError::BrokenPipe);
         }
-        if data.len() <= POSIX_PIPE_BUF_SIZE && (self.byte_stream.len() + data.len()) > (self.max_capacity * 4096) {
+        if data.len() <= POSIX_PIPE_BUF_SIZE
+            && (self.byte_stream.len() + data.len()) > (self.max_capacity * 4096)
+        {
             return Err(IpcError::ChannelFull); // POSIX PIPE_BUF guarantees atomic write if space available
         }
         self.byte_stream.extend_from_slice(data);
@@ -701,7 +703,10 @@ mod tests {
 
         pipe.close_reader();
         assert!(pipe.broken_pipe);
-        assert_eq!(pipe.write_structure(vec![4, 5, 6]), Err(IpcError::BrokenPipe));
+        assert_eq!(
+            pipe.write_structure(vec![4, 5, 6]),
+            Err(IpcError::BrokenPipe)
+        );
 
         // Test POSIX/BSD byte stream read/write
         let mut byte_pipe = SovereignPipe::new(21, 101, 102, 10);

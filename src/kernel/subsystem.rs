@@ -4,8 +4,6 @@ extern crate alloc;
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

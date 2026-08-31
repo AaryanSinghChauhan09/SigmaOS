@@ -3,7 +3,6 @@ extern crate alloc;
 // Implements Linux-style EXPORT_SYMBOL dynamic registries,
 // BSD-style SYSINIT boots, and Kernel Linker Daemon (KLD) modules.
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -485,9 +485,18 @@ mod tests {
     fn test_universal_abi_translator() {
         let translator = UniversalAbiTranslator::new("SigmaOS");
         assert_eq!(translator.host_platform(), "SigmaOS");
-        assert_eq!(translator.translate_abi_syscall("Windows", 0x2A), Some("sys_win32_create_window"));
-        assert_eq!(translator.translate_abi_syscall("Linux", 9), Some("sys_mmap"));
-        assert_eq!(translator.translate_abi_syscall("MacOS", 0x2000004), Some("sys_write"));
+        assert_eq!(
+            translator.translate_abi_syscall("Windows", 0x2A),
+            Some("sys_win32_create_window")
+        );
+        assert_eq!(
+            translator.translate_abi_syscall("Linux", 9),
+            Some("sys_mmap")
+        );
+        assert_eq!(
+            translator.translate_abi_syscall("MacOS", 0x2000004),
+            Some("sys_write")
+        );
         assert_eq!(translator.translate_abi_syscall("Unknown", 1), None);
     }
 
@@ -504,8 +513,14 @@ mod tests {
     #[test]
     fn test_self_healing_kernel() {
         let healing = SelfHealingKernel::new(0xDEADBEEF);
-        assert!(healing.verify_and_heal(0xDEADBEEF).unwrap().contains("integral"));
-        assert!(healing.verify_and_heal(0xBAD00000).unwrap().contains("Rollback applied"));
+        assert!(healing
+            .verify_and_heal(0xDEADBEEF)
+            .unwrap()
+            .contains("integral"));
+        assert!(healing
+            .verify_and_heal(0xBAD00000)
+            .unwrap()
+            .contains("Rollback applied"));
     }
 
     #[test]
@@ -523,7 +538,7 @@ mod tests {
         let eas = EnergyAwareScheduler::new(85);
         assert_eq!(eas.calculate_energy_multiplier(90, 10), 1); // Throttling
         assert_eq!(eas.calculate_energy_multiplier(50, 10), 4); // High performance
-        assert_eq!(eas.calculate_energy_multiplier(50, 2), 2);  // Eco mode
+        assert_eq!(eas.calculate_energy_multiplier(50, 2), 2); // Eco mode
     }
 
     #[test]

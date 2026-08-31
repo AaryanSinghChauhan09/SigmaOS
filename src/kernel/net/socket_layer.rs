@@ -1,12 +1,12 @@
 use alloc::vec;
 extern crate alloc;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
 use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 
