@@ -107,7 +107,7 @@ pub use missing_distro_innovations::{
 };
 
 pub use linux_bsd_inspirations::{
-    SovereignUniversalDistroBridge, DistroSubsystemMode,
+    SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType,
     SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
     NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
     SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
