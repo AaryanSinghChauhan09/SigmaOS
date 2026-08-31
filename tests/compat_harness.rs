@@ -42,6 +42,12 @@ pub struct PosixTranslator {
     pub registered_calls: std::collections::HashMap<u32, &'static str>,
 }
 
+impl Default for PosixTranslator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PosixTranslator {
     pub fn new() -> Self {
         let mut map = std::collections::HashMap::new();
