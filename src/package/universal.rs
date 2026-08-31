@@ -1,3 +1,4 @@
+extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -45,6 +46,19 @@ pub enum PackageFormat {
     Pup,      // Puppy Linux Package (.pup)
     Pet,      // Puppy Extra Tarball (.pet)
     Tar,      // Plain tarball (.tar)
+    Xbps,     // Void Linux (.xbps)
+    Zypper,   // OpenSUSE Zypper (.zypper)
+    Guix,     // GNU Guix (.guix / .scm)
+    Moss,     // Solus Moss (.moss)
+    Hpkg,     // Haiku Package (.hpkg)
+    Tcz,      // Tiny Core Linux (.tcz)
+    Gobo,     // GoboLinux (.gobo)
+    Ostree,   // OSTree commit (.commit)
+    Pkgsrc,   // NetBSD pkgsrc (.pkgsrc)
+    Sfs,      // SquashFS (.sfs)
+    Puk,      // Portable Package (.puk)
+    Dmg,      // macOS Disk Image (.dmg)
+    Cports,   // Chimera Linux (.cports)
 }
 
 impl PackageFormat {
@@ -89,7 +103,31 @@ impl PackageFormat {
         } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
             Some(PackageFormat::Xz)
         } else if name.ends_with(".xbps") {
-            Some(PackageFormat::SigmaPkg)
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
         } else if name.ends_with(".cachy") {
             Some(PackageFormat::Pacman)
         } else if name.ends_with(".app") {
@@ -854,6 +892,19 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Pup, PackageAdapter::new(PackageFormat::Pup, "pup".to_string()));
         self.adapters.insert(PackageFormat::Pet, PackageAdapter::new(PackageFormat::Pet, "pet".to_string()));
         self.adapters.insert(PackageFormat::Tar, PackageAdapter::new(PackageFormat::Tar, "tar".to_string()));
+        self.adapters.insert(PackageFormat::Xbps, PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string()));
+        self.adapters.insert(PackageFormat::Zypper, PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string()));
+        self.adapters.insert(PackageFormat::Guix, PackageAdapter::new(PackageFormat::Guix, "guix".to_string()));
+        self.adapters.insert(PackageFormat::Moss, PackageAdapter::new(PackageFormat::Moss, "moss".to_string()));
+        self.adapters.insert(PackageFormat::Hpkg, PackageAdapter::new(PackageFormat::Hpkg, "hpkg".to_string()));
+        self.adapters.insert(PackageFormat::Tcz, PackageAdapter::new(PackageFormat::Tcz, "tcz".to_string()));
+        self.adapters.insert(PackageFormat::Gobo, PackageAdapter::new(PackageFormat::Gobo, "gobo".to_string()));
+        self.adapters.insert(PackageFormat::Ostree, PackageAdapter::new(PackageFormat::Ostree, "ostree".to_string()));
+        self.adapters.insert(PackageFormat::Pkgsrc, PackageAdapter::new(PackageFormat::Pkgsrc, "pkgsrc".to_string()));
+        self.adapters.insert(PackageFormat::Sfs, PackageAdapter::new(PackageFormat::Sfs, "sfs".to_string()));
+        self.adapters.insert(PackageFormat::Puk, PackageAdapter::new(PackageFormat::Puk, "puk".to_string()));
+        self.adapters.insert(PackageFormat::Dmg, PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()));
+        self.adapters.insert(PackageFormat::Cports, PackageAdapter::new(PackageFormat::Cports, "cports".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -877,9 +928,9 @@ impl UniversalPackageManager {
             .cloned()
         {
             let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
-            for key in current_keys {
-                if !checkpoint.installed_keys.contains(&key) {
-                    self.remove(&key)?;
+            for key in &current_keys {
+                if !checkpoint.installed_keys.contains(key) {
+                    self.remove(key)?;
                 }
             }
             Ok(())
@@ -1434,7 +1485,7 @@ mod tests {
     #[test]
     fn test_package_format_from_filename_extensions() {
         assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
         assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
     }
 

@@ -929,6 +929,245 @@ impl ShellArithmeticEvaluator {
 }
 
 // =========================================================================
+// 6. UNIVERSAL SHELL COMPATIBILITY ENGINE (Bash, Zsh, Fish, Tcsh, Ksh, Dash)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ShellDialect {
+    Bash,
+    Zsh,
+    Fish,
+    Tcsh,
+    Ksh,
+    Dash,
+    BsdSh,
+}
+
+pub struct FishAbbreviationEngine {
+    pub abbreviations: Vec<(String, String)>,
+}
+
+impl FishAbbreviationEngine {
+    pub fn new() -> Self {
+        Self {
+            abbreviations: Vec::new(),
+        }
+    }
+
+    pub fn add_abbreviation(&mut self, abbr: &str, expansion: &str) {
+        self.abbreviations.push((abbr.to_string(), expansion.to_string()));
+    }
+
+    pub fn expand_line(&self, line: &str) -> String {
+        let trimmed = line.trim();
+        let mut parts = trimmed.split_whitespace();
+        if let Some(first) = parts.next() {
+            for (abbr, expansion) in &self.abbreviations {
+                if first == abbr {
+                    let rest: Vec<&str> = parts.collect();
+                    if rest.is_empty() {
+                        return expansion.clone();
+                    } else {
+                        return format!("{} {}", expansion, rest.join(" "));
+                    }
+                }
+            }
+        }
+        line.to_string()
+    }
+}
+
+pub struct TcshHistorySubstitutionEngine {
+    pub history: Vec<String>,
+}
+
+impl TcshHistorySubstitutionEngine {
+    pub fn new() -> Self {
+        Self {
+            history: Vec::new(),
+        }
+    }
+
+    pub fn push_history(&mut self, cmd: &str) {
+        self.history.push(cmd.to_string());
+    }
+
+    pub fn substitute(&self, line: &str) -> Result<String, &'static str> {
+        let trimmed = line.trim();
+        if !trimmed.contains('!') {
+            return Ok(line.to_string());
+        }
+
+        let last_cmd = self.history.last().ok_or("No event in history")?;
+        let last_parts: Vec<&str> = last_cmd.split_whitespace().collect();
+
+        if trimmed == "!!" {
+            return Ok(last_cmd.clone());
+        }
+        if trimmed == "!$" {
+            let last_arg = last_parts.last().ok_or("No argument in history")?;
+            return Ok(last_arg.to_string());
+        }
+        if trimmed == "!*" {
+            if last_parts.len() > 1 {
+                return Ok(last_parts[1..].join(" "));
+            } else {
+                return Ok(String::new());
+            }
+        }
+        if trimmed.starts_with("!") {
+            let prefix = &trimmed[1..];
+            for prev in self.history.iter().rev() {
+                if prev.starts_with(prefix) {
+                    return Ok(prev.clone());
+                }
+            }
+            return Err("No matching history entry");
+        }
+
+        Ok(line.to_string())
+    }
+}
+
+pub struct KshParameterExpansionEngine;
+
+impl KshParameterExpansionEngine {
+    pub fn expand_parameter(expr: &str, env: &[(String, String)]) -> String {
+        // Handle ${var:-default}
+        if expr.contains(":-") {
+            if let (Some(start), Some(end)) = (expr.find("${"), expr.find('}')) {
+                let inner = &expr[start + 2..end];
+                if let Some(pos) = inner.find(":-") {
+                    let var_name = &inner[..pos];
+                    let default_val = &inner[pos + 2..];
+                    for (k, v) in env {
+                        if k == var_name && !v.is_empty() {
+                            return format!("{}{}{}", &expr[..start], v, &expr[end + 1..]);
+                        }
+                    }
+                    return format!("{}{}{}", &expr[..start], default_val, &expr[end + 1..]);
+                }
+            }
+        }
+
+        // Handle ${#var} (String length)
+        if expr.contains("${#") {
+            if let (Some(start), Some(end)) = (expr.find("${#"), expr.find('}')) {
+                let var_name = &expr[start + 3..end];
+                for (k, v) in env {
+                    if k == var_name {
+                        let len_str = v.len().to_string();
+                        return format!("{}{}{}", &expr[..start], len_str, &expr[end + 1..]);
+                    }
+                }
+                return format!("{}0{}", &expr[..start], &expr[end + 1..]);
+            }
+        }
+
+        // Handle ${var//search/replace}
+        if expr.contains("//") {
+            if let (Some(start), Some(end)) = (expr.find("${"), expr.find('}')) {
+                let inner = &expr[start + 2..end];
+                if let Some(pos) = inner.find("//") {
+                    let var_name = &inner[..pos];
+                    let rest = &inner[pos + 2..];
+                    if let Some(slash_idx) = rest.find('/') {
+                        let search = &rest[..slash_idx];
+                        let replace = &rest[slash_idx + 1..];
+                        for (k, v) in env {
+                            if k == var_name {
+                                let substituted = v.replace(search, replace);
+                                return format!("{}{}{}", &expr[..start], substituted, &expr[end + 1..]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        expr.to_string()
+    }
+}
+
+pub struct DashPosixShValidator;
+
+impl DashPosixShValidator {
+    pub fn validate_posix_compliance(script: &str) -> Vec<(u32, &'static str)> {
+        let mut non_posix_warnings = Vec::new();
+        for (line_num, line) in script.lines().enumerate() {
+            let l = line.trim();
+            if l.contains("[[") {
+                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX conditional [[ ]]; use [ ] instead"));
+            }
+            if l.contains("<<<") {
+                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX here-string <<<; use echo | or cat <<"));
+            }
+            if l.starts_with("function ") {
+                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX 'function' keyword; use foo() { ... }"));
+            }
+            if l.contains("=(") {
+                non_posix_warnings.push(((line_num + 1) as u32, "Non-POSIX array syntax foo=(...); arrays not supported in dash/sh"));
+            }
+        }
+        non_posix_warnings
+    }
+}
+
+pub struct UniversalShellCompatibilityEngine {
+    pub fish_abbr: FishAbbreviationEngine,
+    pub tcsh_history: TcshHistorySubstitutionEngine,
+    pub environment: Vec<(String, String)>,
+}
+
+impl UniversalShellCompatibilityEngine {
+    pub fn new() -> Self {
+        Self {
+            fish_abbr: FishAbbreviationEngine::new(),
+            tcsh_history: TcshHistorySubstitutionEngine::new(),
+            environment: Vec::new(),
+        }
+    }
+
+    pub fn detect_shebang_dialect(script: &str) -> ShellDialect {
+        if let Some(first_line) = script.lines().next() {
+            let trimmed = first_line.trim();
+            if trimmed.starts_with("#!") {
+                if trimmed.contains("bash") {
+                    return ShellDialect::Bash;
+                } else if trimmed.contains("zsh") {
+                    return ShellDialect::Zsh;
+                } else if trimmed.contains("fish") {
+                    return ShellDialect::Fish;
+                } else if trimmed.contains("tcsh") || trimmed.contains("csh") {
+                    return ShellDialect::Tcsh;
+                } else if trimmed.contains("ksh") {
+                    return ShellDialect::Ksh;
+                } else if trimmed.contains("dash") {
+                    return ShellDialect::Dash;
+                } else if trimmed.contains("sh") {
+                    return ShellDialect::BsdSh;
+                }
+            }
+        }
+        ShellDialect::Bash
+    }
+
+    pub fn process_input_line(&mut self, line: &str) -> Result<ShellPipeline, &'static str> {
+        let hist_sub = self.tcsh_history.substitute(line)?;
+        let abbr_expanded = self.fish_abbr.expand_line(&hist_sub);
+        let param_expanded = KshParameterExpansionEngine::expand_parameter(&abbr_expanded, &self.environment);
+        self.tcsh_history.push_history(line);
+        Ok(ShellPipelineParser::parse(&param_expanded))
+    }
+}
+
+impl Default for UniversalShellCompatibilityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1111,5 +1350,81 @@ mod tests {
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 6 * 7 ))"), Ok(42));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 5 ))"), Ok(20));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 0 ))"), Err("Division by zero"));
+    }
+
+    #[test]
+    fn test_fish_abbreviation_engine() {
+        let mut abbr_engine = FishAbbreviationEngine::new();
+        abbr_engine.add_abbreviation("g", "git");
+        abbr_engine.add_abbreviation("gc", "git commit -m");
+
+        assert_eq!(abbr_engine.expand_line("g checkout main"), "git checkout main");
+        assert_eq!(abbr_engine.expand_line("gc 'initial commit'"), "git commit -m 'initial commit'");
+        assert_eq!(abbr_engine.expand_line("ls -la"), "ls -la");
+    }
+
+    #[test]
+    fn test_tcsh_history_substitution() {
+        let mut tcsh_hist = TcshHistorySubstitutionEngine::new();
+        tcsh_hist.push_history("cargo build --release");
+
+        assert_eq!(tcsh_hist.substitute("!!").unwrap(), "cargo build --release");
+        assert_eq!(tcsh_hist.substitute("!$").unwrap(), "--release");
+        assert_eq!(tcsh_hist.substitute("!*").unwrap(), "build --release");
+        assert_eq!(tcsh_hist.substitute("!car").unwrap(), "cargo build --release");
+    }
+
+    #[test]
+    fn test_ksh_parameter_expansion() {
+        let env = vec![
+            ("USER".to_string(), "sigma".to_string()),
+            ("EMPTY".to_string(), "".to_string()),
+            ("PATH".to_string(), "/usr/bin:/bin".to_string()),
+        ];
+
+        assert_eq!(
+            KshParameterExpansionEngine::expand_parameter("echo ${EMPTY:-fallback}", &env),
+            "echo fallback"
+        );
+        assert_eq!(
+            KshParameterExpansionEngine::expand_parameter("echo ${USER:-fallback}", &env),
+            "echo sigma"
+        );
+        assert_eq!(
+            KshParameterExpansionEngine::expand_parameter("len=${#USER}", &env),
+            "len=5"
+        );
+        assert_eq!(
+            KshParameterExpansionEngine::expand_parameter("echo ${PATH//bin/sbin}", &env),
+            "echo /usr/sbin:/sbin"
+        );
+    }
+
+    #[test]
+    fn test_dash_posix_sh_validator() {
+        let non_posix_script = "#!/bin/sh\n[[ -f /etc/sigma ]] && echo ok\necho <<< 'hello'\nfunction foo() {\n  arr=(1 2 3)\n}\n";
+        let warnings = DashPosixShValidator::validate_posix_compliance(non_posix_script);
+        assert_eq!(warnings.len(), 4);
+        assert_eq!(warnings[0].0, 2);
+        assert_eq!(warnings[1].0, 3);
+        assert_eq!(warnings[2].0, 4);
+        assert_eq!(warnings[3].0, 5);
+    }
+
+    #[test]
+    fn test_universal_shell_compatibility_engine() {
+        let mut engine = UniversalShellCompatibilityEngine::new();
+        engine.fish_abbr.add_abbreviation("co", "checkout");
+        engine.environment.push(("NAME".to_string(), "SigmaOS".to_string()));
+
+        let bash_script = "#!/bin/bash\necho hello";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(bash_script), ShellDialect::Bash);
+
+        let fish_script = "#!/usr/bin/env fish\nco main";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(fish_script), ShellDialect::Fish);
+
+        let pipeline = engine.process_input_line("co ${NAME:-default}").unwrap();
+        assert_eq!(pipeline.stages[0].program, "checkout");
+        assert_eq!(pipeline.stages[0].args, vec!["SigmaOS".to_string()]);
     }
 }
