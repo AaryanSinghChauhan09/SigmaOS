@@ -12,8 +12,10 @@ pub mod pci_bus;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
+pub mod ubuntu_common_drivers;
 pub mod universal_support;
 pub mod vault;
+pub mod windows_compat;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
@@ -26,5 +28,10 @@ pub use pods::{PeripheralPod, PodType};
 pub use rootkit::{
     FileDirectoryEntry, MappedView, SectionBackingType, SectionObject, StealthFilterDriver,
     SyscallStubDisassembler,
+};
+pub use ubuntu_common_drivers::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
 };
 pub use vault::{DriverArchiveVault, VaultEntry};

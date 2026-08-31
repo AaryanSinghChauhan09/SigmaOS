@@ -2,6 +2,13 @@
 pub mod zenith_compositor;
 pub mod moksha;
 pub mod pantheon;
+pub mod mate_packages;
+
+pub use mate_packages::{
+    AppletKind, BetsyBundleHeader, BetsyPackageBundleExporter, MateAptUrlProtocolHandler,
+    MateDesktopApplet, MatePanelLayout, MatePkgPpaRepositoryManager, MateSoftwareStoreManager,
+    MateStoreAppEntry, PanelPosition, PpaRepositorySource,
+};
 
 pub use pantheon::{
     GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
