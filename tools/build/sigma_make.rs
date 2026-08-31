@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, static_mut_refs)]
 
 // SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
 // Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

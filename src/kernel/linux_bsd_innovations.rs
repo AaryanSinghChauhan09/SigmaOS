@@ -344,6 +344,313 @@ impl OpenBsdPledge {
     }
 }
 
+
+
+// ============================================================================
+// 1. Linux `perf_event_open` Hardware PMU Performance Counters
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PerfHardwareCounterType {
+    CpuCycles,
+    Instructions,
+    CacheReferences,
+    CacheMisses,
+    BranchInstructions,
+    BranchMisses,
+    BusCycles,
+    ContextSwitches,
+    CpuMigrations,
+    PageFaults,
+}
+
+#[derive(Debug, Clone)]
+pub struct PerfEventSample {
+    pub counter_type: PerfHardwareCounterType,
+    pub raw_count: u64,
+    pub enabled_time_ns: u64,
+    pub running_time_ns: u64,
+
+pub struct LinuxPerfEventsEngine {
+    pub active_counters: Vec<(u32, PerfHardwareCounterType, u64)>,
+
+impl LinuxPerfEventsEngine {
+    pub fn new() -> Self {
+        Self {
+            active_counters: Vec::new(),
+        }
+    }
+
+    pub fn open_counter(&mut self, pid: u32, counter_type: PerfHardwareCounterType) -> usize {
+        self.active_counters.push((pid, counter_type, 0));
+        self.active_counters.len() - 1
+
+    pub fn increment_counter(&mut self, handle: usize, delta: u64) {
+        if let Some((_, _, ref mut count)) = self.active_counters.get_mut(handle) {
+            *count += delta;
+
+    pub fn sample_counter(&self, handle: usize) -> Option<PerfEventSample> {
+        if let Some(&(pid, counter_type, count)) = self.active_counters.get(handle) {
+            let _ = pid;
+            Some(PerfEventSample {
+                counter_type,
+                raw_count: count,
+                enabled_time_ns: 1_000_000,
+                running_time_ns: 1_000_000,
+            })
+        } else {
+            None
+
+// 2. FreeBSD `racct(9)` Resource Accounting & `rctl(8)` Resource Limits
+
+pub enum RacctResource {
+    CputimeSec,
+    MemoryBytes,
+    ProcessCount,
+    OpenFilesCount,
+    BlockIoReadBytes,
+    BlockIoWriteBytes,
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RctlAction {
+    Deny,
+    Log,
+    SignalSigXCpu,
+    SignalSigKill,
+
+pub struct RctlRule {
+    pub subject_pid: u32,
+    pub resource: RacctResource,
+    pub limit_value: u64,
+    pub action: RctlAction,
+
+pub struct FreeBsdRacctRctlEngine {
+    pub rules: Vec<RctlRule>,
+    pub accounting: Vec<(u32, RacctResource, u64)>,
+
+impl FreeBsdRacctRctlEngine {
+            rules: Vec::new(),
+            accounting: Vec::new(),
+
+    pub fn add_rule(&mut self, rule: RctlRule) {
+        self.rules.push(rule);
+
+    pub fn record_usage(&mut self, pid: u32, resource: RacctResource, amount: u64) -> Option<RctlAction> {
+        let mut new_val = amount;
+        if let Some((_, _, ref mut current)) = self.accounting.iter_mut().find(|(p, r, _)| *p == pid && *r == resource) {
+            *current += amount;
+            new_val = *current;
+            self.accounting.push((pid, resource, amount));
+
+        for rule in &self.rules {
+            if rule.subject_pid == pid && rule.resource == resource && new_val >= rule.limit_value {
+                return Some(rule.action);
+            }
+        None
+
+// 3. Linux `inotify`/`fanotify` Filesystem Event Monitoring
+
+pub enum FsEventMask {
+    Access,
+    Modify,
+    Attrib,
+    CloseWrite,
+    Open,
+    MovedFrom,
+    MovedTo,
+    Create,
+    Delete,
+
+pub struct FsEventNotification {
+    pub watch_descriptor: i32,
+    pub mask: FsEventMask,
+    pub path: String,
+
+pub struct LinuxInotifyFanotifyEngine {
+    pub watches: Vec<(i32, String, Vec<FsEventMask>)>,
+    pub pending_events: Vec<FsEventNotification>,
+    pub next_wd: i32,
+
+impl LinuxInotifyFanotifyEngine {
+            watches: Vec::new(),
+            pending_events: Vec::new(),
+            next_wd: 1,
+
+    pub fn add_watch(&mut self, path: &str, masks: Vec<FsEventMask>) -> i32 {
+        let wd = self.next_wd;
+        self.next_wd += 1;
+        self.watches.push((wd, path.to_string(), masks));
+        wd
+
+    pub fn trigger_event(&mut self, path: &str, mask: FsEventMask) {
+        for (wd, watch_path, masks) in &self.watches {
+            if path.starts_with(watch_path) && masks.contains(&mask) {
+                self.pending_events.push(FsEventNotification {
+                    watch_descriptor: *wd,
+                    mask,
+                    path: path.to_string(),
+                });
+
+    pub fn pop_event(&mut self) -> Option<FsEventNotification> {
+        if !self.pending_events.is_empty() {
+            Some(self.pending_events.remove(0))
+
+// 4. NetBSD `sysmon(4)` Hardware Environmental Sensor Monitoring
+
+pub enum SensorType {
+    TemperatureCelsius,
+    FanRpm,
+    VoltageVolts,
+    IndicatorState,
+
+pub struct EnvironmentalSensor {
+    pub name: String,
+    pub sensor_type: SensorType,
+    pub current_value: f64,
+    pub warning_threshold: f64,
+    pub critical_threshold: f64,
+
+pub struct NetBsdSysmonPowerPwmEngine {
+    pub sensors: Vec<EnvironmentalSensor>,
+
+impl NetBsdSysmonPowerPwmEngine {
+            sensors: Vec::new(),
+
+    pub fn register_sensor(&mut self, sensor: EnvironmentalSensor) {
+        self.sensors.push(sensor);
+
+    pub fn update_sensor_value(&mut self, name: &str, val: f64) {
+        if let Some(s) = self.sensors.iter_mut().find(|s| s.name == name) {
+            s.current_value = val;
+
+    pub fn check_alerts(&self) -> Vec<(String, &'static str)> {
+        let mut alerts = Vec::new();
+        for sensor in &self.sensors {
+            if sensor.current_value >= sensor.critical_threshold {
+                alerts.push((sensor.name.clone(), "CRITICAL"));
+            } else if sensor.current_value >= sensor.warning_threshold {
+                alerts.push((sensor.name.clone(), "WARNING"));
+        alerts
+
+// 5. Linux Kernel Livepatch (`kpatch`/`livepatch`) fentry Trampoline
+
+pub struct LivepatchFunctionSymbol {
+    pub original_address: u64,
+    pub new_address: u64,
+    pub is_patched: bool,
+
+pub struct LinuxKernelLivepatchEngine {
+    pub patches: Vec<LivepatchFunctionSymbol>,
+
+impl LinuxKernelLivepatchEngine {
+            patches: Vec::new(),
+
+    pub fn register_patch(&mut self, name: &str, orig_addr: u64, new_addr: u64) {
+        self.patches.push(LivepatchFunctionSymbol {
+            name: name.to_string(),
+            original_address: orig_addr,
+            new_address: new_addr,
+            is_patched: false,
+        });
+
+    pub fn apply_livepatch(&mut self, name: &str) -> Result<u64, &'static str> {
+        if let Some(sym) = self.patches.iter_mut().find(|p| p.name == name) {
+            sym.is_patched = true;
+            Ok(sym.new_address)
+            Err("Livepatch symbol not found")
+
+    pub fn resolve_entry(&self, addr: u64) -> u64 {
+        for sym in &self.patches {
+            if sym.original_address == addr && sym.is_patched {
+                return sym.new_address;
+        addr
+
+// =========================================================================
+// Linux XDP (eXpress Data Path) Extended Packet Filter Engine
+
+pub struct LinuxXdpExtendedFilter {
+    pub blocked_ports: Vec<u16>,
+    pub drop_count: u64,
+    pub pass_count: u64,
+
+impl LinuxXdpExtendedFilter {
+            blocked_ports: Vec::new(),
+            drop_count: 0,
+            pass_count: 0,
+
+    pub fn block_port(&mut self, port: u16) {
+        if !self.blocked_ports.contains(&port) {
+            self.blocked_ports.push(port);
+
+    pub fn filter_packet_at_rx_ring(&mut self, dst_port: u16) -> XdpAction {
+        if self.blocked_ports.contains(&dst_port) {
+            self.drop_count += 1;
+            XdpAction::Drop
+            self.pass_count += 1;
+            XdpAction::Pass
+
+impl Default for LinuxXdpExtendedFilter {
+    fn default() -> Self {
+        Self::new()
+
+// FreeBSD VFS Vnode Shared/Exclusive Locking Engine
+
+pub enum VnodeLockState {
+    Unlocked,
+    Shared(u32),
+    Exclusive(u64),
+
+pub struct FreeBsdVfsVnodeLock {
+    pub vnode_id: u64,
+    pub state: VnodeLockState,
+
+impl FreeBsdVfsVnodeLock {
+    pub fn new(vnode_id: u64) -> Self {
+            vnode_id,
+            state: VnodeLockState::Unlocked,
+
+    pub fn acquire_shared(&mut self) -> Result<(), &'static str> {
+        match self.state {
+            VnodeLockState::Unlocked => {
+                self.state = VnodeLockState::Shared(1);
+                Ok(())
+            VnodeLockState::Shared(count) => {
+                self.state = VnodeLockState::Shared(count + 1);
+            VnodeLockState::Exclusive(_) => Err("Vnode locked exclusively"),
+
+    pub fn acquire_exclusive(&mut self, thread_id: u64) -> Result<(), &'static str> {
+                self.state = VnodeLockState::Exclusive(thread_id);
+            _ => Err("Vnode lock busy"),
+
+    pub fn release(&mut self) -> Result<(), &'static str> {
+            VnodeLockState::Unlocked => Err("Vnode is not locked"),
+                if count > 1 {
+                    self.state = VnodeLockState::Shared(count - 1);
+                } else {
+                    self.state = VnodeLockState::Unlocked;
+                }
+            VnodeLockState::Exclusive(_) => {
+                self.state = VnodeLockState::Unlocked;
+
+// Kernel Memory Page Pool Allocation Engine
+
+pub struct KernelMemoryPagePool {
+    pub free_frame_pfns: Vec<u64>,
+    pub pool_size: usize,
+
+impl KernelMemoryPagePool {
+    pub fn new(initial_capacity: usize) -> Self {
+        let mut free_frames = Vec::with_capacity(initial_capacity);
+        for i in 0..initial_capacity {
+            free_frames.push(i as u64 + 0x10000); // Frame numbers above 0x10000
+            free_frame_pfns: free_frames,
+            pool_size: initial_capacity,
+
+    pub fn alloc_page_frame(&mut self) -> Option<u64> {
+        self.free_frame_pfns.pop()
+
+    pub fn free_page_frame(&mut self, pfn: u64) {
+        self.free_frame_pfns.push(pfn);
+
 // ================= FreeBSD GEOM Modular Storage Framework =================
 
 #[derive(Debug, Clone)]
@@ -2790,6 +3097,74 @@ impl MemoryCompactionSuperpagesAllocator {
 
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_linux_perf_events_engine() {
+        let mut perf = LinuxPerfEventsEngine::new();
+        let h1 = perf.open_counter(1001, PerfHardwareCounterType::CpuCycles);
+        perf.increment_counter(h1, 5000);
+        let sample = perf.sample_counter(h1).unwrap();
+        assert_eq!(sample.counter_type, PerfHardwareCounterType::CpuCycles);
+        assert_eq!(sample.raw_count, 5000);
+    }
+
+    #[test]
+    fn test_freebsd_racct_rctl_engine() {
+        let mut rctl = FreeBsdRacctRctlEngine::new();
+        rctl.add_rule(RctlRule {
+            subject_pid: 200,
+            resource: RacctResource::MemoryBytes,
+            limit_value: 1024 * 1024,
+            action: RctlAction::SignalSigKill,
+        });
+
+        assert_eq!(rctl.record_usage(200, RacctResource::MemoryBytes, 512 * 1024), None);
+        assert_eq!(
+            rctl.record_usage(200, RacctResource::MemoryBytes, 600 * 1024),
+            Some(RctlAction::SignalSigKill)
+        );
+    }
+
+    #[test]
+    fn test_inotify_fanotify_engine() {
+        let mut fs = LinuxInotifyFanotifyEngine::new();
+        let wd = fs.add_watch("/etc/sigma", vec![FsEventMask::Modify, FsEventMask::Create]);
+        assert_eq!(wd, 1);
+
+        fs.trigger_event("/etc/sigma/config.toml", FsEventMask::Modify);
+        let event = fs.pop_event().unwrap();
+        assert_eq!(event.watch_descriptor, 1);
+        assert_eq!(event.mask, FsEventMask::Modify);
+        assert_eq!(event.path, "/etc/sigma/config.toml");
+    }
+
+    #[test]
+    fn test_sysmon_environmental_sensors() {
+        let mut sysmon = NetBsdSysmonPowerPwmEngine::new();
+        sysmon.register_sensor(EnvironmentalSensor {
+            name: "cpu_temp".to_string(),
+            sensor_type: SensorType::TemperatureCelsius,
+            current_value: 45.0,
+            warning_threshold: 75.0,
+            critical_threshold: 90.0,
+        });
+
+        assert!(sysmon.check_alerts().is_empty());
+        sysmon.update_sensor_value("cpu_temp", 80.0);
+        let alerts = sysmon.check_alerts();
+        assert_eq!(alerts.len(), 1);
+        assert_eq!(alerts[0].1, "WARNING");
+    }
+
+    #[test]
+    fn test_kernel_livepatch_fentry() {
+        let mut livepatch = LinuxKernelLivepatchEngine::new();
+        livepatch.register_patch("vfs_read", 0xFF80001000, 0xFF80009000);
+
+        assert_eq!(livepatch.resolve_entry(0xFF80001000), 0xFF80001000);
+        livepatch.apply_livepatch("vfs_read").unwrap();
+        assert_eq!(livepatch.resolve_entry(0xFF80001000), 0xFF80009000);
+    }
 
     #[test]
     fn test_arch_aur_manager() {

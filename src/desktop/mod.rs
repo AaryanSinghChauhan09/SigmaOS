@@ -12,6 +12,12 @@ pub mod screensaver;
 
 pub use screensaver::{
     DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+pub mod mate_packages;
+
+pub use mate_packages::{
+    AppletKind, BetsyBundleHeader, BetsyPackageBundleExporter, MateAptUrlProtocolHandler,
+    MateDesktopApplet, MatePanelLayout, MatePkgPpaRepositoryManager, MateSoftwareStoreManager,
+    MateStoreAppEntry, PanelPosition, PpaRepositorySource,
 };
 
 pub use pantheon::{
