@@ -298,6 +298,130 @@ impl AdwPreferencesEngine {
     pub fn total_settings_count(&self) -> usize {
         self.pages.iter().flat_map(|p| p.groups.iter()).map(|g| g.rows.len()).sum()
     }
+
+    pub fn search_rows(&self, query: &str) -> Vec<&AdwPreferenceRow> {
+        let q = query.to_lowercase();
+        let mut results = Vec::new();
+        for page in &self.pages {
+            for group in &page.groups {
+                for row in &group.rows {
+                    let title = match row {
+                        AdwPreferenceRow::ActionRow { title, .. } => title,
+                        AdwPreferenceRow::SwitchRow { title, .. } => title,
+                        AdwPreferenceRow::ComboRow { title, .. } => title,
+                        AdwPreferenceRow::EntryRow { title, .. } => title,
+                    };
+                    if title.to_lowercase().contains(&q) {
+                        results.push(row);
+                    }
+                }
+            }
+        }
+        results
+    }
+}
+
+/// Libadwaita Banner Severity
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AdwBannerSeverity {
+    Info,
+    Warning,
+    Error,
+}
+
+/// Libadwaita Banner Notification (AdwBanner inspired)
+#[derive(Debug, Clone)]
+pub struct AdwBanner {
+    pub title: String,
+    pub button_label: Option<String>,
+    pub severity: AdwBannerSeverity,
+    pub revealed: bool,
+}
+
+impl AdwBanner {
+    pub fn new(title: &str, severity: AdwBannerSeverity) -> Self {
+        Self {
+            title: title.to_string(),
+            button_label: None,
+            severity,
+            revealed: true,
+        }
+    }
+
+    pub fn with_button(mut self, label: &str) -> Self {
+        self.button_label = Some(label.to_string());
+        self
+    }
+
+    pub fn dismiss(&mut self) {
+        self.revealed = false;
+    }
+
+    pub fn reveal(&mut self) {
+        self.revealed = true;
+    }
+}
+
+/// Libadwaita View Switcher Tab Item (AdwViewSwitcher inspired)
+#[derive(Debug, Clone)]
+pub struct AdwViewSwitcherTab {
+    pub id: String,
+    pub title: String,
+    pub icon_name: String,
+    pub badge_number: u32,
+}
+
+/// Libadwaita View Switcher Tab Bar Engine
+#[derive(Debug, Clone)]
+pub struct AdwViewSwitcher {
+    pub tabs: Vec<AdwViewSwitcherTab>,
+    pub active_tab_id: String,
+}
+
+impl AdwViewSwitcher {
+    pub fn new() -> Self {
+        Self {
+            tabs: Vec::new(),
+            active_tab_id: String::new(),
+        }
+    }
+
+    pub fn add_tab(&mut self, id: &str, title: &str, icon_name: &str) {
+        let tab = AdwViewSwitcherTab {
+            id: id.to_string(),
+            title: title.to_string(),
+            icon_name: icon_name.to_string(),
+            badge_number: 0,
+        };
+        if self.tabs.is_empty() {
+            self.active_tab_id = id.to_string();
+        }
+        self.tabs.push(tab);
+    }
+
+    pub fn set_badge(&mut self, id: &str, badge_number: u32) -> bool {
+        if let Some(tab) = self.tabs.iter_mut().find(|t| t.id == id) {
+            tab.badge_number = badge_number;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn switch_to(&mut self, id: &str) -> bool {
+        if self.tabs.iter().any(|t| t.id == id) {
+            self.active_tab_id = id.to_string();
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for AdwViewSwitcher {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Adaptive Responsive Navigation Split View Container (Libadwaita / Libhandy)
@@ -445,12 +569,51 @@ impl Default for XAppStatusIconManager {
     }
 }
 
+/// FreeBSD Capsicum GTK Sandbox Capability Guard
+#[derive(Debug, Clone)]
+pub struct FreeBsdCapsicumGtkGuard {
+    pub in_capability_mode: bool,
+    pub allowed_fd_rights: Vec<String>,
+}
+
+impl FreeBsdCapsicumGtkGuard {
+    pub fn new() -> Self {
+        Self {
+            in_capability_mode: false,
+            allowed_fd_rights: Vec::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) -> Result<(), &'static str> {
+        self.allowed_fd_rights.push("CAP_READ".to_string());
+        self.allowed_fd_rights.push("CAP_WRITE".to_string());
+        self.allowed_fd_rights.push("CAP_SEEK".to_string());
+        self.allowed_fd_rights.push("CAP_MMAP".to_string());
+        self.in_capability_mode = true;
+        Ok(())
+    }
+
+    pub fn is_right_allowed(&self, right: &str) -> bool {
+        if !self.in_capability_mode {
+            return true;
+        }
+        self.allowed_fd_rights.iter().any(|r| r == right)
+    }
+}
+
+impl Default for FreeBsdCapsicumGtkGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// OpenBSD Pledge/Unveil & FreeBSD Sandbox Guard for GTK Processes
 #[derive(Debug, Clone)]
 pub struct BsdGtkSandboxGuard {
     pub pledged_promises: String,
     pub unveiled_paths: Vec<(String, String)>,
     pub sandbox_active: bool,
+    pub capsicum_guard: FreeBsdCapsicumGtkGuard,
 }
 
 impl BsdGtkSandboxGuard {
@@ -459,6 +622,7 @@ impl BsdGtkSandboxGuard {
             pledged_promises: "stdio rpath wpath cpath unix inet prot_exec tty gpath".to_string(),
             unveiled_paths: Vec::new(),
             sandbox_active: false,
+            capsicum_guard: FreeBsdCapsicumGtkGuard::new(),
         }
     }
 
@@ -473,6 +637,7 @@ impl BsdGtkSandboxGuard {
             self.unveil_path("/usr/share/icons", "r");
             self.unveil_path("/usr/share/fonts", "r");
         }
+        self.capsicum_guard.enter_capability_mode()?;
         self.sandbox_active = true;
         Ok(())
     }
@@ -498,6 +663,8 @@ pub struct SovereignGtkToolkitEngine {
     pub header_bar: GtkHeaderBar,
     pub preference_engine: AdwPreferencesEngine,
     pub navigation_split_view: AdwNavigationSplitView,
+    pub view_switcher: AdwViewSwitcher,
+    pub banner: Option<AdwBanner>,
     pub toast_overlay: GtkToastOverlay,
     pub status_icon_manager: XAppStatusIconManager,
     pub bsd_sandbox_guard: BsdGtkSandboxGuard,
@@ -510,6 +677,8 @@ impl SovereignGtkToolkitEngine {
             header_bar: GtkHeaderBar::new(app_name),
             preference_engine: AdwPreferencesEngine::new(&format!("{} Preferences", app_name)),
             navigation_split_view: AdwNavigationSplitView::new(),
+            view_switcher: AdwViewSwitcher::new(),
+            banner: None,
             toast_overlay: GtkToastOverlay::new(),
             status_icon_manager: XAppStatusIconManager::new(),
             bsd_sandbox_guard: BsdGtkSandboxGuard::new(),
@@ -527,6 +696,10 @@ impl SovereignGtkToolkitEngine {
         );
 
         engine
+    }
+
+    pub fn set_banner(&mut self, banner: AdwBanner) {
+        self.banner = Some(banner);
     }
 
     pub fn initialize_security_sandbox(&mut self) -> Result<(), &'static str> {
@@ -638,12 +811,45 @@ mod tests {
     }
 
     #[test]
+    fn test_adw_banner_and_view_switcher() {
+        let mut banner = AdwBanner::new("Updates available", AdwBannerSeverity::Info).with_button("Restart");
+        assert!(banner.revealed);
+        assert_eq!(banner.severity, AdwBannerSeverity::Info);
+        banner.dismiss();
+        assert!(!banner.revealed);
+
+        let mut switcher = AdwViewSwitcher::new();
+        switcher.add_tab("home", "Home", "user-home-symbolic");
+        switcher.add_tab("explore", "Explore", "compass-symbolic");
+
+        assert_eq!(switcher.active_tab_id, "home");
+        assert!(switcher.set_badge("explore", 5));
+        assert!(switcher.switch_to("explore"));
+        assert_eq!(switcher.active_tab_id, "explore");
+    }
+
+    #[test]
+    fn test_freebsd_capsicum_gtk_guard() {
+        let mut guard = FreeBsdCapsicumGtkGuard::new();
+        assert!(guard.is_right_allowed("CAP_READ"));
+
+        assert!(guard.enter_capability_mode().is_ok());
+        assert!(guard.in_capability_mode);
+        assert!(guard.is_right_allowed("CAP_READ"));
+        assert!(!guard.is_right_allowed("CAP_SYS_ADMIN"));
+    }
+
+    #[test]
     fn test_sovereign_gtk_toolkit_engine() {
         let mut engine = SovereignGtkToolkitEngine::new("Sigma Terminal");
         engine.set_theme("Adwaita", GtkAccentColor::Purple, GtkThemeMode::PreferDark);
 
+        engine.set_banner(AdwBanner::new("Low battery", AdwBannerSeverity::Warning));
+        assert!(engine.banner.is_some());
+
         assert_eq!(engine.css_provider.accent_color, GtkAccentColor::Purple);
         assert!(engine.initialize_security_sandbox().is_ok());
         assert!(engine.bsd_sandbox_guard.sandbox_active);
+        assert!(engine.bsd_sandbox_guard.capsicum_guard.in_capability_mode);
     }
 }

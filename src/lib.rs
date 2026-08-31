@@ -192,9 +192,9 @@ pub use desktop::mate_betsy::{
 };
 
 pub use ui::gtk::{
-    AdwNavigationSplitView, AdwPreferencesEngine, BsdGtkSandboxGuard, GtkAccentColor,
-    GtkCssProvider, GtkHeaderBar, GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine,
-    XAppStatusIconManager,
+    AdwBanner, AdwBannerSeverity, AdwNavigationSplitView, AdwPreferencesEngine, AdwViewSwitcher,
+    BsdGtkSandboxGuard, FreeBsdCapsicumGtkGuard, GtkAccentColor, GtkCssProvider, GtkHeaderBar,
+    GtkThemeMode, GtkToastOverlay, SovereignGtkToolkitEngine, XAppStatusIconManager,
 };
 
 pub use customization::{
