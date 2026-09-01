@@ -1,0 +1,25 @@
+name: Sovereign Kernel Fuzzing & Sanitizer Harness CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  kernel-fuzzing-sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Execute Fuzzing Harness Script
+        run: bash scripts/fuzz.sh

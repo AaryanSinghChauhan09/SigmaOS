@@ -50,7 +50,7 @@ jobs:
       - name: Build API documentation
         run: cargo doc --workspace --no-deps --release || cargo doc --no-deps || true
         env:
-          RUSTDOCFLAGS: "--cfg docsrs --html-in-header .cargo/html-header.html"
+          RUSTDOCFLAGS: "--cfg docsrs"
 
       - name: Create pages index
         run: |

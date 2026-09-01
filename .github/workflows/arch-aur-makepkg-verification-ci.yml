@@ -1,0 +1,25 @@
+name: Arch Linux Pacman & AUR Makepkg Verification CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  arch-pacman-aur-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Arch Pacman Engine & AUR Verifier
+        run: cargo test --lib sigpkg::arch_pacman_engine

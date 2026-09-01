@@ -1,0 +1,25 @@
+name: DragonFly BSD HAMMER2 MVCC & Storage CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  dragonfly-hammer2-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test DragonFly BSD HAMMER2 Subsystem
+        run: cargo test --lib filesystem::hammer2
