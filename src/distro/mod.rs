@@ -141,6 +141,10 @@ pub use sovereign_distro_dominance::{
     SovereignDistroDominanceSuite, NixGuixZeroCopyStore, CachyBoreDynamicAiScheduler,
     OpenBsdHardenedCapsicumPledge, ZfsBtrfsHybridSelfHealingCoW, SovereignMicrovmHypervisorGateway,
     SovereignPqcWireguardVpnEngine, MicrovmState, VirtioConfig, WireguardPeer,
+    PopOsSystem76AutoScheduler, ProcessPowerProfile, ManagedProcessAffinity,
+    TalosHeadlessMtlsClusterEngine, ClusterNodeConfig,
+    AlpineApkCASPackageCache, CasPackageBlob,
+    FreeBsdBhyveMicrovmJailBridge, IsolationType, HybridIsolationInstance,
 };
 
 pub mod void_xbps_src;
