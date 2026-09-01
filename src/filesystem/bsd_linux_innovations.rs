@@ -8,11 +8,10 @@
 use alloc::vec;
 extern crate alloc;
 
-
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Metadata update dependency types for FreeBSD Soft Updates
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,7 +97,7 @@ impl Default for BsdSoftUpdatesEngine {
 pub const MNT_RDONLY: u32 = 0x0001;
 pub const MNT_NOEXEC: u32 = 0x0002;
 pub const MNT_NOSUID: u32 = 0x0004;
-pub const MNT_NODEV:  u32 = 0x0008;
+pub const MNT_NODEV: u32 = 0x0008;
 
 /// OpenBSD-inspired Mount Flag and Securelevel Enforcer
 pub struct OpenBsdMountEnforcer {
@@ -160,8 +159,8 @@ impl Default for OpenBsdMountEnforcer {
 
 /// Linux OverlayFS / Union Mount Subsystem
 pub struct LinuxOverlayFsManager {
-    pub lower_layer: BTreeMap<String, Vec<u8>>,  // Read-only lower layer
-    pub upper_layer: BTreeMap<String, Vec<u8>>,  // Read-write upper layer
+    pub lower_layer: BTreeMap<String, Vec<u8>>, // Read-only lower layer
+    pub upper_layer: BTreeMap<String, Vec<u8>>, // Read-write upper layer
     pub whiteouts: Vec<String>,                 // Deleted lower-layer entries
 }
 
@@ -229,7 +228,12 @@ pub struct LinuxProcSysfsEmulator {
 }
 
 impl LinuxProcSysfsEmulator {
-    pub fn new(uptime_seconds: u64, total_memory_kb: u64, free_memory_kb: u64, cpu_count: usize) -> Self {
+    pub fn new(
+        uptime_seconds: u64,
+        total_memory_kb: u64,
+        free_memory_kb: u64,
+        cpu_count: usize,
+    ) -> Self {
         Self {
             uptime_seconds,
             total_memory_kb,
@@ -246,9 +250,15 @@ impl LinuxProcSysfsEmulator {
                 self.total_memory_kb, self.free_memory_kb
             )),
             "/proc/uptime" => Some(format!("{}.00 0.00\n", self.uptime_seconds)),
-            "/proc/version" => Some("Linux version 6.8.0-sigmaos (gcc 13.2.0) #1 SMP PREEMPT_DYNAMIC\n".to_string()),
-            "/sys/devices/system/cpu/online" => Some(format!("0-{}\n", self.cpu_count.saturating_sub(1))),
-            "/sys/kernel/debug" => Some("debugfs /sys/kernel/debug debugfs rw,relatime 0 0\n".to_string()),
+            "/proc/version" => Some(
+                "Linux version 6.8.0-sigmaos (gcc 13.2.0) #1 SMP PREEMPT_DYNAMIC\n".to_string(),
+            ),
+            "/sys/devices/system/cpu/online" => {
+                Some(format!("0-{}\n", self.cpu_count.saturating_sub(1)))
+            }
+            "/sys/kernel/debug" => {
+                Some("debugfs /sys/kernel/debug debugfs rw,relatime 0 0\n".to_string())
+            }
             _ => None,
         }
     }
@@ -265,9 +275,21 @@ mod tests {
         // Register 1: BlockAlloc
         let op0 = engine.register_operation(MetadataOp::BlockAlloc { block_id: 100 }, None);
         // Register 2: InodeAlloc depending on BlockAlloc
-        let op1 = engine.register_operation(MetadataOp::InodeAlloc { inode_id: 5, block_id: 100 }, Some(op0));
+        let op1 = engine.register_operation(
+            MetadataOp::InodeAlloc {
+                inode_id: 5,
+                block_id: 100,
+            },
+            Some(op0),
+        );
         // Register 3: DirAddEntry depending on InodeAlloc
-        let op2 = engine.register_operation(MetadataOp::DirAddEntry { parent_inode: 1, child_inode: 5 }, Some(op1));
+        let op2 = engine.register_operation(
+            MetadataOp::DirAddEntry {
+                parent_inode: 1,
+                child_inode: 5,
+            },
+            Some(op1),
+        );
 
         assert!(!engine.is_fully_committed());
         let sequence = engine.commit_flush_sequence();
@@ -282,13 +304,19 @@ mod tests {
         enforcer.set_mount_flags("/var", MNT_NOEXEC | MNT_NOSUID);
 
         // Read/Write on /var should succeed
-        assert!(enforcer.validate_access("/var", "/var/log/syslog", true, false, false, 0).is_ok());
+        assert!(enforcer
+            .validate_access("/var", "/var/log/syslog", true, false, false, 0)
+            .is_ok());
 
         // Execution on /var should fail due to MNT_NOEXEC
-        assert!(enforcer.validate_access("/var", "/var/tmp/script.sh", false, true, false, 0).is_err());
+        assert!(enforcer
+            .validate_access("/var", "/var/tmp/script.sh", false, true, false, 0)
+            .is_err());
 
         // Raw disk write with securelevel > 0 should fail
-        assert!(enforcer.validate_access("/", "/dev/raw/disk0", true, false, false, 1).is_err());
+        assert!(enforcer
+            .validate_access("/", "/dev/raw/disk0", true, false, false, 1)
+            .is_err());
     }
 
     #[test]
@@ -297,11 +325,17 @@ mod tests {
         overlay.add_lower_file("/etc/hosts", b"127.0.0.1 localhost");
 
         // Read from lower layer
-        assert_eq!(overlay.read_file("/etc/hosts").unwrap(), b"127.0.0.1 localhost");
+        assert_eq!(
+            overlay.read_file("/etc/hosts").unwrap(),
+            b"127.0.0.1 localhost"
+        );
 
         // Copy-up write to upper layer
         overlay.write_file("/etc/hosts", b"127.0.0.1 localhost sigmaos");
-        assert_eq!(overlay.read_file("/etc/hosts").unwrap(), b"127.0.0.1 localhost sigmaos");
+        assert_eq!(
+            overlay.read_file("/etc/hosts").unwrap(),
+            b"127.0.0.1 localhost sigmaos"
+        );
 
         // Delete (creates whiteout)
         assert!(overlay.delete_file("/etc/hosts"));
@@ -315,7 +349,9 @@ mod tests {
         let meminfo = emu.read_virtual_path("/proc/meminfo").unwrap();
         assert!(meminfo.contains("16384000 kB"));
 
-        let cpu = emu.read_virtual_path("/sys/devices/system/cpu/online").unwrap();
+        let cpu = emu
+            .read_virtual_path("/sys/devices/system/cpu/online")
+            .unwrap();
         assert_eq!(cpu, "0-7\n");
     }
 }
@@ -391,13 +427,25 @@ mod fhs_tests {
         // Merged-usr test
         assert_eq!(engine.resolve_fhs_path("/bin/sh"), "/usr/bin/sh");
         assert_eq!(engine.resolve_fhs_path("/sbin/init"), "/usr/sbin/init");
-        assert_eq!(engine.resolve_fhs_path("/lib/libc.so.6"), "/usr/lib/libc.so.6");
+        assert_eq!(
+            engine.resolve_fhs_path("/lib/libc.so.6"),
+            "/usr/lib/libc.so.6"
+        );
 
         // /var/run redirection
-        assert_eq!(engine.resolve_fhs_path("/var/run/sshd.pid"), "/run/sshd.pid");
-        assert_eq!(engine.resolve_fhs_path("/var/lock/subsys"), "/run/lock/subsys");
+        assert_eq!(
+            engine.resolve_fhs_path("/var/run/sshd.pid"),
+            "/run/sshd.pid"
+        );
+        assert_eq!(
+            engine.resolve_fhs_path("/var/lock/subsys"),
+            "/run/lock/subsys"
+        );
 
         // FreeBSD hier(7) /usr/local
-        assert_eq!(engine.resolve_fhs_path("/usr/local/etc/nginx.conf"), "/usr/local/etc/nginx.conf");
+        assert_eq!(
+            engine.resolve_fhs_path("/usr/local/etc/nginx.conf"),
+            "/usr/local/etc/nginx.conf"
+        );
     }
 }

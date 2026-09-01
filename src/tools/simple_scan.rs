@@ -122,8 +122,12 @@ impl SovereignSimpleScanEngine {
             .ok_or("No active scanner selected")?;
 
         let page_num = (self.scanned_pages.len() + 1) as u32;
-        let width_px = (self.current_options.width_mm as f32 * self.current_options.dpi_resolution as f32 / 25.4) as u32;
-        let height_px = (self.current_options.height_mm as f32 * self.current_options.dpi_resolution as f32 / 25.4) as u32;
+        let width_px = (self.current_options.width_mm as f32
+            * self.current_options.dpi_resolution as f32
+            / 25.4) as u32;
+        let height_px = (self.current_options.height_mm as f32
+            * self.current_options.dpi_resolution as f32
+            / 25.4) as u32;
 
         let total_pixels = (width_px * height_px) as usize;
         let dummy_pixels = vec![255; total_pixels * 3]; // RGB white canvas
@@ -139,9 +143,18 @@ impl SovereignSimpleScanEngine {
         Ok(page_num)
     }
 
-    pub fn perform_ocr_text_extraction(&mut self, page_index: usize) -> Result<String, &'static str> {
-        let page = self.scanned_pages.get_mut(page_index).ok_or("Page index out of bounds")?;
-        let simulated_ocr = format!("Sovereign OCR Text Extracted from Scanned Page #{}", page.page_number);
+    pub fn perform_ocr_text_extraction(
+        &mut self,
+        page_index: usize,
+    ) -> Result<String, &'static str> {
+        let page = self
+            .scanned_pages
+            .get_mut(page_index)
+            .ok_or("Page index out of bounds")?;
+        let simulated_ocr = format!(
+            "Sovereign OCR Text Extracted from Scanned Page #{}",
+            page.page_number
+        );
         page.ocr_extracted_text = Some(simulated_ocr.clone());
         Ok(simulated_ocr)
     }
@@ -159,7 +172,10 @@ impl SovereignSimpleScanEngine {
         Ok(())
     }
 
-    pub fn export_document_multipage(&self, format: ScanExportFormat) -> Result<Vec<u8>, &'static str> {
+    pub fn export_document_multipage(
+        &self,
+        format: ScanExportFormat,
+    ) -> Result<Vec<u8>, &'static str> {
         if self.scanned_pages.is_empty() {
             return Err("No scanned pages available to export");
         }
@@ -168,14 +184,17 @@ impl SovereignSimpleScanEngine {
         match format {
             ScanExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n");
-                output.extend_from_slice(format!("%%Pages: {}\n", self.scanned_pages.len()).as_bytes());
+                output.extend_from_slice(
+                    format!("%%Pages: {}\n", self.scanned_pages.len()).as_bytes(),
+                );
                 output.extend_from_slice(b"%%EOF\n");
             }
             ScanExportFormat::Jpeg => {
                 output.extend_from_slice(&[0xFF, 0xD8, 0xFF, 0xE0]); // JPEG SOI & APP0
             }
             ScanExportFormat::Png => {
-                output.extend_from_slice(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]); // PNG Signature
+                output.extend_from_slice(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+                // PNG Signature
             }
             ScanExportFormat::Tiff => {
                 output.extend_from_slice(b"II*\x00"); // TIFF Little-Endian Header
@@ -211,7 +230,9 @@ mod tests {
         assert!(scan.reorder_pages(1, 0).is_ok());
         assert_eq!(scan.scanned_pages[0].page_number, 1);
 
-        let pdf = scan.export_document_multipage(ScanExportFormat::Pdf).unwrap();
+        let pdf = scan
+            .export_document_multipage(ScanExportFormat::Pdf)
+            .unwrap();
         assert!(pdf.starts_with(b"%PDF-1.7"));
     }
 }

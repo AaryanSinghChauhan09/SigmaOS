@@ -324,7 +324,13 @@ impl SovereignBrushEngine {
     }
 
     /// Calculates Catmull-Rom spline interpolation between stroke control points for smooth curves
-    pub fn interpolate_catmull_rom(p0: BrushPoint, p1: BrushPoint, p2: BrushPoint, p3: BrushPoint, t: f32) -> BrushPoint {
+    pub fn interpolate_catmull_rom(
+        p0: BrushPoint,
+        p1: BrushPoint,
+        p2: BrushPoint,
+        p3: BrushPoint,
+        t: f32,
+    ) -> BrushPoint {
         let t2 = t * t;
         let t3 = t2 * t;
 
@@ -380,12 +386,19 @@ impl SovereignBrushEngine {
 
                         if src_a > 0 {
                             let dst = pixels[idx];
-                            let blended_r = ((self.color.r as u32 * src_a as u32 + dst.r as u32 * (255 - src_a) as u32) / 255) as u8;
-                            let blended_g = ((self.color.g as u32 * src_a as u32 + dst.g as u32 * (255 - src_a) as u32) / 255) as u8;
-                            let blended_b = ((self.color.b as u32 * src_a as u32 + dst.b as u32 * (255 - src_a) as u32) / 255) as u8;
+                            let blended_r = ((self.color.r as u32 * src_a as u32
+                                + dst.r as u32 * (255 - src_a) as u32)
+                                / 255) as u8;
+                            let blended_g = ((self.color.g as u32 * src_a as u32
+                                + dst.g as u32 * (255 - src_a) as u32)
+                                / 255) as u8;
+                            let blended_b = ((self.color.b as u32 * src_a as u32
+                                + dst.b as u32 * (255 - src_a) as u32)
+                                / 255) as u8;
                             let blended_a = dst.a.saturating_add(src_a);
 
-                            pixels[idx] = ColorRgba::new(blended_r, blended_g, blended_b, blended_a);
+                            pixels[idx] =
+                                ColorRgba::new(blended_r, blended_g, blended_b, blended_a);
                         }
                     }
                 }
@@ -512,7 +525,17 @@ impl SigmaVectorPathEngine {
     }
 
     /// Evaluates cubic Bezier curve point given control handles
-    pub fn evaluate_cubic_bezier(p0_x: f32, p0_y: f32, c0_x: f32, c0_y: f32, c1_x: f32, c1_y: f32, p1_x: f32, p1_y: f32, t: f32) -> (f32, f32) {
+    pub fn evaluate_cubic_bezier(
+        p0_x: f32,
+        p0_y: f32,
+        c0_x: f32,
+        c0_y: f32,
+        c1_x: f32,
+        c1_y: f32,
+        p1_x: f32,
+        p1_y: f32,
+        t: f32,
+    ) -> (f32, f32) {
         let u = 1.0 - t;
         let tt = t * t;
         let uu = u * u;
@@ -532,7 +555,8 @@ impl SigmaVectorPathEngine {
         }
 
         let segment_count = self.points.len() - if self.closed { 0 } else { 1 };
-        let brush = SovereignBrushEngine::new(BrushType::PixelArt, self.stroke_width, self.stroke_color);
+        let brush =
+            SovereignBrushEngine::new(BrushType::PixelArt, self.stroke_width, self.stroke_color);
 
         for i in 0..segment_count {
             let p0 = self.points[i];
@@ -542,14 +566,22 @@ impl SigmaVectorPathEngine {
             for s in 0..=steps {
                 let t = s as f32 / steps as f32;
                 let (bx, by) = Self::evaluate_cubic_bezier(
-                    p0.x, p0.y,
-                    p0.handle_out_x, p0.handle_out_y,
-                    p1.handle_in_x, p1.handle_in_y,
-                    p1.x, p1.y,
+                    p0.x,
+                    p0.y,
+                    p0.handle_out_x,
+                    p0.handle_out_y,
+                    p1.handle_in_x,
+                    p1.handle_in_y,
+                    p1.x,
+                    p1.y,
                     t,
                 );
 
-                let bp = BrushPoint { x: bx, y: by, pressure: 1.0 };
+                let bp = BrushPoint {
+                    x: bx,
+                    y: by,
+                    pressure: 1.0,
+                };
                 brush.paint_dab(bp, width, height, pixels);
             }
         }
@@ -580,13 +612,22 @@ impl SigmaPaletteManager {
         self.colors.clear();
         for line in gpl_text.lines() {
             let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with("GIMP Palette") || trimmed.starts_with("Name:") || trimmed.starts_with("Columns:") {
+            if trimmed.is_empty()
+                || trimmed.starts_with('#')
+                || trimmed.starts_with("GIMP Palette")
+                || trimmed.starts_with("Name:")
+                || trimmed.starts_with("Columns:")
+            {
                 continue;
             }
 
             let parts: Vec<&str> = trimmed.split_whitespace().collect();
             if parts.len() >= 3 {
-                if let (Ok(r), Ok(g), Ok(b)) = (parts[0].parse::<u8>(), parts[1].parse::<u8>(), parts[2].parse::<u8>()) {
+                if let (Ok(r), Ok(g), Ok(b)) = (
+                    parts[0].parse::<u8>(),
+                    parts[1].parse::<u8>(),
+                    parts[2].parse::<u8>(),
+                ) {
                     self.colors.push(ColorRgba::new(r, g, b, 255));
                 }
             }
@@ -630,7 +671,11 @@ impl SigmaImageExporter {
     }
 
     /// Exports canvas pixel buffer as Quite OK Image (QOI) lightweight binary byte stream
-    pub fn export_qoi_bytes(width: u32, height: u32, pixels: &[ColorRgba]) -> Result<Vec<u8>, PhotoError> {
+    pub fn export_qoi_bytes(
+        width: u32,
+        height: u32,
+        pixels: &[ColorRgba],
+    ) -> Result<Vec<u8>, PhotoError> {
         if width == 0 || height == 0 || pixels.len() != (width * height) as usize {
             return Err(PhotoError::InvalidDimensions);
         }
@@ -700,11 +745,28 @@ mod tests {
 
     #[test]
     fn test_brush_engine_and_spline_interpolation() {
-        let brush = SovereignBrushEngine::new(BrushType::SoftRound, 10.0, ColorRgba::new(0, 0, 255, 255));
-        let p0 = BrushPoint { x: 0.0, y: 0.0, pressure: 0.5 };
-        let p1 = BrushPoint { x: 10.0, y: 10.0, pressure: 0.8 };
-        let p2 = BrushPoint { x: 20.0, y: 10.0, pressure: 0.8 };
-        let p3 = BrushPoint { x: 30.0, y: 0.0, pressure: 0.5 };
+        let brush =
+            SovereignBrushEngine::new(BrushType::SoftRound, 10.0, ColorRgba::new(0, 0, 255, 255));
+        let p0 = BrushPoint {
+            x: 0.0,
+            y: 0.0,
+            pressure: 0.5,
+        };
+        let p1 = BrushPoint {
+            x: 10.0,
+            y: 10.0,
+            pressure: 0.8,
+        };
+        let p2 = BrushPoint {
+            x: 20.0,
+            y: 10.0,
+            pressure: 0.8,
+        };
+        let p3 = BrushPoint {
+            x: 30.0,
+            y: 0.0,
+            pressure: 0.5,
+        };
 
         let mid = SovereignBrushEngine::interpolate_catmull_rom(p0, p1, p2, p3, 0.5);
         assert!(mid.x > 10.0 && mid.x < 20.0);
@@ -733,14 +795,20 @@ mod tests {
     fn test_vector_path_engine() {
         let mut path = SigmaVectorPathEngine::new();
         path.add_point(VectorControlPoint {
-            x: 2.0, y: 2.0,
-            handle_in_x: 2.0, handle_in_y: 2.0,
-            handle_out_x: 5.0, handle_out_y: 2.0,
+            x: 2.0,
+            y: 2.0,
+            handle_in_x: 2.0,
+            handle_in_y: 2.0,
+            handle_out_x: 5.0,
+            handle_out_y: 2.0,
         });
         path.add_point(VectorControlPoint {
-            x: 8.0, y: 8.0,
-            handle_in_x: 5.0, handle_in_y: 8.0,
-            handle_out_x: 8.0, handle_out_y: 8.0,
+            x: 8.0,
+            y: 8.0,
+            handle_in_x: 5.0,
+            handle_in_y: 8.0,
+            handle_out_x: 8.0,
+            handle_out_y: 8.0,
         });
 
         let mut pixels = alloc::vec![ColorRgba::new(255, 255, 255, 0); 100]; // 10x10 canvas
@@ -754,13 +822,15 @@ mod tests {
     #[test]
     fn test_palette_manager() {
         let mut palette = SigmaPaletteManager::new("Tango");
-        let gpl_data = "GIMP Palette\nName: Tango\n# Comment\n252 233 79 Butter\n138 226 52 Chameleon\n";
+        let gpl_data =
+            "GIMP Palette\nName: Tango\n# Comment\n252 233 79 Butter\n138 226 52 Chameleon\n";
 
         let count = palette.load_gpl_palette(gpl_data);
         assert_eq!(count, 2);
         assert_eq!(palette.colors[0], ColorRgba::new(252, 233, 79, 255));
 
-        let comp = SigmaPaletteManager::compute_complementary_color(ColorRgba::new(200, 100, 50, 255));
+        let comp =
+            SigmaPaletteManager::compute_complementary_color(ColorRgba::new(200, 100, 50, 255));
         assert_eq!(comp, ColorRgba::new(55, 155, 205, 255));
     }
 

@@ -3,7 +3,6 @@ extern crate alloc;
 // SigmaOS Distro-Inspired Clean-Room Drivers
 // Replicates key drivers, device nodes, and audio/crypto subsystems from Linux & BSD distributions
 
-
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};

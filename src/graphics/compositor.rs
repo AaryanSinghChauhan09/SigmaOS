@@ -609,11 +609,7 @@ impl Compositor for SimpleCompositor {
             return Err(GraphicsError::PermissionDenied);
         }
 
-        if let Some(pos) = self
-            .windows
-            .iter()
-            .position(|w| w.id() == id)
-        {
+        if let Some(pos) = self.windows.iter().position(|w| w.id() == id) {
             self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
             self.stats.total_windows -= 1;

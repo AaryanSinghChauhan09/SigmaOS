@@ -180,11 +180,7 @@ mod additional_secure_boot_tests {
 
     #[test]
     fn test_unified_kernel_image_signing_and_hashing() {
-        let mut uki = UnifiedKernelImage::new(
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-        );
+        let mut uki = UnifiedKernelImage::new(Vec::new(), Vec::new(), Vec::new());
 
         uki.kernel_payload.push(0xDE);
         uki.initramfs_payload.push(0xAD);

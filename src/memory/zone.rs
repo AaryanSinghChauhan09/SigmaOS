@@ -2,7 +2,6 @@ extern crate alloc;
 // SigmaOS BSD-inspired Zone / UMA (Universal Memory Allocator) Allocator
 // Implements type-stable object caching for kernel resources
 
-
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -196,7 +195,8 @@ impl BsdZoneAllocator {
         for zone in &mut self.zones {
             let max_slots_per_slab = 4096 / zone.item_size;
             let initial_len = zone.slabs.len();
-            zone.slabs.retain(|s| s.free_slots.len() < max_slots_per_slab);
+            zone.slabs
+                .retain(|s| s.free_slots.len() < max_slots_per_slab);
             freed_slabs += initial_len - zone.slabs.len();
         }
         freed_slabs

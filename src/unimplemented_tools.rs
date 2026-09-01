@@ -2778,7 +2778,13 @@ impl SysinternalsProcMon {
         self.is_capturing = false;
     }
 
-    pub fn record_event(&mut self, pid: u32, proc_name: &str, event_type: ProcMonEventType, detail: &str) {
+    pub fn record_event(
+        &mut self,
+        pid: u32,
+        proc_name: &str,
+        event_type: ProcMonEventType,
+        detail: &str,
+    ) {
         if self.is_capturing {
             let seq = self.sequence_counter;
             self.sequence_counter += 1;
@@ -2797,7 +2803,11 @@ impl SysinternalsProcMon {
     }
 
     pub fn filter_events_by_pid(&self, pid: u32) -> Vec<ProcMonEvent> {
-        self.captured_events.iter().filter(|e| e.pid == pid).cloned().collect()
+        self.captured_events
+            .iter()
+            .filter(|e| e.pid == pid)
+            .cloned()
+            .collect()
     }
 
     pub fn record_operation(&mut self, process: &str, pid: u32, op: &str, path: &str, res: &str) {
@@ -2898,7 +2908,11 @@ impl NetBsdRumpKernelServer {
     }
 
     pub fn unload_component(&mut self, component_name: &str) -> bool {
-        if let Some(idx) = self.active_components.iter().position(|c| c == component_name) {
+        if let Some(idx) = self
+            .active_components
+            .iter()
+            .position(|c| c == component_name)
+        {
             self.active_components.remove(idx);
             true
         } else {
@@ -3596,7 +3610,11 @@ impl MiseUniversalVersionManager {
     }
 
     pub fn install_tool(&mut self, tool: &str, version: &str) {
-        if let Some(existing) = self.installed_tools.iter_mut().find(|t| t.tool_name == tool) {
+        if let Some(existing) = self
+            .installed_tools
+            .iter_mut()
+            .find(|t| t.tool_name == tool)
+        {
             existing.active_version = version.to_string();
         } else {
             self.installed_tools.push(LanguageRuntimeVersion {
@@ -3642,7 +3660,8 @@ impl DevenvReproducibleEnvironment {
     }
 
     pub fn set_env_var(&mut self, key: &str, value: &str) {
-        self.environment_variables.push((key.to_string(), value.to_string()));
+        self.environment_variables
+            .push((key.to_string(), value.to_string()));
     }
 
     pub fn enter_shell(&mut self) -> Result<usize, &'static str> {
@@ -3679,7 +3698,14 @@ impl AircrackWirelessAuditor {
         }
     }
 
-    pub fn scan_airspace(&mut self, bssid: &str, ssid: &str, channel: u8, signal: i8, enc: &'static str) {
+    pub fn scan_airspace(
+        &mut self,
+        bssid: &str,
+        ssid: &str,
+        channel: u8,
+        signal: i8,
+        enc: &'static str,
+    ) {
         self.captured_access_points.push(AccessPointPacket {
             bssid: bssid.to_string(),
             ssid: ssid.to_string(),
@@ -3690,7 +3716,11 @@ impl AircrackWirelessAuditor {
     }
 
     pub fn capture_eapol_handshake(&mut self, target_bssid: &str) -> bool {
-        if self.captured_access_points.iter().any(|ap| ap.bssid == target_bssid) {
+        if self
+            .captured_access_points
+            .iter()
+            .any(|ap| ap.bssid == target_bssid)
+        {
             self.handshake_captured = true;
             return true;
         }
@@ -3788,11 +3818,13 @@ impl ClearLinuxStatelessEngine {
     }
 
     pub fn register_usr_default(&mut self, path: &str, content: &str) {
-        self.usr_defaults.push((path.to_string(), content.to_string()));
+        self.usr_defaults
+            .push((path.to_string(), content.to_string()));
     }
 
     pub fn override_etc(&mut self, path: &str, content: &str) {
-        self.sysconfdir_overrides.push((path.to_string(), content.to_string()));
+        self.sysconfdir_overrides
+            .push((path.to_string(), content.to_string()));
     }
 
     pub fn reset_etc_to_stateless_defaults(&mut self) -> usize {
@@ -3807,7 +3839,6 @@ impl Default for ClearLinuxStatelessEngine {
         Self::new()
     }
 }
-
 
 // =========================================================================
 // UNIT TESTS
@@ -4905,7 +4936,9 @@ mod tests {
     #[test]
     fn test_ubuntu_pro_livepatch_engine() {
         let mut engine_no_sub = UbuntuProLivepatchEngine::new(false);
-        assert!(engine_no_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_err());
+        assert!(engine_no_sub
+            .apply_hotpatch("LP-2026-001", "CWE-119")
+            .is_err());
 
         let mut engine_sub = UbuntuProLivepatchEngine::new(true);
         assert!(engine_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_ok());
@@ -4924,7 +4957,10 @@ mod tests {
     #[test]
     fn test_clear_linux_stateless_engine() {
         let mut engine = ClearLinuxStatelessEngine::new();
-        engine.register_usr_default("/usr/share/defaults/etc/fstab", "LABEL=root / ext4 defaults 0 1");
+        engine.register_usr_default(
+            "/usr/share/defaults/etc/fstab",
+            "LABEL=root / ext4 defaults 0 1",
+        );
         engine.override_etc("/etc/fstab", "/dev/sda1 / ext4 defaults 0 1");
         assert_eq!(engine.sysconfdir_overrides.len(), 1);
         assert_eq!(engine.reset_etc_to_stateless_defaults(), 1);

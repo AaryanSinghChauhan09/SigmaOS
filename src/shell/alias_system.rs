@@ -6,8 +6,6 @@
 //! 3. **Automatic aliases** (typo auto-correction and zsh-style suffix-based file extensions)
 extern crate alloc;
 
-
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};

@@ -10,7 +10,6 @@ extern crate alloc;
 // 2. Copy-on-Write (CoW) Fault Handling: Generates a writable clone of a shared/KSM page upon write intents.
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
 
-
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -512,8 +511,7 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page(virt, decompressed_phys)
-                    .unwrap();
+                self.map_page(virt, decompressed_phys).unwrap();
                 return Ok(decompressed_phys);
             }
         }
@@ -933,10 +931,8 @@ mod tests {
         let virt_a = VirtualAddress(0x1000);
         let virt_b = VirtualAddress(0x2000);
 
-        vmm.map_page(virt_a, PhysicalAddress(0x10000))
-            .unwrap();
-        vmm.map_page(virt_b, PhysicalAddress(0x20000))
-            .unwrap();
+        vmm.map_page(virt_a, PhysicalAddress(0x10000)).unwrap();
+        vmm.map_page(virt_b, PhysicalAddress(0x20000)).unwrap();
 
         // Trigger KSM sweep representing content deduplication
         let merged_phys = vmm

@@ -1,11 +1,10 @@
 extern crate alloc;
 
-use core::mem;
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-
 use alloc::vec::Vec;
+use core::mem;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
@@ -52,7 +51,8 @@ impl SimpleUEFIBootloader {
     pub fn load_kernel_raw(&mut self, src: &[u8], dst: &mut [u8]) -> Result<usize, BootError> {
         let len = src.len().min(dst.len());
         dst[..len].copy_from_slice(&src[..len]);
-        self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);
         Ok(len)
     }

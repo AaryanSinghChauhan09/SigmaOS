@@ -1,9 +1,8 @@
 extern crate alloc;
+use alloc::boxed::Box;
 #[cfg(not(target_os = "none"))]
-
 #[cfg(not(target_os = "none"))]
 use alloc::string::String;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -345,7 +344,11 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            seccomp: SeccompProfile { blocked_syscalls: Vec::new(), hardened: false, blocked_syscalls_mask: 0 },
+            seccomp: SeccompProfile {
+                blocked_syscalls: Vec::new(),
+                hardened: false,
+                blocked_syscalls_mask: 0,
+            },
         }
     }
 
@@ -743,8 +746,6 @@ unsafe fn alloc(size: usize) -> *mut u8 {
     unsafe { std_alloc(layout) }
 }
 
-
-
 /// Flatpak & Snap Sandboxed App Compatibility Layer
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppBundleFormat {
@@ -777,7 +778,10 @@ impl FlatpakSnapCompatLayer {
             app_id: alloc::string::String::from(app_id),
             format: AppBundleFormat::Flatpak,
             runtime_version: alloc::string::String::from(runtime_ver),
-            sandbox_permissions: permissions.iter().map(|&s| alloc::string::String::from(s)).collect(),
+            sandbox_permissions: permissions
+                .iter()
+                .map(|&s| alloc::string::String::from(s))
+                .collect(),
             is_active: false,
         };
         self.installed_bundles.push(bundle);
@@ -788,7 +792,10 @@ impl FlatpakSnapCompatLayer {
             app_id: alloc::string::String::from(snap_name),
             format: AppBundleFormat::Snap,
             runtime_version: alloc::string::String::from(revision),
-            sandbox_permissions: permissions.iter().map(|&s| alloc::string::String::from(s)).collect(),
+            sandbox_permissions: permissions
+                .iter()
+                .map(|&s| alloc::string::String::from(s))
+                .collect(),
             is_active: false,
         };
         self.installed_bundles.push(bundle);
@@ -825,8 +832,8 @@ impl Default for FlatpakSnapCompatLayer {
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
 pub mod oci {
-    use crate::container::ContainerError;
     use crate::container::runtime::NamespaceConfig;
+    use crate::container::ContainerError;
     use alloc::string::{String, ToString};
     use alloc::vec::Vec;
 
@@ -1045,12 +1052,8 @@ mod tests {
 
     #[test]
     fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
+        let mut container =
+            SimpleContainer::new(1, b"hardened_ct", b"alpine", ContainerCapability::full());
         container.seccomp = SeccompProfile {
             blocked_syscalls: Vec::new(),
             hardened: true,

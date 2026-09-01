@@ -17,25 +17,29 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Dependency Resolver Engine for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 5
 /// Implements deterministic solver with conflict diagnostics
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PackageID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ResolverError { Success = 0, Conflict = 1, NotFound = 2, Cycle = 3 }
+pub enum ResolverError {
+    Success = 0,
+    Conflict = 1,
+    NotFound = 2,
+    Cycle = 3,
+}
 
 pub trait Dependency {
     fn package_id(&self) -> PackageID;
@@ -55,7 +59,11 @@ impl SimpleDependency {
         let mut version_array = [0u8; 32];
         let version_len = version.len().min(31);
         unsafe {
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimpleDependency {
             package_id: id,
@@ -66,8 +74,12 @@ impl SimpleDependency {
 }
 
 impl Dependency for SimpleDependency {
-    fn package_id(&self) -> PackageID { self.package_id }
-    fn dependencies(&self) -> Vec<PackageID> { self.deps.clone() }
+    fn package_id(&self) -> PackageID {
+        self.package_id
+    }
+    fn dependencies(&self) -> Vec<PackageID> {
+        self.deps.clone()
+    }
     fn version(&self) -> &[u8] {
         let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
         &self.version[..len]
@@ -163,7 +175,12 @@ impl DependencyResolver for SimpleDependencyResolver {
 }
 
 impl SimpleDependencyResolver {
-    fn visit(&self, id: PackageID, resolved: &mut Vec<PackageID>, visited: &mut Vec<PackageID>) -> Result<(), ResolverError> {
+    fn visit(
+        &self,
+        id: PackageID,
+        resolved: &mut Vec<PackageID>,
+        visited: &mut Vec<PackageID>,
+    ) -> Result<(), ResolverError> {
         if visited.contains(&id) {
             return Err(ResolverError::Cycle);
         }
@@ -187,7 +204,12 @@ impl SimpleDependencyResolver {
         Ok(())
     }
 
-    fn has_cycle(&self, id: PackageID, visited: &mut Vec<PackageID>, rec_stack: &mut Vec<PackageID>) -> bool {
+    fn has_cycle(
+        &self,
+        id: PackageID,
+        visited: &mut Vec<PackageID>,
+        rec_stack: &mut Vec<PackageID>,
+    ) -> bool {
         visited.push(id);
         rec_stack.push(id);
 
@@ -219,7 +241,13 @@ pub trait VersionConstraint {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ConstraintType { Exact = 0, Greater = 1, Less = 2, GreaterEqual = 3, LessEqual = 4 }
+pub enum ConstraintType {
+    Exact = 0,
+    Greater = 1,
+    Less = 2,
+    GreaterEqual = 3,
+    LessEqual = 4,
+}
 
 #[repr(C)]
 pub struct SimpleVersionConstraint {
@@ -232,7 +260,11 @@ impl SimpleVersionConstraint {
         let mut version_array = [0u8; 32];
         let version_len = version.len().min(31);
         unsafe {
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimpleVersionConstraint {
             constraint_type,
@@ -267,13 +299,21 @@ impl VersionConstraint for SimpleVersionConstraint {
 }
 
 pub trait ConflictResolver {
-    fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError>;
+    fn resolve_conflict(
+        &mut self,
+        pkg1: PackageID,
+        pkg2: PackageID,
+    ) -> Result<PackageID, ResolverError>;
     fn get_resolution_strategy(&self) -> ResolutionStrategy;
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ResolutionStrategy { Newest = 0, Oldest = 1, Manual = 2 }
+pub enum ResolutionStrategy {
+    Newest = 0,
+    Oldest = 1,
+    Manual = 2,
+}
 
 #[repr(C)]
 pub struct SimpleConflictResolver {
@@ -289,7 +329,11 @@ impl SimpleConflictResolver {
 }
 
 impl ConflictResolver for SimpleConflictResolver {
-    fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError> {
+    fn resolve_conflict(
+        &mut self,
+        pkg1: PackageID,
+        pkg2: PackageID,
+    ) -> Result<PackageID, ResolverError> {
         let strategy = unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) };
         match strategy {
             ResolutionStrategy::Newest => Ok(pkg1.max(pkg2)),
@@ -303,13 +347,25 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -326,28 +382,43 @@ impl<T> Vec<T> {
         }
         new_vec
     }
-    fn contains(&self, item: &T) -> bool where T: PartialEq {
+    fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
         for i in 0..self.len {
             unsafe {
-                if &*self.data.add(i) == item { return true; }
+                if &*self.data.add(i) == item {
+                    return true;
+                }
             }
         }
         false
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -379,7 +450,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -1,14 +1,11 @@
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Display Manager (GDM/LightDM Inspiration)
 // Login screen, session management, and display server spawning
 
-
-
-
-use crate::klib::{Vec, String};
+use crate::klib::{String, Vec};
 
 /// Session type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,7 +141,10 @@ impl DisplayManager {
             users: Vec::new(),
             autologin: None,
             current_session: None,
-            active_greeter_theme: Some(MdmGreeterTheme::new("Mint-HTML5-Default", GreeterEngineStyle::Html5WebKit)),
+            active_greeter_theme: Some(MdmGreeterTheme::new(
+                "Mint-HTML5-Default",
+                GreeterEngineStyle::Html5WebKit,
+            )),
             accessibility_overlay: GreeterAccessibilityOverlay::new(),
         }
     }

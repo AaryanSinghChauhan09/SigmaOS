@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 use crate::klib::BTreeMap;
 
@@ -238,10 +238,18 @@ impl LocaleManager {
     /// 4. Raw Message Key
     pub fn translate(&self, key: &str) -> String {
         // Strip encoding suffix if present (e.g., "fr_CA.UTF-8" -> "fr_CA")
-        let clean_locale = self.current_locale.split('.').next().unwrap_or(&self.current_locale);
+        let clean_locale = self
+            .current_locale
+            .split('.')
+            .next()
+            .unwrap_or(&self.current_locale);
 
         // Tier 1: Try current exact/cleaned locale
-        if let Some(pack) = self.language_packs.get(clean_locale).or_else(|| self.language_packs.get(&self.current_locale)) {
+        if let Some(pack) = self
+            .language_packs
+            .get(clean_locale)
+            .or_else(|| self.language_packs.get(&self.current_locale))
+        {
             let pack: &LanguagePack = pack;
             if let Some(translation) = pack.translate(key) {
                 let translation: &str = translation;
@@ -271,7 +279,11 @@ impl LocaleManager {
                     return translation.to_string();
                 }
             }
-            let fallback_clean = self.fallback_locale.split('.').next().unwrap_or(&self.fallback_locale);
+            let fallback_clean = self
+                .fallback_locale
+                .split('.')
+                .next()
+                .unwrap_or(&self.fallback_locale);
             if let Some(fallback_base) = fallback_clean.split('_').next() {
                 if let Some(pack) = self.language_packs.get(fallback_base) {
                     let pack: &LanguagePack = pack;

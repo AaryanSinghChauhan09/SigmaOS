@@ -4,8 +4,6 @@ extern crate alloc;
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
 
-
-
 #[cfg(not(test))]
 use crate::kernel::{Priority, Process, ProcessState};
 

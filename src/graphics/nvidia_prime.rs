@@ -36,10 +36,10 @@ pub enum GpuPowerState {
 /// Offload environment variables generator for GL/Vulkan/EGL render offloading
 #[derive(Debug, Clone)]
 pub struct NvidiaPrimeOffloadConfig {
-    pub prime_render_offload: bool,         // __NV_PRIME_RENDER_OFFLOAD=1
-    pub glx_vendor_library_name: String,    // __GLX_VENDOR_LIBRARY_NAME=nvidia
-    pub vk_layer_nv_optimus: String,         // __VK_LAYER_NV_optimus=NVIDIA_only
-    pub egl_vendor_library_filenames: String,// __EGL_VENDOR_LIBRARY_FILENAMES
+    pub prime_render_offload: bool,      // __NV_PRIME_RENDER_OFFLOAD=1
+    pub glx_vendor_library_name: String, // __GLX_VENDOR_LIBRARY_NAME=nvidia
+    pub vk_layer_nv_optimus: String,     // __VK_LAYER_NV_optimus=NVIDIA_only
+    pub egl_vendor_library_filenames: String, // __EGL_VENDOR_LIBRARY_FILENAMES
 }
 
 impl Default for NvidiaPrimeOffloadConfig {
@@ -48,7 +48,9 @@ impl Default for NvidiaPrimeOffloadConfig {
             prime_render_offload: true,
             glx_vendor_library_name: String::from("nvidia"),
             vk_layer_nv_optimus: String::from("NVIDIA_only"),
-            egl_vendor_library_filenames: String::from("/usr/share/glvnd/egl_vendor.d/10_nvidia.json"),
+            egl_vendor_library_filenames: String::from(
+                "/usr/share/glvnd/egl_vendor.d/10_nvidia.json",
+            ),
         }
     }
 }
@@ -61,10 +63,7 @@ impl NvidiaPrimeOffloadConfig {
         }
 
         vec![
-            (
-                String::from("__NV_PRIME_RENDER_OFFLOAD"),
-                String::from("1"),
-            ),
+            (String::from("__NV_PRIME_RENDER_OFFLOAD"), String::from("1")),
             (
                 String::from("__GLX_VENDOR_LIBRARY_NAME"),
                 self.glx_vendor_library_name.clone(),
@@ -152,7 +151,9 @@ impl NvidiaPrimeEngine {
         size_bytes: usize,
     ) -> Result<(), &'static str> {
         if self.power_state == GpuPowerState::D3coldDynamicOff {
-            return Err("NVIDIA PRIME: Cannot export DMA-BUF while dGPU is in D3cold power off state");
+            return Err(
+                "NVIDIA PRIME: Cannot export DMA-BUF while dGPU is in D3cold power off state",
+            );
         }
 
         self.shared_dma_buffers.push(PrimeDmaBufShare {
@@ -169,7 +170,11 @@ impl NvidiaPrimeEngine {
     }
 
     /// Register a process to run with GPU offload environment variables
-    pub fn register_offload_process(&mut self, pid: u32, process_name: &str) -> Result<Vec<(String, String)>, &'static str> {
+    pub fn register_offload_process(
+        &mut self,
+        pid: u32,
+        process_name: &str,
+    ) -> Result<Vec<(String, String)>, &'static str> {
         if self.active_profile == PrimeProfile::IntegratedOnly {
             return Err("NVIDIA PRIME: Offload requested but system is in IntegratedOnly power saving profile");
         }
@@ -187,7 +192,9 @@ impl NvidiaPrimeEngine {
     pub fn unregister_offload_process(&mut self, pid: u32) {
         self.active_offloaded_processes.remove(&pid);
 
-        if self.active_offloaded_processes.is_empty() && self.active_profile == PrimeProfile::OnDemand {
+        if self.active_offloaded_processes.is_empty()
+            && self.active_profile == PrimeProfile::OnDemand
+        {
             // Auto-suspend dGPU to D3cold when idle on demand
             self.power_state = GpuPowerState::D3coldDynamicOff;
         }
@@ -238,7 +245,10 @@ mod tests {
 
         assert_eq!(envs.len(), 4);
         assert!(envs.contains(&(String::from("__NV_PRIME_RENDER_OFFLOAD"), String::from("1"))));
-        assert!(envs.contains(&(String::from("__GLX_VENDOR_LIBRARY_NAME"), String::from("nvidia"))));
+        assert!(envs.contains(&(
+            String::from("__GLX_VENDOR_LIBRARY_NAME"),
+            String::from("nvidia")
+        )));
     }
 
     #[test]

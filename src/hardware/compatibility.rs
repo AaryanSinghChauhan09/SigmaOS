@@ -2,7 +2,6 @@ extern crate alloc;
 // OOP-based Hardware Compatibility Matrix for SigmaOS
 // Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -36,7 +35,11 @@ impl SimpleAcpiManager {
         Ok(())
     }
 
-    pub fn set_device_power_state(&mut self, dev: DeviceID, state: AcpiPowerState) -> Result<(), &'static str> {
+    pub fn set_device_power_state(
+        &mut self,
+        dev: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str> {
         self.power_states.insert(dev, state);
         Ok(())
     }
@@ -480,7 +483,6 @@ pub trait CompatibilityCheck {
     fn run_full_scan(&self) -> CompatibilityReport;
 }
 
-
 pub struct SimpleDiagnostics {
     pub matrix: SimpleCompatibilityMatrix,
 }
@@ -579,7 +581,10 @@ mod tests {
         assert_eq!(matrix.list_by_type(DeviceType::Audio).len(), 1);
 
         let nvme_id = matrix.find_by_vendor_device(0x144D, 0xA809).unwrap();
-        assert_eq!(matrix.get_device(nvme_id).unwrap().name(), "Samsung NVMe SSD Controller 980 Pro");
+        assert_eq!(
+            matrix.get_device(nvme_id).unwrap().name(),
+            "Samsung NVMe SSD Controller 980 Pro"
+        );
     }
 
     #[test]

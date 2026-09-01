@@ -1,7 +1,6 @@
 use alloc::format;
 extern crate alloc;
 
-
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -45,8 +44,8 @@ impl TerminalTheme {
                 (216, 222, 233),
                 (46, 52, 64),
                 [
-                    (59, 66, 82),   // Black
-                    (191, 97, 106), // Red
+                    (59, 66, 82),    // Black
+                    (191, 97, 106),  // Red
                     (163, 190, 140), // Green
                     (235, 203, 139), // Yellow
                     (129, 161, 193), // Blue
@@ -67,11 +66,11 @@ impl TerminalTheme {
                 (248, 248, 242),
                 (40, 42, 54),
                 [
-                    (40, 42, 54),   // Black
-                    (255, 85, 85),  // Red
-                    (80, 250, 123), // Green
+                    (40, 42, 54),    // Black
+                    (255, 85, 85),   // Red
+                    (80, 250, 123),  // Green
                     (241, 250, 140), // Yellow
-                    (98, 114, 164), // Blue
+                    (98, 114, 164),  // Blue
                     (255, 121, 198), // Magenta
                     (139, 233, 253), // Cyan
                     (248, 248, 242), // White
@@ -89,21 +88,21 @@ impl TerminalTheme {
                 (131, 148, 150),
                 (0, 43, 54),
                 [
-                    (7, 54, 66),    // Black
-                    (220, 50, 47),  // Red
-                    (133, 153, 0),  // Green
-                    (181, 137, 0),  // Yellow
-                    (38, 139, 210), // Blue
+                    (7, 54, 66),     // Black
+                    (220, 50, 47),   // Red
+                    (133, 153, 0),   // Green
+                    (181, 137, 0),   // Yellow
+                    (38, 139, 210),  // Blue
                     (211, 54, 130),  // Magenta
-                    (42, 161, 152), // Cyan
+                    (42, 161, 152),  // Cyan
                     (238, 232, 213), // White
-                    (0, 43, 54),    // Bright Black
-                    (203, 75, 22),  // Bright Red
-                    (88, 110, 117), // Bright Green
-                    (133, 153, 0),  // Bright Yellow
-                    (38, 139, 210), // Bright Blue
-                    (211, 54, 130), // Bright Magenta
-                    (42, 161, 152), // Bright Cyan
+                    (0, 43, 54),     // Bright Black
+                    (203, 75, 22),   // Bright Red
+                    (88, 110, 117),  // Bright Green
+                    (133, 153, 0),   // Bright Yellow
+                    (38, 139, 210),  // Bright Blue
+                    (211, 54, 130),  // Bright Magenta
+                    (42, 161, 152),  // Bright Cyan
                     (253, 246, 227), // Bright White
                 ],
             ),
@@ -111,19 +110,19 @@ impl TerminalTheme {
                 (235, 219, 178),
                 (40, 40, 40),
                 [
-                    (60, 56, 54),   // Black
-                    (204, 36, 29),  // Red
-                    (152, 151, 26), // Green
-                    (215, 153, 33), // Yellow
-                    (69, 133, 136), // Blue
-                    (177, 98, 134), // Magenta
+                    (60, 56, 54),    // Black
+                    (204, 36, 29),   // Red
+                    (152, 151, 26),  // Green
+                    (215, 153, 33),  // Yellow
+                    (69, 133, 136),  // Blue
+                    (177, 98, 134),  // Magenta
                     (104, 157, 106), // Cyan
                     (251, 241, 199), // White
-                    (80, 73, 69),   // Bright Black
-                    (251, 73, 48),  // Bright Red
-                    (184, 187, 38), // Bright Green
+                    (80, 73, 69),    // Bright Black
+                    (251, 73, 48),   // Bright Red
+                    (184, 187, 38),  // Bright Green
                     (229, 192, 123), // Bright Yellow
-                    (84, 167, 178), // Bright Blue
+                    (84, 167, 178),  // Bright Blue
                     (244, 105, 157), // Bright Magenta
                     (142, 190, 142), // Bright Cyan
                     (235, 219, 178), // Bright White
@@ -277,8 +276,8 @@ impl BsdConsoleTheme {
     pub fn palette(self) -> BsdConsoleColorPalette {
         match self {
             BsdConsoleTheme::Vt100Classic => BsdConsoleColorPalette {
-                foreground_rgb: (0, 255, 0),     // Green
-                background_rgb: (0, 0, 0),       // Black
+                foreground_rgb: (0, 255, 0), // Green
+                background_rgb: (0, 0, 0),   // Black
                 selection_rgb: (0, 100, 0),
                 cursor_rgb: (0, 255, 0),
             },
@@ -343,7 +342,9 @@ pub struct SyntaxHighlightingEngine {
 
 impl SyntaxHighlightingEngine {
     pub fn new() -> Self {
-        Self { known_commands: Vec::new() }
+        Self {
+            known_commands: Vec::new(),
+        }
     }
 
     pub fn register_command(&mut self, cmd: &str) {
@@ -367,7 +368,8 @@ impl SyntaxHighlightingEngine {
                 (TokenKind::OptionFlag, AnsiColor::Cyan)
             } else if part.starts_with('$') {
                 (TokenKind::Variable, AnsiColor::Magenta)
-            } else if *part == "|" || *part == ">" || *part == "<" || *part == "&&" || *part == "||" {
+            } else if *part == "|" || *part == ">" || *part == "<" || *part == "&&" || *part == "||"
+            {
                 (TokenKind::Operator, AnsiColor::Yellow)
             } else if part.starts_with('"') || part.starts_with('\'') {
                 (TokenKind::StringLiteral, AnsiColor::Yellow)
@@ -452,7 +454,9 @@ pub struct PowerlineStatusline {
 
 impl PowerlineStatusline {
     pub fn new() -> Self {
-        Self { segments: Vec::new() }
+        Self {
+            segments: Vec::new(),
+        }
     }
 
     pub fn add_segment(&mut self, text: &str, fg: AnsiColor, bg: AnsiColor) {
@@ -519,7 +523,11 @@ impl TerminalSessionRecorder {
     }
 
     pub fn playback_summary(&self) -> String {
-        format!("Recorded {} frames across {} ms", self.frames.len(), self.frames.last().map(|f| f.timestamp_ms).unwrap_or(0))
+        format!(
+            "Recorded {} frames across {} ms",
+            self.frames.len(),
+            self.frames.last().map(|f| f.timestamp_ms).unwrap_or(0)
+        )
     }
 }
 
@@ -718,7 +726,9 @@ pub struct TerminalKeybindingEngine {
 
 impl TerminalKeybindingEngine {
     pub fn new() -> Self {
-        Self { bindings: Vec::new() }
+        Self {
+            bindings: Vec::new(),
+        }
     }
 
     pub fn dispatch_key(&self, shortcut: &KeyShortcut) -> Option<TerminalAction> {
@@ -817,8 +827,15 @@ impl TerminalMultiplexerV1 {
         }
     }
 
-    pub fn split_active_pane(&mut self, direction: PaneSplitDirection) -> Result<u32, &'static str> {
-        let pos = self.panes.iter().position(|p| p.pane_id == self.active_pane_id).ok_or("Pane not found")?;
+    pub fn split_active_pane(
+        &mut self,
+        direction: PaneSplitDirection,
+    ) -> Result<u32, &'static str> {
+        let pos = self
+            .panes
+            .iter()
+            .position(|p| p.pane_id == self.active_pane_id)
+            .ok_or("Pane not found")?;
         let active = &mut self.panes[pos];
 
         let (new_w, new_h, new_x, new_y) = match direction {
@@ -858,7 +875,10 @@ impl TerminalMultiplexerV1 {
     pub fn render_status_line(&self) -> String {
         let mut status = self.status_line_format.clone();
         status = status.replace("#{active_pane}", &format!("{}", self.active_pane_id));
-        status = status.replace("#{status}", if self.sync_panes { "SYNC-ON" } else { "NORMAL" });
+        status = status.replace(
+            "#{status}",
+            if self.sync_panes { "SYNC-ON" } else { "NORMAL" },
+        );
         status
     }
 }
@@ -1513,8 +1533,17 @@ impl TerminalSession {
     }
 
     /// Generates Starship/Powerlevel10k-inspired segmented prompt
-    pub fn get_prompt(&self, user: &str, host: &str, cwd: &str, git_branch: Option<&str>, exit_code: i32, duration_ms: u64) -> String {
-        self.prompt_engine.build_prompt(user, host, cwd, git_branch, exit_code, duration_ms)
+    pub fn get_prompt(
+        &self,
+        user: &str,
+        host: &str,
+        cwd: &str,
+        git_branch: Option<&str>,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> String {
+        self.prompt_engine
+            .build_prompt(user, host, cwd, git_branch, exit_code, duration_ms)
     }
 
     /// Searches active scrollback history using ScrollbackSearchEngine
@@ -1527,10 +1556,14 @@ impl TerminalSession {
         if let Some(action) = self.keybinding_engine.dispatch_key(shortcut) {
             match action {
                 TerminalAction::SplitVertical => {
-                    let _ = self.multiplexer.split_active_pane(PaneSplitDirection::Vertical);
+                    let _ = self
+                        .multiplexer
+                        .split_active_pane(PaneSplitDirection::Vertical);
                 }
                 TerminalAction::SplitHorizontal => {
-                    let _ = self.multiplexer.split_active_pane(PaneSplitDirection::Horizontal);
+                    let _ = self
+                        .multiplexer
+                        .split_active_pane(PaneSplitDirection::Horizontal);
                 }
                 TerminalAction::ClearScreen => {
                     self.scrollback.clear();
@@ -1552,7 +1585,10 @@ impl TerminalSession {
         }
 
         // Clean up string terminator (\x07 or \x1B\)
-        let payload = seq.trim_start_matches("\x1B]").trim_end_matches('\x07').trim_end_matches("\x1B\\");
+        let payload = seq
+            .trim_start_matches("\x1B]")
+            .trim_end_matches('\x07')
+            .trim_end_matches("\x1B\\");
 
         if payload.starts_with("0;") || payload.starts_with("2;") {
             let title = &payload[2..];
@@ -1564,7 +1600,8 @@ impl TerminalSession {
             if parts.len() == 3 {
                 let url = parts[2];
                 let anchor = parts[1];
-                self.explicit_hyperlinks.push((anchor.to_string(), url.to_string()));
+                self.explicit_hyperlinks
+                    .push((anchor.to_string(), url.to_string()));
                 return true;
             }
         }
@@ -1874,7 +1911,10 @@ mod tests {
         assert_eq!(session.multiplexer.panes[0].width, 100);
 
         // Vertical split (splits width 100 into 50 and 50)
-        let new_pane_id = session.multiplexer.split_active_pane(PaneSplitDirection::Vertical).unwrap();
+        let new_pane_id = session
+            .multiplexer
+            .split_active_pane(PaneSplitDirection::Vertical)
+            .unwrap();
         assert_eq!(session.multiplexer.panes.len(), 2);
         assert_eq!(session.multiplexer.panes[0].width, 50);
 
@@ -1935,14 +1975,23 @@ mod tests {
         // 4. Syntax highlighting classification
         session.syntax_engine.register_command("ls");
         session.syntax_engine.register_command("grep");
-        let tokens = session.syntax_engine.highlight_command("ls -la $HOME | grep \"docs\"");
+        let tokens = session
+            .syntax_engine
+            .highlight_command("ls -la $HOME | grep \"docs\"");
         assert_eq!(tokens[0].kind, TokenKind::CommandValid);
         assert_eq!(tokens[1].kind, TokenKind::OptionFlag);
         assert_eq!(tokens[2].kind, TokenKind::Variable);
         assert_eq!(tokens[3].kind, TokenKind::Operator);
 
         // 5. Segmented prompt generation
-        let prompt = session.prompt_engine.build_prompt("user", "sigma", "/home/user", Some("main"), 0, 1500);
+        let prompt = session.prompt_engine.build_prompt(
+            "user",
+            "sigma",
+            "/home/user",
+            Some("main"),
+            0,
+            1500,
+        );
         assert!(prompt.contains("sigma-sh"));
 
         // 6. Scrollback search

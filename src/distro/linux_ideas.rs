@@ -6,7 +6,6 @@
 // Inspired by: Arch, Debian, Fedora, NixOS, Alpine, Gentoo, openSUSE, Ubuntu, Clear Linux, Void Linux
 // Zero external library dependency - all native Rust implementations
 
-
 extern crate alloc;
 use crate::klib::Vec;
 use alloc::string::String;

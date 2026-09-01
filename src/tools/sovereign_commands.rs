@@ -8,11 +8,11 @@
 // - systemd & initramfs: Modular initramfs generator & systemd unit manager package hooks
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// 1. Sovereign Sudo & Privilege Elevation Engine
 pub struct SovereignSudo {
@@ -28,16 +28,28 @@ impl SovereignSudo {
         }
     }
 
-    pub fn execute_as_root(&mut self, user: &str, command: &str, current_time_ms: u64) -> Result<String, String> {
+    pub fn execute_as_root(
+        &mut self,
+        user: &str,
+        command: &str,
+        current_time_ms: u64,
+    ) -> Result<String, String> {
         if let Some(&last_time) = self.cached_credentials.get(user) {
             if current_time_ms < last_time + self.timestamp_timeout_ms {
-                return Ok(format!("[sudo] Executing '{}' as root (cached auth)", command));
+                return Ok(format!(
+                    "[sudo] Executing '{}' as root (cached auth)",
+                    command
+                ));
             }
         }
 
         // Authenticate user
-        self.cached_credentials.insert(user.to_string(), current_time_ms);
-        Ok(format!("[sudo] Executing '{}' as root (authenticated)", command))
+        self.cached_credentials
+            .insert(user.to_string(), current_time_ms);
+        Ok(format!(
+            "[sudo] Executing '{}' as root (authenticated)",
+            command
+        ))
     }
 }
 
@@ -80,7 +92,11 @@ impl SovereignTopHtop {
 
     pub fn get_sorted_by_cpu(&self) -> Vec<ProcessTaskMetrics> {
         let mut list = self.process_list.clone();
-        list.sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap_or(core::cmp::Ordering::Equal));
+        list.sort_by(|a, b| {
+            b.cpu_usage_pct
+                .partial_cmp(&a.cpu_usage_pct)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         list
     }
 }
@@ -212,8 +228,16 @@ impl SovereignGccToolchain {
         Self
     }
 
-    pub fn compile_source(&self, source_file: &str, output_binary: &str, opt_level: &str) -> Result<String, String> {
-        if !source_file.ends_with(".c") && !source_file.ends_with(".cpp") && !source_file.ends_with(".rs") {
+    pub fn compile_source(
+        &self,
+        source_file: &str,
+        output_binary: &str,
+        opt_level: &str,
+    ) -> Result<String, String> {
+        if !source_file.ends_with(".c")
+            && !source_file.ends_with(".cpp")
+            && !source_file.ends_with(".rs")
+        {
             return Err(format!("Unsupported source extension: {}", source_file));
         }
 
@@ -239,17 +263,27 @@ pub struct SovereignInitramfsSystemd {
 impl SovereignInitramfsSystemd {
     pub fn new() -> Self {
         Self {
-            initramfs_modules: vec![String::from("base"), String::from("btrfs"), String::from("nvme")],
+            initramfs_modules: vec![
+                String::from("base"),
+                String::from("btrfs"),
+                String::from("nvme"),
+            ],
             package_post_install_hooks: Vec::new(),
         }
     }
 
     pub fn trigger_mkinitcpio_build(&mut self) -> String {
-        format!("mkinitcpio: Image built successfully with {} modules", self.initramfs_modules.len())
+        format!(
+            "mkinitcpio: Image built successfully with {} modules",
+            self.initramfs_modules.len()
+        )
     }
 
     pub fn register_post_install_hook(&mut self, package_name: &str) {
-        let hook = format!("systemctl daemon-reload && systemctl restart {}.service", package_name);
+        let hook = format!(
+            "systemctl daemon-reload && systemctl restart {}.service",
+            package_name
+        );
         self.package_post_install_hooks.push(hook);
     }
 }

@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // OpenStack Murano Inspired Application Catalogue for SigmaOS
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

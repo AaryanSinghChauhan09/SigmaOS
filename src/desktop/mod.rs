@@ -1,8 +1,8 @@
 // SigmaOS Desktop Module
-pub mod zenith_compositor;
+pub mod mate_betsy;
 pub mod moksha;
 pub mod pantheon;
-pub mod mate_betsy;
+pub mod zenith_compositor;
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
@@ -15,16 +15,17 @@ pub use screensaver::{
 };
 
 pub use pantheon::{
-    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
-    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
-    AppCenterProduct, PantheonGreeter,
+    AppCenter, AppCenterProduct, GalaTransitionStyle, GalaWindowManager, PantheonGreeter,
+    PlankDock, PlankDockItem, SlingshotApp, SlingshotCategory, SlingshotLauncher, Wingpanel,
+    WingpanelIndicator,
 };
 
+pub use moksha::{
+    BodhiAppCenterInstaller, EphotoViewer, EvasCanvasManager, EvasObject, MokshaProfile,
+    MokshaWindowManager, MokshaWindowType, ShelfOrientation, TerminologyBackend,
+    WallpaperTransition,
+};
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
-};
-pub use moksha::{
-    EvasCanvasManager, EvasObject, MokshaProfile, MokshaWindowManager, MokshaWindowType,
-    ShelfOrientation, WallpaperTransition, TerminologyBackend, EphotoViewer, BodhiAppCenterInstaller,
 };

@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Software Store & Safety Scanner Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Evaluates package installations against security/safety scores and sandboxing requirements (Linux Mint Software Manager parity).

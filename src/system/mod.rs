@@ -45,8 +45,8 @@ pub use config::{
     ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
 };
 pub use cron::{
-    CronJob, CronSchedule, CronDaemon, CronError, CronField,
-    SovereignCronDaemon, CronSpoolDirectory, CronSpoolFile, InotifyCrontabWatcher,
+    CronDaemon, CronError, CronField, CronJob, CronSchedule, CronSpoolDirectory, CronSpoolFile,
+    InotifyCrontabWatcher, SovereignCronDaemon,
 };
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
@@ -91,12 +91,8 @@ pub use startup::{
     StartupService,
 };
 pub use state::{
-    DeclarativeStateGraph, StateError, StateNode, StateValue, SystemConfiguration,
-    get_system_config, get_system_config_mut, init_system_config,
+    get_system_config, get_system_config_mut, init_system_config, DeclarativeStateGraph,
+    StateError, StateNode, StateValue, SystemConfiguration,
 };
-pub use syslog::{
-    LogLevel, LogFacility, LogEntry, SyslogManager, LogRule, LogAction, SyslogError,
-};
-pub use user::{
-    Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager,
-};
+pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
+pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};

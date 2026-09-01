@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
@@ -118,7 +118,10 @@ impl AutoInstallProvisioner {
     }
 
     /// Parses custom unattended Kickstart YAML profiles for automated deployments
-    pub fn load_profile_from_unattended_config(&mut self, config: &str) -> Result<(), &'static str> {
+    pub fn load_profile_from_unattended_config(
+        &mut self,
+        config: &str,
+    ) -> Result<(), &'static str> {
         if config.is_empty() {
             return Err("Empty configuration profile");
         }
@@ -153,7 +156,10 @@ impl AutoInstallProvisioner {
 
     /// Provision storage, format target partitions, and perform live system extraction
     pub fn execute_unattended_deployment(&mut self) -> Result<String, &'static str> {
-        let profile = self.active_profile.as_ref().ok_or("No active profile loaded")?;
+        let profile = self
+            .active_profile
+            .as_ref()
+            .ok_or("No active profile loaded")?;
         self.installation_completed = true;
         Ok(format!(
             "Deployment succeeded! Hostname: '{}', RootFS partitioned on '{}' using '{}' filesystem. Installed extra packages: {}.",
@@ -610,7 +616,9 @@ mod tests {
         let mut provisioner = AutoInstallProvisioner::new();
         let profile_content = "hostname: sovereign-node\npartition: /dev/sda1\nfs_type: zfs\npackage: sigma-gcc\npackage: sigma-git";
 
-        provisioner.load_profile_from_unattended_config(profile_content).unwrap();
+        provisioner
+            .load_profile_from_unattended_config(profile_content)
+            .unwrap();
         let active = provisioner.active_profile.as_ref().unwrap();
         assert_eq!(active.hostname, "sovereign-node");
         assert_eq!(active.target_partition, "/dev/sda1");

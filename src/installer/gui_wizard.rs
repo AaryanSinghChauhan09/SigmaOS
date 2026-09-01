@@ -2,7 +2,6 @@
 //! Zero-dependency, `#![no_std]` compliant installation engine with Calamares & Anaconda parity
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -101,7 +100,13 @@ impl GuiInstallerWizard {
         self.detected_oses.len()
     }
 
-    pub fn configure_user(&mut self, username: &str, hostname: &str, is_admin: bool, auto_login: bool) {
+    pub fn configure_user(
+        &mut self,
+        username: &str,
+        hostname: &str,
+        is_admin: bool,
+        auto_login: bool,
+    ) {
         self.user_config = Some(UserAccountConfig {
             username: username.to_string(),
             hostname: hostname.to_string(),
@@ -146,7 +151,10 @@ mod tests {
 
         wizard.configure_user("sovereign_user", "sigma-desktop", true, false);
         assert!(wizard.user_config.is_some());
-        assert_eq!(wizard.user_config.as_ref().unwrap().username, "sovereign_user");
+        assert_eq!(
+            wizard.user_config.as_ref().unwrap().username,
+            "sovereign_user"
+        );
 
         // Advance to installation progress
         wizard.advance_step(); // Partitioning

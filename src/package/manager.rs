@@ -15,24 +15,28 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
 /// OOP-based Package Management for SigmaOS
 /// Based on Roadmap Item: Package Management + Reproducible Builds
-
 extern crate alloc;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PackageID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PackageState { Installed = 0, Available = 1, Updating = 2, Corrupted = 3 }
+pub enum PackageState {
+    Installed = 0,
+    Available = 1,
+    Updating = 2,
+    Corrupted = 3,
+}
 
 pub trait Package {
     fn id(&self) -> PackageID;
@@ -59,7 +63,11 @@ impl SimplePackage {
         let version_len = version.len().min(31);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimplePackage {
             id,
@@ -73,14 +81,18 @@ impl SimplePackage {
 }
 
 impl Package for SimplePackage {
-    fn id(&self) -> PackageID { self.id }
+    fn id(&self) -> PackageID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
         &self.version[..self.version_len as usize]
     }
-    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
+    fn state(&self) -> PackageState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+    }
 }
 
 pub trait PackageManager {
@@ -120,7 +132,13 @@ impl GuiAppStoreManager {
         }
     }
 
-    pub fn publish_app(&mut self, app_id: &str, display_name: &str, category: &str, description: &str) {
+    pub fn publish_app(
+        &mut self,
+        app_id: &str,
+        display_name: &str,
+        category: &str,
+        description: &str,
+    ) {
         let listing = AppListing {
             app_id: alloc::string::String::from(app_id),
             display_name: alloc::string::String::from(display_name),
@@ -133,7 +151,13 @@ impl GuiAppStoreManager {
         self.store_listings.push(listing);
     }
 
-    pub fn add_review(&mut self, app_id: &str, author: &str, rating_stars: u8, comment: &str) -> Result<(), &'static str> {
+    pub fn add_review(
+        &mut self,
+        app_id: &str,
+        author: &str,
+        rating_stars: u8,
+        comment: &str,
+    ) -> Result<(), &'static str> {
         let stars = rating_stars.clamp(1, 5);
         for app in &mut self.store_listings {
             if app.app_id == app_id {
@@ -180,7 +204,12 @@ impl Default for GuiAppStoreManager {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PackageError { Success = 0, PackageNotFound = 1, InstallFailed = 2, UpdateFailed = 3 }
+pub enum PackageError {
+    Success = 0,
+    PackageNotFound = 1,
+    InstallFailed = 2,
+    UpdateFailed = 3,
+}
 
 pub struct SimplePackageManager {
     packages: Vec<Option<Box<dyn Package>>>,
@@ -189,7 +218,12 @@ pub struct SimplePackageManager {
 
 impl SimplePackageManager {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimplePackageManager { packages: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimplePackageManager {
+            packages: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl PackageManager for SimplePackageManager {
@@ -222,7 +256,9 @@ impl PackageManager for SimplePackageManager {
     fn get_package(&self, id: PackageID) -> Option<&dyn Package> {
         for pkg_option in &self.packages {
             if let Some(ref pkg) = *pkg_option {
-                if pkg.id() == id { return Some(pkg.as_ref()); }
+                if pkg.id() == id {
+                    return Some(pkg.as_ref());
+                }
             }
         }
         None
@@ -241,7 +277,11 @@ pub struct SimpleRepository {
 
 impl SimpleRepository {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleRepository { packages: Vec::new() } }
+    pub fn new() -> Self {
+        SimpleRepository {
+            packages: Vec::new(),
+        }
+    }
 }
 
 impl Repository for SimpleRepository {
@@ -271,34 +311,58 @@ impl Repository for SimpleRepository {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn clear(&mut self) { self.len = 0; }
+    fn clear(&mut self) {
+        self.len = 0;
+    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -331,7 +395,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -359,11 +422,25 @@ mod tests {
     #[test]
     fn test_gui_app_store_manager() {
         let mut store = GuiAppStoreManager::new();
-        store.publish_app("org.gimp.GIMP", "GIMP Image Editor", "Graphics", "Professional photo manipulation software");
+        store.publish_app(
+            "org.gimp.GIMP",
+            "GIMP Image Editor",
+            "Graphics",
+            "Professional photo manipulation software",
+        );
         assert_eq!(store.store_listings.len(), 1);
 
-        assert!(store.add_review("org.gimp.GIMP", "Alice", 5, "Amazing open source photo editor!").is_ok());
-        assert!(store.add_review("org.gimp.GIMP", "Bob", 3, "Good but complex UI").is_ok());
+        assert!(store
+            .add_review(
+                "org.gimp.GIMP",
+                "Alice",
+                5,
+                "Amazing open source photo editor!"
+            )
+            .is_ok());
+        assert!(store
+            .add_review("org.gimp.GIMP", "Bob", 3, "Good but complex UI")
+            .is_ok());
 
         let app = &store.store_listings[0];
         assert_eq!(app.average_rating, 4.0);

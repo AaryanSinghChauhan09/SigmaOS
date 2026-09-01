@@ -3,7 +3,6 @@ extern crate alloc;
 // This module provides zero-dependency, no-std compliant implementations of subtitle editors,
 // style processors, and audio-timing synchronizers inspired by Aegisub & Subtitle Edit.
 
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};

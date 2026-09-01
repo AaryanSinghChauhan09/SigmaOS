@@ -4,6 +4,5 @@ pub mod training;
 
 pub use sovereign_data_workspace::{
     AuditLedgerEntry, ColumnSeries, ComplianceFramework, DilithiumNeuralNode, SchemaMetadata,
-    SovereignCapture, SovereignCatalog, SovereignGuard, SovereignQuery,
-    SovereignTensor,
+    SovereignCapture, SovereignCatalog, SovereignGuard, SovereignQuery, SovereignTensor,
 };

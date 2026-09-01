@@ -17,9 +17,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // SigmaOS Duplicate File Finder
 // OOP-based duplicate file detection with hash comparison
@@ -208,8 +208,8 @@ impl DuplicateFinder {
                 self.scan_stats.directories_scanned += 1;
                 self.collect_files_by_size(&entry_path, files_by_size)?;
             } else if entry_path.is_file() {
-                let metadata = Err("fs not available")
-                    .map_err(|e| DuplicateError::IoError(e.to_string()))?;
+                let metadata =
+                    Err("fs not available").map_err(|e| DuplicateError::IoError(e.to_string()))?;
 
                 if metadata.len() >= self.min_file_size {
                     self.scan_stats.files_scanned += 1;

@@ -1,9 +1,9 @@
 extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
 use alloc::collections::BTreeSet;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
@@ -30,7 +30,9 @@ pub struct InitSystem {
 
 impl InitSystem {
     pub fn new() -> Self {
-        Self { services: BTreeMap::new() }
+        Self {
+            services: BTreeMap::new(),
+        }
     }
 
     pub fn register_service(&mut self, service: Service) {
@@ -67,7 +69,13 @@ impl InitSystem {
         }
 
         for node in self.services.keys() {
-            visit(node, &self.services, &mut visited, &mut temp_mark, &mut sorted)?;
+            visit(
+                node,
+                &self.services,
+                &mut visited,
+                &mut temp_mark,
+                &mut sorted,
+            )?;
         }
         Ok(sorted)
     }
@@ -82,14 +90,16 @@ impl InitSystem {
 
     pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
         let srv = self.services.get_mut(name).ok_or("Service not found")?;
-        if srv.state == ServiceState::Running { return Ok(()); }
-        
+        if srv.state == ServiceState::Running {
+            return Ok(());
+        }
+
         srv.state = ServiceState::Starting;
         // Mock actual parallel spawn
         srv.pid = Some(1000 + name.len() as u32);
         srv.state = ServiceState::Running;
         srv.last_ping = 0; // set by current time
-        
+
         Ok(())
     }
 

@@ -2,10 +2,8 @@
 //! Large-scale device management, protocol support, and digital twin integration
 extern crate alloc;
 
-
-
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -240,7 +238,9 @@ impl SigmaIoT {
     }
 
     pub fn get_gateway(&mut self, id: &str) -> Option<&mut IoTGateway> {
-        self.gateways.iter_mut().find(|g| g.id == id || g.name == id)
+        self.gateways
+            .iter_mut()
+            .find(|g| g.id == id || g.name == id)
     }
 
     pub fn add_data_lake(&mut self, lake: DataLake) {
@@ -257,7 +257,11 @@ impl SigmaIoT {
         Ok(device_id)
     }
 
-    pub fn update_device_firmware(&mut self, device_id: &str, version: &str) -> Result<(), IoTError> {
+    pub fn update_device_firmware(
+        &mut self,
+        device_id: &str,
+        version: &str,
+    ) -> Result<(), IoTError> {
         if let Some(device) = self.get_device(device_id) {
             device.update_firmware(version)
         } else {
@@ -275,11 +279,19 @@ impl SigmaIoT {
     pub fn get_iot_stats(&self) -> IoTStats {
         IoTStats {
             total_devices: self.devices.len(),
-            online_devices: self.devices.iter().filter(|d| d.state == DeviceState::Online).count(),
+            online_devices: self
+                .devices
+                .iter()
+                .filter(|d| d.state == DeviceState::Online)
+                .count(),
             total_gateways: self.gateways.len(),
             total_data_lakes: self.data_lakes.len(),
             total_twins: self.digital_twins.len(),
-            synced_twins: self.digital_twins.iter().filter(|t| t.state == TwinState::Synced).count(),
+            synced_twins: self
+                .digital_twins
+                .iter()
+                .filter(|t| t.state == TwinState::Synced)
+                .count(),
         }
     }
 

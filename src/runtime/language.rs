@@ -17,9 +17,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec as AllocVec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -366,12 +366,18 @@ impl SovereignLocaleEngine {
     pub fn set_locale(&mut self, category: LocaleCategory, locale: &str) -> String {
         if category == LocaleCategory::All {
             self.active_locale = locale.to_string();
-            self.category_locales.insert(LocaleCategory::Ctype, locale.to_string());
-            self.category_locales.insert(LocaleCategory::Numeric, locale.to_string());
-            self.category_locales.insert(LocaleCategory::Time, locale.to_string());
-            self.category_locales.insert(LocaleCategory::Collate, locale.to_string());
-            self.category_locales.insert(LocaleCategory::Monetary, locale.to_string());
-            self.category_locales.insert(LocaleCategory::Messages, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Ctype, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Numeric, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Time, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Collate, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Monetary, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Messages, locale.to_string());
         } else {
             self.category_locales.insert(category, locale.to_string());
         }
@@ -400,7 +406,11 @@ impl SovereignLocaleEngine {
 impl Default for SovereignLocaleEngine {
     fn default() -> Self {
         let mut locale = Self::new("en_US.UTF-8");
-        locale.register_translation("sigmaos", "Welcome to SigmaOS", "Welcome to SigmaOS Sovereign System");
+        locale.register_translation(
+            "sigmaos",
+            "Welcome to SigmaOS",
+            "Welcome to SigmaOS Sovereign System",
+        );
         locale
     }
 }
@@ -412,8 +422,14 @@ mod tests {
     #[test]
     fn test_sovereign_locale_engine() {
         let mut locale = SovereignLocaleEngine::new("en_US.UTF-8");
-        assert_eq!(locale.set_locale(LocaleCategory::Time, "hi_IN.UTF-8"), "en_US.UTF-8");
-        assert_eq!(locale.category_locales.get(&LocaleCategory::Time).unwrap(), "hi_IN.UTF-8");
+        assert_eq!(
+            locale.set_locale(LocaleCategory::Time, "hi_IN.UTF-8"),
+            "en_US.UTF-8"
+        );
+        assert_eq!(
+            locale.category_locales.get(&LocaleCategory::Time).unwrap(),
+            "hi_IN.UTF-8"
+        );
 
         locale.register_translation("desktop", "Settings", "सेटिंग्स");
         assert_eq!(locale.gettext("desktop", "Settings"), "सेटिंग्स");

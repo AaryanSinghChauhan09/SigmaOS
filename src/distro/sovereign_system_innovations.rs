@@ -75,7 +75,11 @@ impl PolicyAdaptiveEventScheduler {
 
     pub fn select_next_task(&self) -> Option<&EventWorkloadTask> {
         self.active_tasks.values().min_by_key(|t| {
-            let priority_bonus = if t.workload_type == self.current_workload_mode { 0 } else { 100 };
+            let priority_bonus = if t.workload_type == self.current_workload_mode {
+                0
+            } else {
+                100
+            };
             t.last_latency_us + (priority_bonus as u64)
         })
     }
@@ -122,10 +126,18 @@ impl ExtensibleSyscallHookGate {
 
     pub fn evaluate_syscall(&mut self, pid: u32, syscall_nr: u32) -> HookAction {
         if self.blocked_syscalls.contains(&syscall_nr) {
-            self.audit_log.push((pid, syscall_nr, format!("Syscall {} DENIED for PID {}", syscall_nr, pid)));
+            self.audit_log.push((
+                pid,
+                syscall_nr,
+                format!("Syscall {} DENIED for PID {}", syscall_nr, pid),
+            ));
             HookAction::Deny
         } else {
-            self.audit_log.push((pid, syscall_nr, format!("Syscall {} ALLOWED for PID {}", syscall_nr, pid)));
+            self.audit_log.push((
+                pid,
+                syscall_nr,
+                format!("Syscall {} ALLOWED for PID {}", syscall_nr, pid),
+            ));
             HookAction::Allow
         }
     }
@@ -312,15 +324,27 @@ impl GamifiedSystemMonitor {
     }
 
     pub fn calculate_overall_score(&self) -> u8 {
-        ((self.cpu_health_score as u32 + self.memory_health_score as u32 + self.thermal_score as u32) / 3) as u8
+        ((self.cpu_health_score as u32
+            + self.memory_health_score as u32
+            + self.thermal_score as u32)
+            / 3) as u8
     }
 
     pub fn update_telemetry(&mut self, cpu_usage: u8, temp_c: u8) {
         self.cpu_health_score = 100u8.saturating_sub(cpu_usage);
-        self.thermal_score = if temp_c > 80 { 50 } else { 100u8.saturating_sub(temp_c / 2) };
+        self.thermal_score = if temp_c > 80 {
+            50
+        } else {
+            100u8.saturating_sub(temp_c / 2)
+        };
 
-        if self.calculate_overall_score() > 90 && !self.achievements_unlocked.contains(&"Peak Efficiency".to_string()) {
-            self.achievements_unlocked.push("Peak Efficiency".to_string());
+        if self.calculate_overall_score() > 90
+            && !self
+                .achievements_unlocked
+                .contains(&"Peak Efficiency".to_string())
+        {
+            self.achievements_unlocked
+                .push("Peak Efficiency".to_string());
         }
     }
 }
@@ -393,6 +417,8 @@ mod tests {
         let mut monitor = GamifiedSystemMonitor::new();
         monitor.update_telemetry(0, 10); // Zero load, cool temp
         assert!(monitor.calculate_overall_score() >= 90);
-        assert!(monitor.achievements_unlocked.contains(&"Peak Efficiency".to_string()));
+        assert!(monitor
+            .achievements_unlocked
+            .contains(&"Peak Efficiency".to_string()));
     }
 }

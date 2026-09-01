@@ -1,6 +1,6 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS AI-Native Structured Document Extraction Engine (SigmaLift)
 // Fully absorbs and implements all design philosophies of datalab-to/lift:
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,

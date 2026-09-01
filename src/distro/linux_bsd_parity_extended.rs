@@ -5,7 +5,6 @@ extern crate alloc;
 // Clean-room implementations of Slackware PkgTools / SlackBuilds, GNU Guix & Shepherd,
 // Fedora Silverblue OSTree, Illumos/Solaris Crossbow & NetBSD RUMP, Netplan & Cloud-Init, and openSUSE YaST2 & Snapper.
 
-
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

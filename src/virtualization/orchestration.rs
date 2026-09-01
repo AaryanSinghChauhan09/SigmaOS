@@ -2,7 +2,6 @@ extern crate alloc;
 // SigmaOS Built-in Virtualization Support
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec;

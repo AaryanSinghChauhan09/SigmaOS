@@ -17,29 +17,38 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Package Sandboxing for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 28
 /// Implements isolated environments for package builds
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SandboxID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SandboxState { Created = 0, Running = 1, Stopped = 2, Failed = 3 }
+pub enum SandboxState {
+    Created = 0,
+    Running = 1,
+    Stopped = 2,
+    Failed = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SandboxError { Success = 0, CreateFailed = 1, StartFailed = 2, ResourceLimit = 3 }
+pub enum SandboxError {
+    Success = 0,
+    CreateFailed = 1,
+    StartFailed = 2,
+    ResourceLimit = 3,
+}
 
 pub trait BuildSandbox {
     fn id(&self) -> SandboxID;
@@ -77,21 +86,28 @@ impl SimpleBuildSandbox {
 }
 
 impl BuildSandbox for SimpleBuildSandbox {
-    fn id(&self) -> SandboxID { self.id }
-    fn state(&self) -> SandboxState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn id(&self) -> SandboxID {
+        self.id
+    }
+    fn state(&self) -> SandboxState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
 
     fn create(&mut self) -> Result<(), SandboxError> {
-        self.state.store(SandboxState::Created as usize, Ordering::SeqCst);
+        self.state
+            .store(SandboxState::Created as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn start(&mut self) -> Result<(), SandboxError> {
-        self.state.store(SandboxState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(SandboxState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), SandboxError> {
-        self.state.store(SandboxState::Stopped as usize, Ordering::SeqCst);
+        self.state
+            .store(SandboxState::Stopped as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -127,14 +143,17 @@ impl SimpleNetworkIsolation {
 
 impl NetworkIsolation for SimpleNetworkIsolation {
     fn enable_network(&mut self, enabled: bool) {
-        self.network_enabled.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
+        self.network_enabled
+            .store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn set_allowed_hosts(&mut self, hosts: Vec<[u8; 128]>) {
         self.allowed_hosts = hosts;
     }
 
-    fn is_network_enabled(&self) -> bool { self.network_enabled.load(Ordering::SeqCst) == 1 }
+    fn is_network_enabled(&self) -> bool {
+        self.network_enabled.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait FilesystemIsolation {
@@ -151,9 +170,7 @@ pub struct SimpleFilesystemIsolation {
 impl SimpleFilesystemIsolation {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleFilesystemIsolation {
-            mounts: Vec::new(),
-        }
+        SimpleFilesystemIsolation { mounts: Vec::new() }
     }
 }
 
@@ -164,10 +181,15 @@ impl FilesystemIsolation for SimpleFilesystemIsolation {
         let source_len = source.len().min(255);
         let target_len = target.len().min(255);
 
-        for i in 0..source_len { source_array[i] = source[i]; }
-        for i in 0..target_len { target_array[i] = target[i]; }
+        for i in 0..source_len {
+            source_array[i] = source[i];
+        }
+        for i in 0..target_len {
+            target_array[i] = target[i];
+        }
 
-        self.mounts.push((source_array, target_array, AtomicUsize::new(0)));
+        self.mounts
+            .push((source_array, target_array, AtomicUsize::new(0)));
         Ok(())
     }
 
@@ -176,7 +198,9 @@ impl FilesystemIsolation for SimpleFilesystemIsolation {
             let target = &mount.1;
             let len = target.iter().position(|&b| b == 0).unwrap_or(256);
             if &target[..len] == path {
-                mount.2.store(if readonly { 1 } else { 0 }, Ordering::SeqCst);
+                mount
+                    .2
+                    .store(if readonly { 1 } else { 0 }, Ordering::SeqCst);
                 return Ok(());
             }
         }
@@ -186,8 +210,11 @@ impl FilesystemIsolation for SimpleFilesystemIsolation {
     fn create_tmpfs(&mut self, path: &[u8], _size_mb: usize) -> Result<(), SandboxError> {
         let mut path_array = [0u8; 256];
         let path_len = path.len().min(255);
-        for i in 0..path_len { path_array[i] = path[i]; }
-        self.mounts.push((path_array, [0u8; 256], AtomicUsize::new(1)));
+        for i in 0..path_len {
+            path_array[i] = path[i];
+        }
+        self.mounts
+            .push((path_array, [0u8; 256], AtomicUsize::new(1)));
         Ok(())
     }
 }
@@ -237,7 +264,9 @@ impl SandboxManager for SimpleSandboxManager {
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn BuildSandbox> {
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id() == id { return Some(sandbox.as_ref()); }
+                if sandbox.id() == id {
+                    return Some(sandbox.as_ref());
+                }
             }
         }
         None
@@ -255,7 +284,8 @@ impl SandboxManager for SimpleSandboxManager {
 }
 
 pub trait ResourceQuota {
-    fn set_memory_quota(&mut self, sandbox_id: SandboxID, bytes: usize) -> Result<(), SandboxError>;
+    fn set_memory_quota(&mut self, sandbox_id: SandboxID, bytes: usize)
+        -> Result<(), SandboxError>;
     fn set_cpu_quota(&mut self, sandbox_id: SandboxID, cores: usize) -> Result<(), SandboxError>;
     fn set_disk_quota(&mut self, sandbox_id: SandboxID, bytes: usize) -> Result<(), SandboxError>;
 }
@@ -272,11 +302,19 @@ impl SimpleResourceQuota {
 }
 
 impl ResourceQuota for SimpleResourceQuota {
-    fn set_memory_quota(&mut self, sandbox_id: SandboxID, bytes: usize) -> Result<(), SandboxError> {
+    fn set_memory_quota(
+        &mut self,
+        sandbox_id: SandboxID,
+        bytes: usize,
+    ) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
                 if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox { ref mut memory_limit, .. } = **sandbox {
+                    if let SimpleBuildSandbox {
+                        ref mut memory_limit,
+                        ..
+                    } = **sandbox
+                    {
                         memory_limit.store(bytes, Ordering::SeqCst);
                         return Ok(());
                     }
@@ -290,7 +328,10 @@ impl ResourceQuota for SimpleResourceQuota {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
                 if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox { ref mut cpu_limit, .. } = **sandbox {
+                    if let SimpleBuildSandbox {
+                        ref mut cpu_limit, ..
+                    } = **sandbox
+                    {
                         cpu_limit.store(cores, Ordering::SeqCst);
                         return Ok(());
                     }
@@ -300,18 +341,34 @@ impl ResourceQuota for SimpleResourceQuota {
         Err(SandboxError::CreateFailed)
     }
 
-    fn set_disk_quota(&mut self, _sandbox_id: SandboxID, _bytes: usize) -> Result<(), SandboxError> {
+    fn set_disk_quota(
+        &mut self,
+        _sandbox_id: SandboxID,
+        _bytes: usize,
+    ) -> Result<(), SandboxError> {
         Ok(())
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -319,19 +376,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -363,7 +430,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

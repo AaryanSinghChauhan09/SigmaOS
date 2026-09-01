@@ -3,8 +3,6 @@
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
 
-
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
@@ -68,30 +66,30 @@ impl LogLevel {
 /// Log facility
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFacility {
-    Kernel,    // 0
-    User,      // 1
-    Mail,      // 2
-    Daemon,    // 3
-    Auth,      // 4
-    Syslog,    // 5
-    Lpr,       // 6
-    News,      // 7
-    Uucp,      // 8
-    Cron,      // 9
-    AuthPriv,  // 10
-    Ftp,       // 11
-    Ntp,       // 12
-    LogAudit,  // 13
-    LogAlert,  // 14
-    Clock,     // 15
-    Local0,    // 16
-    Local1,    // 17
-    Local2,    // 18
-    Local3,    // 19
-    Local4,    // 20
-    Local5,    // 21
-    Local6,    // 22
-    Local7,    // 23
+    Kernel,   // 0
+    User,     // 1
+    Mail,     // 2
+    Daemon,   // 3
+    Auth,     // 4
+    Syslog,   // 5
+    Lpr,      // 6
+    News,     // 7
+    Uucp,     // 8
+    Cron,     // 9
+    AuthPriv, // 10
+    Ftp,      // 11
+    Ntp,      // 12
+    LogAudit, // 13
+    LogAlert, // 14
+    Clock,    // 15
+    Local0,   // 16
+    Local1,   // 17
+    Local2,   // 18
+    Local3,   // 19
+    Local4,   // 20
+    Local5,   // 21
+    Local6,   // 22
+    Local7,   // 23
 }
 
 impl LogFacility {
@@ -197,7 +195,14 @@ impl SyslogManager {
     }
 
     /// Log a message
-    pub fn log(&mut self, level: LogLevel, facility: LogFacility, process: &str, pid: u32, message: &str) {
+    pub fn log(
+        &mut self,
+        level: LogLevel,
+        facility: LogFacility,
+        process: &str,
+        pid: u32,
+        message: &str,
+    ) {
         if level.to_u8() > self.log_level.to_u8() {
             return;
         }
@@ -267,14 +272,16 @@ impl SyslogManager {
 
     /// Get log entries by level
     pub fn get_entries_by_level(&self, level: LogLevel) -> Vec<&LogEntry> {
-        self.log_entries.iter()
+        self.log_entries
+            .iter()
             .filter(|entry| entry.level == level)
             .collect()
     }
 
     /// Get log entries by facility
     pub fn get_entries_by_facility(&self, facility: LogFacility) -> Vec<&LogEntry> {
-        self.log_entries.iter()
+        self.log_entries
+            .iter()
             .filter(|entry| entry.facility == facility)
             .collect()
     }
@@ -353,8 +360,14 @@ mod tests {
     fn test_syslog_manager() {
         let mut manager = SyslogManager::new("/var/log/syslog");
         manager.initialize().unwrap();
-        
-        manager.log(LogLevel::Info, LogFacility::User, "test", 1234, "Test message");
+
+        manager.log(
+            LogLevel::Info,
+            LogFacility::User,
+            "test",
+            1234,
+            "Test message",
+        );
         assert_eq!(manager.log_entries.len(), 1);
     }
 
@@ -363,10 +376,22 @@ mod tests {
         let mut manager = SyslogManager::new("/var/log/syslog");
         manager.set_log_level(LogLevel::Error);
         manager.initialize().unwrap();
-        
-        manager.log(LogLevel::Debug, LogFacility::User, "test", 1234, "Debug message");
-        manager.log(LogLevel::Error, LogFacility::User, "test", 1234, "Error message");
-        
+
+        manager.log(
+            LogLevel::Debug,
+            LogFacility::User,
+            "test",
+            1234,
+            "Debug message",
+        );
+        manager.log(
+            LogLevel::Error,
+            LogFacility::User,
+            "test",
+            1234,
+            "Error message",
+        );
+
         assert_eq!(manager.log_entries.len(), 1);
     }
 
@@ -374,10 +399,16 @@ mod tests {
     fn test_log_filtering() {
         let mut manager = SyslogManager::new("/var/log/syslog");
         manager.initialize().unwrap();
-        
-        manager.log(LogLevel::Error, LogFacility::Auth, "test", 1234, "Auth error");
+
+        manager.log(
+            LogLevel::Error,
+            LogFacility::Auth,
+            "test",
+            1234,
+            "Auth error",
+        );
         manager.log(LogLevel::Info, LogFacility::Cron, "test", 1234, "Cron info");
-        
+
         let auth_entries = manager.get_entries_by_facility(LogFacility::Auth);
         assert_eq!(auth_entries.len(), 1);
     }

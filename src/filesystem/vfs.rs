@@ -1,11 +1,11 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
-use crate::security::{CapabilityToken, Permission};
 use crate::klib::HashMap;
+use crate::security::{CapabilityToken, Permission};
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,12 +46,24 @@ impl BsdFileFlags {
 
     pub fn to_u32(&self) -> u32 {
         let mut flags = 0u32;
-        if self.nodump { flags |= 0x0001; }
-        if self.immutable { flags |= 0x0002; }
-        if self.append_only { flags |= 0x0004; }
-        if self.opaque { flags |= 0x0008; }
-        if self.nounlink { flags |= 0x0010; }
-        if self.archived { flags |= 0x0001_0000; }
+        if self.nodump {
+            flags |= 0x0001;
+        }
+        if self.immutable {
+            flags |= 0x0002;
+        }
+        if self.append_only {
+            flags |= 0x0004;
+        }
+        if self.opaque {
+            flags |= 0x0008;
+        }
+        if self.nounlink {
+            flags |= 0x0010;
+        }
+        if self.archived {
+            flags |= 0x0001_0000;
+        }
         flags
     }
 }
@@ -82,9 +94,9 @@ pub mod mode_bits {
 /// Comprehensive File Permissions combining Linux POSIX Mode Bits and BSD File Flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FilePermissions {
-    pub read: bool,      // Legacy backward compatibility flag (reflects owner read)
-    pub write: bool,     // Legacy backward compatibility flag (reflects owner write)
-    pub execute: bool,   // Legacy backward compatibility flag (reflects owner execute)
+    pub read: bool,    // Legacy backward compatibility flag (reflects owner read)
+    pub write: bool,   // Legacy backward compatibility flag (reflects owner write)
+    pub execute: bool, // Legacy backward compatibility flag (reflects owner execute)
 
     pub user_read: bool,
     pub user_write: bool,
@@ -98,9 +110,9 @@ pub struct FilePermissions {
     pub other_write: bool,
     pub other_execute: bool,
 
-    pub suid: bool,      // SUID bit (set-user-ID)
-    pub sgid: bool,      // SGID bit (set-group-ID)
-    pub sticky: bool,    // Sticky bit
+    pub suid: bool,   // SUID bit (set-user-ID)
+    pub sgid: bool,   // SGID bit (set-group-ID)
+    pub sticky: bool, // Sticky bit
 
     pub owner_mask: u8,
     pub group_mask: u8,
@@ -144,11 +156,15 @@ impl FilePermissions {
     }
 
     pub fn group_mask(&self) -> u8 {
-        ((self.group_read as u8) << 2) | ((self.group_write as u8) << 1) | (self.group_execute as u8)
+        ((self.group_read as u8) << 2)
+            | ((self.group_write as u8) << 1)
+            | (self.group_execute as u8)
     }
 
     pub fn other_mask(&self) -> u8 {
-        ((self.other_read as u8) << 2) | ((self.other_write as u8) << 1) | (self.other_execute as u8)
+        ((self.other_read as u8) << 2)
+            | ((self.other_write as u8) << 1)
+            | (self.other_execute as u8)
     }
 
     pub fn to_mode_bits(&self) -> u32 {
@@ -156,17 +172,23 @@ impl FilePermissions {
     }
 
     pub fn allows_owner(&self, req_mask: u8) -> bool {
-        let mask = ((self.user_read as u8) << 2) | ((self.user_write as u8) << 1) | (self.user_execute as u8);
+        let mask = ((self.user_read as u8) << 2)
+            | ((self.user_write as u8) << 1)
+            | (self.user_execute as u8);
         (mask & req_mask) == req_mask
     }
 
     pub fn allows_group(&self, req_mask: u8) -> bool {
-        let mask = ((self.group_read as u8) << 2) | ((self.group_write as u8) << 1) | (self.group_execute as u8);
+        let mask = ((self.group_read as u8) << 2)
+            | ((self.group_write as u8) << 1)
+            | (self.group_execute as u8);
         (mask & req_mask) == req_mask
     }
 
     pub fn allows_other(&self, req_mask: u8) -> bool {
-        let mask = ((self.other_read as u8) << 2) | ((self.other_write as u8) << 1) | (self.other_execute as u8);
+        let mask = ((self.other_read as u8) << 2)
+            | ((self.other_write as u8) << 1)
+            | (self.other_execute as u8);
         (mask & req_mask) == req_mask
     }
 
@@ -226,21 +248,45 @@ impl FilePermissions {
     pub fn to_mode(&self) -> u16 {
         let mut mode = 0u16;
 
-        if self.suid { mode |= mode_bits::S_ISUID; }
-        if self.sgid { mode |= mode_bits::S_ISGID; }
-        if self.sticky { mode |= mode_bits::S_ISVTX; }
+        if self.suid {
+            mode |= mode_bits::S_ISUID;
+        }
+        if self.sgid {
+            mode |= mode_bits::S_ISGID;
+        }
+        if self.sticky {
+            mode |= mode_bits::S_ISVTX;
+        }
 
-        if self.user_read { mode |= mode_bits::S_IRUSR; }
-        if self.user_write { mode |= mode_bits::S_IWUSR; }
-        if self.user_execute { mode |= mode_bits::S_IXUSR; }
+        if self.user_read {
+            mode |= mode_bits::S_IRUSR;
+        }
+        if self.user_write {
+            mode |= mode_bits::S_IWUSR;
+        }
+        if self.user_execute {
+            mode |= mode_bits::S_IXUSR;
+        }
 
-        if self.group_read { mode |= mode_bits::S_IRGRP; }
-        if self.group_write { mode |= mode_bits::S_IWGRP; }
-        if self.group_execute { mode |= mode_bits::S_IXGRP; }
+        if self.group_read {
+            mode |= mode_bits::S_IRGRP;
+        }
+        if self.group_write {
+            mode |= mode_bits::S_IWGRP;
+        }
+        if self.group_execute {
+            mode |= mode_bits::S_IXGRP;
+        }
 
-        if self.other_read { mode |= mode_bits::S_IROTH; }
-        if self.other_write { mode |= mode_bits::S_IWOTH; }
-        if self.other_execute { mode |= mode_bits::S_IXOTH; }
+        if self.other_read {
+            mode |= mode_bits::S_IROTH;
+        }
+        if self.other_write {
+            mode |= mode_bits::S_IWOTH;
+        }
+        if self.other_execute {
+            mode |= mode_bits::S_IXOTH;
+        }
 
         mode
     }
@@ -341,7 +387,9 @@ pub struct PosixAcl {
 
 impl PosixAcl {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_entry(&mut self, tag: PosixAclTag, permissions: u8) {
@@ -382,13 +430,21 @@ impl PosixAcl {
         }
 
         // 2. NamedUser check (subject to mask)
-        if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::NamedUser(uid)) {
+        if let Some(entry) = self
+            .entries
+            .iter()
+            .find(|e| e.tag == PosixAclTag::NamedUser(uid))
+        {
             let effective = entry.permissions & mask;
             return Some((effective & req_mask) == req_mask);
         }
 
         // 3. NamedGroup check (subject to mask)
-        if let Some(entry) = self.entries.iter().find(|e| e.tag == PosixAclTag::NamedGroup(gid)) {
+        if let Some(entry) = self
+            .entries
+            .iter()
+            .find(|e| e.tag == PosixAclTag::NamedGroup(gid))
+        {
             let effective = entry.permissions & mask;
             return Some((effective & req_mask) == req_mask);
         }
@@ -644,7 +700,8 @@ impl VirtualFilesystem {
 
         let new_bsd_flags = BsdFileFlags::from_u32(flags);
         // Under BSD securelevel > 0, clearing system immutable flags is forbidden
-        if self.securelevel > 0 && inode.permissions.bsd_flags.immutable && !new_bsd_flags.immutable {
+        if self.securelevel > 0 && inode.permissions.bsd_flags.immutable && !new_bsd_flags.immutable
+        {
             return Err(FsError::SecureLevelViolation);
         }
 
@@ -666,7 +723,11 @@ impl VirtualFilesystem {
 
         // Root (UID 0) bypasses standard ACL & DAC permission checks (except execution if no execute bit is set)
         if subject_uid == 0 {
-            if req_execute && !inode.permissions.user_execute && !inode.permissions.group_execute && !inode.permissions.other_execute {
+            if req_execute
+                && !inode.permissions.user_execute
+                && !inode.permissions.group_execute
+                && !inode.permissions.other_execute
+            {
                 return Err(FsError::PermissionDenied);
             }
             return Ok(());
@@ -683,7 +744,11 @@ impl VirtualFilesystem {
                 req_write,
                 req_execute,
             ) {
-                return if granted { Ok(()) } else { Err(FsError::PermissionDenied) };
+                return if granted {
+                    Ok(())
+                } else {
+                    Err(FsError::PermissionDenied)
+                };
             }
         }
 
@@ -794,7 +859,10 @@ impl VirtualFilesystem {
         child_inode_id: u64,
         deleter_uid: u64,
     ) -> Result<(), FsError> {
-        let parent_inode = self.inodes.get(&parent_dir_inode_id).ok_or(FsError::NotFound)?;
+        let parent_inode = self
+            .inodes
+            .get(&parent_dir_inode_id)
+            .ok_or(FsError::NotFound)?;
         let child_inode = self.inodes.get(&child_inode_id).ok_or(FsError::NotFound)?;
 
         // If directory has Sticky bit set, deleter must be root (0), dir owner, or child owner
@@ -991,7 +1059,10 @@ mod tests {
         vfs.chflags(inode_id, 0x0002).unwrap();
 
         // Attempt write -> FsError::ImmutableFile
-        assert_eq!(vfs.write_file(fd, b"immutable test"), Err(FsError::ImmutableFile));
+        assert_eq!(
+            vfs.write_file(fd, b"immutable test"),
+            Err(FsError::ImmutableFile)
+        );
 
         // Attempt delete -> FsError::ImmutableFile
         assert_eq!(vfs.delete_file(inode_id), Err(FsError::ImmutableFile));
@@ -1015,9 +1086,14 @@ mod tests {
         assert!(vfs.getfacl(inode_id).is_some());
 
         // NamedUser 1005 attempting read -> Ok
-        assert!(vfs.evaluate_access(inode_id, 1005, 1000, &[], true, false, false).is_ok());
+        assert!(vfs
+            .evaluate_access(inode_id, 1005, 1000, &[], true, false, false)
+            .is_ok());
         // NamedUser 1005 attempting write -> Err
-        assert_eq!(vfs.evaluate_access(inode_id, 1005, 1000, &[], false, true, false), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.evaluate_access(inode_id, 1005, 1000, &[], false, true, false),
+            Err(FsError::PermissionDenied)
+        );
     }
 
     #[test]
@@ -1043,7 +1119,9 @@ mod tests {
         let suid_bin_id = vfs.create_file(FileType::Regular, 0).unwrap(); // Owned by root (0)
         vfs.chmod(suid_bin_id, 0o4755).unwrap(); // SUID set
 
-        let (euid, egid) = vfs.evaluate_execution_credentials(suid_bin_id, 1000, 1000).unwrap();
+        let (euid, egid) = vfs
+            .evaluate_execution_credentials(suid_bin_id, 1000, 1000)
+            .unwrap();
         assert_eq!(euid, 0); // Promoted to root UID
         assert_eq!(egid, 1000);
 
@@ -1054,7 +1132,10 @@ mod tests {
         let file_id = vfs.create_file(FileType::Regular, 2000).unwrap(); // Owned by UID 2000
 
         // User 3000 trying to delete user 2000's file in sticky dir -> Denied
-        assert_eq!(vfs.delete_child_file(dir_id, file_id, 3000), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.delete_child_file(dir_id, file_id, 3000),
+            Err(FsError::PermissionDenied)
+        );
 
         // Owner (2000) deleting own file -> Ok
         assert!(vfs.delete_child_file(dir_id, file_id, 2000).is_ok());

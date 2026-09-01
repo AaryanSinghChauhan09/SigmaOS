@@ -22,10 +22,9 @@
 //!     -> Display
 //! ```
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
-
 
 use crate::klib::HashMap;
 
@@ -164,8 +163,8 @@ pub struct Output {
     pub refresh_rate: u32,
     pub scale: f32, // Fractional scaling support for HiDPI (e.g., 1.25, 1.5, 1.75)
     pub primary: bool,
-    pub supports_vrr: bool,     // Variable Refresh Rate (VRR) for high-end gaming
-    pub current_refresh: u32,   // Dynamically scales based on load
+    pub supports_vrr: bool, // Variable Refresh Rate (VRR) for high-end gaming
+    pub current_refresh: u32, // Dynamically scales based on load
 }
 
 impl Output {
@@ -419,9 +418,7 @@ impl ZenithCompositor {
 
     /// Destroy a window
     pub fn destroy_window(&mut self, window_id: u64) -> Result<()> {
-        self.windows
-            .remove(&window_id)
-            .ok_or("Window not found")?;
+        self.windows.remove(&window_id).ok_or("Window not found")?;
         self.surfaces.remove(&window_id);
 
         if self.active_window == Some(window_id) {
@@ -433,10 +430,7 @@ impl ZenithCompositor {
 
     /// Set window state
     pub fn set_window_state(&mut self, window_id: u64, state: WindowState) -> Result<()> {
-        let window = self
-            .windows
-            .get_mut(&window_id)
-            .ok_or("Window not found")?;
+        let window = self.windows.get_mut(&window_id).ok_or("Window not found")?;
 
         window.state = state;
         Ok(())
@@ -444,10 +438,7 @@ impl ZenithCompositor {
 
     /// Set window geometry
     pub fn set_window_geometry(&mut self, window_id: u64, geometry: WindowGeometry) -> Result<()> {
-        let window = self
-            .windows
-            .get_mut(&window_id)
-            .ok_or("Window not found")?;
+        let window = self.windows.get_mut(&window_id).ok_or("Window not found")?;
 
         window.geometry = geometry;
         self.damage_regions.push(DamageRegion::new(

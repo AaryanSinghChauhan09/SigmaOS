@@ -2,8 +2,6 @@
 //! Supports wireless (Intel iwlwifi, Broadcom brcmfmac, Realtek rtw88, Atheros ath10k), ethernet, and Bluetooth
 extern crate alloc;
 
-
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

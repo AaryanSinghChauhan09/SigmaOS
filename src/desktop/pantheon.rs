@@ -2,10 +2,8 @@ extern crate alloc;
 // SigmaOS Pantheon Desktop Environment (elementary OS Parity)
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
-
 #[cfg(test)]
 extern crate std;
-
 
 use alloc::string::String;
 use alloc::string::ToString;
@@ -229,7 +227,11 @@ impl AppCenter {
     }
 
     /// Buy and install software, allowing custom pay-what-you-want pricing
-    pub fn install_with_payment(&mut self, id: &str, paid_amount: f64) -> Result<bool, &'static str> {
+    pub fn install_with_payment(
+        &mut self,
+        id: &str,
+        paid_amount: f64,
+    ) -> Result<bool, &'static str> {
         if paid_amount > self.account_balance_usd {
             return Err("Insufficient balance in AppCenter account");
         }
@@ -319,7 +321,10 @@ mod tests {
         assert!(wing.indicators.contains_key("network"));
         let updated = wing.update_indicator_text("network", "Connected to Fiber");
         assert!(updated);
-        assert_eq!(wing.indicators.get("network").unwrap().status_text, "Connected to Fiber");
+        assert_eq!(
+            wing.indicators.get("network").unwrap().status_text,
+            "Connected to Fiber"
+        );
     }
 
     #[test]

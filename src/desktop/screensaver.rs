@@ -2,8 +2,8 @@
 #![allow(unused_variables)]
 
 extern crate alloc;
-use alloc::string::String;
 use alloc::format;
+use alloc::string::String;
 
 /// Display Power Management Signaling (DPMS) state inspired by X11 / Wayland / BSD xset
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,9 +51,9 @@ impl Default for ScreenSaverConfig {
         Self {
             screensaver_timeout_secs: 300, // 5 minutes
             lock_timeout_secs: 600,        // 10 minutes
-            dpms_standby_secs: 900,      // 15 minutes
-            dpms_suspend_secs: 1200,     // 20 minutes
-            dpms_off_secs: 1800,         // 30 minutes
+            dpms_standby_secs: 900,        // 15 minutes
+            dpms_suspend_secs: 1200,       // 20 minutes
+            dpms_off_secs: 1800,           // 30 minutes
             mode: ScreenSaverMode::MatrixRain,
             show_clock_on_lock: true,
             user_name: String::from("sigma_user"),
@@ -170,7 +170,9 @@ impl ScreenSaverEngine {
         let status_text = match self.lock_state {
             LockState::Locked => format!("Locked: User {}", self.config.user_name),
             LockState::Authenticating => String::from("Verifying passphrase..."),
-            LockState::Unlocked if self.is_active => format!("Screensaver Active: Mode {:?}", self.config.mode),
+            LockState::Unlocked if self.is_active => {
+                format!("Screensaver Active: Mode {:?}", self.config.mode)
+            }
             LockState::Unlocked => String::from("System Active"),
         };
 

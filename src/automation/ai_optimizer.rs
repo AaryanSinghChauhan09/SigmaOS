@@ -1,9 +1,8 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS AI-Driven Optimization System
 // Copilot-style assistants for system tuning and automation
-
 
 /// Optimization category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

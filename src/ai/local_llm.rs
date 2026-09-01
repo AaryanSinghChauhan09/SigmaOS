@@ -1,5 +1,5 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Local LLM & Whisper Speech-to-Text Integration
 // Native wrapper interfacing with llama.cpp and OpenAI Whisper GGUF models

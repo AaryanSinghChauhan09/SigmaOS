@@ -1,24 +1,32 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // OOP-based Log Rotation for SigmaOS
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 pub type LogFileID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RotationPolicy { Size = 0, Time = 1, Daily = 2 }
+pub enum RotationPolicy {
+    Size = 0,
+    Time = 1,
+    Daily = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RotationError { Success = 0, NotFound = 1, RotationFailed = 2 }
+pub enum RotationError {
+    Success = 0,
+    NotFound = 1,
+    RotationFailed = 2,
+}
 
 /// Syslog-parity severity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -85,14 +93,22 @@ impl SimpleLogFile {
 }
 
 impl LogFile for SimpleLogFile {
-    fn id(&self) -> LogFileID { self.id }
+    fn id(&self) -> LogFileID {
+        self.id
+    }
     fn path(&self) -> &[u8] {
         // Fast path slicing: O(1) instantaneous lookup using cached byte length instead of linear O(N) scan
         &self.path[..self.path_len as usize]
     }
-    fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
-    fn created(&self) -> u64 { self.created.load(Ordering::SeqCst) as u64 }
-    fn reset_size(&self) { self.size.store(0, Ordering::SeqCst); }
+    fn size(&self) -> usize {
+        self.size.load(Ordering::SeqCst)
+    }
+    fn created(&self) -> u64 {
+        self.created.load(Ordering::SeqCst) as u64
+    }
+    fn reset_size(&self) {
+        self.size.store(0, Ordering::SeqCst);
+    }
 }
 
 pub trait LogRotator {
@@ -150,7 +166,11 @@ impl SimpleLogRotator {
         // Shift generations in reverse order
         for i in (1..max_generations).rev() {
             let prev_name = format!("{}.{}.gz", base_filename, i);
-            if self.active_generations.iter().any(|name| name == &prev_name) {
+            if self
+                .active_generations
+                .iter()
+                .any(|name| name == &prev_name)
+            {
                 let next_name = format!("{}.{}.gz", base_filename, i + 1);
                 new_generations.push(next_name);
             }
@@ -200,7 +220,9 @@ impl LogRotator for SimpleLogRotator {
                     log_file.reset_size();
                     // Use standard alloc::string::ToString
                     use alloc::string::ToString;
-                    let path_str = core:: String::from_utf8(log_file.path()).unwrap_or("log").to_string();
+                    let path_str = core::String::from_utf8(log_file.path())
+                        .unwrap_or("log")
+                        .to_string();
                     path_to_shift = Some(path_str);
                     break;
                 }
@@ -225,7 +247,9 @@ pub trait LogCompressor {
 pub struct SimpleLogCompressor;
 
 impl SimpleLogCompressor {
-    pub fn new() -> Self { SimpleLogCompressor }
+    pub fn new() -> Self {
+        SimpleLogCompressor
+    }
 
     /// Compresses data dynamically using a clean Run-Length Encoding (RLE) algorithm
     pub fn compress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {

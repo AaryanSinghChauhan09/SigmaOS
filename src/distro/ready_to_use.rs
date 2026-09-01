@@ -3,9 +3,8 @@ extern crate alloc;
 // Ready-to-Use OS Usability Primitives
 // Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
-
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[cfg(test)]
 use crate::klib::HashMap;

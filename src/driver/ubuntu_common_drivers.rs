@@ -7,10 +7,10 @@
 //! - Hardware PCI ID auto-matching for NVIDIA/AMD GPUs, Broadcom Wi-Fi, Realtek NICs
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 use crate::klib::HashMap;
 
@@ -56,7 +56,8 @@ impl UbuntuDriverPackage {
         vendor_id: u16,
         device_id: u16,
     ) -> Self {
-        let free_software = license == DriverLicense::GplCompatible || license == DriverLicense::OpenSourceFallback;
+        let free_software =
+            license == DriverLicense::GplCompatible || license == DriverLicense::OpenSourceFallback;
         Self {
             name: name.to_string(),
             version: version.to_string(),
@@ -175,7 +176,8 @@ impl UbuntuAdditionalDriversRegistry {
                 DriverLicense::Proprietary,
                 0x10DE, // NVIDIA Vendor ID
                 0x2484, // RTX 3070
-            ).with_dkms("nvidia"),
+            )
+            .with_dkms("nvidia"),
             UbuntuDriverPackage::new(
                 "xserver-xorg-video-nouveau",
                 "1.0.17",
@@ -192,7 +194,8 @@ impl UbuntuAdditionalDriversRegistry {
                 DriverLicense::Proprietary,
                 0x14E4, // Broadcom
                 0x43A0, // BCM4360
-            ).with_dkms("wl"),
+            )
+            .with_dkms("wl"),
             UbuntuDriverPackage::new(
                 "firmware-b43-installer",
                 "1:019-4",
@@ -209,7 +212,8 @@ impl UbuntuAdditionalDriversRegistry {
                 DriverLicense::GplCompatible,
                 0x10EC, // Realtek
                 0x8168, // RTL8111/8168
-            ).with_dkms("r8168"),
+            )
+            .with_dkms("r8168"),
             // Intel CPU Microcode
             UbuntuDriverPackage::new(
                 "intel-microcode",
@@ -223,7 +227,11 @@ impl UbuntuAdditionalDriversRegistry {
     }
 
     /// Detect recommended drivers for detected PCI hardware
-    pub fn detect_drivers_for_pci(&self, vendor_id: u16, device_id: u16) -> Vec<UbuntuDriverPackage> {
+    pub fn detect_drivers_for_pci(
+        &self,
+        vendor_id: u16,
+        device_id: u16,
+    ) -> Vec<UbuntuDriverPackage> {
         self.available_drivers
             .iter()
             .filter(|drv| drv.vendor_id == vendor_id && drv.device_id == device_id)
@@ -276,7 +284,8 @@ impl UbuntuLivepatchDriverHook {
         if !self.livepatch_active {
             return false;
         }
-        self.active_patches.push(format!("{}: {}", cve_id, patch_name));
+        self.active_patches
+            .push(format!("{}: {}", cve_id, patch_name));
         true
     }
 }
@@ -314,7 +323,9 @@ mod tests {
         let nvidia_drivers = registry.detect_drivers_for_pci(0x10DE, 0x2484);
         assert_eq!(nvidia_drivers.len(), 2);
         assert!(nvidia_drivers.iter().any(|d| d.name == "nvidia-driver-550"));
-        assert!(nvidia_drivers.iter().any(|d| d.name == "xserver-xorg-video-nouveau"));
+        assert!(nvidia_drivers
+            .iter()
+            .any(|d| d.name == "xserver-xorg-video-nouveau"));
     }
 
     #[test]

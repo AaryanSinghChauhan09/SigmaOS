@@ -1,25 +1,33 @@
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::string::String;
 /// OOP-based Performance Profiler for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 191
 /// Implements CPU and memory profiling
-
 use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::boxed::Box;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ProfileID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy)]
-pub enum ProfileType { CPU = 0, Memory = 1, IO = 2, Network = 3 }
+pub enum ProfileType {
+    CPU = 0,
+    Memory = 1,
+    IO = 2,
+    Network = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ProfilerError { Success = 0, NotFound = 1, ProfileRunning = 2 }
+pub enum ProfilerError {
+    Success = 0,
+    NotFound = 1,
+    ProfileRunning = 2,
+}
 
 pub trait Profile {
     fn id(&self) -> ProfileID;
@@ -50,17 +58,30 @@ impl SimpleProfile {
     }
 }
 
-
 impl Profile for SimpleProfile {
-    fn id(&self) -> ProfileID { self.id }
-    fn profile_type(&self) -> ProfileType { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
-    fn start_time(&self) -> u64 { self.start_time.load(Ordering::SeqCst) as u64 }
-    fn end_time(&self) -> u64 { self.end_time.load(Ordering::SeqCst) as u64 }
-    fn set_end_time(&self, end_time: u64) { self.end_time.store(end_time as usize, Ordering::SeqCst); }
+    fn id(&self) -> ProfileID {
+        self.id
+    }
+    fn profile_type(&self) -> ProfileType {
+        unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) }
+    }
+    fn start_time(&self) -> u64 {
+        self.start_time.load(Ordering::SeqCst) as u64
+    }
+    fn end_time(&self) -> u64 {
+        self.end_time.load(Ordering::SeqCst) as u64
+    }
+    fn set_end_time(&self, end_time: u64) {
+        self.end_time.store(end_time as usize, Ordering::SeqCst);
+    }
     fn duration(&self) -> u64 {
         let end = self.end_time();
         let start = self.start_time();
-        if end > start { end - start } else { 0 }
+        if end > start {
+            end - start
+        } else {
+            0
+        }
     }
     fn stop_profile(&mut self) {
         self.end_time.store(2000000, Ordering::SeqCst);
@@ -117,15 +138,21 @@ impl Profiler for SimpleProfiler {
     fn get_profile(&self, id: ProfileID) -> Option<&dyn Profile> {
         for profile_option in &self.profiles {
             if let Some(ref profile) = *profile_option {
-                if profile.id() == id { return Some(profile.as_ref()); }
+                if profile.id() == id {
+                    return Some(profile.as_ref());
+                }
             }
         }
         None
     }
 
-    fn get_cpu_usage(&self) -> f32 { (self.cpu_usage.load(Ordering::SeqCst) as f32) / 100.0 }
+    fn get_cpu_usage(&self) -> f32 {
+        (self.cpu_usage.load(Ordering::SeqCst) as f32) / 100.0
+    }
 
-    fn get_memory_usage(&self) -> f32 { (self.memory_usage.load(Ordering::SeqCst) as f32) / 100.0 }
+    fn get_memory_usage(&self) -> f32 {
+        (self.memory_usage.load(Ordering::SeqCst) as f32) / 100.0
+    }
 }
 
 pub trait CallGraph {
@@ -164,8 +191,12 @@ impl CallGraph for SimpleCallGraph {
         let mut callee_array = [0u8; 128];
         let caller_len = caller.len().min(127);
         let callee_len = callee.len().min(127);
-        for i in 0..caller_len { caller_array[i] = caller[i]; }
-        for i in 0..callee_len { callee_array[i] = callee[i]; }
+        for i in 0..caller_len {
+            caller_array[i] = caller[i];
+        }
+        for i in 0..callee_len {
+            callee_array[i] = callee[i];
+        }
         self.edges.push((caller_array, callee_array));
     }
 
@@ -178,4 +209,3 @@ impl CallGraph for SimpleCallGraph {
         hotspots
     }
 }
-

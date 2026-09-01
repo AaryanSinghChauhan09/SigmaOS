@@ -2,10 +2,9 @@ extern crate alloc;
 // eBPF-based Scheduling System for SigmaOS
 // Inspired by Ubuntu 25.04 sched_ext integration
 
-
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Scheduling policy types
@@ -77,7 +76,7 @@ impl SchedExtScheduler {
             active: AtomicBool::new(false),
         }
     }
-    
+
     pub fn load_policy(&mut self, policy: SchedulingPolicy) -> Result<(), SchedError> {
         // Load appropriate eBPF program based on policy
         match &policy {
@@ -97,87 +96,79 @@ impl SchedExtScheduler {
         }
 
         self.scheduling_policy = policy;
-        
+
         Ok(())
     }
-    
+
     fn load_mlfq_program(&mut self) -> Result<(), SchedError> {
         // In a real implementation, this would load MLFQ eBPF bytecode
-        let bytecode = vec
-![0; 1024]; // Mock bytecode
-        
+        let bytecode = vec![0; 1024]; // Mock bytecode
+
         self.bpf_program = Some(BpfProgram {
             name: String::from("mlfq_scheduler"),
             bytecode,
-            map_descriptors: vec
-![],
+            map_descriptors: vec![],
             loaded: AtomicBool::new(false),
         });
-        
+
         Ok(())
     }
-    
+
     fn load_cfs_program(&mut self) -> Result<(), SchedError> {
         // In a real implementation, this would load CFS eBPF bytecode
-        let bytecode = vec
-![0; 1024]; // Mock bytecode
-        
+        let bytecode = vec![0; 1024]; // Mock bytecode
+
         self.bpf_program = Some(BpfProgram {
             name: String::from("cfs_scheduler"),
             bytecode,
-            map_descriptors: vec
-![],
+            map_descriptors: vec![],
             loaded: AtomicBool::new(false),
         });
-        
+
         Ok(())
     }
-    
+
     fn load_edf_program(&mut self) -> Result<(), SchedError> {
         // In a real implementation, this would load EDF eBPF bytecode
-        let bytecode = vec
-![0; 1024]; // Mock bytecode
-        
+        let bytecode = vec![0; 1024]; // Mock bytecode
+
         self.bpf_program = Some(BpfProgram {
             name: String::from("edf_scheduler"),
             bytecode,
-            map_descriptors: vec
-![],
+            map_descriptors: vec![],
             loaded: AtomicBool::new(false),
         });
-        
+
         Ok(())
     }
-    
+
     fn load_custom_program(&mut self, name: &str) -> Result<(), SchedError> {
         // In a real implementation, this would load custom eBPF bytecode
-        let bytecode = vec
-![0; 1024]; // Mock bytecode
-        
+        let bytecode = vec![0; 1024]; // Mock bytecode
+
         self.bpf_program = Some(BpfProgram {
             name: String::from(name),
             bytecode,
-            map_descriptors: vec
-![],
+            map_descriptors: vec![],
             loaded: AtomicBool::new(false),
         });
-        
+
         Ok(())
     }
-    
+
     pub fn enable_hotswap(&mut self) -> Result<(), SchedError> {
         self.hotswap_enabled.store(true, Ordering::SeqCst);
         Ok(())
     }
-    
+
     pub fn disable_hotswap(&mut self) {
         self.hotswap_enabled.store(false, Ordering::SeqCst);
     }
-    
+
     pub fn is_hotswap_enabled(&self) -> bool {
         self.hotswap_enabled.load(Ordering::SeqCst)
     }
-    
+
     pub fn activate(&mut self) -> Result<(), SchedError> {
         if let Some(ref mut program) = self.bpf_program {
             // In a real implementation, this would load the eBPF program into kernel
@@ -188,22 +179,22 @@ impl SchedExtScheduler {
             Err(SchedError::NoProgramLoaded)
         }
     }
-    
+
     pub fn deactivate(&mut self) {
         if let Some(ref mut program) = self.bpf_program {
             program.loaded.store(false, Ordering::SeqCst);
         }
         self.active.store(false, Ordering::SeqCst);
     }
-    
+
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::SeqCst)
     }
-    
+
     pub fn set_user_space_scheduler(&mut self, scheduler: UserSpaceScheduler) {
         self.user_space_scheduler = Some(scheduler);
     }
-    
+
     pub fn get_scheduling_policy(&self) -> SchedulingPolicy {
         self.scheduling_policy.clone()
     }
@@ -248,12 +239,12 @@ impl UserSpaceScheduler {
             config: SchedulerConfig::default(),
         }
     }
-    
+
     pub fn with_config(mut self, config: SchedulerConfig) -> Self {
         self.config = config;
         self
     }
-    
+
     pub fn schedule_task(&self, task_id: u64, priority: u8) -> ScheduleDecision {
         // In a real implementation, this would make scheduling decisions
         ScheduleDecision {
@@ -341,7 +332,8 @@ mod tests {
 
     #[test]
     fn test_user_space_scheduler() {
-        let us_scheduler = UserSpaceScheduler::new("custom", SchedulingPolicy::Custom(String::from("test")));
+        let us_scheduler =
+            UserSpaceScheduler::new("custom", SchedulingPolicy::Custom(String::from("test")));
         let decision = us_scheduler.schedule_task(1, 10);
         assert_eq!(decision.task_id, 1);
     }
@@ -352,7 +344,7 @@ mod tests {
         scheduler.enable_hotswap().unwrap();
         scheduler.load_policy(SchedulingPolicy::Mlfq).unwrap();
         scheduler.activate().unwrap();
-        
+
         // Hotswap to different policy
         scheduler.load_policy(SchedulingPolicy::Cfs).unwrap();
         assert_eq!(scheduler.get_scheduling_policy(), SchedulingPolicy::Cfs);

@@ -52,7 +52,10 @@ impl CajaFileManager {
             current_directory: String::from("/home/user"),
             dual_pane_active: false,
             selected_emblem: String::from("emblem-favorite"),
-            extension_scripts: vec!["open-in-terminal.sh".to_string(), "caja-image-converter.py".to_string()],
+            extension_scripts: vec![
+                "open-in-terminal.sh".to_string(),
+                "caja-image-converter.py".to_string(),
+            ],
         }
     }
 
@@ -182,7 +185,8 @@ impl MateBetsyDesktopEnvironment {
 
     pub fn launch_eye_of_mate(&mut self, image_path: &str, w: u32, h: u32) {
         self.active_eom = Some(EyeOfMateImageViewer::open_image(image_path, w, h));
-        self.marco.map_window(103, &format!("Eye of MATE - {}", image_path));
+        self.marco
+            .map_window(103, &format!("Eye of MATE - {}", image_path));
     }
 }
 

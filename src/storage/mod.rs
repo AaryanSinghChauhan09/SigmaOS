@@ -21,14 +21,14 @@
 // Database engines, block storage systems, and data management
 
 pub mod block;
+pub mod block_device_extended;
 pub mod cinder;
 pub mod geom;
 pub mod nosql_engine;
 pub mod search;
+pub mod sovereign_disk_manager;
 pub mod sql_engine;
 pub mod volume;
-pub mod block_device_extended;
-pub mod sovereign_disk_manager;
 
 pub use block::{
     BlockError, BlockKind, BlockOpCode, BlockOperationEngine, BlockOrientedDevice,

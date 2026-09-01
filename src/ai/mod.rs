@@ -1,50 +1,45 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
-
-
-
-
 extern crate alloc;
 
 pub mod agent;
 pub mod agentic_os_runtime;
 pub mod apm;
 pub mod autogen;
-pub mod llm;
-pub mod orchestrator;
-pub mod sai;
-pub mod openclaw;
-pub mod system;
-pub mod voice;
-pub mod wiki;
-pub mod qwenpaw;
-pub mod developer_platform;
-pub mod open_computer;
-pub mod tensor_memory;
 pub mod compute_scheduler;
+pub mod developer_platform;
 pub mod lift_engine;
+pub mod llm;
+pub mod local_llm;
 pub mod next_gen;
+pub mod open_computer;
+pub mod openclaw;
+pub mod orchestrator;
 pub mod perplexity;
 pub mod quantization;
-pub mod wandr;
+pub mod qwenpaw;
+pub mod sai;
 pub mod sigma_data;
-pub mod local_llm;
 pub mod sigma_logic;
+pub mod system;
+pub mod tensor_memory;
+pub mod voice;
+pub mod wandr;
+pub mod wiki;
 
+pub use local_llm::{
+    LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
+};
 pub use sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
-pub use local_llm::{LocalLlmWrapper, WhisperSpeechToText, QuantizationType as LocalQuantizationType};
 
 pub use agentic_os_runtime::{
-    ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
-    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
-    ContainerEngineType, BootContainer, EbpfNetworkFilter, ContextMemorySegment,
-    GpuBackend, LocalLlmDaemon, AgentAuditEvent,
+    AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
+    EbpfNetworkFilter, EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 
-pub use openclaw::{
-    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
-};
+pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{

@@ -4,7 +4,6 @@ extern crate alloc;
 // SovereignML tensor core, agent orchestrator, and local inference
 // Fully implements the 6-Phase AI & Automation Roadmap to differentiate SigmaOS from traditional distros.
 
-
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

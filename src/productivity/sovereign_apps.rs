@@ -8,7 +8,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-
 const MAX_NODES: usize = 16;
 const MAX_TASKS: usize = 16;
 const MAX_SECRETS: usize = 16;
@@ -220,7 +219,12 @@ impl SigmaChatRoomManager {
     }
 
     /// Process IRC-style command line input or plain message
-    pub fn process_input(&mut self, current_room: &str, input: &str, timestamp_sec: u64) -> Result<String, &'static str> {
+    pub fn process_input(
+        &mut self,
+        current_room: &str,
+        input: &str,
+        timestamp_sec: u64,
+    ) -> Result<String, &'static str> {
         let trimmed = input.trim();
         if trimmed.starts_with('/') {
             let mut parts = trimmed.split_whitespace();
@@ -298,13 +302,19 @@ mod tests {
         assert_eq!(secret_id, 1);
 
         let mut chat = SigmaChatRoomManager::new("alice");
-        assert!(chat.process_input("#general", "Hello SigmaOS World!", 1700000000).is_ok());
+        assert!(chat
+            .process_input("#general", "Hello SigmaOS World!", 1700000000)
+            .is_ok());
         assert_eq!(chat.rooms.get("#general").unwrap().messages.len(), 1);
 
-        assert!(chat.process_input("#general", "/join #kernel", 1700000001).is_ok());
+        assert!(chat
+            .process_input("#general", "/join #kernel", 1700000001)
+            .is_ok());
         assert!(chat.rooms.contains_key("#kernel"));
 
-        assert!(chat.process_input("#general", "/nick bob", 1700000002).is_ok());
+        assert!(chat
+            .process_input("#general", "/nick bob", 1700000002)
+            .is_ok());
         assert_eq!(chat.active_user, "bob");
     }
 }

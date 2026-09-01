@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS File Manager
 // OOP-based file management with advanced features
@@ -495,10 +495,7 @@ mod tests {
         let mut manager = FileManager::default();
         let path = String::from("/home/user/Documents");
         manager.navigate(&path).unwrap();
-        assert_eq!(
-            manager.current_path(),
-            String::from("/home/user/Documents")
-        );
+        assert_eq!(manager.current_path(), String::from("/home/user/Documents"));
     }
 
     #[test]
