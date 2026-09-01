@@ -113,7 +113,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
     use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
