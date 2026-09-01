@@ -46,6 +46,23 @@ This document serves as the master engineering roadmap to systematically resolve
 
 ---
 
+## 🍃 0.2.1 Linux Mint Ecosystem Integration Matrix
+
+| Linux Mint Project | Function & Purpose | SigmaOS Sovereign Counterpart |
+| :--- | :--- | :--- |
+| **bulky** | Bulk file renamer utility | `SigmaFileRenamer` (regex & batch rename engine in `filemanager.rs`) |
+| **webapp-manager** | Isolated web application container launcher | `WebappManager` (isolated browser profile container in `linuxmint_inspirations.rs`) |
+| **mint-upgrade-info** | Release upgrade lifecycle & migration metadata | `ReleaseLifecycleMeta` (upgrade preflight checker in `updater.rs`) |
+| **lightdm-settings** | Display manager & greeter configuration tool | `MdmGreeterTheme` (greeter configuration in `display_manager.rs`) |
+| **folder-color-switcher**| Per-directory icon accent color switcher | `SymbolicIconTintEngine` (directory tinting in `theme.rs`) |
+| **mintwelcome** | First-boot welcome screen & system setup wizard | `WelcomeWizardOverlay` (Zenith onboarding wizard) |
+| **circle-flags / flags**| Country & locale flag icon collections | `LocaleManager` (flag & locale resolver in `i18n.rs`) |
+| **celluloid** | Modern GTK frontend for mpv media player | `SigmaPlayerEngine` (VLC/mpv GPU media player) |
+| **blueman** | Desktop Bluetooth manager & device paired control | `SovereignBluetoothManager` (Bluetooth 5.3 stack) |
+| **gdebi** | Standalone package installer with auto-deps | `UniversalPackageImporter` (standalone package installer in `sigma_pkg.rs`) |
+
+---
+
 ## ⚔️ 0.3 SigmaOS Competitive Strike Map
 
 ### Kernel & Core

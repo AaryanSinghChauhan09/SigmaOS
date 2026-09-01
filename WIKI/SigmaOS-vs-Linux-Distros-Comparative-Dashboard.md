@@ -18,7 +18,7 @@ This document presents a comparative dashboard and strategic development roadmap
 | **Package Management** | apt, dnf, pacman, apk, nix | `sigpkg` with multi-distro adapters (Debian, Fedora, Arch, Alpine, Nix) | Build official community package repositories, AUR compiler, & atomic rollback transactions. |
 | **Bootloader** | GRUB2, systemd-boot, EFISTUB | Custom UEFI bootloader (`src/boot/uefi.rs`) & Sigma-Boot EFI bridge | Enhance Secure Boot DB/DBX keyring verification and automated initramfs generation (`mkinitcpio`). |
 | **Shell / CLI** | Bash, Zsh, Fish | `sigma-sh` REPL with Bash aliases, Zsh tab completion, & Fish suggestions | Expand POSIX coreutils CLI utilities (`fdisk`, `df`, `ps`, `top`). |
-| **System Utilities** | Monitoring, journald, udev, systemd | Runit service manager, `systemd-preset` configurator, & `df` disk reporting | Add unified system journal logging, hardware telemetry diagnostics, & startup optimizers. |
+| **System Utilities** | Monitoring, journald, udev, systemd, bulky, webapp-manager | Runit service manager, `systemd-preset` configurator, `WebappManager`, & `SigmaFileRenamer` | Add unified system journal logging, hardware telemetry diagnostics, & startup optimizers. |
 | **Virtualization** | KVM, QEMU, Docker, Podman, LXC | Qubes OS RPC policy engine & Kata Containers microVM manager | Integrate Firecracker/KVM hypervisor bindings and OCI container image execution. |
 | **Update Mechanism** | Rolling (Arch) / Stable (Debian/Fedora) releases | Rawhide rolling channel selector (`SigmaNextChannel`) & livepatching | Build automated transactional updates, delta packages (`debdelta`), and reproducible ISO pipelines. |
 

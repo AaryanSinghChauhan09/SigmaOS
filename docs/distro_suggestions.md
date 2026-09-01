@@ -20,6 +20,13 @@ This document compiles key architectural strengths, design paradigms, and featur
 ### 🧪 4. Community-Driven Verified Modules
 - **Continuous Compliance Verification**: Automated CI/CD pipelines evaluating userland packages and driver modules against statutory compliance matrices and fuzzing harnesses prior to registry publication.
 
+### 🍃 5. Linux Mint Ecosystem Tool Parity
+- **Isolated Web Apps (`webapp-manager`)**: Containerized browser launcher running isolated site profiles with Capsicum/Landlock sandboxing policies.
+- **Bulk Renaming (`bulky`)**: Regex-based multi-file batch renaming integrated directly into `MillerColumnsView` and dual-pane file navigation.
+- **Display Manager Greeter Settings (`lightdm-settings`)**: Customization overlay for MDM/LightDM/SDDM greeter themes, avatars, and accessibility overlays.
+- **Icon Accent Tinting (`folder-color-switcher`)**: Symbolic icon tinting engine for per-folder custom color coding.
+- **Standalone Package Installer (`gdebi`)**: Single-file package installation with automatic dependency resolution and security audit checks.
+
 ---
 
 ## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD
