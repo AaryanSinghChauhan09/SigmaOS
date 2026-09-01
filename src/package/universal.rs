@@ -1,8 +1,31 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
+extern crate alloc;
+
+#[cfg(feature = "standalone_test")]
+use std::boxed::Box;
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::format;
+#[cfg(feature = "standalone_test")]
+use std::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use std::sync::Arc;
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
+
+#[cfg(not(feature = "standalone_test"))]
+use alloc::boxed::Box;
+#[cfg(not(feature = "standalone_test"))]
 use alloc::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::format;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
+use alloc::sync::Arc;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec::Vec;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
@@ -212,7 +235,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -223,7 +246,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: alloc::sync::Arc::new(handler),
+            handler: Arc::new(handler),
         }
     }
 }
@@ -1035,7 +1058,7 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
-    pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    pub user_hooks: Vec<Arc<dyn PackageHook>>,
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1089,7 +1112,7 @@ impl UniversalPackageManager {
     }
 
     /// Registers a user-defined lifecycle hook
-    pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
+    pub fn add_user_hook(&mut self, hook: Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
     }
 
