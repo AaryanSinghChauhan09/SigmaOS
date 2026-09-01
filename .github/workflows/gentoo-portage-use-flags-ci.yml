@@ -1,0 +1,25 @@
+name: Gentoo Portage USE Flags & Ebuild Matrix CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  gentoo-portage-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Gentoo Portage Engine & Profile Resolvers
+        run: cargo test --lib distro::gentoo
