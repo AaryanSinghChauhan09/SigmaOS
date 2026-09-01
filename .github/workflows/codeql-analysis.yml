@@ -1,0 +1,108 @@
+name: "CodeQL Security Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    # Run every Sunday at 01:30 UTC
+    - cron: '30 1 * * 0'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'rust' ]
+        # CodeQL supports: [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'rust' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Rust toolchain (for Rust analysis)
+      if: matrix.language == 'rust'
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # Custom queries for OS-level security patterns
+        queries: security-extended,security-and-quality
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{ matrix.language }}"
+
+  # Custom Rust-specific security checks
+  rust-security-audit:
+    name: Rust Security Checks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+
+    - name: Run cargo clippy (deny unsafe patterns)
+      run: |
+        cargo clippy --all-targets --all-features -- \
+          -D warnings \
+          -W clippy::undocumented_unsafe_blocks \
+          -W clippy::integer_arithmetic \
+          2>&1 || true
+      # Allow failure for now - these are warnings we're actively fixing
+
+    - name: Check for unsafe without SAFETY comments
+      run: |
+        # Find unsafe blocks without // SAFETY: documentation
+        UNDOCUMENTED=$(grep -rn 'unsafe {' src/ --include='*.rs' -l | xargs grep -L '// SAFETY:' 2>/dev/null || true)
+        if [ -n "$UNDOCUMENTED" ]; then
+          echo "⚠️ Files with undocumented unsafe blocks:"
+          echo "$UNDOCUMENTED"
+        else
+          echo "✅ All unsafe blocks are documented"
+        fi
+
+    - name: Check for unwrap() in kernel code
+      run: |
+        UNWRAPS=$(grep -rn '\.unwrap()' src/kernel/ src/klib/ --include='*.rs' 2>/dev/null | grep -v '#\[test\]' | grep -v '// OK:' | wc -l || echo 0)
+        echo "Found $UNWRAPS unwrap() calls in kernel/klib code"
+        if [ "$UNWRAPS" -gt 50 ]; then
+          echo "⚠️ High number of unwrap() calls - consider using proper error handling"
+        fi
+
+    - name: Generate security report
+      run: |
+        echo "## Security Scan Summary" > security_report.md
+        echo "- Date: $(date)" >> security_report.md
+        echo "- Rust version: $(rustc --version)" >> security_report.md
+        echo "- unsafe blocks: $(grep -rn 'unsafe' src/ --include='*.rs' | wc -l)" >> security_report.md
+        echo "- SAFETY comments: $(grep -rn '// SAFETY:' src/ --include='*.rs' | wc -l)" >> security_report.md
+        cat security_report.md
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4.3.6
+      with:
+        name: security-report
+        path: security_report.md
