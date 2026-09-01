@@ -3307,6 +3307,187 @@ impl VoidXbpsPackageEngine {
 }
 
 // =========================================================================
+/// FreeBSD/OpenBSD vmstat & iostat inspired performance and virtual memory diagnostic monitor
+pub struct FreeBsdVmstatIostatPerformanceMonitor {
+    pub page_faults: u64,
+    pub vm_free_pages: usize,
+    pub bytes_read_sec: u64,
+    pub bytes_written_sec: u64,
+    pub interrupts_per_sec: u32,
+}
+
+impl FreeBsdVmstatIostatPerformanceMonitor {
+    pub fn new(initial_free_pages: usize) -> Self {
+        Self {
+            page_faults: 0,
+            vm_free_pages: initial_free_pages,
+            bytes_read_sec: 0,
+            bytes_written_sec: 0,
+            interrupts_per_sec: 0,
+        }
+    }
+
+    pub fn record_page_fault(&mut self) {
+        self.page_faults += 1;
+        if self.vm_free_pages > 0 {
+            self.vm_free_pages -= 1;
+        }
+    }
+
+    pub fn update_io_counters(&mut self, read_bytes: u64, write_bytes: u64, interrupts: u32) {
+        self.bytes_read_sec = read_bytes;
+        self.bytes_written_sec = write_bytes;
+        self.interrupts_per_sec = interrupts;
+    }
+
+    pub fn get_vm_health_score(&self) -> u32 {
+        if self.vm_free_pages > 1000 {
+            100
+        } else if self.vm_free_pages > 100 {
+            75
+        } else {
+            30
+        }
+    }
+}
+
+/// Gentoo Portage equery & eix inspired USE flag query, slot collision resolver, and package inspector
+pub struct GentooEqueryEixPortageInspector {
+    pub use_flags: Vec<String>,
+    pub slot_bindings: Vec<(String, String)>,
+}
+
+impl GentooEqueryEixPortageInspector {
+    pub fn new() -> Self {
+        Self {
+            use_flags: Vec::new(),
+            slot_bindings: Vec::new(),
+        }
+    }
+
+    pub fn add_use_flag(&mut self, flag: &str) {
+        if !self.use_flags.iter().any(|f| f == flag) {
+            self.use_flags.push(flag.to_string());
+        }
+    }
+
+    pub fn has_use_flag(&self, flag: &str) -> bool {
+        self.use_flags.iter().any(|f| f == flag)
+    }
+
+    pub fn register_slot(&mut self, pkg_name: &str, slot: &str) {
+        self.slot_bindings.push((pkg_name.to_string(), slot.to_string()));
+    }
+
+    pub fn check_slot_conflict(&self, pkg_name: &str, slot: &str) -> bool {
+        self.slot_bindings.iter().any(|(p, s)| p == pkg_name && s != slot)
+    }
+}
+
+/// Debian debsums & RedHat rpm -V inspired package checksum & file integrity auditor
+pub struct DebianDebsumsRpmVerifyAuditor {
+    pub file_hashes: Vec<(String, String)>,
+    pub tampered_files: Vec<String>,
+}
+
+impl DebianDebsumsRpmVerifyAuditor {
+    pub fn new() -> Self {
+        Self {
+            file_hashes: Vec::new(),
+            tampered_files: Vec::new(),
+        }
+    }
+
+    pub fn register_expected_hash(&mut self, filepath: &str, expected_hash: &str) {
+        self.file_hashes.push((filepath.to_string(), expected_hash.to_string()));
+    }
+
+    pub fn verify_file_hash(&mut self, filepath: &str, actual_hash: &str) -> bool {
+        if let Some((_, expected)) = self.file_hashes.iter().find(|(p, _)| p == filepath) {
+            if expected == actual_hash {
+                true
+            } else {
+                if !self.tampered_files.iter().any(|p| p == filepath) {
+                    self.tampered_files.push(filepath.to_string());
+                }
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn get_tampered_count(&self) -> usize {
+        self.tampered_files.len()
+    }
+}
+
+/// NixOS nix-collect-garbage & nix-store --verify inspired unreferenced store path manager
+pub struct NixGcStoreIntegrityManager {
+    pub store_paths: Vec<String>,
+    pub referenced_paths: Vec<String>,
+}
+
+impl NixGcStoreIntegrityManager {
+    pub fn new() -> Self {
+        Self {
+            store_paths: Vec::new(),
+            referenced_paths: Vec::new(),
+        }
+    }
+
+    pub fn add_store_path(&mut self, path: &str) {
+        if !self.store_paths.iter().any(|p| p == path) {
+            self.store_paths.push(path.to_string());
+        }
+    }
+
+    pub fn mark_referenced(&mut self, path: &str) {
+        if !self.referenced_paths.iter().any(|p| p == path) {
+            self.referenced_paths.push(path.to_string());
+        }
+    }
+
+    pub fn collect_garbage(&mut self) -> usize {
+        let before_count = self.store_paths.len();
+        self.store_paths.retain(|p| self.referenced_paths.contains(p));
+        before_count - self.store_paths.len()
+    }
+}
+
+/// OpenBSD pfctl inspired state table inspector & bandwidth QoS queue manager
+pub struct OpenBsdPfctlStateInspector {
+    pub active_states: u32,
+    pub nat_rules: Vec<String>,
+    pub qos_queues: Vec<String>,
+}
+
+impl OpenBsdPfctlStateInspector {
+    pub fn new() -> Self {
+        Self {
+            active_states: 0,
+            nat_rules: Vec::new(),
+            qos_queues: Vec::new(),
+        }
+    }
+
+    pub fn add_nat_rule(&mut self, rule: &str) {
+        self.nat_rules.push(rule.to_string());
+    }
+
+    pub fn add_qos_queue(&mut self, queue: &str) {
+        self.qos_queues.push(queue.to_string());
+    }
+
+    pub fn track_connection(&mut self) {
+        self.active_states += 1;
+    }
+
+    pub fn get_active_state_count(&self) -> u32 {
+        self.active_states
+    }
+}
+
 // UNIT TESTS
 // =========================================================================
 
@@ -4314,5 +4495,73 @@ mod tests {
         assert_eq!(xbps.sync_repository(), 42);
         assert!(xbps.install_package("void-repo-multilib").is_ok());
         assert!(xbps.is_installed("void-repo-multilib"));
+    }
+
+    #[test]
+    fn test_freebsd_vmstat_iostat_monitor() {
+        let mut monitor = FreeBsdVmstatIostatPerformanceMonitor::new(2000);
+        assert_eq!(monitor.get_vm_health_score(), 100);
+
+        monitor.record_page_fault();
+        assert_eq!(monitor.page_faults, 1);
+        assert_eq!(monitor.vm_free_pages, 1999);
+
+        monitor.update_io_counters(102400, 204800, 50);
+        assert_eq!(monitor.bytes_read_sec, 102400);
+        assert_eq!(monitor.bytes_written_sec, 204800);
+    }
+
+    #[test]
+    fn test_gentoo_equery_eix_inspector() {
+        let mut inspector = GentooEqueryEixPortageInspector::new();
+        inspector.add_use_flag("pqc");
+        inspector.add_use_flag("wayland");
+
+        assert!(inspector.has_use_flag("pqc"));
+        assert!(!inspector.has_use_flag("systemd"));
+
+        inspector.register_slot("sys-libs/zlib", "0/1");
+        assert!(inspector.check_slot_conflict("sys-libs/zlib", "1/2"));
+        assert!(!inspector.check_slot_conflict("sys-libs/zlib", "0/1"));
+    }
+
+    #[test]
+    fn test_debian_debsums_rpm_verify_auditor() {
+        let mut auditor = DebianDebsumsRpmVerifyAuditor::new();
+        auditor.register_expected_hash("/bin/bash", "a1b2c3d4");
+
+        assert!(auditor.verify_file_hash("/bin/bash", "a1b2c3d4"));
+        assert_eq!(auditor.get_tampered_count(), 0);
+
+        assert!(!auditor.verify_file_hash("/bin/bash", "corrupted"));
+        assert_eq!(auditor.get_tampered_count(), 1);
+    }
+
+    #[test]
+    fn test_nix_gc_store_integrity_manager() {
+        let mut nix_gc = NixGcStoreIntegrityManager::new();
+        nix_gc.add_store_path("/sigma/store/hash1-gcc");
+        nix_gc.add_store_path("/sigma/store/hash2-unused");
+
+        nix_gc.mark_referenced("/sigma/store/hash1-gcc");
+        let collected = nix_gc.collect_garbage();
+
+        assert_eq!(collected, 1);
+        assert_eq!(nix_gc.store_paths.len(), 1);
+        assert_eq!(nix_gc.store_paths[0], "/sigma/store/hash1-gcc");
+    }
+
+    #[test]
+    fn test_openbsd_pfctl_state_inspector() {
+        let mut pfctl = OpenBsdPfctlStateInspector::new();
+        pfctl.add_nat_rule("match out on egress inet from 192.168.1.0/24 to any nat-to egress");
+        pfctl.add_qos_queue("queue std parent root bandwidth 100M");
+
+        pfctl.track_connection();
+        pfctl.track_connection();
+
+        assert_eq!(pfctl.get_active_state_count(), 2);
+        assert_eq!(pfctl.nat_rules.len(), 1);
+        assert_eq!(pfctl.qos_queues.len(), 1);
     }
 }
