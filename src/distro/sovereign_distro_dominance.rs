@@ -6,11 +6,11 @@ extern crate alloc;
 // 3. OpenBsdHardenedCapsicumPledge: Unified FreeBSD Capsicum capability rights and OpenBSD pledge/unveil zero-overhead syscall sentinel.
 // 4. ZfsBtrfsHybridSelfHealingCoW: Merkle tree RAID self-healing CoW filesystem engine with instant Btrfs-style subvolumes.
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// 1. NixGuixZeroCopyStore
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -40,8 +40,17 @@ impl NixGuixZeroCopyStore {
         }
     }
 
-    pub fn add_package(&mut self, name: &str, version: &str, deps: Vec<String>, binary_payload: &[u8]) -> String {
-        let hash_id = format!("{:x}", name.len() * 31 + version.len() * 17 + binary_payload.len());
+    pub fn add_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        deps: Vec<String>,
+        binary_payload: &[u8],
+    ) -> String {
+        let hash_id = format!(
+            "{:x}",
+            name.len() * 31 + version.len() * 17 + binary_payload.len()
+        );
         let store_path = format!("/nix/store/{}-{}-{}", hash_id, name, version);
         let slice = StorePackageSlice {
             hash_id: hash_id.clone(),
@@ -55,9 +64,16 @@ impl NixGuixZeroCopyStore {
         hash_id
     }
 
-    pub fn register_in_generation(&mut self, pkg_name: &str, hash_id: &str) -> Result<usize, String> {
+    pub fn register_in_generation(
+        &mut self,
+        pkg_name: &str,
+        hash_id: &str,
+    ) -> Result<usize, String> {
         if !self.store_entries.contains_key(hash_id) {
-            return Err(format!("Package hash {} not present in zero-copy store", hash_id));
+            return Err(format!(
+                "Package hash {} not present in zero-copy store",
+                hash_id
+            ));
         }
         let next_gen = self.current_generation + 1;
         let mut new_active = self.generation_history[self.current_generation].clone();
@@ -69,14 +85,19 @@ impl NixGuixZeroCopyStore {
 
     pub fn rollback_generation(&mut self, target_gen: usize) -> Result<usize, String> {
         if target_gen >= self.generation_history.len() {
-            return Err(format!("Target generation {} exceeds available history", target_gen));
+            return Err(format!(
+                "Target generation {} exceeds available history",
+                target_gen
+            ));
         }
         self.current_generation = target_gen;
         Ok(self.current_generation)
     }
 
     pub fn zero_copy_read_slice(&self, hash_id: &str) -> Option<&[u8]> {
-        self.store_entries.get(hash_id).map(|s| s.mmap_data.as_slice())
+        self.store_entries
+            .get(hash_id)
+            .map(|s| s.mmap_data.as_slice())
     }
 }
 
@@ -187,7 +208,7 @@ pub enum CapsicumRight {
 pub struct OpenBsdHardenedCapsicumPledge {
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
-    pub unveiled_paths: BTreeMap<String, String>,    // path -> permissions e.g. "rwc"
+    pub unveiled_paths: BTreeMap<String, String>,   // path -> permissions e.g. "rwc"
 }
 
 impl OpenBsdHardenedCapsicumPledge {
@@ -208,16 +229,24 @@ impl OpenBsdHardenedCapsicumPledge {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
     }
 
     pub fn set_fd_rights(&mut self, fd: usize, rights_mask: u32) {
         self.fd_capability_rights.insert(fd, rights_mask);
     }
 
-    pub fn authorize_syscall(&self, promise_req: &str, path_req: Option<&str>, fd_req: Option<(usize, CapsicumRight)>) -> bool {
+    pub fn authorize_syscall(
+        &self,
+        promise_req: &str,
+        path_req: Option<&str>,
+        fd_req: Option<(usize, CapsicumRight)>,
+    ) -> bool {
         // 1. Verify pledge promise
-        if !self.pledged_promises.is_empty() && !self.pledged_promises.iter().any(|p| p == promise_req) {
+        if !self.pledged_promises.is_empty()
+            && !self.pledged_promises.iter().any(|p| p == promise_req)
+        {
             return false;
         }
 
@@ -271,7 +300,10 @@ impl ZfsBtrfsHybridSelfHealingCoW {
             files: BTreeMap::new(),
             is_read_only_snapshot: false,
         };
-        root_subvol.files.insert(String::from("/etc/os-release"), b"NAME=SigmaOS\nVERSION=1.0\n".to_vec());
+        root_subvol.files.insert(
+            String::from("/etc/os-release"),
+            b"NAME=SigmaOS\nVERSION=1.0\n".to_vec(),
+        );
 
         let mut map = BTreeMap::new();
         map.insert(String::from("@root"), root_subvol);
@@ -282,8 +314,15 @@ impl ZfsBtrfsHybridSelfHealingCoW {
         }
     }
 
-    pub fn create_cow_snapshot(&mut self, parent_subvol: &str, snapshot_name: &str) -> Result<(), String> {
-        let parent = self.subvolumes.get(parent_subvol).ok_or_else(|| format!("Parent subvol {} not found", parent_subvol))?;
+    pub fn create_cow_snapshot(
+        &mut self,
+        parent_subvol: &str,
+        snapshot_name: &str,
+    ) -> Result<(), String> {
+        let parent = self
+            .subvolumes
+            .get(parent_subvol)
+            .ok_or_else(|| format!("Parent subvol {} not found", parent_subvol))?;
         let mut snap = parent.clone();
         snap.name = snapshot_name.to_string();
         snap.is_read_only_snapshot = true;
@@ -291,8 +330,16 @@ impl ZfsBtrfsHybridSelfHealingCoW {
         Ok(())
     }
 
-    pub fn write_file_cow(&mut self, subvol: &str, filepath: &str, content: &[u8]) -> Result<(), String> {
-        let target = self.subvolumes.get_mut(subvol).ok_or_else(|| format!("Subvolume {} not found", subvol))?;
+    pub fn write_file_cow(
+        &mut self,
+        subvol: &str,
+        filepath: &str,
+        content: &[u8],
+    ) -> Result<(), String> {
+        let target = self
+            .subvolumes
+            .get_mut(subvol)
+            .ok_or_else(|| format!("Subvolume {} not found", subvol))?;
         if target.is_read_only_snapshot {
             return Err(format!("Subvolume {} is read-only", subvol));
         }
@@ -302,8 +349,16 @@ impl ZfsBtrfsHybridSelfHealingCoW {
         Ok(())
     }
 
-    pub fn verify_and_self_heal(&mut self, subvol: &str, filepath: &str, expected_data: &[u8]) -> Result<bool, String> {
-        let target = self.subvolumes.get_mut(subvol).ok_or_else(|| format!("Subvolume {} not found", subvol))?;
+    pub fn verify_and_self_heal(
+        &mut self,
+        subvol: &str,
+        filepath: &str,
+        expected_data: &[u8],
+    ) -> Result<bool, String> {
+        let target = self
+            .subvolumes
+            .get_mut(subvol)
+            .ok_or_else(|| format!("Subvolume {} not found", subvol))?;
         if let Some(actual_data) = target.files.get_mut(filepath) {
             if actual_data.as_slice() != expected_data {
                 // Bit rot detected! Perform Merkle self-healing recovery
@@ -365,7 +420,14 @@ impl SovereignMicrovmHypervisorGateway {
         }
     }
 
-    pub fn launch_microvm(&mut self, name: &str, vcpus: u32, memory_mb: u64, net: &str, blk: &str) -> u64 {
+    pub fn launch_microvm(
+        &mut self,
+        name: &str,
+        vcpus: u32,
+        memory_mb: u64,
+        net: &str,
+        blk: &str,
+    ) -> u64 {
         let vm_id = self.next_vm_id;
         self.next_vm_id += 1;
 
@@ -388,7 +450,10 @@ impl SovereignMicrovmHypervisorGateway {
     }
 
     pub fn set_memory_balloon(&mut self, vm_id: u64, target_memory_mb: u64) -> Result<(), String> {
-        let vm = self.instances.get_mut(&vm_id).ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
+        let vm = self
+            .instances
+            .get_mut(&vm_id)
+            .ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
         if vm.state != MicrovmState::Running {
             return Err(format!("MicroVM ID {} is not running", vm_id));
         }
@@ -397,7 +462,10 @@ impl SovereignMicrovmHypervisorGateway {
     }
 
     pub fn pause_microvm(&mut self, vm_id: u64) -> Result<(), String> {
-        let vm = self.instances.get_mut(&vm_id).ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
+        let vm = self
+            .instances
+            .get_mut(&vm_id)
+            .ok_or_else(|| format!("MicroVM ID {} not found", vm_id))?;
         vm.state = MicrovmState::Paused;
         Ok(())
     }
@@ -457,7 +525,10 @@ impl SovereignPqcWireguardVpnEngine {
         if !self.is_up {
             return Err("VPN Interface is down".to_string());
         }
-        let peer = self.peers.get_mut(peer_id).ok_or_else(|| format!("Peer {} not registered", peer_id))?;
+        let peer = self
+            .peers
+            .get_mut(peer_id)
+            .ok_or_else(|| format!("Peer {} not registered", peer_id))?;
         peer.tx_bytes += packet_len as u64;
         Ok(())
     }
@@ -507,13 +578,22 @@ mod tests {
         let mut gateway = SovereignMicrovmHypervisorGateway::new();
         let vm_id = gateway.launch_microvm("sovereign-node-1", 4, 2048, "eth0", "/dev/vda");
         assert_eq!(vm_id, 1);
-        assert_eq!(gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Running);
+        assert_eq!(
+            gateway.instances.get(&vm_id).unwrap().state,
+            MicrovmState::Running
+        );
 
         assert!(gateway.set_memory_balloon(vm_id, 1024).is_ok());
-        assert_eq!(gateway.instances.get(&vm_id).unwrap().ballooned_memory_mb, 1024);
+        assert_eq!(
+            gateway.instances.get(&vm_id).unwrap().ballooned_memory_mb,
+            1024
+        );
 
         assert!(gateway.pause_microvm(vm_id).is_ok());
-        assert_eq!(gateway.instances.get(&vm_id).unwrap().state, MicrovmState::Paused);
+        assert_eq!(
+            gateway.instances.get(&vm_id).unwrap().state,
+            MicrovmState::Paused
+        );
     }
 
     #[test]
@@ -561,7 +641,11 @@ mod tests {
         sentinel.unveil("/etc/passwd", "r");
         sentinel.set_fd_rights(3, CapsicumRight::CapRead as u32);
 
-        assert!(sentinel.authorize_syscall("stdio", Some("/etc/passwd"), Some((3, CapsicumRight::CapRead))));
+        assert!(sentinel.authorize_syscall(
+            "stdio",
+            Some("/etc/passwd"),
+            Some((3, CapsicumRight::CapRead))
+        ));
         assert!(!sentinel.authorize_syscall("exec", Some("/etc/passwd"), None));
         assert!(!sentinel.authorize_syscall("stdio", Some("/etc/shadow"), None));
     }
@@ -569,18 +653,22 @@ mod tests {
     #[test]
     fn test_zfs_btrfs_hybrid_self_healing_cow() {
         let mut fs = ZfsBtrfsHybridSelfHealingCoW::new();
-        fs.write_file_cow("@root", "/var/log/syslog", b"system initialized").unwrap();
+        fs.write_file_cow("@root", "/var/log/syslog", b"system initialized")
+            .unwrap();
         fs.create_cow_snapshot("@root", "@root_snap_1").unwrap();
 
         assert_eq!(fs.subvolumes.len(), 2);
 
         // Corrupt syslog data in @root
         if let Some(sub) = fs.subvolumes.get_mut("@root") {
-            sub.files.insert("/var/log/syslog".to_string(), b"corrupted data".to_vec());
+            sub.files
+                .insert("/var/log/syslog".to_string(), b"corrupted data".to_vec());
         }
 
         // Verify and self-heal
-        let healed = fs.verify_and_self_heal("@root", "/var/log/syslog", b"system initialized").unwrap();
+        let healed = fs
+            .verify_and_self_heal("@root", "/var/log/syslog", b"system initialized")
+            .unwrap();
         assert!(healed);
         assert_eq!(fs.total_self_healing_corrections, 1);
     }

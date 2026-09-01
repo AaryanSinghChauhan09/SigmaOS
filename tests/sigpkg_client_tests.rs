@@ -1,5 +1,5 @@
 // Integration tests for the SigmaPkg TUF-style repository client.
-use sigmaos::sigpkg::client::{Manifest, SigpkgClient, TufRole, parse_manifest};
+use sigmaos::sigpkg::client::{parse_manifest, Manifest, SigpkgClient, TufRole};
 use sigmaos::sigpkg::{CryptoVerifier, Version};
 
 #[test]
@@ -151,7 +151,12 @@ fn test_sigpkg_daemon_update_check() {
     let mut repo = std::collections::BTreeMap::new();
     repo.insert(
         "hello".to_string(),
-        sigmaos::sigpkg::Manifest::new("hello", sigmaos::sigpkg::Version::new(2, 0, 0), "x", "dead"),
+        sigmaos::sigpkg::Manifest::new(
+            "hello",
+            sigmaos::sigpkg::Version::new(2, 0, 0),
+            "x",
+            "dead",
+        ),
     );
     let updates = daemon.check_updates(&repo);
     assert_eq!(updates.len(), 1);
@@ -162,9 +167,7 @@ fn test_sigpkg_daemon_update_check() {
 
 #[test]
 fn test_foundation_governance_and_bounties() {
-    use sigmaos::compatibility::{
-        BountySeverity, FoundationRole, SovereignFoundationManager,
-    };
+    use sigmaos::compatibility::{BountySeverity, FoundationRole, SovereignFoundationManager};
     let mut foundation = SovereignFoundationManager::new("SigmaOS Foundation");
     foundation.register_member("alice", FoundationRole::BoardMember);
     foundation.register_member("bob", FoundationRole::SecurityAuditor);

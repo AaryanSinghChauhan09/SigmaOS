@@ -1,12 +1,12 @@
 extern crate alloc;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-use crate::sigpkg::{Package, Version, VersionConstraint};
 use crate::klib::HashMap;
+use crate::sigpkg::{Package, Version, VersionConstraint};
 use alloc::collections::BTreeSet as HashSet;
 
 /// Debian-style APT Pinning Rule representing release and priority weighting

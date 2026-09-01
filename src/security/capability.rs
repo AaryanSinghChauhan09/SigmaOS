@@ -218,7 +218,10 @@ impl LinuxCapabilitySet {
     /// Raise capability in ambient set (must be in both permitted and inheritable sets, and bounding set)
     pub fn raise_ambient(&mut self, cap: LinuxCapability) -> Result<(), &'static str> {
         let bit = 1u64 << (cap as u64);
-        if (self.permitted & bit) == 0 || (self.inheritable & bit) == 0 || (self.bounding & bit) == 0 {
+        if (self.permitted & bit) == 0
+            || (self.inheritable & bit) == 0
+            || (self.bounding & bit) == 0
+        {
             return Err("Ambient capability must be in permitted, inheritable, and bounding sets");
         }
         self.ambient |= bit;
@@ -347,11 +350,15 @@ mod tests {
 
         // Ambient capability requirements test
         let mut user_caps = LinuxCapabilitySet::empty();
-        assert!(user_caps.raise_ambient(LinuxCapability::NetBindService).is_err());
+        assert!(user_caps
+            .raise_ambient(LinuxCapability::NetBindService)
+            .is_err());
 
         user_caps.permitted |= 1 << (LinuxCapability::NetBindService as u64);
         user_caps.inheritable |= 1 << (LinuxCapability::NetBindService as u64);
-        assert!(user_caps.raise_ambient(LinuxCapability::NetBindService).is_ok());
+        assert!(user_caps
+            .raise_ambient(LinuxCapability::NetBindService)
+            .is_ok());
 
         user_caps.clear_ambient();
         assert_eq!(user_caps.ambient, 0);

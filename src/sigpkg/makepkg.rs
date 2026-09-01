@@ -11,7 +11,6 @@
 // SigmaOS makepkg - Arch Linux PKGBUILD compilation sandbox
 // Provides safe, isolated compilation of Arch Linux packages
 
-
 extern crate alloc;
 use crate::sigpkg::{Package, Version};
 use alloc::collections::BTreeMap;

@@ -2,7 +2,6 @@ extern crate alloc;
 // CPU Instruction Set Architecture (ISA) Level Assessor & Vectorized Router
 // Inspired by CachyOS hardware-specific optimizations, directing performance-optimal memory copying.
 
-
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

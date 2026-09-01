@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Secure Clipboard Manager
 // OOP-based clipboard with encryption and auto-clear
@@ -267,7 +267,9 @@ impl SecureClipboardManager {
     /// Check auto-clear
     fn check_auto_clear(&mut self) {
         if let Some(ref entry) = self.current_entry {
-            if self.auto_clear_enabled && core::time::Duration::from_millis(0) > entry.auto_clear_after {
+            if self.auto_clear_enabled
+                && core::time::Duration::from_millis(0) > entry.auto_clear_after
+            {
                 self.clear();
             }
         }

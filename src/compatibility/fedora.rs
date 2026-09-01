@@ -1323,7 +1323,9 @@ impl FedoraFlatpakSandboxManager {
     }
 
     pub fn request_portal_access(&mut self, portal_name: &str) -> bool {
-        if self.permissions.contains(&portal_name.to_string()) || portal_name == "org.freedesktop.portal.OpenURI" {
+        if self.permissions.contains(&portal_name.to_string())
+            || portal_name == "org.freedesktop.portal.OpenURI"
+        {
             if !self.active_portals.contains(&portal_name.to_string()) {
                 self.active_portals.push(portal_name.to_string());
             }
@@ -1364,7 +1366,10 @@ impl FedoraMockChrootEnvironment {
             Err("No build dependencies installed in Mock chroot")
         } else {
             self.build_clean = false;
-            Ok(format!("Successfully built {} in mock chroot {}", srpm_name, self.chroot_name))
+            Ok(format!(
+                "Successfully built {} in mock chroot {}",
+                srpm_name, self.chroot_name
+            ))
         }
     }
 }
@@ -1426,7 +1431,8 @@ impl FedoraCoprRepositoryEngine {
     }
 
     pub fn add_copr_repo(&mut self, repo_id: &str, url: &str) {
-        self.repositories.insert(repo_id.to_string(), url.to_string());
+        self.repositories
+            .insert(repo_id.to_string(), url.to_string());
         if !self.enabled_repos.contains(&repo_id.to_string()) {
             self.enabled_repos.push(repo_id.to_string());
         }
@@ -1494,7 +1500,10 @@ impl FedoraAnacondaKickstartGenerator {
     }
 
     pub fn generate_kickstart_cfg(&self) -> String {
-        let mut cfg = format!("lang {}\ntimezone {}\n{}", self.language, self.timezone, self.root_password_hash);
+        let mut cfg = format!(
+            "lang {}\ntimezone {}\n{}",
+            self.language, self.timezone, self.root_password_hash
+        );
         cfg.push_str("\n%packages\n");
         for grp in &self.package_groups {
             cfg.push_str(&format!("@{}\n", grp));
@@ -1537,7 +1546,10 @@ impl FedoraMediaWriterEngine {
             Err("ISO checksum verification required before writing USB")
         } else {
             self.bytes_written = 2_147_483_648; // 2 GB ISO
-            Ok(format!("Successfully wrote Fedora Live ISO to drive {}", self.target_drive))
+            Ok(format!(
+                "Successfully wrote Fedora Live ISO to drive {}",
+                self.target_drive
+            ))
         }
     }
 }
@@ -1564,8 +1576,12 @@ impl FedoraDnf5PackageEngine {
     }
 
     pub fn dnf5_install(&mut self, package: &str, version: &str) -> Result<String, &'static str> {
-        self.installed_packages.insert(package.to_string(), version.to_string());
-        Ok(format!("DNF5: Transaction succeeded. Installed {} version {}", package, version))
+        self.installed_packages
+            .insert(package.to_string(), version.to_string());
+        Ok(format!(
+            "DNF5: Transaction succeeded. Installed {} version {}",
+            package, version
+        ))
     }
 }
 
@@ -1615,7 +1631,10 @@ pub struct FedoraFirewalldPolicyEngine {
 impl FedoraFirewalldPolicyEngine {
     pub fn new() -> Self {
         let mut allowed_services = HashMap::new();
-        allowed_services.insert("public".to_string(), vec!["ssh".to_string(), "dhcpv6-client".to_string()]);
+        allowed_services.insert(
+            "public".to_string(),
+            vec!["ssh".to_string(), "dhcpv6-client".to_string()],
+        );
         allowed_services.insert("trusted".to_string(), vec!["ALL".to_string()]);
 
         FedoraFirewalldPolicyEngine {
@@ -1625,7 +1644,10 @@ impl FedoraFirewalldPolicyEngine {
     }
 
     pub fn add_service_to_zone(&mut self, zone: &str, service: &str) {
-        let entry = self.allowed_services.entry(zone.to_string()).or_insert_with(Vec::new);
+        let entry = self
+            .allowed_services
+            .entry(zone.to_string())
+            .or_insert_with(Vec::new);
         if !entry.contains(&service.to_string()) {
             entry.push(service.to_string());
         }
@@ -1685,10 +1707,15 @@ impl FedoraSsdEnterpriseDirectoryClient {
         }
     }
 
-    pub fn authenticate_ldap(&mut self, username: &str, secret: &str) -> Result<String, &'static str> {
+    pub fn authenticate_ldap(
+        &mut self,
+        username: &str,
+        secret: &str,
+    ) -> Result<String, &'static str> {
         if secret == "fedora_ad_pass" || secret == "corp_pass" {
             let ticket = format!("tgt_{}_fedora_{}", username, self.kerberos_realm);
-            self.authenticated_users.insert(username.to_string(), ticket.clone());
+            self.authenticated_users
+                .insert(username.to_string(), ticket.clone());
             Ok(ticket)
         } else {
             Err("SSSD LDAP: Active Directory credentials rejected")
@@ -1712,9 +1739,18 @@ impl FedoraAdwaitaIconThemeEngine {
             icon_cache: HashMap::new(),
         };
         // Register default Adwaita system icons
-        engine.register_icon("system-file-manager", "/usr/share/icons/Adwaita/scalable/apps/system-file-manager.svg");
-        engine.register_icon("utilities-terminal", "/usr/share/icons/Adwaita/scalable/apps/utilities-terminal.svg");
-        engine.register_icon("emblem-symbolic", "/usr/share/icons/Adwaita/scalable/emblems/emblem-symbolic.svg");
+        engine.register_icon(
+            "system-file-manager",
+            "/usr/share/icons/Adwaita/scalable/apps/system-file-manager.svg",
+        );
+        engine.register_icon(
+            "utilities-terminal",
+            "/usr/share/icons/Adwaita/scalable/apps/utilities-terminal.svg",
+        );
+        engine.register_icon(
+            "emblem-symbolic",
+            "/usr/share/icons/Adwaita/scalable/emblems/emblem-symbolic.svg",
+        );
         engine
     }
 
@@ -1758,7 +1794,13 @@ impl FedoraDeskletWidgetEngine {
         }
     }
 
-    pub fn add_desklet(&mut self, desklet_id: u32, widget_type: &str, raw_x: u32, raw_y: u32) -> &FedoraDeskletItem {
+    pub fn add_desklet(
+        &mut self,
+        desklet_id: u32,
+        widget_type: &str,
+        raw_x: u32,
+        raw_y: u32,
+    ) -> &FedoraDeskletItem {
         let (pos_x, pos_y) = if self.grid_snapping_enabled && self.grid_cell_size > 0 {
             (
                 (raw_x / self.grid_cell_size) * self.grid_cell_size,
@@ -1781,7 +1823,11 @@ impl FedoraDeskletWidgetEngine {
     }
 
     pub fn set_desklet_opacity(&mut self, desklet_id: u32, opacity: u8) -> bool {
-        if let Some(item) = self.active_desklets.iter_mut().find(|d| d.desklet_id == desklet_id) {
+        if let Some(item) = self
+            .active_desklets
+            .iter_mut()
+            .find(|d| d.desklet_id == desklet_id)
+        {
             item.opacity_percent = opacity.min(100);
             true
         } else {
@@ -1814,7 +1860,10 @@ impl FedoraLiveMediaOverlayEngine {
     pub fn mount_squashfs_rootfs(&mut self) -> Result<String, &'static str> {
         self.squashfs_mounted = true;
         self.overlayfs_active = true;
-        Ok(format!("Successfully mounted Live ISO SquashFS rootfs from {}", self.live_iso_name))
+        Ok(format!(
+            "Successfully mounted Live ISO SquashFS rootfs from {}",
+            self.live_iso_name
+        ))
     }
 
     pub fn write_overlay_file(&mut self, filepath: &str) -> Result<(), &'static str> {
@@ -1852,7 +1901,10 @@ impl FedoraKojiTaskRunner {
         let rpm_arch = format!("{}-1.0.0.{}.rpm", self.package_name, self.target_tag);
         self.generated_rpms.push(rpm_arch.clone());
         self.build_completed = true;
-        Ok(format!("Koji Task #{}: Successfully built {} for tag {}", self.task_id, rpm_arch, self.target_tag))
+        Ok(format!(
+            "Koji Task #{}: Successfully built {} for tag {}",
+            self.task_id, rpm_arch, self.target_tag
+        ))
     }
 
     pub fn tag_build_release(&mut self, release_tag: &str) {
@@ -1932,14 +1984,20 @@ impl FedoraFolderColorSwitcherEngine {
     }
 
     pub fn add_folder_emblem(&mut self, path: &str, emblem: &str) {
-        let emblems = self.folder_emblems.entry(path.to_string()).or_insert_with(Vec::new);
+        let emblems = self
+            .folder_emblems
+            .entry(path.to_string())
+            .or_insert_with(Vec::new);
         if !emblems.contains(&emblem.to_string()) {
             emblems.push(emblem.to_string());
         }
     }
 
     pub fn get_folder_color(&self, path: &str) -> FolderColor {
-        self.folder_colors.get(path).cloned().unwrap_or(FolderColor::Blue)
+        self.folder_colors
+            .get(path)
+            .cloned()
+            .unwrap_or(FolderColor::Blue)
     }
 }
 
@@ -1971,7 +2029,8 @@ impl FedoraDnfHistoryRollbackEngine {
     pub fn record_install(&mut self, pkg: &str, version: &str) {
         let tid = (self.transaction_history.len() + 1) as u32;
         let prev = self.installed_packages.get(pkg).cloned();
-        self.installed_packages.insert(pkg.to_string(), version.to_string());
+        self.installed_packages
+            .insert(pkg.to_string(), version.to_string());
         self.transaction_history.push(FedoraDnfTransaction {
             transaction_id: tid,
             action: "install".to_string(),
@@ -1982,14 +2041,25 @@ impl FedoraDnfHistoryRollbackEngine {
     }
 
     pub fn rollback_transaction(&mut self, transaction_id: u32) -> Result<String, &'static str> {
-        if let Some(pos) = self.transaction_history.iter().position(|t| t.transaction_id == transaction_id) {
+        if let Some(pos) = self
+            .transaction_history
+            .iter()
+            .position(|t| t.transaction_id == transaction_id)
+        {
             let tx = self.transaction_history.remove(pos);
             if let Some(prev_ver) = tx.previous_version {
-                self.installed_packages.insert(tx.package_name.clone(), prev_ver.clone());
-                Ok(format!("DNF History Rollback #{}: Restored {} to version {}", transaction_id, tx.package_name, prev_ver))
+                self.installed_packages
+                    .insert(tx.package_name.clone(), prev_ver.clone());
+                Ok(format!(
+                    "DNF History Rollback #{}: Restored {} to version {}",
+                    transaction_id, tx.package_name, prev_ver
+                ))
             } else {
                 self.installed_packages.remove(&tx.package_name);
-                Ok(format!("DNF History Rollback #{}: Removed package {}", transaction_id, tx.package_name))
+                Ok(format!(
+                    "DNF History Rollback #{}: Removed package {}",
+                    transaction_id, tx.package_name
+                ))
             }
         } else {
             Err("Transaction ID not found in DNF history log")
@@ -2058,7 +2128,10 @@ impl FedoraGettextL10nEngine {
     }
 
     pub fn register_translation(&mut self, locale: &str, msgid: &str, msgstr: &str) {
-        let catalog = self.translation_catalogs.entry(locale.to_string()).or_insert_with(HashMap::new);
+        let catalog = self
+            .translation_catalogs
+            .entry(locale.to_string())
+            .or_insert_with(HashMap::new);
         catalog.insert(msgid.to_string(), msgstr.to_string());
     }
 
@@ -2151,7 +2224,10 @@ impl FedoraBtrfsSnapperSnapshotEngine {
             } else {
                 let prev = self.active_subvolume.clone();
                 self.active_subvolume = snap.subvolume_path.clone();
-                Ok(format!("Successfully rolled back Btrfs subvolume to snapshot #{}: {}. Previous: {}", snapshot_id, snap.subvolume_path, prev))
+                Ok(format!(
+                    "Successfully rolled back Btrfs subvolume to snapshot #{}: {}. Previous: {}",
+                    snapshot_id, snap.subvolume_path, prev
+                ))
             }
         } else {
             Err("Snapshot ID not found in Snapper catalog")
@@ -2192,13 +2268,21 @@ impl FedoraNvidiaPrimeSwitcherEngine {
             }
             FedoraGpuPowerMode::DiscreteNvidia => {
                 self.prime_offload_active = true;
-                self.active_env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
-                self.active_env_vars.insert("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string());
+                self.active_env_vars
+                    .insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+                self.active_env_vars.insert(
+                    "__VK_LAYER_NV_optimus".to_string(),
+                    "NVIDIA_only".to_string(),
+                );
             }
             FedoraGpuPowerMode::HybridPrimeOffload => {
                 self.prime_offload_active = true;
-                self.active_env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
-                self.active_env_vars.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+                self.active_env_vars
+                    .insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+                self.active_env_vars.insert(
+                    "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+                    "nvidia".to_string(),
+                );
             }
         }
         self.current_mode = mode;
@@ -2519,7 +2603,10 @@ mod tests {
 
     #[test]
     fn test_fedora_flatpak_sandbox_manager() {
-        let mut flatpak = FedoraFlatpakSandboxManager::new("org.mozilla.firefox", "org.freedesktop.Platform//23.08");
+        let mut flatpak = FedoraFlatpakSandboxManager::new(
+            "org.mozilla.firefox",
+            "org.freedesktop.Platform//23.08",
+        );
         assert_eq!(flatpak.app_id, "org.mozilla.firefox");
 
         // OpenURI allowed by default
@@ -2562,9 +2649,15 @@ mod tests {
         let mut copr = FedoraCoprRepositoryEngine::new();
         assert_eq!(copr.enabled_repos.len(), 0);
 
-        copr.add_copr_repo("user/my-tools", "https://copr.fedorainfracloud.org/coprs/user/my-tools/");
+        copr.add_copr_repo(
+            "user/my-tools",
+            "https://copr.fedorainfracloud.org/coprs/user/my-tools/",
+        );
         assert_eq!(copr.enabled_repos.len(), 1);
-        assert_eq!(copr.repositories.get("user/my-tools").unwrap(), "https://copr.fedorainfracloud.org/coprs/user/my-tools/");
+        assert_eq!(
+            copr.repositories.get("user/my-tools").unwrap(),
+            "https://copr.fedorainfracloud.org/coprs/user/my-tools/"
+        );
 
         copr.disable_copr_repo("user/my-tools");
         assert_eq!(copr.enabled_repos.len(), 0);
@@ -2599,7 +2692,9 @@ mod tests {
         let mut writer = FedoraMediaWriterEngine::new("/tmp/fedora-39.iso", "/dev/sdb");
         assert!(writer.write_live_usb().is_err()); // Checksum not verified
 
-        assert!(writer.verify_iso_checksum("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+        assert!(writer.verify_iso_checksum(
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ));
         let res = writer.write_live_usb().unwrap();
         assert!(res.contains("Successfully wrote Fedora Live ISO"));
         assert_eq!(writer.bytes_written, 2_147_483_648);
@@ -2613,7 +2708,10 @@ mod tests {
 
         let res = dnf5.dnf5_install("kernel", "6.8.0-1.fc39").unwrap();
         assert!(res.contains("Installed kernel version 6.8.0-1.fc39"));
-        assert_eq!(dnf5.installed_packages.get("kernel").unwrap(), "6.8.0-1.fc39");
+        assert_eq!(
+            dnf5.installed_packages.get("kernel").unwrap(),
+            "6.8.0-1.fc39"
+        );
     }
 
     #[test]
@@ -2655,7 +2753,8 @@ mod tests {
 
     #[test]
     fn test_fedora_sssd_enterprise_directory_client() {
-        let mut sssd = FedoraSsdEnterpriseDirectoryClient::new("corp.fedora.internal", "CORP.FEDORA.INTERNAL");
+        let mut sssd =
+            FedoraSsdEnterpriseDirectoryClient::new("corp.fedora.internal", "CORP.FEDORA.INTERNAL");
         assert!(sssd.authenticate_ldap("alice", "wrong_pass").is_err());
 
         let tgt = sssd.authenticate_ldap("alice", "corp_pass").unwrap();
@@ -2734,13 +2833,26 @@ mod tests {
     #[test]
     fn test_fedora_folder_color_switcher_engine() {
         let mut switcher = FedoraFolderColorSwitcherEngine::new();
-        assert_eq!(switcher.get_folder_color("/home/user/Documents"), FolderColor::Blue);
+        assert_eq!(
+            switcher.get_folder_color("/home/user/Documents"),
+            FolderColor::Blue
+        );
 
         switcher.set_folder_color("/home/user/Documents", FolderColor::Green);
-        assert_eq!(switcher.get_folder_color("/home/user/Documents"), FolderColor::Green);
+        assert_eq!(
+            switcher.get_folder_color("/home/user/Documents"),
+            FolderColor::Green
+        );
 
         switcher.add_folder_emblem("/home/user/Documents", "emblem-important");
-        assert_eq!(switcher.folder_emblems.get("/home/user/Documents").unwrap().len(), 1);
+        assert_eq!(
+            switcher
+                .folder_emblems
+                .get("/home/user/Documents")
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[test]
@@ -2810,7 +2922,10 @@ mod tests {
     #[test]
     fn test_fedora_nvidia_prime_switcher_engine() {
         let mut switcher = FedoraNvidiaPrimeSwitcherEngine::new();
-        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::HybridPrimeOffload);
+        assert_eq!(
+            switcher.current_mode,
+            FedoraGpuPowerMode::HybridPrimeOffload
+        );
         assert!(switcher.prime_offload_active);
 
         switcher.set_gpu_mode(FedoraGpuPowerMode::Integrated);
@@ -2821,7 +2936,19 @@ mod tests {
         switcher.set_gpu_mode(FedoraGpuPowerMode::DiscreteNvidia);
         assert_eq!(switcher.current_mode, FedoraGpuPowerMode::DiscreteNvidia);
         assert!(switcher.prime_offload_active);
-        assert_eq!(switcher.active_env_vars.get("__NV_PRIME_RENDER_OFFLOAD").unwrap(), "1");
-        assert_eq!(switcher.active_env_vars.get("__VK_LAYER_NV_optimus").unwrap(), "NVIDIA_only");
+        assert_eq!(
+            switcher
+                .active_env_vars
+                .get("__NV_PRIME_RENDER_OFFLOAD")
+                .unwrap(),
+            "1"
+        );
+        assert_eq!(
+            switcher
+                .active_env_vars
+                .get("__VK_LAYER_NV_optimus")
+                .unwrap(),
+            "NVIDIA_only"
+        );
     }
 }

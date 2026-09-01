@@ -9,9 +9,9 @@
 #![no_std]
 extern crate alloc;
 
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Category of Linux/BSD Distribution Architecture
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -224,7 +224,10 @@ impl UniversalDistroSuperMatrix {
 
     /// Spawns a Qubes-style isolated domain with specific trust level
     pub fn create_qubes_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
-        if self.qubes_isolation_domains.contains(&domain_name.to_string()) {
+        if self
+            .qubes_isolation_domains
+            .contains(&domain_name.to_string())
+        {
             return Err("Domain already exists");
         }
         self.qubes_isolation_domains.push(domain_name.to_string());
@@ -237,7 +240,8 @@ impl UniversalDistroSuperMatrix {
         for f in flags {
             flag_list.push(f.to_string());
         }
-        self.ebuild_matrix_slots.insert(package.to_string(), flag_list);
+        self.ebuild_matrix_slots
+            .insert(package.to_string(), flag_list);
     }
 }
 
