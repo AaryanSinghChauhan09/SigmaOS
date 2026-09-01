@@ -10,4 +10,8 @@ pub use runit::*;
 pub use s6::*;
 pub use sigma_init::*;
 pub use sigmainit::*;
-pub use systemd_init::*;
+pub use systemd_init::{
+    BsdRcOrder, InitSystemBridge, InitSystemType, JournalEntry, ParsedSystemdUnitFile,
+    RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
+    SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
+};
