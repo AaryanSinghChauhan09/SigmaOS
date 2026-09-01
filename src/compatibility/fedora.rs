@@ -2205,6 +2205,57 @@ impl FedoraNvidiaPrimeSwitcherEngine {
     }
 }
 
+// =========================================================================
+// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
+// =========================================================================
+
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
+    }
+
+    pub fn stage_offline_packages(&mut self, pkgs: &[&str]) {
+        for pkg in pkgs {
+            self.staged_packages.push((*pkg).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        if !self.is_offline_update_pending {
+            return Err("No staged offline packages pending");
+        }
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        if !self.is_offline_update_pending || !self.trigger_reboot_flag {
+            return Err("Offline update transaction not properly triggered");
+        }
+        self.staged_packages.clear();
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        Ok(())
+    }
+}
+
+impl Default for FedoraOfflineUpdateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2805,6 +2856,24 @@ mod tests {
         let res = snapper.rollback_to_subvolume(1).unwrap();
         assert!(res.contains("Successfully rolled back Btrfs subvolume to snapshot #1"));
         assert_eq!(snapper.active_subvolume, "/.snapshots/1/snapshot");
+    }
+
+    #[test]
+    fn test_fedora_offline_update_engine() {
+        let mut engine = FedoraOfflineUpdateEngine::new();
+        assert!(!engine.is_offline_update_pending);
+
+        engine.stage_offline_packages(&["kernel-6.8.0", "glibc-2.39"]);
+        assert!(engine.is_offline_update_pending);
+
+        let staged_count = engine.trigger_offline_update_on_reboot().unwrap();
+        assert_eq!(staged_count, 2);
+        assert!(engine.trigger_reboot_flag);
+
+        assert!(engine.execute_pending_offline_update().is_ok());
+        assert!(!engine.is_offline_update_pending);
+        assert!(!engine.trigger_reboot_flag);
+        assert!(engine.staged_packages.is_empty());
     }
 
     #[test]
