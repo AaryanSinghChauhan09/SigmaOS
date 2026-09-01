@@ -34,7 +34,7 @@ Every traditional application category—ranging from desktop suites and system 
 |            |                                         | WordPress, WebKit, Chromium, IPv6 Mesh, QUIC  |
 --------------------------------------------------------------------------------------------------------
 | S-SHARD 06 | Sovereign Virtualization & Distro Parity | VirtualBox, QEMU, KVM, Docker, Podman, LXC,   |
-|            |                                         | Arch Docker, MintSystem, GDebi, AptDaemon     |
+|            |                                         | Arch ALPM Engine, MintSystem, GDebi, AptDaemon|
 --------------------------------------------------------------------------------------------------------
 | S-SHARD 07 | Sovereign Data Storage & Search Core    | PostgreSQL, MySQL, MariaDB, Cassandra, CouchDB|
 |            |                                         | PostGIS, Lucene, Solr, Nutch, Xapian, SQLite  |
@@ -103,13 +103,18 @@ Every traditional application category—ranging from desktop suites and system 
   - Privacy shield with ad/tracker blocking, fingerprint randomization, and TOR onion routing integration (`Brave` / `Tor` / `Tails` parity).
 
 #### 6. S-SHARD 06: Sovereign Virtualization & Distro Parity Hub
-- **Absorbed Systems:** Oracle VirtualBox, QEMU, KVM, Docker, Podman, LXC, Arch Linux Docker Container Engine, MintSystem, Mint Upgrade Info, GDebi, AptDaemon, Blueberry, Blueman, LightDM Settings, NVIDIA Prime Applet.
+- **Absorbed Systems:** Oracle VirtualBox, QEMU, KVM, Docker, Podman, LXC, Arch Linux ALPM Package Engine, Arch Docker, MintSystem, Mint Upgrade Info, GDebi, AptDaemon, Blueberry, Blueman, LightDM Settings, NVIDIA Prime Applet.
 - **Key Features:**
   - Lightweight Type-1 hypervisor with zero-overhead hardware virtualization (`VirtualBox` / `KVM` parity).
+  - **Arch Linux ALPM (Arch Linux Package Management) Subsystem Improvements:**
+    - **Debian APT Pre/Post Transaction Hook Phases:** Declarative hook execution phases (`PreTransaction` & `PostTransaction`) with target wildcard triggers (e.g., triggering `update-desktop-database` on `*.desktop` install).
+    - **FreeBSD Pkg Delta Database Compression:** High-efficiency Zstd delta database sync engine reducing Pacman repository update payloads by up to 80%.
+    - **NixOS Flakes Atomic Transaction Lockfiles:** Immutable lockfile generation tracking explicit SHA-256 package content hashes to guarantee reproducible rollback capabilities.
+    - **OpenBSD Pledge/Unveil Sandboxed Hook Execution:** Unveil-restricted VFS paths and pledge-restricted syscalls enforced on all ALPM hook scripts during package installation.
+    - **Gentoo Portage Dependency Graph Cycle Detection:** Topological sort dependency resolution with Tarjan's strongly connected components cycle detection to safely handle circular package dependencies.
   - **Arch Linux Docker Subsystem Improvements:**
     - **Pacman / AUR Bootstrap Pipeline:** Automated rolling-release base image generation directly from Arch Linux `Core` and `Extra` package repos, with clean chroot AUR helper building (`Yay` / `Paru` parity).
     - **FreeBSD Jail VFS Isolation:** Multi-tenant container filesystem partitioning using chroot pivoting, nullfs read-only base mounts, and isolated VFS namespaces.
-    - **OpenBSD Pledge/Unveil Sandboxing:** Fine-grained syscall privilege restriction (`pledge`) and file path visibility restriction (`unveil`) enforced directly on container entrypoints.
   - Bluetooth device manager and configuration engine (`Blueman` / `Blueberry` parity).
   - Display manager configuration utility (`LightDM Settings` parity).
   - Dynamic hybrid GPU switching and power profile manager (`NVIDIA Prime Applet` parity).
