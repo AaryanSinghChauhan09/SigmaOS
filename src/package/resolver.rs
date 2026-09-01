@@ -290,7 +290,12 @@ impl SimpleConflictResolver {
 
 impl ConflictResolver for SimpleConflictResolver {
     fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError> {
-        let strategy = unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) };
+        let val = self.strategy.load(Ordering::SeqCst);
+        let strategy = match val {
+            0 => ResolutionStrategy::Newest,
+            1 => ResolutionStrategy::Oldest,
+            _ => ResolutionStrategy::Manual,
+        };
         match strategy {
             ResolutionStrategy::Newest => Ok(pkg1.max(pkg2)),
             ResolutionStrategy::Oldest => Ok(pkg1.min(pkg2)),
@@ -299,7 +304,12 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 
     fn get_resolution_strategy(&self) -> ResolutionStrategy {
-        unsafe { core::mem::transmute(self.strategy.load(Ordering::SeqCst)) }
+        let val = self.strategy.load(Ordering::SeqCst);
+        match val {
+            0 => ResolutionStrategy::Newest,
+            1 => ResolutionStrategy::Oldest,
+            _ => ResolutionStrategy::Manual,
+        }
     }
 }
 

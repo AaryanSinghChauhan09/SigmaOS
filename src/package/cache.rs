@@ -252,6 +252,7 @@ pub trait RegistryProxy {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct ProxyStats {
     pub requests_served: u64,
     pub cache_hits: u64,

@@ -54,11 +54,18 @@ pub use package::bsd_linux_package_innovations::{
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
     NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };
+pub use sigpkg::declarative_build::{
+    ArchLinuxReproBuildInspector, DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer,
+    GentooPortageReproducibleEbuildEngine, NetBsdPkgsrcDeterministicBulkBuilder,
+    ReproducibleBuildDiffInspector,
+};
 pub use unimplemented_features::{
-    AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, PuppyLinuxOverlayRamdiskEngine,
-    RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, TargetArch,
-    TinyCoreModularTczLoader, VoidXbpsContainerEngine,
+    AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
+    DistroWatchParityMetricsHub, FedoraSilverblueOstreeAtomicUpdater, GentooEmergeDependencyGraphSolver,
+    ManjaroHardwareDetectionEngine, OpenSuseYaSTConfigurationEngine, PhoronixAutomatedBenchmarkEngine,
+    PhoronixTestSuiteRunner, PopOsSystem76SchedulerGovernor, PuppyLinuxOverlayRamdiskEngine,
+    RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, SteamOsGamescopeCompositorEngine,
+    TargetArch, TinyCoreModularTczLoader, VoidXbpsContainerEngine,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
