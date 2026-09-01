@@ -11,6 +11,12 @@ pub mod client;
 pub mod daemon;
 pub mod aur;
 pub mod aur_helper;
+pub mod aurweb;
+
+pub use aurweb::{
+    AurComment, AurCommentThread, AurGitRepoManager, AurGitRepository, AurPackageRecord,
+    AurRpcQueryType, AurRpcResponse, AurVotingSystem, SovereignAurWebEngine,
+};
 pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
