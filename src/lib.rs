@@ -55,9 +55,10 @@ pub use package::bsd_linux_package_innovations::{
     NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };
 pub use unimplemented_features::{
-    AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, PuppyLinuxOverlayRamdiskEngine,
-    RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, TargetArch,
+    AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
+    DistroWatchParityMetricsHub, ManjaroHardwareDetectionEngine, PhoronixAutomatedBenchmarkEngine,
+    PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine, RockyAlmaLinuxEnterpriseLifecycleGovernor,
+    RosettaDynamicBinaryTranslator, SteamOsGamescopeCompositorEngine, TargetArch,
     TinyCoreModularTczLoader, VoidXbpsContainerEngine,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
