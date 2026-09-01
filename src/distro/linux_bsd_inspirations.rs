@@ -8,8 +8,8 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::distro::sovereign_distro_dominance::SovereignDistroDominanceSuite;
-use crate::distro::universal_distro_super_matrix::UniversalDistroSuperMatrix;
+use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;
+use super::universal_distro_super_matrix::UniversalDistroSuperMatrix;
 
 // ==========================================
 // 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE

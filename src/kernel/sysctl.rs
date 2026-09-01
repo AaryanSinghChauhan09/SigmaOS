@@ -88,18 +88,18 @@ impl SysctlRegistry {
             }
 
             // Ensure type matches
-            match (&node.value, &new_value) {
+            match (&node.value, new_value) {
                 (SysctlValue::Int(_), SysctlValue::Int(v)) => {
-                    if *v < 0 && mib == "vm.swappiness" {
+                    if v < 0 && mib == "vm.swappiness" {
                         return Err("Swappiness cannot be negative!");
                     }
-                    node.value = SysctlValue::Int(*v);
+                    node.value = SysctlValue::Int(v);
                 }
-                (SysctlValue::String(_), SysctlValue::String(_)) => {
-                    node.value = new_value;
+                (SysctlValue::String(_), SysctlValue::String(s)) => {
+                    node.value = SysctlValue::String(s);
                 }
-                (SysctlValue::Bool(_), SysctlValue::Bool(_)) => {
-                    node.value = new_value;
+                (SysctlValue::Bool(_), SysctlValue::Bool(b)) => {
+                    node.value = SysctlValue::Bool(b);
                 }
                 _ => return Err("Type mismatch for sysctl parameter!"),
             }
