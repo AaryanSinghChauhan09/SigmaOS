@@ -29,6 +29,7 @@ use crate::kernel::memory::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock,
 
 #[cfg(feature = "standalone_test")]
 pub mod dummy {
+    extern crate alloc;
     use alloc::vec::Vec;
     use core::ptr::NonNull;
     use core::sync::atomic::{AtomicUsize, Ordering};
