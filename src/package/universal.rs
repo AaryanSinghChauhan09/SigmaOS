@@ -1,6 +1,8 @@
+#[cfg(feature = "standalone_test")]
+extern crate alloc;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
 use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
