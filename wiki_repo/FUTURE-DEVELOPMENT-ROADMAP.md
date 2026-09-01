@@ -3217,3 +3217,27 @@ SigmaOS guarantees native bare-metal execution across 30+ years of hardware evol
    - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
    - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
    - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
+
+## SECTION 53: SOVEREIGN MKINITCPIO & INITRAMFS / DRACUT / BSD BOOT-ARCH ENGINE SPECIFICATION
+
+### 53.1 Initramfs Engine Architecture & Distro Parity Features
+1. **Hook-Based Modular CPIO Image Generation Engine**:
+   - Inspired by Arch Linux `mkinitcpio` and Fedora `dracut`.
+   - Executes a dynamic hook pipeline (`base`, `udev`/`sigma_dev`, `autodetect`, `microcode`, `modconf`, `block`, `filesystems`, `fsck`, `pqc_crypto`, `resume`) that resolves kernel module dependencies and constructs compressed CPIO (`cpio.zst`) initramfs images directly without external host utilities.
+2. **Early Microcode Patching & Firmware Staging**:
+   - Implements early CPIO archive prepending (`early_cpio`) to load Intel (`intel-ucode.img`) and AMD (`amd-ucode.img`) CPU microcode patches before kernel initialization.
+   - Stages ACPI DMAR/IVRS tables and peripheral firmware blobs (`/lib/firmware/`) directly in early boot memory.
+3. **PQC Encrypted Initramfs & Zero-Trust Boot Verification**:
+   - Verifies Dilithium-5 post-quantum digital signatures on initramfs images prior to memory execution.
+   - Executes Kyber-1024 quantum-safe root storage volume decryption and TPM 2.0 PCR measured boot attestation before handing over control to `/sbin/init` or `sigmainit`.
+4. **Fallback & Emergency Rescue Image Generation**:
+   - Generates dual initramfs targets: a lightweight autodetected image (`sigmaos-initramfs.img`) and a comprehensive fallback rescue image (`sigmaos-initramfs-fallback.img`) containing all device drivers for hardware recovery.
+
+### 53.2 Bare-Metal Zero-Dependency OOP Systems Architecture Rules
+1. **Modern Low-Level Language Restriction**: Written strictly in Rust, Zig, or Nim under `#![no_std]` bare-metal configurations.
+2. **Absolute Zero-Dependency Constraint**: Zero external standard library dependencies (`std::` or third-party crates/libraries). All allocation utilities, custom data structures (`SigmaVec`, `SigmaString`, `BTreeMap`), and string parsers are implemented from scratch.
+3. **Bare-Metal Object-Oriented Principles (OOP)**:
+   - **Encapsulation**: Isolating hardware MMIO registers and state inside modular objects.
+   - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
+   - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
+   - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
