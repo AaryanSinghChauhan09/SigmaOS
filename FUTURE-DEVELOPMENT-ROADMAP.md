@@ -3335,3 +3335,29 @@ SigmaOS guarantees native bare-metal execution across 30+ years of hardware evol
    - **Inheritance & Hierarchy**: Establishing package tool class hierarchies (`PackageTool` extended by `PkgNgRepositoryTool` and `DpkgTriggersEngine`).
    - **Polymorphism**: Dynamic dispatch enabling unified trigger and hook processing across multi-format package operations.
    - **OS Design Patterns**: Singleton pattern (`AuditorRegistry`), Factory pattern (dynamic cheque classification based on instrument attributes), and Observer pattern (asynchronous transaction hook execution).
+
+
+## SECTION 57: SOVEREIGN DESKTOP, HARDWARE DETECTION & GAMING COMPOSITOR INNOVATIONS SPECIFICATION
+
+### 57.1 Desktop & Gaming Ecosystem Innovations
+1. **Deepin Desktop Environment (DDE) Control Center**:
+   - Grounded in `src/unimplemented_features.rs` (`DeepinDdeControlCenterEngine`).
+   - Manages desktop environment visual presets (Light/Dark/Auto theme modes), wallpaper slideshow automation, scale factor adjustments, and multi-monitor panel docking configurations.
+2. **Manjaro Hardware Detection (`mhwd` Parity)**:
+   - Grounded in `src/unimplemented_features.rs` (`ManjaroHardwareDetectionEngine`).
+   - Probes PCI bus vendor and device IDs, classifies open-source vs. proprietary graphics and network drivers (NVIDIA, AMDGPU, Intel modesetting), and automates kernel driver installation.
+3. **SteamOS Gamescope Micro-Compositor & Resolution Scaling**:
+   - Grounded in `src/unimplemented_features.rs` (`SteamOsGamescopeCompositorEngine`).
+   - Manages adaptive resolution upscaling (AMD FidelityFX Super Resolution / FSR), frame rate cap enforcing (e.g., 60 FPS or 120 FPS limits), nested DRM surface leasing, and HDR color space pass-through for high-performance gaming workloads.
+4. **Phoronix Test Suite Automated Performance Benchmarking**:
+   - Grounded in `src/unimplemented_features.rs` (`PhoronixTestSuiteRunner`).
+   - Automates multi-workload benchmarking across CPU, GPU, memory, and storage subsystems, normalizing raw score outputs and calculating composite system performance indices.
+
+### 57.2 Bare-Metal Zero-Dependency OOP Systems Architecture Rules
+1. **Modern Low-Level Language Restriction**: Written strictly in Rust, Zig, or Nim under `#![no_std]` bare-metal configurations.
+2. **Absolute Zero-Dependency Constraint**: Zero external standard library dependencies (`std::` or third-party crates/libraries). All compositor leasing logic, hardware detection matchers, and benchmark metric collectors are constructed from scratch.
+3. **Bare-Metal Object-Oriented Principles (OOP)**:
+   - **Encapsulation**: Isolating hardware IDs, DRM surface leases, and theme configurations within modular structures.
+   - **Inheritance & Hierarchy**: Establishing compositor and hardware manager hierarchies (`CompositorEngine` extended by `SteamOsGamescopeCompositorEngine`).
+   - **Polymorphism**: Dynamic dispatch enabling uniform display and driver query interfaces across heterogeneous hardware.
+   - **OS Design Patterns**: Singleton pattern (`ControlCenterManager`), Factory pattern (dynamic driver allocation based on PCI scan results), and Observer pattern (asynchronous frame rate state notifications).

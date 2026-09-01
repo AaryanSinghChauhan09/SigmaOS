@@ -497,8 +497,8 @@ impl SigmaPkg {
         println!("Removing packages...");
 
         for name in package_names {
-            if let Some(package) = self.local_packages.get(name) {
-                self.remove_package(package)?;
+            if let Some(package) = self.local_packages.get(name).cloned() {
+                self.remove_package(&package)?;
             } else {
                 println!("Package '{}' is not installed.", name);
             }
