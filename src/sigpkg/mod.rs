@@ -21,6 +21,13 @@ pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod declarative_build;
+pub use declarative_build::{
+    ArchLinuxReproBuildInspector, BazelBuildEngine, BazelRuleType, BazelTarget,
+    DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer,
+    GentooPortageReproducibleEbuildEngine, NetBsdPkgsrcDeterministicBulkBuilder,
+    NixDerivation, PackageReview, PackageRatingsRegistry,
+    ReproducibleBuildDiffInspector,
+};
 pub mod fedora_rpm_engine;
 pub mod importer;
 pub mod linux_compat;
