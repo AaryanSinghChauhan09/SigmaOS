@@ -2,8 +2,7 @@ extern crate alloc;
 // SigmaOS EndeavourOS Parity Module
 // Implements terminal-centric EndeavourOS features: Calamares installer engine,
 // EOS Welcome app tasks, EOS Log Tool pastebin diagnostics, Reflector mirror ranking,
-// Yay/Paru AUR helper, and AKM Kernel Manager.
-
+// Yay/Paru AUR helper, AKM Kernel Manager, eos-apps-info, eos-quickstart, and inxi GPU health auditor.
 
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -181,101 +180,81 @@ impl Default for EosLogTool {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// EndeavourOS `eos-apps-info` Community App Discovery Engine
+#[derive(Debug, Clone)]
+pub struct EosAppInfo {
+    pub name: String,
+    pub category: String,
+    pub description: String,
+    pub is_aur: bool,
+}
 
-    #[test]
-    fn test_calamares_installer() {
-        let config = CalamaresConfig::new("endeavour_user", "eos-laptop");
-        let mut installer = CalamaresInstaller::new(config);
-        assert!(!installer.is_completed);
+pub struct EosAppsInfoEngine {
+    pub catalog: Vec<EosAppInfo>,
+}
 
-        let res = installer.run_installation();
-        assert!(res.is_ok());
-        assert!(installer.is_completed);
-        let msg = res.unwrap();
-        assert!(msg.contains("endeavour_user"));
-        assert!(msg.contains("eos-laptop"));
-    }
-
-    #[test]
-    fn test_eos_welcome_app_and_log_tool() {
-        let mut welcome = EosWelcomeApp::new();
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::UpdateMirrors)
-            .is_ok());
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::UpdateSystem)
-            .is_ok());
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::CleanPackages)
-            .is_ok());
-        assert!(welcome.execute_task(WelcomeButtonTask::FixKeys).is_ok());
-
-        let log_tool = EosLogTool::new();
-        let upload_res =
-            log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
-        assert!(upload_res.is_ok());
-        assert!(upload_res.unwrap().contains("https://0x0.st/"));
-    }
-
-    #[test]
-    fn test_reflector_mirror_manager() {
-        let mut reflector = ReflectorMirrorManager::new();
-        reflector.add_mirror(PacmanMirror {
-            country: "Germany".to_string(),
-            url: "https://mirror.archlinux.de".to_string(),
-            latency_ms: 120,
-            speed_kbps: 5000,
+impl EosAppsInfoEngine {
+    pub fn new() -> Self {
+        let mut catalog = Vec::new();
+        catalog.push(EosAppInfo {
+            name: "firefox".to_string(),
+            category: "Internet".to_string(),
+            description: "Fast, private web browser".to_string(),
+            is_aur: false,
         });
-        reflector.add_mirror(PacmanMirror {
-            country: "Germany".to_string(),
-            url: "https://fast.archlinux.de".to_string(),
-            latency_ms: 45,
-            speed_kbps: 15000,
-        });
-        reflector.add_mirror(PacmanMirror {
-            country: "USA".to_string(),
-            url: "https://us.mirror.archlinux.org".to_string(),
-            latency_ms: 200,
-            speed_kbps: 8000,
-        });
-
-        let ranked_de = reflector.rank_mirrors(Some("Germany"));
-        assert_eq!(ranked_de.len(), 2);
-        assert_eq!(ranked_de[0].url, "https://fast.archlinux.de"); // Lowest latency first
-    }
-
-    #[test]
-    fn test_yay_paru_helper() {
-        let mut helper = YayParuHelper::new();
-        helper.register_aur_package(AurPackageSpec {
+        catalog.push(EosAppInfo {
             name: "visual-studio-code-bin".to_string(),
-            version: "1.89.0-1".to_string(),
-            pkgbuild_url: "https://aur.archlinux.org/visual-studio-code-bin.git".to_string(),
-            votes: 1250,
+            category: "Development".to_string(),
+            description: "Visual Studio Code binary release".to_string(),
+            is_aur: true,
         });
-
-        let build_res = helper.build_and_install("visual-studio-code-bin");
-        assert!(build_res.is_ok());
-        assert!(build_res.unwrap().contains("visual-studio-code-bin"));
-
-        assert!(helper.build_and_install("nonexistent-pkg").is_err());
+        Self { catalog }
     }
 
-    #[test]
-    fn test_akm_kernel_manager() {
-        let mut akm = AkmKernelManager::new();
-        assert_eq!(akm.current_kernel, EosKernelFlavor::LinuxStable);
+    pub fn list_by_category(&self, cat: &str) -> Vec<EosAppInfo> {
+        self.catalog.iter().filter(|app| app.category == cat).cloned().collect()
+    }
+}
 
-        // Cannot switch to uninstalled kernel
-        assert!(akm.switch_active_kernel(EosKernelFlavor::LinuxZen).is_err());
+impl Default for EosAppsInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-        // Install and switch to LinuxZen
-        akm.install_kernel(EosKernelFlavor::LinuxZen);
-        assert!(akm.switch_active_kernel(EosKernelFlavor::LinuxZen).is_ok());
-        assert_eq!(akm.current_kernel, EosKernelFlavor::LinuxZen);
+/// EndeavourOS `eos-quickstart` Setup Generator Engine
+pub struct EosQuickstartEngine;
+
+impl EosQuickstartEngine {
+    pub fn generate_setup_script(packages: &[&str]) -> String {
+        let mut script = String::from("#!/usr/bin/env bash\n# Generated by eos-quickstart\nset -euo pipefail\n\n");
+        script.push_str("echo '==> Installing selected packages...'\n");
+        script.push_str(&format!("yay -S --needed --noconfirm {}\n", packages.join(" ")));
+        script
+    }
+}
+
+/// EndeavourOS `inxi` Hardware & GPU Diagnostic Auditor (`eos-sendlog` parity)
+pub struct EosInxiGpuHealthAuditor {
+    pub cpu_model: String,
+    pub gpu_model: String,
+    pub driver_active: String,
+}
+
+impl EosInxiGpuHealthAuditor {
+    pub fn new(cpu: &str, gpu: &str, driver: &str) -> Self {
+        Self {
+            cpu_model: cpu.to_string(),
+            gpu_model: gpu.to_string(),
+            driver_active: driver.to_string(),
+        }
+    }
+
+    pub fn generate_inxi_report(&self) -> String {
+        format!(
+            "System: Host: endeavour-laptop Kernel: 6.8.0-arch1-1 x86_64\nCPU: {}\nGraphics: Device-1: {} driver: {}\n",
+            self.cpu_model, self.gpu_model, self.driver_active
+        )
     }
 }
 
@@ -433,5 +412,122 @@ impl AkmKernelManager {
 impl Default for AkmKernelManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calamares_installer() {
+        let config = CalamaresConfig::new("endeavour_user", "eos-laptop");
+        let mut installer = CalamaresInstaller::new(config);
+        assert!(!installer.is_completed);
+
+        let res = installer.run_installation();
+        assert!(res.is_ok());
+        assert!(installer.is_completed);
+        let msg = res.unwrap();
+        assert!(msg.contains("endeavour_user"));
+        assert!(msg.contains("eos-laptop"));
+    }
+
+    #[test]
+    fn test_eos_welcome_app_and_log_tool() {
+        let mut welcome = EosWelcomeApp::new();
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::UpdateMirrors)
+            .is_ok());
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::UpdateSystem)
+            .is_ok());
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::CleanPackages)
+            .is_ok());
+        assert!(welcome.execute_task(WelcomeButtonTask::FixKeys).is_ok());
+
+        let log_tool = EosLogTool::new();
+        let upload_res =
+            log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
+        assert!(upload_res.is_ok());
+        assert!(upload_res.unwrap().contains("https://0x0.st/"));
+    }
+
+    #[test]
+    fn test_eos_apps_info_and_quickstart() {
+        let engine = EosAppsInfoEngine::new();
+        let dev_apps = engine.list_by_category("Development");
+        assert_eq!(dev_apps.len(), 1);
+        assert!(dev_apps[0].is_aur);
+
+        let script = EosQuickstartEngine::generate_setup_script(&["neovim", "git"]);
+        assert!(script.contains("yay -S --needed --noconfirm neovim git"));
+    }
+
+    #[test]
+    fn test_eos_inxi_gpu_health_auditor() {
+        let auditor = EosInxiGpuHealthAuditor::new("AMD Ryzen 7 7840HS", "Radeon 780M", "amdgpu");
+        let report = auditor.generate_inxi_report();
+        assert!(report.contains("Radeon 780M"));
+        assert!(report.contains("driver: amdgpu"));
+    }
+
+    #[test]
+    fn test_reflector_mirror_manager() {
+        let mut reflector = ReflectorMirrorManager::new();
+        reflector.add_mirror(PacmanMirror {
+            country: "Germany".to_string(),
+            url: "https://mirror.archlinux.de".to_string(),
+            latency_ms: 120,
+            speed_kbps: 5000,
+        });
+        reflector.add_mirror(PacmanMirror {
+            country: "Germany".to_string(),
+            url: "https://fast.archlinux.de".to_string(),
+            latency_ms: 45,
+            speed_kbps: 15000,
+        });
+        reflector.add_mirror(PacmanMirror {
+            country: "USA".to_string(),
+            url: "https://us.mirror.archlinux.org".to_string(),
+            latency_ms: 200,
+            speed_kbps: 8000,
+        });
+
+        let ranked_de = reflector.rank_mirrors(Some("Germany"));
+        assert_eq!(ranked_de.len(), 2);
+        assert_eq!(ranked_de[0].url, "https://fast.archlinux.de"); // Lowest latency first
+    }
+
+    #[test]
+    fn test_yay_paru_helper() {
+        let mut helper = YayParuHelper::new();
+        helper.register_aur_package(AurPackageSpec {
+            name: "visual-studio-code-bin".to_string(),
+            version: "1.89.0-1".to_string(),
+            pkgbuild_url: "https://aur.archlinux.org/visual-studio-code-bin.git".to_string(),
+            votes: 1250,
+        });
+
+        let build_res = helper.build_and_install("visual-studio-code-bin");
+        assert!(build_res.is_ok());
+        assert!(build_res.unwrap().contains("visual-studio-code-bin"));
+
+        assert!(helper.build_and_install("nonexistent-pkg").is_err());
+    }
+
+    #[test]
+    fn test_akm_kernel_manager() {
+        let mut akm = AkmKernelManager::new();
+        assert_eq!(akm.current_kernel, EosKernelFlavor::LinuxStable);
+
+        // Cannot switch to uninstalled kernel
+        assert!(akm.switch_active_kernel(EosKernelFlavor::LinuxZen).is_err());
+
+        // Install and switch to LinuxZen
+        akm.install_kernel(EosKernelFlavor::LinuxZen);
+        assert!(akm.switch_active_kernel(EosKernelFlavor::LinuxZen).is_ok());
+        assert_eq!(akm.current_kernel, EosKernelFlavor::LinuxZen);
     }
 }

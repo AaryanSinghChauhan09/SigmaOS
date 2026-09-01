@@ -36,43 +36,100 @@ pub enum HandoffProtocol {
 }
 
 #[derive(Debug, Clone)]
-pub struct SovereignDistroBootStageHandoff {
+pub struct BootStageDescriptor {
     pub protocol: HandoffProtocol,
-    pub root_uuid: String,
+    pub entry_point: u64,
+    pub cmdline: String,
+    pub initrd_addr: Option<u64>,
+    pub initrd_size: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignDistroBootStageHandoff {
+    pub stage_descriptor: Option<BootStageDescriptor>,
     pub live_overlay_mounted: bool,
-    pub live_overlay_mounted: bool,
-    pub kernel_entry_point_addr: u64,
+    pub emergency_rescue_active: bool,
+    pub last_error_log: Option<String>,
 }
 
 impl SovereignDistroBootStageHandoff {
-    pub fn new(protocol: HandoffProtocol, root_uuid: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            protocol,
-            root_uuid: root_uuid.to_string(),
+            stage_descriptor: None,
             live_overlay_mounted: false,
-            live_overlay_mounted: false,
-            kernel_entry_point_addr: 0x0010_0000,
+            emergency_rescue_active: false,
+            last_error_log: None,
         }
     }
 
-    pub fn mount_initramfs_vfs(&mut self) -> Result<(), &'static str> {
-        if self.root_uuid.is_empty() {
-            return Err("Boot Handoff: Root UUID cannot be empty");
-        }
+    pub fn setup_linux_efistub(&mut self, entry: u64, cmdline: &str, initrd_addr: Option<u64>, initrd_size: usize) {
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::LinuxEfiStub,
+            entry_point: entry,
+            cmdline: cmdline.to_string(),
+            initrd_addr,
+            initrd_size,
+        });
+    }
+
+    pub fn setup_multiboot2(&mut self, entry: u64, cmdline: &str) {
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::Multiboot2,
+            entry_point: entry,
+            cmdline: cmdline.to_string(),
+            initrd_addr: None,
+            initrd_size: 0,
+        });
+    }
+
+    pub fn setup_freebsd_btx_elf(&mut self, entry: u64, cmdline: &str) {
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::FreeBsdBtxElf,
+            entry_point: entry,
+            cmdline: cmdline.to_string(),
+            initrd_addr: None,
+            initrd_size: 0,
+        });
+    }
+
+    pub fn parse_openbsd_boot_conf(&mut self, conf: &str) -> usize {
+        let count = conf.lines().filter(|l| !l.trim().is_empty()).count();
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::OpenBsdBootConf,
+            entry_point: 0x100000,
+            cmdline: conf.to_string(),
+            initrd_addr: None,
+            initrd_size: 0,
+        });
+        count
+    }
+
+    pub fn prepare_live_iso_overlay(&mut self, _squashfs_path: &str, _ram_disk_mb: usize) -> Result<(), &'static str> {
         self.live_overlay_mounted = true;
+        self.stage_descriptor = Some(BootStageDescriptor {
+            protocol: HandoffProtocol::LiveIsoOverlayFs,
+            entry_point: 0x200000,
+            cmdline: "live_overlay".to_string(),
+            initrd_addr: None,
+            initrd_size: 0,
+        });
         Ok(())
     }
 
-    pub fn setup_live_iso_overlayfs(&mut self) -> Result<(), &'static str> {
-        if !self.live_overlay_mounted {
-            return Err("Boot Handoff: Initramfs VFS must be mounted before overlayfs setup");
-        }
-        self.live_overlay_mounted = true;
-        Ok(())
+    pub fn trigger_emergency_rescue(&mut self, reason: &str) {
+        self.emergency_rescue_active = true;
+        self.last_error_log = Some(reason.to_string());
     }
 
-    pub fn execute_stage_handoff(&self) -> bool {
-        self.live_overlay_mounted && self.kernel_entry_point_addr > 0
+    pub fn execute_handoff(&self) -> Result<u64, &'static str> {
+        if self.emergency_rescue_active {
+            return Err("Emergency rescue active");
+        }
+        if let Some(desc) = &self.stage_descriptor {
+            Ok(desc.entry_point)
+        } else {
+            Err("No stage descriptor configured")
+        }
     }
 }
 
@@ -275,4 +332,4 @@ mod tests {
         let cfg = boot.generate_bootloader_config();
         assert!(cfg.contains("SigmaOS 2.0 Sovereign"));
     }
-
+}
