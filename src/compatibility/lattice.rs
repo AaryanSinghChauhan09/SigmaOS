@@ -3,6 +3,7 @@ extern crate alloc;
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 

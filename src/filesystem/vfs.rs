@@ -784,7 +784,6 @@ impl VirtualFilesystem {
             return Err(FsError::ImmutableFile);
         }
 
-        self.inodes.remove(&inode_id);
         Ok(())
     }
 
