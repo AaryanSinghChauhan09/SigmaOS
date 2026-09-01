@@ -421,9 +421,13 @@ impl PiaSplitTunnelGovernor {
         }
         for rule in &self.rules {
             match rule {
-                SplitTunnelRule::BypassVpnApp(app) if app == app_name => return true,
+                SplitTunnelRule::BypassVpnApp(app) => {
+                    if app == app_name {
+                        return true;
+                    }
+                }
                 SplitTunnelRule::BypassSubnet(net_ip, prefix) => {
-                    let prefix_val = *prefix;
+                    let prefix_val = u32::from(*prefix);
                     let mask = if prefix_val == 0 { 0 } else { !0u32 << (32 - prefix_val) };
                     if (destination_ip & mask) == (net_ip & mask) {
                         return true;
