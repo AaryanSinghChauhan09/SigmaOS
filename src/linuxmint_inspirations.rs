@@ -21,10 +21,25 @@
 //   - MintMenu            -> `MintMenuLayout`
 //   - Automate            -> `AutomateWorkflow`
 
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // =========================================================================
 // 1. WARPINATOR -> LanWarpEngine
@@ -659,7 +674,7 @@ impl BulkyRenamer {
         self.files
             .iter()
             .enumerate()
-            .map(|(i, f)| {
+            .map(|(i, f): (usize, &String)| {
                 let seq = i as u32;
                 let mut out = f.clone();
                 for rule in &self.rules {
@@ -687,7 +702,7 @@ impl BulkyRenamer {
 
         counts
             .into_iter()
-            .filter(|(_, sources)| sources.len() > 1)
+            .filter(|(_target, sources)| sources.len() > 1)
             .map(|(target, sources)| RenameConflict {
                 target,
                 conflicting_sources: sources,
