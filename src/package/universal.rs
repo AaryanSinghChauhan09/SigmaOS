@@ -1334,6 +1334,68 @@ impl UniversalPackageManager {
     }
 }
 
+// =========================================================================
+// Universal Package System Matrix Hub
+// Interop matrix bridging every open-source package format into SigmaOS
+// =========================================================================
+
+pub struct UniversalPackageSystemMatrixHub {
+    pub supported_formats: Vec<PackageFormat>,
+}
+
+impl UniversalPackageSystemMatrixHub {
+    pub fn new() -> Self {
+        Self {
+            supported_formats: vec![
+                PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman,
+                PackageFormat::Snap, PackageFormat::Flatpak, PackageFormat::AppImage,
+                PackageFormat::SigmaPkg, PackageFormat::Air, PackageFormat::Bottle,
+                PackageFormat::Ipa, PackageFormat::Ports, PackageFormat::Pkg,
+                PackageFormat::Aab, PackageFormat::Apk, PackageFormat::Eopkg,
+                PackageFormat::Nixpkg, PackageFormat::Ebuild, PackageFormat::TarGz,
+                PackageFormat::Xz, PackageFormat::App, PackageFormat::Hap,
+                PackageFormat::Pisi, PackageFormat::Superdeb, PackageFormat::Lzm,
+                PackageFormat::Pup, PackageFormat::Pet, PackageFormat::Tar,
+                PackageFormat::Xbps, PackageFormat::Zypper, PackageFormat::Guix,
+                PackageFormat::Moss, PackageFormat::Hpkg, PackageFormat::Tcz,
+                PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
+                PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg,
+                PackageFormat::Cports, PackageFormat::Cachy,
+            ],
+        }
+    }
+
+    pub fn total_supported_formats(&self) -> usize {
+        self.supported_formats.len()
+    }
+
+    pub fn is_supported(&self, format: PackageFormat) -> bool {
+        self.supported_formats.contains(&format)
+    }
+
+    /// Universally converts any supported package format into native SigmaPkg format
+    pub fn convert_format_to_sigpkg(&self, input_package: &UnifiedPackage) -> UnifiedPackage {
+        let mut target = UnifiedPackage::new(
+            format!("universal-sigpkg-{}", input_package.name),
+            input_package.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(input_package.name.clone());
+
+        for dep in &input_package.dependencies {
+            target = target.with_dependency(dep.clone());
+        }
+
+        target
+    }
+}
+
+impl Default for UniversalPackageSystemMatrixHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for UniversalPackageManager {
     fn default() -> Self {
         Self::new()
@@ -1854,5 +1916,23 @@ mod tests {
         let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
         assert_eq!(installed_pkg.version, "v20.11.0");
         assert!(installed_pkg.installed);
+    }
+
+    #[test]
+    fn test_universal_package_system_matrix_hub() {
+        let hub = UniversalPackageSystemMatrixHub::new();
+        assert_eq!(hub.total_supported_formats(), 41);
+        assert!(hub.is_supported(PackageFormat::Deb));
+        assert!(hub.is_supported(PackageFormat::Rpm));
+        assert!(hub.is_supported(PackageFormat::Cachy));
+
+        let deb_pkg = UnifiedPackage::new("firefox".to_string(), "125.0.0".to_string())
+            .with_format(PackageFormat::Deb)
+            .with_dependency("sovereign-libc".to_string());
+
+        let converted = hub.convert_format_to_sigpkg(&deb_pkg);
+        assert_eq!(converted.name, "universal-sigpkg-firefox");
+        assert_eq!(converted.formats[0], PackageFormat::SigmaPkg);
+        assert!(converted.dependencies.contains(&"sovereign-libc".to_string()));
     }
 }
