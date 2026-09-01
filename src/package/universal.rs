@@ -236,6 +236,34 @@ impl PackageFormat {
             Some(PackageFormat::Sfs)
         } else if name.ends_with(".pkg") {
             Some(PackageFormat::Pkg)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".ebuild") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".nix") || name.ends_with(".nixpkg") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".scm") || name.ends_with(".guix") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
         } else {
             None
         }
@@ -1905,6 +1933,9 @@ mod tests {
         assert_eq!(PackageFormat::detect_format_from_filename("glibc-2.38_1.xbps"), Some(PackageFormat::Xbps));
         assert_eq!(PackageFormat::detect_format_from_filename("vlc.flatpak"), Some(PackageFormat::Flatpak));
         assert_eq!(PackageFormat::detect_format_from_filename("firefox.appimage"), Some(PackageFormat::AppImage));
+        assert_eq!(PackageFormat::detect_format_from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
+        assert_eq!(PackageFormat::detect_format_from_filename("package.nix"), Some(PackageFormat::Nixpkg));
+        assert_eq!(PackageFormat::detect_format_from_filename("haiku.hpkg"), Some(PackageFormat::Hpkg));
 
         // Magic byte detection
         assert_eq!(PackageFormat::detect_format_from_bytes(b"!<arch>\ndebian-binary"), Some(PackageFormat::Deb));
