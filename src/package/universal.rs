@@ -1,5 +1,8 @@
+extern crate alloc;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+#[allow(unused_imports)]
 use alloc::vec;
 use alloc::format;
 use alloc::collections::BTreeMap;
