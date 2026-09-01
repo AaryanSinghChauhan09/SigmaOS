@@ -1,0 +1,25 @@
+name: FreeBSD Poudriere Ports & Jail Matrix CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  freebsd-jail-capsicum-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test FreeBSD Jail Isolation & Capsicum Subsystem
+        run: cargo test --lib compatibility::freebsd_jails
