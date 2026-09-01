@@ -281,6 +281,119 @@ impl Default for ZenithCompositor {
 }
 
 // ==============================================================================
+// 5. Gamescope & wlroots Direct Scanout Engine (Zero-Copy Low-Latency Blitting)
+// ==============================================================================
+pub struct GamescopeDirectScanoutEngine {
+    pub active_scanout_window_id: Option<u32>,
+    pub direct_scanout_active: bool,
+    pub primary_plane_fd: i32,
+    pub bypass_compositing_passes: u64,
+}
+
+impl GamescopeDirectScanoutEngine {
+    pub fn new() -> Self {
+        Self {
+            active_scanout_window_id: None,
+            direct_scanout_active: false,
+            primary_plane_fd: -1,
+            bypass_compositing_passes: 0,
+        }
+    }
+
+    pub fn try_enable_direct_scanout(&mut self, window_id: u32, geom: Geometry) -> bool {
+        // Direct scanout is eligible if window is fullscreen (covers 1920x1080)
+        if geom.x == 0 && geom.y == 0 && geom.width >= SCREEN_WIDTH && geom.height >= SCREEN_HEIGHT {
+            self.active_scanout_window_id = Some(window_id);
+            self.direct_scanout_active = true;
+            self.bypass_compositing_passes += 1;
+            true
+        } else {
+            self.disable_direct_scanout();
+            false
+        }
+    }
+
+    pub fn disable_direct_scanout(&mut self) {
+        self.active_scanout_window_id = None;
+        self.direct_scanout_active = false;
+    }
+}
+
+impl Default for GamescopeDirectScanoutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 6. Wayland Fractional Scaling Engine (wp_fractional_scale_v1)
+// ==============================================================================
+#[derive(Debug, Clone, Copy)]
+pub struct FractionalScaleMetrics {
+    pub scale_numerator: u32, // e.g., 120 = 1.2x, 150 = 1.5x, 175 = 1.75x
+}
+
+impl FractionalScaleMetrics {
+    pub fn new(scale_numerator: u32) -> Self {
+        Self { scale_numerator }
+    }
+
+    pub fn scale_dimension(&self, unscaled_px: u32) -> u32 {
+        (unscaled_px * self.scale_numerator) / 120
+    }
+
+    pub fn unscale_dimension(&self, scaled_px: u32) -> u32 {
+        (scaled_px * 120) / self.scale_numerator
+    }
+}
+
+// ==============================================================================
+// 7. Hyprland & KDE Plasma Workspace Transition Animator
+// ==============================================================================
+pub struct HyprlandWorkspaceTransition {
+    pub source_workspace_id: u32,
+    pub target_workspace_id: u32,
+    pub progress_pct: f32, // 0.0 to 1.0
+    pub is_animating: bool,
+}
+
+impl HyprlandWorkspaceTransition {
+    pub fn new() -> Self {
+        Self {
+            source_workspace_id: 0,
+            target_workspace_id: 0,
+            progress_pct: 0.0,
+            is_animating: false,
+        }
+    }
+
+    pub fn start_transition(&mut self, from: u32, to: u32) {
+        self.source_workspace_id = from;
+        self.target_workspace_id = to;
+        self.progress_pct = 0.0;
+        self.is_animating = true;
+    }
+
+    pub fn step_frame(&mut self, delta_time_ms: f32) -> bool {
+        if !self.is_animating {
+            return false;
+        }
+        self.progress_pct += delta_time_ms / 16.0 * 0.1; // ~160ms transition duration
+        if self.progress_pct >= 1.0 {
+            self.progress_pct = 1.0;
+            self.is_animating = false;
+        }
+        self.is_animating
+    }
+}
+
+impl Default for HyprlandWorkspaceTransition {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
 // 1. Wayland-style Sub-surface (wl_subsurface)
 // ==============================================================================
 #[derive(Debug, Clone, Copy)]
@@ -523,5 +636,37 @@ mod tests {
         let w2 = compositor.get_window(2).unwrap();
         assert_eq!(w1.geometry.width, SCREEN_WIDTH / 2);
         assert_eq!(w2.geometry.x, (SCREEN_WIDTH / 2) as i32);
+    }
+
+    #[test]
+    fn test_gamescope_direct_scanout_engine() {
+        let mut scanout = GamescopeDirectScanoutEngine::new();
+        let fs_geom = Geometry { x: 0, y: 0, width: 1920, height: 1080 };
+        let win_geom = Geometry { x: 100, y: 100, width: 800, height: 600 };
+
+        assert!(scanout.try_enable_direct_scanout(1, fs_geom));
+        assert!(scanout.direct_scanout_active);
+        assert_eq!(scanout.active_scanout_window_id, Some(1));
+
+        assert!(!scanout.try_enable_direct_scanout(2, win_geom));
+        assert!(!scanout.direct_scanout_active);
+    }
+
+    #[test]
+    fn test_fractional_scale_metrics() {
+        let metrics = FractionalScaleMetrics::new(150); // 1.5x HiDPI scaling
+        assert_eq!(metrics.scale_dimension(100), 125);
+        assert_eq!(metrics.unscale_dimension(125), 100);
+    }
+
+    #[test]
+    fn test_workspace_transition_animation() {
+        let mut anim = HyprlandWorkspaceTransition::new();
+        anim.start_transition(1, 2);
+        assert!(anim.is_animating);
+
+        let still_animating = anim.step_frame(16.0);
+        assert!(still_animating);
+        assert!(anim.progress_pct > 0.0);
     }
 }

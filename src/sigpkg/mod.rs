@@ -6,7 +6,6 @@ use alloc::format;
 
 pub mod alpine_apk_engine;
 pub mod arch_compat;
-pub mod alpine_apk_engine;
 pub mod arch_pacman_engine;
 pub mod client;
 pub mod daemon;
@@ -34,13 +33,7 @@ pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
-pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
-
-pub use sovereign_package_innovations::{
-    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-};
 pub mod spec;
 pub mod store;
 pub mod transaction;
@@ -69,8 +62,9 @@ pub use sovereign_sigpkg::{
 };
 
 pub use arch_compat::{
-    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager,
+    AlpmConflictSolver, AlpmDatabaseSync, AlpmHookManager, AlpmSyncEntry,
+    AlpmTransactionEngine, AlpmTransactionState, AurRecipeCompiler, MakepkgBuilder,
+    MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager,
 };
 pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
@@ -108,10 +102,10 @@ pub use package_snapshot_rollback::{
 };
 pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-    SlackBuildScript, SlackwarePackageArchive, SlackwareBuildPackageEngine,
-    ZypperPackageSpec, ZypperSatDependencyResolver,
-    MossStatelessPackage, MossStateTransaction, SolusMossStatelessTransactionEngine,
+    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+    SlackBuildScript, SlackwarePackageArchive,
+    ZypperPackageSpec,
+    MossStatelessPackage, MossStateTransaction,
     BsdPkgManifestSpec, BsdPkgManifestSignatureAuditor,
 };
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};

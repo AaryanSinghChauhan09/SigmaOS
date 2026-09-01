@@ -38,7 +38,7 @@ pub mod string {
         if i < dest.len() {
             dest[i] = 0;
         }
-        dest.as_mut_ptr()
+        Ok(dest.as_mut_ptr())
     }
 
     /// Concatenate strings
