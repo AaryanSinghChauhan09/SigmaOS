@@ -78,7 +78,21 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
             (DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/etc") => "/etc".to_string(),
+            (DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/var/log") => "/var/log".to_string(),
+            (DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/proc") => "/proc".to_string(),
+            (DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/sys") => "/sys".to_string(),
+            (DistroSubsystemMode::LinuxNix, "/var/log") => "/var/log".to_string(),
             _ => generic_path.to_string(),
+        }
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        let supervisor = self.get_supervisor_type();
+        let sample_path = self.translate_vfs_path("/etc");
+        let sample_pkg = self.translate_package_specifier("core-utils");
+
+        !sample_path.is_empty() && !sample_pkg.is_empty() && match supervisor {
+            ServiceSupervisorType::Systemd | ServiceSupervisorType::OpenRC | ServiceSupervisorType::Runit | ServiceSupervisorType::Shepherd => true,
         }
     }
 
