@@ -3488,6 +3488,202 @@ impl OpenBsdPfctlStateInspector {
     }
 }
 
+/// Financial Cheque Type classification & MICR signature verification auditor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ChequeType {
+    OrderCheque,
+    BearerCheque,
+    CrossedCheque,
+    PostDatedCheque,
+    StaleCheque,
+    BankersCheque,
+}
+
+pub struct FinancialChequeTransactionAuditor {
+    pub cheque_number: String,
+    pub micr_code: String,
+    pub amount: u64,
+    pub payee: String,
+    pub cheque_type: ChequeType,
+    pub days_since_issue: u32,
+    pub is_signature_valid: bool,
+}
+
+impl FinancialChequeTransactionAuditor {
+    pub fn new(
+        cheque_number: &str,
+        micr_code: &str,
+        amount: u64,
+        payee: &str,
+        is_crossed: bool,
+        is_bearer: bool,
+        days_since_issue: u32,
+    ) -> Self {
+        let cheque_type = if days_since_issue > 90 {
+            ChequeType::StaleCheque
+        } else if is_crossed {
+            ChequeType::CrossedCheque
+        } else if is_bearer {
+            ChequeType::BearerCheque
+        } else if amount > 1_000_000 {
+            ChequeType::BankersCheque
+        } else {
+            ChequeType::OrderCheque
+        };
+
+        Self {
+            cheque_number: cheque_number.to_string(),
+            micr_code: micr_code.to_string(),
+            amount,
+            payee: payee.to_string(),
+            cheque_type,
+            days_since_issue,
+            is_signature_valid: false,
+        }
+    }
+
+    pub fn verify_micr_checksum(&self) -> bool {
+        self.micr_code.len() == 9 && self.micr_code.chars().all(|c| c.is_ascii_digit())
+    }
+
+    pub fn sign_and_validate(&mut self, signature_hash: &str) -> bool {
+        if !signature_hash.is_empty() && self.verify_micr_checksum() && self.cheque_type != ChequeType::StaleCheque {
+            self.is_signature_valid = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// FreeBSD pkg ng & OpenBSD pkg_add inspired binary package repository indexer and delta calculator
+pub struct FreeBsdPkgNgRepositoryTool {
+    pub repo_name: String,
+    pub package_catalog: Vec<(String, String)>, // (name, version)
+    pub is_signed: bool,
+}
+
+impl FreeBsdPkgNgRepositoryTool {
+    pub fn new(repo_name: &str) -> Self {
+        Self {
+            repo_name: repo_name.to_string(),
+            package_catalog: Vec::new(),
+            is_signed: false,
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, version: &str) {
+        self.package_catalog.push((name.to_string(), version.to_string()));
+    }
+
+    pub fn sign_manifest(&mut self, key_fingerprint: &str) -> bool {
+        if !key_fingerprint.is_empty() {
+            self.is_signed = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn compute_delta_updates(&self, current_packages: &[(&str, &str)]) -> Vec<String> {
+        let mut updates = Vec::new();
+        for (name, ver) in &self.package_catalog {
+            if let Some((_, curr_ver)) = current_packages.iter().find(|(n, _)| n == name) {
+                if curr_ver != ver {
+                    updates.push(format!("{}-{}", name, ver));
+                }
+            } else {
+                updates.push(format!("{}-{}", name, ver));
+            }
+        }
+        updates
+    }
+}
+
+/// Debian dpkg-trigger & RedHat rpm triggers inspired post-install trigger dispatcher
+pub struct DebianDpkgTriggersPackageEngine {
+    pub pending_triggers: Vec<String>,
+    pub executed_triggers: Vec<String>,
+}
+
+impl DebianDpkgTriggersPackageEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_triggers: Vec::new(),
+            executed_triggers: Vec::new(),
+        }
+    }
+
+    pub fn activate_trigger(&mut self, trigger_name: &str) {
+        if !self.pending_triggers.iter().any(|t| t == trigger_name) {
+            self.pending_triggers.push(trigger_name.to_string());
+        }
+    }
+
+    pub fn process_triggers(&mut self) -> usize {
+        let processed_count = self.pending_triggers.len();
+        for trigger in self.pending_triggers.drain(..) {
+            self.executed_triggers.push(trigger);
+        }
+        processed_count
+    }
+}
+
+/// Arch Linux pacman hooks inspired transaction execution hook engine
+pub struct ArchPacmanHooksEngine {
+    pub hooks: Vec<(String, String)>, // (Target, Exec)
+}
+
+impl ArchPacmanHooksEngine {
+    pub fn new() -> Self {
+        Self { hooks: Vec::new() }
+    }
+
+    pub fn register_hook(&mut self, target_pkg: &str, exec_cmd: &str) {
+        self.hooks.push((target_pkg.to_string(), exec_cmd.to_string()));
+    }
+
+    pub fn match_hooks_for_transaction(&self, transaction_pkgs: &[&str]) -> Vec<String> {
+        let mut matching_execs = Vec::new();
+        for (target, exec) in &self.hooks {
+            if target == "*" || transaction_pkgs.contains(&target.as_str()) {
+                matching_execs.push(exec.clone());
+            }
+        }
+        matching_execs
+    }
+}
+
+/// Alpine Linux apk index & Void xbps-src inspired APKINDEX package catalog packager
+pub struct AlpineApkIndexSignerTool {
+    pub index_name: String,
+    pub package_checksums: Vec<(String, String)>,
+    pub is_tar_gz_compressed: bool,
+}
+
+impl AlpineApkIndexSignerTool {
+    pub fn new(index_name: &str) -> Self {
+        Self {
+            index_name: index_name.to_string(),
+            package_checksums: Vec::new(),
+            is_tar_gz_compressed: false,
+        }
+    }
+
+    pub fn add_package_checksum(&mut self, pkg_name: &str, sha256_sum: &str) {
+        self.package_checksums.push((pkg_name.to_string(), sha256_sum.to_string()));
+    }
+
+    pub fn pack_index_archive(&mut self) -> bool {
+        if !self.package_checksums.is_empty() {
+            self.is_tar_gz_compressed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 // UNIT TESTS
 // =========================================================================
 
@@ -4563,5 +4759,85 @@ mod tests {
         assert_eq!(pfctl.get_active_state_count(), 2);
         assert_eq!(pfctl.nat_rules.len(), 1);
         assert_eq!(pfctl.qos_queues.len(), 1);
+    }
+
+    #[test]
+    fn test_financial_cheque_transaction_auditor() {
+        let mut auditor = FinancialChequeTransactionAuditor::new(
+            "100023",
+            "110229001",
+            5000,
+            "Alice Smith",
+            true,
+            false,
+            10,
+        );
+
+        assert_eq!(auditor.cheque_type, ChequeType::CrossedCheque);
+        assert!(auditor.verify_micr_checksum());
+        assert!(auditor.sign_and_validate("valid_rsa_hash_123"));
+        assert!(auditor.is_signature_valid);
+
+        let stale_auditor = FinancialChequeTransactionAuditor::new(
+            "100024",
+            "110229001",
+            1000,
+            "Bob Jones",
+            false,
+            false,
+            100,
+        );
+        assert_eq!(stale_auditor.cheque_type, ChequeType::StaleCheque);
+    }
+
+    #[test]
+    fn test_freebsd_pkg_ng_repository_tool() {
+        let mut pkg_tool = FreeBsdPkgNgRepositoryTool::new("FreeBSD-Ports-Official");
+        pkg_tool.register_package("zsh", "5.9");
+        pkg_tool.register_package("git", "2.44");
+
+        assert!(pkg_tool.sign_manifest("fingerprint_98765"));
+        assert!(pkg_tool.is_signed);
+
+        let current = [("zsh", "5.8"), ("git", "2.44")];
+        let deltas = pkg_tool.compute_delta_updates(&current);
+        assert_eq!(deltas.len(), 1);
+        assert_eq!(deltas[0], "zsh-5.9");
+    }
+
+    #[test]
+    fn test_debian_dpkg_triggers_engine() {
+        let mut triggers = DebianDpkgTriggersPackageEngine::new();
+        triggers.activate_trigger("update-desktop-database");
+        triggers.activate_trigger("mime-database-update");
+
+        assert_eq!(triggers.pending_triggers.len(), 2);
+        let count = triggers.process_triggers();
+
+        assert_eq!(count, 2);
+        assert_eq!(triggers.executed_triggers.len(), 2);
+        assert_eq!(triggers.pending_triggers.len(), 0);
+    }
+
+    #[test]
+    fn test_arch_pacman_hooks_engine() {
+        let mut hooks = ArchPacmanHooksEngine::new();
+        hooks.register_hook("glib2", "/usr/bin/gio-querymodules /usr/lib/gio/modules");
+        hooks.register_hook("*", "/usr/bin/ldconfig");
+
+        let matches = hooks.match_hooks_for_transaction(&["glib2", "bash"]);
+        assert_eq!(matches.len(), 2);
+
+        let no_matches = hooks.match_hooks_for_transaction(&["nano"]);
+        assert_eq!(no_matches.len(), 1); // matches '*'
+    }
+
+    #[test]
+    fn test_alpine_apk_index_signer_tool() {
+        let mut apk_indexer = AlpineApkIndexSignerTool::new("APKINDEX.tar.gz");
+        apk_indexer.add_package_checksum("musl-1.2.4", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+
+        assert!(apk_indexer.pack_index_archive());
+        assert!(apk_indexer.is_tar_gz_compressed);
     }
 }
