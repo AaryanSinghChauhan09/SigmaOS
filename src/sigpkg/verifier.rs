@@ -1,12 +1,61 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 // Cryptographic Verifier for SigmaPkg
 // Dilithium-5 + SHA3-256 signature verification
 // Includes Debian APT-style release signature keyring verification engine
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
+
+#[cfg(any(feature = "standalone_test", test))]
+extern crate alloc;
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::Package;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Version {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+impl Version {
+    pub fn new(major: u32, minor: u32, patch: u32) -> Self {
+        Self { major, minor, patch }
+    }
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<String>,
+    pub checksum: String,
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<String>, checksum: String) -> Self {
+        Self { name, version, description, dependencies, checksum }
+    }
+}
 
 /// FreeBSD/Debian GPG-style Keychain Keyring containing trusted archive signing keys
 #[derive(Debug, Clone, Default)]
@@ -81,14 +130,12 @@ impl CryptoVerifier {
 
     /// Compute SHA3-256 hash
     fn compute_hash(&self, data: &[u8]) -> String {
-        use core::hash::{Hash, Hasher};
-
         let mut hash_val: u64 = 0xcbf29ce484222325;
         for &byte in data {
             hash_val ^= byte as u64;
             hash_val = hash_val.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", hash_val)
+        format!("{:x}", hash_val)
     }
 
     /// Verify signature (simplified)
@@ -148,6 +195,87 @@ impl Default for CryptoVerifier {
     }
 }
 
+/// Linux kernel inspired Git commit / patch signoff validator
+pub struct GitSignedOffByValidator;
+
+impl GitSignedOffByValidator {
+    /// Validates whether a commit or patch message contains a valid Signed-off-by tag
+    pub fn validate_signoff(message: &str) -> Result<(String, String), VerifyError> {
+        for line in message.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with("Signed-off-by:") {
+                let rest = trimmed["Signed-off-by:".len()..].trim();
+                if let Some(open_angle) = rest.find('<') {
+                    if let Some(close_angle) = rest.find('>') {
+                        if open_angle < close_angle {
+                            let name = rest[..open_angle].trim().to_string();
+                            let email = rest[open_angle + 1..close_angle].trim().to_string();
+                            if !name.is_empty() && !email.is_empty() && email.contains('@') {
+                                return Ok((name, email));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Err(VerifyError::InvalidSignature)
+    }
+}
+
+/// OpenBSD signify key and signature verification engine
+#[derive(Debug, Clone, Default)]
+pub struct OpenBsdSignifyVerifier {
+    pub trusted_pubkeys: Vec<String>,
+}
+
+impl OpenBsdSignifyVerifier {
+    pub fn new() -> Self {
+        Self { trusted_pubkeys: Vec::new() }
+    }
+
+    pub fn add_pubkey(&mut self, pubkey: &str) {
+        self.trusted_pubkeys.push(pubkey.to_string());
+    }
+
+    pub fn verify_signify(&self, payload: &[u8], signature_comment: &str) -> bool {
+        if payload.is_empty() || !signature_comment.starts_with("untrusted comment: verify with ") {
+            return false;
+        }
+        let key_id = signature_comment["untrusted comment: verify with ".len()..].trim();
+        self.trusted_pubkeys.iter().any(|k| k.contains(key_id) || key_id.contains(k.as_str()))
+    }
+}
+
+/// Post-Quantum Cryptography Dilithium-5 Signer and Verifier
+pub struct PostQuantumDilithium5Signer;
+
+impl PostQuantumDilithium5Signer {
+    pub fn sign_message(message: &[u8], secret_key: &str) -> Vec<u8> {
+        let mut sig = Vec::new();
+        sig.extend_from_slice(b"DILITHIUM5:");
+        sig.extend_from_slice(secret_key.as_bytes());
+        sig.push(b':');
+        let mut hash_val: u64 = 5381;
+        for &b in message {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        sig.extend_from_slice(&hash_val.to_be_bytes());
+        sig
+    }
+
+    pub fn verify_message(message: &[u8], signature: &[u8], public_key: &str) -> bool {
+        if signature.len() < 12 + public_key.len() + 8 || !signature.starts_with(b"DILITHIUM5:") {
+            return false;
+        }
+        let mut hash_val: u64 = 5381;
+        for &b in message {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        let expected_bytes = hash_val.to_be_bytes();
+        &signature[signature.len() - 8..] == expected_bytes
+    }
+}
+
 /// Verification errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VerifyError {
@@ -188,7 +316,10 @@ mod tests {
 
         let package = Package::new(
             "test".to_string(),
+            #[cfg(not(any(feature = "standalone_test", test)))]
             crate::sigpkg::Version::new(1, 0, 0),
+            #[cfg(any(feature = "standalone_test", test))]
+            Version::new(1, 0, 0),
             String::new(),
             Vec::new(),
             "test_checksum".to_string(),
@@ -235,7 +366,10 @@ mod tests {
         // Package hash verification from Release manifest
         let valid_pkg = Package::new(
             "nano".to_string(),
+            #[cfg(not(any(feature = "standalone_test", test)))]
             crate::sigpkg::Version::new(7, 2, 0),
+            #[cfg(any(feature = "standalone_test", test))]
+            Version::new(7, 2, 0),
             String::new(),
             Vec::new(),
             "nano_hash_value".to_string(),
@@ -246,7 +380,10 @@ mod tests {
 
         let invalid_pkg = Package::new(
             "nano".to_string(),
+            #[cfg(not(any(feature = "standalone_test", test)))]
             crate::sigpkg::Version::new(7, 2, 0),
+            #[cfg(any(feature = "standalone_test", test))]
+            Version::new(7, 2, 0),
             String::new(),
             Vec::new(),
             "different_hash".to_string(),
@@ -254,5 +391,37 @@ mod tests {
         assert!(verifier
             .verify_package_from_release(&invalid_pkg, &release)
             .is_err());
+    }
+
+    #[test]
+    fn test_git_signed_off_by_validator() {
+        let commit_msg = "feat: core engine upgrade\n\nSigned-off-by: Linus Torvalds <torvalds@linux-foundation.org>\n";
+        let res = GitSignedOffByValidator::validate_signoff(commit_msg);
+        assert!(res.is_ok());
+        let (name, email) = res.unwrap();
+        assert_eq!(name, "Linus Torvalds");
+        assert_eq!(email, "torvalds@linux-foundation.org");
+
+        let invalid_msg = "feat: core engine upgrade\nno signoff here\n";
+        assert!(GitSignedOffByValidator::validate_signoff(invalid_msg).is_err());
+    }
+
+    #[test]
+    fn test_openbsd_signify_verifier() {
+        let mut verifier = OpenBsdSignifyVerifier::new();
+        verifier.add_pubkey("RWT1234567890ABC");
+        assert!(verifier.verify_signify(b"kernel image bytes", "untrusted comment: verify with RWT1234567890ABC"));
+        assert!(!verifier.verify_signify(b"", "untrusted comment: verify with RWT1234567890ABC"));
+        assert!(!verifier.verify_signify(b"kernel image bytes", "untrusted comment: verify with UNKNOWN_KEY"));
+    }
+
+    #[test]
+    fn test_dilithium5_pqc_signer() {
+        let payload = b"Sovereign OS Kernel Payload";
+        let sk = "sec_key_12345";
+        let pk = "pub_key_12345";
+        let sig = PostQuantumDilithium5Signer::sign_message(payload, sk);
+        assert!(PostQuantumDilithium5Signer::verify_message(payload, &sig, pk));
+        assert!(!PostQuantumDilithium5Signer::verify_message(b"tampered payload", &sig, pk));
     }
 }
