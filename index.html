@@ -212,9 +212,10 @@
                 </div>
             </div>
             <div class="window-body auto-style-30">
-                <div class="auto-style-31">
-                    <button class="fm-btn" onclick="switchMarketTab('core-shards')">Core Shards</button>
-                    <button class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
+                <div class="auto-style-31" style="display: flex; gap: 10px; margin-bottom: 12px;">
+                    <button type="button" class="fm-btn active" onclick="switchMarketTab('core-shards')">Core Shards</button>
+                    <button type="button" class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
+                    <button type="button" class="fm-btn" onclick="switchMarketTab('archweb-hub')">ArchWeb Package DB</button>
                 </div>
                 
                 <div id="market-core-shards">
@@ -297,6 +298,23 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- ArchWeb / BSD Ports Universal Package Hub -->
+                <div id="market-archweb-hub" class="auto-style-34" style="display: none;">
+                    <h3 class="auto-style-35">ArchWeb & BSD Ports Universal Package Database</h3>
+                    <p class="auto-style-36">Search official binary packages, AUR PKGBUILDs, and FreeBSD ports with Kyber-1024 mirror attestation.</p>
+                    <div class="settings-group" style="margin-top: 10px;">
+                        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                            <input type="text" id="archweb-search" class="cmd-input" placeholder="Search packages (e.g. linux-zen, hyprland, zfs, gcc)..." aria-label="Search ArchWeb & BSD Ports package database">
+                            <button type="button" class="wizard-btn" style="padding: 0 15px; font-size: 0.8rem;" onclick="searchArchWebPackages()">SEARCH</button>
+                        </div>
+                        <div style="display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted);">
+                            <span><strong>Repos:</strong> [core] [extra] [multilib] [aur] [freebsd-ports]</span>
+                            <span><strong>Arch:</strong> <span class="capsule-badge" style="font-size: 0.65rem;">x86_64</span> <span class="capsule-badge" style="font-size: 0.65rem;">aarch64</span> <span class="capsule-badge" style="font-size: 0.65rem;">riscv64</span></span>
+                            <span><strong>Mirror Status:</strong> <span style="color: #4ade80;">● 100% Synced</span></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -545,6 +563,12 @@
     <script>
 // Fixed to resolve XSS and unused variables
 console.log("Loaded");
+
+function switchMarketTab(tabId) {
+    document.getElementById('market-core-shards').style.display = (tabId === 'core-shards') ? 'block' : 'none';
+    document.getElementById('market-foss-apps').style.display = (tabId === 'foss-apps') ? 'block' : 'none';
+    document.getElementById('market-archweb-hub').style.display = (tabId === 'archweb-hub') ? 'block' : 'none';
+}
 </script>
 </body>
 </html>
