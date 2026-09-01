@@ -233,6 +233,24 @@ py_binary(
 
 ## Package Compatibility
 
+### Universal Foreign Package Engine & Conversion
+SigmaPkg features a Universal Cross-Distro Adapter that seamlessly translates and converts foreign Linux & BSD package formats (`.deb`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.rpm`, `.apk`, `.xbps`, `.ebuild`, `.txz`, `.eopkg`, `.pkg`, `.flatpak`, `.snap`, `.appimage`) into native Sigma-pkg packages.
+
+#### Universal Cross-Distro Dependency Mapping
+Distro-specific dependency package names (e.g. `libssl-dev` in Debian, `openssl-devel` in Fedora, `openssl-dev` in Alpine, `security/openssl` in FreeBSD Ports) are automatically mapped to canonical SigmaOS package names via `UniversalDependencyMapper`.
+
+#### Scriptlet & Lifecycle Hook Translation
+Foreign installation scripts (`postinst`, `preinst`, `prerm`, `postrm` for DEB; `%pre`, `%post`, `%preun`, `%postun` for RPM; `.INSTALL` scripts for Pacman; `post-install` for Alpine/XBPS) are safely converted into native Sigma-pkg lifecycle hooks (`PreInstall`, `PostInstall`, `PreRemove`, `PostRemove`) via `UniversalScriptletConverter`.
+
+#### Dry-Run Simulation
+Simulate installation transactions across any foreign format without modifying system state:
+```bash
+# Dry-run simulate foreign package installation
+sigpkg install --dry-run ./package.deb
+sigpkg install --dry-run ./package.rpm
+sigpkg install --dry-run ./package.pkg.tar.zst
+```
+
 ### Debian Package Support
 ```bash
 # Install Debian package

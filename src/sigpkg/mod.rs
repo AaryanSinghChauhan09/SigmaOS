@@ -49,7 +49,9 @@ pub use zero_alloc_resolver::{
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
     AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
-    RpmSpecManifest, AppImageContainer,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
 };
 pub use sovereign_sigpkg::*;
 pub use sovereign_sigpkg::{
