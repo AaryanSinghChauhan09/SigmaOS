@@ -19,6 +19,7 @@
 // SigmaOS Package Module
 pub mod apm;
 pub mod aur_integration;
+pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
 pub mod debian_translator;
@@ -56,4 +57,10 @@ pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, StoreApp, StoreError,
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };

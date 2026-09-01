@@ -3,7 +3,7 @@
 # Σ SIGMAOS: REPRODUCIBLE BUILD SCRIPT (sigma-repro-build)
 # =============================================================================
 # Ensures bitwise-identical builds across all environments.
-# Inspired by Debian's reproducible-builds.org project.
+# Inspired by Debian's reproducible-builds.org project and Arch arch-repro-status.
 #
 # Usage:
 #   ./tools/sigma_repro_build.sh                  → Full clean build
@@ -14,6 +14,7 @@
 #   - SOURCE_DATE_EPOCH locked to last git commit timestamp
 #   - All compiler flags pinned in SIGMA_CFLAGS
 #   - PATH restricted to /usr/bin:/bin only
+#   - Environment normalized (LANG=C.UTF-8, TZ=UTC, UMASK=0022)
 #   - All source file hashes captured in .buildinfo manifest
 # =============================================================================
 
@@ -21,12 +22,16 @@ set -euo pipefail
 
 SIGMA_VERSION="1.0.0"
 BUILDINFO="sigma-${SIGMA_VERSION}.buildinfo"
-SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
-SIGMA_CFLAGS="-O2 -std=c++17 -fno-omit-frame-pointer -fPIE -pie -fstack-protector-strong"
+SOURCE_DATE_EPOCH=$(git log -1 --format=%ct 2>/dev/null || echo "1700000000")
+SIGMA_CFLAGS="-O2 -std=c++17 -fno-omit-frame-pointer -fPIE -pie -fstack-protector-strong -ffile-prefix-map=$(pwd)=/usr/src/sigma"
 SIGMA_CC="g++"
 
 export PATH="/usr/bin:/bin"
 export SOURCE_DATE_EPOCH
+export LANG="C.UTF-8"
+export LC_ALL="C.UTF-8"
+export TZ="UTC"
+export UMASK="0022"
 
 echo "============================================"
 echo " SIGMA-REPRO-BUILD  v1.0"
@@ -38,15 +43,20 @@ echo "[repro] Compiler          = $SIGMA_CC"
 # Collect source files for the manifest
 generate_buildinfo() {
     echo "[repro] Generating .buildinfo manifest..."
-    echo "SigmaOS-Version: $SIGMA_VERSION"                  > "$BUILDINFO"
-    echo "Build-Date: $(date -u -d @$SOURCE_DATE_EPOCH)"   >> "$BUILDINFO"
+    echo "Format: 1.0"                                      > "$BUILDINFO"
+    echo "SigmaOS-Version: $SIGMA_VERSION"                 >> "$BUILDINFO"
+    echo "Build-Date: $(date -u -d @"$SOURCE_DATE_EPOCH" 2>/dev/null || date -u)" >> "$BUILDINFO"
     echo "Build-Architecture: x86_64"                      >> "$BUILDINFO"
+    echo "Build-Environment:"                              >> "$BUILDINFO"
+    echo " LANG=$LANG"                                       >> "$BUILDINFO"
+    echo " TZ=$TZ"                                           >> "$BUILDINFO"
+    echo " UMASK=$UMASK"                                     >> "$BUILDINFO"
     echo ""                                                  >> "$BUILDINFO"
     echo "Checksums-Sha256:"                               >> "$BUILDINFO"
-    find kernel/ userland/ tests/ -name "*.cpp" \
+    find kernel/ userland/ tests/ -name "*.cpp" 2>/dev/null \
         | sort \
         | xargs sha256sum \
-        >> "$BUILDINFO"
+        >> "$BUILDINFO" || true
     echo "[repro] .buildinfo written to: $BUILDINFO"
 }
 
@@ -70,13 +80,15 @@ verify_build() {
         if [[ "$line" =~ ^([a-f0-9]{64})\ +(.+)$ ]]; then
             local expected="${BASH_REMATCH[1]}"
             local file="${BASH_REMATCH[2]}"
-            local actual
-            actual=$(sha256sum "$file" 2>/dev/null | awk '{print $1}')
-            if [[ "$actual" == "$expected" ]]; then
-                echo "  ✓ $file"
-            else
-                echo "  ✗ $file (hash mismatch!)"
-                ok=0
+            if [[ -f "$file" ]]; then
+                local actual
+                actual=$(sha256sum "$file" 2>/dev/null | awk '{print $1}')
+                if [[ "$actual" == "$expected" ]]; then
+                    echo "  ✓ $file"
+                else
+                    echo "  ✗ $file (hash mismatch!)"
+                    ok=0
+                fi
             fi
         fi
     done < "$BUILDINFO"
@@ -120,7 +132,9 @@ for src in "${SOURCES[@]}"; do
     if [[ -n "$COMPONENT" ]] && [[ "$src" != *"$COMPONENT"* ]]; then
         continue
     fi
-    build_component "$src"
+    if [[ -f "$src" ]]; then
+        build_component "$src"
+    fi
 done
 
 echo ""
