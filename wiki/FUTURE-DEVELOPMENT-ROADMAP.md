@@ -3241,3 +3241,29 @@ SigmaOS guarantees native bare-metal execution across 30+ years of hardware evol
    - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
    - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
    - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
+
+## SECTION 54: SOVEREIGN REPRODUCIBLE PACKAGE REBUILDING & REPRODUCIBLE BUILDS ENGINE SPECIFICATION
+
+### 54.1 Reproducible Package Building Architecture & Distro Parity Features
+1. **Deterministic Content-Addressable Derivation Engine**:
+   - Inspired by NixOS functional package management (`nix-store`) and Debian Reproducible Builds.
+   - Grounded in `src/compatibility/nixos_reproducible.rs` (`NixLikeStore`, `PackageDerivation`, `PackageInput`).
+   - Generates deterministic FNV-1a content hashes for every package derivation based on inputs, build scripts, and compiler flags, storing outputs in immutable `/sigma/store/<hash>-<name>-<ver>` paths.
+2. **Hermetic Isolated Build Sandbox**:
+   - Enforces strict environment sanitization (`SOURCE_DATE_EPOCH=1`, `LANG=C`, `LC_ALL=C`, `TZ=UTC`).
+   - Strips non-deterministic environment variables (`HOME`, `USER`, `PWD`), mounts input dependencies read-only, enforces private network namespaces, and passes compiler reproducibility flags (`-fdebug-prefix-map=/build=/usr/src`).
+3. **Binary Output Verification & SLSA Attestation**:
+   - Computes recursive output hashes of compiled binary trees and compares results against published reproducibility manifests.
+   - Generates cryptographic SLSA Level 4 provenance attestations signed with Dilithium-5 keys.
+4. **Generation-Based Profile Symlinks & Garbage Collection**:
+   - Manages atomic system generation profiles (`/sigma/profiles/system-1`, `/sigma/profiles/system-2`) via atomic symlink updates.
+   - Automatically identifies and garbage-collects unreferenced store paths during system maintenance sweeps.
+
+### 54.2 Bare-Metal Zero-Dependency OOP Systems Architecture Rules
+1. **Modern Low-Level Language Restriction**: Written strictly in Rust, Zig, or Nim under `#![no_std]` bare-metal configurations.
+2. **Absolute Zero-Dependency Constraint**: Zero external standard library dependencies (`std::` or third-party crates/libraries). All allocation utilities, custom data structures (`SigmaVec`, `SigmaString`, `BTreeMap`), and string parsers are implemented from scratch.
+3. **Bare-Metal Object-Oriented Principles (OOP)**:
+   - **Encapsulation**: Isolating hardware MMIO registers and state inside modular objects.
+   - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
+   - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
+   - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
