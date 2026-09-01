@@ -90,11 +90,10 @@ impl SysctlRegistry {
             // Ensure type matches
             match (&node.value, &new_value) {
                 (SysctlValue::Int(_), SysctlValue::Int(v)) => {
-                    let v_val = *v;
-                    if v_val < 0 && mib == "vm.swappiness" {
+                    if *v < 0 && mib == "vm.swappiness" {
                         return Err("Swappiness cannot be negative!");
                     }
-                    node.value = SysctlValue::Int(v_val);
+                    node.value = new_value;
                 }
                 (SysctlValue::String(_), SysctlValue::String(_)) => {
                     node.value = new_value;
