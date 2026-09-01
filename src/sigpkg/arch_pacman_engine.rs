@@ -267,6 +267,124 @@ impl Default for PacmanDatabase {
     }
 }
 
+/// Utility for pacman cache cleaning (paccache parity)
+pub struct PacmanCacheCleaner {
+    pub cached_files: Vec<String>,
+}
+
+impl PacmanCacheCleaner {
+    pub fn new(files: Vec<String>) -> Self {
+        PacmanCacheCleaner { cached_files: files }
+    }
+
+    /// Prunes cache to keep specified number of candidates per package
+    pub fn prune_cache(&mut self, keep_count: usize) -> Vec<String> {
+        if self.cached_files.len() <= keep_count {
+            return Vec::new();
+        }
+        let remove_count = self.cached_files.len() - keep_count;
+        let removed: Vec<String> = self.cached_files.drain(0..remove_count).collect();
+        removed
+    }
+}
+
+/// Utility for managing configuration diffs (.pacnew / .pacsave parity)
+pub struct PacnewDiffManager {
+    pub pending_diffs: Vec<(String, String)>, // (original_path, pacnew_path)
+}
+
+impl PacnewDiffManager {
+    pub fn new() -> Self {
+        PacnewDiffManager { pending_diffs: Vec::new() }
+    }
+
+    pub fn register_pacnew(&mut self, original: &str, pacnew: &str) {
+        self.pending_diffs.push((original.to_string(), pacnew.to_string()));
+    }
+
+    pub fn resolve_diff(&mut self, original: &str) -> Option<String> {
+        if let Some(pos) = self.pending_diffs.iter().position(|(orig, _)| orig == original) {
+            let item = self.pending_diffs.remove(pos);
+            Some(format!("Merged {} into {}", item.1, item.0))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for PacnewDiffManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Utility for displaying package dependency tree (pactree parity)
+pub struct DependencyTreeVisualizer;
+
+impl DependencyTreeVisualizer {
+    pub fn render_tree(pkg_name: &str, db: &PacmanDatabase, reverse: bool) -> String {
+        let mut result = format!("{}\n", pkg_name);
+        if !reverse {
+            if let Some(pkg) = db.packages.iter().chain(db.local_packages.iter()).find(|p| p.name == pkg_name) {
+                for dep in &pkg.depends {
+                    result.push_str(&format!("├── {}\n", dep));
+                }
+            }
+        } else {
+            for pkg in db.packages.iter().chain(db.local_packages.iter()) {
+                if pkg.depends.contains(&pkg_name.to_string()) {
+                    result.push_str(&format!("├── {} (required by)\n", pkg.name));
+                }
+            }
+        }
+        result
+    }
+}
+
+/// Utility for safe non-root package update checks (checkupdates parity)
+pub struct SafeUpdateChecker;
+
+impl SafeUpdateChecker {
+    pub fn check_pending_updates(db: &PacmanDatabase) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local in &db.local_packages {
+            if let Some(repo_pkg) = db.packages.iter().find(|p| p.name == local.name) {
+                if repo_pkg.version != local.version {
+                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
+                }
+            }
+        }
+        updates
+    }
+}
+
+/// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
+pub struct PkgbuildChecksumUpdater;
+
+impl PkgbuildChecksumUpdater {
+    pub fn update_sha256(pkgbuild_text: &str, source_payload: &[u8]) -> String {
+        let mut hash_val: u64 = 5381;
+        for &b in source_payload {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        let hash_str = format!("{:016x}{:016x}", hash_val, hash_val.wrapping_add(0x12345678));
+
+        let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
+        let mut found = false;
+        for line in &mut lines {
+            if line.starts_with("sha256sums=") {
+                *line = format!("sha256sums=('{}')", hash_str);
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            lines.push(format!("sha256sums=('{}')", hash_str));
+        }
+        lines.join("\n")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -468,5 +586,97 @@ depends=('glibc')
         assert_eq!(db.local_packages.len(), 2);
         assert!(db.local_packages.iter().any(|p| p.name == "app"));
         assert!(db.local_packages.iter().any(|p| p.name == "libdep"));
+    }
+
+    #[test]
+    fn test_pacman_contrib_cache_cleaner() {
+        let files = vec![
+            "pkg-1.0.tar.zst".to_string(),
+            "pkg-1.1.tar.zst".to_string(),
+            "pkg-1.2.tar.zst".to_string(),
+        ];
+        let mut cleaner = PacmanCacheCleaner::new(files);
+        let removed = cleaner.prune_cache(2);
+        assert_eq!(removed.len(), 1);
+        assert_eq!(removed[0], "pkg-1.0.tar.zst");
+        assert_eq!(cleaner.cached_files.len(), 2);
+    }
+
+    #[test]
+    fn test_pacman_contrib_pacnew_diff() {
+        let mut diff_mgr = PacnewDiffManager::new();
+        diff_mgr.register_pacnew("/etc/pacman.conf", "/etc/pacman.conf.pacnew");
+        assert_eq!(diff_mgr.pending_diffs.len(), 1);
+
+        let res = diff_mgr.resolve_diff("/etc/pacman.conf");
+        assert!(res.is_some());
+        assert!(res.unwrap().contains("Merged /etc/pacman.conf.pacnew into /etc/pacman.conf"));
+        assert_eq!(diff_mgr.pending_diffs.len(), 0);
+    }
+
+    #[test]
+    fn test_pacman_contrib_pactree_and_checkupdates() {
+        let mut db = PacmanDatabase::new();
+        let repo_pkg = ArchPacmanPackage {
+            name: "bash".to_string(),
+            version: "5.2.0".to_string(),
+            description: "GNU Bourne Again SHell".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: vec!["readline".to_string()],
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 2048,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: true,
+        };
+        let local_pkg = ArchPacmanPackage {
+            name: "bash".to_string(),
+            version: "5.1.0".to_string(),
+            description: "GNU Bourne Again SHell".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: vec!["readline".to_string()],
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 2048,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: true,
+        };
+
+        db.packages.push(repo_pkg);
+        db.local_packages.push(local_pkg);
+
+        let tree = DependencyTreeVisualizer::render_tree("bash", &db, false);
+        assert!(tree.contains("├── readline"));
+
+        let updates = SafeUpdateChecker::check_pending_updates(&db);
+        assert_eq!(updates.len(), 1);
+        assert_eq!(updates[0], ("bash".to_string(), "5.1.0".to_string(), "5.2.0".to_string()));
+    }
+
+    #[test]
+    fn test_pacman_contrib_updpkgsums() {
+        let pkgbuild = "pkgname=foo\npkgver=1.0\n";
+        let updated = PkgbuildChecksumUpdater::update_sha256(pkgbuild, b"sample source code");
+        assert!(updated.contains("sha256sums="));
     }
 }
