@@ -1,0 +1,31 @@
+name: NixOS & Guix Reproducible Build & Security Verification CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  nixos-guix-reproducible-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Nix Declarative Merkle DAG Store Engine
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/nix_dsl.rs -o /tmp/test_nix && /tmp/test_nix
+
+      - name: Verify Reproducible Build Farm Engine
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_obsoletion.rs -o /tmp/test_obsoletion && /tmp/test_obsoletion test_sovereign_reproducible_build_farm
+
+      - name: Verify Guix Derivation Engine
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o /tmp/test_guix && /tmp/test_guix
