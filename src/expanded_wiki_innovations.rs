@@ -1,6 +1,10 @@
 extern crate alloc;
 /// Expanded Wiki & Distro Unimplemented Innovations Engine
 /// Implements planned wiki concepts inspired by Linux & BSD distributions:
+/// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
+/// - Debian dpkg triggers & post-transaction processing engine
+/// - FreeBSD pkg audit vulnerability scanner & orphan package autoremove engine
+/// - Fedora system-wide crypto policies engine (DEFAULT, LEGACY, FUTURE, FIPS)
 /// - Fedora Toolbox OCI dev container engine
 /// - NixOS Home-Manager declarative user environments
 /// - Mise / Asdf universal multi-runtime version manager
@@ -10,12 +14,201 @@ extern crate alloc;
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
 
-
 use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
+
+/// Arch Linux pacman-contrib Utilities Engine
+pub struct ArchPacmanContribEngine {
+    pub cached_pkg_versions: Vec<(String, String)>, // (pkg_name, version)
+    pub installed_pkgs: Vec<String>,
+}
+
+impl ArchPacmanContribEngine {
+    pub fn new() -> Self {
+        Self {
+            cached_pkg_versions: Vec::new(),
+            installed_pkgs: Vec::new(),
+        }
+    }
+
+    /// Emulates `paccache -r`: Cleans old cached package tarballs keeping N recent versions
+    pub fn paccache_clean(&mut self, keep_count: usize) -> usize {
+        if self.cached_pkg_versions.len() <= keep_count {
+            return 0;
+        }
+        let removed = self.cached_pkg_versions.len() - keep_count;
+        self.cached_pkg_versions.truncate(keep_count);
+        removed
+    }
+
+    /// Emulates `checkupdates`: Safely checks for available repository updates without syncing DB
+    pub fn checkupdates(&self, remote_versions: &[(String, String)]) -> Vec<(String, String, String)> {
+        let mut pending = Vec::new();
+        for (pkg, remote_ver) in remote_versions {
+            if let Some((_, local_ver)) = self.cached_pkg_versions.iter().find(|(p, _)| p == pkg) {
+                if local_ver != remote_ver {
+                    pending.push((pkg.clone(), local_ver.clone(), remote_ver.clone()));
+                }
+            }
+        }
+        pending
+    }
+
+    /// Emulates `rankmirrors`: Ranks Pacman repository mirrors by latency/ping time
+    pub fn rankmirrors(mirrors_with_ping: &[(String, u32)]) -> Vec<String> {
+        let mut sorted = mirrors_with_ping.to_vec();
+        sorted.sort_by_key(|(_, ping)| *ping);
+        sorted.into_iter().map(|(url, _)| url).collect()
+    }
+
+    /// Emulates `updpkgsums`: Auto-generates and updates PKGBUILD sha256 checksums
+    pub fn updpkgsums(pkgbuild_content: &str, mock_sha256: &str) -> String {
+        if pkgbuild_content.contains("sha256sums=") {
+            pkgbuild_content.replace("sha256sums=('SKIP')", &format!("sha256sums=('{}')", mock_sha256))
+        } else {
+            format!("{}\nsha256sums=('{}')", pkgbuild_content.trim(), mock_sha256)
+        }
+    }
+
+    /// Emulates `finddeps`: Finds all installed packages that depend on a target library
+    pub fn finddeps(&self, target_dep: &str, pkg_deps_map: &[(String, Vec<String>)]) -> Vec<String> {
+        let mut dependents = Vec::new();
+        for (pkg, deps) in pkg_deps_map {
+            if deps.iter().any(|d| d == target_dep) {
+                dependents.push(pkg.clone());
+            }
+        }
+        dependents
+    }
+}
+
+impl Default for ArchPacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Debian dpkg Triggers & Deferred Processing Engine
+pub struct DebianDpkgTriggersEngine {
+    pub pending_triggers: Vec<(String, String)>, // (trigger_name, path)
+    pub executed_triggers: Vec<String>,
+}
+
+impl DebianDpkgTriggersEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_triggers: Vec::new(),
+            executed_triggers: Vec::new(),
+        }
+    }
+
+    /// Registers interest in a trigger (e.g. `update-desktop-database`, `update-mime-database`)
+    pub fn register_interest(&mut self, trigger_name: &str, path: &str) {
+        self.pending_triggers.push((trigger_name.to_string(), path.to_string()));
+    }
+
+    /// Processes all deferred post-transaction triggers
+    pub fn process_triggers(&mut self) -> usize {
+        let count = self.pending_triggers.len();
+        for (trigger, path) in self.pending_triggers.drain(..) {
+            self.executed_triggers.push(format!("Executed {}: {}", trigger, path));
+        }
+        count
+    }
+}
+
+impl Default for DebianDpkgTriggersEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// FreeBSD `pkg audit` & `pkg autoremove` Engine
+pub struct FreeBsdPkgAuditEngine {
+    pub vulnerability_cve_db: Vec<(String, String, String)>, // (pkg, cve_id, severity)
+}
+
+impl FreeBsdPkgAuditEngine {
+    pub fn new() -> Self {
+        Self {
+            vulnerability_cve_db: Vec::new(),
+        }
+    }
+
+    pub fn add_vulnerability(&mut self, pkg: &str, cve_id: &str, severity: &str) {
+        self.vulnerability_cve_db.push((pkg.to_string(), cve_id.to_string(), severity.to_string()));
+    }
+
+    /// Scans installed packages against known FreeBSD VuXML CVE database (`pkg audit`)
+    pub fn audit_vulnerabilities(&self, installed_pkgs: &[String]) -> Vec<(String, String, String)> {
+        let mut found = Vec::new();
+        for (pkg, cve, sev) in &self.vulnerability_cve_db {
+            if installed_pkgs.iter().any(|p| p.starts_with(pkg)) {
+                found.push((pkg.clone(), cve.clone(), sev.clone()));
+            }
+        }
+        found
+    }
+
+    /// Identifies orphan leaf dependencies no longer required by any installed package (`pkg autoremove`)
+    pub fn autoremove_orphans(&self, installed_pkgs: &[String], required_deps: &[String]) -> Vec<String> {
+        let mut orphans = Vec::new();
+        for pkg in installed_pkgs {
+            if !required_deps.contains(pkg) {
+                orphans.push(pkg.clone());
+            }
+        }
+        orphans
+    }
+}
+
+impl Default for FreeBsdPkgAuditEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora System-Wide Crypto Policies Enforcement Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CryptoPolicyLevel {
+    Default, // TLS 1.2+, RSA >= 2048, AES-GCM
+    Legacy,  // TLS 1.0+, RSA >= 1024 (legacy interop)
+    Future,  // TLS 1.3+, RSA >= 3072, Post-Quantum Dilithium
+    Fips,    // FIPS 140-3 validated algorithms only
+}
+
+pub struct FedoraCryptoPoliciesEngine {
+    pub current_policy: CryptoPolicyLevel,
+}
+
+impl FedoraCryptoPoliciesEngine {
+    pub fn new(policy: CryptoPolicyLevel) -> Self {
+        Self { current_policy: policy }
+    }
+
+    pub fn set_policy(&mut self, policy: CryptoPolicyLevel) {
+        self.current_policy = policy;
+    }
+
+    pub fn is_tls_version_allowed(&self, min_tls: &str) -> bool {
+        match self.current_policy {
+            CryptoPolicyLevel::Future | CryptoPolicyLevel::Fips => min_tls == "1.3",
+            CryptoPolicyLevel::Default => min_tls == "1.2" || min_tls == "1.3",
+            CryptoPolicyLevel::Legacy => true,
+        }
+    }
+
+    pub fn min_rsa_bits(&self) -> u32 {
+        match self.current_policy {
+            CryptoPolicyLevel::Future => 3072,
+            CryptoPolicyLevel::Default | CryptoPolicyLevel::Fips => 2048,
+            CryptoPolicyLevel::Legacy => 1024,
+        }
+    }
+}
 
 /// Fedora Toolbox OCI Container Engine
 pub struct FedoraToolboxContainerEngine {
@@ -86,6 +279,12 @@ impl MiseUniversalVersionManager {
 
     pub fn get_version(&self, runtime: &str) -> Option<String> {
         self.runtimes.iter().find(|(r, _)| r == runtime).map(|(_, v)| v.clone())
+    }
+}
+
+impl Default for MiseUniversalVersionManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -350,11 +549,11 @@ impl DistroWikiPageDocumentationGenerator {
         let mut wiki = String::new();
         wiki.push_str("# Linux Distributions Architecture & Parity Guide\n\n");
         wiki.push_str("SigmaOS integrates architectural concepts from premier Linux distributions:\n");
-        wiki.push_str("- **Arch Linux**: Rolling package release resolution and PKGBUILD recipes.\n");
+        wiki.push_str("- **Arch Linux**: Rolling package release resolution, PKGBUILD recipes, and pacman-contrib.\n");
+        wiki.push_str("- **Debian**: dpkg triggers and post-transaction package Hooks.\n");
+        wiki.push_str("- **Fedora**: Crypto Policies and Silverblue rpm-ostree atomic trees.\n");
+        wiki.push_str("- **FreeBSD**: pkg audit CVE scanner and physical page queues.\n");
         wiki.push_str("- **NixOS**: Declarative system generations and atomic rollback.\n");
-        wiki.push_str("- **Clear Linux**: Stateless `/usr` configuration defaults with `/etc` overrides.\n");
-        wiki.push_str("- **Gentoo**: Portage USE-flags dependency compilation.\n");
-        wiki.push_str("- **Alpine / Void**: Lightweight trigger hooks and init supervision.\n");
         wiki
     }
 
@@ -363,7 +562,7 @@ impl DistroWikiPageDocumentationGenerator {
         wiki.push_str("# BSD Security Hardening & Isolation Guide\n\n");
         wiki.push_str("SigmaOS incorporates security paradigms from BSD systems:\n");
         wiki.push_str("- **OpenBSD**: Pledge syscall restrictions, unveil file path masking, W^X, and Retguard canaries.\n");
-        wiki.push_str("- **FreeBSD**: RACCT/RCTL resource controls and Capsicum capability delegation.\n");
+        wiki.push_str("- **FreeBSD**: RACCT/RCTL resource controls, Capsicum capability delegation, and pkg audit.\n");
         wiki.push_str("- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n");
         wiki
     }
@@ -372,6 +571,66 @@ impl DistroWikiPageDocumentationGenerator {
 #[cfg(test)]
 mod expanded_wiki_tests {
     use super::*;
+
+    #[test]
+    fn test_arch_pacman_contrib_engine() {
+        let mut contrib = ArchPacmanContribEngine::new();
+        contrib.cached_pkg_versions.push(("curl".to_string(), "7.85.0".to_string()));
+        contrib.cached_pkg_versions.push(("curl".to_string(), "7.86.0".to_string()));
+        contrib.cached_pkg_versions.push(("curl".to_string(), "8.2.1".to_string()));
+
+        let removed = contrib.paccache_clean(1);
+        assert_eq!(removed, 2);
+        assert_eq!(contrib.cached_pkg_versions.len(), 1);
+
+        let ranked = ArchPacmanContribEngine::rankmirrors(&[
+            ("https://slow.mirror".to_string(), 150),
+            ("https://fast.mirror".to_string(), 12),
+        ]);
+        assert_eq!(ranked[0], "https://fast.mirror");
+
+        let updated = ArchPacmanContribEngine::updpkgsums("pkgname=test\nsha256sums=('SKIP')", "abc123hash");
+        assert!(updated.contains("sha256sums=('abc123hash')"));
+    }
+
+    #[test]
+    fn test_debian_dpkg_triggers_engine() {
+        let mut triggers = DebianDpkgTriggersEngine::new();
+        triggers.register_interest("update-desktop-database", "usr/share/applications");
+        triggers.register_interest("update-mime-database", "usr/share/mime");
+
+        let processed = triggers.process_triggers();
+        assert_eq!(processed, 2);
+        assert_eq!(triggers.executed_triggers.len(), 2);
+        assert!(triggers.executed_triggers[0].contains("update-desktop-database"));
+    }
+
+    #[test]
+    fn test_freebsd_pkg_audit_engine() {
+        let mut audit = FreeBsdPkgAuditEngine::new();
+        audit.add_vulnerability("openssl", "CVE-2024-0001", "High");
+
+        let installed = vec!["openssl-3.0.13".to_string(), "curl-8.2.1".to_string()];
+        let found = audit.audit_vulnerabilities(&installed);
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].1, "CVE-2024-0001");
+
+        let orphans = audit.autoremove_orphans(&["orphan-lib".to_string(), "core-pkg".to_string()], &["core-pkg".to_string()]);
+        assert_eq!(orphans.len(), 1);
+        assert_eq!(orphans[0], "orphan-lib");
+    }
+
+    #[test]
+    fn test_fedora_crypto_policies_engine() {
+        let mut crypto = FedoraCryptoPoliciesEngine::new(CryptoPolicyLevel::Default);
+        assert!(crypto.is_tls_version_allowed("1.2"));
+        assert_eq!(crypto.min_rsa_bits(), 2048);
+
+        crypto.set_policy(CryptoPolicyLevel::Future);
+        assert!(!crypto.is_tls_version_allowed("1.2"));
+        assert!(crypto.is_tls_version_allowed("1.3"));
+        assert_eq!(crypto.min_rsa_bits(), 3072);
+    }
 
     #[test]
     fn test_fedora_toolbox_container() {

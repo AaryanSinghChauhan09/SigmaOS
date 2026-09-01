@@ -114,7 +114,7 @@ pub trait IPackage: Send + Sync {
 }
 
 /// Package format enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
     // Debian-based
     Deb,

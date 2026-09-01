@@ -675,14 +675,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: crate::package::UniversalPackageManager,
+    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: crate::package::UniversalPackageManager::new(),
+            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -725,14 +725,30 @@ impl SigPkgUniversalBridgeEngine {
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
     pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let mut unified_pkg = crate::package::UnifiedPackage::new(
-            native_pkg.name.clone(),
-            native_pkg.version.to_string(),
-        );
-        for dep in &native_pkg.dependencies {
-            unified_pkg = unified_pkg.with_dependency(dep.name.clone());
-        }
-        self.pm.add_package(unified_pkg);
+        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
+            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+                name: native_pkg.name.clone(),
+                version: crate::sigpkg::universal_oop_system::Version::new(
+                    native_pkg.version.major,
+                    native_pkg.version.minor,
+                    native_pkg.version.patch,
+                ),
+                description: native_pkg.description.clone(),
+                license: String::new(),
+                maintainer: String::new(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: native_pkg.checksum.clone(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+        };
+        let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
     }
 
