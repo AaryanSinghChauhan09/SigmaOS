@@ -297,6 +297,296 @@ impl Default for BpfLsmPolicyGovernor {
 }
 
 // ============================================================================
+// 5. Linux pidfd Process File Descriptor Subsystem (PidfdEngine)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PidfdDescriptor {
+    pub pidfd: i32,
+    pub target_pid: u32,
+    pub is_alive: bool,
+    pub exit_code: Option<i32>,
+}
+
+pub struct PidfdEngine {
+    pub descriptors: Vec<PidfdDescriptor>,
+    pub next_fd: i32,
+}
+
+impl PidfdEngine {
+    pub fn new() -> Self {
+        Self {
+            descriptors: Vec::new(),
+            next_fd: 100,
+        }
+    }
+
+    pub fn pidfd_open(&mut self, target_pid: u32) -> Result<i32, &'static str> {
+        if target_pid == 0 {
+            return Err("pidfd: Invalid PID 0");
+        }
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        self.descriptors.push(PidfdDescriptor {
+            pidfd: fd,
+            target_pid,
+            is_alive: true,
+            exit_code: None,
+        });
+        Ok(fd)
+    }
+
+    pub fn pidfd_send_signal(&mut self, pidfd: i32, signal: u32) -> Result<(), &'static str> {
+        let desc = self
+            .descriptors
+            .iter_mut()
+            .find(|d| d.pidfd == pidfd)
+            .ok_or("pidfd: Invalid process descriptor")?;
+
+        if !desc.is_alive {
+            return Err("pidfd: Target process has exited");
+        }
+
+        if signal == 9 || signal == 15 {
+            desc.is_alive = false;
+            desc.exit_code = Some(128 + signal as i32);
+        }
+        Ok(())
+    }
+
+    pub fn pidfd_getfd(&self, pidfd: i32, _target_fd: i32) -> Result<i32, &'static str> {
+        let desc = self
+            .descriptors
+            .iter()
+            .find(|d| d.pidfd == pidfd)
+            .ok_or("pidfd: Process descriptor not found")?;
+
+        if !desc.is_alive {
+            return Err("pidfd: Target process dead");
+        }
+        Ok(200 + _target_fd) // Duplicated FD handle
+    }
+}
+
+impl Default for PidfdEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. Linux epoll Event Multiplexer Engine (LinuxEpollEngine)
+// ============================================================================
+
+pub const EPOLLIN: u32 = 1 << 0;
+pub const EPOLLOUT: u32 = 1 << 2;
+pub const EPOLLET: u32 = 1 << 31;
+
+pub const EPOLL_CTL_ADD: u32 = 1;
+pub const EPOLL_CTL_DEL: u32 = 2;
+pub const EPOLL_CTL_MOD: u32 = 3;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct EpollEvent {
+    pub events: u32,
+    pub data: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct EpollRegistration {
+    pub fd: i32,
+    pub event: EpollEvent,
+    pub triggered: bool,
+}
+
+pub struct LinuxEpollEngine {
+    pub epfd: i32,
+    pub registrations: Vec<EpollRegistration>,
+}
+
+impl LinuxEpollEngine {
+    pub fn new(epfd: i32) -> Self {
+        Self {
+            epfd,
+            registrations: Vec::new(),
+        }
+    }
+
+    pub fn epoll_ctl(&mut self, op: u32, fd: i32, event: EpollEvent) -> Result<(), &'static str> {
+        match op {
+            EPOLL_CTL_ADD => {
+                if self.registrations.iter().any(|r| r.fd == fd) {
+                    return Err("epoll: FD already registered");
+                }
+                self.registrations.push(EpollRegistration {
+                    fd,
+                    event,
+                    triggered: false,
+                });
+                Ok(())
+            }
+            EPOLL_CTL_MOD => {
+                let reg = self
+                    .registrations
+                    .iter_mut()
+                    .find(|r| r.fd == fd)
+                    .ok_or("epoll: FD not found for MOD")?;
+                reg.event = event;
+                Ok(())
+            }
+            EPOLL_CTL_DEL => {
+                let pos = self
+                    .registrations
+                    .iter()
+                    .position(|r| r.fd == fd)
+                    .ok_or("epoll: FD not found for DEL")?;
+                self.registrations.remove(pos);
+                Ok(())
+            }
+            _ => Err("epoll: Invalid ctl op"),
+        }
+    }
+
+    pub fn trigger_event(&mut self, fd: i32, fired_mask: u32) {
+        if let Some(reg) = self.registrations.iter_mut().find(|r| r.fd == fd) {
+            if (reg.event.events & fired_mask) != 0 {
+                reg.triggered = true;
+            }
+        }
+    }
+
+    pub fn epoll_wait(&mut self, maxevents: usize) -> Vec<EpollEvent> {
+        let mut ready = Vec::new();
+        for reg in &mut self.registrations {
+            if reg.triggered && ready.len() < maxevents {
+                ready.push(reg.event);
+                if (reg.event.events & EPOLLET) != 0 {
+                    reg.triggered = false; // Edge-triggered resets after read
+                }
+            }
+        }
+        ready
+    }
+}
+
+// ============================================================================
+// 7. Linux userfaultfd On-Demand Page Fault Subsystem (UserfaultfdEngine)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UffdMode {
+    Missing,
+    WriteProtect,
+    Minor,
+}
+
+#[derive(Debug, Clone)]
+pub struct UffdRangeRegistration {
+    pub start_addr: usize,
+    pub length: usize,
+    pub mode: UffdMode,
+}
+
+pub struct UserfaultfdEngine {
+    pub registrations: Vec<UffdRangeRegistration>,
+    pub pending_fault_addrs: Vec<usize>,
+}
+
+impl UserfaultfdEngine {
+    pub fn new() -> Self {
+        Self {
+            registrations: Vec::new(),
+            pending_fault_addrs: Vec::new(),
+        }
+    }
+
+    pub fn register_range(&mut self, start: usize, length: usize, mode: UffdMode) -> Result<(), &'static str> {
+        if start % 4096 != 0 || length % 4096 != 0 {
+            return Err("userfaultfd: Unaligned page address or length");
+        }
+        self.registrations.push(UffdRangeRegistration {
+            start_addr: start,
+            length,
+            mode,
+        });
+        Ok(())
+    }
+
+    pub fn trigger_page_fault(&mut self, fault_addr: usize) -> bool {
+        let page_base = fault_addr & !(4096 - 1);
+        let is_monitored = self.registrations.iter().any(|r| {
+            page_base >= r.start_addr && page_base < (r.start_addr + r.length)
+        });
+
+        if is_monitored {
+            if !self.pending_fault_addrs.contains(&page_base) {
+                self.pending_fault_addrs.push(page_base);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn copy_page_and_resolve(&mut self, page_base: usize, _data: &[u8]) -> Result<(), &'static str> {
+        if let Some(pos) = self.pending_fault_addrs.iter().position(|&addr| addr == page_base) {
+            self.pending_fault_addrs.remove(pos);
+            Ok(())
+        } else {
+            Err("userfaultfd: Fault address not pending")
+        }
+    }
+}
+
+impl Default for UserfaultfdEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. Linux PSI Pressure Stall Information Monitor (PressureStallInfoEngine)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PressureMetrics {
+    pub some_pct_avg10: f32,
+    pub full_pct_avg10: f32,
+    pub total_stall_time_us: u64,
+}
+
+pub struct PressureStallInfoEngine {
+    pub cpu_pressure: PressureMetrics,
+    pub memory_pressure: PressureMetrics,
+    pub io_pressure: PressureMetrics,
+}
+
+impl PressureStallInfoEngine {
+    pub fn new() -> Self {
+        Self {
+            cpu_pressure: PressureMetrics::default(),
+            memory_pressure: PressureMetrics::default(),
+            io_pressure: PressureMetrics::default(),
+        }
+    }
+
+    pub fn update_memory_stall(&mut self, stall_duration_us: u64, is_full: bool) {
+        self.memory_pressure.total_stall_time_us += stall_duration_us;
+        let pct = (stall_duration_us as f32 / 1000.0).min(100.0);
+        self.memory_pressure.some_pct_avg10 = pct;
+        if is_full {
+            self.memory_pressure.full_pct_avg10 = pct;
+        }
+    }
+}
+
+impl Default for PressureStallInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // 4. Page Folio Compound Memory Cache Manager (PageFolioCacheManager)
 // ============================================================================
 
@@ -425,5 +715,36 @@ mod tests {
 
         assert!(manager.free_folio(0x100).is_ok());
         assert_eq!(manager.total_managed_pages, 0);
+    }
+
+    #[test]
+    fn test_linux_parity_pidfd_epoll_uffd_psi() {
+        // 1. pidfd tests
+        let mut pidfd_eng = PidfdEngine::new();
+        let pfd = pidfd_eng.pidfd_open(1234).unwrap();
+        assert_eq!(pidfd_eng.pidfd_getfd(pfd, 3).unwrap(), 203);
+        assert!(pidfd_eng.pidfd_send_signal(pfd, 15).is_ok());
+        assert!(pidfd_eng.pidfd_send_signal(pfd, 15).is_err()); // Already dead
+
+        // 2. epoll tests
+        let mut epoll_eng = LinuxEpollEngine::new(5);
+        let event = EpollEvent { events: EPOLLIN | EPOLLET, data: 42 };
+        assert!(epoll_eng.epoll_ctl(EPOLL_CTL_ADD, 10, event).is_ok());
+
+        epoll_eng.trigger_event(10, EPOLLIN);
+        let ready = epoll_eng.epoll_wait(10);
+        assert_eq!(ready.len(), 1);
+        assert_eq!(ready[0].data, 42);
+
+        // 3. userfaultfd tests
+        let mut uffd = UserfaultfdEngine::new();
+        assert!(uffd.register_range(0x7fff_0000, 4096, UffdMode::Missing).is_ok());
+        assert!(uffd.trigger_page_fault(0x7fff_0100));
+        assert!(uffd.copy_page_and_resolve(0x7fff_0000, &[0u8; 4096]).is_ok());
+
+        // 4. PSI metrics tests
+        let mut psi = PressureStallInfoEngine::new();
+        psi.update_memory_stall(50, true);
+        assert_eq!(psi.memory_pressure.some_pct_avg10, 0.05);
     }
 }
