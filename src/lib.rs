@@ -48,6 +48,12 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 
+pub use package::bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+};
 pub use unimplemented_features::{
     AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
     PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,

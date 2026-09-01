@@ -19,15 +19,13 @@
 // SigmaOS Package Module
 pub mod apm;
 pub mod aur_integration;
+pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
 pub mod debian_translator;
 pub mod dependency_resolver;
 pub mod gentoo_opt;
 pub mod linux_translation;
-pub mod repository;
-pub mod store;
-pub mod universal;
 pub mod manager;
 pub mod repository;
 pub mod resolver;
@@ -39,6 +37,12 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+};
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
 };
