@@ -3,8 +3,8 @@
 //! Inspired by Linux & BSD distribution standards (XDG Base Directory, OpenBSD secure_getenv, FreeBSD defaults)
 
 use alloc::boxed::Box;
-use alloc::string::FromUtf8Error as Utf8Error;
 use alloc::string::String;
+use alloc::string::FromUtf8Error as Utf8Error;
 use core::arch::asm;
 use core::ffi::c_char;
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -193,7 +193,8 @@ impl SigmaEnv {
     pub fn remove(key: &str) -> Result<(), EnvError> {
         let key_cstr = Self::str_to_cstr(key)?;
 
-        let result = unsafe { syscall(SYSCALL_UNSETENV, key_cstr.as_ptr(), core::ptr::null()) };
+        let result =
+            unsafe { syscall(SYSCALL_UNSETENV, key_cstr.as_ptr(), core::ptr::null()) };
 
         if result == 0 {
             Ok(())
@@ -517,19 +518,13 @@ mod tests {
             SigmaEnv::default_for_key("XDG_CACHE_HOME"),
             "/userland/home/sovereign/.cache"
         );
-        assert_eq!(
-            SigmaEnv::default_for_key("XDG_RUNTIME_DIR"),
-            "/run/user/1000"
-        );
+        assert_eq!(SigmaEnv::default_for_key("XDG_RUNTIME_DIR"), "/run/user/1000");
 
         // Device and driver environment variable getters test
         assert_eq!(SigmaEnv::devpath(), "/sys/devices/pci0000:00/0000:00:1f.2");
         assert_eq!(SigmaEnv::driver(), "pci_core");
         assert_eq!(SigmaEnv::subsystem(), "pci");
-        assert_eq!(
-            SigmaEnv::modalias(),
-            "pci:v00008086d0000100Esv00000000sd00000000bc02sc00pn00"
-        );
+        assert_eq!(SigmaEnv::modalias(), "pci:v00008086d0000100Esv00000000sd00000000bc02sc00pn00");
         assert_eq!(SigmaEnv::drm_card(), "/dev/dri/card0");
         assert_eq!(SigmaEnv::audio_device(), "/dev/snd/pcmC0D0p");
     }
@@ -553,11 +548,12 @@ mod tests {
     fn test_expand_vars() {
         let mut out = [0u8; 128];
 
-        let len =
-            SigmaEnv::expand_vars("Blocksize is $BLOCKSIZE and editor is ${EDITOR}", &mut out)
-                .unwrap();
+        let len = SigmaEnv::expand_vars("Blocksize is $BLOCKSIZE and editor is ${EDITOR}", &mut out).unwrap();
         let expanded = String::from_utf8(out[..len].to_vec()).unwrap();
 
-        assert_eq!(expanded, "Blocksize is 1024 and editor is vi");
+        assert_eq!(
+            expanded,
+            "Blocksize is 1024 and editor is vi"
+        );
     }
 }

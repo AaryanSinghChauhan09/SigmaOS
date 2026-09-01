@@ -1,13 +1,13 @@
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Gentoo Linux USE Flags Engine
 // Implements USE flag system for conditional compilation and feature selection
 
-use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::collections::HashMap;
 
 /// USE flag definition
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -125,9 +125,7 @@ impl UseFlagManager {
         if let Some(profile_name) = &self.current_profile {
             if let Some(profile) = self.profiles.iter().find(|p| &p.name == profile_name) {
                 for profile_flag in &profile.flags {
-                    if let Some(global_flag) =
-                        effective.iter_mut().find(|f| f.name == profile_flag.name)
-                    {
+                    if let Some(global_flag) = effective.iter_mut().find(|f| f.name == profile_flag.name) {
                         global_flag.enabled = profile_flag.enabled;
                     } else {
                         effective.push(profile_flag.clone());

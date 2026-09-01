@@ -1,7 +1,7 @@
 extern crate alloc;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 // Fedora-inspired SELinux (Security-Enhanced Linux) Mandatory Access Control Subsystem.
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,
@@ -119,8 +119,7 @@ impl AppArmorProfile {
     }
 
     pub fn add_transition(&mut self, path: &str, target_profile: &str) {
-        self.transitions
-            .insert(path.to_string(), target_profile.to_string());
+        self.transitions.insert(path.to_string(), target_profile.to_string());
     }
 
     pub fn is_allowed(&self, path: &str) -> bool {
@@ -355,15 +354,8 @@ impl SelinuxEngine {
             let mut decision = self.policies.contains(&avc_key);
 
             // Conditional boolean evaluation
-            if !decision
-                && src_context.type_name == "httpd_t"
-                && class == "tcp_socket"
-                && permission == "name_connect"
-            {
-                if self
-                    .get_boolean("httpd_can_network_connect")
-                    .unwrap_or(false)
-                {
+            if !decision && src_context.type_name == "httpd_t" && class == "tcp_socket" && permission == "name_connect" {
+                if self.get_boolean("httpd_can_network_connect").unwrap_or(false) {
                     decision = true;
                 }
             }
@@ -500,16 +492,12 @@ mod tests {
 
         // Default httpd_can_network_connect is false
         assert_eq!(engine.get_boolean("httpd_can_network_connect"), Some(false));
-        assert!(!engine
-            .has_permission(src, tgt, "tcp_socket", "name_connect")
-            .unwrap());
+        assert!(!engine.has_permission(src, tgt, "tcp_socket", "name_connect").unwrap());
 
         // Toggle boolean to true
         engine.set_boolean("httpd_can_network_connect", true);
         assert_eq!(engine.get_boolean("httpd_can_network_connect"), Some(true));
-        assert!(engine
-            .has_permission(src, tgt, "tcp_socket", "name_connect")
-            .unwrap());
+        assert!(engine.has_permission(src, tgt, "tcp_socket", "name_connect").unwrap());
     }
 
     #[test]

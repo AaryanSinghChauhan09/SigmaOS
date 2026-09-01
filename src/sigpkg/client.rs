@@ -8,8 +8,8 @@
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 
 use crate::sigpkg::{
     ContentAddressedStore, CryptoVerifier, Dependency, Package, Version, VersionConstraint,
@@ -63,7 +63,10 @@ impl SignedMetadata {
 }
 
 /// Verifies a signed role metadata blob (root/timestamp/snapshot/targets).
-pub fn verify_signed_metadata(verifier: &CryptoVerifier, meta: &SignedMetadata) -> bool {
+pub fn verify_signed_metadata(
+    verifier: &CryptoVerifier,
+    meta: &SignedMetadata,
+) -> bool {
     if meta.signature.is_empty() {
         return false;
     }
@@ -88,7 +91,12 @@ pub struct Manifest {
 }
 
 impl Manifest {
-    pub fn new(name: &str, version: Version, description: &str, checksum: &str) -> Self {
+    pub fn new(
+        name: &str,
+        version: Version,
+        description: &str,
+        checksum: &str,
+    ) -> Self {
         Self {
             name: name.to_string(),
             version,
@@ -166,34 +174,17 @@ pub fn parse_manifest(text: &str) -> Result<Manifest, String> {
 
         match key {
             "name" => name = Some(value.to_string()),
-            "version" => {
-                version = Some(Version::parse(value).map_err(|_| "bad version".to_string())?)
-            }
+            "version" => version = Some(Version::parse(value).map_err(|_| "bad version".to_string())?),
             "description" => description = value.to_string(),
             "checksum" => checksum = value.to_string(),
             "dependencies" => {
-                dependencies.extend(
-                    value
-                        .split(',')
-                        .map(|s| s.trim().to_string())
-                        .filter(|s| !s.is_empty()),
-                );
+                dependencies.extend(value.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()));
             }
             "provides" => {
-                provides.extend(
-                    value
-                        .split(',')
-                        .map(|s| s.trim().to_string())
-                        .filter(|s| !s.is_empty()),
-                );
+                provides.extend(value.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()));
             }
             "files" => {
-                files.extend(
-                    value
-                        .split(',')
-                        .map(|s| s.trim().to_string())
-                        .filter(|s| !s.is_empty()),
-                );
+                files.extend(value.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()));
             }
             _ => {}
         }
@@ -319,28 +310,16 @@ files: /usr/bin/zenith, /etc/zenith.conf
         assert_eq!(manifest.name, "zenith");
         assert_eq!(manifest.version, Version::new(1, 2, 3));
         assert_eq!(manifest.description, "Zenith compositor");
-        assert_eq!(
-            manifest.dependencies,
-            vec!["libfoo".to_string(), "libbar".to_string()]
-        );
-        assert_eq!(
-            manifest.provides,
-            vec!["zenith".to_string(), "zenith-compositor".to_string()]
-        );
+        assert_eq!(manifest.dependencies, vec!["libfoo".to_string(), "libbar".to_string()]);
+        assert_eq!(manifest.provides, vec!["zenith".to_string(), "zenith-compositor".to_string()]);
         assert_eq!(manifest.files.len(), 2);
     }
 
     #[test]
     fn test_parse_manifest_equals_and_missing_fields() {
         assert!(parse_manifest("name=zenith\nversion=1.0.0\nchecksum=abc").is_ok());
-        assert!(
-            parse_manifest("name=zenith\nchecksum=abc").is_err(),
-            "missing version"
-        );
-        assert!(
-            parse_manifest("name=zenith\nversion=1.0.0").is_err(),
-            "missing checksum"
-        );
+        assert!(parse_manifest("name=zenith\nchecksum=abc").is_err(), "missing version");
+        assert!(parse_manifest("name=zenith\nversion=1.0.0").is_err(), "missing checksum");
     }
 
     #[test]
@@ -361,8 +340,7 @@ files: /usr/bin/zenith, /etc/zenith.conf
     fn test_client_install_verified_and_rejected() {
         let mut client = SigpkgClient::new("https://repo.sigmaos.dev/sigma");
         client.add_trusted_key("pkg-key");
-        let text =
-            "name: hello\nversion: 2.0.0\ndescription: hello util\nchecksum: 5428\ndependencies:\n";
+        let text = "name: hello\nversion: 2.0.0\ndescription: hello util\nchecksum: 5428\ndependencies:\n";
         // checksum 5428 corresponds to payload bytes below per FNV-1a; compute lazily below.
         let manifest = parse_manifest(text).unwrap();
         let installed = BTreeMap::new();

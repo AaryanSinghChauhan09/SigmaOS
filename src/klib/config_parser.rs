@@ -3,9 +3,9 @@
 // Supports [sections] and key = value pairs
 
 extern crate alloc;
-use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::HashMap;
 
 /// INI-style configuration store
 pub struct ConfigStore {
@@ -71,9 +71,9 @@ impl ConfigStore {
 
     /// Get all keys in a section
     pub fn keys(&self, section: &str) -> Option<Vec<&str>> {
-        self.sections
-            .get(section)
-            .map(|map| map.keys().map(|k| k.as_str()).collect())
+        self.sections.get(section).map(|map| {
+            map.keys().map(|k| k.as_str()).collect()
+        })
     }
 
     /// Get all section names

@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use core::str::Chars;
+use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Custom String Parser
 // Reduces dependency on std string parsing functions
 

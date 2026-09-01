@@ -3,9 +3,9 @@
 // for secure-boot / measured-boot narrative
 
 extern crate alloc;
+use alloc::vec::Vec;
 use crate::klib::merkle::{MerkleAccumulator, MerkleHash};
 use crate::security::pqc_enclave::KyberKem;
-use alloc::vec::Vec;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements
 pub struct HybridPqcMeasurementEngine {
@@ -66,21 +66,21 @@ impl HybridPqcMeasurementEngine {
         digest == expected_root
     }
 
-    fn digest_of(data: &[u8]) -> [u8; 32] {
-        let mut h: u32 = 0x811C_9DC5;
-        for &b in data {
-            h ^= b as u32;
-            h = h.wrapping_mul(0x0100_0193);
-        }
-        let mut out = [0u8; 32];
-        for i in 0..32u32 {
-            h ^= i.wrapping_mul(0x9E37_79B1);
-            h = h.wrapping_mul(0x0100_0193);
-            let bytes = h.to_be_bytes();
-            out[i as usize] = bytes[0] ^ bytes[3];
-        }
-        out
+fn digest_of(data: &[u8]) -> [u8; 32] {
+    let mut h: u32 = 0x811C_9DC5;
+    for &b in data {
+        h ^= b as u32;
+        h = h.wrapping_mul(0x0100_0193);
     }
+    let mut out = [0u8; 32];
+    for i in 0..32u32 {
+        h ^= i.wrapping_mul(0x9E37_79B1);
+        h = h.wrapping_mul(0x0100_0193);
+        let bytes = h.to_be_bytes();
+        out[i as usize] = bytes[0] ^ bytes[3];
+    }
+    out
+}
 
     /// Get the current firmware measurement root
     pub fn measurement_root(&self) -> Option<MerkleHash> {

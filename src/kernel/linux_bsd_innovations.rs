@@ -1,7 +1,7 @@
 extern crate alloc;
 
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
@@ -344,6 +344,8 @@ impl OpenBsdPledge {
     }
 }
 
+
+
 // ============================================================================
 // 1. Linux `perf_event_open` Hardware PMU Performance Counters
 // ============================================================================
@@ -453,18 +455,9 @@ impl FreeBsdRacctRctlEngine {
         self.rules.push(rule);
     }
 
-    pub fn record_usage(
-        &mut self,
-        pid: u32,
-        resource: RacctResource,
-        amount: u64,
-    ) -> Option<RctlAction> {
+    pub fn record_usage(&mut self, pid: u32, resource: RacctResource, amount: u64) -> Option<RctlAction> {
         let mut new_val = amount;
-        if let Some((_, _, ref mut current)) = self
-            .accounting
-            .iter_mut()
-            .find(|(p, r, _)| *p == pid && *r == resource)
-        {
+        if let Some((_, _, ref mut current)) = self.accounting.iter_mut().find(|(p, r, _)| *p == pid && *r == resource) {
             *current += amount;
             new_val = *current;
         } else {
@@ -1109,11 +1102,7 @@ impl SovereignCgroupGovernor {
         Ok(())
     }
 
-    pub fn configure_limits(
-        &mut self,
-        path: &str,
-        limits: CgroupResourceLimits,
-    ) -> Result<(), &'static str> {
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
         let grp = self.groups.get_mut(path).ok_or("Cgroup path not found")?;
         grp.limits = Some(limits);
         Ok(())
@@ -1640,11 +1629,7 @@ impl SovereignCgroupGovernorV1 {
         Ok(())
     }
 
-    pub fn configure_limits(
-        &mut self,
-        path: &str,
-        limits: CgroupResourceLimits,
-    ) -> Result<(), &'static str> {
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
         group.limits = Some(limits);
         Ok(())
@@ -2082,16 +2067,11 @@ impl SovereignSwapEngine {
             capacity_sectors,
         });
         // Sort swap devices descending by priority (FreeBSD swap priority parity)
-        self.swap_devices
-            .sort_by(|a, b| b.priority.cmp(&a.priority));
+        self.swap_devices.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
     /// Compresses unpaged memory frame and stores into in-memory ZRAM pool (Linux ZRAM parity)
-    pub fn zram_compress_and_page(
-        &mut self,
-        virtual_addr: u64,
-        page_data: &[u8],
-    ) -> Result<usize, &'static str> {
+    pub fn zram_compress_and_page(&mut self, virtual_addr: u64, page_data: &[u8]) -> Result<usize, &'static str> {
         if page_data.is_empty() {
             return Err("Swap Engine: Cannot compress empty page data");
         }
@@ -2112,14 +2092,8 @@ impl SovereignSwapEngine {
     }
 
     /// Decompresses page from ZRAM memory pool back into active memory
-    pub fn zram_decompress_and_restore(
-        &mut self,
-        virtual_addr: u64,
-    ) -> Result<Vec<u8>, &'static str> {
-        let entry = self
-            .zram_pages
-            .remove(&virtual_addr)
-            .ok_or("Swap Engine: Page not found in ZRAM pool")?;
+    pub fn zram_decompress_and_restore(&mut self, virtual_addr: u64) -> Result<Vec<u8>, &'static str> {
+        let entry = self.zram_pages.remove(&virtual_addr).ok_or("Swap Engine: Page not found in ZRAM pool")?;
         let mut decompressed = Vec::with_capacity(entry.original_size_bytes);
         for &byte in &entry.compressed_data {
             decompressed.push(byte ^ 0xAA);
@@ -2517,23 +2491,14 @@ impl DynamicLkmLoader {
         Ok(())
     }
 
-    pub fn load_module_with_dependencies(
-        &mut self,
-        mut module: KernelModule,
-        signature: &[u8],
-    ) -> Result<(), &'static str> {
+    pub fn load_module_with_dependencies(&mut self, mut module: KernelModule, signature: &[u8]) -> Result<(), &'static str> {
         if !module.is_signed || signature.is_empty() {
-            return Err(
-                "Module signature verification failed: rejected unsigned or invalid signature",
-            );
+            return Err("Module signature verification failed: rejected unsigned or invalid signature");
         }
 
         // Verify dependencies are loaded and active
         for dep in &module.dependencies {
-            let dep_mod = self
-                .loaded_modules
-                .get(dep)
-                .ok_or("Unresolved module dependency: required dependency not loaded")?;
+            let dep_mod = self.loaded_modules.get(dep).ok_or("Unresolved module dependency: required dependency not loaded")?;
             if dep_mod.state != ModuleState::Live {
                 return Err("Module dependency state invalid: dependency is not active");
             }
@@ -2552,8 +2517,7 @@ impl DynamicLkmLoader {
 
         // Register exported symbols in global kernel symbol table (kallsyms / EXPORT_SYMBOL)
         for sym in &module.exported_symbols {
-            self.global_symbol_table
-                .insert(sym.name.clone(), sym.clone());
+            self.global_symbol_table.insert(sym.name.clone(), sym.clone());
         }
 
         self.loaded_modules.insert(module.name.clone(), module);
@@ -2569,10 +2533,7 @@ impl DynamicLkmLoader {
 
         // Check if any other loaded module depends on this module
         for (other_name, other_mod) in &self.loaded_modules {
-            if other_name != name
-                && other_mod.is_loaded
-                && other_mod.dependencies.contains(&name.to_string())
-            {
+            if other_name != name && other_mod.is_loaded && other_mod.dependencies.contains(&name.to_string()) {
                 return Err("Cannot unload module: required by another active module");
             }
         }
@@ -2599,15 +2560,8 @@ impl DynamicLkmLoader {
         Ok(())
     }
 
-    pub fn dispatch_module_event(
-        &mut self,
-        module_name: &str,
-        event: ModuleEvent,
-    ) -> Result<(), &'static str> {
-        let mod_obj = self
-            .loaded_modules
-            .get_mut(module_name)
-            .ok_or("Module not found")?;
+    pub fn dispatch_module_event(&mut self, module_name: &str, event: ModuleEvent) -> Result<(), &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(module_name).ok_or("Module not found")?;
         mod_obj.event_log.push(event);
         match event {
             ModuleEvent::Quiesce => {
@@ -2625,44 +2579,22 @@ impl DynamicLkmLoader {
     }
 
     pub fn get_symbol(&self, name: &str, caller_is_gpl: bool) -> Result<u64, &'static str> {
-        let sym = self
-            .global_symbol_table
-            .get(name)
-            .ok_or("Symbol not found in kernel symbol table")?;
+        let sym = self.global_symbol_table.get(name).ok_or("Symbol not found in kernel symbol table")?;
         if sym.is_gpl_only && !caller_is_gpl {
-            return Err(
-                "Symbol access denied: EXPORT_SYMBOL_GPL symbol requested by non-GPL module",
-            );
+            return Err("Symbol access denied: EXPORT_SYMBOL_GPL symbol requested by non-GPL module");
         }
         Ok(sym.address)
     }
 
     pub fn get_param(&self, module_name: &str, param_name: &str) -> Result<String, &'static str> {
-        let mod_obj = self
-            .loaded_modules
-            .get(module_name)
-            .ok_or("Module not found")?;
-        let param = mod_obj
-            .parameters
-            .get(param_name)
-            .ok_or("Module parameter not found")?;
+        let mod_obj = self.loaded_modules.get(module_name).ok_or("Module not found")?;
+        let param = mod_obj.parameters.get(param_name).ok_or("Module parameter not found")?;
         Ok(param.value.clone())
     }
 
-    pub fn set_param(
-        &mut self,
-        module_name: &str,
-        param_name: &str,
-        new_val: &str,
-    ) -> Result<(), &'static str> {
-        let mod_obj = self
-            .loaded_modules
-            .get_mut(module_name)
-            .ok_or("Module not found")?;
-        let param = mod_obj
-            .parameters
-            .get_mut(param_name)
-            .ok_or("Module parameter not found")?;
+    pub fn set_param(&mut self, module_name: &str, param_name: &str, new_val: &str) -> Result<(), &'static str> {
+        let mod_obj = self.loaded_modules.get_mut(module_name).ok_or("Module not found")?;
+        let param = mod_obj.parameters.get_mut(param_name).ok_or("Module parameter not found")?;
         if (param.perm_mask & 0o200) == 0 {
             return Err("Permission denied: module parameter is read-only");
         }
@@ -2681,19 +2613,13 @@ impl DynamicLkmLoader {
     }
 
     pub fn inc_ref_count(&mut self, name: &str) -> Result<usize, &'static str> {
-        let mod_obj = self
-            .loaded_modules
-            .get_mut(name)
-            .ok_or("Module not found")?;
+        let mod_obj = self.loaded_modules.get_mut(name).ok_or("Module not found")?;
         mod_obj.ref_count += 1;
         Ok(mod_obj.ref_count)
     }
 
     pub fn dec_ref_count(&mut self, name: &str) -> Result<usize, &'static str> {
-        let mod_obj = self
-            .loaded_modules
-            .get_mut(name)
-            .ok_or("Module not found")?;
+        let mod_obj = self.loaded_modules.get_mut(name).ok_or("Module not found")?;
         if mod_obj.ref_count == 0 {
             return Err("Reference count underflow");
         }
@@ -2701,11 +2627,7 @@ impl DynamicLkmLoader {
         Ok(mod_obj.ref_count)
     }
 
-    pub fn register_syscall_hook(
-        &mut self,
-        syscall_id: u32,
-        hook_owner: &str,
-    ) -> Result<(), &'static str> {
+    pub fn register_syscall_hook(&mut self, syscall_id: u32, hook_owner: &str) -> Result<(), &'static str> {
         if let Some(owner) = self.sys_call_hooks.get(&syscall_id) {
             if owner != hook_owner {
                 return Err("Syscall hijack blocked: unauthorized hook attempt detected");
@@ -2842,31 +2764,24 @@ impl SovereignCgroupGovernorV2 {
         if self.groups.contains_key(path) {
             return Err("cgroup path already exists");
         }
-        self.groups.insert(
-            path.to_string(),
-            CgroupGroupV2 {
-                path: path.to_string(),
-                limits: CgroupResourceLimitsV3 {
-                    cpu_quota_us: 100_000,
-                    cpu_period_us: 100_000,
-                    memory_max_bytes: 1024 * 1024 * 1024,
-                    memory_high_bytes: 512 * 1024 * 1024,
-                    memory_swap_max_bytes: 0,
-                    io_weight: 100,
-                },
-                pids: Vec::new(),
-                current_cpu_usage_us: 0,
-                current_memory_bytes: 0,
+        self.groups.insert(path.to_string(), CgroupGroupV2 {
+            path: path.to_string(),
+            limits: CgroupResourceLimitsV3 {
+                cpu_quota_us: 100_000,
+                cpu_period_us: 100_000,
+                memory_max_bytes: 1024 * 1024 * 1024,
+                memory_high_bytes: 512 * 1024 * 1024,
+                memory_swap_max_bytes: 0,
+                io_weight: 100,
             },
-        );
+            pids: Vec::new(),
+            current_cpu_usage_us: 0,
+            current_memory_bytes: 0,
+        });
         Ok(())
     }
 
-    pub fn configure_limits(
-        &mut self,
-        path: &str,
-        limits: CgroupResourceLimitsV3,
-    ) -> Result<(), &'static str> {
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimitsV3) -> Result<(), &'static str> {
         let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
         entry.limits = limits;
         Ok(())
@@ -2880,11 +2795,7 @@ impl SovereignCgroupGovernorV2 {
         Ok(())
     }
 
-    pub fn check_cpu_budget(
-        &mut self,
-        path: &str,
-        time_requested_us: u64,
-    ) -> Result<bool, &'static str> {
+    pub fn check_cpu_budget(&mut self, path: &str, time_requested_us: u64) -> Result<bool, &'static str> {
         let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
         if entry.current_cpu_usage_us + time_requested_us > entry.limits.cpu_quota_us {
             Ok(false) // Quota exceeded
@@ -3009,9 +2920,9 @@ pub const PLEDGE_RPATH: u64 = 1 << 1;
 pub const PLEDGE_WPATH: u64 = 1 << 2;
 pub const PLEDGE_CPATH: u64 = 1 << 3;
 pub const PLEDGE_DPATH: u64 = 1 << 4;
-pub const PLEDGE_INET: u64 = 1 << 5;
-pub const PLEDGE_UNIX: u64 = 1 << 6;
-pub const PLEDGE_EXEC: u64 = 1 << 7;
+pub const PLEDGE_INET: u64  = 1 << 5;
+pub const PLEDGE_UNIX: u64  = 1 << 6;
+pub const PLEDGE_EXEC: u64  = 1 << 7;
 
 pub struct KernelAccessController {
     pub landlock_path_rules: Vec<LandlockPathRule>,
@@ -3048,11 +2959,7 @@ impl KernelAccessController {
         self.is_enforced = true;
     }
 
-    pub fn check_path_access(
-        &self,
-        path: &str,
-        right: LandlockAccessRight,
-    ) -> Result<(), &'static str> {
+    pub fn check_path_access(&self, path: &str, right: LandlockAccessRight) -> Result<(), &'static str> {
         if !self.is_enforced {
             return Ok(());
         }
@@ -3143,9 +3050,7 @@ impl InteractiveHybridScheduler {
 
         for (i, task) in self.ready_tasks.iter().enumerate() {
             let score = task.interactivity_score();
-            if score > best_score
-                || (score == best_score && task.vruntime < self.ready_tasks[best_idx].vruntime)
-            {
+            if score > best_score || (score == best_score && task.vruntime < self.ready_tasks[best_idx].vruntime) {
                 best_score = score;
                 best_idx = i;
             }
@@ -3219,15 +3124,12 @@ impl CowStorageEngine {
         self.next_block_id += 1;
 
         let checksum = Self::simple_checksum(payload);
-        self.blocks.insert(
+        self.blocks.insert(block_id, CowBlock {
             block_id,
-            CowBlock {
-                block_id,
-                payload: payload.to_vec(),
-                ref_count: 1,
-                checksum,
-            },
-        );
+            payload: payload.to_vec(),
+            ref_count: 1,
+            checksum,
+        });
 
         block_id
     }
@@ -3352,10 +3254,7 @@ mod tests {
             action: RctlAction::SignalSigKill,
         });
 
-        assert_eq!(
-            rctl.record_usage(200, RacctResource::MemoryBytes, 512 * 1024),
-            None
-        );
+        assert_eq!(rctl.record_usage(200, RacctResource::MemoryBytes, 512 * 1024), None);
         assert_eq!(
             rctl.record_usage(200, RacctResource::MemoryBytes, 600 * 1024),
             Some(RctlAction::SignalSigKill)
@@ -3516,21 +3415,11 @@ mod tests {
         let mut core_mod = KernelModule::new("e1000e", true);
         core_mod.version = "2.1.0".to_string();
 
-        assert!(loader
-            .load_module_with_dependencies(core_mod, b"pqc_dilithium_sig")
-            .is_ok());
-        assert_eq!(
-            loader.get_module_state("e1000e").unwrap(),
-            ModuleState::Live
-        );
+        assert!(loader.load_module_with_dependencies(core_mod, b"pqc_dilithium_sig").is_ok());
+        assert_eq!(loader.get_module_state("e1000e").unwrap(), ModuleState::Live);
 
-        assert!(loader
-            .dispatch_module_event("e1000e", ModuleEvent::Quiesce)
-            .is_ok());
-        assert_eq!(
-            loader.get_module_state("e1000e").unwrap(),
-            ModuleState::Unloading
-        );
+        assert!(loader.dispatch_module_event("e1000e", ModuleEvent::Quiesce).is_ok());
+        assert_eq!(loader.get_module_state("e1000e").unwrap(), ModuleState::Unloading);
 
         // Reset to live then unload
         if let Some(m) = loader.loaded_modules.get_mut("e1000e") {
@@ -3546,15 +3435,11 @@ mod tests {
         let mut loader = DynamicLkmLoader::new();
 
         let core_mod = KernelModule::new("net_core", true);
-        assert!(loader
-            .load_module_with_dependencies(core_mod, b"sig_net_core")
-            .is_ok());
+        assert!(loader.load_module_with_dependencies(core_mod, b"sig_net_core").is_ok());
 
         let mut drv_mod = KernelModule::new("e1000e", true);
         drv_mod.dependencies.push("net_core".to_string());
-        assert!(loader
-            .load_module_with_dependencies(drv_mod, b"sig_e1000e")
-            .is_ok());
+        assert!(loader.load_module_with_dependencies(drv_mod, b"sig_e1000e").is_ok());
 
         // net_core ref_count should be 1
         assert_eq!(loader.get_ref_count("net_core").unwrap(), 1);
@@ -3588,24 +3473,16 @@ mod tests {
             is_gpl_only: true,
         });
 
-        assert!(loader
-            .load_module_with_dependencies(core_mod, b"sig_crypto")
-            .is_ok());
+        assert!(loader.load_module_with_dependencies(core_mod, b"sig_crypto").is_ok());
 
         // Non-GPL caller can access standard EXPORT_SYMBOL
-        assert_eq!(
-            loader.get_symbol("crypto_sha256_hash", false).unwrap(),
-            0xffffffff81001000
-        );
+        assert_eq!(loader.get_symbol("crypto_sha256_hash", false).unwrap(), 0xffffffff81001000);
 
         // Non-GPL caller blocked from EXPORT_SYMBOL_GPL
         assert!(loader.get_symbol("crypto_internal_pqc_key", false).is_err());
 
         // GPL caller can access EXPORT_SYMBOL_GPL
-        assert_eq!(
-            loader.get_symbol("crypto_internal_pqc_key", true).unwrap(),
-            0xffffffff81002000
-        );
+        assert_eq!(loader.get_symbol("crypto_internal_pqc_key", true).unwrap(), 0xffffffff81002000);
     }
 
     #[test]
@@ -3613,40 +3490,26 @@ mod tests {
         let mut loader = DynamicLkmLoader::new();
 
         let mut wifi_mod = KernelModule::new("iwlwifi", true);
-        wifi_mod.parameters.insert(
-            "power_save".to_string(),
-            ModuleParam {
-                name: "power_save".to_string(),
-                param_type: "bool".to_string(),
-                value: "1".to_string(),
-                perm_mask: 0o644,
-            },
-        );
-        wifi_mod.parameters.insert(
-            "hw_id".to_string(),
-            ModuleParam {
-                name: "hw_id".to_string(),
-                param_type: "uint".to_string(),
-                value: "0x8086".to_string(),
-                perm_mask: 0o444, // Read-only
-            },
-        );
+        wifi_mod.parameters.insert("power_save".to_string(), ModuleParam {
+            name: "power_save".to_string(),
+            param_type: "bool".to_string(),
+            value: "1".to_string(),
+            perm_mask: 0o644,
+        });
+        wifi_mod.parameters.insert("hw_id".to_string(), ModuleParam {
+            name: "hw_id".to_string(),
+            param_type: "uint".to_string(),
+            value: "0x8086".to_string(),
+            perm_mask: 0o444, // Read-only
+        });
 
-        assert!(loader
-            .load_module_with_dependencies(wifi_mod, b"sig_iwlwifi")
-            .is_ok());
+        assert!(loader.load_module_with_dependencies(wifi_mod, b"sig_iwlwifi").is_ok());
 
-        assert_eq!(
-            loader.get_param("iwlwifi", "power_save").unwrap().as_str(),
-            "1"
-        );
+        assert_eq!(loader.get_param("iwlwifi", "power_save").unwrap().as_str(), "1");
 
         // Write to writable param succeeds
         assert!(loader.set_param("iwlwifi", "power_save", "0").is_ok());
-        assert_eq!(
-            loader.get_param("iwlwifi", "power_save").unwrap().as_str(),
-            "0"
-        );
+        assert_eq!(loader.get_param("iwlwifi", "power_save").unwrap().as_str(), "0");
 
         // Write to read-only param fails
         assert!(loader.set_param("iwlwifi", "hw_id", "0x1234").is_err());
@@ -4042,96 +3905,81 @@ mod tests {
         );
     }
 
-    #[derive(Debug, Clone)]
-    pub struct CgroupResourceLimits {
-        pub cpu_quota_us: u64,
-        pub cpu_period_us: u64,
-        pub memory_max_bytes: u64,
-        pub memory_high_bytes: u64,
-        pub memory_swap_max_bytes: u64,
-        pub io_weight: u32,
-    }
+#[derive(Debug, Clone)]
+pub struct CgroupResourceLimits {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
 
-    #[derive(Debug, Clone)]
-    pub struct SovereignCgroupGroup {
-        pub name: String,
-        pub limits: Option<CgroupResourceLimits>,
-        pub pids: Vec<u64>,
-        pub cpu_used_us: u64,
-        pub memory_allocated: u64,
-    }
+#[derive(Debug, Clone)]
+pub struct SovereignCgroupGroup {
+    pub name: String,
+    pub limits: Option<CgroupResourceLimits>,
+    pub pids: Vec<u64>,
+    pub cpu_used_us: u64,
+    pub memory_allocated: u64,
+}
 
-    pub struct SovereignCgroupGovernor {
-        pub groups: HashMap<String, SovereignCgroupGroup>,
-    }
+pub struct SovereignCgroupGovernor {
+    pub groups: HashMap<String, SovereignCgroupGroup>,
+}
 
-    impl SovereignCgroupGovernor {
-        pub fn new() -> Self {
-            Self {
-                groups: HashMap::new(),
-            }
+impl SovereignCgroupGovernor {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
         }
+    }
 
-        pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-            self.groups.insert(
-                path.to_string(),
-                SovereignCgroupGroup {
-                    name: path.to_string(),
-                    limits: None,
-                    pids: Vec::new(),
-                    cpu_used_us: 0,
-                    memory_allocated: 0,
-                },
-            );
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        self.groups.insert(path.to_string(), SovereignCgroupGroup {
+            name: path.to_string(),
+            limits: None,
+            pids: Vec::new(),
+            cpu_used_us: 0,
+            memory_allocated: 0,
+        });
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
+        grp.limits = Some(limits);
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
+        grp.pids.push(pid);
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, used_us: u64) -> Result<bool, &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
+        let quota = grp.limits.as_ref().map(|l| l.cpu_quota_us).unwrap_or(u64::MAX);
+        if grp.cpu_used_us + used_us > quota {
+            Ok(false)
+        } else {
+            grp.cpu_used_us += used_us;
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
+        let max_mem = grp.limits.as_ref().map(|l| l.memory_max_bytes).unwrap_or(u64::MAX);
+        if grp.memory_allocated + bytes > max_mem {
+            Err("Memory limit exceeded")
+        } else {
+            grp.memory_allocated += bytes;
             Ok(())
         }
-
-        pub fn configure_limits(
-            &mut self,
-            path: &str,
-            limits: CgroupResourceLimits,
-        ) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            grp.limits = Some(limits);
-            Ok(())
-        }
-
-        pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            grp.pids.push(pid);
-            Ok(())
-        }
-
-        pub fn check_cpu_budget(&mut self, path: &str, used_us: u64) -> Result<bool, &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            let quota = grp
-                .limits
-                .as_ref()
-                .map(|l| l.cpu_quota_us)
-                .unwrap_or(u64::MAX);
-            if grp.cpu_used_us + used_us > quota {
-                Ok(false)
-            } else {
-                grp.cpu_used_us += used_us;
-                Ok(true)
-            }
-        }
-
-        pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            let max_mem = grp
-                .limits
-                .as_ref()
-                .map(|l| l.memory_max_bytes)
-                .unwrap_or(u64::MAX);
-            if grp.memory_allocated + bytes > max_mem {
-                Err("Memory limit exceeded")
-            } else {
-                grp.memory_allocated += bytes;
-                Ok(())
-            }
-        }
     }
+}
 
     #[test]
     fn test_sovereign_cgroup_governor() {
@@ -4262,12 +4110,8 @@ mod tests {
         ac.add_path_rule("/var/log", vec![LandlockAccessRight::Read]);
         ac.restrict_pledge(PLEDGE_STDIO | PLEDGE_RPATH);
 
-        assert!(ac
-            .check_path_access("/var/log/syslog", LandlockAccessRight::Read)
-            .is_ok());
-        assert!(ac
-            .check_path_access("/var/log/syslog", LandlockAccessRight::Write)
-            .is_err());
+        assert!(ac.check_path_access("/var/log/syslog", LandlockAccessRight::Read).is_ok());
+        assert!(ac.check_path_access("/var/log/syslog", LandlockAccessRight::Write).is_err());
 
         assert!(ac.check_pledge(PLEDGE_STDIO).is_ok());
         assert!(ac.check_pledge(PLEDGE_EXEC).is_err());
@@ -4343,11 +4187,7 @@ impl LinuxLandlockLsmRuleEngine {
         }
     }
 
-    pub fn add_path_benefit(
-        &mut self,
-        path: &str,
-        allowed_access: u32,
-    ) -> Result<(), &'static str> {
+    pub fn add_path_benefit(&mut self, path: &str, allowed_access: u32) -> Result<(), &'static str> {
         if self.is_enforced {
             return Err("Landlock LSM rules locked; cannot add path rule post-enforcement");
         }
@@ -4398,11 +4238,7 @@ impl FreeBsdCapsicumEngine {
         self.in_capability_mode = true;
     }
 
-    pub fn limit_descriptor_rights(
-        &mut self,
-        fd: u32,
-        rights_mask: u64,
-    ) -> Result<(), &'static str> {
+    pub fn limit_descriptor_rights(&mut self, fd: u32, rights_mask: u64) -> Result<(), &'static str> {
         if let Some(&existing) = self.descriptor_rights.get(&fd) {
             if (existing & rights_mask) != rights_mask {
                 return Err("Capsicum: Cannot escalate descriptor rights in capability mode");
@@ -4458,14 +4294,11 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn register_service(&mut self, name: &str, pid: u32) {
-        self.services.insert(
-            name.to_string(),
-            VoidRunitService {
-                name: name.to_string(),
-                pid,
-                is_active: true,
-            },
-        );
+        self.services.insert(name.to_string(), VoidRunitService {
+            name: name.to_string(),
+            pid,
+            is_active: true,
+        });
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {
@@ -4478,10 +4311,7 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn is_service_active(&self, name: &str) -> bool {
-        self.services
-            .get(name)
-            .map(|s| s.is_active)
-            .unwrap_or(false)
+        self.services.get(name).map(|s| s.is_active).unwrap_or(false)
     }
 }
 
@@ -4522,13 +4352,11 @@ impl IntelClearLinuxStatelessEngine {
     }
 
     pub fn register_default_config(&mut self, path: &str, content: &str) {
-        self.usr_share_defaults
-            .insert(path.to_string(), content.to_string());
+        self.usr_share_defaults.insert(path.to_string(), content.to_string());
     }
 
     pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.etc_user_overrides
-            .insert(path.to_string(), content.to_string());
+        self.etc_user_overrides.insert(path.to_string(), content.to_string());
     }
 
     pub fn resolve_config(&self, path: &str) -> Option<String> {
@@ -4588,11 +4416,7 @@ impl OpenSuseSnapperEngine {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: u64) -> Result<u64, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.id == id)
-            .ok_or("Snapper: Target snapshot not found")?;
+        let snap = self.snapshots.iter().find(|s| s.id == id).ok_or("Snapper: Target snapshot not found")?;
         self.active_snapshot_id = id;
         Ok(snap.root_block_hash)
     }
@@ -4616,9 +4440,7 @@ mod linux_bsd_extra_tests {
     #[test]
     fn test_freebsd_capsicum_engine() {
         let mut capsicum = FreeBsdCapsicumEngine::new();
-        capsicum
-            .limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG)
-            .unwrap();
+        capsicum.limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG).unwrap();
         capsicum.enter_capability_mode();
 
         assert!(capsicum.check_descriptor_right(3, CAP_READ_FLAG));
@@ -4639,22 +4461,13 @@ mod linux_bsd_extra_tests {
     fn test_intel_clear_linux_stateless() {
         let mut stateless = IntelClearLinuxStatelessEngine::new();
         stateless.register_default_config("/etc/hostname", "sigma-default");
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-default"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
 
         stateless.set_user_override("/etc/hostname", "sigma-custom");
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-custom"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-custom");
 
         stateless.reset_etc_to_stateless();
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-default"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
     }
 
     #[test]

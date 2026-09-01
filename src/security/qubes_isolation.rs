@@ -1,11 +1,12 @@
-extern crate alloc;
 extern crate core;
+extern crate alloc;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 // SigmaOS Microkernel Shard & Domain Isolation (Qubes OS & Kata Containers Parity)
 // Enables ultra-lightweight, compartmentalized zero-trust secure domains (MicroVMs)
 // Running natively in user-space with microsecond-level IPC latencies and hypervisor isolation.
+
 
 use core::cell::RefCell;
 
@@ -27,6 +28,7 @@ impl CapabilityToken {
 }
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+
 
 pub type DomainID = usize;
 
@@ -456,10 +458,7 @@ impl XenStoreTree {
     }
 
     pub fn read_key(&self, path: &str) -> Option<&str> {
-        self.nodes
-            .iter()
-            .find(|n| n.path == path)
-            .map(|n| n.value.as_str())
+        self.nodes.iter().find(|n| n.path == path).map(|n| n.value.as_str())
     }
 
     pub fn add_watch(&mut self, path: &str, dom_id: u32) {
@@ -468,8 +467,7 @@ impl XenStoreTree {
 }
 
 /// Lock-free zero-copy inter-domain Xen grant table shared memory ring
-pub struct XenChannelRing {
-    pub dom_a: u32,
+pub struct XenChannelRing {pub dom_a: u32,
     pub dom_b: u32,
     pub grant_ref: u32,
     pub ring_size: usize,
@@ -668,9 +666,7 @@ mod tests {
         let channel = SQrexecChannel::new(1024);
 
         // Write low-latency payload bypasses any virtual NIC overhead
-        channel
-            .write_payload(b"Hello Sovereign Domain IPC")
-            .unwrap();
+        channel.write_payload(b"Hello Sovereign Domain IPC").unwrap();
 
         // Read payload from shared memory segment
         let read = channel.read_payload();

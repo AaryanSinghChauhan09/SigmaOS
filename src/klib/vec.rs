@@ -1,7 +1,7 @@
 extern crate alloc;
 
-use core::hash::{Hash, Hasher};
 use core::mem;
+use core::hash::{Hash, Hasher};
 
 pub type SigmaVec<T> = Vec<T>;
 
@@ -48,9 +48,7 @@ impl<T> Vec<T> {
 
     pub fn reserve(&mut self, additional: usize) {
         if self.len + additional > self.capacity {
-            unsafe {
-                self.grow_to(self.len + additional);
-            }
+            unsafe { self.grow_to(self.len + additional); }
         }
     }
 

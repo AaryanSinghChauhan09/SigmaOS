@@ -2,13 +2,13 @@
 
 extern crate alloc;
 
-use sigmaos::access::append_rights::*;
-use sigmaos::app::murano_catalogue::*;
-use sigmaos::auth::authentication_pipeline::*;
 use sigmaos::compatibility::abi_extended::*;
+use sigmaos::access::append_rights::*;
 use sigmaos::kernel::atomic_extended::*;
-use sigmaos::process::blocked_state::*;
+use sigmaos::auth::authentication_pipeline::*;
 use sigmaos::storage::block_device_extended::*;
+use sigmaos::process::blocked_state::*;
+use sigmaos::app::murano_catalogue::*;
 
 #[test]
 fn test_cinder_volume_extended() {

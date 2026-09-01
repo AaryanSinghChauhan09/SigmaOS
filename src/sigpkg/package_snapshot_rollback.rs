@@ -8,8 +8,8 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstalledPackageRecord {
@@ -51,18 +51,8 @@ impl SovereignPackageSnapshotRollbackEngine {
         };
 
         // Seed initial base system packages
-        engine.install_package_record(
-            "sigma-base",
-            "1.0.0",
-            "chk_base_v1",
-            vec!["/bin/init".to_string()],
-        );
-        engine.install_package_record(
-            "sigma-libc",
-            "2.38.0",
-            "chk_libc_v1",
-            vec!["/lib/libc.so".to_string()],
-        );
+        engine.install_package_record("sigma-base", "1.0.0", "chk_base_v1", vec!["/bin/init".to_string()]);
+        engine.install_package_record("sigma-libc", "2.38.0", "chk_libc_v1", vec!["/lib/libc.so".to_string()]);
         engine.create_snapshot("Initial System Installation Base");
         engine
     }
@@ -80,8 +70,7 @@ impl SovereignPackageSnapshotRollbackEngine {
             config_checksum: config_checksum.to_string(),
             installed_files,
         };
-        self.active_installed_packages
-            .insert(name.to_string(), record);
+        self.active_installed_packages.insert(name.to_string(), record);
     }
 
     pub fn remove_package_record(&mut self, name: &str) -> bool {
@@ -129,8 +118,7 @@ impl SovereignPackageSnapshotRollbackEngine {
 
         for (name, rec_b) in &snap_b.packages {
             if let Some(rec_a) = snap_a.packages.get(name) {
-                if rec_a.version != rec_b.version || rec_a.config_checksum != rec_b.config_checksum
-                {
+                if rec_a.version != rec_b.version || rec_a.config_checksum != rec_b.config_checksum {
                     modified.push((name.clone(), rec_a.version.clone(), rec_b.version.clone()));
                 }
             } else {
@@ -191,12 +179,7 @@ mod tests {
         assert_eq!(engine.current_generation, 1);
 
         // Install new package and take generation 2 snapshot
-        engine.install_package_record(
-            "curl",
-            "8.2.1",
-            "chk_curl_v1",
-            vec!["/bin/curl".to_string()],
-        );
+        engine.install_package_record("curl", "8.2.1", "chk_curl_v1", vec!["/bin/curl".to_string()]);
         let gen2 = engine.create_snapshot("Installed curl 8.2.1");
         assert_eq!(gen2, 2);
         assert!(engine.active_installed_packages.contains_key("curl"));

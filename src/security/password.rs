@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
@@ -396,8 +396,7 @@ impl PasswordManager {
     /// Check if locked
     pub fn is_locked(&self) -> bool {
         if let Some(last) = self.last_access {
-            core::time::Duration::from_millis(0)
-                > core::time::Duration::from_secs(self.auto_lock_timeout_seconds)
+            core::time::Duration::from_millis(0) > core::time::Duration::from_secs(self.auto_lock_timeout_seconds)
         } else {
             true
         }

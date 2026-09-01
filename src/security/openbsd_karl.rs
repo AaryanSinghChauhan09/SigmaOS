@@ -2,6 +2,7 @@
 // OpenBSD KARL (Kernel Address Randomized Link) engine for SigmaOS
 // Randomizes kernel section order, function alignments, and symbol offsets on boot
 
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -44,13 +45,7 @@ impl KarlKernelRelinker {
         }
     }
 
-    pub fn add_section(
-        &mut self,
-        name: &str,
-        kind: KernelSectionKind,
-        orig_addr: u64,
-        size: usize,
-    ) {
+    pub fn add_section(&mut self, name: &str, kind: KernelSectionKind, orig_addr: u64, size: usize) {
         self.sections.push(KernelBinarySection {
             name: name.to_string(),
             kind,
@@ -68,8 +63,7 @@ impl KarlKernelRelinker {
     /// Perform KARL link-time kernel section re-ordering and offset randomization
     pub fn perform_karl_relink(&mut self) -> u64 {
         let mut prng_state = self.seed;
-        let mut current_load_addr =
-            0xFFFFFFFF80000000u64 + (Self::next_prng(&mut prng_state) % 0x1000000);
+        let mut current_load_addr = 0xFFFFFFFF80000000u64 + (Self::next_prng(&mut prng_state) % 0x1000000);
 
         // Permute sections order
         let len = self.sections.len();
@@ -89,11 +83,7 @@ impl KarlKernelRelinker {
         }
 
         // Adjust symbol offsets
-        let base_delta = self
-            .sections
-            .first()
-            .map(|s| s.randomized_address.saturating_sub(s.original_address))
-            .unwrap_or(0);
+        let base_delta = self.sections.first().map(|s| s.randomized_address.saturating_sub(s.original_address)).unwrap_or(0);
         for offset in self.symbol_offsets.values_mut() {
             *offset += base_delta;
         }
@@ -102,9 +92,7 @@ impl KarlKernelRelinker {
     }
 
     fn next_prng(state: &mut u64) -> u64 {
-        *state = state
-            .wrapping_mul(6364136223846793005)
-            .wrapping_add(1442695040888963407);
+        *state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
         *state
     }
 
@@ -120,24 +108,9 @@ mod tests {
     #[test]
     fn test_karl_relinking() {
         let mut relinker = KarlKernelRelinker::new("sigma-6.8-openbsd", 0xDEADBEEF12345678);
-        relinker.add_section(
-            ".text",
-            KernelSectionKind::Text,
-            0xFFFFFFFF81000000,
-            0x400000,
-        );
-        relinker.add_section(
-            ".rodata",
-            KernelSectionKind::RoData,
-            0xFFFFFFFF81400000,
-            0x100000,
-        );
-        relinker.add_section(
-            ".data",
-            KernelSectionKind::Data,
-            0xFFFFFFFF81500000,
-            0x080000,
-        );
+        relinker.add_section(".text", KernelSectionKind::Text, 0xFFFFFFFF81000000, 0x400000);
+        relinker.add_section(".rodata", KernelSectionKind::RoData, 0xFFFFFFFF81400000, 0x100000);
+        relinker.add_section(".data", KernelSectionKind::Data, 0xFFFFFFFF81500000, 0x080000);
 
         relinker.register_symbol("sys_pledge", 0xFFFFFFFF81012340);
 

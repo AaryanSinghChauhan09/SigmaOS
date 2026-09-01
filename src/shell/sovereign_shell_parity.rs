@@ -9,18 +9,18 @@ extern crate alloc;
 // - Custom prompt formatting (PS1 expansion: \u, \h, \w, \$)
 // - Background job control parsing (&)
 
-use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RedirectionType {
-    OutputTruncate(String), // > file
-    OutputAppend(String),   // >> file
-    InputRead(String),      // < file
-    StderrToStdout,         // 2>&1
+    OutputTruncate(String),  // > file
+    OutputAppend(String),    // >> file
+    InputRead(String),       // < file
+    StderrToStdout,          // 2>&1
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -206,21 +206,9 @@ impl SovereignBashZshParityShell {
     /// Renders PS1 custom prompt (e.g. `root@sigmaos:/home/root# `)
     pub fn render_prompt(&self) -> String {
         let mut prompt = self.prompt_format.clone();
-        let user = self
-            .variables
-            .get("USER")
-            .cloned()
-            .unwrap_or_else(|| String::from("root"));
-        let host = self
-            .variables
-            .get("HOSTNAME")
-            .cloned()
-            .unwrap_or_else(|| String::from("sigmaos"));
-        let pwd = self
-            .variables
-            .get("PWD")
-            .cloned()
-            .unwrap_or_else(|| String::from("/"));
+        let user = self.variables.get("USER").cloned().unwrap_or_else(|| String::from("root"));
+        let host = self.variables.get("HOSTNAME").cloned().unwrap_or_else(|| String::from("sigmaos"));
+        let pwd = self.variables.get("PWD").cloned().unwrap_or_else(|| String::from("/"));
 
         prompt = prompt.replace("\\u", &user);
         prompt = prompt.replace("\\h", &host);
@@ -257,15 +245,10 @@ mod tests {
     #[test]
     fn test_variable_expansion() {
         let mut shell = SovereignBashZshParityShell::new();
-        shell
-            .variables
-            .insert(String::from("FOO"), String::from("bar"));
+        shell.variables.insert(String::from("FOO"), String::from("bar"));
 
         assert_eq!(shell.expand_variables("Hello $FOO"), "Hello bar");
-        assert_eq!(
-            shell.expand_variables("Home is ${HOME}"),
-            "Home is /home/root"
-        );
+        assert_eq!(shell.expand_variables("Home is ${HOME}"), "Home is /home/root");
         assert_eq!(shell.expand_variables("${MISSING:-fallback}"), "fallback");
     }
 

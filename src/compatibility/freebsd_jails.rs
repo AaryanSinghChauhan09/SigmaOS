@@ -4,9 +4,9 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -388,10 +388,7 @@ impl SigmaJailManager {
         }
     }
 
-    fn kill_jail_processes_by_pids(
-        &self,
-        processes: &[u32],
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn kill_jail_processes_by_pids(&self, processes: &[u32]) -> Result<(), Box<dyn std::error::Error>> {
         // Kill all processes in jail's process group
         for pid in processes {
             let _ = Command::new("kill")
@@ -422,15 +419,9 @@ impl SigmaJailManager {
         let root_path = &config.root_path;
 
         // Unmount filesystems
-        let _ = Command::new("umount")
-            .arg(root_path.join("proc").to_string_lossy().as_ref())
-            .output();
-        let _ = Command::new("umount")
-            .arg(root_path.join("sys").to_string_lossy().as_ref())
-            .output();
-        let _ = Command::new("umount")
-            .arg(root_path.join("dev").to_string_lossy().as_ref())
-            .output();
+        let _ = Command::new("umount").arg(root_path.join("proc").to_string_lossy().as_ref()).output();
+        let _ = Command::new("umount").arg(root_path.join("sys").to_string_lossy().as_ref()).output();
+        let _ = Command::new("umount").arg(root_path.join("dev").to_string_lossy().as_ref()).output();
 
         Ok(())
     }

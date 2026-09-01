@@ -281,27 +281,21 @@ static mut INSTANCE: EditionTarget = EditionTarget::new();
 /// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn init() {
-    unsafe {
-        (&mut *core::ptr::addr_of_mut!(INSTANCE)).init();
-    }
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
 /// # Safety
 /// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setTorDefault() {
-    unsafe {
-        (&mut *core::ptr::addr_of_mut!(INSTANCE)).setTorDefault(1, true);
-    }
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).setTorDefault(1, true); }
 }
 
 /// # Safety
 /// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setMinimalGUI() {
-    unsafe {
-        (&mut *core::ptr::addr_of_mut!(INSTANCE)).setMinimalGUI(1, true);
-    }
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).setMinimalGUI(1, true); }
 }
 
 /// # Safety
@@ -313,18 +307,14 @@ pub unsafe extern "C" fn printStatus() {}
 /// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_init() {
-    unsafe {
-        (&mut *core::ptr::addr_of_mut!(INSTANCE)).init();
-    }
+    unsafe { (&mut *core::ptr::addr_of_mut!(INSTANCE)).init(); }
 }
 
 /// # Safety
 /// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_build() {
-    unsafe {
-        let _ = (&mut *core::ptr::addr_of_mut!(INSTANCE)).buildEdition(1);
-    }
+    unsafe { let _ = (&mut *core::ptr::addr_of_mut!(INSTANCE)).buildEdition(1); }
 }
 
 /// # Safety

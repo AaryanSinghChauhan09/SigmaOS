@@ -5,9 +5,9 @@
 // on external TOML/serde crates and keeps the sovereign toolchain dependency-free.
 
 extern crate alloc;
-use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::HashMap;
 
 /// A parsed TOML document: top-level keys plus nested tables.
 pub struct TomlDocument {
