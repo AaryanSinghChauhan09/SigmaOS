@@ -318,7 +318,7 @@ fn test_audio_dsp_mixing_and_effects() {
     assert!((mix[0] - 0.8).abs() < 1e-5);
 
     let mut dsp_buf: [f32; 3] = [0.02, 0.80, -0.01];
-    let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05, 12.0);
+    let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05);
     noise_suppress.apply(&mut dsp_buf);
     assert!(if dsp_buf[0] < 0.0 { -dsp_buf[0] } else { dsp_buf[0] } < 0.01);
     assert!(dsp_buf[1] > 0.70);

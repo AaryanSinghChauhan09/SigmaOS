@@ -366,10 +366,9 @@ impl SimpleVMM {
                 let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
                 let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
                 if let Some(ref mut pt) = self.pt_tables.get_mut(pt_idx_in_vec).and_then(|o| o.as_mut()) {
-                    let mut entry = pt.entries[pt_idx];
+                    let entry = &mut pt.entries[pt_idx];
                     entry.set_writable(false);
                     entry.cow.store(1, Ordering::SeqCst);
-                    pt.entries[pt_idx] = entry;
                     return Ok(());
                 }
             }
