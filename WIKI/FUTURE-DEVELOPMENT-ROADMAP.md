@@ -3192,3 +3192,28 @@ SigmaOS guarantees native bare-metal execution across 30+ years of hardware evol
    - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
    - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
    - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
+
+## SECTION 52: SOVEREIGN ARCHINSTALL & BSD bsdinstall PARITY SPECIFICATION
+
+### 52.1 Installation Subsystem Architecture & Distro Parity Features
+1. **Declarative Profile-Driven Guided Installer**:
+   - Inspired by Arch Linux `archinstall` and FreeBSD `bsdinstall`.
+   - Grounded in `src/installer/system_installer.rs` (`SystemInstaller`, `InstallConfig`, `InstallStage`, `InstallProgress`).
+   - Supports both guided TUI/CLI interactive prompts and unattended declarative JSON/YAML installation profiles (`sigmaos.conf`), featuring dry-run disk partitioning simulation.
+2. **Advanced Multi-Filesystem & Volume Management**:
+   - Supports Automatic (`DiskLayout::Automatic`), Manual (`DiskLayout::Manual`), LVM (`DiskLayout::LVM`), Btrfs (`DiskLayout::Btrfs`), ZFS (`DiskLayout::ZFS`), and SigmaFS Copy-on-Write with Merkle tree state verification.
+   - Provides automated subvolume layout creation (`@`, `@home`, `@snapshots`) for Btrfs and zpool dataset hierarchies for ZFS.
+3. **Multi-Bootloader Support & Firmware Auto-Detection**:
+   - Grounded in `BootloaderType` (`Limine`, `SystemdBoot`, `GRUB2`, `Refind`).
+   - Automatically detects UEFI NVRAM vs 16-bit legacy BIOS firmware, configures Secure Boot keys, and writes EFI executable boot entries.
+4. **Post-Installation Declarative Configuration & User Setup**:
+   - Automates hostname assignment, timezone selection, locale generation, keyboard keymap binding, root/user account creation with Argon2/SHA-512 password hashing, wheel/sudoers group assignment, and systemd-style init service enablement.
+
+### 52.2 Bare-Metal Zero-Dependency OOP Systems Architecture Rules
+1. **Modern Low-Level Language Restriction**: Written strictly in Rust, Zig, or Nim under `#![no_std]` bare-metal configurations.
+2. **Absolute Zero-Dependency Constraint**: Zero external standard library dependencies (`std::` or third-party crates/libraries). All allocation utilities, custom data structures (`SigmaVec`, `SigmaString`, `BTreeMap`), and string parsers are implemented from scratch.
+3. **Bare-Metal Object-Oriented Principles (OOP)**:
+   - **Encapsulation**: Isolating hardware MMIO registers and state inside modular objects.
+   - **Inheritance & Hierarchy**: Establishing device hierarchies (`StorageDriver` extended by `NvmeDriver` and `IdeDriver`).
+   - **Polymorphism**: Dynamic trait dispatch enabling multi-device management under unified interfaces.
+   - **OS Design Patterns**: Singleton pattern (`DriverManager`), Factory pattern (PCI VID/DID dynamic allocation), Observer pattern (thread-safe asynchronous kernel event handling), and Adapter pattern (wrapping legacy BSD/Linux driver APIs).
