@@ -427,7 +427,7 @@ impl PiaSplitTunnelGovernor {
                     }
                 }
                 SplitTunnelRule::BypassSubnet(net_ip, prefix) => {
-                    let prefix_val = u32::from(*prefix);
+                    let prefix_val = u32::from(prefix);
                     let mask = if prefix_val == 0 { 0 } else { !0u32 << (32 - prefix_val) };
                     if (destination_ip & mask) == (net_ip & mask) {
                         return true;
