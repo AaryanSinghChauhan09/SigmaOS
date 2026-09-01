@@ -1,0 +1,28 @@
+name: Qubes OS & Xen Micro-Domain Isolation Security CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  qubes-xen-isolation-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Qubes Isolation & Inter-VM Buffer Engine
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/security/qubes_isolation.rs -o /tmp/test_qubes && /tmp/test_qubes
+
+      - name: Verify Firecracker MicroVM Manager Subsystem
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_obsoletion.rs -o /tmp/test_microvm && /tmp/test_microvm test_sovereign_firecracker_microvm_manager

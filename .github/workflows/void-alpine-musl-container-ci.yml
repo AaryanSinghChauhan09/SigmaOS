@@ -1,0 +1,28 @@
+name: Void, Alpine & Musl Lightweight Container Verification CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  void-alpine-musl-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Runit Init Supervisor & Service Management
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/init/systemd_init.rs -o /tmp/test_init && /tmp/test_init
+
+      - name: Verify Alpine APK & Flatpak Container Sandboxing Engine
+        run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_obsoletion.rs -o /tmp/test_flatpak && /tmp/test_flatpak test_sovereign_flatpak_sandbox

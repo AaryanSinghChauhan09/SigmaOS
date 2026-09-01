@@ -8,6 +8,9 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+use crate::distro::sovereign_distro_dominance::SovereignDistroDominanceSuite;
+use crate::distro::universal_distro_super_matrix::UniversalDistroSuperMatrix;
+
 // ==========================================
 // 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE
 // ==========================================
@@ -28,6 +31,8 @@ pub struct SovereignUniversalDistroBridge {
     pub pledge_sentinel: OpenBsdPledgeUnveilSentinel,
     pub apk_hook_engine: ApkXbpsHookEngine,
     pub retguard_engine: OpenBsdRetguardEngine,
+    pub dominance_suite: SovereignDistroDominanceSuite,
+    pub super_matrix: UniversalDistroSuperMatrix,
 }
 
 impl SovereignUniversalDistroBridge {
@@ -38,6 +43,8 @@ impl SovereignUniversalDistroBridge {
             pledge_sentinel: OpenBsdPledgeUnveilSentinel::new(),
             apk_hook_engine: ApkXbpsHookEngine::new(),
             retguard_engine: OpenBsdRetguardEngine::new(),
+            dominance_suite: SovereignDistroDominanceSuite::new(),
+            super_matrix: UniversalDistroSuperMatrix::new(),
         }
     }
 
@@ -78,6 +85,25 @@ impl SovereignUniversalDistroBridge {
 
     pub fn validate_retguard_stack(&mut self, func_name: &str, canary: u64, sp: u64) -> Result<(), &'static str> {
         self.retguard_engine.verify_exit_function(func_name, canary, sp)
+    }
+
+    pub fn nix_store_add_and_register_package(&mut self, name: &str, version: &str, deps: Vec<String>, binary_payload: &[u8]) -> Result<(String, usize), String> {
+        let hash_id = self.dominance_suite.nix_store.add_package(name, version, deps, binary_payload);
+        let generation = self.dominance_suite.nix_store.register_in_generation(name, &hash_id)?;
+        Ok((hash_id, generation))
+    }
+
+    pub fn schedule_distro_task(&mut self, pid: usize, name: &str, burst_us: u64) -> Option<usize> {
+        self.dominance_suite.scheduler.register_task(pid, name, burst_us);
+        self.dominance_suite.scheduler.schedule_next()
+    }
+
+    pub fn verify_and_self_heal_cow_file(&mut self, subvol: &str, filepath: &str, expected_data: &[u8]) -> Result<bool, String> {
+        self.dominance_suite.filesystem_cow.verify_and_self_heal(subvol, filepath, expected_data)
+    }
+
+    pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
+        self.super_matrix.create_qubes_domain(domain_name)
     }
 }
 
@@ -5314,6 +5340,40 @@ mod tests {
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
         assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
+    }
+
+    #[test]
+    fn test_universal_distro_bridge_dominance_interop() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxNix);
+        assert_eq!(bridge.translate_package_specifier("zsh"), "zsh.nix");
+
+        // Nix store integration test via bridge
+        let (hash_id, gen) = bridge.nix_store_add_and_register_package("zsh", "5.9", vec![], b"binary-content").unwrap();
+        assert_eq!(gen, 1);
+        assert!(bridge.dominance_suite.nix_store.zero_copy_read_slice(&hash_id).is_some());
+
+        // BORE Scheduler integration test via bridge
+        let scheduled_pid = bridge.schedule_distro_task(42, "compiler-job", 50);
+        assert_eq!(scheduled_pid, Some(42));
+
+        // Self-healing CoW filesystem integration test via bridge
+        let healed = bridge.verify_and_self_heal_cow_file("@root", "/etc/os-release", b"NAME=SigmaOS\nVERSION=1.0\n").unwrap();
+        assert!(!healed);
+    }
+
+    #[test]
+    fn test_universal_distro_bridge_super_matrix_interop() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd);
+        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
+
+        // Qubes isolation domain creation test via bridge
+        assert!(bridge.create_qubes_isolation_domain("vault-domain").is_ok());
+        assert!(bridge.create_qubes_isolation_domain("vault-domain").is_err());
+
+        // Super matrix distro profiles verification via bridge
+        let ubuntu = bridge.super_matrix.get_profile("Ubuntu/Debian");
+        assert!(ubuntu.is_some());
+        assert_eq!(ubuntu.unwrap().package_management_model, "deb/apt");
     }
 }
 
