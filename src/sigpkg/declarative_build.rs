@@ -3,8 +3,18 @@
 use alloc::format;
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use alloc::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
 use alloc::vec::Vec;
 
 // ==========================================
@@ -94,12 +104,11 @@ impl BazelBuildEngine {
     pub fn build_target(&mut self, target: &BazelTarget) -> (String, bool) {
         let cache_key = self.calculate_target_cache_key(target);
         if let Some(cached_output) = self.action_cache.get(&cache_key) {
-            (cached_output.clone(), true) // Cache Hit!
+            (cached_output.clone(), true)
         } else {
-            // Simulated action execution compiling sources to outputs
-            let generated_hash = format!("bazel-out/{:016x}", 42);
+            let generated_hash: String = format!("bazel-out/{:016x}", 42);
             self.action_cache.insert(cache_key, generated_hash.clone());
-            (generated_hash, false) // Cache Miss
+            (generated_hash, false)
         }
     }
 }
@@ -169,7 +178,103 @@ impl Default for PackageRatingsRegistry {
 }
 
 // ==========================================
-// 4. Tests Module
+// 4. Gentoo Portage Ebuild & FreeBSD Poudriere Reproducibility Engines
+// ==========================================
+
+/// Gentoo Portage Ebuild USE Flag Matrix & Slotting Engine for Deterministic Package Compilation
+#[derive(Debug, Clone)]
+pub struct GentooPortageReproducibleEbuildEngine {
+    pub category_atom: String,
+    pub active_use_flags: Vec<String>,
+    pub slot: String,
+}
+
+impl GentooPortageReproducibleEbuildEngine {
+    pub fn new(atom: &str, slot: &str) -> Self {
+        Self {
+            category_atom: atom.to_string(),
+            active_use_flags: Vec::new(),
+            slot: slot.to_string(),
+        }
+    }
+
+    pub fn set_use_flags(&mut self, flags: &[&str]) {
+        self.active_use_flags = flags.iter().map(|f| f.to_string()).collect();
+        self.active_use_flags.sort();
+    }
+
+    pub fn compute_ebuild_build_hash(&self) -> String {
+        let key = format!("{}:{}:{}", self.category_atom, self.slot, self.active_use_flags.join(","));
+        let mut hash_val = 5381u64;
+        for b in key.bytes() {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        format!("{:016x}", hash_val)
+    }
+}
+
+/// FreeBSD Ports & Poudriere Hermetic Jail Package Reproducer Engine
+#[derive(Debug, Clone)]
+pub struct FreeBsdPortsPackageReproducer {
+    pub origin_port: String,
+    pub poudriere_jail_name: String,
+    pub make_options: Vec<String>,
+}
+
+impl FreeBsdPortsPackageReproducer {
+    pub fn new(port: &str, jail: &str) -> Self {
+        Self {
+            origin_port: port.to_string(),
+            poudriere_jail_name: jail.to_string(),
+            make_options: Vec::new(),
+        }
+    }
+
+    pub fn add_make_option(&mut self, opt: &str) {
+        self.make_options.push(opt.to_string());
+        self.make_options.sort();
+    }
+
+    pub fn generate_reproducible_pkg_manifest(&self) -> String {
+        format!(
+            "name: {}\nversion: 1.0.0\norigin: {}\njail: {}\noptions: [{}]\n",
+            self.origin_port.split('/').last().unwrap_or("pkg"),
+            self.origin_port,
+            self.poudriere_jail_name,
+            self.make_options.join(", ")
+        )
+    }
+}
+
+/// Diffoscope-Inspired Binary/AST Build Artifact Difference Inspector
+pub struct ReproducibleBuildDiffInspector;
+
+impl ReproducibleBuildDiffInspector {
+    pub fn inspect_diffs(artifact_a: &[u8], artifact_b: &[u8]) -> Vec<String> {
+        let mut diffs = Vec::new();
+        if artifact_a.len() != artifact_b.len() {
+            diffs.push(format!("Size mismatch: {} bytes vs {} bytes", artifact_a.len(), artifact_b.len()));
+            return diffs;
+        }
+
+        let mut mismatch_count = 0;
+        for (i, (&byte_a, &byte_b)) in artifact_a.iter().zip(artifact_b.iter()).enumerate() {
+            if byte_a != byte_b {
+                if mismatch_count < 3 {
+                    diffs.push(format!("Byte mismatch at offset 0x{:x}: 0x{:02x} vs 0x{:02x}", i, byte_a, byte_b));
+                }
+                mismatch_count += 1;
+            }
+        }
+        if mismatch_count > 3 {
+            diffs.push(format!("Total {} byte mismatches detected", mismatch_count));
+        }
+        diffs
+    }
+}
+
+// ==========================================
+// 5. Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -262,5 +367,45 @@ mod tests {
         let (avg, count) = registry.get_aggregate_rating(store_path).unwrap();
         assert_eq!(count, 2);
         assert_eq!(avg, 4.5);
+    }
+
+    #[test]
+    fn test_gentoo_portage_reproducible_ebuild_engine() {
+        let mut ebuild1 = GentooPortageReproducibleEbuildEngine::new("dev-libs/openssl", "0/1.1");
+        ebuild1.set_use_flags(&["asm", "tls-compression", "zlib"]);
+
+        let mut ebuild2 = GentooPortageReproducibleEbuildEngine::new("dev-libs/openssl", "0/1.1");
+        ebuild2.set_use_flags(&["zlib", "asm", "tls-compression"]);
+
+        assert_eq!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+
+        ebuild2.set_use_flags(&["asm", "zlib"]);
+        assert_ne!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+    }
+
+    #[test]
+    fn test_freebsd_ports_package_reproducer() {
+        let mut ports = FreeBsdPortsPackageReproducer::new("security/openssl", "140amd64-default");
+        ports.add_make_option("WITH_OPTIMIZED_CFLAGS=yes");
+        ports.add_make_option("WITHOUT_SSL3=yes");
+
+        let manifest = ports.generate_reproducible_pkg_manifest();
+        assert!(manifest.contains("origin: security/openssl"));
+        assert!(manifest.contains("jail: 140amd64-default"));
+        assert!(manifest.contains("WITHOUT_SSL3=yes"));
+    }
+
+    #[test]
+    fn test_reproducible_build_diff_inspector() {
+        let bin1 = b"reproducible_sigma_binary_payload";
+        let bin2 = b"reproducible_sigma_binary_payload";
+        let bin3 = b"reproducible_sigma_binary_TAMPERD";
+
+        let diffs_empty = ReproducibleBuildDiffInspector::inspect_diffs(bin1, bin2);
+        assert!(diffs_empty.is_empty());
+
+        let diffs_mismatch = ReproducibleBuildDiffInspector::inspect_diffs(bin1, bin3);
+        assert!(!diffs_mismatch.is_empty());
+        assert!(diffs_mismatch[0].contains("Byte mismatch"));
     }
 }

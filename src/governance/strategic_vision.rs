@@ -1,10 +1,4 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 extern crate alloc;
-// SigmaOS Strategic Vision Roadmap & OKR Engine
-// Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
-
-
 
 #[cfg(not(feature = "standalone_test"))]
 use alloc::{
@@ -16,10 +10,13 @@ use alloc::{
 extern crate std;
 
 #[cfg(feature = "standalone_test")]
-use alloc::{
+use std::{
     string::{String, ToString},
     vec::Vec,
 };
+
+// SigmaOS Strategic Vision Roadmap & OKR Engine
+// Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
 
 /// Strategic evaluation error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -122,6 +119,23 @@ impl StrategicOkrEvaluator {
             .sum();
         sum / self.milestones.len() as f64
     }
+
+    pub fn evaluate_milestone_status(&self, id: u32) -> Result<f64, OkrError> {
+        let milestone = self
+            .milestones
+            .iter()
+            .find(|m| m.id == id)
+            .ok_or(OkrError::MilestoneNotFound)?;
+        Ok(milestone.completion_percentage)
+    }
+
+    pub fn check_okr_error(&self, id: u32) -> OkrError {
+        if self.milestones.iter().any(|m| m.id == id) {
+            OkrError::Success
+        } else {
+            OkrError::MilestoneNotFound
+        }
+    }
 }
 
 impl Default for StrategicOkrEvaluator {
@@ -158,5 +172,12 @@ mod tests {
         );
         assert_eq!(evaluator.milestones.len(), 4);
         assert_eq!(evaluator.compute_roadmap_completion(), 87.5); // (100+100+100+50)/4
+
+        assert_eq!(evaluator.evaluate_milestone_status(1), Ok(100.0));
+        assert_eq!(evaluator.evaluate_milestone_status(4), Ok(50.0));
+        assert_eq!(evaluator.evaluate_milestone_status(99), Err(OkrError::MilestoneNotFound));
+
+        assert_eq!(evaluator.check_okr_error(1), OkrError::Success);
+        assert_eq!(evaluator.check_okr_error(99), OkrError::MilestoneNotFound);
     }
 }

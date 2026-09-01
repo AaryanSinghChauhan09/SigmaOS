@@ -1,8 +1,23 @@
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
@@ -191,6 +206,107 @@ impl PackageFormat {
             None
         }
     }
+
+    /// Automatically detects package format from file path or filename extension
+    pub fn detect_format_from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        if name.ends_with(".deb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".txz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".spkg") || name.ends_with(".sigpkg") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".ebuild") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".nix") || name.ends_with(".nixpkg") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".scm") || name.ends_with(".guix") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else {
+            None
+        }
+    }
+
+    /// Inspects magic headers / magic bytes from archive data to determine package format
+    pub fn detect_format_from_bytes(bytes: &[u8]) -> Option<Self> {
+        if bytes.len() < 8 {
+            return None;
+        }
+
+        // Debian deb archive: "!<arch>\ndebian-binary"
+        if bytes.starts_with(b"!<arch>\n") {
+            return Some(PackageFormat::Deb);
+        }
+
+        // RPM package magic: 0xED 0xAB 0xEE 0xDB
+        if bytes[0..4] == [0xED, 0xAB, 0xEE, 0xDB] {
+            return Some(PackageFormat::Rpm);
+        }
+
+        // SquashFS magic (used by Snap & AppImage): "hsqs" or "sqsh"
+        if bytes.starts_with(b"hsqs") || bytes.starts_with(b"sqsh") {
+            return Some(PackageFormat::Snap);
+        }
+
+        // Zstandard compressed archive (.pkg.tar.zst): 0x28 0xB5 0x2F 0xFD
+        if bytes[0..4] == [0x28, 0xB5, 0x2F, 0xFD] {
+            return Some(PackageFormat::Pacman);
+        }
+
+        // ELF binary / AppImage single-file container: 0x7F 'E' 'L' 'F'
+        if bytes.starts_with(b"\x7fELF") {
+            return Some(PackageFormat::AppImage);
+        }
+
+        // Gzip archive (.tar.gz / .apk): 0x1F 0x8B
+        if bytes[0..2] == [0x1F, 0x8B] {
+            return Some(PackageFormat::Apk);
+        }
+
+        None
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -338,26 +454,42 @@ impl UniversalPackageTranslator {
         match clean {
             // C Library & Compilers
             "libc6" | "glibc" | "musl" | "libc" => "sovereign-libc".to_string(),
-            "gcc" | "gcc-c++" | "g++" | "clang" | "build-base" => "sovereign-build-essential".to_string(),
+            "gcc" | "gcc-c++" | "g++" | "clang" | "build-base" | "llvm" => "sovereign-build-essential".to_string(),
 
             // SSL & Security Libraries
-            "libssl-dev" | "openssl-devel" | "openssl-dev" | "libssl3" => "sovereign-openssl".to_string(),
+            "libssl-dev" | "openssl-devel" | "openssl-dev" | "libssl3" | "gnutls" => "sovereign-openssl".to_string(),
 
             // Python Runtimes
             "python3" | "python" | "python3-minimal" | "python3-base" => "sovereign-python3".to_string(),
 
             // Node.js Runtimes & Package Managers
-            "nodejs" | "node" | "nodejs-lts" | "node20" => "sovereign-nodejs".to_string(),
+            "nodejs" | "node" | "nodejs-lts" | "node20" | "npm" => "sovereign-nodejs".to_string(),
+
+            // Desktop Toolkits (GTK / Qt / Cocoa / FLTK)
+            "libgtk-3-dev" | "gtk3-devel" | "gtk3" | "gtk4" => "sovereign-gtk".to_string(),
+            "qtbase5-dev" | "qt5-qtbase-devel" | "qt6-base" => "sovereign-qt".to_string(),
 
             // X11 / Display / GUI Libraries
             "libx11-dev" | "libX11-devel" | "libx11" => "sovereign-libx11".to_string(),
             "libwayland-dev" | "wayland-devel" | "wayland" => "sovereign-wayland".to_string(),
 
-            // Audio Subsystems
+            // Audio & Media Subsystems
             "libpipewire-0.3-dev" | "pipewire-devel" | "pipewire" => "sovereign-pipewire".to_string(),
+            "libasound2-dev" | "alsa-lib-devel" | "alsa-lib" => "sovereign-alsa".to_string(),
+            "libpulseaudio-dev" | "pulseaudio-libs-devel" => "sovereign-pulseaudio".to_string(),
+
+            // Graphics Drivers & Hardware Acceleration
+            "mesa" | "mesa-libGL-devel" | "libgl1-mesa-dev" => "sovereign-graphics-driver".to_string(),
+            "nvidia-driver" | "nvidia-utils" | "xorg-x11-drv-nvidia" => "sovereign-nvidia-driver".to_string(),
+            "vulkan-loader" | "vulkan-headers" => "sovereign-vulkan".to_string(),
+
+            // Networking Stacks & VPNs
+            "network-manager" | "NetworkManager" => "sovereign-networkmanager".to_string(),
+            "wireguard-tools" | "wireguard" => "sovereign-wireguard".to_string(),
 
             // Compression Utilities
-            "zlib1g-dev" | "zlib-devel" | "zlib" => "sovereign-zlib".to_string(),
+            "zlib1g-dev" | "zlib-devel" | "zlib" | "libz" => "sovereign-zlib".to_string(),
+            "libzstd-dev" | "zstd-devel" | "zstd" => "sovereign-zstd".to_string(),
 
             // Default: preserve original clean name
             other => format!("sovereign-pkg-{}", other),
@@ -1790,6 +1922,34 @@ mod tests {
             enabled: true,
         };
         assert!(dnf_adapter.query_dnf_repository(&dnf_config));
+    }
+
+    #[test]
+    fn test_package_format_auto_detection() {
+        assert_eq!(PackageFormat::detect_format_from_filename("nginx_1.24.0-1_amd64.deb"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::detect_format_from_filename("curl-8.4.0-1.x86_64.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::detect_format_from_filename("bash-5.2.21-1-x86_64.pkg.tar.zst"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::detect_format_from_filename("openssl-3.1.0-r0.apk"), Some(PackageFormat::Apk));
+        assert_eq!(PackageFormat::detect_format_from_filename("glibc-2.38_1.xbps"), Some(PackageFormat::Xbps));
+        assert_eq!(PackageFormat::detect_format_from_filename("vlc.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::detect_format_from_filename("firefox.appimage"), Some(PackageFormat::AppImage));
+        assert_eq!(PackageFormat::detect_format_from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
+        assert_eq!(PackageFormat::detect_format_from_filename("package.nix"), Some(PackageFormat::Nixpkg));
+        assert_eq!(PackageFormat::detect_format_from_filename("haiku.hpkg"), Some(PackageFormat::Hpkg));
+
+        // Magic byte detection
+        assert_eq!(PackageFormat::detect_format_from_bytes(b"!<arch>\ndebian-binary"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::detect_format_from_bytes(&[0xED, 0xAB, 0xEE, 0xDB, 0x01, 0x02, 0x03, 0x04]), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::detect_format_from_bytes(&[0x28, 0xB5, 0x2F, 0xFD, 0x00, 0x00, 0x00, 0x00]), Some(PackageFormat::Pacman));
+    }
+
+    #[test]
+    fn test_expanded_dependency_normalization() {
+        assert_eq!(UniversalPackageTranslator::normalize_dependency_name("gtk3-devel"), "sovereign-gtk");
+        assert_eq!(UniversalPackageTranslator::normalize_dependency_name("alsa-lib"), "sovereign-alsa");
+        assert_eq!(UniversalPackageTranslator::normalize_dependency_name("nvidia-utils"), "sovereign-nvidia-driver");
+        assert_eq!(UniversalPackageTranslator::normalize_dependency_name("wireguard-tools"), "sovereign-wireguard");
+        assert_eq!(UniversalPackageTranslator::normalize_dependency_name("libzstd-dev"), "sovereign-zstd");
     }
 
     #[test]

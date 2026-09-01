@@ -13,6 +13,9 @@ pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
 };
+pub use strategic_vision::{
+    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
+};
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

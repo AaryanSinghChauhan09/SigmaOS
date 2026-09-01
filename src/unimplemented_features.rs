@@ -2612,6 +2612,322 @@ impl Default for NetBsdRumpComponentEngine {
     }
 }
 
+/// Android APEX Container Module Manager (Inspired by Android APEX modular system updates)
+#[derive(Debug, Clone)]
+pub struct AndroidApexModule {
+    pub package_name: String,
+    pub version_code: u64,
+    pub mount_point: String,
+    pub active: bool,
+}
+
+pub struct AndroidApexContainerModuleEngine {
+    pub modules: Vec<AndroidApexModule>,
+    pub active_mounts: usize,
+}
+
+impl AndroidApexContainerModuleEngine {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+            active_mounts: 0,
+        }
+    }
+
+    pub fn register_apex_module(&mut self, package_name: &str, version_code: u64, mount_point: &str) -> bool {
+        if self.modules.iter().any(|m| m.package_name == package_name && m.version_code == version_code) {
+            return false;
+        }
+        self.modules.push(AndroidApexModule {
+            package_name: package_name.to_string(),
+            version_code,
+            mount_point: mount_point.to_string(),
+            active: false,
+        });
+        true
+    }
+
+    pub fn activate_module(&mut self, package_name: &str, version_code: u64) -> Result<(), &'static str> {
+        let module = self.modules.iter_mut()
+            .find(|m| m.package_name == package_name && m.version_code == version_code)
+            .ok_or("APEX module not registered")?;
+        if module.active {
+            return Ok(());
+        }
+        module.active = true;
+        self.active_mounts += 1;
+        Ok(())
+    }
+
+    pub fn rollback_module(&mut self, package_name: &str) -> Result<u64, &'static str> {
+        let module = self.modules.iter_mut()
+            .find(|m| m.package_name == package_name && m.active)
+            .ok_or("Active APEX module not found for rollback")?;
+        module.active = false;
+        if self.active_mounts > 0 {
+            self.active_mounts -= 1;
+        }
+        Ok(module.version_code)
+    }
+}
+
+impl Default for AndroidApexContainerModuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic Binary Translator (Inspired by macOS Rosetta 2 & Android Houdini binary translation)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TargetArch {
+    AArch64,
+    RiscV64,
+}
+
+#[derive(Debug, Clone)]
+pub struct TranslatedInstructionBlock {
+    pub guest_address: u64,
+    pub host_instructions: Vec<u8>,
+    pub hit_count: u64,
+}
+
+pub struct RosettaDynamicBinaryTranslator {
+    pub target_arch: TargetArch,
+    pub translation_cache: Vec<TranslatedInstructionBlock>,
+    pub total_translations: u64,
+}
+
+impl RosettaDynamicBinaryTranslator {
+    pub fn new(target_arch: TargetArch) -> Self {
+        Self {
+            target_arch,
+            translation_cache: Vec::new(),
+            total_translations: 0,
+        }
+    }
+
+    pub fn translate_instruction_block(&mut self, guest_address: u64, x86_bytes: &[u8]) -> Vec<u8> {
+        if let Some(cached) = self.translation_cache.iter_mut().find(|b| b.guest_address == guest_address) {
+            cached.hit_count += 1;
+            return cached.host_instructions.clone();
+        }
+
+        let mut translated = Vec::new();
+        match self.target_arch {
+            TargetArch::AArch64 => {
+                translated.extend_from_slice(&[0x1F, 0x20, 0x03, 0xD5]);
+                translated.extend_from_slice(x86_bytes);
+            }
+            TargetArch::RiscV64 => {
+                translated.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]);
+                translated.extend_from_slice(x86_bytes);
+            }
+        }
+
+        self.translation_cache.push(TranslatedInstructionBlock {
+            guest_address,
+            host_instructions: translated.clone(),
+            hit_count: 1,
+        });
+        self.total_translations += 1;
+        translated
+    }
+}
+
+/// Automated Performance Benchmark Engine (Inspired by Phoronix Test Suite)
+#[derive(Debug, Clone)]
+pub struct BenchmarkResult {
+    pub test_name: String,
+    pub metric_unit: String,
+    pub score: f64,
+}
+
+pub struct PhoronixAutomatedBenchmarkEngine {
+    pub test_suite_name: String,
+    pub results: Vec<BenchmarkResult>,
+}
+
+impl PhoronixAutomatedBenchmarkEngine {
+    pub fn new(test_suite_name: &str) -> Self {
+        Self {
+            test_suite_name: test_suite_name.to_string(),
+            results: Vec::new(),
+        }
+    }
+
+    pub fn run_test(&mut self, test_name: &str, metric_unit: &str, score: f64) {
+        self.results.push(BenchmarkResult {
+            test_name: test_name.to_string(),
+            metric_unit: metric_unit.to_string(),
+            score,
+        });
+    }
+
+    pub fn compute_composite_index(&self) -> f64 {
+        if self.results.is_empty() {
+            return 0.0;
+        }
+        let sum: f64 = self.results.iter().map(|r| r.score).sum();
+        sum / self.results.len() as f64
+    }
+}
+
+/// Distro Parity & Ecosystem Absorption Hub (Inspired by DistroWatch feature tracking)
+#[derive(Debug, Clone)]
+pub struct DistroParityScore {
+    pub distro_name: String,
+    pub absorption_percentage: u8,
+}
+
+pub struct DistroWatchParityMetricsHub {
+    pub distros: Vec<DistroParityScore>,
+}
+
+impl DistroWatchParityMetricsHub {
+    pub fn new() -> Self {
+        Self {
+            distros: Vec::new(),
+        }
+    }
+
+    pub fn record_distro_parity(&mut self, distro_name: &str, absorption_percentage: u8) {
+        if let Some(entry) = self.distros.iter_mut().find(|d| d.distro_name == distro_name) {
+            entry.absorption_percentage = absorption_percentage;
+        } else {
+            self.distros.push(DistroParityScore {
+                distro_name: distro_name.to_string(),
+                absorption_percentage,
+            });
+        }
+    }
+
+    pub fn average_ecosystem_parity(&self) -> f64 {
+        if self.distros.is_empty() {
+            return 0.0;
+        }
+        let total: u64 = self.distros.iter().map(|d| d.absorption_percentage as u64).sum();
+        total as f64 / self.distros.len() as f64
+    }
+}
+
+impl Default for DistroWatchParityMetricsHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Rocky Linux & AlmaLinux Enterprise Long-Term Support ABI Stability & Errata Governor
+#[derive(Debug, Clone)]
+pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub rhel_abi_compat_level: u32,
+    pub errata_patches_applied: usize,
+    pub security_advisories: Vec<String>,
+}
+
+impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub fn new(abi_level: u32) -> Self {
+        Self {
+            rhel_abi_compat_level: abi_level,
+            errata_patches_applied: 0,
+            security_advisories: Vec::new(),
+        }
+    }
+
+    pub fn apply_errata_patch(&mut self, advisory_id: &str) {
+        self.security_advisories.push(advisory_id.to_string());
+        self.errata_patches_applied += 1;
+    }
+
+    pub fn verify_abi_compatibility(&self, min_required: u32) -> bool {
+        self.rhel_abi_compat_level >= min_required
+    }
+}
+
+/// Void Linux XBPS Fast Binary Delta Package & Runit Service Engine
+#[derive(Debug, Clone)]
+pub struct VoidXbpsContainerEngine {
+    pub registered_packages: Vec<String>,
+    pub runit_services_active: Vec<String>,
+}
+
+impl VoidXbpsContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_packages: Vec::new(),
+            runit_services_active: Vec::new(),
+        }
+    }
+
+    pub fn install_xbps_package(&mut self, name: &str) {
+        self.registered_packages.push(name.to_string());
+    }
+
+    pub fn start_runit_service(&mut self, service: &str) {
+        if !self.runit_services_active.contains(&service.to_string()) {
+            self.runit_services_active.push(service.to_string());
+        }
+    }
+}
+
+impl Default for VoidXbpsContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Puppy Linux Squashed File System (SFS) Read-Only RAM Disk & Persistence Overlay
+#[derive(Debug, Clone)]
+pub struct PuppyLinuxOverlayRamdiskEngine {
+    pub ramdisk_size_mb: usize,
+    pub loaded_sfs_modules: Vec<String>,
+    pub persistence_save_file: Option<String>,
+}
+
+impl PuppyLinuxOverlayRamdiskEngine {
+    pub fn new(ramdisk_mb: usize) -> Self {
+        Self {
+            ramdisk_size_mb: ramdisk_mb,
+            loaded_sfs_modules: Vec::new(),
+            persistence_save_file: None,
+        }
+    }
+
+    pub fn load_sfs_module(&mut self, sfs_name: &str) {
+        self.loaded_sfs_modules.push(sfs_name.to_string());
+    }
+
+    pub fn mount_persistence(&mut self, savefile_path: &str) {
+        self.persistence_save_file = Some(savefile_path.to_string());
+    }
+}
+
+/// Tiny Core Linux TCZ Extension Loader & On-Demand Symlink Tree Manager
+#[derive(Debug, Clone)]
+pub struct TinyCoreModularTczLoader {
+    pub mounted_extensions: Vec<String>,
+    pub total_ram_used_kb: usize,
+}
+
+impl TinyCoreModularTczLoader {
+    pub fn new() -> Self {
+        Self {
+            mounted_extensions: Vec::new(),
+            total_ram_used_kb: 0,
+        }
+    }
+
+    pub fn mount_tcz(&mut self, ext_name: &str, size_kb: usize) {
+        self.mounted_extensions.push(ext_name.to_string());
+        self.total_ram_used_kb += size_kb;
+    }
+}
+
+impl Default for TinyCoreModularTczLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -3025,6 +3341,46 @@ mod extra_unimplemented_tests {
         hub.record_distro_parity("FreeBSD", 90);
         assert_eq!(hub.distros.len(), 2);
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+    #[test]
+    fn test_rocky_alma_enterprise_lifecycle_governor() {
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        assert!(gov.verify_abi_compatibility(8));
+        assert!(gov.verify_abi_compatibility(9));
+        assert!(!gov.verify_abi_compatibility(10));
+
+        gov.apply_errata_patch("RHSA-2026:1234");
+        assert_eq!(gov.errata_patches_applied, 1);
+        assert_eq!(gov.security_advisories[0], "RHSA-2026:1234");
+    }
+
+    #[test]
+    fn test_void_xbps_container_engine() {
+        let mut xbps = VoidXbpsContainerEngine::new();
+        xbps.install_xbps_package("xbps-src");
+        xbps.start_runit_service("dhcpcd");
+        xbps.start_runit_service("dhcpcd"); // duplicate check
+        assert_eq!(xbps.registered_packages.len(), 1);
+        assert_eq!(xbps.runit_services_active.len(), 1);
+    }
+
+    #[test]
+    fn test_puppy_linux_overlay_ramdisk_engine() {
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
+        puppy.load_sfs_module("puppy_sigma_2.0.sfs");
+        puppy.mount_persistence("/mnt/home/sigmasave.2fs");
+        assert_eq!(puppy.loaded_sfs_modules.len(), 1);
+        assert_eq!(puppy.persistence_save_file.unwrap(), "/mnt/home/sigmasave.2fs");
+    }
+
+    #[test]
+    fn test_tinycore_modular_tcz_loader() {
+        let mut tcz = TinyCoreModularTczLoader::new();
+        tcz.mount_tcz("wifi.tcz", 1024);
+        tcz.mount_tcz("openssh.tcz", 2048);
+        assert_eq!(tcz.mounted_extensions.len(), 2);
+        assert_eq!(tcz.total_ram_used_kb, 3072);
     }
 
 }
