@@ -51,7 +51,9 @@ pub mod config_parser;
 pub mod utf8_utils;
 pub mod merkle;
 pub mod toml;
+pub mod json;
 
+pub use json::{SovereignJsonValue, SovereignJsonParser};
 pub use vec::Vec;
 pub use alloc::collections::BTreeMap;
 pub use hashmap::HashMap;

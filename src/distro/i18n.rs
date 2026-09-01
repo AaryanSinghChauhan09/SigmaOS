@@ -185,9 +185,11 @@ impl RegionalSettings {
 }
 
 /// Global coordinator for Internationalization and Localization settings.
+/// Inspired by GNU gettext & Linux/BSD distros (Ubuntu, Fedora, FreeBSD) multi-tier translation resolution.
 #[derive(Debug, Clone)]
 pub struct LocaleManager {
     pub current_locale: String,
+    pub fallback_locale: String,
     pub language_packs: BTreeMap<String, LanguagePack>,
     pub imes: BTreeMap<String, InputMethodEngine>,
     pub regional_settings: BTreeMap<String, RegionalSettings>,
@@ -197,6 +199,7 @@ impl LocaleManager {
     pub fn new(default_locale: &str) -> Self {
         Self {
             current_locale: default_locale.to_string(),
+            fallback_locale: "en_US".to_string(),
             language_packs: BTreeMap::new(),
             imes: BTreeMap::new(),
             regional_settings: BTreeMap::new(),
@@ -228,14 +231,59 @@ impl LocaleManager {
         }
     }
 
+    /// GNU gettext / Linux distro inspired multi-tier translation resolution chain:
+    /// 1. Current Full Locale (e.g. "fr_CA.UTF-8" or "fr_CA")
+    /// 2. Base Language Code (e.g. "fr")
+    /// 3. Fallback Locale (e.g. "en_US" or "en")
+    /// 4. Raw Message Key
     pub fn translate(&self, key: &str) -> String {
-        if let Some(pack) = self.language_packs.get(&self.current_locale) {
+        // Strip encoding suffix if present (e.g., "fr_CA.UTF-8" -> "fr_CA")
+        let clean_locale = self.current_locale.split('.').next().unwrap_or(&self.current_locale);
+
+        // Tier 1: Try current exact/cleaned locale
+        if let Some(pack) = self.language_packs.get(clean_locale).or_else(|| self.language_packs.get(&self.current_locale)) {
             let pack: &LanguagePack = pack;
             if let Some(translation) = pack.translate(key) {
                 let translation: &str = translation;
                 return translation.to_string();
             }
         }
+
+        // Tier 2: Try base language code (e.g., "fr_CA" -> "fr")
+        if let Some(base_lang) = clean_locale.split('_').next() {
+            if base_lang != clean_locale {
+                if let Some(pack) = self.language_packs.get(base_lang) {
+                    let pack: &LanguagePack = pack;
+                    if let Some(translation) = pack.translate(key) {
+                        let translation: &str = translation;
+                        return translation.to_string();
+                    }
+                }
+            }
+        }
+
+        // Tier 3: Try fallback locale (e.g., "en_US" or base "en")
+        if self.current_locale != self.fallback_locale && clean_locale != self.fallback_locale {
+            if let Some(pack) = self.language_packs.get(&self.fallback_locale) {
+                let pack: &LanguagePack = pack;
+                if let Some(translation) = pack.translate(key) {
+                    let translation: &str = translation;
+                    return translation.to_string();
+                }
+            }
+            let fallback_clean = self.fallback_locale.split('.').next().unwrap_or(&self.fallback_locale);
+            if let Some(fallback_base) = fallback_clean.split('_').next() {
+                if let Some(pack) = self.language_packs.get(fallback_base) {
+                    let pack: &LanguagePack = pack;
+                    if let Some(translation) = pack.translate(key) {
+                        let translation: &str = translation;
+                        return translation.to_string();
+                    }
+                }
+            }
+        }
+
+        // Tier 4: Fallback to raw key
         key.to_string()
     }
 }
@@ -313,5 +361,34 @@ mod tests {
         assert_eq!(lm.translate("hello"), "Hello");
         assert!(lm.set_locale("en_IN").is_ok());
         assert_eq!(lm.translate("hello"), "Namaste");
+    }
+
+    #[test]
+    fn test_locale_manager_multitier_fallback() {
+        let mut lm = LocaleManager::new("fr_CA.UTF-8");
+
+        let mut pack_en = LanguagePack::new("en_US", "English (US)");
+        pack_en.insert("yes", "Yes");
+        pack_en.insert("no", "No");
+        pack_en.insert("cancel", "Cancel");
+        lm.register_language_pack(pack_en);
+
+        let mut pack_fr = LanguagePack::new("fr", "French");
+        pack_fr.insert("yes", "Oui");
+        pack_fr.insert("no", "Non");
+        lm.register_language_pack(pack_fr);
+
+        let mut pack_fr_ca = LanguagePack::new("fr_CA", "French (Canada)");
+        pack_fr_ca.insert("yes", "Oui (CA)");
+        lm.register_language_pack(pack_fr_ca);
+
+        // Tier 1: "yes" exists in exact/clean "fr_CA"
+        assert_eq!(lm.translate("yes"), "Oui (CA)");
+        // Tier 2: "no" falls back from "fr_CA" to base language "fr"
+        assert_eq!(lm.translate("no"), "Non");
+        // Tier 3: "cancel" falls back to fallback locale "en_US"
+        assert_eq!(lm.translate("cancel"), "Cancel");
+        // Tier 4: Unknown key returns raw key
+        assert_eq!(lm.translate("unknown_key"), "unknown_key");
     }
 }
