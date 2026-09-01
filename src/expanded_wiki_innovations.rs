@@ -568,6 +568,91 @@ impl DistroWikiPageDocumentationGenerator {
     }
 }
 
+/// Strategic Import Plan Engine for Linux & BSD component absorption
+#[derive(Debug, Clone)]
+pub struct StrategicImportItem {
+    pub pillar: String,
+    pub linux_source: String,
+    pub bsd_source: String,
+    pub sigmaos_goal: String,
+}
+
+pub struct StrategicImportPlanEngine {
+    pub items: Vec<StrategicImportItem>,
+}
+
+impl StrategicImportPlanEngine {
+    pub fn new() -> Self {
+        let items = vec![
+            StrategicImportItem {
+                pillar: "Kernel Enhancements".to_string(),
+                linux_source: "Arch RT, Fedora (Btrfs)".to_string(),
+                bsd_source: "FreeBSD (ZFS, secure malloc)".to_string(),
+                sigmaos_goal: "Resilient + low-latency core kernel".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "Package Management".to_string(),
+                linux_source: "NixOS (declarative), Ubuntu (APT/DNF)".to_string(),
+                bsd_source: "FreeBSD (pkg)".to_string(),
+                sigmaos_goal: "Declarative + universal cross-platform builds".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "Security Frameworks".to_string(),
+                linux_source: "Fedora/Ubuntu (SELinux, AppArmor)".to_string(),
+                bsd_source: "OpenBSD (pledge, unveil), FreeBSD (jails)".to_string(),
+                sigmaos_goal: "Zero-trust OS isolation".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "Desktop Environment & UX".to_string(),
+                linux_source: "Linux Mint (Cinnamon), i3 WM".to_string(),
+                bsd_source: "Lumina DE".to_string(),
+                sigmaos_goal: "Hybrid accessible UX & power-user tiling".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "System Tools".to_string(),
+                linux_source: "Linux Mint (Timeshift), Ubuntu (Driver Mgr)".to_string(),
+                bsd_source: "BSD (rc.d service init)".to_string(),
+                sigmaos_goal: "System snapshots + resilient service supervision".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "Networking & Remote Access".to_string(),
+                linux_source: "Linux Mint (xRDP/VNC), Linux kernel (WireGuard)".to_string(),
+                bsd_source: "OpenBSD (pf firewall)".to_string(),
+                sigmaos_goal: "Secure remote access & packet filtering".to_string(),
+            },
+            StrategicImportItem {
+                pillar: "Community & Ecosystem".to_string(),
+                linux_source: "GNOME/KDE plugin architecture".to_string(),
+                bsd_source: "FreeBSD Handbook documentation".to_string(),
+                sigmaos_goal: "Transparent governance & structured docs".to_string(),
+            },
+        ];
+        Self { items }
+    }
+
+    pub fn generate_strategic_import_plan_wiki(&self) -> String {
+        let mut wiki = String::new();
+        wiki.push_str("# Strategic Import Plan: SigmaOS from Linux & BSD\n\n");
+        wiki.push_str("SigmaOS absorbs proven components from Linux and BSD distributions to achieve enterprise maturity rapidly.\n\n");
+        wiki.push_str("## Import Matrix\n\n");
+        wiki.push_str("| Component | Linux Source | BSD Source | SigmaOS Goal |\n");
+        wiki.push_str("|---|---|---|---|\n");
+        for item in &self.items {
+            wiki.push_str(&format!(
+                "| {} | {} | {} | {} |\n",
+                item.pillar, item.linux_source, item.bsd_source, item.sigmaos_goal
+            ));
+        }
+        wiki
+    }
+}
+
+impl Default for StrategicImportPlanEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod expanded_wiki_tests {
     use super::*;
@@ -747,5 +832,16 @@ mod expanded_wiki_tests {
         let bsd_wiki = DistroWikiPageDocumentationGenerator::generate_bsd_security_hardening_wiki();
         assert!(bsd_wiki.contains("OpenBSD"));
         assert!(bsd_wiki.contains("FreeBSD"));
+    }
+
+    #[test]
+    fn test_strategic_import_plan_engine() {
+        let engine = StrategicImportPlanEngine::new();
+        assert_eq!(engine.items.len(), 7);
+
+        let markdown = engine.generate_strategic_import_plan_wiki();
+        assert!(markdown.contains("# Strategic Import Plan: SigmaOS from Linux & BSD"));
+        assert!(markdown.contains("Kernel Enhancements"));
+        assert!(markdown.contains("FreeBSD (ZFS, secure malloc)"));
     }
 }
