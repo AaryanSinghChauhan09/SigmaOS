@@ -78,7 +78,15 @@ impl SimpleBuildSandbox {
 
 impl BuildSandbox for SimpleBuildSandbox {
     fn id(&self) -> SandboxID { self.id }
-    fn state(&self) -> SandboxState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> SandboxState {
+        let val = self.state.load(Ordering::SeqCst);
+        match val {
+            0 => SandboxState::Created,
+            1 => SandboxState::Running,
+            2 => SandboxState::Stopped,
+            _ => SandboxState::Failed,
+        }
+    }
 
     fn create(&mut self) -> Result<(), SandboxError> {
         self.state.store(SandboxState::Created as usize, Ordering::SeqCst);
