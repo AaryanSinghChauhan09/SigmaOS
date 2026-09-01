@@ -111,6 +111,16 @@ pub struct XbpsManifest {
     pub run_depends: Vec<String>,
 }
 
+/// Description of FreeBSD/OpenBSD pkg +MANIFEST (UCL / YAML / line format)
+#[derive(Debug, Clone)]
+pub struct BsdPkgManifest {
+    pub name: String,
+    pub version: String,
+    pub origin: String,
+    pub comment: String,
+    pub deps: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct SnapcraftManifest {
     pub name: String,
@@ -424,6 +434,83 @@ impl UniversalPackageAdapter {
             version,
             short_desc,
             run_depends,
+        })
+    }
+
+    /// Parses FreeBSD/OpenBSD `pkg` manifest text (+MANIFEST or UCL format)
+    pub fn parse_bsd_pkg_manifest(&self, text: &str) -> Result<BsdPkgManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut origin = String::new();
+        let mut comment = String::new();
+        let mut deps = Vec::new();
+
+        let mut in_deps_block = false;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            if line.starts_with("deps:") || line.starts_with("deps =") || line.starts_with("deps {") {
+                in_deps_block = true;
+                continue;
+            }
+
+            if in_deps_block {
+                if line.starts_with('}') || line.starts_with(']') {
+                    in_deps_block = false;
+                    continue;
+                }
+                // Match lines like `libiconv: {` or `libiconv:` or `- libiconv`
+                if let Some(pos) = line.find(':') {
+                    let dep_key = line[..pos].trim().trim_matches(|c| c == '"' || c == '\'' || c == ' ');
+                    if !dep_key.is_empty() && dep_key != "origin" && dep_key != "version" {
+                        deps.push(dep_key.to_string());
+                    }
+                } else if line.starts_with("- ") {
+                    let dep_name = line[2..].trim().trim_matches(|c| c == '"' || c == '\'');
+                    if !dep_name.is_empty() {
+                        deps.push(dep_name.to_string());
+                    }
+                }
+                continue;
+            }
+
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ',');
+                match key {
+                    "name" => name = val.to_string(),
+                    "version" => version = val.to_string(),
+                    "origin" => origin = val.to_string(),
+                    "comment" | "desc" => comment = val.to_string(),
+                    _ => {}
+                }
+            } else if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'');
+                match key {
+                    "name" | "PKG_NAME" => name = val.to_string(),
+                    "version" | "PKG_VERSION" => version = val.to_string(),
+                    "origin" => origin = val.to_string(),
+                    "comment" | "desc" => comment = val.to_string(),
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid BSD pkg manifest: missing name or version");
+        }
+
+        Ok(BsdPkgManifest {
+            name,
+            version,
+            origin,
+            comment,
+            deps,
         })
     }
 
@@ -758,6 +845,10 @@ impl UniversalPackageAdapter {
                 deps.extend(ebuild.depend.clone());
                 self.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
             }
+            Some(PackageFormat::Ports) | Some(PackageFormat::Pkg) | Some(PackageFormat::Pkgsrc) => {
+                let bsd = self.parse_bsd_pkg_manifest(raw_text)?;
+                self.translate_to_native_package(&bsd.name, &bsd.version, &bsd.comment, &bsd.deps)
+            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -780,6 +871,9 @@ impl UniversalPackageAdapter {
                     let mut deps = ebuild.rdepend.clone();
                     deps.extend(ebuild.depend.clone());
                     self.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
+                } else if (raw_text.contains("name:") || raw_text.contains("name =")) && (raw_text.contains("version:") || raw_text.contains("version =")) && (raw_text.contains("origin:") || raw_text.contains("comment:")) {
+                    let bsd = self.parse_bsd_pkg_manifest(raw_text)?;
+                    self.translate_to_native_package(&bsd.name, &bsd.version, &bsd.comment, &bsd.deps)
                 } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
                     let spec = self.parse_rpm_spec(raw_text)?;
                     self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
@@ -980,7 +1074,7 @@ impl SigPkgUniversalBridgeEngine {
                     self.adapter.translate_to_native_package(&pacman.pkgname, &pacman.pkgver, &pacman.pkgdesc, &pacman.depends)
                 }
             }
-            PackageFormat::Yum => {
+            PackageFormat::Yum | PackageFormat::Zypper => {
                 let rpm = self.adapter.parse_rpm_spec(&manifest_text)?;
                 self.adapter.translate_to_native_package(&rpm.name, &rpm.version, &rpm.summary, &rpm.requires)
             }
@@ -1001,6 +1095,10 @@ impl SigPkgUniversalBridgeEngine {
                 let mut deps = ebuild.rdepend.clone();
                 deps.extend(ebuild.depend.clone());
                 self.adapter.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
+            }
+            PackageFormat::Ports | PackageFormat::Pkg | PackageFormat::Pkgsrc => {
+                let bsd = self.adapter.parse_bsd_pkg_manifest(&manifest_text)?;
+                self.adapter.translate_to_native_package(&bsd.name, &bsd.version, &bsd.comment, &bsd.deps)
             }
             _ => {
                 self.adapter.parse_and_translate_manifest(filename, &manifest_text)
@@ -1114,21 +1212,21 @@ impl UniversalDependencyMapper {
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
         match name.as_str() {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
+            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" | "openssl" => {
                 "openssl".to_string()
             }
             "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" => "libc".to_string(),
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" | "archivers/zlib" => {
                 "zlib".to_string()
             }
-            "python3" | "python" | "lang/python3" | "dev-lang/python" => "python".to_string(),
+            "python3" | "python" | "lang/python3" | "lang/python" | "dev-lang/python" => "python".to_string(),
             "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
-            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
+            "libx11" | "x11-libs/libx11" | "x11/libX11" | "x11-proto/xorgproto" => "libx11".to_string(),
             "wayland" | "dev-libs/wayland" => "wayland".to_string(),
-            "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
-            "dbus" | "sys-apps/dbus" => "dbus".to_string(),
-            "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
+            "pipewire" | "media-video/pipewire" | "multimedia/pipewire" => "pipewire".to_string(),
+            "dbus" | "sys-apps/dbus" | "devel/dbus" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "dev-util/pkgconf" | "devel/pkgconf" => "pkgconf".to_string(),
             _ => foreign_name.to_string(),
         }
     }
@@ -1171,9 +1269,9 @@ impl UniversalScriptletConverter {
                 "postrm" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Yum => match script_name {
-                "%pre" => Some(SigmaPkgHookType::PreInstall),
-                "%post" => Some(SigmaPkgHookType::PostInstall),
+            PackageFormat::Yum | PackageFormat::Zypper => match script_name {
+                "%pre" | "%pretrans" => Some(SigmaPkgHookType::PreInstall),
+                "%post" | "%posttrans" => Some(SigmaPkgHookType::PostInstall),
                 "%preun" => Some(SigmaPkgHookType::PreRemove),
                 "%postun" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
@@ -1190,6 +1288,13 @@ impl UniversalScriptletConverter {
                 "post-install" => Some(SigmaPkgHookType::PostInstall),
                 "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
                 "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::Ports | PackageFormat::Pkg | PackageFormat::Pkgsrc => match script_name {
+                "+PRE_INSTALL" | "pre-install" => Some(SigmaPkgHookType::PreInstall),
+                "+POST_INSTALL" | "post-install" => Some(SigmaPkgHookType::PostInstall),
+                "+PRE_DEINSTALL" | "pre-deinstall" => Some(SigmaPkgHookType::PreRemove),
+                "+POST_DEINSTALL" | "post-deinstall" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
             _ => None,
@@ -1707,5 +1812,52 @@ mod tests {
         assert_eq!(pkg.name, "zstd");
         assert_eq!(pkg.version, Version::new(1, 5, 5));
         assert!(bridge.is_package_registered("zstd"));
+    }
+
+    #[test]
+    fn test_bsd_pkg_manifest_and_scriptlets_and_canonical_mapping() {
+        let adapter = UniversalPackageAdapter::new();
+        let bsd_manifest = r#"
+            name: "sudo"
+            version: "1.9.14"
+            origin: "security/sudo"
+            comment: "Allow users to run commands as root"
+            deps: {
+                libiconv: {
+                    origin: "converters/libiconv"
+                    version: "1.17"
+                }
+                security/openssl: {
+                    origin: "security/openssl"
+                    version: "3.0.10"
+                }
+            }
+        "#;
+
+        let parsed = adapter.parse_bsd_pkg_manifest(bsd_manifest).unwrap();
+        assert_eq!(parsed.name, "sudo");
+        assert_eq!(parsed.version, "1.9.14");
+        assert_eq!(parsed.origin, "security/sudo");
+        assert!(parsed.deps.contains(&"libiconv".to_string()) || parsed.deps.contains(&"security/openssl".to_string()));
+
+        let scriptlet_conv = UniversalScriptletConverter::new();
+        let pre_hook = scriptlet_conv.convert_scriptlet(PackageFormat::Pkg, "+PRE_INSTALL", "echo pre_install").unwrap();
+        assert_eq!(pre_hook.hook_type, SigmaPkgHookType::PreInstall);
+        let post_hook = scriptlet_conv.convert_scriptlet(PackageFormat::Pkg, "+POST_INSTALL", "echo post_install").unwrap();
+        assert_eq!(post_hook.hook_type, SigmaPkgHookType::PostInstall);
+
+        let dnf_hook = scriptlet_conv.convert_scriptlet(PackageFormat::Yum, "%posttrans", "echo posttrans").unwrap();
+        assert_eq!(dnf_hook.hook_type, SigmaPkgHookType::PostInstall);
+
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("security/openssl"), "openssl");
+        assert_eq!(mapper.to_canonical_name("archivers/zlib"), "zlib");
+        assert_eq!(mapper.to_canonical_name("multimedia/pipewire"), "pipewire");
+
+        let mut bridge = SigPkgUniversalBridgeEngine::new();
+        let pkg = bridge.absorb_and_register("sudo.pkg", bsd_manifest.as_bytes()).unwrap();
+        assert_eq!(pkg.name, "sudo");
+        assert_eq!(pkg.version, Version::new(1, 9, 14));
+        assert!(bridge.is_package_registered("sudo"));
     }
 }
