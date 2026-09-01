@@ -54,6 +54,12 @@ pub use developer::{
 pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
+pub use gentoo::{
+    BuildError, BuildSpec, CatalystStage, CpuOptimizationDetector, EapiPhase, FeatureSet,
+    GentooCatalystStageBuilder, GentooDistfilesDigestEngine, GentooKeywordsAcceptanceEngine,
+    KeywordStatus, ManifestEntry, ManifestEntryType, OpenRcRunlevel, OpenRcRunlevelSupervisor,
+    PortageEapi8PhaseEngine, SigmaBuildGraph, UseFlag,
+};
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,

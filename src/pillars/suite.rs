@@ -459,6 +459,71 @@ impl SigmaOpsSuite {
 }
 
 // ============================================================================
+// 8. SOVEREIGN PHASED ROLLOUT GOVERNOR & DASHBOARD OVERLAY
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PriorityTier {
+    CriticalImmediateYear1To2,
+    ImportantMidTermYear3To4,
+    OptionalLongTermYear5Plus,
+}
+
+#[derive(Debug, Clone)]
+pub struct RolloutComponent {
+    pub name: &'static str,
+    pub tier: PriorityTier,
+    pub reference_source: &'static str,
+    pub is_deployed: bool,
+}
+
+pub struct SovereignPhasedRolloutGovernor {
+    pub components: Vec<RolloutComponent>,
+}
+
+impl SovereignPhasedRolloutGovernor {
+    pub fn new() -> Self {
+        let mut gov = Self { components: Vec::new() };
+        gov.seed_rollout_roadmap();
+        gov
+    }
+
+    fn seed_rollout_roadmap(&mut self) {
+        // Critical Tier (Year 1-2)
+        self.components.push(RolloutComponent { name: "Installer Framework", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Ubuntu / Mint / Calamares", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Hardware Enablement Stack", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Fedora / FreeBSD GEOM / Linux DRM", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Multimedia Codecs", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "Linux Mint / FFmpeg", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Update & Snapshot Manager", tier: PriorityTier::CriticalImmediateYear1To2, reference_source: "openSUSE Snapper / Timeshift", is_deployed: true });
+
+        // Important Tier (Year 3-4)
+        self.components.push(RolloutComponent { name: "System Configuration Tools", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "Mint / BSD rc.conf / YaST", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Networking & Remote Access", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "OpenBSD pf / WireGuard / xRDP", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Accessibility Features", tier: PriorityTier::ImportantMidTermYear3To4, reference_source: "WCAG 2.1 / GNOME Orca", is_deployed: true });
+
+        // Optional Tier (Year 5+)
+        self.components.push(RolloutComponent { name: "Documentation & Community", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "FreeBSD Handbook / RFC Governance", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Plugin & Extension Ecosystem", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "GNOME Shell / KDE Plasma Extensions", is_deployed: true });
+        self.components.push(RolloutComponent { name: "Multimedia Enhancements", tier: PriorityTier::OptionalLongTermYear5Plus, reference_source: "NVENC / AV1 Hardware Offload", is_deployed: true });
+    }
+
+    pub fn filter_by_tier(&self, tier: PriorityTier) -> Vec<&RolloutComponent> {
+        self.components.iter().filter(|c| c.tier == tier).collect()
+    }
+
+    pub fn deployment_readiness_pct(&self) -> f32 {
+        if self.components.is_empty() { return 100.0; }
+        let deployed = self.components.iter().filter(|c| c.is_deployed).count();
+        (deployed as f32 / self.components.len() as f32) * 100.0
+    }
+}
+
+impl Default for SovereignPhasedRolloutGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // 7. SIGMADAO DECENTRALIZED GOVERNANCE & CONTRIBUTOR REWARDS
 // ============================================================================
 
@@ -592,5 +657,22 @@ mod tests {
         assert!(dao.proposals[0].passed);
         dao.reward_contributor(50);
         assert_eq!(dao.contributor_token_balance, 550);
+    }
+
+    #[test]
+    fn test_phased_rollout_governor() {
+        let gov = SovereignPhasedRolloutGovernor::new();
+        assert_eq!(gov.components.len(), 10);
+
+        let critical = gov.filter_by_tier(PriorityTier::CriticalImmediateYear1To2);
+        assert_eq!(critical.len(), 4);
+
+        let important = gov.filter_by_tier(PriorityTier::ImportantMidTermYear3To4);
+        assert_eq!(important.len(), 3);
+
+        let optional = gov.filter_by_tier(PriorityTier::OptionalLongTermYear5Plus);
+        assert_eq!(optional.len(), 3);
+
+        assert_eq!(gov.deployment_readiness_pct(), 100.0);
     }
 }
