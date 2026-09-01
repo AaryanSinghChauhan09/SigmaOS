@@ -5,7 +5,6 @@
 //! Copy-on-Write (COW) Forking, x86_64 Fast Syscalls (IA32_LSTAR MSR),
 //! and Minimal POSIX Syscall Matrix.
 
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};

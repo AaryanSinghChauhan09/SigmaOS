@@ -13,9 +13,9 @@ mod bsd;
 
 #[path = "../src/distro"]
 pub mod distro {
+    pub mod linux_bsd_inspirations;
     pub mod sovereign_distro_dominance;
     pub mod universal_distro_super_matrix;
-    pub mod linux_bsd_inspirations;
 }
 use distro::linux_bsd_inspirations as distro_inspirations;
 

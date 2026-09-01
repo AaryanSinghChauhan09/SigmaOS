@@ -1,7 +1,7 @@
 // SigmaOS Security Subsystem
-pub mod defensive_audit;
 pub mod audit;
 pub mod capability;
+pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
 
@@ -16,12 +16,18 @@ pub mod integrity;
 pub mod intrusion;
 pub mod libgksu;
 pub mod mac;
-pub mod password;
 pub mod openbsd_karl;
+pub mod password;
 pub mod pki;
 pub mod pledge;
 pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
+pub mod kali_stack;
+pub mod parrot;
+pub mod parrot_kali;
+pub mod parrot_linux;
+pub mod parrot_parity;
+pub mod pqc_measurement;
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -34,18 +40,11 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod parrot;
-pub mod parrot_kali;
-pub mod parrot_linux;
-pub mod parrot_parity;
-pub mod kali_stack;
-pub mod pqc_measurement;
 
-pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
-pub use capability::{CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission};
+pub use capability::{
+    CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
+};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
@@ -60,41 +59,47 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
-pub use libgksu::{
-    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
-    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
-pub use parrot::{
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, AnonSurfShunt, AppSandboxEngine,
-    ForensicStorageFilter, RoutingMode,
+pub use intrusion::{
+    AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
+    IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
     KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
     PcapPacketHeader, WifiFrameType,
 };
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
 pub use kernel_hardening::{
-    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
-    PagePermissions, PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine,
-    SmepSmapEnforcer, SovereignKaslrEngine, SyscallCategory,
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
+    PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
+    SovereignKaslrEngine, SyscallCategory,
 };
-pub use intrusion::{
-    AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
-    IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
+pub use libgksu::{
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
+    GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use qubes_isolation::*;
+pub use root_improvement::*;
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission, UnveilState};
+pub use sigma_unveil::{
+    UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission,
+    UnveilState,
+};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
@@ -103,11 +108,11 @@ pub use vault::{
 pub use vpn::{
     AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, PiaDedicatedIpBinding,
     PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
-    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient,
-    SplitTunnelRule, VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler,
-    VpnStatistics, WireGuardHandler,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient, SplitTunnelRule,
+    VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
 };
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-    SimpleVulnerabilityScanner,
+    ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
+    VulnerabilityClass, VulnerabilityReport,
 };

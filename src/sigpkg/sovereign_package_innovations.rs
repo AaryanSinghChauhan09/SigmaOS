@@ -124,7 +124,9 @@ impl ArchAlpmHookTransactionEngine {
     pub fn trigger_post_transaction_hooks(&mut self, installed_pkgs: &[&str]) -> usize {
         let mut count = 0;
         for hook in &self.hooks {
-            let matched = installed_pkgs.iter().any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
+            let matched = installed_pkgs
+                .iter()
+                .any(|pkg| pkg.contains(&hook.target_pattern) || hook.target_pattern == "*");
             if matched {
                 self.executed_hooks.push(hook.exec_command.clone());
                 count += 1;
@@ -205,7 +207,10 @@ mod tests {
             shared_libs: vec!["libncurses.so.6".to_string()],
         });
 
-        assert_eq!(db.query_pkg_file_owner("/usr/bin/zsh"), Some("zsh".to_string()));
+        assert_eq!(
+            db.query_pkg_file_owner("/usr/bin/zsh"),
+            Some("zsh".to_string())
+        );
         assert_eq!(db.query_pkg_file_owner("/usr/bin/bash"), None);
     }
 
@@ -222,9 +227,13 @@ mod tests {
     #[test]
     fn test_nix_flake_cache() {
         let mut store = NixFlakeHermeticCacheStore::new();
-        let hash = NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
+        let hash =
+            NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
 
         store.store_build(&hash, b"HERMETIC_NIX_OUTPUT");
-        assert_eq!(store.fetch_cached_build(&hash).unwrap(), b"HERMETIC_NIX_OUTPUT");
+        assert_eq!(
+            store.fetch_cached_build(&hash).unwrap(),
+            b"HERMETIC_NIX_OUTPUT"
+        );
     }
 }

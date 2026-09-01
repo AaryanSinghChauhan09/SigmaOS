@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Security Evolution Bridge (SecurityBridge)
 // Maps legacy security models (basic Unix DAC, AppArmor profile contexts, legacy SELinux labels) to modern zero-trust capability gates
 

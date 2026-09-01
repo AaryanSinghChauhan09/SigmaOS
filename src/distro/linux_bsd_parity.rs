@@ -3,7 +3,6 @@ extern crate alloc;
 /// Sovereign Linux & BSD Distro Parity Subsystem for SigmaOS
 /// Clean-room implementation of NixOS Flakes, Arch Pacman Hooks, Void runit Supervision, and Gentoo Portage USE Flags
 /// Designed for bare-metal zero-dependency performance and zero-trust security
-
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -392,7 +391,11 @@ impl XbpsPackageManager {
         Ok(order)
     }
 
-    fn resolve_deps_recursive(&self, pkg_name: &str, order: &mut Vec<String>) -> Result<(), &'static str> {
+    fn resolve_deps_recursive(
+        &self,
+        pkg_name: &str,
+        order: &mut Vec<String>,
+    ) -> Result<(), &'static str> {
         if order.contains(&String::from(pkg_name)) {
             return Ok(());
         }
@@ -469,7 +472,13 @@ impl LinuxDevlinkDriver {
         }
     }
 
-    pub fn register_port(&mut self, bus: &str, dev: &str, port_index: u32, flavor: DevlinkPortFlavor) {
+    pub fn register_port(
+        &mut self,
+        bus: &str,
+        dev: &str,
+        port_index: u32,
+        flavor: DevlinkPortFlavor,
+    ) {
         self.ports.push(DevlinkPort {
             bus_name: String::from(bus),
             dev_name: String::from(dev),
@@ -491,7 +500,12 @@ impl LinuxDevlinkDriver {
         }
     }
 
-    pub fn flash_device_firmware(&mut self, _bus: &str, _dev: &str, image: &[u8]) -> Result<usize, &'static str> {
+    pub fn flash_device_firmware(
+        &mut self,
+        _bus: &str,
+        _dev: &str,
+        image: &[u8],
+    ) -> Result<usize, &'static str> {
         if image.is_empty() {
             return Err("Empty firmware image buffer");
         }

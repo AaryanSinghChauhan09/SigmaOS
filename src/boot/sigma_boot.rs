@@ -3,7 +3,6 @@
 //! and fallback boot recovery environments.
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -68,7 +67,13 @@ impl SovereignDistroBootStageHandoff {
         }
     }
 
-    pub fn setup_linux_efistub(&mut self, kernel_addr: u64, cmdline: &str, _initrd_addr: Option<u64>, _initrd_size: usize) {
+    pub fn setup_linux_efistub(
+        &mut self,
+        kernel_addr: u64,
+        cmdline: &str,
+        _initrd_addr: Option<u64>,
+        _initrd_size: usize,
+    ) {
         self.protocol = HandoffProtocol::LinuxEfiStub;
         self.kernel_entry_point_addr = kernel_addr;
         self.stage_descriptor = Some(BootStageDescriptor {
@@ -104,7 +109,11 @@ impl SovereignDistroBootStageHandoff {
         conf.lines().filter(|l| !l.trim().is_empty()).count()
     }
 
-    pub fn prepare_live_iso_overlay(&mut self, _squashfs_path: &str, _mem_mb: usize) -> Result<(), &'static str> {
+    pub fn prepare_live_iso_overlay(
+        &mut self,
+        _squashfs_path: &str,
+        _mem_mb: usize,
+    ) -> Result<(), &'static str> {
         self.protocol = HandoffProtocol::LiveIsoOverlayFs;
         self.live_overlay_mounted = true;
         self.kernel_entry_point_addr = 0x200000;
@@ -213,7 +222,9 @@ impl BootManager {
     }
 
     pub fn find_root_by_uuid(&self, uuid: &str) -> Option<&BootEntry> {
-        self.entries.iter().find(|e| e.cmdline_params.contains(uuid))
+        self.entries
+            .iter()
+            .find(|e| e.cmdline_params.contains(uuid))
     }
 
     pub fn generate_bootloader_config(&self) -> String {
@@ -289,7 +300,10 @@ impl SovereignFastBootServicePipeline {
             // Check dependency readiness
             let deps = self.services[i].dependencies.clone();
             for dep in &deps {
-                let dep_ready = self.services.iter().any(|s| &s.name == dep && s.state == BootServiceState::Active);
+                let dep_ready = self
+                    .services
+                    .iter()
+                    .any(|s| &s.name == dep && s.state == BootServiceState::Active);
                 if !dep_ready {
                     self.services[i].state = BootServiceState::Failed;
                     return Err("FastBoot: Dependency unresolved during boot pipeline execution");
@@ -350,7 +364,13 @@ mod tests {
         let result = pipeline.execute_fast_boot();
         assert!(result.is_ok());
         assert!(pipeline.boot_time_ms > 0);
-        assert_eq!(pipeline.services.iter().filter(|s| s.state == BootServiceState::Active).count(), 4);
+        assert_eq!(
+            pipeline
+                .services
+                .iter()
+                .filter(|s| s.state == BootServiceState::Active)
+                .count(),
+            4
+        );
     }
 }
-

@@ -4,9 +4,9 @@ extern crate alloc;
 // SigmaOS Alpine Linux APK Compatibility Engine
 // Implements APK package management, APKINDEX parsing, and musl libc compatibility
 
+use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 /// APK package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,7 +47,7 @@ impl ApkIndexParser {
         // Basic APKINDEX parsing logic
         // In production, this would parse the actual APKINDEX format
         self.packages.insert("alpine-base".to_string(), current_pkg);
-        
+
         Ok(())
     }
 
@@ -58,9 +58,10 @@ impl ApkIndexParser {
 
     /// Resolve dependencies for a package
     pub fn resolve_dependencies(&self, name: &str) -> Result<Vec<String>, String> {
-        let pkg = self.get_package(name)
+        let pkg = self
+            .get_package(name)
             .ok_or_else(|| format!("Package {} not found", name))?;
-        
+
         let mut resolved = Vec::new();
         for dep in &pkg.dependencies {
             resolved.push(dep.clone());
@@ -69,7 +70,7 @@ impl ApkIndexParser {
                 resolved.extend(sub_deps);
             }
         }
-        
+
         Ok(resolved)
     }
 }
@@ -91,8 +92,10 @@ impl AlpineCommunityRepo {
     /// Fetch APKINDEX from repository
     pub fn fetch_index(&self) -> Result<String, String> {
         // In production, this would perform actual HTTP fetch
-        Ok(format!("{}/{}/community/x86_64/APKINDEX.tar.gz", 
-                   self.repo_url, self.branch))
+        Ok(format!(
+            "{}/{}/community/x86_64/APKINDEX.tar.gz",
+            self.repo_url, self.branch
+        ))
     }
 }
 
@@ -111,7 +114,7 @@ mod tests {
     fn test_dependency_resolution() {
         let mut parser = ApkIndexParser::new();
         parser.parse_index("test").unwrap();
-        
+
         let deps = parser.resolve_dependencies("alpine-base");
         assert!(deps.is_ok());
     }
