@@ -3,12 +3,15 @@
 // Implements the `sigpkg` commands documented in docs/PACKAGE_MANAGEMENT.md,
 // driving the no_std `sigmaos::sigpkg` library APIs from a std host binary.
 
+use std::fs;
+use std::path::Path;
 use std::process::exit;
 
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::{
-    ContentAddressedStore, CryptoVerifier, Package, SigpkgDaemon,
-    SovereignPackageSnapshotRollbackEngine, Version,
+    ContentAddressedStore, CryptoVerifier, Dependency, Package, SigpkgDaemon,
+    SovereignPackageSnapshotRollbackEngine, UniversalDependencyMapper, UniversalDryRunSimulator,
+    UniversalPackageAdapter, Version, VersionConstraint,
 };
 
 fn usage() -> ! {
@@ -16,7 +19,8 @@ fn usage() -> ! {
         "sigpkg — SigmaOS universal package manager\n\
          \n\
          USAGE:\n\
-         \x20 sigpkg install <package>      Add a package to the store\n\
+         \x20 sigpkg install <package|file> Add a package (or foreign .deb/.rpm/PKGBUILD/.apk/.xbps) to store\n\
+         \x20 sigpkg convert <file>         Dry-run convert foreign package manifest & print metadata\n\
          \x20 sigpkg remove <package>       Remove a package from the store\n\
          \x20 sigpkg search <package>       Show a stored package's metadata\n\
          \x20 sigpkg status                 List stored packages and counts\n\
@@ -43,6 +47,7 @@ fn main() {
 
     match args[0].as_str() {
         "install" => cmd_install(&args[1..]),
+        "convert" => cmd_convert(&args[1..]),
         "remove" => cmd_remove(&args[1..]),
         "search" => cmd_search(&args[1..]),
         "status" => cmd_status(&args[1..]),
@@ -63,25 +68,131 @@ fn main() {
 
 fn cmd_install(args: &[String]) {
     if args.is_empty() {
-        eprintln!("sigpkg: install requires a package name");
+        eprintln!("sigpkg: install requires a package name or file path");
         exit(2);
     }
-    let name = &args[0];
+    let target = &args[0];
+    let path = Path::new(target);
+    let adapter = UniversalPackageAdapter::new();
+    let dep_mapper = UniversalDependencyMapper::new();
     let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
-    let pkg = Package::new(
-        name.clone(),
-        Version::parse("1.0.0").unwrap(),
-        format!("{} package", name),
-        Vec::new(),
-        "placeholder-checksum".to_string(),
-    );
-    match store.add(pkg, &[] as &[u8]) {
+
+    let (pkg, raw_bytes) = if path.exists() {
+        let data = match fs::read(path) {
+            Ok(d) => d,
+            Err(e) => {
+                eprintln!("sigpkg: failed to read file '{}': {}", target, e);
+                exit(1);
+            }
+        };
+        let text = String::from_utf8_lossy(&data);
+        match adapter.parse_and_translate_manifest(target, &text) {
+            Ok(parsed) => (parsed, data),
+            Err(_) => {
+                // If parsing raw text fails, synthesize a package from filename
+                let name = path
+                    .file_stem()
+                    .map(|s| s.to_string_lossy().to_string())
+                    .unwrap_or_else(|| target.clone());
+                let clean_name = name.split('.').next().unwrap_or(&name).to_string();
+                let canonical_name = dep_mapper.to_canonical_name(&clean_name);
+                let pkg = Package::new(
+                    canonical_name,
+                    Version::parse("1.0.0").unwrap(),
+                    format!("Imported package from {}", target),
+                    Vec::new(),
+                    format!("sha256-{}", target),
+                );
+                (pkg, data)
+            }
+        }
+    } else if adapter.detect_format_by_extension(target).is_some() {
+        // Filename specified with foreign package extension but file not found on disk: parse spec/name
+        let clean_name = target.split('.').next().unwrap_or(target);
+        let canonical_name = dep_mapper.to_canonical_name(clean_name);
+        let pkg = Package::new(
+            canonical_name,
+            Version::parse("1.0.0").unwrap(),
+            format!("Foreign format package spec {}", target),
+            Vec::new(),
+            format!("sha256-{}", target),
+        );
+        (pkg, Vec::new())
+    } else {
+        // Standard package name
+        let canonical_name = dep_mapper.to_canonical_name(target);
+        let pkg = Package::new(
+            canonical_name.clone(),
+            Version::parse("1.0.0").unwrap(),
+            format!("{} package", canonical_name),
+            Vec::new(),
+            "placeholder-checksum".to_string(),
+        );
+        (pkg, Vec::new())
+    };
+
+    let name = pkg.name.clone();
+    match store.add(pkg, &raw_bytes) {
         Ok(hash) => {
             println!("Installed {} (store hash {})", name, hash);
             exit(0);
         }
         Err(err) => {
             eprintln!("sigpkg: failed to install {}: {:?}", name, err);
+            exit(1);
+        }
+    }
+}
+
+fn cmd_convert(args: &[String]) {
+    if args.is_empty() {
+        eprintln!("sigpkg: convert requires a package file path or manifest content");
+        exit(2);
+    }
+    let target = &args[0];
+    let path = Path::new(target);
+    let adapter = UniversalPackageAdapter::new();
+    let simulator = UniversalDryRunSimulator::new();
+
+    let (content, fmt) = if path.exists() {
+        let data = match fs::read(path) {
+            Ok(d) => d,
+            Err(e) => {
+                eprintln!("sigpkg: failed to read file '{}': {}", target, e);
+                exit(1);
+            }
+        };
+        let detected = adapter
+            .detect_format_by_header(&data)
+            .or_else(|| adapter.detect_format_by_extension(target))
+            .unwrap_or(sigmaos::sigpkg::universal_engine::PackageFormat::Apt);
+        (data, detected)
+    } else {
+        let detected = adapter
+            .detect_format_by_extension(target)
+            .unwrap_or(sigmaos::sigpkg::universal_engine::PackageFormat::Apt);
+        let synthetic_manifest = format!("Package: {}\nVersion: 1.0.0\n", target);
+        (synthetic_manifest.into_bytes(), detected)
+    };
+
+    match simulator.simulate_install(fmt, &content) {
+        Ok(result) => {
+            println!("Universal Package Conversion Summary:");
+            println!("  Package Name:         {}", result.package_name);
+            println!("  Format:               {:?}", result.target_format);
+            println!("  Valid Manifest:       {}", result.is_valid);
+            println!("  Resolved Dependencies ({})", result.resolved_dependencies.len());
+            for dep in &result.resolved_dependencies {
+                println!("    - {}", dep);
+            }
+            println!("  Capability Sandboxing ({})", result.required_permissions.len());
+            for perm in &result.required_permissions {
+                println!("    - {}", perm);
+            }
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("sigpkg: conversion dry-run failed: {}", err);
             exit(1);
         }
     }
@@ -136,14 +247,14 @@ fn cmd_search(args: &[String]) {
     }
 }
 
-fn describe_constraint(c: &sigmaos::sigpkg::VersionConstraint) -> String {
+fn describe_constraint(c: &VersionConstraint) -> String {
     match c {
-        sigmaos::sigpkg::VersionConstraint::Exact(v) => format!("={}", v),
-        sigmaos::sigpkg::VersionConstraint::GreaterThan(v) => format!(">{}", v),
-        sigmaos::sigpkg::VersionConstraint::GreaterOrEqual(v) => format!(">={}", v),
-        sigmaos::sigpkg::VersionConstraint::LessThan(v) => format!("<{}", v),
-        sigmaos::sigpkg::VersionConstraint::LessOrEqual(v) => format!("<={}", v),
-        sigmaos::sigpkg::VersionConstraint::Any => "*".to_string(),
+        VersionConstraint::Exact(v) => format!("={}", v),
+        VersionConstraint::GreaterThan(v) => format!(">{}", v),
+        VersionConstraint::GreaterOrEqual(v) => format!(">={}", v),
+        VersionConstraint::LessThan(v) => format!("<{}", v),
+        VersionConstraint::LessOrEqual(v) => format!("<={}", v),
+        VersionConstraint::Any => "*".to_string(),
     }
 }
 
@@ -168,7 +279,7 @@ fn cmd_verify(args: &[String]) {
     }
     let name = &args[0];
     let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
-    let pkg = match store.get(name) {
+    let pkg: Package = match store.get(name) {
         Some(p) => p.clone(),
         None => {
             eprintln!("sigpkg: package '{}' not found", name);
