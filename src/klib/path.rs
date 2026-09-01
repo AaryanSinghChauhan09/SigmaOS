@@ -60,6 +60,12 @@ impl Deref for PathBuf {
     }
 }
 
+impl core::fmt::Display for PathBuf {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.inner)
+    }
+}
+
 impl From<&str> for PathBuf {
     fn from(s: &str) -> Self {
         PathBuf {

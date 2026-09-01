@@ -452,7 +452,7 @@ pub struct JailInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     // Simple temporary directory implementation for testing
     struct TestTempDir {
         path: PathBuf,
