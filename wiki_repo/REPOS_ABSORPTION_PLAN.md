@@ -230,6 +230,52 @@ This document serves as the master absorption plan for integrating these 500+ re
 
 ---
 
+## Milestone Dependency Chart & Priority Heatmap
+
+### 📅 Milestone Dependency Chart
+
+```
+[Installer Framework] ──► [Hardware Enablement] ──► [Multimedia Codecs] ──► [Update Manager]
+         │                          │
+         ▼                          ▼
+ [System Config Tools] ──► [Networking & Remote Access] ──► [Accessibility Features]
+         │
+         ▼
+ [Documentation & Community] ──► [Plugin Ecosystem]
+```
+
+- **Installer Framework**: Unlocks hardware detection, disk partitioning, and driver management.
+- **Hardware Enablement**: Prerequisite for stable multimedia codecs, GPU offloading, and update manager rollbacks.
+- **System Config Tools**: Depend on installer + hardware stack foundation.
+- **Networking & Accessibility**: Build upon solid system config tools and IPC primitives.
+- **Community & Plugins**: Expand ecosystem sustainability once the core OS is stable.
+
+---
+
+### 🌡️ Priority Heatmap (Impact vs Effort)
+
+| Component | Impact | Effort | Priority | Strategic Focus |
+|---|---|---|---|---|
+| **Installer Framework** | Very High | Medium | 🚨 Critical | Core usability foundation & disk partitioning |
+| **Hardware Enablement Stack** | Very High | High | 🚨 Critical | Driver switching, GPU offload, power profiles |
+| **Multimedia Codecs** | High | Low | 🚨 Critical | Hardware-accelerated audio/video routing |
+| **Update & Snapshot Manager** | High | Medium | 🚨 Critical | Atomic A/B updates & ZFS/Timeshift snapshots |
+| **System Config Tools** | Medium | Medium | ⚡ Important | Zenith Control Center & preference management |
+| **Networking & Remote Access** | High | High | ⚡ Important | WireGuard, SSH, and mesh networking |
+| **Accessibility Features** | Medium | High | ⚡ Important | High-contrast UI, screen readers, keyboard navigation |
+| **Documentation & Community** | Medium | Low | 🌱 Optional | Manuals, RFCs, and contributor onboarding |
+| **Plugin Ecosystem** | Medium | Medium | 🌱 Optional | Dynamic toolchain extensions & store plugins |
+
+---
+
+### 🔑 Strategic Roadmap & Timeline
+
+- **Years 1–2 (Foundation Strike)**: Focus on Installer, Hardware Enablement, Codecs, and Update/Snapshot Manager (critical usability foundation).
+- **Years 3–4 (Expansion Strike)**: Expand into System Config Tools, Networking & Remote Access, and Accessibility Features (important adoption drivers).
+- **Years 5+ (Differentiation Strike)**: Build Community, Documentation, and Plugin Ecosystem (long-term ecosystem sustainability).
+
+---
+
 ## Master Implementation Strategy & Deliverables
 
 1. **Architecture & Design**: All absorbed features are implemented in Rust using safe abstractions, trait-based OOP, and zero-dependency designs.

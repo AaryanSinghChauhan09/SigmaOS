@@ -101,6 +101,34 @@ This document provides the concrete technical implementation roadmap, object-ori
 
 ---
 
+## Milestone-Aligned Technical Execution Sequence
+
+### Phase 1 (Years 1–2): Critical Usability Foundation
+1. **Installer Framework (`installer/`, `src/boot/`)**:
+   - Disk partitioning, measured boot PCR checking, and ISO live overlays.
+2. **Hardware Enablement Stack (`src/graphics/`, `src/kernel/`)**:
+   - PCIe BAR allocator, NVIDIA PRIME offload switcher, and power governors.
+3. **Multimedia Codecs (`src/media/`, `src/audio/`)**:
+   - Hardware-accelerated video decoder/encoder pipelines and PipeWire zero-latency routing.
+4. **Update & Snapshot Manager (`src/package/`, `src/system/`)**:
+   - Atomic A/B rootfs updates, Timeshift restore points, and ZFS/Btrfs snapshot rollbacks.
+
+### Phase 2 (Years 3–4): Adoption & Systems Expansion
+5. **System Config Tools (`src/ui/`, `src/tools/`)**:
+   - Zenith Control Center, Cinnamon Spices manager, and system preferences daemon.
+6. **Networking & Remote Access (`src/net/`, `src/security/`)**:
+   - eBPF firewall, WireGuard VPN orchestrator, and OpenSSH ed25519 daemon.
+7. **Accessibility Features (`src/dashboard/`, `src/ui/`)**:
+   - High-contrast visual modes, ARIA screen-reader bindings, and keyboard navigation focus states.
+
+### Phase 3 (Years 5+): Sustainable Ecosystem & Community
+8. **Documentation & Community (`src/community/`, `wiki/`)**:
+   - Interactive command manuals (`tldr`/`cheat`), RFC submission manager, and maintainer onboarding.
+9. **Plugin Ecosystem (`src/sigpkg/`, `src/sdk/`)**:
+   - Dynamic user-defined package pipeline stages, store plugins, and extension SDKs.
+
+---
+
 ## Tri-Agent Quality Assurance & Verification Roadmap
 
 ### Phase 1: Bolt ⚡ Micro-Benchmark & Latency Audit
