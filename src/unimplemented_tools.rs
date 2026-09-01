@@ -3693,6 +3693,87 @@ impl FlatpakSdkContainerBuilder {
 }
 
 // -------------------------------------------------------------------------
+// FreeBSD Jails Container & Virtual VNET Isolation Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdJailSandboxEngine {
+    pub jid: u32,
+    pub name: String,
+    pub path: String,
+    pub hostname: String,
+    pub vnet_enabled: bool,
+    pub is_running: bool,
+}
+
+impl FreeBsdJailSandboxEngine {
+    pub fn new(jid: u32, name: &str, path: &str, hostname: &str, vnet: bool) -> Self {
+        Self {
+            jid,
+            name: name.to_string(),
+            path: path.to_string(),
+            hostname: hostname.to_string(),
+            vnet_enabled: vnet,
+            is_running: false,
+        }
+    }
+
+    pub fn start_jail(&mut self) -> Result<(), &'static str> {
+        if self.path.is_empty() {
+            return Err("Invalid jail root path");
+        }
+        self.is_running = true;
+        Ok(())
+    }
+
+    pub fn stop_jail(&mut self) {
+        self.is_running = false;
+    }
+}
+
+// -------------------------------------------------------------------------
+// FreeBSD Netgraph Graph-Based Networking Node Engine
+// -------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct NetgraphHook {
+    pub name: String,
+    pub peer_node_name: String,
+    pub peer_hook_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdNetgraphNodeEngine {
+    pub node_id: u32,
+    pub name: String,
+    pub node_type: String, // "socket", "ether", "tee", "bridge"
+    pub hooks: Vec<NetgraphHook>,
+}
+
+impl FreeBsdNetgraphNodeEngine {
+    pub fn new(node_id: u32, name: &str, node_type: &str) -> Self {
+        Self {
+            node_id,
+            name: name.to_string(),
+            node_type: node_type.to_string(),
+            hooks: Vec::new(),
+        }
+    }
+
+    pub fn connect_hook(&mut self, hook_name: &str, peer_node: &str, peer_hook: &str) {
+        self.hooks.push(NetgraphHook {
+            name: hook_name.to_string(),
+            peer_node_name: peer_node.to_string(),
+            peer_hook_name: peer_hook.to_string(),
+        });
+    }
+
+    pub fn is_hook_connected(&self, hook_name: &str) -> bool {
+        self.hooks.iter().any(|h| h.name == hook_name)
+    }
+}
+
+// -------------------------------------------------------------------------
 // Clear Linux Stateless OS Configuration Engine
 // -------------------------------------------------------------------------
 
@@ -4850,5 +4931,23 @@ mod tests {
         assert_eq!(engine.sysconfdir_overrides.len(), 1);
         assert_eq!(engine.reset_etc_to_stateless_defaults(), 1);
         assert_eq!(engine.sysconfdir_overrides.len(), 0);
+    }
+
+    #[test]
+    fn test_freebsd_jail_sandbox_engine() {
+        let mut jail = FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
+        assert!(!jail.is_running);
+        assert!(jail.start_jail().is_ok());
+        assert!(jail.is_running);
+        jail.stop_jail();
+        assert!(!jail.is_running);
+    }
+
+    #[test]
+    fn test_freebsd_netgraph_node_engine() {
+        let mut node = FreeBsdNetgraphNodeEngine::new(10, "bce0", "ether");
+        assert!(!node.is_hook_connected("lower"));
+        node.connect_hook("lower", "tee1", "left");
+        assert!(node.is_hook_connected("lower"));
     }
 }

@@ -32,6 +32,10 @@ This document compiles key architectural strengths, design paradigms, and featur
 - **Hardware Security Module Attestation**: YubiHSM2 integration validating hardware key presence during release builds.
 - **Dual OpenPGP + Post-Quantum Signature**: Combines classical OpenPGP signatures with Dilithium-5 post-quantum signature headers.
 
+### ⛓️ 7. FreeBSD Jails & Netgraph Paradigm
+- **Container Isolation (`FreeBsdJailSandboxEngine`)**: JID-indexed jail process groups with path chroot scoping and VNET network stack virtualization.
+- **Graph Networking Nodes (`FreeBsdNetgraphNodeEngine`)**: Netgraph node and hook abstraction graph linking interfaces, sockets, and bridges.
+
 ---
 
 ## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD

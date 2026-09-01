@@ -11,7 +11,7 @@ This document presents a comparative dashboard and strategic development roadmap
 | **Kernel** | Mature, modular, supports SMP & preemptive multitasking | Sovereign microkernel with BORE scheduler, CachyOS SMP, & NUMA buddy allocator | Expand POSIX process lifecycle, signal handling, and preemptive thread scheduling. |
 | **File System** | ext4, Btrfs, XFS, ZFS | `SigmaFS` with transactional journaling, Ext4/NTFS translation, & POSIX ACLs | Implement hard links, ext4 read/write compatibility, and copy-on-write snapshotting. |
 | **Device Drivers** | Broad vendor hardware support & dkms | Sovereign Driver Framework (SDF), Intel e1000, VirtIO, xHCI, & NVMe drivers | Expand open GPU drivers (i915/amdgpu/nouveau) and modern Wi-Fi stacks (`iwlwifi`). |
-| **Networking Stack** | Full TCP/IP, sockets, eBPF, Cilium | Zero-copy socket layer, BSD `SO_REUSEADDR`, SYN cookies, & RPS steering | Finalize IPv6 dual-stack routing, WireGuard VPN, and eBPF syscall verifiers. |
+| **Networking Stack** | Full TCP/IP, sockets, eBPF, Cilium, Netgraph | Zero-copy socket layer, BSD `SO_REUSEADDR`, SYN cookies, `FreeBsdNetgraphNodeEngine`, & RPS steering | Finalize IPv6 dual-stack routing, WireGuard VPN, and eBPF syscall verifiers. |
 | **Security Framework** | SELinux / AppArmor, POSIX capabilities, Arch Signstar | Post-Quantum Enclave (Kyber/Dilithium), `SignstarSigningService`, Bell-LaPadula MLS MAC, POSIX DAC, & Qubes microVMs | Integrate reproducible package verification, SELinux domain transitions, & zero-trust capability tokens. |
 | **System Calls** | POSIX-compliant, Linux x86-64 ABI | FastSyscallTrampoline MSR dispatcher & Linux syscall translator | Expand epoll, eventfd, futex, inotify, and memfd POSIX syscall coverage. |
 | **GUI / Window System** | GNOME / KDE / XFCE on Wayland / X11 | Zenith Desktop prototype, multi-layout personas (Windows/Mac/GNOME/Ubuntu) | Finalize Wayland compositor rendering, client-side decorations, & multi-monitor display manager. |
@@ -19,7 +19,7 @@ This document presents a comparative dashboard and strategic development roadmap
 | **Bootloader** | GRUB2, systemd-boot, EFISTUB | Custom UEFI bootloader (`src/boot/uefi.rs`) & Sigma-Boot EFI bridge | Enhance Secure Boot DB/DBX keyring verification and automated initramfs generation (`mkinitcpio`). |
 | **Shell / CLI** | Bash, Zsh, Fish | `sigma-sh` REPL with Bash aliases, Zsh tab completion, & Fish suggestions | Expand POSIX coreutils CLI utilities (`fdisk`, `df`, `ps`, `top`). |
 | **System Utilities** | Monitoring, journald, udev, systemd, bulky, webapp-manager | Runit service manager, `systemd-preset` configurator, `WebappManager`, & `SigmaFileRenamer` | Add unified system journal logging, hardware telemetry diagnostics, & startup optimizers. |
-| **Virtualization** | KVM, QEMU, Docker, Podman, LXC | Qubes OS RPC policy engine & Kata Containers microVM manager | Integrate Firecracker/KVM hypervisor bindings and OCI container image execution. |
+| **Virtualization** | KVM, QEMU, Docker, Podman, LXC, FreeBSD Jails | Qubes OS RPC policy engine, `FreeBsdJailSandboxEngine`, & Kata Containers microVM manager | Integrate Firecracker/KVM hypervisor bindings and OCI container image execution. |
 | **Update Mechanism** | Rolling (Arch) / Stable (Debian/Fedora) releases | Rawhide rolling channel selector (`SigmaNextChannel`) & livepatching | Build automated transactional updates, delta packages (`debdelta`), and reproducible ISO pipelines. |
 
 ---

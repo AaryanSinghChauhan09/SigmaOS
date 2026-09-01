@@ -3,6 +3,7 @@ extern crate alloc;
 #[cfg(test)]
 extern crate std;
 
+use alloc::vec::Vec;
 use core::mem;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
 /// Provides PKGBUILD parsing, source compilation simulation, and rolling release dependency installations.
@@ -133,15 +134,7 @@ impl PacmanMirrorlist {
 
     /// Sort mirrors by latency (fastest first)
     pub fn sort_by_latency(&mut self) {
-        for i in 0..self.mirrors.len {
-            for j in (i + 1)..self.mirrors.len {
-                if self.mirrors[j].latency_ms < self.mirrors[i].latency_ms {
-                    let temp = self.mirrors[i].clone();
-                    self.mirrors[i] = self.mirrors[j].clone();
-                    self.mirrors[j] = temp;
-                }
-            }
-        }
+        self.mirrors.sort_by_key(|m| m.latency_ms);
     }
 }
 
@@ -163,8 +156,7 @@ impl AbsTreeEngine {
 
     pub fn find_recipe_by_name(&self, name: &[u8]) -> Option<PkgBuildScript> {
         let name_len = name.len().min(31);
-        for i in 0..self.repositories.len {
-            let pkg = &self.repositories[i];
+        for pkg in &self.repositories {
             let mut matches = true;
             for k in 0..name_len {
                 if pkg.pkgname[k] != name[k] {
@@ -206,8 +198,8 @@ impl PacmanManager {
 
     /// Creates an atomic checkpoint before running rolling upgrades (defeats Arch update breakage)
     pub fn create_checkpoint(&mut self) -> usize {
-        let id = self.checkpoints.len + 1;
-        let active_cnt = self.installed_packages.len;
+        let id = self.checkpoints.len() + 1;
+        let active_cnt = self.installed_packages.len();
         self.checkpoints.push(PacmanTransactionCheckpoint {
             checkpoint_id: id,
             active_packages_count: active_cnt,
@@ -218,17 +210,15 @@ impl PacmanManager {
     /// Instant sub-millisecond transactional rollback to a specified checkpoint ID
     pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), PacmanError> {
         let mut target_count = None;
-        for i in 0..self.checkpoints.len {
-            if self.checkpoints[i].checkpoint_id == checkpoint_id {
-                target_count = Some(self.checkpoints[i].active_packages_count);
+        for cp in &self.checkpoints {
+            if cp.checkpoint_id == checkpoint_id {
+                target_count = Some(cp.active_packages_count);
                 break;
             }
         }
 
         if let Some(cnt) = target_count {
-            while self.installed_packages.len > cnt {
-                self.installed_packages.len -= 1;
-            }
+            self.installed_packages.truncate(cnt);
             Ok(())
         } else {
             Err(PacmanError::CompileError)
@@ -243,8 +233,8 @@ impl PacmanManager {
     /// Upgrade/Rolling sync of all packages (pacman -Syu equivalent)
     pub fn rolling_upgrade(&mut self) -> usize {
         let mut upgraded = 0;
-        for i in 0..self.installed_packages.len {
-            if let Some(ref mut pkg) = self.installed_packages[i] {
+        for opt in &mut self.installed_packages {
+            if let Some(ref mut pkg) = opt {
                 // Increment version suffix to represent rolling release upgrade
                 pkg.pkgrel += 1;
                 upgraded += 1;
@@ -252,106 +242,6 @@ impl PacmanManager {
         }
         upgraded
     }
-}
-
-pub struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
-            }
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    if size == 0 { return core::ptr::null_mut(); }
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8, size: usize) {
-    if !ptr.is_null() && size > 0 {
-        use std::alloc::{dealloc, Layout};
-        let layout = Layout::from_size_align(size, 8).unwrap();
-        dealloc(ptr, layout);
-    }
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8, size: usize);
 }
 
 #[cfg(test)]
