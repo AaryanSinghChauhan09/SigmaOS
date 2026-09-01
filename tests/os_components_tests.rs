@@ -67,6 +67,8 @@ mod epoll;
 mod elf_relocation;
 #[path = "../src/security/mod.rs"]
 pub mod security;
+#[path = "../src/package/universal.rs"]
+pub mod package;
 #[path = "../src/sigpkg/mod.rs"]
 mod sigpkg;
 #[path = "../src/device/manager.rs"]

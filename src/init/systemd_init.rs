@@ -8,8 +8,6 @@ use alloc::vec::Vec;
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
@@ -390,6 +388,9 @@ pub struct ParsedSystemdUnitFile {
     pub hardening_profile: SystemdUnitHardeningProfile,
     pub listen_stream: String,
     pub on_calendar: String,
+    pub protect_system: String,
+    pub protect_home: String,
+    pub oom_score_adjust: i32,
 }
 
 pub struct SystemdUnitFileParser;
@@ -873,6 +874,8 @@ pub struct SystemdUnit {
     pub hardening_profile: SystemdUnitHardeningProfile,
     pub socket_config: Option<SocketConfig>,
     pub timer_config: Option<TimerConfig>,
+    pub upholds: Vec<UnitID>,
+    pub oom_score_adjust: i32,
 }
 
 impl SystemdUnit {
@@ -904,6 +907,8 @@ impl SystemdUnit {
             hardening_profile: SystemdUnitHardeningProfile::default(),
             socket_config: None,
             timer_config: None,
+            upholds: Vec::new(),
+            oom_score_adjust: 0,
         }
     }
 

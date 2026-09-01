@@ -241,10 +241,6 @@ pub struct SimpleVMM {
 }
 
 impl SimpleVMM {
-    pub fn mark_copy_on_write(&mut self, _virt: VirtualAddress) -> Result<(), PageFaultError> {
-        Ok(())
-    }
-
     pub fn new() -> Self {
         let pml4 = SimplePageTable::new(0x1000);
         SimpleVMM {
@@ -407,18 +403,6 @@ impl SimpleVMM {
             }
         }
     }
-
-    pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
-        let pd_idx = self.get_pd_index(virt);
-        let pt_idx = self.get_pt_index(virt);
-
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pd_idx).and_then(|opt| opt.as_mut()) {
-            let pt_entry = pt.get_entry(pt_idx);
-            pt_entry.set_writable(false);
-            return Ok(());
-        }
-        Err(PageFaultError::NotPresent)
-    }
 }
 
 impl Default for SimpleVMM {
@@ -535,11 +519,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 return Some(pdpt_entry.get_physical_address() | page_offset);
             }
 
-            let pdpt_phys = self.pml4.get_entry_ref(pml4_idx).get_physical_address();
-            let pdpt_entry_idx = (pdpt_phys / 4096) * 512 + pdpt_idx;
-            let pd_idx_in_vec = pdpt_entry_idx * 512 + pd_idx;
-
-            if let Some(ref pd) = self.pd_tables.get(pdpt_entry_idx).and_then(|opt| opt.as_ref()) {
+            if let Some(ref pd) = self.pd_tables.get(pdpt_idx).and_then(|opt| opt.as_ref()) {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
@@ -550,7 +530,7 @@ impl VirtualMemoryManager for SimpleVMM {
                     return Some(pd_entry.get_physical_address() | page_offset);
                 }
 
-                if let Some(ref pt) = self.pt_tables.get(pd_idx_in_vec).and_then(|opt| opt.as_ref()) {
+                if let Some(ref pt) = self.pt_tables.get(pd_idx).and_then(|opt| opt.as_ref()) {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;
