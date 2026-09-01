@@ -33,12 +33,11 @@ pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
-pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
 
 pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
 pub mod store;
@@ -99,10 +98,6 @@ pub use verifier::CryptoVerifier;
 pub use package_snapshot_rollback::{
     SovereignPackageSnapshotRollbackEngine, PackageSnapshotState, PackageSnapshotDiff,
     InstalledPackageRecord,
-};
-pub use sovereign_package_innovations::{
-    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
 };
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
 pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
