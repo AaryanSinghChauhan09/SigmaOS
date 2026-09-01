@@ -3,6 +3,7 @@ extern crate alloc;
 // Fully-featured, zero-dependency, safe Rust implementation of standard-defeating
 // desktop features matching and crushing Linux Mint (Cinnamon, Software/Update/Driver Managers)
 
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -329,5 +330,278 @@ mod tests {
             Some("e1000e".to_string())
         );
         assert_eq!(dm.active_hardware[1].matched_driver_name, None);
+    }
+
+    #[test]
+    fn test_nvidia_prime_engine_and_applet() {
+        let mut applet = NvidiaPrimeApplet::new(101);
+        assert_eq!(
+            applet.prime_engine.active_profile,
+            NvidiaPrimeProfile::NvidiaOnDemand
+        );
+        assert_eq!(
+            applet.render_status_text(),
+            "GPU: NVIDIA On-Demand (Sleeping)"
+        );
+
+        // Test process offloading registration
+        applet.prime_engine.register_offload_process(4512);
+        assert_eq!(applet.prime_engine.power_state, NvidiaPowerState::D0Active);
+        assert_eq!(
+            applet.render_status_text(),
+            "GPU: NVIDIA On-Demand (Active: 1 app(s))"
+        );
+
+        // Offload command generation
+        let offload_cmd = applet.prime_engine.generate_offload_command("vkcube");
+        assert_eq!(offload_cmd.env_vars.len(), 3);
+        assert!(offload_cmd.formatted_cmd.contains("__NV_PRIME_RENDER_OFFLOAD=1"));
+
+        // Unregister offload process
+        applet.prime_engine.unregister_offload_process(4512);
+        assert_eq!(applet.prime_engine.power_state, NvidiaPowerState::D3Hot);
+
+        // Test profile switching to Integrated (requires relogin)
+        let relogin = applet
+            .prime_engine
+            .set_profile(NvidiaPrimeProfile::IntegratedIntelRadeon)
+            .unwrap();
+        assert!(relogin);
+        assert_eq!(
+            applet.prime_engine.pending_profile,
+            Some(NvidiaPrimeProfile::IntegratedIntelRadeon)
+        );
+
+        let active = applet.prime_engine.apply_pending_profile().unwrap();
+        assert_eq!(active, NvidiaPrimeProfile::IntegratedIntelRadeon);
+        assert_eq!(
+            applet.prime_engine.power_state,
+            NvidiaPowerState::D3ColdPowerOff
+        );
+        assert_eq!(
+            applet.render_status_text(),
+            "GPU: Integrated (Power Saving)"
+        );
+    }
+}
+
+// =========================================================================
+// 5. SOVEREIGN NVIDIA PRIME HYBRID GPU ENGINE & APPLETS
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvidiaPrimeProfile {
+    IntegratedIntelRadeon,
+    NvidiaOnDemand,
+    NvidiaPerformance,
+    OffloadCompute,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvidiaPowerState {
+    D0Active,
+    D3Hot,
+    D3ColdPowerOff,
+}
+
+#[derive(Debug, Clone)]
+pub struct NvidiaPrimeTelemetry {
+    pub gpu_temp_celsius: u32,
+    pub power_draw_watts: u32,
+    pub vram_used_mb: usize,
+    pub vram_total_mb: usize,
+    pub power_state: NvidiaPowerState,
+}
+
+#[derive(Debug, Clone)]
+pub struct OffloadCommand {
+    pub command: String,
+    pub env_vars: Vec<(String, String)>,
+    pub formatted_cmd: String,
+}
+
+pub struct SovereignNvidiaPrimeEngine {
+    pub active_profile: NvidiaPrimeProfile,
+    pub pending_profile: Option<NvidiaPrimeProfile>,
+    pub power_state: NvidiaPowerState,
+    pub telemetry: NvidiaPrimeTelemetry,
+    pub active_offloaded_processes: Vec<u32>, // PIDs
+    pub relogin_required: bool,
+}
+
+impl SovereignNvidiaPrimeEngine {
+    pub fn new() -> Self {
+        Self {
+            active_profile: NvidiaPrimeProfile::NvidiaOnDemand,
+            pending_profile: None,
+            power_state: NvidiaPowerState::D3Hot,
+            telemetry: NvidiaPrimeTelemetry {
+                gpu_temp_celsius: 42,
+                power_draw_watts: 5,
+                vram_used_mb: 128,
+                vram_total_mb: 8192,
+                power_state: NvidiaPowerState::D3Hot,
+            },
+            active_offloaded_processes: Vec::new(),
+            relogin_required: false,
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: NvidiaPrimeProfile) -> Result<bool, &'static str> {
+        if self.active_profile == profile {
+            return Ok(false);
+        }
+
+        match profile {
+            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::OffloadCompute => {
+                // Dynamic runtime switching without requiring session restart / relogin
+                self.active_profile = profile;
+                self.pending_profile = None;
+                self.relogin_required = false;
+                if profile == NvidiaPrimeProfile::OffloadCompute {
+                    self.power_state = NvidiaPowerState::D3Hot;
+                }
+                Ok(false) // false = no relogin required
+            }
+            NvidiaPrimeProfile::IntegratedIntelRadeon => {
+                // Switching to pure integrated cuts dGPU power completely (D3Cold)
+                self.pending_profile = Some(profile);
+                self.relogin_required = true;
+                Ok(true) // true = relogin required to restart display server
+            }
+            NvidiaPrimeProfile::NvidiaPerformance => {
+                // Pure discrete mode forces GPU active (D0Active)
+                self.pending_profile = Some(profile);
+                self.relogin_required = true;
+                Ok(true)
+            }
+        }
+    }
+
+    pub fn apply_pending_profile(&mut self) -> Result<NvidiaPrimeProfile, &'static str> {
+        let profile = self
+            .pending_profile
+            .take()
+            .ok_or("No pending NVIDIA PRIME profile transition to apply")?;
+
+        self.active_profile = profile;
+        self.relogin_required = false;
+
+        match profile {
+            NvidiaPrimeProfile::IntegratedIntelRadeon => {
+                self.power_state = NvidiaPowerState::D3ColdPowerOff;
+                self.telemetry.power_state = NvidiaPowerState::D3ColdPowerOff;
+                self.telemetry.power_draw_watts = 0;
+            }
+            NvidiaPrimeProfile::NvidiaPerformance => {
+                self.power_state = NvidiaPowerState::D0Active;
+                self.telemetry.power_state = NvidiaPowerState::D0Active;
+                self.telemetry.power_draw_watts = 25;
+            }
+            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::OffloadCompute => {
+                self.power_state = NvidiaPowerState::D3Hot;
+                self.telemetry.power_state = NvidiaPowerState::D3Hot;
+            }
+        }
+
+        Ok(self.active_profile)
+    }
+
+    pub fn generate_offload_command(&self, cmd: &str) -> OffloadCommand {
+        let mut env_vars = Vec::new();
+        env_vars.push(("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string()));
+        env_vars.push(("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string()));
+        env_vars.push(("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string()));
+
+        let formatted = format!(
+            "__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only {}",
+            cmd
+        );
+
+        OffloadCommand {
+            command: cmd.to_string(),
+            env_vars,
+            formatted_cmd: formatted,
+        }
+    }
+
+    pub fn register_offload_process(&mut self, pid: u32) {
+        if !self.active_offloaded_processes.contains(&pid) {
+            self.active_offloaded_processes.push(pid);
+        }
+        if self.power_state != NvidiaPowerState::D0Active {
+            self.power_state = NvidiaPowerState::D0Active;
+            self.telemetry.power_state = NvidiaPowerState::D0Active;
+            self.telemetry.power_draw_watts = 35;
+        }
+    }
+
+    pub fn unregister_offload_process(&mut self, pid: u32) {
+        self.active_offloaded_processes.retain(|&p| p != pid);
+        if self.active_offloaded_processes.is_empty()
+            && self.active_profile != NvidiaPrimeProfile::NvidiaPerformance
+        {
+            self.power_state = NvidiaPowerState::D3Hot;
+            self.telemetry.power_state = NvidiaPowerState::D3Hot;
+            self.telemetry.power_draw_watts = 5;
+        }
+    }
+
+    pub fn update_telemetry(&mut self, temp: u32, watts: u32, vram_used: usize) {
+        self.telemetry.gpu_temp_celsius = temp;
+        self.telemetry.power_draw_watts = watts;
+        self.telemetry.vram_used_mb = vram_used;
+    }
+}
+
+impl Default for SovereignNvidiaPrimeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct NvidiaPrimeApplet {
+    pub applet_id: u32,
+    pub prime_engine: SovereignNvidiaPrimeEngine,
+    pub icon_name: String,
+}
+
+impl NvidiaPrimeApplet {
+    pub fn new(id: u32) -> Self {
+        Self {
+            applet_id: id,
+            prime_engine: SovereignNvidiaPrimeEngine::new(),
+            icon_name: "prime-indicator".to_string(),
+        }
+    }
+
+    pub fn switch_mode(&mut self, profile: NvidiaPrimeProfile) -> Result<String, &'static str> {
+        let relogin = self.prime_engine.set_profile(profile)?;
+        if relogin {
+            Ok(format!(
+                "Switched PRIME profile to {:?}. Relogin or display server restart required.",
+                profile
+            ))
+        } else {
+            Ok(format!("Switched PRIME profile to {:?} immediately.", profile))
+        }
+    }
+
+    pub fn render_status_text(&self) -> String {
+        match self.prime_engine.active_profile {
+            NvidiaPrimeProfile::IntegratedIntelRadeon => "GPU: Integrated (Power Saving)".to_string(),
+            NvidiaPrimeProfile::NvidiaOnDemand => {
+                if self.prime_engine.active_offloaded_processes.is_empty() {
+                    "GPU: NVIDIA On-Demand (Sleeping)".to_string()
+                } else {
+                    format!(
+                        "GPU: NVIDIA On-Demand (Active: {} app(s))",
+                        self.prime_engine.active_offloaded_processes.len()
+                    )
+                }
+            }
+            NvidiaPrimeProfile::NvidiaPerformance => "GPU: NVIDIA Performance (NVIDIA Always On)".to_string(),
+            NvidiaPrimeProfile::OffloadCompute => "GPU: Offload Compute (CUDA / Vulkan Only)".to_string(),
+        }
     }
 }
