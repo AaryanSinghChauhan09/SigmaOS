@@ -36,6 +36,10 @@ This document compiles key architectural strengths, design paradigms, and featur
 - **Container Isolation (`FreeBsdJailSandboxEngine`)**: JID-indexed jail process groups with path chroot scoping and VNET network stack virtualization.
 - **Graph Networking Nodes (`FreeBsdNetgraphNodeEngine`)**: Netgraph node and hook abstraction graph linking interfaces, sockets, and bridges.
 
+### 🔬 8. Nix / Guix / Debian Reproducible Build Pipeline
+- **Environment Scrubbing (`scrub_environment`)**: Automatic removal of non-deterministic host environment variables (`USER`, `HOSTNAME`, `TZ`, `PWD`, `HOME`).
+- **Diffoscope-Style Byte Diagnostics (`audit_reproducibility`)**: Bit-for-bit offset analysis reporting hex discrepancies across independent package builds.
+
 ---
 
 ## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD

@@ -61,6 +61,7 @@ This document serves as the master engineering roadmap to systematically resolve
 | **blueman** | Desktop Bluetooth manager & device paired control | `SovereignBluetoothManager` (Bluetooth 5.3 stack) |
 | **gdebi** | Standalone package installer with auto-deps | `UniversalPackageImporter` (standalone package installer in `sigma_pkg.rs`) |
 | **signstar** | Arch Linux package & artifact signing service | `SignstarSigningService` (dual OpenPGP + PQC HSM signing in `verifier.rs`) |
+| **diffoscope** | Reproducible builds byte diagnostic tool | `ReproducibleBuildContext::audit_reproducibility` (in `sovereign_sigpkg.rs`) |
 
 ---
 
