@@ -54,6 +54,7 @@ pub struct GuiInstallerWizard {
     pub user_config: Option<UserAccountConfig>,
     pub privacy: PrivacySettings,
     pub installation_progress_pct: u32,
+    pub hardware_driver_probing_active: bool,
 }
 
 impl GuiInstallerWizard {
@@ -72,7 +73,14 @@ impl GuiInstallerWizard {
                 location_services: false,
             },
             installation_progress_pct: 0,
+            hardware_driver_probing_active: false,
         }
+    }
+
+    pub fn trigger_hardware_driver_detection(&mut self) -> usize {
+        self.hardware_driver_probing_active = true;
+        // Simulate Ubuntu HWE / Linux Mint Driver Manager hardware enablement detection
+        3 // Detected GPU, Wi-Fi, and Printer devices
     }
 
     pub fn advance_step(&mut self) -> InstallerStep {
