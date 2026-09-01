@@ -7,7 +7,7 @@
  */
 export function initKeyboardNavigation() {
   const interactiveElements = document.querySelectorAll(
-    '[role="button"], [tab-index="0"]',
+    '[role="button"], [tabindex="0"], [tab-index="0"]',
   );
 
   interactiveElements.forEach((element) => {
@@ -28,6 +28,15 @@ export function initKeyboardNavigation() {
     element.addEventListener("keypress", () => {
       // onKeyPress
       // Legacy keypress handler
+    });
+
+    // Enhance visual focus indicators for screen readers and keyboard users
+    element.addEventListener("focus", () => {
+      element.classList.add("keyboard-focus");
+    });
+
+    element.addEventListener("blur", () => {
+      element.classList.remove("keyboard-focus");
     });
   });
 }
