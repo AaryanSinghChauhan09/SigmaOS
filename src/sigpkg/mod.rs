@@ -39,13 +39,7 @@ pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
-pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
-
-pub use sovereign_package_innovations::{
-    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-};
 pub mod spec;
 pub mod store;
 pub mod transaction;

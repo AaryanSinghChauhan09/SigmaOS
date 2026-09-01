@@ -1260,6 +1260,24 @@ impl ArchWikiKnowledgeBaseEngine {
                 content: "Btrfs provides copy-on-write snapshots, subvolumes, and compression...".to_string(),
             },
         );
+        articles.insert(
+            "PledgeUnveil".to_string(),
+            ArchWikiArticle {
+                title: "OpenBSD Pledge & Unveil Sandboxing".to_string(),
+                category: "Security".to_string(),
+                tags: vec!["pledge".to_string(), "unveil".to_string(), "sandboxing".to_string()],
+                content: "Pledge restricts process system call promises while unveiling limits path access...".to_string(),
+            },
+        );
+        articles.insert(
+            "ZFS".to_string(),
+            ArchWikiArticle {
+                title: "FreeBSD ZFS Storage Pools & Boot Environments".to_string(),
+                category: "Filesystems".to_string(),
+                tags: vec!["zfs".to_string(), "beadm".to_string(), "bectl".to_string()],
+                content: "ZFS zpools support transactional copy-on-write datasets and boot environment switching...".to_string(),
+            },
+        );
         Self { articles }
     }
 
@@ -1279,6 +1297,16 @@ impl ArchWikiKnowledgeBaseEngine {
         let mut matches = Vec::new();
         for article in self.articles.values() {
             if article.tags.iter().any(|t| t == tag) {
+                matches.push(article.clone());
+            }
+        }
+        matches
+    }
+
+    pub fn search_by_category(&self, category: &str) -> Vec<ArchWikiArticle> {
+        let mut matches = Vec::new();
+        for article in self.articles.values() {
+            if article.category == category {
                 matches.push(article.clone());
             }
         }
