@@ -344,7 +344,9 @@ impl Default for AlpmTransactionEngine {
 // =========================================================================
 // 3. ARCH-SECURITY-TRACKER -> SecurityAdvisoryTracker
 //    Track CVE/security advisories per package, with affected-version ranges,
-//    severity and fixed-version resolution like arch-security-tracker.
+//    CVSS v3.1 vector ratings, multi-distro origin tracking (Arch, Debian, FreeBSD, Alpine),
+//    workaround mitigations, and automated patch prioritization —
+//    mirroring Arch Linux security tracker, Debian Security Tracker, and FreeBSD Vuxml.
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -356,6 +358,31 @@ pub enum AdvisorySeverity {
     Critical,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AdvisoryType {
+    Vulnerability,
+    SecurityWarning,
+    ZeroDayFix,
+    WorkaroundAvailable,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AdvisoryStatus {
+    NotAffected,
+    Vulnerable,
+    FixedInRelease,
+    MitigatedByWorkaround,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroOrigin {
+    ArchLinux,
+    Debian,
+    FreeBSD,
+    Alpine,
+    SigmaOS,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SecurityAdvisory {
     pub cve: String,
@@ -363,6 +390,11 @@ pub struct SecurityAdvisory {
     pub affected_versions: Vec<String>,
     pub fixed_version: Option<String>,
     pub severity: AdvisorySeverity,
+    pub cvss_score: u32, // CVSS v3.1 score multiplied by 10 (e.g. 98 = 9.8)
+    pub advisory_type: AdvisoryType,
+    pub status: AdvisoryStatus,
+    pub origin: DistroOrigin,
+    pub workaround: Option<String>,
     pub description: String,
 }
 
@@ -392,6 +424,14 @@ impl SecurityAdvisoryTracker {
             .collect()
     }
 
+    /// Find high-risk advisories exceeding a CVSS score threshold (e.g., cvss >= 70 for 7.0+)
+    pub fn high_risk_advisories(&self, min_cvss_score: u32) -> Vec<&SecurityAdvisory> {
+        self.advisories
+            .iter()
+            .filter(|a| a.cvss_score >= min_cvss_score && a.status == AdvisoryStatus::Vulnerable)
+            .collect()
+    }
+
     /// Upgrades that would resolve outstanding advisories.
     pub fn recommended_upgrades(&self, package: &str, installed_version: &str) -> Vec<String> {
         let mut upgrades: Vec<String> = Vec::new();
@@ -403,6 +443,15 @@ impl SecurityAdvisoryTracker {
             }
         }
         upgrades
+    }
+
+    /// Calculates cumulative CVSS risk score across all vulnerable advisories
+    pub fn calculate_total_risk_score(&self) -> u32 {
+        self.advisories
+            .iter()
+            .filter(|a| a.status == AdvisoryStatus::Vulnerable)
+            .map(|a| a.cvss_score)
+            .sum()
     }
 
     pub fn critical_count(&self) -> usize {
@@ -966,12 +1015,25 @@ mod tests {
             affected_versions: vec!["1.1.1".into(), "3.0.0".into()],
             fixed_version: Some("3.0.1".into()),
             severity: AdvisorySeverity::Critical,
+            cvss_score: 98,
+            advisory_type: AdvisoryType::Vulnerability,
+            status: AdvisoryStatus::Vulnerable,
+            origin: DistroOrigin::ArchLinux,
+            workaround: Some("Disable TLS 1.3 renegotiation".to_string()),
             description: "buffer overflow".into(),
         });
+
         assert_eq!(t.affected("openssl", "1.1.1").len(), 1);
         assert_eq!(t.affected("openssl", "3.0.1").len(), 0);
         assert_eq!(t.recommended_upgrades("openssl", "1.1.1"), vec!["3.0.1".to_string()]);
         assert_eq!(t.critical_count(), 1);
+
+        // Verify CVSS risk score calculation and high risk filtering
+        assert_eq!(t.calculate_total_risk_score(), 98);
+        let high_risk = t.high_risk_advisories(70);
+        assert_eq!(high_risk.len(), 1);
+        assert_eq!(high_risk[0].origin, DistroOrigin::ArchLinux);
+        assert!(high_risk[0].workaround.is_some());
     }
 
     #[test]
