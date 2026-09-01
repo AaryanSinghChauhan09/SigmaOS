@@ -1,5 +1,5 @@
-use alloc::string::{String, ToString};
 use alloc::format;
+use alloc::string::{String, ToString};
 // Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
 // Implements high-performance kernel data structures:
 // - SplayTree<K, V>: FreeBSD `sys/tree.h` inspired self-balancing binary search tree

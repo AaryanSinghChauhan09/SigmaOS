@@ -12,12 +12,12 @@
 //! sigma_unveil!(nullptr, nullptr); // Lock the veil
 //! ```
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
-use sigma_types::Result;
 use crate::klib::HashMap;
+use sigma_types::Result;
 // Path/PathBuf not in no_std; using alloc::string::String as path
 pub type PathBuf = alloc::string::String;
 pub type Path = str;
@@ -232,9 +232,7 @@ impl UnveilManager {
     pub fn lock(&mut self, process_id: u64) -> Result<()> {
         match self.process_states.get_mut(&process_id) {
             Some(state) => state.lock(),
-            None => {
-                Err("Process not found")
-            }
+            None => Err("Process not found"),
         }
     }
 
@@ -247,9 +245,7 @@ impl UnveilManager {
     ) -> Result<()> {
         match self.process_states.get(&process_id) {
             Some(state) => state.check_access(path, required_perm),
-            None => {
-                Err("Process not found")
-            }
+            None => Err("Process not found"),
         }
     }
 
@@ -302,8 +298,12 @@ mod tests {
     fn test_unveil_state() {
         let mut state = UnveilState::new();
 
-        state.unveil(alloc::string::String::from("/etc"), "r").unwrap();
-        state.unveil(alloc::string::String::from("/tmp"), "rw").unwrap();
+        state
+            .unveil(alloc::string::String::from("/etc"), "r")
+            .unwrap();
+        state
+            .unveil(alloc::string::String::from("/tmp"), "rw")
+            .unwrap();
 
         assert!(!state.is_locked());
         state.lock().unwrap();
@@ -317,8 +317,12 @@ mod tests {
     fn test_access_check() {
         let mut state = UnveilState::new();
 
-        state.unveil(alloc::string::String::from("/etc"), "r").unwrap();
-        state.unveil(alloc::string::String::from("/tmp"), "rw").unwrap();
+        state
+            .unveil(alloc::string::String::from("/etc"), "r")
+            .unwrap();
+        state
+            .unveil(alloc::string::String::from("/tmp"), "rw")
+            .unwrap();
 
         // Read access to /etc should be allowed
         assert!(state
@@ -355,7 +359,9 @@ mod tests {
     fn test_unveil_manager() {
         let mut manager = UnveilManager::new();
 
-        manager.unveil(1, alloc::string::String::from("/home"), "rw").unwrap();
+        manager
+            .unveil(1, alloc::string::String::from("/home"), "rw")
+            .unwrap();
         manager.lock(1).unwrap();
 
         // Check access

@@ -6,8 +6,6 @@ extern crate alloc;
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
-
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -1156,7 +1154,8 @@ impl SovereignCephMinioObjectStore {
             crc = crc.wrapping_add(b as u32).wrapping_mul(31);
         }
 
-        self.objects.retain(|o| !(o.bucket == bucket && o.key == key));
+        self.objects
+            .retain(|o| !(o.bucket == bucket && o.key == key));
         self.objects.push(S3Object {
             bucket: bucket.to_string(),
             key: key.to_string(),
@@ -1560,8 +1559,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
     }
 
     pub fn bootstrap_sovereign_stack(&mut self) -> Result<String, &'static str> {
-        self.vcs.stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
-        let _commit = self.vcs.commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
+        self.vcs
+            .stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
+        let _commit = self
+            .vcs
+            .commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
 
         let init_unit = ServiceUnit {
             name: "sovereign_core".to_string(),
@@ -1574,7 +1576,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.supervisor.register_service(init_unit)?;
         self.supervisor.start_service("sovereign_core")?;
 
-        self.observability.record_metric("cpu_utilization", 12.5, 1700000000);
+        self.observability
+            .record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
 
         Ok(format!(
@@ -1690,7 +1693,12 @@ impl SovereignZirconHandleManager {
         }
     }
 
-    pub fn create_handle(&mut self, object_type: &str, rights: ZirconRights, pqc_token: [u8; 16]) -> u32 {
+    pub fn create_handle(
+        &mut self,
+        object_type: &str,
+        rights: ZirconRights,
+        pqc_token: [u8; 16],
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.handles.push(ZirconHandle {
@@ -1813,7 +1821,11 @@ impl SovereignSolarisZoneEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(p) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
+        if let Some(p) = self
+            .probes
+            .iter_mut()
+            .find(|p| p.provider == provider && p.name == name)
+        {
             p.hit_count += 1;
             true
         } else {
@@ -1922,7 +1934,11 @@ impl SovereignQubesIsolationEngine {
         });
     }
 
-    pub fn copy_inter_vm_buffer(&mut self, src_domain: &str, payload: &[u8]) -> Result<(), &'static str> {
+    pub fn copy_inter_vm_buffer(
+        &mut self,
+        src_domain: &str,
+        payload: &[u8],
+    ) -> Result<(), &'static str> {
         if !self.domains.iter().any(|d| d.name == src_domain) {
             return Err("QubesIsolationEngine: Source domain does not exist");
         }
@@ -2016,8 +2032,17 @@ impl SovereignHaikuInterfaceEngine {
         });
     }
 
-    pub fn convert_media(&self, in_fmt: &str, out_fmt: &str, data: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if self.translators.iter().any(|t| t.input_format == in_fmt && t.output_format == out_fmt) {
+    pub fn convert_media(
+        &self,
+        in_fmt: &str,
+        out_fmt: &str,
+        data: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if self
+            .translators
+            .iter()
+            .any(|t| t.input_format == in_fmt && t.output_format == out_fmt)
+        {
             let mut converted = data.to_vec();
             converted.reverse(); // Zero-copy representation transformation
             Ok(converted)
@@ -2055,7 +2080,13 @@ impl SovereignFirecrackerMicroVmManager {
         Self { vms: Vec::new() }
     }
 
-    pub fn launch_microvm(&mut self, vm_id: &str, vcpus: u32, mem_mb: u64, kernel: &str) -> Result<(), &'static str> {
+    pub fn launch_microvm(
+        &mut self,
+        vm_id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+        kernel: &str,
+    ) -> Result<(), &'static str> {
         if self.vms.iter().any(|v| v.vm_id == vm_id) {
             return Err("MicroVmManager: MicroVM ID already exists");
         }
@@ -2157,7 +2188,9 @@ pub struct SovereignSbomGeneratorPipeline {
 
 impl SovereignSbomGeneratorPipeline {
     pub fn new() -> Self {
-        Self { packages: Vec::new() }
+        Self {
+            packages: Vec::new(),
+        }
     }
 
     pub fn record_package(&mut self, name: &str, ver: &str, license: &str) {
@@ -2176,7 +2209,10 @@ impl SovereignSbomGeneratorPipeline {
             if i > 0 {
                 manifest.push(',');
             }
-            manifest.push_str(&format!("{{\"name\":\"{}\",\"version\":\"{}\",\"purl\":\"{}\"}}", pkg.name, pkg.version, pkg.purl));
+            manifest.push_str(&format!(
+                "{{\"name\":\"{}\",\"version\":\"{}\",\"purl\":\"{}\"}}",
+                pkg.name, pkg.version, pkg.purl
+            ));
         }
         manifest.push_str("]}");
         manifest
@@ -2309,7 +2345,10 @@ impl SovereignWeb3FsIpfsEngine {
     }
 
     pub fn fetch_block(&self, cid: &str) -> Option<&[u8]> {
-        self.blocks.iter().find(|b| b.cid == cid).map(|b| b.data.as_slice())
+        self.blocks
+            .iter()
+            .find(|b| b.cid == cid)
+            .map(|b| b.data.as_slice())
     }
 }
 
@@ -2336,7 +2375,9 @@ pub struct SovereignWasmCraneliftEngine {
 
 impl SovereignWasmCraneliftEngine {
     pub fn new() -> Self {
-        Self { modules: Vec::new() }
+        Self {
+            modules: Vec::new(),
+        }
     }
 
     pub fn load_wasm_bytecode(&mut self, name: &str, bytecode: &[u8]) {
@@ -2393,7 +2434,11 @@ impl SovereignReproducibleBuildFarm {
     }
 
     pub fn audit_build_reproducibility(&self, job_id: &str) -> bool {
-        self.jobs.iter().find(|j| j.job_id == job_id).map(|j| j.reproducible).unwrap_or(false)
+        self.jobs
+            .iter()
+            .find(|j| j.job_id == job_id)
+            .map(|j| j.reproducible)
+            .unwrap_or(false)
     }
 }
 
@@ -2544,7 +2589,10 @@ impl SovereignFlatpakAppImageSandbox {
 
     pub fn launch_sandboxed_app(&self, app_id: &str) -> Result<String, &'static str> {
         if let Some(app) = self.installed_bundles.iter().find(|b| b.app_id == app_id) {
-            Ok(format!("Bubblewrap Sandbox Spawned: {} v{}", app.app_id, app.version))
+            Ok(format!(
+                "Bubblewrap Sandbox Spawned: {} v{}",
+                app.app_id, app.version
+            ))
         } else {
             Err("FlatpakAppImageSandbox: App bundle not registered")
         }
@@ -2637,7 +2685,10 @@ impl SovereignCockroachDistributedStore {
     }
 
     pub fn raft_get(&self, key: &str) -> Option<&[u8]> {
-        self.store.iter().find(|k| k.key == key).map(|k| k.value.as_slice())
+        self.store
+            .iter()
+            .find(|k| k.key == key)
+            .map(|k| k.value.as_slice())
     }
 }
 
@@ -3358,7 +3409,9 @@ mod tests {
         let mut qubes = SovereignQubesIsolationEngine::new();
         qubes.create_domain("work-vault", "red", false);
 
-        assert!(qubes.copy_inter_vm_buffer("work-vault", b"secret_token").is_ok());
+        assert!(qubes
+            .copy_inter_vm_buffer("work-vault", b"secret_token")
+            .is_ok());
         assert_eq!(qubes.inter_vm_clipboard, Some(b"secret_token".to_vec()));
     }
 
@@ -3447,7 +3500,15 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum_sandbox() {
         let mut capsicum = SovereignCapsicumSandbox::new();
-        capsicum.limit_fd_rights(3, CapsicumCapRights { read: true, write: false, seek: true, fstat: true });
+        capsicum.limit_fd_rights(
+            3,
+            CapsicumCapRights {
+                read: true,
+                write: false,
+                seek: true,
+                fstat: true,
+            },
+        );
         // Prior to entering capability mode, checks pass
         assert!(capsicum.check_fd_right(3, true, true));
 
@@ -3524,7 +3585,10 @@ mod tests {
         let mut store = SovereignCephMinioObjectStore::new();
         store.put_object("assets", "logo.png", b"png_data_bytes");
 
-        assert_eq!(store.get_object("assets", "logo.png"), Some(&b"png_data_bytes"[..]));
+        assert_eq!(
+            store.get_object("assets", "logo.png"),
+            Some(&b"png_data_bytes"[..])
+        );
         assert_eq!(store.get_object("assets", "nonexistent"), None);
     }
 
@@ -3544,7 +3608,10 @@ mod tests {
         let mut mesh = SovereignTailscaleMeshEngine::new();
         mesh.join_mesh("node-alpha", "100.64.0.1", [0x01; 32]);
 
-        assert_eq!(mesh.route_mesh_packet("100.64.0.1"), Some("node-alpha".to_string()));
+        assert_eq!(
+            mesh.route_mesh_packet("100.64.0.1"),
+            Some("node-alpha".to_string())
+        );
         assert_eq!(mesh.route_mesh_packet("100.64.0.99"), None);
     }
 
@@ -3610,7 +3677,10 @@ mod tests {
         envoy.report_failure("10.0.0.1:8080");
         envoy.report_failure("10.0.0.1:8080");
 
-        assert_eq!(envoy.upstreams[0].circuit_breaker, CircuitBreakerState::Open);
+        assert_eq!(
+            envoy.upstreams[0].circuit_breaker,
+            CircuitBreakerState::Open
+        );
     }
 
     #[test]

@@ -22,7 +22,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use alloc::format;
 
-
 extern crate alloc;
 use alloc::collections::VecDeque;
 use alloc::string::{String, ToString};

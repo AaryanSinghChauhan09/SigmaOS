@@ -66,8 +66,14 @@ impl SovereignUniversalDistroBridge {
 
     pub fn get_supervisor_type(&self) -> ServiceSupervisorType {
         match self.mode {
-            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
             DistroSubsystemMode::LinuxAlpine => ServiceSupervisorType::Runit,
             DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
         }
@@ -77,7 +83,12 @@ impl SovereignUniversalDistroBridge {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd, "/etc") => "/etc".to_string(),
+            (
+                DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/etc",
+            ) => "/etc".to_string(),
             _ => generic_path.to_string(),
         }
     }
@@ -97,7 +108,11 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
-    pub fn enforce_security_isolation(&mut self, pid: u64, root_path: &str) -> Result<(), &'static str> {
+    pub fn enforce_security_isolation(
+        &mut self,
+        pid: u64,
+        root_path: &str,
+    ) -> Result<(), &'static str> {
         match self.mode {
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
@@ -105,7 +120,8 @@ impl SovereignUniversalDistroBridge {
                 Ok(())
             }
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
-                self.pledge_sentinel.pledge_process(pid, &["stdio", "rpath", "wpath"])?;
+                self.pledge_sentinel
+                    .pledge_process(pid, &["stdio", "rpath", "wpath"])?;
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
@@ -117,23 +133,50 @@ impl SovereignUniversalDistroBridge {
         self.apk_hook_engine.run_pre_hooks(pkg_name) + self.apk_hook_engine.run_post_hooks(pkg_name)
     }
 
-    pub fn validate_retguard_stack(&mut self, func_name: &str, canary: u64, sp: u64) -> Result<(), &'static str> {
-        self.retguard_engine.verify_exit_function(func_name, canary, sp)
+    pub fn validate_retguard_stack(
+        &mut self,
+        func_name: &str,
+        canary: u64,
+        sp: u64,
+    ) -> Result<(), &'static str> {
+        self.retguard_engine
+            .verify_exit_function(func_name, canary, sp)
     }
 
-    pub fn nix_store_add_and_register_package(&mut self, name: &str, version: &str, deps: Vec<String>, binary_payload: &[u8]) -> Result<(String, usize), String> {
-        let hash_id = self.dominance_suite.nix_store.add_package(name, version, deps, binary_payload);
-        let generation = self.dominance_suite.nix_store.register_in_generation(name, &hash_id)?;
+    pub fn nix_store_add_and_register_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        deps: Vec<String>,
+        binary_payload: &[u8],
+    ) -> Result<(String, usize), String> {
+        let hash_id =
+            self.dominance_suite
+                .nix_store
+                .add_package(name, version, deps, binary_payload);
+        let generation = self
+            .dominance_suite
+            .nix_store
+            .register_in_generation(name, &hash_id)?;
         Ok((hash_id, generation))
     }
 
     pub fn schedule_distro_task(&mut self, pid: usize, name: &str, burst_us: u64) -> Option<usize> {
-        self.dominance_suite.scheduler.register_task(pid, name, burst_us);
+        self.dominance_suite
+            .scheduler
+            .register_task(pid, name, burst_us);
         self.dominance_suite.scheduler.schedule_next()
     }
 
-    pub fn verify_and_self_heal_cow_file(&mut self, subvol: &str, filepath: &str, expected_data: &[u8]) -> Result<bool, String> {
-        self.dominance_suite.filesystem_cow.verify_and_self_heal(subvol, filepath, expected_data)
+    pub fn verify_and_self_heal_cow_file(
+        &mut self,
+        subvol: &str,
+        filepath: &str,
+        expected_data: &[u8],
+    ) -> Result<bool, String> {
+        self.dominance_suite
+            .filesystem_cow
+            .verify_and_self_heal(subvol, filepath, expected_data)
     }
 
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
@@ -1269,7 +1312,8 @@ impl ApkChrootBuildSandboxEngine {
         if let Some(pos) = self.environment_vars.iter().position(|(k, _)| k == key) {
             self.environment_vars[pos].1 = val.to_string();
         } else {
-            self.environment_vars.push((key.to_string(), val.to_string()));
+            self.environment_vars
+                .push((key.to_string(), val.to_string()));
         }
     }
 
@@ -1289,7 +1333,11 @@ impl ApkChrootBuildSandboxEngine {
         Ok(())
     }
 
-    pub fn compile_package(&mut self, pkg_name: &str, build_cmd: &str) -> Result<String, &'static str> {
+    pub fn compile_package(
+        &mut self,
+        pkg_name: &str,
+        build_cmd: &str,
+    ) -> Result<String, &'static str> {
         if !self.is_active {
             return Err("Must enter chroot before compiling package in sandbox");
         }
@@ -1467,7 +1515,11 @@ impl HermeticStoreClosureEngine {
     }
 
     pub fn pin_closure(&mut self, pkg: StoreClosurePackage) {
-        if !self.pinned_closures.iter().any(|p| p.hash_path == pkg.hash_path) {
+        if !self
+            .pinned_closures
+            .iter()
+            .any(|p| p.hash_path == pkg.hash_path)
+        {
             self.pinned_closures.push(pkg);
         }
     }
@@ -1613,7 +1665,8 @@ impl Hammer2PfsClusterQuorumEngine {
             return Err("No nodes in cluster");
         }
 
-        let online_nodes: Vec<&PfsNodeVote> = self.cluster_nodes.iter().filter(|n| n.is_online).collect();
+        let online_nodes: Vec<&PfsNodeVote> =
+            self.cluster_nodes.iter().filter(|n| n.is_online).collect();
         if (online_nodes.len() as f64 / total as f64) < self.required_quorum_ratio {
             return Err("Cluster quorum lost: insufficient online nodes");
         }
@@ -1623,7 +1676,10 @@ impl Hammer2PfsClusterQuorumEngine {
         let mut consensus_hash = 0u64;
 
         for node in &online_nodes {
-            let count = online_nodes.iter().filter(|n| n.merkle_root_hash == node.merkle_root_hash).count();
+            let count = online_nodes
+                .iter()
+                .filter(|n| n.merkle_root_hash == node.merkle_root_hash)
+                .count();
             if count > max_votes {
                 max_votes = count;
                 consensus_hash = node.merkle_root_hash;
@@ -1681,7 +1737,13 @@ impl HardenedBsdPaxGuardEngine {
         }
     }
 
-    pub fn check_mprotect(&mut self, pid: u64, vaddr: u64, can_write: bool, can_exec: bool) -> Result<(), &'static str> {
+    pub fn check_mprotect(
+        &mut self,
+        pid: u64,
+        vaddr: u64,
+        can_write: bool,
+        can_exec: bool,
+    ) -> Result<(), &'static str> {
         if self.mprotect_wx_enforced && can_write && can_exec {
             self.violations.push(PaxViolationLog {
                 pid,
@@ -1749,7 +1811,13 @@ impl ApkXbpsHookEngine {
         }
     }
 
-    pub fn register_hook(&mut self, name: &str, trigger_keyword: &str, exec_cmd: &str, revert_cmd: &str) {
+    pub fn register_hook(
+        &mut self,
+        name: &str,
+        trigger_keyword: &str,
+        exec_cmd: &str,
+        revert_cmd: &str,
+    ) {
         self.rules.push(ApkXbpsHookRule {
             name: name.to_string(),
             trigger_keyword: trigger_keyword.to_string(),
@@ -1844,9 +1912,17 @@ impl OpenBsdRetguardEngine {
         secret_key ^ hash ^ sp
     }
 
-    pub fn verify_exit_function(&mut self, _func_name: &str, _canary: u64, sp: u64) -> Result<(), &'static str> {
+    pub fn verify_exit_function(
+        &mut self,
+        _func_name: &str,
+        _canary: u64,
+        sp: u64,
+    ) -> Result<(), &'static str> {
         if !self.is_valid_stack_pointer(sp) {
-            let msg = format!("MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region", sp);
+            let msg = format!(
+                "MAP_STACK Violation: Stack pointer {:#X} outside MAP_STACK region",
+                sp
+            );
             self.violations.push(msg);
             return Err("MAP_STACK Violation");
         }
@@ -4083,7 +4159,10 @@ impl SovereignIllumosZonesEngine {
 
         match zone.brand {
             ZoneBrand::Native => Ok(format!("Native Solaris/Illumos syscall {}", syscall_name)),
-            ZoneBrand::LinuxBrand => Ok(format!("LxBrand Linux ABI translation for {}", syscall_name)),
+            ZoneBrand::LinuxBrand => Ok(format!(
+                "LxBrand Linux ABI translation for {}",
+                syscall_name
+            )),
             ZoneBrand::BsdBrand => Ok(format!("BsdBrand BSD ABI translation for {}", syscall_name)),
         }
     }
@@ -4232,7 +4311,10 @@ mod tests {
 
         bridge.set_subsystem_mode(DistroSubsystemMode::LinuxNix);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.nix");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Shepherd);
+        assert_eq!(
+            bridge.get_supervisor_type(),
+            ServiceSupervisorType::Shepherd
+        );
         assert_eq!(bridge.translate_vfs_path("/etc"), "/etc/nixos");
 
         bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
@@ -5173,7 +5255,9 @@ mod tests {
 
         // 3. Write data larger than remaining SSD capacity (50 + 80 = 130 > 100) -> falls back to SlowHdd
         let large_data = vec![0xAA; 80];
-        let id2 = bcachefs.write_extent("/var/log/large.log", &large_data).unwrap();
+        let id2 = bcachefs
+            .write_extent("/var/log/large.log", &large_data)
+            .unwrap();
         assert_eq!(id2, 2);
         assert_eq!(bcachefs.extents[1].tier, StorageTier::SlowHdd);
 
@@ -5197,27 +5281,42 @@ mod tests {
         assert_eq!(zones_engine.boot_environments.len(), 1);
         assert!(zones_engine.boot_environments[0].active);
 
-        assert!(zones_engine.create_boot_environment("sigmaos-be-2026").is_ok());
-        assert!(zones_engine.activate_boot_environment("sigmaos-be-2026").is_ok());
+        assert!(zones_engine
+            .create_boot_environment("sigmaos-be-2026")
+            .is_ok());
+        assert!(zones_engine
+            .activate_boot_environment("sigmaos-be-2026")
+            .is_ok());
         assert!(zones_engine.boot_environments[1].active);
         assert!(!zones_engine.boot_environments[0].active);
 
         // 2. Zone creation & lifecycle
         let zone_id = zones_engine
-            .create_zone("lx-container-1", ZoneBrand::LinuxBrand, 50, 1024 * 1024 * 1024)
+            .create_zone(
+                "lx-container-1",
+                ZoneBrand::LinuxBrand,
+                50,
+                1024 * 1024 * 1024,
+            )
             .unwrap();
 
         // Cannot dispatch syscall to non-running zone
-        assert!(zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").is_err());
+        assert!(zones_engine
+            .dispatch_brand_syscall(zone_id, "sys_clone")
+            .is_err());
 
         // Boot zone
         assert!(zones_engine.boot_zone(zone_id).is_ok());
-        let dispatch_res = zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").unwrap();
+        let dispatch_res = zones_engine
+            .dispatch_brand_syscall(zone_id, "sys_clone")
+            .unwrap();
         assert!(dispatch_res.contains("LxBrand Linux ABI translation"));
 
         // Halt zone
         assert!(zones_engine.halt_zone(zone_id).is_ok());
-        assert!(zones_engine.dispatch_brand_syscall(zone_id, "sys_clone").is_err());
+        assert!(zones_engine
+            .dispatch_brand_syscall(zone_id, "sys_clone")
+            .is_err());
     }
 
     #[test]
@@ -5270,10 +5369,10 @@ mod tests {
         assert!(shepherd.is_provisioned("ssh"));
     }
 
-
     #[test]
     fn test_apk_chroot_build_sandbox() {
-        let mut sandbox = ApkChrootBuildSandboxEngine::new("sbx_alpine_01", "/var/chroot/build", true);
+        let mut sandbox =
+            ApkChrootBuildSandboxEngine::new("sbx_alpine_01", "/var/chroot/build", true);
         assert!(sandbox.add_bind_mount("/usr/include").is_ok());
         sandbox.set_env("CC", "gcc");
 
@@ -5289,7 +5388,9 @@ mod tests {
     #[test]
     fn test_openbsd_fd_pledge_gate() {
         let mut gate = OpenBsdFdPledgeGate::new();
-        assert!(gate.set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE | FD_RIGHT_SEEK).is_ok());
+        assert!(gate
+            .set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE | FD_RIGHT_SEEK)
+            .is_ok());
 
         assert!(gate.check_fd_right(3, FD_RIGHT_READ));
         assert!(gate.check_fd_right(3, FD_RIGHT_WRITE));
@@ -5300,7 +5401,9 @@ mod tests {
         assert!(!gate.check_fd_right(3, FD_RIGHT_WRITE));
 
         // Attempting to expand rights mask is blocked
-        assert!(gate.set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE).is_err());
+        assert!(gate
+            .set_fd_rights(3, FD_RIGHT_READ | FD_RIGHT_WRITE)
+            .is_err());
 
         gate.lock_gate();
         assert!(gate.set_fd_rights(3, FD_RIGHT_READ).is_err());
@@ -5344,10 +5447,16 @@ mod tests {
 
         store.pin_closure(pkg_bash);
         // Initially hermeticity check fails because glibc isn't in closure
-        assert_eq!(store.verify_closure_hermeticity("/sigma/store/hash2-bash"), Ok(false));
+        assert_eq!(
+            store.verify_closure_hermeticity("/sigma/store/hash2-bash"),
+            Ok(false)
+        );
 
         store.pin_closure(pkg_glibc);
-        assert_eq!(store.verify_closure_hermeticity("/sigma/store/hash2-bash"), Ok(true));
+        assert_eq!(
+            store.verify_closure_hermeticity("/sigma/store/hash2-bash"),
+            Ok(true)
+        );
         assert_eq!(store.compute_closure_size("/sigma/store/hash2-bash"), 2);
     }
 
@@ -5388,7 +5497,10 @@ mod tests {
         // MPROTECT W^X Violation check
         assert!(pax.check_mprotect(100, 0x7FFF0000, true, true).is_err());
         assert_eq!(pax.violations.len(), 1);
-        assert_eq!(pax.violations[0].violation, PaxViolationType::MprotectWxViolation);
+        assert_eq!(
+            pax.violations[0].violation,
+            PaxViolationType::MprotectWxViolation
+        );
 
         // SegvGuard threshold check
         for _ in 0..4 {
@@ -5397,7 +5509,10 @@ mod tests {
         // 5th crash triggers SegvGuard brute force mitigation
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
-        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
+        assert_eq!(
+            pax.violations[1].violation,
+            PaxViolationType::SegvGuardThresholdExceeded
+        );
     }
 
     #[test]
@@ -5406,16 +5521,28 @@ mod tests {
         assert_eq!(bridge.translate_package_specifier("zsh"), "zsh.nix");
 
         // Nix store integration test via bridge
-        let (hash_id, gen) = bridge.nix_store_add_and_register_package("zsh", "5.9", vec![], b"binary-content").unwrap();
+        let (hash_id, gen) = bridge
+            .nix_store_add_and_register_package("zsh", "5.9", vec![], b"binary-content")
+            .unwrap();
         assert_eq!(gen, 1);
-        assert!(bridge.dominance_suite.nix_store.zero_copy_read_slice(&hash_id).is_some());
+        assert!(bridge
+            .dominance_suite
+            .nix_store
+            .zero_copy_read_slice(&hash_id)
+            .is_some());
 
         // BORE Scheduler integration test via bridge
         let scheduled_pid = bridge.schedule_distro_task(42, "compiler-job", 50);
         assert_eq!(scheduled_pid, Some(42));
 
         // Self-healing CoW filesystem integration test via bridge
-        let healed = bridge.verify_and_self_heal_cow_file("@root", "/etc/os-release", b"NAME=SigmaOS\nVERSION=1.0\n").unwrap();
+        let healed = bridge
+            .verify_and_self_heal_cow_file(
+                "@root",
+                "/etc/os-release",
+                b"NAME=SigmaOS\nVERSION=1.0\n",
+            )
+            .unwrap();
         assert!(!healed);
     }
 
@@ -5426,7 +5553,9 @@ mod tests {
 
         // Qubes isolation domain creation test via bridge
         assert!(bridge.create_qubes_isolation_domain("vault-domain").is_ok());
-        assert!(bridge.create_qubes_isolation_domain("vault-domain").is_err());
+        assert!(bridge
+            .create_qubes_isolation_domain("vault-domain")
+            .is_err());
 
         // Super matrix distro profiles verification via bridge
         let ubuntu = bridge.super_matrix.get_profile("Ubuntu/Debian");
@@ -5499,7 +5628,10 @@ impl GuixDerivationEngine {
     }
 
     pub fn build_derivation(&mut self, name: &str) -> Result<String, &'static str> {
-        let drv = self.derivations.iter().find(|d| d.name == name)
+        let drv = self
+            .derivations
+            .iter()
+            .find(|d| d.name == name)
             .ok_or("Derivation not found")?
             .clone();
 
@@ -5539,10 +5671,18 @@ pub struct ShepherdServiceManager {
 
 impl ShepherdServiceManager {
     pub fn new() -> Self {
-        Self { services: Vec::new() }
+        Self {
+            services: Vec::new(),
+        }
     }
 
-    pub fn register_service(&mut self, name: &str, provision: &[&str], requirement: &[&str], respawn: bool) {
+    pub fn register_service(
+        &mut self,
+        name: &str,
+        provision: &[&str],
+        requirement: &[&str],
+        respawn: bool,
+    ) {
         self.services.push(ShepherdService {
             name: name.to_string(),
             provision: provision.iter().map(|s| s.to_string()).collect(),
@@ -5553,18 +5693,25 @@ impl ShepherdServiceManager {
     }
 
     pub fn is_provisioned(&self, symbol: &str) -> bool {
-        self.services.iter().any(|s| s.running && s.provision.iter().any(|p| p == symbol))
+        self.services
+            .iter()
+            .any(|s| s.running && s.provision.iter().any(|p| p == symbol))
     }
 
     pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc_idx = self.services.iter().position(|s| s.name == name)
+        let svc_idx = self
+            .services
+            .iter()
+            .position(|s| s.name == name)
             .ok_or("Service not found in Shepherd graph")?;
 
         let reqs = self.services[svc_idx].requirement.clone();
 
         for req in reqs {
             if !self.is_provisioned(&req) {
-                let provider_name = self.services.iter()
+                let provider_name = self
+                    .services
+                    .iter()
                     .find(|s| s.provision.contains(&req))
                     .map(|s| s.name.clone());
 
@@ -5581,7 +5728,10 @@ impl ShepherdServiceManager {
     }
 
     pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc = self.services.iter_mut().find(|s| s.name == name)
+        let svc = self
+            .services
+            .iter_mut()
+            .find(|s| s.name == name)
             .ok_or("Service not found")?;
         svc.running = false;
         Ok(())
@@ -5593,4 +5743,3 @@ impl Default for ShepherdServiceManager {
         Self::new()
     }
 }
-

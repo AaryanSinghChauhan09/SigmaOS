@@ -3,7 +3,6 @@
 use alloc::vec;
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -135,7 +134,10 @@ impl HardwareVideoDecoder {
     }
 
     /// Decodes a demuxed packet into a zero-copy hardware surface
-    pub fn decode_packet(&mut self, packet: &DemuxedPacket) -> Result<HardwareVideoSurface, &'static str> {
+    pub fn decode_packet(
+        &mut self,
+        packet: &DemuxedPacket,
+    ) -> Result<HardwareVideoSurface, &'static str> {
         if packet.payload.is_empty() {
             return Err("Empty packet payload");
         }
@@ -271,7 +273,11 @@ impl SubtitleTrack {
                     let start_ms = parse_srt_time(times[0].trim());
                     let end_ms = parse_srt_time(times[1].trim());
                     let text = lines[2..].join("\n");
-                    self.cues.push(SubtitleCue { start_ms, end_ms, text });
+                    self.cues.push(SubtitleCue {
+                        start_ms,
+                        end_ms,
+                        text,
+                    });
                 }
             }
         }
@@ -348,7 +354,11 @@ impl Playlist {
     }
 
     pub fn add(&mut self, url: String, title: String, duration_ms: u64) {
-        self.items.push(PlaylistItem { url, title, duration_ms });
+        self.items.push(PlaylistItem {
+            url,
+            title,
+            duration_ms,
+        });
     }
 
     pub fn next(&mut self) -> Option<&PlaylistItem> {
@@ -870,7 +880,7 @@ mod tests {
     #[test]
     fn test_vlc_equalizer() {
         let mut eq = VlcEqualizer::new();
-        eq.set_band_gain(0, 6.0);  // +6dB at 60Hz
+        eq.set_band_gain(0, 6.0); // +6dB at 60Hz
         eq.set_band_gain(4, -3.0); // -3dB at 1kHz
 
         assert_eq!(eq.bands_db[0], 6.0);

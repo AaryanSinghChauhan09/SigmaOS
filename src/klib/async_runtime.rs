@@ -2,7 +2,6 @@ extern crate alloc;
 // 'sigma-async' Cooperative Runtime for SigmaOS
 // A lightweight, `#![no_std]` cooperative task executor using raw Future polling.
 
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::future::Future;

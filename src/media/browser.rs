@@ -33,12 +33,12 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BrowserProcessType {
-    BrowserCore,     // Orchestrates UI, handles user input, holds high privileges
-    RendererSandbox, // Decodes HTML/CSS, executes JavaScript, run as unprivileged sandbox
-    NetworkSandbox,  // Handles TCP/SSL and HTTP parsing, capability-gated network socket
-    GpuSandbox,      // Composites layers, executes WebGL/WebGPU shaders
-    UtilitySandbox,  // Audio decoding, PDF rendering, media stream processing
-    ExtensionSandbox,// Isolated extensions environment
+    BrowserCore,      // Orchestrates UI, handles user input, holds high privileges
+    RendererSandbox,  // Decodes HTML/CSS, executes JavaScript, run as unprivileged sandbox
+    NetworkSandbox,   // Handles TCP/SSL and HTTP parsing, capability-gated network socket
+    GpuSandbox,       // Composites layers, executes WebGL/WebGPU shaders
+    UtilitySandbox,   // Audio decoding, PDF rendering, media stream processing
+    ExtensionSandbox, // Isolated extensions environment
 }
 
 #[derive(Debug, Clone)]
@@ -86,8 +86,12 @@ impl SovereignBrowserEngine {
             blocked_ads_count: 0,
         };
         engine.adblock_filters.push("doubleclick.net".to_string());
-        engine.adblock_filters.push("telemetry.analytics.com".to_string());
-        engine.adblock_filters.push("google-analytics.com".to_string());
+        engine
+            .adblock_filters
+            .push("telemetry.analytics.com".to_string());
+        engine
+            .adblock_filters
+            .push("google-analytics.com".to_string());
         engine
     }
 
@@ -191,7 +195,10 @@ impl ResistFingerprintingEngine {
     /// Spoofs WebGL Vendor and Renderer identification strings
     pub fn spoof_webgl_info(&self) -> (&'static str, &'static str) {
         if self.enabled {
-            ("Mesa/X.org", "Gallium 0.4 on llvmpipe (LLVM 15.0.7, 256 bits)")
+            (
+                "Mesa/X.org",
+                "Gallium 0.4 on llvmpipe (LLVM 15.0.7, 256 bits)",
+            )
         } else {
             ("NVIDIA Corporation", "NVIDIA GeForce RTX 4090/PCIe/SSE2")
         }
@@ -220,8 +227,16 @@ impl ResistFingerprintingEngine {
         let clamped_height = (raw_height / height_step) * height_step;
 
         (
-            if clamped_width == 0 { width_step } else { clamped_width },
-            if clamped_height == 0 { height_step } else { clamped_height },
+            if clamped_width == 0 {
+                width_step
+            } else {
+                clamped_width
+            },
+            if clamped_height == 0 {
+                height_step
+            } else {
+                clamped_height
+            },
         )
     }
 
@@ -253,11 +268,21 @@ impl TelemetryAndTrackerStripper {
         };
 
         // Telemetry endpoints
-        stripper.blocked_endpoints.push("telemetry.mozilla.org".to_string());
-        stripper.blocked_endpoints.push("google-analytics.com".to_string());
-        stripper.blocked_endpoints.push("doubleclick.net".to_string());
-        stripper.blocked_endpoints.push("edge.microsoft.com/telemetry".to_string());
-        stripper.blocked_endpoints.push("graph.facebook.com/tr".to_string());
+        stripper
+            .blocked_endpoints
+            .push("telemetry.mozilla.org".to_string());
+        stripper
+            .blocked_endpoints
+            .push("google-analytics.com".to_string());
+        stripper
+            .blocked_endpoints
+            .push("doubleclick.net".to_string());
+        stripper
+            .blocked_endpoints
+            .push("edge.microsoft.com/telemetry".to_string());
+        stripper
+            .blocked_endpoints
+            .push("graph.facebook.com/tr".to_string());
 
         // Invasive tracking URL query parameter keys
         stripper.tracking_param_keys.push("fbclid".to_string());
@@ -265,7 +290,9 @@ impl TelemetryAndTrackerStripper {
         stripper.tracking_param_keys.push("msclkid".to_string());
         stripper.tracking_param_keys.push("utm_source".to_string());
         stripper.tracking_param_keys.push("utm_medium".to_string());
-        stripper.tracking_param_keys.push("utm_campaign".to_string());
+        stripper
+            .tracking_param_keys
+            .push("utm_campaign".to_string());
         stripper.tracking_param_keys.push("utm_term".to_string());
         stripper.tracking_param_keys.push("utm_content".to_string());
         stripper.tracking_param_keys.push("mc_eid".to_string());
@@ -344,7 +371,9 @@ impl BraveShieldsEngine {
 
         shield.cosmetic_filters.push("##.ad-banner".to_string());
         shield.cosmetic_filters.push("###sponsor-box".to_string());
-        shield.cosmetic_filters.push("##div[class*=\"ad-slot\"]".to_string());
+        shield
+            .cosmetic_filters
+            .push("##div[class*=\"ad-slot\"]".to_string());
 
         shield
     }
@@ -645,8 +674,7 @@ impl SigmaWebBrowser {
         let uncloaked = self.brave_shields.resolve_cname_uncloak(domain);
 
         // 4. Check if uncloaked domain is a blocked ad or telemetry target
-        if self.stripper.should_block_telemetry(&uncloaked)
-            || !self.engine.navigate_url(&uncloaked)
+        if self.stripper.should_block_telemetry(&uncloaked) || !self.engine.navigate_url(&uncloaked)
         {
             return Err("Navigation Blocked: Ad/Telemetry Target Detected");
         }
@@ -719,7 +747,10 @@ mod tests {
 
         // HTTPS upgrade
         let http_url = "http://example.com/login";
-        assert_eq!(shield.upgrade_to_https(http_url), "https://example.com/login");
+        assert_eq!(
+            shield.upgrade_to_https(http_url),
+            "https://example.com/login"
+        );
 
         // CNAME uncloaking
         let uncloaked = shield.resolve_cname_uncloak("metrics.example.com");
@@ -743,7 +774,7 @@ mod tests {
 
         tor.active_level = TorSecurityLevel::Safer;
         assert!(!tor.is_javascript_allowed(false)); // JS blocked on HTTP
-        assert!(tor.is_javascript_allowed(true));  // JS allowed on HTTPS
+        assert!(tor.is_javascript_allowed(true)); // JS allowed on HTTPS
 
         tor.active_level = TorSecurityLevel::Safest;
         assert!(!tor.is_javascript_allowed(true));
@@ -813,11 +844,16 @@ mod tests {
         let mut sigma_web = SigmaWebBrowser::new();
 
         // Test normal safe URL
-        let nav = sigma_web.navigate_protected("http://rust-lang.org/learn?topic=rust&utm_source=twitter");
-        assert_eq!(nav, Ok("https://rust-lang.org/learn?topic=rust".to_string()));
+        let nav = sigma_web
+            .navigate_protected("http://rust-lang.org/learn?topic=rust&utm_source=twitter");
+        assert_eq!(
+            nav,
+            Ok("https://rust-lang.org/learn?topic=rust".to_string())
+        );
 
         // Test CNAME uncloaked ad target detection and block
-        let blocked_nav = sigma_web.navigate_protected("http://metrics.example.com/collect?fbclid=123");
+        let blocked_nav =
+            sigma_web.navigate_protected("http://metrics.example.com/collect?fbclid=123");
         assert!(blocked_nav.is_err());
     }
 }
