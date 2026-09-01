@@ -1193,6 +1193,7 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Puk, PackageAdapter::new(PackageFormat::Puk, "puk".to_string()));
         self.adapters.insert(PackageFormat::Dmg, PackageAdapter::new(PackageFormat::Dmg, "dmg".to_string()));
         self.adapters.insert(PackageFormat::Cports, PackageAdapter::new(PackageFormat::Cports, "cports".to_string()));
+        self.adapters.insert(PackageFormat::Cachy, PackageAdapter::new(PackageFormat::Cachy, "cachy".to_string()));
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -1385,7 +1386,9 @@ pub struct UniversalPackageManifestParser;
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
         let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
+        if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".deb") {
             Some(PackageFormat::Deb)
         } else if name.ends_with(".rpm") {
             Some(PackageFormat::Rpm)
@@ -1431,6 +1434,40 @@ impl UniversalPackageManifestParser {
             Some(PackageFormat::Tar)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::SigmaPkg)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if name.ends_with(".cachy") {
+            Some(PackageFormat::Cachy)
         } else {
             None
         }
