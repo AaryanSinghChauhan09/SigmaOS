@@ -199,11 +199,14 @@ body {
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s ease;
 }
 
-.dock-icon:hover {
+.dock-icon:hover,
+.dock-icon:focus-visible {
     transform: translateY(-8px) scale(1.15);
     background: rgba(255,255,255,0.08);
     border-color: var(--border-bright);
     box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 3px;
 }
 
 .dock-icon::after {
@@ -225,7 +228,8 @@ body {
     transition: all 0.2s ease;
 }
 
-.dock-icon:hover::after {
+.dock-icon:hover::after,
+.dock-icon:focus-visible::after {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
