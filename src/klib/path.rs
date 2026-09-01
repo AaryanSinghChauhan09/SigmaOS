@@ -5,12 +5,19 @@ extern crate alloc;
 use alloc::string::String;
 use core::ops::Deref;
 
+pub type Path = PathBuf;
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PathBuf {
     inner: String,
 }
 
 impl PathBuf {
+    pub fn join(&self, path: &str) -> PathBuf {
+        let mut p = self.clone();
+        p.push(path);
+        p
+    }
     pub fn new() -> Self {
         PathBuf {
             inner: String::new(),

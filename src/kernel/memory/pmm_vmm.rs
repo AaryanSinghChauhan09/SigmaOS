@@ -4,10 +4,8 @@ extern crate alloc;
 // Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc
 // Formally verified with Kani
 
-
-
-use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 use core::ptr::null_mut;
+use core::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 
 #[repr(C)]
 pub struct PhysicalMemoryManager {
@@ -81,7 +79,7 @@ pub const PAGE_SIZE: usize = 4096;
 impl PhysicalMemoryManager {
     pub fn new(total_memory: usize) -> Self {
         let total_pages = total_memory / PAGE_SIZE;
-        
+
         PhysicalMemoryManager {
             buddy: BuddyAllocator::new(),
             slab: SlabAllocator::new(),
@@ -98,7 +96,7 @@ impl PhysicalMemoryManager {
 
         let block = self.buddy.alloc(order)?;
         self.free_pages.fetch_sub(1 << order, Ordering::SeqCst);
-        
+
         Ok(block as *mut u8)
     }
 
@@ -189,7 +187,7 @@ impl BuddyAllocator {
         }
 
         let buddy = self.find_buddy(block, order);
-        
+
         if let Some(buddy_block) = self.try_coalesce(block, buddy, order) {
             self.free(buddy_block, order + 1);
         } else {
@@ -205,7 +203,10 @@ impl BuddyAllocator {
             }
 
             let next = (*head).next.load(Ordering::Acquire);
-            if self.free_lists[order].compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+            if self.free_lists[order]
+                .compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst)
+                .is_ok()
+            {
                 (*head).next.store(null_mut(), Ordering::SeqCst);
                 (*head).prev.store(null_mut(), Ordering::SeqCst);
                 (*head).is_free.store(0, Ordering::SeqCst);
@@ -234,11 +235,11 @@ impl BuddyAllocator {
         unsafe {
             let offset = (PAGE_SIZE << target_order) as isize;
             let buddy = (block as *mut u8).offset(offset) as *mut BuddyBlock;
-            
+
             (*block).order.store(target_order, Ordering::SeqCst);
             (*buddy).order.store(target_order, Ordering::SeqCst);
             (*buddy).is_free.store(1, Ordering::SeqCst);
-            
+
             buddy
         }
     }
@@ -250,10 +251,17 @@ impl BuddyAllocator {
         buddy_addr as *mut BuddyBlock
     }
 
-    fn try_coalesce(&self, block: *mut BuddyBlock, buddy: *mut BuddyBlock, order: usize) -> Option<*mut BuddyBlock> {
+    fn try_coalesce(
+        &self,
+        block: *mut BuddyBlock,
+        buddy: *mut BuddyBlock,
+        order: usize,
+    ) -> Option<*mut BuddyBlock> {
         unsafe {
             // Verify buddy exists, is free, and has matching order to prevent corruption
-            if (*buddy).is_free.load(Ordering::Acquire) != 1 || (*buddy).order.load(Ordering::Acquire) != order {
+            if (*buddy).is_free.load(Ordering::Acquire) != 1
+                || (*buddy).order.load(Ordering::Acquire) != order
+            {
                 return None;
             }
 
@@ -350,7 +358,11 @@ impl SlabCache {
             let obj = self.free_list.load(Ordering::Acquire);
             if !obj.is_null() {
                 let next = (*obj).next.load(Ordering::Acquire);
-                if self.free_list.compare_exchange(obj, next, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+                if self
+                    .free_list
+                    .compare_exchange(obj, next, Ordering::SeqCst, Ordering::SeqCst)
+                    .is_ok()
+                {
                     return Ok(obj as *mut u8);
                 }
             }
@@ -379,15 +391,18 @@ impl SlabCache {
 
     unsafe fn alloc_from_slab(&self, slab: *mut Slab) -> Option<*mut u8> {
         for i in 0..64 {
-            if (*slab).objects[i].compare_exchange(null_mut(), null_mut(), Ordering::SeqCst, Ordering::SeqCst).is_ok() {
+            if (*slab).objects[i]
+                .compare_exchange(null_mut(), null_mut(), Ordering::SeqCst, Ordering::SeqCst)
+                .is_ok()
+            {
                 let obj = (slab as *mut u8).add(i * self.size.load(Ordering::Acquire));
                 (*slab).inuse.fetch_add(1, Ordering::SeqCst);
-                
+
                 if (*slab).inuse.load(Ordering::Acquire) == 64 {
                     // Move to full slabs
                     self.move_to_full(slab);
                 }
-                
+
                 return Some(obj);
             }
         }
@@ -430,10 +445,16 @@ impl VirtualMemoryManager {
             let pt = self.page_tables.load(Ordering::Acquire);
             if !pt.is_null() {
                 let index = (virt >> 12) & 0x1FF;
-                (*pt).entries[index].address.store(phys >> 12, Ordering::SeqCst);
+                (*pt).entries[index]
+                    .address
+                    .store(phys >> 12, Ordering::SeqCst);
                 (*pt).entries[index].present.store(1, Ordering::SeqCst);
-                (*pt).entries[index].writable.store(flags & PageFlags::WRITABLE, Ordering::SeqCst);
-                (*pt).entries[index].user.store(flags & PageFlags::USER, Ordering::SeqCst);
+                (*pt).entries[index]
+                    .writable
+                    .store(flags & PageFlags::WRITABLE, Ordering::SeqCst);
+                (*pt).entries[index]
+                    .user
+                    .store(flags & PageFlags::USER, Ordering::SeqCst);
             }
         }
     }
