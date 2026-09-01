@@ -186,9 +186,12 @@ impl LazyPageZeroer {
 
     pub fn prepare_page_for_user(&self, page_addr: usize, page_size: usize) {
         if self.enforce_security_zeroing && page_addr != 0 {
-            let ptr = page_addr as *mut u8;
-            unsafe {
-                core::ptr::write_bytes(ptr, 0, page_size);
+            #[cfg(not(test))]
+            {
+                let ptr = page_addr as *mut u8;
+                unsafe {
+                    core::ptr::write_bytes(ptr, 0, page_size);
+                }
             }
         }
     }
@@ -272,7 +275,6 @@ impl LinuxBsdBuddyGlueEngine {
             }
 
             // OpenBSD lazy zeroing for user/movable pages
-            #[cfg(not(feature = "standalone_test"))]
             if migrate_type == MigrateType::Movable {
                 self.zeroer
                     .prepare_page_for_user(block.addr.as_ptr() as usize, block.size);

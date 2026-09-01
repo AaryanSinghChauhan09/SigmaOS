@@ -63,8 +63,9 @@ pub use compat_layers::{
     RegistryValue, Win32Gdi, WindowsRegistry,
 };
 pub use developer::{
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
+    ArchMakepkgDevEngine, BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit,
+    PackageBuildService, PortageCompilerTuner, PoudriereBulkBuildEngine, SbuildChrootSandboxEngine,
+    SovereignDevToolsSuite, TargetArch,
 };
 pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,

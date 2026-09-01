@@ -41,7 +41,7 @@ for file in "${FILES[@]}"; do
 
     # Check if the file contains test module or cfg(test)
     if grep -q '#\[test\]' "$file" || grep -q '#\[cfg(test)\]' "$file"; then
-        if rustc --test --edition=2021 "$file" -o "$binary_out" 2>/dev/null; then
+        if rustc --test --edition=2021 --cfg 'feature="standalone_test"' "$file" -o "$binary_out" 2>/dev/null || rustc --test --edition=2021 "$file" -o "$binary_out" 2>/dev/null; then
             if ./"$binary_out"; then
                 echo "SUCCESS: $file passed standalone test."
                 PASSED=$((PASSED + 1))
