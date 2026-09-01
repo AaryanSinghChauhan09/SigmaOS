@@ -2,9 +2,9 @@
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
 extern crate alloc;
+use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {

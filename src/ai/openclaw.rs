@@ -16,9 +16,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // SigmaOS OpenClaw Integration Engine
 //
@@ -27,8 +27,8 @@ use alloc::format;
 // 2. ClawVoiceTranscriber (Acoustic frame feature-extraction & S-CLI mapper)
 // 3. ClawChatIntegrator (Chat webhook alert triggers and GitHub triage)
 
-use core::sync::atomic::{AtomicBool, Ordering};
 use alloc::collections::{BTreeMap, VecDeque};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================
 // 1. ClawBackgroundDaemon

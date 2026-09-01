@@ -1,13 +1,13 @@
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // Sovereign Remote Sharing & Protocol Enhancements for SigmaOS
 // Inspired by Linux & BSD distributions: OpenSSH, dropbear, NFSv4, Samba (smbd/ksmbd), SCP, and rsync.
 
-use alloc::collections::BTreeMap;
 use crate::klib::HashMap;
+use alloc::collections::BTreeMap;
 
 // =========================================================================
 // 1. SSH ENHANCEMENTS: OpenSSH / Dropbear / OpenBSD PrivSep & ControlMaster
@@ -67,28 +67,49 @@ impl SovereignSshEngine {
         self.match_rules.push(rule);
     }
 
-    pub fn verify_certificate(&self, cert: &SshCertificate, principal: &str, current_time: u64) -> bool {
+    pub fn verify_certificate(
+        &self,
+        cert: &SshCertificate,
+        principal: &str,
+        current_time: u64,
+    ) -> bool {
         if !self.trusted_ca_keys.contains(&cert.ca_fingerprint) {
             return false;
         }
         if current_time > cert.valid_until_epoch {
             return false;
         }
-        if !cert.valid_principals.is_empty() && !cert.valid_principals.iter().any(|p| p == principal) {
+        if !cert.valid_principals.is_empty()
+            && !cert.valid_principals.iter().any(|p| p == principal)
+        {
             return false;
         }
         true
     }
 
-    pub fn evaluate_match_block(&self, user: &str, group: &str, remote_ip: &str) -> (bool, bool, Option<String>) {
+    pub fn evaluate_match_block(
+        &self,
+        user: &str,
+        group: &str,
+        remote_ip: &str,
+    ) -> (bool, bool, Option<String>) {
         let mut root_login = false;
         let mut pass_auth = true;
         let mut chroot = None;
 
         for rule in &self.match_rules {
-            let user_matches = rule.match_user.as_ref().map_or(true, |u| u == user || u == "*");
-            let group_matches = rule.match_group.as_ref().map_or(true, |g| g == group || g == "*");
-            let addr_matches = rule.match_address.as_ref().map_or(true, |a| remote_ip.starts_with(a.trim_end_matches('*')));
+            let user_matches = rule
+                .match_user
+                .as_ref()
+                .map_or(true, |u| u == user || u == "*");
+            let group_matches = rule
+                .match_group
+                .as_ref()
+                .map_or(true, |g| g == group || g == "*");
+            let addr_matches = rule
+                .match_address
+                .as_ref()
+                .map_or(true, |a| remote_ip.starts_with(a.trim_end_matches('*')));
 
             if user_matches && group_matches && addr_matches {
                 if let Some(r) = rule.permit_root_login_override {
@@ -116,7 +137,10 @@ impl SovereignSshEngine {
     }
 
     pub fn open_multiplexed_channel(&mut self, session_id: u64) -> Result<u32, &'static str> {
-        let master = self.control_masters.get_mut(&session_id).ok_or("ControlMaster socket not found")?;
+        let master = self
+            .control_masters
+            .get_mut(&session_id)
+            .ok_or("ControlMaster socket not found")?;
         master.active_multiplexed_channels += 1;
         Ok(master.active_multiplexed_channels)
     }
@@ -173,10 +197,22 @@ impl SovereignNfsEngine {
         self.exports.push(rule);
     }
 
-    pub fn check_export_access(&self, client_ip: &str, path: &str, is_write: bool, is_root: bool) -> Result<u32, &'static str> {
-        let matching_rule = self.exports.iter().find(|e| {
-            path.starts_with(&e.export_path) && (e.client_network == "*" || client_ip.starts_with(e.client_network.trim_end_matches(".0/24")))
-        }).ok_or("NFS: Access denied (no matching export rule)")?;
+    pub fn check_export_access(
+        &self,
+        client_ip: &str,
+        path: &str,
+        is_write: bool,
+        is_root: bool,
+    ) -> Result<u32, &'static str> {
+        let matching_rule = self
+            .exports
+            .iter()
+            .find(|e| {
+                path.starts_with(&e.export_path)
+                    && (e.client_network == "*"
+                        || client_ip.starts_with(e.client_network.trim_end_matches(".0/24")))
+            })
+            .ok_or("NFS: Access denied (no matching export rule)")?;
 
         if is_write && matching_rule.read_only {
             return Err("NFS: Read-only export");
@@ -193,7 +229,12 @@ impl SovereignNfsEngine {
         }
     }
 
-    pub fn process_compound_rpc(&self, client_ip: &str, path: &str, ops: &[NfsCompoundOp]) -> Result<Vec<String>, &'static str> {
+    pub fn process_compound_rpc(
+        &self,
+        client_ip: &str,
+        path: &str,
+        ops: &[NfsCompoundOp],
+    ) -> Result<Vec<String>, &'static str> {
         let mut results = Vec::new();
         let mut current_handle = path.to_string();
 
@@ -214,7 +255,11 @@ impl SovereignNfsEngine {
                 }
                 NfsCompoundOp::Write { offset, data } => {
                     self.check_export_access(client_ip, &current_handle, true, false)?;
-                    results.push(format!("WRITE_OK: written={} at offset={}", data.len(), offset));
+                    results.push(format!(
+                        "WRITE_OK: written={} at offset={}",
+                        data.len(),
+                        offset
+                    ));
                 }
                 NfsCompoundOp::Close => {
                     results.push("CLOSE_OK".to_string());
@@ -230,7 +275,9 @@ impl SovereignNfsEngine {
     pub fn acquire_lock(&mut self, lock: NfsClientLock) -> bool {
         // Conflict check
         let conflict = self.active_locks.iter().any(|l| {
-            l.file_path == lock.file_path && l.client_id != lock.client_id && (l.lock_type_write || lock.lock_type_write)
+            l.file_path == lock.file_path
+                && l.client_id != lock.client_id
+                && (l.lock_type_write || lock.lock_type_write)
         });
 
         if conflict {
@@ -243,7 +290,8 @@ impl SovereignNfsEngine {
 
     pub fn release_lock(&mut self, client_id: u64, file_path: &str) -> bool {
         let before = self.active_locks.len();
-        self.active_locks.retain(|l| !(l.client_id == client_id && l.file_path == file_path));
+        self.active_locks
+            .retain(|l| !(l.client_id == client_id && l.file_path == file_path));
         self.active_locks.len() < before
     }
 }
@@ -310,10 +358,19 @@ impl SovereignSambaEngine {
     }
 
     pub fn negotiate_dialect(&self, requested: &[SmbDialect]) -> SmbDialect {
-        requested.iter().cloned().max().unwrap_or(SmbDialect::Smb3_11)
+        requested
+            .iter()
+            .cloned()
+            .max()
+            .unwrap_or(SmbDialect::Smb3_11)
     }
 
-    pub fn authenticate_user(&mut self, user: &str, pass: &str, dialect: SmbDialect) -> Result<u64, &'static str> {
+    pub fn authenticate_user(
+        &mut self,
+        user: &str,
+        pass: &str,
+        dialect: SmbDialect,
+    ) -> Result<u64, &'static str> {
         if user.is_empty() {
             return Err("SMB: Invalid empty username");
         }
@@ -338,7 +395,10 @@ impl SovereignSambaEngine {
 
     pub fn tree_connect(&mut self, session_id: u64, share_name: &str) -> Result<u32, &'static str> {
         let share = self.shares.get(share_name).ok_or("SMB: Share not found")?;
-        let session = self.active_sessions.get_mut(&session_id).ok_or("SMB: Invalid session ID")?;
+        let session = self
+            .active_sessions
+            .get_mut(&session_id)
+            .ok_or("SMB: Invalid session ID")?;
 
         if share.encryption_required && !session.is_encrypted {
             return Err("SMB: Share requires SMB3 encryption");
@@ -358,9 +418,15 @@ impl SovereignSambaEngine {
 
     pub fn map_posix_to_nt_acl(posix_mode: u32) -> u32 {
         let mut access_mask = 0u32;
-        if (posix_mode & 0o400) != 0 { access_mask |= 0x0001; } // FILE_READ_DATA
-        if (posix_mode & 0o200) != 0 { access_mask |= 0x0002; } // FILE_WRITE_DATA
-        if (posix_mode & 0o100) != 0 { access_mask |= 0x0020; } // FILE_EXECUTE
+        if (posix_mode & 0o400) != 0 {
+            access_mask |= 0x0001;
+        } // FILE_READ_DATA
+        if (posix_mode & 0o200) != 0 {
+            access_mask |= 0x0002;
+        } // FILE_WRITE_DATA
+        if (posix_mode & 0o100) != 0 {
+            access_mask |= 0x0020;
+        } // FILE_EXECUTE
         access_mask
     }
 }
@@ -371,8 +437,15 @@ impl SovereignSambaEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ScpWireMessage {
-    FileHeader { mode: u32, size: u64, filename: String },
-    DirectoryHeader { mode: u32, dirname: String },
+    FileHeader {
+        mode: u32,
+        size: u64,
+        filename: String,
+    },
+    DirectoryHeader {
+        mode: u32,
+        dirname: String,
+    },
     DirectoryEnd,
     Ack,
     Error(String),
@@ -484,7 +557,9 @@ impl SovereignRsyncEngine {
 
         for (i, chunk) in data.chunks(self.block_size).enumerate() {
             let adler = Self::compute_adler32(chunk);
-            let md5_prefix = chunk.iter().fold(0u32, |acc, &b| acc.wrapping_add(b as u32));
+            let md5_prefix = chunk
+                .iter()
+                .fold(0u32, |acc, &b| acc.wrapping_add(b as u32));
             checksums.push(RsyncBlockChecksum {
                 block_index: i,
                 adler32: adler,
@@ -494,7 +569,11 @@ impl SovereignRsyncEngine {
         checksums
     }
 
-    pub fn generate_delta(&self, basis_checksums: &[RsyncBlockChecksum], target_data: &[u8]) -> Vec<RsyncDeltaInstruction> {
+    pub fn generate_delta(
+        &self,
+        basis_checksums: &[RsyncBlockChecksum],
+        target_data: &[u8],
+    ) -> Vec<RsyncDeltaInstruction> {
         let mut instructions = Vec::new();
         let mut offset = 0;
 
@@ -514,7 +593,11 @@ impl SovereignRsyncEngine {
         instructions
     }
 
-    pub fn apply_delta(&self, basis_data: &[u8], instructions: &[RsyncDeltaInstruction]) -> Vec<u8> {
+    pub fn apply_delta(
+        &self,
+        basis_data: &[u8],
+        instructions: &[RsyncDeltaInstruction],
+    ) -> Vec<u8> {
         let mut reconstructed = Vec::new();
 
         for inst in instructions {
@@ -587,17 +670,24 @@ mod tests {
             sec_flavor: "sys".to_string(),
         });
 
-        let root_uid = nfs.check_export_access("192.168.1.10", "/export/data/file.txt", false, true).unwrap();
+        let root_uid = nfs
+            .check_export_access("192.168.1.10", "/export/data/file.txt", false, true)
+            .unwrap();
         assert_eq!(root_uid, 65534); // root squashed
 
         let ops = vec![
             NfsCompoundOp::Lookup("subfolder".to_string()),
             NfsCompoundOp::Open("rw".to_string()),
-            NfsCompoundOp::Write { offset: 0, data: b"hello nfs".to_vec() },
+            NfsCompoundOp::Write {
+                offset: 0,
+                data: b"hello nfs".to_vec(),
+            },
             NfsCompoundOp::Close,
         ];
 
-        let rpc_res = nfs.process_compound_rpc("192.168.1.10", "/export/data", &ops).unwrap();
+        let rpc_res = nfs
+            .process_compound_rpc("192.168.1.10", "/export/data", &ops)
+            .unwrap();
         assert_eq!(rpc_res.len(), 4);
 
         let lock = NfsClientLock {
@@ -634,7 +724,9 @@ mod tests {
         let dialect = samba.negotiate_dialect(&[SmbDialect::Smb2_10, SmbDialect::Smb3_11]);
         assert_eq!(dialect, SmbDialect::Smb3_11);
 
-        let sid = samba.authenticate_user("guest", "", SmbDialect::Smb3_11).unwrap();
+        let sid = samba
+            .authenticate_user("guest", "", SmbDialect::Smb3_11)
+            .unwrap();
         let tree_id = samba.tree_connect(sid, "public").unwrap();
         assert!(tree_id > 0);
 
@@ -649,7 +741,12 @@ mod tests {
         assert_eq!(header, "C0644 1048576 archive.tar.gz\n");
 
         let msg = SovereignScpEngine::parse_wire_message("C0755 2048 script.sh").unwrap();
-        if let ScpWireMessage::FileHeader { mode, size, filename } = msg {
+        if let ScpWireMessage::FileHeader {
+            mode,
+            size,
+            filename,
+        } = msg
+        {
             assert_eq!(mode, 0o755);
             assert_eq!(size, 2048);
             assert_eq!(filename, "script.sh");
@@ -668,7 +765,8 @@ mod tests {
         assert!(rsync.is_path_excluded("/code/project/.git/HEAD"));
 
         let basis_data = b"Hello world! This is the basis file data content for rsync testing.";
-        let target_data = b"Hello world! This is the target modified file data content for rsync testing.";
+        let target_data =
+            b"Hello world! This is the target modified file data content for rsync testing.";
 
         let checksums = rsync.compute_block_checksums(basis_data);
         let delta = rsync.generate_delta(&checksums, target_data);

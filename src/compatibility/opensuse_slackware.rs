@@ -151,8 +151,12 @@ impl ZypperSolver {
                     self.zypper_install(dep)?;
                 }
             }
-            self.installed_packages.insert(pkg.name.clone(), pkg.version.clone());
-            Ok(format!("zypper: Successfully installed {} version {}", pkg.name, pkg.version))
+            self.installed_packages
+                .insert(pkg.name.clone(), pkg.version.clone());
+            Ok(format!(
+                "zypper: Successfully installed {} version {}",
+                pkg.name, pkg.version
+            ))
         } else {
             Err("zypper: Package not found in active repositories")
         }
@@ -191,7 +195,13 @@ impl OpenBuildServiceEngine {
         }
     }
 
-    pub fn create_obs_project(&mut self, proj: &str, pkg: &str, target: ObsBuildTarget, spec: &str) -> &ObsPackageProject {
+    pub fn create_obs_project(
+        &mut self,
+        proj: &str,
+        pkg: &str,
+        target: ObsBuildTarget,
+        spec: &str,
+    ) -> &ObsPackageProject {
         let obs_proj = ObsPackageProject {
             project_name: proj.to_string(),
             package_name: pkg.to_string(),
@@ -205,14 +215,22 @@ impl OpenBuildServiceEngine {
     }
 
     pub fn trigger_obs_build(&mut self, proj_name: &str) -> Result<String, &'static str> {
-        let proj = self.projects.iter_mut().find(|p| p.project_name == proj_name).ok_or("OBS project not found")?;
+        let proj = self
+            .projects
+            .iter_mut()
+            .find(|p| p.project_name == proj_name)
+            .ok_or("OBS project not found")?;
 
-        if !proj.spec_file_content.contains("Name:") || !proj.spec_file_content.contains("Version:") {
+        if !proj.spec_file_content.contains("Name:") || !proj.spec_file_content.contains("Version:")
+        {
             return Err("OBS build failed: Invalid RPM spec file syntax");
         }
 
         proj.build_successful = true;
-        Ok(format!("OBS: Successfully compiled {} for target {:?}", proj.package_name, proj.build_target))
+        Ok(format!(
+            "OBS: Successfully compiled {} for target {:?}",
+            proj.package_name, proj.build_target
+        ))
     }
 }
 
@@ -400,7 +418,11 @@ mod tests {
     #[test]
     fn test_zypper_solver_flow() {
         let mut solver = ZypperSolver::new();
-        let mut repo = ZypperRepository::new("openSUSE-OSS", "https://download.opensuse.org/distribution/leap/15.5/repo/oss/", 10);
+        let mut repo = ZypperRepository::new(
+            "openSUSE-OSS",
+            "https://download.opensuse.org/distribution/leap/15.5/repo/oss/",
+            10,
+        );
         repo.add_package("zlib", "1.2.13", "x86_64", &[]);
         repo.add_package("curl", "8.0.1", "x86_64", &["zlib"]);
 
@@ -416,7 +438,12 @@ mod tests {
     fn test_open_build_service_engine() {
         let mut obs = OpenBuildServiceEngine::new();
         let spec = "Name: hello\nVersion: 2.10\nSummary: GNU Hello World\n";
-        obs.create_obs_project("home:user:branches", "hello", ObsBuildTarget::OpenSuseTumbleweed, spec);
+        obs.create_obs_project(
+            "home:user:branches",
+            "hello",
+            ObsBuildTarget::OpenSuseTumbleweed,
+            spec,
+        );
 
         let res = obs.trigger_obs_build("home:user:branches").unwrap();
         assert!(res.contains("Successfully compiled hello"));

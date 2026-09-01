@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Appending Access Rights & Immutable Journal Stream Enforcement for SigmaOS
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

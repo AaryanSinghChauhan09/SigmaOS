@@ -5,7 +5,6 @@ extern crate alloc;
 // Inspired by Linux kernel (EEVDF, CFS, BORE, PDS, MuQSS, BFS, CacULE, EAS, SCHED_DEADLINE, SCHED_EXT)
 // and BSD OS distributions (FreeBSD ULE, 4.4BSD Decay, OpenBSD Fair Share FSS, DragonFly BSD LWKT Work-Stealing).
 
-
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -66,7 +65,11 @@ impl EevdfScheduler {
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
         // Bolt Optimization: Functional iterator `min_by_key` eliminates manual index and variable initialization tracking,
         // allowing LLVM to optimize vector bounds checking and unroll the task selection loop in hot scheduler ticks.
-        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.deadline)?;
+        let (best_idx, _) = self
+            .tasks
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, task)| task.deadline)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -96,7 +99,11 @@ impl BoreScheduler {
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
         // Bolt Optimization: BORE prioritizes tasks with smaller burst times to maximize interactivity.
         // Using `min_by_key` eliminates imperative state loop overhead and enables compiler loop unrolling.
-        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.burst_time)?;
+        let (best_idx, _) = self
+            .tasks
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, task)| task.burst_time)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -148,7 +155,9 @@ impl MuqssScheduler {
         for _ in 0..num_cpus {
             queues.push(Vec::new());
         }
-        Self { per_cpu_queues: queues }
+        Self {
+            per_cpu_queues: queues,
+        }
     }
 
     pub fn add_task(&mut self, cpu_id: usize, task: SchedTask) {
@@ -191,7 +200,11 @@ impl CfsScheduler {
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
         // Bolt Optimization: CFS selects the task with the minimum virtual runtime.
         // Iterator `min_by_key` provides clean single-pass selection without manual variable bounds setup.
-        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.virtual_runtime)?;
+        let (best_idx, _) = self
+            .tasks
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, task)| task.virtual_runtime)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -220,7 +233,11 @@ impl SchedDeadline {
 
     pub fn pick_next_task(&mut self) -> Option<SchedTask> {
         // Bolt Optimization: Earliest Deadline First selection via single-pass `min_by_key` iterator chain.
-        let (best_idx, _) = self.tasks.iter().enumerate().min_by_key(|(_, task)| task.deadline)?;
+        let (best_idx, _) = self
+            .tasks
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, task)| task.deadline)?;
         Some(self.tasks.remove(best_idx))
     }
 }
@@ -390,7 +407,9 @@ impl DragonFlyBsdWorkStealingScheduler {
         for _ in 0..cpus {
             queues.push(Vec::new());
         }
-        Self { per_cpu_queues: queues }
+        Self {
+            per_cpu_queues: queues,
+        }
     }
 
     pub fn add_task(&mut self, cpu: usize, task: SchedTask) {
@@ -428,7 +447,9 @@ impl Default for BfsScheduler {
 
 impl BfsScheduler {
     pub fn new() -> Self {
-        Self { single_queue: Vec::new() }
+        Self {
+            single_queue: Vec::new(),
+        }
     }
 
     pub fn add_task(&mut self, task: SchedTask) {
@@ -642,7 +663,9 @@ impl Default for GangHpcClusterScheduler {
 
 impl GangHpcClusterScheduler {
     pub fn new() -> Self {
-        Self { gang_tasks: Vec::new() }
+        Self {
+            gang_tasks: Vec::new(),
+        }
     }
 
     pub fn schedule_gang(&mut self, gang: Vec<SchedTask>) -> bool {
@@ -838,7 +861,8 @@ impl AiPredictiveScheduler {
     }
 
     pub fn predict_and_set_prio(&mut self, pid: u64, predicted_latency_ns: u64) {
-        self.task_latency_predictions.insert(pid, predicted_latency_ns);
+        self.task_latency_predictions
+            .insert(pid, predicted_latency_ns);
     }
 }
 

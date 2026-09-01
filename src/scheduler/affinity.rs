@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // Processor Assignment, CPU Affinity & NUMA Topology Manager for SigmaOS
 // Inspired by Linux sched_setaffinity(2), FreeBSD cpuset(2) / cpuset_setaffinity, and Windows NUMA node affinity.
 
@@ -99,12 +99,18 @@ impl ProcessCpuAssigner {
 
         // Default NUMA Node 0 setup
         let default_cores: Vec<usize> = (0..system_core_count.min(64)).collect();
-        assigner.numa_nodes.insert(0, NumaDomainTopology::new(0, &default_cores, 32768));
+        assigner
+            .numa_nodes
+            .insert(0, NumaDomainTopology::new(0, &default_cores, 32768));
         assigner
     }
 
     /// Set process CPU affinity mask (Linux sched_setaffinity & FreeBSD cpuset_setaffinity)
-    pub fn assign_process_affinity(&mut self, pid: usize, mask: CpuAffinityMask) -> Result<(), &'static str> {
+    pub fn assign_process_affinity(
+        &mut self,
+        pid: usize,
+        mask: CpuAffinityMask,
+    ) -> Result<(), &'static str> {
         if mask.mask_bits == 0 {
             return Err("Invalid affinity mask: Must assign at least 1 CPU core");
         }
@@ -114,7 +120,10 @@ impl ProcessCpuAssigner {
 
     /// Query process CPU affinity mask (Linux sched_getaffinity & FreeBSD cpuset_getaffinity)
     pub fn get_process_affinity(&self, pid: usize) -> CpuAffinityMask {
-        self.process_affinity.get(&pid).copied().unwrap_or_else(CpuAffinityMask::all_cores)
+        self.process_affinity
+            .get(&pid)
+            .copied()
+            .unwrap_or_else(CpuAffinityMask::all_cores)
     }
 
     /// Pin thread to a specific CPU core (Hard Core Pinning)
@@ -127,8 +136,15 @@ impl ProcessCpuAssigner {
     }
 
     /// Migrate process to preferred NUMA node
-    pub fn migrate_process_numa_node(&mut self, pid: usize, target_node_id: usize) -> Result<(), &'static str> {
-        let node = self.numa_nodes.get(&target_node_id).ok_or("NUMA node not found")?;
+    pub fn migrate_process_numa_node(
+        &mut self,
+        pid: usize,
+        target_node_id: usize,
+    ) -> Result<(), &'static str> {
+        let node = self
+            .numa_nodes
+            .get(&target_node_id)
+            .ok_or("NUMA node not found")?;
         let mask = CpuAffinityMask::from_cores(&node.cpu_cores);
         self.assign_process_affinity(pid, mask)?;
         Ok(())

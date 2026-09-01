@@ -1,8 +1,8 @@
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Performance Enhancer
 // Auto resource optimizer with OOP-based design
 // Enhanced with Fedora/Linux-inspired systemd-analyze, Autoruns, and Soluto startup boot-delay optimizers.
@@ -330,10 +330,23 @@ impl SovereignStartupOptimizer {
 
     fn seed_default_services(&mut self) {
         // Seed some standard heavy background daemons
-        self.entries.push(SovereignStartupEntry::new("fedora-telemetry-daemon", 1200, 150));
-        self.entries.push(SovereignStartupEntry::new("cups-printer-service", 800, 64));
-        self.entries.push(SovereignStartupEntry::new("flatpak-update-checker", 450, 48));
-        self.entries.push(SovereignStartupEntry::new("systemd-journal-uploader", 150, 16));
+        self.entries.push(SovereignStartupEntry::new(
+            "fedora-telemetry-daemon",
+            1200,
+            150,
+        ));
+        self.entries
+            .push(SovereignStartupEntry::new("cups-printer-service", 800, 64));
+        self.entries.push(SovereignStartupEntry::new(
+            "flatpak-update-checker",
+            450,
+            48,
+        ));
+        self.entries.push(SovereignStartupEntry::new(
+            "systemd-journal-uploader",
+            150,
+            16,
+        ));
     }
 
     /// Toggles a service's enabled state (Sysinternals Autoruns-style toggle-off)
@@ -369,9 +382,15 @@ impl SovereignStartupOptimizer {
                 recommendations.push(format!("Disabled high-impact service: {}", entry.name));
             } else if entry.postponed_delay_sec > 0 {
                 total_delay_saved_ms += entry.boot_delay_ms;
-                recommendations.push(format!("Postponed launching '{}' by {}s to clear boot concurrency", entry.name, entry.postponed_delay_sec));
+                recommendations.push(format!(
+                    "Postponed launching '{}' by {}s to clear boot concurrency",
+                    entry.name, entry.postponed_delay_sec
+                ));
             } else if entry.impact == StartupImpact::High {
-                recommendations.push(format!("Recommendation: Postpone or disable '{}' to save {}ms at startup", entry.name, entry.boot_delay_ms));
+                recommendations.push(format!(
+                    "Recommendation: Postpone or disable '{}' to save {}ms at startup",
+                    entry.name, entry.boot_delay_ms
+                ));
             }
         }
 
@@ -409,7 +428,10 @@ impl OptimizationStrategy for SovereignStartupOptimizer {
             success: true,
             memory_freed_mb: services_optimized as u64 * 32, // Emulate RAM savings
             cpu_saved_percent: 0.0,
-            message: format!("Optimized startup times! Displaced/Postponed startup boot-delay by {}ms", delay_freed_ms),
+            message: format!(
+                "Optimized startup times! Displaced/Postponed startup boot-delay by {}ms",
+                delay_freed_ms
+            ),
         })
     }
 
@@ -574,8 +596,9 @@ mod tests {
 
     #[test]
     fn test_optimization() {
-        let mut enhancer = PerformanceEnhancer::new()
-            .add_strategy(Box::new(MemoryOptimization::new().aggressive().with_target(90.0)));
+        let mut enhancer = PerformanceEnhancer::new().add_strategy(Box::new(
+            MemoryOptimization::new().aggressive().with_target(90.0),
+        ));
         let results = enhancer.optimize().unwrap();
         assert!(!results.is_empty());
     }

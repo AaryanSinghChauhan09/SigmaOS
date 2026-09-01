@@ -285,14 +285,20 @@ impl SovereignMintUpgradeEngine {
     }
 
     /// Perform Linux Mint mintupgrade-style pre-flight system health audit
-    pub fn perform_preflight_check(&mut self, available_disk_space_mb: u64) -> PreFlightCheckResult {
+    pub fn perform_preflight_check(
+        &mut self,
+        available_disk_space_mb: u64,
+    ) -> PreFlightCheckResult {
         self.stage = UpgradeStage::PreFlightCheck;
 
         let min_space = 10240; // 10GB required for major OS release upgrade
         let is_space_ok = available_disk_space_mb >= min_space;
 
         // Audit orphaned / foreign packages
-        self.orphaned_packages = vec!["liblegacy-v1.so".to_string(), "deprecated-app-bin".to_string()];
+        self.orphaned_packages = vec![
+            "liblegacy-v1.so".to_string(),
+            "deprecated-app-bin".to_string(),
+        ];
 
         let is_passed = is_space_ok;
         PreFlightCheckResult {
@@ -305,7 +311,10 @@ impl SovereignMintUpgradeEngine {
     }
 
     /// Execute multi-stage major version system upgrade
-    pub fn execute_upgrade(&mut self, available_disk_space_mb: u64) -> Result<String, &'static str> {
+    pub fn execute_upgrade(
+        &mut self,
+        available_disk_space_mb: u64,
+    ) -> Result<String, &'static str> {
         let check = self.perform_preflight_check(available_disk_space_mb);
         if !check.is_passed {
             self.stage = UpgradeStage::Failed;
@@ -456,7 +465,11 @@ impl SovereignMintStickEngine {
     }
 
     /// Format target USB device with selected filesystem (mintstick -m format)
-    pub fn format_usb_drive(&mut self, fs: UsbFileSystem, volume_label: &str) -> Result<(), &'static str> {
+    pub fn format_usb_drive(
+        &mut self,
+        fs: UsbFileSystem,
+        volume_label: &str,
+    ) -> Result<(), &'static str> {
         if self.target_device.is_empty() || self.target_device == "/dev/sda" {
             self.mode = MintStickMode::Failed;
             return Err("mintstick: Refusing to format system primary disk!");
@@ -521,13 +534,22 @@ impl NvidiaPrimeApplet {
             }
             NvidiaPrimeProfile::NvidiaOnDemand => {
                 env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
-                env_vars.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+                env_vars.insert(
+                    "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+                    "nvidia".to_string(),
+                );
                 self.gpu_power_draw_watts = 12;
             }
             NvidiaPrimeProfile::NvidiaPerformance => {
                 env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
-                env_vars.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
-                env_vars.insert("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string());
+                env_vars.insert(
+                    "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+                    "nvidia".to_string(),
+                );
+                env_vars.insert(
+                    "__VK_LAYER_NV_optimus".to_string(),
+                    "NVIDIA_only".to_string(),
+                );
                 self.gpu_power_draw_watts = 45;
             }
             NvidiaPrimeProfile::OffloadCompute => {
@@ -587,15 +609,51 @@ impl SovereignMintMenuValaEngine {
         };
 
         // Seed default MintMenu applications
-        engine.add_item("firefox", "Firefox Web Browser", "firefox %U", "web-browser", MintMenuCategory::Internet, true);
-        engine.add_item("terminal", "Sigma Terminal", "sigma-terminal", "utilities-terminal", MintMenuCategory::System, true);
-        engine.add_item("software", "Software Manager", "mintinstall", "system-software-install", MintMenuCategory::Administration, false);
-        engine.add_item("settings", "System Settings", "cinnamon-settings", "preferences-system", MintMenuCategory::Preferences, false);
+        engine.add_item(
+            "firefox",
+            "Firefox Web Browser",
+            "firefox %U",
+            "web-browser",
+            MintMenuCategory::Internet,
+            true,
+        );
+        engine.add_item(
+            "terminal",
+            "Sigma Terminal",
+            "sigma-terminal",
+            "utilities-terminal",
+            MintMenuCategory::System,
+            true,
+        );
+        engine.add_item(
+            "software",
+            "Software Manager",
+            "mintinstall",
+            "system-software-install",
+            MintMenuCategory::Administration,
+            false,
+        );
+        engine.add_item(
+            "settings",
+            "System Settings",
+            "cinnamon-settings",
+            "preferences-system",
+            MintMenuCategory::Preferences,
+            false,
+        );
 
         engine
     }
 
-    pub fn add_item(&mut self, id: &str, name: &str, exec: &str, icon: &str, cat: MintMenuCategory, favorite: bool) {
+    pub fn add_item(
+        &mut self,
+        id: &str,
+        name: &str,
+        exec: &str,
+        icon: &str,
+        cat: MintMenuCategory,
+        favorite: bool,
+    ) {
         self.items.push(MintMenuItem {
             id: id.to_string(),
             name: name.to_string(),
@@ -622,9 +680,17 @@ impl SovereignMintMenuValaEngine {
 
     pub fn filter_by_category(&self, category: MintMenuCategory) -> Vec<MintMenuItem> {
         if category == MintMenuCategory::Favorites {
-            self.items.iter().filter(|i| i.is_favorite).cloned().collect()
+            self.items
+                .iter()
+                .filter(|i| i.is_favorite)
+                .cloned()
+                .collect()
         } else {
-            self.items.iter().filter(|i| i.category == category).cloned().collect()
+            self.items
+                .iter()
+                .filter(|i| i.category == category)
+                .cloned()
+                .collect()
         }
     }
 
@@ -764,10 +830,16 @@ mod tests {
     #[test]
     fn test_cinnamon_translation_engine() {
         let mut trans = CinnamonTranslationEngine::new("en_US");
-        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "Software Manager");
+        assert_eq!(
+            trans.gettext("cinnamon", "Software Manager"),
+            "Software Manager"
+        );
 
         trans.set_locale("hi_IN");
-        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "सॉफ़्टवेयर मैनेजर");
+        assert_eq!(
+            trans.gettext("cinnamon", "Software Manager"),
+            "सॉफ़्टवेयर मैनेजर"
+        );
         assert_eq!(trans.gettext("cinnamon", "Unknown"), "Unknown");
         assert_eq!(trans.ngettext("cinnamon", "File", "Files", 1), "File");
     }
@@ -786,7 +858,9 @@ mod tests {
         assert_eq!(unsafe_flasher.mode, MintStickMode::Failed);
 
         let mut formatter = SovereignMintStickEngine::new("/dev/sdc");
-        assert!(formatter.format_usb_drive(UsbFileSystem::Fat32, "SIGMAOS_BOOT").is_ok());
+        assert!(formatter
+            .format_usb_drive(UsbFileSystem::Fat32, "SIGMAOS_BOOT")
+            .is_ok());
         assert_eq!(formatter.mode, MintStickMode::Completed);
     }
 
@@ -822,7 +896,10 @@ mod tests {
 
         let is_fav = menu.toggle_favorite("software").unwrap();
         assert!(is_fav);
-        assert_eq!(menu.filter_by_category(MintMenuCategory::Favorites).len(), 3);
+        assert_eq!(
+            menu.filter_by_category(MintMenuCategory::Favorites).len(),
+            3
+        );
     }
 }
 
@@ -951,8 +1028,14 @@ impl SovereignNvidiaPrimeEngine {
     pub fn generate_offload_command(&self, cmd: &str) -> OffloadCommand {
         let mut env_vars = Vec::new();
         env_vars.push(("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string()));
-        env_vars.push(("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string()));
-        env_vars.push(("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string()));
+        env_vars.push((
+            "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+            "nvidia".to_string(),
+        ));
+        env_vars.push((
+            "__VK_LAYER_NV_optimus".to_string(),
+            "NVIDIA_only".to_string(),
+        ));
 
         let formatted = format!(
             "__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only {}",
@@ -1024,13 +1107,18 @@ impl NvidiaPrimeApplet {
                 profile
             ))
         } else {
-            Ok(format!("Switched PRIME profile to {:?} immediately.", profile))
+            Ok(format!(
+                "Switched PRIME profile to {:?} immediately.",
+                profile
+            ))
         }
     }
 
     pub fn render_status_text(&self) -> String {
         match self.prime_engine.active_profile {
-            NvidiaPrimeProfile::IntegratedIntelRadeon => "GPU: Integrated (Power Saving)".to_string(),
+            NvidiaPrimeProfile::IntegratedIntelRadeon => {
+                "GPU: Integrated (Power Saving)".to_string()
+            }
             NvidiaPrimeProfile::NvidiaOnDemand => {
                 if self.prime_engine.active_offloaded_processes.is_empty() {
                     "GPU: NVIDIA On-Demand (Sleeping)".to_string()
@@ -1041,8 +1129,12 @@ impl NvidiaPrimeApplet {
                     )
                 }
             }
-            NvidiaPrimeProfile::NvidiaPerformance => "GPU: NVIDIA Performance (NVIDIA Always On)".to_string(),
-            NvidiaPrimeProfile::OffloadCompute => "GPU: Offload Compute (CUDA / Vulkan Only)".to_string(),
+            NvidiaPrimeProfile::NvidiaPerformance => {
+                "GPU: NVIDIA Performance (NVIDIA Always On)".to_string()
+            }
+            NvidiaPrimeProfile::OffloadCompute => {
+                "GPU: Offload Compute (CUDA / Vulkan Only)".to_string()
+            }
         }
     }
 }
@@ -1172,8 +1264,14 @@ impl SovereignNvidiaPrimeEngine {
     pub fn generate_offload_command(&self, cmd: &str) -> OffloadCommand {
         let mut env_vars = Vec::new();
         env_vars.push(("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string()));
-        env_vars.push(("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string()));
-        env_vars.push(("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string()));
+        env_vars.push((
+            "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+            "nvidia".to_string(),
+        ));
+        env_vars.push((
+            "__VK_LAYER_NV_optimus".to_string(),
+            "NVIDIA_only".to_string(),
+        ));
 
         let formatted = format!(
             "__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only {}",
@@ -1245,13 +1343,18 @@ impl SovereignNvidiaPrimeApplet {
                 profile
             ))
         } else {
-            Ok(format!("Switched PRIME profile to {:?} immediately.", profile))
+            Ok(format!(
+                "Switched PRIME profile to {:?} immediately.",
+                profile
+            ))
         }
     }
 
     pub fn render_status_text(&self) -> String {
         match self.prime_engine.active_profile {
-            NvidiaPrimeProfile::IntegratedIntelRadeon => "GPU: Integrated (Power Saving)".to_string(),
+            NvidiaPrimeProfile::IntegratedIntelRadeon => {
+                "GPU: Integrated (Power Saving)".to_string()
+            }
             NvidiaPrimeProfile::NvidiaOnDemand => {
                 if self.prime_engine.active_offloaded_processes.is_empty() {
                     "GPU: NVIDIA On-Demand (Sleeping)".to_string()
@@ -1262,86 +1365,101 @@ impl SovereignNvidiaPrimeApplet {
                     )
                 }
             }
-            NvidiaPrimeProfile::NvidiaPerformance => "GPU: NVIDIA Performance (NVIDIA Always On)".to_string(),
-            NvidiaPrimeProfile::OffloadCompute => "GPU: Offload Compute (CUDA / Vulkan Only)".to_string(),
+            NvidiaPrimeProfile::NvidiaPerformance => {
+                "GPU: NVIDIA Performance (NVIDIA Always On)".to_string()
+            }
+            NvidiaPrimeProfile::OffloadCompute => {
+                "GPU: Offload Compute (CUDA / Vulkan Only)".to_string()
+            }
         }
     }
 }
 
-    #[test]
-    fn test_sovereign_mintupgrade_engine() {
-        let mut upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
-        let result = upgrade.execute_upgrade(20480);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), "SigmaOS 2.0");
-        assert_eq!(upgrade.stage, UpgradeStage::Completed);
+#[test]
+fn test_sovereign_mintupgrade_engine() {
+    let mut upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
+    let result = upgrade.execute_upgrade(20480);
+    assert!(result.is_ok());
+    assert_eq!(result.unwrap(), "SigmaOS 2.0");
+    assert_eq!(upgrade.stage, UpgradeStage::Completed);
 
-        let mut failed_upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
-        let failed_res = failed_upgrade.execute_upgrade(500); // 500MB insufficient
-        assert!(failed_res.is_err());
-        assert_eq!(failed_upgrade.stage, UpgradeStage::Failed);
-    }
+    let mut failed_upgrade = SovereignMintUpgradeEngine::new("SigmaOS 1.0", "SigmaOS 2.0");
+    let failed_res = failed_upgrade.execute_upgrade(500); // 500MB insufficient
+    assert!(failed_res.is_err());
+    assert_eq!(failed_upgrade.stage, UpgradeStage::Failed);
+}
 
-    #[test]
-    fn test_cinnamon_translation_engine() {
-        let mut trans = CinnamonTranslationEngine::new("en_US");
-        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "Software Manager");
+#[test]
+fn test_cinnamon_translation_engine() {
+    let mut trans = CinnamonTranslationEngine::new("en_US");
+    assert_eq!(
+        trans.gettext("cinnamon", "Software Manager"),
+        "Software Manager"
+    );
 
-        trans.set_locale("hi_IN");
-        assert_eq!(trans.gettext("cinnamon", "Software Manager"), "सॉफ़्टवेयर मैनेजर");
-        assert_eq!(trans.gettext("cinnamon", "Unknown"), "Unknown");
-        assert_eq!(trans.ngettext("cinnamon", "File", "Files", 1), "File");
-    }
+    trans.set_locale("hi_IN");
+    assert_eq!(
+        trans.gettext("cinnamon", "Software Manager"),
+        "सॉफ़्टवेयर मैनेजर"
+    );
+    assert_eq!(trans.gettext("cinnamon", "Unknown"), "Unknown");
+    assert_eq!(trans.ngettext("cinnamon", "File", "Files", 1), "File");
+}
 
-    #[test]
-    fn test_sovereign_mintstick_engine() {
-        let mut flasher = SovereignMintStickEngine::new("/dev/sdb");
-        let dummy_iso = vec![0u8; 16384];
-        let written = flasher.flash_iso_image(&dummy_iso).unwrap();
-        assert_eq!(written, 16384);
-        assert_eq!(flasher.progress_pct, 100);
-        assert_eq!(flasher.mode, MintStickMode::Completed);
+#[test]
+fn test_sovereign_mintstick_engine() {
+    let mut flasher = SovereignMintStickEngine::new("/dev/sdb");
+    let dummy_iso = vec![0u8; 16384];
+    let written = flasher.flash_iso_image(&dummy_iso).unwrap();
+    assert_eq!(written, 16384);
+    assert_eq!(flasher.progress_pct, 100);
+    assert_eq!(flasher.mode, MintStickMode::Completed);
 
-        let mut unsafe_flasher = SovereignMintStickEngine::new("/dev/sda");
-        assert!(unsafe_flasher.flash_iso_image(&dummy_iso).is_err());
-        assert_eq!(unsafe_flasher.mode, MintStickMode::Failed);
+    let mut unsafe_flasher = SovereignMintStickEngine::new("/dev/sda");
+    assert!(unsafe_flasher.flash_iso_image(&dummy_iso).is_err());
+    assert_eq!(unsafe_flasher.mode, MintStickMode::Failed);
 
-        let mut formatter = SovereignMintStickEngine::new("/dev/sdc");
-        assert!(formatter.format_usb_drive(UsbFileSystem::Fat32, "SIGMAOS_BOOT").is_ok());
-        assert_eq!(formatter.mode, MintStickMode::Completed);
-    }
+    let mut formatter = SovereignMintStickEngine::new("/dev/sdc");
+    assert!(formatter
+        .format_usb_drive(UsbFileSystem::Fat32, "SIGMAOS_BOOT")
+        .is_ok());
+    assert_eq!(formatter.mode, MintStickMode::Completed);
+}
 
-    #[test]
-    fn test_nvidia_prime_applet() {
-        let mut prime = NvidiaPrimeApplet::new();
-        assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaOnDemand);
+#[test]
+fn test_nvidia_prime_applet() {
+    let mut prime = NvidiaPrimeApplet::new();
+    assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaOnDemand);
 
-        let envs = prime.switch_profile(NvidiaPrimeProfile::NvidiaPerformance);
-        assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaPerformance);
-        assert!(prime.is_relogin_required);
-        assert_eq!(envs.get("__NV_PRIME_RENDER_OFFLOAD").unwrap(), "1");
-        assert_eq!(prime.gpu_power_draw_watts, 45);
+    let envs = prime.switch_profile(NvidiaPrimeProfile::NvidiaPerformance);
+    assert_eq!(prime.active_profile, NvidiaPrimeProfile::NvidiaPerformance);
+    assert!(prime.is_relogin_required);
+    assert_eq!(envs.get("__NV_PRIME_RENDER_OFFLOAD").unwrap(), "1");
+    assert_eq!(prime.gpu_power_draw_watts, 45);
 
-        let intel_envs = prime.switch_profile(NvidiaPrimeProfile::IntegratedIntelRadeon);
-        assert!(intel_envs.is_empty());
-        assert_eq!(prime.gpu_power_draw_watts, 0);
-    }
+    let intel_envs = prime.switch_profile(NvidiaPrimeProfile::IntegratedIntelRadeon);
+    assert!(intel_envs.is_empty());
+    assert_eq!(prime.gpu_power_draw_watts, 0);
+}
 
-    #[test]
-    fn test_mintmenu_vala_engine() {
-        let mut menu = SovereignMintMenuValaEngine::new();
-        let favs = menu.filter_by_category(MintMenuCategory::Favorites);
-        assert_eq!(favs.len(), 2);
+#[test]
+fn test_mintmenu_vala_engine() {
+    let mut menu = SovereignMintMenuValaEngine::new();
+    let favs = menu.filter_by_category(MintMenuCategory::Favorites);
+    assert_eq!(favs.len(), 2);
 
-        let search_res = menu.search_items("Terminal");
-        assert_eq!(search_res.len(), 1);
-        assert_eq!(search_res[0].id, "terminal");
+    let search_res = menu.search_items("Terminal");
+    assert_eq!(search_res.len(), 1);
+    assert_eq!(search_res[0].id, "terminal");
 
-        let cmd = menu.launch_item("firefox").unwrap();
-        assert_eq!(cmd, "firefox %U");
-        assert_eq!(menu.recent_launches.len(), 1);
+    let cmd = menu.launch_item("firefox").unwrap();
+    assert_eq!(cmd, "firefox %U");
+    assert_eq!(menu.recent_launches.len(), 1);
 
-        let is_fav = menu.toggle_favorite("software").unwrap();
-        assert!(is_fav);
-        assert_eq!(menu.filter_by_category(MintMenuCategory::Favorites).len(), 3);
-    }
+    let is_fav = menu.toggle_favorite("software").unwrap();
+    assert!(is_fav);
+    assert_eq!(
+        menu.filter_by_category(MintMenuCategory::Favorites).len(),
+        3
+    );
+}

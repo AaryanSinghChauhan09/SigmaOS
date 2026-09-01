@@ -1,15 +1,15 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
 
@@ -79,7 +79,13 @@ impl GentooPortageMaskResolver {
         }
     }
 
-    pub fn register_ebuild(&mut self, category_pkg: &str, version: &str, keywords: &[&str], is_masked: bool) {
+    pub fn register_ebuild(
+        &mut self,
+        category_pkg: &str,
+        version: &str,
+        keywords: &[&str],
+        is_masked: bool,
+    ) {
         self.ebuilds.push(PortageEbuildProfile {
             atom_name: format!("{}:{}", category_pkg, version),
             category_pkg: category_pkg.to_string(),
@@ -95,13 +101,24 @@ impl GentooPortageMaskResolver {
         self.hard_masked_atoms.push(category_pkg.to_string());
     }
 
-    pub fn evaluate_installability(&self, category_pkg: &str, version: &str, accept_keywords: bool) -> Result<bool, &'static str> {
+    pub fn evaluate_installability(
+        &self,
+        category_pkg: &str,
+        version: &str,
+        accept_keywords: bool,
+    ) -> Result<bool, &'static str> {
         if self.hard_masked_atoms.iter().any(|pkg| pkg == category_pkg) {
             return Err("Package is hard-masked in package.mask");
         }
 
         let target_atom = format!("{}:{}", category_pkg, version);
-        let ebuild = self.ebuilds.iter().find(|e| format!("{}:{}", e.category_pkg, e.version) == target_atom || e.category_pkg == category_pkg)
+        let ebuild = self
+            .ebuilds
+            .iter()
+            .find(|e| {
+                format!("{}:{}", e.category_pkg, e.version) == target_atom
+                    || e.category_pkg == category_pkg
+            })
             .ok_or("Ebuild not found")?;
 
         if ebuild.is_masked && !accept_keywords {
@@ -109,7 +126,10 @@ impl GentooPortageMaskResolver {
         }
 
         let is_stable = ebuild.keywords.iter().any(|k| k == &self.target_arch);
-        let is_testing = ebuild.keywords.iter().any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
+        let is_testing = ebuild
+            .keywords
+            .iter()
+            .any(|k| k.starts_with('~') && &k[1..] == self.target_arch);
 
         if is_stable {
             Ok(true)
@@ -823,7 +843,8 @@ impl RpmOstreeDeployEngine {
             timestamp,
             layered_packages: Vec::new(),
         };
-        self.deployments.push((commit, OstreeDeploymentState::Staged));
+        self.deployments
+            .push((commit, OstreeDeploymentState::Staged));
         self.deployments.len() - 1
     }
 
@@ -853,7 +874,10 @@ impl RpmOstreeDeployEngine {
     }
 
     pub fn rollback(&mut self) -> Option<usize> {
-        let rollback_idx = self.deployments.iter().position(|(_, state)| *state == OstreeDeploymentState::RollbackTarget)?;
+        let rollback_idx = self
+            .deployments
+            .iter()
+            .position(|(_, state)| *state == OstreeDeploymentState::RollbackTarget)?;
         self.switch_active_deployment(rollback_idx);
         Some(rollback_idx)
     }
@@ -907,7 +931,10 @@ impl NetplanConfigEngine {
     pub fn render_systemd_networkd_config(&self, iface_name: &str) -> Option<String> {
         let iface = self.interfaces.iter().find(|i| i.name == iface_name)?;
         let dhcp_str = if iface.dhcp4 { "yes" } else { "no" };
-        Some(format!("[Match]\nName={}\n\n[Network]\nDHCP={}\n", iface.name, dhcp_str))
+        Some(format!(
+            "[Match]\nName={}\n\n[Network]\nDHCP={}\n",
+            iface.name, dhcp_str
+        ))
     }
 }
 
@@ -955,7 +982,9 @@ impl MultiArchAptPinningResolver {
     pub fn evaluate_pin_priority(&self, pkg_name: &str, release: &str) -> i32 {
         let mut highest = 500;
         for rule in &self.pin_rules {
-            if (rule.package_pattern == "*" || rule.package_pattern == pkg_name) && rule.release_channel == release {
+            if (rule.package_pattern == "*" || rule.package_pattern == pkg_name)
+                && rule.release_channel == release
+            {
                 if rule.priority_score > highest {
                     highest = rule.priority_score;
                 }
@@ -993,7 +1022,10 @@ impl PkgBuildChrootRunner {
         if spec.pkgname.is_empty() || spec.pkgver.is_empty() {
             return Err("Invalid PKGBUILD specification");
         }
-        let artifact_name = format!("{}-{}-{}-x86_64.pkg.tar.zst", spec.pkgname, spec.pkgver, spec.pkgrel);
+        let artifact_name = format!(
+            "{}-{}-{}-x86_64.pkg.tar.zst",
+            spec.pkgname, spec.pkgver, spec.pkgrel
+        );
         Ok(artifact_name)
     }
 }
@@ -1167,12 +1199,7 @@ impl DragonFlyHammer2FsSnapshot {
         });
     }
 
-    pub fn create_pfs_snapshot(
-        &mut self,
-        pfs_name: &str,
-        merkle_root: u64,
-        timestamp: u64,
-    ) -> u64 {
+    pub fn create_pfs_snapshot(&mut self, pfs_name: &str, merkle_root: u64, timestamp: u64) -> u64 {
         let snap_id = self.next_snapshot_id;
         self.next_snapshot_id += 1;
 
@@ -1187,12 +1214,22 @@ impl DragonFlyHammer2FsSnapshot {
         snap_id
     }
 
-    pub fn replicate_snapshot_to_node(&self, snapshot_id: u64, node_id: u32) -> Result<(), &'static str> {
-        let snap_exists = self.pfs_snapshots.iter().any(|s| s.snapshot_id == snapshot_id);
+    pub fn replicate_snapshot_to_node(
+        &self,
+        snapshot_id: u64,
+        node_id: u32,
+    ) -> Result<(), &'static str> {
+        let snap_exists = self
+            .pfs_snapshots
+            .iter()
+            .any(|s| s.snapshot_id == snapshot_id);
         if !snap_exists {
             return Err("PFS snapshot not found");
         }
-        let node_active = self.cluster_nodes.iter().any(|n| n.node_id == node_id && n.active);
+        let node_active = self
+            .cluster_nodes
+            .iter()
+            .any(|n| n.node_id == node_id && n.active);
         if !node_active {
             return Err("Target cluster node is inactive or missing");
         }
@@ -1200,19 +1237,33 @@ impl DragonFlyHammer2FsSnapshot {
     }
 
     pub fn rollback_pfs(&mut self, pfs_name: &str, snapshot_id: u64) -> Result<u64, &'static str> {
-        if let Some(snap) = self.pfs_snapshots.iter().find(|s| s.pfs_name == pfs_name && s.snapshot_id == snapshot_id) {
+        if let Some(snap) = self
+            .pfs_snapshots
+            .iter()
+            .find(|s| s.pfs_name == pfs_name && s.snapshot_id == snapshot_id)
+        {
             Ok(snap.merkle_root)
         } else {
             Err("Matching PFS snapshot not found for rollback")
         }
     }
 
-    pub fn sync_cluster_delta(&mut self, snapshot_id: u64, target_node_id: u32) -> Result<u64, &'static str> {
-        let snap = self.pfs_snapshots.iter().find(|s| s.snapshot_id == snapshot_id)
+    pub fn sync_cluster_delta(
+        &mut self,
+        snapshot_id: u64,
+        target_node_id: u32,
+    ) -> Result<u64, &'static str> {
+        let snap = self
+            .pfs_snapshots
+            .iter()
+            .find(|s| s.snapshot_id == snapshot_id)
             .ok_or("PFS snapshot not found")?;
         let merkle = snap.merkle_root;
 
-        let node_active = self.cluster_nodes.iter().any(|n| n.node_id == target_node_id && n.active);
+        let node_active = self
+            .cluster_nodes
+            .iter()
+            .any(|n| n.node_id == target_node_id && n.active);
         if !node_active {
             return Err("Target cluster node is inactive or missing");
         }
@@ -1220,7 +1271,11 @@ impl DragonFlyHammer2FsSnapshot {
     }
 
     pub fn verify_cluster_merkle_roots(&self, pfs_name: &str) -> bool {
-        let count = self.pfs_snapshots.iter().filter(|s| s.pfs_name == pfs_name).count();
+        let count = self
+            .pfs_snapshots
+            .iter()
+            .filter(|s| s.pfs_name == pfs_name)
+            .count();
         count > 0
     }
 }
@@ -1247,8 +1302,13 @@ impl ArchWikiKnowledgeBaseEngine {
             ArchWikiArticle {
                 title: "Systemd Service & Target Management".to_string(),
                 category: "System Administration".to_string(),
-                tags: vec!["init".to_string(), "systemd".to_string(), "services".to_string()],
-                content: "Systemd unit files describe services, sockets, timers, and targets...".to_string(),
+                tags: vec![
+                    "init".to_string(),
+                    "systemd".to_string(),
+                    "services".to_string(),
+                ],
+                content: "Systemd unit files describe services, sockets, timers, and targets..."
+                    .to_string(),
             },
         );
         articles.insert(
@@ -1256,8 +1316,13 @@ impl ArchWikiKnowledgeBaseEngine {
             ArchWikiArticle {
                 title: "Btrfs Subvolumes & CoW Snapshots".to_string(),
                 category: "Filesystems".to_string(),
-                tags: vec!["btrfs".to_string(), "snapshots".to_string(), "cow".to_string()],
-                content: "Btrfs provides copy-on-write snapshots, subvolumes, and compression...".to_string(),
+                tags: vec![
+                    "btrfs".to_string(),
+                    "snapshots".to_string(),
+                    "cow".to_string(),
+                ],
+                content: "Btrfs provides copy-on-write snapshots, subvolumes, and compression..."
+                    .to_string(),
             },
         );
         Self { articles }
@@ -1344,8 +1409,14 @@ impl NixOsDeclarativeConfigEngine {
         gen_number
     }
 
-    pub fn switch_generation(&mut self, gen_number: u32) -> Result<&NixSystemGeneration, &'static str> {
-        let pos = self.generations.iter().position(|g| g.gen_number == gen_number);
+    pub fn switch_generation(
+        &mut self,
+        gen_number: u32,
+    ) -> Result<&NixSystemGeneration, &'static str> {
+        let pos = self
+            .generations
+            .iter()
+            .position(|g| g.gen_number == gen_number);
         if let Some(idx) = pos {
             self.active_generation = gen_number;
             Ok(&self.generations[idx])
@@ -1363,7 +1434,9 @@ impl NixOsDeclarativeConfigEngine {
     }
 
     pub fn active_generation_info(&self) -> Option<&NixSystemGeneration> {
-        self.generations.iter().find(|g| g.gen_number == self.active_generation)
+        self.generations
+            .iter()
+            .find(|g| g.gen_number == self.active_generation)
     }
 }
 
@@ -1372,8 +1445,6 @@ impl Default for NixOsDeclarativeConfigEngine {
         Self::new()
     }
 }
-
-
 
 // 4. ANTIX LINUX LIGHTWEIGHT SYSVINIT & LOW-RAM GOVERNOR
 // ===========================================================
@@ -1445,7 +1516,11 @@ impl ZorinWinAppDbRegistry {
     }
 
     pub fn register_app(&mut self, app: ZorinAppMapping) {
-        if !self.registered_apps.iter().any(|a| a.exe_name == app.exe_name) {
+        if !self
+            .registered_apps
+            .iter()
+            .any(|a| a.exe_name == app.exe_name)
+        {
             self.registered_apps.push(app);
         }
     }
@@ -1455,7 +1530,11 @@ impl ZorinWinAppDbRegistry {
     }
 
     pub fn launch_win_app(&mut self, exe_name: &str) -> Result<&'static str, &'static str> {
-        if let Some(app) = self.registered_apps.iter_mut().find(|a| a.exe_name == exe_name) {
+        if let Some(app) = self
+            .registered_apps
+            .iter_mut()
+            .find(|a| a.exe_name == exe_name)
+        {
             app.is_installed = true;
             Ok("App launched successfully via Zorin compatibility layer")
         } else {
@@ -1489,7 +1568,11 @@ impl HaikuTranslatorEngine {
         self.translators.push(translator);
     }
 
-    pub fn find_best_translator(&self, input_mime: &str, output_mime: &str) -> Option<&HaikuMediaTranslator> {
+    pub fn find_best_translator(
+        &self,
+        input_mime: &str,
+        output_mime: &str,
+    ) -> Option<&HaikuMediaTranslator> {
         self.translators
             .iter()
             .filter(|t| t.input_mime == input_mime && t.output_mime == output_mime)
@@ -1586,7 +1669,11 @@ impl GestureVoiceControlEngine {
         }
     }
 
-    pub fn parse_touchpad_gesture(&self, fingers_count: u8, swipe_up: bool) -> Option<DesktopShellAction> {
+    pub fn parse_touchpad_gesture(
+        &self,
+        fingers_count: u8,
+        swipe_up: bool,
+    ) -> Option<DesktopShellAction> {
         match (fingers_count, swipe_up) {
             (3, true) => Some(DesktopShellAction::ToggleOverview),
             (4, false) => Some(DesktopShellAction::SwitchWorkspace),
@@ -1719,9 +1806,21 @@ impl GamifiedProductivityLayer {
             daily_streak_days: 1,
             last_activity_timestamp: 0,
             badges: [
-                AchievementBadge { badge_id: "pkg_builder", name: "Package Artisan", unlocked: false },
-                AchievementBadge { badge_id: "shard_debugger", name: "Shard Whisperer", unlocked: false },
-                AchievementBadge { badge_id: "security_sentinel", name: "Security Sentinel", unlocked: false },
+                AchievementBadge {
+                    badge_id: "pkg_builder",
+                    name: "Package Artisan",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "shard_debugger",
+                    name: "Shard Whisperer",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "security_sentinel",
+                    name: "Security Sentinel",
+                    unlocked: false,
+                },
             ],
         }
     }
@@ -1869,7 +1968,12 @@ impl GentooUseFlagEngine {
             self.disabled_flags.push(name.clone());
             self.enabled_flags.retain(|f| f != &name);
         } else {
-            let name = if flag.starts_with('+') { &flag[1..] } else { flag }.to_string();
+            let name = if flag.starts_with('+') {
+                &flag[1..]
+            } else {
+                flag
+            }
+            .to_string();
             self.enabled_flags.push(name.clone());
             self.disabled_flags.retain(|f| f != &name);
         }
@@ -1880,14 +1984,14 @@ impl GentooUseFlagEngine {
     }
 
     pub fn resolve_conflicts(&self, mutually_exclusive: (&str, &str)) -> Result<(), &'static str> {
-        if self.is_flag_enabled(mutually_exclusive.0) && self.is_flag_enabled(mutually_exclusive.1) {
+        if self.is_flag_enabled(mutually_exclusive.0) && self.is_flag_enabled(mutually_exclusive.1)
+        {
             Err("Gentoo USE flag conflict: mutually exclusive flags enabled")
         } else {
             Ok(())
         }
     }
 }
-
 
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
@@ -2072,7 +2176,11 @@ impl SovereignStatelessArchitectureEngine {
         self.detected_isa_level
     }
 
-    pub fn resolve_configuration_path(&self, config_key: &str, user_overrides_exist: bool) -> String {
+    pub fn resolve_configuration_path(
+        &self,
+        config_key: &str,
+        user_overrides_exist: bool,
+    ) -> String {
         if user_overrides_exist {
             alloc::format!("{}/{}", self.user_override_path, config_key)
         } else {
@@ -2169,8 +2277,8 @@ impl SovereignCosmicTilingEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
     OneOneTimeInit, // Stage 1: Initial boot mounts and initialization
-    TwoRunsvDir,     // Stage 2: Main supervision loop (runsvdir)
-    ThreeShutdown,   // Stage 3: System halt/reboot cleanup
+    TwoRunsvDir,    // Stage 2: Main supervision loop (runsvdir)
+    ThreeShutdown,  // Stage 3: System halt/reboot cleanup
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -2263,7 +2371,8 @@ impl AlpineApkPackageIndexV2 {
     }
 
     pub fn register_package(&mut self, name: &str, checksum: &str, size: u64) {
-        self.package_entries.push((name.to_string(), checksum.to_string(), size));
+        self.package_entries
+            .push((name.to_string(), checksum.to_string(), size));
     }
 
     pub fn find_package(&self, name: &str) -> Option<&(String, String, u64)> {
@@ -2473,7 +2582,10 @@ impl MageiaUrpmiMccResolver {
     }
 
     pub fn resolve_package_deps(&self, pkg_name: &str) -> Result<Vec<String>, &'static str> {
-        let pkg = self.synthesis_db.iter().find(|p| p.name == pkg_name)
+        let pkg = self
+            .synthesis_db
+            .iter()
+            .find(|p| p.name == pkg_name)
             .ok_or("Mageia URPMI: Package missing in synthesis.hdlist.cz")?;
         let mut deps = Vec::new();
         for req in &pkg.requires {
@@ -2519,7 +2631,11 @@ impl DragonFlyHammer2DeduplicationEngine {
     }
 
     pub fn write_or_dedup_block(&mut self, offset: u64, size: usize, merkle_hash: u64) -> bool {
-        if let Some(existing) = self.blocks.iter_mut().find(|b| b.merkle_hash == merkle_hash) {
+        if let Some(existing) = self
+            .blocks
+            .iter_mut()
+            .find(|b| b.merkle_hash == merkle_hash)
+        {
             existing.ref_count += 1;
             self.saved_bytes += size as u64;
             true // Deduplicated
@@ -2596,8 +2712,15 @@ impl NetBsdRumpComponentEngine {
         count
     }
 
-    pub fn dispatch_rump_hypercall(&self, component_name: &str, syscall_id: u32) -> Result<u64, &'static str> {
-        let comp = self.components.iter().find(|c| c.name == component_name)
+    pub fn dispatch_rump_hypercall(
+        &self,
+        component_name: &str,
+        syscall_id: u32,
+    ) -> Result<u64, &'static str> {
+        let comp = self
+            .components
+            .iter()
+            .find(|c| c.name == component_name)
             .ok_or("NetBSD Rump: Component not found")?;
         if !comp.is_initialized {
             return Err("NetBSD Rump: Component uninitialized");
@@ -2639,7 +2762,10 @@ mod extra_unimplemented_tests {
 
         let idx1 = ostree.stage_commit([2u8; 32], "6.8.1-sigma", 1700000100);
         assert!(ostree.switch_active_deployment(idx1));
-        assert_eq!(ostree.deployments[idx0].1, OstreeDeploymentState::RollbackTarget);
+        assert_eq!(
+            ostree.deployments[idx0].1,
+            OstreeDeploymentState::RollbackTarget
+        );
         assert_eq!(ostree.rollback(), Some(idx0));
 
         // 2. Ubuntu Netplan & Cloud-init
@@ -2652,7 +2778,10 @@ mod extra_unimplemented_tests {
             gateway4: None,
             nameservers: vec!["1.1.1.1".to_string()],
         });
-        netplan.set_cloud_init("sigma-server-1", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."]);
+        netplan.set_cloud_init(
+            "sigma-server-1",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+        );
         let rendered = netplan.render_systemd_networkd_config("eth0").unwrap();
         assert!(rendered.contains("Name=eth0"));
         assert!(rendered.contains("DHCP=yes"));
@@ -2765,11 +2894,17 @@ mod extra_unimplemented_tests {
         assert!(supervisor.register_service("dbus").is_ok());
         assert!(supervisor.start_service("dbus", 1001).is_ok());
 
-        assert_eq!(supervisor.services[0].as_ref().unwrap().status, RunitServiceStatus::Up);
+        assert_eq!(
+            supervisor.services[0].as_ref().unwrap().status,
+            RunitServiceStatus::Up
+        );
         assert_eq!(supervisor.services[0].as_ref().unwrap().pid, 1001);
 
         assert!(supervisor.stop_service("dbus").is_ok());
-        assert_eq!(supervisor.services[0].as_ref().unwrap().status, RunitServiceStatus::Down);
+        assert_eq!(
+            supervisor.services[0].as_ref().unwrap().status,
+            RunitServiceStatus::Down
+        );
     }
 
     #[test]
@@ -2837,7 +2972,6 @@ mod extra_unimplemented_tests {
         assert_eq!(nix.active_generation, 2);
     }
 
-
     #[test]
     fn test_antix_low_ram_sysvinit_governor() {
         let mut gov = AntiXLowRamSysVInitGovernor::new(256);
@@ -2884,10 +3018,14 @@ mod extra_unimplemented_tests {
         };
         engine.register_translator(translator);
 
-        let best = engine.find_best_translator("image/x-raw", "image/png").unwrap();
+        let best = engine
+            .find_best_translator("image/x-raw", "image/png")
+            .unwrap();
         assert_eq!(best.name, "PNG-Translator");
 
-        let translated = engine.translate_stream("image/x-raw", "image/png", b"RAWPIXELS").unwrap();
+        let translated = engine
+            .translate_stream("image/x-raw", "image/png", b"RAWPIXELS")
+            .unwrap();
         assert!(translated.starts_with(b"PNG-Translator:RAWPIXELS"));
     }
 
@@ -2919,7 +3057,10 @@ mod extra_unimplemented_tests {
             version: "5.2.21".to_string(),
             arch: "x86_64".to_string(),
             build: "1".to_string(),
-            installed_files: vec!["/bin/bash".to_string(), "/usr/share/man/man1/bash.1".to_string()],
+            installed_files: vec![
+                "/bin/bash".to_string(),
+                "/usr/share/man/man1/bash.1".to_string(),
+            ],
             post_install_script: Some("install-info /usr/share/info/bash.info".to_string()),
         };
         let log_path = pkgtool.install_pkg(pkg).unwrap();
@@ -2984,10 +3125,20 @@ mod extra_unimplemented_tests {
     #[test]
     fn test_android_apex_container_module_engine() {
         let mut engine = AndroidApexContainerModuleEngine::new();
-        assert!(engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
-        assert!(!engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+        assert!(engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
+        assert!(!engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
 
-        assert!(engine.activate_module("com.android.runtime", 330000000).is_ok());
+        assert!(engine
+            .activate_module("com.android.runtime", 330000000)
+            .is_ok());
         assert_eq!(engine.active_mounts, 1);
 
         let version = engine.rollback_module("com.android.runtime").unwrap();
@@ -3026,5 +3177,4 @@ mod extra_unimplemented_tests {
         assert_eq!(hub.distros.len(), 2);
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
     }
-
 }

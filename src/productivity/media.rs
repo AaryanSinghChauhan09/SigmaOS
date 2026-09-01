@@ -119,7 +119,6 @@ impl SigmaMediaEngine {
 
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
 
-
 pub struct AudioTrack {
     pub name: String,
     pub format: MediaFormat,

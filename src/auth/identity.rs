@@ -3,17 +3,26 @@ extern crate alloc;
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543
 /// Implements decentralized identity and DID support
-
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type IdentityID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IdentityType { User = 0, Service = 1, Device = 2, Organization = 3 }
+pub enum IdentityType {
+    User = 0,
+    Service = 1,
+    Device = 2,
+    Organization = 3,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IdentityError { Success = 0, NotFound = 1, InvalidDID = 2, VerificationFailed = 3 }
+pub enum IdentityError {
+    Success = 0,
+    NotFound = 1,
+    InvalidDID = 2,
+    VerificationFailed = 3,
+}
 
 pub trait DigitalIdentity {
     fn id(&self) -> IdentityID;
@@ -55,7 +64,9 @@ impl SimpleDigitalIdentity {
 }
 
 impl DigitalIdentity for SimpleDigitalIdentity {
-    fn id(&self) -> IdentityID { self.id }
+    fn id(&self) -> IdentityID {
+        self.id
+    }
     fn did(&self) -> &[u8] {
         // Bolt ⚡ Optimization: O(1) constant-time slice access using pre-calculated did_len
         // instead of an O(N) zero-byte linear position scan across 128 bytes.
@@ -76,7 +87,10 @@ impl DigitalIdentity for SimpleDigitalIdentity {
 }
 
 pub trait IdentityManager {
-    fn register_identity(&mut self, identity: Box<dyn DigitalIdentity>) -> Result<IdentityID, IdentityError>;
+    fn register_identity(
+        &mut self,
+        identity: Box<dyn DigitalIdentity>,
+    ) -> Result<IdentityID, IdentityError>;
     fn resolve_did(&self, did: &[u8]) -> Option<IdentityID>;
     fn get_identity(&self, id: IdentityID) -> Option<&dyn DigitalIdentity>;
 }
@@ -146,7 +160,10 @@ mod tests {
 }
 
 impl IdentityManager for SimpleIdentityManager {
-    fn register_identity(&mut self, identity: Box<dyn DigitalIdentity>) -> Result<IdentityID, IdentityError> {
+    fn register_identity(
+        &mut self,
+        identity: Box<dyn DigitalIdentity>,
+    ) -> Result<IdentityID, IdentityError> {
         let id = identity.id();
         self.identities.push(Some(identity));
         Ok(id)
@@ -166,7 +183,9 @@ impl IdentityManager for SimpleIdentityManager {
     fn get_identity(&self, id: IdentityID) -> Option<&dyn DigitalIdentity> {
         for identity_option in &self.identities {
             if let Some(ref identity) = *identity_option {
-                if identity.id() == id { return Some(identity.as_ref()); }
+                if identity.id() == id {
+                    return Some(identity.as_ref());
+                }
             }
         }
         None
@@ -174,7 +193,12 @@ impl IdentityManager for SimpleIdentityManager {
 }
 
 pub trait CredentialManager {
-    fn issue_credential(&mut self, issuer_id: IdentityID, subject_id: IdentityID, credential: &[u8]) -> Result<(), IdentityError>;
+    fn issue_credential(
+        &mut self,
+        issuer_id: IdentityID,
+        subject_id: IdentityID,
+        credential: &[u8],
+    ) -> Result<(), IdentityError>;
     fn verify_credential(&self, credential: &[u8]) -> Result<bool, IdentityError>;
     fn revoke_credential(&mut self, credential_id: usize) -> Result<(), IdentityError>;
 }
@@ -195,13 +219,19 @@ impl SimpleCredentialManager {
 }
 
 impl CredentialManager for SimpleCredentialManager {
-    fn issue_credential(&mut self, issuer_id: IdentityID, subject_id: IdentityID, credential: &[u8]) -> Result<(), IdentityError> {
+    fn issue_credential(
+        &mut self,
+        issuer_id: IdentityID,
+        subject_id: IdentityID,
+        credential: &[u8],
+    ) -> Result<(), IdentityError> {
         let mut credential_array = [0u8; 256];
         let credential_len = credential.len().min(255);
         for i in 0..credential_len {
             credential_array[i] = credential[i];
         }
-        self.credentials.push((issuer_id, subject_id, credential_array));
+        self.credentials
+            .push((issuer_id, subject_id, credential_array));
         Ok(())
     }
 
@@ -221,7 +251,11 @@ impl CredentialManager for SimpleCredentialManager {
 
 pub trait DecentralizedAuth {
     fn authenticate(&self, did: &[u8], proof: &[u8]) -> Result<IdentityID, IdentityError>;
-    fn create_proof(&self, identity_id: IdentityID, challenge: &[u8]) -> Result<Vec<u8>, IdentityError>;
+    fn create_proof(
+        &self,
+        identity_id: IdentityID,
+        challenge: &[u8],
+    ) -> Result<Vec<u8>, IdentityError>;
 }
 
 #[repr(C)]
@@ -244,7 +278,11 @@ impl DecentralizedAuth for SimpleDecentralizedAuth {
         }
     }
 
-    fn create_proof(&self, identity_id: IdentityID, _challenge: &[u8]) -> Result<Vec<u8>, IdentityError> {
+    fn create_proof(
+        &self,
+        identity_id: IdentityID,
+        _challenge: &[u8],
+    ) -> Result<Vec<u8>, IdentityError> {
         if self.identity_manager.get_identity(identity_id).is_some() {
             let mut proof = Vec::new();
             proof.push(0x01);

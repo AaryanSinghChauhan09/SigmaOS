@@ -5,7 +5,6 @@
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};

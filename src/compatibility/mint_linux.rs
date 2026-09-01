@@ -360,8 +360,16 @@ impl CinnamonThemeEngine {
                 theme.as_mut_ptr(),
                 default_name.len(),
             );
-            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
-            core::ptr::copy_nonoverlapping(default_icons.as_ptr(), icon_theme.as_mut_ptr(), default_icons.len());
+            core::ptr::copy_nonoverlapping(
+                default_name.as_ptr(),
+                theme.as_mut_ptr(),
+                default_name.len(),
+            );
+            core::ptr::copy_nonoverlapping(
+                default_icons.as_ptr(),
+                icon_theme.as_mut_ptr(),
+                default_icons.len(),
+            );
         }
         Self {
             active_gtk_theme: theme,
@@ -661,10 +669,10 @@ pub enum LoopbackDiskFormat {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowsBootloaderType {
-    Ntldr,          // Windows XP / Server 2003
-    BcdBootmgr,     // Windows Vista / 7 / 8 / 10 / 11
-    Grub4Dos,       // Legacy MBR chainloader
-    UefiEfiEntry,   // UEFI NVRAM Boot Entry
+    Ntldr,        // Windows XP / Server 2003
+    BcdBootmgr,   // Windows Vista / 7 / 8 / 10 / 11
+    Grub4Dos,     // Legacy MBR chainloader
+    UefiEfiEntry, // UEFI NVRAM Boot Entry
 }
 
 #[derive(Debug, Clone)]
@@ -673,8 +681,8 @@ pub struct Mint4WinInstallationConfig {
     pub target_folder: String,     // e.g. "C:\mint4win"
     pub disk_format: LoopbackDiskFormat,
     pub bootloader_type: WindowsBootloaderType,
-    pub root_disk_size_mb: u64,    // e.g. 32768 MB (32 GB)
-    pub swap_file_size_mb: u64,    // e.g. 4096 MB (4 GB)
+    pub root_disk_size_mb: u64, // e.g. 32768 MB (32 GB)
+    pub swap_file_size_mb: u64, // e.g. 4096 MB (4 GB)
     pub default_username: String,
     pub host_os_version: String,
 }
@@ -722,9 +730,7 @@ impl Mint4WinInstallerEngine {
         self.loopback_root_vhd_created = true;
         Ok(format!(
             "Successfully allocated {} MB loopback root disk and {} MB swap file at {}",
-            self.config.root_disk_size_mb,
-            self.config.swap_file_size_mb,
-            self.config.target_folder
+            self.config.root_disk_size_mb, self.config.swap_file_size_mb, self.config.target_folder
         ))
     }
 

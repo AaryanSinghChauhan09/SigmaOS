@@ -73,7 +73,12 @@ impl ABITranslator {
     }
 
     /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
-    pub fn translate_syscall_abi(&self, os_abi: &str, syscall_nr: u32, args: &[u64]) -> SyscallAbiMapping {
+    pub fn translate_syscall_abi(
+        &self,
+        os_abi: &str,
+        syscall_nr: u32,
+        args: &[u64],
+    ) -> SyscallAbiMapping {
         let arg_regs = match conv_for_os_abi(os_abi) {
             _ => vec!["RDI", "RSI", "RDX", "R10", "R8", "R9"],
         };
@@ -93,7 +98,12 @@ impl ABITranslator {
         }
     }
 
-    pub fn construct_signal_frame_context(&self, signal_nr: i32, fault_addr: u64, ip: u64) -> SignalFrameContext {
+    pub fn construct_signal_frame_context(
+        &self,
+        signal_nr: i32,
+        fault_addr: u64,
+        ip: u64,
+    ) -> SignalFrameContext {
         SignalFrameContext {
             signal_nr,
             fault_addr,

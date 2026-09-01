@@ -55,7 +55,9 @@ impl Deref for PathBuf {
 
 impl From<&str> for PathBuf {
     fn from(s: &str) -> Self {
-        PathBuf { inner: String::from(s) }
+        PathBuf {
+            inner: String::from(s),
+        }
     }
 }
 

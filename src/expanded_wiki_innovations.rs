@@ -9,8 +9,6 @@ extern crate alloc;
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-
-
 use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -35,14 +33,20 @@ impl FedoraToolboxContainerEngine {
 
     pub fn enter_container(&mut self) -> Result<String, &'static str> {
         self.active = true;
-        Ok(format!("Entered Fedora Toolbox container: {}", self.container_name))
+        Ok(format!(
+            "Entered Fedora Toolbox container: {}",
+            self.container_name
+        ))
     }
 
     pub fn run_command(&self, cmd: &str) -> Result<String, &'static str> {
         if !self.active {
             return Err("Container not active");
         }
-        Ok(format!("[Toolbox:{}] Executed: {}", self.container_name, cmd))
+        Ok(format!(
+            "[Toolbox:{}] Executed: {}",
+            self.container_name, cmd
+        ))
     }
 }
 
@@ -65,7 +69,11 @@ impl NixHomeManagerEnvironment {
     }
 
     pub fn switch_user_environment(&self) -> String {
-        format!("Home-Manager applied {} packages for user {}", self.packages.len(), self.username)
+        format!(
+            "Home-Manager applied {} packages for user {}",
+            self.packages.len(),
+            self.username
+        )
     }
 }
 
@@ -76,16 +84,22 @@ pub struct MiseUniversalVersionManager {
 
 impl MiseUniversalVersionManager {
     pub fn new() -> Self {
-        Self { runtimes: Vec::new() }
+        Self {
+            runtimes: Vec::new(),
+        }
     }
 
     pub fn set_version(&mut self, runtime: &str, version: &str) {
         self.runtimes.retain(|(r, _)| r != runtime);
-        self.runtimes.push((runtime.to_string(), version.to_string()));
+        self.runtimes
+            .push((runtime.to_string(), version.to_string()));
     }
 
     pub fn get_version(&self, runtime: &str) -> Option<String> {
-        self.runtimes.iter().find(|(r, _)| r == runtime).map(|(_, v)| v.clone())
+        self.runtimes
+            .iter()
+            .find(|(r, _)| r == runtime)
+            .map(|(_, v)| v.clone())
     }
 }
 
@@ -108,7 +122,11 @@ impl DevenvReproducibleEnvironment {
     }
 
     pub fn up(&self) -> String {
-        format!("Devenv environment '{}' started with {} services", self.env_name, self.services.len())
+        format!(
+            "Devenv environment '{}' started with {} services",
+            self.env_name,
+            self.services.len()
+        )
     }
 }
 
@@ -155,7 +173,10 @@ impl UbuntuProLivepatchEngine {
             return Err("Invalid patch ID");
         }
         self.patches_applied += 1;
-        Ok(format!("Livepatch {} applied to kernel {}", patch_id, self.kernel_version))
+        Ok(format!(
+            "Livepatch {} applied to kernel {}",
+            patch_id, self.kernel_version
+        ))
     }
 }
 
@@ -174,7 +195,10 @@ impl FlatpakSdkContainerBuilder {
     }
 
     pub fn build_bundle(&self) -> String {
-        format!("Flatpak bundle {} built with SDK {}", self.app_id, self.sdk_version)
+        format!(
+            "Flatpak bundle {} built with SDK {}",
+            self.app_id, self.sdk_version
+        )
     }
 }
 
@@ -220,7 +244,8 @@ impl AlpineVoidTriggerHookManager {
     }
 
     pub fn register_trigger(&mut self, pattern: &str, hook_cmd: &str) {
-        self.registered_triggers.push((pattern.to_string(), hook_cmd.to_string()));
+        self.registered_triggers
+            .push((pattern.to_string(), hook_cmd.to_string()));
     }
 
     pub fn execute_triggers_for_package(&self, pkg_name: &str) -> Vec<String> {
@@ -276,7 +301,9 @@ pub struct DragonFlyVarsymsPfsResolver {
 
 impl DragonFlyVarsymsPfsResolver {
     pub fn new() -> Self {
-        let mut resolver = Self { varsyms: Vec::new() };
+        let mut resolver = Self {
+            varsyms: Vec::new(),
+        };
         resolver.set_varsym("MACHINE", "x86_64");
         resolver.set_varsym("SYS", "SigmaOS");
         resolver
@@ -324,7 +351,8 @@ impl OpenBsdSecuritySandboxWikiEngine {
     }
 
     pub fn unveil(&mut self, path: &str, perms: &str) {
-        self.unveiled_paths.push((path.to_string(), perms.to_string()));
+        self.unveiled_paths
+            .push((path.to_string(), perms.to_string()));
     }
 
     pub fn generate_sandbox_summary(&self) -> String {
@@ -349,10 +377,16 @@ impl DistroWikiPageDocumentationGenerator {
     pub fn generate_linux_distros_architecture_wiki() -> String {
         let mut wiki = String::new();
         wiki.push_str("# Linux Distributions Architecture & Parity Guide\n\n");
-        wiki.push_str("SigmaOS integrates architectural concepts from premier Linux distributions:\n");
-        wiki.push_str("- **Arch Linux**: Rolling package release resolution and PKGBUILD recipes.\n");
+        wiki.push_str(
+            "SigmaOS integrates architectural concepts from premier Linux distributions:\n",
+        );
+        wiki.push_str(
+            "- **Arch Linux**: Rolling package release resolution and PKGBUILD recipes.\n",
+        );
         wiki.push_str("- **NixOS**: Declarative system generations and atomic rollback.\n");
-        wiki.push_str("- **Clear Linux**: Stateless `/usr` configuration defaults with `/etc` overrides.\n");
+        wiki.push_str(
+            "- **Clear Linux**: Stateless `/usr` configuration defaults with `/etc` overrides.\n",
+        );
         wiki.push_str("- **Gentoo**: Portage USE-flags dependency compilation.\n");
         wiki.push_str("- **Alpine / Void**: Lightweight trigger hooks and init supervision.\n");
         wiki
@@ -363,8 +397,12 @@ impl DistroWikiPageDocumentationGenerator {
         wiki.push_str("# BSD Security Hardening & Isolation Guide\n\n");
         wiki.push_str("SigmaOS incorporates security paradigms from BSD systems:\n");
         wiki.push_str("- **OpenBSD**: Pledge syscall restrictions, unveil file path masking, W^X, and Retguard canaries.\n");
-        wiki.push_str("- **FreeBSD**: RACCT/RCTL resource controls and Capsicum capability delegation.\n");
-        wiki.push_str("- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n");
+        wiki.push_str(
+            "- **FreeBSD**: RACCT/RCTL resource controls and Capsicum capability delegation.\n",
+        );
+        wiki.push_str(
+            "- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n",
+        );
         wiki
     }
 }
@@ -387,7 +425,10 @@ mod expanded_wiki_tests {
         let mut hm = NixHomeManagerEnvironment::new("developer");
         hm.add_user_package("neovim");
         hm.add_user_package("git");
-        assert_eq!(hm.switch_user_environment(), "Home-Manager applied 2 packages for user developer");
+        assert_eq!(
+            hm.switch_user_environment(),
+            "Home-Manager applied 2 packages for user developer"
+        );
     }
 
     #[test]
@@ -406,7 +447,10 @@ mod expanded_wiki_tests {
         devenv.add_service("postgres");
         devenv.add_service("redis");
 
-        assert_eq!(devenv.up(), "Devenv environment 'fullstack' started with 2 services");
+        assert_eq!(
+            devenv.up(),
+            "Devenv environment 'fullstack' started with 2 services"
+        );
     }
 
     #[test]
@@ -426,14 +470,23 @@ mod expanded_wiki_tests {
     #[test]
     fn test_flatpak_sdk_builder() {
         let builder = FlatpakSdkContainerBuilder::new("org.sigmaos.ZenithDesktop", "23.08");
-        assert_eq!(builder.build_bundle(), "Flatpak bundle org.sigmaos.ZenithDesktop built with SDK 23.08");
+        assert_eq!(
+            builder.build_bundle(),
+            "Flatpak bundle org.sigmaos.ZenithDesktop built with SDK 23.08"
+        );
     }
 
     #[test]
     fn test_clear_linux_stateless_overlay() {
         let engine = ClearLinuxStatelessOverlayEngine::new();
-        assert_eq!(engine.resolve_config_file("nginx/nginx.conf"), "/etc/nginx/nginx.conf");
-        assert_eq!(engine.fallback_factory_default("nginx/nginx.conf"), "/usr/share/defaults/nginx/nginx.conf");
+        assert_eq!(
+            engine.resolve_config_file("nginx/nginx.conf"),
+            "/etc/nginx/nginx.conf"
+        );
+        assert_eq!(
+            engine.fallback_factory_default("nginx/nginx.conf"),
+            "/usr/share/defaults/nginx/nginx.conf"
+        );
     }
 
     #[test]
@@ -476,12 +529,16 @@ mod expanded_wiki_tests {
         sandbox.unveil("/usr/lib", "r");
 
         let summary = sandbox.generate_sandbox_summary();
-        assert_eq!(summary, "Sandbox configured with 2 pledge promises and 1 unveiled paths");
+        assert_eq!(
+            summary,
+            "Sandbox configured with 2 pledge promises and 1 unveiled paths"
+        );
     }
 
     #[test]
     fn test_distro_wiki_page_documentation_generator() {
-        let linux_wiki = DistroWikiPageDocumentationGenerator::generate_linux_distros_architecture_wiki();
+        let linux_wiki =
+            DistroWikiPageDocumentationGenerator::generate_linux_distros_architecture_wiki();
         assert!(linux_wiki.contains("Arch Linux"));
         assert!(linux_wiki.contains("Clear Linux"));
 

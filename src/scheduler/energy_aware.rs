@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Energy-Aware Scheduler (EAS)
 // Predicts and balances task thread execution energy cost vs. thermal/battery constraints
 

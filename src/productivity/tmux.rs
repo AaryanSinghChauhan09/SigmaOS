@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Cutting-Edge Terminal Multiplexer (SigmaTmux Engine)
 // Implements robust OOP principles with custom split, zoom, broadcast, copy registers,
 // control mode (-C) protocol parsing, copy-mode scrollback search, pane synchronization,
@@ -391,10 +391,7 @@ impl TmuxControlModeParser {
                 TmuxControlEvent::WindowAdd { window_id, name }
             }
             "window-close" => {
-                let window_id = args
-                    .trim_start_matches('@')
-                    .parse::<usize>()
-                    .unwrap_or(0);
+                let window_id = args.trim_start_matches('@').parse::<usize>().unwrap_or(0);
                 TmuxControlEvent::WindowClose { window_id }
             }
             "layout-change" => {
@@ -436,7 +433,9 @@ impl TmuxSession {
             active_window_idx: 0,
             copy_registers: HashMap::new(),
             is_attached: true,
-            status_format: String::from("[#{session_name}] #{window_name}* | #{cpu_usage} #{mem_usage}"),
+            status_format: String::from(
+                "[#{session_name}] #{window_name}* | #{cpu_usage} #{mem_usage}",
+            ),
         }
     }
 
@@ -620,10 +619,7 @@ impl TmuxSession {
 
         status = status.replace("#{session_name}", &self.name);
         status = status.replace("#{window_name}", &active_win.name);
-        status = status.replace(
-            "#{active_pane}",
-            &format!("{}", active_win.active_pane_idx),
-        );
+        status = status.replace("#{active_pane}", &format!("{}", active_win.active_pane_idx));
         status = status.replace("#{cpu_usage}", "CPU: 1.2%");
         status = status.replace("#{mem_usage}", "MEM: 12%");
         status = status.replace("#{hostname}", "sigmaos-host");
@@ -772,14 +768,8 @@ mod tests {
         assert!(window.sync_panes_enabled);
 
         window.send_input_to_active("uptime");
-        assert_eq!(
-            window.panes[0].current_command.as_deref(),
-            Some("uptime")
-        );
-        assert_eq!(
-            window.panes[1].current_command.as_deref(),
-            Some("uptime")
-        );
+        assert_eq!(window.panes[0].current_command.as_deref(), Some("uptime"));
+        assert_eq!(window.panes[1].current_command.as_deref(), Some("uptime"));
 
         // Copy mode search
         let search_results = window.panes[0].search_copy_mode("Output");

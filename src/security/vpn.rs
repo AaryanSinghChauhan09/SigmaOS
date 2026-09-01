@@ -15,11 +15,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::boxed::Box;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Secure VPN Client
 // OOP-based VPN with WireGuard, OpenVPN, and Private Internet Access (PIA) support
@@ -28,7 +28,9 @@ use alloc::format;
 pub type PathBuf = alloc::string::String;
 pub type IpAddr = u32;
 #[allow(non_snake_case)]
-pub fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 { ((a as u32) << 24) | ((b as u32) << 16) | ((c as u32) << 8) | d as u32 }
+pub fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 {
+    ((a as u32) << 24) | ((b as u32) << 16) | ((c as u32) << 8) | d as u32
+}
 
 /// VPN protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -301,7 +303,13 @@ pub struct PiaServerRegion {
 }
 
 impl PiaServerRegion {
-    pub fn new(id: &str, name: &str, country_code: &str, ip_address: IpAddr, ping_latency_ms: u32) -> Self {
+    pub fn new(
+        id: &str,
+        name: &str,
+        country_code: &str,
+        ip_address: IpAddr,
+        ping_latency_ms: u32,
+    ) -> Self {
         Self {
             id: id.to_string(),
             name: name.to_string(),
@@ -335,7 +343,10 @@ impl PiaPortForwardingEngine {
         }
     }
 
-    pub fn request_port_forwarding_lease(&mut self, current_time_sec: u64) -> Result<u16, VpnError> {
+    pub fn request_port_forwarding_lease(
+        &mut self,
+        current_time_sec: u64,
+    ) -> Result<u16, VpnError> {
         let port = 45000 + ((current_time_sec % 1000) as u16);
         self.enabled = true;
         self.forwarded_port = Some(port);
@@ -390,9 +401,9 @@ impl PiaMaceAdBlocker {
 /// PIA Split Tunneling Rule
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SplitTunnelRule {
-    BypassVpnApp(String),       // Application binary bypasses VPN
-    OnlyVpnApp(String),         // Only application uses VPN
-    BypassSubnet(IpAddr, u8),   // CIDR Subnet bypasses VPN
+    BypassVpnApp(String),     // Application binary bypasses VPN
+    OnlyVpnApp(String),       // Only application uses VPN
+    BypassSubnet(IpAddr, u8), // CIDR Subnet bypasses VPN
 }
 
 /// PIA Split Tunnel Governor
@@ -423,7 +434,11 @@ impl PiaSplitTunnelGovernor {
             match rule {
                 SplitTunnelRule::BypassVpnApp(app) if app == app_name => return true,
                 SplitTunnelRule::BypassSubnet(net_ip, prefix) => {
-                    let mask = if *prefix == 0 { 0 } else { !0u32 << (32 - prefix) };
+                    let mask = if *prefix == 0 {
+                        0
+                    } else {
+                        !0u32 << (32 - prefix)
+                    };
                     if (destination_ip & mask) == (net_ip & mask) {
                         return true;
                     }
@@ -544,12 +559,48 @@ impl PiaVpnManager {
     /// Populate standard PIA server regions with sample latencies
     pub fn populate_default_regions(&mut self) {
         self.regions = vec![
-            PiaServerRegion::new("us-east", "US East", "US", Ipv4Addr_new(209, 222, 18, 222), 22),
-            PiaServerRegion::new("us-west", "US West", "US", Ipv4Addr_new(209, 222, 18, 223), 45),
-            PiaServerRegion::new("nl-amsterdam", "Netherlands", "NL", Ipv4Addr_new(109, 201, 152, 12), 85),
-            PiaServerRegion::new("uk-london", "UK London", "GB", Ipv4Addr_new(185, 230, 125, 4), 92),
-            PiaServerRegion::new("de-frankfurt", "Germany", "DE", Ipv4Addr_new(185, 230, 126, 8), 78),
-            PiaServerRegion::new("jp-tokyo", "Japan", "JP", Ipv4Addr_new(154, 16, 170, 2), 160),
+            PiaServerRegion::new(
+                "us-east",
+                "US East",
+                "US",
+                Ipv4Addr_new(209, 222, 18, 222),
+                22,
+            ),
+            PiaServerRegion::new(
+                "us-west",
+                "US West",
+                "US",
+                Ipv4Addr_new(209, 222, 18, 223),
+                45,
+            ),
+            PiaServerRegion::new(
+                "nl-amsterdam",
+                "Netherlands",
+                "NL",
+                Ipv4Addr_new(109, 201, 152, 12),
+                85,
+            ),
+            PiaServerRegion::new(
+                "uk-london",
+                "UK London",
+                "GB",
+                Ipv4Addr_new(185, 230, 125, 4),
+                92,
+            ),
+            PiaServerRegion::new(
+                "de-frankfurt",
+                "Germany",
+                "DE",
+                Ipv4Addr_new(185, 230, 126, 8),
+                78,
+            ),
+            PiaServerRegion::new(
+                "jp-tokyo",
+                "Japan",
+                "JP",
+                Ipv4Addr_new(154, 16, 170, 2),
+                160,
+            ),
         ];
     }
 
@@ -568,7 +619,9 @@ impl PiaVpnManager {
     /// Authenticate via API token
     pub fn authenticate(&mut self, password_or_token: &str) -> Result<(), VpnError> {
         if password_or_token.is_empty() {
-            return Err(VpnError::AuthenticationFailed("Empty PIA token".to_string()));
+            return Err(VpnError::AuthenticationFailed(
+                "Empty PIA token".to_string(),
+            ));
         }
         self.auth_token = Some(format!("pia_tok_{}", password_or_token));
         Ok(())
@@ -577,12 +630,16 @@ impl PiaVpnManager {
     /// Connect to active or optimal PIA region
     pub fn connect(&mut self, current_time_sec: u64) -> Result<VpnConnectionResult, VpnError> {
         if self.auth_token.is_none() {
-            return Err(VpnError::AuthenticationFailed("PIA User Not Authenticated".to_string()));
+            return Err(VpnError::AuthenticationFailed(
+                "PIA User Not Authenticated".to_string(),
+            ));
         }
 
         if self.active_region.is_none() {
             if self.select_optimal_region().is_none() {
-                return Err(VpnError::ConfigurationError("No PIA regions available".to_string()));
+                return Err(VpnError::ConfigurationError(
+                    "No PIA regions available".to_string(),
+                ));
             }
         }
 
@@ -590,7 +647,9 @@ impl PiaVpnManager {
         let region = self.active_region.as_ref().unwrap().clone();
 
         if self.port_forwarding.enabled {
-            let _ = self.port_forwarding.request_port_forwarding_lease(current_time_sec);
+            let _ = self
+                .port_forwarding
+                .request_port_forwarding_lease(current_time_sec);
         }
 
         self.state = ConnectionState::Connected;
@@ -843,7 +902,10 @@ mod tests {
     fn test_pia_split_tunneling_and_multihop() {
         let mut split = PiaSplitTunnelGovernor::new();
         split.add_rule(SplitTunnelRule::BypassVpnApp("firefox".to_string()));
-        split.add_rule(SplitTunnelRule::BypassSubnet(Ipv4Addr_new(192, 168, 1, 0), 24));
+        split.add_rule(SplitTunnelRule::BypassSubnet(
+            Ipv4Addr_new(192, 168, 1, 0),
+            24,
+        ));
 
         assert!(split.should_bypass_vpn("firefox", Ipv4Addr_new(1, 1, 1, 1)));
         assert!(split.should_bypass_vpn("curl", Ipv4Addr_new(192, 168, 1, 50)));

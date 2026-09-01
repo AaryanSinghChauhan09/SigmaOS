@@ -2,12 +2,11 @@ extern crate alloc;
 // OOP-based AI Agent Framework for SigmaOS
 // Implements AI agent using OOP principles with traits and structs.
 
-
+use crate::klib::BTreeMap;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type

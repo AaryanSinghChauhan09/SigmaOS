@@ -16,11 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::format;
-
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;

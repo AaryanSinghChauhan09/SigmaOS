@@ -4,8 +4,6 @@ use alloc::vec;
 // Advanced window management, multi-monitor support, gesture control, AI suggestions
 // Implements missing desktop features from 100-Improvement-Ideas.md
 
-
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
@@ -634,7 +632,12 @@ impl ZenithWindowRuleEngine {
         self.rules.push(rule);
     }
 
-    pub fn match_window(&self, app_id: &str, title: &str, window_class: &str) -> Vec<WindowRuleAction> {
+    pub fn match_window(
+        &self,
+        app_id: &str,
+        title: &str,
+        window_class: &str,
+    ) -> Vec<WindowRuleAction> {
         let mut matched_actions = Vec::new();
         for rule in &self.rules {
             let mut app_match = true;
@@ -683,17 +686,22 @@ pub struct ZenithScratchpadManager {
 
 impl ZenithScratchpadManager {
     pub fn new() -> Self {
-        Self { windows: BTreeMap::new() }
+        Self {
+            windows: BTreeMap::new(),
+        }
     }
 
     pub fn register_scratchpad(&mut self, app_id: String, window_id: u64, width: u32, height: u32) {
-        self.windows.insert(app_id.clone(), ScratchpadWindow {
-            window_id,
-            app_id,
-            visible: false,
-            preferred_width: width,
-            preferred_height: height,
-        });
+        self.windows.insert(
+            app_id.clone(),
+            ScratchpadWindow {
+                window_id,
+                app_id,
+                visible: false,
+                preferred_width: width,
+                preferred_height: height,
+            },
+        );
     }
 
     pub fn toggle_scratchpad(&mut self, app_id: &str) -> Option<bool> {
@@ -737,14 +745,17 @@ pub struct ZenithActivityManager {
 impl ZenithActivityManager {
     pub fn new() -> Self {
         let mut activities = BTreeMap::new();
-        activities.insert("default".to_string(), DesktopActivity {
-            id: "default".to_string(),
-            name: "General Workspace".to_string(),
-            icon: "desktop".to_string(),
-            wallpaper_path: "/usr/share/backgrounds/sigma_default.png".to_string(),
-            default_workspaces: vec![0, 1, 2],
-            active: true,
-        });
+        activities.insert(
+            "default".to_string(),
+            DesktopActivity {
+                id: "default".to_string(),
+                name: "General Workspace".to_string(),
+                icon: "desktop".to_string(),
+                wallpaper_path: "/usr/share/backgrounds/sigma_default.png".to_string(),
+                default_workspaces: vec![0, 1, 2],
+                active: true,
+            },
+        );
 
         Self {
             activities,
@@ -992,7 +1003,10 @@ mod tests {
         });
 
         assert!(activity_mgr.switch_activity("coding").is_ok());
-        assert_eq!(activity_mgr.get_current_activity().unwrap().name, "Development Activity");
+        assert_eq!(
+            activity_mgr.get_current_activity().unwrap().name,
+            "Development Activity"
+        );
 
         let sec_guard = ZenithDesktopSecurityGuard::new();
         assert!(!sec_guard.should_lock_session(100));

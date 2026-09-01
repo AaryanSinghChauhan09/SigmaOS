@@ -1,12 +1,11 @@
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 extern crate alloc;
 // SigmaOS Disk Defragmenter (SigmaDefrag Engine)
 // Fully absorbs and implements all features, systems, and philosophies of Defraggler & Windows Defrag:
 // File fragmentation analysis, contiguous cluster relocation, free space consolidation,
 // S.M.A.R.T. thermal validation, and an interactive colored-block cluster map representation.
-
 
 use alloc::collections::BTreeMap;
 

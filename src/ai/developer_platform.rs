@@ -4,7 +4,6 @@
 //! privacy prompt redaction, default-deny network policy, and OpenShell sandboxing.
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

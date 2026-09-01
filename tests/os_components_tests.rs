@@ -6,98 +6,123 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/storage/geom.rs"]
-mod geom;
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
-#[path = "../src/graphics/video_editor.rs"]
-mod video_editor;
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
+#[path = "../src/storage/geom.rs"]
+mod geom;
+#[path = "../src/ipc/pipes.rs"]
+mod pipes;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/graphics/video_editor.rs"]
+mod video_editor;
 #[path = "../src/distro"]
 pub mod distro {
+    pub mod linux_bsd_inspirations;
     pub mod sovereign_distro_dominance;
     pub mod universal_distro_super_matrix;
-    pub mod linux_bsd_inspirations;
 }
 use distro::linux_bsd_inspirations as distro_inspirations;
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
-#[path = "../src/distro/endeavour_os.rs"]
-mod endeavour_os;
-#[path = "../src/compatibility/fedora.rs"]
-mod fedora_compat;
-#[path = "../src/scheduler/scheduler.rs"]
-mod task_scheduler;
+#[path = "../src/access/control.rs"]
+mod access_control;
 #[path = "../src/ipc/alpc.rs"]
 mod alpc;
 #[path = "../src/memory/bitmap_pmm.rs"]
 mod bitmap_pmm;
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-#[path = "../src/access/control.rs"]
-mod access_control;
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
+#[path = "../src/compatibility/cachy_os.rs"]
+mod cachy_os;
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-#[path = "../src/system/user.rs"]
-mod system_user;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-#[path = "../src/security/mod.rs"]
-pub mod security;
-#[path = "../src/package/universal.rs"]
-pub mod package;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
+#[path = "../src/loader/elf/relocation.rs"]
+mod elf_relocation;
+#[path = "../src/distro/endeavour_os.rs"]
+mod endeavour_os;
+#[path = "../src/event/epoll.rs"]
+mod epoll;
+#[path = "../src/filesystem/ext4_ntfs_security.rs"]
+mod ext4_ntfs_security;
+#[path = "../src/compatibility/fedora.rs"]
+mod fedora_compat;
+#[path = "../src/memory/low_level.rs"]
+mod low_level_memory;
+#[path = "../src/package/universal.rs"]
+pub mod package;
+#[path = "../src/process/activity_manager.rs"]
+mod process_activity_manager;
+#[path = "../src/security/mod.rs"]
+pub mod security;
+#[path = "../src/memory/segmentation_paging.rs"]
+mod segmentation_paging;
+#[path = "../src/filesystem/sigma_fs.rs"]
+mod sigma_fs_extended;
+#[path = "../src/tools/sigmatools.rs"]
+mod sigmatools;
+#[path = "../src/sigpkg/mod.rs"]
+mod sigpkg;
+#[path = "../src/dashboard/statutory_compliance.rs"]
+mod statutory_compliance;
+#[path = "../src/system/user.rs"]
+mod system_user;
+#[path = "../src/scheduler/scheduler.rs"]
+mod task_scheduler;
 
-use pipes::Pipe;
-use unveil::{UnveilManager, UnveilPermission};
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use chimera_linux::{ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager};
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use task_scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType};
+use access_control::{
+    AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
+    MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
+};
 use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use low_level_memory::{posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator};
-use access_control::{AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate};
-use statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use community_toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use system_user::UserManager;
-use sigmatools::*;
-use segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use process_activity_manager::{ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot};
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
+    SyscallTableRouter,
+};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
+use community_toolkit::{
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
+    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+};
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use fedora_compat::DnfPackageResolver;
+use geom::{BioRequest, GeomProvider, GeomTopology};
+use low_level_memory::{
+    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
+use pipes::Pipe;
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
+use segmentation_paging::{
+    AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode,
+    ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
+    SegmentationPagingEngine, SpaceProtectionFlags,
+};
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use sigmatools::*;
+use statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
+    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use system_user::UserManager;
+use task_scheduler::{
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
+use unveil::{UnveilManager, UnveilPermission};
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {

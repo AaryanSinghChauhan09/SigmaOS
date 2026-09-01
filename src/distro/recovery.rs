@@ -1,10 +1,10 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[cfg(target_os = "none")]
 use crate::klib::BTreeMap as HashMap;

@@ -4,8 +4,6 @@ use alloc::vec;
 // Linux/BSD distro-inspired process management
 // Handles process supervision, monitoring, and lifecycle management
 
-
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
@@ -75,7 +73,7 @@ impl ProcessSupervisor {
     pub fn add_process(&mut self, config: ProcessConfig) -> Result<(), SupervisorError> {
         let name = config.name.clone();
         self.processes.insert(name.clone(), config);
-        
+
         let status = ProcessStatus {
             pid: None,
             state: ProcessState::Stopped,
@@ -86,7 +84,7 @@ impl ProcessSupervisor {
             cpu_usage: 0.0,
         };
         self.process_status.insert(name, status);
-        
+
         Ok(())
     }
 
@@ -128,11 +126,11 @@ impl ProcessSupervisor {
     pub fn restart_process(&mut self, name: &str) -> Result<(), SupervisorError> {
         self.stop_process(name)?;
         self.start_process(name)?;
-        
+
         if let Some(status) = self.process_status.get_mut(name) {
             status.restart_count += 1;
         }
-        
+
         Ok(())
     }
 
@@ -148,7 +146,8 @@ impl ProcessSupervisor {
 
     /// Get running processes
     pub fn get_running_processes(&self) -> Vec<String> {
-        self.process_status.iter()
+        self.process_status
+            .iter()
             .filter(|(_, status)| status.state == ProcessState::Running)
             .map(|(name, _)| name.clone())
             .collect()
@@ -170,7 +169,12 @@ impl ProcessSupervisor {
     }
 
     /// Update process statistics
-    pub fn update_process_stats(&mut self, name: &str, memory: u64, cpu: f32) -> Result<(), SupervisorError> {
+    pub fn update_process_stats(
+        &mut self,
+        name: &str,
+        memory: u64,
+        cpu: f32,
+    ) -> Result<(), SupervisorError> {
         if let Some(status) = self.process_status.get_mut(name) {
             status.memory_usage = memory;
             status.cpu_usage = cpu;
@@ -256,7 +260,7 @@ mod tests {
     fn test_process_supervisor() {
         let mut supervisor = ProcessSupervisor::new("/etc/supervisor", "/var/run/supervisor");
         supervisor.initialize().unwrap();
-        
+
         assert!(supervisor.create_default_processes().is_ok());
         assert_eq!(supervisor.processes.len(), 3);
     }
@@ -266,7 +270,7 @@ mod tests {
         let mut supervisor = ProcessSupervisor::new("/etc/supervisor", "/var/run/supervisor");
         supervisor.initialize().unwrap();
         supervisor.create_default_processes().unwrap();
-        
+
         assert!(supervisor.start_process("sshd").is_ok());
         assert!(supervisor.stop_process("sshd").is_ok());
         assert!(supervisor.restart_process("sshd").is_ok());
@@ -277,7 +281,7 @@ mod tests {
         let mut supervisor = ProcessSupervisor::new("/etc/supervisor", "/var/run/supervisor");
         supervisor.initialize().unwrap();
         supervisor.create_default_processes().unwrap();
-        
+
         supervisor.start_process("sshd").unwrap();
         let status = supervisor.get_process_status("sshd").unwrap();
         assert_eq!(status.state, ProcessState::Running);
@@ -288,10 +292,10 @@ mod tests {
         let mut supervisor = ProcessSupervisor::new("/etc/supervisor", "/var/run/supervisor");
         supervisor.initialize().unwrap();
         supervisor.create_default_processes().unwrap();
-        
+
         supervisor.start_process("sshd").unwrap();
         supervisor.start_process("cron").unwrap();
-        
+
         let running = supervisor.get_running_processes();
         assert_eq!(running.len(), 2);
     }

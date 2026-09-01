@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Tiny Core Linux Core Concepts Integration
 // Implements minimal footprint, frugal installs, RAM-copy booting, and .tcz loop-mount application extensions.
 // Ensures Tiny Core architecture is no longer a challenge to SigmaOS.

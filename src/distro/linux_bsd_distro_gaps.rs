@@ -162,9 +162,9 @@ impl UsbHidKeyboardDriver {
                     Some(num[(keycode - 0x1E) as usize])
                 }
             }
-            0x28 => Some(b'\n'), // Return
+            0x28 => Some(b'\n'),   // Return
             0x2A => Some(b'\x08'), // Backspace
-            0x2C => Some(b' '),  // Space
+            0x2C => Some(b' '),    // Space
             _ => None,
         }
     }
@@ -222,12 +222,24 @@ impl WirelessBluetoothStack {
 
     pub fn scan_wifi(&self) -> Vec<WifiAccessPoint> {
         vec![
-            WifiAccessPoint { ssid: "SigmaOS-Secure-5G", rssi_dbm: -45, security: WifiSecurity::Wpa3Sae },
-            WifiAccessPoint { ssid: "Guest-Wi-Fi", rssi_dbm: -65, security: WifiSecurity::Wpa2Psk },
+            WifiAccessPoint {
+                ssid: "SigmaOS-Secure-5G",
+                rssi_dbm: -45,
+                security: WifiSecurity::Wpa3Sae,
+            },
+            WifiAccessPoint {
+                ssid: "Guest-Wi-Fi",
+                rssi_dbm: -65,
+                security: WifiSecurity::Wpa2Psk,
+            },
         ]
     }
 
-    pub fn connect_wifi(&mut self, ssid: &'static str, _passphrase: &str) -> Result<(), &'static str> {
+    pub fn connect_wifi(
+        &mut self,
+        ssid: &'static str,
+        _passphrase: &str,
+    ) -> Result<(), &'static str> {
         self.connected_ssid = Some(ssid);
         Ok(())
     }
@@ -276,10 +288,16 @@ pub struct NetworkTcpUdpStack {
 
 impl NetworkTcpUdpStack {
     pub fn new() -> Self {
-        Self { tcp_sockets: Vec::new() }
+        Self {
+            tcp_sockets: Vec::new(),
+        }
     }
 
-    pub fn tcp_connect(&mut self, remote_ip: [u8; 4], remote_port: u16) -> Result<usize, &'static str> {
+    pub fn tcp_connect(
+        &mut self,
+        remote_ip: [u8; 4],
+        remote_port: u16,
+    ) -> Result<usize, &'static str> {
         let sock = TcpSocket {
             local_port: 49152 + (self.tcp_sockets.len() as u16),
             remote_ip,
@@ -292,7 +310,12 @@ impl NetworkTcpUdpStack {
         Ok(idx)
     }
 
-    pub fn send_udp_datagram(&self, _dest_ip: [u8; 4], _dest_port: u16, payload: &[u8]) -> Result<usize, &'static str> {
+    pub fn send_udp_datagram(
+        &self,
+        _dest_ip: [u8; 4],
+        _dest_port: u16,
+        payload: &[u8],
+    ) -> Result<usize, &'static str> {
         if payload.is_empty() {
             return Err("Empty UDP payload");
         }
@@ -335,7 +358,9 @@ pub struct SystemdInitManager {
 
 impl SystemdInitManager {
     pub fn new() -> Self {
-        let mut manager = Self { services: Vec::new() };
+        let mut manager = Self {
+            services: Vec::new(),
+        };
 
         manager.register_service(SystemdUnitService {
             name: "networkd.service",
@@ -368,7 +393,10 @@ impl SystemdInitManager {
     }
 
     pub fn get_active_services_count(&self) -> usize {
-        self.services.iter().filter(|s| s.state == ServiceState::Running).count()
+        self.services
+            .iter()
+            .filter(|s| s.state == ServiceState::Running)
+            .count()
     }
 }
 
@@ -471,7 +499,9 @@ mod tests {
         assert!(!aps.is_empty());
         assert_eq!(aps[0].ssid, "SigmaOS-Secure-5G");
 
-        assert!(stack.connect_wifi("SigmaOS-Secure-5G", "SecretWpa3Pass").is_ok());
+        assert!(stack
+            .connect_wifi("SigmaOS-Secure-5G", "SecretWpa3Pass")
+            .is_ok());
         assert_eq!(stack.connected_ssid, Some("SigmaOS-Secure-5G"));
 
         stack.pair_bluetooth_device("Headphones", "00:11:22:33:44:55");
@@ -484,7 +514,9 @@ mod tests {
         let sock_idx = stack.tcp_connect([192, 168, 1, 1], 80).unwrap();
         assert_eq!(stack.tcp_sockets[sock_idx].state, TcpState::Established);
 
-        let bytes_sent = stack.send_udp_datagram([192, 168, 1, 1], 53, b"DNS_QUERY").unwrap();
+        let bytes_sent = stack
+            .send_udp_datagram([192, 168, 1, 1], 53, b"DNS_QUERY")
+            .unwrap();
         assert_eq!(bytes_sent, 14 + 20 + 8 + 9);
     }
 

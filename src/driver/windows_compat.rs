@@ -8,7 +8,6 @@ extern crate alloc;
 // Windows Driver Compatibility, Emulation, and PE Loading Framework for SigmaOS
 // Implements WDM, WDF (KMDF/UMDF), NDIS, Storport, WDDM, and PE-grade .sys loading.
 
-
 use crate::driver::device::{
     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };

@@ -4,8 +4,6 @@ extern crate alloc;
 /// Step 1: Hybrid Linux Runtime Foundation (Container-First Architecture, eBPF Monitoring, POSIX Base Bridge)
 /// Step 2: Agentic OS Architecture (Context MMU, Local LLM System Daemons, OmniAutomator Studio APIs)
 /// Step 3: Zero-Trust & Sovereign Auditing (TPM 2.0 Key Vault, Ephemeral Agent Sandboxing, Tamper-Proof Action Audit Logs)
-
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -54,7 +52,10 @@ impl HybridContainerRuntime {
 
     /// Boots directly into a container environment without traditional Linux OS bloat.
     pub fn boot_container(&mut self, image: &str, engine: ContainerEngineType) -> String {
-        let id = format!("ctr_{:x}", image.len() * 31 + self.boot_containers.len() * 101);
+        let id = format!(
+            "ctr_{:x}",
+            image.len() * 31 + self.boot_containers.len() * 101
+        );
         self.boot_containers.push(BootContainer {
             container_id: id.clone(),
             image_name: image.to_string(),
@@ -75,7 +76,9 @@ impl HybridContainerRuntime {
 
     /// Bridges native POSIX compliance by loading base layer libraries (musl/glibc).
     pub fn resolve_posix_dependency(&self, lib_name: &str) -> bool {
-        self.base_layer_distro.contains("Alpine") || self.base_layer_distro.contains("Arch") || lib_name.starts_with("libc")
+        self.base_layer_distro.contains("Alpine")
+            || self.base_layer_distro.contains("Arch")
+            || lib_name.starts_with("libc")
     }
 }
 
@@ -115,7 +118,13 @@ impl ContextVirtualMmu {
     }
 
     /// Allocates virtual context memory for short-term conversation or vector embeddings.
-    pub fn allocate_context_page(&mut self, seg_id: &str, tokens: u32, vector_db: bool, long_term: bool) -> Result<(), &'static str> {
+    pub fn allocate_context_page(
+        &mut self,
+        seg_id: &str,
+        tokens: u32,
+        vector_db: bool,
+        long_term: bool,
+    ) -> Result<(), &'static str> {
         if self.used_token_pool + tokens > self.total_token_pool {
             return Err("ContextVirtualMmu: OOM Context memory exhausted");
         }
@@ -163,7 +172,9 @@ pub struct LocalLlmSystemDaemon {
 
 impl LocalLlmSystemDaemon {
     pub fn new() -> Self {
-        Self { daemons: Vec::new() }
+        Self {
+            daemons: Vec::new(),
+        }
     }
 
     /// Deploys a fine-tuned local model as a background system daemon.
@@ -180,7 +191,10 @@ impl LocalLlmSystemDaemon {
     pub fn infer(&mut self, model: &str, prompt: &str) -> Result<String, &'static str> {
         if let Some(daemon) = self.daemons.iter_mut().find(|d| d.model_name == model) {
             daemon.tokens_processed += (prompt.len() as u64) / 4 + 16;
-            Ok(format!("Inference result from [{}] via {:?}: Executed prompt task successfully", model, daemon.backend))
+            Ok(format!(
+                "Inference result from [{}] via {:?}: Executed prompt task successfully",
+                model, daemon.backend
+            ))
         } else {
             Err("LocalLlmSystemDaemon: System daemon for model not found")
         }
@@ -276,7 +290,10 @@ impl EphemeralAgentSandbox {
             return Err("EphemeralSandbox: Security Violation - Unauthorized filesystem mutation");
         }
         self.execution_count += 1;
-        Ok(format!("Executed in read-only sandbox ({} KB memory): Success", self.memory_space_kb))
+        Ok(format!(
+            "Executed in read-only sandbox ({} KB memory): Success",
+            self.memory_space_kb
+        ))
     }
 }
 
@@ -308,8 +325,17 @@ impl TamperProofActionAuditLog {
         }
     }
 
-    pub fn log_agent_action(&mut self, tick: u64, agent_id: &str, action: &str, tokens: u32) -> String {
-        let hash = format!("hash_{:x}", tick * 17 + tokens as u64 * 31 + self.logs.len() as u64);
+    pub fn log_agent_action(
+        &mut self,
+        tick: u64,
+        agent_id: &str,
+        action: &str,
+        tokens: u32,
+    ) -> String {
+        let hash = format!(
+            "hash_{:x}",
+            tick * 17 + tokens as u64 * 31 + self.logs.len() as u64
+        );
         let event = AgentAuditEvent {
             timestamp_tick: tick,
             agent_id: agent_id.to_string(),
@@ -357,10 +383,14 @@ mod tests {
     #[test]
     fn test_context_virtual_mmu() {
         let mut mmu = ContextVirtualMmu::new(64_000);
-        assert!(mmu.allocate_context_page("agent_convo_01", 16_000, false, false).is_ok());
+        assert!(mmu
+            .allocate_context_page("agent_convo_01", 16_000, false, false)
+            .is_ok());
         assert_eq!(mmu.used_token_pool, 16_000);
 
-        assert!(mmu.allocate_context_page("vector_db_cache", 50_000, true, true).is_err()); // OOM
+        assert!(mmu
+            .allocate_context_page("vector_db_cache", 50_000, true, true)
+            .is_err()); // OOM
     }
 
     #[test]
@@ -368,7 +398,9 @@ mod tests {
         let mut daemon_mgr = LocalLlmSystemDaemon::new();
         daemon_mgr.deploy_daemon("Llama-3-8B", GpuBackend::Cuda);
 
-        let res = daemon_mgr.infer("Llama-3-8B", "Write a system script").unwrap();
+        let res = daemon_mgr
+            .infer("Llama-3-8B", "Write a system script")
+            .unwrap();
         assert!(res.contains("Inference result"));
         assert_eq!(daemon_mgr.daemons[0].tokens_processed, 21);
     }
@@ -395,7 +427,9 @@ mod tests {
     fn test_ephemeral_agent_sandbox() {
         let mut sandbox = EphemeralAgentSandbox::new(32_768);
         assert!(sandbox.execute_python_block("print('hello world')").is_ok());
-        assert!(sandbox.execute_python_block("import os; os.remove('/etc/passwd')").is_err());
+        assert!(sandbox
+            .execute_python_block("import os; os.remove('/etc/passwd')")
+            .is_err());
     }
 
     #[test]

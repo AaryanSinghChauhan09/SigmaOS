@@ -332,10 +332,16 @@ impl ShellCommand for WhichCommand {
         let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
-            if len == 0 { continue; }
+            if len == 0 {
+                continue;
+            }
             let s = &arg[..len];
-            for &b in b"/system/bin/" { output.push(b); }
-            for &b in s { output.push(b); }
+            for &b in b"/system/bin/" {
+                output.push(b);
+            }
+            for &b in s {
+                output.push(b);
+            }
             output.push(b'\n');
         }
         Ok(output)
@@ -357,10 +363,16 @@ impl ShellCommand for TypeCommand {
         let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
-            if len == 0 { continue; }
+            if len == 0 {
+                continue;
+            }
             let s = &arg[..len];
-            for &b in s { output.push(b); }
-            for &b in b" is a shell builtin\n" { output.push(b); }
+            for &b in s {
+                output.push(b);
+            }
+            for &b in b" is a shell builtin\n" {
+                output.push(b);
+            }
         }
         Ok(output)
     }
@@ -376,7 +388,9 @@ pub struct DirectoryStack {
 
 impl DirectoryStack {
     pub fn new() -> Self {
-        DirectoryStack { stack: ShellVec::new() }
+        DirectoryStack {
+            stack: ShellVec::new(),
+        }
     }
 }
 
@@ -401,7 +415,9 @@ impl ShellCommand for PushdCommand {
                 }
             }
         }
-        for &b in b"pushd: directory pushed\n" { output.push(b); }
+        for &b in b"pushd: directory pushed\n" {
+            output.push(b);
+        }
         Ok(output)
     }
 
@@ -425,9 +441,13 @@ impl ShellCommand for PopdCommand {
             if !self.dir_stack.is_null() && !(*self.dir_stack).stack.is_empty() {
                 let last_idx = (*self.dir_stack).stack.len() - 1;
                 (*self.dir_stack).stack.remove(last_idx);
-                for &b in b"popd: popped directory\n" { output.push(b); }
+                for &b in b"popd: popped directory\n" {
+                    output.push(b);
+                }
             } else {
-                for &b in b"popd: directory stack empty\n" { output.push(b); }
+                for &b in b"popd: directory stack empty\n" {
+                    output.push(b);
+                }
             }
         }
         Ok(output)
@@ -449,13 +469,19 @@ impl ShellCommand for DirsCommand {
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
         let mut output = ShellVec::new();
-        for &b in b"Directory stack: " { output.push(b); }
+        for &b in b"Directory stack: " {
+            output.push(b);
+        }
         unsafe {
             if !self.dir_stack.is_null() {
                 for (i, dir) in (*self.dir_stack).stack.iter().enumerate() {
-                    if i > 0 { output.push(b' '); }
+                    if i > 0 {
+                        output.push(b' ');
+                    }
                     let len = dir.iter().position(|&b| b == 0).unwrap_or(64);
-                    for &b in &dir[..len] { output.push(b); }
+                    for &b in &dir[..len] {
+                        output.push(b);
+                    }
                 }
             }
         }
@@ -602,13 +628,19 @@ impl SimpleCommandRegistry {
 
         static mut GLOBAL_DIR_STACK: DirectoryStack = DirectoryStack { stack: Vec::new() };
         unsafe {
-            let pushd = PushdCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            let pushd = PushdCommand {
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
+            };
             self.commands.push(Some(Box::new(pushd)));
 
-            let popd = PopdCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            let popd = PopdCommand {
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
+            };
             self.commands.push(Some(Box::new(popd)));
 
-            let dirs = DirsCommand { dir_stack: &raw mut GLOBAL_DIR_STACK };
+            let dirs = DirsCommand {
+                dir_stack: &raw mut GLOBAL_DIR_STACK,
+            };
             self.commands.push(Some(Box::new(dirs)));
         }
     }

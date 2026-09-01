@@ -232,13 +232,17 @@ impl AiDependencyResolver {
     pub fn resolve_conflict(&self, conflict: &DependencyConflict) -> Version {
         match self.strategy {
             AiResolutionStrategy::PreferLatestLts => {
-                if conflict.conflicting_version_a.satisfies(conflict.conflicting_version_b) {
+                if conflict
+                    .conflicting_version_a
+                    .satisfies(conflict.conflicting_version_b)
+                {
                     conflict.conflicting_version_a
                 } else {
                     conflict.conflicting_version_b
                 }
             }
-            AiResolutionStrategy::MinimizeBreakingChanges | AiResolutionStrategy::ForceDowngradeToStable => {
+            AiResolutionStrategy::MinimizeBreakingChanges
+            | AiResolutionStrategy::ForceDowngradeToStable => {
                 if conflict.conflicting_version_a.major <= conflict.conflicting_version_b.major {
                     conflict.conflicting_version_a
                 } else {

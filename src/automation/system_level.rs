@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS AI-Powered System-Level Automation
 // Extended Samsung Modes & Routines for system-level workflows
@@ -606,12 +606,7 @@ impl DistroInspiredAutomationEngine {
     }
 
     // --- 1. Linux Systemd / OpenRC Service Lifecycle Automation ---
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        dependencies: &[&str],
-        max_restarts: u32,
-    ) {
+    pub fn register_service(&mut self, name: &str, dependencies: &[&str], max_restarts: u32) {
         let deps = dependencies.iter().map(|s| s.to_string()).collect();
         self.services.push(SupervisedService {
             name: name.to_string(),
@@ -623,7 +618,11 @@ impl DistroInspiredAutomationEngine {
         });
     }
 
-    pub fn set_service_state(&mut self, name: &str, state: SupervisedServiceState) -> Result<(), AutomationError> {
+    pub fn set_service_state(
+        &mut self,
+        name: &str,
+        state: SupervisedServiceState,
+    ) -> Result<(), AutomationError> {
         let service = self
             .services
             .iter_mut()
@@ -672,7 +671,12 @@ impl DistroInspiredAutomationEngine {
         });
     }
 
-    pub fn evaluate_resource_limits(&mut self, pid: u64, cpu_pct: u32, rss_bytes: u64) -> Option<SystemAction> {
+    pub fn evaluate_resource_limits(
+        &mut self,
+        pid: u64,
+        cpu_pct: u32,
+        rss_bytes: u64,
+    ) -> Option<SystemAction> {
         if let Some(policy) = self.racct_policies.iter_mut().find(|p| p.pid == pid) {
             if cpu_pct > policy.max_cpu_pct || rss_bytes > policy.max_rss_bytes {
                 policy.is_throttled = true;
@@ -685,7 +689,11 @@ impl DistroInspiredAutomationEngine {
     }
 
     // --- 3. OpenBSD Pledge / Unveil Auto-Sandboxing ---
-    pub fn generate_auto_sandbox_policy(&mut self, process_name: &str, categories: &[&str]) -> AutomatedSandboxPolicy {
+    pub fn generate_auto_sandbox_policy(
+        &mut self,
+        process_name: &str,
+        categories: &[&str],
+    ) -> AutomatedSandboxPolicy {
         let mut promises = vec!["stdio".to_string()];
         let mut unveiled = Vec::new();
 
@@ -713,7 +721,10 @@ impl DistroInspiredAutomationEngine {
     }
 
     // --- 4. NixOS Declarative System State Reconciliation ---
-    pub fn apply_declarative_spec(&mut self, spec: DeclarativeSpecState) -> Result<u32, AutomationError> {
+    pub fn apply_declarative_spec(
+        &mut self,
+        spec: DeclarativeSpecState,
+    ) -> Result<u32, AutomationError> {
         let rev = spec.revision;
         if let Some(ref current) = self.active_spec {
             self.spec_history.push(current.clone());
@@ -904,7 +915,9 @@ mod tests {
         assert_eq!(engine.services[1].state, SupervisedServiceState::Running);
 
         // Simulate failure and restart
-        assert!(engine.set_service_state("web", SupervisedServiceState::Failed).is_ok());
+        assert!(engine
+            .set_service_state("web", SupervisedServiceState::Failed)
+            .is_ok());
         assert_eq!(engine.reconcile_services(), 1);
         assert_eq!(engine.services[1].restart_count, 1);
     }
@@ -927,12 +940,19 @@ mod tests {
     #[test]
     fn test_distro_inspired_auto_sandbox() {
         let mut engine = DistroInspiredAutomationEngine::new();
-        let policy = engine.generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
+        let policy = engine
+            .generate_auto_sandbox_policy("web_browser", &["network", "filesystem_read", "exec"]);
 
         assert!(policy.allowed_promises.contains(&"inet".to_string()));
         assert!(policy.allowed_promises.contains(&"exec".to_string()));
-        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/usr" && perm == "r"));
-        assert!(policy.unveiled_paths.iter().any(|(p, perm)| p == "/bin" && perm == "rx"));
+        assert!(policy
+            .unveiled_paths
+            .iter()
+            .any(|(p, perm)| p == "/usr" && perm == "r"));
+        assert!(policy
+            .unveiled_paths
+            .iter()
+            .any(|(p, perm)| p == "/bin" && perm == "rx"));
     }
 
     #[test]
@@ -1016,7 +1036,8 @@ mod tests {
         .with_action(SystemAction::BalanceLoad);
 
         manager.add_rule(rule);
-        let actions = manager.handle_event(SystemEventType::LinuxEBPFNetworkFilter, BTreeMap::new());
+        let actions =
+            manager.handle_event(SystemEventType::LinuxEBPFNetworkFilter, BTreeMap::new());
         assert_eq!(actions.len(), 1);
     }
 

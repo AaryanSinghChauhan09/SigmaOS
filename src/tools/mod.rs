@@ -3,17 +3,17 @@
 
 pub mod display_manager;
 pub mod sigmatools;
-pub mod sovereign_commands;
 pub mod simple_scan;
+pub mod sovereign_commands;
 
 pub use simple_scan::{
-    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource,
-    ScannedPage, SovereignSimpleScanEngine,
+    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource, ScannedPage,
+    SovereignSimpleScanEngine,
 };
 
 pub use simple_scan::{
-    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource,
-    ScannedPage, SovereignSimpleScanEngine,
+    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource, ScannedPage,
+    SovereignSimpleScanEngine,
 };
 
 pub use display_manager::{DMError, DisplayManager, Session, SessionType, User};

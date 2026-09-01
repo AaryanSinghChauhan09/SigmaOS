@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Package Manager (sigma-pkg)
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
@@ -50,16 +50,16 @@ pub struct Transaction {
 /// Supported Linux & BSD Universal Foreign Package Formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageFormat {
-    DebianDeb,        // .deb (APT/dpkg)
-    ArchPacman,       // .pkg.tar.zst (pacman)
-    FedoraRpm,        // .rpm (dnf/rpm)
-    AlpineApk,        // .apk (apk)
-    GentooEbuild,     // .ebuild (portage)
-    VoidXbps,         // .xbps (xbps)
-    FreeBsdPkg,       // .txz / .pkg (pkg)
-    FlatpakBundle,    // .flatpak
-    SnapPackage,      // .snap
-    AppImageBinary,   // .AppImage
+    DebianDeb,      // .deb (APT/dpkg)
+    ArchPacman,     // .pkg.tar.zst (pacman)
+    FedoraRpm,      // .rpm (dnf/rpm)
+    AlpineApk,      // .apk (apk)
+    GentooEbuild,   // .ebuild (portage)
+    VoidXbps,       // .xbps (xbps)
+    FreeBsdPkg,     // .txz / .pkg (pkg)
+    FlatpakBundle,  // .flatpak
+    SnapPackage,    // .snap
+    AppImageBinary, // .AppImage
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -165,13 +165,13 @@ impl SigmaPkg {
     pub fn new() -> Result<Self, String> {
         let cache_dir = PathBuf::from("/var/cache/sigma-pkg");
         let database_dir = PathBuf::from("/var/lib/sigma-pkg");
-        
+
         // Create directories if they don't exist
         fs::create_dir_all(&cache_dir)
             .map_err(|e| format!("Failed to create cache directory: {}", e))?;
         fs::create_dir_all(&database_dir)
             .map_err(|e| format!("Failed to create database directory: {}", e))?;
-        
+
         let mut pkg = SigmaPkg {
             config: PkgConfig::default(),
             repositories: vec![],
@@ -179,10 +179,10 @@ impl SigmaPkg {
             cache_dir,
             database_dir,
         };
-        
+
         pkg.load_repositories()?;
         pkg.load_local_database()?;
-        
+
         Ok(pkg)
     }
 
@@ -195,7 +195,7 @@ impl SigmaPkg {
     fn load_repositories(&mut self) -> Result<(), String> {
         // Load repository configuration from /etc/sigma-pkg/repositories.conf
         let repo_config_path = PathBuf::from("/etc/sigma-pkg/repositories.conf");
-        
+
         if !repo_config_path.exists() {
             // Create default repositories
             self.repositories = vec![
@@ -226,17 +226,17 @@ impl SigmaPkg {
 
         let content = fs::read_to_string(&repo_config_path)
             .map_err(|e| format!("Failed to read repository config: {}", e))?;
-        
+
         for line in content.lines() {
             let line = line.trim();
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            
+
             // Parse repository configuration
             // Format: [repo_name] or Server = url
             if line.starts_with('[') && line.ends_with(']') {
-                let repo_name = line[1..line.len()-1].to_string();
+                let repo_name = line[1..line.len() - 1].to_string();
                 self.repositories.push(Repository {
                     name: repo_name,
                     url: String::new(),
@@ -252,13 +252,13 @@ impl SigmaPkg {
                 }
             }
         }
-        
+
         Ok(())
     }
 
     fn load_local_database(&mut self) -> Result<(), String> {
         let db_path = self.database_dir.join("local");
-        
+
         if !db_path.exists() {
             return Ok(());
         }
@@ -270,29 +270,29 @@ impl SigmaPkg {
 
     pub fn sync_repositories(&mut self) -> Result<(), String> {
         println!("Synchronizing package databases...");
-        
+
         for repo in &mut self.repositories {
             if !repo.enabled {
                 continue;
             }
-            
+
             println!("Syncing repository: {}", repo.name);
-            
+
             // Download repository database
             let db_url = format!("{}/{}.db", repo.url, repo.name);
             let db_path = self.cache_dir.join(format!("{}.db", repo.name));
-            
+
             // Simulate database download
             // In real implementation, would use HTTP client to download
             if let Ok(content) = Self::download_file(&db_url) {
                 fs::write(&db_path, content)
                     .map_err(|e| format!("Failed to write database: {}", e))?;
-                
+
                 // Parse database and update packages
                 repo.packages = Self::parse_database(&db_path)?;
             }
         }
-        
+
         println!("Synchronization complete.");
         Ok(())
     }
@@ -304,7 +304,7 @@ impl SigmaPkg {
 
     fn parse_database(path: &Path) -> Result<HashMap<String, Package>, String> {
         let mut packages = HashMap::new();
-        
+
         // Parse package database (simplified)
         // Real implementation would parse actual database format
         Ok(packages)
@@ -313,20 +313,21 @@ impl SigmaPkg {
     pub fn search(&self, query: &str) -> Vec<&Package> {
         let mut results = Vec::new();
         let query_lower = query.to_lowercase();
-        
+
         for repo in &self.repositories {
             if !repo.enabled {
                 continue;
             }
-            
+
             for (name, package) in &repo.packages {
-                if name.to_lowercase().contains(&query_lower) ||
-                   package.description.to_lowercase().contains(&query_lower) {
+                if name.to_lowercase().contains(&query_lower)
+                    || package.description.to_lowercase().contains(&query_lower)
+                {
                     results.push(package);
                 }
             }
         }
-        
+
         results
     }
 
@@ -335,7 +336,7 @@ impl SigmaPkg {
         if let Some(pkg) = self.local_packages.get(package_name) {
             return Some(pkg);
         }
-        
+
         // Check repositories
         for repo in &self.repositories {
             if repo.enabled {
@@ -344,7 +345,7 @@ impl SigmaPkg {
                 }
             }
         }
-        
+
         None
     }
 
@@ -356,33 +357,37 @@ impl SigmaPkg {
             download_size: 0,
             install_size: 0,
         };
-        
+
         for name in package_names {
             self.resolve_package_dependencies(name, &mut transaction)?;
         }
-        
+
         Ok(transaction)
     }
 
-    fn resolve_package_dependencies(&self, name: &str, transaction: &mut Transaction) -> Result<(), String> {
+    fn resolve_package_dependencies(
+        &self,
+        name: &str,
+        transaction: &mut Transaction,
+    ) -> Result<(), String> {
         // Find package in repositories
         let package = self.find_package(name)?;
-        
+
         // Check if already in transaction
         if transaction.install.iter().any(|p| p.name == package.name) {
             return Ok(());
         }
-        
+
         // Add package to transaction
         transaction.download_size += package.size;
         transaction.install_size += package.installed_size;
         transaction.install.push(package.clone());
-        
+
         // Resolve dependencies recursively
         for dep in &package.dependencies {
             self.resolve_package_dependencies(dep, transaction)?;
         }
-        
+
         Ok(())
     }
 
@@ -400,50 +405,54 @@ impl SigmaPkg {
     pub fn install_packages(&mut self, package_names: &[String]) -> Result<(), String> {
         println!("Resolving dependencies...");
         let transaction = self.resolve_dependencies(package_names)?;
-        
+
         self.display_transaction(&transaction)?;
-        
+
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Installation cancelled.");
                 return Ok(());
             }
         }
-        
+
         println!("Installing packages...");
-        
+
         for package in &transaction.install {
             self.install_package(package)?;
         }
-        
+
         println!("Installation complete.");
         Ok(())
     }
 
     fn install_package(&mut self, package: &Package) -> Result<(), String> {
         println!("Installing {} {}...", package.name, package.version);
-        
+
         // Download package
-        let package_url = format!("{}/{}-{}.sigmpkg", 
-            package.repository, package.name, package.version);
-        let package_path = self.cache_dir.join(format!("{}-{}.sigmpkg", 
-            package.name, package.version));
-        
+        let package_url = format!(
+            "{}/{}-{}.sigmpkg",
+            package.repository, package.name, package.version
+        );
+        let package_path = self
+            .cache_dir
+            .join(format!("{}-{}.sigmpkg", package.name, package.version));
+
         // Simulate download
         println!("Downloading from {}", package_url);
-        
+
         // Extract package
         println!("Extracting package...");
-        
+
         // Install files
         println!("Installing files...");
-        
+
         // Update local database
-        self.local_packages.insert(package.name.clone(), package.clone());
-        
+        self.local_packages
+            .insert(package.name.clone(), package.clone());
+
         // Run post-install scripts
         self.run_hooks("post_install", package)?;
-        
+
         Ok(())
     }
 
@@ -452,9 +461,15 @@ impl SigmaPkg {
         println!("  Install: {} packages", transaction.install.len());
         println!("  Remove: {} packages", transaction.remove.len());
         println!("  Upgrade: {} packages", transaction.upgrade.len());
-        println!("  Total Download Size: {} MB", transaction.download_size / 1024 / 1024);
-        println!("  Total Installed Size: {} MB", transaction.install_size / 1024 / 1024);
-        
+        println!(
+            "  Total Download Size: {} MB",
+            transaction.download_size / 1024 / 1024
+        );
+        println!(
+            "  Total Installed Size: {} MB",
+            transaction.install_size / 1024 / 1024
+        );
+
         if !transaction.install.is_empty() {
             println!("\nPackages to install:");
             for pkg in &transaction.install {
@@ -471,20 +486,20 @@ impl SigmaPkg {
 
     fn run_hooks(&self, hook_type: &str, package: &Package) -> Result<(), String> {
         let hook_dir = PathBuf::from("/etc/sigma-pkg/hooks").join(hook_type);
-        
+
         if !hook_dir.exists() {
             return Ok(());
         }
-        
+
         // Run hook scripts
         println!("Running {} hooks for {}...", hook_type, package.name);
-        
+
         Ok(())
     }
 
     pub fn remove_packages(&mut self, package_names: &[String]) -> Result<(), String> {
         println!("Removing packages...");
-        
+
         for name in package_names {
             if let Some(package) = self.local_packages.get(name) {
                 self.remove_package(package)?;
@@ -492,57 +507,59 @@ impl SigmaPkg {
                 println!("Package '{}' is not installed.", name);
             }
         }
-        
+
         println!("Removal complete.");
         Ok(())
     }
 
     fn remove_package(&mut self, package: &Package) -> Result<(), String> {
         println!("Removing {} {}...", package.name, package.version);
-        
+
         // Check for reverse dependencies
         let dependents = self.find_dependents(&package.name);
         if !dependents.is_empty() {
-            return Err(format!("Cannot remove {}: required by {:?}", 
-                package.name, dependents));
+            return Err(format!(
+                "Cannot remove {}: required by {:?}",
+                package.name, dependents
+            ));
         }
-        
+
         // Run pre-remove hooks
         self.run_hooks("pre_remove", package)?;
-        
+
         // Remove files
         println!("Removing files...");
-        
+
         // Update local database
         self.local_packages.remove(&package.name);
-        
+
         // Run post-remove hooks
         self.run_hooks("post_remove", package)?;
-        
+
         Ok(())
     }
 
     fn find_dependents(&self, package_name: &str) -> Vec<String> {
         let mut dependents = Vec::new();
-        
+
         for (name, package) in &self.local_packages {
             if package.dependencies.contains(&package_name.to_string()) {
                 dependents.push(name.clone());
             }
         }
-        
+
         dependents
     }
 
     pub fn upgrade_system(&mut self) -> Result<(), String> {
         println!("Starting full system upgrade...");
-        
+
         // Sync repositories first
         self.sync_repositories()?;
-        
+
         // Find upgradable packages
         let mut upgradable = Vec::new();
-        
+
         for (name, local_pkg) in &self.local_packages {
             if let Some(remote_pkg) = self.find_package(name) {
                 if remote_pkg.version != local_pkg.version {
@@ -550,14 +567,14 @@ impl SigmaPkg {
                 }
             }
         }
-        
+
         if upgradable.is_empty() {
             println!("System is up to date.");
             return Ok(());
         }
-        
+
         println!("Found {} package(s) to upgrade.", upgradable.len());
-        
+
         // Create upgrade transaction
         let mut transaction = Transaction {
             install: Vec::new(),
@@ -566,27 +583,27 @@ impl SigmaPkg {
             download_size: 0,
             install_size: 0,
         };
-        
+
         for (old, new) in &transaction.upgrade {
             transaction.download_size += new.size;
             transaction.install_size += new.installed_size - old.installed_size;
         }
-        
+
         self.display_transaction(&transaction)?;
-        
+
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Upgrade cancelled.");
                 return Ok(());
             }
         }
-        
+
         // Perform upgrades
         for (old, new) in &transaction.upgrade {
             println!("Upgrading {} {} -> {}", new.name, old.version, new.version);
             self.upgrade_package(old, new)?;
         }
-        
+
         println!("System upgrade complete.");
         Ok(())
     }
@@ -594,13 +611,13 @@ impl SigmaPkg {
     fn upgrade_package(&mut self, old: &Package, new: &Package) -> Result<(), String> {
         // Run pre-upgrade hooks
         self.run_hooks("pre_upgrade", new)?;
-        
+
         // Download and install new version
         self.install_package(new)?;
-        
+
         // Run post-upgrade hooks
         self.run_hooks("post_upgrade", new)?;
-        
+
         Ok(())
     }
 
@@ -610,13 +627,13 @@ impl SigmaPkg {
 
     pub fn list_available(&self) -> Vec<&Package> {
         let mut packages = Vec::new();
-        
+
         for repo in &self.repositories {
             if repo.enabled {
                 packages.extend(repo.packages.values());
             }
         }
-        
+
         packages.sort_by(|a, b| a.name.cmp(&b.name));
         packages
     }
@@ -631,7 +648,8 @@ impl SigmaPkg {
             "Successfully imported foreign package '{}' ({:?}) into Sigma-pkg universal engine.",
             package.name, format
         );
-        self.local_packages.insert(package.name.clone(), package.clone());
+        self.local_packages
+            .insert(package.name.clone(), package.clone());
         Ok(package)
     }
 }
@@ -664,7 +682,7 @@ mod tests {
             architecture: "x86_64".to_string(),
             repository: "core".to_string(),
         };
-        
+
         assert_eq!(package.name, "test");
         assert_eq!(package.version, "1.0.0");
     }
@@ -674,13 +692,18 @@ mod tests {
         let fmt_deb = UniversalPackageImporter::autodetect_format("nginx_1.24.deb");
         assert_eq!(fmt_deb, Some(UniversalPackageFormat::DebianDeb));
 
-        let fmt_arch = UniversalPackageImporter::autodetect_format("ripgrep-13.0.0-1-x86_64.pkg.tar.zst");
+        let fmt_arch =
+            UniversalPackageImporter::autodetect_format("ripgrep-13.0.0-1-x86_64.pkg.tar.zst");
         assert_eq!(fmt_arch, Some(UniversalPackageFormat::ArchPacman));
 
         let fmt_rpm = UniversalPackageImporter::autodetect_format("htop-3.2.1.rpm");
         assert_eq!(fmt_rpm, Some(UniversalPackageFormat::FedoraRpm));
 
-        let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
+        let pkg = UniversalPackageImporter::parse_foreign_package(
+            "curl_8.0.deb",
+            UniversalPackageFormat::DebianDeb,
+        )
+        .unwrap();
         assert_eq!(pkg.name, "curl");
         assert_eq!(pkg.repository, "universal-debiandeb");
     }

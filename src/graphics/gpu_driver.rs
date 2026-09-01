@@ -15,8 +15,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use super::nvidia_prime::{NvidiaPrimeEngine, PrimeProfile};
 
@@ -131,10 +131,26 @@ impl GpuDriver {
         };
 
         // Pre-configure OpenBSD wsdisplay VTs 1-4
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 1, is_active: true, title: String::from("tty1") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 2, is_active: false, title: String::from("tty2") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 3, is_active: false, title: String::from("tty3") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 4, is_active: false, title: String::from("tty4") });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 1,
+            is_active: true,
+            title: String::from("tty1"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 2,
+            is_active: false,
+            title: String::from("tty2"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 3,
+            is_active: false,
+            title: String::from("tty3"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 4,
+            is_active: false,
+            title: String::from("tty4"),
+        });
 
         driver
     }
@@ -374,9 +390,17 @@ mod tests {
         let mut driver = GpuDriver::new();
         assert_eq!(driver.get_atomic_plane_count(), 0);
         let plane = DrmAtomicPlaneState {
-            plane_id: 1, crtc_id: 10, fb_id: 100,
-            src_x: 0, src_y: 0, src_w: 1920, src_h: 1080,
-            crtc_x: 0, crtc_y: 0, crtc_w: 1920, crtc_h: 1080,
+            plane_id: 1,
+            crtc_id: 10,
+            fb_id: 100,
+            src_x: 0,
+            src_y: 0,
+            src_w: 1920,
+            src_h: 1080,
+            crtc_x: 0,
+            crtc_y: 0,
+            crtc_w: 1920,
+            crtc_h: 1080,
             zpos: 0,
         };
         assert!(driver.commit_atomic_plane(plane).is_ok());
@@ -387,8 +411,13 @@ mod tests {
     fn test_wayland_dma_buf_import() {
         let mut driver = GpuDriver::new();
         let buf = WaylandDmaBuf {
-            fd: 5, width: 1920, height: 1080,
-            format: PixelFormat::Rgba32, stride: 1920 * 4, offset: 0, size: 1920 * 1080 * 4,
+            fd: 5,
+            width: 1920,
+            height: 1080,
+            format: PixelFormat::Rgba32,
+            stride: 1920 * 4,
+            offset: 0,
+            size: 1920 * 1080 * 4,
         };
         let size = driver.import_dma_buf(buf).unwrap();
         assert_eq!(size, 1920 * 1080 * 4);

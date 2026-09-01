@@ -3,11 +3,10 @@ extern crate alloc;
 // Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
 // Enhanced with advanced GDB/WinDbg-inspired Predefined and User-Defined Pseudo Registers
 
-
-use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 pub type InterruptNumber = u32;
@@ -61,8 +60,8 @@ pub struct RegisterSet {
     pub rdi: u64,
     pub rbp: u64,
     pub rsp: u64,
-    pub r8:  u64,
-    pub r9:  u64,
+    pub r8: u64,
+    pub r9: u64,
     pub r10: u64,
     pub r11: u64,
     pub r12: u64,
@@ -239,14 +238,14 @@ impl Default for InterruptManager {
 /// GDB/WinDbg-inspired Predefined Pseudo Registers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PredefinedPseudoRegister {
-    Pid,            // Current process ID
-    Tid,            // Current thread ID
-    Irql,           // Current Interrupt Request Level
-    KernelBase,     // Virtual kernel load base
-    Pc,             // Alias for Program Counter (RIP/EIP)
-    Sp,             // Alias for Stack Pointer (RSP/ESP)
-    Fp,             // Alias for Frame Pointer (RBP/EBP)
-    PageTableBase,  // CR3 / Page Directory base pointer representation
+    Pid,           // Current process ID
+    Tid,           // Current thread ID
+    Irql,          // Current Interrupt Request Level
+    KernelBase,    // Virtual kernel load base
+    Pc,            // Alias for Program Counter (RIP/EIP)
+    Sp,            // Alias for Stack Pointer (RSP/ESP)
+    Fp,            // Alias for Frame Pointer (RBP/EBP)
+    PageTableBase, // CR3 / Page Directory base pointer representation
 }
 
 /// Manager of Predefined and User-Defined Pseudo Registers
@@ -295,11 +294,15 @@ impl SovereignPseudoRegisterManager {
             "pid" | "proc_id" => Some(self.read_predefined(PredefinedPseudoRegister::Pid, regs)),
             "tid" | "thread_id" => Some(self.read_predefined(PredefinedPseudoRegister::Tid, regs)),
             "irql" => Some(self.read_predefined(PredefinedPseudoRegister::Irql, regs)),
-            "kernel_base" | "kbase" => Some(self.read_predefined(PredefinedPseudoRegister::KernelBase, regs)),
+            "kernel_base" | "kbase" => {
+                Some(self.read_predefined(PredefinedPseudoRegister::KernelBase, regs))
+            }
             "pc" | "ip" | "rip" => Some(self.read_predefined(PredefinedPseudoRegister::Pc, regs)),
             "sp" | "rsp" => Some(self.read_predefined(PredefinedPseudoRegister::Sp, regs)),
             "fp" | "rbp" => Some(self.read_predefined(PredefinedPseudoRegister::Fp, regs)),
-            "cr3" | "pg_base" | "page_table_base" => Some(self.read_predefined(PredefinedPseudoRegister::PageTableBase, regs)),
+            "cr3" | "pg_base" | "page_table_base" => {
+                Some(self.read_predefined(PredefinedPseudoRegister::PageTableBase, regs))
+            }
             _ => {
                 // Check user-defined pseudo registers map
                 self.user_defined.get(clean_name).copied()
@@ -308,13 +311,17 @@ impl SovereignPseudoRegisterManager {
     }
 
     /// Write value to a user-defined pseudo register
-    pub fn write_user_defined_register(&mut self, name: &str, value: u64) -> Result<(), &'static str> {
+    pub fn write_user_defined_register(
+        &mut self,
+        name: &str,
+        value: u64,
+    ) -> Result<(), &'static str> {
         let clean_name = name.trim_start_matches('$');
 
         // Cannot overwrite predefined pseudo register names
         match clean_name {
-            "pid" | "proc_id" | "tid" | "thread_id" | "irql" | "kernel_base" | "kbase"
-            | "pc" | "ip" | "rip" | "sp" | "rsp" | "fp" | "rbp" | "cr3" | "pg_base"
+            "pid" | "proc_id" | "tid" | "thread_id" | "irql" | "kernel_base" | "kbase" | "pc"
+            | "ip" | "rip" | "sp" | "rsp" | "fp" | "rbp" | "cr3" | "pg_base"
             | "page_table_base" => {
                 return Err("PseudoRegister: Cannot overwrite a predefined pseudo register name");
             }
@@ -348,14 +355,22 @@ mod tests {
     #[test]
     fn test_canonical_address_verification() {
         // Standard user canonical address
-        assert!(InterruptManager::is_canonical_address(0x0000_7FFF_FFFF_FFFF));
+        assert!(InterruptManager::is_canonical_address(
+            0x0000_7FFF_FFFF_FFFF
+        ));
         // Standard kernel canonical address (sign extended 1s)
-        assert!(InterruptManager::is_canonical_address(0xFFFF_8000_0000_0000));
+        assert!(InterruptManager::is_canonical_address(
+            0xFFFF_8000_0000_0000
+        ));
 
         // Non-canonical address (sign bit 47 is 0, but upper bits contain 1s)
-        assert!(!InterruptManager::is_canonical_address(0x0001_7FFF_FFFF_FFFF));
+        assert!(!InterruptManager::is_canonical_address(
+            0x0001_7FFF_FFFF_FFFF
+        ));
         // Non-canonical address (sign bit 47 is 1, but upper bits contain 0s)
-        assert!(!InterruptManager::is_canonical_address(0x1FFF_8000_0000_0000));
+        assert!(!InterruptManager::is_canonical_address(
+            0x1FFF_8000_0000_0000
+        ));
     }
 
     #[test]
@@ -418,17 +433,38 @@ mod tests {
         mgr.irql = 2; // DPC_LEVEL
 
         // Test basic enum read
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Pid, &regs), 42);
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Tid, &regs), 1337);
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Irql, &regs), 2);
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Pc, &regs), 0x1111222233334444);
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Sp, &regs), 0xAAAA_BBBB_CCCC_DDDD);
-        assert_eq!(mgr.read_predefined(PredefinedPseudoRegister::Fp, &regs), 0x5555_6666_7777_8888);
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Pid, &regs),
+            42
+        );
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Tid, &regs),
+            1337
+        );
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Irql, &regs),
+            2
+        );
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Pc, &regs),
+            0x1111222233334444
+        );
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Sp, &regs),
+            0xAAAA_BBBB_CCCC_DDDD
+        );
+        assert_eq!(
+            mgr.read_predefined(PredefinedPseudoRegister::Fp, &regs),
+            0x5555_6666_7777_8888
+        );
 
         // Test string name resolution with/without "$" prefix
         assert_eq!(mgr.read_pseudo_register("$pid", &regs), Some(42));
         assert_eq!(mgr.read_pseudo_register("tid", &regs), Some(1337));
-        assert_eq!(mgr.read_pseudo_register("$pc", &regs), Some(0x1111222233334444));
+        assert_eq!(
+            mgr.read_pseudo_register("$pc", &regs),
+            Some(0x1111222233334444)
+        );
         assert_eq!(mgr.read_pseudo_register("$cr3", &regs), Some(0x1000));
     }
 

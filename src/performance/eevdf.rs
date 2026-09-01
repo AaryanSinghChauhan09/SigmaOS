@@ -29,7 +29,12 @@ impl EevdfScheduler {
     }
 
     /// Add a new task to the scheduler queue
-    pub fn add_task(&mut self, id: usize, weight: u32, latency_nice: i8) -> Result<(), &'static str> {
+    pub fn add_task(
+        &mut self,
+        id: usize,
+        weight: u32,
+        latency_nice: i8,
+    ) -> Result<(), &'static str> {
         for slot in &mut self.tasks {
             if slot.is_none() {
                 *slot = Some(EevdfTask {
@@ -181,7 +186,7 @@ mod tests {
 
         // Add an interactive task (low nice) and a batch task (high nice) with equal weight
         sched.add_task(10, 2, -10).unwrap(); // interactive
-        sched.add_task(20, 2, 10).unwrap();  // batch
+        sched.add_task(20, 2, 10).unwrap(); // batch
 
         sched.update_lag_and_eligibility();
         sched.calculate_deadlines();

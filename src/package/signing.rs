@@ -1,26 +1,33 @@
 extern crate alloc;
 
-
-/// OOP-based Package Signing & Attestation for SigmaOS
-/// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
-/// Implements provenance metadata and supply-chain attestations
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
+use alloc::vec::Vec;
+use core::mem;
+/// OOP-based Package Signing & Attestation for SigmaOS
+/// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
+/// Implements provenance metadata and supply-chain attestations
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SignatureAlgorithm { ED25519 = 0, RSA4096 = 1, Dilithium5 = 2 }
+pub enum SignatureAlgorithm {
+    ED25519 = 0,
+    RSA4096 = 1,
+    Dilithium5 = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SigningError { Success = 0, KeyNotFound = 1, SignFailed = 2, VerifyFailed = 3 }
+pub enum SigningError {
+    Success = 0,
+    KeyNotFound = 1,
+    SignFailed = 2,
+    VerifyFailed = 3,
+}
 
 pub trait SigningKey {
     fn id(&self) -> KeyID;
@@ -58,9 +65,15 @@ impl SimpleSigningKey {
 }
 
 impl SigningKey for SimpleSigningKey {
-    fn id(&self) -> KeyID { self.id }
-    fn algorithm(&self) -> SignatureAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
-    fn public_key(&self) -> &[u8] { &self.public_key }
+    fn id(&self) -> KeyID {
+        self.id
+    }
+    fn algorithm(&self) -> SignatureAlgorithm {
+        unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) }
+    }
+    fn public_key(&self) -> &[u8] {
+        &self.public_key
+    }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {
         let mut signature = Vec::new();
@@ -114,9 +127,7 @@ pub struct SimplePackageAttestation {
 
 impl SimplePackageAttestation {
     pub fn new() -> Self {
-        SimplePackageAttestation {
-            keys: Vec::new(),
-        }
+        SimplePackageAttestation { keys: Vec::new() }
     }
 
     pub fn add_key(&mut self, key: Box<dyn SigningKey>) {
@@ -133,11 +144,17 @@ impl PackageAttestation for SimplePackageAttestation {
                     let mut attestation = Vec::new();
 
                     let header = b"SIGPKG-ATTESTATION";
-                    for &byte in header { attestation.push(byte); }
+                    for &byte in header {
+                        attestation.push(byte);
+                    }
 
-                    for byte in signature { attestation.push(byte); }
+                    for byte in signature {
+                        attestation.push(byte);
+                    }
 
-                    for &byte in package { attestation.push(byte); }
+                    for &byte in package {
+                        attestation.push(byte);
+                    }
 
                     return Ok(attestation);
                 }

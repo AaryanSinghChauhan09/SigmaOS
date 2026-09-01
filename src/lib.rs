@@ -1,12 +1,11 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-
 // Core working modules
+pub mod accessibility;
 pub mod ai;
 pub mod app;
 pub mod auth;
-pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -34,51 +33,53 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub use process::{
-    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
-    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
-    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
-    SigQueuePayload, AdvancedIpcHub, SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel,
-    SovereignProcessManager,
+    AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
+    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
+    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
+    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
+    WNOHANG, WUNTRACED,
 };
-pub mod community;
 pub mod access;
+pub mod community;
 pub mod tools;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 
-pub use unimplemented_features::{
-    AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,
-    AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
-    GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
-    LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
-    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
-    ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
-    SlackwarePkgtoolEngine, SlackwarePackage, SolusEopkgRavenGovernor, SolusEopkgDeltaPackage, RavenWidgetState,
-    MageiaUrpmiMccResolver, MageiaSynthesisPackage, MageiaMirror, DragonFlyHammer2DeduplicationEngine, Hammer2Block,
-    NetBsdRumpComponentEngine, RumpComponent, RumpComponentType,
-};
 pub use distro::{
-    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage,
-    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
-};
-pub use security::{
-    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
-    PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
-    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
-    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
-    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
-    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
-    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
-    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+    missing_distro_innovations::{
+        CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
+    },
+    ApkChrootBuildSandboxEngine, FreeBsdGeomVdevTopology, GeomVdevNode, HermeticStoreClosureEngine,
+    OpenBsdFdPledgeGate, StoreClosurePackage,
 };
 pub use driver::{
     DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
     UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
     UbuntuLivepatchDriverHook,
+};
+pub use security::{
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, HardenedSyscallDispatcher, HardenedSyscallError, KaliAirgeddonWifiAudit,
+    KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer, LibGksuGraphicalSudoEngine,
+    MemoryAccessError, PagePermissions, PcapPacketHeader, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion, PiaSplitTunnelGovernor,
+    PiaStrictKillSwitch, PiaVpnManager, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
+    SovereignKaslrEngine, SplitTunnelRule, WifiFrameType,
+};
+pub use unimplemented_features::{
+    AlpineApkPackageIndex, AndroidApexContainerModuleEngine, AndroidApexModule,
+    AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
+    DistroWatchParityMetricsHub, DragonFlyHammer2DeduplicationEngine, DragonFlyHammer2FsSnapshot,
+    GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine,
+    Hammer2Block, Jbd2TransactionLedger, LegacyController, MageiaMirror, MageiaSynthesisPackage,
+    MageiaUrpmiMccResolver, ModernController, NetBsdRumpComponentEngine,
+    NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine, PowerState,
+    RavenWidgetState, RosettaDynamicBinaryTranslator, RumpComponent, RumpComponentType,
+    SatSolverEngine, SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage,
+    SlackwarePkgtoolEngine, SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
+    TargetArch, UdfVm, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub mod expanded_wiki_innovations;
 pub mod virtualization;
@@ -112,13 +113,13 @@ pub mod crypto {
     pub mod vectorized_pqc;
 }
 
-pub mod logging;
 pub mod ai;
-pub mod system;
 pub mod installer;
-pub mod performance;
-pub mod ml;
 pub mod iot;
+pub mod logging;
+pub mod ml;
+pub mod performance;
+pub mod system;
 
 // Temporarily disabled problematic modules
 // pub mod accessibility;

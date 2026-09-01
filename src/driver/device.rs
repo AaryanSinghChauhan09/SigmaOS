@@ -1656,21 +1656,34 @@ mod tests {
     fn test_wdm_driver_lifecycle() {
         let mut io_mgr = IoManager::new();
 
-        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
+        let driver_idx = io_mgr
+            .normal_driver_installation_process(
+                b"MySerialDriver",
+                b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver",
+            )
+            .unwrap();
         assert_eq!(io_mgr.active_drivers.len(), 1);
 
         let driver = &mut io_mgr.active_drivers[driver_idx];
         assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
+        assert_eq!(
+            &driver.registry_path[..66],
+            b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver"
+        );
 
         driver.unload_routine = Some(|_drv| {});
 
-        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
+        assert!(io_mgr
+            .io_create_device(driver_idx, b"COM1", DeviceType::Character)
+            .is_ok());
 
         let driver_updated = &io_mgr.active_drivers[driver_idx];
         assert_eq!(driver_updated.device_objects.len(), 1);
         assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
+        assert_eq!(
+            driver_updated.device_objects[0].device_type,
+            DeviceType::Character
+        );
 
         let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
         ext.irq = 4;

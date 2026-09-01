@@ -8,8 +8,8 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitionTableScheme {
@@ -18,11 +18,11 @@ pub enum PartitionTableScheme {
 }
 
 pub mod partition_guids {
-    pub const EFI_SYSTEM: &str       = "C12A7328-F81F-11D2-BA4B-00A0C93EC93B";
+    pub const EFI_SYSTEM: &str = "C12A7328-F81F-11D2-BA4B-00A0C93EC93B";
     pub const LINUX_ROOT_X86_64: &str = "4F680000-0000-11AA-8000-006070732643";
-    pub const LINUX_LVM: &str         = "E6D6D370-C0A4-4A31-975F-3564063C8038";
-    pub const FREEBSD_UFS: &str       = "516E7CB4-6ECF-11D6-8FF8-00022D09712B";
-    pub const FREEBSD_ZFS: &str       = "516E7CBA-6ECF-11D6-8FF8-00022D09712B";
+    pub const LINUX_LVM: &str = "E6D6D370-C0A4-4A31-975F-3564063C8038";
+    pub const FREEBSD_UFS: &str = "516E7CB4-6ECF-11D6-8FF8-00022D09712B";
+    pub const FREEBSD_ZFS: &str = "516E7CBA-6ECF-11D6-8FF8-00022D09712B";
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -121,7 +121,11 @@ impl FdiskPartedEngine {
         Ok(part_num)
     }
 
-    pub fn resize_partition(&mut self, part_num: u32, new_size_mb: u64) -> Result<(), &'static str> {
+    pub fn resize_partition(
+        &mut self,
+        part_num: u32,
+        new_size_mb: u64,
+    ) -> Result<(), &'static str> {
         let idx = self
             .partitions
             .iter()
@@ -208,7 +212,10 @@ impl VolumeGroup {
     }
 
     pub fn free_extents(&self) -> u32 {
-        self.physical_volumes.values().map(|pv| pv.free_extents).sum()
+        self.physical_volumes
+            .values()
+            .map(|pv| pv.free_extents)
+            .sum()
     }
 
     pub fn create_lv(&mut self, lv_name: &str, size_mb: u32) -> Result<(), &'static str> {
@@ -241,8 +248,16 @@ impl VolumeGroup {
         Ok(())
     }
 
-    pub fn create_cow_snapshot(&mut self, origin_name: &str, snapshot_name: &str) -> Result<(), &'static str> {
-        let origin = self.logical_volumes.get(origin_name).ok_or("Origin Logical Volume not found")?.clone();
+    pub fn create_cow_snapshot(
+        &mut self,
+        origin_name: &str,
+        snapshot_name: &str,
+    ) -> Result<(), &'static str> {
+        let origin = self
+            .logical_volumes
+            .get(origin_name)
+            .ok_or("Origin Logical Volume not found")?
+            .clone();
         let snap_extents = origin.allocated_extents / 2; // CoW delta pool allocation
 
         if self.free_extents() < snap_extents {
@@ -269,7 +284,8 @@ impl VolumeGroup {
             origin_lv: Some(origin_name.to_string()),
         };
 
-        self.logical_volumes.insert(snapshot_name.to_string(), snap_lv);
+        self.logical_volumes
+            .insert(snapshot_name.to_string(), snap_lv);
         Ok(())
     }
 }
@@ -307,11 +323,15 @@ mod tests {
     #[test]
     fn test_fdisk_gpt_partitioning_and_alignment() {
         let mut engine = FdiskPartedEngine::new("sda", 20971520, PartitionTableScheme::Gpt); // 10GB disk
-        let p1 = engine.add_partition("efi", 512, partition_guids::EFI_SYSTEM).unwrap();
+        let p1 = engine
+            .add_partition("efi", 512, partition_guids::EFI_SYSTEM)
+            .unwrap();
         assert_eq!(p1, 1);
         assert_eq!(engine.partitions[0].start_sector, 2048); // Aligned to 2048 sectors
 
-        let p2 = engine.add_partition("root", 4096, partition_guids::LINUX_ROOT_X86_64).unwrap();
+        let p2 = engine
+            .add_partition("root", 4096, partition_guids::LINUX_ROOT_X86_64)
+            .unwrap();
         assert_eq!(p2, 2);
         assert!(engine.partitions[1].start_sector > engine.partitions[0].end_sector);
 
@@ -329,7 +349,10 @@ mod tests {
         assert_eq!(vg.free_extents(), 2560); // 10240 / 4
 
         assert!(vg.create_lv("lv_root", 4096).is_ok());
-        assert_eq!(vg.logical_volumes.get("lv_root").unwrap().allocated_extents, 1024);
+        assert_eq!(
+            vg.logical_volumes.get("lv_root").unwrap().allocated_extents,
+            1024
+        );
 
         assert!(vg.create_cow_snapshot("lv_root", "lv_root_snap").is_ok());
         let snap = vg.logical_volumes.get("lv_root_snap").unwrap();
@@ -344,7 +367,9 @@ mod tests {
         vg.add_pv("/dev/sdb1", 20480);
 
         assert!(vg.create_lv("lv_home", 8192).is_ok());
-        assert!(vg.create_cow_snapshot("lv_home", "lv_home_backup_snap").is_ok());
+        assert!(vg
+            .create_cow_snapshot("lv_home", "lv_home_backup_snap")
+            .is_ok());
 
         let snap = vg.logical_volumes.get("lv_home_backup_snap").unwrap();
         assert_eq!(snap.allocated_extents, 512); // 8192MB / 8MB = 1024 extents -> snap gets 512 extents

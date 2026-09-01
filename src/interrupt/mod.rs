@@ -12,5 +12,5 @@ pub use controller::{
     SimpleIRQHandler, SimpleInterruptController,
 };
 pub use handler::{
-    InterruptHandler, InterruptNumber, InterruptResult, SimpleInterruptHandler, RegisterSet,
+    InterruptHandler, InterruptNumber, InterruptResult, RegisterSet, SimpleInterruptHandler,
 };

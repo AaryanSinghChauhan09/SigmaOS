@@ -82,10 +82,10 @@ pub struct NodeStoreEntry {
 /// Node process security policy inspired by OpenBSD pledge/unveil & Linux seccomp-bpf
 #[derive(Debug, Clone)]
 pub struct NodeSecurityPolicy {
-    pub pledge_promises: String,       // e.g., "rpath wpath cpath inet stdio"
-    pub unveiled_paths: Vec<String>,   // allowed filesystem branches
-    pub disable_native_addons: bool,   // block loading .node C++ native addons
-    pub seccomp_filter_active: bool,   // restrict syscall surface
+    pub pledge_promises: String,     // e.g., "rpath wpath cpath inet stdio"
+    pub unveiled_paths: Vec<String>, // allowed filesystem branches
+    pub disable_native_addons: bool, // block loading .node C++ native addons
+    pub seccomp_filter_active: bool, // restrict syscall surface
 }
 
 impl Default for NodeSecurityPolicy {
@@ -259,7 +259,11 @@ impl NodeBinaryDistroEngine {
     }
 
     /// Configure npm & corepack integration paths
-    pub fn configure_npm_integration(&mut self, version: &str, corepack: bool) -> Result<(), &'static str> {
+    pub fn configure_npm_integration(
+        &mut self,
+        version: &str,
+        corepack: bool,
+    ) -> Result<(), &'static str> {
         if let Some(entry) = self.installed_store.get_mut(version) {
             entry.corepack_enabled = corepack;
             Ok(())
@@ -310,7 +314,11 @@ mod tests {
 
         engine.register_release_binary(pkg.clone());
         let latest = engine
-            .find_latest_release(NodeReleaseStream::Lts, NodeTargetArch::X86_64, LibcFlavor::Musl)
+            .find_latest_release(
+                NodeReleaseStream::Lts,
+                NodeTargetArch::X86_64,
+                LibcFlavor::Musl,
+            )
             .unwrap();
 
         assert_eq!(latest.version, "v20.11.0");
@@ -338,8 +346,20 @@ mod tests {
         // Switch active version
         engine.set_active_version("v20.11.0").unwrap();
         assert_eq!(engine.get_active_version().unwrap().version, "v20.11.0");
-        assert!(!engine.installed_store.get("v18.19.0").unwrap().is_active_default);
-        assert!(engine.installed_store.get("v20.11.0").unwrap().is_active_default);
+        assert!(
+            !engine
+                .installed_store
+                .get("v18.19.0")
+                .unwrap()
+                .is_active_default
+        );
+        assert!(
+            engine
+                .installed_store
+                .get("v20.11.0")
+                .unwrap()
+                .is_active_default
+        );
     }
 
     #[test]
@@ -349,16 +369,24 @@ mod tests {
         engine.security_policy.disable_native_addons = true;
 
         // Allowed path
-        assert!(engine.enforce_sandbox_policy("/sovereign/app/index.js", false).is_ok());
+        assert!(engine
+            .enforce_sandbox_policy("/sovereign/app/index.js", false)
+            .is_ok());
 
         // Unveil violation
         let path_err = engine.enforce_sandbox_policy("/etc/passwd", false);
         assert!(path_err.is_err());
-        assert_eq!(path_err.unwrap_err(), "Node process unveil violation: filesystem access denied");
+        assert_eq!(
+            path_err.unwrap_err(),
+            "Node process unveil violation: filesystem access denied"
+        );
 
         // Native add-on violation
         let addon_err = engine.enforce_sandbox_policy("/sovereign/app/binding.node", true);
         assert!(addon_err.is_err());
-        assert_eq!(addon_err.unwrap_err(), "Node process policy error: C++ native add-ons (.node) are blocked");
+        assert_eq!(
+            addon_err.unwrap_err(),
+            "Node process policy error: C++ native add-ons (.node) are blocked"
+        );
     }
 }

@@ -25,9 +25,14 @@ pub use sigma_sh::{
 };
 
 // pub use repl::{ShellCommand, ShellRepl};
-pub use command::{CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession, SimpleCommandRegistry, SimpleShellSession};
-pub use terminal_emulator::{TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
-pub use alias_system::{AliasManager, SigmaAlias, AliasType};
+pub use alias_system::{AliasManager, AliasType, SigmaAlias};
+pub use command::{
+    CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession,
+    SimpleCommandRegistry, SimpleShellSession,
+};
 pub use sovereign_shell_parity::{
-    RedirectionType, ParsedPipelineCommand, SovereignBashZshParityShell,
+    ParsedPipelineCommand, RedirectionType, SovereignBashZshParityShell,
+};
+pub use terminal_emulator::{
+    AnsiColor, AutoSuggestionEngine, TerminalSession, UserDefinedFunction,
 };

@@ -13,20 +13,11 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
+#[path = "memory/pmm_vmm.rs"]
 pub mod pmm_vmm;
+#[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
-pub mod sigma_buddy;
-
-pub use pmm_vmm::*;
-pub use resource_allocator::{
-    ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,
-    PcieResourceAllocator, PcieResourceWindow, ResourceLimits, ResourceUsage,
-    SigmaResourceAllocatorHub, SlabObjectCacheAllocator, SlabSizeClass,
-};
-pub use sigma_buddy::*;
-
-pub mod pmm_vmm;
-pub mod resource_allocator;
+#[path = "memory/sigma_buddy.rs"]
 pub mod sigma_buddy;
 
 pub use pmm_vmm::*;

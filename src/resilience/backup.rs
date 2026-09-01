@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Timeshift-Parity Recovery & Snapshot Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Permitting instant system-wide rollbacks of the root file system hierarchy if user updates damage any system file.
@@ -221,7 +221,9 @@ impl ExclusionFilter {
     }
 
     pub fn is_path_excluded(&self, path: &str) -> bool {
-        self.excluded_paths.iter().any(|excluded| path.starts_with(excluded))
+        self.excluded_paths
+            .iter()
+            .any(|excluded| path.starts_with(excluded))
     }
 }
 
@@ -288,7 +290,10 @@ impl AdvancedTimeshiftEngine {
             }
         }
 
-        let snapshot_id = format!("timeshift-{:?}-{}-{}", self.backend, schedule as u8, timestamp);
+        let snapshot_id = format!(
+            "timeshift-{:?}-{}-{}",
+            self.backend, schedule as u8, timestamp
+        );
         let snapshot = AdvancedTimeshiftSnapshot {
             id: snapshot_id.clone(),
             timestamp,
@@ -386,7 +391,10 @@ mod tests {
         let mut raw_manifest = HashMap::new();
         raw_manifest.insert("/etc/sigma.conf".to_string(), "hash_config".to_string());
         raw_manifest.insert("/usr/bin/kernel".to_string(), "hash_kernel".to_string());
-        raw_manifest.insert("/home/user/document.txt".to_string(), "hash_user".to_string()); // Should be excluded
+        raw_manifest.insert(
+            "/home/user/document.txt".to_string(),
+            "hash_user".to_string(),
+        ); // Should be excluded
 
         let snap_id = engine
             .create_checkpoint(
@@ -398,7 +406,10 @@ mod tests {
 
         assert_eq!(engine.snapshots.len(), 1);
         assert_eq!(engine.boot_entries.len(), 1);
-        assert_eq!(engine.boot_entries[0].title, "SigmaOS Snapshot - Pre-Upgrade Snapshot");
+        assert_eq!(
+            engine.boot_entries[0].title,
+            "SigmaOS Snapshot - Pre-Upgrade Snapshot"
+        );
 
         let restored = engine.rollback(&snap_id).unwrap();
         assert!(restored.contains_key("/etc/sigma.conf"));
@@ -419,7 +430,11 @@ mod tests {
         let _ = engine.create_checkpoint("Boot 3".to_string(), SnapshotSchedule::Boot, raw.clone());
 
         // Should be capped at 2 boot snapshots according to policy
-        let boot_count = engine.snapshots.iter().filter(|s| s.schedule == SnapshotSchedule::Boot).count();
+        let boot_count = engine
+            .snapshots
+            .iter()
+            .filter(|s| s.schedule == SnapshotSchedule::Boot)
+            .count();
         assert_eq!(boot_count, 2);
     }
 }

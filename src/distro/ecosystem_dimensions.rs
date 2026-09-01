@@ -15,7 +15,6 @@ extern crate alloc;
 // 11. Academic & Research Infrastructure
 // 12. Democratic Community Governance
 
-
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};

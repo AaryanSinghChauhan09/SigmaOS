@@ -17,10 +17,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Memory Leak Detector
 // OOP-based memory leak detection with tracking and analysis
@@ -125,7 +125,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in self.allocations.values() {
-            let stack_key = record.format!("{}/{}", stack_trace, " | ");
+            let stack_key = record.stack_trace.join(" | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
@@ -206,7 +206,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in leaked_allocations {
-            let stack_key = record.format!("{}/{}", stack_trace, " | ");
+            let stack_key = record.stack_trace.join(" | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
@@ -308,14 +308,16 @@ impl MemoryLeakDetector {
 
     /// Check if there are leaks
     pub fn has_leaks(&self) -> bool {
-        self.current_report.as_ref()
+        self.current_report
+            .as_ref()
             .map(|r| r.leaked_allocations > 0)
             .unwrap_or(false)
     }
 
     /// Get total leaked bytes
     pub fn total_leaked_bytes(&self) -> u64 {
-        self.current_report.as_ref()
+        self.current_report
+            .as_ref()
             .map(|r| r.total_leaked_bytes)
             .unwrap_or(0)
     }
@@ -379,7 +381,9 @@ impl LeakSanitizerDetector {
                 // Determine if this lost block is a direct root leak (Definitely Lost)
                 // or if it was pointed to by another block that was lost (Indirectly Lost)
                 let pointed_to_by_any_lost_block = self.allocations.values().any(|other| {
-                    other.address != addr && other.address <= addr && addr < other.address + other.size
+                    other.address != addr
+                        && other.address <= addr
+                        && addr < other.address + other.size
                 });
 
                 if pointed_to_by_any_lost_block {
@@ -433,7 +437,8 @@ impl AsanGuardZoneDetector {
         for _i in 0..self.redzone_size {
             magic_pattern.push(0xFA); // Standard ASan Heap Redzone marker byte
         }
-        self.redzones.insert(record.address + record.size, magic_pattern);
+        self.redzones
+            .insert(record.address + record.size, magic_pattern);
         self.allocations.insert(record.address, record);
     }
 
@@ -591,9 +596,18 @@ mod tests {
         });
 
         let classification = lsan.scan_reachability();
-        assert_eq!(*classification.get(&0x5000).unwrap(), ReachabilityStatus::StillReachable);
-        assert_eq!(*classification.get(&0x9000).unwrap(), ReachabilityStatus::DefinitelyLost);
-        assert_eq!(*classification.get(&0x9010).unwrap(), ReachabilityStatus::IndirectlyLost);
+        assert_eq!(
+            *classification.get(&0x5000).unwrap(),
+            ReachabilityStatus::StillReachable
+        );
+        assert_eq!(
+            *classification.get(&0x9000).unwrap(),
+            ReachabilityStatus::DefinitelyLost
+        );
+        assert_eq!(
+            *classification.get(&0x9010).unwrap(),
+            ReachabilityStatus::IndirectlyLost
+        );
     }
 
     #[test]
@@ -637,6 +651,9 @@ mod tests {
         assert!(quarantine.verify_use_after_free(0x7000));
 
         // 3. Trying to free again returns a Double Free error
-        assert_eq!(quarantine.track_deallocation(0x7000), Err("Double Free detected!"));
+        assert_eq!(
+            quarantine.track_deallocation(0x7000),
+            Err("Double Free detected!")
+        );
     }
 }

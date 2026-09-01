@@ -126,7 +126,9 @@ impl LlmnrNbnsResolver {
     pub fn build_llmnr_query(host_name: &str) -> Vec<u8> {
         let mut packet = Vec::new();
         // LLMNR Header: ID=0x1234, Flags=0x0000 (Query), QDCOUNT=1
-        packet.extend_from_slice(&[0x12, 0x34, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        packet.extend_from_slice(&[
+            0x12, 0x34, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        ]);
         // Question name labels
         for part in host_name.split('.') {
             if !part.is_empty() {
@@ -253,7 +255,10 @@ mod tests {
 
         let peers = engine.list_active_peers();
         assert_eq!(peers.len(), 1);
-        assert_eq!(peers[0].services[0].protocol, DiscoveryProtocolType::UpnpSsdp);
+        assert_eq!(
+            peers[0].services[0].protocol,
+            DiscoveryProtocolType::UpnpSsdp
+        );
     }
 
     #[test]

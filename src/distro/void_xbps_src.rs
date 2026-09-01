@@ -5,9 +5,9 @@
 // inspiration beyond the init system already modelled in compatibility/void_linux.rs.
 
 extern crate alloc;
+use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum XbpsTemplatePhase {
@@ -105,7 +105,10 @@ impl XbpsBootstrapPlanner {
             for dep in t.build_depends.iter().chain(t.hostmakedepends.iter()) {
                 if self.templates.contains_key(dep) {
                     *indegree.entry(name.clone()).or_insert(0) += 1;
-                    successors.entry(dep.clone()).or_default().push(name.clone());
+                    successors
+                        .entry(dep.clone())
+                        .or_default()
+                        .push(name.clone());
                 }
             }
         }
