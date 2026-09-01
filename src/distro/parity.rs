@@ -481,6 +481,14 @@ mod tests {
         installer.set_installation_mode(InstallationMode::DualBootSovereign);
         assert_eq!(installer.mode, InstallationMode::DualBootSovereign);
 
+        // Detect OS & set dual-boot mode
+        let os_list = installer.detect_existing_operating_systems();
+        assert_eq!(os_list.len(), 2);
+        assert_eq!(os_list[0].name, "Windows 11 Pro");
+
+        installer.set_installation_mode(InstallationMode::DualBootSovereign);
+        assert_eq!(installer.mode, InstallationMode::DualBootSovereign);
+
         let init_res = installer.initialize_target(InstallationTarget::VirtualDisk);
         assert!(init_res.is_ok());
         assert_eq!(installer.get_current_step(), InstallerStep::Partitioning);

@@ -15,6 +15,7 @@ type SigmaU64 = u64;
 
 /// System information
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct UnameInfo {
     pub sysname: [u8; 64],
     pub nodename: [u8; 64],

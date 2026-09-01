@@ -25,6 +25,7 @@ pub struct DownloadOptions {
 
 /// Download progress
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct DownloadProgress {
     pub url: [u8; 512],
     pub downloaded_bytes: SigmaU64,

@@ -15,6 +15,7 @@ type SigmaU64 = u64;
 
 /// Wc result
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct WcResult {
     pub line_count: SigmaU64,
     pub word_count: SigmaU64,

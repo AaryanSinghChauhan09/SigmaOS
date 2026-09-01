@@ -15,6 +15,7 @@ type SigmaU64 = u64;
 
 /// User account
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct UserAccount {
     pub username: [u8; 32],
     pub uid: SigmaU32,
@@ -253,7 +254,7 @@ pub unsafe extern "C" fn useradd_list(users: *mut UserAccount, max_count: SigmaU
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Get user count
