@@ -1,30 +1,31 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod arch_pacman_engine;
-pub mod aur;
-pub mod aur_helper;
 pub mod client;
 pub mod daemon;
+pub mod aur;
+pub mod aur_helper;
 pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod declarative_build;
 pub mod fedora_rpm_engine;
-pub mod gentoo_use_flags;
 pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
 pub mod nix_dsl;
+pub mod gentoo_use_flags;
+pub mod package_snapshot_rollback;
+pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
-pub mod package_snapshot_rollback;
 pub mod pacman;
 pub mod portage;
 pub mod recipe;
@@ -33,12 +34,11 @@ pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
 pub mod sovereign_package_innovations;
-pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
-    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
+    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
 pub mod store;
@@ -50,65 +50,66 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use sovereign_sigpkg::*;
-pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
+};
+pub use sovereign_sigpkg::*;
 
-pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager,
 };
 pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
-pub use client::{
-    parse_manifest, verify_signed_metadata, Manifest, SignedMetadata, SigpkgClient, TufRole,
-};
-pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
 pub use fedora_rpm_engine::{DnfRepository, RpmPackage};
-pub use gentoo_use_flags::{ConditionalDependency, UseFlagManager, UseProfile};
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
 pub use multi_distro::{
-    AptPinPriority, BsdPkgDb, BsdPkgDirective, BsdPkgManifest, DnfDeltaEngine, EbuildManifestEntry,
-    EbuildManifestEntryType, GentooEbuildManifestEngine, NixFlakeInput, NixFlakeLockVerifier,
-    NixFlakeLockfile, PacmanAlpmHookRegistry, ParallelMirrorDownloader, PortageSlotResolver,
-    SovereignMultiDistroPackageManager, StagedTransaction, TransactionRollbackHandler,
-    XbpsCasExtractor,
-};
-pub use nix_dsl::{NixDerivationSpec, NixDslEvaluator, NixExpr};
-pub use package_snapshot_rollback::{
-    InstalledPackageRecord, PackageSnapshotDiff, PackageSnapshotState,
-    SovereignPackageSnapshotRollbackEngine,
+    AptPinPriority, BsdPkgDb, BsdPkgDirective, BsdPkgManifest, DnfDeltaEngine,
+    EbuildManifestEntry, EbuildManifestEntryType, GentooEbuildManifestEngine,
+    NixFlakeInput, NixFlakeLockVerifier, NixFlakeLockfile, PacmanAlpmHookRegistry,
+    ParallelMirrorDownloader, PortageSlotResolver, SovereignMultiDistroPackageManager,
+    StagedTransaction, TransactionRollbackHandler, XbpsCasExtractor,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use nix_dsl::{NixDerivationSpec, NixDslEvaluator, NixExpr};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
-};
+pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
+pub use transaction::Transaction;
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use store::{
-    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
-};
-pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
+pub use package_snapshot_rollback::{
+    SovereignPackageSnapshotRollbackEngine, PackageSnapshotState, PackageSnapshotDiff,
+    InstalledPackageRecord,
+};
+pub use sovereign_package_innovations::{
+    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
+    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+};
+pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
+pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
+pub use client::{
+    SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
+};
+pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
