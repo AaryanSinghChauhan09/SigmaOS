@@ -5,11 +5,11 @@
 
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. FreeBSD Ports Flavours & VuXML Package Vulnerability Auditor
@@ -52,7 +52,14 @@ impl FreeBsdPortsFlavoursAndVuxmlEngine {
         });
     }
 
-    pub fn add_vuxml_entry(&mut self, vid: &str, pkg_name: &str, affected_range: &str, description: &str, cve: &str) {
+    pub fn add_vuxml_entry(
+        &mut self,
+        vid: &str,
+        pkg_name: &str,
+        affected_range: &str,
+        description: &str,
+        cve: &str,
+    ) {
         self.vuxml_db.push(VuXmlVulnerabilityEntry {
             vid: vid.to_string(),
             pkg_name: pkg_name.to_string(),
@@ -97,21 +104,34 @@ impl XbpsSonameAndOrphanEngine {
         }
     }
 
-    pub fn register_package(&mut self, name: &str, version: &str, provided: &[&str], required: &[&str], is_explicit: bool) {
-        self.packages.insert(name.to_string(), XbpsPackageNode {
-            name: name.to_string(),
-            version: version.to_string(),
-            provided_sonames: provided.iter().map(|s| s.to_string()).collect(),
-            required_sonames: required.iter().map(|s| s.to_string()).collect(),
-            is_explicitly_installed: is_explicit,
-        });
+    pub fn register_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        provided: &[&str],
+        required: &[&str],
+        is_explicit: bool,
+    ) {
+        self.packages.insert(
+            name.to_string(),
+            XbpsPackageNode {
+                name: name.to_string(),
+                version: version.to_string(),
+                provided_sonames: provided.iter().map(|s| s.to_string()).collect(),
+                required_sonames: required.iter().map(|s| s.to_string()).collect(),
+                is_explicitly_installed: is_explicit,
+            },
+        );
     }
 
     pub fn find_missing_sonames(&self, pkg_name: &str) -> Vec<String> {
         let mut missing = Vec::new();
         if let Some(pkg) = self.packages.get(pkg_name) {
             for req in &pkg.required_sonames {
-                let satisfied = self.packages.values().any(|p| p.provided_sonames.contains(req));
+                let satisfied = self
+                    .packages
+                    .values()
+                    .any(|p| p.provided_sonames.contains(req));
                 if !satisfied {
                     missing.push(req.clone());
                 }
@@ -128,7 +148,10 @@ impl XbpsSonameAndOrphanEngine {
                     if other.name == *name {
                         return false;
                     }
-                    other.required_sonames.iter().any(|req| pkg.provided_sonames.contains(req))
+                    other
+                        .required_sonames
+                        .iter()
+                        .any(|req| pkg.provided_sonames.contains(req))
                 });
                 if !is_needed {
                     orphans.push(name.clone());
@@ -171,13 +194,15 @@ impl AlpineApkWorldAndVirtualPkgEngine {
 
     pub fn push_ephemeral_build_deps(&mut self, virtual_name: &str, deps: &[&str]) {
         for dep in deps {
-            self.ephemeral_build_deps.push(format!("{}:{}", virtual_name, dep));
+            self.ephemeral_build_deps
+                .push(format!("{}:{}", virtual_name, dep));
         }
     }
 
     pub fn purge_virtual_build_deps(&mut self, virtual_name: &str) -> usize {
         let initial_len = self.ephemeral_build_deps.len();
-        self.ephemeral_build_deps.retain(|d| !d.starts_with(&format!("{}:", virtual_name)));
+        self.ephemeral_build_deps
+            .retain(|d| !d.starts_with(&format!("{}:", virtual_name)));
         initial_len - self.ephemeral_build_deps.len()
     }
 }
@@ -294,9 +319,10 @@ impl ArchSplitPackageHookRunnerEngine {
     pub fn trigger_hooks_for_files(&self, installed_files: &[&str]) -> Vec<String> {
         let mut triggered = Vec::new();
         for hook in &self.hooks {
-            let matches = hook.target_paths.iter().any(|target| {
-                installed_files.iter().any(|file| file.starts_with(target))
-            });
+            let matches = hook
+                .target_paths
+                .iter()
+                .any(|target| installed_files.iter().any(|file| file.starts_with(target)));
             if matches {
                 triggered.push(hook.exec_cmd.clone());
             }
@@ -331,10 +357,18 @@ pub struct FedoraDnf5AdvisoryAndDeltaRpmEngine {
 
 impl FedoraDnf5AdvisoryAndDeltaRpmEngine {
     pub fn new() -> Self {
-        Self { advisories: Vec::new() }
+        Self {
+            advisories: Vec::new(),
+        }
     }
 
-    pub fn add_advisory(&mut self, id: &str, severity: AdvisorySeverity, package: &str, fixed_version: &str) {
+    pub fn add_advisory(
+        &mut self,
+        id: &str,
+        severity: AdvisorySeverity,
+        package: &str,
+        fixed_version: &str,
+    ) {
         self.advisories.push(Dnf5Advisory {
             id: id.to_string(),
             severity,
@@ -355,7 +389,11 @@ impl FedoraDnf5AdvisoryAndDeltaRpmEngine {
         updates
     }
 
-    pub fn reconstruct_delta_rpm(&self, _base_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+    pub fn reconstruct_delta_rpm(
+        &self,
+        _base_bytes: &[u8],
+        delta_bytes: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
         if delta_bytes.is_empty() {
             return Err("Delta payload empty");
         }
@@ -391,16 +429,22 @@ impl GentooPortageSubslotAndUseExpandEngine {
     }
 
     pub fn register_package(&mut self, name: &str, slot: &str, subslot: &str, deps: &[&str]) {
-        self.packages.insert(name.to_string(), PortageSubslotPackage {
-            name: name.to_string(),
-            slot: slot.to_string(),
-            subslot: subslot.to_string(),
-            dependencies: deps.iter().map(|s| s.to_string()).collect(),
-        });
+        self.packages.insert(
+            name.to_string(),
+            PortageSubslotPackage {
+                name: name.to_string(),
+                slot: slot.to_string(),
+                subslot: subslot.to_string(),
+                dependencies: deps.iter().map(|s| s.to_string()).collect(),
+            },
+        );
     }
 
     pub fn set_use_expand(&mut self, var_name: &str, values: &[&str]) {
-        self.use_expand_vars.insert(var_name.to_string(), values.iter().map(|s| s.to_string()).collect());
+        self.use_expand_vars.insert(
+            var_name.to_string(),
+            values.iter().map(|s| s.to_string()).collect(),
+        );
     }
 
     pub fn compute_subslot_rebuilds(&self, updated_pkg: &str, _new_subslot: &str) -> Vec<String> {
@@ -409,7 +453,10 @@ impl GentooPortageSubslotAndUseExpandEngine {
             if name == updated_pkg {
                 continue;
             }
-            let depends_on_updated = pkg.dependencies.iter().any(|dep| dep.starts_with(updated_pkg));
+            let depends_on_updated = pkg
+                .dependencies
+                .iter()
+                .any(|dep| dep.starts_with(updated_pkg));
             if depends_on_updated {
                 rebuilds.push(name.clone());
             }
@@ -453,7 +500,11 @@ impl HaikuHpkgPackageFsEngine {
         }
     }
 
-    pub fn mount_hpkg(&mut self, hpkg_path: &str, mount_vfs_path: &str) -> Result<(), &'static str> {
+    pub fn mount_hpkg(
+        &mut self,
+        hpkg_path: &str,
+        mount_vfs_path: &str,
+    ) -> Result<(), &'static str> {
         if hpkg_path.is_empty() || mount_vfs_path.is_empty() {
             return Err("Invalid mount parameters");
         }
@@ -485,7 +536,13 @@ mod tests {
     #[test]
     fn test_freebsd_vuxml_auditor() {
         let mut eng = FreeBsdPortsFlavoursAndVuxmlEngine::new();
-        eng.add_vuxml_entry("vid1", "openssl", "< 3.0.1", "Buffer overflow", "CVE-2023-0001");
+        eng.add_vuxml_entry(
+            "vid1",
+            "openssl",
+            "< 3.0.1",
+            "Buffer overflow",
+            "CVE-2023-0001",
+        );
         let vulns = eng.audit_package("openssl", "3.0.0");
         assert_eq!(vulns.len(), 1);
         assert_eq!(vulns[0].cve, "CVE-2023-0001");
@@ -496,7 +553,13 @@ mod tests {
         let mut xbps = XbpsSonameAndOrphanEngine::new();
         xbps.register_package("glibc", "2.38", &["libc.so.6"], &[], true);
         xbps.register_package("libssl", "3.0", &["libssl.so.3"], &["libc.so.6"], false);
-        xbps.register_package("curl", "8.5", &[], &["libssl.so.3", "libmissing.so.1"], true);
+        xbps.register_package(
+            "curl",
+            "8.5",
+            &[],
+            &["libssl.so.3", "libmissing.so.1"],
+            true,
+        );
 
         let missing = xbps.find_missing_sonames("curl");
         assert_eq!(missing, vec!["libmissing.so.1"]);
@@ -530,15 +593,25 @@ mod tests {
     #[test]
     fn test_arch_split_package_and_hooks() {
         let mut arch = ArchSplitPackageHookRunnerEngine::new();
-        arch.register_path_hook("glib-compile-schemas", &["usr/share/glib-2.0/schemas/"], "glib-compile-schemas usr/share/glib-2.0/schemas/");
-        let triggered = arch.trigger_hooks_for_files(&["usr/share/glib-2.0/schemas/my-app.gschema.xml"]);
+        arch.register_path_hook(
+            "glib-compile-schemas",
+            &["usr/share/glib-2.0/schemas/"],
+            "glib-compile-schemas usr/share/glib-2.0/schemas/",
+        );
+        let triggered =
+            arch.trigger_hooks_for_files(&["usr/share/glib-2.0/schemas/my-app.gschema.xml"]);
         assert_eq!(triggered.len(), 1);
     }
 
     #[test]
     fn test_fedora_dnf5_advisories() {
         let mut dnf = FedoraDnf5AdvisoryAndDeltaRpmEngine::new();
-        dnf.add_advisory("FEDORA-2024-001", AdvisorySeverity::Critical, "curl", "8.6.0");
+        dnf.add_advisory(
+            "FEDORA-2024-001",
+            AdvisorySeverity::Critical,
+            "curl",
+            "8.6.0",
+        );
         let updates = dnf.filter_sec_updates(&[("curl", "8.5.0")]);
         assert_eq!(updates.len(), 1);
     }
@@ -560,7 +633,9 @@ mod tests {
     #[test]
     fn test_haiku_packagefs() {
         let mut haiku = HaikuHpkgPackageFsEngine::new();
-        assert!(haiku.mount_hpkg("/boot/system/packages/bash.hpkg", "/system").is_ok());
+        assert!(haiku
+            .mount_hpkg("/boot/system/packages/bash.hpkg", "/system")
+            .is_ok());
         assert!(haiku.is_mounted("/boot/system/packages/bash.hpkg"));
         haiku.enable_stateless_moss_overlay();
         assert!(haiku.stateless_overlay_active);

@@ -25,10 +25,8 @@ pub mod debian_translator;
 pub mod dependency_resolver;
 pub mod gentoo_opt;
 pub mod linux_translation;
-pub mod repository;
-pub mod store;
-pub mod universal;
 pub mod manager;
+pub mod repository;
 pub mod repository;
 pub mod resolver;
 pub mod sandbox;
@@ -36,6 +34,8 @@ pub mod sigma_pkg;
 pub mod signing;
 pub mod spac;
 pub mod store;
+pub mod store;
+pub mod universal;
 pub mod universal;
 pub mod updater;
 
@@ -48,11 +48,13 @@ pub use linux_translation::{
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use repository::{
-    MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule,
-    PackageRepository, PackageTransactionJournal, PinPriority, RepoError,
-    RepositoryManager, RepositoryMetadata, TransactionJournalEntry,
+    MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule, PackageRepository,
+    PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
+    TransactionJournalEntry,
 };
-pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, StoreApp, StoreError, GLOBAL_SOFTWARE_STORE};
+pub use store::{
+    SigmaSoftwareStore, SoftwareRegistryEntry, StoreApp, StoreError, GLOBAL_SOFTWARE_STORE,
+};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
