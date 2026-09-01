@@ -422,9 +422,35 @@ impl Default for SecurityAdvisoryTracker {
 // =========================================================================
 // 4. SIGNSTAR -> SignstarService
 //    A signing service for reproducible package repositories: a configurable
-//    set of signers, a mandatory/optional signer policy, and verification of
-//    completed signing sets — mirroring Arch's signstar signer orchestration.
+//    set of signers, mandatory/optional policies, threshold quorum enforcement,
+//    revocation & key expiration checks, and algorithm hardware backing verification —
+//    mirroring Arch's signstar, OpenBSD signify, and FreeBSD pkg signing pipelines.
 // =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SignatureAlgorithm {
+    Ed25519,
+    Rsa4096,
+    EcdsaP256,
+    GpgOpenPgp,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyBacking {
+    HardwareHsm,
+    SoftwareKey,
+    SmartCard,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SigningKey {
+    pub key_id: String,
+    pub fingerprint: String,
+    pub algorithm: SignatureAlgorithm,
+    pub backing: KeyBacking,
+    pub expires_at: u64, // 0 means no expiration
+    pub is_revoked: bool,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SignerPolicy {
@@ -435,13 +461,16 @@ pub enum SignerPolicy {
 #[derive(Debug, Clone)]
 pub struct Signer {
     pub id: String,
+    pub key: SigningKey,
     pub policy: SignerPolicy,
     pub signed: bool,
+    pub signature_timestamp: u64,
 }
 
 pub struct SignstarService {
     pub signers: Vec<Signer>,
     pub package: String,
+    pub quorum_threshold: usize,
     pub fully_signed: bool,
 }
 
@@ -450,41 +479,91 @@ impl SignstarService {
         Self {
             signers: Vec::new(),
             package: package.to_string(),
+            quorum_threshold: 1,
             fully_signed: false,
         }
     }
 
-    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
+    pub fn with_quorum_threshold(mut self, threshold: usize) -> Self {
+        self.quorum_threshold = threshold;
+        self
+    }
+
+    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy, key: SigningKey) {
         self.signers.push(Signer {
             id: id.to_string(),
+            key,
             policy,
             signed: false,
+            signature_timestamp: 0,
         });
     }
 
-    /// Record that a signer has produced a valid signature.
-    pub fn record_signature(&mut self, id: &str) {
+    /// Record that a signer has produced a valid signature at a specific timestamp.
+    /// Fails if the signing key is revoked or expired at current time.
+    pub fn record_signature_at(&mut self, id: &str, now_sec: u64) -> Result<(), &'static str> {
+        let mut found = false;
         for s in &mut self.signers {
             if s.id == id {
+                found = true;
+                if s.key.is_revoked {
+                    return Err("Signstar: Cannot accept signature from a revoked key");
+                }
+                if s.key.expires_at > 0 && now_sec > s.key.expires_at {
+                    return Err("Signstar: Cannot accept signature from an expired key");
+                }
                 s.signed = true;
+                s.signature_timestamp = now_sec;
             }
         }
-        self.fully_signed = self.all_mandatory_signed();
+
+        if !found {
+            return Err("Signstar: Signer ID not registered");
+        }
+
+        self.fully_signed = self.verify_signing_quorum();
+        Ok(())
     }
 
-    /// The signing set is complete when every mandatory signer has signed
-    /// (optional signers may or may not have signed).
+    /// Record signature assuming current timestamp 0 (legacy overload compatibility)
+    pub fn record_signature(&mut self, id: &str) {
+        let _ = self.record_signature_at(id, 0);
+    }
+
+    /// Verifies if both all mandatory signers have signed AND the total valid signatures
+    /// satisfy the required N-of-M quorum threshold.
+    pub fn verify_signing_quorum(&self) -> bool {
+        let mandatory_ok = self.all_mandatory_signed();
+        let total_valid = self.valid_signatures_count();
+        mandatory_ok && total_valid >= self.quorum_threshold
+    }
+
+    /// Check if all non-revoked mandatory signers have signed
     pub fn all_mandatory_signed(&self) -> bool {
         self.signers
             .iter()
-            .filter(|s| s.policy == SignerPolicy::Mandatory)
+            .filter(|s| s.policy == SignerPolicy::Mandatory && !s.key.is_revoked)
             .all(|s| s.signed)
+    }
+
+    pub fn valid_signatures_count(&self) -> usize {
+        self.signers
+            .iter()
+            .filter(|s| s.signed && !s.key.is_revoked)
+            .count()
     }
 
     pub fn mandatory_signed_count(&self) -> usize {
         self.signers
             .iter()
-            .filter(|s| s.policy == SignerPolicy::Mandatory && s.signed)
+            .filter(|s| s.policy == SignerPolicy::Mandatory && s.signed && !s.key.is_revoked)
+            .count()
+    }
+
+    pub fn hardware_backed_signatures_count(&self) -> usize {
+        self.signers
+            .iter()
+            .filter(|s| s.signed && !s.key.is_revoked && s.key.backing == KeyBacking::HardwareHsm)
             .count()
     }
 }
@@ -893,5 +972,54 @@ mod tests {
         assert_eq!(t.affected("openssl", "3.0.1").len(), 0);
         assert_eq!(t.recommended_upgrades("openssl", "1.1.1"), vec!["3.0.1".to_string()]);
         assert_eq!(t.critical_count(), 1);
+    }
+
+    #[test]
+    fn signstar_service_multi_signature_quorum_and_revocation() {
+        let key_master = SigningKey {
+            key_id: "master-key-01".to_string(),
+            fingerprint: "A1B2C3D4".to_string(),
+            algorithm: SignatureAlgorithm::Ed25519,
+            backing: KeyBacking::HardwareHsm,
+            expires_at: 1800000000,
+            is_revoked: false,
+        };
+
+        let key_revoked = SigningKey {
+            key_id: "compromised-key".to_string(),
+            fingerprint: "DEADBEEF".to_string(),
+            algorithm: SignatureAlgorithm::Rsa4096,
+            backing: KeyBacking::SoftwareKey,
+            expires_at: 0,
+            is_revoked: true,
+        };
+
+        let key_auditor = SigningKey {
+            key_id: "auditor-key-02".to_string(),
+            fingerprint: "E5F6G7H8".to_string(),
+            algorithm: SignatureAlgorithm::EcdsaP256,
+            backing: KeyBacking::SmartCard,
+            expires_at: 0,
+            is_revoked: false,
+        };
+
+        let mut signstar = SignstarService::new("core/glibc").with_quorum_threshold(2);
+        signstar.add_signer("releng", SignerPolicy::Mandatory, key_master);
+        signstar.add_signer("rogue", SignerPolicy::Optional, key_revoked);
+        signstar.add_signer("security-team", SignerPolicy::Optional, key_auditor);
+
+        // Revoked key signature should be rejected
+        assert!(signstar.record_signature_at("rogue", 1700000000).is_err());
+
+        // Single mandatory signature: quorum threshold (2) not yet met
+        assert!(signstar.record_signature_at("releng", 1700000000).is_ok());
+        assert!(!signstar.fully_signed);
+        assert_eq!(signstar.mandatory_signed_count(), 1);
+        assert_eq!(signstar.hardware_backed_signatures_count(), 1);
+
+        // Second optional signature arrives: quorum threshold 2 met
+        assert!(signstar.record_signature_at("security-team", 1700000000).is_ok());
+        assert!(signstar.fully_signed);
+        assert_eq!(signstar.valid_signatures_count(), 2);
     }
 }
