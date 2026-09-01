@@ -1,0 +1,62 @@
+name: Linux & BSD Parity Wiki & Manuals Pages Hub
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'wiki/**'
+      - 'wiki_repo/**'
+      - '*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-distro-wiki"
+  cancel-in-progress: false
+
+jobs:
+  build-wiki-pages:
+    name: Build & Render Distro Parity Wiki Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate API Documentation
+        run: cargo doc --no-deps --lib || true
+
+      - name: Prepare Pages Artifacts
+        run: |
+          mkdir -p _site/wiki
+          cp -r target/doc/. _site/api/ || true
+          cp LINUX_BSD_DISTRO_PARITY_MASTER_SPEC.md _site/wiki/ || true
+          cp NODE_JS_BINARY_DISTRIBUTION_GUIDE.md _site/wiki/ || true
+          cp NVIDIA_PRIME_HYBRID_GRAPHICS_SPEC.md _site/wiki/ || true
+          cp UNIVERSAL_PACKAGE_TRANSLATION_MANUAL.md _site/wiki/ || true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy-wiki-pages:
+    name: Deploy Wiki Pages to GitHub Pages
+    needs: build-wiki-pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

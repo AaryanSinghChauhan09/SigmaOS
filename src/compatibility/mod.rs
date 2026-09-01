@@ -71,6 +71,13 @@ pub mod macos_darwin;
 pub mod mate_betsy;
 pub mod mesh_hub;
 pub mod mint_linux;
+pub mod mint_ecosystem;
+
+pub use mint_ecosystem::{
+    CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,
+    LinuxMintEcosystemHub, MintRepoMirror, MintUpgradeSourcesEngine, RecentDocument,
+    SlickGreeterXappPortal, WarpinatorLanShare, WarpinatorPeer, XappAppsSuite,
+};
 pub mod mobile_desktop_parity;
 pub mod nixos;
 // pub mod nixos_reproducible;
