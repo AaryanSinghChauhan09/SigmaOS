@@ -37,9 +37,11 @@ pub struct SupportContract {
 #[derive(Debug, Clone)]
 pub struct LtsRelease {
     pub version: String,
+    pub release_codename: String,
     pub release_date: String,
     pub supported_until: String,
     pub kernel_version: String,
+    pub is_esm_eligible: bool,
 }
 
 /// Disaster recovery tool mapping (such as Rescue ISO configuration)
@@ -188,17 +190,28 @@ impl SupportServicesManager {
     pub fn register_lts_release(
         &mut self,
         version: String,
+        codename: String,
         release_date: String,
         supported_until: String,
         kernel: String,
+        is_esm: bool,
     ) {
         let release = LtsRelease {
             version: version.clone(),
+            release_codename: codename,
             release_date,
             supported_until,
             kernel_version: kernel,
+            is_esm_eligible: is_esm,
         };
         self.lts_releases.insert(version, release);
+    }
+
+    /// Retrieve Vivid LTS release manifest metadata
+    pub fn vivid_lts_manifest(&self) -> Option<&LtsRelease> {
+        self.lts_releases
+            .values()
+            .find(|r| r.release_codename.eq_ignore_ascii_case("vivid") || r.version.contains("Vivid"))
     }
 
     pub fn add_recovery_tool(&mut self, config: RecoveryConfig) {
@@ -260,14 +273,21 @@ mod tests {
         let mut manager = SupportServicesManager::new();
         manager.register_lts_release(
             "v1.0-LTS".to_string(),
+            "Vivid".to_string(),
             "2025-01-15".to_string(),
             "2030-01-15".to_string(),
             "sigma-6.1-hardened".to_string(),
+            true,
         );
 
         assert_eq!(manager.lts_releases.len(), 1);
         let release = manager.lts_releases.get("v1.0-LTS").unwrap();
         assert_eq!(release.kernel_version, "sigma-6.1-hardened");
+        assert_eq!(release.release_codename, "Vivid");
+        assert!(release.is_esm_eligible);
+
+        let vivid = manager.vivid_lts_manifest().unwrap();
+        assert_eq!(vivid.version, "v1.0-LTS");
     }
 
     #[test]

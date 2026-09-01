@@ -122,9 +122,9 @@ pub mod distro_inspirations;
 pub use linuxmint_inspirations::{
     AppTheme, BulkyRenamer, CaptainInstaller, ConfigBackend, DebPackage, DiagnosticField,
     FsFormat, HypnotixIptvPlayer, IsolationMode, LanPeer, LanWarpEngine, MintConfigHub,
-    MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintWelcomeFlow, NannyDecision,
-    ProviderType, RenameRule, TransferOutcome, TvChannel, WebEngineKind, Webapp, WebappManager,
-    XAppThemeEngine, ThingyEntry, ThingyKind, ThingyRecentDocs, WelcomeStep,
+    MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintUpgradeEngine, MintUpgradePhase,
+    MintWelcomeFlow, NannyDecision, ProviderType, RenameRule, TransferOutcome, TvChannel, WebEngineKind,
+    Webapp, WebappManager, XAppThemeEngine, ThingyEntry, ThingyKind, ThingyRecentDocs, WelcomeStep,
     WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
 };
 
