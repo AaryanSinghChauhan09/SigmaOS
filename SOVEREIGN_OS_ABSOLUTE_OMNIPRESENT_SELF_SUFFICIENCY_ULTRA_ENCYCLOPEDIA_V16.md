@@ -34,7 +34,7 @@ Every traditional application category—ranging from desktop suites and system 
 |            |                                         | WordPress, WebKit, Chromium, IPv6 Mesh, QUIC  |
 --------------------------------------------------------------------------------------------------------
 | S-SHARD 06 | Sovereign Virtualization & Distro Parity | VirtualBox, QEMU, KVM, Docker, Podman, LXC,   |
-|            |                                         | MintSystem, MintUpgrade, GDebi, AptDaemon     |
+|            |                                         | Arch Docker, MintSystem, GDebi, AptDaemon     |
 --------------------------------------------------------------------------------------------------------
 | S-SHARD 07 | Sovereign Data Storage & Search Core    | PostgreSQL, MySQL, MariaDB, Cassandra, CouchDB|
 |            |                                         | PostGIS, Lucene, Solr, Nutch, Xapian, SQLite  |
@@ -103,9 +103,13 @@ Every traditional application category—ranging from desktop suites and system 
   - Privacy shield with ad/tracker blocking, fingerprint randomization, and TOR onion routing integration (`Brave` / `Tor` / `Tails` parity).
 
 #### 6. S-SHARD 06: Sovereign Virtualization & Distro Parity Hub
-- **Absorbed Systems:** Oracle VirtualBox, QEMU, KVM, Docker, Podman, LXC, MintSystem, Mint Upgrade Info, GDebi, AptDaemon, Blueberry, Blueman, LightDM Settings, NVIDIA Prime Applet.
+- **Absorbed Systems:** Oracle VirtualBox, QEMU, KVM, Docker, Podman, LXC, Arch Linux Docker Container Engine, MintSystem, Mint Upgrade Info, GDebi, AptDaemon, Blueberry, Blueman, LightDM Settings, NVIDIA Prime Applet.
 - **Key Features:**
   - Lightweight Type-1 hypervisor with zero-overhead hardware virtualization (`VirtualBox` / `KVM` parity).
+  - **Arch Linux Docker Subsystem Improvements:**
+    - **Pacman / AUR Bootstrap Pipeline:** Automated rolling-release base image generation directly from Arch Linux `Core` and `Extra` package repos, with clean chroot AUR helper building (`Yay` / `Paru` parity).
+    - **FreeBSD Jail VFS Isolation:** Multi-tenant container filesystem partitioning using chroot pivoting, nullfs read-only base mounts, and isolated VFS namespaces.
+    - **OpenBSD Pledge/Unveil Sandboxing:** Fine-grained syscall privilege restriction (`pledge`) and file path visibility restriction (`unveil`) enforced directly on container entrypoints.
   - Bluetooth device manager and configuration engine (`Blueman` / `Blueberry` parity).
   - Display manager configuration utility (`LightDM Settings` parity).
   - Dynamic hybrid GPU switching and power profile manager (`NVIDIA Prime Applet` parity).
