@@ -125,7 +125,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in self.allocations.values() {
-            let stack_key = record.stack_trace.join(" | ");
+            let stack_key = record.format!("{}/{}", stack_trace, " | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
@@ -206,7 +206,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
         let mut leak_locations: BTreeMap<String, LeakLocation> = BTreeMap::new();
 
         for record in leaked_allocations {
-            let stack_key = record.stack_trace.join(" | ");
+            let stack_key = record.format!("{}/{}", stack_trace, " | ");
             let entry = leak_locations
                 .entry(stack_key)
                 .or_insert_with(|| LeakLocation {
