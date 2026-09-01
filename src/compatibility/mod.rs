@@ -95,8 +95,10 @@ pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod superiority;
 pub mod tiny_core;
+pub mod wsl;
 pub mod zorin;
 
+pub use wsl::*;
 pub use zorin::*;
 
 pub use gap_closure::{
