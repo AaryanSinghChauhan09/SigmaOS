@@ -62,8 +62,9 @@ pub use sovereign_sigpkg::{
 };
 
 pub use arch_compat::{
-    AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager,
+    AlpmConflictSolver, AlpmDatabaseSync, AlpmHookManager, AlpmSyncEntry,
+    AlpmTransactionEngine, AlpmTransactionState, AurRecipeCompiler, MakepkgBuilder,
+    MkinitcpioBuilder, PacmanDbAdapter, RollingSyncManager,
 };
 pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
