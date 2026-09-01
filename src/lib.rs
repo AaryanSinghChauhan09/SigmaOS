@@ -50,7 +50,9 @@ pub mod userland;
 
 pub use unimplemented_features::{
     AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,
+    PhoronixAutomatedBenchmarkEngine, PuppyLinuxOverlayRamdiskEngine,
+    RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, TargetArch,
+    TinyCoreModularTczLoader, VoidXbpsContainerEngine,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,

@@ -2816,6 +2816,118 @@ impl Default for DistroWatchParityMetricsHub {
     }
 }
 
+/// Rocky Linux & AlmaLinux Enterprise Long-Term Support ABI Stability & Errata Governor
+#[derive(Debug, Clone)]
+pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub rhel_abi_compat_level: u32,
+    pub errata_patches_applied: usize,
+    pub security_advisories: Vec<String>,
+}
+
+impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub fn new(abi_level: u32) -> Self {
+        Self {
+            rhel_abi_compat_level: abi_level,
+            errata_patches_applied: 0,
+            security_advisories: Vec::new(),
+        }
+    }
+
+    pub fn apply_errata_patch(&mut self, advisory_id: &str) {
+        self.security_advisories.push(advisory_id.to_string());
+        self.errata_patches_applied += 1;
+    }
+
+    pub fn verify_abi_compatibility(&self, min_required: u32) -> bool {
+        self.rhel_abi_compat_level >= min_required
+    }
+}
+
+/// Void Linux XBPS Fast Binary Delta Package & Runit Service Engine
+#[derive(Debug, Clone)]
+pub struct VoidXbpsContainerEngine {
+    pub registered_packages: Vec<String>,
+    pub runit_services_active: Vec<String>,
+}
+
+impl VoidXbpsContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_packages: Vec::new(),
+            runit_services_active: Vec::new(),
+        }
+    }
+
+    pub fn install_xbps_package(&mut self, name: &str) {
+        self.registered_packages.push(name.to_string());
+    }
+
+    pub fn start_runit_service(&mut self, service: &str) {
+        if !self.runit_services_active.contains(&service.to_string()) {
+            self.runit_services_active.push(service.to_string());
+        }
+    }
+}
+
+impl Default for VoidXbpsContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Puppy Linux Squashed File System (SFS) Read-Only RAM Disk & Persistence Overlay
+#[derive(Debug, Clone)]
+pub struct PuppyLinuxOverlayRamdiskEngine {
+    pub ramdisk_size_mb: usize,
+    pub loaded_sfs_modules: Vec<String>,
+    pub persistence_save_file: Option<String>,
+}
+
+impl PuppyLinuxOverlayRamdiskEngine {
+    pub fn new(ramdisk_mb: usize) -> Self {
+        Self {
+            ramdisk_size_mb: ramdisk_mb,
+            loaded_sfs_modules: Vec::new(),
+            persistence_save_file: None,
+        }
+    }
+
+    pub fn load_sfs_module(&mut self, sfs_name: &str) {
+        self.loaded_sfs_modules.push(sfs_name.to_string());
+    }
+
+    pub fn mount_persistence(&mut self, savefile_path: &str) {
+        self.persistence_save_file = Some(savefile_path.to_string());
+    }
+}
+
+/// Tiny Core Linux TCZ Extension Loader & On-Demand Symlink Tree Manager
+#[derive(Debug, Clone)]
+pub struct TinyCoreModularTczLoader {
+    pub mounted_extensions: Vec<String>,
+    pub total_ram_used_kb: usize,
+}
+
+impl TinyCoreModularTczLoader {
+    pub fn new() -> Self {
+        Self {
+            mounted_extensions: Vec::new(),
+            total_ram_used_kb: 0,
+        }
+    }
+
+    pub fn mount_tcz(&mut self, ext_name: &str, size_kb: usize) {
+        self.mounted_extensions.push(ext_name.to_string());
+        self.total_ram_used_kb += size_kb;
+    }
+}
+
+impl Default for TinyCoreModularTczLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -3229,6 +3341,46 @@ mod extra_unimplemented_tests {
         hub.record_distro_parity("FreeBSD", 90);
         assert_eq!(hub.distros.len(), 2);
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+    #[test]
+    fn test_rocky_alma_enterprise_lifecycle_governor() {
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        assert!(gov.verify_abi_compatibility(8));
+        assert!(gov.verify_abi_compatibility(9));
+        assert!(!gov.verify_abi_compatibility(10));
+
+        gov.apply_errata_patch("RHSA-2026:1234");
+        assert_eq!(gov.errata_patches_applied, 1);
+        assert_eq!(gov.security_advisories[0], "RHSA-2026:1234");
+    }
+
+    #[test]
+    fn test_void_xbps_container_engine() {
+        let mut xbps = VoidXbpsContainerEngine::new();
+        xbps.install_xbps_package("xbps-src");
+        xbps.start_runit_service("dhcpcd");
+        xbps.start_runit_service("dhcpcd"); // duplicate check
+        assert_eq!(xbps.registered_packages.len(), 1);
+        assert_eq!(xbps.runit_services_active.len(), 1);
+    }
+
+    #[test]
+    fn test_puppy_linux_overlay_ramdisk_engine() {
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
+        puppy.load_sfs_module("puppy_sigma_2.0.sfs");
+        puppy.mount_persistence("/mnt/home/sigmasave.2fs");
+        assert_eq!(puppy.loaded_sfs_modules.len(), 1);
+        assert_eq!(puppy.persistence_save_file.unwrap(), "/mnt/home/sigmasave.2fs");
+    }
+
+    #[test]
+    fn test_tinycore_modular_tcz_loader() {
+        let mut tcz = TinyCoreModularTczLoader::new();
+        tcz.mount_tcz("wifi.tcz", 1024);
+        tcz.mount_tcz("openssh.tcz", 2048);
+        assert_eq!(tcz.mounted_extensions.len(), 2);
+        assert_eq!(tcz.total_ram_used_kb, 3072);
     }
 
 }
