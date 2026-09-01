@@ -30,6 +30,12 @@ pub mod stable_components;
 pub mod tiny_core;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_system_innovations;
+pub mod arch_boxes;
+
+pub use arch_boxes::{
+    ArchBoxCatalogManager, ArchBoxFormat, ArchBoxImageRecord, ArchBoxesImageEngine,
+    ArchCloudInitProvisioner, CloudInitUserAccount,
+};
 
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
