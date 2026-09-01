@@ -11,34 +11,29 @@
 //! and Polkit/Sudoers policy enforcement.
 
 extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 use alloc::boxed::Box;
 use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 
 use crate::security::root_improvement::{PolkitAuthorization, PolkitEnforcer};
 
 /// Graphical Sudo Auth Backend
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GksuAuthBackend {
-    Sudo,         // Traditional sudo / gksudo (/etc/sudoers)
-    Su,           // Target user password elevation (/etc/passwd, su -)
-    Polkit,       // PolicyKit fine-grained action authorization
-    Kerberos,     // Active Directory / Krb5 SSO ticket ticket-granting ticket check
-    PqcTokenGate, // Sovereign Post-Quantum Cryptography capability token
+    Sudo,           // Traditional sudo / gksudo (/etc/sudoers)
+    Su,             // Target user password elevation (/etc/passwd, su -)
+    Polkit,         // PolicyKit fine-grained action authorization
+    Kerberos,       // Active Directory / Krb5 SSO ticket ticket-granting ticket check
+    PqcTokenGate,   // Sovereign Post-Quantum Cryptography capability token
 }
 
 /// Display Server Isolation Environment
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GksuDisplayServer {
-    WaylandZenith {
-        socket_path: String,
-    },
-    X11Compat {
-        display_id: String,
-        xauthority_path: String,
-    },
+    WaylandZenith { socket_path: String },
+    X11Compat { display_id: String, xauthority_path: String },
     HeadlessConsole,
 }
 
@@ -46,7 +41,7 @@ pub enum GksuDisplayServer {
 #[derive(Debug, Clone)]
 pub struct GksuExecutionRequest {
     pub command: String,
-    pub target_user: String, // Default "root"
+    pub target_user: String,  // Default "root"
     pub prompt_message: String,
     pub preserve_env: bool,
     pub keep_env_vars: Vec<String>,
@@ -195,7 +190,9 @@ impl LibGksuGraphicalSudoEngine {
                 // Simulated Krb5 TGT check
                 !credential_input.is_empty()
             }
-            GksuAuthBackend::PqcTokenGate => credential_input.len() >= 16,
+            GksuAuthBackend::PqcTokenGate => {
+                credential_input.len() >= 16
+            }
         };
 
         guard.wipe();
@@ -235,10 +232,7 @@ impl LibGksuGraphicalSudoEngine {
         let clean_env = GksuSecurityGuard::sanitize_environment(raw_env, &request.keep_env_vars);
 
         // Simulated process spawn under target_user e.g. root
-        let stdout = format!(
-            "LibGksu: Executed [{}] as user [{}]",
-            request.command, request.target_user
-        );
+        let stdout = format!("LibGksu: Executed [{}] as user [{}]", request.command, request.target_user);
 
         Ok(GksuExecutionResult {
             success: true,
@@ -300,21 +294,18 @@ mod tests {
     #[test]
     fn test_libgksu_elevation_workflow() {
         let mut engine = LibGksuGraphicalSudoEngine::new();
-        let req = GksuExecutionRequest::new("/sbin/fdisk").with_auth_backend(GksuAuthBackend::Sudo);
+        let req = GksuExecutionRequest::new("/sbin/fdisk")
+            .with_auth_backend(GksuAuthBackend::Sudo);
 
         let raw_env = vec![("PATH".to_string(), "/sbin:/bin".to_string())];
 
         // Valid authentication
-        let res = engine
-            .execute_elevated(&req, b"correct_root_pass", &raw_env)
-            .unwrap();
+        let res = engine.execute_elevated(&req, b"correct_root_pass", &raw_env).unwrap();
         assert!(res.success);
         assert_eq!(res.exit_code, 0);
 
         // Invalid authentication
-        let res_fail = engine
-            .execute_elevated(&req, b"wrong_pass", &raw_env)
-            .unwrap();
+        let res_fail = engine.execute_elevated(&req, b"wrong_pass", &raw_env).unwrap();
         assert!(!res_fail.success);
     }
 }

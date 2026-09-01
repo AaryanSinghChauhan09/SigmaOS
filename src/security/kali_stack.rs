@@ -1,11 +1,11 @@
 extern crate alloc;
 
-use crate::klib::Vec;
 use core::mem;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

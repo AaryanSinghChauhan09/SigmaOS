@@ -213,14 +213,8 @@ impl StandardStreamTable {
     pub fn new() -> Self {
         Self {
             stdin: StandardStreamHandle::new(StandardStreamType::Stdin, BufferingMode::Unbuffered),
-            stdout: StandardStreamHandle::new(
-                StandardStreamType::Stdout,
-                BufferingMode::LineBuffered,
-            ),
-            stderr: StandardStreamHandle::new(
-                StandardStreamType::Stderr,
-                BufferingMode::Unbuffered,
-            ),
+            stdout: StandardStreamHandle::new(StandardStreamType::Stdout, BufferingMode::LineBuffered),
+            stderr: StandardStreamHandle::new(StandardStreamType::Stderr, BufferingMode::Unbuffered),
         }
     }
 

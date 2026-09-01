@@ -1,5 +1,5 @@
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Fedora/RPM Compatibility Engine

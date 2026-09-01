@@ -65,10 +65,7 @@ impl SigpkgDaemon {
     /// role aborts the whole sync (all-or-nothing), so a tampered repository
     /// can never partially poison the daemon's trust state.
     pub fn sync_repository(&mut self, root_payload: &[u8], root_sig: &[u8]) -> SyncStatus {
-        if self
-            .client
-            .fetch_metadata(TufRole::Root, root_payload, root_sig)
-        {
+        if self.client.fetch_metadata(TufRole::Root, root_payload, root_sig) {
             self.last_sync = Some(SyncStatus::Synced {
                 metadata_roles: self.client.metadata.len(),
             });
@@ -77,9 +74,7 @@ impl SigpkgDaemon {
             }
         } else {
             let reason = "root metadata signature verification failed".to_string();
-            self.last_sync = Some(SyncStatus::Failed {
-                reason: reason.clone(),
-            });
+            self.last_sync = Some(SyncStatus::Failed { reason: reason.clone() });
             SyncStatus::Failed { reason }
         }
     }
@@ -112,8 +107,7 @@ impl SigpkgDaemon {
         payload: &[u8],
         installed: &BTreeMap<String, Version>,
     ) -> Result<String, String> {
-        self.client
-            .install_from_manifest(manifest, payload, installed)
+        self.client.install_from_manifest(manifest, payload, installed)
     }
 
     /// Garbage-collect orphaned store packages: remove any stored package that
@@ -143,9 +137,7 @@ impl SigpkgDaemon {
     /// Present a concise daemon status line for logs/telemetry.
     pub fn status_line(&self) -> String {
         let roles = match &self.last_sync {
-            Some(SyncStatus::Synced { metadata_roles }) => {
-                format!("synced({} roles)", metadata_roles)
-            }
+            Some(SyncStatus::Synced { metadata_roles }) => format!("synced({} roles)", metadata_roles),
             Some(SyncStatus::Failed { reason }) => format!("failed: {}", reason),
             None => "never-synced".to_string(),
         };
@@ -153,7 +145,11 @@ impl SigpkgDaemon {
         let referenced = self.referenced.len();
         format!(
             "sigpkgd[{}]: {}; {} installed; {} referenced; repo {}",
-            self.client.repository_url, roles, installed, referenced, self.client.repository_url
+            self.client.repository_url,
+            roles,
+            installed,
+            referenced,
+            self.client.repository_url
         )
     }
 }
@@ -204,22 +200,12 @@ mod tests {
         let payload = b"hello-bytes";
         let installed_map = BTreeMap::new();
         daemon
-            .deploy(
-                &make_manifest("hello", Version::new(1, 0, 0), payload),
-                payload,
-                &installed_map,
-            )
+            .deploy(&make_manifest("hello", Version::new(1, 0, 0), payload), payload, &installed_map)
             .unwrap();
 
         let mut repo: BTreeMap<String, Manifest> = BTreeMap::new();
-        repo.insert(
-            "hello".to_string(),
-            make_manifest("hello", Version::new(2, 0, 0), payload),
-        );
-        repo.insert(
-            "other".to_string(),
-            make_manifest("other", Version::new(1, 0, 0), payload),
-        );
+        repo.insert("hello".to_string(), make_manifest("hello", Version::new(2, 0, 0), payload));
+        repo.insert("other".to_string(), make_manifest("other", Version::new(1, 0, 0), payload));
 
         let updates = daemon.check_updates(&repo);
         assert_eq!(updates.len(), 1);
@@ -233,18 +219,10 @@ mod tests {
         let mut daemon = SigpkgDaemon::new("https://repo.sigmaos.dev/sigma");
         let installed_map = BTreeMap::new();
         daemon
-            .deploy(
-                &make_manifest("keep", Version::new(1, 0, 0), b"keep-bytes"),
-                b"keep-bytes",
-                &installed_map,
-            )
+            .deploy(&make_manifest("keep", Version::new(1, 0, 0), b"keep-bytes"), b"keep-bytes", &installed_map)
             .unwrap();
         daemon
-            .deploy(
-                &make_manifest("orphan", Version::new(1, 0, 0), b"orphan-bytes"),
-                b"orphan-bytes",
-                &installed_map,
-            )
+            .deploy(&make_manifest("orphan", Version::new(1, 0, 0), b"orphan-bytes"), b"orphan-bytes", &installed_map)
             .unwrap();
         daemon.mark_referenced("keep");
 

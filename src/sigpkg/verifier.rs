@@ -1,12 +1,12 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // Cryptographic Verifier for SigmaPkg
 // Dilithium-5 + SHA3-256 signature verification
 // Includes Debian APT-style release signature keyring verification engine
 
-use crate::klib::HashMap;
 use crate::sigpkg::Package;
+use crate::klib::HashMap;
 
 /// FreeBSD/Debian GPG-style Keychain Keyring containing trusted archive signing keys
 #[derive(Debug, Clone, Default)]

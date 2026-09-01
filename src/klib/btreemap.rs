@@ -1,13 +1,13 @@
-use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::format;
 // Custom BTreeMap implementation for SigmaOS
 // Reduces dependency on alloc::collections::BTreeMap
 // Simple implementation using sorted Vec for now
 
 use super::Vec;
-use core::borrow::Borrow;
-use core::cmp::PartialEq;
 use core::fmt;
+use core::cmp::PartialEq;
+use core::borrow::Borrow;
 
 pub struct BTreeMap<K, V>
 where
@@ -100,10 +100,7 @@ where
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         for i in 0..self.entries.len() {
             if self.entries[i].0 == key {
-                return Entry::Occupied(OccupiedEntry {
-                    map: self,
-                    index: i,
-                });
+                return Entry::Occupied(OccupiedEntry { map: self, index: i });
             }
         }
         Entry::Vacant(VacantEntry { map: self, key })
@@ -312,6 +309,7 @@ where
     }
 }
 
+
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -323,6 +321,7 @@ where
             idx: 0,
         }
     }
+
 }
 
 pub struct Values<'a, K, V> {
@@ -448,11 +447,7 @@ impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
                 if let Some(first) = self.entries.first() {
                     first.0.clone()
                 } else {
-                    return Range {
-                        map: self,
-                        index: 0,
-                        end: 0,
-                    };
+                    return Range { map: self, index: 0, end: 0 };
                 }
             }
         };
@@ -460,24 +455,15 @@ impl<K: Clone + core::cmp::Ord, V: Clone> BTreeMap<K, V> {
         let end = match range.end_bound() {
             core::ops::Bound::Included(x) => {
                 // Find index after x
-                self.entries
-                    .iter()
-                    .position(|(k, _)| k > x)
-                    .unwrap_or(self.entries.len())
+                self.entries.iter().position(|(k, _)| k > x).unwrap_or(self.entries.len())
             }
-            core::ops::Bound::Excluded(x) => self
-                .entries
-                .iter()
-                .position(|(k, _)| k >= x)
-                .unwrap_or(self.entries.len()),
+            core::ops::Bound::Excluded(x) => {
+                self.entries.iter().position(|(k, _)| k >= x).unwrap_or(self.entries.len())
+            }
             core::ops::Bound::Unbounded => self.entries.len(),
         };
 
-        let start_index = self
-            .entries
-            .iter()
-            .position(|(k, _)| k >= &start)
-            .unwrap_or(0);
+        let start_index = self.entries.iter().position(|(k, _)| k >= &start).unwrap_or(0);
 
         Range {
             map: self,

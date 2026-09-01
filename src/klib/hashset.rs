@@ -1,6 +1,6 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // Custom HashSet implementation for SigmaOS
 // Reduces dependency on std::collections::HashSet

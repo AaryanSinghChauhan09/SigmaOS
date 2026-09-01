@@ -1,13 +1,13 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // Custom string implementation for SigmaOS
 // This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 
 use super::vec::SigmaVec;
-use core::fmt;
 use core::ops::{Deref, DerefMut};
 use core::slice;
+use core::fmt;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -158,9 +158,7 @@ impl SigmaString {
         } else {
             let slice = self.as_str();
             let mut char_iter = slice.char_indices();
-            char_iter
-                .nth(idx)
-                .map_or(self.len, |(byte_start, _)| byte_start)
+            char_iter.nth(idx).map_or(self.len, |(byte_start, _)| byte_start)
         };
 
         let mut buf = [0u8; 4];
@@ -187,9 +185,7 @@ impl SigmaString {
         } else {
             let slice = self.as_str();
             let mut char_iter = slice.char_indices();
-            char_iter
-                .nth(idx)
-                .map_or(self.len, |(byte_start, _)| byte_start)
+            char_iter.nth(idx).map_or(self.len, |(byte_start, _)| byte_start)
         };
 
         let s_len = s.len();
@@ -224,9 +220,7 @@ impl SigmaString {
         } else {
             let slice = self.as_str();
             let mut char_iter = slice.char_indices();
-            char_iter
-                .nth(mid)
-                .map_or(self.len, |(byte_start, _)| byte_start)
+            char_iter.nth(mid).map_or(self.len, |(byte_start, _)| byte_start)
         };
 
         let left = SigmaString::from_bytes(&self.data.as_slice()[..byte_mid]).unwrap();

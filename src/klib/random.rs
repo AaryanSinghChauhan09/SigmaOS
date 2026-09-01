@@ -1,6 +1,7 @@
 // Simple random number generator for SigmaOS
 // Reduces dependency on external rand crate
 
+
 use core::cell::Cell;
 
 /// Simple XORShift PRNG implementation

@@ -3,6 +3,7 @@ extern crate alloc;
 /// Post-Quantum Cryptographic Secure Enclave and Token-Rotation IPC Bus
 /// Outclasses standard Linux/BSD security with rotatable, ephemeral post-quantum
 /// capability tokens and cryptographically gated microkernel transactions.
+
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
@@ -228,8 +229,7 @@ impl PqcZeroTrustGater {
 
         // Verify Dilithium signature on payload
         let peer_pubkey = [0x11; 32];
-        self.sig_verifier
-            .verify(operation_payload, signature, &peer_pubkey)
+        self.sig_verifier.verify(operation_payload, signature, &peer_pubkey)
     }
 }
 

@@ -3,6 +3,7 @@ extern crate alloc;
 // SigmaOS Unveil & Landlock - Filesystem Visibility & Sandboxing Subsystem
 // Inspired by OpenBSD unveil and Linux Landlock, providing fine-grained path restrictions.
 
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityError {
     AccessDenied,

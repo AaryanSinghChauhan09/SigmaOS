@@ -21,11 +21,11 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-use crate::security::Permission;
-use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use crate::sigpkg::universal_engine::PackageFormat;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::security::Permission;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -334,10 +334,7 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Apt)
         } else if f.ends_with(".rpm") {
             Some(PackageFormat::Yum)
-        } else if f.ends_with(".pkg.tar.zst")
-            || f.ends_with(".pkg.tar.xz")
-            || f.ends_with(".pkg.tar.gz")
-        {
+        } else if f.ends_with(".pkg.tar.zst") || f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.gz") {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
             Some(PackageFormat::Apk)
@@ -491,82 +488,38 @@ impl UniversalPackageAdapter {
     }
 
     /// Auto-detects package format by extension or text heuristics and parses & translates into native Package
-    pub fn parse_and_translate_manifest(
-        &self,
-        filename: &str,
-        raw_text: &str,
-    ) -> Result<Package, &'static str> {
+    pub fn parse_and_translate_manifest(&self, filename: &str, raw_text: &str) -> Result<Package, &'static str> {
         let fmt = self.detect_format_by_extension(filename);
         match fmt {
             Some(PackageFormat::Apt) | Some(PackageFormat::Superdeb) => {
                 let deb = self.parse_apt_control(raw_text)?;
-                self.translate_to_native_package(
-                    &deb.package,
-                    &deb.version,
-                    &deb.description,
-                    &deb.depends,
-                )
+                self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
             }
             Some(PackageFormat::Pacman) => {
                 let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
-                self.translate_to_native_package(
-                    &pkgbuild.pkgname,
-                    &pkgbuild.pkgver,
-                    &pkgbuild.pkgdesc,
-                    &pkgbuild.depends,
-                )
+                self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
             }
             Some(PackageFormat::Yum) | Some(PackageFormat::Pisi) => {
                 let spec = self.parse_rpm_spec(raw_text)?;
-                self.translate_to_native_package(
-                    &spec.name,
-                    &spec.version,
-                    &spec.summary,
-                    &spec.requires,
-                )
+                self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
             }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
                     let deb = self.parse_apt_control(raw_text)?;
-                    self.translate_to_native_package(
-                        &deb.package,
-                        &deb.version,
-                        &deb.description,
-                        &deb.depends,
-                    )
+                    self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
                 } else if raw_text.contains("pkgname=") && raw_text.contains("pkgver=") {
                     let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
-                    self.translate_to_native_package(
-                        &pkgbuild.pkgname,
-                        &pkgbuild.pkgver,
-                        &pkgbuild.pkgdesc,
-                        &pkgbuild.depends,
-                    )
+                    self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
                 } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
                     let spec = self.parse_rpm_spec(raw_text)?;
-                    self.translate_to_native_package(
-                        &spec.name,
-                        &spec.version,
-                        &spec.summary,
-                        &spec.requires,
-                    )
+                    self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
                 } else if raw_text.contains("name:") && raw_text.contains("confinement:") {
                     let snap = self.parse_snapcraft_yaml(raw_text)?;
-                    self.translate_to_native_package(
-                        &snap.name,
-                        &snap.version,
-                        &snap.summary,
-                        &snap.plugs,
-                    )
+                    self.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
                 } else if raw_text.contains("\"app-id\"") {
                     let flatpak = self.parse_flatpak_json(raw_text)?;
-                    self.translate_to_native_package(
-                        &flatpak.app_id,
-                        "1.0.0",
-                        "Flatpak Sandboxed App",
-                        &flatpak.finish_args,
-                    )
+                    self.translate_to_native_package(&flatpak.app_id, "1.0.0", "Flatpak Sandboxed App", &flatpak.finish_args)
                 } else {
                     Err("Unrecognized package manifest format")
                 }
@@ -659,11 +612,7 @@ impl UniversalServerImageAdapter {
     }
 
     /// Detects format and parses metadata for container/VM server images
-    pub fn parse_server_image_manifest(
-        &self,
-        format: ServerImageFormat,
-        manifest_data: &str,
-    ) -> Result<ServerImageMetadata, &'static str> {
+    pub fn parse_server_image_manifest(&self, format: ServerImageFormat, manifest_data: &str) -> Result<ServerImageMetadata, &'static str> {
         let mut name = String::new();
         let mut version = String::from("1.0.0");
         let mut virtual_size_bytes = 0u64;
@@ -739,11 +688,7 @@ impl SigPkgUniversalBridgeEngine {
 
     /// Automatically detects format from filename and header, parses foreign manifest,
     /// and converts it directly into a native Sigma-pkg (`Package`)
-    pub fn convert_to_sigpkg(
-        &self,
-        filename: &str,
-        raw_data: &[u8],
-    ) -> Result<Package, &'static str> {
+    pub fn convert_to_sigpkg(&self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let fmt = self
             .adapter
             .detect_format_by_header(raw_data)
@@ -755,59 +700,30 @@ impl SigPkgUniversalBridgeEngine {
         match fmt {
             PackageFormat::Apt => {
                 let apt = self.adapter.parse_apt_control(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &apt.package,
-                    &apt.version,
-                    &apt.description,
-                    &apt.depends,
-                )
+                self.adapter.translate_to_native_package(&apt.package, &apt.version, &apt.description, &apt.depends)
             }
             PackageFormat::Pacman => {
                 let pacman = self.adapter.parse_pacman_pkgbuild(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &pacman.pkgname,
-                    &pacman.pkgver,
-                    &pacman.pkgdesc,
-                    &pacman.depends,
-                )
+                self.adapter.translate_to_native_package(&pacman.pkgname, &pacman.pkgver, &pacman.pkgdesc, &pacman.depends)
             }
             PackageFormat::Yum => {
                 let rpm = self.adapter.parse_rpm_spec(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &rpm.name,
-                    &rpm.version,
-                    &rpm.summary,
-                    &rpm.requires,
-                )
+                self.adapter.translate_to_native_package(&rpm.name, &rpm.version, &rpm.summary, &rpm.requires)
             }
             PackageFormat::Snap => {
                 let snap = self.adapter.parse_snapcraft_yaml(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &snap.name,
-                    &snap.version,
-                    &snap.summary,
-                    &snap.plugs,
-                )
+                self.adapter.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
             }
             _ => {
                 // Fallback auto-extraction
                 let clean_name = filename.split('.').next().unwrap_or("sigpkg-converted");
-                self.adapter.translate_to_native_package(
-                    clean_name,
-                    "1.0.0",
-                    "Converted foreign package",
-                    &[],
-                )
+                self.adapter.translate_to_native_package(clean_name, "1.0.0", "Converted foreign package", &[])
             }
         }
     }
 
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
-    pub fn absorb_and_register(
-        &mut self,
-        filename: &str,
-        raw_data: &[u8],
-    ) -> Result<Package, &'static str> {
+    pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
         let mut unified_pkg = crate::package::UnifiedPackage::new(
             native_pkg.name.clone(),
@@ -896,8 +812,9 @@ impl UniversalDependencyMapper {
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
         match name.as_str() {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" => "openssl".to_string(),
+            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
+                "openssl".to_string()
+            }
             "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
@@ -938,12 +855,7 @@ impl UniversalScriptletConverter {
         Self
     }
 
-    pub fn convert_scriptlet(
-        &self,
-        format: PackageFormat,
-        script_name: &str,
-        content: &str,
-    ) -> Option<MappedScriptletHook> {
+    pub fn convert_scriptlet(&self, format: PackageFormat, script_name: &str, content: &str) -> Option<MappedScriptletHook> {
         let hook_type = match format {
             PackageFormat::Apt => match script_name {
                 "preinst" => Some(SigmaPkgHookType::PreInstall),
@@ -1014,9 +926,7 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
-                let parsed = adapter
-                    .parse_apt_control(&text)
-                    .map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_apt_control(&text).map_err(|e| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -1032,9 +942,7 @@ impl UniversalFormatConverter {
                     .map_err(|e| e.to_string())
             }
             PackageFormat::Pacman => {
-                let parsed = adapter
-                    .parse_pacman_pkgbuild(&text)
-                    .map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -1304,9 +1212,7 @@ mod tests {
             Description: Interactive process viewer
         "#;
 
-        let converted_deb = bridge
-            .absorb_and_register("htop.deb", deb_control.as_bytes())
-            .unwrap();
+        let converted_deb = bridge.absorb_and_register("htop.deb", deb_control.as_bytes()).unwrap();
         assert_eq!(converted_deb.name, "htop");
         assert_eq!(converted_deb.version, Version::new(3, 2, 2));
         assert_eq!(converted_deb.dependencies.len(), 2);
@@ -1318,9 +1224,7 @@ mod tests {
             depends=('pcre2')
         "#;
 
-        let converted_pacman = bridge
-            .absorb_and_register("ripgrep.pkg.tar.zst", pkgbuild.as_bytes())
-            .unwrap();
+        let converted_pacman = bridge.absorb_and_register("ripgrep.pkg.tar.zst", pkgbuild.as_bytes()).unwrap();
         assert_eq!(converted_pacman.name, "ripgrep");
         assert_eq!(converted_pacman.version, Version::new(13, 0, 0));
         assert!(bridge.is_package_registered("ripgrep"));
@@ -1337,9 +1241,7 @@ mod tests {
             cmd: /usr/sbin/init
         "#;
 
-        let meta = adapter
-            .parse_server_image_manifest(ServerImageFormat::Qcow2DiskImage, manifest_data)
-            .unwrap();
+        let meta = adapter.parse_server_image_manifest(ServerImageFormat::Qcow2DiskImage, manifest_data).unwrap();
         assert_eq!(meta.name, "rhel-server-node");
         assert_eq!(meta.version, "9.2");
         assert_eq!(meta.target_distro, "RHEL");
@@ -1352,153 +1254,45 @@ mod tests {
         let adapter = UniversalPackageAdapter::new();
 
         // Check format detection by extension
-        assert_eq!(
-            adapter.detect_format_by_extension("app.air"),
-            Some(PackageFormat::Air)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("lib.bottle"),
-            Some(PackageFormat::Bottle)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("game.ipa"),
-            Some(PackageFormat::Ipa)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("custom.ports"),
-            Some(PackageFormat::Ports)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("base.pkg"),
-            Some(PackageFormat::Pkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("mobile.aab"),
-            Some(PackageFormat::Aab)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("alpine.apk"),
-            Some(PackageFormat::Apk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("app.appimage"),
-            Some(PackageFormat::AppImage)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Portage)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("arch.pkg.tar.xz"),
-            Some(PackageFormat::Pacman)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("harmony.hap"),
-            Some(PackageFormat::Hap)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("slax.lzm"),
-            Some(PackageFormat::Lzm)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("puppy.pup"),
-            Some(PackageFormat::Pup)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("puppy.pet"),
-            Some(PackageFormat::Pet)
-        );
+        assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
+        assert_eq!(adapter.detect_format_by_extension("lib.bottle"), Some(PackageFormat::Bottle));
+        assert_eq!(adapter.detect_format_by_extension("game.ipa"), Some(PackageFormat::Ipa));
+        assert_eq!(adapter.detect_format_by_extension("custom.ports"), Some(PackageFormat::Ports));
+        assert_eq!(adapter.detect_format_by_extension("base.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(adapter.detect_format_by_extension("mobile.aab"), Some(PackageFormat::Aab));
+        assert_eq!(adapter.detect_format_by_extension("alpine.apk"), Some(PackageFormat::Apk));
+        assert_eq!(adapter.detect_format_by_extension("app.appimage"), Some(PackageFormat::AppImage));
+        assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Pisi));
+        assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+        assert_eq!(adapter.detect_format_by_extension("ubuntu.deb"), Some(PackageFormat::Apt));
+        assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
+        assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
+        assert_eq!(adapter.detect_format_by_extension("harmony.hap"), Some(PackageFormat::Hap));
+        assert_eq!(adapter.detect_format_by_extension("slax.lzm"), Some(PackageFormat::Lzm));
+        assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(PackageFormat::Pup));
+        assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
 
-        assert_eq!(
-            adapter.detect_format_by_extension("solus.moss"),
-            Some(PackageFormat::Moss)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("haiku.hpkg"),
-            Some(PackageFormat::Hpkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("extension.tcz"),
-            Some(PackageFormat::Tcz)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("app.gobo"),
-            Some(PackageFormat::Gobo)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("commit.ostree"),
-            Some(PackageFormat::Ostree)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("tool.pkgsrc"),
-            Some(PackageFormat::Pkgsrc)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("module.sfs"),
-            Some(PackageFormat::Sfs)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("portable.puk"),
-            Some(PackageFormat::Puk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("image.dmg"),
-            Some(PackageFormat::Dmg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("recipe.cports"),
-            Some(PackageFormat::Cports)
-        );
+        assert_eq!(adapter.detect_format_by_extension("solus.moss"), Some(PackageFormat::Moss));
+        assert_eq!(adapter.detect_format_by_extension("haiku.hpkg"), Some(PackageFormat::Hpkg));
+        assert_eq!(adapter.detect_format_by_extension("extension.tcz"), Some(PackageFormat::Tcz));
+        assert_eq!(adapter.detect_format_by_extension("app.gobo"), Some(PackageFormat::Gobo));
+        assert_eq!(adapter.detect_format_by_extension("commit.ostree"), Some(PackageFormat::Ostree));
+        assert_eq!(adapter.detect_format_by_extension("tool.pkgsrc"), Some(PackageFormat::Pkgsrc));
+        assert_eq!(adapter.detect_format_by_extension("module.sfs"), Some(PackageFormat::Sfs));
+        assert_eq!(adapter.detect_format_by_extension("portable.puk"), Some(PackageFormat::Puk));
+        assert_eq!(adapter.detect_format_by_extension("image.dmg"), Some(PackageFormat::Dmg));
+        assert_eq!(adapter.detect_format_by_extension("recipe.cports"), Some(PackageFormat::Cports));
 
         // Check format detection by header signature magic
-        assert_eq!(
-            adapter.detect_format_by_header(b"!<arch>\ncontrol.tar.xz"),
-            Some(PackageFormat::Apt)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"hpkg1234"),
-            Some(PackageFormat::Hpkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"MOSS1234"),
-            Some(PackageFormat::Moss)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"hsqs1234"),
-            Some(PackageFormat::Tcz)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"koly1234"),
-            Some(PackageFormat::Dmg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"cports123"),
-            Some(PackageFormat::Cports)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]),
-            Some(PackageFormat::Yum)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"PK\x03\x04payload"),
-            Some(PackageFormat::Aab)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"SPKG0001header"),
-            Some(PackageFormat::Sovereign)
-        );
+        assert_eq!(adapter.detect_format_by_header(b"!<arch>\ncontrol.tar.xz"), Some(PackageFormat::Apt));
+        assert_eq!(adapter.detect_format_by_header(b"hpkg1234"), Some(PackageFormat::Hpkg));
+        assert_eq!(adapter.detect_format_by_header(b"MOSS1234"), Some(PackageFormat::Moss));
+        assert_eq!(adapter.detect_format_by_header(b"hsqs1234"), Some(PackageFormat::Tcz));
+        assert_eq!(adapter.detect_format_by_header(b"koly1234"), Some(PackageFormat::Dmg));
+        assert_eq!(adapter.detect_format_by_header(b"cports123"), Some(PackageFormat::Cports));
+        assert_eq!(adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]), Some(PackageFormat::Yum));
+        assert_eq!(adapter.detect_format_by_header(b"PK\x03\x04payload"), Some(PackageFormat::Aab));
+        assert_eq!(adapter.detect_format_by_header(b"SPKG0001header"), Some(PackageFormat::Sovereign));
     }
 
     #[test]
@@ -1509,24 +1303,18 @@ mod tests {
         assert_eq!(mapper.to_canonical_name("libc6"), "libc");
 
         let scriptlet_conv = UniversalScriptletConverter::new();
-        let hook = scriptlet_conv
-            .convert_scriptlet(PackageFormat::Apt, "postinst", "echo post")
-            .unwrap();
+        let hook = scriptlet_conv.convert_scriptlet(PackageFormat::Apt, "postinst", "echo post").unwrap();
         assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
 
         let format_conv = UniversalFormatConverter::new();
         let deb_control = b"Package: wget\nVersion: 1.21.0\nDepends: libssl-dev, libc6\nDescription: Retrieval tool\n";
-        let pkg = format_conv
-            .convert_to_sigma_pkg(PackageFormat::Apt, deb_control)
-            .unwrap();
+        let pkg = format_conv.convert_to_sigma_pkg(PackageFormat::Apt, deb_control).unwrap();
         assert_eq!(pkg.name, "wget");
         assert_eq!(pkg.dependencies[0].name, "openssl");
         assert_eq!(pkg.dependencies[1].name, "libc");
 
         let simulator = UniversalDryRunSimulator::new();
-        let result = simulator
-            .simulate_install(PackageFormat::Apt, deb_control)
-            .unwrap();
+        let result = simulator.simulate_install(PackageFormat::Apt, deb_control).unwrap();
         assert!(result.is_valid);
         assert_eq!(result.package_name, "wget");
         assert_eq!(result.resolved_dependencies.len(), 2);

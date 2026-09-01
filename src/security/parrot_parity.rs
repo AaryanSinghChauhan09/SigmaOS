@@ -1,12 +1,12 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-use crate::klib::SigmaString;
 use core::cell::Cell;
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, AtomicBool, AtomicU64, Ordering};
+use crate::klib::SigmaString;
 
 /// Routing modes for network traffic
 #[repr(usize)]
@@ -37,22 +37,19 @@ impl AnonSurfShunt {
 
     /// Enable anonymized routing
     pub fn enable_anonsurf(&self) {
-        self.current_mode
-            .store(RoutingMode::TorAnonymized as usize, Ordering::SeqCst);
+        self.current_mode.store(RoutingMode::TorAnonymized as usize, Ordering::SeqCst);
         self.dns_leak_protection.store(true, Ordering::SeqCst);
     }
 
     /// Disable anonymized routing
     pub fn disable_anonsurf(&self) {
-        self.current_mode
-            .store(RoutingMode::DirectCleartext as usize, Ordering::SeqCst);
+        self.current_mode.store(RoutingMode::DirectCleartext as usize, Ordering::SeqCst);
     }
 
     /// Route packet through anonymized network
     pub fn shunt_packet(&self, _packet_id: u32, _size_bytes: usize) -> bool {
         if self.current_mode.load(Ordering::SeqCst) != RoutingMode::DirectCleartext as usize {
-            self.anonymized_packets_routed
-                .fetch_add(1, Ordering::SeqCst);
+            self.anonymized_packets_routed.fetch_add(1, Ordering::SeqCst);
             true
         } else {
             false
@@ -137,12 +134,9 @@ impl AppSandboxEngine {
 
     /// Set sandbox policy
     pub fn set_policy(&self, policy: SandboxPolicy) {
-        self.allow_network
-            .store(policy.allow_network, Ordering::SeqCst);
-        self.allow_raw_sockets
-            .store(policy.allow_raw_sockets, Ordering::SeqCst);
-        self.allow_filesystem_write
-            .store(policy.allow_filesystem_write, Ordering::SeqCst);
+        self.allow_network.store(policy.allow_network, Ordering::SeqCst);
+        self.allow_raw_sockets.store(policy.allow_raw_sockets, Ordering::SeqCst);
+        self.allow_filesystem_write.store(policy.allow_filesystem_write, Ordering::SeqCst);
     }
 
     /// Get current policy
@@ -185,9 +179,7 @@ impl ForensicStorageFilter {
         for byte in target_buffer.iter_mut() {
             // SAFETY: We're writing to valid memory within the buffer bounds
             // Using volatile write ensures the compiler doesn't optimize away the zeroing
-            unsafe {
-                core::ptr::write_volatile(byte, 0x00);
-            }
+            unsafe { core::ptr::write_volatile(byte, 0x00); }
         }
     }
 

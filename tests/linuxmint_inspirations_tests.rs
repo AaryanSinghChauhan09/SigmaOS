@@ -3,7 +3,7 @@ extern crate alloc;
 use sigmaos::linuxmint_inspirations::{
     BulkyRenamer, CaptainInstaller, DebPackage, FsFormat, HypnotixIptvPlayer, IsolationMode,
     LanWarpEngine, MintNannyFilter, NannyDecision, ProviderType, RenameRule, ThingyRecentDocs,
-    WebEngineKind, WebappManager, WARP_AUTH_PORT, WARP_TRANSFER_PORT,
+    WebappManager, WebEngineKind, WARP_AUTH_PORT, WARP_TRANSFER_PORT,
 };
 
 #[test]
@@ -59,42 +59,20 @@ fn webapp_manager_registers_isolated_apps() {
 fn captain_deb_and_apt_url_install() {
     let mut c = CaptainInstaller::new();
     c.seed_repo(vec![
-        DebPackage {
-            name: "libfoo".into(),
-            version: "1.0".into(),
-            depends: vec![],
-        },
-        DebPackage {
-            name: "app".into(),
-            version: "2.0".into(),
-            depends: vec!["libfoo".into()],
-        },
+        DebPackage { name: "libfoo".into(), version: "1.0".into(), depends: vec![] },
+        DebPackage { name: "app".into(), version: "2.0".into(), depends: vec!["libfoo".into()] },
     ]);
     assert!(c.install_from_apt_url("apt://app").is_ok());
     // Missing dependency blocks the .deb install.
-    let missing = DebPackage {
-        name: "x".into(),
-        version: "1.0".into(),
-        depends: vec!["no-such".into()],
-    };
+    let missing = DebPackage { name: "x".into(), version: "1.0".into(), depends: vec!["no-such".into()] };
     assert!(c.install_deb(missing).is_err());
 }
 
 #[test]
 fn hypnotix_ingests_m3u_by_country() {
     let mut h = HypnotixIptvPlayer::new();
-    h.add_provider(
-        "Free-TV",
-        ProviderType::M3uUrl,
-        "https://iptv.example/feed.m3u",
-        false,
-    );
-    h.add_provider(
-        "Adult",
-        ProviderType::XtreamApi,
-        "https://x.example/api",
-        true,
-    );
+    h.add_provider("Free-TV", ProviderType::M3uUrl, "https://iptv.example/feed.m3u", false);
+    h.add_provider("Adult", ProviderType::XtreamApi, "https://x.example/api", true);
     h.select_free_provider();
     assert_eq!(h.provider_count(), 1);
 
@@ -108,14 +86,8 @@ fn bulky_renames_multiple_files() {
     let mut b = BulkyRenamer::new();
     b.add_file("photo (1).jpg");
     b.add_file("photo (2).jpg");
-    b.add_rule(RenameRule::FindReplace {
-        find: " (".into(),
-        replace: "_".into(),
-    });
-    b.add_rule(RenameRule::FindReplace {
-        find: ")".into(),
-        replace: "".into(),
-    });
+    b.add_rule(RenameRule::FindReplace { find: " (".into(), replace: "_".into() });
+    b.add_rule(RenameRule::FindReplace { find: ")".into(), replace: "".into() });
     let renamed = b.execute().unwrap();
     assert_eq!(renamed.len(), 2);
     assert_eq!(renamed[0].renamed, "photo_1.jpg");
@@ -127,20 +99,11 @@ fn mint_nanny_allowlist_wins() {
     let mut n = MintNannyFilter::new();
     n.block("adult.example");
     n.allow("docs.example");
-    assert_eq!(
-        n.evaluate("https://media.adult.example/a"),
-        NannyDecision::Block
-    );
-    assert_eq!(
-        n.evaluate("https://docs.example/guide"),
-        NannyDecision::Allow
-    );
+    assert_eq!(n.evaluate("https://media.adult.example/a"), NannyDecision::Block);
+    assert_eq!(n.evaluate("https://docs.example/guide"), NannyDecision::Allow);
     // Allow-list is evaluated before the block-list.
     n.allow("safe.example");
-    assert_eq!(
-        n.evaluate("https://safe.example/resource"),
-        NannyDecision::Allow
-    );
+    assert_eq!(n.evaluate("https://safe.example/resource"), NannyDecision::Allow);
 }
 
 #[test]

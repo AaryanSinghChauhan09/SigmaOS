@@ -4,14 +4,13 @@ use alloc::string::ToString;
 use alloc::vec;
 
 use sigmaos::distro_inspirations::{
-    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackmanBuild,
-    CaineForensicsEnforcer, ClearLinuxAutoOptimizer, ElevateMigration, FlatcarImmutableRootfs,
-    ForensicsDevicePolicy, FormFactor, FreePolicyVerdict, GamescopeCompositor, InterfaceFlag,
-    IsolationKind, KaliMetapackage, KaliToolGroup, MicroarchTier, NebraskaUpdateServer,
-    PhoshConvergence, PressureVessel, PuppySaveSession, PureosFreePolicy, RancherOsCloudConfig,
-    RaspiConfigTool, ReleaseChannel, RescuezillaBackupEngine, SaveMode, SigRepository,
-    SteamABImageUpdate, TinyCoreExtensionManager, TorStreamIsolation, UpdateStrategy, WhonixSplit,
-    WoofCeLayer, ZincatiUpdateAgent,
+    AppStreamModuleStream, BlackarchCategory, BlackarchRepository, BlackmanBuild, CaineForensicsEnforcer,
+    ClearLinuxAutoOptimizer, ElevateMigration, FlatcarImmutableRootfs, ForensicsDevicePolicy, FormFactor,
+    FreePolicyVerdict, GamescopeCompositor, InterfaceFlag, IsolationKind, KaliMetapackage, KaliToolGroup,
+    MicroarchTier, NebraskaUpdateServer, PhoshConvergence, PressureVessel, PuppySaveSession, PureosFreePolicy,
+    RancherOsCloudConfig, RaspiConfigTool, ReleaseChannel, RescuezillaBackupEngine, SaveMode, SigRepository,
+    SteamABImageUpdate, TinyCoreExtensionManager, TorStreamIsolation, UpdateStrategy, WhonixSplit, WoofCeLayer,
+    ZincatiUpdateAgent,
 };
 
 #[test]
@@ -33,16 +32,11 @@ fn blackarch_repository_organizes_tools_by_category() {
         "password cracker",
     );
     assert_eq!(repo.total_tools(), 3);
-    assert!(repo
-        .tools_in(BlackarchCategory::Webapp)
-        .contains(&"sqlmap".to_string()));
+    assert!(repo.tools_in(BlackarchCategory::Webapp).contains(&"sqlmap".to_string()));
     assert!(repo.validate_base_membership().is_ok());
 
     let build = BlackmanBuild::new(repo);
-    assert_eq!(
-        build.category_members("blackarch-wireless"),
-        vec!["aircrack-ng".to_string()]
-    );
+    assert_eq!(build.category_members("blackarch-wireless"), vec!["aircrack-ng".to_string()]);
 }
 
 #[test]
@@ -153,10 +147,7 @@ fn rancheros_cloud_config_and_elevate_migration_work() {
     let mut cfg = RancherOsCloudConfig::new();
     assert!(cfg.has_dual_daemons());
     cfg.set("ssh_authorized_keys", "abc");
-    assert_eq!(
-        cfg.get("ssh_authorized_keys").map(|s| s.as_str()),
-        Some("abc")
-    );
+    assert_eq!(cfg.get("ssh_authorized_keys").map(|s| s.as_str()), Some("abc"));
 
     let mut migrate = ElevateMigration::new("centos-7", "almalinux-8");
     migrate.add_readiness_check("repositories configured");
@@ -209,9 +200,7 @@ fn raspi_config_and_puppy_save_session_work() {
 #[test]
 fn tiny_core_and_caine_forensics_work() {
     let mut tce = TinyCoreExtensionManager::new();
-    assert!(tce
-        .load_extension_on_demand("openssh.tcz", "/dev/loop0", true)
-        .is_ok());
+    assert!(tce.load_extension_on_demand("openssh.tcz", "/dev/loop0", true).is_ok());
     assert!(tce.is_mounted("openssh.tcz"));
     assert_eq!(tce.mounted_count(), 1);
 

@@ -3,6 +3,7 @@ use alloc::boxed::Box;
 // Purely functional Nix DSL parser and derivation evaluator for SigmaOS
 // Enables content-addressed store derivations, deterministic hashes, and Nix expressions
 
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -127,11 +128,7 @@ impl NixDslEvaluator {
         }
     }
 
-    pub fn apply_function(
-        &mut self,
-        func: &NixExpr,
-        arg: &NixExpr,
-    ) -> Result<NixExpr, &'static str> {
+    pub fn apply_function(&mut self, func: &NixExpr, arg: &NixExpr) -> Result<NixExpr, &'static str> {
         if let NixExpr::Function { arg_name, body } = func {
             let eval_arg = self.evaluate(arg)?;
             let previous = self.environment_scope.insert(arg_name.clone(), eval_arg);
@@ -163,8 +160,7 @@ mod tests {
         let mut spec = NixDerivationSpec::new("hello-2.12", "x86_64-linux", "/bin/sh");
         spec.args.push("-c".to_string());
         spec.args.push("make install".to_string());
-        spec.env
-            .insert("src".to_string(), "hello-2.12.tar.gz".to_string());
+        spec.env.insert("src".to_string(), "hello-2.12.tar.gz".to_string());
 
         let out_path = spec.get_out_path();
         assert!(out_path.starts_with("/nix/store/"));

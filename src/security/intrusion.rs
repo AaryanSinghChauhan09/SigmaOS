@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
