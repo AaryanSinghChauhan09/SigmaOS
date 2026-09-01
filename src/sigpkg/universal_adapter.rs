@@ -71,6 +71,46 @@ pub struct PacmanPkgbuildV2 {
     pub depends: Vec<String>,
 }
 
+/// Description of Arch Linux .PKGINFO binary manifest (pacman standard)
+#[derive(Debug, Clone)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+/// Description of Gentoo ebuild manifest (Portage standard)
+#[derive(Debug, Clone)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+/// Description of Alpine Linux APKINDEX manifest (apk standard)
+#[derive(Debug, Clone)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+/// Description of Void Linux XBPS manifest
+#[derive(Debug, Clone)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct SnapcraftManifest {
     pub name: String,
@@ -188,6 +228,202 @@ impl UniversalPackageAdapter {
             depends,
             makedepends: Vec::new(),
             source_urls: Vec::new(),
+        })
+    }
+
+    /// Parses Arch Linux binary .PKGINFO text
+    pub fn parse_arch_pkginfo(&self, text: &str) -> Result<ArchPkgInfoManifest, &'static str> {
+        let mut pkgname = String::new();
+        let mut pkgver = String::new();
+        let mut pkgdesc = String::new();
+        let mut depends = Vec::new();
+        let mut architecture = String::from("x86_64");
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "pkgname" => pkgname = val.to_string(),
+                    "pkgver" => pkgver = val.to_string(),
+                    "pkgdesc" => pkgdesc = val.to_string(),
+                    "depend" => depends.push(val.to_string()),
+                    "arch" => architecture = val.to_string(),
+                    _ => {}
+                }
+            }
+        }
+
+        if pkgname.is_empty() || pkgver.is_empty() {
+            return Err("Invalid .PKGINFO: missing pkgname or pkgver");
+        }
+
+        Ok(ArchPkgInfoManifest {
+            pkgname,
+            pkgver,
+            pkgdesc,
+            depends,
+            architecture,
+        })
+    }
+
+    /// Parses Gentoo .ebuild specification text
+    pub fn parse_gentoo_ebuild(&self, filename: &str, text: &str) -> Result<GentooEbuildMetadata, &'static str> {
+        let mut category = String::from("app-misc");
+        let mut package_name = String::new();
+        let mut version = String::from("1.0.0");
+        let mut rdepend = Vec::new();
+        let mut depend = Vec::new();
+        let mut description = String::new();
+        let mut use_flags = Vec::new();
+
+        // Infer name and version from filename (e.g. `sys-apps/portage-3.0.30.ebuild` or `nginx-1.25.1.ebuild`)
+        let clean_filename = filename.trim_end_matches(".ebuild");
+        if clean_filename.contains('/') {
+            let mut parts = clean_filename.split('/');
+            category = parts.next().unwrap_or("app-misc").to_string();
+            let name_ver = parts.next().unwrap_or(clean_filename);
+            if let Some(pos) = name_ver.rfind('-') {
+                package_name = name_ver[..pos].to_string();
+                version = name_ver[pos + 1..].to_string();
+            } else {
+                package_name = name_ver.to_string();
+            }
+        } else if let Some(pos) = clean_filename.rfind('-') {
+            package_name = clean_filename[..pos].to_string();
+            version = clean_filename[pos + 1..].to_string();
+        } else {
+            package_name = clean_filename.to_string();
+        }
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if line.starts_with("DESCRIPTION=") {
+                description = line["DESCRIPTION=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'')
+                    .to_string();
+            } else if line.starts_with("RDEPEND=") {
+                let dep_str = line["RDEPEND=".len()..].trim_matches(|c| c == '"' || c == '\'');
+                for dep in dep_str.split_whitespace() {
+                    let cleaned = dep.trim_matches(|c| c == '"' || c == '\'');
+                    if !cleaned.is_empty() && !cleaned.starts_with('!') {
+                        rdepend.push(cleaned.to_string());
+                    }
+                }
+            } else if line.starts_with("DEPEND=") {
+                let dep_str = line["DEPEND=".len()..].trim_matches(|c| c == '"' || c == '\'');
+                for dep in dep_str.split_whitespace() {
+                    let cleaned = dep.trim_matches(|c| c == '"' || c == '\'');
+                    if !cleaned.is_empty() && !cleaned.starts_with('!') {
+                        depend.push(cleaned.to_string());
+                    }
+                }
+            } else if line.starts_with("IUSE=") {
+                let use_str = line["IUSE=".len()..].trim_matches(|c| c == '"' || c == '\'');
+                for flag in use_str.split_whitespace() {
+                    use_flags.push(flag.trim_start_matches('+').trim_start_matches('-').to_string());
+                }
+            }
+        }
+
+        if package_name.is_empty() {
+            package_name = String::from("gentoo-pkg");
+        }
+
+        Ok(GentooEbuildMetadata {
+            category,
+            package_name,
+            version,
+            rdepend,
+            depend,
+            description,
+            use_flags,
+        })
+    }
+
+    /// Parses Alpine APKINDEX control entry text
+    pub fn parse_apkindex(&self, text: &str) -> Result<ApkIndexManifest, &'static str> {
+        let mut pkgname = String::new();
+        let mut pkgver = String::new();
+        let mut pkgdesc = String::new();
+        let mut depends = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if line.starts_with("P:") {
+                pkgname = line[2..].trim().to_string();
+            } else if line.starts_with("V:") {
+                pkgver = line[2..].trim().to_string();
+            } else if line.starts_with("T:") {
+                pkgdesc = line[2..].trim().to_string();
+            } else if line.starts_with("D:") {
+                for dep in line[2..].trim().split_whitespace() {
+                    depends.push(dep.to_string());
+                }
+            }
+        }
+
+        if pkgname.is_empty() || pkgver.is_empty() {
+            return Err("Invalid APKINDEX manifest: missing P: or V:");
+        }
+
+        Ok(ApkIndexManifest {
+            pkgname,
+            pkgver,
+            pkgdesc,
+            depends,
+        })
+    }
+
+    /// Parses Void Linux XBPS control manifest text
+    pub fn parse_xbps_manifest(&self, text: &str) -> Result<XbpsManifest, &'static str> {
+        let mut pkgname = String::new();
+        let mut version = String::new();
+        let mut short_desc = String::new();
+        let mut run_depends = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "pkgname" => pkgname = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "version" => version = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "short_desc" => short_desc = val.trim_matches(|c| c == '"' || c == '\'').to_string(),
+                    "run_depends" => {
+                        let clean_val = val.trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
+                        for dep in clean_val.split_whitespace() {
+                            run_depends.push(dep.to_string());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if pkgname.is_empty() || version.is_empty() {
+            return Err("Invalid XBPS manifest: missing pkgname or version");
+        }
+
+        Ok(XbpsManifest {
+            pkgname,
+            version,
+            short_desc,
+            run_depends,
         })
     }
 
@@ -496,12 +732,31 @@ impl UniversalPackageAdapter {
                 self.translate_to_native_package(&deb.package, &deb.version, &deb.description, &deb.depends)
             }
             Some(PackageFormat::Pacman) => {
-                let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
-                self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+                if raw_text.contains("pkgname") && raw_text.contains("depend") && !raw_text.contains("pkgname=") {
+                    let pkginfo = self.parse_arch_pkginfo(raw_text)?;
+                    self.translate_to_native_package(&pkginfo.pkgname, &pkginfo.pkgver, &pkginfo.pkgdesc, &pkginfo.depends)
+                } else {
+                    let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
+                    self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+                }
             }
             Some(PackageFormat::Yum) | Some(PackageFormat::Pisi) => {
                 let spec = self.parse_rpm_spec(raw_text)?;
                 self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
+            }
+            Some(PackageFormat::Apk) => {
+                let apk = self.parse_apkindex(raw_text)?;
+                self.translate_to_native_package(&apk.pkgname, &apk.pkgver, &apk.pkgdesc, &apk.depends)
+            }
+            Some(PackageFormat::Xbps) => {
+                let xbps = self.parse_xbps_manifest(raw_text)?;
+                self.translate_to_native_package(&xbps.pkgname, &xbps.version, &xbps.short_desc, &xbps.run_depends)
+            }
+            Some(PackageFormat::Portage) => {
+                let ebuild = self.parse_gentoo_ebuild(filename, raw_text)?;
+                let mut deps = ebuild.rdepend.clone();
+                deps.extend(ebuild.depend.clone());
+                self.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
             }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
@@ -511,6 +766,20 @@ impl UniversalPackageAdapter {
                 } else if raw_text.contains("pkgname=") && raw_text.contains("pkgver=") {
                     let pkgbuild = self.parse_pacman_pkgbuild(raw_text)?;
                     self.translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &pkgbuild.depends)
+                } else if raw_text.contains("pkgname") && raw_text.contains("depend") {
+                    let pkginfo = self.parse_arch_pkginfo(raw_text)?;
+                    self.translate_to_native_package(&pkginfo.pkgname, &pkginfo.pkgver, &pkginfo.pkgdesc, &pkginfo.depends)
+                } else if raw_text.contains("P:") && raw_text.contains("V:") {
+                    let apk = self.parse_apkindex(raw_text)?;
+                    self.translate_to_native_package(&apk.pkgname, &apk.pkgver, &apk.pkgdesc, &apk.depends)
+                } else if raw_text.contains("short_desc=") || raw_text.contains("run_depends=") {
+                    let xbps = self.parse_xbps_manifest(raw_text)?;
+                    self.translate_to_native_package(&xbps.pkgname, &xbps.version, &xbps.short_desc, &xbps.run_depends)
+                } else if raw_text.contains("DESCRIPTION=") || raw_text.contains("RDEPEND=") {
+                    let ebuild = self.parse_gentoo_ebuild(filename, raw_text)?;
+                    let mut deps = ebuild.rdepend.clone();
+                    deps.extend(ebuild.depend.clone());
+                    self.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
                 } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
                     let spec = self.parse_rpm_spec(raw_text)?;
                     self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
@@ -703,8 +972,13 @@ impl SigPkgUniversalBridgeEngine {
                 self.adapter.translate_to_native_package(&apt.package, &apt.version, &apt.description, &apt.depends)
             }
             PackageFormat::Pacman => {
-                let pacman = self.adapter.parse_pacman_pkgbuild(&manifest_text)?;
-                self.adapter.translate_to_native_package(&pacman.pkgname, &pacman.pkgver, &pacman.pkgdesc, &pacman.depends)
+                if manifest_text.contains("pkgname") && manifest_text.contains("depend") && !manifest_text.contains("pkgname=") {
+                    let pkginfo = self.adapter.parse_arch_pkginfo(&manifest_text)?;
+                    self.adapter.translate_to_native_package(&pkginfo.pkgname, &pkginfo.pkgver, &pkginfo.pkgdesc, &pkginfo.depends)
+                } else {
+                    let pacman = self.adapter.parse_pacman_pkgbuild(&manifest_text)?;
+                    self.adapter.translate_to_native_package(&pacman.pkgname, &pacman.pkgver, &pacman.pkgdesc, &pacman.depends)
+                }
             }
             PackageFormat::Yum => {
                 let rpm = self.adapter.parse_rpm_spec(&manifest_text)?;
@@ -714,10 +988,22 @@ impl SigPkgUniversalBridgeEngine {
                 let snap = self.adapter.parse_snapcraft_yaml(&manifest_text)?;
                 self.adapter.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
             }
+            PackageFormat::Apk => {
+                let apk = self.adapter.parse_apkindex(&manifest_text)?;
+                self.adapter.translate_to_native_package(&apk.pkgname, &apk.pkgver, &apk.pkgdesc, &apk.depends)
+            }
+            PackageFormat::Xbps => {
+                let xbps = self.adapter.parse_xbps_manifest(&manifest_text)?;
+                self.adapter.translate_to_native_package(&xbps.pkgname, &xbps.version, &xbps.short_desc, &xbps.run_depends)
+            }
+            PackageFormat::Portage => {
+                let ebuild = self.adapter.parse_gentoo_ebuild(filename, &manifest_text)?;
+                let mut deps = ebuild.rdepend.clone();
+                deps.extend(ebuild.depend.clone());
+                self.adapter.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
+            }
             _ => {
-                // Fallback auto-extraction
-                let clean_name = filename.split('.').next().unwrap_or("sigpkg-converted");
-                self.adapter.translate_to_native_package(clean_name, "1.0.0", "Converted foreign package", &[])
+                self.adapter.parse_and_translate_manifest(filename, &manifest_text)
             }
         }
     }
@@ -822,6 +1108,11 @@ impl UniversalDependencyMapper {
             "python3" | "python" | "lang/python3" | "dev-lang/python" => "python".to_string(),
             "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
+            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
+            "wayland" | "dev-libs/wayland" => "wayland".to_string(),
+            "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
+            "dbus" | "sys-apps/dbus" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
             _ => foreign_name.to_string(),
         }
     }
@@ -1318,5 +1609,87 @@ mod tests {
         assert!(result.is_valid);
         assert_eq!(result.package_name, "wget");
         assert_eq!(result.resolved_dependencies.len(), 2);
+    }
+
+    #[test]
+    fn test_arch_pkginfo_and_xbps_and_apk_manifest_parsing() {
+        let adapter = UniversalPackageAdapter::new();
+
+        let pkginfo_text = r#"
+            # Generated by makepkg
+            pkgname = neovim
+            pkgver = 0.9.1-1
+            pkgdesc = Vim-fork focused on extensibility and usability
+            arch = x86_64
+            depend = libtermkey
+            depend = unibilium
+        "#;
+
+        let pkginfo = adapter.parse_arch_pkginfo(pkginfo_text).unwrap();
+        assert_eq!(pkginfo.pkgname, "neovim");
+        assert_eq!(pkginfo.pkgver, "0.9.1-1");
+        assert_eq!(pkginfo.depends.len(), 2);
+        assert_eq!(pkginfo.architecture, "x86_64");
+
+        let apk_text = r#"
+            P:musl
+            V:1.2.4-r0
+            T:the musl c library
+            D:so:libc.musl-x86_64.so.1
+        "#;
+
+        let apk = adapter.parse_apkindex(apk_text).unwrap();
+        assert_eq!(apk.pkgname, "musl");
+        assert_eq!(apk.pkgver, "1.2.4-r0");
+        assert_eq!(apk.depends.len(), 1);
+
+        let xbps_text = r#"
+            pkgname="void-repo-multilib"
+            version="1.1_1"
+            short_desc="Void Linux multilib repository configuration"
+            run_depends="void-repo-nonfree"
+        "#;
+
+        let xbps = adapter.parse_xbps_manifest(xbps_text).unwrap();
+        assert_eq!(xbps.pkgname, "void-repo-multilib");
+        assert_eq!(xbps.version, "1.1_1");
+        assert_eq!(xbps.run_depends.len(), 1);
+
+        let ebuild_text = r#"
+            # Copyright 1999-2023 Gentoo Authors
+            EAPI=8
+            DESCRIPTION="Awesome Linux terminal emulator"
+            HOMEPAGE="https://alacritty.org"
+            SRC_URI="https://github.com/alacritty/alacritty/archive/refs/tags/v0.12.0.tar.gz"
+            LICENSE="Apache-2.0"
+            SLOT="0"
+            KEYWORDS="amd64 arm64"
+            IUSE="wayland +X"
+            RDEPEND="x11-libs/libx11 dev-libs/wayland"
+            DEPEND="${RDEPEND}"
+        "#;
+
+        let ebuild = adapter.parse_gentoo_ebuild("app-emulation/alacritty-0.12.0.ebuild", ebuild_text).unwrap();
+        assert_eq!(ebuild.category, "app-emulation");
+        assert_eq!(ebuild.package_name, "alacritty");
+        assert_eq!(ebuild.version, "0.12.0");
+        assert_eq!(ebuild.rdepend.len(), 2);
+    }
+
+    #[test]
+    fn test_expanded_bridge_engine_absorb() {
+        let mut bridge = SigPkgUniversalBridgeEngine::new();
+
+        let apk_data = r#"
+            P:zstd
+            V:1.5.5-r0
+            T:Fast real-time compression algorithm
+            D:musl
+        "#;
+
+        let pkg = bridge.absorb_and_register("zstd.apk", apk_data.as_bytes()).unwrap();
+        assert_eq!(pkg.name, "zstd");
+        assert_eq!(pkg.version, Version::new(1, 5, 5));
+        assert!(bridge.is_package_registered("zstd"));
     }
 }
