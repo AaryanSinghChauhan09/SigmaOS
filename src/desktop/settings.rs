@@ -332,7 +332,7 @@ impl<T> Vec<T> {
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            if self.capacity > 0 { free(self.data as *mut u8, self.capacity * mem::size_of::<T>()); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -346,7 +346,7 @@ impl<T> Drop for Vec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-                free(self.data as *mut u8);
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
         }
     }
@@ -373,22 +373,23 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
+    if size == 0 { return core::ptr::null_mut(); }
     use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     std_alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    if !ptr.is_null() {
+unsafe fn free(ptr: *mut u8, size: usize) {
+    if !ptr.is_null() && size > 0 {
         use std::alloc::{dealloc, Layout};
-        let layout = Layout::from_size_align(1, 8).unwrap();
+        let layout = Layout::from_size_align(size, 8).unwrap();
         dealloc(ptr, layout);
     }
 }
 
 #[cfg(target_os = "none")]
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8, size: usize); }
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];

@@ -27,6 +27,11 @@ This document compiles key architectural strengths, design paradigms, and featur
 - **Icon Accent Tinting (`folder-color-switcher`)**: Symbolic icon tinting engine for per-folder custom color coding.
 - **Standalone Package Installer (`gdebi`)**: Single-file package installation with automatic dependency resolution and security audit checks.
 
+### 🌟 6. Arch Linux Signstar Signing Paradigm
+- **Framed Signing Service (`SignstarSigningService`)**: JSON-based signing request/response protocol for build artifacts.
+- **Hardware Security Module Attestation**: YubiHSM2 integration validating hardware key presence during release builds.
+- **Dual OpenPGP + Post-Quantum Signature**: Combines classical OpenPGP signatures with Dilithium-5 post-quantum signature headers.
+
 ---
 
 ## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD

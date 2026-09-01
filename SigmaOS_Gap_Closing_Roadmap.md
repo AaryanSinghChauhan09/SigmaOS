@@ -60,6 +60,7 @@ This document serves as the master engineering roadmap to systematically resolve
 | **celluloid** | Modern GTK frontend for mpv media player | `SigmaPlayerEngine` (VLC/mpv GPU media player) |
 | **blueman** | Desktop Bluetooth manager & device paired control | `SovereignBluetoothManager` (Bluetooth 5.3 stack) |
 | **gdebi** | Standalone package installer with auto-deps | `UniversalPackageImporter` (standalone package installer in `sigma_pkg.rs`) |
+| **signstar** | Arch Linux package & artifact signing service | `SignstarSigningService` (dual OpenPGP + PQC HSM signing in `verifier.rs`) |
 
 ---
 
