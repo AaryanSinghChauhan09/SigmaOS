@@ -738,13 +738,13 @@ pub trait PackageFormatAdapter {
     fn parse_manifest(&self, _raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
         Err("Not implemented")
     }
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
         Ok(())
     }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
         Ok(())
     }
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
         Ok(())
     }
 }
@@ -1170,9 +1170,9 @@ impl UniversalPackageManager {
         let yum_adapter = PackageAdapter::new(PackageFormat::Rpm, "yum".to_string());
         let pacman_adapter = PackageAdapter::new(PackageFormat::Pacman, "pacman".to_string());
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
-        let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
+        let _flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
         let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
-        let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let _sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
 
         self.adapters.insert(PackageFormat::Deb, apt_adapter);
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
