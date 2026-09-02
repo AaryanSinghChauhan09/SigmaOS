@@ -31,6 +31,7 @@ pub mod pqc_measurement;
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
+pub mod rules;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
@@ -91,6 +92,12 @@ pub use password::{
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
+pub use rules::{
+    AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
+    SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
+    SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
+    SysctlParameterRule, UnveilRule,
+};
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,

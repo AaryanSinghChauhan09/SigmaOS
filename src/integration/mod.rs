@@ -183,6 +183,14 @@ impl From<TerminalError> for IntegrationError {
     }
 }
 
+pub mod fedora_messaging;
+pub use fedora_messaging::{
+    AmqpQueueBinding, Bugzilla2FedmsgBridgeEngine, BugzillaEventRecord, BugzillaEventType,
+    FedoraAmqpBusAdapter, FedoraMessageCategory, FedoraMessagePayload, FedoraMessageSchemaEngine,
+    FedoraMessageSigner, FedoraMessageTopic, FedoraMessagingWebhookEngine, WebhookDeliveryJob,
+    WebhookEndpoint,
+};
+
 /// OS-wide integration manager
 pub struct OSIntegrationManager {
     pub integrations: Vec<SigmaIntegration>,
