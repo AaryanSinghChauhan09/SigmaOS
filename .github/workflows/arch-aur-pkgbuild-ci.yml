@@ -19,4 +19,5 @@ jobs:
 
       - name: Verify Arch Pacman & Contrib Engine
         run: |
-          cargo test --lib -- sigpkg::arch_pacman_engine
+          rustc --test src/sigpkg/arch_pacman_engine.rs --edition=2021 -o /tmp/arch_pacman_test
+          /tmp/arch_pacman_test

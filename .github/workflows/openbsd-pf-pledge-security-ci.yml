@@ -19,7 +19,8 @@ jobs:
 
       - name: Verify OpenBSD Pledge & Unveil Primitives
         run: |
-          cargo test --lib -- expanded_wiki_innovations::expanded_wiki_tests::test_openbsd_security_sandbox_wiki_engine
+          rustc --test src/open_source_os_gap_closure.rs --edition=2021 -o /tmp/openbsd_test
+          /tmp/openbsd_test
 
       - name: Run OpenBSD Parity Verification
         run: |

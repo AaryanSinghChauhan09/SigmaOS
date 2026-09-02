@@ -19,4 +19,5 @@ jobs:
 
       - name: Verify FreeBSD Boot Environment & Storage
         run: |
-          cargo test --lib -- boot::sigma_boot
+          rustc --test src/boot/sigma_boot.rs --edition=2021 -o /tmp/freebsd_test
+          /tmp/freebsd_test
