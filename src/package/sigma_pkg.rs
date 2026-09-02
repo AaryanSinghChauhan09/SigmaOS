@@ -8,20 +8,8 @@ use alloc::format;
 // Supports dependencies, repositories, transactions, and package management
 
 use crate::klib::HashMap;
-use crate::klib::path::{Path, PathBuf};
-
-mod fs {
-    use super::*;
-    pub fn read_to_string<P: AsRef<str>>(_path: P) -> Result<String, ()> {
-        Ok(String::new())
-    }
-    pub fn write<P: AsRef<str>>(_path: P, _content: String) -> Result<(), ()> {
-        Ok(())
-    }
-    pub fn create_dir_all<P: AsRef<str>>(_path: P) -> Result<(), ()> {
-        Ok(())
-    }
-}
+use std::path::{Path, PathBuf};
+use std::fs;
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -429,9 +417,9 @@ impl SigmaPkg {
     pub fn install_packages(&mut self, package_names: &[String]) -> Result<(), String> {
         println!("Resolving dependencies...");
         let transaction = self.resolve_dependencies(package_names)?;
-
-        self.display_transaction(&transaction)?;
-
+        
+        self.display_transaction(&transaction);
+        
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Installation cancelled.");
@@ -573,7 +561,7 @@ impl SigmaPkg {
         let mut upgradable = Vec::new();
 
         for (name, local_pkg) in &self.local_packages {
-            if let Some(remote_pkg) = self.find_package(name) {
+            if let Ok(remote_pkg) = self.find_package(name) {
                 if remote_pkg.version != local_pkg.version {
                     upgradable.push((local_pkg.clone(), remote_pkg));
                 }
@@ -600,9 +588,9 @@ impl SigmaPkg {
             transaction.download_size += new.size;
             transaction.install_size += new.installed_size - old.installed_size;
         }
-
-        self.display_transaction(&transaction)?;
-
+        
+        self.display_transaction(&transaction);
+        
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Upgrade cancelled.");

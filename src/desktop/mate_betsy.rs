@@ -2,6 +2,8 @@
 //! Replicates MATE Desktop Environment components: Marco (WM), Caja (File Manager),
 //! Pluma (Text Editor), Atril (Document Viewer), and Eye of MATE (EOM Image Viewer).
 
+extern crate alloc;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

@@ -60,7 +60,13 @@ impl SystemConfigManager {
 
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = PathBuf::from(format!("{}/{}", self.config_dir.as_ref(), filename));
+        let file_path = format!("{}/{}", self.config_dir, filename);
+        
+        if !file_path.exists() {
+            // Create default config if it doesn't exist
+            self.create_default_config(filename)?;
+            return Ok(());
+        }
 
         let content = fs::read_to_string(&file_path)
             .map_err(|e| ConfigError::ReadError(file_path.clone(), e))?;
@@ -105,7 +111,13 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = PathBuf::from(format!("{}/{}", self.config_dir.as_ref(), filename));
+        let file_path = format!("{}/{}", self.config_dir, filename);
+        
+        // Ensure directory exists
+        if let Some(parent) = None::<&str> {
+            fs::create_dir_all(parent)
+                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+        }
 
         let entries = self
             .configs
@@ -277,7 +289,7 @@ impl ServiceUnit {
 
         content.push_str(&format!("\n[Install]\n"));
         content.push_str(&format!("WantedBy={}\n", self.wanted_by.join(" ")));
-
+        
         content
     }
 }
@@ -303,10 +315,10 @@ impl ServiceManager {
 
     /// Load service from file
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
-        let file_path = PathBuf::from(format!("{}/{}.service", self.service_dir.as_ref(), name));
-
-        let content =
-            fs::read_to_string(&file_path).map_err(|e| ConfigError::ReadError(file_path, e))?;
+        let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
+        
+        let content = fs::read_to_string(&file_path)
+            .map_err(|e| ConfigError::ReadError(file_path, e))?;
 
         let service = self.parse_service_unit(&content, name);
         self.services.insert(name.to_string(), service);
@@ -380,7 +392,12 @@ impl ServiceManager {
             .get(name)
             .ok_or(ConfigError::NotFound(name.to_string()))?;
 
-        let file_path = PathBuf::from(format!("{}/{}.service", self.service_dir.as_ref(), name));
+        let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
+        
+        if let Some(parent) = None::<&str> {
+            fs::create_dir_all(parent)
+                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+        }
 
         fs::write(&file_path, service.to_unit_file())
             .map_err(|e| ConfigError::WriteError(file_path, e))?;

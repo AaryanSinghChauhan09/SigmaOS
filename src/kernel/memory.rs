@@ -15,7 +15,6 @@ use std::collections::HashMap;
 pub mod pmm_vmm;
 #[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
-#[path = "memory/sigma_buddy.rs"]
 pub mod sigma_buddy;
 
 pub use pmm_vmm::*;

@@ -86,11 +86,14 @@ impl SimpleBuildSandbox {
 }
 
 impl BuildSandbox for SimpleBuildSandbox {
-    fn id(&self) -> SandboxID {
-        self.id
-    }
+    fn id(&self) -> SandboxID { self.id }
     fn state(&self) -> SandboxState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => SandboxState::Created,
+            1 => SandboxState::Running,
+            2 => SandboxState::Stopped,
+            _ => SandboxState::Failed,
+        }
     }
 
     fn create(&mut self) -> Result<(), SandboxError> {
@@ -228,7 +231,7 @@ pub trait SandboxManager {
 
 #[repr(C)]
 pub struct SimpleSandboxManager {
-    pub sandboxes: Vec<Option<Box<dyn BuildSandbox>>>,
+    pub sandboxes: Vec<Option<SimpleBuildSandbox>>,
     pub next_id: AtomicUsize,
 }
 
@@ -246,14 +249,15 @@ impl SandboxManager for SimpleSandboxManager {
     fn create_sandbox(&mut self, rootfs: &[u8]) -> Result<SandboxID, SandboxError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let sandbox = SimpleBuildSandbox::new(id, rootfs);
-        self.sandboxes.push(Some(Box::new(sandbox)));
+        self.sandboxes.push(Some(sandbox));
         Ok(id)
     }
 
     fn destroy_sandbox(&mut self, id: SandboxID) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id() == id {
+                if sandbox.id == id {
+                    *sandbox_option = None;
                     return Ok(());
                 }
             }
@@ -264,9 +268,7 @@ impl SandboxManager for SimpleSandboxManager {
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn BuildSandbox> {
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id() == id {
-                    return Some(sandbox.as_ref());
-                }
+                if sandbox.id == id { return Some(sandbox as &dyn BuildSandbox); }
             }
         }
         None
@@ -276,7 +278,7 @@ impl SandboxManager for SimpleSandboxManager {
         let mut ids = Vec::new();
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                ids.push(sandbox.id());
+                ids.push(sandbox.id);
             }
         }
         ids
@@ -309,15 +311,9 @@ impl ResourceQuota for SimpleResourceQuota {
     ) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
-                if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox {
-                        ref mut memory_limit,
-                        ..
-                    } = **sandbox
-                    {
-                        memory_limit.store(bytes, Ordering::SeqCst);
-                        return Ok(());
-                    }
+                if sandbox.id == sandbox_id {
+                    sandbox.memory_limit.store(bytes, Ordering::SeqCst);
+                    return Ok(());
                 }
             }
         }
@@ -327,14 +323,9 @@ impl ResourceQuota for SimpleResourceQuota {
     fn set_cpu_quota(&mut self, sandbox_id: SandboxID, cores: usize) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
-                if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox {
-                        ref mut cpu_limit, ..
-                    } = **sandbox
-                    {
-                        cpu_limit.store(cores, Ordering::SeqCst);
-                        return Ok(());
-                    }
+                if sandbox.id == sandbox_id {
+                    sandbox.cpu_limit.store(cores, Ordering::SeqCst);
+                    return Ok(());
                 }
             }
         }
@@ -350,93 +341,3 @@ impl ResourceQuota for SimpleResourceQuota {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
