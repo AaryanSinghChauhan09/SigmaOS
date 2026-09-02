@@ -6,24 +6,13 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-#[path = "../src/boot/sigma_boot.rs"]
-mod sigma_boot;
 #[path = "../src/init/systemd_init.rs"]
 mod systemd_init;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
 
-#[path = "../src/distro/mod.rs"]
-pub mod distro;
-pub use distro::*;
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/process/advanced_process_control.rs"]
@@ -229,10 +218,9 @@ fn test_kernel_classic_algorithms_inspection() {
 fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
-        SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
-        SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ,
-        CAP_SEEK,
+        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass, SigmaZeroCopySpliceEngine,
+        SnapperTransactionGuard, SovereignHybridSchedulerInnovations, SovereignSystemdParityEngine,
+        SystemdUnitActiveState, SystemdUnitType, CAP_READ, CAP_SEEK,
     };
 
     // 1. NixOS Declarative System State

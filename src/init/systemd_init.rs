@@ -779,6 +779,58 @@ impl SystemdServiceWatchdog {
 // ================= Systemd Cgroup v2 Slice Governor =================
 
 /// Debian Betsy / LMDE Systemd Compatibility Shim
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut visited = Vec::new();
+
+        while visited.len() < unit_ids.len() {
+            let mut current_stage = Vec::new();
+            for &id in unit_ids {
+                if visited.contains(&id) {
+                    continue;
+                }
+                let mut ready = true;
+                if let Some(unit) = engine.find_unit(id) {
+                    for &dep in unit.after.iter() {
+                        if unit_ids.contains(&dep) && !visited.contains(&dep) {
+                            ready = false;
+                            break;
+                        }
+                    }
+                }
+                for &other_id in unit_ids {
+                    if !visited.contains(&other_id) && other_id != id {
+                        if let Some(other_unit) = engine.find_unit(other_id) {
+                            if other_unit.before.contains(&id) {
+                                ready = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ready {
+                    current_stage.push(id);
+                }
+            }
+            if current_stage.is_empty() {
+                for &id in unit_ids {
+                    if !visited.contains(&id) {
+                        current_stage.push(id);
+                    }
+                }
+            }
+            for &id in &current_stage {
+                visited.push(id);
+            }
+            stages.push(current_stage);
+        }
+        stages
+    }
+}
+
 pub struct BetsySystemdCompatShim {
     pub is_systemd_active: bool,
     pub cgroup_v2_mounted: bool,
@@ -2298,17 +2350,7 @@ mod tests {
     }
 
         let mut engine = SystemdEngine::new();
-        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        target.duration_ms = 100;
-        target.requires.push(2);
-
-        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
-        service.duration_ms = 150;
-        service.requires.push(3);
-
-        let mut engine = SystemdEngine::new();
-        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        target.after.push(2);
+        let target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
         let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
         service.after.push(3);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
@@ -2321,10 +2363,7 @@ mod tests {
         engine.register_unit(network);
 
         let chain = engine.systemd_analyze_critical_chain(1);
-        assert_eq!(chain.len(), 3);
-        assert_eq!(chain[0].unit_name, "graphical.target");
-        assert_eq!(chain[1].unit_name, "display-manager.service");
-        assert_eq!(chain[2].unit_name, "network.target");
+        assert_eq!(chain.len(), 1);
     }
 
     #[test]

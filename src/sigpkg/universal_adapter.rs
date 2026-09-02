@@ -537,8 +537,34 @@ impl UniversalPackageAdapter {
             } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
                 permissions.push(Permission::FileRead);
                 permissions.push(Permission::FileWrite);
-            } else if arg == "--share=ipc" {
+            } else if arg == "--share=ipc" || arg == "ipc" {
                 permissions.push(Permission::Ipc);
+            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
+                permissions.push(Permission::AudioPlayback);
+            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
+                permissions.push(Permission::DisplayAccess);
+            }
+        }
+        permissions
+    }
+
+    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
+    #[cfg(test)]
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<String> {
+        let mut permissions = Vec::new();
+        for arg in plugs_or_args {
+            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
+                permissions.push("NetworkTcp".to_string());
+                permissions.push("NetworkUdp".to_string());
+            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
+                permissions.push("FileRead".to_string());
+                permissions.push("FileWrite".to_string());
+            } else if arg == "--share=ipc" || arg == "ipc" {
+                permissions.push("Ipc".to_string());
+            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
+                permissions.push("AudioPlayback".to_string());
+            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
+                permissions.push("DisplayAccess".to_string());
             }
         }
         permissions
@@ -623,6 +649,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Guix)
         } else if f.ends_with(".zypper") {
             Some(PackageFormat::Zypper)
+        } else if f.ends_with(".cachy") {
+            Some(PackageFormat::Pacman)
         } else {
             None
         }
@@ -657,6 +685,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Tar) // POSIX tar archive magic
         } else if data.starts_with(b"SPKG") {
             Some(PackageFormat::Sovereign) // Native SigPkg magic
+        } else if data.starts_with(b"CACHY") {
+            Some(PackageFormat::Pacman) // CachyOS magic
         } else {
             None
         }

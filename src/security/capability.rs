@@ -101,6 +101,8 @@ pub enum Permission {
     FileWrite = 3,
     ProcessExec = 4,
     Ipc = 5,
+    AudioPlayback = 6,
+    DisplayAccess = 7,
 }
 
 /// Linux POSIX capability definitions (`capabilities(7)`)
