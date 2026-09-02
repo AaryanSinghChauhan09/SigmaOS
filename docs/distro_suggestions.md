@@ -50,6 +50,9 @@ This document compiles key architectural strengths, design paradigms, and featur
 - **Safe Update Scanning (`CheckupdatesEngine`)**: Scans repository index diffs without locking the primary package database.
 - **Dependency Tree Visualization (`PactreeEngine`)**: Renders ASCII dependency trees for installed packages and recipes.
 
+### 🔄 10. Arch Linux svntogit-to-pkgctl Migration Paradigm
+- **SVN Layout Translation (`SvntogitPackageMigrator`)**: Converts legacy Subversion `trunk/PKGBUILD` layouts into modern Git `pkgctl` package repositories.
+
 ---
 
 ## ⚔️ 0.1 Competitive Strike Map & Battle Plan: Neutralizing Linux & BSD

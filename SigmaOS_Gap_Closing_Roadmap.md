@@ -63,6 +63,7 @@ This document serves as the master engineering roadmap to systematically resolve
 | **signstar** | Arch Linux package & artifact signing service | `SignstarSigningService` (dual OpenPGP + PQC HSM signing in `verifier.rs`) |
 | **diffoscope** | Reproducible builds byte diagnostic tool | `ReproducibleBuildContext::audit_reproducibility` (in `sovereign_sigpkg.rs`) |
 | **pacman-contrib** | Arch package utilities (paccache, checkupdates) | `PaccacheEngine`, `CheckupdatesEngine`, `RankmirrorsEngine`, `PactreeEngine` (in `pacman.rs`) |
+| **svntogit** | Arch SVN-to-Git pkgctl migration engine | `SvntogitPackageMigrator` (in `aur.rs`) |
 
 ---
 

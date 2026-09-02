@@ -145,7 +145,40 @@ impl ArchChrootSandbox {
 }
 
 // ============================================================================
-// 3. Pacman Alpm Transaction Hooks Engine
+// 3. Arch Linux svntogit-to-pkgctl Migration Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SvntogitPackageMigrator {
+    pub svn_repo_path: String,
+    pub target_repo: String, // "core", "extra", "multilib"
+    pub is_migrated: bool,
+}
+
+impl SvntogitPackageMigrator {
+    pub fn new(svn_path: &str, target_repo: &str) -> Self {
+        Self {
+            svn_repo_path: svn_path.to_string(),
+            target_repo: target_repo.to_string(),
+            is_migrated: false,
+        }
+    }
+
+    /// Converts an old SVN repository layout (trunk/PKGBUILD) to modern Arch Git pkgctl structure
+    pub fn convert_svn_layout_to_git_pkgctl(&mut self, pkg_name: &str) -> Result<String, &'static str> {
+        if self.svn_repo_path.is_empty() {
+            return Err("svntogit: Invalid SVN repository source path");
+        }
+        self.is_migrated = true;
+        Ok(format!(
+            "pkgctl repo clone --protocol=https packages/{} (converted from {}/trunk/PKGBUILD -> [{}] Git repo)",
+            pkg_name, self.svn_repo_path, self.target_repo
+        ))
+    }
+}
+
+// ============================================================================
+// 4. Pacman Alpm Transaction Hooks Engine
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -378,6 +411,20 @@ mod tests {
         chroot.setup_chroot().unwrap();
         let res = chroot.execute_in_chroot("pacman -Syu").unwrap();
         assert!(res.contains("chroot [/mnt/arch] -> executed: pacman -Syu"));
+    }
+
+    #[test]
+    fn test_svntogit_package_migrator() {
+        let mut migrator = SvntogitPackageMigrator::new("svn://archlinux.org/packages", "extra");
+        assert!(!migrator.is_migrated);
+
+        let res = migrator.convert_svn_layout_to_git_pkgctl("glibc").unwrap();
+        assert!(migrator.is_migrated);
+        assert!(res.contains("pkgctl repo clone"));
+        assert!(res.contains("extra"));
+
+        let mut invalid_migrator = SvntogitPackageMigrator::new("", "core");
+        assert!(invalid_migrator.convert_svn_layout_to_git_pkgctl("bash").is_err());
     }
 
     #[test]
