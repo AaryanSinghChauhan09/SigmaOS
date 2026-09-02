@@ -28,15 +28,12 @@ pub mod gentoo_opt;
 pub mod linux_translation;
 pub mod manager;
 pub mod repository;
-pub mod repository;
 pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
 pub mod signing;
 pub mod spac;
 pub mod store;
-pub mod store;
-pub mod universal;
 pub mod universal;
 pub mod updater;
 
