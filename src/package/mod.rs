@@ -23,6 +23,7 @@ pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
 pub mod debian_translator;
+pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod gentoo_opt;
 pub mod hardening;
@@ -46,6 +47,9 @@ pub use bsd_linux_package_innovations::{
 };
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
+};
+pub use dependency_graph::{
+    DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
 pub use hardening::{
     PackageSignature, PackageSignatureType, PackageSigningEngine, PackageSecurityMetadata,
