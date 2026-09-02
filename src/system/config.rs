@@ -8,8 +8,8 @@ use alloc::format;
 // Handles system-wide configuration files, service configs, and runtime settings
 
 use crate::klib::HashMap;
-// std::fs not in no_std
-// Path/PathBuf not in no_std
+use std::path::PathBuf;
+use std::fs;
 
 /// System configuration file types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,7 +47,7 @@ impl SystemConfigManager {
 
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", config_dir, filename);
+        let file_path = self.config_dir.join(filename);
         
         if !file_path.exists() {
             // Create default config if it doesn't exist
@@ -98,12 +98,12 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", config_dir, filename);
+        let file_path = self.config_dir.join(filename);
         
         // Ensure directory exists
-        if let Some(parent) = None::<&str> {
+        if let Some(parent) = file_path.parent() {
             fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+                .map_err(|e| ConfigError::WriteError(parent.to_path_buf(), e))?;
         }
 
         let entries = self.configs.get(filename)
@@ -111,7 +111,7 @@ impl SystemConfigManager {
 
         let content = self.format_config(entries);
         fs::write(&file_path, content)
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
+            .map_err(|e| ConfigError::WriteError(file_path.clone(), e))?;
 
         Ok(())
     }
@@ -245,22 +245,22 @@ impl ServiceUnit {
     pub fn to_unit_file(&self) -> String {
         let mut content = String::new();
         
-        content.push_str(&format!("[Unit]\n"));
+        content.push_str("[Unit]\n");
         content.push_str(&format!("Description={}\n", self.description));
         
         if !self.after.is_empty() {
-            content.push_str(&format!("After={}\n", self.format!("{}/{}", after, " ")));
+            content.push_str(&format!("After={}\n", self.after.join(" ")));
         }
         
         if !self.requires.is_empty() {
-            content.push_str(&format!("Requires={}\n", self.format!("{}/{}", requires, " ")));
+            content.push_str(&format!("Requires={}\n", self.requires.join(" ")));
         }
         
         if !self.wants.is_empty() {
-            content.push_str(&format!("Wants={}\n", self.format!("{}/{}", wants, " ")));
+            content.push_str(&format!("Wants={}\n", self.wants.join(" ")));
         }
         
-        content.push_str(&format!("\n[Service]\n"));
+        content.push_str("\n[Service]\n");
         content.push_str(&format!("ExecStart={}\n", self.exec_start));
         
         if let Some(ref exec_stop) = self.exec_stop {
@@ -269,8 +269,8 @@ impl ServiceUnit {
         
         content.push_str(&format!("Restart={}\n", self.restart));
         
-        content.push_str(&format!("\n[Install]\n"));
-        content.push_str(&format!("WantedBy={}\n", self.format!("{}/{}", wanted_by, " ")));
+        content.push_str("\n[Install]\n");
+        content.push_str(&format!("WantedBy={}\n", self.wanted_by.join(" ")));
         
         content
     }
@@ -297,7 +297,7 @@ impl ServiceManager {
 
     /// Load service from file
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
-        let file_path = self.format!("{}/{}", service_dir, format!("{}.service", name));
+        let file_path = self.service_dir.join(format!("{}.service", name));
         
         let content = fs::read_to_string(&file_path)
             .map_err(|e| ConfigError::ReadError(file_path, e))?;
@@ -366,15 +366,15 @@ impl ServiceManager {
         let service = self.services.get(name)
             .ok_or(ConfigError::NotFound(name.to_string()))?;
 
-        let file_path = self.format!("{}/{}", service_dir, format!("{}.service", name));
+        let file_path = self.service_dir.join(format!("{}.service", name));
         
-        if let Some(parent) = None::<&str> {
+        if let Some(parent) = file_path.parent() {
             fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+                .map_err(|e| ConfigError::WriteError(parent.to_path_buf(), e))?;
         }
 
         fs::write(&file_path, service.to_unit_file())
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
+            .map_err(|e| ConfigError::WriteError(file_path.clone(), e))?;
 
         Ok(())
     }
