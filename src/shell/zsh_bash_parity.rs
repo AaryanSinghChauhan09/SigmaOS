@@ -1237,6 +1237,161 @@ impl UniversalShellCompatibilityEngine {
         self.tcsh_history.push_history(line);
         Ok(ShellPipelineParser::parse(&param_expanded))
     }
+
+    /// Transpiles any script into a vector of executable POSIX `/bin/sh` pipelines
+    pub fn execute_script_as_sh(&mut self, script: &str) -> Result<Vec<ShellPipeline>, &'static str> {
+        let dialect = Self::detect_shebang_dialect(script);
+        let posix_script = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
+
+        let mut pipelines = Vec::new();
+        for line in posix_script.lines() {
+            let l = line.trim();
+            if l.is_empty() || l.starts_with('#') {
+                continue;
+            }
+            if let Ok(pipeline) = self.process_input_line(l) {
+                if !pipeline.stages.is_empty() {
+                    pipelines.push(pipeline);
+                }
+            }
+        }
+        Ok(pipelines)
+    }
+}
+
+pub struct UniversalScriptTranspiler;
+
+impl UniversalScriptTranspiler {
+    /// Transpiles multi-dialect shell scripts (Fish, Tcsh, Bash, Zsh, Ksh) into POSIX /bin/sh compliant syntax
+    pub fn transpile_to_posix_sh(script: &str, dialect: ShellDialect) -> String {
+        let mut transpiled = String::new();
+        let mut in_function = false;
+
+        for line in script.lines() {
+            let trimmed = line.trim();
+
+            if trimmed.starts_with("#!") {
+                transpiled.push_str("#!/bin/sh\n");
+                continue;
+            }
+
+            let converted_line = match dialect {
+                ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
+                ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
+                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => Self::transpile_bash_zsh_line(trimmed),
+                ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
+            };
+
+            transpiled.push_str(&converted_line);
+            transpiled.push('\n');
+        }
+
+        transpiled
+    }
+
+    fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
+        let mut l = line.to_string();
+
+        // 1. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
+        if l.starts_with("set -x ") || l.starts_with("set -gx ") {
+            let rest = l.trim_start_matches("set -x ").trim_start_matches("set -gx ");
+            if let Some(space_idx) = rest.find(' ') {
+                let var = &rest[..space_idx];
+                let val = &rest[space_idx + 1..];
+                return format!("export {}={}", var, val);
+            }
+        } else if l.starts_with("set -g ") || l.starts_with("set ") {
+            let rest = l.trim_start_matches("set -g ").trim_start_matches("set ");
+            if let Some(space_idx) = rest.find(' ') {
+                let var = &rest[..space_idx];
+                let val = &rest[space_idx + 1..];
+                return format!("{}={}", var, val);
+            }
+        }
+
+        // 2. Fish 'and' / 'or' -> '&&' / '||'
+        if l.starts_with("and ") {
+            l = format!("&& {}", &l[4..]);
+        } else if l.starts_with("or ") {
+            l = format!("|| {}", &l[3..]);
+        }
+
+        // 3. Fish 'function foo' -> 'foo() {'
+        if l.starts_with("function ") {
+            let func_name = l.trim_start_matches("function ").trim();
+            *in_function = true;
+            return format!("{}() {{", func_name);
+        }
+
+        // 4. Fish 'end' -> '}' if in function
+        if l == "end" && *in_function {
+            *in_function = false;
+            return "}".to_string();
+        }
+
+        l
+    }
+
+    fn transpile_tcsh_line(line: &str) -> String {
+        let l = line.to_string();
+
+        // 1. Tcsh 'setenv VAR val' -> 'export VAR=val'
+        if l.starts_with("setenv ") {
+            let rest = l.trim_start_matches("setenv ");
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                return format!("export {}={}", parts[0], parts[1..].join(" "));
+            } else if parts.len() == 1 {
+                return format!("export {}=", parts[0]);
+            }
+        }
+
+        // 2. Tcsh 'alias foo bar' -> 'alias foo="bar"'
+        if l.starts_with("alias ") {
+            let rest = l.trim_start_matches("alias ");
+            if let Some(space_idx) = rest.find(' ') {
+                let name = &rest[..space_idx];
+                let cmd = &rest[space_idx + 1..];
+                return format!("alias {}={}", name, cmd);
+            }
+        }
+
+        l
+    }
+
+    fn transpile_bash_zsh_line(line: &str) -> String {
+        let mut l = line.to_string();
+
+        // 1. [[ expr ]] -> [ expr ]
+        if l.contains("[[") && l.contains("]]") {
+            l = l.replace("[[", "[").replace("]]", "]");
+        }
+
+        // 2. <<< "here string" -> echo "here string" |
+        if l.contains("<<<") {
+            if let Some(pos) = l.find("<<<") {
+                let cmd = &l[..pos].trim();
+                let string_val = &l[pos + 3..].trim();
+                return format!("echo {} | {}", string_val, cmd);
+            }
+        }
+
+        // 3. function foo() -> foo()
+        if l.starts_with("function ") {
+            let rest = l.trim_start_matches("function ").trim();
+            if !rest.contains("()") {
+                if let Some(idx) = rest.find(' ') {
+                    let name = &rest[..idx];
+                    let body = &rest[idx..];
+                    return format!("{}() {}", name, body);
+                } else {
+                    return format!("{}()", rest);
+                }
+            }
+        }
+
+        l
+    }
 }
 
 impl Default for UniversalShellCompatibilityEngine {
@@ -1549,5 +1704,30 @@ mod tests {
         let pipeline = engine.process_input_line("co ${NAME:-default}").unwrap();
         assert_eq!(pipeline.stages[0].program, "checkout");
         assert_eq!(pipeline.stages[0].args, vec!["SigmaOS".to_string()]);
+    }
+
+    #[test]
+    fn test_universal_script_transpiler_and_sh_execution() {
+        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done";
+        let posix_fish = UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
+        assert!(posix_fish.contains("#!/bin/sh"));
+        assert!(posix_fish.contains("export TARGET=/usr/bin"));
+        assert!(posix_fish.contains("build_all() {"));
+        assert!(posix_fish.contains("}"));
+        assert!(posix_fish.contains("&& echo done"));
+
+        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la";
+        let posix_tcsh = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
+        assert!(posix_tcsh.contains("export PORT=8080"));
+        assert!(posix_tcsh.contains("alias ll=ls -la"));
+
+        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]";
+        let posix_bash = UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
+        assert!(posix_bash.contains("echo \"test_string\" | grep test"));
+        assert!(posix_bash.contains("[ -f /tmp/foo ]"));
+
+        let mut engine = UniversalShellCompatibilityEngine::new();
+        let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
+        assert!(!pipelines.is_empty());
     }
 }
