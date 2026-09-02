@@ -753,6 +753,45 @@ impl SystemdServiceHardeningEvaluator {
     }
 }
 
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut processed = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let can_run = engine.units.iter().all(|other| {
+                    if other.id == id || processed.contains(&other.id) {
+                        return true;
+                    }
+                    let depends_on_other = if let Some(u) = engine.find_unit(id) {
+                        u.after.contains(&other.id) || other.before.contains(&id)
+                    } else {
+                        false
+                    };
+                    !depends_on_other
+                });
+                if can_run {
+                    current_stage.push(id);
+                }
+            }
+            if current_stage.is_empty() {
+                current_stage.extend(remaining.drain(..));
+                stages.push(current_stage);
+                break;
+            }
+            processed.extend(&current_stage);
+            remaining.retain(|id| !current_stage.contains(id));
+            stages.push(current_stage);
+        }
+        stages
+    }
+}
+
 pub struct SystemdCgroupSliceGovernor {
     pub slice_name: String,
     pub cpu_weight: u32,
@@ -2127,6 +2166,15 @@ mod tests {
     fn test_systemd_service_hardening_evaluator() {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
+
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.duration_ms = 100;
+        target.requires.push(2);
+
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.duration_ms = 150;
+        service.requires.push(3);
 
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
