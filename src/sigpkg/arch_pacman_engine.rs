@@ -1,37 +1,13 @@
-use alloc::format;
-use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman Compatibility Engine
 // Inspired by Arch Linux package manager, ABS (Arch Build System), and AUR (Arch User Repository)
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-/// Arch Linux pacman-contrib utility suite
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn rankmirrors(mirrors: &[(&str, usize)]) -> Vec<String> {
-        let mut sorted: Vec<(&str, usize)> = mirrors.to_vec();
-        sorted.sort_by_key(|&(_, ping)| ping);
-        sorted.into_iter().map(|(url, _)| url.to_string()).collect()
-    }
-
-    pub fn updpkgsums(pkgbuild: &str, sha256_hash: &str) -> String {
-        format!("{}\nsha256sums=('{}')", pkgbuild.trim(), sha256_hash)
-    }
-}
-
-impl Default for PacmanContribEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub type PacmanContribEngine = crate::expanded_wiki_innovations::ArchPacmanContribEngine;
 
 /// Pacman package database entry
 #[derive(Debug, Clone)]

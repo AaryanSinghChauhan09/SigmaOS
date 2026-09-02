@@ -832,12 +832,13 @@ pub struct SovereignDistroDominanceSuite {
 
 impl SovereignDistroDominanceSuite {
     pub fn new() -> Self {
-        let mut sentinel = OpenBsdHardenedCapsicumPledge::new();
-        sentinel.pledge(&["stdio", "rpath"]);
+        let mut security_sentinel = OpenBsdHardenedCapsicumPledge::new();
+        security_sentinel.pledge(&["stdio", "rpath", "wpath", "exec", "proc"]);
+
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
-            security_sentinel: sentinel,
+            security_sentinel,
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
