@@ -18,7 +18,6 @@ pub mod libgksu;
 pub mod mac;
 pub mod openbsd_karl;
 pub mod password;
-pub mod pki;
 pub mod pledge;
 pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
@@ -34,6 +33,7 @@ pub mod root_improvement;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
+pub mod selinux_advanced;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod unveil;
@@ -92,9 +92,10 @@ pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
+    AppArmorManager, AppArmorProfile, ObjectType, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
 };
+pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission,
