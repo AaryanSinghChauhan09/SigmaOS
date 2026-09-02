@@ -1,13 +1,5 @@
-# Palette's Journal - UX & Accessibility Learnings
+## 2026-09-02 - Accessible Window Controls in Web Desktop Interfaces
 
-## Philosophy
-- Users notice the little things.
-- Accessibility is not optional.
-- Every interaction should feel smooth.
-- Good UX is invisible - it just works.
+**Learning:** Custom window controls (e.g. minimize, maximize, close dots) in web-based desktop operating systems are frequently styled as simple `div` or `span` tags, making them invisible to keyboard focus traps and screen readers. Converting these to semantic `<button type="button">` elements with explicit `aria-label` and `title` attributes (e.g., `aria-label="Minimize OmniShell Terminal"`) alongside CSS reset rules (`border: none; padding: 0; outline: none`) preserves exact visual aesthetics while making window management WCAG 2.1 AA compliant.
 
-## Critical Learnings
-
-## 2025-05-18 - Desktop Shell & Terminal Accessibility Standards
-**Learning:** Icon-only controls in terminal multiplexers and graphical control centers lack screen reader announcements if `aria-label` or explicit tooltip titles are omitted. Adding distinct keyboard focus indicators improves navigation efficiency for power users and screen readers alike.
-**Action:** Every interactive UI component must include high-contrast focus states, explicit accessibility labels, and keyboard shortcuts.
+**Action:** Whenever building custom window titlebars or desktop controls, always use native `<button>` tags with explicit, context-aware `aria-label`s and `:focus-visible` focus rings.
