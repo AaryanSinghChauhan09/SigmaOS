@@ -47,7 +47,8 @@ pub use sovereign_system_innovations::{
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
-    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
+    SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
