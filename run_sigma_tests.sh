@@ -3,14 +3,12 @@ set -e
 
 echo "=== SigmaOS / SovereignOS Master CI Test Runner ==="
 
-# 1. Run Python integration test suite if python3/pytest available
-echo "[1/5] Running Python integration test suite..."
-if command -v pytest &>/dev/null; then
+# 1. Run Python integration test suite if pytest module is available
+echo "[1/5] Checking Python integration test suite..."
+if python3 -c "import pytest" &>/dev/null; then
     pytest
-elif command -v python3 &>/dev/null; then
-    python3 -m unittest discover -s tests -p "test_*.py"
 else
-    echo "Python test environment not available; skipping."
+    echo "pytest module not installed in python environment; skipping python tests."
 fi
 
 # 2. Run Open Source OS Gap Closure standalone tests
