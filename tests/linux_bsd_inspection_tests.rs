@@ -951,3 +951,42 @@ fn test_pacman_contrib_suite_inspection() {
     let parsed = PacLogAuditor::parse_log_line(log_line).unwrap();
     assert_eq!(parsed.target, "linux");
 }
+
+#[test]
+fn test_svntogit_repro_and_aur_rules_inspection() {
+    use sigpkg::{
+        SovereignSvnToGitMigrator, SvnRevisionLog, SvnBranchType, ReproduciblePackageBuilder, ReproducibleBuildEnvironment,
+        AurRuleEngine, MakepkgReproduciblePipeline, MakepkgBuildStatus,
+    };
+
+    // 1. SVN-to-Git Migrator
+    let mut migrator = SovereignSvnToGitMigrator::new();
+    migrator.add_svn_log(SvnRevisionLog {
+        revision: 9876,
+        author: "sigma-dev".to_string(),
+        message: "upgpkg: zstd 1.5.5-1".to_string(),
+        path: "trunk".to_string(),
+        branch_type: SvnBranchType::Trunk,
+    });
+    let commits = migrator.migrate_svn_to_git("sigmaos.org");
+    assert_eq!(commits.len(), 1);
+    assert_eq!(commits[0].author_email, "sigma-dev@sigmaos.org");
+
+    // 2. Reproducible Package Builder
+    let env = ReproducibleBuildEnvironment::default();
+    let mut builder = ReproduciblePackageBuilder::new(env);
+    builder.add_artifact("/usr/bin/zstd", b"ZSTD_BINARY");
+    let report = builder.build_reproducible_package();
+    assert!(report.is_reproducible);
+    assert_eq!(report.artifact_count, 1);
+
+    // 3. AUR Rule Linter & Makepkg Pipeline
+    let linter = AurRuleEngine::new();
+    let findings = linter.lint_pkgbuild("pkgname=test\nbuild() {\n sudo rm -rf /\n}");
+    assert!(findings.len() >= 1);
+
+    let pipeline = MakepkgReproduciblePipeline::new();
+    let res = pipeline.build_and_package("zstd", "1.5.5", "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }", Some("0x123"));
+    assert_eq!(res.status, MakepkgBuildStatus::Success);
+    assert_eq!(res.package_filename, "zstd-1.5.5-x86_64.pkg.tar.zst");
+}

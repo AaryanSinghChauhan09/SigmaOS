@@ -26,9 +26,11 @@ pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
+pub mod aur_rules;
 pub mod pacman;
 pub mod pacman_contrib;
 pub mod portage;
+pub mod svntogit_repro;
 pub mod recipe;
 pub mod repository_manager;
 pub mod resolver;
@@ -110,6 +112,15 @@ pub use pacman_contrib::{
     PacDiffConfigResolver, PacDiffAction, PacDiffCandidate,
     CheckUpdatesEngine, InstalledPackage, SyncPackage, PendingUpdate,
     PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor, PacLogAction, PacLogEntry,
+};
+pub use svntogit_repro::{
+    SovereignSvnToGitMigrator, SvnRevisionLog, ConvertedGitCommit, SvnBranchType,
+    ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
+    ReproducibilityAttestationReport,
+};
+pub use aur_rules::{
+    AurRuleEngine, AurLintFinding, LintSeverity, AurSandboxPolicy,
+    MakepkgReproduciblePipeline, MakepkgBuildStatus, MakepkgBuildResult,
 };
 
 /// Package version using SemVer
