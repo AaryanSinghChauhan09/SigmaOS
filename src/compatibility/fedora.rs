@@ -587,6 +587,108 @@ impl Default for SystemdPresetConfigurator {
     }
 }
 
+// =========================================================================
+// Fedora status.fpo Infrastructure Status & Health Monitoring System
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StatusFpoServiceHealth {
+    Good,
+    Degraded,
+    MajorOutage,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StatusFpoIncident {
+    pub incident_id: u32,
+    pub service_name: String,
+    pub title: String,
+    pub resolved: bool,
+}
+
+/// Fedora status.fpo infrastructure health and status monitoring engine.
+/// Tracks service availability (Koji, Bodhi, Copr, MirrorManager, Pagure),
+/// logs incidents, calculates uptime SLA percentages, and generates status reports.
+pub struct FedoraStatusFpoEngine {
+    pub service_states: HashMap<String, StatusFpoServiceHealth>,
+    pub incidents: Vec<StatusFpoIncident>,
+    pub total_checks: u64,
+    pub successful_checks: u64,
+}
+
+impl FedoraStatusFpoEngine {
+    pub fn new() -> Self {
+        let mut states = HashMap::new();
+        states.insert("Koji".to_string(), StatusFpoServiceHealth::Good);
+        states.insert("Bodhi".to_string(), StatusFpoServiceHealth::Good);
+        states.insert("Copr".to_string(), StatusFpoServiceHealth::Good);
+        states.insert("MirrorManager".to_string(), StatusFpoServiceHealth::Good);
+        states.insert("Pagure".to_string(), StatusFpoServiceHealth::Good);
+
+        Self {
+            service_states: states,
+            incidents: Vec::new(),
+            total_checks: 100,
+            successful_checks: 100,
+        }
+    }
+
+    pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
+        self.service_states.insert(service_name.to_string(), health);
+        self.total_checks += 1;
+        if health == StatusFpoServiceHealth::Good {
+            self.successful_checks += 1;
+        }
+    }
+
+    pub fn report_incident(&mut self, id: u32, service: &str, title: &str) {
+        self.incidents.push(StatusFpoIncident {
+            incident_id: id,
+            service_name: service.to_string(),
+            title: title.to_string(),
+            resolved: false,
+        });
+        self.set_service_health(service, StatusFpoServiceHealth::MajorOutage);
+    }
+
+    pub fn resolve_incident(&mut self, id: u32) -> bool {
+        if let Some(inc) = self.incidents.iter_mut().find(|i| i.incident_id == id) {
+            inc.resolved = true;
+            let service = inc.service_name.clone();
+            self.set_service_health(&service, StatusFpoServiceHealth::Good);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_uptime_sla_percentage(&self) -> f64 {
+        if self.total_checks == 0 {
+            return 100.0;
+        }
+        (self.successful_checks as f64 / self.total_checks as f64) * 100.0
+    }
+
+    pub fn generate_status_summary(&self) -> String {
+        let mut report = String::from("Fedora Infrastructure Status (status.fpo):\n");
+        for (svc, health) in &self.service_states {
+            report.push_str(&format!("  - {}: {:?}\n", svc, health));
+        }
+        report.push_str(&format!(
+            "Uptime SLA: {:.2}%\nActive Incidents: {}\n",
+            self.calculate_uptime_sla_percentage(),
+            self.incidents.iter().filter(|i| !i.resolved).count()
+        ));
+        report
+    }
+}
+
+impl Default for FedoraStatusFpoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================================
 // Fedora Anaconda Installer & Kickstart Configurator
 // ==========================================================
@@ -2986,6 +3088,24 @@ mod tests {
         assert!(!engine.is_offline_update_pending);
         assert!(!engine.trigger_reboot_flag);
         assert!(engine.staged_packages.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_status_fpo_engine() {
+        let mut status = FedoraStatusFpoEngine::new();
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
+        assert_eq!(status.calculate_uptime_sla_percentage(), 100.0);
+
+        status.report_incident(101, "Koji", "Database connectivity degradation");
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::MajorOutage));
+        assert_eq!(status.incidents.len(), 1);
+
+        assert!(status.resolve_incident(101));
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
+
+        let summary = status.generate_status_summary();
+        assert!(summary.contains("status.fpo"));
+        assert!(summary.contains("Active Incidents: 0"));
     }
 
     #[test]
