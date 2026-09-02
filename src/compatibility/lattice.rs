@@ -1,4 +1,3 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
