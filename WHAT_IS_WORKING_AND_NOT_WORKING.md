@@ -49,6 +49,15 @@ This document serves as the master guide for human engineers and AI agents to un
 * **Format Adaptation**: Native adaptation and cross-translation of 25+ foreign package formats (.deb, .rpm, PKGBUILD/AUR, .apk, .ebuild, .ports, Flatpak, AppImage, Snap, .nixpkg).
 * **Distro Parity Innovations**: Functional implementations of Arch Pacman/AUR, Gentoo Portage, Fedora OSTree/SELinux, Void Runit, NixOS Flakes, Mint Tweak Engine, FreeBSD Jails, OpenBSD Pledge/Unveil, Bedrock Linux Strata Engine, and SmartOS Zone Engine.
 
+### 1.8 Productivity & Mint Ecosystem Tools
+* **Bulky Bulk File Renamer**: TitleCase, zero-padded sequences, position insertion/removal, regex replacement, conflict detection, and undo stack.
+* **PowerRename Engine**: Advanced batch renaming with case conversion, counter padding, and collision prevention.
+* **Mint System Tweak Engine**: Linux Mint inspired swappiness tuning, zRAM allocation, cgroup v2 memory reclaim, DNS caching, and kernel sysctl hardening.
+
+### 1.9 Multi-Core Schedulers & Memory Allocators
+* **Interactive Hybrid Scheduler**: Task yielding (`yield_task`), task counting (`get_task_count`), and EEVDF/BORE runtime tracking.
+* **Superpage & Arena Allocator**: `#![no_std]` compatible memory page allocation, alignment, and tracking.
+
 ---
 
 ## 2. WHAT IS NOT WORKING & WHY (Diagnostic Error Matrix)
@@ -59,10 +68,13 @@ When building or extending algorithms in SigmaOS, AI agents may encounter standa
 | :--- | :--- | :--- |
 | **E0004** | `non-exhaustive patterns: ... not covered` | Match block on enums (e.g. `PackageFormat`, `HandoffProtocol`) missing newly added enum variants. |
 | **E0034** | `multiple matching items found` | Duplicate method implementations inside `impl` blocks (e.g. multiple `select_next_rt_task` methods in scheduler impls). |
+| **E0062** / **E0063** | `field ... missing in struct initialization` | Missing struct fields during struct instantiation or builder construction. |
 | **E0119** | `conflicting implementations of trait` | Implementing standard library traits for types where orphan rules or existing blanket impls collide in `#![no_std]` context. |
+| **E0124** | `field ... is already declared` | Duplicate field names defined within a struct definition. |
 | **E0252** / **E0255** | `the name ... is defined multiple times` | Re-declaration or conflicting imports of core primitive types (`Vec`, `String`, `HashMap`) across `alloc` and `klib` submodules. |
 | **E0277** | `the trait bound ... is not satisfied` | Missing required traits (`Clone`, `Copy`, `Send`, `Sync`, `Default`, `PartialEq`) on custom structs or primitive slice vs `Vec` type mismatches. |
 | **E0282** | `type annotations needed` | Type inference failure in generic collection lookup or iterator chaining (`map.get()`, `collect()`). |
+| **E0308** | `mismatched types` / `expected Option<&T>, found Option<&&T>` | Type mismatch caused by redundant `.as_ref().map(|s| s)` on Option references or mismatch between `&str` and `String`/`SigmaString`. |
 | **E0382** | `use of moved value` | Value moved into struct field or closure without implementing `Copy` or calling `.clone()` (e.g., `NvidiaPrimeProfile`). |
 | **E0428** | `a type named ... has already been defined` | Duplicate struct/enum declarations within the same module scope or imported via `use super::*`. |
 | **E0433** | `failed to resolve: use of undeclared type` | Missing struct/engine definition or missing module import in `src/unimplemented_features.rs` or `src/lib.rs`. |
@@ -71,6 +83,7 @@ When building or extending algorithms in SigmaOS, AI agents may encounter standa
 | **E0599** | `no method named ... found for type` | Custom collection types (e.g., `klib::Vec<T>`) lacking expected standard methods (`iter_mut()`, `from_utf8()`, `contains_key_str()`). |
 | **E0614** | `type ... cannot be dereferenced` | Attempting to dereference (`*v`) a primitive scalar type (like `i32`) that is already passed by value. |
 | **E0659** | `... is ambiguous` | Wildcard imports (`use super::*`) bringing multiple conflicting symbols into the same namespace. |
+| **Syntax Error** | `this file contains an unclosed delimiter` | Missing closing parenthesis `)` or bracket `]` in inner attribute `#![allow(...)]` or misplaced test module brackets. |
 
 ---
 
@@ -318,6 +331,32 @@ impl<const N: usize> ZeroCopyPipeRing<N> {
 }
 ```
 
+### 3.9 Blueprint 9: Resolving Option Reference Mapping (`E0308`)
+**Problem**: Calling `.as_ref().map(|s| s)` on an already borrowed option `Option<&T>` yields `Option<&&T>`.
+**Fix**: Compare directly with `Some(&value)` or map using dereference `map(|v| &**v)`.
+
+```rust
+// INCORRECT:
+// results.last().map(|(_, s)| s) == Some(&BuildStatus::Success).as_ref().map(|s| s) // Yields Option<&&BuildStatus>
+
+// CORRECT PATTERN:
+if results.last().map(|(_, s)| s) == Some(&BuildStatus::Success) {
+    // Phase succeeded — proceed with build chain
+}
+```
+
+### 3.10 Blueprint 10: Fixing Unclosed Delimiters and Attributes
+**Problem**: Unclosed parentheses in module-level `#![allow(...)]` attributes or mismatched test module scope braces cause parsing failures.
+**Fix**: Ensure every `#![allow(...)]` is properly closed with `)]` and ensure test functions inside `impl` blocks are extracted into appropriate `mod tests` scopes.
+
+```rust
+// INCORRECT:
+// #![allow(clippy::unnecessary_lazy_evaluations)
+
+// CORRECT PATTERN:
+#![allow(clippy::unnecessary_lazy_evaluations)]
+```
+
 ---
 
 ## 4. STEP-BY-STEP AI AGENT VERIFICATION WORKFLOW
@@ -327,7 +366,8 @@ When fixing or enhancing algorithms in SigmaOS, every AI agent MUST follow this 
 ```
 +-----------------------------------------------------------------------+
 | STEP 1: DIAGNOSE & CATALOG ERRORS                                      |
-| Run `cargo check --lib` or `./run_sigma_tests.sh` to capture errors.  |
+| Run `cargo check --lib` or `cargo check --all-targets` to capture     |
+| compilation diagnostics.                                              |
 +-----------------------------------------------------------------------+
                                   |
                                   v
@@ -346,7 +386,8 @@ When fixing or enhancing algorithms in SigmaOS, every AI agent MUST follow this 
                                   v
 +-----------------------------------------------------------------------+
 | STEP 4: EXECUTE FULL SUITE VALIDATION                                 |
-| Run `./run_sigma_tests.sh` and ensure 100% tests pass cleanly.       |
+| Run `cargo check --lib` or `./scripts/app_regression_test.sh` to     |
+| verify that the build succeeds and all tests pass cleanly.            |
 +-----------------------------------------------------------------------+
 ```
 
