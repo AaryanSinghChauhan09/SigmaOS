@@ -89,8 +89,83 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::DragonFlyBsd,
                 "/etc",
             ) => "/etc".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/var/log",
+            ) => "/var/log".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/proc",
+            ) => "/proc".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/sys",
+            ) => "/sys".to_string(),
             _ => generic_path.to_string(),
         }
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Verify pledge sentinel bounds
+        if self.pledge_sentinel.pledged_processes.len() > 1000 {
+            return false;
+        }
+
+        // Verify supervisor compatibility matching subsystem mode
+        let supervisor = self.get_supervisor_type();
+        match self.mode {
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxFedora => {
+                if supervisor != ServiceSupervisorType::Systemd {
+                    return false;
+                }
+            }
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => {
+                if supervisor != ServiceSupervisorType::OpenRC {
+                    return false;
+                }
+            }
+            DistroSubsystemMode::LinuxAlpine => {
+                if supervisor != ServiceSupervisorType::Runit {
+                    return false;
+                }
+            }
+            DistroSubsystemMode::LinuxNix => {
+                if supervisor != ServiceSupervisorType::Shepherd {
+                    return false;
+                }
+            }
+        }
+
+        // Verify VFS path translations for standard system paths
+        if self.translate_vfs_path("/etc").is_empty()
+            || self.translate_vfs_path("/var/log").is_empty()
+            || self.translate_vfs_path("/proc").is_empty()
+            || self.translate_vfs_path("/sys").is_empty()
+        {
+            return false;
+        }
+
+        // Verify package specifier translation
+        if self.translate_package_specifier("coreutils").is_empty() {
+            return false;
+        }
+
+        true
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {

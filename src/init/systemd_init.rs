@@ -286,6 +286,62 @@ impl Default for TimerConfig {
     }
 }
 
+/// Parallel stage resolution for BSD rc.d startup stages
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut completed: Vec<UnitID> = Vec::new();
+        let mut stages: Vec<Vec<UnitID>> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let mut ready = true;
+                if let Some(unit) = engine.find_unit(id) {
+                    for &dep in unit.after.iter().chain(unit.requires.iter()) {
+                        if remaining.contains(&dep) && dep != id {
+                            ready = false;
+                            break;
+                        }
+                    }
+                }
+                if ready {
+                    for &other_id in &remaining {
+                        if other_id == id {
+                            continue;
+                        }
+                        if let Some(other_unit) = engine.find_unit(other_id) {
+                            if other_unit.before.contains(&id) {
+                                ready = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ready {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                // Dependency cycle or unresolvable stage, break with remaining
+                stages.push(remaining);
+                break;
+            }
+
+            for &id in &current_stage {
+                completed.push(id);
+                remaining.retain(|&x| x != id);
+            }
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 /// Multi-init abstraction bridge allowing boot-time switching across Linux & BSD init models
 pub struct InitSystemBridge {
     pub active_init: InitSystemType,
@@ -2127,6 +2183,15 @@ mod tests {
     fn test_systemd_service_hardening_evaluator() {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
+
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.requires.push(2);
+        target.duration_ms = 100;
+
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.requires.push(3);
+        service.duration_ms = 150;
 
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
