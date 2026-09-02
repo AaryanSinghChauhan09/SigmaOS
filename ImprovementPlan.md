@@ -1,7 +1,21 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR** and the **Installer**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, the **Installer**, and the **Website UI**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for SigmaOS Web UI (`web_ui/`)
+
+To elevate the SigmaOS Web Interface (`web_ui/index.html` and `web_ui/styles/style.css`) into a responsive, accessible, high-performance web portal, SigmaOS synthesizes innovations from premier Linux and BSD distribution sites:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS Web UI Integration Strategy |
+|-------------------|-------------------|-------------------------------------|
+| **OpenBSD Website** | Zero-JS accessible HTML fallbacks | Ensure full usability in text-mode browsers (`lynx`, `w3m`) without JavaScript enabled. |
+| **NixOS Web UI** | Client-side package & option explorer | Implement fast client-side fuzzy search for packages and system configuration options. |
+| **Arch Linux Website** | Package database API & Security Feed | Integrate live REST API endpoints for package search and security advisory (CVE) alerts. |
+| **FreeBSD Portal** | Hugo/Asciidoctor static generation | Offline documentation generator producing self-contained HTML/CSS manuals. |
+| **Linux Mint Website** | Glassmorphism styling & mirror selector | Modern CSS glassmorphism visuals with adaptive dark mode and mirror speed benchmark widgets. |
 
 ---
 

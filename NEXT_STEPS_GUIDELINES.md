@@ -1,11 +1,33 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)** and the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, and the **SigmaOS Web Interface (`web_ui/`)**.
 
 ---
 
-## 1. Multi-OS Distro Inspired Installer Architecture Guidelines
+## 1. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
+
+To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, responsive, zero-jank web interface, front-end maintainers must adhere to the following guidelines:
+
+### A. OpenBSD Zero-JavaScript Progressive Enhancement
+- **Guideline**: Ensure all critical information (release notes, ISO download mirrors, installation steps) remains fully functional when JavaScript is disabled or when rendered in text-based user agents (`lynx`, `w3m`, `links`).
+- **Implementation**: Form elements and installer steppers must rely on standard semantic `<form>` actions with server fallback routes alongside client-side JS.
+
+### B. NixOS Interactive Option & Package Search
+- **Guideline**: Implement instant client-side package and configuration searching directly in the web UI.
+- **Implementation**: Embed a lightweight, zero-dependency client-side fuzzy search index (`web_ui/index.js`) for searching kernel modules, package names, and configuration parameters.
+
+### C. FreeBSD SSG Documentation & Static Mirroring
+- **Guideline**: Build self-contained static documentation bundles that can be served offline from local ISO media.
+- **Implementation**: Compile wiki pages and specifications into offline static HTML bundles stored in `docs/` and accessible directly from the live ISO installer interface.
+
+### D. Linux Mint Responsive Glassmorphism Design System
+- **Guideline**: Maintain a modern, accessible glassmorphism visual aesthetic with full dark mode support and WCAG 2.1 AA contrast compliance.
+- **Implementation**: Standardize CSS custom variables (`--bg-glass`, `--accent-sig`, `--text-primary`) in `web_ui/styles/style.css`, enforcing `focus-visible:ring-2` keyboard outline rings across all interactive buttons.
+
+---
+
+## 2. Multi-OS Distro Inspired Installer Architecture Guidelines
 
 To evolve `installer/sigma-installer.rs` into a high-reliability installer engine, developers must follow these architectural guidelines:
 
@@ -27,7 +49,7 @@ To evolve `installer/sigma-installer.rs` into a high-reliability installer engin
 
 ---
 
-## 2. Multi-OS Distro Inspired AUR Architecture Guidelines
+## 3. Multi-OS Distro Inspired AUR Architecture Guidelines
 
 To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign package ecosystem, maintainers must adhere to the following architectural guidelines:
 
@@ -53,7 +75,7 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 3. General Engineering & Quality Guidelines
+## 4. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -66,10 +88,11 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 4. Recommended Phased Implementation Sequence
+## 5. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
 3. **Phase 3: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
-4. **Phase 4: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
-5. **Phase 5: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
+4. **Phase 4: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
+5. **Phase 5: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
+6. **Phase 6: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
