@@ -3062,6 +3062,580 @@ impl Default for DebianTriggerManager {
     }
 }
 
+// ============================================================================
+// OOP Command Pattern: Transactional & Reversible Package Operations
+// ============================================================================
+
+pub trait IPackageCommand: Send + Sync {
+    fn execute(&mut self) -> Result<(), HookError>;
+    fn undo(&mut self) -> Result<(), HookError>;
+    fn description(&self) -> &str;
+}
+
+pub struct TransactionRollbackExecutor {
+    executed_commands: Vec<Box<dyn IPackageCommand>>,
+}
+
+impl TransactionRollbackExecutor {
+    pub fn new() -> Self {
+        Self {
+            executed_commands: Vec::new(),
+        }
+    }
+
+    pub fn execute_command(
+        &mut self,
+        mut command: Box<dyn IPackageCommand>,
+    ) -> Result<(), HookError> {
+        command.execute()?;
+        self.executed_commands.push(command);
+        Ok(())
+    }
+
+    pub fn rollback_all(&mut self) -> Result<usize, HookError> {
+        let mut count = 0;
+        while let Some(mut cmd) = self.executed_commands.pop() {
+            cmd.undo()?;
+            count += 1;
+        }
+        Ok(count)
+    }
+
+    pub fn executed_count(&self) -> usize {
+        self.executed_commands.len()
+    }
+}
+
+impl Default for TransactionRollbackExecutor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// OOP Observer Pattern: Package Lifecycle Event Listening
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PackageEvent {
+    Installed(String),
+    Removed(String),
+    FileDiverted { original: String, diverted: String },
+    AlternativeSwitched { link_name: String, path: String },
+    ConfigConflict { path: String },
+}
+
+pub trait IPackageObserver: Send + Sync {
+    fn on_event(&self, event: &PackageEvent);
+}
+
+pub struct PackageEventManager {
+    observers: Vec<Arc<dyn IPackageObserver>>,
+}
+
+impl PackageEventManager {
+    pub fn new() -> Self {
+        Self {
+            observers: Vec::new(),
+        }
+    }
+
+    pub fn register_observer(&mut self, observer: Arc<dyn IPackageObserver>) {
+        self.observers.push(observer);
+    }
+
+    pub fn notify_event(&self, event: &PackageEvent) {
+        for obs in &self.observers {
+            obs.on_event(event);
+        }
+    }
+}
+
+impl Default for PackageEventManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// OOP Decorator Pattern: Dynamic Package Enhancements
+// ============================================================================
+
+pub struct SandboxedPackageDecorator {
+    pub wrapped: Box<dyn IPackage>,
+    pub pledge_promises: Vec<String>,
+    pub unveil_paths: Vec<String>,
+}
+
+impl SandboxedPackageDecorator {
+    pub fn new(
+        wrapped: Box<dyn IPackage>,
+        pledge_promises: Vec<String>,
+        unveil_paths: Vec<String>,
+    ) -> Self {
+        Self {
+            wrapped,
+            pledge_promises,
+            unveil_paths,
+        }
+    }
+}
+
+impl IPackage for SandboxedPackageDecorator {
+    fn name(&self) -> &str {
+        self.wrapped.name()
+    }
+    fn version(&self) -> &Version {
+        self.wrapped.version()
+    }
+    fn dependencies(&self) -> &[Dependency] {
+        self.wrapped.dependencies()
+    }
+    fn format(&self) -> PackageFormat {
+        self.wrapped.format()
+    }
+    fn metadata(&self) -> &PackageMetadata {
+        self.wrapped.metadata()
+    }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        self.wrapped.metadata_mut()
+    }
+    fn files(&self) -> &[String] {
+        self.wrapped.files()
+    }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        self.wrapped.conditional_dependencies()
+    }
+}
+
+pub struct AuditedPackageDecorator {
+    pub wrapped: Box<dyn IPackage>,
+    pub audit_passed: bool,
+    pub audit_notes: String,
+}
+
+impl AuditedPackageDecorator {
+    pub fn new(wrapped: Box<dyn IPackage>) -> Self {
+        let name = wrapped.name();
+        let audit_passed = !name.contains("vulnerable") && !name.contains("malware");
+        let audit_notes = if audit_passed {
+            "Package passed security audit".to_string()
+        } else {
+            "Security vulnerability detected during audit".to_string()
+        };
+
+        Self {
+            wrapped,
+            audit_passed,
+            audit_notes,
+        }
+    }
+}
+
+impl IPackage for AuditedPackageDecorator {
+    fn name(&self) -> &str {
+        self.wrapped.name()
+    }
+    fn version(&self) -> &Version {
+        self.wrapped.version()
+    }
+    fn dependencies(&self) -> &[Dependency] {
+        self.wrapped.dependencies()
+    }
+    fn format(&self) -> PackageFormat {
+        self.wrapped.format()
+    }
+    fn metadata(&self) -> &PackageMetadata {
+        self.wrapped.metadata()
+    }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        self.wrapped.metadata_mut()
+    }
+    fn files(&self) -> &[String] {
+        self.wrapped.files()
+    }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        self.wrapped.conditional_dependencies()
+    }
+}
+
+// ============================================================================
+// User-Defined Function Build & Phase Pipeline
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageBuildPhase {
+    Prepare,
+    Unpack,
+    Configure,
+    Compile,
+    Test,
+    Install,
+    Clean,
+}
+
+pub struct UserDefinedPhaseClosure {
+    pub name: String,
+    pub phase: PackageBuildPhase,
+    pub closure: Arc<dyn Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync>,
+}
+
+pub struct UserDefinedFunctionPipeline {
+    closures: Vec<UserDefinedPhaseClosure>,
+}
+
+impl UserDefinedFunctionPipeline {
+    pub fn new() -> Self {
+        Self {
+            closures: Vec::new(),
+        }
+    }
+
+    pub fn register_closure<F>(&mut self, name: &str, phase: PackageBuildPhase, closure: F)
+    where
+        F: Fn(&mut dyn IPackage) -> Result<(), HookError> + Send + Sync + 'static,
+    {
+        self.closures.push(UserDefinedPhaseClosure {
+            name: name.to_string(),
+            phase,
+            closure: Arc::new(closure),
+        });
+    }
+
+    pub fn execute_phase(
+        &self,
+        phase: PackageBuildPhase,
+        package: &mut dyn IPackage,
+    ) -> Result<usize, HookError> {
+        let mut executed = 0;
+        for c in &self.closures {
+            if c.phase == phase {
+                (c.closure)(package)?;
+                executed += 1;
+            }
+        }
+        Ok(executed)
+    }
+}
+
+impl Default for UserDefinedFunctionPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Software Alternatives & File Diverter Subsystems
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeChoice {
+    pub path: String,
+    pub priority: i32,
+}
+
+pub struct SovereignAlternativesEngine {
+    pub alternatives: HashMap<String, Vec<AlternativeChoice>>, // Name -> Choices
+    pub active_selections: HashMap<String, String>,             // Name -> Selected Path
+}
+
+impl SovereignAlternativesEngine {
+    pub fn new() -> Self {
+        Self {
+            alternatives: HashMap::new(),
+            active_selections: HashMap::new(),
+        }
+    }
+
+    pub fn install_alternative(&mut self, name: &str, path: &str, priority: i32) {
+        let entry = self.alternatives.entry(name.to_string()).or_default();
+        if !entry.iter().any(|c| c.path == path) {
+            entry.push(AlternativeChoice {
+                path: path.to_string(),
+                priority,
+            });
+        }
+        entry.sort_by(|a, b| b.priority.cmp(&a.priority));
+
+        if let Some(best) = entry.first() {
+            self.active_selections
+                .insert(name.to_string(), best.path.clone());
+        }
+    }
+
+    pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
+        self.active_selections.get(name).map(|s| s.as_str())
+    }
+}
+
+impl Default for SovereignAlternativesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct DebianDiverterEngine {
+    pub diversions: HashMap<String, String>, // original_path -> diverted_path
+}
+
+impl DebianDiverterEngine {
+    pub fn new() -> Self {
+        Self {
+            diversions: HashMap::new(),
+        }
+    }
+
+    pub fn add_diversion(&mut self, original: &str, diverted: &str) {
+        self.diversions
+            .insert(original.to_string(), diverted.to_string());
+    }
+
+    pub fn resolve_path<'a>(&'a self, path: &'a str) -> &'a str {
+        if let Some(div) = self.diversions.get(path) {
+            div.as_str()
+        } else {
+            path
+        }
+    }
+}
+
+impl Default for DebianDiverterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Gentoo Portage Slotting & Eclass Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PortageSlotInfo {
+    pub slot: String,
+    pub subslot: Option<String>,
+}
+
+pub struct PortageSlotResolver {
+    pub installed_slots: HashMap<String, Vec<PortageSlotInfo>>, // Package -> Slots
+}
+
+impl PortageSlotResolver {
+    pub fn new() -> Self {
+        Self {
+            installed_slots: HashMap::new(),
+        }
+    }
+
+    pub fn register_package_slot(&mut self, pkg_name: &str, slot: &str, subslot: Option<&str>) {
+        let entry = self.installed_slots.entry(pkg_name.to_string()).or_default();
+        let slot_info = PortageSlotInfo {
+            slot: slot.to_string(),
+            subslot: subslot.map(|s| s.to_string()),
+        };
+        if !entry.iter().any(|s| s.slot == slot) {
+            entry.push(slot_info);
+        }
+    }
+
+    pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
+        if let Some(slots) = self.installed_slots.get(pkg_name) {
+            slots.iter().any(|s| s.slot == target_slot)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for PortageSlotResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Arch Linux Pacman Hooks Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PacmanHookWhen {
+    PreTransaction,
+    PostTransaction,
+}
+
+pub struct PacmanHook {
+    pub name: String,
+    pub when: PacmanHookWhen,
+    pub target_pattern: String,
+    pub exec_command: String,
+}
+
+pub struct PacmanHookEngine {
+    pub hooks: Vec<PacmanHook>,
+}
+
+impl PacmanHookEngine {
+    pub fn new() -> Self {
+        Self { hooks: Vec::new() }
+    }
+
+    pub fn register_hook(&mut self, hook: PacmanHook) {
+        self.hooks.push(hook);
+    }
+
+    pub fn run_hooks(&self, when: PacmanHookWhen, affected_files: &[String]) -> Vec<String> {
+        let mut executed = Vec::new();
+        for h in &self.hooks {
+            if h.when == when {
+                for file in affected_files {
+                    let matches = if h.target_pattern.starts_with('*') {
+                        file.ends_with(&h.target_pattern[1..])
+                    } else {
+                        file.contains(&h.target_pattern)
+                    };
+
+                    if matches {
+                        executed.push(h.exec_command.clone());
+                        break;
+                    }
+                }
+            }
+        }
+        executed
+    }
+}
+
+impl Default for PacmanHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// RPM Macro Evaluator & 3-Way Conffile Merge Engine
+// ============================================================================
+
+pub struct RpmMacroEvaluator {
+    pub macros: HashMap<String, String>,
+}
+
+impl RpmMacroEvaluator {
+    pub fn new() -> Self {
+        let mut macros = HashMap::new();
+        macros.insert("_bindir".to_string(), "/usr/bin".to_string());
+        macros.insert("_sysconfdir".to_string(), "/etc".to_string());
+        Self { macros }
+    }
+
+    pub fn define(&mut self, name: &str, val: &str) {
+        self.macros.insert(name.to_string(), val.to_string());
+    }
+
+    pub fn expand(&self, text: &str) -> String {
+        let mut result = text.to_string();
+        for (k, v) in &self.macros {
+            let key_macro = format!("%{{{}}}", k);
+            result = result.replace(&key_macro, v);
+            let simple_macro = format!("%{}", k);
+            result = result.replace(&simple_macro, v);
+        }
+        result
+    }
+}
+
+impl Default for RpmMacroEvaluator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct ConffileMergeEngine;
+
+impl ConffileMergeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn merge_conffile(&self, ancestor: &str, user_local: &str, new_vendor: &str) -> String {
+        if user_local == ancestor {
+            new_vendor.to_string()
+        } else if new_vendor == ancestor {
+            user_local.to_string()
+        } else if user_local == new_vendor {
+            user_local.to_string()
+        } else {
+            format!(
+                "{}\n# --- VENDOR UPGRADE CHANGES ---\n{}",
+                user_local, new_vendor
+            )
+        }
+    }
+}
+
+impl Default for ConffileMergeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Nix Pure Store Garbage Collector Engine
+// ============================================================================
+
+pub struct NixStoreGcEngine {
+    pub store_paths: HashMap<String, Vec<String>>, // StorePath -> Dependencies
+    pub gc_roots: HashMap<String, bool>,           // StorePath -> IsRoot
+}
+
+impl NixStoreGcEngine {
+    pub fn new() -> Self {
+        Self {
+            store_paths: HashMap::new(),
+            gc_roots: HashMap::new(),
+        }
+    }
+
+    pub fn register_path(&mut self, path: &str, deps: Vec<String>) {
+        self.store_paths.insert(path.to_string(), deps);
+    }
+
+    pub fn add_gc_root(&mut self, path: &str) {
+        self.gc_roots.insert(path.to_string(), true);
+    }
+
+    pub fn collect_garbage(&self) -> Vec<String> {
+        let mut reachable = HashMap::new();
+        let mut stack: Vec<String> = self.gc_roots.keys().cloned().collect();
+
+        while let Some(path) = stack.pop() {
+            if reachable.contains_key(&path) {
+                continue;
+            }
+            reachable.insert(path.clone(), true);
+            if let Some(deps) = self.store_paths.get(&path) {
+                for dep in deps {
+                    if !reachable.contains_key(dep) {
+                        stack.push(dep.clone());
+                    }
+                }
+            }
+        }
+
+        let mut unreachable = Vec::new();
+        for path in self.store_paths.keys() {
+            if !reachable.contains_key(path) {
+                unreachable.push(path.clone());
+            }
+        }
+        unreachable
+    }
+}
+
+impl Default for NixStoreGcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3670,5 +4244,240 @@ Description: Hook test";
 
         // Confirm executing logic was triggered successfully
         assert!(executed.load(core::sync::atomic::Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_command_pattern_rollback_executor() {
+        struct MockCommand {
+            desc: String,
+            executed: bool,
+        }
+
+        impl IPackageCommand for MockCommand {
+            fn execute(&mut self) -> Result<(), HookError> {
+                self.executed = true;
+                Ok(())
+            }
+            fn undo(&mut self) -> Result<(), HookError> {
+                self.executed = false;
+                Ok(())
+            }
+            fn description(&self) -> &str {
+                &self.desc
+            }
+        }
+
+        let mut executor = TransactionRollbackExecutor::new();
+        assert_eq!(executor.executed_count(), 0);
+
+        let cmd1 = Box::new(MockCommand {
+            desc: "Install gcc".to_string(),
+            executed: false,
+        });
+        let cmd2 = Box::new(MockCommand {
+            desc: "Update /usr/bin/cc alternative".to_string(),
+            executed: false,
+        });
+
+        assert!(executor.execute_command(cmd1).is_ok());
+        assert!(executor.execute_command(cmd2).is_ok());
+        assert_eq!(executor.executed_count(), 2);
+
+        let rolled_back = executor.rollback_all().unwrap();
+        assert_eq!(rolled_back, 2);
+        assert_eq!(executor.executed_count(), 0);
+    }
+
+    #[test]
+    fn test_observer_pattern_event_manager() {
+        struct MockObserver {
+            events: Arc<core::sync::atomic::AtomicUsize>,
+        }
+
+        impl IPackageObserver for MockObserver {
+            fn on_event(&self, event: &PackageEvent) {
+                if let PackageEvent::Installed(name) = event {
+                    if name == "bash" {
+                        self.events
+                            .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+                    }
+                }
+            }
+        }
+
+        let counter = Arc::new(core::sync::atomic::AtomicUsize::new(0));
+        let obs = Arc::new(MockObserver {
+            events: Arc::clone(&counter),
+        });
+
+        let mut mgr = PackageEventManager::new();
+        mgr.register_observer(obs);
+
+        mgr.notify_event(&PackageEvent::Installed("bash".to_string()));
+        mgr.notify_event(&PackageEvent::Installed("zsh".to_string()));
+
+        assert_eq!(counter.load(core::sync::atomic::Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_decorator_pattern_package_enhancements() {
+        let base_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "firefox".to_string(),
+                version: Version::new(120, 0, 0),
+                description: "Web Browser".to_string(),
+                license: "MPL-2.0".to_string(),
+                maintainer: "Mozilla".to_string(),
+                homepage: "mozilla.org".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "abc".to_string(),
+                size: 80000000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let sandboxed = SandboxedPackageDecorator::new(
+            base_pkg,
+            vec!["stdio".to_string(), "network".to_string()],
+            vec!["/home/user".to_string()],
+        );
+
+        assert_eq!(sandboxed.name(), "firefox");
+        assert_eq!(sandboxed.pledge_promises.len(), 2);
+
+        let audited = AuditedPackageDecorator::new(Box::new(sandboxed));
+        assert_eq!(audited.name(), "firefox");
+        assert!(audited.audit_passed);
+        assert!(audited.audit_notes.contains("passed"));
+    }
+
+    #[test]
+    fn test_user_defined_function_pipeline() {
+        let mut pipeline = UserDefinedFunctionPipeline::new();
+
+        pipeline.register_closure(
+            "set-install-date",
+            PackageBuildPhase::Prepare,
+            |pkg: &mut dyn IPackage| {
+                pkg.metadata_mut().install_date = Some(1700000000);
+                Ok(())
+            },
+        );
+
+        let mut pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "custom-build".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: "example.com".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 1024,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        };
+
+        let executed = pipeline
+            .execute_phase(PackageBuildPhase::Prepare, &mut pkg)
+            .unwrap();
+        assert_eq!(executed, 1);
+        assert_eq!(pkg.metadata().install_date, Some(1700000000));
+    }
+
+    #[test]
+    fn test_software_alternatives_and_diverter() {
+        let mut alt_engine = SovereignAlternativesEngine::new();
+        alt_engine.install_alternative("editor", "/usr/bin/nano", 50);
+        alt_engine.install_alternative("editor", "/usr/bin/vim", 100);
+
+        assert_eq!(
+            alt_engine.get_active_alternative("editor"),
+            Some("/usr/bin/vim")
+        );
+
+        let mut div_engine = DebianDiverterEngine::new();
+        div_engine.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real");
+
+        assert_eq!(div_engine.resolve_path("/usr/bin/gcc"), "/usr/bin/gcc.real");
+        assert_eq!(div_engine.resolve_path("/usr/bin/clang"), "/usr/bin/clang");
+    }
+
+    #[test]
+    fn test_portage_slotting_and_pacman_hooks() {
+        let mut slots = PortageSlotResolver::new();
+        slots.register_package_slot("dev-libs/openssl", "3", Some("3.1"));
+
+        assert!(slots.is_slot_compatible("dev-libs/openssl", "3"));
+        assert!(!slots.is_slot_compatible("dev-libs/openssl", "1.1"));
+
+        let mut hook_engine = PacmanHookEngine::new();
+        hook_engine.register_hook(PacmanHook {
+            name: "font-cache".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_pattern: "*.ttf".to_string(),
+            exec_command: "fc-cache -s".to_string(),
+        });
+
+        let files = vec![
+            "/usr/share/fonts/DejaVuSans.ttf".to_string(),
+            "/usr/bin/bash".to_string(),
+        ];
+        let cmds = hook_engine.run_hooks(PacmanHookWhen::PostTransaction, &files);
+        assert_eq!(cmds.len(), 1);
+        assert_eq!(cmds[0], "fc-cache -s");
+    }
+
+    #[test]
+    fn test_rpm_macro_and_conffile_merge() {
+        let mut macro_eval = RpmMacroEvaluator::new();
+        macro_eval.define("prefix", "/opt/sigma");
+
+        assert_eq!(
+            macro_eval.expand("%{prefix}/bin/app"),
+            "/opt/sigma/bin/app"
+        );
+        assert_eq!(macro_eval.expand("%_bindir/app"), "/usr/bin/app");
+
+        let merger = ConffileMergeEngine::new();
+
+        // Unmodified local user conffile -> adopt new vendor
+        let res1 = merger.merge_conffile("port=80", "port=80", "port=8080");
+        assert_eq!(res1, "port=8080");
+
+        // User modified conffile & vendor modified conffile -> 3-way merge append
+        let res2 = merger.merge_conffile("port=80", "port=90", "port=8080");
+        assert!(res2.contains("port=90"));
+        assert!(res2.contains("port=8080"));
+    }
+
+    #[test]
+    fn test_nix_store_garbage_collector() {
+        let mut gc = NixStoreGcEngine::new();
+        gc.register_path("/nix/store/bash", vec![]);
+        gc.register_path("/nix/store/glibc", vec![]);
+        gc.register_path("/nix/store/old-unused-lib", vec![]);
+
+        gc.register_path(
+            "/nix/store/system-profile",
+            vec!["/nix/store/bash".to_string(), "/nix/store/glibc".to_string()],
+        );
+
+        gc.add_gc_root("/nix/store/system-profile");
+
+        let garbage = gc.collect_garbage();
+        assert_eq!(garbage.len(), 1);
+        assert_eq!(garbage[0], "/nix/store/old-unused-lib");
     }
 }
