@@ -26,8 +26,8 @@ use alloc::vec::Vec;
 // OOP-based system update management with rollback support
 
 use crate::klib::BTreeMap;
+use crate::klib::time::Instant;
 use core::time::Duration;
-// Instant not in no_std
 
 /// Update channel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -166,7 +166,7 @@ impl AutoInstallProvisioner {
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
-            profile.format!("{}/{}", extra_packages, ", ")
+            profile.extra_packages.join(", ")
         ))
     }
 }

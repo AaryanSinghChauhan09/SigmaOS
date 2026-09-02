@@ -8,6 +8,8 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+pub use crate::expanded_wiki_innovations::ArchPacmanContribEngine as PacmanContribEngine;
+
 /// Pacman package database entry
 #[derive(Debug, Clone)]
 pub struct ArchPacmanPackage {

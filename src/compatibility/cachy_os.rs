@@ -152,6 +152,10 @@ impl V4OptimizedPackageManager {
             _ => "",
         }
     }
+
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
+    }
 }
 
 impl Default for V4OptimizedPackageManager {

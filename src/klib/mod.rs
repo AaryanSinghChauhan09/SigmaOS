@@ -61,6 +61,7 @@ pub use path::PathBuf;
 pub use collections::VecDeque;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub use time::{Duration, Instant, Time};
 
 pub const fn is_zero_dependency_build() -> bool {
     true

@@ -44,6 +44,10 @@ impl PathBuf {
     pub fn to_path_buf(&self) -> PathBuf {
         self.clone()
     }
+
+    pub fn exists(&self) -> bool {
+        !self.inner.is_empty()
+    }
 }
 
 impl Default for PathBuf {
