@@ -182,6 +182,11 @@ impl SovereignUniversalDistroBridge {
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
     }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        !self.translate_vfs_path("/etc").is_empty()
+            && !self.translate_package_specifier("core").is_empty()
+    }
 }
 
 // ==========================================
