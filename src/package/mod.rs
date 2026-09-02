@@ -29,6 +29,7 @@ pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod fedora_dnf;
 pub mod gentoo_opt;
+pub mod gentoo_portage;
 pub mod hardening;
 pub mod linux_translation;
 pub mod manager;
@@ -46,6 +47,7 @@ pub mod updater;
 pub use arch_aur::{SigmaAUR, AURPackage, PKGBUILD, BuildError};
 pub use debian_apt::{SigmaAPT, AptPackage, SourcesEntry, AptDatabase, AptError};
 pub use fedora_dnf::{SigmaDNF, DnfPackage, Transaction, TransactionOperation, Repository, DnfError};
+pub use gentoo_portage::{SigmaPortage, Ebuild, UseFlag, UseFlagType, UseFlagManager, PortageTree, PackageDatabase, ProfileManager, PortageError};
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,

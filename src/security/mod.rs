@@ -6,6 +6,7 @@ pub mod hardening;
 pub mod kernel_hardening;
 
 pub mod bridge;
+pub mod bsd_hardening;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
@@ -42,6 +43,12 @@ pub mod vpn;
 pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use bsd_hardening::{
+    PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise, 
+    UnveilManager as BsdUnveilManager, UnveilPermission as BsdUnveilPermission, UnveilEntry as BsdUnveilEntry,
+    WxEnforcer, MemoryPermission, PaxMprotect, AslrEngine, CapsicumManager,
+    CapsicumCapability, BsdHardeningSuite,
+};
 pub use capability::{
     CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
 };
@@ -88,7 +95,7 @@ pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use pledge::{promises, PledgeError, PledgeManager as OriginalPledgeManager, PledgePromise as OriginalPledgePromise};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 pub use selinux::{
@@ -98,8 +105,7 @@ pub use selinux::{
 pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel, SecurityContext};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
-    UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission,
-    UnveilState,
+    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions, UnveilState,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
