@@ -18,13 +18,16 @@
 
 // SigmaOS Package Module
 pub mod apm;
+pub mod arch_aur;
 pub mod aur_integration;
 pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
+pub mod debian_apt;
 pub mod debian_translator;
 pub mod dependency_graph;
 pub mod dependency_resolver;
+pub mod fedora_dnf;
 pub mod gentoo_opt;
 pub mod hardening;
 pub mod linux_translation;
@@ -40,6 +43,9 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 
+pub use arch_aur::{SigmaAUR, AURPackage, PKGBUILD, BuildError};
+pub use debian_apt::{SigmaAPT, AptPackage, SourcesEntry, AptDatabase, AptError};
+pub use fedora_dnf::{SigmaDNF, DnfPackage, Transaction, TransactionOperation, Repository, DnfError};
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
