@@ -393,6 +393,182 @@ impl IsoBuildSystem {
     }
 }
 
+// =========================================================================
+// ARCH LINUX ARCHISO & LIVE MEDIA PARITY COMPONENTS
+// =========================================================================
+
+/// Archiso profile preset types (Arch Linux ISO profile standards)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArchisoProfileType {
+    Releng,        // Official Arch Linux release engineering live rescue profile
+    Baseline,      // Minimal bootable netinstall profile
+    ZenithDesktop, // Full SigmaOS Zenith live DE environment profile
+}
+
+/// Profile configuration for Archiso-style live ISO creation
+#[derive(Debug, Clone)]
+pub struct ArchisoProfileConfig {
+    pub profile_type: ArchisoProfileType,
+    pub install_packages: Vec<String>,
+    pub services: Vec<String>,
+    pub airootfs_path: String,
+    pub boot_splash_theme: String,
+}
+
+impl ArchisoProfileConfig {
+    pub fn new(profile_type: ArchisoProfileType) -> Self {
+        match profile_type {
+            ArchisoProfileType::Releng => Self {
+                profile_type,
+                install_packages: vec![
+                    String::from("base"),
+                    String::from("linux-sigma"),
+                    String::from("linux-firmware"),
+                    String::from("sigpkg"),
+                    String::from("networkmanager"),
+                    String::from("openssh"),
+                ],
+                services: vec![String::from("NetworkManager"), String::from("sshd")],
+                airootfs_path: String::from("/arch/x86_64/airootfs.sfs"),
+                boot_splash_theme: String::from("archiso-minimal"),
+            },
+            ArchisoProfileType::Baseline => Self {
+                profile_type,
+                install_packages: vec![String::from("base"), String::from("linux-sigma")],
+                services: vec![],
+                airootfs_path: String::from("/arch/x86_64/airootfs.sfs"),
+                boot_splash_theme: String::from("none"),
+            },
+            ArchisoProfileType::ZenithDesktop => Self {
+                profile_type,
+                install_packages: vec![
+                    String::from("base"),
+                    String::from("linux-sigma"),
+                    String::from("sigmaos-zenith-desktop"),
+                    String::from("sigpkg"),
+                    String::from("pipewire"),
+                    String::from("wayland"),
+                ],
+                services: vec![
+                    String::from("NetworkManager"),
+                    String::from("display-manager"),
+                ],
+                airootfs_path: String::from("/sigma/x86_64/zenith.sfs"),
+                boot_splash_theme: String::from("sigmaos-singularity"),
+            },
+        }
+    }
+}
+
+/// SquashFS compression algorithm for `airootfs.sfs`
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArchisoCompressor {
+    Zstd,
+    Xz,
+    Gzip,
+}
+
+/// OverlayFS Copy-on-Write staging engine for Archiso live root filesystems
+#[derive(Debug, Clone)]
+pub struct ArchisoOverlayfsEngine {
+    pub sfs_image_path: String,
+    pub compressor: ArchisoCompressor,
+    pub compression_level: u32,
+    pub cow_ram_size_mb: usize,
+}
+
+impl ArchisoOverlayfsEngine {
+    pub fn new(sfs_image_path: &str, compressor: ArchisoCompressor) -> Self {
+        Self {
+            sfs_image_path: String::from(sfs_image_path),
+            compressor,
+            compression_level: match compressor {
+                ArchisoCompressor::Zstd => 19,
+                ArchisoCompressor::Xz => 9,
+                ArchisoCompressor::Gzip => 6,
+            },
+            cow_ram_size_mb: 2048,
+        }
+    }
+
+    pub fn build_mount_command(&self, lower_dir: &str, upper_dir: &str, work_dir: &str, target_dir: &str) -> String {
+        format!(
+            "mount -t overlay overlay -o lowerdir={},upperdir={},workdir={} {}",
+            lower_dir, upper_dir, work_dir, target_dir
+        )
+    }
+}
+
+/// Archiso multi-architecture bootloader generator (systemd-boot, GRUB2, Syslinux, loader.efi)
+pub struct ArchisoBootLoaderMatrix {
+    pub enable_systemd_boot: bool,
+    pub enable_grub2: bool,
+    pub enable_syslinux: bool,
+    pub enable_freebsd_loader: bool,
+}
+
+impl ArchisoBootLoaderMatrix {
+    pub fn new() -> Self {
+        Self {
+            enable_systemd_boot: true,
+            enable_grub2: true,
+            enable_syslinux: true,
+            enable_freebsd_loader: true,
+        }
+    }
+
+    /// Generates Archiso systemd-boot loader entry text (`loader/entries/archiso-x86_64.conf`)
+    pub fn generate_systemd_boot_entry(&self, volume_label: &str) -> String {
+        let mut entry = String::new();
+        entry.push_str("title      SigmaOS Live Archiso (x86_64, UEFI)\n");
+        entry.push_str("sort-key   01\n");
+        entry.push_str("linux      /boot/vmlinuz-sigma\n");
+        entry.push_str("initrd     /boot/initrd-sigma.img\n");
+        entry.push_str(&format!(
+            "options    archisobasedir=arch archisolabel={} quiet splash\n",
+            volume_label
+        ));
+        entry
+    }
+}
+
+impl Default for ArchisoBootLoaderMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Encrypted LUKS & Ventoy persistence configuration for Archiso live storage
+#[derive(Debug, Clone)]
+pub struct ArchisoPersistenceStorage {
+    pub luks_encrypted: bool,
+    pub persistence_file: String,
+    pub ventoy_persistence_enabled: bool,
+    pub label: String,
+}
+
+impl ArchisoPersistenceStorage {
+    pub fn new(label: &str) -> Self {
+        Self {
+            luks_encrypted: false,
+            persistence_file: String::from("/persistence/archiso_persistence.dat"),
+            ventoy_persistence_enabled: true,
+            label: String::from(label),
+        }
+    }
+
+    pub fn enable_luks(&mut self) {
+        self.luks_encrypted = true;
+    }
+
+    pub fn build_ventoy_json(&self) -> String {
+        format!(
+            "{{\n  \"persistence\": [\n    {{\n      \"image\": \"{}\",\n      \"backend\": \"{}\"\n    }}\n  ]\n}}",
+            self.persistence_file, self.label
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -448,5 +624,41 @@ mod tests {
         assert!(config.persistence_enabled);
         assert!(config.home_persistence);
         assert_eq!(config.persistence_size_mb, 1024);
+    }
+
+    #[test]
+    fn test_archiso_profile_configs() {
+        let releng = ArchisoProfileConfig::new(ArchisoProfileType::Releng);
+        assert_eq!(releng.profile_type, ArchisoProfileType::Releng);
+        assert!(releng.install_packages.contains(&String::from("sigpkg")));
+
+        let zenith = ArchisoProfileConfig::new(ArchisoProfileType::ZenithDesktop);
+        assert_eq!(zenith.profile_type, ArchisoProfileType::ZenithDesktop);
+        assert!(zenith.install_packages.contains(&String::from("sigmaos-zenith-desktop")));
+    }
+
+    #[test]
+    fn test_archiso_overlayfs_and_bootloader_matrix() {
+        let engine = ArchisoOverlayfsEngine::new("/arch/x86_64/airootfs.sfs", ArchisoCompressor::Zstd);
+        assert_eq!(engine.compression_level, 19);
+
+        let mount_cmd = engine.build_mount_command("/airootfs", "/cow/upper", "/cow/work", "/mnt");
+        assert!(mount_cmd.contains("lowerdir=/airootfs"));
+
+        let matrix = ArchisoBootLoaderMatrix::new();
+        let entry = matrix.generate_systemd_boot_entry("SIGMAOS_LIVE");
+        assert!(entry.contains("SIGMAOS_LIVE"));
+    }
+
+    #[test]
+    fn test_archiso_persistence_storage() {
+        let mut storage = ArchisoPersistenceStorage::new("SIGMAOS_PERSIST");
+        assert!(!storage.luks_encrypted);
+
+        storage.enable_luks();
+        assert!(storage.luks_encrypted);
+
+        let json = storage.build_ventoy_json();
+        assert!(json.contains("SIGMAOS_PERSIST"));
     }
 }
