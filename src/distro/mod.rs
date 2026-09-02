@@ -2,6 +2,7 @@
 pub mod arch_parity;
 pub mod certification;
 pub mod chakra_parity;
+pub mod clear_linux;
 pub mod community;
 pub mod compat_layers;
 pub mod compliance;
@@ -41,6 +42,7 @@ pub mod visual_dashboard;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_system_innovations;
 
+pub use clear_linux::{ClearLinuxStatelessEngine, ConfigState, ConfigLocation, SwupdBundle, SwupdUpdateManager};
 pub use compliance::{ComplianceAuditLogger, ComplianceAuditEvent, ComplianceFramework, TpmAttestationManager, TpmPcrMeasurement};
 pub use visual_dashboard::{VisualDashboardManager, FirewallPolicy, FirewallAction, VpnTunnel, VpnType, VpnStatus, ProcessCapability, HardwareTelemetry};
 pub use sovereign_system_innovations::{
@@ -128,7 +130,7 @@ pub use ready_to_use::{
 };
 
 pub use missing_distro_innovations::{
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
     BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
     SmartOsZoneEngine,
