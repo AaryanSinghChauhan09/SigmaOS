@@ -1,8 +1,9 @@
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
 extern crate alloc;
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543
-/// Implements decentralized identity and DID support
+/// Implements decentralized identity, Fedora FAS OIDC, and Flask-OIDC SSO middleware support
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -40,6 +41,95 @@ pub struct SimpleDigitalIdentity {
     pub did_len: u8,
     pub identity_type: AtomicUsize,
     pub public_key: [u8; 64],
+}
+
+/// OIDC Token Claims (Fedora Account System / FAS OIDC profile parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OidcTokenClaims {
+    pub sub: String,
+    pub iss: String,
+    pub aud: String,
+    pub exp: u64,
+    pub preferred_username: String,
+    pub email: String,
+    pub groups: Vec<String>,
+}
+
+/// Fedora Account System (FAS) / Flask-OIDC compatible OpenID Connect Provider
+pub struct FedoraFlaskOidcProvider {
+    pub issuer: String,
+    pub client_id: String,
+    pub client_secret: String,
+    pub active_tokens: Vec<(String, OidcTokenClaims)>,
+    pub revoked_tokens: Vec<String>,
+}
+
+impl FedoraFlaskOidcProvider {
+    pub fn new(issuer: &str, client_id: &str, client_secret: &str) -> Self {
+        Self {
+            issuer: issuer.to_string(),
+            client_id: client_id.to_string(),
+            client_secret: client_secret.to_string(),
+            active_tokens: Vec::new(),
+            revoked_tokens: Vec::new(),
+        }
+    }
+
+    /// Register/issue a mock OIDC token for testing/federation
+    pub fn issue_token(&mut self, token: &str, claims: OidcTokenClaims) {
+        self.active_tokens.push((token.to_string(), claims));
+    }
+
+    /// Validate an incoming bearer OIDC token against issuer, audience, and expiration
+    pub fn validate_token(&self, token: &str, current_time: u64) -> Result<&OidcTokenClaims, IdentityError> {
+        if self.revoked_tokens.iter().any(|t| t == token) {
+            return Err(IdentityError::VerificationFailed);
+        }
+
+        for (t, claims) in &self.active_tokens {
+            if t == token {
+                if claims.iss != self.issuer || claims.aud != self.client_id {
+                    return Err(IdentityError::VerificationFailed);
+                }
+                if current_time >= claims.exp {
+                    return Err(IdentityError::VerificationFailed);
+                }
+                return Ok(claims);
+            }
+        }
+
+        Err(IdentityError::NotFound)
+    }
+
+    /// Revoke an active OIDC token
+    pub fn revoke_token(&mut self, token: &str) {
+        self.revoked_tokens.push(token.to_string());
+    }
+}
+
+/// Flask-OIDC middleware filter for protecting endpoints and requiring specific FAS groups
+pub struct FlaskOidcMiddlewareFilter {
+    pub provider: FedoraFlaskOidcProvider,
+}
+
+impl FlaskOidcMiddlewareFilter {
+    pub fn new(provider: FedoraFlaskOidcProvider) -> Self {
+        Self { provider }
+    }
+
+    /// Authenticate request via HTTP Authorization header ("Bearer <token>")
+    pub fn authenticate_request(&self, auth_header: &str, current_time: u64) -> Result<&OidcTokenClaims, IdentityError> {
+        if !auth_header.starts_with("Bearer ") {
+            return Err(IdentityError::InvalidDID);
+        }
+        let token = auth_header[7..].trim();
+        self.provider.validate_token(token, current_time)
+    }
+
+    /// Check if authenticated user belongs to a required Fedora group (e.g., "packager", "sysadmin")
+    pub fn require_group(&self, claims: &OidcTokenClaims, required_group: &str) -> bool {
+        claims.groups.iter().any(|g| g == required_group)
+    }
 }
 
 impl SimpleDigitalIdentity {
@@ -156,6 +246,40 @@ mod tests {
         let mut cred_mgr = SimpleCredentialManager::new();
         assert_eq!(cred_mgr.issue_credential(1, 2, b"admin_claim"), Ok(()));
         assert_eq!(cred_mgr.revoke_credential(0), Ok(()));
+    }
+
+    #[test]
+    fn test_fedora_flask_oidc_provider() {
+        let issuer = "https://id.fedoraproject.org/openidc/";
+        let client_id = "sigmaos-client";
+        let client_secret = "secret123";
+
+        let mut provider = FedoraFlaskOidcProvider::new(issuer, client_id, client_secret);
+
+        let claims = OidcTokenClaims {
+            sub: "user-fedora-1001".to_string(),
+            iss: issuer.to_string(),
+            aud: client_id.to_string(),
+            exp: 1000,
+            preferred_username: "fedoradevel".to_string(),
+            email: "devel@fedoraproject.org".to_string(),
+            groups: vec!["packager".to_string(), "sysadmin".to_string()],
+        };
+
+        provider.issue_token("token_abc123", claims.clone());
+
+        // Valid authentication
+        let filter = FlaskOidcMiddlewareFilter::new(provider);
+        let auth_res = filter.authenticate_request("Bearer token_abc123", 500);
+        assert!(auth_res.is_ok());
+        let validated_claims = auth_res.unwrap();
+        assert_eq!(validated_claims.preferred_username, "fedoradevel");
+        assert!(filter.require_group(validated_claims, "packager"));
+        assert!(!filter.require_group(validated_claims, "kernel-team"));
+
+        // Expired token authentication failure
+        let exp_res = filter.authenticate_request("Bearer token_abc123", 1500);
+        assert_eq!(exp_res, Err(IdentityError::VerificationFailed));
     }
 }
 

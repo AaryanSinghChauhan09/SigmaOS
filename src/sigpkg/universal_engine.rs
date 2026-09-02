@@ -2002,6 +2002,72 @@ mod tests {
         );
     }
 
+// =========================================================================
+// P2P CAS MIRROR NETWORK (NIX CAS & IPFS DISTRIBUTED MIRROR PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CasBlobDescriptor {
+    pub hash_id: String,
+    pub size_bytes: u64,
+    pub peer_sources: Vec<String>,
+    pub is_pinned: bool,
+}
+
+pub struct P2pCasMirrorNetwork {
+    pub pinned_blobs: Vec<CasBlobDescriptor>,
+}
+
+impl P2pCasMirrorNetwork {
+    pub fn new() -> Self {
+        Self {
+            pinned_blobs: Vec::new(),
+        }
+    }
+
+    pub fn pin_blob(&mut self, hash_id: &str, size_bytes: u64, peers: &[&str]) {
+        let descriptor = CasBlobDescriptor {
+            hash_id: hash_id.to_string(),
+            size_bytes,
+            peer_sources: peers.iter().map(|s| s.to_string()).collect(),
+            is_pinned: true,
+        };
+        self.pinned_blobs.push(descriptor);
+    }
+
+    pub fn get_blob(&self, hash_id: &str) -> Option<&CasBlobDescriptor> {
+        self.pinned_blobs.iter().find(|b| b.hash_id == hash_id)
+    }
+
+    pub fn unpin_blob(&mut self, hash_id: &str) -> bool {
+        if let Some(pos) = self.pinned_blobs.iter().position(|b| b.hash_id == hash_id) {
+            self.pinned_blobs.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for P2pCasMirrorNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+    #[test]
+    fn test_p2p_cas_mirror_network() {
+        let mut net = P2pCasMirrorNetwork::new();
+        net.pin_blob("sha256:abc12345", 10240, &["p2p://node1", "p2p://node2"]);
+
+        let blob = net.get_blob("sha256:abc12345").unwrap();
+        assert!(blob.is_pinned);
+        assert_eq!(blob.peer_sources.len(), 2);
+
+        assert!(net.unpin_blob("sha256:abc12345"));
+        assert!(net.get_blob("sha256:abc12345").is_none());
+    }
+
     #[test]
     fn test_dependency_graph_resolver() {
         let mut resolver = DependencyGraphResolver::new();

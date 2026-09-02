@@ -554,6 +554,7 @@ impl DistroWikiPageDocumentationGenerator {
         wiki.push_str("- **Fedora**: Crypto Policies and Silverblue rpm-ostree atomic trees.\n");
         wiki.push_str("- **FreeBSD**: pkg audit CVE scanner and physical page queues.\n");
         wiki.push_str("- **NixOS**: Declarative system generations and atomic rollback.\n");
+        wiki.push_str("- **Clear Linux**: Intel auto-vectorized x86-64-v3/v4 FMV performance tuning.\n");
         wiki
     }
 
