@@ -12,9 +12,9 @@ pub mod custom_allocator {
         pub fn dealloc(&self, _ptr: *mut u8, _layout: core::alloc::Layout) {}
     }
     pub unsafe fn alloc(size: usize) -> *mut u8 {
-        use alloc::alloc::{alloc as std_alloc, Layout};
+        use core::alloc::Layout;
         let layout = Layout::from_size_align(size, 8).unwrap();
-        std_alloc(layout)
+        core::ptr::null_mut()
     }
     pub unsafe fn free(_ptr: *mut u8) {}
 }

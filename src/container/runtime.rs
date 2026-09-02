@@ -830,6 +830,7 @@ impl Default for FlatpakSnapCompatLayer {
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
 pub mod oci {
+    extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
     use alloc::string::{String, ToString};

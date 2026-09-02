@@ -7,10 +7,6 @@ use alloc::collections::BTreeMap as HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 
