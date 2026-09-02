@@ -28,12 +28,8 @@ mod pipes;
 mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
 mod video_editor;
-#[path = "../src/distro"]
-pub mod distro {
-    pub mod linux_bsd_inspirations;
-    pub mod sovereign_distro_dominance;
-    pub mod universal_distro_super_matrix;
-}
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
 use distro::linux_bsd_inspirations as distro_inspirations;
 #[path = "../src/access/control.rs"]
 mod access_control;
