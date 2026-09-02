@@ -690,11 +690,11 @@ impl SigmaUpdateManager {
 
 ## Best Practices
 
-1. **Security First**: Implement SELinux and other security features by default
-2. **Cutting Edge**: Use latest technologies while maintaining stability
-3. **Developer Friendly**: Provide comprehensive development tools
-4. **Container Ready**: Optimize for container-based workflows
-5. **Cloud Native**: Support cloud deployment scenarios
+1.  **Security First**: Implement SELinux and other security features by default
+2.  **Cutting Edge**: Use latest technologies while maintaining stability
+3.  **Developer Friendly**: Provide comprehensive development tools
+4.  **Container Ready**: Optimize for container-based workflows
+5.  **Cloud Native**: Support cloud deployment scenarios
 
 ## Migration Tools
 
@@ -738,8 +738,8 @@ impl FedoraMigrationAssistant {
 
 ## References
 
-- [Fedora Documentation](https://docs.fedoraproject.org/)
-- [DNF Documentation](https://dnf.readthedocs.io/)
-- [SELinux Project Wiki](https://selinuxproject.org/)
-- [Fedora Silverblue Documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/)
-- [Podman Documentation](https://docs.podman.io/)
+*   [Fedora Documentation](https://docs.fedoraproject.org/)
+*   [DNF Documentation](https://dnf.readthedocs.io/)
+*   [SELinux Project Wiki](https://selinuxproject.org/)
+*   [Fedora Silverblue Documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/)
+*   [Podman Documentation](https://docs.podman.io/)

@@ -8,6 +8,7 @@
 The boot path has been refactored to eliminate raw pointer arithmetic in UEFI and Secure Boot code. All memory accesses now go through safe abstractions:
 
 ### Before (unsafe)
+
 ```rust
 // OLD: raw pointer arithmetic - CVE-prone
 let ptr = 0x7E00 as *mut u8;
@@ -15,6 +16,7 @@ unsafe { *ptr.offset(4) = 0x42; }
 ```
 
 ### After (safe)
+
 ```rust
 // NEW: safe slice abstraction
 let boot_region = BootRegion::new(0x7E00, 512);
@@ -24,6 +26,7 @@ boot_region.write_byte(4, 0x42)?;
 ## TPM 2.0 Integration
 
 ### Measured Boot
+
 SigmaOS extends the TPM 2.0 PCR chain through all boot stages:
 
 | PCR | Content Measured |
@@ -37,6 +40,7 @@ SigmaOS extends the TPM 2.0 PCR chain through all boot stages:
 | PCR 10 | SigmaOS early userspace |
 
 ### Attestation
+
 ```rust
 // src/tpm/
 let quote = Tpm2::quote(pcr_selection, nonce, signing_key)?;
@@ -46,11 +50,13 @@ let verified = RemoteAttestationServer::verify(&quote, &ek_cert)?;
 ## Secure Boot
 
 ### Key Hierarchy
-1. UEFI DB contains SigmaOS Secure Boot CA certificate
-2. SigmaOS kernel is signed with a key signed by that CA
-3. shim is not required - SigmaOS has its own first-stage UEFI loader
+
+1.  UEFI DB contains SigmaOS Secure Boot CA certificate
+2.  SigmaOS kernel is signed with a key signed by that CA
+3.  shim is not required - SigmaOS has its own first-stage UEFI loader
 
 ### Signing Pipeline (CI/CD)
+
 ```yaml
 # .github/workflows/release.yml
 - name: Sign kernel image
@@ -62,6 +68,7 @@ let verified = RemoteAttestationServer::verify(&quote, &ek_cert)?;
 ```
 
 ### Verification at Boot
+
 ```rust
 // src/boot/secure.rs
 pub fn verify_kernel_signature(kernel: &[u8], db_certs: &[X509Cert]) -> Result<(), SecureBootError> {
@@ -74,10 +81,11 @@ pub fn verify_kernel_signature(kernel: &[u8], db_certs: &[X509Cert]) -> Result<(
 ## CI Workflow Fixes
 
 The CI workflow was updated to:
-1. Run on `ubuntu-latest` (not deprecated `ubuntu-20.04`)
-2. Use `cargo clippy -- -D warnings` to catch unsafe patterns
-3. Add `cargo audit` for dependency vulnerability scanning
-4. Add `cargo deny` for license compliance
+
+1.  Run on `ubuntu-latest` (not deprecated `ubuntu-20.04`)
+2.  Use `cargo clippy -- -D warnings` to catch unsafe patterns
+3.  Add `cargo audit` for dependency vulnerability scanning
+4.  Add `cargo deny` for license compliance
 
 ```yaml
 # .github/workflows/sigma-ci.yml

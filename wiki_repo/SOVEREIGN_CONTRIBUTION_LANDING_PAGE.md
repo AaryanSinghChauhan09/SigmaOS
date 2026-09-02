@@ -2,7 +2,7 @@
 
 Welcome to the **SigmaOS Sovereign Contribution Landing Page**. This master manual provides open-source contributors, kernel engineers, package maintainers, and security researchers with complete guidance for contributing to the SigmaOS ecosystem, inspired by the contributor portals of Arch Linux, FreeBSD, Debian, Gentoo, and OpenBSD.
 
----
+***
 
 ## 🚀 Quick Navigation & Developer Portals
 
@@ -14,19 +14,22 @@ Welcome to the **SigmaOS Sovereign Contribution Landing Page**. This master manu
 | **Zenith Desktop Compositor** | Adaptive visual overlays, bare-metal compositor synthesis | Cinnamon, KDE Plasma & Wayland |
 | **Supreme Court Governance** | Judicial review of architectural changes, dispute resolution, statutory compliance | Debian Constitution & Apache Foundation |
 
----
+***
 
 ## 📜 Developer Certificate of Origin (DCO) & Commit Signoff
 
 SigmaOS strictly enforces the Developer Certificate of Origin (DCO) for all commits across kernel, userland, and documentation modules.
 
 ### DCO Statement
+
 By making a contribution to this project, I certify that:
-1. The contribution was created in whole or in part by me and I have the right to submit it under the open-source license indicated in the file; or
-2. The contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open-source license; or
-3. The contribution was provided directly to me by a person who certified (1) or (2) and I have not modified it.
+
+1.  The contribution was created in whole or in part by me and I have the right to submit it under the open-source license indicated in the file; or
+2.  The contribution is based upon previous work that, to the best of my knowledge, is covered under an appropriate open-source license; or
+3.  The contribution was provided directly to me by a person who certified (1) or (2) and I have not modified it.
 
 ### Required Commit Format
+
 All commit messages must conclude with an explicit `Signed-off-by` tag:
 
 ```text
@@ -37,11 +40,12 @@ Detailed description of changes, rationale, and test results.
 Signed-off-by: Developer Name <developer@example.com>
 ```
 
----
+***
 
 ## 🔧 Build, Test & Verification Workflows
 
 ### 1. Building Kernel & Userland
+
 ```bash
 # Verify kernel and userland library compilation
 cargo check --lib
@@ -51,6 +55,7 @@ ninja userland
 ```
 
 ### 2. Executing Comprehensive Test Suites
+
 ```bash
 # Run all 11+ SigmaOS inspection test suites
 ./run_sigma_tests.sh
@@ -60,16 +65,17 @@ ninja userland
 ```
 
 ### 3. Testing Standalone Modules
+
 ```bash
 # Example: Standalone verification test execution
 mkdir -p build
 rustc --edition 2021 --test src/sigpkg/verifier.rs -o build/test_verifier && ./build/test_verifier
 ```
 
----
+***
 
 ## 🏛️ Contribution Rules & Supreme Court Review Process
 
-1. **Bare-Metal Zero-Dependency Imperative**: External crate dependencies are prohibited in core `#![no_std]` crates without Supreme Court approval.
-2. **Proactive Testing**: Every feature addition or bug fix must include corresponding unit tests.
-3. **Documentation Parity**: Architectural updates must update corresponding documentation in `WIKI/` and be synchronized using `./scripts/sync_wiki.sh`.
+1.  **Bare-Metal Zero-Dependency Imperative**: External crate dependencies are prohibited in core `#![no_std]` crates without Supreme Court approval.
+2.  **Proactive Testing**: Every feature addition or bug fix must include corresponding unit tests.
+3.  **Documentation Parity**: Architectural updates must update corresponding documentation in `WIKI/` and be synchronized using `./scripts/sync_wiki.sh`.

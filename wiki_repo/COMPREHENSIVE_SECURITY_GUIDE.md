@@ -42,10 +42,11 @@ impl CapabilityToken {
 ```
 
 **Key Principles:**
-- Least privilege: Only grant necessary permissions
-- Delegation: Capabilities can be delegated with restrictions
-- Revocation: Capabilities can be revoked at any time
-- Expiration: Time-limited capabilities for security
+
+*   Least privilege: Only grant necessary permissions
+*   Delegation: Capabilities can be delegated with restrictions
+*   Revocation: Capabilities can be revoked at any time
+*   Expiration: Time-limited capabilities for security
 
 ### 2. Post-Quantum Cryptography
 
@@ -82,9 +83,10 @@ impl PostQuantumCrypto {
 ```
 
 **Supported Algorithms:**
-- Kyber-1024 KEM (Key Encapsulation Mechanism)
-- Dilithium-5 Digital Signatures
-- Hybrid key exchange for backward compatibility
+
+*   Kyber-1024 KEM (Key Encapsulation Mechanism)
+*   Dilithium-5 Digital Signatures
+*   Hybrid key exchange for backward compatibility
 
 ## Security Features
 
@@ -143,10 +145,11 @@ impl KernelHardening {
 ```
 
 **Hardening Features:**
-- Stack canaries
-- Address space layout randomization
-- Control flow integrity
-- Kernel address space isolation
+
+*   Stack canaries
+*   Address space layout randomization
+*   Control flow integrity
+*   Kernel address space isolation
 
 ### 3. Memory Protection
 
@@ -503,11 +506,11 @@ impl ForensicsTool {
 
 ## Best Practices
 
-1. **Defense in Depth**: Multiple layers of security
-2. **Least Privilege**: Minimal necessary permissions
-3. **Zero Trust**: Verify everything, trust nothing
-4. **Continuous Monitoring**: Real-time security monitoring
-5. **Regular Updates**: Keep security components current
+1.  **Defense in Depth**: Multiple layers of security
+2.  **Least Privilege**: Minimal necessary permissions
+3.  **Zero Trust**: Verify everything, trust nothing
+4.  **Continuous Monitoring**: Real-time security monitoring
+5.  **Regular Updates**: Keep security components current
 
 ## Configuration
 
@@ -542,10 +545,10 @@ sigmactl security scan
 
 ## Resources
 
-- [NIST Post-Quantum Cryptography](https://csrc.nist.gov/projects/post-quantum-cryptography)
-- [Capability-Based Security](https://en.wikipedia.org/wiki/Capability-based_security)
-- [Security Hardening](https://wiki.gentoo.org/wiki/Security_Handbook)
+*   [NIST Post-Quantum Cryptography](https://csrc.nist.gov/projects/post-quantum-cryptography)
+*   [Capability-Based Security](https://en.wikipedia.org/wiki/Capability-based_security)
+*   [Security Hardening](https://wiki.gentoo.org/wiki/Security_Handbook)
 
----
+***
 
 *Last updated: August 21, 2026*

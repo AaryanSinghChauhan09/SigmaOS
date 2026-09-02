@@ -4,30 +4,30 @@
 > and implemented in SigmaOS. All implementations are **zero-dependency Rust** — no
 > libc, no OS APIs, pure bare-metal code.
 
----
+***
 
 ## Table of Contents
 
-1. [Kernel Scheduler](#kernel-scheduler)
-2. [Memory Management](#memory-management)
-3. [Security Framework](#security-framework)
-4. [Filesystem](#filesystem)
-5. [Networking](#networking)
-6. [Package Management](#package-management)
-7. [Init & Service Management](#init--service-management)
-8. [Drivers & Hardware](#drivers--hardware)
-9. [Process Management](#process-management)
+1.  [Kernel Scheduler](#kernel-scheduler)
+2.  [Memory Management](#memory-management)
+3.  [Security Framework](#security-framework)
+4.  [Filesystem](#filesystem)
+5.  [Networking](#networking)
+6.  [Package Management](#package-management)
+7.  [Init & Service Management](#init--service-management)
+8.  [Drivers & Hardware](#drivers--hardware)
+9.  [Process Management](#process-management)
 10. [Observability & Tracing](#observability--tracing)
 11. [Virtualization & Containers](#virtualization--containers)
 12. [Ideas Under Implementation](#ideas-under-implementation)
 
----
+***
 
 ## Kernel Scheduler
 
 | Innovation | Source OS | SigmaOS File | Status | Notes |
 |-----------|-----------|-------------|--------|-------|
-| eBPF-based sched_ext hot-swappable scheduler | Linux 6.x | `src/scheduler/numa_scheduler.rs` | ✅ Done | Policies loadable without kernel recompile |
+| eBPF-based sched\_ext hot-swappable scheduler | Linux 6.x | `src/scheduler/numa_scheduler.rs` | ✅ Done | Policies loadable without kernel recompile |
 | CFS (Completely Fair Scheduler) weights | Linux | `src/kernel/mod.rs` | ✅ Done | vruntime-based fairness |
 | Priority inheritance for mutexes | POSIX/Linux | `src/kernel/mod.rs` | ✅ Done | Prevents priority inversion |
 | NUMA-aware task placement | Linux 2.6+ | `src/scheduler/numa_scheduler.rs` | ✅ Done | Topology-aware scheduling |
@@ -36,7 +36,7 @@
 | Work-stealing scheduler | Go runtime / Linux | `src/scheduler/` | 🔄 In Progress | Multi-core load balancing |
 | Process group scheduling | Linux cgroups v2 | `src/kernel/` | ✅ Done | Resource limits per group |
 
----
+***
 
 ## Memory Management
 
@@ -53,7 +53,7 @@
 | Huge pages (2MB, 1GB) | Linux THP | `src/klib/paging.rs` | 🔄 In Progress | Transparent huge pages |
 | Balloon driver (memory reclaim) | Xen, KVM virtio | `src/virt/` | 🔄 In Progress | Dynamic memory for VMs |
 
----
+***
 
 ## Security Framework
 
@@ -74,7 +74,7 @@
 | TPM-backed attestation | Linux IMA | `src/tpm/` | 🔄 In Progress | Boot integrity measurement |
 | Immutable kernel rootfs | NixOS, Alpine | `src/filesystem/` | 🔄 In Progress | Read-only `/` after boot |
 
----
+***
 
 ## Filesystem
 
@@ -92,7 +92,7 @@
 | FUSE-compatible layer | Linux | `src/filesystem/` | 🔄 In Progress | Userspace filesystem driver |
 | FHS compliance | Linux Standard Base | `src/filesystem/` | ✅ Done | `/bin`, `/etc`, `/lib`, etc. |
 
----
+***
 
 ## Networking
 
@@ -109,7 +109,7 @@
 | eBPF XDP | Linux 4.8 | `src/net/` | 🔄 In Progress | Programmable packet processing |
 | Mesh networking | Custom | `src/network/` | ✅ Done | Kyber-1024 encrypted mesh |
 
----
+***
 
 ## Package Management
 
@@ -124,7 +124,7 @@
 | OCI container image support | Docker / OCI spec | `src/sigpkg/` | ✅ Done | Pull and run OCI images |
 | Delta updates | ChromeOS | `src/update/` | 🔄 In Progress | Binary diff updates |
 
----
+***
 
 ## Init & Service Management
 
@@ -138,7 +138,7 @@
 | OpenRC-style ordered runlevels | Gentoo OpenRC | `src/distro/` | 🔄 In Progress | Simple script-based ordering |
 | Service health checks | Kubernetes / systemd | `src/resilience/self_healing.rs` | ✅ Done | Auto-restart unhealthy services |
 
----
+***
 
 ## Drivers & Hardware
 
@@ -157,7 +157,7 @@
 | GPU hang recovery | SteamOS | `drivers/graphics/sigma_kms.cpp` | ✅ Done | Auto-reset hung GPU |
 | Clear Linux perf profiles | Clear Linux | `drivers/graphics/sigma_kms.cpp` | ✅ Done | POWERSAVE/BALANCED/PERFORMANCE |
 
----
+***
 
 ## Process Management
 
@@ -169,7 +169,7 @@
 | Process groups / sessions | POSIX | `src/process/` | ✅ Done | Job control, SIGHUP on hangup |
 | Core dump generation | Linux | `src/crash/` | 🔄 In Progress | ELF core files |
 
----
+***
 
 ## Observability & Tracing
 
@@ -182,7 +182,7 @@
 | Audit framework | Linux audit | `src/security/audit.rs` | ✅ Done | Syscall audit trail |
 | Advanced debugger | GNU/Linux ptrace | `src/debugger/advanced.rs` | ✅ Done | Breakpoints, watchpoints, DWARF |
 
----
+***
 
 ## Virtualization & Containers
 
@@ -194,7 +194,7 @@
 | Firecracker-style microVMs | AWS Firecracker | `src/virt/microvm.rs` | ✅ Done | Minimal VM for containers |
 | crun/runc-compatible | OCI Runtime Spec | `src/virtualization/` | 🔄 In Progress | OCI runtime spec compliance |
 
----
+***
 
 ## Ideas Under Implementation
 
@@ -202,7 +202,7 @@ The following innovations are planned but not yet fully implemented:
 
 | Innovation | Source OS | Target Module | Priority |
 |-----------|-----------|--------------|----------|
-| io_uring async I/O | Linux 5.1 | `src/kernel/` | 🔴 High |
+| io\_uring async I/O | Linux 5.1 | `src/kernel/` | 🔴 High |
 | BPF Type Format (BTF) | Linux | `src/observability/` | 🟡 Medium |
 | Landlock LSM | Linux 5.13 | `src/security/` | 🔴 High |
 | EROFS read-only overlay FS | Linux | `src/filesystem/` | 🟡 Medium |
@@ -212,15 +212,15 @@ The following innovations are planned but not yet fully implemented:
 | RISC-V port | Linux | `src/arch/` | 🟡 Medium |
 | LoongArch port | Linux | `src/arch/` | 🟢 Low |
 
----
+***
 
 ## Implementation Principles
 
 All innovations must meet these standards before being marked ✅:
 
-1. **Zero external dependencies** — only `klib` or bare-metal primitives
-2. **SAFETY comments** — all `unsafe` blocks documented
-3. **No `unwrap()`** — use `Option`/`Result` properly
-4. **Test coverage** — unit or integration test exists
-5. **Documentation** — doc comment on public API
-6. **Security review** — checked against CVE database for analogous issues
+1.  **Zero external dependencies** — only `klib` or bare-metal primitives
+2.  **SAFETY comments** — all `unsafe` blocks documented
+3.  **No `unwrap()`** — use `Option`/`Result` properly
+4.  **Test coverage** — unit or integration test exists
+5.  **Documentation** — doc comment on public API
+6.  **Security review** — checked against CVE database for analogous issues
