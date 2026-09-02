@@ -367,6 +367,13 @@ pub struct SecurityAdvisory {
     pub description: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VulnerabilityState {
+    Vulnerable,
+    Fixed,
+    Unaffected,
+}
+
 pub struct SecurityAdvisoryTracker {
     pub advisories: Vec<SecurityAdvisory>,
 }
@@ -406,11 +413,25 @@ impl SecurityAdvisoryTracker {
         upgrades
     }
 
+    /// Evaluate vulnerability classification state for a given package version
+    pub fn evaluate_state(&self, package: &str, installed_version: &str) -> VulnerabilityState {
+        let affected_list = self.affected(package, installed_version);
+        if !affected_list.is_empty() {
+            VulnerabilityState::Vulnerable
+        } else if self.advisories.iter().any(|a| a.package == package && a.fixed_version.as_deref() == Some(installed_version)) {
+            VulnerabilityState::Fixed
+        } else {
+            VulnerabilityState::Unaffected
+        }
+    }
+
+    /// Query advisories matching target severity
+    pub fn by_severity(&self, severity: AdvisorySeverity) -> Vec<&SecurityAdvisory> {
+        self.advisories.iter().filter(|a| a.severity == severity).collect()
+    }
+
     pub fn critical_count(&self) -> usize {
-        self.advisories
-            .iter()
-            .filter(|a| a.severity == AdvisorySeverity::Critical)
-            .count()
+        self.by_severity(AdvisorySeverity::Critical).len()
     }
 }
 
