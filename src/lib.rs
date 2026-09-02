@@ -81,6 +81,9 @@ pub use driver::{
     UbuntuLivepatchDriverHook,
 };
 pub mod expanded_wiki_innovations;
+pub use expanded_wiki_innovations::{
+    StrategicImportItem, StrategicImportPlanEngine,
+};
 pub mod virtualization;
 
 pub mod interrupt;
