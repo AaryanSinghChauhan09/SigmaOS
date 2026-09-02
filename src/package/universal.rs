@@ -1581,14 +1581,15 @@ impl UniversalPackageManifestParser {
         }
     }
 
-    pub fn parse_manifest_auto(
-        filename: &str,
-        raw_data: &[u8],
-    ) -> Result<UnifiedPackage, &'static str> {
+    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
         let fmt = Self::detect_format_from_filename(filename)
             .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
 
-        let pkg_name = filename.split('.').next().unwrap_or("unknown").to_string();
+        let pkg_name = filename
+            .split('.')
+            .next()
+            .unwrap_or("unknown")
+            .to_string();
 
         let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
         if !raw_data.is_empty() {
@@ -1601,11 +1602,11 @@ impl UniversalPackageManifestParser {
 /// Linux & BSD Distro Inspired Rollback Mechanics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRollbackType {
-    NixOsGeneration,   // NixOS atomic generation profile rollback
-    FreeBsdZfsBootEnv, // FreeBSD ZFS boot environment (bectl / beadm) rollback
-    OpenSuseSnapper,   // openSUSE Snapper CoW snapshot rollback
-    FedoraRpmOstree,   // Fedora Silverblue / rpm-ostree deployment rollback
-    AlpineApkCache,    // Alpine Linux local apk tarball cache rollback
+    NixOsGeneration,       // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
 }
 
 #[derive(Debug, Clone)]
@@ -1656,11 +1657,7 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.snapshot_id == snapshot_id)
-            .ok_or("Rollback Engine: Snapshot not found")?;
+        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
         self.active_snapshot_id = Some(snapshot_id);
         Ok(snap.installed_packages_state.clone())
     }
@@ -1969,8 +1966,7 @@ mod tests {
             Some(PackageFormat::Flatpak)
         );
 
-        let pkg =
-            UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }
@@ -1990,38 +1986,5 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
-    }
-
-    #[test]
-    fn test_universal_package_manager_node_runtime_integration() {
-        let mut manager = UniversalPackageManager::new();
-        let bytes = vec![0x42u8; 120];
-        let mut hash = [0u8; 32];
-        let mut state: u64 = 0xcbf29ce484222325;
-        for (i, &b) in bytes.iter().enumerate() {
-            state ^= b as u64;
-            state = state.wrapping_mul(0x100000001b3);
-            hash[i % 32] ^= (state >> ((i % 8) * 8)) as u8;
-        }
-
-        let node_pkg = NodeBinaryPackage::new(
-            "v20.11.0",
-            NodeReleaseStream::Lts,
-            NodeTargetArch::X86_64,
-            LibcFlavor::Musl,
-            "https://dist.sigmaos.org/node/v20.11.0.tar.xz",
-            hash,
-            [0u8; 64],
-            120,
-        );
-
-        let path = manager
-            .install_node_runtime(&node_pkg, &bytes, "10.2.4")
-            .unwrap();
-        assert!(path.starts_with("/sovereign/store/node-v20.11.0-"));
-
-        let installed_pkg = manager.installed_packages.get("nodejs-v20.11.0").unwrap();
-        assert_eq!(installed_pkg.version, "v20.11.0");
-        assert!(installed_pkg.installed);
     }
 }

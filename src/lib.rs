@@ -134,6 +134,7 @@ pub mod crypto {
 }
 
 pub mod logging;
+pub mod ai;
 pub mod system;
 pub mod installer;
 pub mod performance;

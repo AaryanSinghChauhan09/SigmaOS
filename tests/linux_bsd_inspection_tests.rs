@@ -1,80 +1,45 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
-extern crate alloc;
-
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd_compat;
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-#[path = "../src/compatibility/freebsd_jails.rs"]
-mod freebsd_jails;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
 mod fs_bsd_linux_innovations;
+#[path = "../src/memory/tlb_associative.rs"]
+mod tlb_associative;
+#[path = "../src/desktop/zenith_advanced_features.rs"]
+mod zenith_advanced;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
-#[path = "../src/compatibility/garuda_zen.rs"]
-mod garuda_zen;
-#[path = "../src/security/hardening.rs"]
-mod hardening;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-#[path = "../src/boot/sigma_boot.rs"]
-mod sigma_boot;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/logging/unified.rs"]
+mod unified;
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/driver/mod.rs"]
-pub mod driver;
-#[path = "../src/package/mod.rs"]
-pub mod package;
-#[path = "../src/security/mod.rs"]
-pub mod security;
-#[path = "../src/sigpkg/mod.rs"]
-pub mod sigpkg;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
@@ -82,13 +47,8 @@ mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 
-use bsd_compat::{
-    FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
-};
+use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
-use wiki_ideas_implementation::{
-    RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
-};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -216,11 +176,11 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
-        ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass, SigmaZeroCopySpliceEngine,
-        SnapperTransactionGuard, SovereignHybridSchedulerInnovations, SovereignSystemdParityEngine,
-        SystemdUnitActiveState, SystemdUnitType, CAP_READ, CAP_SEEK,
+    use wiki_ideas::{
+        NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
+        SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
+        SovereignSystemdParityEngine, SystemdUnitActiveState,
     };
 
     // 1. NixOS Declarative System State
@@ -357,19 +317,8 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(ls_out.len(), 1);
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
-    kmod_mgr
-        .set_module_parameter("virtio_gpu", "modeset", "1")
-        .unwrap();
-    assert_eq!(
-        kmod_mgr
-            .loaded_modules
-            .get("virtio_gpu")
-            .unwrap()
-            .parameters
-            .get("modeset")
-            .map(|s: &String| s.as_str()),
-        Some("1")
-    );
+    kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
+    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);

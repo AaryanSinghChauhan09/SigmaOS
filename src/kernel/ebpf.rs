@@ -220,10 +220,7 @@ impl EbpfXdpFilterEngine {
         Ok(())
     }
 
-    pub fn process_xdp_packet_hook(
-        &mut self,
-        ctx: &mut XdpPacketContext,
-    ) -> Result<XdpAction, &'static str> {
+    pub fn process_xdp_packet_hook(&mut self, ctx: &mut XdpPacketContext) -> Result<XdpAction, &'static str> {
         if self.loaded_program.is_empty() {
             return Ok(XdpAction::Pass);
         }
@@ -288,10 +285,7 @@ mod tests {
         };
 
         // Unloaded program defaults to Pass
-        assert_eq!(
-            xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(),
-            XdpAction::Pass
-        );
+        assert_eq!(xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(), XdpAction::Pass);
 
         // eBPF program returning 2 (XdpAction::Drop)
         let drop_program = vec![
@@ -312,9 +306,6 @@ mod tests {
         ];
 
         xdp_engine.attach_program(drop_program).unwrap();
-        assert_eq!(
-            xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(),
-            XdpAction::Drop
-        );
+        assert_eq!(xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(), XdpAction::Drop);
     }
 }

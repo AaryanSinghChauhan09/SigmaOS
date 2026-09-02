@@ -6,6 +6,12 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[path = "../src/ipc/pipes.rs"]
+mod pipes;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/storage/geom.rs"]
+mod geom;
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
 #[path = "../src/compatibility/bsd.rs"]

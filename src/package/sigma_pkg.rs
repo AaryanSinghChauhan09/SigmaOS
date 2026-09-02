@@ -56,12 +56,6 @@ pub enum UniversalPackageFormat {
     GentooEbuild,     // .ebuild (portage)
     VoidXbps,         // .xbps (xbps)
     FreeBsdPkg,       // .txz / .pkg (pkg)
-    OpenBsdPkg,       // .tgz / .pkg (OpenBSD pkg_add)
-    NetBsdPkgsrc,     // .tgz / .tgz (NetBSD pkgsrc)
-    SlackwarePkg,     // .txz / .tgz (Slackware installpkg)
-    NixDerivation,    // .nix / .drv (NixOS store derivation)
-    GuixPackage,      // .scm (GNU Guix package scheme)
-    HaikuHpkg,        // .hpkg (Haiku package format)
     FlatpakBundle,    // .flatpak
     SnapPackage,      // .snap
     AppImageBinary,   // .AppImage
@@ -84,20 +78,8 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::GentooEbuild)
         } else if filename.ends_with(".xbps") {
             Some(UniversalPackageFormat::VoidXbps)
-        } else if filename.ends_with(".openbsd.tgz") {
-            Some(UniversalPackageFormat::OpenBsdPkg)
-        } else if filename.ends_with(".pkgsrc.tgz") {
-            Some(UniversalPackageFormat::NetBsdPkgsrc)
-        } else if filename.ends_with(".slackware.txz") || filename.ends_with(".slackware.tgz") {
-            Some(UniversalPackageFormat::SlackwarePkg)
         } else if filename.ends_with(".txz") || filename.ends_with(".pkg") {
             Some(UniversalPackageFormat::FreeBsdPkg)
-        } else if filename.ends_with(".nix") || filename.ends_with(".drv") {
-            Some(UniversalPackageFormat::NixDerivation)
-        } else if filename.ends_with(".scm") || filename.ends_with(".guix") {
-            Some(UniversalPackageFormat::GuixPackage)
-        } else if filename.ends_with(".hpkg") {
-            Some(UniversalPackageFormat::HaikuHpkg)
         } else if filename.ends_with(".flatpak") {
             Some(UniversalPackageFormat::FlatpakBundle)
         } else if filename.ends_with(".snap") {
@@ -696,18 +678,6 @@ mod tests {
 
         let fmt_rpm = UniversalPackageImporter::autodetect_format("htop-3.2.1.rpm");
         assert_eq!(fmt_rpm, Some(UniversalPackageFormat::FedoraRpm));
-
-        let fmt_slack = UniversalPackageImporter::autodetect_format("bash.slackware.txz");
-        assert_eq!(fmt_slack, Some(UniversalPackageFormat::SlackwarePkg));
-
-        let fmt_nix = UniversalPackageImporter::autodetect_format("hello.nix");
-        assert_eq!(fmt_nix, Some(UniversalPackageFormat::NixDerivation));
-
-        let fmt_guix = UniversalPackageImporter::autodetect_format("gnu-hello.scm");
-        assert_eq!(fmt_guix, Some(UniversalPackageFormat::GuixPackage));
-
-        let fmt_haiku = UniversalPackageImporter::autodetect_format("bash.hpkg");
-        assert_eq!(fmt_haiku, Some(UniversalPackageFormat::HaikuHpkg));
 
         let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
         assert_eq!(pkg.name, "curl");
