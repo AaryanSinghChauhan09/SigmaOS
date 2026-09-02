@@ -57,16 +57,18 @@ pub mod transaction_log;
 pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
-pub use universal_oop_system::{
-    AuditedPackageDecorator, ConffileMergeEngine, DebianDiverterEngine, IPackageCommand,
-    IPackageObserver, NixStoreGcEngine, PackageBuildPhase, PackageEvent, PackageEventManager,
-    PacmanHook, PacmanHookEngine, PacmanHookWhen, RpmMacroEvaluator, SandboxedPackageDecorator,
-    SovereignAlternativesEngine, TransactionRollbackExecutor, UserDefinedFunctionPipeline,
-    UserDefinedPhaseClosure,
-};
+pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+};
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };

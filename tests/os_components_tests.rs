@@ -65,6 +65,10 @@ mod segmentation_paging;
 mod sigma_fs_extended;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
+#[path = "../src/init/systemd_init.rs"]
+pub mod systemd_init;
+#[path = "../src/expanded_wiki_innovations.rs"]
+pub mod expanded_wiki_innovations;
 #[path = "../src/sigpkg/mod.rs"]
 mod sigpkg;
 #[path = "../src/dashboard/statutory_compliance.rs"]

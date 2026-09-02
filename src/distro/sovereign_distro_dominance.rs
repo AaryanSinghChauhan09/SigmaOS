@@ -830,10 +830,13 @@ pub struct SovereignDistroDominanceSuite {
 
 impl SovereignDistroDominanceSuite {
     pub fn new() -> Self {
+        let mut security_sentinel = OpenBsdHardenedCapsicumPledge::new();
+        security_sentinel.pledge(&["stdio", "rpath", "wpath", "exec", "proc"]);
+
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
-            security_sentinel: OpenBsdHardenedCapsicumPledge::new(),
+            security_sentinel,
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
@@ -852,7 +855,7 @@ impl SovereignDistroDominanceSuite {
     pub fn is_distro_dominance_fulfilled(&self) -> bool {
         let nix_ready = true;
         let sched_ready = true;
-        let sec_ready = !self.security_sentinel.pledged_promises.is_empty() || true;
+        let sec_ready = !self.security_sentinel.pledged_promises.is_empty();
         let cow_ready = self.filesystem_cow.subvolumes.contains_key("@root");
         let vpn_ready = !self.pqc_vpn.interface_name.is_empty();
 

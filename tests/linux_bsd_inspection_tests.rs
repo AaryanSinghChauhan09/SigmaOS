@@ -54,6 +54,8 @@ mod linux_bsd_innovations;
 mod sovereign_distro_dominance;
 #[path = "../src/distro/universal_distro_super_matrix.rs"]
 mod universal_distro_super_matrix;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
 #[path = "../src/distro/linux_bsd_parity.rs"]
@@ -141,11 +143,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use std::path::PathBuf;
-    use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
-    };
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
@@ -229,9 +226,9 @@ fn test_kernel_classic_algorithms_inspection() {
 fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        NixDeclarativeSystemState, PolicyAction, SigmaZeroCopySpliceEngine,
-        SnapperTransactionGuard, SovereignSystemdParityEngine, SystemdUnitActiveState,
-        SystemdUnitType, CAP_READ, CAP_SEEK,
+        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
+        SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
+        SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ, CAP_SEEK,
     };
 
     // 1. NixOS Declarative System State
