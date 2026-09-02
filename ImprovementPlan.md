@@ -1,7 +1,23 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, and recommended next steps guidelines for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for SigmaOS AUR (Sovereign AUR)
+
+To transform the SigmaOS User Repository (AUR) into the ultimate user-driven package engine, SigmaOS synthesizes key innovations from premier Linux and BSD distribution ecosystems:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS AUR Integration Strategy |
+|-------------------|-------------------|----------------------------------|
+| **Arch Linux** | AURweb RPC v5, PKGBUILD, `namcap` linter | Complete RPC v5 API compatibility, PKGBUILD recipe execution, and automated `namcap` static security linting before package submission. |
+| **FreeBSD** | `poudriere` clean chroots & FLAVORS | Isolated jail/chroot compilation environments (`AurBuildSandbox`) and multi-variant builds (FLAVORS) for customized software binaries. |
+| **OpenBSD** | `pledge(2)` and `unveil(2)` sandboxing | Strict runtime system call restriction (`pledge`) and filesystem path isolation (`unveil`) during package build script execution. |
+| **Gentoo Linux** | Portage USE flags | Conditional build-time flag system (`PortageUseFlagPipeline`) enabling user-customized feature toggles per package. |
+| **Nix / NixOS** | Pure functional store paths | Cryptographically hashed, isolated store paths preventing dependency collisions and enabling instant atomic rollbacks. |
+| **Void Linux** | `xbps-src` restricted builds & binary deltas | Isolated user privilege compilation and binary delta patching (`DeltaRpmEngine`) for minimal bandwidth updates. |
+| **NetBSD** | `pkgsrc` cross-platform overlays | Portable multi-architecture overlay management (`AurOverlayManager`) supporting x86_64, AArch64, and RISC-V targets. |
 
 ---
 
