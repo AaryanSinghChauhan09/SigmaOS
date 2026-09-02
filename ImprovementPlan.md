@@ -1,7 +1,22 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, system test verification results, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, **Package Repository Infrastructure**, **System Manual Pages**, and **Strategic Ideas for OS Improvement**, across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, 6 Strategic Supremacy Vectors for defeating traditional Linux distros, system test verification results, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, **Package Repository Infrastructure**, **System Manual Pages**, and **Strategic Ideas for OS Improvement**, across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## The 6 Strategic Supremacy Vectors for Defeating Traditional Linux Distros
+
+To render traditional Linux distributions obsolete, SigmaOS executes a comprehensive 6-vector supremacy framework combining the strengths of Linux, FreeBSD, OpenBSD, NixOS, and Gentoo into a unified sovereign operating system:
+
+| Strategic Supremacy Vector | Competitive Advantage over Legacy Linux | SigmaOS Architectural Implementation |
+|----------------------------|-----------------------------------------|---------------------------------------|
+| **1. Universal Package Parity** | Eliminates package format fragmentation (`.deb` vs `.rpm` vs `.pkg.tar.zst`). | Natively parses and executes `.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `.xbps`, and FreeBSD `.pkg` binaries via `UniversalPackageTranslator` with $O(1)$ atomic rollbacks. |
+| **2. Zero-Allocation Kernel Memory** | Prevents fragmentation and out-of-memory (OOM) kernel panics. | `SlabObjectCacheAllocator` in `src/kernel/memory/resource_allocator.rs` providing SLUB/UMA object caching with zero-copy ring buffers. |
+| **3. Hybrid Microkernel Resilience** | Driver crashes in Linux cause total kernel panics (BSOD). | Rump kernel driver architecture isolating GPU, USB, and network drivers in sandboxed userland microkernel processes. |
+| **4. Defense-in-Depth Sandboxing** | Standard Linux relies solely on file permissions and SELinux/AppArmor complexity. | Tri-layer sandboxing combining OpenBSD `pledge`/`unveil`, FreeBSD Capsicum capability mode, and Linux Landlock/seccomp filtering. |
+| **5. Native Hybrid Hardware Parity** | Manual configuration required for hybrid laptops and GPU offloading. | Built-in `NvidiaPrimeEngine` supporting dynamic Offload, OnDemand, and D3cold dynamic power suspend without X11/Wayland restarts. |
+| **6. Declarative Immutable Profiles** | Eliminates "works on my machine" state drift across systems. | Atomic, cryptographically hashed Nix/Guix-style system profile closures stored in `/sigma/store/`. |
 
 ---
 
