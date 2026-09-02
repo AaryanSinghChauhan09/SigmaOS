@@ -1,92 +1,162 @@
-# 🛠️ SigmaOS Global Repository Implementation Plan
+# SigmaOS Repository Implementation Plan: Technical Architecture & Subsystem Mapping
 
-This document maps out the systematic, step-by-step implementation roadmap to integrate the features, algorithms, UI/UX designs, and utilities absorbed from 500+ open-source repositories into the **SigmaOS** microkernel and userspace.
+## Executive Technical Overview
 
----
+This document provides the concrete technical implementation roadmap, object-oriented abstractions, trait signatures, algorithm adaptations, and subsystem directory mappings for absorbing features from **500+ top open-source GitHub repositories** into SigmaOS.
 
-## 📅 Roadmap Overview
+***
 
-```text
-  Phase 1: Stabilization & Foundation  [Q1-Q2]  -->  Phase 2: Capability & Hardening [Q2-Q3]
-                                                                        |
-  Phase 4: Sovereign Integration & Delight [Q4] <--  Phase 3: High-Perf Storage & Net [Q3-Q4]
-```
+## Technical Architecture & Design Principles
 
----
+1.  **Zero-External-Dependency Rust Core**: All absorbed subsystems are implemented natively in Rust within `src/` using `alloc` and safe abstractions.
+2.  **Multi-OS Trait Abstractions**: Universal interfaces allow seamless switching between Linux, BSD, and Sovereign algorithms.
+3.  **Tri-Agent Pre-Commit Quality Gate**:
+    *   **Bolt ⚡**: Enforces memory pooling, SIMD acceleration, and sub-millisecond execution loops.
+    *   **Palette 🎨**: Enforces keyboard navigation focus states, ARIA visual roles, and intuitive desktop feedback.
+    *   **Sentinel 🛡️**: Enforces OpenBSD `pledge`/`unveil` sandboxing, capability dropping, and cryptographic verification.
 
-## 🚀 Milestones & Implementation Steps
+***
 
-### 🔴 Phase 1: Core Kernel Stabilization & Foundation (Short-Term: 1–3 Months)
-*Focus: Stabilizing the memory manager, multi-priority scheduler, and standard command utilities.*
+## Subsystem Mappings & Technical Trait Signatures
 
-#### 1.1 Buddy Allocator & Real-Time Scheduler Integration
-* **Task:** Integrate state-restoring error handling into the physical memory manager buddy allocator to support crash recoveries. Integrate Earliest Deadline First (EDF) scheduler tick mechanisms.
-* **Target Directories:** `src/kernel/`, `src/kernel/memory.rs`, `src/kernel/scheduler.rs`
-* **Upstream Inspiration:** `torvalds/linux`, `preempt-rt/preempt-rt`, `seL4/seL4`
-* **Success Criteria:** Zero-copy buddy merges; EDF task selection compiles and passes tests.
+### 1. Kernel, Memory & Hardware Bringup (`src/kernel/`, `src/hardware/`)
 
-#### 1.2 Multi-Call Command Utility (Sigma-Shell REPL)
-* **Task:** Implement a unified multi-call shell REPL binary that acts as `coreutils` + `procps-ng` combined, keeping size to < 100KB statically.
-* **Target Directories:** `src/shell/`
-* **Upstream Inspiration:** `busybox/busybox`, `coreutils/coreutils`
-* **Success Criteria:** Native commands (ls, cat, ps, clear, help) execute correctly in REPL.
+*   **Absorbed Repositories**: `torvalds/linux`, `gregkh/linux`, `rt-linux/rt-linux`, `analogdevicesinc/linux`, `seL4/seL4`, `coreboot/coreboot`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait KernelResourceGovernor {
+        fn allocate_dma_buffer(&self, size: usize) -> Result<u64, &'static str>;
+        fn enforce_cgroup_quota(&mut self, process_id: u64, cpu_limit_pct: u8) -> bool;
+        fn register_ebpf_hook(&mut self, hook_type: EbpfHookType, bytecode: &[u8]) -> Result<u32, &'static str>;
+    }
+    ```
+*   **File Location**: `src/kernel/memory/resource_allocator.rs`
 
----
+### 2. Universal Multi-Distro Package Management (`src/sigpkg/`, `src/package/`)
 
-### 🟡 Phase 2: Capability Gate & Security Hardening (Medium-Term: 3–6 Months)
-*Focus: Enforcing privilege reduction, access control sandboxing, and post-quantum network keys.*
+*   **Absorbed Repositories**: `pacman/pacman`, `dpkg/dpkg`, `rpm-software-management/rpm`, `alpinelinux/aports`, `nixos/nixpkgs`, `void-linux/void-packages`, `gentoo/portage`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait UniversalPackageAdapter {
+        fn parse_metadata(&self, raw_bytes: &[u8]) -> Result<PackageMetadata, PackageError>;
+        fn resolve_dependencies(&self, target_pkg: &str) -> Vec<String>;
+        fn execute_sandboxed_install(&self, sandbox: &AurBuildSandbox) -> Result<(), PackageError>;
+    }
+    ```
+*   **File Location**: `src/package/universal.rs` & `src/sigpkg/aurweb.rs`
 
-#### 2.1 Capability-Gated Virtual File System & Drivers
-* **Task:** Connect the `CapabilityGate` validation token to all file reads and writes inside the Virtual Filesystem (VFS). Guard device command execution (NVMe, GPU, USB) behind mandatory capability bits checking.
-* **Target Directories:** `src/filesystem/vfs.rs`, `src/drivers/`, `src/security/capability.rs`
-* **Upstream Inspiration:** `genode/genode`, `seL4/seL4`
-* **Success Criteria:** Any access without a valid `CapabilityToken` fails with a clean `FsError::PermissionDenied`.
+### 3. Desktop Shell, Window Management & Display Managers (`src/desktop/`, `src/tools/`)
 
-#### 2.2 Process Privilege Reduction (`sigma_pledge` & `sigma_unveil`)
-* **Task:** Implement dynamic process privilege restriction on syscall bounds using open-source sandboxing mechanisms.
-* **Target Directories:** `src/security/pledge.rs`, `src/syscall/`
-* **Upstream Inspiration:** `openbsd/src` (pledge/unveil), `flatpak/flatpak`
-* **Success Criteria:** Sockets or executables violate active pledges fail and invoke a healing fallback rule.
+*   **Absorbed Repositories**: `linuxmint/cinnamon`, `GNOME/gnome-shell`, `KDE/plasma-desktop`, `hyprlandwm/Hyprland`, `i3/i3`, `canonical/lightdm`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait DesktopCompositorEngine {
+        fn render_frame(&mut self, frame_buffer: &mut FrameBuffer) -> Result<(), DisplayError>;
+        fn handle_keyboard_navigation(&mut self, key_event: KeyEvent) -> NavigationAction;
+        fn enforce_session_security(&self, auth_provider: &MdmAuthProvider) -> bool;
+    }
+    ```
+*   **File Location**: `src/desktop/cinnamon_settings_daemon.rs` & `src/tools/display_manager.rs`
 
----
+### 4. Hybrid Graphics Acceleration & Power Management (`src/graphics/`, `src/system/`)
 
-### 🟢 Phase 3: High-Performance Storage & Networking (Long-Term: 6–9 Months)
-*Focus: Copy-on-Write snapshots, content-addressed packages, and wire-speed packet handlers.*
+*   **Absorbed Repositories**: `NVIDIA/open-gpu-kernel-modules`, `mesa/mesa`, `Bumblebee-Project/Bumblebee`, `linrunner/TLP`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait HybridGraphicsGovernor {
+        fn set_power_profile(&mut self, profile: NvidiaPrimeProfile) -> Result<(), GpuError>;
+        fn offload_render_command(&self, cmd: &str) -> RenderEnvironmentVars;
+    }
+    ```
+*   **File Location**: `src/graphics/nvidia_prime.rs` & `src/graphics/gpu_driver.rs`
 
-#### 3.1 Merkle-Tree CoW File System & Self-Healing Rollbacks
-* **Task:** Integrate transactional log-structured writes in the block storage driver. Use Merkle-tree state verification to allow atomic snapshots and system-level rollbacks.
-* **Target Directories:** `src/resilience/self_healing.rs`, `src/filesystem/`
-* **Upstream Inspiration:** `btrfs/btrfs-progs`, `zfs/zfs`, `f2fs-tools/f2fs-tools`
-* **Success Criteria:** Creating a snapshot returns a secure hash; rollbacks safely restore configuration tables in under 1ms.
+### 5. Node.js & Multi-Runtime Binary Distribution (`src/runtime/`)
 
-#### 3.2 SAT-Solver Dependency Resolution & CAS Store
-* **Task:** Scale `src/sigpkg/resolver.rs` to support complete DPLL SAT solving. Establish a native content-addressed storage (CAS) folder format using SHA-256 hashes to guarantee conflict-free package states.
-* **Target Directories:** `src/sigpkg/`, `src/package/universal.rs`
-* **Upstream Inspiration:** `nixos/nixpkgs`, `flatpak/flatpak`, `pacman/pacman`
-* **Success Criteria:** Conflict detection flags overlapping dependencies instantly; multiple packages share identical files safely via CAS hashes.
+*   **Absorbed Repositories**: `nodejs/node`, `nixos/nixpkgs`, `openbsd/src`, `termux/termux-packages`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait NodeDistributionEngine {
+        fn resolve_binary_store_path(&self, stream: ReleaseStream, target_abi: LibcTargetAbi) -> String;
+        fn switch_alternative_version(&mut self, version: &str) -> Result<(), RuntimeDistroError>;
+        fn apply_pledge_unveil_sandbox(&self) -> Result<(), RuntimeDistroError>;
+    }
+    ```
+*   **File Location**: `src/runtime/node_distribution.rs`
 
----
+### 6. Embedded IoT, Cloud & Edge Packaging (`src/distro/`, `src/iot/`)
 
-### 🔵 Phase 4: Sovereign Integration, AI Optimization & UI Delight (9–12 Months)
-*Focus: High-performance dashboard telemetry, AI-powered predictive scaling, and screen accessibility.*
+*   **Absorbed Repositories**: `openwrt/openwrt`, `k3s-io/k3s`, `hashicorp/terraform`, `home-assistant/core`, `arch-boxes`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait CloudBoxImageGenerator {
+        fn build_arch_box(&self, format: ArchBoxFormat) -> Result<ArchBoxImageRecord, ImageError>;
+        fn provision_cloud_init(&self, config: CloudInitConfig) -> bool;
+    }
+    ```
+*   **File Location**: `src/distro/arch_boxes.rs`
 
-#### 4.1 AI-Powered Adaptive Telemetry & Monitoring
-* **Task:** Feed real-time telemetry metrics (from htop-like widgets) directly into an AI optimization model to dynamically scale cooling levels and CPU frequencies.
-* **Target Directories:** `src/dashboard/`, `src/automation/system_level.rs`
-* **Upstream Inspiration:** `prometheus/prometheus`, `sysstat/sysstat`, `htop-dev/htop`
-* **Success Criteria:** High thermal events automatically invoke CPU throttling rules.
+### 7. Community Contribution & RFC Hub (`src/community/`)
 
-#### 4.2 Zenith Desktop Accessibility & Transition Polish
-* **Task:** Connect assistive tech (Screen Reader, High Contrast) to the UI compositor rendering loop. Implement responsive layouts and screen reader voice buffers.
-* **Target Directories:** `src/accessibility/`, `zenith_desktop/`
-* **Upstream Inspiration:** `KDE/plasma-desktop`, `gnome-shell/gnome-shell`
-* **Success Criteria:** Activating high-contrast states updates desktop layouts instantly; all icons and input areas expose screen reader text elements.
+*   **Absorbed Repositories**: `archlinux/aurweb`, `gentoo/gentoo`, `fedoraproject/pkgdb`
+*   **Implemented Architecture**:
+    ```rust
+    pub trait SovereignContribPipeline {
+        fn onboard_new_maintainer(&mut self, applicant: MaintainerApplicant) -> Result<MaintainerId, ContribError>;
+        fn submit_rfc_proposal(&mut self, rfc: RfcProposal) -> Result<RfcId, ContribError>;
+    }
+    ```
+*   **File Location**: `src/community/contrib.rs`
 
----
+***
 
-## 📈 Quality Assurance & Sync Protocol
+## Milestone-Aligned Technical Execution Sequence
 
-To maintain 100% architectural integrity during execution:
-1. **Security Scan:** Every module update undergoes automated static vulnerability audits to detect boundary leakages.
-2. **Readability Check:** Optimizations are reviewed to keep the code clear, simple, and under 50 lines per change.
-3. **No-Regression Test:** Full unit and integration test suites compile and execute successfully on every milestone release.
+### Phase 1 (Years 1–2): Critical Usability Foundation
+
+1.  **Installer Framework (`installer/`, `src/boot/`)**:
+    *   Disk partitioning, measured boot PCR checking, and ISO live overlays.
+2.  **Hardware Enablement Stack (`src/graphics/`, `src/kernel/`)**:
+    *   PCIe BAR allocator, NVIDIA PRIME offload switcher, and power governors.
+3.  **Multimedia Codecs (`src/media/`, `src/audio/`)**:
+    *   Hardware-accelerated video decoder/encoder pipelines and PipeWire zero-latency routing.
+4.  **Update & Snapshot Manager (`src/package/`, `src/system/`)**:
+    *   Atomic A/B rootfs updates, Timeshift restore points, and ZFS/Btrfs snapshot rollbacks.
+
+### Phase 2 (Years 3–4): Adoption & Systems Expansion
+
+5.  **System Config Tools (`src/ui/`, `src/tools/`)**:
+    *   Zenith Control Center, Cinnamon Spices manager, and system preferences daemon.
+6.  **Networking & Remote Access (`src/net/`, `src/security/`)**:
+    *   eBPF firewall, WireGuard VPN orchestrator, and OpenSSH ed25519 daemon.
+7.  **Accessibility Features (`src/dashboard/`, `src/ui/`)**:
+    *   High-contrast visual modes, ARIA screen-reader bindings, and keyboard navigation focus states.
+
+### Phase 3 (Years 5+): Sustainable Ecosystem & Community
+
+8.  **Documentation & Community (`src/community/`, `wiki/`)**:
+    *   Interactive command manuals (`tldr`/`cheat`), RFC submission manager, and maintainer onboarding.
+9.  **Plugin Ecosystem (`src/sigpkg/`, `src/sdk/`)**:
+    *   Dynamic user-defined package pipeline stages, store plugins, and extension SDKs.
+
+***
+
+## Tri-Agent Quality Assurance & Verification Roadmap
+
+### Phase 1: Bolt ⚡ Micro-Benchmark & Latency Audit
+
+*   Micro-benchmark all hot loops using `cargo test` and standalone test runners.
+*   Verify sub-millisecond execution for package dependency resolution, fast-boot pipelines, and VFS file operations.
+
+### Phase 2: Palette 🎨 Usability & Accessibility Audit
+
+*   Verify high-contrast color contrast compliance in Zenith Desktop and Control Center.
+*   Confirm keyboard tab navigation order and screen reader ARIA roles across all interactive UI tools.
+
+### Phase 3: Sentinel 🛡️ Zero-Trust Security Audit
+
+*   Verify OpenBSD `pledge` and `unveil` sandbox enforcement on all userland executables.
+*   Validate cryptographic hash signatures and TPM measured boot PCR register values.
+
+***
+
+*End of Technical Implementation Plan.*
