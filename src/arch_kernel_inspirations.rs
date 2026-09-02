@@ -16,10 +16,11 @@
 //   - arch-signoff                    -> `PackageSignoff`
 //   - arch-repro-status (reproducible)-> `ReproducibleBuildVerdict`
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -522,6 +523,7 @@ pub struct SignstarService {
     pub package: String,
     pub quorum_threshold: usize,
     pub fully_signed: bool,
+    pub threshold_signers_count: usize,
 }
 
 impl SignstarService {
@@ -531,15 +533,20 @@ impl SignstarService {
             package: package.to_string(),
             quorum_threshold: 1,
             fully_signed: false,
+            threshold_signers_count: 0,
         }
     }
 
-    pub fn with_quorum_threshold(mut self, threshold: usize) -> Self {
-        self.quorum_threshold = threshold;
-        self
+    pub fn set_threshold_count(&mut self, threshold: usize) {
+        self.threshold_signers_count = threshold;
     }
 
-    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy, key: SigningKey) {
+    pub fn verify_signature_threshold(&self) -> bool {
+        let total_signed = self.signers.iter().filter(|s| s.signed).count();
+        self.all_mandatory_signed() && total_signed >= self.threshold_signers_count
+    }
+
+    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
         self.signers.push(Signer {
             id: id.to_string(),
             key,
@@ -651,6 +658,7 @@ pub struct MkinitcpioHookFramework {
     pub hooks: Vec<InitramfsHook>,
     pub compression: String,
     pub microcode: bool,
+    pub early_microcode_bytes: Vec<u8>,
 }
 
 impl MkinitcpioHookFramework {
@@ -659,7 +667,17 @@ impl MkinitcpioHookFramework {
             hooks: Vec::new(),
             compression: "lz4".to_string(),
             microcode: true,
+            early_microcode_bytes: Vec::new(),
         }
+    }
+
+    pub fn prepend_early_microcode(&mut self, microcode: &[u8]) {
+        self.early_microcode_bytes = microcode.to_vec();
+        self.microcode = !self.early_microcode_bytes.is_empty();
+    }
+
+    pub fn has_early_microcode(&self) -> bool {
+        !self.early_microcode_bytes.is_empty()
     }
 
     pub fn add_hook(&mut self, name: &str, actions: Vec<HookAction>) {
@@ -1081,6 +1099,34 @@ mod tests {
         assert!(eng.commit().is_ok());
         assert!(eng.installed.iter().any(|p| p.name == "app"));
         assert!(eng.installed.iter().any(|p| p.name == "libc"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_early_microcode_prepending() {
+        let mut framework = MkinitcpioHookFramework::new();
+        assert!(!framework.has_early_microcode());
+
+        let fake_ucode = b"\x00\x00\x00\x01GenuineIntelMicrocodePayload";
+        framework.prepend_early_microcode(fake_ucode);
+
+        assert!(framework.has_early_microcode());
+        assert_eq!(framework.early_microcode_bytes, fake_ucode);
+        assert!(framework.microcode);
+    }
+
+    #[test]
+    fn signstar_threshold_signing_verification() {
+        let mut signstar = SignstarService::new("core-package.pkg.tar.zst");
+        signstar.add_signer("arch-key-1", SignerPolicy::Mandatory);
+        signstar.add_signer("arch-key-2", SignerPolicy::Optional);
+        signstar.add_signer("arch-key-3", SignerPolicy::Optional);
+        signstar.set_threshold_count(2);
+
+        signstar.record_signature("arch-key-1");
+        assert!(!signstar.verify_signature_threshold()); // Mandatory signed, but total signatures = 1 < threshold (2)
+
+        signstar.record_signature("arch-key-2");
+        assert!(signstar.verify_signature_threshold()); // Mandatory signed and total signatures = 2 >= threshold (2)
     }
 
     #[test]

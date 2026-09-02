@@ -51,6 +51,17 @@ impl SovereignVcsEngine {
         }
     }
 
+    pub fn stage_svn_revision_checkout(
+        &mut self,
+        _repo_url: &str,
+        revision: u32,
+        path: &str,
+        payload: &[u8],
+    ) {
+        let path_with_rev = format!("{}@r{}", path, revision);
+        self.stage_file(&path_with_rev, payload);
+    }
+
     pub fn stage_file(&mut self, path: &str, payload: &[u8]) {
         let mut hash = [0u8; 32];
         for (i, &b) in payload.iter().enumerate() {
@@ -3444,6 +3455,22 @@ impl Default for SovereignK8sOrchestratorEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_vcs_svn_checkout() {
+        let mut vcs = SovereignVcsEngine::new();
+        vcs.stage_svn_revision_checkout(
+            "svn://svn.archlinux.org/packages/gcc/trunk",
+            1048,
+            "PKGBUILD",
+            b"pkgname=gcc\npkgver=13.2.0",
+        );
+        assert_eq!(vcs.staging_area.len(), 1);
+        assert_eq!(vcs.staging_area[0].path, "PKGBUILD@r1048");
+
+        let commit = vcs.commit("Jules", "Checkout SVN r1048", 1700000000).unwrap();
+        assert_ne!(commit, "");
+    }
 
     #[test]
     fn test_sovereign_vcs_engine_commit_and_branching() {
