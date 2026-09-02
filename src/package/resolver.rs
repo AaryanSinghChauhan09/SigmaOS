@@ -307,7 +307,7 @@ pub trait ConflictResolver {
     fn get_resolution_strategy(&self) -> ResolutionStrategy;
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResolutionStrategy {
     Newest = 0,

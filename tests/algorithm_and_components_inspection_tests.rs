@@ -9,24 +9,41 @@ use alloc::vec::Vec;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
-pub mod kernel {
-    #[path = "../../src/kernel/memory.rs"]
-    pub mod memory;
-    #[path = "../../src/kernel/scheduler.rs"]
-    pub mod scheduler;
-    #[path = "../../src/kernel/bore.rs"]
-    pub mod bore;
-    #[path = "../../src/kernel/ipc.rs"]
-    pub mod ipc;
-}
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
 
-use kernel::bore;
-use kernel::ipc;
-use kernel::memory;
-use kernel::scheduler;
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/kernel/scheduler.rs"]
+mod scheduler;
+
+#[path = "../src/kernel/memory.rs"]
+mod memory;
+
+#[path = "../src/kernel/bore.rs"]
+mod bore;
 
 #[path = "../src/security/capability.rs"]
 mod security;
+
+#[path = "../src/kernel/ipc.rs"]
+mod ipc;
 
 use bore::{BoreScheduler, BoreTask};
 use ipc::{Channel, Message};

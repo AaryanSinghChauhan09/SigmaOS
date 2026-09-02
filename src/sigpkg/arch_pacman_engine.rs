@@ -268,15 +268,6 @@ impl Default for PacmanDatabase {
     }
 }
 
-/// Pacman Contrib Engine
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
 /// Utility for pacman cache cleaning (paccache parity)
 pub struct PacmanCacheCleaner {
     pub cached_files: Vec<String>,

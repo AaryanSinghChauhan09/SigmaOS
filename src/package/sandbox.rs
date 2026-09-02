@@ -32,7 +32,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SandboxID = usize;
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum SandboxState {
     Created = 0,

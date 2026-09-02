@@ -243,10 +243,6 @@ impl UniversalDistroSuperMatrix {
         self.ebuild_matrix_slots
             .insert(package.to_string(), flag_list);
     }
-
-    pub fn verify_matrix_consistency(&self) -> bool {
-        !self.profiles.is_empty()
-    }
 }
 
 impl Default for UniversalDistroSuperMatrix {
