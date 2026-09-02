@@ -1,11 +1,33 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing heavily on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)** and the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**.
 
 ---
 
-## 1. Multi-OS Distro Inspired AUR Architecture Guidelines
+## 1. Multi-OS Distro Inspired Installer Architecture Guidelines
+
+To evolve `installer/sigma-installer.rs` into a high-reliability installer engine, developers must follow these architectural guidelines:
+
+### A. Calamares-Inspired Plugin Modularization
+- **Guideline**: Decouple monolithic installer routines into modular, isolated steps (Language, Timezone, DiskPartition, UserAccount, PackageSelection, BootloaderInstall, PostInstallHooks).
+- **Implementation**: Define a Rust `InstallerPlugin` trait with `prepare()`, `validate()`, and `execute()` callbacks.
+
+### B. FreeBSD `bsdinstall` Root-on-ZFS & Boot Environments
+- **Guideline**: Support automatic ZFS pool creation with Boot Environments (`bectl`/`beadm`).
+- **Implementation**: Allow user selection of `FilesystemType::ZFS`, automatically generating zpool root datasets (`zroot/ROOT/default`, `zroot/home`, `zroot/var`).
+
+### C. OpenBSD Autoinstall (`install.conf`) & Debian Preseed
+- **Guideline**: Support non-interactive headless PXE/HTTP automated installations.
+- **Implementation**: Expand `preseed_file` parsing to accept OpenBSD-style key-value answer files (`install.conf`) or JSON/YAML unattended install scripts.
+
+### D. Ubuntu Subiquity Cloud-Init & Network Provisioning
+- **Guideline**: Integrate declarative network and cloud-init post-installation provisioners.
+- **Implementation**: Automatically output netplan/NetworkManager YAML files and cloud-init metadata during stage 2 target disk chroot setup.
+
+---
+
+## 2. Multi-OS Distro Inspired AUR Architecture Guidelines
 
 To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign package ecosystem, maintainers must adhere to the following architectural guidelines:
 
@@ -31,7 +53,7 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 2. General Engineering & Quality Guidelines
+## 3. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -44,9 +66,10 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 3. Recommended Phased Implementation Sequence
+## 4. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
-3. **Phase 3: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
-4. **Phase 4: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
+3. **Phase 3: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
+4. **Phase 4: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
+5. **Phase 5: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.

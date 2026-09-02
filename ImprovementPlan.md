@@ -1,7 +1,23 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR** and the **Installer**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for SigmaOS Installer (Sovereign Installer)
+
+To elevate the SigmaOS Installer (`installer/sigma-installer.rs`) into an enterprise-grade, versatile installation engine, SigmaOS incorporates best-in-class paradigms from Linux and BSD operating systems:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS Installer Integration Strategy |
+|-------------------|-------------------|----------------------------------------|
+| **Calamares** | Modular plugin-based workflow | Modularize installer execution steps (disk partition, user setup, desktop selection, bootloader install) into decoupled, testable Rust plugins. |
+| **FreeBSD** | `bsdinstall` & ZFS boot environments | Native Root-on-ZFS layout generation with boot environments (`bectl` / `beadm` snapshots) for risk-free system upgrades. |
+| **OpenBSD** | `install.conf` autoinstall response files | Fully unattended non-interactive installation via TFTP/HTTP `autoinstall` response configuration files. |
+| **Arch Linux** | `archinstall` guided CLI wizard | Scriptable JSON installer profiles enabling fast headless or terminal-based automated installations. |
+| **Ubuntu Subiquity** | YAML cloud-init installer specs | Declarative YAML schema for network, storage, and cloud-init post-install configuration provisioners. |
+| **Debian** | `preseed` automated pre-configuration | Preseed key-value configuration overrides for enterprise PXE network deployments. |
+| **Gentoo** | Stage3 tarball chroot bootstrap | Lightweight base system tarball extraction with chroot package generation for minimal footprints. |
 
 ---
 
