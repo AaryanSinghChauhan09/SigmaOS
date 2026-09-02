@@ -709,6 +709,9 @@ pub struct SignoffEntry {
     pub package: String,
     pub version: String,
     pub signoffs: SignoffCount,
+    pub qa_tested: bool,
+    pub build_reproducible: bool,
+    pub security_audited: bool,
 }
 
 pub struct PackageSignoff {
@@ -732,7 +735,27 @@ impl PackageSignoff {
                 maintainer: false,
                 community: 0,
             },
+            qa_tested: false,
+            build_reproducible: false,
+            security_audited: false,
         });
+    }
+
+    pub fn set_verification_flags(
+        &mut self,
+        package: &str,
+        qa_tested: bool,
+        build_reproducible: bool,
+        security_audited: bool,
+    ) -> bool {
+        if let Some(e) = self.entries.iter_mut().find(|e| e.package == package) {
+            e.qa_tested = qa_tested;
+            e.build_reproducible = build_reproducible;
+            e.security_audited = security_audited;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn sign(&mut self, package: &str, by_maintainer: bool) -> Option<bool> {
@@ -742,14 +765,15 @@ impl PackageSignoff {
         } else {
             e.signoffs.community += 1;
         }
-        Some(by_maintainer || e.signoffs.community >= self.required_signoffs)
+        Some(self.ready(package))
     }
 
     pub fn ready(&self, package: &str) -> bool {
-        self.entries
-            .iter()
-            .find(|e| e.package == package)
-            .map_or(false, |e| e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs)
+        self.entries.iter().find(|e| e.package == package).map_or(false, |e| {
+            let quorum_met = e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs;
+            let verifications_met = e.qa_tested && e.build_reproducible && e.security_audited;
+            quorum_met && verifications_met
+        })
     }
 }
 
