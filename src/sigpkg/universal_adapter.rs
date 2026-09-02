@@ -27,6 +27,8 @@ use crate::sigpkg::universal_engine::PackageFormat;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
 
+use crate::sigpkg::Version as SigpkgVersion;
+
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackagePriority {
@@ -1014,11 +1016,12 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::universal_oop_system::Version::new(
+                version: SigpkgVersion::new(
                     native_pkg.version.major,
                     native_pkg.version.minor,
                     native_pkg.version.patch,
                 ),
+
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),

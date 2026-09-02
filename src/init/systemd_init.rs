@@ -704,6 +704,40 @@ impl BetsySystemdCompatShim {
 }
 
 /// Systemd Transient Unit (`systemd-run`) Service Generator
+/// BSD Parallel Stage Execution Solver for BSD rc.d parallel startup
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut completed: Vec<UnitID> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                if let Some(unit) = engine.find_unit(id) {
+                    let deps_satisfied = unit.after.iter().all(|dep| completed.contains(dep));
+                    if deps_satisfied {
+                        current_stage.push(id);
+                    }
+                }
+            }
+
+            if current_stage.is_empty() {
+                // If no unit can make progress, push remaining as final stage to handle cycles
+                current_stage = remaining.clone();
+            }
+
+            completed.extend(current_stage.iter().cloned());
+            remaining.retain(|id| !completed.contains(id));
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 pub struct TransientServiceGenerator;
 
 impl TransientServiceGenerator {
@@ -2128,6 +2162,11 @@ mod tests {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
 
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.requires.push(2);
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.requires.push(3);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 
@@ -2262,8 +2301,10 @@ WantedBy=multi-user.target
         u1.before.push(2);
         u1.before.push(3);
 
-        let u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
-        let u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
+        let mut u2 = SystemdUnit::new(2, b"net1.service", UnitType::Service);
+        u2.after.push(1);
+        let mut u3 = SystemdUnit::new(3, b"net2.service", UnitType::Service);
+        u3.after.push(1);
 
         let mut u4 = SystemdUnit::new(4, b"app.service", UnitType::Service);
         u4.after.push(2);

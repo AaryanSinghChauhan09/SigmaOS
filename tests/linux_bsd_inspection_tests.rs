@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -70,6 +72,12 @@ mod wiki_ideas_implementation;
 mod zenith_advanced;
 #[path = "../src/compatibility/zorin.rs"]
 mod zorin;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 
 use bsd_compat::{
     FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
@@ -117,10 +125,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use std::path::PathBuf;
-    use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
-    };
     use vm_manager::{
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
@@ -208,9 +212,10 @@ fn test_kernel_classic_algorithms_inspection() {
 fn test_wiki_distro_innovations_inspection() {
     use wiki_ideas_implementation::{
         ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        NixDeclarativeSystemState, PolicyAction, SigmaZeroCopySpliceEngine,
-        SnapperTransactionGuard, SovereignSystemdParityEngine, SystemdUnitActiveState,
-        SystemdUnitType, CAP_READ, CAP_SEEK,
+        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
+        SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
+        SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ,
+        CAP_SEEK,
     };
 
     // 1. NixOS Declarative System State

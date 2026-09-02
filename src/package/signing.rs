@@ -12,7 +12,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type KeyID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SignatureAlgorithm {
     ED25519 = 0,
