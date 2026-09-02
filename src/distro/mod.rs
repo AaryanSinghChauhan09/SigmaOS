@@ -17,12 +17,19 @@ pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 pub mod linux_bsd_distro_gaps;
+pub mod garuda_nomad_innovations;
 
 pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
     SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
     WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+};
+
+pub use garuda_nomad_innovations::{
+    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
+    ZfsPoolState, ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;
 pub mod manjaro;

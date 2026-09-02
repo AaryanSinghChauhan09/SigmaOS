@@ -8,6 +8,31 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+/// Arch Linux pacman-contrib utility suite
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn rankmirrors(mirrors: &[(&str, usize)]) -> Vec<String> {
+        let mut sorted: Vec<(&str, usize)> = mirrors.to_vec();
+        sorted.sort_by_key(|&(_, ping)| ping);
+        sorted.into_iter().map(|(url, _)| url.to_string()).collect()
+    }
+
+    pub fn updpkgsums(pkgbuild: &str, sha256_hash: &str) -> String {
+        format!("{}\nsha256sums=('{}')", pkgbuild.trim(), sha256_hash)
+    }
+}
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Pacman package database entry
 #[derive(Debug, Clone)]
 pub struct ArchPacmanPackage {

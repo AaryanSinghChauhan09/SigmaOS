@@ -73,6 +73,8 @@ pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage,
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
+    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
