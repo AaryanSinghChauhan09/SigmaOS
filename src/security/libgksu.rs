@@ -17,7 +17,9 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::security::root_improvement::{PolkitAuthorization, PolkitEnforcer};
+#[path = "root_improvement.rs"]
+mod root_improvement;
+use root_improvement::{PolkitAuthorization, PolkitEnforcer};
 
 /// Graphical Sudo Auth Backend
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,6 +55,7 @@ pub struct GksuExecutionRequest {
     pub auth_backend: GksuAuthBackend,
     pub display: GksuDisplayServer,
     pub timeout_seconds: u32,
+    pub action_id: Option<String>,
 }
 
 impl GksuExecutionRequest {
@@ -68,7 +71,13 @@ impl GksuExecutionRequest {
                 socket_path: "/run/user/1000/wayland-0".to_string(),
             },
             timeout_seconds: 60,
+            action_id: None,
         }
+    }
+
+    pub fn with_action_id(mut self, action_id: &str) -> Self {
+        self.action_id = Some(action_id.to_string());
+        self
     }
 
     pub fn with_target_user(mut self, user: &str) -> Self {
@@ -256,6 +265,238 @@ impl Default for LibGksuGraphicalSudoEngine {
     }
 }
 
+// =========================================================================
+// 1. OPENBSD DOAS.CONF RULE POLICY EVALUATOR
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DoasAction {
+    Permit,
+    Deny,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DoasRule {
+    pub action: DoasAction,
+    pub identity: String,      // User or :group
+    pub target_user: String,  // e.g. "root"
+    pub no_pass: bool,
+    pub keep_env: Vec<String>,
+    pub command_path: Option<String>,
+}
+
+impl DoasRule {
+    pub fn permit(identity: &str, target_user: &str) -> Self {
+        Self {
+            action: DoasAction::Permit,
+            identity: identity.to_string(),
+            target_user: target_user.to_string(),
+            no_pass: false,
+            keep_env: Vec::new(),
+            command_path: None,
+        }
+    }
+}
+
+pub struct DoasRulePolicyEvaluator {
+    pub rules: Vec<DoasRule>,
+}
+
+impl DoasRulePolicyEvaluator {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: DoasRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn evaluate_authorization(
+        &self,
+        calling_user: &str,
+        target_user: &str,
+        cmd: &str,
+    ) -> Option<(DoasAction, bool, Vec<String>)> {
+        let mut last_match = None;
+        for rule in &self.rules {
+            let user_matches = rule.identity == calling_user || rule.identity == "*";
+            let target_matches = rule.target_user == target_user || rule.target_user == "*";
+            let cmd_matches = match &rule.command_path {
+                Some(p) => p == cmd || cmd.starts_with(p.as_str()),
+                None => true,
+            };
+
+            if user_matches && target_matches && cmd_matches {
+                last_match = Some((rule.action, rule.no_pass, rule.keep_env.clone()));
+            }
+        }
+        last_match
+    }
+}
+
+impl Default for DoasRulePolicyEvaluator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 2. POLKIT ACTION RULE REGISTRY (POLKITD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PolkitImplicitResult {
+    Yes,
+    No,
+    AuthSelf,
+    AuthAdmin,
+    AuthSelfKeep,
+    AuthAdminKeep,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PolkitActionDefinition {
+    pub action_id: String, // e.g. "org.sigmaos.system.network.configure"
+    pub description: String,
+    pub implicit_active: PolkitImplicitResult,
+    pub implicit_inactive: PolkitImplicitResult,
+}
+
+pub struct PolkitActionRuleRegistry {
+    pub actions: Vec<PolkitActionDefinition>,
+    pub active_cache_ttl_sec: u64,
+}
+
+impl PolkitActionRuleRegistry {
+    pub fn new() -> Self {
+        Self {
+            actions: Vec::new(),
+            active_cache_ttl_sec: 300,
+        }
+    }
+
+    pub fn register_action(&mut self, action: PolkitActionDefinition) {
+        self.actions.push(action);
+    }
+
+    pub fn check_action_authorization(
+        &self,
+        action_id: &str,
+        is_active_session: bool,
+    ) -> PolkitImplicitResult {
+        for action in &self.actions {
+            if action.action_id == action_id {
+                return if is_active_session {
+                    action.implicit_active
+                } else {
+                    action.implicit_inactive
+                };
+            }
+        }
+        PolkitImplicitResult::AuthAdmin
+    }
+}
+
+impl Default for PolkitActionRuleRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 3. SOVEREIGN SECURE HELPER DAEMON
+// =========================================================================
+
+pub struct SovereignSecureHelperDaemon {
+    pub gksu_engine: LibGksuGraphicalSudoEngine,
+    pub doas_evaluator: DoasRulePolicyEvaluator,
+    pub polkit_registry: PolkitActionRuleRegistry,
+    pub audit_logs: Vec<String>,
+}
+
+impl SovereignSecureHelperDaemon {
+    pub fn new() -> Self {
+        let mut daemon = Self {
+            gksu_engine: LibGksuGraphicalSudoEngine::new(),
+            doas_evaluator: DoasRulePolicyEvaluator::new(),
+            polkit_registry: PolkitActionRuleRegistry::new(),
+            audit_logs: Vec::new(),
+        };
+
+        daemon.doas_evaluator.add_rule(DoasRule::permit("admin", "root"));
+
+        daemon.polkit_registry.register_action(PolkitActionDefinition {
+            action_id: "org.sigmaos.pkg.install".to_string(),
+            description: "Install Sovereign Packages".to_string(),
+            implicit_active: PolkitImplicitResult::AuthAdmin,
+            implicit_inactive: PolkitImplicitResult::No,
+        });
+
+        daemon
+    }
+
+    pub fn dispatch_helper_execution(
+        &mut self,
+        calling_user: &str,
+        request: &GksuExecutionRequest,
+        pass_input: &str,
+        raw_env: &[(String, String)],
+    ) -> Result<GksuExecutionResult, &'static str> {
+        let doas_eval = self.doas_evaluator.evaluate_authorization(
+            calling_user,
+            &request.target_user,
+            &request.command,
+        );
+
+        let mut permitted = false;
+
+        match doas_eval {
+            Some((DoasAction::Deny, _, _)) => {
+                let msg = format!("SecureHelperDaemon: Denied by doas.conf policy for user {}", calling_user);
+                self.audit_logs.push(msg);
+                return Err("SecureHelperDaemon: Policy Denied");
+            }
+            Some((DoasAction::Permit, _, _)) => {
+                permitted = true;
+            }
+            None => {
+                if let Some(ref action_id) = request.action_id {
+                    let polkit_res = self.polkit_registry.check_action_authorization(action_id, true);
+                    if polkit_res != PolkitImplicitResult::No {
+                        permitted = true;
+                    } else {
+                        let msg = format!("SecureHelperDaemon: Denied by Polkit action policy for action {}", action_id);
+                        self.audit_logs.push(msg);
+                        return Err("SecureHelperDaemon: Polkit Policy Denied");
+                    }
+                }
+            }
+        }
+
+        if !permitted {
+            let msg = format!("SecureHelperDaemon: Default Deny policy enforced for user [{}] cmd [{}]", calling_user, request.command);
+            self.audit_logs.push(msg);
+            return Err("SecureHelperDaemon: Default Deny Policy");
+        }
+
+        let result = self.gksu_engine.execute_elevated(request, pass_input.as_bytes(), raw_env)?;
+
+        let audit_msg = format!(
+            "SecureHelperDaemon: User [{}] executed [{}] as [{}] -> Success={}",
+            calling_user, request.command, request.target_user, result.success
+        );
+        self.audit_logs.push(audit_msg);
+
+        Ok(result)
+    }
+}
+
+impl Default for SovereignSecureHelperDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -316,5 +557,56 @@ mod tests {
             .execute_elevated(&req, b"wrong_pass", &raw_env)
             .unwrap();
         assert!(!res_fail.success);
+    }
+
+    #[test]
+    fn test_doas_rule_policy_evaluator() {
+        let mut doas = DoasRulePolicyEvaluator::new();
+        doas.add_rule(DoasRule::permit("alice", "root"));
+        doas.add_rule(DoasRule {
+            action: DoasAction::Deny,
+            identity: "bob".to_string(),
+            target_user: "*".to_string(),
+            no_pass: false,
+            keep_env: Vec::new(),
+            command_path: None,
+        });
+
+        let alice_eval = doas.evaluate_authorization("alice", "root", "/usr/bin/htop").unwrap();
+        assert_eq!(alice_eval.0, DoasAction::Permit);
+
+        let bob_eval = doas.evaluate_authorization("bob", "root", "/usr/bin/htop").unwrap();
+        assert_eq!(bob_eval.0, DoasAction::Deny);
+    }
+
+    #[test]
+    fn test_polkit_action_rule_registry() {
+        let mut reg = PolkitActionRuleRegistry::new();
+        reg.register_action(PolkitActionDefinition {
+            action_id: "org.sigmaos.network.configure".to_string(),
+            description: "Configure Network".to_string(),
+            implicit_active: PolkitImplicitResult::Yes,
+            implicit_inactive: PolkitImplicitResult::AuthAdmin,
+        });
+
+        assert_eq!(
+            reg.check_action_authorization("org.sigmaos.network.configure", true),
+            PolkitImplicitResult::Yes
+        );
+        assert_eq!(
+            reg.check_action_authorization("org.sigmaos.network.configure", false),
+            PolkitImplicitResult::AuthAdmin
+        );
+    }
+
+    #[test]
+    fn test_sovereign_secure_helper_daemon() {
+        let mut daemon = SovereignSecureHelperDaemon::new();
+        let req = GksuExecutionRequest::new("/usr/bin/pacman").with_auth_backend(GksuAuthBackend::Sudo);
+        let env = vec![("PATH".to_string(), "/usr/bin".to_string())];
+
+        let res = daemon.dispatch_helper_execution("admin", &req, "correct_root_pass", &env).unwrap();
+        assert!(res.success);
+        assert!(!daemon.audit_logs.is_empty());
     }
 }
