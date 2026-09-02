@@ -464,10 +464,12 @@ pub struct CachyosKernelFeatureMatrix {
 
 impl CachyosKernelFeatureMatrix {
     pub fn new() -> Self {
+        let v4_pm = V4OptimizedPackageManager::new();
+        v4_pm.detect_microarchitecture_level(true, true, true);
         Self {
             bore_governor: BoreSchedulerGovernor::new(),
             ananicy_manager: AnanicyManager::new(),
-            v4_package_manager: V4OptimizedPackageManager::new(),
+            v4_package_manager: v4_pm,
             thp_tuner: CachyThpTuner::new(ThpMode::Always),
             ksm_daemon: CachyKsmDaemon::new(),
             latency_governor: CachyLatencyGovernor::new(),
