@@ -6,7 +6,12 @@
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
 extern crate alloc;
 
+#[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(test)]
+use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
 
@@ -238,7 +243,47 @@ impl Default for LinuxLdSoLoader {
 }
 
 // ==========================================
-// 5. Integration Tests
+// 5. Linux Pluggable Authentication Modules (PAM) Engine
+// ==========================================
+
+pub struct LinuxPamAuthenticationEngine {
+    pub active_service: String,
+    pub pam_modules: Vec<String>,
+    pub authenticated_sessions: HashMap<String, bool>,
+}
+
+impl LinuxPamAuthenticationEngine {
+    pub fn new(service_name: &str) -> Self {
+        let mut pam_modules = Vec::new();
+        pam_modules.push("pam_unix.so".to_string());
+        pam_modules.push("pam_env.so".to_string());
+        pam_modules.push("pam_limits.so".to_string());
+
+        Self {
+            active_service: service_name.to_string(),
+            pam_modules,
+            authenticated_sessions: HashMap::new(),
+        }
+    }
+
+    pub fn authenticate(&mut self, username: &str, password: &str) -> Result<bool, &'static str> {
+        if username.is_empty() {
+            return Err("PAM Authentication Error: Username empty");
+        }
+
+        // Simulate pam_unix.so credential check
+        let is_valid = password == "sigma_pass" || password == "root_pass";
+        self.authenticated_sessions.insert(username.to_string(), is_valid);
+        Ok(is_valid)
+    }
+
+    pub fn close_session(&mut self, username: &str) {
+        self.authenticated_sessions.remove(username);
+    }
+}
+
+// ==========================================
+// 6. Integration Tests
 // ==========================================
 
 #[cfg(test)]
@@ -295,6 +340,20 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
             entries[2].mntops,
             vec!["defaults".to_string(), "noatime".to_string()]
         );
+    }
+
+    #[test]
+    fn test_linux_pam_authentication_engine() {
+        let mut pam = LinuxPamAuthenticationEngine::new("sshd");
+        assert_eq!(pam.active_service, "sshd");
+        assert!(pam.pam_modules.contains(&"pam_unix.so".to_string()));
+
+        let ok = pam.authenticate("sovereign_user", "sigma_pass").unwrap();
+        assert!(ok);
+        assert_eq!(pam.authenticated_sessions.get("sovereign_user"), Some(&true));
+
+        pam.close_session("sovereign_user");
+        assert!(pam.authenticated_sessions.get("sovereign_user").is_none());
     }
 
     #[test]
