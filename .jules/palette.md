@@ -1,9 +1,5 @@
-# Palette 🎨 Agent Journal - UX & Accessibility Learnings
+## 2026-09-02 - Accessible Window Controls in Web Desktop Interfaces
 
-## 2026-03-31 - Web UI & Desktop Control Center ARIA Compliance
-**Learning:** Interactive desktop controls (such as Cinnamon Spices toggles and MintDrivers switcher in `src/ui/control_center.rs` and `web_ui/index.html`) require explicit ARIA attributes (`aria-label`, `aria-checked`, `role="switch"`) and keyboard focus rings for screen reader accessibility.
-**Action:** Ensure all interactive UI elements maintain clear visual focus states (`focus-visible:ring-2`) and programmatic accessibility labels.
+**Learning:** Custom window controls (e.g. minimize, maximize, close dots) in web-based desktop operating systems are frequently styled as simple `div` or `span` tags, making them invisible to keyboard focus traps and screen readers. Converting these to semantic `<button type="button">` elements with explicit `aria-label` and `title` attributes (e.g., `aria-label="Minimize OmniShell Terminal"`) alongside CSS reset rules (`border: none; padding: 0; outline: none`) preserves exact visual aesthetics while making window management WCAG 2.1 AA compliant.
 
-## 2026-03-31 - Unified Control Center Visual Feedback
-**Learning:** Asynchronous operations (such as system restore point creation in Timeshift or theme switching) must provide instantaneous visual feedback or loading indicators to prevent double-clicks and confusion.
-**Action:** Use inline status badges and disabled button states during ongoing configuration sync tasks.
+**Action:** Whenever building custom window titlebars or desktop controls, always use native `<button>` tags with explicit, context-aware `aria-label`s and `:focus-visible` focus rings.
