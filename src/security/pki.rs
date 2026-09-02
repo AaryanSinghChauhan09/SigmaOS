@@ -42,7 +42,9 @@ pub struct SimpleCertificate {
     pub id: CertificateID,
     pub certificate_type: AtomicUsize,
     pub subject: [u8; 256],
+    pub subject_len: u16,
     pub issuer: [u8; 256],
+    pub issuer_len: u16,
     pub not_before: AtomicUsize,
     pub not_after: AtomicUsize,
 }
@@ -70,7 +72,9 @@ impl SimpleCertificate {
             id,
             certificate_type: AtomicUsize::new(cert_type as usize),
             subject: subject_array,
+            subject_len: subject_len as u16,
             issuer: issuer_array,
+            issuer_len: issuer_len as u16,
             not_before: AtomicUsize::new(1000000),
             not_after: AtomicUsize::new(2000000),
         }
@@ -91,13 +95,13 @@ impl Certificate for SimpleCertificate {
     }
 
     fn subject(&self) -> &[u8] {
-        let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.subject[..len]
+        // O(1) slice lookup using cached subject_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.subject[..self.subject_len as usize]
     }
 
     fn issuer(&self) -> &[u8] {
-        let len = self.issuer.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.issuer[..len]
+        // O(1) slice lookup using cached issuer_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.issuer[..self.issuer_len as usize]
     }
 
     fn not_before(&self) -> u64 {
