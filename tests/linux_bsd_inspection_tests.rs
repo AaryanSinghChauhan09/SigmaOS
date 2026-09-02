@@ -1057,3 +1057,49 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
     );
     assert!(handoff.execute_handoff().is_err());
 }
+
+#[test]
+fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
+    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
+
+    let modes = [
+        DistroSubsystemMode::LinuxArch,
+        DistroSubsystemMode::LinuxDebian,
+        DistroSubsystemMode::LinuxAlpine,
+        DistroSubsystemMode::LinuxNix,
+        DistroSubsystemMode::LinuxGentoo,
+        DistroSubsystemMode::LinuxFedora,
+        DistroSubsystemMode::FreeBsd,
+        DistroSubsystemMode::OpenBsd,
+        DistroSubsystemMode::NetBsd,
+        DistroSubsystemMode::DragonFlyBsd,
+    ];
+
+    for mode in modes {
+        let bridge = SovereignUniversalDistroBridge::new(mode);
+        assert!(bridge.verify_all_subsystems_compatibility());
+        assert!(!bridge.translate_vfs_path("/etc").is_empty());
+        assert!(!bridge.translate_vfs_path("/var/log").is_empty());
+        assert!(!bridge.translate_vfs_path("/proc").is_empty());
+        assert!(!bridge.translate_vfs_path("/sys").is_empty());
+
+        let pkg_spec = bridge.translate_package_specifier("coreutils");
+        assert!(pkg_spec.contains("coreutils"));
+
+        let supervisor = bridge.get_supervisor_type();
+        match mode {
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                assert_eq!(supervisor, ServiceSupervisorType::Systemd);
+            }
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+            }
+            DistroSubsystemMode::LinuxAlpine => {
+                assert_eq!(supervisor, ServiceSupervisorType::Runit);
+            }
+            DistroSubsystemMode::LinuxNix => {
+                assert_eq!(supervisor, ServiceSupervisorType::Shepherd);
+            }
+        }
+    }
+}
