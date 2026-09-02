@@ -283,7 +283,168 @@ impl LinuxPamAuthenticationEngine {
 }
 
 // ==========================================
-// 6. Integration Tests
+// 6. Linux Sysctl Governor (/etc/sysctl.conf)
+// ==========================================
+
+pub struct LinuxSysctlGovernor {
+    pub sysctl_params: HashMap<String, String>,
+}
+
+impl LinuxSysctlGovernor {
+    pub fn new() -> Self {
+        let mut params = HashMap::new();
+        params.insert("vm.swappiness".to_string(), "60".to_string());
+        params.insert("net.ipv4.ip_forward".to_string(), "0".to_string());
+        params.insert("fs.file-max".to_string(), "2097152".to_string());
+        Self { sysctl_params: params }
+    }
+
+    pub fn parse_sysctl_conf(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') || trimmed.starts_with(';') || trimmed.is_empty() {
+                continue;
+            }
+            if let Some(idx) = trimmed.find('=') {
+                let key = trimmed[..idx].trim().to_string();
+                let val = trimmed[idx + 1..].trim().to_string();
+                self.sysctl_params.insert(key, val);
+            }
+        }
+    }
+
+    pub fn get(&self, key: &str) -> Option<&str> {
+        self.sysctl_params.get(key).map(|s| s.as_str())
+    }
+
+    pub fn set(&mut self, key: &str, val: &str) {
+        self.sysctl_params.insert(key.to_string(), val.to_string());
+    }
+}
+
+impl Default for LinuxSysctlGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 7. Linux Udev Rules Engine (/etc/udev/rules.d/)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct UdevRule {
+    pub subsystem: Option<String>,
+    pub action: Option<String>,
+    pub vendor_id: Option<String>,
+    pub product_id: Option<String>,
+    pub run_command: Option<String>,
+    pub mode: Option<String>,
+}
+
+pub struct LinuxUdevRulesEngine {
+    pub rules: Vec<UdevRule>,
+}
+
+impl LinuxUdevRulesEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn parse_rule_line(&mut self, line: &str) {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') || trimmed.is_empty() {
+            return;
+        }
+
+        let mut subsystem = None;
+        let mut action = None;
+        let mut vendor_id = None;
+        let mut product_id = None;
+        let mut run_command = None;
+        let mut mode = None;
+
+        for token in trimmed.split(',') {
+            let parts: Vec<&str> = token.split('=').map(|s| s.trim().trim_matches('"')).collect();
+            if parts.len() == 2 {
+                let key = parts[0].trim_end_matches(':').trim_end_matches('+');
+                let val = parts[1];
+                match key {
+                    "SUBSYSTEM" => subsystem = Some(val.to_string()),
+                    "ACTION" => action = Some(val.to_string()),
+                    "ATTR{idVendor}" => vendor_id = Some(val.to_string()),
+                    "ATTR{idProduct}" => product_id = Some(val.to_string()),
+                    "RUN" => run_command = Some(val.to_string()),
+                    "MODE" => mode = Some(val.to_string()),
+                    _ => {}
+                }
+            }
+        }
+
+        self.rules.push(UdevRule {
+            subsystem,
+            action,
+            vendor_id,
+            product_id,
+            run_command,
+            mode,
+        });
+    }
+
+    pub fn match_device(&self, subsystem: &str, vendor: &str, product: &str) -> Vec<&UdevRule> {
+        self.rules
+            .iter()
+            .filter(|r| {
+                (r.subsystem.is_none() || r.subsystem.as_deref() == Some(subsystem))
+                    && (r.vendor_id.is_none() || r.vendor_id.as_deref() == Some(vendor))
+                    && (r.product_id.is_none() || r.product_id.as_deref() == Some(product))
+            })
+            .collect()
+    }
+}
+
+impl Default for LinuxUdevRulesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 8. Linux Modules Load Engine (/etc/modules-load.d/)
+// ==========================================
+
+pub struct LinuxModulesLoadEngine {
+    pub modules_to_load: Vec<String>,
+}
+
+impl LinuxModulesLoadEngine {
+    pub fn new() -> Self {
+        Self {
+            modules_to_load: Vec::new(),
+        }
+    }
+
+    pub fn parse_modules_load_conf(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') || trimmed.starts_with(';') || trimmed.is_empty() {
+                continue;
+            }
+            if !self.modules_to_load.contains(&trimmed.to_string()) {
+                self.modules_to_load.push(trimmed.to_string());
+            }
+        }
+    }
+}
+
+impl Default for LinuxModulesLoadEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 9. Integration Tests
 // ==========================================
 
 #[cfg(test)]
@@ -373,5 +534,42 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
         assert_eq!(loader.dlsym("libc.so.6", "malloc"), Some(0x7FFF00010000));
         assert_eq!(loader.dlsym("libc.so.6", "free"), Some(0x7FFF00010040));
         assert_eq!(loader.dlsym("libc.so.6", "nonexistent"), None);
+    }
+
+    #[test]
+    fn test_linux_sysctl_governor() {
+        let mut sysctl = LinuxSysctlGovernor::new();
+        assert_eq!(sysctl.get("vm.swappiness"), Some("60"));
+
+        let conf = r#"
+# Kernel IP forwarding
+net.ipv4.ip_forward = 1
+vm.swappiness = 10
+"#;
+        sysctl.parse_sysctl_conf(conf);
+        assert_eq!(sysctl.get("net.ipv4.ip_forward"), Some("1"));
+        assert_eq!(sysctl.get("vm.swappiness"), Some("10"));
+    }
+
+    #[test]
+    fn test_linux_udev_rules_engine() {
+        let mut udev = LinuxUdevRulesEngine::new();
+        udev.parse_rule_line(r#"SUBSYSTEM=="usb", ATTR{idVendor}=="10de", ATTR{idProduct}=="1e84", MODE="0666", RUN+="/usr/bin/nvidia_setup"#);
+
+        let matches = udev.match_device("usb", "10de", "1e84");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].mode.as_deref(), Some("0666"));
+    }
+
+    #[test]
+    fn test_linux_modules_load_engine() {
+        let mut modules = LinuxModulesLoadEngine::new();
+        let conf = r#"
+# Load wireguard and kvm at boot
+wireguard
+kvm
+"#;
+        modules.parse_modules_load_conf(conf);
+        assert_eq!(modules.modules_to_load, vec!["wireguard".to_string(), "kvm".to_string()]);
     }
 }
