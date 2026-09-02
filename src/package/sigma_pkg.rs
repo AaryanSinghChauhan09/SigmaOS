@@ -8,9 +8,8 @@ use alloc::format;
 // Supports dependencies, repositories, transactions, and package management
 
 use crate::klib::HashMap;
-// std::fs not in no_std
-// Path/PathBuf not in no_std
-// std::process not in no_std
+use std::path::{Path, PathBuf};
+use std::fs;
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -401,7 +400,7 @@ impl SigmaPkg {
         println!("Resolving dependencies...");
         let transaction = self.resolve_dependencies(package_names)?;
         
-        self.display_transaction(&transaction)?;
+        self.display_transaction(&transaction);
         
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
@@ -486,8 +485,8 @@ impl SigmaPkg {
         println!("Removing packages...");
         
         for name in package_names {
-            if let Some(package) = self.local_packages.get(name) {
-                self.remove_package(package)?;
+            if let Some(package) = self.local_packages.get(name).cloned() {
+                self.remove_package(&package)?;
             } else {
                 println!("Package '{}' is not installed.", name);
             }
@@ -544,7 +543,7 @@ impl SigmaPkg {
         let mut upgradable = Vec::new();
         
         for (name, local_pkg) in &self.local_packages {
-            if let Some(remote_pkg) = self.find_package(name) {
+            if let Ok(remote_pkg) = self.find_package(name) {
                 if remote_pkg.version != local_pkg.version {
                     upgradable.push((local_pkg.clone(), remote_pkg));
                 }
@@ -572,7 +571,7 @@ impl SigmaPkg {
             transaction.install_size += new.installed_size - old.installed_size;
         }
         
-        self.display_transaction(&transaction)?;
+        self.display_transaction(&transaction);
         
         if !self.config.no_confirm {
             if !self.confirm_transaction() {

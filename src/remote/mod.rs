@@ -1,6 +1,7 @@
 // SigmaOS Remote Access Module
 pub mod desktop;
 pub mod shell;
+pub mod fedora_remote;
 
 pub use desktop::{
     InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession, SessionID,
@@ -9,4 +10,9 @@ pub use desktop::{
 pub use shell::{
     FileTransfer, RemoteShell, ShellError, ShellID, ShellManager, SimpleFileTransfer,
     SimpleRemoteShell, SimpleShellManager,
+};
+pub use fedora_remote::{
+    FedoraCockpitRemoteBridge, CockpitSessionState, CockpitSystemdStatus, CockpitSystemMetrics,
+    FedoraPipeWireRemoteDesktop, PipeWireVideoFormat, PipeWireRemoteDesktopSession,
+    FedoraFreeIpaKerberosAuth, KerberosTicket,
 };

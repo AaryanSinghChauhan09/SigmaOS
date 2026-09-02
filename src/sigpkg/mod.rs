@@ -26,20 +26,18 @@ pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
+pub mod aur_rules;
+pub mod poudriere_xbps;
 pub mod pacman;
+pub mod pacman_contrib;
 pub mod portage;
+pub mod svntogit_repro;
 pub mod recipe;
 pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
-pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
-
-pub use sovereign_package_innovations::{
-    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    AlpmHook, ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-};
 pub mod spec;
 pub mod store;
 pub mod transaction;
@@ -110,6 +108,26 @@ pub use client::{
     SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
 };
 pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
+pub use pacman_contrib::{
+    PacCacheTrimmer, PackageCacheEntry, PacCacheResult,
+    PacDiffConfigResolver, PacDiffAction, PacDiffCandidate,
+    CheckUpdatesEngine, InstalledPackage, SyncPackage, PendingUpdate,
+    PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor, PacLogAction, PacLogEntry,
+};
+pub use svntogit_repro::{
+    SovereignSvnToGitMigrator, SvnRevisionLog, ConvertedGitCommit, SvnBranchType,
+    ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
+    ReproducibilityAttestationReport,
+};
+pub use aur_rules::{
+    AurRuleEngine, AurLintFinding, LintSeverity, AurSandboxPolicy,
+    MakepkgReproduciblePipeline, MakepkgBuildStatus, MakepkgBuildResult,
+};
+pub use poudriere_xbps::{
+    PoudriereBulkBuildQueue, PoudriereBuildState, PoudrierePortJob,
+    XbpsSrcChrootBuilder, XbpsSrcTemplate, XbpsSrcBuildResult,
+    SlackpkgPatchEngine, SlackBuildSpec,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

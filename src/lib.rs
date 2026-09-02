@@ -113,7 +113,6 @@ pub mod crypto {
 }
 
 pub mod logging;
-pub mod ai;
 pub mod system;
 pub mod installer;
 pub mod performance;
@@ -139,7 +138,7 @@ pub mod distro;
 // pub mod package;
 // pub mod performance;
 // pub mod productivity;
-// pub mod remote;
+pub mod remote;
 // pub mod resilience;
 // pub mod shell;
 // pub mod sigpkg;

@@ -2612,6 +2612,195 @@ impl Default for NetBsdRumpComponentEngine {
     }
 }
 
+// ==================================================================
+// 50. ANDROID APEX CONTAINER MODULE ENGINE
+// ==================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AndroidApexModule {
+    pub name: String,
+    pub version: u64,
+    pub mount_path: String,
+    pub active: bool,
+}
+
+pub struct AndroidApexContainerModuleEngine {
+    pub modules: Vec<AndroidApexModule>,
+    pub active_mounts: usize,
+}
+
+impl AndroidApexContainerModuleEngine {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+            active_mounts: 0,
+        }
+    }
+
+    pub fn register_apex_module(&mut self, name: &str, version: u64, mount_path: &str) -> bool {
+        if self.modules.iter().any(|m| m.name == name && m.version == version) {
+            return false;
+        }
+        self.modules.push(AndroidApexModule {
+            name: name.to_string(),
+            version,
+            mount_path: mount_path.to_string(),
+            active: false,
+        });
+        true
+    }
+
+    pub fn activate_module(&mut self, name: &str, version: u64) -> Result<(), &'static str> {
+        let module = self.modules.iter_mut().find(|m| m.name == name && m.version == version)
+            .ok_or("APEX module not found")?;
+        if !module.active {
+            module.active = true;
+            self.active_mounts += 1;
+        }
+        Ok(())
+    }
+
+    pub fn rollback_module(&mut self, name: &str) -> Result<u64, &'static str> {
+        let module = self.modules.iter_mut().find(|m| m.name == name && m.active)
+            .ok_or("Active APEX module not found")?;
+        module.active = false;
+        if self.active_mounts > 0 {
+            self.active_mounts -= 1;
+        }
+        Ok(module.version)
+    }
+}
+
+impl Default for AndroidApexContainerModuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 51. ROSETTA DYNAMIC BINARY TRANSLATOR
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TargetArch {
+    AArch64,
+    X86_64,
+    RiscV64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RosettaTranslationCacheEntry {
+    pub pc: u64,
+    pub translated_code: Vec<u8>,
+    pub hit_count: usize,
+}
+
+pub struct RosettaDynamicBinaryTranslator {
+    pub target_arch: TargetArch,
+    pub translation_cache: Vec<RosettaTranslationCacheEntry>,
+    pub total_translations: usize,
+}
+
+impl RosettaDynamicBinaryTranslator {
+    pub fn new(target_arch: TargetArch) -> Self {
+        Self {
+            target_arch,
+            translation_cache: Vec::new(),
+            total_translations: 0,
+        }
+    }
+
+    pub fn translate_instruction_block(&mut self, pc: u64, code: &[u8]) -> Vec<u8> {
+        if let Some(entry) = self.translation_cache.iter_mut().find(|e| e.pc == pc) {
+            entry.hit_count += 1;
+            return entry.translated_code.clone();
+        }
+
+        let mut translated = Vec::with_capacity(code.len() * 2);
+        for &byte in code {
+            translated.push(byte ^ 0xAA);
+        }
+        self.translation_cache.push(RosettaTranslationCacheEntry {
+            pc,
+            translated_code: translated.clone(),
+            hit_count: 1,
+        });
+        self.total_translations += 1;
+        translated
+    }
+}
+
+// ==================================================================
+// 52. PHORONIX AUTOMATED BENCHMARK ENGINE
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct PhoronixTestResult {
+    pub test_name: String,
+    pub metric_unit: String,
+    pub score: f64,
+}
+
+pub struct PhoronixAutomatedBenchmarkEngine {
+    pub suite_name: String,
+    pub results: Vec<PhoronixTestResult>,
+}
+
+impl PhoronixAutomatedBenchmarkEngine {
+    pub fn new(suite_name: &str) -> Self {
+        Self {
+            suite_name: suite_name.to_string(),
+            results: Vec::new(),
+        }
+    }
+
+    pub fn run_test(&mut self, test_name: &str, metric_unit: &str, score: f64) {
+        self.results.push(PhoronixTestResult {
+            test_name: test_name.to_string(),
+            metric_unit: metric_unit.to_string(),
+            score,
+        });
+    }
+
+    pub fn compute_composite_index(&self) -> f64 {
+        if self.results.is_empty() {
+            return 0.0;
+        }
+        let sum: f64 = self.results.iter().map(|r| r.score).sum();
+        sum / (self.results.len() as f64)
+    }
+}
+
+// ==================================================================
+// 53. DISTROWATCH PARITY METRICS HUB
+// ==================================================================
+pub struct DistroWatchParityMetricsHub {
+    pub distros: Vec<(String, u32)>,
+}
+
+impl DistroWatchParityMetricsHub {
+    pub fn new() -> Self {
+        Self {
+            distros: Vec::new(),
+        }
+    }
+
+    pub fn record_distro_parity(&mut self, name: &str, score: u32) {
+        self.distros.push((name.to_string(), score));
+    }
+
+    pub fn average_ecosystem_parity(&self) -> f64 {
+        if self.distros.is_empty() {
+            return 0.0;
+        }
+        let sum: u32 = self.distros.iter().map(|(_, score)| *score).sum();
+        (sum as f64) / (self.distros.len() as f64)
+    }
+}
+
+impl Default for DistroWatchParityMetricsHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
