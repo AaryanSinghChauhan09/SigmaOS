@@ -22,6 +22,8 @@
 //! Filesystem Hierarchy Standard (FHS) compliance
 //! Systemd-style service management concepts
 //! Package management best practices
+extern crate alloc;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -386,6 +388,52 @@ impl Default for PamServiceChain {
     }
 }
 
+// ==========================================
+// Linux Cgroup v2 Controller Governor
+// ==========================================
+
+pub struct LinuxCgroupV2Governor {
+    pub cgroup_path: String,
+    pub memory_max_bytes: u64,
+    pub cpu_max_quota: u32,
+    pub attached_pids: Vec<u32>,
+}
+
+impl LinuxCgroupV2Governor {
+    pub fn new(cgroup_path: &str) -> Self {
+        Self {
+            cgroup_path: cgroup_path.to_string(),
+            memory_max_bytes: u64::MAX,
+            cpu_max_quota: 100_000, // 100% quota in microseconds
+            attached_pids: Vec::new(),
+        }
+    }
+
+    pub fn set_memory_max(&mut self, bytes: u64) {
+        self.memory_max_bytes = bytes;
+    }
+
+    pub fn set_cpu_max(&mut self, quota_us: u32) {
+        self.cpu_max_quota = quota_us;
+    }
+
+    pub fn attach_pid(&mut self, pid: u32) -> Result<(), &'static str> {
+        if pid == 0 {
+            return Err("Cgroup Error: Invalid PID 0");
+        }
+        if !self.attached_pids.contains(&pid) {
+            self.attached_pids.push(pid);
+        }
+        Ok(())
+    }
+}
+
+impl Default for LinuxCgroupV2Governor {
+    fn default() -> Self {
+        Self::new("/sys/fs/cgroup/sigma.slice")
+    }
+}
+
 /// Linux compatibility layer for common utilities
 pub struct LinuxCompat {
     path: String,
@@ -474,6 +522,21 @@ mod tests {
         assert_eq!(auditor.evaluate_syscall(59), SeccompAction::Allow);
         assert_eq!(auditor.evaluate_syscall(57), SeccompAction::KillThread);
         assert_eq!(auditor.violation_count, 1);
+    }
+
+    #[test]
+    fn test_linux_cgroup_v2_governor() {
+        let mut cg = LinuxCgroupV2Governor::new("/sys/fs/cgroup/user.slice");
+        assert_eq!(cg.cgroup_path, "/sys/fs/cgroup/user.slice");
+
+        cg.set_memory_max(1_073_741_824); // 1 GB
+        cg.set_cpu_max(50_000); // 50% CPU quota
+        assert_eq!(cg.memory_max_bytes, 1_073_741_824);
+        assert_eq!(cg.cpu_max_quota, 50_000);
+
+        assert!(cg.attach_pid(1024).is_ok());
+        assert_eq!(cg.attached_pids, vec![1024]);
+        assert!(cg.attach_pid(0).is_err());
     }
 
     #[test]
