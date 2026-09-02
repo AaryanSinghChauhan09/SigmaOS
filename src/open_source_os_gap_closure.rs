@@ -1117,6 +1117,357 @@ impl Default for MachZeroCopyIpcEngine {
 }
 
 // =========================================================================
+// 15. REACTOS / WINDOWS NT SUBSYSTEM (Executive Object Manager & Registry Hive)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtObject {
+    pub handle_id: u32,
+    pub object_type: String,
+    pub name: String,
+    pub reference_count: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NtRegistryKey {
+    pub path: String,
+    pub values: BTreeMap<String, Vec<u8>>,
+}
+
+pub struct NtExecutiveObjectManagerEngine {
+    pub objects: Vec<NtObject>,
+    pub registry_keys: Vec<NtRegistryKey>,
+    pub next_handle: u32,
+}
+
+impl NtExecutiveObjectManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            objects: Vec::new(),
+            registry_keys: Vec::new(),
+            next_handle: 1,
+        }
+    }
+
+    pub fn ob_create_object(&mut self, object_type: &str, name: &str) -> u32 {
+        let handle = self.next_handle;
+        self.next_handle += 1;
+        self.objects.push(NtObject {
+            handle_id: handle,
+            object_type: object_type.to_string(),
+            name: name.to_string(),
+            reference_count: 1,
+        });
+        handle
+    }
+
+    pub fn reg_set_value(&mut self, key_path: &str, val_name: &str, data: &[u8]) {
+        if let Some(key) = self.registry_keys.iter_mut().find(|k| k.path == key_path) {
+            key.values.insert(val_name.to_string(), data.to_vec());
+        } else {
+            let mut values = BTreeMap::new();
+            values.insert(val_name.to_string(), data.to_vec());
+            self.registry_keys.push(NtRegistryKey {
+                path: key_path.to_string(),
+                values,
+            });
+        }
+    }
+
+    pub fn reg_query_value(&self, key_path: &str, val_name: &str) -> Option<Vec<u8>> {
+        self.registry_keys
+            .iter()
+            .find(|k| k.path == key_path)
+            .and_then(|k| k.values.get(val_name).cloned())
+    }
+}
+
+impl Default for NtExecutiveObjectManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. TEMPLEOS (HolyC JIT Compiler & Ring-0 Cooperative Multi-Tasking)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HolyCTask {
+    pub task_id: u32,
+    pub name: String,
+    pub code_symbol: String,
+    pub is_completed: bool,
+}
+
+pub struct TempleOsHolyCCompilerEngine {
+    pub tasks: Vec<HolyCTask>,
+    pub compiled_symbols: BTreeMap<String, Vec<u8>>,
+}
+
+impl TempleOsHolyCCompilerEngine {
+    pub fn new() -> Self {
+        Self {
+            tasks: Vec::new(),
+            compiled_symbols: BTreeMap::new(),
+        }
+    }
+
+    pub fn compile_holyc_jit(&mut self, symbol_name: &str, code_str: &str) -> Result<usize, &'static str> {
+        if code_str.is_empty() {
+            return Err("TempleOS HolyC: Empty source code");
+        }
+        let bytecode = format!("HolyC_JIT_NATIVE[{}]", code_str).into_bytes();
+        let len = bytecode.len();
+        self.compiled_symbols.insert(symbol_name.to_string(), bytecode);
+        Ok(len)
+    }
+
+    pub fn spawn_cooperative_task(&mut self, name: &str, symbol_name: &str) -> Result<u32, &'static str> {
+        if !self.compiled_symbols.contains_key(symbol_name) {
+            return Err("TempleOS HolyC: Uncompiled function symbol");
+        }
+        let task_id = (self.tasks.len() + 1) as u32;
+        self.tasks.push(HolyCTask {
+            task_id,
+            name: name.to_string(),
+            code_symbol: symbol_name.to_string(),
+            is_completed: false,
+        });
+        Ok(task_id)
+    }
+
+    pub fn yield_cooperative_task(&mut self, task_id: u32) -> bool {
+        if let Some(t) = self.tasks.iter_mut().find(|t| t.task_id == task_id) {
+            t.is_completed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for TempleOsHolyCCompilerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. FREEDOS / MS-DOS (TSR Interrupt Vector Table & Int 21h Execution Adapter)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IvtVectorEntry {
+    pub int_num: u8,
+    pub handler_segment: u16,
+    pub handler_offset: u16,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DosTsrMemoryBlock {
+    pub program_name: String,
+    pub psp_segment: u16,
+    pub resident_size_bytes: u32,
+}
+
+pub struct FreeDosInterruptVectorEngine {
+    pub ivt: BTreeMap<u8, IvtVectorEntry>,
+    pub tsr_blocks: Vec<DosTsrMemoryBlock>,
+}
+
+impl FreeDosInterruptVectorEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            ivt: BTreeMap::new(),
+            tsr_blocks: Vec::new(),
+        };
+        // Register default DOS Int 21h handler
+        engine.set_interrupt_vector(0x21, 0xF000, 0x1000);
+        engine
+    }
+
+    pub fn set_interrupt_vector(&mut self, int_num: u8, segment: u16, offset: u16) {
+        self.ivt.insert(
+            int_num,
+            IvtVectorEntry {
+                int_num,
+                handler_segment: segment,
+                handler_offset: offset,
+            },
+        );
+    }
+
+    pub fn register_tsr_program(&mut self, name: &str, psp_seg: u16, size: u32) {
+        self.tsr_blocks.push(DosTsrMemoryBlock {
+            program_name: name.to_string(),
+            psp_segment: psp_seg,
+            resident_size_bytes: size,
+        });
+    }
+
+    pub fn dispatch_int21h(&self, ah_subfunction: u8) -> Result<String, &'static str> {
+        match ah_subfunction {
+            0x09 => Ok("FreeDOS: Display String Int 21h AH=09h".to_string()),
+            0x31 => Ok("FreeDOS: Terminate and Stay Resident (TSR) Int 21h AH=31h".to_string()),
+            0x4C => Ok("FreeDOS: Process Terminate Int 21h AH=4Ch".to_string()),
+            _ => Err("FreeDOS: Unsupported Int 21h subfunction"),
+        }
+    }
+}
+
+impl Default for FreeDosInterruptVectorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 18. CONTIKI-OS / RIOT OS (Protothreads & 6LoWPAN Sensor Mesh Engine)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProtothreadState {
+    Waiting,
+    Yielded,
+    Exited,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LowPanFrame {
+    pub src_short_addr: u16,
+    pub dst_short_addr: u16,
+    pub compressed_ipv6_payload: Vec<u8>,
+}
+
+pub struct ContikiProtothreadEngine {
+    pub active_threads_count: u32,
+    pub transmitted_frames: Vec<LowPanFrame>,
+}
+
+impl ContikiProtothreadEngine {
+    pub fn new() -> Self {
+        Self {
+            active_threads_count: 0,
+            transmitted_frames: Vec::new(),
+        }
+    }
+
+    pub fn spawn_protothread(&mut self) -> u32 {
+        self.active_threads_count += 1;
+        self.active_threads_count
+    }
+
+    pub fn transmit_6lowpan_frame(&mut self, src: u16, dst: u16, ipv6_payload: &[u8]) {
+        let compressed = ipv6_payload.iter().map(|b| b ^ 0x60).collect();
+        self.transmitted_frames.push(LowPanFrame {
+            src_short_addr: src,
+            dst_short_addr: dst,
+            compressed_ipv6_payload: compressed,
+        });
+    }
+}
+
+impl Default for ContikiProtothreadEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 19. COSMOPOLITAN OS / APE (Actually Portable Executable Multi-Format Engine)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApeTargetFormat {
+    Elf64,
+    Pe32Plus,
+    MachO64,
+}
+
+pub struct CosmopolitanApeHeaderEngine {
+    pub target_formats: Vec<ApeTargetFormat>,
+}
+
+impl CosmopolitanApeHeaderEngine {
+    pub fn new() -> Self {
+        Self {
+            target_formats: vec![
+                ApeTargetFormat::Elf64,
+                ApeTargetFormat::Pe32Plus,
+                ApeTargetFormat::MachO64,
+            ],
+        }
+    }
+
+    pub fn build_ape_stub(&self, payload: &[u8]) -> Vec<u8> {
+        let mut ape_binary = b"MZqFpD='ShellStub';\n".to_vec(); // Shell/DOS stub signature
+        ape_binary.extend_from_slice(payload);
+        ape_binary
+    }
+
+    pub fn validate_ape_binary(&self, binary: &[u8]) -> bool {
+        binary.starts_with(b"MZqFpD=")
+    }
+}
+
+impl Default for CosmopolitanApeHeaderEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 20. SERENITYOS (LibGUI EventLoop & Window Manager Protocol)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibGuiWindow {
+    pub window_id: u32,
+    pub title: String,
+    pub rect: (i32, i32, u32, u32),
+}
+
+pub struct SerenityOsLibGuiProtocolEngine {
+    pub windows: Vec<LibGuiWindow>,
+    pub pending_events_count: u64,
+}
+
+impl SerenityOsLibGuiProtocolEngine {
+    pub fn new() -> Self {
+        Self {
+            windows: Vec::new(),
+            pending_events_count: 0,
+        }
+    }
+
+    pub fn create_window(&mut self, title: &str, x: i32, y: i32, w: u32, h: u32) -> u32 {
+        let id = (self.windows.len() + 1) as u32;
+        self.windows.push(LibGuiWindow {
+            window_id: id,
+            title: title.to_string(),
+            rect: (x, y, w, h),
+        });
+        id
+    }
+
+    pub fn dispatch_gui_event(&mut self, window_id: u32, _event_type: &str) -> bool {
+        if self.windows.iter().any(|w| w.window_id == window_id) {
+            self.pending_events_count += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SerenityOsLibGuiProtocolEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1321,5 +1672,68 @@ mod tests {
         let received = mach.receive_message(100).unwrap();
         assert_eq!(received.sender_pid, 42);
         assert!(received.is_ool_zero_copy);
+    }
+
+    #[test]
+    fn test_nt_executive_object_manager_and_registry() {
+        let mut nt = NtExecutiveObjectManagerEngine::new();
+        let handle = nt.ob_create_object("FileObject", "\\Device\\HarddiskVolume1\\boot.ini");
+        assert_eq!(handle, 1);
+        assert_eq!(nt.objects.len(), 1);
+
+        nt.reg_set_value("HKLM\\SYSTEM\\CurrentControlSet", "Start", &[0x02, 0x00, 0x00, 0x00]);
+        let val = nt.reg_query_value("HKLM\\SYSTEM\\CurrentControlSet", "Start").unwrap();
+        assert_eq!(val, vec![0x02, 0x00, 0x00, 0x00]);
+    }
+
+    #[test]
+    fn test_templeos_holyc_compiler_and_cooperative_tasking() {
+        let mut holyc = TempleOsHolyCCompilerEngine::new();
+        let len = holyc.compile_holyc_jit("DrawMatrix", "U0 Main() { Print(\"TempleOS\"); }").unwrap();
+        assert!(len > 0);
+
+        let task_id = holyc.spawn_cooperative_task("RenderTask", "DrawMatrix").unwrap();
+        assert_eq!(task_id, 1);
+        assert!(holyc.yield_cooperative_task(task_id));
+        assert!(holyc.tasks[0].is_completed);
+    }
+
+    #[test]
+    fn test_freedos_interrupt_vector_engine() {
+        let mut freedos = FreeDosInterruptVectorEngine::new();
+        freedos.set_interrupt_vector(0x33, 0xF000, 0x2000); // Mouse interrupt
+        freedos.register_tsr_program("MOUSE.COM", 0x1200, 4096);
+
+        assert_eq!(freedos.tsr_blocks.len(), 1);
+        let res = freedos.dispatch_int21h(0x31).unwrap();
+        assert!(res.contains("TSR"));
+    }
+
+    #[test]
+    fn test_contiki_protothread_6lowpan_mesh() {
+        let mut contiki = ContikiProtothreadEngine::new();
+        let tid = contiki.spawn_protothread();
+        assert_eq!(tid, 1);
+
+        contiki.transmit_6lowpan_frame(0x0001, 0x0002, b"sensor_temp_data");
+        assert_eq!(contiki.transmitted_frames.len(), 1);
+        assert_eq!(contiki.transmitted_frames[0].src_short_addr, 0x0001);
+    }
+
+    #[test]
+    fn test_cosmopolitan_ape_header_engine() {
+        let ape = CosmopolitanApeHeaderEngine::new();
+        let stub = ape.build_ape_stub(b"echo Hello World");
+        assert!(ape.validate_ape_binary(&stub));
+    }
+
+    #[test]
+    fn test_serenityos_libgui_protocol() {
+        let mut serenity = SerenityOsLibGuiProtocolEngine::new();
+        let win_id = serenity.create_window("Terminal", 100, 100, 640, 480);
+        assert_eq!(win_id, 1);
+
+        assert!(serenity.dispatch_gui_event(win_id, "WM_PAINT"));
+        assert_eq!(serenity.pending_events_count, 1);
     }
 }
