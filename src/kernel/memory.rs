@@ -1,3 +1,5 @@
+use alloc::vec;
+extern crate alloc;
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging with zero std dependency
 
@@ -11,9 +13,7 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
-#[path = "../memory/pmm_vmm.rs"]
 pub mod pmm_vmm;
-#[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
 pub mod sigma_buddy;
 

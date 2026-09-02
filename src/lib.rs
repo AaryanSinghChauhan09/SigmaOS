@@ -168,7 +168,7 @@ pub mod distro;
 // pub mod package;
 // pub mod performance;
 // pub mod productivity;
-// pub mod remote;
+pub mod remote;
 // pub mod resilience;
 // pub mod shell;
 // pub mod sigpkg;

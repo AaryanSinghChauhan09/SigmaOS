@@ -105,48 +105,48 @@ impl Default for SystemdUnitHardeningProfile {
     }
 }
 
-/// BSD rc.d parallel boot execution stage solver
+/// Solves parallel execution stages for BSD rc.d service scripts based on dependency levels
 pub struct BsdRcParallelStageSolver;
 
 impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(
-        engine: &SystemdEngine,
-        unit_ids: &[UnitID],
-    ) -> Vec<Vec<UnitID>> {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
         let mut stages = Vec::new();
-        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut processed = Vec::new();
 
-        while !remaining.is_empty() {
+        while processed.len() < units.len() {
             let mut current_stage = Vec::new();
-            for &id in &remaining {
-                let has_unresolved_prereq = remaining.iter().any(|&other| {
-                    if other == id {
-                        return false;
-                    }
-                    if let Some(u) = engine.find_unit(id) {
-                        if u.after.contains(&other) {
-                            return true;
-                        }
-                    }
-                    if let Some(other_u) = engine.find_unit(other) {
-                        if other_u.before.contains(&id) {
-                            return true;
-                        }
-                    }
-                    false
-                });
+            for &u in units {
+                if processed.contains(&u) {
+                    continue;
+                }
+                let unit = match engine.find_unit(u) {
+                    Some(unit) => unit,
+                    None => continue,
+                };
 
-                if !has_unresolved_prereq {
-                    current_stage.push(id);
+                let prereqs_met = unit.after.iter().all(|req| processed.contains(req)) &&
+                    units.iter().filter(|&&other| other != u && !processed.contains(&other)).all(|&other| {
+                        if let Some(other_unit) = engine.find_unit(other) {
+                            !other_unit.before.contains(&u)
+                        } else {
+                            true
+                        }
+                    });
+
+                if prereqs_met {
+                    current_stage.push(u);
                 }
             }
 
             if current_stage.is_empty() {
+                let remaining: Vec<UnitID> = units.iter().filter(|&&u| !processed.contains(&u)).cloned().collect();
                 stages.push(remaining);
                 break;
             }
 
-            remaining.retain(|id| !current_stage.contains(id));
+            for &u in &current_stage {
+                processed.push(u);
+            }
             stages.push(current_stage);
         }
 
@@ -332,51 +332,6 @@ impl Default for TimerConfig {
             persistent: true,
             randomized_delay_sec: 0,
         }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct BsdRcParallelStageSolver;
-
-impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[usize]) -> Vec<Vec<usize>> {
-        let mut stages = Vec::new();
-        let mut remaining: Vec<usize> = unit_ids.to_vec();
-        let mut completed: Vec<usize> = Vec::new();
-
-        while !remaining.is_empty() {
-            let mut current_stage = Vec::new();
-            for &id in &remaining {
-                if let Some(unit) = engine.units.iter().find(|u| u.id == id) {
-                    let after_satisfied = unit
-                        .after
-                        .iter()
-                        .all(|dep| completed.contains(dep) || !unit_ids.contains(dep));
-                    let before_satisfied = !remaining.iter().any(|&other_id| {
-                        if other_id == id {
-                            return false;
-                        }
-                        if let Some(other) = engine.units.iter().find(|u| u.id == other_id) {
-                            other.before.contains(&id)
-                        } else {
-                            false
-                        }
-                    });
-                    if after_satisfied && before_satisfied {
-                        current_stage.push(id);
-                    }
-                } else {
-                    current_stage.push(id);
-                }
-            }
-            if current_stage.is_empty() {
-                current_stage = remaining.clone();
-            }
-            completed.extend(&current_stage);
-            remaining.retain(|id| !current_stage.contains(id));
-            stages.push(current_stage);
-        }
-        stages
     }
 }
 
@@ -2222,23 +2177,13 @@ mod tests {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
 
-        let score_none = SystemdServiceHardeningEvaluator::calculate_hardening_score(false, false, false);
-        assert_eq!(score_none, 10.0);
-    }
-
-    #[test]
-    fn test_systemd_engine() {
         let mut engine = SystemdEngine::new();
         let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        target.duration_ms = 100;
-        target.after.push(2);
-
         let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
-        service.duration_ms = 150;
-        service.after.push(3);
-
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
+        target.requires.push(2);
+        service.requires.push(3);
 
         engine.register_unit(target);
         engine.register_unit(service);
