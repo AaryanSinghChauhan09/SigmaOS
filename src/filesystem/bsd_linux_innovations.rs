@@ -5,7 +5,6 @@
 //! 2. OpenBSD securelevel lockdown and mount flags enforcement (`OpenBsdMountEnforcer`)
 //! 3. Linux OverlayFS / Union Mount subsystem (`LinuxOverlayFsManager`)
 //! 4. Linux ProcFS & SysFS dynamic telemetry virtual file system (`LinuxProcSysfsEmulator`)
-use alloc::vec;
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -283,7 +282,7 @@ mod tests {
             Some(op0),
         );
         // Register 3: DirAddEntry depending on InodeAlloc
-        let op2 = engine.register_operation(
+        let _op2 = engine.register_operation(
             MetadataOp::DirAddEntry {
                 parent_inode: 1,
                 child_inode: 5,
@@ -446,6 +445,80 @@ mod fhs_tests {
         assert_eq!(
             engine.resolve_fhs_path("/usr/local/etc/nginx.conf"),
             "/usr/local/etc/nginx.conf"
+        );
+    }
+}
+
+// ================= GoboLinux Non-Hierarchical Package Directory Resolver =================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GoboProgramEntry {
+    pub program_name: String,
+    pub version: String,
+    pub binary_files: Vec<String>,
+}
+
+pub struct GoboLinuxPathResolver {
+    pub programs: Vec<GoboProgramEntry>,
+    pub system_index_path: String,
+}
+
+impl GoboLinuxPathResolver {
+    pub fn new() -> Self {
+        Self {
+            programs: Vec::new(),
+            system_index_path: "/System/Index".to_string(),
+        }
+    }
+
+    pub fn register_program(&mut self, name: &str, version: &str, binaries: &[&str]) {
+        self.programs.push(GoboProgramEntry {
+            program_name: name.to_string(),
+            version: version.to_string(),
+            binary_files: binaries.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn resolve_program_binary(&self, name: &str, binary: &str) -> Option<String> {
+        let entry = self.programs.iter().find(|p| p.program_name == name)?;
+        if entry.binary_files.iter().any(|b| b == binary) {
+            Some(format!(
+                "/Programs/{}/{}/bin/{}",
+                entry.program_name, entry.version, binary
+            ))
+        } else {
+            None
+        }
+    }
+
+    pub fn generate_system_index_symlink(&self, name: &str, binary: &str) -> Option<String> {
+        let target = self.resolve_program_binary(name, binary)?;
+        Some(format!("{}/bin/{} -> {}", self.system_index_path, binary, target))
+    }
+}
+
+impl Default for GoboLinuxPathResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod gobo_tests {
+    use super::*;
+
+    #[test]
+    fn test_gobolinux_path_resolver() {
+        let mut gobo = GoboLinuxPathResolver::new();
+        gobo.register_program("Bash", "5.2.21", &["bash", "sh"]);
+
+        let binary_path = gobo.resolve_program_binary("Bash", "bash").unwrap();
+        assert_eq!(binary_path, "/Programs/Bash/5.2.21/bin/bash");
+
+        let symlink = gobo.generate_system_index_symlink("Bash", "bash").unwrap();
+        assert_eq!(
+            symlink,
+            "/System/Index/bin/bash -> /Programs/Bash/5.2.21/bin/bash"
         );
     }
 }

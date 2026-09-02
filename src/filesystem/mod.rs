@@ -9,7 +9,10 @@ pub mod manager;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
-pub use bsd_linux_innovations::*;
+pub use bsd_linux_innovations::{
+    BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
+    MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
+};
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
