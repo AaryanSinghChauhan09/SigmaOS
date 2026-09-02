@@ -3,12 +3,9 @@ extern crate alloc;
 // SigmaOS elementaryOS Parity Subsystem: Granite UI, Switchboard, Contractor & ScreenTime
 // Inspired by elementaryOS Granite toolkit, Switchboard Control Center, Contractor Service, and Parental Controls
 
-#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
-
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
+use alloc::format;
+use alloc::string::String;
 
 // ============================================================================
 // 1. Granite UI Toolkit & Toast Manager
@@ -310,6 +307,74 @@ impl ScreenTimeParentalGovernor {
     }
 }
 
+// ============================================================================
+// 5. elementaryOS AppCenter Pay-What-You-Want Monetization Engine
+// ============================================================================
+
+/// elementaryOS AppCenter Pay-What-You-Want (PWYW) Pricing Tier
+#[derive(Debug, Clone)]
+pub struct AppCenterPackage {
+    pub app_id: &'static str,
+    pub name: &'static str,
+    pub suggested_price_usd: u32,
+    pub is_free_tier_allowed: bool,
+}
+
+/// elementaryOS AppCenter Monetized App Store Engine
+#[derive(Debug, Default)]
+pub struct AppCenterMonetizationEngine {
+    pub packages: Vec<AppCenterPackage>,
+    pub total_developer_payout_usd: u64,
+}
+
+impl AppCenterMonetizationEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            packages: Vec::new(),
+            total_developer_payout_usd: 0,
+        };
+
+        engine.register_package(AppCenterPackage {
+            app_id: "io.elementary.code",
+            name: "Code Editor",
+            suggested_price_usd: 10,
+            is_free_tier_allowed: true,
+        });
+
+        engine.register_package(AppCenterPackage {
+            app_id: "io.elementary.music",
+            name: "Music Player",
+            suggested_price_usd: 5,
+            is_free_tier_allowed: true,
+        });
+
+        engine
+    }
+
+    pub fn register_package(&mut self, package: AppCenterPackage) {
+        self.packages.push(package);
+    }
+
+    pub fn purchase_or_download_custom_price(
+        &mut self,
+        app_id: &str,
+        custom_amount_usd: u32,
+    ) -> Result<String, &'static str> {
+        if let Some(pkg) = self.packages.iter().find(|p| p.app_id == app_id) {
+            if custom_amount_usd == 0 && !pkg.is_free_tier_allowed {
+                return Err("Free download not allowed for this app");
+            }
+            self.total_developer_payout_usd += custom_amount_usd as u64;
+            Ok(format!(
+                "App '{}' acquired with custom contribution of ${}",
+                pkg.name, custom_amount_usd
+            ))
+        } else {
+            Err("App ID not found in elementary AppCenter")
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -375,5 +440,21 @@ mod tests {
         // Record 130 minutes usage (exceeds 120 quota)
         governor.record_usage(130);
         assert!(governor.can_launch_app("Calculator", 14).is_err());
+    }
+
+    #[test]
+    fn test_appcenter_monetization_engine() {
+        let mut appcenter = AppCenterMonetizationEngine::new();
+        assert_eq!(appcenter.packages.len(), 2);
+
+        // Download for 0 USD (free tier)
+        let res = appcenter.purchase_or_download_custom_price("io.elementary.code", 0);
+        assert!(res.is_ok());
+        assert_eq!(appcenter.total_developer_payout_usd, 0);
+
+        // Pay 15 USD tip
+        let res_paid = appcenter.purchase_or_download_custom_price("io.elementary.code", 15);
+        assert!(res_paid.is_ok());
+        assert_eq!(appcenter.total_developer_payout_usd, 15);
     }
 }

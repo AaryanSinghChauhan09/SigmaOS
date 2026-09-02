@@ -18,6 +18,7 @@ pub mod driver;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -81,6 +82,9 @@ pub use driver::{
     UbuntuLivepatchDriverHook,
 };
 pub mod expanded_wiki_innovations;
+pub use expanded_wiki_innovations::{
+    GrowthDomainItem, SigmaosGrowthArchitectureEngine, StrategicImportItem, StrategicImportPlanEngine,
+};
 pub mod virtualization;
 
 pub mod interrupt;
@@ -115,6 +119,12 @@ pub mod crypto {
 pub mod logging;
 pub mod ai;
 pub mod system;
+pub mod update {
+    pub mod distro_update_parity;
+}
+pub use update::distro_update_parity::{
+    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+};
 pub mod installer;
 pub mod performance;
 pub mod ml;
