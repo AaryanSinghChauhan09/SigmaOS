@@ -1,0 +1,1 @@
+std::result::Result<hardening::MemoryPermission, &'static str>

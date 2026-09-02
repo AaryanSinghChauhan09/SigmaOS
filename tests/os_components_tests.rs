@@ -20,12 +20,6 @@ mod bsd;
 mod chimera_linux;
 #[path = "../src/compatibility/debian.rs"]
 mod debian_compat;
-#[path = "../src/storage/geom.rs"]
-mod geom;
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
 mod video_editor;
 #[path = "../src/distro/mod.rs"]
