@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -30,6 +32,12 @@ mod hardening;
 mod kvm_vcpu;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
 #[path = "../src/distro/linux_bsd_parity.rs"]
@@ -75,6 +83,9 @@ use bsd_compat::{
     FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
 };
 use wiki_ideas_implementation as wiki_ideas;
+use wiki_ideas_implementation::{
+    RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
+};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -117,10 +128,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use std::path::PathBuf;
-    use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
-    };
     use vm_manager::{
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,

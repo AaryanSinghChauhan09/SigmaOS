@@ -206,6 +206,7 @@ pub enum CapsicumRight {
 }
 
 pub struct OpenBsdHardenedCapsicumPledge {
+    pub is_pledged: bool,
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
     pub unveiled_paths: BTreeMap<String, String>,   // path -> permissions e.g. "rwc"
@@ -214,6 +215,7 @@ pub struct OpenBsdHardenedCapsicumPledge {
 impl OpenBsdHardenedCapsicumPledge {
     pub fn new() -> Self {
         Self {
+            is_pledged: false,
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
@@ -221,6 +223,7 @@ impl OpenBsdHardenedCapsicumPledge {
     }
 
     pub fn pledge(&mut self, promises: &[&str]) {
+        self.is_pledged = true;
         for promise in promises {
             if !self.pledged_promises.contains(&promise.to_string()) {
                 self.pledged_promises.push(promise.to_string());
@@ -827,10 +830,12 @@ pub struct SovereignDistroDominanceSuite {
 
 impl SovereignDistroDominanceSuite {
     pub fn new() -> Self {
+        let mut sentinel = OpenBsdHardenedCapsicumPledge::new();
+        sentinel.pledge(&["stdio", "rpath"]);
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
-            security_sentinel: OpenBsdHardenedCapsicumPledge::new(),
+            security_sentinel: sentinel,
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
