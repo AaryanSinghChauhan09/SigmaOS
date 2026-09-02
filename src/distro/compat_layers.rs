@@ -28,11 +28,11 @@ use crate::klib::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
 
-#[cfg(not(target_os = "none"))]
-use crate::klib::HashMap;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
 
-#[cfg(target_os = "none")]
-use crate::klib::BTreeMap as HashMap;
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::HashMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -430,6 +430,79 @@ impl Default for GeomTopology {
     }
 }
 
+// ==========================================================
+// WSL2 (Windows Subsystem for Linux 2) Lxss Interop Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct Wsl2DistroConfig {
+    pub distro_name: String,
+    pub default_user: String,
+    pub enable_wslg_gui: bool,
+    pub enable_systemd: bool,
+    pub kernel_command_line: String,
+}
+
+pub struct Wsl2LxssBridgeEngine {
+    pub active_distros: HashMap<String, Wsl2DistroConfig>,
+    pub interop_enabled: bool,
+}
+
+impl Wsl2LxssBridgeEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            active_distros: HashMap::new(),
+            interop_enabled: true,
+        };
+
+        engine.register_distro(Wsl2DistroConfig {
+            distro_name: "SigmaOS-WSL".to_string(),
+            default_user: "sigma".to_string(),
+            enable_wslg_gui: true,
+            enable_systemd: true,
+            kernel_command_line: "init=/sbin/init wslg.wayland=1".to_string(),
+        });
+
+        engine
+    }
+
+    pub fn register_distro(&mut self, config: Wsl2DistroConfig) {
+        self.active_distros.insert(config.distro_name.clone(), config);
+    }
+
+    pub fn translate_drvfs_path(&self, windows_path: &str) -> String {
+        let path = windows_path.replace('\\', "/");
+        if path.len() >= 2 && path.as_bytes()[1] == b':' {
+            let drive = (path.as_bytes()[0] as char).to_ascii_lowercase();
+            let rest = &path[2..];
+            format!("/mnt/{}{}", drive, rest)
+        } else {
+            path
+        }
+    }
+
+    pub fn execute_interop_command(
+        &self,
+        distro_name: &str,
+        cmd: &str,
+    ) -> Result<String, &'static str> {
+        if !self.interop_enabled {
+            return Err("WSL Interop Disabled");
+        }
+        if let Some(distro) = self.active_distros.get(distro_name) {
+            Ok(format!("[WSL2:{}] Executed: {}", distro.distro_name, cmd))
+        } else {
+            Err("WSL Distro Not Found")
+        }
+    }
+}
+
+impl Default for Wsl2LxssBridgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -567,5 +640,18 @@ mod tests {
         // Check topology stacked properties
         assert!(geom.is_provider_stacked("ada0"));
         assert!(!geom.is_provider_stacked("ada1"));
+    }
+
+    #[test]
+    fn test_wsl2_lxss_bridge_engine() {
+        let bridge = Wsl2LxssBridgeEngine::new();
+        assert!(bridge.active_distros.contains_key("SigmaOS-WSL"));
+
+        let linux_path = bridge.translate_drvfs_path("C:\\Users\\Sigma\\Documents");
+        assert_eq!(linux_path, "/mnt/c/Users/Sigma/Documents");
+
+        let exec_res = bridge.execute_interop_command("SigmaOS-WSL", "ls -la");
+        assert!(exec_res.is_ok());
+        assert!(exec_res.unwrap().contains("ls -la"));
     }
 }

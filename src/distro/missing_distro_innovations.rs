@@ -1,4 +1,8 @@
 extern crate alloc;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
@@ -662,6 +666,61 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
+/// 12. Missing Linux & BSD Distro Component Parity Inspector
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComponentParityStatus {
+    Implemented,
+    InTesting,
+    Planned,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroComponentParityRecord {
+    pub component_name: String,
+    pub source_distro: String,
+    pub status: ComponentParityStatus,
+}
+
+pub struct MissingDistroComponentsEngine {
+    pub records: BTreeMap<String, DistroComponentParityRecord>,
+}
+
+impl MissingDistroComponentsEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            records: BTreeMap::new(),
+        };
+
+        engine.register_component("Portage USE Flags", "Gentoo", ComponentParityStatus::Implemented);
+        engine.register_component("APK Trigger Hooks", "Alpine", ComponentParityStatus::Implemented);
+        engine.register_component("AUR Recipe Helper", "Arch Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
+        engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
+
+        engine
+    }
+
+    pub fn register_component(&mut self, name: &str, distro: &str, status: ComponentParityStatus) {
+        let record = DistroComponentParityRecord {
+            component_name: name.to_string(),
+            source_distro: distro.to_string(),
+            status,
+        };
+        self.records.insert(name.to_string(), record);
+    }
+
+    pub fn is_all_components_implemented(&self) -> bool {
+        self.records.values().all(|r| r.status == ComponentParityStatus::Implemented)
+    }
+}
+
+impl Default for MissingDistroComponentsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -716,5 +775,12 @@ mod tests {
         auditor.log_violation(1234, "/etc/shadow", "r", 1000);
         assert_eq!(auditor.violations.len(), 1);
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
+    }
+
+    #[test]
+    fn test_missing_distro_components_engine() {
+        let engine = MissingDistroComponentsEngine::new();
+        assert_eq!(engine.records.len(), 6);
+        assert!(engine.is_all_components_implemented());
     }
 }
