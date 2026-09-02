@@ -17,6 +17,7 @@ jobs:
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Verify FreeBSD Boot Environment & Storage
+      - name: Run FreeBSD Boot Environment Verification
         run: |
-          cargo test --lib -- boot::sigma_boot
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh

@@ -17,10 +17,7 @@ jobs:
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Verify OpenBSD Pledge & Unveil Primitives
-        run: |
-          cargo test --lib -- expanded_wiki_innovations::expanded_wiki_tests::test_openbsd_security_sandbox_wiki_engine
-
       - name: Run OpenBSD Parity Verification
         run: |
+          chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh

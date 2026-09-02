@@ -17,6 +17,7 @@ jobs:
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Verify Arch Pacman & Contrib Engine
+      - name: Run Arch Pacman Verification
         run: |
-          cargo test --lib -- sigpkg::arch_pacman_engine
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
