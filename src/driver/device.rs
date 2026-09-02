@@ -540,6 +540,7 @@ impl DeviceCapability {
 pub struct DeviceDescriptor {
     pub id: usize,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub device_type: DeviceType,
     pub capability: DeviceCapability,
     pub state: AtomicUsize, // DeviceState as usize
@@ -562,11 +563,19 @@ impl DeviceDescriptor {
         DeviceDescriptor {
             id,
             name: name_array,
+            name_len: len as u8,
             device_type,
             capability,
             state: AtomicUsize::new(DeviceState::Uninitialized as usize),
             reference_count: AtomicUsize::new(0),
         }
+    }
+
+    pub fn name(&self) -> &[u8] {
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every device lookup by name,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     pub fn get_state(&self) -> DeviceState {
@@ -1333,8 +1342,7 @@ impl DeviceManager {
             if let Some(desc_ptr) = desc_option {
                 let ptr: *mut DeviceDescriptor = desc_ptr.as_ptr();
                 let desc: &DeviceDescriptor = unsafe { &*ptr };
-                let desc_name_len = desc.name.iter().position(|&b| b == 0).unwrap_or(64);
-                if &desc.name[..desc_name_len] == name {
+                if desc.name() == name {
                     return Some(id);
                 }
             }
