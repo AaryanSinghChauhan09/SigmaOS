@@ -17,6 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)
 
 // SigmaOS Package Module
+pub mod alpine_apk;
 pub mod apm;
 pub mod arch_aur;
 pub mod aur_integration;
@@ -34,6 +35,7 @@ pub mod gentoo_portage;
 pub mod hardening;
 pub mod linux_translation;
 pub mod manager;
+pub mod nix_guix;
 pub mod paccache;
 pub mod pactree;
 pub mod repository;
@@ -46,10 +48,12 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 
+pub use alpine_apk::{ApkPackageManager, ApkPackage, ApkRepository, ApkWorld};
 pub use arch_aur::{SigmaAUR, AURPackage, PKGBUILD, BuildError};
 pub use debian_apt::{SigmaAPT, AptPackage, SourcesEntry, AptDatabase, AptError};
 pub use fedora_dnf::{SigmaDNF, DnfPackage, Transaction, TransactionOperation, Repository, DnfError};
 pub use gentoo_portage::{SigmaPortage, Ebuild, UseFlag, UseFlagType, UseFlagManager, PortageTree, PackageDatabase, ProfileManager, PortageError};
+pub use nix_guix::{NixPackageManager, StorePath, SystemGeneration, Derivation, EnvironmentScrubber};
 pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
 pub use pactree::{PactreeEngine, DependencyNode};
 pub use bsd_linux_package_innovations::{

@@ -39,10 +39,12 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod visual_dashboard;
+pub mod void_runit;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_system_innovations;
 
 pub use clear_linux::{ClearLinuxStatelessEngine, ConfigState, ConfigLocation, SwupdBundle, SwupdUpdateManager};
+pub use void_runit::{RunitSupervisor, RunitService, RunitStage, ServiceState as RunitServiceState};
 pub use compliance::{ComplianceAuditLogger, ComplianceAuditEvent, ComplianceFramework, TpmAttestationManager, TpmPcrMeasurement};
 pub use visual_dashboard::{VisualDashboardManager, FirewallPolicy, FirewallAction, VpnTunnel, VpnType, VpnStatus, ProcessCapability, HardwareTelemetry};
 pub use sovereign_system_innovations::{
