@@ -139,6 +139,40 @@ This document serves as the master engineering roadmap to systematically resolve
 
 ---
 
+## 🚨 0.3.1 Ranked Gap Analysis: SigmaOS vs Linux & BSD
+
+### 🚨 Critical Gaps (Must Close First)
+- **Demand Paging & Swapping**: SigmaOS requires mature demand paging and swap management to match Linux page caching and FreeBSD UVM memory management.
+- **Dynamic Hotplugging**: Parity with Linux `udev` and FreeBSD `devd` for real-time USB, PCI, and NVMe device detection.
+- **Multicore Interrupt Balancing**: APIC/ACPI interrupt routing load-balancing across multi-core NUMA topologies.
+- **Application Ecosystem**: Standalone package distribution readiness via `UniversalPackageImporter` and `sigpkg`.
+
+---
+
+### ⚡ Important Gaps (Next Priority)
+- **Fault Tolerance**: Task orchestration for burst-parallel workloads under heavy multi-core stress.
+- **Enterprise Integration**: Authentication hooks for Active Directory, LDAP, Kerberos, and compliance certifications.
+- **Documentation & Governance**: Structured handbooks matching the FreeBSD Handbook and Linux man pages.
+
+---
+
+### 🌀 Optional Gaps (Long-term Polish)
+- **Proc Start-up Scaling**: Sub-10ms cold start scaling for large-scale container workloads.
+- **Community Ecosystem**: Expanding contributor base through verified compliance modules.
+- **UI/UX Consistency**: Adaptive desktop overlays (Zenith) matching modern desktop expectations.
+
+---
+
+### 📊 Ranked Gap Dashboard Summary
+
+| Tier | Gap Area | Competitor Strength | SigmaOS Opportunity |
+| :--- | :--- | :--- | :--- |
+| **Critical** | Memory Mgmt, Hotplugging, Interrupts, App Ecosystem | Mature VM, udev/devd, SMP, rich packages | Demand paging, udev/devd parity, APIC balancing, sigpkg apps |
+| **Important** | Fault Tolerance, Enterprise, Docs | Robust orchestration, AD/LDAP, handbooks | Task resilience, AD/LDAP hooks, compliance handbook |
+| **Optional** | Proc Scaling, Community, UI | Large scaling, strong communities, polished UX | Workload scaling, contributor verification, Zenith overlays |
+
+---
+
 ## ⚔️ 0.4 SigmaOS Battle Plan & Dependency Flowchart
 
 ### ⚔️ Stage-by-Stage Battle Plan

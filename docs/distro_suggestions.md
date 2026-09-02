@@ -40,6 +40,11 @@ This document compiles key architectural strengths, design paradigms, and featur
 - **Environment Scrubbing (`scrub_environment`)**: Automatic removal of non-deterministic host environment variables (`USER`, `HOSTNAME`, `TZ`, `PWD`, `HOME`).
 - **Diffoscope-Style Byte Diagnostics (`audit_reproducibility`)**: Bit-for-bit offset analysis reporting hex discrepancies across independent package builds.
 
+### 🎯 9. Ranked Gap Resolution Strategy
+- **Critical (Tier 1)**: Demand paging, `udev`/`devd` hotplugging parity, APIC interrupt load balancing, and `sigpkg` app distribution.
+- **Important (Tier 2)**: Burst-parallel fault tolerance, Active Directory/LDAP enterprise hooks, and structured handbooks.
+- **Optional (Tier 3)**: Process startup scaling, contributor community verification, and Zenith desktop UI consistency.
+
 ### 📦 9. Arch Linux pacman-contrib Suite
 - **Package Cache Purging (`PaccacheEngine`)**: Retains `keep_count` uninstalled package tarballs while purging stale cache files.
 - **Safe Update Scanning (`CheckupdatesEngine`)**: Scans repository index diffs without locking the primary package database.
