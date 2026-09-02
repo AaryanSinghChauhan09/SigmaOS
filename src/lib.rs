@@ -18,6 +18,7 @@ pub mod driver;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
