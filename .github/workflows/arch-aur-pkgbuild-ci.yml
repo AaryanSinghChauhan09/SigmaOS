@@ -1,0 +1,22 @@
+name: Arch Linux PKGBUILD & AUR Helper CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  arch-pkgbuild-audit:
+    name: Arch Pacman & Contrib Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Arch Pacman & Contrib Engine
+        run: |
+          cargo test --lib -- sigpkg::arch_pacman_engine
