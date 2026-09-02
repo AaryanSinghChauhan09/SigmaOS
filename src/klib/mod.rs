@@ -34,6 +34,7 @@ pub mod random;
 pub mod ring_buffer;
 pub mod ringbuf;
 pub mod rng;
+pub mod sigma_string_utils;
 pub mod sigmalib;
 pub mod slab;
 pub mod static_hashmap;

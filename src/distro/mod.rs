@@ -1,4 +1,5 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch_inspirations;
 pub mod arch_parity;
 pub mod certification;
 pub mod chakra_parity;
@@ -13,6 +14,7 @@ pub mod endeavour_os;
 pub mod enterprise;
 pub mod fedora_parity;
 pub mod gentoo;
+pub mod gentoo_inspirations;
 pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_inspirations;
@@ -36,6 +38,7 @@ pub use garuda_nomad_innovations::{
 pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
+pub mod nixos_inspirations;
 pub mod parity;
 pub mod power_network_tools;
 pub mod missing_distro_innovations;

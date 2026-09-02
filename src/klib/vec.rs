@@ -14,6 +14,8 @@ pub struct Vec<T> {
 impl<T: PartialEq> Vec<T> {
     pub fn contains(&self, item: &T) -> bool {
         for i in 0..self.len {
+            // SAFETY: `i` is always in `0..self.len`, and `self.data` points to a valid,
+            // initialised allocation of at least `self.len` elements.
             unsafe {
                 if &*self.data.add(i) == item {
                     return true;
@@ -38,6 +40,8 @@ impl<T> Vec<T> {
             return Self::new();
         }
         let size = mem::size_of::<T>() * capacity;
+        // SAFETY: `size` is non-zero (capacity > 0 and size_of::<T>() >= 1 for non-ZST).
+        // The returned pointer is either null (checked by callers) or valid for `size` bytes.
         let new_data = unsafe { alloc(size) as *mut T };
         Vec {
             data: new_data,
@@ -48,6 +52,7 @@ impl<T> Vec<T> {
 
     pub fn reserve(&mut self, additional: usize) {
         if self.len + additional > self.capacity {
+            // SAFETY: delegated to `grow_to`, which validates allocation before use.
             unsafe {
                 self.grow_to(self.len + additional);
             }
@@ -55,6 +60,9 @@ impl<T> Vec<T> {
     }
 
     pub fn truncate(&mut self, new_len: usize) {
+        // SAFETY: `self.len - 1` is always in range because the while loop
+        // condition guards against underflow, and `self.data` is valid for
+        // indices `0..self.len`.
         unsafe {
             while self.len > new_len {
                 self.len -= 1;
@@ -64,6 +72,8 @@ impl<T> Vec<T> {
     }
 
     pub fn push(&mut self, item: T) {
+        // SAFETY: After `grow()` succeeds, `self.capacity > self.len`, so
+        // writing at `self.data.add(self.len)` is within the allocation.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -91,6 +101,8 @@ impl<T> Vec<T> {
         if self.len == 0 {
             &[]
         } else {
+            // SAFETY: `self.data` is non-null when `self.len > 0` (ensured by `push`/`grow`),
+            // is properly aligned for `T`, and covers exactly `self.len` initialised elements.
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -99,6 +111,8 @@ impl<T> Vec<T> {
         if self.len == 0 {
             &mut []
         } else {
+            // SAFETY: Same guarantees as `as_slice`; additionally no other
+            // reference to the same elements exists while this `&mut self` is live.
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
@@ -123,6 +137,9 @@ impl<T> Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: `index < self.len` is checked above; `self.data + index` is within
+        // the allocation. `copy_nonoverlapping` shifts elements left one position —
+        // valid because `i+1 <= self.len - 1` inside the loop.
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -139,6 +156,9 @@ impl<T> Vec<T> {
     {
         let mut write_idx = 0;
         for i in 0..self.len {
+            // SAFETY: `i` is in `0..self.len`; all accesses are within bounds.
+            // Elements that do not pass the predicate are dropped in place before
+            // `write_idx` advances, preventing double-free.
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
@@ -159,6 +179,8 @@ impl<T> Vec<T> {
     }
 
     pub fn clear(&mut self) {
+        // SAFETY: `i` is in `0..self.len`; each element is dropped exactly once
+        // and `self.len` is set to 0 so the destructor won't double-free.
         unsafe {
             for i in 0..self.len {
                 core::ptr::drop_in_place(self.data.add(i));
@@ -169,6 +191,8 @@ impl<T> Vec<T> {
 
     pub fn get(&self, index: usize) -> Option<&T> {
         if index < self.len {
+            // SAFETY: `index < self.len` guarantees the pointer is within bounds
+            // and the element is initialised.
             unsafe { Some(&*self.data.add(index)) }
         } else {
             None
@@ -177,6 +201,8 @@ impl<T> Vec<T> {
 
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         if index < self.len {
+            // SAFETY: Same as `get`; additionally the exclusive borrow of `self`
+            // ensures no aliasing.
             unsafe { Some(&mut *self.data.add(index)) }
         } else {
             None
@@ -187,6 +213,8 @@ impl<T> Vec<T> {
         if self.len == 0 {
             None
         } else {
+            // SAFETY: `self.len > 0` so `self.len - 1` is a valid, initialised index.
+            // After decrement, the element at that position is logically removed.
             unsafe {
                 self.len -= 1;
                 Some(core::ptr::read(self.data.add(self.len)))
@@ -198,6 +226,9 @@ impl<T> Vec<T> {
         if index > self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: After optional growth, `self.capacity > self.len`.  The loop shifts
+        // elements to the right making space at `index`.  All accesses are within
+        // `0..=self.len` which is covered by the allocation.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -245,6 +276,9 @@ impl<T> Vec<T> {
             return;
         }
         self.reserve(other.len());
+        // SAFETY: `reserve` ensures `self.data.add(self.len)` through
+        // `self.data.add(self.len + other.len())` is within the allocation.
+        // `T: Copy` means no drop glue is needed for the source elements.
         unsafe {
             core::ptr::copy_nonoverlapping(
                 other.as_ptr(),
@@ -255,6 +289,12 @@ impl<T> Vec<T> {
         }
     }
 
+    // SAFETY contract for `grow` and `grow_to`:
+    // • The allocation returned by `alloc` is valid for `new_capacity * size_of::<T>()` bytes.
+    // • If `new_data` is null the grow is silently skipped (out-of-memory path; callers
+    //   should handle or panic after the call).
+    // • Old elements are moved via `copy_nonoverlapping` (valid because they are `T`-aligned)
+    //   and the old allocation is freed only after the copy.
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -265,9 +305,13 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow_to(&mut self, new_capacity: usize) {
+        // SAFETY: `new_capacity * size_of::<T>()` is the correct byte count.
+        // If the allocator returns null we leave the vec unchanged (capacity stays).
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             if self.capacity > 0 && !self.data.is_null() {
+                // SAFETY: `self.data..self.data+self.len` and `new_data..new_data+self.len`
+                // do not overlap because they come from distinct allocations.
                 for i in 0..self.len {
                     core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
                 }
@@ -368,6 +412,10 @@ impl<T> Iterator for VecIntoIter<T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.vec.len {
+            // SAFETY: `self.index < self.vec.len` guarantees the element is
+            // initialised. `ptr::read` moves ownership to the caller; the
+            // element at `self.index` must not be dropped again (ensured by
+            // the `Drop` impl which only drops `self.index..self.vec.len`).
             unsafe {
                 let item = core::ptr::read(self.vec.data.add(self.index));
                 self.index += 1;
@@ -381,6 +429,10 @@ impl<T> Iterator for VecIntoIter<T> {
 
 impl<T> Drop for VecIntoIter<T> {
     fn drop(&mut self) {
+        // SAFETY: Elements in `self.index..self.vec.len` have not been moved
+        // out yet (they were not yielded by `next`) and must be dropped.
+        // Setting `self.vec.len = 0` prevents the Vec's own destructor from
+        // dropping them a second time.
         unsafe {
             for i in self.index..self.vec.len {
                 core::ptr::drop_in_place(self.vec.data.add(i));
@@ -429,6 +481,9 @@ impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.vec.len() {
+            // SAFETY: `self.index < self.vec.len()` guarantees bounds; the
+            // lifetime `'a` is tied to the originating `&Vec`, ensuring no
+            // concurrent mutation.
             let item = unsafe { &*self.vec.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -449,6 +504,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.len {
+            // SAFETY: `self.index < self.len` guarantees bounds.
+            // `PhantomData<&'a mut T>` encodes the exclusive-borrow invariant;
+            // no two `next()` calls yield overlapping references.
             let item = unsafe { &mut *self.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -464,6 +522,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: `index < self.len` is checked above.
         unsafe { &*self.data.add(index) }
     }
 }
@@ -473,6 +532,7 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
         if index >= self.len {
             panic!("index out of bounds");
         }
+        // SAFETY: `index < self.len` is checked above; exclusive borrow prevents aliasing.
         unsafe { &mut *self.data.add(index) }
     }
 }
@@ -480,6 +540,9 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 && !self.data.is_null() {
+            // SAFETY: Each element in `0..self.len` is initialised and dropped exactly
+            // once here.  The allocation is then freed.  `self.capacity > 0 &&
+            // !self.data.is_null()` guards against double-free on zero-capacity vecs.
             unsafe {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
@@ -501,6 +564,9 @@ impl<'a, T> Iterator for Drain<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.start < self.end {
+            // SAFETY: `self.start` is in `original_start..self.end`, which is a
+            // sub-range of `0..self.vec.len`.  `ptr::read` transfers ownership;
+            // the `Drop` impl for `Drain` will not drop these elements again.
             unsafe {
                 self.start += 1;
                 Some(core::ptr::read(self.vec.data.add(self.start - 1)))
@@ -513,6 +579,9 @@ impl<'a, T> Iterator for Drain<'a, T> {
 
 impl<'a, T> Drop for Drain<'a, T> {
     fn drop(&mut self) {
+        // SAFETY: Elements from `self.start` to `self.end` that were not
+        // consumed by `next()` are dropped here.  Then the tail
+        // (`self.end..self.vec.len`) is shifted left to close the gap.
         unsafe {
             for i in self.start..self.end {
                 core::ptr::drop_in_place(self.vec.data.add(i));
