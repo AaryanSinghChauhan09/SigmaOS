@@ -561,12 +561,6 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
     }
 }
 
-// =========================================================================
-// ZenithNet: Post-Quantum Zero-Trust Network Router Shard
-// Inspired by WireGuard stateless Noise protocol handshakes, stateful packet filtering,
-// and iptables sliding-window rate limiters.
-// =========================================================================
-
 #[cfg(test)]
 mod tests {
     use super::*;
