@@ -1023,6 +1023,7 @@ mod tests {
     #[test]
     fn test_sovereign_distro_dominance_suite_matrix() {
         let mut suite = SovereignDistroDominanceSuite::new();
+        suite.security_sentinel.pledge(&["stdio"]);
         assert!(suite.execute_distro_dominance_matrix());
     }
 }

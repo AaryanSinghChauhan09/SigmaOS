@@ -140,8 +140,8 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use vm_manager::{
-        KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
-        VmConfig, VmState, HypervisorBackend,
+        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
+        VirtioNetDeviceConfig, VmConfig, VmState,
     };
 
     let mut kvm = KvmHypervisor::new();

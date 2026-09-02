@@ -672,6 +672,8 @@ impl UniversalPackageAdapter {
     ) -> Result<Package, &'static str> {
         let cleaned_ver = if version_str.contains('-') {
             version_str.split('-').next().unwrap()
+        } else if version_str.contains('_') {
+            version_str.split('_').next().unwrap()
         } else {
             version_str
         };
@@ -995,11 +997,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = super::universal_oop_system::StandardPackage {
             metadata: super::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::Version::new(
-                    native_pkg.version.major,
-                    native_pkg.version.minor,
-                    native_pkg.version.patch,
-                ),
+                version: native_pkg.version,
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1094,7 +1092,7 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
-        if name.contains("libc") || name == "glibc" || name.contains("musl") {
+        if name.starts_with("so:libc.") || name.starts_with("so:libc") {
             return "libc".to_string();
         }
         match name.as_str() {

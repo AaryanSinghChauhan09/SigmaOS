@@ -649,7 +649,7 @@ impl QubesZeroTrustParitySuite {
     }
 
     pub fn is_qubes_parity_fulfilled(&self) -> bool {
-        let has_screen = self.gui_blitter.screen_width > 0;
+        let has_screen = self.gui_blitter.screen_width > 0 && self.gui_blitter.screen_height > 0;
         let policy_active = true;
         has_screen && policy_active
     }
