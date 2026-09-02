@@ -2,8 +2,10 @@
 pub mod arch_parity;
 pub mod certification;
 pub mod chakra_parity;
+pub mod clear_linux;
 pub mod community;
 pub mod compat_layers;
+pub mod compliance;
 pub mod debian_parity;
 pub mod developer;
 pub mod ecosystem_dimensions;
@@ -17,12 +19,19 @@ pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 pub mod linux_bsd_distro_gaps;
+pub mod garuda_nomad_innovations;
 
 pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
     SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
     WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+};
+
+pub use garuda_nomad_innovations::{
+    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
+    ZfsPoolState, ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;
 pub mod manjaro;
@@ -36,9 +45,15 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
+pub mod visual_dashboard;
+pub mod void_runit;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_system_innovations;
 
+pub use clear_linux::{ClearLinuxStatelessEngine, ConfigState, ConfigLocation, SwupdBundle, SwupdUpdateManager};
+pub use void_runit::{RunitSupervisor, RunitService, RunitStage, ServiceState as RunitServiceState};
+pub use compliance::{ComplianceAuditLogger, ComplianceAuditEvent, ComplianceFramework, TpmAttestationManager, TpmPcrMeasurement};
+pub use visual_dashboard::{VisualDashboardManager, FirewallPolicy, FirewallAction, VpnTunnel, VpnType, VpnStatus, ProcessCapability, HardwareTelemetry};
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
     GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler, UnifiedFirewallVpnOrchestrator,
@@ -47,7 +62,8 @@ pub use sovereign_system_innovations::{
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
-    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
+    SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -70,6 +86,12 @@ pub use developer::{
 pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
+pub use gentoo::{
+    BuildError, BuildSpec, CatalystStage, CpuOptimizationDetector, EapiPhase, FeatureSet,
+    GentooCatalystStageBuilder, GentooDistfilesDigestEngine, GentooKeywordsAcceptanceEngine,
+    KeywordStatus, ManifestEntry, ManifestEntryType, OpenRcRunlevel, OpenRcRunlevelSupervisor,
+    PortageEapi8PhaseEngine, SigmaBuildGraph, UseFlag,
+};
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
@@ -79,9 +101,10 @@ pub use linux_bsd_parity_extended::{
     SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
+    AdminAction, AiSysAdmin, AtomicTrampolineGenerator, IntegrityState,
+    KernelPatchVerificationEngine, LivepatchArchitecture, LivepatchManager, LivepatchPatch,
+    NetplanConfig, NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    ThreadStackConsistencyChecker, TimeTravelCheckpoint, TimeTravelEngine,
 };
 pub use parity::{
     AppBundleRuntime, BundleError, ChannelManager, CpuArchitecture, HalError,
@@ -116,10 +139,10 @@ pub use ready_to_use::{
 };
 
 pub use missing_distro_innovations::{
-    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
     BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
-    SmartOsZoneEngine,
+    SmartOsZoneEngine, ComponentParityStatus, MissingDistroComponentsEngine,
 };
 
 pub use linux_bsd_inspirations::{
@@ -149,5 +172,14 @@ pub use sovereign_distro_dominance::{
 };
 
 pub mod void_xbps_src;
+pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub use nextgen_innovations::{
+    SigmaHyperKernel, PredictedTask, WorkloadLatencyClass, SigmaCacheFlow, AdaptiveCacheModule,
+    SigmaVector, SimdInstructionSet, SigmaThermal, ThermalGovernorState, SigmaMod,
+    KernelModuleHeader, SigmaContainer, NativeContainerSpec, SigmaProfile, OperatingProfileKind,
+    SigmaLayer, OSLayer, SigmaLink, NetworkMediaKind, SigmaEdgeNet, SigmaSecureNet, SigmaCollab,
+    CollabWorkspacePeer, SigmaAssist, TroubleshootingDiagnostic, SigmaRollback, SystemSnapshot,
+    SigmaDoc, DocumentationTopic, SigmaRescue,
+};

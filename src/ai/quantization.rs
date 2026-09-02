@@ -7,6 +7,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum TensorDtype {
     Fp32,
     Fp16,
@@ -16,6 +17,7 @@ pub enum TensorDtype {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum ComputeDeviceTarget {
     CPU,
     CpuSimd,

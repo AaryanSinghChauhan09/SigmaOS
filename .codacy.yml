@@ -1,6 +1,0 @@
----
-engines:
-  pmd:
-    enabled: false
-  eslint:
-    enabled: false

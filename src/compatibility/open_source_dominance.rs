@@ -89,6 +89,18 @@ impl InspirationFeatureMatrix {
             is_enabled: true,
             description: "ReactOS / Wine PE binary loader and GDI/User32 translation".to_string(),
         });
+        self.features.push(InspirationFeature {
+            name: "QEMU/KVM Hypervisor Core".to_string(),
+            tier: OpenSourceInspirationTier::LinuxKernel,
+            is_enabled: true,
+            description: "QEMU VirtIO device virtualization and KVM dirty-ring tracking".to_string(),
+        });
+        self.features.push(InspirationFeature {
+            name: "WireGuard Mesh VPN".to_string(),
+            tier: OpenSourceInspirationTier::LinuxKernel,
+            is_enabled: true,
+            description: "WireGuard Noise protocol peer-to-peer crypto mesh tunneling".to_string(),
+        });
     }
 
     pub fn is_feature_active(&self, feature_name: &str) -> bool {
@@ -239,9 +251,10 @@ mod tests {
     fn test_inspiration_feature_matrix() {
         let matrix = InspirationFeatureMatrix::new();
         assert!(matrix.is_feature_active("OpenBSD Pledge & Unveil"));
+        assert!(matrix.is_feature_active("WireGuard Mesh VPN"));
         assert_eq!(
             matrix.count_features_by_tier(OpenSourceInspirationTier::LinuxKernel),
-            1
+            3
         );
         assert_eq!(
             matrix.count_features_by_tier(OpenSourceInspirationTier::FreeBsd),

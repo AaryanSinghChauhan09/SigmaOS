@@ -525,11 +525,11 @@ impl ArchCompatibilityTest {
 
 ## Best Practices
 
-1. **Follow Arch Philosophy**: Keep it simple, user-centric, and minimalist
-2. **Rolling Release**: Maintain continuous updates without major version bumps
-3. **User Repositories**: Support user-created repositories and AUR-like functionality
-4. **Binary Transparency**: Provide clear package signing and verification
-5. **Documentation**: Maintain comprehensive, community-driven documentation
+1.  **Follow Arch Philosophy**: Keep it simple, user-centric, and minimalist
+2.  **Rolling Release**: Maintain continuous updates without major version bumps
+3.  **User Repositories**: Support user-created repositories and AUR-like functionality
+4.  **Binary Transparency**: Provide clear package signing and verification
+5.  **Documentation**: Maintain comprehensive, community-driven documentation
 
 ## Migration Tools
 
@@ -570,8 +570,8 @@ impl ArchMigrationAssistant {
 
 ## References
 
-- [Arch Linux Philosophy](https://wiki.archlinux.org/title/Arch_Linux_Philosophy)
-- [pacman(8)](https://man.archlinux.org/man/pacman.8)
-- [makepkg(8)](https://man.archlinux.org/man/makepkg.8)
-- [PKGBUILD(5)](https://man.archlinux.org/man/PKGBUILD.5)
-- [Arch User Repository](https://wiki.archlinux.org/title/Arch_User_Repository)
+*   [Arch Linux Philosophy](https://wiki.archlinux.org/title/Arch_Linux_Philosophy)
+*   [pacman(8)](https://man.archlinux.org/man/pacman.8)
+*   [makepkg(8)](https://man.archlinux.org/man/makepkg.8)
+*   [PKGBUILD(5)](https://man.archlinux.org/man/PKGBUILD.5)
+*   [Arch User Repository](https://wiki.archlinux.org/title/Arch_User_Repository)

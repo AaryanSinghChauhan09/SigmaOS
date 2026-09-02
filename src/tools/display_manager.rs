@@ -5,8 +5,6 @@ use alloc::vec::Vec;
 // Display Manager (GDM/LightDM Inspiration)
 // Login screen, session management, and display server spawning
 
-use crate::klib::{String, Vec};
-
 /// Session type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionType {
@@ -82,12 +80,6 @@ impl MdmGreeterTheme {
     }
 }
 
-impl Default for MdmGreeterTheme {
-    fn default() -> Self {
-        Self::new("Mint-MDM-Default", GreeterEngineStyle::Html5WebKit)
-    }
-}
-
 /// User Face Avatar & Session Memory Store
 #[derive(Debug, Clone)]
 pub struct UserSessionMemory {
@@ -97,7 +89,6 @@ pub struct UserSessionMemory {
 }
 
 /// On-Screen Accessibility Keyboard & High-Contrast Greeter Overlay
-#[derive(Debug, Clone)]
 pub struct GreeterAccessibilityOverlay {
     pub onscreen_keyboard_enabled: bool,
     pub high_contrast_enabled: bool,
@@ -118,12 +109,6 @@ impl GreeterAccessibilityOverlay {
     }
 }
 
-impl Default for GreeterAccessibilityOverlay {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Display manager
 pub struct DisplayManager {
     pub sessions: Vec<Session>,
@@ -141,10 +126,7 @@ impl DisplayManager {
             users: Vec::new(),
             autologin: None,
             current_session: None,
-            active_greeter_theme: Some(MdmGreeterTheme::new(
-                "Mint-HTML5-Default",
-                GreeterEngineStyle::Html5WebKit,
-            )),
+            active_greeter_theme: Some(MdmGreeterTheme::new("Mint-HTML5-Default", GreeterEngineStyle::Html5WebKit)),
             accessibility_overlay: GreeterAccessibilityOverlay::new(),
         }
     }
@@ -236,12 +218,5 @@ mod tests {
         assert!(!overlay.onscreen_keyboard_enabled);
         overlay.toggle_onscreen_keyboard();
         assert!(overlay.onscreen_keyboard_enabled);
-        let theme = MdmGreeterTheme::default();
-        assert_eq!(theme.name, "Mint-MDM-Default");
-
-        let mut a11y = GreeterAccessibilityOverlay::default();
-        assert!(!a11y.high_contrast_enabled);
-        a11y.high_contrast_enabled = true;
-        assert!(a11y.high_contrast_enabled);
     }
 }

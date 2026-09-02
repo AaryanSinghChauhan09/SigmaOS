@@ -344,6 +344,88 @@ impl OpenBsdPledge {
     }
 }
 
+// =========================================================================
+// EBPF XDP FAST PACKET ENGINE (LINUX XDP & FREEBSD NETMAP ZERO-COPY PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EbpfXdpAction {
+    Aborted = 0,
+    Drop = 1,
+    Pass = 2,
+    Tx = 3,
+    Redirect = 4,
+}
+
+#[derive(Debug, Clone)]
+pub struct EbpfXdpProgram {
+    pub name: String,
+    pub instructions: Vec<u64>,
+}
+
+impl EbpfXdpProgram {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            instructions: Vec::new(),
+        }
+    }
+
+    pub fn execute(&self, packet_data: &[u8]) -> EbpfXdpAction {
+        if packet_data.is_empty() {
+            return EbpfXdpAction::Drop;
+        }
+        if packet_data.len() > 14 && packet_data[0] == 0xFF && packet_data[1] == 0xFF {
+            return EbpfXdpAction::Drop;
+        }
+        EbpfXdpAction::Pass
+    }
+}
+
+pub struct EbpfXdpFastPacketEngine {
+    pub active_program: Option<EbpfXdpProgram>,
+    pub rx_ring_buffer: Vec<Vec<u8>>,
+    pub total_processed: u64,
+    pub total_dropped: u64,
+}
+
+impl EbpfXdpFastPacketEngine {
+    pub fn new() -> Self {
+        Self {
+            active_program: None,
+            rx_ring_buffer: Vec::new(),
+            total_processed: 0,
+            total_dropped: 0,
+        }
+    }
+
+    pub fn attach_xdp_program(&mut self, program: EbpfXdpProgram) {
+        self.active_program = Some(program);
+    }
+
+    pub fn process_rx_packet(&mut self, packet_data: &[u8]) -> EbpfXdpAction {
+        self.total_processed += 1;
+        let action = if let Some(ref prog) = self.active_program {
+            prog.execute(packet_data)
+        } else {
+            EbpfXdpAction::Pass
+        };
+
+        if action == EbpfXdpAction::Drop || action == EbpfXdpAction::Aborted {
+            self.total_dropped += 1;
+        } else if action == EbpfXdpAction::Pass {
+            self.rx_ring_buffer.push(packet_data.to_vec());
+        }
+        action
+    }
+}
+
+impl Default for EbpfXdpFastPacketEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 1. Linux `perf_event_open` Hardware PMU Performance Counters
 // ============================================================================
@@ -4343,11 +4425,7 @@ impl LinuxLandlockLsmRuleEngine {
         }
     }
 
-    pub fn add_path_benefit(
-        &mut self,
-        path: &str,
-        allowed_access: u32,
-    ) -> Result<(), &'static str> {
+    pub fn add_path_benefit(&mut self, path: &str, allowed_access: u32) -> Result<(), &'static str> {
         if self.is_enforced {
             return Err("Landlock LSM rules locked; cannot add path rule post-enforcement");
         }
@@ -4398,11 +4476,7 @@ impl FreeBsdCapsicumEngine {
         self.in_capability_mode = true;
     }
 
-    pub fn limit_descriptor_rights(
-        &mut self,
-        fd: u32,
-        rights_mask: u64,
-    ) -> Result<(), &'static str> {
+    pub fn limit_descriptor_rights(&mut self, fd: u32, rights_mask: u64) -> Result<(), &'static str> {
         if let Some(&existing) = self.descriptor_rights.get(&fd) {
             if (existing & rights_mask) != rights_mask {
                 return Err("Capsicum: Cannot escalate descriptor rights in capability mode");
@@ -4458,14 +4532,11 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn register_service(&mut self, name: &str, pid: u32) {
-        self.services.insert(
-            name.to_string(),
-            VoidRunitService {
-                name: name.to_string(),
-                pid,
-                is_active: true,
-            },
-        );
+        self.services.insert(name.to_string(), VoidRunitService {
+            name: name.to_string(),
+            pid,
+            is_active: true,
+        });
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {
@@ -4478,10 +4549,7 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn is_service_active(&self, name: &str) -> bool {
-        self.services
-            .get(name)
-            .map(|s| s.is_active)
-            .unwrap_or(false)
+        self.services.get(name).map(|s| s.is_active).unwrap_or(false)
     }
 }
 
@@ -4522,13 +4590,11 @@ impl IntelClearLinuxStatelessEngine {
     }
 
     pub fn register_default_config(&mut self, path: &str, content: &str) {
-        self.usr_share_defaults
-            .insert(path.to_string(), content.to_string());
+        self.usr_share_defaults.insert(path.to_string(), content.to_string());
     }
 
     pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.etc_user_overrides
-            .insert(path.to_string(), content.to_string());
+        self.etc_user_overrides.insert(path.to_string(), content.to_string());
     }
 
     pub fn resolve_config(&self, path: &str) -> Option<String> {
@@ -4588,11 +4654,7 @@ impl OpenSuseSnapperEngine {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: u64) -> Result<u64, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.id == id)
-            .ok_or("Snapper: Target snapshot not found")?;
+        let snap = self.snapshots.iter().find(|s| s.id == id).ok_or("Snapper: Target snapshot not found")?;
         self.active_snapshot_id = id;
         Ok(snap.root_block_hash)
     }
@@ -4616,9 +4678,7 @@ mod linux_bsd_extra_tests {
     #[test]
     fn test_freebsd_capsicum_engine() {
         let mut capsicum = FreeBsdCapsicumEngine::new();
-        capsicum
-            .limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG)
-            .unwrap();
+        capsicum.limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG).unwrap();
         capsicum.enter_capability_mode();
 
         assert!(capsicum.check_descriptor_right(3, CAP_READ_FLAG));
@@ -4639,22 +4699,13 @@ mod linux_bsd_extra_tests {
     fn test_intel_clear_linux_stateless() {
         let mut stateless = IntelClearLinuxStatelessEngine::new();
         stateless.register_default_config("/etc/hostname", "sigma-default");
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-default"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
 
         stateless.set_user_override("/etc/hostname", "sigma-custom");
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-custom"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-custom");
 
         stateless.reset_etc_to_stateless();
-        assert_eq!(
-            stateless.resolve_config("/etc/hostname").unwrap(),
-            "sigma-default"
-        );
+        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
     }
 
     #[test]

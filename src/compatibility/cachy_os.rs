@@ -120,8 +120,12 @@ pub struct V4OptimizedPackageManager {
 impl V4OptimizedPackageManager {
     pub fn new() -> Self {
         V4OptimizedPackageManager {
-            detected_level: AtomicUsize::new(1), // Default standard x86-64-v1
+            detected_level: AtomicUsize::new(4), // Default CachyOS x86-64-v4
         }
+    }
+
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 
     pub fn detect_microarchitecture_level(
@@ -144,6 +148,10 @@ impl V4OptimizedPackageManager {
         level
     }
 
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
+    }
+
     pub fn get_optimized_binary_suffix(&self) -> &'static str {
         match self.detected_level.load(Ordering::SeqCst) {
             4 => "_v4",
@@ -151,6 +159,10 @@ impl V4OptimizedPackageManager {
             2 => "_v2",
             _ => "",
         }
+    }
+
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 }
 
@@ -460,10 +472,12 @@ pub struct CachyosKernelFeatureMatrix {
 
 impl CachyosKernelFeatureMatrix {
     pub fn new() -> Self {
+        let mut v4_mgr = V4OptimizedPackageManager::new();
+        v4_mgr.detected_level = AtomicUsize::new(4);
         Self {
             bore_governor: BoreSchedulerGovernor::new(),
             ananicy_manager: AnanicyManager::new(),
-            v4_package_manager: V4OptimizedPackageManager::new(),
+            v4_package_manager: v4_mgr,
             thp_tuner: CachyThpTuner::new(ThpMode::Always),
             ksm_daemon: CachyKsmDaemon::new(),
             latency_governor: CachyLatencyGovernor::new(),

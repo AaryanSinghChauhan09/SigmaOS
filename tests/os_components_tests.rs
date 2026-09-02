@@ -6,6 +6,12 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[path = "../src/ipc/pipes.rs"]
+mod pipes;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/storage/geom.rs"]
+mod geom;
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
 #[path = "../src/compatibility/bsd.rs"]
@@ -22,12 +28,8 @@ mod pipes;
 mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
 mod video_editor;
-#[path = "../src/distro"]
-pub mod distro {
-    pub mod linux_bsd_inspirations;
-    pub mod sovereign_distro_dominance;
-    pub mod universal_distro_super_matrix;
-}
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
 use distro::linux_bsd_inspirations as distro_inspirations;
 #[path = "../src/access/control.rs"]
 mod access_control;
@@ -53,8 +55,13 @@ mod ext4_ntfs_security;
 mod fedora_compat;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
-#[path = "../src/package/universal.rs"]
-pub mod package;
+#[path = "../src/package"]
+pub mod package {
+    pub mod bsd_linux_package_innovations;
+    #[path = "universal.rs"]
+    pub mod universal;
+    pub use universal::*;
+}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 #[path = "../src/security/mod.rs"]
@@ -65,6 +72,10 @@ mod segmentation_paging;
 mod sigma_fs_extended;
 #[path = "../src/tools/sigmatools.rs"]
 mod sigmatools;
+#[path = "../src/init/systemd_init.rs"]
+pub mod systemd_init;
+#[path = "../src/expanded_wiki_innovations.rs"]
+pub mod expanded_wiki_innovations;
 #[path = "../src/sigpkg/mod.rs"]
 mod sigpkg;
 #[path = "../src/dashboard/statutory_compliance.rs"]

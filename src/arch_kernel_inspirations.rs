@@ -16,10 +16,11 @@
 //   - arch-signoff                    -> `PackageSignoff`
 //   - arch-repro-status (reproducible)-> `ReproducibleBuildVerdict`
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -399,6 +400,13 @@ pub struct SecurityAdvisory {
     pub description: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VulnerabilityState {
+    Vulnerable,
+    Fixed,
+    Unaffected,
+}
+
 pub struct SecurityAdvisoryTracker {
     pub advisories: Vec<SecurityAdvisory>,
 }
@@ -446,20 +454,25 @@ impl SecurityAdvisoryTracker {
         upgrades
     }
 
-    /// Calculates cumulative CVSS risk score across all vulnerable advisories
-    pub fn calculate_total_risk_score(&self) -> u32 {
-        self.advisories
-            .iter()
-            .filter(|a| a.status == AdvisoryStatus::Vulnerable)
-            .map(|a| a.cvss_score)
-            .sum()
+    /// Evaluate vulnerability classification state for a given package version
+    pub fn evaluate_state(&self, package: &str, installed_version: &str) -> VulnerabilityState {
+        let affected_list = self.affected(package, installed_version);
+        if !affected_list.is_empty() {
+            VulnerabilityState::Vulnerable
+        } else if self.advisories.iter().any(|a| a.package == package && a.fixed_version.as_deref() == Some(installed_version)) {
+            VulnerabilityState::Fixed
+        } else {
+            VulnerabilityState::Unaffected
+        }
+    }
+
+    /// Query advisories matching target severity
+    pub fn by_severity(&self, severity: AdvisorySeverity) -> Vec<&SecurityAdvisory> {
+        self.advisories.iter().filter(|a| a.severity == severity).collect()
     }
 
     pub fn critical_count(&self) -> usize {
-        self.advisories
-            .iter()
-            .filter(|a| a.severity == AdvisorySeverity::Critical)
-            .count()
+        self.by_severity(AdvisorySeverity::Critical).len()
     }
 }
 
@@ -522,6 +535,7 @@ pub struct SignstarService {
     pub package: String,
     pub quorum_threshold: usize,
     pub fully_signed: bool,
+    pub threshold_signers_count: usize,
 }
 
 impl SignstarService {
@@ -531,15 +545,20 @@ impl SignstarService {
             package: package.to_string(),
             quorum_threshold: 1,
             fully_signed: false,
+            threshold_signers_count: 0,
         }
     }
 
-    pub fn with_quorum_threshold(mut self, threshold: usize) -> Self {
-        self.quorum_threshold = threshold;
-        self
+    pub fn set_threshold_count(&mut self, threshold: usize) {
+        self.threshold_signers_count = threshold;
     }
 
-    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy, key: SigningKey) {
+    pub fn verify_signature_threshold(&self) -> bool {
+        let total_signed = self.signers.iter().filter(|s| s.signed).count();
+        self.all_mandatory_signed() && total_signed >= self.threshold_signers_count
+    }
+
+    pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
         self.signers.push(Signer {
             id: id.to_string(),
             key,
@@ -651,6 +670,7 @@ pub struct MkinitcpioHookFramework {
     pub hooks: Vec<InitramfsHook>,
     pub compression: String,
     pub microcode: bool,
+    pub early_microcode_bytes: Vec<u8>,
 }
 
 impl MkinitcpioHookFramework {
@@ -659,7 +679,17 @@ impl MkinitcpioHookFramework {
             hooks: Vec::new(),
             compression: "lz4".to_string(),
             microcode: true,
+            early_microcode_bytes: Vec::new(),
         }
+    }
+
+    pub fn prepend_early_microcode(&mut self, microcode: &[u8]) {
+        self.early_microcode_bytes = microcode.to_vec();
+        self.microcode = !self.early_microcode_bytes.is_empty();
+    }
+
+    pub fn has_early_microcode(&self) -> bool {
+        !self.early_microcode_bytes.is_empty()
     }
 
     pub fn add_hook(&mut self, name: &str, actions: Vec<HookAction>) {
@@ -837,6 +867,9 @@ pub struct SignoffEntry {
     pub package: String,
     pub version: String,
     pub signoffs: SignoffCount,
+    pub qa_tested: bool,
+    pub build_reproducible: bool,
+    pub security_audited: bool,
 }
 
 pub struct PackageSignoff {
@@ -860,7 +893,27 @@ impl PackageSignoff {
                 maintainer: false,
                 community: 0,
             },
+            qa_tested: false,
+            build_reproducible: false,
+            security_audited: false,
         });
+    }
+
+    pub fn set_verification_flags(
+        &mut self,
+        package: &str,
+        qa_tested: bool,
+        build_reproducible: bool,
+        security_audited: bool,
+    ) -> bool {
+        if let Some(e) = self.entries.iter_mut().find(|e| e.package == package) {
+            e.qa_tested = qa_tested;
+            e.build_reproducible = build_reproducible;
+            e.security_audited = security_audited;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn sign(&mut self, package: &str, by_maintainer: bool) -> Option<bool> {
@@ -870,14 +923,15 @@ impl PackageSignoff {
         } else {
             e.signoffs.community += 1;
         }
-        Some(by_maintainer || e.signoffs.community >= self.required_signoffs)
+        Some(self.ready(package))
     }
 
     pub fn ready(&self, package: &str) -> bool {
-        self.entries
-            .iter()
-            .find(|e| e.package == package)
-            .map_or(false, |e| e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs)
+        self.entries.iter().find(|e| e.package == package).map_or(false, |e| {
+            let quorum_met = e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs;
+            let verifications_met = e.qa_tested && e.build_reproducible && e.security_audited;
+            quorum_met && verifications_met
+        })
     }
 }
 
@@ -902,43 +956,57 @@ pub enum ReproducibleStatus {
     NotBuilt,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DiscrepancyKind {
-    HeaderTimestampMismatch,
-    BuildPathMismatch,
-    UmaskMismatch,
-    EnvironmentVarMismatch,
-    BinaryDiffBitMismatch,
-    SizeMismatch,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ReproducibleAuditReport {
+pub struct ReproducibleBuildRecord {
     pub package: String,
     pub status: ReproducibleStatus,
-    pub build_a_hash: [u8; 32],
-    pub build_b_hash: [u8; 32],
-    pub discrepancies: Vec<DiscrepancyKind>,
     pub source_date_epoch: u64,
+    pub toolchain_version: String,
+    pub diff_hash: Option<String>,
 }
 
 pub struct ReproducibleBuildVerdict {
-    pub verdicts: Vec<(String, ReproducibleStatus)>,
-    pub audit_reports: Vec<ReproducibleAuditReport>,
-    pub source_date_epoch: u64,
+    pub records: Vec<ReproducibleBuildRecord>,
 }
 
 impl ReproducibleBuildVerdict {
     pub fn new() -> Self {
-        Self {
-            verdicts: Vec::new(),
-            audit_reports: Vec::new(),
-            source_date_epoch: 1700000000, // Normalized default epoch
-        }
+        Self { records: Vec::new() }
     }
 
     pub fn record(&mut self, package: &str, status: ReproducibleStatus) {
-        self.verdicts.push((package.to_string(), status));
+        self.records.push(ReproducibleBuildRecord {
+            package: package.to_string(),
+            status,
+            source_date_epoch: 1700000000,
+            toolchain_version: "rustc-1.98.0".to_string(),
+            diff_hash: if status == ReproducibleStatus::Unreproducible {
+                Some("diffoscope-sha256-mismatch".to_string())
+            } else {
+                None
+            },
+        });
+    }
+
+    pub fn record_detailed(
+        &mut self,
+        package: &str,
+        status: ReproducibleStatus,
+        source_date_epoch: u64,
+        toolchain: &str,
+        diff_hash: Option<&str>,
+    ) {
+        self.records.push(ReproducibleBuildRecord {
+            package: package.to_string(),
+            status,
+            source_date_epoch,
+            toolchain_version: toolchain.to_string(),
+            diff_hash: diff_hash.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn filter_by_status(&self, status: ReproducibleStatus) -> Vec<&ReproducibleBuildRecord> {
+        self.records.iter().filter(|r| r.status == status).collect()
     }
 
     /// Compare two binary build artifacts byte-by-byte and record diffoscope-style diagnostic audit
@@ -987,17 +1055,14 @@ impl ReproducibleBuildVerdict {
     }
 
     pub fn reproducible_count(&self) -> usize {
-        self.verdicts
-            .iter()
-            .filter(|(_, s)| *s == ReproducibleStatus::Reproducible)
-            .count()
+        self.filter_by_status(ReproducibleStatus::Reproducible).len()
     }
 
     pub fn ratio(&self) -> f32 {
-        if self.verdicts.is_empty() {
+        if self.records.is_empty() {
             return 0.0;
         }
-        self.reproducible_count() as f32 / self.verdicts.len() as f32
+        self.reproducible_count() as f32 / self.records.len() as f32
     }
 }
 
@@ -1081,6 +1146,34 @@ mod tests {
         assert!(eng.commit().is_ok());
         assert!(eng.installed.iter().any(|p| p.name == "app"));
         assert!(eng.installed.iter().any(|p| p.name == "libc"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_early_microcode_prepending() {
+        let mut framework = MkinitcpioHookFramework::new();
+        assert!(!framework.has_early_microcode());
+
+        let fake_ucode = b"\x00\x00\x00\x01GenuineIntelMicrocodePayload";
+        framework.prepend_early_microcode(fake_ucode);
+
+        assert!(framework.has_early_microcode());
+        assert_eq!(framework.early_microcode_bytes, fake_ucode);
+        assert!(framework.microcode);
+    }
+
+    #[test]
+    fn signstar_threshold_signing_verification() {
+        let mut signstar = SignstarService::new("core-package.pkg.tar.zst");
+        signstar.add_signer("arch-key-1", SignerPolicy::Mandatory);
+        signstar.add_signer("arch-key-2", SignerPolicy::Optional);
+        signstar.add_signer("arch-key-3", SignerPolicy::Optional);
+        signstar.set_threshold_count(2);
+
+        signstar.record_signature("arch-key-1");
+        assert!(!signstar.verify_signature_threshold()); // Mandatory signed, but total signatures = 1 < threshold (2)
+
+        signstar.record_signature("arch-key-2");
+        assert!(signstar.verify_signature_threshold()); // Mandatory signed and total signatures = 2 >= threshold (2)
     }
 
     #[test]

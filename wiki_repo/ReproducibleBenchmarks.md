@@ -2,7 +2,7 @@
 
 > **"Every product win must be reproducible, auditable, and measurable."**
 
----
+***
 
 ## 📈 Developer Productivity Benchmarks
 
@@ -13,7 +13,7 @@
 | **P99 Microservice Tail Latency** | 1.8ms | 0.12ms (Zero-copy IPC) | **15x lower latency** |
 | **Trusted Computing Base (TCB) SLoC** | 30M+ lines (Linux kernel) | 120k lines (SigmaOS microkernel) | **250x smaller TCB** |
 
----
+***
 
 ## 🔬 How to Reproduce
 

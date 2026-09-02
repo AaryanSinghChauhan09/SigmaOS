@@ -644,6 +644,10 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.values().next()
     }
 
+    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
+        self.rt_tasks.values().next()
+    }
+
     /// Selects optimal NUMA node for memory and thread affinity binding.
     pub fn select_optimal_numa_node(&self, cpu_core: usize) -> Option<usize> {
         self.numa_nodes

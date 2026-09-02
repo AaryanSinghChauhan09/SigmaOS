@@ -528,7 +528,6 @@ impl UniversalPackageAdapter {
     }
 
     /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(not(test))]
     pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
         let mut permissions = Vec::new();
         for arg in plugs_or_args {
@@ -538,8 +537,12 @@ impl UniversalPackageAdapter {
             } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
                 permissions.push(Permission::FileRead);
                 permissions.push(Permission::FileWrite);
-            } else if arg == "--share=ipc" {
+            } else if arg == "--share=ipc" || arg == "ipc" {
                 permissions.push(Permission::Ipc);
+            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
+                permissions.push(Permission::AudioPlayback);
+            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
+                permissions.push(Permission::DisplayAccess);
             }
         }
         permissions
@@ -556,8 +559,12 @@ impl UniversalPackageAdapter {
             } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
                 permissions.push("FileRead".to_string());
                 permissions.push("FileWrite".to_string());
-            } else if arg == "--share=ipc" {
+            } else if arg == "--share=ipc" || arg == "ipc" {
                 permissions.push("Ipc".to_string());
+            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
+                permissions.push("AudioPlayback".to_string());
+            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
+                permissions.push("DisplayAccess".to_string());
             }
         }
         permissions
@@ -642,6 +649,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Guix)
         } else if f.ends_with(".zypper") {
             Some(PackageFormat::Zypper)
+        } else if f.ends_with(".cachy") {
+            Some(PackageFormat::Pacman)
         } else {
             None
         }
@@ -676,6 +685,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Tar) // POSIX tar archive magic
         } else if data.starts_with(b"SPKG") {
             Some(PackageFormat::Sovereign) // Native SigPkg magic
+        } else if data.starts_with(b"CACHY") {
+            Some(PackageFormat::Pacman) // CachyOS magic
         } else {
             None
         }
@@ -691,6 +702,8 @@ impl UniversalPackageAdapter {
     ) -> Result<Package, &'static str> {
         let cleaned_ver = if version_str.contains('-') {
             version_str.split('-').next().unwrap()
+        } else if version_str.contains('_') {
+            version_str.split('_').next().unwrap()
         } else {
             version_str
         };
@@ -1011,14 +1024,10 @@ impl SigPkgUniversalBridgeEngine {
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
     pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
-            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+        let standard_pkg = super::universal_oop_system::StandardPackage {
+            metadata: super::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::universal_oop_system::Version::new(
-                    native_pkg.version.major,
-                    native_pkg.version.minor,
-                    native_pkg.version.patch,
-                ),
+                version: native_pkg.version,
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1112,12 +1121,24 @@ impl UniversalDependencyMapper {
 
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
-        let name = foreign_name.trim().to_lowercase();
-        match name.as_str() {
+        let raw = foreign_name.trim().to_lowercase();
+        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+            if stripped.starts_with("libc.") {
+                "libc"
+            } else {
+                stripped.split('.').next().unwrap_or(stripped)
+            }
+        } else if let Some(stripped) = raw.strip_prefix("cmd:") {
+            stripped
+        } else {
+            raw.as_str()
+        };
+
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" => "libc".to_string(),
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1129,7 +1150,7 @@ impl UniversalDependencyMapper {
             "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
             "dbus" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            _ => foreign_name.to_string(),
+            _ => clean.to_string(),
         }
     }
 }
@@ -1233,7 +1254,7 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
-                let parsed = adapter.parse_apt_control(&text).map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -1246,10 +1267,10 @@ impl UniversalFormatConverter {
                         &parsed.description,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Pacman => {
-                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -1262,10 +1283,10 @@ impl UniversalFormatConverter {
                         &parsed.pkgdesc,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
-            PackageFormat::Yum => {
-                let parsed = adapter.parse_rpm_spec(&text).map_err(|e| e.to_string())?;
+            PackageFormat::Yum | PackageFormat::Pisi => {
+                let parsed = adapter.parse_rpm_spec(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .requires
                     .iter()
@@ -1278,13 +1299,118 @@ impl UniversalFormatConverter {
                         &parsed.summary,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Apk => {
+                let parsed = adapter.parse_apkindex(&text).map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.pkgname,
+                        &parsed.pkgver,
+                        &parsed.pkgdesc,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Xbps => {
+                let parsed = adapter.parse_xbps_manifest(&text).map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .run_depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.pkgname,
+                        &parsed.version,
+                        &parsed.short_desc,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Portage => {
+                let parsed = adapter
+                    .parse_gentoo_ebuild("package.ebuild", &text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let mut raw_deps = parsed.rdepend.clone();
+                raw_deps.extend(parsed.depend.clone());
+                let canonical_deps: Vec<String> = raw_deps
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.package_name,
+                        &parsed.version,
+                        &parsed.description,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Snap => {
+                let parsed = adapter.parse_snapcraft_yaml(&text).map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .plugs
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.name,
+                        &parsed.version,
+                        &parsed.summary,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Flatpak => {
+                let parsed = adapter.parse_flatpak_json(&text).map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .finish_args
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.app_id,
+                        "1.0.0",
+                        "Flatpak Sandboxed App",
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
             }
             _ => {
-                let name = format!("{:?}-converted-pkg", format).to_lowercase();
-                adapter
-                    .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
-                    .map_err(|e| e.to_string())
+                if text.contains("Package:") && text.contains("Version:") {
+                    let deb = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = deb
+                        .depends
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(&deb.package, &deb.version, &deb.description, &canonical_deps)
+                        .map_err(|e: &'static str| e.to_string())
+                } else if text.contains("pkgname=") && text.contains("pkgver=") {
+                    let pkgbuild = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = pkgbuild
+                        .depends
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(&pkgbuild.pkgname, &pkgbuild.pkgver, &pkgbuild.pkgdesc, &canonical_deps)
+                        .map_err(|e: &'static str| e.to_string())
+                } else {
+                    let name = format!("{:?}-converted-pkg", format).to_lowercase();
+                    adapter
+                        .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
+                        .map_err(|e: &'static str| e.to_string())
+                }
             }
         }
     }
@@ -1420,16 +1546,8 @@ mod tests {
 
         // Verify container permissions map perfectly to SigmaOS capability permissions
         let perms = adapter.translate_sandbox_permissions(parsed.plugs.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileRead));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileRead".to_string()));
-        }
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileRead));
     }
 
     #[test]
@@ -1452,18 +1570,9 @@ mod tests {
         assert_eq!(parsed.finish_args.len(), 3);
 
         let perms = adapter.translate_sandbox_permissions(parsed.finish_args.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::Ipc));
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileWrite));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"Ipc".to_string()));
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileWrite".to_string()));
-        }
+        assert!(perms.contains(&Permission::Ipc));
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileWrite));
     }
 
     #[test]
@@ -1707,5 +1816,35 @@ mod tests {
         assert_eq!(pkg.name, "zstd");
         assert_eq!(pkg.version, Version::new(1, 5, 5));
         assert!(bridge.is_package_registered("zstd"));
+    }
+
+    #[test]
+    fn test_universal_format_converter_expanded_formats() {
+        let converter = UniversalFormatConverter::new();
+
+        // Test APK format conversion
+        let apk_text = b"P:openssl\nV:3.0.8-r0\nT:TLS and SSL toolkit\nD:so:libc.musl-x86_64.so.1\n";
+        let pkg_apk = converter.convert_to_sigma_pkg(PackageFormat::Apk, apk_text).unwrap();
+        assert_eq!(pkg_apk.name, "openssl");
+        assert_eq!(pkg_apk.dependencies[0].name, "libc");
+
+        // Test XBPS format conversion
+        let xbps_text = b"pkgname=\"bash\"\nversion=\"5.2.15_1\"\nshort_desc=\"GNU Bourne Again Shell\"\nrun_depends=\"libc6\"\n";
+        let pkg_xbps = converter.convert_to_sigma_pkg(PackageFormat::Xbps, xbps_text).unwrap();
+        assert_eq!(pkg_xbps.name, "bash");
+        assert_eq!(pkg_xbps.dependencies[0].name, "libc");
+
+        // Test Portage ebuild format conversion
+        let ebuild_text = b"DESCRIPTION=\"Curl tool\"\nRDEPEND=\"dev-libs/openssl sys-libs/glibc\"\n";
+        let pkg_ebuild = converter.convert_to_sigma_pkg(PackageFormat::Portage, ebuild_text).unwrap();
+        assert_eq!(pkg_ebuild.dependencies[0].name, "openssl");
+        assert_eq!(pkg_ebuild.dependencies[1].name, "libc");
+
+        // Test Dry Run simulation on XBPS
+        let simulator = UniversalDryRunSimulator::new();
+        let sim_result = simulator.simulate_install(PackageFormat::Xbps, xbps_text).unwrap();
+        assert!(sim_result.is_valid);
+        assert_eq!(sim_result.package_name, "bash");
+        assert_eq!(sim_result.resolved_dependencies[0], "libc");
     }
 }

@@ -27,7 +27,7 @@ use alloc::vec::Vec;
 
 use crate::klib::BTreeMap;
 use core::time::Duration;
-// Instant not in no_std
+use std::time::Instant;
 
 /// Update channel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -162,11 +162,11 @@ impl AutoInstallProvisioner {
             .ok_or("No active profile loaded")?;
         self.installation_completed = true;
         Ok(format!(
-            "Deployment succeeded! Hostname: '{}', RootFS partitioned on '{}' using '{}' filesystem. Installed extra packages: {}.",
+            "Deployment succeeded! Hostname: {}, RootFS partitioned on {} using {} filesystem.",
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
-            profile.format!("{}/{}", extra_packages, ", ")
+            profile.extra_packages.join(", ")
         ))
     }
 }

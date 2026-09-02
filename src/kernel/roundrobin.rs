@@ -742,15 +742,9 @@ mod tests {
         assert_eq!(scheduler.dynamic_time_slice(10), 10);
 
         // Add 3 more processes -> ready count = 4
-        scheduler
-            .add_process(Process::new(2, "task2".to_string(), Priority::Normal))
-            .unwrap();
-        scheduler
-            .add_process(Process::new(3, "task3".to_string(), Priority::Normal))
-            .unwrap();
-        scheduler
-            .add_process(Process::new(4, "task4".to_string(), Priority::Normal))
-            .unwrap();
+        scheduler.add_process(Process::new(2, "task2".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(3, "task3".to_string(), Priority::Normal)).unwrap();
+        scheduler.add_process(Process::new(4, "task4".to_string(), Priority::Normal)).unwrap();
 
         // 4 ready tasks -> target_latency (40) / 4 = 10
         assert_eq!(scheduler.dynamic_time_slice(10), 10);

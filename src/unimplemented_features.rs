@@ -2640,12 +2640,14 @@ impl Default for NetBsdRumpComponentEngine {
     }
 }
 
-/// Android APEX Container Module Manager (Inspired by Android APEX modular system updates)
-#[derive(Debug, Clone)]
+// ==================================================================
+// 50. ANDROID APEX CONTAINER MODULE ENGINE
+// ==================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AndroidApexModule {
-    pub package_name: String,
-    pub version_code: u64,
-    pub mount_point: String,
+    pub name: String,
+    pub version: u64,
+    pub mount_path: String,
     pub active: bool,
 }
 
@@ -2662,40 +2664,37 @@ impl AndroidApexContainerModuleEngine {
         }
     }
 
-    pub fn register_apex_module(&mut self, package_name: &str, version_code: u64, mount_point: &str) -> bool {
-        if self.modules.iter().any(|m| m.package_name == package_name && m.version_code == version_code) {
+    pub fn register_apex_module(&mut self, name: &str, version: u64, mount_path: &str) -> bool {
+        if self.modules.iter().any(|m| m.name == name && m.version == version) {
             return false;
         }
         self.modules.push(AndroidApexModule {
-            package_name: package_name.to_string(),
-            version_code,
-            mount_point: mount_point.to_string(),
+            name: name.to_string(),
+            version,
+            mount_path: mount_path.to_string(),
             active: false,
         });
         true
     }
 
-    pub fn activate_module(&mut self, package_name: &str, version_code: u64) -> Result<(), &'static str> {
-        let module = self.modules.iter_mut()
-            .find(|m| m.package_name == package_name && m.version_code == version_code)
-            .ok_or("APEX module not registered")?;
-        if module.active {
-            return Ok(());
+    pub fn activate_module(&mut self, name: &str, version: u64) -> Result<(), &'static str> {
+        let module = self.modules.iter_mut().find(|m| m.name == name && m.version == version)
+            .ok_or("APEX module not found")?;
+        if !module.active {
+            module.active = true;
+            self.active_mounts += 1;
         }
-        module.active = true;
-        self.active_mounts += 1;
         Ok(())
     }
 
-    pub fn rollback_module(&mut self, package_name: &str) -> Result<u64, &'static str> {
-        let module = self.modules.iter_mut()
-            .find(|m| m.package_name == package_name && m.active)
-            .ok_or("Active APEX module not found for rollback")?;
+    pub fn rollback_module(&mut self, name: &str) -> Result<u64, &'static str> {
+        let module = self.modules.iter_mut().find(|m| m.name == name && m.active)
+            .ok_or("Active APEX module not found")?;
         module.active = false;
         if self.active_mounts > 0 {
             self.active_mounts -= 1;
         }
-        Ok(module.version_code)
+        Ok(module.version)
     }
 }
 
@@ -2705,24 +2704,27 @@ impl Default for AndroidApexContainerModuleEngine {
     }
 }
 
-/// Dynamic Binary Translator (Inspired by macOS Rosetta 2 & Android Houdini binary translation)
+// ==================================================================
+// 51. ROSETTA DYNAMIC BINARY TRANSLATOR
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArch {
     AArch64,
+    X86_64,
     RiscV64,
 }
 
 #[derive(Debug, Clone)]
-pub struct TranslatedInstructionBlock {
-    pub guest_address: u64,
-    pub host_instructions: Vec<u8>,
-    pub hit_count: u64,
+pub struct RosettaTranslationCacheEntry {
+    pub pc: u64,
+    pub translated_code: Vec<u8>,
+    pub hit_count: usize,
 }
 
 pub struct RosettaDynamicBinaryTranslator {
     pub target_arch: TargetArch,
-    pub translation_cache: Vec<TranslatedInstructionBlock>,
-    pub total_translations: u64,
+    pub translation_cache: Vec<RosettaTranslationCacheEntry>,
+    pub total_translations: usize,
 }
 
 impl RosettaDynamicBinaryTranslator {
@@ -2734,27 +2736,19 @@ impl RosettaDynamicBinaryTranslator {
         }
     }
 
-    pub fn translate_instruction_block(&mut self, guest_address: u64, x86_bytes: &[u8]) -> Vec<u8> {
-        if let Some(cached) = self.translation_cache.iter_mut().find(|b| b.guest_address == guest_address) {
-            cached.hit_count += 1;
-            return cached.host_instructions.clone();
+    pub fn translate_instruction_block(&mut self, pc: u64, code: &[u8]) -> Vec<u8> {
+        if let Some(entry) = self.translation_cache.iter_mut().find(|e| e.pc == pc) {
+            entry.hit_count += 1;
+            return entry.translated_code.clone();
         }
 
-        let mut translated = Vec::new();
-        match self.target_arch {
-            TargetArch::AArch64 => {
-                translated.extend_from_slice(&[0x1F, 0x20, 0x03, 0xD5]);
-                translated.extend_from_slice(x86_bytes);
-            }
-            TargetArch::RiscV64 => {
-                translated.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]);
-                translated.extend_from_slice(x86_bytes);
-            }
+        let mut translated = Vec::with_capacity(code.len() * 2);
+        for &byte in code {
+            translated.push(byte ^ 0xAA);
         }
-
-        self.translation_cache.push(TranslatedInstructionBlock {
-            guest_address,
-            host_instructions: translated.clone(),
+        self.translation_cache.push(RosettaTranslationCacheEntry {
+            pc,
+            translated_code: translated.clone(),
             hit_count: 1,
         });
         self.total_translations += 1;
@@ -2762,29 +2756,31 @@ impl RosettaDynamicBinaryTranslator {
     }
 }
 
-/// Automated Performance Benchmark Engine (Inspired by Phoronix Test Suite)
+// ==================================================================
+// 52. PHORONIX AUTOMATED BENCHMARK ENGINE
+// ==================================================================
 #[derive(Debug, Clone)]
-pub struct BenchmarkResult {
+pub struct PhoronixTestResult {
     pub test_name: String,
     pub metric_unit: String,
     pub score: f64,
 }
 
 pub struct PhoronixAutomatedBenchmarkEngine {
-    pub test_suite_name: String,
-    pub results: Vec<BenchmarkResult>,
+    pub suite_name: String,
+    pub results: Vec<PhoronixTestResult>,
 }
 
 impl PhoronixAutomatedBenchmarkEngine {
-    pub fn new(test_suite_name: &str) -> Self {
+    pub fn new(suite_name: &str) -> Self {
         Self {
-            test_suite_name: test_suite_name.to_string(),
+            suite_name: suite_name.to_string(),
             results: Vec::new(),
         }
     }
 
     pub fn run_test(&mut self, test_name: &str, metric_unit: &str, score: f64) {
-        self.results.push(BenchmarkResult {
+        self.results.push(PhoronixTestResult {
             test_name: test_name.to_string(),
             metric_unit: metric_unit.to_string(),
             score,
@@ -2796,19 +2792,15 @@ impl PhoronixAutomatedBenchmarkEngine {
             return 0.0;
         }
         let sum: f64 = self.results.iter().map(|r| r.score).sum();
-        sum / self.results.len() as f64
+        sum / (self.results.len() as f64)
     }
 }
 
-/// Distro Parity & Ecosystem Absorption Hub (Inspired by DistroWatch feature tracking)
-#[derive(Debug, Clone)]
-pub struct DistroParityScore {
-    pub distro_name: String,
-    pub absorption_percentage: u8,
-}
-
+// ==================================================================
+// 53. DISTROWATCH PARITY METRICS HUB
+// ==================================================================
 pub struct DistroWatchParityMetricsHub {
-    pub distros: Vec<DistroParityScore>,
+    pub distros: Vec<(String, u32)>,
 }
 
 impl DistroWatchParityMetricsHub {
@@ -2818,286 +2810,22 @@ impl DistroWatchParityMetricsHub {
         }
     }
 
-    pub fn record_distro_parity(&mut self, distro_name: &str, absorption_percentage: u8) {
-        if let Some(entry) = self.distros.iter_mut().find(|d| d.distro_name == distro_name) {
-            entry.absorption_percentage = absorption_percentage;
-        } else {
-            self.distros.push(DistroParityScore {
-                distro_name: distro_name.to_string(),
-                absorption_percentage,
-            });
-        }
+    pub fn record_distro_parity(&mut self, name: &str, score: u32) {
+        self.distros.push((name.to_string(), score));
     }
 
     pub fn average_ecosystem_parity(&self) -> f64 {
         if self.distros.is_empty() {
             return 0.0;
         }
-        let total: u64 = self.distros.iter().map(|d| d.absorption_percentage as u64).sum();
-        total as f64 / self.distros.len() as f64
+        let sum: u32 = self.distros.iter().map(|(_, score)| *score).sum();
+        (sum as f64) / (self.distros.len() as f64)
     }
 }
 
 impl Default for DistroWatchParityMetricsHub {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// Rocky Linux & AlmaLinux Enterprise Long-Term Support ABI Stability & Errata Governor
-#[derive(Debug, Clone)]
-pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub rhel_abi_compat_level: u32,
-    pub errata_patches_applied: usize,
-    pub security_advisories: Vec<String>,
-}
-
-impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub fn new(abi_level: u32) -> Self {
-        Self {
-            rhel_abi_compat_level: abi_level,
-            errata_patches_applied: 0,
-            security_advisories: Vec::new(),
-        }
-    }
-
-    pub fn apply_errata_patch(&mut self, advisory_id: &str) {
-        self.security_advisories.push(advisory_id.to_string());
-        self.errata_patches_applied += 1;
-    }
-
-    pub fn verify_abi_compatibility(&self, min_required: u32) -> bool {
-        self.rhel_abi_compat_level >= min_required
-    }
-}
-
-/// Void Linux XBPS Fast Binary Delta Package & Runit Service Engine
-#[derive(Debug, Clone)]
-pub struct VoidXbpsContainerEngine {
-    pub registered_packages: Vec<String>,
-    pub runit_services_active: Vec<String>,
-}
-
-impl VoidXbpsContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_packages: Vec::new(),
-            runit_services_active: Vec::new(),
-        }
-    }
-
-    pub fn install_xbps_package(&mut self, name: &str) {
-        self.registered_packages.push(name.to_string());
-    }
-
-    pub fn start_runit_service(&mut self, service: &str) {
-        if !self.runit_services_active.contains(&service.to_string()) {
-            self.runit_services_active.push(service.to_string());
-        }
-    }
-}
-
-impl Default for VoidXbpsContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Puppy Linux Squashed File System (SFS) Read-Only RAM Disk & Persistence Overlay
-#[derive(Debug, Clone)]
-pub struct PuppyLinuxOverlayRamdiskEngine {
-    pub ramdisk_size_mb: usize,
-    pub loaded_sfs_modules: Vec<String>,
-    pub persistence_save_file: Option<String>,
-}
-
-impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ramdisk_mb: usize) -> Self {
-        Self {
-            ramdisk_size_mb: ramdisk_mb,
-            loaded_sfs_modules: Vec::new(),
-            persistence_save_file: None,
-        }
-    }
-
-    pub fn load_sfs_module(&mut self, sfs_name: &str) {
-        self.loaded_sfs_modules.push(sfs_name.to_string());
-    }
-
-    pub fn mount_persistence(&mut self, savefile_path: &str) {
-        self.persistence_save_file = Some(savefile_path.to_string());
-    }
-}
-
-/// Tiny Core Linux TCZ Extension Loader & On-Demand Symlink Tree Manager
-#[derive(Debug, Clone)]
-pub struct TinyCoreModularTczLoader {
-    pub mounted_extensions: Vec<String>,
-    pub total_ram_used_kb: usize,
-}
-
-impl TinyCoreModularTczLoader {
-    pub fn new() -> Self {
-        Self {
-            mounted_extensions: Vec::new(),
-            total_ram_used_kb: 0,
-        }
-    }
-
-    pub fn mount_tcz(&mut self, ext_name: &str, size_kb: usize) {
-        self.mounted_extensions.push(ext_name.to_string());
-        self.total_ram_used_kb += size_kb;
-    }
-}
-
-impl Default for TinyCoreModularTczLoader {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Deepin Desktop Environment (DDE) Inspired Control Center & Appearance Engine.
-pub struct DeepinDdeControlCenterEngine {
-    pub theme_mode: String,
-    pub wallpaper_slideshow: bool,
-    pub dock_position: String,
-    pub scale_factor: f32,
-}
-
-impl DeepinDdeControlCenterEngine {
-    pub fn new() -> Self {
-        Self {
-            theme_mode: "Dark".to_string(),
-            wallpaper_slideshow: true,
-            dock_position: "Bottom".to_string(),
-            scale_factor: 1.0,
-        }
-    }
-
-    pub fn set_theme_mode(&mut self, mode: &str) {
-        self.theme_mode = mode.to_string();
-    }
-
-    pub fn toggle_slideshow(&mut self, enabled: bool) {
-        self.wallpaper_slideshow = enabled;
-    }
-
-    pub fn set_dock_position(&mut self, pos: &str) {
-        self.dock_position = pos.to_string();
-    }
-}
-
-impl Default for DeepinDdeControlCenterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Manjaro Hardware Detection (mhwd) Inspired Driver Auto-Configuration Engine.
-pub struct ManjaroHardwareDetectionEngine {
-    pub detected_pci_ids: Vec<u32>,
-    pub recommended_drivers: Vec<String>,
-    pub free_drivers_enabled: bool,
-}
-
-impl ManjaroHardwareDetectionEngine {
-    pub fn new() -> Self {
-        Self {
-            detected_pci_ids: Vec::new(),
-            recommended_drivers: Vec::new(),
-            free_drivers_enabled: true,
-        }
-    }
-
-    pub fn scan_pci_bus(&mut self, vendor_id: u16, device_id: u16) {
-        let combined_id = ((vendor_id as u32) << 16) | (device_id as u32);
-        self.detected_pci_ids.push(combined_id);
-
-        if vendor_id == 0x10DE {
-            self.recommended_drivers.push("video-nvidia".to_string());
-        } else if vendor_id == 0x1002 {
-            self.recommended_drivers.push("video-amdgpu".to_string());
-        } else {
-            self.recommended_drivers.push("video-modesetting".to_string());
-        }
-    }
-
-    pub fn auto_install_recommended_drivers(&mut self) -> usize {
-        self.recommended_drivers.len()
-    }
-}
-
-impl Default for ManjaroHardwareDetectionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// SteamOS Gamescope Inspired Micro-Compositor & Resolution Scaling Engine.
-pub struct SteamOsGamescopeCompositorEngine {
-    pub target_fps_limit: u32,
-    pub fsr_enabled: bool,
-    pub hdr_enabled: bool,
-    pub leased_surfaces_count: usize,
-}
-
-impl SteamOsGamescopeCompositorEngine {
-    pub fn new() -> Self {
-        Self {
-            target_fps_limit: 60,
-            fsr_enabled: false,
-            hdr_enabled: true,
-            leased_surfaces_count: 0,
-        }
-    }
-
-    pub fn enable_fsr(&mut self, enable: bool) {
-        self.fsr_enabled = enable;
-    }
-
-    pub fn set_fps_limit(&mut self, fps: u32) {
-        self.target_fps_limit = fps;
-    }
-
-    pub fn lease_drm_surface(&mut self) -> usize {
-        self.leased_surfaces_count += 1;
-        self.leased_surfaces_count
-    }
-}
-
-impl Default for SteamOsGamescopeCompositorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Phoronix Test Suite Inspired Automated Performance Benchmarking Engine.
-pub struct PhoronixTestSuiteRunner {
-    pub suite_name: String,
-    pub test_runs: Vec<(String, f64)>,
-    pub composite_score: f64,
-}
-
-impl PhoronixTestSuiteRunner {
-    pub fn new(suite_name: &str) -> Self {
-        Self {
-            suite_name: suite_name.to_string(),
-            test_runs: Vec::new(),
-            composite_score: 0.0,
-        }
-    }
-
-    pub fn execute_benchmark(&mut self, test_name: &str, score: f64) {
-        self.test_runs.push((test_name.to_string(), score));
-    }
-
-    pub fn calculate_composite_score(&mut self) -> f64 {
-        if self.test_runs.is_empty() {
-            return 0.0;
-        }
-        let total: f64 = self.test_runs.iter().map(|(_, s)| *s).sum();
-        self.composite_score = total / (self.test_runs.len() as f64);
-        self.composite_score
     }
 }
 

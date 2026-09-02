@@ -1,14 +1,20 @@
 // SigmaOS Desktop Module
 pub mod mate_betsy;
+pub mod mint_tools;
 pub mod moksha;
 pub mod pantheon;
+pub mod screensaver;
 pub mod zenith_compositor;
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
-pub mod screensaver;
+
+pub use mint_tools::{
+    MintUpdateManager, UpdatePackage, UpdateLevel, MintTimeshiftEngine, TimeshiftSnapshot,
+    SnapshotType, MintSoftwareManager, AppMetadata,
+};
 
 pub use screensaver::{
     DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
@@ -25,6 +31,7 @@ pub use moksha::{
     MokshaWindowManager, MokshaWindowType, ShelfOrientation, TerminologyBackend,
     WallpaperTransition,
 };
+
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,

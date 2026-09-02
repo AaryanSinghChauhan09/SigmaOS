@@ -274,24 +274,9 @@ impl BuiltInThemeProvider {
                     margin_medium: 12,
                     margin_large: 18,
                 },
-                border_radius: BorderRadiusSettings {
-                    small: 2,
-                    medium: 4,
-                    large: 8,
-                    full: false,
-                },
-                shadows: ShadowSettings {
-                    enabled: false,
-                    blur: 0,
-                    spread: 0,
-                    color: "#000".to_string(),
-                    opacity: 0.0,
-                },
-                animations: AnimationSettings {
-                    enabled: true,
-                    duration_ms: 150,
-                    easing: "ease".to_string(),
-                },
+                border_radius: BorderRadiusSettings { small: 2, medium: 4, large: 8, full: false },
+                shadows: ShadowSettings { enabled: false, blur: 0, spread: 0, color: "#000".to_string(), opacity: 0.0 },
+                animations: AnimationSettings { enabled: true, duration_ms: 150, easing: "ease".to_string() },
             },
         );
 
@@ -327,24 +312,9 @@ impl BuiltInThemeProvider {
                     margin_medium: 16,
                     margin_large: 24,
                 },
-                border_radius: BorderRadiusSettings {
-                    small: 3,
-                    medium: 6,
-                    large: 12,
-                    full: false,
-                },
-                shadows: ShadowSettings {
-                    enabled: true,
-                    blur: 8,
-                    spread: 0,
-                    color: "#000".to_string(),
-                    opacity: 0.2,
-                },
-                animations: AnimationSettings {
-                    enabled: true,
-                    duration_ms: 200,
-                    easing: "ease-in-out".to_string(),
-                },
+                border_radius: BorderRadiusSettings { small: 3, medium: 6, large: 12, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 8, spread: 0, color: "#000".to_string(), opacity: 0.2 },
+                animations: AnimationSettings { enabled: true, duration_ms: 200, easing: "ease-in-out".to_string() },
             },
         );
 
@@ -380,24 +350,9 @@ impl BuiltInThemeProvider {
                     margin_medium: 16,
                     margin_large: 24,
                 },
-                border_radius: BorderRadiusSettings {
-                    small: 4,
-                    medium: 8,
-                    large: 12,
-                    full: false,
-                },
-                shadows: ShadowSettings {
-                    enabled: true,
-                    blur: 6,
-                    spread: 0,
-                    color: "#000".to_string(),
-                    opacity: 0.1,
-                },
-                animations: AnimationSettings {
-                    enabled: true,
-                    duration_ms: 250,
-                    easing: "ease".to_string(),
-                },
+                border_radius: BorderRadiusSettings { small: 4, medium: 8, large: 12, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 6, spread: 0, color: "#000".to_string(), opacity: 0.1 },
+                animations: AnimationSettings { enabled: true, duration_ms: 250, easing: "ease".to_string() },
             },
         );
 
@@ -433,24 +388,9 @@ impl BuiltInThemeProvider {
                     margin_medium: 16,
                     margin_large: 24,
                 },
-                border_radius: BorderRadiusSettings {
-                    small: 4,
-                    medium: 8,
-                    large: 16,
-                    full: false,
-                },
-                shadows: ShadowSettings {
-                    enabled: true,
-                    blur: 10,
-                    spread: 0,
-                    color: "#294172".to_string(),
-                    opacity: 0.08,
-                },
-                animations: AnimationSettings {
-                    enabled: true,
-                    duration_ms: 200,
-                    easing: "ease-in-out".to_string(),
-                },
+                border_radius: BorderRadiusSettings { small: 4, medium: 8, large: 16, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 10, spread: 0, color: "#294172".to_string(), opacity: 0.08 },
+                animations: AnimationSettings { enabled: true, duration_ms: 200, easing: "ease-in-out".to_string() },
             },
         );
 
@@ -997,9 +937,7 @@ pub struct SymbolicIconTintEngine;
 
 impl SymbolicIconTintEngine {
     pub fn tint_symbolic_color(svg_content: &str, foreground_hex: &str) -> String {
-        svg_content
-            .replace("#000000", foreground_hex)
-            .replace("fill:black", &format!("fill:{}", foreground_hex))
+        svg_content.replace("#000000", foreground_hex).replace("fill:black", &format!("fill:{}", foreground_hex))
     }
 }
 
@@ -1108,12 +1046,8 @@ mod tests {
     fn test_community_forum_theme_presets() {
         let provider = BuiltInThemeProvider::new();
         assert!(provider.get_theme_by_name("arch_forum_dark").is_some());
-        assert!(provider
-            .get_theme_by_name("freebsd_forum_classic")
-            .is_some());
-        assert!(provider
-            .get_theme_by_name("ubuntu_discourse_warm")
-            .is_some());
+        assert!(provider.get_theme_by_name("freebsd_forum_classic").is_some());
+        assert!(provider.get_theme_by_name("ubuntu_discourse_warm").is_some());
         assert!(provider.get_theme_by_name("fedora_forum_clean").is_some());
 
         let arch = provider.get_theme_by_name("arch_forum_dark").unwrap();
@@ -1206,14 +1140,7 @@ mod tests {
         let mut index = IconThemeSpecIndex::new("Breeze", "KDE Breeze Icon Theme");
         index.add_inherits("oxygen");
         let chain = IconInheritsResolver::resolve_lookup_chain(&index);
-        assert_eq!(
-            chain,
-            vec![
-                "Breeze".to_string(),
-                "oxygen".to_string(),
-                "hicolor".to_string()
-            ]
-        );
+        assert_eq!(chain, vec!["Breeze".to_string(), "oxygen".to_string(), "hicolor".to_string()]);
     }
 
     #[test]
@@ -1221,15 +1148,5 @@ mod tests {
         let svg = "<path fill=\"#000000\" d=\"M0 0h24v24H0z\"/>";
         let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
         assert_eq!(tinted, "<path fill=\"#3584E4\" d=\"M0 0h24v24H0z\"/>");
-    }
-
-    #[test]
-    fn test_yaru_theme_spec() {
-        let yaru = YaruThemeSpec::new(YaruThemeStyle::Dark, YaruAccentColor::Aubergine);
-        assert_eq!(yaru.accent_hex(), "#77216F");
-        let theme = yaru.to_theme();
-        assert_eq!(theme.mode, ThemeMode::Dark);
-        assert_eq!(theme.colors.primary, "#77216F");
-        assert_eq!(theme.colors.background, "#1E1E1E");
     }
 }

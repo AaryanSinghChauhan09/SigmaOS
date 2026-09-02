@@ -39,8 +39,11 @@ pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
+pub mod aur_rules;
 pub mod pacman;
+pub mod pacman_contrib;
 pub mod portage;
+pub mod svntogit_repro;
 pub mod recipe;
 pub mod repository_manager;
 pub mod resolver;
@@ -54,14 +57,21 @@ pub mod transaction_log;
 pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
+pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use crate::package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
+    DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
+    DpkgStatoverrideRule, FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock,
+    FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine,
+    OpenBsdPkgAddSignifyEngine, OpenSuseZypperVendorStickinessEngine, PpaRepository,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
+    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
@@ -77,9 +87,13 @@ pub use sovereign_sigpkg::*;
 
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager,
+    PacmanDbAdapter, RollingSyncManager, SvntogitMigrationEngine, SvnPackageMetadata,
 };
-pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase};
+pub use arch_pacman_engine::{
+    AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer,
+    PacmanCacheCleaner, PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater,
+    SafeUpdateChecker,
+};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
@@ -123,6 +137,21 @@ pub use client::{
     SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
 };
 pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
+pub use pacman_contrib::{
+    PacCacheTrimmer, PackageCacheEntry, PacCacheResult,
+    PacDiffConfigResolver, PacDiffAction, PacDiffCandidate,
+    CheckUpdatesEngine, InstalledPackage, SyncPackage, PendingUpdate,
+    PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor, PacLogAction, PacLogEntry,
+};
+pub use svntogit_repro::{
+    SovereignSvnToGitMigrator, SvnRevisionLog, ConvertedGitCommit, SvnBranchType,
+    ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
+    ReproducibilityAttestationReport,
+};
+pub use aur_rules::{
+    AurRuleEngine, AurLintFinding, LintSeverity, AurSandboxPolicy,
+    MakepkgReproduciblePipeline, MakepkgBuildStatus, MakepkgBuildResult,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -148,25 +177,27 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let mut parts = version_str.split('.');
-
-        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-
-        if parts.next().is_some() {
+        let clean = version_str.split('-').next().unwrap_or(version_str);
+        if !clean.chars().any(|c| c.is_ascii_digit()) {
             return Err(ParseError::InvalidFormat);
         }
+        let mut parts = clean.split('.');
 
-        let major = major_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = minor_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = patch_str
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
+        let major_str = parts.next().unwrap_or("0");
+        let minor_str = parts.next().unwrap_or("0");
+        let patch_str = parts.next().unwrap_or("0");
+
+        let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
+        let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
+        let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
+
+        if major_clean.is_empty() {
+            return Err(ParseError::InvalidNumber);
+        }
+
+        let major = major_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)?;
+        let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)? };
+        let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)? };
 
         Ok(Version::new(major, minor, patch))
     }

@@ -62,6 +62,65 @@ impl PageTable {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DemandPageType {
+    AnonymousZero,
+    FileBacked,
+    SharedMemory,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageFaultReason {
+    PageNotPresent,
+    WriteProtectionViolation,
+    UserAccessViolation,
+}
+
+#[derive(Debug, Clone)]
+pub struct DemandPageZone {
+    pub start_vaddr: u64,
+    pub page_count: usize,
+    pub zone_type: DemandPageType,
+    pub read_only: bool,
+}
+
+pub struct DemandPagingSubsystem {
+    pub total_memory_bytes: usize,
+    pub mapped_zones: Vec<DemandPageZone>,
+    pub allocated_fault_pages: usize,
+}
+
+impl DemandPagingSubsystem {
+    pub fn new(total_memory_bytes: usize) -> Self {
+        Self {
+            total_memory_bytes,
+            mapped_zones: Vec::new(),
+            allocated_fault_pages: 0,
+        }
+    }
+
+    pub fn map_demand_zone(&mut self, zone: DemandPageZone) {
+        self.mapped_zones.push(zone);
+    }
+
+    pub fn handle_demand_fault(&mut self, vaddr: u64, reason: PageFaultReason) -> Result<(), &'static str> {
+        let matching_zone = self.mapped_zones.iter().find(|z| {
+            vaddr >= z.start_vaddr && vaddr < z.start_vaddr + (z.page_count as u64 * 4096)
+        });
+
+        if matching_zone.is_some() && reason == PageFaultReason::PageNotPresent {
+            self.allocated_fault_pages += 1;
+            Ok(())
+        } else {
+            Err("Page fault outside mapped demand zone or invalid reason")
+        }
+    }
+
+    pub fn get_active_mapped_pages_count(&self) -> usize {
+        self.allocated_fault_pages
+    }
+}
+
 pub struct VirtualMemoryManagerV2 {
     pub pml4_table: NonNull<PageTable>,
 }

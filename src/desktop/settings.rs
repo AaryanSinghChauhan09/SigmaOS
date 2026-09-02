@@ -24,12 +24,9 @@
 /// Implements desktop settings and preferences
 
 extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::boxed::Box;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -321,137 +318,46 @@ impl RcConfSettingsOverlay {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_gsettings_schema_validation() {
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"true"));
+        assert!(!GsettingsSchemaValidator::validate_setting(SettingType::Boolean, b"invalid"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Integer, b"100"));
+        assert!(GsettingsSchemaValidator::validate_setting(SettingType::Color, b"#FF0000"));
     }
 
-    pub fn register_key(&mut self, path: &str, default_value: &str) {
-        self.schemas.insert(
-            path.to_string(),
-            SchemaKey {
-                path: path.to_string(),
-                default_value: default_value.to_string(),
-                current_value: default_value.to_string(),
-            },
-        );
+    #[test]
+    fn test_kconfig_cascading_store() {
+        let global = SimpleSettingsManager::new();
+        let mut user = SimpleSettingsManager::new();
+
+        let id = user.next_id.fetch_add(1, Ordering::SeqCst);
+        let s = SimpleSetting::new(id, b"theme", SettingType::String, b"dark");
+        user.settings.push(Some(Box::new(s)));
+
+        let store = KconfigCascadingStore::new(global, user);
+        let eff = store.get_effective_setting(b"theme");
+        assert!(eff.is_some());
+        assert_eq!(eff.unwrap().value(), b"dark");
     }
 
-    pub fn get_value(&self, path: &str) -> Option<String> {
-        self.schemas.get(path).map(|k| k.current_value.clone())
+    #[test]
+    fn test_xfconf_bus_dispatcher() {
+        let mut dispatcher = XfconfBusDispatcher::new(b"xsettings");
+        dispatcher.notify_property_change(b"/Net/ThemeName", b"Adwaita-dark");
+        assert_eq!(dispatcher.dispatch_count, 1);
     }
 
-    pub fn set_value(&mut self, path: &str, value: &str) -> Result<(), &'static str> {
-        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
-        key.current_value = value.to_string();
-        Ok(())
-    }
-
-    pub fn reset_to_default(&mut self, path: &str) -> Result<(), &'static str> {
-        let key = self.schemas.get_mut(path).ok_or("Schema path not registered")?;
-        key.current_value = key.default_value.clone();
-        Ok(())
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    if !ptr.is_null() {
-        use std::alloc::{dealloc, Layout};
-        let layout = Layout::from_size_align(1, 8).unwrap();
-        dealloc(ptr, layout);
-    }
-}
-
-#[cfg(target_os = "none")]
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    #[test]
+    fn test_rc_conf_overlay() {
+        let mut overlay = RcConfSettingsOverlay::new();
+        assert!(overlay.apply_override(b"kern.ipc.maxsockbuf", b"2097152").is_ok());
+        assert!(overlay.sysctl_overrides.get_setting(b"kern.ipc.maxsockbuf").is_some());
     }
 }
 

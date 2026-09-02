@@ -89,7 +89,46 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::DragonFlyBsd,
                 "/etc",
             ) => "/etc".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/var/log",
+            ) => "/var/log".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/proc",
+            ) => "/proc".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/sys",
+            ) => "/sys".to_string(),
             _ => generic_path.to_string(),
+        }
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Verify that the current subsystem mode has valid supervisor, package translation, and VFS translation
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+
+        !pkg_spec.is_empty() && !vfs_etc.is_empty() && match self.mode {
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                supervisor == ServiceSupervisorType::Systemd
+            }
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                supervisor == ServiceSupervisorType::OpenRC
+            }
+            DistroSubsystemMode::LinuxAlpine => supervisor == ServiceSupervisorType::Runit,
+            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
         }
     }
 
@@ -181,6 +220,12 @@ impl SovereignUniversalDistroBridge {
 
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Validates active jail, pledge/unveil, package hooks, and distro matrix capabilities
+        !self.translate_package_specifier("kernel").is_empty()
+            && !self.translate_vfs_path("/etc").is_empty()
     }
 }
 

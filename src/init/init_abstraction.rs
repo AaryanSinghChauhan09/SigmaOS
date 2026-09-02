@@ -27,11 +27,16 @@ pub enum InitError {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitSystemType {
     SigmaInit,
+    Systemd,
     Runit,
     S6,
     Dinit,
     Sysvinit,
     OpenRC,
+    Shepherd,
+    FreeBsdRcd,
+    OpenBsdRcd,
+    Launchd,
 }
 
 /// Socket Activation Configuration inspired by systemd / macOS launchd
@@ -187,5 +192,14 @@ mod tests {
         assert_eq!(controller.service_status("webserver.service"), ServiceStatus::Stopped);
         assert!(controller.start_service("webserver.service").is_ok());
         assert_eq!(controller.service_status("webserver.service"), ServiceStatus::Running);
+    }
+
+    #[test]
+    fn test_universal_init_controller_extended_supervisors() {
+        let controller_bsd = UniversalInitController::new(InitSystemType::FreeBsdRcd);
+        assert_eq!(controller_bsd.init_type(), InitSystemType::FreeBsdRcd);
+
+        let controller_shepherd = UniversalInitController::new(InitSystemType::Shepherd);
+        assert_eq!(controller_shepherd.init_type(), InitSystemType::Shepherd);
     }
 }

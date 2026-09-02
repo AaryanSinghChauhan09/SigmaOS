@@ -10,8 +10,8 @@ pub use kvm_vcpu::{
 };
 
 pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,
-    VirtioDeviceType,
+    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs,
+    VirtioDeviceBackend, VirtioDeviceType,
 };
 
 pub use orchestration::{

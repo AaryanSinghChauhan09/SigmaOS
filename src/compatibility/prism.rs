@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Kernel Personality Prism & Syscall Ledgerbook
 // Refracts workloads into different kernel behaviors and maintains historical syscall fallbacks
 
