@@ -1,11 +1,33 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, and the **SigmaOS Web Interface (`web_ui/`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, and **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**.
 
 ---
 
-## 1. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
+## 1. Multi-OS Distro Inspired Package Repository Infrastructure Guidelines
+
+To evolve `registry_config.json` and `src/sigpkg/repository_manager.rs` into a global, zero-trust distribution network, repository maintainers must follow these guidelines:
+
+### A. FreeBSD DNS SRV Record Auto-Discovery
+- **Guideline**: Implement dynamic mirror discovery using DNS SRV records to eliminate hardcoded mirror lists.
+- **Implementation**: Query `_https._tcp.repo.sigmaos.org` to dynamically resolve geographical mirror hosts with automatic fallback on timeout.
+
+### B. Nix Cryptographically Signed Binary Caches
+- **Guideline**: All pre-compiled binary packages and store objects must be signed with Ed25519 cryptographic signatures.
+- **Implementation**: Enforce signature checking before extracting binary archives, storing trusted public keys in `registry_config.json`.
+
+### C. Linux Mint Automated Mirror Speed & Latency Benchmarks
+- **Guideline**: Automatically measure mirror latency and throughput before bulk updates.
+- **Implementation**: Expand `MirrorBenchmarkEngine` (`src/sigpkg/repository_manager.rs`) to benchmark mirror endpoints and rank active sources automatically.
+
+### D. Ubuntu/Debian PPA Snippets & GPG Verification
+- **Guideline**: Allow modular third-party repository additions via `PpaRepository`.
+- **Implementation**: Automatically fetch and verify GPG key fingerprints for custom repository entries added to `/etc/sigma/sources.list.d/`.
+
+---
+
+## 2. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
 
 To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, responsive, zero-jank web interface, front-end maintainers must adhere to the following guidelines:
 
@@ -27,7 +49,7 @@ To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, 
 
 ---
 
-## 2. Multi-OS Distro Inspired Installer Architecture Guidelines
+## 3. Multi-OS Distro Inspired Installer Architecture Guidelines
 
 To evolve `installer/sigma-installer.rs` into a high-reliability installer engine, developers must follow these architectural guidelines:
 
@@ -49,7 +71,7 @@ To evolve `installer/sigma-installer.rs` into a high-reliability installer engin
 
 ---
 
-## 3. Multi-OS Distro Inspired AUR Architecture Guidelines
+## 4. Multi-OS Distro Inspired AUR Architecture Guidelines
 
 To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign package ecosystem, maintainers must adhere to the following architectural guidelines:
 
@@ -75,7 +97,7 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 4. General Engineering & Quality Guidelines
+## 5. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -88,11 +110,12 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 5. Recommended Phased Implementation Sequence
+## 6. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
 3. **Phase 3: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
 4. **Phase 4: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
-5. **Phase 5: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
-6. **Phase 6: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
+5. **Phase 5: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
+6. **Phase 6: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
+7. **Phase 7: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.

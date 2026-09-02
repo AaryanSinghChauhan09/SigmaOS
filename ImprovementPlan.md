@@ -1,7 +1,21 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, the **Installer**, and the **Website UI**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, the **Installer**, the **Web UI**, and **Package Repository Infrastructure**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)
+
+To elevate the SigmaOS Package Repository Engine (`registry_config.json` and `src/sigpkg/repository_manager.rs`) into a high-availability, zero-latency distribution network, SigmaOS synthesizes innovations from premier Linux and BSD distribution repos:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS Repo Infrastructure Strategy |
+|-------------------|-------------------|--------------------------------------|
+| **FreeBSD (`pkg.conf`)** | DNS SRV record auto-discovery | Dynamic DNS SRV lookup (`_https._tcp.repo.sigmaos.org`) for automatic geographical mirror selection and failover. |
+| **Nix (`cache.nixos.org`)** | Cryptographically signed binary caches | Ed25519-signed store paths (`.nar` binary archives) enabling safe CDN distribution and instant atomic binary downloads. |
+| **Linux Mint** | Mirror latency benchmark engine | Integrated benchmark engine (`MirrorBenchmarkEngine`) testing latency and bandwidth to rank mirror mirrors dynamically. |
+| **Debian / Ubuntu** | PPA GPG launchpad signatures | Support for custom Personal Package Archives (`PpaRepository`) with automated GPG key fingerprint verification. |
+| **Fedora DNF / Arch** | Metalink dynamic mirrorlists | Dynamic XML/JSON metalink mirrorlists with chunked checksums and fallback mirrors. |
 
 ---
 
