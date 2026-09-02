@@ -2,6 +2,10 @@ use alloc::vec;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
@@ -266,6 +270,65 @@ impl Default for FundingSustainability {
     }
 }
 
+// ============================================================================
+// Contributor License Agreement (CLA) & DCO (Developer Certificate of Origin)
+// ============================================================================
+
+/// Contributor Recognition Tier
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContributionTier {
+    FirstTime,
+    Regular,
+    CoreMaintainer,
+}
+
+/// Signed Contributor License Agreement Record
+#[derive(Debug, Clone)]
+pub struct ClaSignatureRecord {
+    pub github_username: String,
+    pub full_name: String,
+    pub email: String,
+    pub is_signed: bool,
+    pub tier: ContributionTier,
+}
+
+/// CLA & DCO Verification Engine
+#[derive(Debug, Default)]
+pub struct ContributorLicenseAgreementEngine {
+    pub signatures: HashMap<String, ClaSignatureRecord>,
+}
+
+impl ContributorLicenseAgreementEngine {
+    pub fn new() -> Self {
+        Self {
+            signatures: HashMap::new(),
+        }
+    }
+
+    pub fn sign_cla(&mut self, username: &str, full_name: &str, email: &str) {
+        let record = ClaSignatureRecord {
+            github_username: username.to_string(),
+            full_name: full_name.to_string(),
+            email: email.to_string(),
+            is_signed: true,
+            tier: ContributionTier::FirstTime,
+        };
+        self.signatures.insert(username.to_string(), record);
+    }
+
+    pub fn verify_dco_signoff(&self, username: &str, commit_msg: &str) -> bool {
+        if let Some(record) = self.signatures.get(username) {
+            if !record.is_signed {
+                return false;
+            }
+            let signoff_needle = format!("Signed-off-by: {} <{}>", record.full_name, record.email);
+            commit_msg.contains(&signoff_needle)
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -331,5 +394,18 @@ mod tests {
         assert_eq!(fs.total_funds, 50000.0);
 
         assert!(!fs.allocate_budget("UI Design".to_string(), 60000.0));
+    }
+
+    #[test]
+    fn test_contributor_cla_engine() {
+        let mut cla = ContributorLicenseAgreementEngine::new();
+        cla.sign_cla("jules-agent", "Jules Engineer", "jules@sigmaos.dev");
+
+        let valid_msg = "feat: Add CLA verification\n\nSigned-off-by: Jules Engineer <jules@sigmaos.dev>";
+        let invalid_msg = "feat: Add CLA verification\n\nNo signoff";
+
+        assert!(cla.verify_dco_signoff("jules-agent", valid_msg));
+        assert!(!cla.verify_dco_signoff("jules-agent", invalid_msg));
+        assert!(!cla.verify_dco_signoff("unknown-user", valid_msg));
     }
 }
