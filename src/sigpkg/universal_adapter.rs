@@ -691,6 +691,8 @@ impl UniversalPackageAdapter {
     ) -> Result<Package, &'static str> {
         let cleaned_ver = if version_str.contains('-') {
             version_str.split('-').next().unwrap()
+        } else if version_str.contains('_') {
+            version_str.split('_').next().unwrap()
         } else {
             version_str
         };
@@ -1014,11 +1016,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::universal_oop_system::Version::new(
-                    native_pkg.version.major,
-                    native_pkg.version.minor,
-                    native_pkg.version.patch,
-                ),
+                version: native_pkg.version,
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1112,12 +1110,24 @@ impl UniversalDependencyMapper {
 
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
-        let name = foreign_name.trim().to_lowercase();
-        match name.as_str() {
+        let raw = foreign_name.trim().to_lowercase();
+        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+            if stripped.starts_with("libc.") {
+                "libc"
+            } else {
+                stripped.split('.').next().unwrap_or(stripped)
+            }
+        } else if let Some(stripped) = raw.strip_prefix("cmd:") {
+            stripped
+        } else {
+            raw.as_str()
+        };
+
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" => "libc".to_string(),
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1129,7 +1139,7 @@ impl UniversalDependencyMapper {
             "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
             "dbus" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            _ => foreign_name.to_string(),
+            _ => clean.to_string(),
         }
     }
 }
