@@ -95,7 +95,7 @@ pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
 };
-pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel};
+pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel, SecurityContext};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry, UnveilManager, UnveilPermissions, UnveilPermissions as UnveilPermission,
