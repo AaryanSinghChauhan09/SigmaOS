@@ -19,4 +19,4 @@ jobs:
 
       - name: Run Fedora Security Policies Test
         run: |
-          ./run_sigma_tests.sh
+          cargo test --lib -- compatibility::fedora
