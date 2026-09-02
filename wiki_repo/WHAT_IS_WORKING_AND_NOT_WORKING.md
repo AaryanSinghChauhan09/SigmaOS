@@ -7,6 +7,8 @@
 
 SigmaOS (SovereignOS) is a high-performance, quantum-resistant, multi-paradigm operating system built in safe Rust. It combines Linux and BSD distro innovations with native system shards (`S-SHARDS`), zero-copy IPC, post-quantum security (Kyber-1024, Dilithium-5), and a multi-format universal package translation engine.
 
+This document serves as the master guide for human engineers and AI agents to understand what subsystems are working, what diagnostic compiler errors occur, why they occur, and exact code blueprints on how to fix them efficiently.
+
 ---
 
 ## 1. WHAT IS WORKING (Fully Operational Subsystems)
@@ -65,7 +67,7 @@ When building or extending algorithms in SigmaOS, AI agents may encounter standa
 | **E0428** | `a type named ... has already been defined` | Duplicate struct/enum declarations within the same module scope or imported via `use super::*`. |
 | **E0433** | `failed to resolve: use of undeclared type` | Missing struct/engine definition or missing module import in `src/unimplemented_features.rs` or `src/lib.rs`. |
 | **E0502** | `cannot borrow ... as mutable because it is also borrowed as immutable` | Holding an immutable reference across a closure or loop while attempting a mutable borrow on the same struct. |
-| **E0512** | `cannot transmute between types of different sizes` | Attempting `core::mem::transmute` between raw kernel structures or pointer types of mismatched byte widths. |
+| **E0512** | `cannot transmute between types of different sizes` | Attempting `core::mem::transmute` between raw kernel structures or pointer types of mismatched byte widths (e.g. transmuting `usize` to 32-bit enum). |
 | **E0599** | `no method named ... found for type` | Custom collection types (e.g., `klib::Vec<T>`) lacking expected standard methods (`iter_mut()`, `from_utf8()`, `contains_key_str()`). |
 | **E0614** | `type ... cannot be dereferenced` | Attempting to dereference (`*v`) a primitive scalar type (like `i32`) that is already passed by value. |
 | **E0659** | `... is ambiguous` | Wildcard imports (`use super::*`) bringing multiple conflicting symbols into the same namespace. |

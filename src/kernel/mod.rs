@@ -36,7 +36,6 @@ pub mod numa_scheduler;
 pub mod object;
 pub mod os_innovations;
 pub mod paging;
-pub mod performance;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
@@ -87,7 +86,6 @@ pub use linux_bsd_innovations::{
     CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
     PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
 };
-pub use performance::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,

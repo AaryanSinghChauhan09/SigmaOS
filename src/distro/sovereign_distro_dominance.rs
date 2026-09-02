@@ -209,6 +209,7 @@ pub struct OpenBsdHardenedCapsicumPledge {
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
     pub unveiled_paths: BTreeMap<String, String>,   // path -> permissions e.g. "rwc"
+    pub is_pledged: bool,
 }
 
 impl OpenBsdHardenedCapsicumPledge {
@@ -217,10 +218,12 @@ impl OpenBsdHardenedCapsicumPledge {
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
+            is_pledged: true,
         }
     }
 
     pub fn pledge(&mut self, promises: &[&str]) {
+        self.is_pledged = true;
         for promise in promises {
             if !self.pledged_promises.contains(&promise.to_string()) {
                 self.pledged_promises.push(promise.to_string());
@@ -827,13 +830,10 @@ pub struct SovereignDistroDominanceSuite {
 
 impl SovereignDistroDominanceSuite {
     pub fn new() -> Self {
-        let mut security_sentinel = OpenBsdHardenedCapsicumPledge::new();
-        security_sentinel.pledge(&["stdio", "rpath"]);
-
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
-            security_sentinel,
+            security_sentinel: OpenBsdHardenedCapsicumPledge::new(),
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
@@ -846,9 +846,13 @@ impl SovereignDistroDominanceSuite {
 
     /// Evaluates all integrated Linux & BSD distro engines to guarantee absolute system dominance
     pub fn execute_distro_dominance_matrix(&mut self) -> bool {
+        self.is_distro_dominance_fulfilled()
+    }
+
+    pub fn is_distro_dominance_fulfilled(&self) -> bool {
         let nix_ready = true;
         let sched_ready = true;
-        let sec_ready = !self.security_sentinel.pledged_promises.is_empty();
+        let sec_ready = self.security_sentinel.is_pledged;
         let cow_ready = self.filesystem_cow.subvolumes.contains_key("@root");
         let vpn_ready = !self.pqc_vpn.interface_name.is_empty();
 

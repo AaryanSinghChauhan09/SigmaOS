@@ -2,21 +2,7 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
-#[cfg(not(test))]
 use crate::driver::framework::{DriverError, DriverID, DriverState, DriverType, SimpleDriver};
-
-#[cfg(test)]
-use dummy_driver::*;
-
-#[cfg(test)]
-mod dummy_driver {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum DriverType { Net, Block, Char }
-    pub struct SimpleDriver;
-    impl SimpleDriver {
-        pub fn new(_id: usize, _dt: DriverType) -> Self { SimpleDriver }
-    }
-}
 use crate::package::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
 

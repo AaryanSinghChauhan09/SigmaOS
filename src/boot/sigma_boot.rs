@@ -35,12 +35,6 @@ pub enum HandoffProtocol {
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdBootDirective {
-    pub directive: String,
-    pub argument: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct BootStageDescriptor {
     pub protocol: HandoffProtocol,
     pub kernel_addr: u64,

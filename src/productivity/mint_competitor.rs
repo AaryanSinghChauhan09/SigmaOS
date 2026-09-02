@@ -489,27 +489,6 @@ pub enum NvidiaPrimeProfile {
     OffloadCompute,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NvidiaPowerState {
-    Active,
-    LowPower,
-    Off,
-}
-
-#[derive(Debug, Clone)]
-pub struct NvidiaPrimeTelemetry {
-    pub gpu_temp_c: u32,
-    pub power_usage_watts: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct OffloadCommand {
-    pub cmd: String,
-    pub env_vars: BTreeMap<String, String>,
-}
-
-pub use crate::graphics::nvidia_prime::NvidiaPrimeEngine as SovereignNvidiaPrimeEngine;
-
 pub struct NvidiaPrimeApplet {
     pub active_profile: NvidiaPrimeProfile,
     pub is_relogin_required: bool,

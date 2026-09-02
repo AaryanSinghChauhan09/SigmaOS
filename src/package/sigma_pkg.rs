@@ -197,9 +197,9 @@ impl SigmaPkg {
 
         // Create directories if they don't exist
         fs::create_dir_all(&cache_dir)
-            .map_err(|_| "Failed to create cache directory".to_string())?;
+            .map_err(|e| format!("Failed to create cache directory: {}", e))?;
         fs::create_dir_all(&database_dir)
-            .map_err(|_| "Failed to create database directory".to_string())?;
+            .map_err(|e| format!("Failed to create database directory: {}", e))?;
 
         let mut pkg = SigmaPkg {
             config: PkgConfig::default(),
@@ -254,7 +254,7 @@ impl SigmaPkg {
         }
 
         let content = fs::read_to_string(&repo_config_path)
-            .map_err(|_| "Failed to read repository config".to_string())?;
+            .map_err(|e| format!("Failed to read repository config: {}", e))?;
 
         for line in content.lines() {
             let line = line.trim();
@@ -309,13 +309,13 @@ impl SigmaPkg {
 
             // Download repository database
             let db_url = format!("{}/{}.db", repo.url, repo.name);
-            let db_path = self.cache_dir.join(&format!("{}.db", repo.name));
+            let db_path = self.cache_dir.join(format!("{}.db", repo.name));
 
             // Simulate database download
             // In real implementation, would use HTTP client to download
             if let Ok(content) = Self::download_file(&db_url) {
                 fs::write(&db_path, content)
-                    .map_err(|_| "Failed to write database".to_string())?;
+                    .map_err(|e| format!("Failed to write database: {}", e))?;
 
                 // Parse database and update packages
                 repo.packages = Self::parse_database(&db_path)?;
@@ -430,7 +430,7 @@ impl SigmaPkg {
         println!("Resolving dependencies...");
         let transaction = self.resolve_dependencies(package_names)?;
 
-        self.display_transaction(&transaction);
+        self.display_transaction(&transaction)?;
 
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
@@ -455,7 +455,7 @@ impl SigmaPkg {
         // Download package
         let package_url = format!("{}/{}-{}.sigmpkg",
             package.repository, package.name, package.version);
-        let package_path = self.cache_dir.join(&format!("{}-{}.sigmpkg",
+        let package_path = self.cache_dir.join(format!("{}-{}.sigmpkg",
             package.name, package.version));
 
         // Simulate download
@@ -573,7 +573,7 @@ impl SigmaPkg {
         let mut upgradable = Vec::new();
 
         for (name, local_pkg) in &self.local_packages {
-            if let Ok(remote_pkg) = self.find_package(name) {
+            if let Some(remote_pkg) = self.find_package(name) {
                 if remote_pkg.version != local_pkg.version {
                     upgradable.push((local_pkg.clone(), remote_pkg));
                 }
@@ -601,7 +601,7 @@ impl SigmaPkg {
             transaction.install_size += new.installed_size - old.installed_size;
         }
 
-        self.display_transaction(&transaction);
+        self.display_transaction(&transaction)?;
 
         if !self.config.no_confirm {
             if !self.confirm_transaction() {

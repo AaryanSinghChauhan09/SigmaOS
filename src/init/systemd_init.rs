@@ -286,47 +286,6 @@ impl Default for TimerConfig {
     }
 }
 
-/// Parallel Stage Solver for BSD rc.d & systemd boot stages
-pub struct BsdRcParallelStageSolver;
-
-impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
-        let mut ids = SystemdVec::new();
-        for &id in unit_ids {
-            ids.push(id);
-        }
-        if let Ok(sorted) = engine.topological_sort(&ids) {
-            let mut stages = Vec::new();
-            let mut current_stage = Vec::new();
-            for &id in sorted.iter() {
-                if let Some(unit) = engine.find_unit(id) {
-                    let has_dep = !current_stage.is_empty() && (
-                        unit.after.iter().any(|dep| current_stage.contains(dep)) ||
-                        current_stage.iter().any(|&prev_id| {
-                            if let Some(prev) = engine.find_unit(prev_id) {
-                                prev.before.contains(&id)
-                            } else {
-                                false
-                            }
-                        })
-                    );
-                    if has_dep {
-                        stages.push(current_stage);
-                        current_stage = Vec::new();
-                    }
-                }
-                current_stage.push(id);
-            }
-            if !current_stage.is_empty() {
-                stages.push(current_stage);
-            }
-            stages
-        } else {
-            vec![unit_ids.to_vec()]
-        }
-    }
-}
-
 /// Multi-init abstraction bridge allowing boot-time switching across Linux & BSD init models
 pub struct InitSystemBridge {
     pub active_init: InitSystemType,
@@ -772,6 +731,41 @@ impl SystemdDynamicUserContext {
             private_tmp: true,
             protect_system: "strict".to_string(),
         }
+    }
+}
+
+/// BSD rc.d / Parallel Stage Boot Stage Solver
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut completed: Vec<UnitID> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut stage = Vec::new();
+            for &id in &remaining {
+                if let Some(unit) = engine.find_unit(id) {
+                    let prereqs_met = unit.after.iter().all(|a| completed.contains(a))
+                        && unit.before.iter().all(|b| !remaining.contains(b) || *b == id);
+                    if prereqs_met {
+                        stage.push(id);
+                    }
+                } else {
+                    stage.push(id);
+                }
+            }
+            if stage.is_empty() {
+                stage = remaining.clone();
+            }
+            for &id in &stage {
+                completed.push(id);
+                remaining.retain(|&x| x != id);
+            }
+            stages.push(stage);
+        }
+        stages
     }
 }
 
@@ -2173,11 +2167,9 @@ mod tests {
         let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
         target.duration_ms = 100;
         target.requires.push(2);
-
         let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
         service.duration_ms = 150;
         service.requires.push(3);
-
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 

@@ -2,7 +2,6 @@
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 
-extern crate alloc;
 use crate::compatibility::{KernelPersona, SyscallAbi};
 use crate::klib::HashMap;
 use alloc::string::{String, ToString};

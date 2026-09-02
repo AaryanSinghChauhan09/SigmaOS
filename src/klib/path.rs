@@ -37,10 +37,6 @@ impl PathBuf {
         self.inner.push_str(path);
     }
 
-    pub fn exists(&self) -> bool {
-        !self.inner.is_empty()
-    }
-
     pub fn to_str(&self) -> Option<&str> {
         Some(&self.inner)
     }

@@ -177,8 +177,8 @@ fn mkinitcpio_hooks_build_payload() {
     f.disable("filesystems");
     let payload = f.build_payload();
     assert_eq!(f.enabled_hook_count(), 1);
-    assert!(payload.iter().any(|p: &String| p.contains("virtio_blk")));
-    assert!(!payload.iter().any(|p: &String| p.contains("ext4")));
+    assert!(payload.iter().any(|p| p.contains("virtio_blk")));
+    assert!(!payload.iter().any(|p| p.contains("ext4")));
 }
 
 #[test]
