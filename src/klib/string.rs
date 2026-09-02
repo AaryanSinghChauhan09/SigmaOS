@@ -38,12 +38,11 @@ impl SigmaString {
     }
 
     /// Create a SigmaString from a string slice
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn from_str(s: &str) -> Self {
         let bytes = s.as_bytes();
         let mut data = SigmaVec::with_capacity(bytes.len());
-        for &byte in bytes {
-            data.push(byte);
-        }
+        data.extend_from_slice(bytes);
 
         Self {
             data,
@@ -52,12 +51,11 @@ impl SigmaString {
     }
 
     /// Create a SigmaString from a byte slice
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, core::str::Utf8Error> {
         core::str::from_utf8(bytes)?;
         let mut data = SigmaVec::with_capacity(bytes.len());
-        for &byte in bytes {
-            data.push(byte);
-        }
+        data.extend_from_slice(bytes);
 
         Ok(Self {
             data,
@@ -96,10 +94,9 @@ impl SigmaString {
     }
 
     /// Push a string slice to the string
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn push_str(&mut self, s: &str) {
-        for byte in s.as_bytes() {
-            self.data.push(*byte);
-        }
+        self.data.extend_from_slice(s.as_bytes());
         self.len += s.len();
     }
 
@@ -273,8 +270,19 @@ impl SigmaString {
     }
 
     /// Trim both leading and trailing whitespace
+    /// Optimized by Bolt ⚡: calculates start and end offsets in a single pass over `self.as_bytes()`,
+    /// constructing only a single `SigmaString` result and avoiding intermediate buffer allocations.
     pub fn trim(&self) -> SigmaString {
-        self.trim_start().trim_end()
+        let bytes = self.as_bytes();
+        let mut start = 0;
+        while start < self.len && bytes[start].is_ascii_whitespace() {
+            start += 1;
+        }
+        let mut end = self.len;
+        while end > start && bytes[end - 1].is_ascii_whitespace() {
+            end -= 1;
+        }
+        SigmaString::from_bytes(&bytes[start..end]).unwrap()
     }
 
     /// Split the string by a pattern
