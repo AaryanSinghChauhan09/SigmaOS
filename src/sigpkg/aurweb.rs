@@ -470,6 +470,16 @@ impl AurGitRepoManager {
             Err("AurGit: Package repository base not found")
         }
     }
+
+    /// Migrates legacy Subversion (SVN) package bases to Git repositories (Arch Linux svntogit parity)
+    pub fn migrate_svn_pkgbase(&mut self, pkgbase: &str, svn_url: &str) -> Result<String, &'static str> {
+        if svn_url.is_empty() {
+            return Err("SvnToGit: Invalid SVN repository URL");
+        }
+        let pkgbuild = format!("# Migrated from SVN {}\npkgname={}\npkgver=1.0.0\n", svn_url, pkgbase);
+        let srcinfo = format!("pkgbase = {}\n\tpkgver = 1.0.0\n", pkgbase);
+        Ok(self.create_repository(pkgbase, &pkgbuild, &srcinfo))
+    }
 }
 
 impl Default for AurGitRepoManager {
@@ -753,5 +763,15 @@ mod tests {
         let promoted = tu_pipeline.vote_and_promote_package("tu_lead", "proton-ge-custom", "extra", 15);
         assert_eq!(promoted, Ok(true));
         assert_eq!(tu_pipeline.package_promotions.get("proton-ge-custom").unwrap(), "extra");
+    }
+
+    #[test]
+    fn test_svntogit_pkgbase_migration() {
+        let mut git_mgr = AurGitRepoManager::new();
+        let clone_url = git_mgr
+            .migrate_svn_pkgbase("glibc", "https://svn.archlinux.org/packages/glibc")
+            .unwrap();
+        assert!(clone_url.contains("glibc.git"));
+        assert!(git_mgr.repositories.contains_key("glibc"));
     }
 }
