@@ -486,7 +486,7 @@ impl VirtualMemoryManager for SimpleVMM {
         while self.pt_tables.len() <= pd_idx_in_vec {
             self.pt_tables.push(None);
         }
-        if self.pt_tables[pd_idx].is_none() {
+        if self.pt_tables[pd_idx_in_vec].is_none() {
             let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
@@ -502,7 +502,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if let Some(ref mut pt) = self.pt_tables[pd_idx] {
+        if let Some(ref mut pt) = self.pt_tables[pd_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);

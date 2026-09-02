@@ -691,6 +691,8 @@ impl UniversalPackageAdapter {
     ) -> Result<Package, &'static str> {
         let cleaned_ver = if version_str.contains('-') {
             version_str.split('-').next().unwrap()
+        } else if version_str.contains('_') {
+            version_str.split('_').next().unwrap()
         } else {
             version_str
         };
@@ -1014,7 +1016,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::universal_oop_system::Version::new(
+                version: crate::sigpkg::Version::new(
                     native_pkg.version.major,
                     native_pkg.version.minor,
                     native_pkg.version.patch,
@@ -1113,6 +1115,9 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
+        if name.starts_with("so:libc.") || name.starts_with("so:libc") {
+            return "libc".to_string();
+        }
         match name.as_str() {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
