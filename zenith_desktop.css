@@ -18,6 +18,9 @@
     --accent-blue: hsl(200, 100%, 50%);
     --accent-blue-glow: hsla(200, 100%, 50%, 0.2);
     
+    --accent-cyan: hsl(180, 100%, 50%);
+    --accent-cyan-glow: hsla(180, 100%, 50%, 0.2);
+
     --text-white: #f5f5f7;
     --text-muted: #86868b;
     --text-accent: var(--accent-gold);

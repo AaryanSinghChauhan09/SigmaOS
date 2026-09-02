@@ -29,6 +29,7 @@ pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod memory;
 pub mod meta;
+pub mod nextgen_breakthroughs;
 pub mod module_loader;
 pub mod net;
 pub mod numa_allocator;
@@ -108,5 +109,6 @@ pub use roundrobin::{
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;
+pub use nextgen_breakthroughs::*;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
