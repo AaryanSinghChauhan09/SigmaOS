@@ -58,10 +58,15 @@ pub mod verifier;
 pub mod zero_alloc_resolver;
 
 pub use crate::package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchGitPackageRepository,
+    ArchSplitPackageHookRunnerEngine, ArchSvnToGitPkgctlMaintainerEngine, DebconfPreseedEntry,
+    DebconfQuestionType, DebianDebconfStatoverrideEngine, DpkgStatoverrideRule,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenSuseZypperVendorStickinessEngine, PkgctlBranchChannel, PpaRepository, SlackBuildInfo,
+    SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SvnLegacyPackageRecord,
+    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,

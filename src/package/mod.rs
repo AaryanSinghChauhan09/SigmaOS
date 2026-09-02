@@ -28,23 +28,25 @@ pub mod gentoo_opt;
 pub mod linux_translation;
 pub mod manager;
 pub mod repository;
-pub mod repository;
 pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
 pub mod signing;
 pub mod spac;
 pub mod store;
-pub mod store;
-pub mod universal;
 pub mod universal;
 pub mod updater;
 
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchGitPackageRepository,
+    ArchSplitPackageHookRunnerEngine, ArchSvnToGitPkgctlMaintainerEngine, DebconfPreseedEntry,
+    DebconfQuestionType, DebianDebconfStatoverrideEngine, DpkgStatoverrideRule,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenSuseZypperVendorStickinessEngine, PkgctlBranchChannel, PpaRepository, SlackBuildInfo,
+    SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SvnLegacyPackageRecord,
+    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
@@ -65,10 +67,4 @@ pub use store::{
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };
