@@ -1,0 +1,3 @@
+## 2026-09-01 - Accessible Custom Window Controls in Web Desktop UI
+**Learning:** Custom window control dots (minimize, maximize, close) in web-based desktop environments are often built as non-semantic `<div>` elements, rendering them completely inaccessible to keyboard users and screen readers. Replacing them with `<button type="button">` combined with explicit `aria-label`s and CSS resets (`border: none; padding: 0; outline: none;`) restores WCAG 2.1 keyboard focus navigation and screen reader accessibility without affecting visual styling.
+**Action:** Always use semantic `<button type="button">` with descriptive `aria-label` and `title` attributes for desktop window controls and custom icon buttons, and verify focus rings via `:focus-visible`.
