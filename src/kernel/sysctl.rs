@@ -109,6 +109,21 @@ impl SysctlRegistry {
             Err("Sysctl parameter not found!")
         }
     }
+
+    pub fn list_by_prefix(&self, prefix: &str) -> Vec<(String, SysctlValue)> {
+        let mut results = Vec::new();
+        for (mib, node) in &self.nodes {
+            if mib.starts_with(prefix) {
+                results.push((mib.clone(), node.value.clone()));
+            }
+        }
+        results
+    }
+
+    pub fn reset_defaults(&mut self) {
+        self.nodes.clear();
+        self.register_default_nodes();
+    }
 }
 
 #[cfg(test)]
@@ -154,5 +169,18 @@ mod tests {
         // Type mismatch validation
         let result = registry.set("vm.swappiness", SysctlValue::Bool(true));
         assert_eq!(result, Err("Type mismatch for sysctl parameter!"));
+    }
+
+    #[test]
+    fn test_sysctl_list_by_prefix_and_reset() {
+        let mut registry = SysctlRegistry::new();
+        let kern_nodes = registry.list_by_prefix("kern.");
+        assert!(kern_nodes.iter().any(|(mib, _)| mib == "kern.ostype"));
+
+        registry.set("vm.swappiness", SysctlValue::Int(0)).unwrap();
+        assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(0)));
+
+        registry.reset_defaults();
+        assert_eq!(registry.get("vm.swappiness"), Some(&SysctlValue::Int(60)));
     }
 }
