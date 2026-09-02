@@ -1,7 +1,21 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, and **Package Repository Infrastructure**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, **Package Repository Infrastructure**, and **System Manual Pages (man pages)**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for SigmaOS Manual Pages (`docs/man/`)
+
+To elevate the SigmaOS System Documentation & Manual Pages into clear, standardized, machine-readable reference guides, SigmaOS incorporates best practices from BSD and Linux manual ecosystems:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS Man Page Integration Strategy |
+|-------------------|-------------------|---------------------------------------|
+| **FreeBSD / OpenBSD** | `mdoc(7)` semantic macro language | Standardize all CLI tool manuals using semantic `mdoc(7)` macros (`.Dd`, `.Dt`, `.Sh NAME`, `.Sh SYNOPSIS`, `.Sh EXAMPLES`). |
+| **OpenBSD** | `mandoc -Tlint` strict linting | Automated CI check running `mandoc -Tlint` to enforce zero man page syntax errors and clean HTML export. |
+| **Arch Linux** | `man-db` / `mandb` indexing | Pre-generated `whatis` database indexes for instant `apropos` and fuzzy keyword searching. |
+| **Debian / Ubuntu** | POSIX & ISO section taxonomy | Standardized section partitioning (Section 1 for user tools, Section 5 for config files, Section 8 for sysadmin daemons). |
+| **NetBSD** | Multilingual & HTML web export | Automated pipeline rendering `mdoc` manuals into searchable web pages for the official site. |
 
 ---
 
