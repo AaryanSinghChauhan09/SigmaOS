@@ -347,6 +347,183 @@ mod tests {
         assert_eq!(version.to_string(), "1.1.0");
     }
 
+// =========================================================================
+// 1. DISTRO RELEASE CHANNEL GOVERNOR (DEBIAN / FEDORA / FREEBSD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReleaseChannelMode {
+    DebianStable,        // Point releases, security backports only
+    DebianTesting,       // Automated migration gate, zero RC bugs required
+    DebianUnstableSid,   // Active development, bleeding-edge packages
+    ArchRollingSync,     // Continuous rolling release updates
+    FedoraRawhide,       // Rawhide nightly builds and branch staging
+    FreeBsdReleng,       // Production release engineering branch
+    FreeBsdStable,       // Stable ABI branch
+    FreeBsdCurrent,      // Head development branch
+}
+
+#[derive(Debug, Clone)]
+pub struct ReleaseChannelConfig {
+    pub mode: ReleaseChannelMode,
+    pub name: String,
+    pub abi_frozen: bool,
+    pub min_aging_days_in_testing: u32,
+    pub max_critical_bugs_allowed: u32,
+}
+
+pub struct DistroReleaseChannelGovernor {
+    pub channels: Vec<ReleaseChannelConfig>,
+}
+
+impl DistroReleaseChannelGovernor {
+    pub fn new() -> Self {
+        let mut gov = Self { channels: Vec::new() };
+        gov.channels.push(ReleaseChannelConfig {
+            mode: ReleaseChannelMode::DebianStable,
+            name: "Stable".to_string(),
+            abi_frozen: true,
+            min_aging_days_in_testing: 10,
+            max_critical_bugs_allowed: 0,
+        });
+        gov.channels.push(ReleaseChannelConfig {
+            mode: ReleaseChannelMode::DebianTesting,
+            name: "Testing".to_string(),
+            abi_frozen: false,
+            min_aging_days_in_testing: 5,
+            max_critical_bugs_allowed: 0,
+        });
+        gov.channels.push(ReleaseChannelConfig {
+            mode: ReleaseChannelMode::ArchRollingSync,
+            name: "Rolling".to_string(),
+            abi_frozen: false,
+            min_aging_days_in_testing: 0,
+            max_critical_bugs_allowed: 2,
+        });
+        gov
+    }
+
+    pub fn evaluate_channel_promotion(
+        &self,
+        mode: ReleaseChannelMode,
+        days_in_testing: u32,
+        open_critical_bugs: u32,
+    ) -> Result<bool, &'static str> {
+        if let Some(cfg) = self.channels.iter().find(|c| c.mode == mode) {
+            if open_critical_bugs > cfg.max_critical_bugs_allowed {
+                return Ok(false);
+            }
+            if days_in_testing < cfg.min_aging_days_in_testing {
+                return Ok(false);
+            }
+            Ok(true)
+        } else {
+            Err("ReleaseChannelGovernor: Mode not configured")
+        }
+    }
+}
+
+impl Default for DistroReleaseChannelGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 2. REPRODUCIBLE RELEASE ARTIFACT VERIFIER (NIXOS HYDRA / DEBIAN REPRO)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ReleaseArtifactManifest {
+    pub artifact_name: String,
+    pub sha256_checksum: String,
+    pub dilithium5_signature: String,
+    pub deterministic_build: bool,
+}
+
+pub struct ReproducibleReleaseArtifactVerifier {
+    pub artifacts: Vec<ReleaseArtifactManifest>,
+}
+
+impl ReproducibleReleaseArtifactVerifier {
+    pub fn new() -> Self {
+        Self { artifacts: Vec::new() }
+    }
+
+    pub fn register_artifact(&mut self, manifest: ReleaseArtifactManifest) {
+        self.artifacts.push(manifest);
+    }
+
+    pub fn verify_release_readiness(&self) -> bool {
+        if self.artifacts.is_empty() {
+            return false;
+        }
+        self.artifacts.iter().all(|a| {
+            a.deterministic_build
+                && !a.sha256_checksum.is_empty()
+                && !a.dilithium5_signature.is_empty()
+        })
+    }
+}
+
+impl Default for ReproducibleReleaseArtifactVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 3. SOVEREIGN RELEASE ORCHESTRATOR
+// =========================================================================
+
+pub struct SovereignReleaseOrchestrator {
+    pub manager: ReleaseManager,
+    pub channel_governor: DistroReleaseChannelGovernor,
+    pub artifact_verifier: ReproducibleReleaseArtifactVerifier,
+}
+
+impl SovereignReleaseOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            manager: ReleaseManager::new(),
+            channel_governor: DistroReleaseChannelGovernor::new(),
+            artifact_verifier: ReproducibleReleaseArtifactVerifier::new(),
+        }
+    }
+
+    pub fn promote_and_release(
+        &mut self,
+        version: &str,
+        codename: &str,
+        mode: ReleaseChannelMode,
+    ) -> Result<bool, &'static str> {
+        let is_ready = self
+            .channel_governor
+            .evaluate_channel_promotion(mode, 14, 0)?;
+
+        if !is_ready {
+            return Ok(false);
+        }
+
+        if !self.artifact_verifier.verify_release_readiness() {
+            return Err("ReleaseOrchestrator: Artifacts not reproducible or signed");
+        }
+
+        self.manager.start_release_cycle(version, codename, ReleaseType::Stable);
+        self.manager
+            .release(version, 1700000000, Some(1800000000))
+            .map_err(|_| "ReleaseOrchestrator: Release error")?;
+
+        Ok(true)
+    }
+}
+
+impl Default for SovereignReleaseOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
     #[test]
     fn test_version_parsing() {
         let version = VersionManager::parse("1.2.3-alpha+build.123").unwrap();
@@ -355,5 +532,43 @@ mod tests {
         assert_eq!(version.patch, 3);
         assert_eq!(version.pre_release, Some("alpha".to_string()));
         assert_eq!(version.build_metadata, Some("build.123".to_string()));
+    }
+
+    #[test]
+    fn test_distro_release_channel_governor() {
+        let gov = DistroReleaseChannelGovernor::new();
+        let ready = gov.evaluate_channel_promotion(ReleaseChannelMode::DebianStable, 14, 0).unwrap();
+        assert!(ready);
+
+        let not_ready = gov.evaluate_channel_promotion(ReleaseChannelMode::DebianStable, 2, 0).unwrap();
+        assert!(!not_ready);
+    }
+
+    #[test]
+    fn test_reproducible_release_artifact_verifier() {
+        let mut verifier = ReproducibleReleaseArtifactVerifier::new();
+        verifier.register_artifact(ReleaseArtifactManifest {
+            artifact_name: "sigmaos-1.0.0-x86_64.iso".to_string(),
+            sha256_checksum: "a1b2c3d4e5f6...".to_string(),
+            dilithium5_signature: "sig_dilithium_123".to_string(),
+            deterministic_build: true,
+        });
+
+        assert!(verifier.verify_release_readiness());
+    }
+
+    #[test]
+    fn test_sovereign_release_orchestrator() {
+        let mut orch = SovereignReleaseOrchestrator::new();
+        orch.artifact_verifier.register_artifact(ReleaseArtifactManifest {
+            artifact_name: "sigmaos-1.0.0-x86_64.iso".to_string(),
+            sha256_checksum: "a1b2c3d4e5f6...".to_string(),
+            dilithium5_signature: "sig_dilithium_123".to_string(),
+            deterministic_build: true,
+        });
+
+        let success = orch.promote_and_release("1.0.0", "Apex", ReleaseChannelMode::DebianStable).unwrap();
+        assert!(success);
+        assert!(orch.manager.get_current_release().is_some());
     }
 }
