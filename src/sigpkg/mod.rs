@@ -64,7 +64,7 @@ pub use sovereign_sigpkg::*;
 
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager,
+    PacmanDbAdapter, RollingSyncManager, SvntogitMigrationEngine, SvnPackageMetadata,
 };
 pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
