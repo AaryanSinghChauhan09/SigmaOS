@@ -1,7 +1,21 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, the **Installer**, the **Web UI**, and **Package Repository Infrastructure**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, and **Package Repository Infrastructure**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Linux & BSD Distro Inspiration for SigmaOS ASP / ABS (`src/sigpkg/arch_pacman_engine.rs`)
+
+To transform the SigmaOS Arch Build System / Protocol (`ArchBuildSystem` in `src/sigpkg/arch_pacman_engine.rs`) into an automated, distributed source-to-binary compilation framework, SigmaOS incorporates inspirations from Linux and BSD source build trees:
+
+| Ecosystem / Distro | Feature / Paradigm | SigmaOS ASP / ABS Integration Strategy |
+|-------------------|-------------------|----------------------------------------|
+| **Arch Linux ASP / ABS** | Git-backed PKGBUILD source tree checkout | Git-integrated PKGBUILD recipe checkout (`asp checkout`) with automated `.SRCINFO` parsing and source tarball verification. |
+| **FreeBSD Ports Tree** | `/usr/ports` category hierarchy | Structured local source build hierarchy (`/sigma/ports/`) supporting MAKE variables and custom compile flags. |
+| **OpenBSD `dpb`** | Distributed parallel port builder | Multi-core parallel and remote build slave cluster scheduler (`dpb`) for accelerating bulk package compilation. |
+| **Gentoo Portage Tree** | Git-synced ebuild repository | Automated git sync for official and user overlay package recipes (`/var/db/repos/sigma`). |
+| **Void Linux `xbps-src`** | Unprivileged template build environment | Sandbox compilation of source recipes using unprivileged user namespaces and clean chroots. |
 
 ---
 
