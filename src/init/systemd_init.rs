@@ -105,6 +105,55 @@ impl Default for SystemdUnitHardeningProfile {
     }
 }
 
+/// Solves parallel execution stages for BSD rc.d service scripts based on dependency levels
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut processed = Vec::new();
+
+        while processed.len() < units.len() {
+            let mut current_stage = Vec::new();
+            for &u in units {
+                if processed.contains(&u) {
+                    continue;
+                }
+                let unit = match engine.find_unit(u) {
+                    Some(unit) => unit,
+                    None => continue,
+                };
+
+                let prereqs_met = unit.after.iter().all(|req| processed.contains(req)) &&
+                    units.iter().filter(|&&other| other != u && !processed.contains(&other)).all(|&other| {
+                        if let Some(other_unit) = engine.find_unit(other) {
+                            !other_unit.before.contains(&u)
+                        } else {
+                            true
+                        }
+                    });
+
+                if prereqs_met {
+                    current_stage.push(u);
+                }
+            }
+
+            if current_stage.is_empty() {
+                let remaining: Vec<UnitID> = units.iter().filter(|&&u| !processed.contains(&u)).cloned().collect();
+                stages.push(remaining);
+                break;
+            }
+
+            for &u in &current_stage {
+                processed.push(u);
+            }
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 /// `systemd-analyze security` Auditor Engine
 #[derive(Debug, Clone)]
 pub struct SecurityAnalysisReport {
@@ -2129,10 +2178,12 @@ mod tests {
         assert_eq!(score_full, 2.5);
 
         let mut engine = SystemdEngine::new();
-        let target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        let service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
+        target.requires.push(2);
+        service.requires.push(3);
 
         engine.register_unit(target);
         engine.register_unit(service);

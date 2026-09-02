@@ -27,7 +27,7 @@ use alloc::format;
 
 use crate::klib::BTreeMap;
 use core::time::Duration;
-// Instant not in no_std
+use std::time::Instant;
 
 /// Update channel
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

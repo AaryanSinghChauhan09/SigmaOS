@@ -27,6 +27,7 @@ pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
 pub mod pacman;
+pub mod pacman_contrib;
 pub mod portage;
 pub mod recipe;
 pub mod repository_manager;
@@ -104,6 +105,12 @@ pub use client::{
     SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
 };
 pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
+pub use pacman_contrib::{
+    PacCacheTrimmer, PackageCacheEntry, PacCacheResult,
+    PacDiffConfigResolver, PacDiffAction, PacDiffCandidate,
+    CheckUpdatesEngine, InstalledPackage, SyncPackage, PendingUpdate,
+    PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor, PacLogAction, PacLogEntry,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

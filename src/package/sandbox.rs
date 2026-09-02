@@ -78,7 +78,14 @@ impl SimpleBuildSandbox {
 
 impl BuildSandbox for SimpleBuildSandbox {
     fn id(&self) -> SandboxID { self.id }
-    fn state(&self) -> SandboxState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> SandboxState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => SandboxState::Created,
+            1 => SandboxState::Running,
+            2 => SandboxState::Stopped,
+            _ => SandboxState::Failed,
+        }
+    }
 
     fn create(&mut self) -> Result<(), SandboxError> {
         self.state.store(SandboxState::Created as usize, Ordering::SeqCst);
@@ -201,7 +208,7 @@ pub trait SandboxManager {
 
 #[repr(C)]
 pub struct SimpleSandboxManager {
-    pub sandboxes: Vec<Option<Box<dyn BuildSandbox>>>,
+    pub sandboxes: Vec<Option<SimpleBuildSandbox>>,
     pub next_id: AtomicUsize,
 }
 
@@ -219,14 +226,15 @@ impl SandboxManager for SimpleSandboxManager {
     fn create_sandbox(&mut self, rootfs: &[u8]) -> Result<SandboxID, SandboxError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let sandbox = SimpleBuildSandbox::new(id, rootfs);
-        self.sandboxes.push(Some(Box::new(sandbox)));
+        self.sandboxes.push(Some(sandbox));
         Ok(id)
     }
 
     fn destroy_sandbox(&mut self, id: SandboxID) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id() == id {
+                if sandbox.id == id {
+                    *sandbox_option = None;
                     return Ok(());
                 }
             }
@@ -237,7 +245,7 @@ impl SandboxManager for SimpleSandboxManager {
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn BuildSandbox> {
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id() == id { return Some(sandbox.as_ref()); }
+                if sandbox.id == id { return Some(sandbox as &dyn BuildSandbox); }
             }
         }
         None
@@ -247,7 +255,7 @@ impl SandboxManager for SimpleSandboxManager {
         let mut ids = Vec::new();
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                ids.push(sandbox.id());
+                ids.push(sandbox.id);
             }
         }
         ids
@@ -275,11 +283,9 @@ impl ResourceQuota for SimpleResourceQuota {
     fn set_memory_quota(&mut self, sandbox_id: SandboxID, bytes: usize) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
-                if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox { ref mut memory_limit, .. } = **sandbox {
-                        memory_limit.store(bytes, Ordering::SeqCst);
-                        return Ok(());
-                    }
+                if sandbox.id == sandbox_id {
+                    sandbox.memory_limit.store(bytes, Ordering::SeqCst);
+                    return Ok(());
                 }
             }
         }
@@ -289,11 +295,9 @@ impl ResourceQuota for SimpleResourceQuota {
     fn set_cpu_quota(&mut self, sandbox_id: SandboxID, cores: usize) -> Result<(), SandboxError> {
         for sandbox_option in &mut self.manager.sandboxes {
             if let Some(ref mut sandbox) = *sandbox_option {
-                if sandbox.id() == sandbox_id {
-                    if let SimpleBuildSandbox { ref mut cpu_limit, .. } = **sandbox {
-                        cpu_limit.store(cores, Ordering::SeqCst);
-                        return Ok(());
-                    }
+                if sandbox.id == sandbox_id {
+                    sandbox.cpu_limit.store(cores, Ordering::SeqCst);
+                    return Ok(());
                 }
             }
         }

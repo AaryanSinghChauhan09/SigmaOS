@@ -229,11 +229,10 @@ impl CacheEviction for SimpleCacheEviction {
         let mut freed = 0;
 
         while freed < target_size && self.cache.packages.len() > 0 {
-            if let Some(id) = self.evict_lru()? {
-                if let Some(package) = self.cache.retrieve(id) {
-                    freed += package.size();
-                    evicted.push(id);
-                }
+            let id = self.evict_lru()?;
+            if let Some(package) = self.cache.retrieve(id) {
+                freed += package.size();
+                evicted.push(id);
             }
         }
 
@@ -252,6 +251,7 @@ pub trait RegistryProxy {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct ProxyStats {
     pub requests_served: u64,
     pub cache_hits: u64,

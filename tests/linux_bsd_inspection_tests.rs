@@ -68,6 +68,12 @@ mod unified;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
+#[path = "../src/driver/mod.rs"]
+pub mod driver;
+#[path = "../src/package/mod.rs"]
+pub mod package;
+#[path = "../src/security/mod.rs"]
+pub mod security;
 #[path = "../src/sigpkg/mod.rs"]
 pub mod sigpkg;
 #[path = "../src/package/repository.rs"]
@@ -240,7 +246,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask { pid: 1, class: distro::wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -881,4 +887,67 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
     assert!(handoff.emergency_rescue_active);
     assert_eq!(handoff.last_error_log.as_deref(), Some("EFI Framebuffer resolution not supported"));
     assert!(handoff.execute_handoff().is_err());
+}
+
+#[test]
+fn test_pacman_contrib_suite_inspection() {
+    use sigpkg::pacman_contrib::{
+        PacCacheTrimmer, PackageCacheEntry, PacDiffConfigResolver, PacDiffCandidate, PacDiffAction,
+        CheckUpdatesEngine, InstalledPackage, SyncPackage, PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor,
+    };
+
+    // 1. Paccache trimmer
+    let mut trimmer = PacCacheTrimmer::new();
+    trimmer.add_cache_entry(PackageCacheEntry {
+        package_name: "sigma-kernel".to_string(),
+        version: "1.0.0".to_string(),
+        file_name: "sigma-kernel-1.0.0.pkg.tar.zst".to_string(),
+        size_bytes: 50_000_000,
+        is_installed: false,
+    });
+    trimmer.add_cache_entry(PackageCacheEntry {
+        package_name: "sigma-kernel".to_string(),
+        version: "1.1.0".to_string(),
+        file_name: "sigma-kernel-1.1.0.pkg.tar.zst".to_string(),
+        size_bytes: 52_000_000,
+        is_installed: true,
+    });
+    let res = trimmer.trim_cache(1, false);
+    assert_eq!(res.removed_files.len(), 1);
+    assert_eq!(res.bytes_freed, 50_000_000);
+
+    // 2. Pacdiff merge
+    let resolver = PacDiffConfigResolver::new();
+    let candidate = PacDiffCandidate {
+        config_path: "/etc/pacman.conf".to_string(),
+        pacnew_path: Some("/etc/pacman.conf.pacnew".to_string()),
+        pacsave_path: None,
+        current_content: "ILoveBar".to_string(),
+        new_content: "ILoveBar\nVerbosePkgLists".to_string(),
+    };
+    let merged = resolver.resolve(&candidate, PacDiffAction::Merge3Way).unwrap();
+    assert!(merged.contains("VerbosePkgLists"));
+
+    // 3. Checkupdates
+    let chk = CheckUpdatesEngine::new();
+    let inst = vec![InstalledPackage { name: "bash".to_string(), current_version: "5.1".to_string(), repository: "core".to_string() }];
+    let sync = vec![SyncPackage { name: "bash".to_string(), sync_version: "5.2".to_string(), repository: "core".to_string() }];
+    let updates = chk.check_updates(&inst, &sync);
+    assert_eq!(updates.len(), 1);
+    assert_eq!(updates[0].new_version, "5.2");
+
+    // 4. Paclist
+    let pflt = PacListRepoFilter::new();
+    let filtered = pflt.filter_by_repo("core", &inst);
+    assert_eq!(filtered.len(), 1);
+
+    // 5. Updpkgsums
+    let upd = UpdPkgSumsGenerator::new();
+    let updated_pkgbuild = upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
+    assert!(updated_pkgbuild.contains("sha256sums=('"));
+
+    // 6. Paclog
+    let log_line = "[2023-10-01 12:00:00] [ALPM] upgraded linux (6.5 -> 6.6)";
+    let parsed = PacLogAuditor::parse_log_line(log_line).unwrap();
+    assert_eq!(parsed.target, "linux");
 }
