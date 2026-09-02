@@ -28,7 +28,7 @@ use alloc::vec::Vec;
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
@@ -38,7 +38,6 @@ use std::collections::HashMap;
 
 use alloc::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -46,14 +45,12 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {

@@ -522,6 +522,7 @@ impl XenChannelRing {
 pub struct QubesGuiBlitter {
     pub screen_width: u32,
     pub screen_height: u32,
+    pub stride: u32,
     pub dom0_framebuffer: Vec<u32>, // ARGB32
 }
 
@@ -531,6 +532,7 @@ impl QubesGuiBlitter {
         Self {
             screen_width: width,
             screen_height: height,
+            stride: width * 4,
             dom0_framebuffer: vec![0x00000000; pixels],
         }
     }
@@ -642,7 +644,7 @@ impl QubesZeroTrustParitySuite {
             isolation_manager: SovereignIsolationManager::new(),
             policy_engine: QrexecPolicyEngine::new(),
             gui_blitter: QubesGuiBlitter::new(1920, 1080),
-            template_manager: TemplateVmManager::new(),
+            template_manager: TemplateVmManager::new(1),
         }
     }
 

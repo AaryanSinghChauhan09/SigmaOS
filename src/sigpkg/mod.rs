@@ -57,7 +57,10 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use crate::package::bsd_linux_package_innovations::{
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+
+pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
     FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
@@ -79,7 +82,7 @@ pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager,
 };
-pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase};
+pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,

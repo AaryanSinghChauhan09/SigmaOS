@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -36,6 +38,12 @@ mod linux_bsd_inspirations;
 mod linux_bsd_parity;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
 #[path = "../src/package/repository.rs"]
@@ -117,10 +125,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use std::path::PathBuf;
-    use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
-    };
     use vm_manager::{
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
@@ -261,10 +265,10 @@ fn test_wiki_distro_innovations_inspection() {
         Ok(SystemdUnitActiveState::Active)
     );
     // 8. Real-Time Hybrid Scheduler
-    let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(RealtimeTask {
+    let mut sched = wiki_ideas::SovereignHybridSchedulerInnovations::new();
+    sched.add_task(wiki_ideas::RealtimeTask {
         pid: 1,
-        class: SchedulerClass::RTLane,
+        class: wiki_ideas::SchedulerClass::RTLane,
         deadline_us: 50,
         wcet_us: 5,
         numa_node: 0,

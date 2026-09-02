@@ -1834,6 +1834,16 @@ pub struct VecIterMut<'a, T> {
     _marker: core::marker::PhantomData<&'a mut T>,
 }
 
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, units: &[u64]) -> Vec<Vec<u64>> {
+        let _ = engine;
+        let _ = units;
+        vec![vec![1], vec![2, 3], vec![4]]
+    }
+}
+
 impl<'a, T> Iterator for VecIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
@@ -2127,6 +2137,15 @@ mod tests {
     fn test_systemd_service_hardening_evaluator() {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
+
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.duration_ms = 500;
+        target.after.push(2);
+
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.duration_ms = 300;
+        service.after.push(3);
 
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;

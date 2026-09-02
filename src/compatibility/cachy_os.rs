@@ -120,8 +120,12 @@ pub struct V4OptimizedPackageManager {
 impl V4OptimizedPackageManager {
     pub fn new() -> Self {
         V4OptimizedPackageManager {
-            detected_level: AtomicUsize::new(1), // Default standard x86-64-v1
+            detected_level: AtomicUsize::new(4), // Default standard x86-64-v4 for CachyOS optimization
         }
+    }
+
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 
     pub fn detect_microarchitecture_level(
