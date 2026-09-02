@@ -387,7 +387,6 @@ mod tests_agent_memory {
 }
 
 /// Curated AI Model Marketplace supporting PQC-signed provenance verification (Roadmap Item 92)
-pub struct ModelMarketplace {
     pub registered_models: Vec<(usize, String, String, String, bool)>, // (id, name, ver, pqc_sig, verified)
 }
 

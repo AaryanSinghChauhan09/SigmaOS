@@ -61,6 +61,7 @@ pub use defensive_audit::{
 pub use forensics::*;
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+    MemoryPermission, MemoryProtectionState, StackCanary, SecurityHardeningConfig,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,

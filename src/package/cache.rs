@@ -370,7 +370,6 @@ impl OfflineMode for SimpleOfflineMode {
     }
 }
 
-struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,

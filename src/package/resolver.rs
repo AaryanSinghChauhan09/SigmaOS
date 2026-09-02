@@ -347,7 +347,6 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 }
 
-struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,

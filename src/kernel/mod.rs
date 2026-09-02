@@ -42,6 +42,7 @@ pub mod sched;
 pub mod scheduler;
 pub mod structures;
 pub mod subsystem;
+pub mod syscall;
 pub mod virtual_cpu;
 pub mod vmm_paging;
 

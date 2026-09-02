@@ -24,12 +24,6 @@ use alloc::vec::Vec as AllocVec;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -345,7 +339,6 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-pub struct SovereignLocaleEngine {
     pub active_locale: String,
     pub category_locales: BTreeMap<LocaleCategory, String>,
     pub translation_catalogs: BTreeMap<String, BTreeMap<String, String>>, // Domain -> (msgid -> msgstr)

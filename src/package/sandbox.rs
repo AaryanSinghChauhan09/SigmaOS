@@ -350,7 +350,6 @@ impl ResourceQuota for SimpleResourceQuota {
     }
 }
 
-struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
