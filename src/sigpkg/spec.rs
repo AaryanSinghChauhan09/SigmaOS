@@ -20,6 +20,8 @@ pub struct PackageVersion {
     pub patch: u32,
 }
 
+pub type Version = PackageVersion;
+
 impl PackageVersion {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
         PackageVersion {
