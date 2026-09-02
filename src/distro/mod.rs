@@ -130,4 +130,4 @@ pub use sovereign_distro_dominance::{
 
 pub mod void_xbps_src;
 pub mod universal_distro_super_matrix;
-pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile, LinuxDominanceSupermacyEngine, DistroDominanceMetrics};

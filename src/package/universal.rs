@@ -281,6 +281,255 @@ pub struct FlatpakManifest {
     pub finish_args: Vec<String>, // Sandboxing constraints e.g. "--share=network", "--filesystem=host"
 }
 
+/// Description of FreeBSD PKG +MANIFEST Metadata
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FreeBsdPkgManifest {
+    pub name: String,
+    pub version: String,
+    pub origin: String,
+    pub comment: String,
+    pub desc: String,
+    pub maintainer: String,
+    pub prefix: String,
+    pub deps: Vec<String>,
+}
+
+/// Description of Alpine Linux APK APKINDEX Control Metadata
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlpineApkControl {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub url: String,
+    pub depends: Vec<String>,
+    pub provides: Vec<String>,
+}
+
+/// Universal Transpiled Package Specification (SigmaPkg native output)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TranspiledSigmaPkg {
+    pub name: String,
+    pub version: String,
+    pub origin_format: PackageFormat,
+    pub dependencies: Vec<String>,
+    pub provides: Vec<String>,
+    pub conflicts: Vec<String>,
+    pub pre_install_scriptlet: Option<String>,
+    pub post_install_scriptlet: Option<String>,
+    pub pre_remove_scriptlet: Option<String>,
+    pub post_remove_scriptlet: Option<String>,
+    pub sandbox_capabilities: Vec<String>,
+}
+
+/// Universal Cross-Distro Package Transpiler
+/// Transpiles foreign packages (deb, rpm, pkg.tar.zst, pkg, apk, ebuild) into native SigmaPkg models.
+pub struct CrossDistroPackageTranspiler;
+
+impl CrossDistroPackageTranspiler {
+    /// Transpiles a Debian `.deb` control file into a native `TranspiledSigmaPkg`
+    pub fn transpile_debian_control(control_text: &str) -> Result<TranspiledSigmaPkg, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut dependencies = Vec::new();
+        let mut provides = Vec::new();
+
+        for line in control_text.lines() {
+            let line = line.trim();
+            if line.starts_with("Package:") {
+                name = line["Package:".len()..].trim().to_string();
+            } else if line.starts_with("Version:") {
+                version = line["Version:".len()..].trim().to_string();
+            } else if line.starts_with("Depends:") {
+                let deps = line["Depends:".len()..].trim();
+                for d in deps.split(',') {
+                    let clean = d.trim().split_whitespace().next().unwrap_or("").to_string();
+                    if !clean.is_empty() {
+                        dependencies.push(clean);
+                    }
+                }
+            } else if line.starts_with("Provides:") {
+                let provs = line["Provides:".len()..].trim();
+                for p in provs.split(',') {
+                    let clean = p.trim().to_string();
+                    if !clean.is_empty() {
+                        provides.push(clean);
+                    }
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Transpiler: Invalid Debian control manifest");
+        }
+
+        Ok(TranspiledSigmaPkg {
+            name,
+            version,
+            origin_format: PackageFormat::Deb,
+            dependencies,
+            provides,
+            conflicts: Vec::new(),
+            pre_install_scriptlet: Some("echo '[sigpkg] Executing Debian preinst hook'".to_string()),
+            post_install_scriptlet: Some("echo '[sigpkg] Executing Debian postinst hook'".to_string()),
+            pre_remove_scriptlet: None,
+            post_remove_scriptlet: None,
+            sandbox_capabilities: vec!["fs_read".to_string(), "fs_write".to_string()],
+        })
+    }
+
+    /// Transpiles an Arch Linux `PKGBUILD` into a native `TranspiledSigmaPkg`
+    pub fn transpile_arch_pkgbuild(pkgbuild_text: &str) -> Result<TranspiledSigmaPkg, &'static str> {
+        let mut pkgname = String::new();
+        let mut pkgver = String::new();
+        let mut depends = Vec::new();
+        let mut provides = Vec::new();
+
+        for line in pkgbuild_text.lines() {
+            let line = line.trim();
+            if line.starts_with("pkgname=") {
+                pkgname = line["pkgname=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
+                    .to_string();
+            } else if line.starts_with("pkgver=") {
+                pkgver = line["pkgver=".len()..]
+                    .trim_matches(|c| c == '"' || c == '\'' || c == ' ')
+                    .to_string();
+            } else if line.starts_with("depends=") {
+                let dep_content = line["depends=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for dep in dep_content.split_whitespace() {
+                    let cleaned = dep.trim_matches(|c| c == '\'' || c == '"').to_string();
+                    if !cleaned.is_empty() {
+                        depends.push(cleaned);
+                    }
+                }
+            } else if line.starts_with("provides=") {
+                let prov_content = line["provides=".len()..].trim_matches(|c| c == '(' || c == ')' || c == ' ');
+                for prov in prov_content.split_whitespace() {
+                    let cleaned = prov.trim_matches(|c| c == '\'' || c == '"').to_string();
+                    if !cleaned.is_empty() {
+                        provides.push(cleaned);
+                    }
+                }
+            }
+        }
+
+        if pkgname.is_empty() || pkgver.is_empty() {
+            return Err("Transpiler: Invalid Arch PKGBUILD manifest");
+        }
+
+        Ok(TranspiledSigmaPkg {
+            name: pkgname,
+            version: pkgver,
+            origin_format: PackageFormat::Pacman,
+            dependencies: depends,
+            provides,
+            conflicts: Vec::new(),
+            pre_install_scriptlet: None,
+            post_install_scriptlet: Some("echo '[sigpkg] Running pacman post-install scriptlet'".to_string()),
+            pre_remove_scriptlet: None,
+            post_remove_scriptlet: None,
+            sandbox_capabilities: vec!["fs_read".to_string(), "network".to_string()],
+        })
+    }
+
+    /// Transpiles a RedHat/Fedora RPM SPEC into a native `TranspiledSigmaPkg`
+    pub fn transpile_rpm_spec(spec_text: &str) -> Result<TranspiledSigmaPkg, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut requires = Vec::new();
+
+        for line in spec_text.lines() {
+            let line = line.trim();
+            if line.starts_with("Name:") {
+                name = line["Name:".len()..].trim().to_string();
+            } else if line.starts_with("Version:") {
+                version = line["Version:".len()..].trim().to_string();
+            } else if line.starts_with("Requires:") {
+                let reqs = line["Requires:".len()..].trim();
+                for r in reqs.split(',') {
+                    let clean = r.trim().split_whitespace().next().unwrap_or("").to_string();
+                    if !clean.is_empty() {
+                        requires.push(clean);
+                    }
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Transpiler: Invalid RPM SPEC manifest");
+        }
+
+        Ok(TranspiledSigmaPkg {
+            name,
+            version,
+            origin_format: PackageFormat::Rpm,
+            dependencies: requires,
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            pre_install_scriptlet: Some("echo '[sigpkg] Executing RPM %pre scriptlet'".to_string()),
+            post_install_scriptlet: Some("echo '[sigpkg] Executing RPM %post scriptlet'".to_string()),
+            pre_remove_scriptlet: Some("echo '[sigpkg] Executing RPM %preun scriptlet'".to_string()),
+            post_remove_scriptlet: Some("echo '[sigpkg] Executing RPM %postun scriptlet'".to_string()),
+            sandbox_capabilities: vec!["fs_read".to_string(), "fs_write".to_string(), "exec".to_string()],
+        })
+    }
+
+    /// Transpiles a FreeBSD PKG `+MANIFEST` into a native `TranspiledSigmaPkg`
+    pub fn transpile_freebsd_manifest(manifest: &FreeBsdPkgManifest) -> TranspiledSigmaPkg {
+        TranspiledSigmaPkg {
+            name: manifest.name.clone(),
+            version: manifest.version.clone(),
+            origin_format: PackageFormat::Pkg,
+            dependencies: manifest.deps.clone(),
+            provides: vec![manifest.origin.clone()],
+            conflicts: Vec::new(),
+            pre_install_scriptlet: Some("echo '[sigpkg] Executing FreeBSD pre-install pkg script'".to_string()),
+            post_install_scriptlet: Some("echo '[sigpkg] Executing FreeBSD post-install pkg script'".to_string()),
+            pre_remove_scriptlet: None,
+            post_remove_scriptlet: None,
+            sandbox_capabilities: vec!["fs_read".to_string(), "capsicum_sandbox".to_string()],
+        }
+    }
+
+    /// Transpiles an Alpine Linux APK `APKINDEX` control structure into a native `TranspiledSigmaPkg`
+    pub fn transpile_alpine_apk(control: &AlpineApkControl) -> TranspiledSigmaPkg {
+        TranspiledSigmaPkg {
+            name: control.pkgname.clone(),
+            version: control.pkgver.clone(),
+            origin_format: PackageFormat::Apk,
+            dependencies: control.depends.clone(),
+            provides: control.provides.clone(),
+            conflicts: Vec::new(),
+            pre_install_scriptlet: None,
+            post_install_scriptlet: Some("echo '[sigpkg] Executing Alpine apk trigger script'".to_string()),
+            pre_remove_scriptlet: None,
+            post_remove_scriptlet: None,
+            sandbox_capabilities: vec!["fs_read".to_string(), "apk_cache".to_string()],
+        }
+    }
+
+    /// Converts a `TranspiledSigmaPkg` directly into a native `UnifiedPackage`
+    pub fn into_unified_package(transpiled: TranspiledSigmaPkg) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(transpiled.name, transpiled.version)
+            .with_format(PackageFormat::SigmaPkg)
+            .with_format(transpiled.origin_format);
+
+        for dep in transpiled.dependencies {
+            pkg = pkg.with_dependency(dep);
+        }
+
+        for prov in transpiled.provides {
+            pkg = pkg.with_provides(prov);
+        }
+
+        for conflict in transpiled.conflicts {
+            pkg = pkg.with_conflict(conflict);
+        }
+
+        pkg
+    }
+}
+
 /// APT Repository Source Configuration (sources.list / apt-get parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptRepoConfig {
@@ -1459,5 +1708,72 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_cross_distro_package_transpiler() {
+        // 1. Test Debian Control Transpilation
+        let deb_ctrl = "Package: ripgrep\nVersion: 13.0.0\nDepends: libc6 (>= 2.34), libpcre2-8-0\nProvides: search-tool\n";
+        let transpiled_deb = CrossDistroPackageTranspiler::transpile_debian_control(deb_ctrl).unwrap();
+        assert_eq!(transpiled_deb.name, "ripgrep");
+        assert_eq!(transpiled_deb.version, "13.0.0");
+        assert_eq!(transpiled_deb.origin_format, PackageFormat::Deb);
+        assert_eq!(transpiled_deb.dependencies[0], "libc6");
+        assert_eq!(transpiled_deb.provides[0], "search-tool");
+        assert!(transpiled_deb.post_install_scriptlet.is_some());
+
+        // Convert transpiled Debian pkg to UnifiedPackage
+        let unified_deb = CrossDistroPackageTranspiler::into_unified_package(transpiled_deb);
+        assert!(unified_deb.formats.contains(&PackageFormat::SigmaPkg));
+        assert!(unified_deb.formats.contains(&PackageFormat::Deb));
+
+        // 2. Test Arch PKGBUILD Transpilation
+        let pkgbuild = "pkgname=bat\npkgver=0.24.0\ndepends=('glibc' 'gcc-libs' 'libgit2')\nprovides=('cat-replacement')\n";
+        let transpiled_arch = CrossDistroPackageTranspiler::transpile_arch_pkgbuild(pkgbuild).unwrap();
+        assert_eq!(transpiled_arch.name, "bat");
+        assert_eq!(transpiled_arch.version, "0.24.0");
+        assert_eq!(transpiled_arch.origin_format, PackageFormat::Pacman);
+        assert_eq!(transpiled_arch.dependencies.len(), 3);
+        assert_eq!(transpiled_arch.provides[0], "cat-replacement");
+
+        // 3. Test RPM SPEC Transpilation
+        let rpm_spec = "Name: htop\nVersion: 3.2.2\nRequires: ncurses-libs, lm_sensors\n";
+        let transpiled_rpm = CrossDistroPackageTranspiler::transpile_rpm_spec(rpm_spec).unwrap();
+        assert_eq!(transpiled_rpm.name, "htop");
+        assert_eq!(transpiled_rpm.version, "3.2.2");
+        assert_eq!(transpiled_rpm.origin_format, PackageFormat::Rpm);
+        assert_eq!(transpiled_rpm.dependencies.len(), 2);
+        assert!(transpiled_rpm.pre_install_scriptlet.is_some());
+
+        // 4. Test FreeBSD PKG +MANIFEST Transpilation
+        let bsd_manifest = FreeBsdPkgManifest {
+            name: "zsh".to_string(),
+            version: "5.9".to_string(),
+            origin: "shells/zsh".to_string(),
+            comment: "Z shell".to_string(),
+            desc: "Advanced shell".to_string(),
+            maintainer: "freebsd@org".to_string(),
+            prefix: "/usr/local".to_string(),
+            deps: vec!["pcre".to_string()],
+        };
+        let transpiled_bsd = CrossDistroPackageTranspiler::transpile_freebsd_manifest(&bsd_manifest);
+        assert_eq!(transpiled_bsd.name, "zsh");
+        assert_eq!(transpiled_bsd.origin_format, PackageFormat::Pkg);
+        assert_eq!(transpiled_bsd.provides[0], "shells/zsh");
+        assert!(transpiled_bsd.sandbox_capabilities.contains(&"capsicum_sandbox".to_string()));
+
+        // 5. Test Alpine APK Transpilation
+        let alpine_control = AlpineApkControl {
+            pkgname: "musl".to_string(),
+            pkgver: "1.2.4".to_string(),
+            pkgdesc: "musl C library".to_string(),
+            url: "https://musl.libc.org".to_string(),
+            depends: Vec::new(),
+            provides: vec!["so:libc.musl-x86_64.so.1".to_string()],
+        };
+        let transpiled_apk = CrossDistroPackageTranspiler::transpile_alpine_apk(&alpine_control);
+        assert_eq!(transpiled_apk.name, "musl");
+        assert_eq!(transpiled_apk.origin_format, PackageFormat::Apk);
+        assert_eq!(transpiled_apk.provides[0], "so:libc.musl-x86_64.so.1");
     }
 }

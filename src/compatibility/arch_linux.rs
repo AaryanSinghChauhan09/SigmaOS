@@ -934,6 +934,91 @@ impl Default for MkinitcpioGenerator {
 // 18. Arch News Feed & Security Advisory Feed
 // ==========================================
 
+/// Arch Linux repository classification kinds
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArchRepositoryKind {
+    Core,
+    Extra,
+    Multilib,
+    CoreTesting,
+    ExtraTesting,
+    MultilibTesting,
+}
+
+/// Testing package staging entry awaiting community testing signoff & promotion
+#[derive(Debug, Clone)]
+pub struct TestingPackageEntry {
+    pub package: ArchPackage,
+    pub repo_kind: ArchRepositoryKind,
+    pub testing_signoffs: usize,
+    pub required_signoffs: usize,
+    pub signoff_users: Vec<String>,
+}
+
+/// Arch Linux testing repository management subsystem
+pub struct ArchTestingRepository {
+    pub staging_packages: Vec<TestingPackageEntry>,
+    pub promoted_packages: Vec<ArchPackage>,
+}
+
+impl ArchTestingRepository {
+    pub fn new() -> Self {
+        Self {
+            staging_packages: Vec::new(),
+            promoted_packages: Vec::new(),
+        }
+    }
+
+    /// Add a new package candidate to staging/testing repository
+    pub fn stage_testing_package(&mut self, pkg: ArchPackage, repo_kind: ArchRepositoryKind, required_signoffs: usize) {
+        self.staging_packages.push(TestingPackageEntry {
+            package: pkg,
+            repo_kind,
+            testing_signoffs: 0,
+            required_signoffs,
+            signoff_users: Vec::new(),
+        });
+    }
+
+    /// Record a testing signoff for a staged package
+    pub fn signoff_testing_package(&mut self, pkg_name: &str, user: &str) -> Result<bool, &'static str> {
+        let entry = self
+            .staging_packages
+            .iter_mut()
+            .find(|e| e.package.name == pkg_name)
+            .ok_or("ArchTestingRepo: Package not found in testing staging")?;
+
+        if entry.signoff_users.contains(&user.to_string()) {
+            return Err("ArchTestingRepo: User has already signed off");
+        }
+
+        entry.signoff_users.push(user.to_string());
+        entry.testing_signoffs += 1;
+
+        let ready = entry.testing_signoffs >= entry.required_signoffs;
+        Ok(ready)
+    }
+
+    /// Promote a tested package from testing into stable core/extra repository
+    pub fn promote_to_stable(&mut self, pkg_name: &str) -> Result<ArchPackage, &'static str> {
+        let pos = self
+            .staging_packages
+            .iter()
+            .position(|e| e.package.name == pkg_name && e.testing_signoffs >= e.required_signoffs)
+            .ok_or("ArchTestingRepo: Package not ready or lacking required signoffs")?;
+
+        let entry = self.staging_packages.remove(pos);
+        self.promoted_packages.push(entry.package.clone());
+        Ok(entry.package)
+    }
+}
+
+impl Default for ArchTestingRepository {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct NewsItem {
     pub title: String,
@@ -1409,5 +1494,36 @@ mod tests {
             engine.apply_patch(original, &bad_patch),
             Err("Patch target line not found in recipe")
         );
+    }
+
+    #[test]
+    fn test_arch_testing_repository_staging_and_promotion() {
+        let mut repo = ArchTestingRepository::new();
+        let pkg = ArchPackage {
+            name: "linux-testing".to_string(),
+            version: "6.9.0.arch1".to_string(),
+            dependencies: vec!["kmod".to_string()],
+        };
+
+        // Stage candidate requiring 2 signoffs
+        repo.stage_testing_package(pkg, ArchRepositoryKind::CoreTesting, 2);
+        assert_eq!(repo.staging_packages.len(), 1);
+
+        // Signoff 1
+        let ready1 = repo.signoff_testing_package("linux-testing", "qa_user_1").unwrap();
+        assert!(!ready1);
+
+        // Duplicate signoff fails
+        assert!(repo.signoff_testing_package("linux-testing", "qa_user_1").is_err());
+
+        // Signoff 2 -> ready for promotion
+        let ready2 = repo.signoff_testing_package("linux-testing", "qa_user_2").unwrap();
+        assert!(ready2);
+
+        // Promote candidate to stable
+        let promoted = repo.promote_to_stable("linux-testing").unwrap();
+        assert_eq!(promoted.name, "linux-testing");
+        assert_eq!(repo.promoted_packages.len(), 1);
+        assert_eq!(repo.staging_packages.len(), 0);
     }
 }
