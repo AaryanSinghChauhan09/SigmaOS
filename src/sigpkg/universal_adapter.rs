@@ -1014,7 +1014,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::Version::new(
+                version: crate::sigpkg::universal_oop_system::Version::new(
                     native_pkg.version.major,
                     native_pkg.version.minor,
                     native_pkg.version.patch,
