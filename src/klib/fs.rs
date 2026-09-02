@@ -321,6 +321,35 @@ impl Drop for SigmaDir {
     }
 }
 
+/// Sovereign C-FFI Bridge providing POSIX/C string and buffer conversion helpers
+pub struct SovereignCffiBridge;
+
+impl SovereignCffiBridge {
+    pub unsafe fn cstr_to_str<'a>(ptr: *const c_char) -> Option<&'a str> {
+        if ptr.is_null() {
+            return None;
+        }
+        let mut len = 0;
+        while *ptr.add(len) != 0 {
+            len += 1;
+        }
+        let bytes = core::slice::from_raw_parts(ptr as *const u8, len);
+        core::str::from_utf8(bytes).ok()
+    }
+
+    pub fn str_to_c_buffer(s: &str, buf: &mut [c_char]) -> bool {
+        let bytes = s.as_bytes();
+        if bytes.len() >= buf.len() {
+            return false;
+        }
+        for (i, &b) in bytes.iter().enumerate() {
+            buf[i] = b as c_char;
+        }
+        buf[bytes.len()] = 0;
+        true
+    }
+}
+
 /// Raw directory entry
 #[repr(C)]
 struct DirEntryRaw {
@@ -629,5 +658,13 @@ mod tests {
         stat.st_mode = 0o040755; // Directory
         assert!(!stat.is_file());
         assert!(stat.is_directory());
+    }
+
+    #[test]
+    fn test_sovereign_cffi_bridge() {
+        let mut buf = [0 as c_char; 16];
+        assert!(SovereignCffiBridge::str_to_c_buffer("hello", &mut buf));
+        let converted = unsafe { SovereignCffiBridge::cstr_to_str(buf.as_ptr()) };
+        assert_eq!(converted, Some("hello"));
     }
 }
