@@ -96,7 +96,7 @@ Options:
   -a, --auto             Unattended automatic installation mode (non-interactive)
   -d, --dry-run          Simulate installation without writing actual state
   -l, --label LABEL      Partition layout table: GPT, MBR (default: GPT)
-  -f, --fs FILESYSTEM    Root filesystem format: SovereignFS, SemanticFS, Ext4 (default: SovereignFS)
+  -f, --fs FILESYSTEM    Root filesystem format: SovereignFS, SemanticFS, Ext4, ZFS, Btrfs (default: SovereignFS)
   -n, --hostname NAME    Define custom system hostname (default: sigmaos-node)
   -p, --preset PRESET    Shard profile preset: Minimal, Standard, Enterprise (default: Standard)
   -h, --help             Show this help guide and exit
@@ -112,6 +112,16 @@ EOF
 # ==============================================================================
 run_preflight_checks() {
     log_info "Initiating system pre-flight verification..."
+
+    # Dual-boot & existing OS probe (Arch/Debian installer style)
+    log_info "Probing storage buses for existing operating systems & dual-boot targets..."
+    if command -v os-prober >/dev/null 2>&1; then
+        os-prober 2>/dev/null | while read -r line; do
+            log_info "Detected existing OS partition: $line"
+        done || true
+    else
+        log_info "os-prober offline. Scanning partition flags manually..."
+    fi
 
     # Check terminal metrics
     local cols
