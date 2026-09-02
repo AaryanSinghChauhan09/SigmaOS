@@ -753,6 +753,61 @@ impl SystemdServiceHardeningEvaluator {
     }
 }
 
+/// FreeBSD rc.d & OpenRC parallel boot execution stage solver
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut handled = Vec::new();
+        let all_ids: Vec<UnitID> = unit_ids.to_vec();
+
+        while handled.len() < all_ids.len() {
+            let mut current_stage = Vec::new();
+            for &id in &all_ids {
+                if handled.contains(&id) {
+                    continue;
+                }
+                let mut deps_satisfied = true;
+                if let Some(unit) = engine.find_unit(id) {
+                    for &prereq in &unit.after {
+                        if all_ids.contains(&prereq) && !handled.contains(&prereq) {
+                            deps_satisfied = false;
+                            break;
+                        }
+                    }
+                }
+                if deps_satisfied {
+                    for &other_id in &all_ids {
+                        if handled.contains(&other_id) || other_id == id {
+                            continue;
+                        }
+                        if let Some(other) = engine.find_unit(other_id) {
+                            if other.before.contains(&id) && !handled.contains(&other_id) {
+                                deps_satisfied = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if deps_satisfied {
+                    current_stage.push(id);
+                }
+            }
+            if current_stage.is_empty() {
+                let remaining: Vec<UnitID> = all_ids.iter().copied().filter(|i| !handled.contains(i)).collect();
+                stages.push(remaining.clone());
+                break;
+            }
+            for &id in &current_stage {
+                handled.push(id);
+            }
+            stages.push(current_stage);
+        }
+        stages
+    }
+}
+
 pub struct SystemdCgroupSliceGovernor {
     pub slice_name: String,
     pub cpu_weight: u32,
@@ -2128,6 +2183,11 @@ mod tests {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
 
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.requires.push(2);
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.requires.push(3);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 
