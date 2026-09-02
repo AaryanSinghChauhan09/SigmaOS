@@ -136,6 +136,12 @@ pub mod crypto {
 
 pub mod logging;
 pub mod system;
+pub mod update {
+    pub mod distro_update_parity;
+}
+pub use update::distro_update_parity::{
+    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+};
 pub mod installer;
 pub mod performance;
 pub mod ml;
