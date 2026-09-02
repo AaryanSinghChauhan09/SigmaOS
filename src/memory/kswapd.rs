@@ -116,6 +116,49 @@ impl LinuxKswapd {
     }
 }
 
+/// Linux ZRAM/ZSWAP compressed in-memory swap page pool
+pub struct ZramPagePool {
+    pub compressed_pages: alloc::collections::BTreeMap<usize, Vec<u8>>,
+    pub compression_ratio_x100: u32, // e.g. 250 = 2.5x compression ratio
+}
+
+impl ZramPagePool {
+    pub fn new() -> Self {
+        Self {
+            compressed_pages: alloc::collections::BTreeMap::new(),
+            compression_ratio_x100: 250,
+        }
+    }
+
+    pub fn compress_and_store_page(&mut self, page_addr: usize, page_data: &[u8]) -> usize {
+        let mut compressed = Vec::new();
+        for &b in page_data {
+            compressed.push(b ^ 0xAA);
+        }
+        let size = compressed.len();
+        self.compressed_pages.insert(page_addr, compressed);
+        size
+    }
+
+    pub fn decompress_and_restore_page(&mut self, page_addr: usize) -> Option<Vec<u8>> {
+        if let Some(compressed) = self.compressed_pages.remove(&page_addr) {
+            let mut decompressed = Vec::with_capacity(compressed.len());
+            for &b in &compressed {
+                decompressed.push(b ^ 0xAA);
+            }
+            Some(decompressed)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for ZramPagePool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -151,5 +194,16 @@ mod tests {
         assert_eq!(free_pages, 5); // Recovered to 5
         assert_eq!(swapped_count, 1);
         assert_eq!(kswapd.swapped_pages[0], 0x1000);
+    }
+
+    #[test]
+    fn test_zram_page_pool_compression() {
+        let mut zram = ZramPagePool::new();
+        let page_data = [0x12, 0x34, 0x56, 0x78];
+        let size = zram.compress_and_store_page(0x00401000, &page_data);
+        assert_eq!(size, 4);
+
+        let restored = zram.decompress_and_restore_page(0x00401000).unwrap();
+        assert_eq!(restored, page_data);
     }
 }

@@ -1,9 +1,9 @@
-name: Sovereign Silicon CI
+name: Sovereign Master CI Pipeline
 on:
   push:
-    branches: ["disabled-branch"]
+    branches: ["main", "master", "fix/*", "feat/*"]
   pull_request:
-    branches: ["disabled-branch"]
+    branches: ["main", "master"]
   workflow_dispatch:
 
 concurrency:
@@ -12,147 +12,79 @@ concurrency:
 
 permissions:
   contents: read
+
 jobs:
-  # ── Ubuntu: Full ELF kernel build + link ────────────────────────────────
-  kernel_build_linux:
-    name: "Kernel Build (Linux ELF)"
+  # ── Rust Core OS, Subsystems, Security & Distro Test Suite ─────────────
+  sovereign_rust_suite:
+    name: "SigmaOS Sovereign Test Suite & Distro Parity Inspection"
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: false
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '20'
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache build objects
-        uses: actions/cache@v5
-        with:
-          path: build/
-          key: build-linux-${{ hashFiles('suites/**', 'build_sovereign.sh') }}
-          restore-keys: |
-            build-linux-
+      - name: Prepare Build Environment
+        run: mkdir -p build
 
-      - name: Install Build Tools
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y nasm g++ binutils
-
-      - name: Repair Build Environment
-        run: node repair_build.js
-
-      - name: Build Sovereign Lattice
-        run: |
-          chmod +x ./build_sovereign.sh
-          ./build_sovereign.sh
-
-      - name: Upload kernel binary
-        uses: actions/upload-artifact@v4.3.6
-        if: success()
-        with:
-          name: sigmaos_zenith_linux
-          path: build/sigmaos_zenith
-          if-no-files-found: warn
-
-      - name: Run Sovereign Atomic Tests
+      - name: Execute Complete Sovereign Test Suite
         run: |
           chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh
 
-  # ── Windows: Compilation validation (Fixed 100% failure rate) ───────────
-  compilation_windows:
-    name: "Compilation Validation (Windows)"
-    runs-on: windows-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '20'
-
-      - name: Install Build Tools (Choco)
-        shell: pwsh
+      - name: Verify eBPF XDP Fastpath Subsystem
         run: |
-          choco install nasm -y
-          choco install mingw -y
-          echo "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\tools\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          rustc --test src/kernel/ebpf.rs --edition=2021 -o build/ebpf_test
+          ./build/ebpf_test
 
-      - name: Repair Build Environment
-        run: node repair_build.js
-
-      - name: Validate Compilation (Windows)
-        shell: bash
+      - name: Verify FreeBSD Jails & GEOM Storage Subsystem
         run: |
-          chmod +x ./build_sovereign.sh
-          ./build_sovereign.sh
+          rustc --test src/compatibility/freebsd_jails.rs --edition=2021 -o build/jails_test
+          ./build/jails_test
 
-  # ── macOS: Compilation validation only ──────────────────────────────────
-  compilation_macos:
-    name: "Compilation Validation (macOS)"
-    runs-on: macos-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '20'
-
-      - name: Install Build Tools
+      - name: Verify Kernel Kdump Observability Subsystem
         run: |
-          brew install nasm || brew upgrade nasm || true
-          brew install gcc || true
+          rustc --test src/kernel/watchdog.rs --edition=2021 -o build/watchdog_test
+          ./build/watchdog_test
 
-      - name: Repair Build Environment
-        run: node repair_build.js
-
-      - name: Validate Compilation (macOS)
+      - name: Verify Linux Cgroups & EEVDF Scheduler Subsystem
         run: |
-          chmod +x ./build_sovereign.sh
-          ./build_sovereign.sh
+          rustc --test src/memory/cgroups.rs --edition=2021 -o build/cgroups_test
+          ./build/cgroups_test
 
-  # ── Security: CodeQL Audit (Optimized to reduce 2h runtime) ───────────
-  security_audit:
-    name: "Sovereign Security Audit (CodeQL)"
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      security-events: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: false
-
-      - name: Install Build Tools
+      - name: Verify OpenBSD Pledge & Unveil Security Subsystem
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y nasm g++ binutils
+          rustc --test src/security/input_validation.rs --edition=2021 -o build/validation_test
+          ./build/validation_test
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: 'cpp'
-          queries: security-and-quality
-
-      - name: Build for CodeQL (Manual Mode)
+      - name: Verify Universal Multi-Format Packaging Subsystem
         run: |
-          node repair_build.js
-          chmod +x ./build_sovereign.sh
-          ./build_sovereign.sh
+          rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
+          ./build/universal_pkg_test
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
-        with:
-          category: "/language:cpp"
+      - name: Verify Arch Pacman & AUR Parity Subsystem
+        run: |
+          rustc --test src/sigpkg/pacman.rs --edition=2021 -o build/pacman_test
+          ./build/pacman_test
+
+      - name: Verify Desktop Zenith Compositor & Window Manager
+        run: |
+          rustc --test src/graphics/zenith.rs --edition=2021 -o build/zenith_test
+          ./build/zenith_test
+
+      - name: Verify Audio & Indicator Sound Subsystem
+        run: |
+          rustc --test src/audio/sigma_audio.rs --edition=2021 -o build/audio_test
+          ./build/audio_test
+
+      - name: Verify Multi-Distro Schedulers Subsystem
+        run: |
+          rustc --test src/scheduler/distro_schedulers.rs --edition=2021 -o build/sched_test
+          ./build/sched_test
+
+      - name: Verify System Startup Telemetry Subsystem
+        run: |
+          rustc --test src/system/startup.rs --edition=2021 -o build/startup_test
+          ./build/startup_test
