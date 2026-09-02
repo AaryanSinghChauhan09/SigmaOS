@@ -34,6 +34,8 @@ impl Clone for SimplePageTableEntry {
             accessed: AtomicUsize::new(self.accessed.load(Ordering::SeqCst)),
             dirty: AtomicUsize::new(self.dirty.load(Ordering::SeqCst)),
             cow: AtomicUsize::new(self.cow.load(Ordering::SeqCst)),
+            huge: AtomicUsize::new(self.huge.load(Ordering::SeqCst)),
+            giant: AtomicUsize::new(self.giant.load(Ordering::SeqCst)),
         }
     }
 }
@@ -93,6 +95,8 @@ pub struct SimplePageTableEntry {
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
     pub cow: AtomicUsize,
+    pub huge: AtomicUsize,
+    pub giant: AtomicUsize,
 }
 
 impl SimplePageTableEntry {
@@ -105,6 +109,8 @@ impl SimplePageTableEntry {
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
             cow: AtomicUsize::new(0),
+            huge: AtomicUsize::new(0),
+            giant: AtomicUsize::new(0),
         }
     }
 }
@@ -151,10 +157,10 @@ impl PageTableEntry for SimplePageTableEntry {
         self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
     }
     fn is_huge(&self) -> bool {
-        self.accessed.load(Ordering::SeqCst) == 1
+        self.huge.load(Ordering::SeqCst) == 1
     }
     fn is_giant(&self) -> bool {
-        self.dirty.load(Ordering::SeqCst) == 1
+        self.giant.load(Ordering::SeqCst) == 1
     }
 }
 
@@ -378,7 +384,7 @@ impl SimpleVMM {
                     pd_entry.set_writable(writable);
                     pd_entry.set_user_accessible(user);
                     pd_entry.set_physical_address(phys);
-                    pd_entry.accessed.store(1, Ordering::SeqCst);
+                    pd_entry.huge.store(1, Ordering::SeqCst);
                     pd.set_entry(pd_idx, pd_entry);
                 }
 
@@ -411,7 +417,7 @@ impl SimpleVMM {
                     pdpt_entry.set_writable(writable);
                     pdpt_entry.set_user_accessible(user);
                     pdpt_entry.set_physical_address(phys);
-                    pdpt_entry.dirty.store(1, Ordering::SeqCst);
+                    pdpt_entry.giant.store(1, Ordering::SeqCst);
                     pdpt.set_entry(pdpt_idx, pdpt_entry);
                 }
 
@@ -486,7 +492,7 @@ impl VirtualMemoryManager for SimpleVMM {
         while self.pt_tables.len() <= pd_idx_in_vec {
             self.pt_tables.push(None);
         }
-        if self.pt_tables[pd_idx].is_none() {
+        if self.pt_tables[pd_idx_in_vec].is_none() {
             let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
@@ -502,7 +508,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        if let Some(ref mut pt) = self.pt_tables[pd_idx] {
+        if let Some(ref mut pt) = self.pt_tables[pd_idx_in_vec] {
             let mut pt_entry = SimplePageTableEntry::new();
             pt_entry.set_present(true);
             pt_entry.set_writable(writable);

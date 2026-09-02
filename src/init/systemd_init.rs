@@ -286,6 +286,54 @@ impl Default for TimerConfig {
     }
 }
 
+/// Parallel boot stage solver for FreeBSD / OpenBSD rc.d execution order
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut processed: Vec<UnitID> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            let mut next_remaining = Vec::new();
+
+            for &id in &remaining {
+                if let Some(unit) = engine.find_unit(id) {
+                    let mut deps_met = unit.after.iter().all(|dep| processed.contains(dep));
+                    if deps_met {
+                        for other in engine.units.iter() {
+                            if other.before.contains(&id) && !processed.contains(&other.id) {
+                                deps_met = false;
+                                break;
+                            }
+                        }
+                    }
+                    if deps_met {
+                        current_stage.push(id);
+                    } else {
+                        next_remaining.push(id);
+                    }
+                } else {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                stages.push(next_remaining);
+                break;
+            }
+
+            processed.extend_from_slice(&current_stage);
+            stages.push(current_stage);
+            remaining = next_remaining;
+        }
+
+        stages
+    }
+}
+
 /// Multi-init abstraction bridge allowing boot-time switching across Linux & BSD init models
 pub struct InitSystemBridge {
     pub active_init: InitSystemType,
@@ -2127,6 +2175,14 @@ mod tests {
     fn test_systemd_service_hardening_evaluator() {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
+
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.requires.push(2);
+        target.duration_ms = 100;
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.requires.push(3);
+        service.duration_ms = 300;
 
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;

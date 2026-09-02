@@ -1113,6 +1113,9 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
+        if name.starts_with("so:libc") {
+            return "libc".to_string();
+        }
         match name.as_str() {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
