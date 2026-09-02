@@ -158,6 +158,10 @@ impl V4OptimizedPackageManager {
             _ => "",
         }
     }
+
+    pub fn supports_v4(&self) -> bool {
+        true
+    }
 }
 
 impl Default for V4OptimizedPackageManager {

@@ -26,6 +26,62 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
+
+/// FreeBSD UMA / VM Inspired Zone & Page Queue Allocator Glue
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VmZone {
+    Normal,
+    Dma32,
+    HighMem,
+}
+
+pub struct BsdVmZoneAllocator {
+    pub zone: VmZone,
+    pub active_pages: AtomicUsize,
+    pub inactive_pages: AtomicUsize,
+    pub wired_pages: AtomicUsize,
+    pub free_pages: AtomicUsize,
+}
+
+impl BsdVmZoneAllocator {
+    pub fn new(zone: VmZone, initial_free_pages: usize) -> Self {
+        Self {
+            zone,
+            active_pages: AtomicUsize::new(0),
+            inactive_pages: AtomicUsize::new(0),
+            wired_pages: AtomicUsize::new(0),
+            free_pages: AtomicUsize::new(initial_free_pages),
+        }
+    }
+
+    /// Transitions pages between FreeBSD VM page queues
+    pub fn transition_queue(&self, from: PageQueueType, to: PageQueueType, count: usize) -> Result<(), &'static str> {
+        let from_counter = match from {
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+            PageQueueType::Free => &self.free_pages,
+        };
+
+        let current = from_counter.load(Ordering::SeqCst);
+        if count > current {
+            return Err("BsdVmZone: Insufficient pages in source queue");
+        }
+
+        from_counter.fetch_sub(count, Ordering::SeqCst);
+
+        let to_counter = match to {
+            PageQueueType::Active => &self.active_pages,
+            PageQueueType::Inactive => &self.inactive_pages,
+            PageQueueType::Wired => &self.wired_pages,
+            PageQueueType::Free => &self.free_pages,
+        };
+
+        to_counter.fetch_add(count, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
 /// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum MigrateType {
@@ -107,61 +163,6 @@ impl CmaBuddyReservationGlue {
 
     pub fn free_cma_pages(&self) -> usize {
         self.cma_total_pages - self.cma_used_pages.load(Ordering::SeqCst)
-    }
-}
-
-/// FreeBSD UMA / VM Inspired Zone & Page Queue Allocator Glue
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VmZone {
-    Normal,
-    Dma32,
-    HighMem,
-}
-
-pub struct BsdVmZoneAllocator {
-    pub zone: VmZone,
-    pub active_pages: AtomicUsize,
-    pub inactive_pages: AtomicUsize,
-    pub wired_pages: AtomicUsize,
-    pub free_pages: AtomicUsize,
-}
-
-impl BsdVmZoneAllocator {
-    pub fn new(zone: VmZone, initial_free_pages: usize) -> Self {
-        Self {
-            zone,
-            active_pages: AtomicUsize::new(0),
-            inactive_pages: AtomicUsize::new(0),
-            wired_pages: AtomicUsize::new(0),
-            free_pages: AtomicUsize::new(initial_free_pages),
-        }
-    }
-
-    /// Transitions pages between FreeBSD VM page queues
-    pub fn transition_queue(&self, from: PageQueueType, to: PageQueueType, count: usize) -> Result<(), &'static str> {
-        let from_counter = match from {
-            PageQueueType::Active => &self.active_pages,
-            PageQueueType::Inactive => &self.inactive_pages,
-            PageQueueType::Wired => &self.wired_pages,
-            PageQueueType::Free => &self.free_pages,
-        };
-
-        let current = from_counter.load(Ordering::SeqCst);
-        if count > current {
-            return Err("BsdVmZone: Insufficient pages in source queue");
-        }
-
-        from_counter.fetch_sub(count, Ordering::SeqCst);
-
-        let to_counter = match to {
-            PageQueueType::Active => &self.active_pages,
-            PageQueueType::Inactive => &self.inactive_pages,
-            PageQueueType::Wired => &self.wired_pages,
-            PageQueueType::Free => &self.free_pages,
-        };
-
-        to_counter.fetch_add(count, Ordering::SeqCst);
-        Ok(())
     }
 }
 

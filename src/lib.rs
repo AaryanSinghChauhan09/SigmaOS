@@ -5,7 +5,6 @@
 // Core working modules
 pub mod ai;
 pub mod app;
-pub mod futuristic_modules;
 pub mod auth;
 pub mod accessibility;
 pub mod automation;
@@ -19,7 +18,6 @@ pub mod driver;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
-pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -46,23 +44,15 @@ pub use process::{
 pub mod community;
 pub mod access;
 pub mod tools;
-pub mod open_source_os_gap_closure;
-pub use open_source_os_gap_closure::*;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
-pub mod open_source_obsoletion;
-pub mod open_source_os_gap_closure;
 
 pub use package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
-    DpkgStatoverrideRule, FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock,
-    FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageSubslotAndUseExpandEngine,
-    HaikuHpkgPackageFsEngine, NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine,
-    OpenBsdPkgAddSignifyEngine, OpenSuseZypperVendorStickinessEngine, PpaRepository,
-    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
-    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };
 pub use unimplemented_features::{
     AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
@@ -85,6 +75,10 @@ pub use distro::{
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
     NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
+    DistGitSpecMetadata, FedoraDistGitExporter, FedoraPagureExporterEngine,
+    LookasideSourceEntry, PagureIssueExport, PagurePullRequestExport, PagurePullRequestStatus,
+    AnityaUpstreamProject, FedoraNewHotnessUpstreamMonitorEngine, NewHotnessActionType,
+    NewHotnessAutomatedTask, UpstreamBackendProvider, UpstreamReleaseEvent,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
@@ -103,7 +97,7 @@ pub use driver::{
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
-    GrowthDomainItem, SigmaosGrowthArchitectureEngine, StrategicImportItem, StrategicImportPlanEngine,
+    StrategicImportItem, StrategicImportPlanEngine,
 };
 pub mod virtualization;
 
@@ -137,13 +131,8 @@ pub mod crypto {
 }
 
 pub mod logging;
-pub mod system;
-pub mod update {
-    pub mod distro_update_parity;
-}
-pub use update::distro_update_parity::{
-    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
-};
+pub mod ai;
+// pub mod system;
 pub mod installer;
 pub mod performance;
 pub mod ml;
@@ -168,7 +157,7 @@ pub mod distro;
 // pub mod package;
 // pub mod performance;
 // pub mod productivity;
-pub mod remote;
+// pub mod remote;
 // pub mod resilience;
 // pub mod shell;
 // pub mod sigpkg;
