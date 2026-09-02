@@ -3219,7 +3219,7 @@ impl SovereignRedisClusterEngine {
             Vec::new()
         };
 
-        let replica_idx = self
+        let _replica_idx = self
             .nodes
             .iter()
             .position(|n| n.role == ClusterNodeRole::Replica && n.master_id.as_deref() == Some(failed_master_id))
