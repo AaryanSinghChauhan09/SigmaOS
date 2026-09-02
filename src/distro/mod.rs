@@ -17,12 +17,32 @@ pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 pub mod linux_bsd_distro_gaps;
+pub mod garuda_nomad_innovations;
+pub mod fedora_pagure_exporter;
+pub mod fedora_new_hotness;
 
 pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
     SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
     WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+};
+
+pub use garuda_nomad_innovations::{
+    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
+    ZfsPoolState, ZramCompressionAlgorithm,
+};
+
+pub use fedora_pagure_exporter::{
+    DistGitSpecMetadata, FedoraDistGitExporter, FedoraPagureExporterEngine,
+    LookasideSourceEntry, PagureIssueExport, PagurePullRequestExport,
+    PagurePullRequestStatus,
+};
+
+pub use fedora_new_hotness::{
+    AnityaUpstreamProject, FedoraNewHotnessUpstreamMonitorEngine, NewHotnessActionType,
+    NewHotnessAutomatedTask, UpstreamBackendProvider, UpstreamReleaseEvent,
 };
 pub mod linux_ideas;
 pub mod manjaro;
