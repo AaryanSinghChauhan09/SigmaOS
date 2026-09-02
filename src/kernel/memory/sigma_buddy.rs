@@ -23,8 +23,9 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
+use crate::kernel::memory::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
+
 
 /// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -109,7 +110,6 @@ impl CmaBuddyReservationGlue {
         self.cma_total_pages - self.cma_used_pages.load(Ordering::SeqCst)
     }
 }
-
 
 /// FreeBSD UMA / VM Inspired Zone & Page Queue Allocator Glue
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
