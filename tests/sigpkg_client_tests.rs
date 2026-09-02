@@ -196,3 +196,40 @@ fn test_foundation_governance_and_bounties() {
         .is_ok());
     assert_eq!(foundation.hackathons[0].projects_submitted.len(), 1);
 }
+
+#[test]
+fn test_universal_package_adapter_multi_distro_conversions() {
+    use sigmaos::sigpkg::{UniversalPackageAdapter, UniversalDependencyMapper, UniversalDryRunSimulator};
+    use sigmaos::sigpkg::universal_engine::PackageFormat;
+
+    let adapter = UniversalPackageAdapter::new();
+    let dep_mapper = UniversalDependencyMapper::new();
+
+    // 1. Debian/APT control conversion
+    let deb_manifest = "Package: nginx\nVersion: 1.24.0-1\nDepends: libssl-dev, libc6\nDescription: Nginx HTTP server\n";
+    let deb_pkg = adapter.parse_and_translate_manifest("nginx.deb", deb_manifest).unwrap();
+    assert_eq!(deb_pkg.name, "nginx");
+    assert_eq!(dep_mapper.to_canonical_name(&deb_pkg.dependencies[0].name), "openssl");
+
+    // 2. Arch Linux PKGBUILD conversion
+    let pkgbuild_manifest = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('pcre2' 'libc6')\n";
+    let arch_pkg = adapter.parse_and_translate_manifest("PKGBUILD", pkgbuild_manifest).unwrap();
+    assert_eq!(arch_pkg.name, "ripgrep");
+
+    // 3. FreeBSD +MANIFEST conversion
+    let fbsd_manifest = "name: curl\nversion: 8.5.0\ncomment: command line tool\ndeps: {\n  openssl: {origin: \"security/openssl\"}\n}\n";
+    let fbsd_pkg = adapter.parse_and_translate_manifest("curl.pkg", fbsd_manifest).unwrap();
+    assert_eq!(fbsd_pkg.name, "curl");
+
+    // 4. OpenBSD +CONTENTS conversion
+    let obsd_manifest = "@name wget-1.21.4\n@comment retrieval tool\n@depend security/openssl:openssl-*:openssl->=3.0\n";
+    let obsd_pkg = adapter.parse_and_translate_manifest("wget.pkg", obsd_manifest).unwrap();
+    assert_eq!(obsd_pkg.name, "wget");
+
+    // 5. Dry-run simulator
+    let simulator = UniversalDryRunSimulator::new();
+    let dry_run = simulator.simulate_install(PackageFormat::Apt, deb_manifest.as_bytes()).unwrap();
+    assert!(dry_run.is_valid);
+    assert_eq!(dry_run.package_name, "nginx");
+    assert_eq!(dry_run.resolved_dependencies.len(), 2);
+}

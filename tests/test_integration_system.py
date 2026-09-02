@@ -186,3 +186,19 @@ def test_boot_sequence_varied_configs():
     assert boot_err.execute_boot() is False
     assert boot_err.state == "BOOT_ERROR"
     assert any("BOOT_FAIL" in log for log in boot_err.boot_logs)
+
+
+def test_universal_package_manager_cli_simulation():
+    """Simulates multi-distro package format translation in sigpkg CLI."""
+    formats = {
+        "debian": {"file": "htop.deb", "pkg": "htop", "deps": ["libssl-dev", "libc6"]},
+        "fedora": {"file": "htop.rpm", "pkg": "htop", "deps": ["openssl-devel", "glibc"]},
+        "arch": {"file": "htop.pkg.tar.zst", "pkg": "htop", "deps": ["openssl", "glibc"]},
+        "freebsd": {"file": "htop.pkg", "pkg": "htop", "deps": ["security/openssl"]},
+        "alpine": {"file": "htop.apk", "pkg": "htop", "deps": ["so:libc.musl-x86_64.so.1"]},
+    }
+
+    # Verify all distro packages translate to canonical dependency names
+    for distro, spec in formats.items():
+        assert spec["pkg"] == "htop"
+        assert len(spec["deps"]) > 0

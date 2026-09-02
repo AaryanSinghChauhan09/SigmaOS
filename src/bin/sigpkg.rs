@@ -16,16 +16,20 @@ use sigmaos::sigpkg::{
 
 fn usage() -> ! {
     eprintln!(
-        "sigpkg — SigmaOS universal package manager\n\
+        "sigpkg — SigmaOS Sovereign Universal Package Manager CLI\n\
+         Universal cross-distro package management inspired by Linux & BSD distros\n\
+         Supported formats: .deb (APT), .rpm/.spec (DNF), PKGBUILD/.pkg.tar.zst (Pacman), .apk (Alpine),\n\
+                            .xbps (Void), .ebuild (Gentoo), .pkg/ports (FreeBSD/OpenBSD), .ymp (openSUSE),\n\
+                            .flatpak, .snap, .appimage\n\
          \n\
          USAGE:\n\
-         \x20 sigpkg install <package|file> Add a package (or foreign .deb/.rpm/PKGBUILD/.apk/.xbps) to store\n\
-         \x20 sigpkg convert <file>         Dry-run convert foreign package manifest & print metadata\n\
+         \x20 sigpkg install <package|file> Install package or convert foreign distro package (.deb/.rpm/PKGBUILD/.apk/.xbps/.ebuild/.pkg/.flatpak)\n\
+         \x20 sigpkg convert <file|spec>   Dry-run convert foreign package manifest & display canonical metadata & capability permissions\n\
          \x20 sigpkg remove <package>       Remove a package from the store\n\
          \x20 sigpkg search <package>       Show a stored package's metadata\n\
          \x20 sigpkg status                 List stored packages and counts\n\
          \x20 sigpkg verify <package>       Verify a package's checksum signature\n\
-         \x20 sigpkg repo add <name> <url>  Register an apt-style repository\n\
+         \x20 sigpkg repo add <name> <url>  Register a package repository\n\
          \x20 sigpkg repo list              List registered repositories\n\
          \x20 sigpkg mirror best <repo>     Choose the best mirror for a repo\n\
          \x20 sigpkg snapshot <desc>        Create a pre-transaction snapshot\n\
