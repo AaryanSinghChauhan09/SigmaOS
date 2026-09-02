@@ -124,6 +124,10 @@ impl V4OptimizedPackageManager {
         }
     }
 
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
+    }
+
     pub fn detect_microarchitecture_level(
         &self,
         has_avx: bool,
@@ -468,10 +472,12 @@ pub struct CachyosKernelFeatureMatrix {
 
 impl CachyosKernelFeatureMatrix {
     pub fn new() -> Self {
+        let mut v4_mgr = V4OptimizedPackageManager::new();
+        v4_mgr.detected_level = AtomicUsize::new(4);
         Self {
             bore_governor: BoreSchedulerGovernor::new(),
             ananicy_manager: AnanicyManager::new(),
-            v4_package_manager: V4OptimizedPackageManager::new(),
+            v4_package_manager: v4_mgr,
             thp_tuner: CachyThpTuner::new(ThpMode::Always),
             ksm_daemon: CachyKsmDaemon::new(),
             latency_governor: CachyLatencyGovernor::new(),
