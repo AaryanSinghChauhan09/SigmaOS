@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -12,10 +14,12 @@ mod unimplemented_features;
 mod firmware;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
+pub use distro::*;
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
@@ -64,6 +68,8 @@ mod unified;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
@@ -113,7 +119,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
     use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();

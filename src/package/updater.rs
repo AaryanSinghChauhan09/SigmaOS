@@ -160,7 +160,7 @@ impl AutoInstallProvisioner {
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
-            profile.format!("{}/{}", extra_packages, ", ")
+            profile.extra_packages.join(", ")
         ))
     }
 }

@@ -1,7 +1,5 @@
 extern crate alloc;
-#[cfg(not(target_os = "none"))]
 
-#[cfg(not(target_os = "none"))]
 use alloc::string::String;
 use alloc::boxed::Box;
 use alloc::vec::Vec;

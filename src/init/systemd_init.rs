@@ -2128,6 +2128,9 @@ mod tests {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
 
+        let mut engine = SystemdEngine::new();
+        let target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        let service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 
