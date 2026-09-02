@@ -666,6 +666,457 @@ impl Default for DistroWatchParityMetricsHub {
 }
 
 // =========================================================================
+// 10. OPENBSD PLEDGE & UNVEIL SECURITY ENGINE
+// =========================================================================
+
+pub struct OpenBsdPledgeUnveilEngine {
+    pub pledge_flags: Vec<String>,
+    pub pledged: bool,
+    pub unveil_rules: Vec<(String, String)>,
+    pub locked: bool,
+}
+
+impl OpenBsdPledgeUnveilEngine {
+    pub fn new() -> Self {
+        Self {
+            pledge_flags: Vec::new(),
+            pledged: false,
+            unveil_rules: Vec::new(),
+            locked: false,
+        }
+    }
+
+    pub fn pledge(&mut self, flags: &[&str]) -> Result<(), &'static str> {
+        let new_flags: Vec<String> = flags.iter().map(|s| s.to_string()).collect();
+        if self.pledged {
+            for f in &new_flags {
+                if !self.pledge_flags.contains(f) {
+                    return Err("OpenBSD Pledge: Illegal capability escalation attempt");
+                }
+            }
+        }
+        self.pledge_flags = new_flags;
+        self.pledged = true;
+        Ok(())
+    }
+
+    pub fn unveil(&mut self, path: &str, perms: &str) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("OpenBSD Unveil: Ruleset locked permanently");
+        }
+        let clean_path = path.trim_end_matches('/').to_string();
+        if let Some(pos) = self.unveil_rules.iter().position(|(p, _)| p == &clean_path) {
+            let existing_perms = &self.unveil_rules[pos].1;
+            for c in perms.chars() {
+                if !existing_perms.contains(c) {
+                    return Err("OpenBSD Unveil: Illegal permission escalation");
+                }
+            }
+            self.unveil_rules[pos].1 = perms.to_string();
+        } else {
+            self.unveil_rules.push((clean_path, perms.to_string()));
+        }
+        Ok(())
+    }
+
+    pub fn lock(&mut self) {
+        self.locked = true;
+    }
+
+    pub fn check_syscall(&self, op: &str) -> bool {
+        if !self.pledged {
+            return true;
+        }
+        self.pledge_flags.contains(&op.to_string())
+    }
+
+    pub fn check_path_access(&self, path: &str, required_perm: char) -> bool {
+        if self.unveil_rules.is_empty() {
+            return true;
+        }
+        let clean_path = path.trim_end_matches('/');
+        let mut best_match: Option<(&str, &str)> = None;
+
+        for (rule_path, perms) in &self.unveil_rules {
+            if clean_path == rule_path || clean_path.starts_with(rule_path) {
+                if best_match.is_none() || rule_path.len() > best_match.unwrap().0.len() {
+                    best_match = Some((rule_path, perms));
+                }
+            }
+        }
+
+        if let Some((_, perms)) = best_match {
+            perms.contains(required_perm)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. DRAGONFLY BSD HAMMER2 PFS COW STORAGE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2Block {
+    pub block_id: u64,
+    pub pfs_name: String,
+    pub generation: u64,
+    pub crc32_checksum: u32,
+    pub payload: Vec<u8>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2PfsSnapshot {
+    pub snap_id: u32,
+    pub pfs_name: String,
+    pub snap_label: String,
+    pub merkle_root: u64,
+}
+
+pub struct Hammer2StorageEngine {
+    pub blocks: Vec<Hammer2Block>,
+    pub snapshots: Vec<Hammer2PfsSnapshot>,
+    pub current_generation: u64,
+}
+
+impl Hammer2StorageEngine {
+    pub fn new() -> Self {
+        Self {
+            blocks: Vec::new(),
+            snapshots: Vec::new(),
+            current_generation: 1,
+        }
+    }
+
+    pub fn compute_checksum(data: &[u8]) -> u32 {
+        let mut crc: u32 = 0;
+        for &b in data {
+            crc = crc.wrapping_add(b as u32).wrapping_mul(31);
+        }
+        crc
+    }
+
+    pub fn write_block(&mut self, pfs_name: &str, block_id: u64, payload: &[u8]) {
+        let checksum = Self::compute_checksum(payload);
+        self.blocks.retain(|b| !(b.pfs_name == pfs_name && b.block_id == block_id));
+        self.blocks.push(Hammer2Block {
+            block_id,
+            pfs_name: pfs_name.to_string(),
+            generation: self.current_generation,
+            crc32_checksum: checksum,
+            payload: payload.to_vec(),
+        });
+        self.current_generation += 1;
+    }
+
+    pub fn create_snapshot(&mut self, pfs_name: &str, snap_label: &str) -> u32 {
+        let snap_id = (self.snapshots.len() + 1) as u32;
+        let mut merkle_sum: u64 = 0;
+        for b in self.blocks.iter().filter(|b| b.pfs_name == pfs_name) {
+            merkle_sum = merkle_sum.wrapping_add(b.crc32_checksum as u64).wrapping_mul(6364136223846793005);
+        }
+
+        self.snapshots.push(Hammer2PfsSnapshot {
+            snap_id,
+            pfs_name: pfs_name.to_string(),
+            snap_label: snap_label.to_string(),
+            merkle_root: merkle_sum,
+        });
+
+        snap_id
+    }
+
+    pub fn verify_pfs_integrity(&self, pfs_name: &str) -> bool {
+        for b in self.blocks.iter().filter(|b| b.pfs_name == pfs_name) {
+            if Self::compute_checksum(&b.payload) != b.crc32_checksum {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub fn deduplicate_blocks(&mut self) -> usize {
+        let original_len = self.blocks.len();
+        let mut unique_blocks: Vec<Hammer2Block> = Vec::new();
+
+        for b in self.blocks.drain(..) {
+            if !unique_blocks.iter().any(|u| u.payload == b.payload) {
+                unique_blocks.push(b);
+            }
+        }
+
+        let deduped = original_len - unique_blocks.len();
+        self.blocks = unique_blocks;
+        deduped
+    }
+}
+
+impl Default for Hammer2StorageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. FREEBSD VNET NETWORK VIRTUALIZATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetInterface {
+    pub ifname: String,
+    pub ip_address: String,
+    pub mtu: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetRouteRule {
+    pub dst_cidr: String,
+    pub gateway: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VnetStackInstance {
+    pub vnet_id: u32,
+    pub container_name: String,
+    pub interfaces: Vec<VnetInterface>,
+    pub routing_table: Vec<VnetRouteRule>,
+}
+
+pub struct FreeBsdVnetEngine {
+    pub vnet_stacks: Vec<VnetStackInstance>,
+}
+
+impl FreeBsdVnetEngine {
+    pub fn new() -> Self {
+        Self {
+            vnet_stacks: Vec::new(),
+        }
+    }
+
+    pub fn create_vnet(&mut self, vnet_id: u32, container_name: &str) -> Result<(), &'static str> {
+        if self.vnet_stacks.iter().any(|v| v.vnet_id == vnet_id) {
+            return Err("FreeBSD VNET: Stack instance ID already exists");
+        }
+        self.vnet_stacks.push(VnetStackInstance {
+            vnet_id,
+            container_name: container_name.to_string(),
+            interfaces: vec![VnetInterface {
+                ifname: "lo0".to_string(),
+                ip_address: "127.0.0.1".to_string(),
+                mtu: 16384,
+            }],
+            routing_table: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn add_interface(&mut self, vnet_id: u32, ifname: &str, ip: &str) {
+        if let Some(vnet) = self.vnet_stacks.iter_mut().find(|v| v.vnet_id == vnet_id) {
+            vnet.interfaces.push(VnetInterface {
+                ifname: ifname.to_string(),
+                ip_address: ip.to_string(),
+                mtu: 1500,
+            });
+        }
+    }
+
+    pub fn add_route(&mut self, vnet_id: u32, dst_cidr: &str, gateway: &str) {
+        if let Some(vnet) = self.vnet_stacks.iter_mut().find(|v| v.vnet_id == vnet_id) {
+            vnet.routing_table.push(VnetRouteRule {
+                dst_cidr: dst_cidr.to_string(),
+                gateway: gateway.to_string(),
+            });
+        }
+    }
+
+    pub fn route_lookup(&self, vnet_id: u32, dst_ip: &str) -> Option<String> {
+        let vnet = self.vnet_stacks.iter().find(|v| v.vnet_id == vnet_id)?;
+        for route in &vnet.routing_table {
+            if route.dst_cidr == "0.0.0.0/0" || route.dst_cidr == dst_ip {
+                return Some(route.gateway.clone());
+            }
+        }
+        None
+    }
+}
+
+impl Default for FreeBsdVnetEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. ILLUMOS / ZFS ADAPTIVE REPLACEMENT CACHE (ARC) ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArcCacheEntry {
+    pub key: String,
+    pub payload: Vec<u8>,
+    pub access_count: u64,
+}
+
+pub struct ZfsArcCacheEngine {
+    pub max_capacity: usize,
+    pub p_target_mru_capacity: usize,
+    pub mru_list: Vec<ArcCacheEntry>,
+    pub mfu_list: Vec<ArcCacheEntry>,
+    pub mru_ghost: Vec<String>,
+    pub mfu_ghost: Vec<String>,
+}
+
+impl ZfsArcCacheEngine {
+    pub fn new(max_capacity: usize) -> Self {
+        Self {
+            max_capacity,
+            p_target_mru_capacity: max_capacity / 2,
+            mru_list: Vec::new(),
+            mfu_list: Vec::new(),
+            mru_ghost: Vec::new(),
+            mfu_ghost: Vec::new(),
+        }
+    }
+
+    pub fn get(&mut self, key: &str) -> Option<Vec<u8>> {
+        // Check MRU
+        if let Some(pos) = self.mru_list.iter().position(|e| e.key == key) {
+            let mut entry = self.mru_list.remove(pos);
+            entry.access_count += 1;
+            let payload = entry.payload.clone();
+            self.mfu_list.push(entry);
+            return Some(payload);
+        }
+
+        // Check MFU
+        if let Some(pos) = self.mfu_list.iter().position(|e| e.key == key) {
+            let mut entry = self.mfu_list.remove(pos);
+            entry.access_count += 1;
+            let payload = entry.payload.clone();
+            self.mfu_list.push(entry);
+            return Some(payload);
+        }
+
+        // Check ghosts to adapt `p` target
+        if self.mru_ghost.contains(&key.to_string()) {
+            self.mru_ghost.retain(|k| k != key);
+            self.p_target_mru_capacity = (self.p_target_mru_capacity + 1).min(self.max_capacity);
+        } else if self.mfu_ghost.contains(&key.to_string()) {
+            self.mfu_ghost.retain(|k| k != key);
+            self.p_target_mru_capacity = self.p_target_mru_capacity.saturating_sub(1);
+        }
+
+        None
+    }
+
+    pub fn put(&mut self, key: &str, payload: &[u8]) {
+        let entry = ArcCacheEntry {
+            key: key.to_string(),
+            payload: payload.to_vec(),
+            access_count: 1,
+        };
+
+        if self.mru_list.len() + self.mfu_list.len() >= self.max_capacity {
+            if self.mru_list.len() > self.p_target_mru_capacity && !self.mru_list.is_empty() {
+                let evicted = self.mru_list.remove(0);
+                self.mru_ghost.push(evicted.key);
+            } else if !self.mfu_list.is_empty() {
+                let evicted = self.mfu_list.remove(0);
+                self.mfu_ghost.push(evicted.key);
+            }
+        }
+
+        self.mru_list.push(entry);
+    }
+}
+
+// =========================================================================
+// 14. MACH / XNU ZERO-COPY IPC PORT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MachPortRight {
+    Receive,
+    Send,
+    SendOnce,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MachMessageDescriptor {
+    pub sender_pid: u32,
+    pub payload: Vec<u8>,
+    pub is_ool_zero_copy: bool,
+}
+
+pub struct MachPortQueue {
+    pub port_id: u32,
+    pub rights: MachPortRight,
+    pub messages: Vec<(u8, MachMessageDescriptor)>, // (priority, descriptor)
+}
+
+pub struct MachZeroCopyIpcEngine {
+    pub ports: Vec<MachPortQueue>,
+}
+
+impl MachZeroCopyIpcEngine {
+    pub fn new() -> Self {
+        Self { ports: Vec::new() }
+    }
+
+    pub fn allocate_port(&mut self, port_id: u32, rights: MachPortRight) {
+        self.ports.push(MachPortQueue {
+            port_id,
+            rights,
+            messages: Vec::new(),
+        });
+    }
+
+    pub fn send_message(
+        &mut self,
+        target_port: u32,
+        priority: u8,
+        descriptor: MachMessageDescriptor,
+    ) -> Result<(), &'static str> {
+        let port = self
+            .ports
+            .iter_mut()
+            .find(|p| p.port_id == target_port)
+            .ok_or("Mach IPC: Target port not found")?;
+
+        port.messages.push((priority, descriptor));
+        port.messages.sort_by(|a, b| b.0.cmp(&a.0)); // Priority descending
+        Ok(())
+    }
+
+    pub fn receive_message(&mut self, port_id: u32) -> Result<MachMessageDescriptor, &'static str> {
+        let port = self
+            .ports
+            .iter_mut()
+            .find(|p| p.port_id == port_id)
+            .ok_or("Mach IPC: Target port not found")?;
+
+        if port.messages.is_empty() {
+            Err("Mach IPC: Port message queue empty")
+        } else {
+            Ok(port.messages.remove(0).1)
+        }
+    }
+}
+
+impl Default for MachZeroCopyIpcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -801,5 +1252,74 @@ mod tests {
         hub.record_distro_parity("FreeBSD", 90);
         assert_eq!(hub.distros.len(), 2);
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_engine() {
+        let mut engine = OpenBsdPledgeUnveilEngine::new();
+        assert!(engine.pledge(&["stdio", "rpath"]).is_ok());
+        assert!(engine.unveil("/etc", "r").is_ok());
+
+        assert!(engine.check_syscall("stdio"));
+        assert!(!engine.check_syscall("wpath"));
+
+        assert!(engine.check_path_access("/etc/hosts", 'r'));
+        assert!(!engine.check_path_access("/etc/hosts", 'w'));
+
+        assert!(engine.pledge(&["stdio", "wpath"]).is_err()); // Escalation error
+        engine.lock();
+        assert!(engine.unveil("/var", "r").is_err()); // Locked error
+    }
+
+    #[test]
+    fn test_hammer2_storage_engine() {
+        let mut hammer2 = Hammer2StorageEngine::new();
+        hammer2.write_block("@root", 1, b"block_payload_data");
+        hammer2.write_block("@root", 2, b"block_payload_data");
+
+        assert!(hammer2.verify_pfs_integrity("@root"));
+        let snap_id = hammer2.create_snapshot("@root", "snap1");
+        assert_eq!(snap_id, 1);
+
+        let deduped = hammer2.deduplicate_blocks();
+        assert_eq!(deduped, 1);
+    }
+
+    #[test]
+    fn test_freebsd_vnet_engine() {
+        let mut vnet = FreeBsdVnetEngine::new();
+        assert!(vnet.create_vnet(1, "jail_web").is_ok());
+        vnet.add_interface(1, "epair0a", "192.168.1.10");
+        vnet.add_route(1, "0.0.0.0/0", "192.168.1.1");
+
+        assert_eq!(vnet.route_lookup(1, "8.8.8.8"), Some("192.168.1.1".to_string()));
+    }
+
+    #[test]
+    fn test_zfs_arc_cache_engine() {
+        let mut arc = ZfsArcCacheEngine::new(2);
+        arc.put("page_1", b"data1");
+        arc.put("page_2", b"data2");
+
+        assert_eq!(arc.get("page_1"), Some(b"data1".to_vec()));
+        arc.put("page_3", b"data3"); // Evicts MRU/MFU entry
+        assert_eq!(arc.mru_list.len() + arc.mfu_list.len(), 2);
+    }
+
+    #[test]
+    fn test_mach_zero_copy_ipc_engine() {
+        let mut mach = MachZeroCopyIpcEngine::new();
+        mach.allocate_port(100, MachPortRight::Receive);
+
+        let msg = MachMessageDescriptor {
+            sender_pid: 42,
+            payload: b"zero_copy_ipc_data".to_vec(),
+            is_ool_zero_copy: true,
+        };
+
+        assert!(mach.send_message(100, 10, msg).is_ok());
+        let received = mach.receive_message(100).unwrap();
+        assert_eq!(received.sender_pid, 42);
+        assert!(received.is_ool_zero_copy);
     }
 }
