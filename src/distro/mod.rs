@@ -4,6 +4,7 @@ pub mod certification;
 pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
+pub mod compliance;
 pub mod debian_parity;
 pub mod developer;
 pub mod ecosystem_dimensions;
@@ -36,9 +37,12 @@ pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
+pub mod visual_dashboard;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_system_innovations;
 
+pub use compliance::{ComplianceAuditLogger, ComplianceAuditEvent, ComplianceFramework, TpmAttestationManager, TpmPcrMeasurement};
+pub use visual_dashboard::{VisualDashboardManager, FirewallPolicy, FirewallAction, VpnTunnel, VpnType, VpnStatus, ProcessCapability, HardwareTelemetry};
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
     GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler, UnifiedFirewallVpnOrchestrator,

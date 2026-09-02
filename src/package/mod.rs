@@ -23,10 +23,13 @@ pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
 pub mod debian_translator;
+pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod gentoo_opt;
+pub mod hardening;
 pub mod linux_translation;
 pub mod manager;
+pub mod paccache;
 pub mod repository;
 pub mod resolver;
 pub mod sandbox;
@@ -62,6 +65,7 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
+pub use paccache::{PaccacheEngine, PaccacheConfig, PackageCacheEntry};
 pub use repository::{
     MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule, PackageRepository,
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
