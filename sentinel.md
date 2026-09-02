@@ -1,6 +1,8 @@
-# 🛡️ Sentinel's Journal — SigmaOS Security & Hardening
+# Sentinel 🛡️ Agent Journal - Security & Compliance Learnings
 
-This journal logs CRITICAL security lessons, vulnerability fixes, and proactive system hardening actions implemented across SigmaOS.
+## 2026-03-31 - Safe Atomic Transmutation & Memory Isolation
+**Learning:** Raw memory transmutations (`core::mem::transmute`) on mismatched atomic state types risk memory corruption and UB in low-level sandbox controllers (`src/package/sandbox.rs` and `src/package/signing.rs`).
+**Action:** Replace direct transmutes with safe enum conversion methods (`TryFrom<usize>` / `From<u32>`) or explicit `#[repr(usize)]` representations to maintain safety guarantees.
 
 ---
 
@@ -35,3 +37,25 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** Permitting unmerged git conflicts to be committed to production branches (such as `main`) results in immediate parser/compiler termination, acting as an unintended Denial-of-Service (DoS) on continuous-integration security validation pipelines.
 **Learning:** Any committed parser markers stop compiler diagnostics from performing security/CVE audits. Standard static-analysis checks must run a raw conflict scan prior to pull-request merges to protect integration stability.
 **Prevention:** Deploy pre-commit hooks that explicitly scan for the exact conflict sequences (`<<<<<<<`, `=======`, `>>>>>>>`) across all source code paths.
+
+## 2026-08-09 - Sanitizing Dynamic Dependency Trees
+**Learning:** Unverified third-party libraries downloaded during build stages can introduce hidden supply chain vulnerabilities. Outdated sub-dependencies like `brace-expansion` and `nanoid` must have priority upgrades pinned at the package level to eliminate Regular Expression Denial of Service (ReDoS) and loop hazards.
+**Action:** Always scan for nested lockfile overrides and apply semantic versions upgrades strictly.
+
+## 2026-08-10 - Multi-Stage PAM Authentication and BSD Securelevels
+**Learning:** Single-factor authentication or static permission checks leave systems vulnerable to brute-force attacks and root level modifications. Implementing Linux-style Pluggable Authentication Modules (PAM) with account lockouts (`pam_tally2`) and pwquality password rules alongside BSD monotonically non-decreasing Securelevels creates a hardened defense-in-depth framework.
+**Action:** Enforce multi-stage PAM authentication for user access and gate critical network/storage operations behind BSD Securelevels and capability bitmasks.
+
+## 2026-08-20 - CRLF Sanitization in Structured Log Attributes
+**Vulnerability:** Permitting unescaped carriage returns (`\r`) or line feeds (`\n`) in key-value attributes passed to structured syslog entries allows malicious log entries to split log frames and inject spoofed syslog headers or fake log entries.
+**Learning:** Unsanitized newlines in log fields break message framing in line-oriented log sinks like rsyslog and systemd-journald.
+**Prevention:** Explicitly strip or escape CRLF characters (`\r`, `\n`) from dynamic key and value attributes before adding them to log structures.
+
+## 2026-08-23 - Multi-Layer Packet Inspection with Post-Quantum Signatures and Hash Verification
+**Learning:** Combining sliding-window rate limiting, asymmetric post-quantum public key signature checking (Dilithium-5), zero-trust subnet filtering, and deep packet session hash matching prevents spoofing, replay attacks, and denial-of-service vectors at the network layer.
+**Action:** Enforce strict 4-stage validation (rate limit -> PQC signature -> subnet check -> payload hash) on all zero-trust network router interfaces.
+
+## 2026-08-29 - Path Traversal Component Separator Enforcement
+**Vulnerability:** Checking path traversal sequences (`..`) using only `/` and `\` directory separators allowed bypasses on non-standard URI schemes and Windows drive relative paths (e.g. `C:..\passwd` or `file:../secret.txt`).
+**Learning:** Path traversal detection logic must include scheme and drive specifiers (e.g., `:`) alongside directory delimiters (`/` and `\`) when determining path component boundaries.
+**Prevention:** Treat colons (`:`) as valid boundary delimiters when evaluating relative dot-dot traversal sequences in path sanitization routines.

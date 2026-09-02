@@ -1,13 +1,5 @@
-# 🎨 Palette's Journal — SigmaOS UX & Accessibility
+## 2026-09-02 - Accessible Window Controls in Web Desktop Interfaces
 
-This journal logs CRITICAL usability enhancements, accessibility standard compliance, and visual micro-interaction polishes across SigmaOS.
+**Learning:** Custom window controls (e.g. minimize, maximize, close dots) in web-based desktop operating systems are frequently styled as simple `div` or `span` tags, making them invisible to keyboard focus traps and screen readers. Converting these to semantic `<button type="button">` elements with explicit `aria-label` and `title` attributes (e.g., `aria-label="Minimize OmniShell Terminal"`) alongside CSS reset rules (`border: none; padding: 0; outline: none`) preserves exact visual aesthetics while making window management WCAG 2.1 AA compliant.
 
----
-
-## 2026-08-01 - Proactive Focus States and ARIA Roles
-**Learning:** Screen readers and keyboard-only users rely entirely on interactive controls having clear focus indicators and ARIA attributes (e.g., `aria-label`, `role="button"`). Icon-only buttons with no textual context must always expose descriptive labels, and focus rings must never be hidden or completely disabled.
-**Action:** Always provide explicit `aria-label` tags for all visual icon elements and retain highly-visible focus indicators.
-
-## 2026-08-01 - Elegant Loading Feedback for Async Tasks
-**Learning:** Destructive or long-running operations (like package installations or database commits) without real-time state feedback cause users to double-submit, resulting in corrupted states or multiple duplicate network/disk requests.
-**Action:** Enforce clear visual and textual transitions, and disable action controls during ongoing asynchronous execution.
+**Action:** Whenever building custom window titlebars or desktop controls, always use native `<button>` tags with explicit, context-aware `aria-label`s and `:focus-visible` focus rings.
