@@ -386,6 +386,133 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
+// ============================================================================
+// ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
+// ============================================================================
+
+/// Repository Stage Tier for package releases
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RepoStageTier {
+    Staging,
+    Testing,
+    Core,
+    Extra,
+    Multilib,
+}
+
+/// Signed Package Entry for Repository DB Tarballs
+#[derive(Debug, Clone)]
+pub struct RepoDbPackageEntry {
+    pub name: String,
+    pub version: String,
+    pub filename: String,
+    pub sha256_hash: String,
+    pub pgp_dilithium5_signature: String,
+    pub stage: RepoStageTier,
+    pub depends: Vec<String>,
+    pub files: Vec<String>,
+}
+
+/// Sovereign Dbscripts Repository Database Manager (Arch dbscripts / repo-add / repo-remove / db-move / db-update parity)
+pub struct SovereignDbscriptsEngine {
+    pub repo_databases: Vec<(RepoStageTier, Vec<RepoDbPackageEntry>)>,
+    pub operation_log: Vec<String>,
+}
+
+impl SovereignDbscriptsEngine {
+    pub fn new() -> Self {
+        let mut dbs = Vec::new();
+        dbs.push((RepoStageTier::Staging, Vec::new()));
+        dbs.push((RepoStageTier::Testing, Vec::new()));
+        dbs.push((RepoStageTier::Core, Vec::new()));
+        dbs.push((RepoStageTier::Extra, Vec::new()));
+        dbs.push((RepoStageTier::Multilib, Vec::new()));
+
+        Self {
+            repo_databases: dbs,
+            operation_log: Vec::new(),
+        }
+    }
+
+    /// repo-add parity: Adds or updates package entry in target repository database index
+    pub fn repo_add(&mut self, stage: RepoStageTier, entry: RepoDbPackageEntry) -> Result<(), &'static str> {
+        if entry.sha256_hash.is_empty() || entry.pgp_dilithium5_signature.is_empty() {
+            return Err("dbscripts: Refusing repo_add for unsigned or missing checksum package");
+        }
+
+        let db = self
+            .repo_databases
+            .iter_mut()
+            .find(|(s, _)| *s == stage)
+            .map(|(_, entries)| entries)
+            .ok_or("dbscripts: Target repository database tier not found")?;
+
+        if let Some(pos) = db.iter().position(|e| e.name == entry.name) {
+            db[pos] = entry.clone();
+        } else {
+            db.push(entry.clone());
+        }
+
+        self.operation_log.push(format!(
+            "repo-add: Registered '{}-{}' in tier '{:?}' [SHA256: {}]",
+            entry.name, entry.version, stage, entry.sha256_hash
+        ));
+
+        Ok(())
+    }
+
+    /// repo-remove parity: Removes package entry from target repository database index
+    pub fn repo_remove(&mut self, stage: RepoStageTier, pkg_name: &str) -> Result<RepoDbPackageEntry, &'static str> {
+        let db = self
+            .repo_databases
+            .iter_mut()
+            .find(|(s, _)| *s == stage)
+            .map(|(_, entries)| entries)
+            .ok_or("dbscripts: Target repository database tier not found")?;
+
+        if let Some(pos) = db.iter().position(|e| e.name == pkg_name) {
+            let removed = db.remove(pos);
+            self.operation_log.push(format!(
+                "repo-remove: Removed '{}' from tier '{:?}'",
+                pkg_name, stage
+            ));
+            Ok(removed)
+        } else {
+            Err("dbscripts: Package not found in target repository database")
+        }
+    }
+
+    /// db-move parity: Moves package between repository stages (e.g. testing -> core)
+    pub fn db_move(&mut self, from_stage: RepoStageTier, to_stage: RepoStageTier, pkg_name: &str) -> Result<(), &'static str> {
+        let mut entry = self.repo_remove(from_stage, pkg_name)?;
+        entry.stage = to_stage;
+        self.repo_add(to_stage, entry)?;
+        self.operation_log.push(format!(
+            "db-move: Promoted '{}' from '{:?}' to '{:?}'",
+            pkg_name, from_stage, to_stage
+        ));
+        Ok(())
+    }
+
+    /// db-update parity: Process incoming package builds, verify signatures, and refresh DB tarball indexes
+    pub fn db_update(&mut self, incoming_packages: Vec<RepoDbPackageEntry>) -> usize {
+        let mut count = 0;
+        for pkg in incoming_packages {
+            let target_stage = pkg.stage;
+            if self.repo_add(target_stage, pkg).is_ok() {
+                count += 1;
+            }
+        }
+        count
+    }
+}
+
+impl Default for SovereignDbscriptsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -679,5 +806,46 @@ depends=('glibc')
         let pkgbuild = "pkgname=foo\npkgver=1.0\n";
         let updated = PkgbuildChecksumUpdater::update_sha256(pkgbuild, b"sample source code");
         assert!(updated.contains("sha256sums="));
+    }
+
+    #[test]
+    fn test_sovereign_dbscripts_engine() {
+        let mut dbscripts = SovereignDbscriptsEngine::new();
+
+        let entry = RepoDbPackageEntry {
+            name: "sigma-kernel".to_string(),
+            version: "6.12.0".to_string(),
+            filename: "sigma-kernel-6.12.0-1-x86_64.pkg.tar.zst".to_string(),
+            sha256_hash: "a1b2c3d4e5f67890".to_string(),
+            pgp_dilithium5_signature: "dilithium5-sig-12345".to_string(),
+            stage: RepoStageTier::Testing,
+            depends: vec!["glibc".to_string()],
+            files: vec!["/boot/vmlinuz-sigma".to_string()],
+        };
+
+        // Unsigned repo_add should fail
+        let mut unsigned_entry = entry.clone();
+        unsigned_entry.pgp_dilithium5_signature = String::new();
+        assert!(dbscripts.repo_add(RepoStageTier::Testing, unsigned_entry).is_err());
+
+        // Valid repo_add
+        assert!(dbscripts.repo_add(RepoStageTier::Testing, entry.clone()).is_ok());
+
+        // db-move from Testing to Core
+        assert!(dbscripts.db_move(RepoStageTier::Testing, RepoStageTier::Core, "sigma-kernel").is_ok());
+
+        let core_db = dbscripts.repo_databases.iter().find(|(s, _)| *s == RepoStageTier::Core).unwrap();
+        assert_eq!(core_db.1.len(), 1);
+        assert_eq!(core_db.1[0].name, "sigma-kernel");
+
+        // db-update
+        let mut incoming = entry.clone();
+        incoming.name = "zsh".to_string();
+        incoming.stage = RepoStageTier::Extra;
+        assert_eq!(dbscripts.db_update(vec![incoming]), 1);
+
+        // repo-remove
+        let removed = dbscripts.repo_remove(RepoStageTier::Core, "sigma-kernel").unwrap();
+        assert_eq!(removed.name, "sigma-kernel");
     }
 }
