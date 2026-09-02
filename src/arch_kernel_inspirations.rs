@@ -16,10 +16,11 @@
 //   - arch-signoff                    -> `PackageSignoff`
 //   - arch-repro-status (reproducible)-> `ReproducibleBuildVerdict`
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -444,6 +445,7 @@ pub struct SignstarService {
     pub signers: Vec<Signer>,
     pub package: String,
     pub fully_signed: bool,
+    pub threshold_signers_count: usize,
 }
 
 impl SignstarService {
@@ -452,7 +454,17 @@ impl SignstarService {
             signers: Vec::new(),
             package: package.to_string(),
             fully_signed: false,
+            threshold_signers_count: 0,
         }
+    }
+
+    pub fn set_threshold_count(&mut self, threshold: usize) {
+        self.threshold_signers_count = threshold;
+    }
+
+    pub fn verify_signature_threshold(&self) -> bool {
+        let total_signed = self.signers.iter().filter(|s| s.signed).count();
+        self.all_mandatory_signed() && total_signed >= self.threshold_signers_count
     }
 
     pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
@@ -880,6 +892,21 @@ mod tests {
         assert!(eng.commit().is_ok());
         assert!(eng.installed.iter().any(|p| p.name == "app"));
         assert!(eng.installed.iter().any(|p| p.name == "libc"));
+    }
+
+    #[test]
+    fn signstar_threshold_signing_verification() {
+        let mut signstar = SignstarService::new("core-package.pkg.tar.zst");
+        signstar.add_signer("arch-key-1", SignerPolicy::Mandatory);
+        signstar.add_signer("arch-key-2", SignerPolicy::Optional);
+        signstar.add_signer("arch-key-3", SignerPolicy::Optional);
+        signstar.set_threshold_count(2);
+
+        signstar.record_signature("arch-key-1");
+        assert!(!signstar.verify_signature_threshold()); // Mandatory signed, but total signatures = 1 < threshold (2)
+
+        signstar.record_signature("arch-key-2");
+        assert!(signstar.verify_signature_threshold()); // Mandatory signed and total signatures = 2 >= threshold (2)
     }
 
     #[test]
