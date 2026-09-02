@@ -133,7 +133,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
+        let snapshot_path = format!("{}/{}", self.base_path, &metadata.id);
         Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
@@ -170,7 +170,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
 
         if !data_path.exists() {
@@ -204,7 +204,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
@@ -256,7 +256,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
+        let snapshot_path = format!("{}/{}", self.base_path, &metadata.id);
         Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
@@ -304,7 +304,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
         let merkle_path = format!("{}/{}", snapshot_path, "merkle_root.txt");
 
@@ -350,7 +350,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         Err("fs not available")
             .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 

@@ -59,7 +59,13 @@ impl SimpleSigningKey {
 
 impl SigningKey for SimpleSigningKey {
     fn id(&self) -> KeyID { self.id }
-    fn algorithm(&self) -> SignatureAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> SignatureAlgorithm {
+        match self.algorithm.load(Ordering::SeqCst) {
+            0 => SignatureAlgorithm::ED25519,
+            1 => SignatureAlgorithm::RSA4096,
+            _ => SignatureAlgorithm::Dilithium5,
+        }
+    }
     fn public_key(&self) -> &[u8] { &self.public_key }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {

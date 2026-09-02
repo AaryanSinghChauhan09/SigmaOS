@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -12,10 +14,12 @@ mod unimplemented_features;
 mod firmware;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
+pub use distro::*;
 #[path = "../src/kernel/sysctl.rs"]
 mod sysctl;
 #[path = "../src/security/root_improvement.rs"]
@@ -64,6 +68,14 @@ mod unified;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
+#[path = "../src/driver/mod.rs"]
+pub mod driver;
+#[path = "../src/package/mod.rs"]
+pub mod package;
+#[path = "../src/security/mod.rs"]
+pub mod security;
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
 #[path = "../src/kernel/module_loader.rs"]
@@ -113,7 +125,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig, VirtioNetDeviceConfig,
         VmConfig, VmState, HypervisorBackend,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
     use std::path::PathBuf;
 
     let mut kvm = KvmHypervisor::new();
@@ -235,7 +246,7 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
     // 8. Real-Time Hybrid Scheduler
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask { pid: 1, class: distro::wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -876,4 +887,137 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
     assert!(handoff.emergency_rescue_active);
     assert_eq!(handoff.last_error_log.as_deref(), Some("EFI Framebuffer resolution not supported"));
     assert!(handoff.execute_handoff().is_err());
+}
+
+#[test]
+fn test_pacman_contrib_suite_inspection() {
+    use sigpkg::pacman_contrib::{
+        PacCacheTrimmer, PackageCacheEntry, PacDiffConfigResolver, PacDiffCandidate, PacDiffAction,
+        CheckUpdatesEngine, InstalledPackage, SyncPackage, PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor,
+    };
+
+    // 1. Paccache trimmer
+    let mut trimmer = PacCacheTrimmer::new();
+    trimmer.add_cache_entry(PackageCacheEntry {
+        package_name: "sigma-kernel".to_string(),
+        version: "1.0.0".to_string(),
+        file_name: "sigma-kernel-1.0.0.pkg.tar.zst".to_string(),
+        size_bytes: 50_000_000,
+        is_installed: false,
+    });
+    trimmer.add_cache_entry(PackageCacheEntry {
+        package_name: "sigma-kernel".to_string(),
+        version: "1.1.0".to_string(),
+        file_name: "sigma-kernel-1.1.0.pkg.tar.zst".to_string(),
+        size_bytes: 52_000_000,
+        is_installed: true,
+    });
+    let res = trimmer.trim_cache(1, false);
+    assert_eq!(res.removed_files.len(), 1);
+    assert_eq!(res.bytes_freed, 50_000_000);
+
+    // 2. Pacdiff merge
+    let resolver = PacDiffConfigResolver::new();
+    let candidate = PacDiffCandidate {
+        config_path: "/etc/pacman.conf".to_string(),
+        pacnew_path: Some("/etc/pacman.conf.pacnew".to_string()),
+        pacsave_path: None,
+        current_content: "ILoveBar".to_string(),
+        new_content: "ILoveBar\nVerbosePkgLists".to_string(),
+    };
+    let merged = resolver.resolve(&candidate, PacDiffAction::Merge3Way).unwrap();
+    assert!(merged.contains("VerbosePkgLists"));
+
+    // 3. Checkupdates
+    let chk = CheckUpdatesEngine::new();
+    let inst = vec![InstalledPackage { name: "bash".to_string(), current_version: "5.1".to_string(), repository: "core".to_string() }];
+    let sync = vec![SyncPackage { name: "bash".to_string(), sync_version: "5.2".to_string(), repository: "core".to_string() }];
+    let updates = chk.check_updates(&inst, &sync);
+    assert_eq!(updates.len(), 1);
+    assert_eq!(updates[0].new_version, "5.2");
+
+    // 4. Paclist
+    let pflt = PacListRepoFilter::new();
+    let filtered = pflt.filter_by_repo("core", &inst);
+    assert_eq!(filtered.len(), 1);
+
+    // 5. Updpkgsums
+    let upd = UpdPkgSumsGenerator::new();
+    let updated_pkgbuild = upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
+    assert!(updated_pkgbuild.contains("sha256sums=('"));
+
+    // 6. Paclog
+    let log_line = "[2023-10-01 12:00:00] [ALPM] upgraded linux (6.5 -> 6.6)";
+    let parsed = PacLogAuditor::parse_log_line(log_line).unwrap();
+    assert_eq!(parsed.target, "linux");
+}
+
+#[test]
+fn test_svntogit_repro_and_aur_rules_inspection() {
+    use sigpkg::{
+        SovereignSvnToGitMigrator, SvnRevisionLog, SvnBranchType, ReproduciblePackageBuilder, ReproducibleBuildEnvironment,
+        AurRuleEngine, MakepkgReproduciblePipeline, MakepkgBuildStatus,
+    };
+
+    // 1. SVN-to-Git Migrator
+    let mut migrator = SovereignSvnToGitMigrator::new();
+    migrator.add_svn_log(SvnRevisionLog {
+        revision: 9876,
+        author: "sigma-dev".to_string(),
+        message: "upgpkg: zstd 1.5.5-1".to_string(),
+        path: "trunk".to_string(),
+        branch_type: SvnBranchType::Trunk,
+    });
+    let commits = migrator.migrate_svn_to_git("sigmaos.org");
+    assert_eq!(commits.len(), 1);
+    assert_eq!(commits[0].author_email, "sigma-dev@sigmaos.org");
+
+    // 2. Reproducible Package Builder
+    let env = ReproducibleBuildEnvironment::default();
+    let mut builder = ReproduciblePackageBuilder::new(env);
+    builder.add_artifact("/usr/bin/zstd", b"ZSTD_BINARY");
+    let report = builder.build_reproducible_package();
+    assert!(report.is_reproducible);
+    assert_eq!(report.artifact_count, 1);
+
+    // 3. AUR Rule Linter & Makepkg Pipeline
+    let linter = AurRuleEngine::new();
+    let findings = linter.lint_pkgbuild("pkgname=test\nbuild() {\n sudo rm -rf /\n}");
+    assert!(findings.len() >= 1);
+
+    let pipeline = MakepkgReproduciblePipeline::new();
+    let res = pipeline.build_and_package("zstd", "1.5.5", "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }", Some("0x123"));
+    assert_eq!(res.status, MakepkgBuildStatus::Success);
+    assert_eq!(res.package_filename, "zstd-1.5.5-x86_64.pkg.tar.zst");
+}
+
+#[test]
+fn test_poudriere_xbps_slackpkg_inspection() {
+    use sigpkg::{
+        PoudriereBulkBuildQueue, PoudriereBuildState,
+        XbpsSrcChrootBuilder,
+        SlackpkgPatchEngine,
+    };
+
+    // 1. FreeBSD Poudriere
+    let mut poudriere = PoudriereBulkBuildQueue::new();
+    poudriere.register_jail("13_2_RELEASE_amd64");
+    assert!(poudriere.enqueue_port("sysutils/ripgrep", "13_2_RELEASE_amd64").is_ok());
+    assert_eq!(poudriere.execute_bulk_build(), 1);
+    assert_eq!(poudriere.jobs[0].state, PoudriereBuildState::Success);
+
+    // 2. Void xbps-src
+    let tmpl_text = "pkgname=neofetch\nversion=7.1.0\nrevision=2\nshort_desc=\"CLI system info tool\"\nbuild_style=gnu-makefile";
+    let tmpl = XbpsSrcChrootBuilder::parse_template(tmpl_text).unwrap();
+    assert_eq!(tmpl.pkgname, "neofetch");
+    let builder = XbpsSrcChrootBuilder::new("/void-packages");
+    let res = builder.build_pkg(&tmpl);
+    assert!(res.binary_xbps_path.contains("neofetch-7.1.0_2.x86_64.xbps"));
+
+    // 3. Slackware slackpkg & SlackBuilds
+    let info_text = "PRGNAM=\"vim\"\nVERSION=\"9.0\"\nBUILD=\"1\"\nTAG=\"_SBo\"\nDOWNLOAD=\"https://slackbuilds.org/src/vim.tar.gz\"";
+    let spec = SlackpkgPatchEngine::parse_slackbuild_info(info_text).unwrap();
+    let patch_engine = SlackpkgPatchEngine::new();
+    let filename = patch_engine.generate_txz_filename(&spec, "x86_64");
+    assert_eq!(filename, "vim-9.0-x86_64-1_SBo.txz");
 }
