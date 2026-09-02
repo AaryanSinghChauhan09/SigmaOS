@@ -9,11 +9,6 @@ pub use kvm_vcpu::{
     VirtioDeviceBackend, VirtioDeviceType,
 };
 
-pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs,
-    VirtioDeviceBackend, VirtioDeviceType,
-};
-
 pub use orchestration::{
     Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
     ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
