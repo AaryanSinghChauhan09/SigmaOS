@@ -22,7 +22,7 @@ jobs:
               'feat/', 'feature/', 'fix/', 'docs/', 'style/', 'refactor/', 'perf/',
               'test/', 'chore/', 'revert/', 'impl/', 'driver/', 'security/',
               'kernel/', 'arch/', 'ci/', 'pkg/', 'ai/', 'ux/', 'sdk/', 'boot/',
-              'bolt/', 'palette/', 'sentinel/', 'jules-', 'universal-'
+              'bolt/', 'palette/', 'sentinel/', 'jules-', 'universal-', 'master', 'main'
             ];
 
             const isValid = validPrefixes.some(prefix => branchName.startsWith(prefix));
