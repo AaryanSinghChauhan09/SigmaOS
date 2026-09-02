@@ -1259,6 +1259,51 @@ impl UniversalShellCompatibilityEngine {
     }
 }
 
+// =========================================================================
+// 7. BRACE EXPANSION & ADVANCED TRANSPILER ENHANCEMENTS
+// =========================================================================
+
+pub struct BraceExpansionEngine;
+
+impl BraceExpansionEngine {
+    /// Expands string patterns like `{a,b,c}` or numeric ranges `{1..5}` into argument vectors
+    pub fn expand(input: &str) -> Vec<String> {
+        let mut results = Vec::new();
+        if let (Some(start), Some(end)) = (input.find('{'), input.find('}')) {
+            if start < end {
+                let prefix = &input[..start];
+                let inner = &input[start + 1..end];
+                let suffix = &input[end + 1..];
+
+                if inner.contains("..") {
+                    let parts: Vec<&str> = inner.split("..").collect();
+                    if parts.len() == 2 {
+                        if let (Ok(s), Ok(e)) = (parts[0].parse::<i64>(), parts[1].parse::<i64>()) {
+                            let step = if s <= e { 1 } else { -1 };
+                            let mut curr = s;
+                            loop {
+                                results.push(format!("{}{}{}", prefix, curr, suffix));
+                                if curr == e {
+                                    break;
+                                }
+                                curr += step;
+                            }
+                            return results;
+                        }
+                    }
+                } else if inner.contains(',') {
+                    for item in inner.split(',') {
+                        results.push(format!("{}{}{}", prefix, item, suffix));
+                    }
+                    return results;
+                }
+            }
+        }
+        results.push(input.to_string());
+        results
+    }
+}
+
 pub struct UniversalScriptTranspiler;
 
 impl UniversalScriptTranspiler {
@@ -1282,17 +1327,75 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
-            transpiled.push_str(&converted_line);
+            // Normalize heredocs and brace expansion if applicable
+            let normalized = Self::normalize_heredoc_and_process_sub(&converted_line);
+            transpiled.push_str(&normalized);
             transpiled.push('\n');
         }
 
         transpiled
     }
 
+    fn normalize_heredoc_and_process_sub(line: &str) -> String {
+        let l = line.to_string();
+
+        // Transpile Process Substitution <(cmd) -> cmd | ...
+        if l.contains("<(") && l.contains(')') {
+            if let (Some(start), Some(end)) = (l.find("<("), l.find(')')) {
+                let outer_cmd = l[..start].trim();
+                let sub_cmd = &l[start + 2..end];
+                let rest = l[end + 1..].trim();
+                if rest.is_empty() {
+                    return format!("{} | {}", sub_cmd, outer_cmd);
+                } else {
+                    return format!("{} | {} {}", sub_cmd, outer_cmd, rest);
+                }
+            }
+        }
+
+        // Transpile Process Substitution >(cmd) -> ... | cmd
+        if l.contains(">(") && l.contains(')') {
+            if let (Some(start), Some(end)) = (l.find(">("), l.find(')')) {
+                let outer_cmd = l[..start].trim();
+                let sub_cmd = &l[start + 2..end];
+                return format!("{} | {}", outer_cmd, sub_cmd);
+            }
+        }
+
+        // Normalize heredoc <<EOF
+        if l.contains("<<") && !l.contains("<<<") {
+            if let Some(pos) = l.find("<<") {
+                let cmd = &l[..pos].trim();
+                let delimiter = l[pos + 2..].trim();
+                if !delimiter.starts_with('\'') && !delimiter.starts_with('"') {
+                    return format!("{} << '{}'", cmd, delimiter);
+                }
+            }
+        }
+
+        l
+    }
+
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
-        // 1. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
+        // 1. Fish 'set -e VAR' -> 'unset VAR'
+        if l.starts_with("set -e ") || l.starts_with("set --erase ") {
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set --erase ").trim();
+            return format!("unset {}", var);
+        }
+
+        // 2. Fish 'set -l VAR val' or 'set -f VAR val' -> 'VAR=val'
+        if l.starts_with("set -l ") || l.starts_with("set -f ") {
+            let rest = l.trim_start_matches("set -l ").trim_start_matches("set -f ");
+            if let Some(space_idx) = rest.find(' ') {
+                let var = &rest[..space_idx];
+                let val = &rest[space_idx + 1..];
+                return format!("{}={}", var, val);
+            }
+        }
+
+        // 3. Fish 'set -x VAR val' or 'set -gx VAR val' -> 'export VAR=val'
         if l.starts_with("set -x ") || l.starts_with("set -gx ") {
             let rest = l.trim_start_matches("set -x ").trim_start_matches("set -gx ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1309,21 +1412,21 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Fish 'and' / 'or' -> '&&' / '||'
+        // 4. Fish 'and' / 'or' -> '&&' / '||'
         if l.starts_with("and ") {
             l = format!("&& {}", &l[4..]);
         } else if l.starts_with("or ") {
             l = format!("|| {}", &l[3..]);
         }
 
-        // 3. Fish 'function foo' -> 'foo() {'
+        // 5. Fish 'function foo' -> 'foo() {'
         if l.starts_with("function ") {
             let func_name = l.trim_start_matches("function ").trim();
             *in_function = true;
             return format!("{}() {{", func_name);
         }
 
-        // 4. Fish 'end' -> '}' if in function
+        // 6. Fish 'end' -> '}' if in function
         if l == "end" && *in_function {
             *in_function = false;
             return "}".to_string();
@@ -1367,7 +1470,12 @@ impl UniversalScriptTranspiler {
             l = l.replace("[[", "[").replace("]]", "]");
         }
 
-        // 2. <<< "here string" -> echo "here string" |
+        // 2. Zsh 1-based array indexing `$arr[1]` -> `$1` or `$arr`
+        if l.contains("[1]") {
+            l = l.replace("[1]", "[0]");
+        }
+
+        // 3. <<< "here string" -> echo "here string" |
         if l.contains("<<<") {
             if let Some(pos) = l.find("<<<") {
                 let cmd = &l[..pos].trim();
@@ -1376,7 +1484,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 3. function foo() -> foo()
+        // 4. function foo() -> foo()
         if l.starts_with("function ") {
             let rest = l.trim_start_matches("function ").trim();
             if !rest.contains("()") {
@@ -1729,5 +1837,40 @@ mod tests {
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
         assert!(!pipelines.is_empty());
+    }
+
+    #[test]
+    fn test_brace_expansion() {
+        let list_exp = BraceExpansionEngine::expand("file_{a,b,c}.txt");
+        assert_eq!(list_exp, vec!["file_a.txt", "file_b.txt", "file_c.txt"]);
+
+        let num_range = BraceExpansionEngine::expand("img_{1..3}.png");
+        assert_eq!(num_range, vec!["img_1.png", "img_2.png", "img_3.png"]);
+    }
+
+    #[test]
+    fn test_process_substitution_transpilation() {
+        let script = "diff <(ls dir1) <(ls dir2)";
+        let posix = UniversalScriptTranspiler::transpile_to_posix_sh(script, ShellDialect::Bash);
+        assert!(posix.contains("| diff"));
+    }
+
+    #[test]
+    fn test_heredoc_normalization() {
+        let script = "cat << EOF\nhello world\nEOF";
+        let posix = UniversalScriptTranspiler::transpile_to_posix_sh(script, ShellDialect::Bash);
+        assert!(posix.contains("cat << 'EOF'"));
+    }
+
+    #[test]
+    fn test_zsh_fish_transpilation_edge_cases() {
+        let fish_script = "set -l TEMP /tmp/foo\nset -e TEMP";
+        let posix_fish = UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
+        assert!(posix_fish.contains("TEMP=/tmp/foo"));
+        assert!(posix_fish.contains("unset TEMP"));
+
+        let zsh_script = "echo $arr[1]";
+        let posix_zsh = UniversalScriptTranspiler::transpile_to_posix_sh(zsh_script, ShellDialect::Zsh);
+        assert!(posix_zsh.contains("$arr[0]"));
     }
 }

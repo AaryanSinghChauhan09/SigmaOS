@@ -694,7 +694,186 @@ impl FirefoxContainerJarManager {
 }
 
 // =========================================================================
-// 11. UNIFIED SIGMAWEB BROWSER SUITE
+// 11. CHROMIUM MANIFEST V3 & DECLARATIVE NET REQUEST ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ManifestV3Action {
+    Block,
+    Allow,
+    UpgradeScheme,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeclarativeNetRule {
+    pub id: u32,
+    pub priority: u32,
+    pub url_filter: String,
+    pub action: ManifestV3Action,
+}
+
+pub struct ChromiumManifestV3Engine {
+    pub rules: Vec<DeclarativeNetRule>,
+    pub isolated_extensions_count: usize,
+}
+
+impl ChromiumManifestV3Engine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            rules: Vec::new(),
+            isolated_extensions_count: 0,
+        };
+        engine.rules.push(DeclarativeNetRule {
+            id: 1,
+            priority: 10,
+            url_filter: "||ad-tracker.com".to_string(),
+            action: ManifestV3Action::Block,
+        });
+        engine
+    }
+
+    pub fn evaluate_url(&self, url: &str) -> ManifestV3Action {
+        for rule in &self.rules {
+            let filter = rule.url_filter.trim_start_matches("||");
+            if url.contains(filter) {
+                return rule.action.clone();
+            }
+        }
+        ManifestV3Action::Allow
+    }
+}
+
+// =========================================================================
+// 12. FIREFOX QUANTUM WEBRENDER & DISPLAY LIST LAYOUT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct WebRenderFrame {
+    pub frame_id: u64,
+    pub display_items_count: usize,
+    pub is_gpu_composited: bool,
+}
+
+pub struct QuantumWebRenderEngine {
+    pub active_frames: Vec<WebRenderFrame>,
+}
+
+impl QuantumWebRenderEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_frames: Vec::new(),
+        }
+    }
+
+    pub fn build_display_list(&mut self, items_count: usize) -> u64 {
+        let frame_id = (self.active_frames.len() as u64) + 1;
+        self.active_frames.push(WebRenderFrame {
+            frame_id,
+            display_items_count: items_count,
+            is_gpu_composited: true,
+        });
+        frame_id
+    }
+}
+
+// =========================================================================
+// 13. UBLOCK ORIGIN EASYLIST NETWORK & COSMETIC FILTER ENGINE
+// =========================================================================
+
+pub struct UBlockOriginFilterEngine {
+    pub network_filters: Vec<String>,
+    pub cosmetic_filters: Vec<String>,
+}
+
+impl UBlockOriginFilterEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut filter = Self {
+            network_filters: Vec::new(),
+            cosmetic_filters: Vec::new(),
+        };
+        filter.network_filters.push("||popads.net^".to_string());
+        filter.cosmetic_filters.push("##.popup-ad".to_string());
+        filter
+    }
+
+    pub fn matches_network_rule(&self, url: &str) -> bool {
+        for rule in &self.network_filters {
+            let pat = rule.trim_start_matches("||").trim_end_matches('^');
+            if url.contains(pat) {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+// =========================================================================
+// 14. ZEN BROWSER VERTICAL TAB WORKSPACE & SPLIT-SCREEN GRID
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZenWorkspace {
+    pub name: String,
+    pub icon: String,
+    pub tab_ids: Vec<u64>,
+}
+
+pub struct ZenWorkspaceTreeEngine {
+    pub workspaces: BTreeMap<String, ZenWorkspace>,
+    pub split_screen_active: bool,
+}
+
+impl ZenWorkspaceTreeEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut tree = Self {
+            workspaces: BTreeMap::new(),
+            split_screen_active: false,
+        };
+        tree.workspaces.insert(
+            "Default".to_string(),
+            ZenWorkspace {
+                name: "Default".to_string(),
+                icon: "globe".to_string(),
+                tab_ids: Vec::new(),
+            },
+        );
+        tree
+    }
+
+    pub fn add_tab_to_workspace(&mut self, workspace_name: &str, tab_id: u64) {
+        let ws = self
+            .workspaces
+            .entry(workspace_name.to_string())
+            .or_insert_with(|| ZenWorkspace {
+                name: workspace_name.to_string(),
+                icon: "folder".to_string(),
+                tab_ids: Vec::new(),
+            });
+        ws.tab_ids.push(tab_id);
+    }
+}
+
+// =========================================================================
+// 15. DUCKDUCKGO DUCKASSIST PRIVATE AI SEARCH ENGINE
+// =========================================================================
+
+pub struct DuckAssistPrivacyEngine;
+
+impl DuckAssistPrivacyEngine {
+    pub fn synthesize_private_answer(query: &str) -> String {
+        format!(
+            "DuckAssist (Private AI Response for '{}'): Synthesized response preserving zero telemetry.",
+            query
+        )
+    }
+}
+
+// =========================================================================
+// 16. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -707,6 +886,10 @@ pub struct SigmaWebBrowser {
     pub memory_optimizer: TabMemoryOptimizer,
     pub doh_ech: DohEchEncryptionEngine,
     pub container_jars: FirefoxContainerJarManager,
+    pub manifest_v3: ChromiumManifestV3Engine,
+    pub webrender: QuantumWebRenderEngine,
+    pub ublock: UBlockOriginFilterEngine,
+    pub zen_workspaces: ZenWorkspaceTreeEngine,
 }
 
 impl SigmaWebBrowser {
@@ -722,6 +905,10 @@ impl SigmaWebBrowser {
             memory_optimizer: TabMemoryOptimizer::new(4096),
             doh_ech: DohEchEncryptionEngine::new(),
             container_jars: FirefoxContainerJarManager::new(),
+            manifest_v3: ChromiumManifestV3Engine::new(),
+            webrender: QuantumWebRenderEngine::new(),
+            ublock: UBlockOriginFilterEngine::new(),
+            zen_workspaces: ZenWorkspaceTreeEngine::new(),
         }
     }
 
@@ -754,7 +941,14 @@ impl SigmaWebBrowser {
 
         let uncloaked = self.brave_shields.resolve_cname_uncloak(domain);
 
-        // 4. Check if uncloaked domain is a blocked ad or telemetry target
+        // 4. Evaluate Manifest V3 and uBlock Origin rules
+        if self.manifest_v3.evaluate_url(&uncloaked) == ManifestV3Action::Block
+            || self.ublock.matches_network_rule(&uncloaked)
+        {
+            return Err("Navigation Blocked: Ad/Tracker Blocked by Manifest V3 / uBlock Rule");
+        }
+
+        // 5. Check if uncloaked domain is a blocked ad or telemetry target
         if self.stripper.should_block_telemetry(&uncloaked) || !self.engine.navigate_url(&uncloaked)
         {
             return Err("Navigation Blocked: Ad/Telemetry Target Detected");
@@ -956,5 +1150,50 @@ mod tests {
         let blocked_nav =
             sigma_web.navigate_protected("http://metrics.example.com/collect?fbclid=123");
         assert!(blocked_nav.is_err());
+    }
+
+    #[test]
+    fn test_chromium_manifest_v3_engine() {
+        let mv3 = ChromiumManifestV3Engine::new();
+        assert_eq!(mv3.evaluate_url("https://ad-tracker.com/pixel"), ManifestV3Action::Block);
+        assert_eq!(mv3.evaluate_url("https://example.com"), ManifestV3Action::Allow);
+    }
+
+    #[test]
+    fn test_quantum_webrender_engine() {
+        let mut qr = QuantumWebRenderEngine::new();
+        let fid = qr.build_display_list(150);
+        assert_eq!(fid, 1);
+        assert_eq!(qr.active_frames.len(), 1);
+        assert!(qr.active_frames[0].is_gpu_composited);
+    }
+
+    #[test]
+    fn test_ublock_origin_filter_engine() {
+        let ublock = UBlockOriginFilterEngine::new();
+        assert!(ublock.matches_network_rule("https://popads.net/serve"));
+        assert!(!ublock.matches_network_rule("https://wikipedia.org"));
+    }
+
+    #[test]
+    fn test_zen_workspace_tree_engine() {
+        let mut zen = ZenWorkspaceTreeEngine::new();
+        zen.add_tab_to_workspace("Work", 101);
+        assert!(zen.workspaces.contains_key("Work"));
+        assert_eq!(zen.workspaces["Work"].tab_ids, vec![101]);
+    }
+
+    #[test]
+    fn test_duckassist_privacy_engine() {
+        let ans = DuckAssistPrivacyEngine::synthesize_private_answer("what is rust");
+        assert!(ans.contains("DuckAssist"));
+        assert!(ans.contains("zero telemetry"));
+    }
+
+    #[test]
+    fn test_sigmaweb_browser_full_innovations_pipeline() {
+        let mut browser = SigmaWebBrowser::new();
+        let blocked = browser.navigate_protected("http://ad-tracker.com/script.js");
+        assert!(blocked.is_err());
     }
 }

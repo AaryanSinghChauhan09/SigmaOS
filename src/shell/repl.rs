@@ -236,6 +236,14 @@ pub enum ShellCommand {
         permissions: String,
     },
 
+    // Transpile and dialect commands
+    Transpile {
+        script: String,
+    },
+    Dialect {
+        script: String,
+    },
+
     Unknown(String),
 }
 
@@ -849,6 +857,24 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "transpile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Transpile {
+                        script: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "dialect" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Dialect {
+                        script: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -1439,6 +1465,15 @@ impl ShellRepl {
             ShellCommand::Unveil { path, permissions } => {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
+            ShellCommand::Transpile { script } => {
+                let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&script);
+                let posix = crate::shell::zsh_bash_parity::UniversalScriptTranspiler::transpile_to_posix_sh(&script, dialect);
+                Ok(format!("Transpiled ({:?} -> POSIX /bin/sh):\n{}", dialect, posix))
+            }
+            ShellCommand::Dialect { script } => {
+                let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&script);
+                Ok(format!("Detected script dialect: {:?}", dialect))
+            }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
@@ -1984,5 +2019,20 @@ mod tests {
         // Test prompt rendering
         let rendered_prompt = repl.get_rendered_prompt();
         assert!(rendered_prompt.contains("ubuntu@sigmaos"));
+    }
+
+    #[test]
+    fn test_repl_transpile_and_dialect_commands() {
+        let mut repl = ShellRepl::new();
+
+        let dialect_cmd = repl.parse_command("dialect #!/usr/bin/env fish\\nset -x PORT 8080");
+        assert!(matches!(dialect_cmd, ShellCommand::Dialect { .. }));
+        let dialect_res = repl.execute_command(dialect_cmd).unwrap();
+        assert!(dialect_res.contains("Fish"));
+
+        let transpile_cmd = repl.parse_command("transpile #!/usr/bin/env fish\\nset -gx PORT 8080");
+        assert!(matches!(transpile_cmd, ShellCommand::Transpile { .. }));
+        let transpile_res = repl.execute_command(transpile_cmd).unwrap();
+        assert!(transpile_res.contains("POSIX /bin/sh"));
     }
 }
