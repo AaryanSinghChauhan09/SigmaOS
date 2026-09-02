@@ -1091,14 +1091,24 @@ impl UniversalDependencyMapper {
 
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
-        let name = foreign_name.trim().to_lowercase();
-        if name.starts_with("so:libc.") || name.starts_with("so:libc") {
-            return "libc".to_string();
-        }
-        match name.as_str() {
+        let raw = foreign_name.trim().to_lowercase();
+        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+            if stripped.starts_with("libc.") {
+                "libc"
+            } else {
+                stripped.split('.').next().unwrap_or(stripped)
+            }
+        } else if let Some(stripped) = raw.strip_prefix("cmd:") {
+            stripped
+        } else {
+            raw.as_str()
+        };
+
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1110,7 +1120,7 @@ impl UniversalDependencyMapper {
             "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
             "dbus" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            _ => foreign_name.to_string(),
+            _ => clean.to_string(),
         }
     }
 }

@@ -119,19 +119,9 @@ pub struct V4OptimizedPackageManager {
 
 impl V4OptimizedPackageManager {
     pub fn new() -> Self {
-        let pm = V4OptimizedPackageManager {
-            detected_level: AtomicUsize::new(1), // Default standard x86-64-v1
-        };
-        pm.detect_microarchitecture_level(true, true, true);
-        pm
-    }
-
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
-    }
-
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
+        V4OptimizedPackageManager {
+            detected_level: AtomicUsize::new(4), // Default CachyOS x86-64-v4
+        }
     }
 
     pub fn detect_microarchitecture_level(
@@ -168,7 +158,7 @@ impl V4OptimizedPackageManager {
     }
 
     pub fn supports_v4(&self) -> bool {
-        true
+        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 }
 

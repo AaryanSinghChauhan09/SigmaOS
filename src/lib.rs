@@ -52,10 +52,14 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
+    DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
+    DpkgStatoverrideRule, FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock,
+    FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine,
+    OpenBsdPkgAddSignifyEngine, OpenSuseZypperVendorStickinessEngine, PpaRepository,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
+    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use unimplemented_features::{
     AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
