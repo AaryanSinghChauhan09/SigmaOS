@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Smart Symbolic Link Engine
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.

@@ -1,3 +1,4 @@
+extern crate alloc;
 //! Linux Mint Debian Edition (LMDE 2 "Betsy") MATE Desktop Suite Implementation
 //! Replicates MATE Desktop Environment components: Marco (WM), Caja (File Manager),
 //! Pluma (Text Editor), Atril (Document Viewer), and Eye of MATE (EOM Image Viewer).

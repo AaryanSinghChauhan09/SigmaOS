@@ -5,7 +5,6 @@ use alloc::vec::Vec;
 // Display Manager (GDM/LightDM Inspiration)
 // Login screen, session management, and display server spawning
 
-use crate::klib::{String, Vec};
 
 /// Session type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

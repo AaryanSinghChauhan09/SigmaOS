@@ -11,11 +11,6 @@ pub use simple_scan::{
     SovereignSimpleScanEngine,
 };
 
-pub use simple_scan::{
-    SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource, ScannedPage,
-    SovereignSimpleScanEngine,
-};
-
 pub use display_manager::{DMError, DisplayManager, Session, SessionType, User};
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,

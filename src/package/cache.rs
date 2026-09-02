@@ -370,10 +370,6 @@ impl OfflineMode for SimpleOfflineMode {
     }
 }
 
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
 impl<T> Vec<T> {
     fn new() -> Self {

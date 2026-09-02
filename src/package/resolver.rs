@@ -347,10 +347,6 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 }
 
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
 impl<T> Vec<T> {
     fn new() -> Self {

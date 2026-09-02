@@ -1,4 +1,5 @@
 extern crate alloc;
+extern crate alloc;
 use alloc::boxed::Box;
 #[cfg(not(target_os = "none"))]
 #[cfg(not(target_os = "none"))]

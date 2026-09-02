@@ -339,10 +339,7 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-    pub active_locale: String,
-    pub category_locales: BTreeMap<LocaleCategory, String>,
     pub translation_catalogs: BTreeMap<String, BTreeMap<String, String>>, // Domain -> (msgid -> msgstr)
-}
 
 impl SovereignLocaleEngine {
     pub fn new(default_locale: &str) -> Self {

@@ -350,10 +350,6 @@ impl ResourceQuota for SimpleResourceQuota {
     }
 }
 
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
 impl<T> Vec<T> {
     fn new() -> Self {

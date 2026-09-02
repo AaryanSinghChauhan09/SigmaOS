@@ -996,11 +996,8 @@ mod tests {
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WindowsBootloaderType {
-    NtLdrLegacy,      // Windows XP / Server 2003 (boot.ini)
     BcdUefi,          // Windows 7/8/10/11 UEFI & BIOS (BCD)
     Grub4DosFallback, // GRUB4DOS fallback chainloader
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NtfsFastStartupState {
