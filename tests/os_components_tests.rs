@@ -53,7 +53,7 @@ mod ext4_ntfs_security;
 mod fedora_compat;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
-#[path = "../src/package/universal.rs"]
+#[path = "../src/package/mod.rs"]
 pub mod package;
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;

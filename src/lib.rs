@@ -1,3 +1,4 @@
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -125,7 +126,6 @@ pub mod crypto {
 }
 
 pub mod logging;
-pub mod ai;
 // pub mod system;
 pub mod installer;
 pub mod performance;
@@ -148,6 +148,8 @@ pub mod iot;
 // pub mod observability;
 // pub mod orchestration;
 pub mod distro;
+pub mod arch_kernel_inspirations;
+pub mod linuxmint_inspirations;
 // pub mod package;
 // pub mod performance;
 // pub mod productivity;

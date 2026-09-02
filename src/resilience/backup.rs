@@ -270,16 +270,15 @@ impl AdvancedTimeshiftEngine {
         schedule: SnapshotSchedule,
         raw_manifest: HashMap<String, String>,
     ) -> Result<String, &'static str> {
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
+        let timestamp = 0u64;
 
         // Filter out excluded path entries
-        let filtered_manifest: HashMap<String, String> = raw_manifest
-            .into_iter()
-            .filter(|(path, _)| !self.exclusion_filter.is_path_excluded(path))
-            .collect();
+        let mut filtered_manifest: HashMap<String, String> = HashMap::new();
+        for (path, val) in raw_manifest.iter() {
+            if !self.exclusion_filter.is_path_excluded(path) {
+                filtered_manifest.insert(path.clone(), val.clone());
+            }
+        }
 
         // Calculate snapshot hash checksum
         let mut checksum: u64 = 0xcbf29ce484222325;

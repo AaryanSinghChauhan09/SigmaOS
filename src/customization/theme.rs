@@ -1014,6 +1014,203 @@ pub struct IconThemeEngine {
 /// Native, zero-dependency Sovereign CSS Color Engine
 pub struct SovereignCssColorEngine;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum YaruThemeStyle {
+    Light,
+    Dark,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum YaruAccentColor {
+    Aubergine,
+    Orange,
+    Bark,
+    Sage,
+    Olive,
+    Viridian,
+    PrusianGreen,
+    Blue,
+    Magenta,
+    MagentaPurple,
+}
+
+#[derive(Debug, Clone)]
+pub struct YaruThemeSpec {
+    pub style: YaruThemeStyle,
+    pub accent: YaruAccentColor,
+}
+
+impl YaruThemeSpec {
+    pub fn new(style: YaruThemeStyle, accent: YaruAccentColor) -> Self {
+        Self { style, accent }
+    }
+
+    pub fn accent_hex(&self) -> &'static str {
+        match self.accent {
+            YaruAccentColor::Aubergine => "#77216F",
+            YaruAccentColor::Orange => "#E95420",
+            YaruAccentColor::Bark => "#787878",
+            YaruAccentColor::Sage => "#4A705B",
+            YaruAccentColor::Olive => "#657B39",
+            YaruAccentColor::Viridian => "#008080",
+            YaruAccentColor::PrusianGreen => "#005F73",
+            YaruAccentColor::Blue => "#1E88E5",
+            YaruAccentColor::Magenta => "#D81B60",
+            YaruAccentColor::MagentaPurple => "#8E24AA",
+        }
+    }
+
+    pub fn to_theme(&self) -> Theme {
+        let mode = match self.style {
+            YaruThemeStyle::Light => ThemeMode::Light,
+            YaruThemeStyle::Dark => ThemeMode::Dark,
+        };
+        let bg = match self.style {
+            YaruThemeStyle::Light => "#FFFFFF",
+            YaruThemeStyle::Dark => "#1E1E1E",
+        };
+        Theme {
+            name: "Yaru".to_string(),
+            mode,
+            colors: ColorPalette {
+                primary: self.accent_hex().to_string(),
+                secondary: "#5E2750".to_string(),
+                accent: self.accent_hex().to_string(),
+                background: bg.to_string(),
+                foreground: if self.style == YaruThemeStyle::Light { "#000000".to_string() } else { "#FFFFFF".to_string() },
+                success: "#388E3C".to_string(),
+                warning: "#F57C00".to_string(),
+                error: "#D32F2F".to_string(),
+            },
+            typography: TypographySettings {
+                font_family: "Ubuntu".to_string(),
+                font_size: 16,
+                font_weight: 400,
+                line_height: 1.5,
+                letter_spacing: 0.0,
+            },
+            spacing: SpacingSettings {
+                unit: 8,
+                padding_small: 8,
+                padding_medium: 16,
+                padding_large: 24,
+                margin_small: 8,
+                margin_medium: 16,
+                margin_large: 24,
+            },
+            border_radius: BorderRadiusSettings {
+                small: 4,
+                medium: 8,
+                large: 12,
+                full: false,
+            },
+            shadows: ShadowSettings {
+                enabled: true,
+                blur: 6,
+                spread: 0,
+                color: "#000000".to_string(),
+                opacity: 0.1,
+            },
+            animations: AnimationSettings {
+                enabled: true,
+                duration_ms: 250,
+                easing: "ease".to_string(),
+            },
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CanvasParticle {
+    pub x: f32,
+    pub y: f32,
+    pub radius: f32,
+    pub vx: f32,
+    pub vy: f32,
+    pub alpha: f32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MdmBackgroundType {
+    Image,
+    SolidColor,
+    Gradient,
+    CanvasAnimation,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MdmThemeEngineKind {
+    Gtk,
+    Html5,
+    Qml,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MdmPamAuthStage {
+    PromptUser,
+    PromptPassword,
+    Authenticated,
+    Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MdmPowerAction {
+    Shutdown,
+    Reboot,
+    Suspend,
+    Hibernate,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MdmMonitorPosition {
+    Primary,
+    Secondary,
+    All,
+}
+
+#[derive(Debug, Clone)]
+pub struct MdmAccessibilitySettings {
+    pub high_contrast: bool,
+    pub onscreen_keyboard: bool,
+    pub screen_reader: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct MdmUserAvatar {
+    pub username: String,
+    pub avatar_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MdmMultiMonitorConfig {
+    pub position: MdmMonitorPosition,
+}
+
+#[derive(Debug, Clone)]
+pub struct MdmThemeInfo {
+    pub name: String,
+    pub kind: MdmThemeEngineKind,
+    pub background_type: MdmBackgroundType,
+}
+
+pub struct SovereignMdmThemeEngine {
+    pub current_theme: MdmThemeInfo,
+    pub particles: Vec<CanvasParticle>,
+}
+
+impl SovereignMdmThemeEngine {
+    pub fn new(name: &str) -> Self {
+        Self {
+            current_theme: MdmThemeInfo {
+                name: name.to_string(),
+                kind: MdmThemeEngineKind::Html5,
+                background_type: MdmBackgroundType::CanvasAnimation,
+            },
+            particles: Vec::new(),
+        }
+    }
+}
+
 impl SovereignCssColorEngine {
     /// Parses CSS hex color strings (#rgb, #rgba, #rrggbb, #rrggbbaa) into RGBA floats (0.0 to 1.0)
     pub fn parse_hex_color(hex_str: &str) -> Result<(f32, f32, f32, f32), &'static str> {

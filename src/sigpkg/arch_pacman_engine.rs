@@ -268,6 +268,9 @@ impl Default for PacmanDatabase {
     }
 }
 
+/// Pacman contrib suite engine
+pub struct PacmanContribEngine;
+
 /// Utility for pacman cache cleaning (paccache parity)
 pub struct PacmanCacheCleaner {
     pub cached_files: Vec<String>,

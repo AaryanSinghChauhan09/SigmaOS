@@ -16,15 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec as AllocVec;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
@@ -339,10 +330,15 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum LocaleCategory {
+    All,
+    Ctype,
+    Numeric,
+    Time,
+    Collate,
+    Monetary,
+    Messages,
 }
 
 pub struct SovereignLocaleEngine {

@@ -57,6 +57,7 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
     FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,

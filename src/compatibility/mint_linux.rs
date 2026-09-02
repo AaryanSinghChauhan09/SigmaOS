@@ -673,6 +673,9 @@ pub enum WindowsBootloaderType {
     BcdBootmgr,   // Windows Vista / 7 / 8 / 10 / 11
     Grub4Dos,     // Legacy MBR chainloader
     UefiEfiEntry, // UEFI NVRAM Boot Entry
+    NtLdrLegacy,
+    BcdUefi,
+    Grub4DosFallback,
 }
 
 #[derive(Debug, Clone)]
@@ -996,13 +999,6 @@ mod tests {
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WindowsBootloaderType {
-    NtLdrLegacy,      // Windows XP / Server 2003 (boot.ini)
-    BcdUefi,          // Windows 7/8/10/11 UEFI & BIOS (BCD)
-    Grub4DosFallback, // GRUB4DOS fallback chainloader
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NtfsFastStartupState {
     Clean,
     DirtyHibernated, // Fast Startup enabled (hiberfil.sys present)
@@ -1118,7 +1114,7 @@ impl Mint4WinInstaller {
     /// Registers dual-boot entry into Windows BCD / Boot.ini
     pub fn register_windows_boot_entry(&mut self) -> String {
         match self.config.bootloader_type {
-            WindowsBootloaderType::BcdUefi => {
+            WindowsBootloaderType::BcdUefi | WindowsBootloaderType::BcdBootmgr | WindowsBootloaderType::UefiEfiEntry => {
                 let guid = "{77777777-1111-2222-3333-SIGMAOS12345}".to_string();
                 self.bcd_entry_guid = Some(guid.clone());
                 format!(
@@ -1126,13 +1122,13 @@ impl Mint4WinInstaller {
                     guid
                 )
             }
-            WindowsBootloaderType::NtLdrLegacy => {
+            WindowsBootloaderType::NtLdrLegacy | WindowsBootloaderType::Ntldr => {
                 format!(
                     "C:\\{}\\winboot\\wubildr.mbr=\"SigmaOS\"",
                     self.config.install_folder
                 )
             }
-            WindowsBootloaderType::Grub4DosFallback => {
+            WindowsBootloaderType::Grub4DosFallback | WindowsBootloaderType::Grub4Dos => {
                 "C:\\grldr=\"SigmaOS GRUB4DOS Loader\"".to_string()
             }
         }
