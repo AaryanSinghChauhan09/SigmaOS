@@ -48,11 +48,12 @@ pub mod access;
 pub mod tools;
 pub mod open_source_os_gap_closure;
 pub use open_source_os_gap_closure::*;
+pub mod sovereign_wiki_master_engine;
+pub use sovereign_wiki_master_engine::*;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 pub mod open_source_obsoletion;
-pub mod open_source_os_gap_closure;
 
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
