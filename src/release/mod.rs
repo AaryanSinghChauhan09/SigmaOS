@@ -557,6 +557,83 @@ impl Default for SovereignReleaseOrchestrator {
         assert!(verifier.verify_release_readiness());
     }
 
+// =========================================================================
+// AI REGRESSION GATE EVALUATOR
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BootPerformanceMetrics {
+    pub boot_latency_ms: u64,
+    pub idle_memory_used_mb: u64,
+    pub syscall_latency_ns: u64,
+}
+
+pub struct AiRegressionGateEvaluator {
+    pub max_allowed_boot_latency_increase_pct: f64,
+    pub max_allowed_memory_drift_mb: u64,
+}
+
+impl AiRegressionGateEvaluator {
+    pub fn new() -> Self {
+        Self {
+            max_allowed_boot_latency_increase_pct: 5.0,
+            max_allowed_memory_drift_mb: 64,
+        }
+    }
+
+    pub fn evaluate_release_regression(
+        &self,
+        baseline: BootPerformanceMetrics,
+        candidate: BootPerformanceMetrics,
+    ) -> bool {
+        let latency_increase_pct = if baseline.boot_latency_ms > 0 {
+            ((candidate.boot_latency_ms as f64 - baseline.boot_latency_ms as f64)
+                / baseline.boot_latency_ms as f64)
+                * 100.0
+        } else {
+            0.0
+        };
+
+        let memory_drift_mb = if candidate.idle_memory_used_mb > baseline.idle_memory_used_mb {
+            candidate.idle_memory_used_mb - baseline.idle_memory_used_mb
+        } else {
+            0
+        };
+
+        latency_increase_pct <= self.max_allowed_boot_latency_increase_pct
+            && memory_drift_mb <= self.max_allowed_memory_drift_mb
+    }
+}
+
+impl Default for AiRegressionGateEvaluator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+    #[test]
+    fn test_ai_regression_gate_evaluator() {
+        let eval = AiRegressionGateEvaluator::new();
+        let baseline = BootPerformanceMetrics {
+            boot_latency_ms: 1200,
+            idle_memory_used_mb: 256,
+            syscall_latency_ns: 45,
+        };
+        let good_candidate = BootPerformanceMetrics {
+            boot_latency_ms: 1220,
+            idle_memory_used_mb: 270,
+            syscall_latency_ns: 46,
+        };
+        let bad_candidate = BootPerformanceMetrics {
+            boot_latency_ms: 1500,
+            idle_memory_used_mb: 512,
+            syscall_latency_ns: 90,
+        };
+
+        assert!(eval.evaluate_release_regression(baseline, good_candidate));
+        assert!(!eval.evaluate_release_regression(baseline, bad_candidate));
+    }
+
     #[test]
     fn test_sovereign_release_orchestrator() {
         let mut orch = SovereignReleaseOrchestrator::new();

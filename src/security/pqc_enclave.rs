@@ -280,6 +280,42 @@ mod tests {
         assert_eq!(rotated.expiration_timestamp, 115);
     }
 
+// =========================================================================
+// PQC TPM HARDWARE ENCLAVE GATE
+// =========================================================================
+
+pub struct PqcTpmHardwareEnclaveGate {
+    pub pcr_index: u32,
+    pub pcr_digest: String,
+    pub token_rotation_bus: PqcTokenRotationBus,
+}
+
+impl PqcTpmHardwareEnclaveGate {
+    pub fn new(pcr_index: u32, pcr_digest: &str) -> Self {
+        Self {
+            pcr_index,
+            pcr_digest: pcr_digest.to_string(),
+            token_rotation_bus: PqcTokenRotationBus::new(10, 300),
+        }
+    }
+
+    pub fn attest_hardware_pcr(&self, expected_digest: &str) -> bool {
+        self.pcr_digest == expected_digest
+    }
+
+    pub fn generate_elevation_token(&mut self, current_time: u64) -> RotatableToken {
+        self.token_rotation_bus.mint_token(0b1111, current_time)
+    }
+}
+
+    #[test]
+    fn test_pqc_tpm_hardware_enclave_gate() {
+        let mut gate = PqcTpmHardwareEnclaveGate::new(7, "pcr7_sha256_hash_123");
+        assert!(gate.attest_hardware_pcr("pcr7_sha256_hash_123"));
+        let token = gate.generate_elevation_token(1000);
+        assert_eq!(token.bits, 0b1111);
+    }
+
     #[test]
     fn test_pqc_zero_trust_gating() {
         let bus = PqcTokenRotationBus::new(2, 5);
