@@ -1011,10 +1011,10 @@ impl SigPkgUniversalBridgeEngine {
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
     pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
-            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+        let standard_pkg = super::universal_oop_system::StandardPackage {
+            metadata: super::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::universal_oop_system::Version::new(
+                version: crate::sigpkg::Version::new(
                     native_pkg.version.major,
                     native_pkg.version.minor,
                     native_pkg.version.patch,

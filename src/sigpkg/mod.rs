@@ -54,10 +54,13 @@ pub mod transaction_log;
 pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
+pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use crate::package::bsd_linux_package_innovations::{
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
     FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,

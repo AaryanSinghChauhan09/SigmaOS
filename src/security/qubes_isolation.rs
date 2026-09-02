@@ -642,12 +642,12 @@ impl QubesZeroTrustParitySuite {
             isolation_manager: SovereignIsolationManager::new(),
             policy_engine: QrexecPolicyEngine::new(),
             gui_blitter: QubesGuiBlitter::new(1920, 1080),
-            template_manager: TemplateVmManager::new(),
+            template_manager: TemplateVmManager::new(1),
         }
     }
 
     pub fn is_qubes_parity_fulfilled(&self) -> bool {
-        let has_screen = self.gui_blitter.stride > 0;
+        let has_screen = self.gui_blitter.screen_width > 0;
         let policy_active = true;
         has_screen && policy_active
     }
