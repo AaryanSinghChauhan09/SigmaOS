@@ -535,6 +535,7 @@ pub struct MkinitcpioHookFramework {
     pub hooks: Vec<InitramfsHook>,
     pub compression: String,
     pub microcode: bool,
+    pub early_microcode_bytes: Vec<u8>,
 }
 
 impl MkinitcpioHookFramework {
@@ -543,7 +544,17 @@ impl MkinitcpioHookFramework {
             hooks: Vec::new(),
             compression: "lz4".to_string(),
             microcode: true,
+            early_microcode_bytes: Vec::new(),
         }
+    }
+
+    pub fn prepend_early_microcode(&mut self, microcode: &[u8]) {
+        self.early_microcode_bytes = microcode.to_vec();
+        self.microcode = !self.early_microcode_bytes.is_empty();
+    }
+
+    pub fn has_early_microcode(&self) -> bool {
+        !self.early_microcode_bytes.is_empty()
     }
 
     pub fn add_hook(&mut self, name: &str, actions: Vec<HookAction>) {
@@ -892,6 +903,19 @@ mod tests {
         assert!(eng.commit().is_ok());
         assert!(eng.installed.iter().any(|p| p.name == "app"));
         assert!(eng.installed.iter().any(|p| p.name == "libc"));
+    }
+
+    #[test]
+    fn test_mkinitcpio_early_microcode_prepending() {
+        let mut framework = MkinitcpioHookFramework::new();
+        assert!(!framework.has_early_microcode());
+
+        let fake_ucode = b"\x00\x00\x00\x01GenuineIntelMicrocodePayload";
+        framework.prepend_early_microcode(fake_ucode);
+
+        assert!(framework.has_early_microcode());
+        assert_eq!(framework.early_microcode_bytes, fake_ucode);
+        assert!(framework.microcode);
     }
 
     #[test]
