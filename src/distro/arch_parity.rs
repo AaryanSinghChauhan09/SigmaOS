@@ -432,6 +432,50 @@ impl Default for AlpmDatabase {
     }
 }
 
+/// Representation of an Arch Linux mirror for ranking
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchMirror {
+    pub url: String,
+    pub country: String,
+    pub download_speed_kbps: u32,
+    pub sync_latency_ms: u32,
+}
+
+/// Reflector-style Arch Linux mirror ranker
+pub struct ReflectorMirrorRanker {
+    pub mirrors: Vec<ArchMirror>,
+}
+
+impl ReflectorMirrorRanker {
+    pub fn new() -> Self {
+        ReflectorMirrorRanker {
+            mirrors: Vec::new(),
+        }
+    }
+
+    pub fn add_mirror(&mut self, mirror: ArchMirror) {
+        self.mirrors.push(mirror);
+    }
+
+    pub fn rank_by_speed(&mut self) {
+        self.mirrors.sort_by(|a, b| b.download_speed_kbps.cmp(&a.download_speed_kbps));
+    }
+
+    pub fn filter_by_country(&self, country: &str) -> Vec<ArchMirror> {
+        self.mirrors
+            .iter()
+            .filter(|m| m.country.eq_ignore_ascii_case(country))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for ReflectorMirrorRanker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -539,6 +583,35 @@ sha256sums=('SKIP')
         let cycle_res = db_cycle.resolve_dependencies("X");
         assert!(cycle_res.is_err());
         assert!(cycle_res.err().unwrap().contains("cycle"));
+    }
+
+    #[test]
+    fn test_reflector_mirror_ranker() {
+        let mut ranker = ReflectorMirrorRanker::new();
+        ranker.add_mirror(ArchMirror {
+            url: "https://mirror1.us.archlinux.org".to_string(),
+            country: "US".to_string(),
+            download_speed_kbps: 5000,
+            sync_latency_ms: 20,
+        });
+        ranker.add_mirror(ArchMirror {
+            url: "https://mirror2.us.archlinux.org".to_string(),
+            country: "US".to_string(),
+            download_speed_kbps: 15000,
+            sync_latency_ms: 10,
+        });
+        ranker.add_mirror(ArchMirror {
+            url: "https://mirror.de.archlinux.org".to_string(),
+            country: "DE".to_string(),
+            download_speed_kbps: 12000,
+            sync_latency_ms: 50,
+        });
+
+        ranker.rank_by_speed();
+        assert_eq!(ranker.mirrors[0].download_speed_kbps, 15000);
+
+        let us_mirrors = ranker.filter_by_country("US");
+        assert_eq!(us_mirrors.len(), 2);
     }
 
     #[test]
