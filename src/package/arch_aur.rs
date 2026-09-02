@@ -150,7 +150,7 @@ impl SigmaAUR {
             .ok_or(BuildError::PackageNotFound)?;
 
         let current_version = self.installed_packages.get(pkg_name);
-        
+
         if current_version.is_none() {
             return Err(BuildError::PackageNotFound);
         }
@@ -190,7 +190,7 @@ mod tests {
     #[test]
     fn test_aur_search() {
         let mut aur = SigmaAUR::new();
-        
+
         let pkg = AURPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -207,7 +207,7 @@ mod tests {
             votes: 100,
             popularity: 5.0,
         };
-        
+
         aur.add_package(pkg);
         let results = aur.search("example");
         assert_eq!(results.len(), 1);
@@ -216,7 +216,7 @@ mod tests {
     #[test]
     fn test_aur_install() {
         let mut aur = SigmaAUR::new();
-        
+
         let pkg = AURPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -233,7 +233,7 @@ mod tests {
             votes: 0,
             popularity: 0.0,
         };
-        
+
         let dep = AURPackage {
             name: "dep1".to_string(),
             version: "1.0.0".to_string(),
@@ -250,10 +250,10 @@ mod tests {
             votes: 0,
             popularity: 0.0,
         };
-        
+
         aur.add_package(pkg);
         aur.add_package(dep);
-        
+
         let result = aur.install_package("example-pkg");
         assert!(result.is_ok());
         assert!(aur.installed_packages.contains_key("example-pkg"));

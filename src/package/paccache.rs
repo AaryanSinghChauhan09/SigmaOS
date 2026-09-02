@@ -85,11 +85,11 @@ impl PaccacheEngine {
     /// Get packages to remove based on keep_count
     pub fn get_packages_to_remove(&self) -> Vec<&PackageCacheEntry> {
         let mut to_remove = Vec::new();
-        
+
         // Group by package name
-        let mut grouped: alloc::collections::BTreeMap<String, Vec<&PackageCacheEntry>> = 
+        let mut grouped: alloc::collections::BTreeMap<String, Vec<&PackageCacheEntry>> =
             alloc::collections::BTreeMap::new();
-        
+
         for entry in &self.cache_entries {
             grouped.entry(entry.name.clone())
                 .or_insert_with(Vec::new)
@@ -100,7 +100,7 @@ impl PaccacheEngine {
         for (_name, entries) in grouped {
             let mut sorted_entries: Vec<&PackageCacheEntry> = entries.clone();
             sorted_entries.sort_by(|a, b| b.version.cmp(&a.version));
-            
+
             // Keep installed packages and keep_count newest versions
             let kept_count = sorted_entries.iter().filter(|e| e.is_installed).count();
             let additional_keep = if kept_count < self.config.keep_count {
@@ -108,7 +108,7 @@ impl PaccacheEngine {
             } else {
                 0
             };
-            
+
             let mut kept = 0;
             for entry in sorted_entries {
                 if entry.is_installed {
@@ -142,7 +142,7 @@ impl PaccacheEngine {
                 let msg = format!("Removing: {} ({})", entry.file_path, entry.version);
                 removed_files.push(msg);
             }
-            
+
             if !self.config.dry_run {
                 // In real implementation, would delete file
                 removed_files.push(format!("Deleted: {}", entry.file_path));

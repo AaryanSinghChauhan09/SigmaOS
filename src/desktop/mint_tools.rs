@@ -65,7 +65,7 @@ impl MintUpdateManager {
     /// Install updates up to specified level
     pub fn install_updates(&mut self, max_level: UpdateLevel) -> Vec<String> {
         let mut installed = Vec::new();
-        
+
         for update in &self.updates {
             if self.is_update_allowed(update.level, max_level) {
                 println!("Installing {} ({})", update.name, update.version);
@@ -81,7 +81,7 @@ impl MintUpdateManager {
         if self.auto_update_levels.contains(&update_level) {
             return true;
         }
-        
+
         match update_level {
             UpdateLevel::Level1 => true,
             UpdateLevel::Level2 => max_level >= UpdateLevel::Level2,
@@ -156,7 +156,7 @@ impl MintTimeshiftEngine {
             on_weekly: false,
             on_monthly: false,
         };
-        
+
         self.snapshots.push(snapshot);
         println!("Created snapshot: {}", id);
         id
@@ -301,7 +301,7 @@ mod tests {
     #[test]
     fn test_update_manager() {
         let mut manager = MintUpdateManager::new();
-        
+
         let update = UpdatePackage {
             name: "linux-kernel".to_string(),
             version: "6.0.0".to_string(),
@@ -311,7 +311,7 @@ mod tests {
             security: true,
             kernel: true,
         };
-        
+
         manager.add_update(update);
         let installed = manager.install_updates(UpdateLevel::Level2);
         assert_eq!(installed.len(), 1);
@@ -327,7 +327,7 @@ mod tests {
     #[test]
     fn test_software_manager() {
         let mut manager = MintSoftwareManager::new();
-        
+
         let app = AppMetadata {
             name: "firefox".to_string(),
             version: "120.0".to_string(),
@@ -340,7 +340,7 @@ mod tests {
             size: 1024 * 1024 * 100,
             installed: false,
         };
-        
+
         manager.add_app(app);
         let result = manager.install_app("firefox");
         assert!(result.is_ok());

@@ -42,22 +42,22 @@ impl SigmaYaST {
     pub fn launch_module(&mut self, module_name: &str) -> Result<(), YaSTError> {
         let module = self.modules.get(module_name)
             .ok_or(YaSTError::ModuleNotFound)?;
-        
+
         // Launch appropriate interface
         self.ncurses_interface.launch_module(module)?;
-        
+
         Ok(())
     }
 
     pub fn configure_network(&mut self, config: NetworkConfig) -> Result<(), YaSTError> {
         let network_module = self.modules.get_mut("network")
             .ok_or(YaSTError::ModuleNotFound)?;
-        
-        network_module.settings.insert("interface".to_string(), 
+
+        network_module.settings.insert("interface".to_string(),
             SettingValue::String(config.interface));
-        network_module.settings.insert("ip_address".to_string(), 
+        network_module.settings.insert("ip_address".to_string(),
             SettingValue::String(config.ip_address));
-        
+
         self.apply_settings(network_module)?;
         Ok(())
     }
@@ -107,15 +107,15 @@ impl SigmaZypper {
             if self.is_locked(&package) {
                 return Err(ZypperError::PackageLocked(package));
             }
-            
+
             // Resolve dependencies
             let deps = self.resolve_dependencies(&package)?;
-            
+
             // Install dependencies
             for dep in deps {
                 self.install(vec![dep])?;
             }
-            
+
             // Install package
             self.install_package(&package)?;
         }
@@ -174,10 +174,10 @@ impl SigmaBtrfs {
             uuid: Uuid::new_v4().to_string(),
             readonly: false,
         };
-        
+
         self.create_btrfs_subvolume(&subvolume)?;
         self.subvolumes.push(subvolume);
-        
+
         Ok(())
     }
 
@@ -189,10 +189,10 @@ impl SigmaBtrfs {
             timestamp: Utc::now(),
             readonly: true,
         };
-        
+
         self.create_btrfs_snapshot(&source_subvolume, &snapshot)?;
         self.snapshots.push(snapshot);
-        
+
         Ok(())
     }
 
@@ -251,10 +251,10 @@ impl SigmaSnapper {
             cleanup: "timeline".to_string(),
             user_data: HashMap::new(),
         };
-        
+
         self.create_btrfs_snapshot(&config, &snapshot)?;
         self.snapshots.push(snapshot);
-        
+
         Ok(())
     }
 
@@ -290,27 +290,27 @@ impl SigmaSystemd {
     pub fn enable_service(&mut self, service_name: &str) -> Result<(), SystemdError> {
         let service = self.services.get_mut(service_name)
             .ok_or(SystemdError::ServiceNotFound)?;
-        
+
         service.enabled = true;
         self.create_symlink(service_name)?;
         self.reload_daemon()?;
-        
+
         Ok(())
     }
 
     pub fn start_service(&mut self, service_name: &str) -> Result<(), SystemdError> {
         let service = self.services.get_mut(service_name)
             .ok_or(SystemdError::ServiceNotFound)?;
-        
+
         // Start dependencies first
         for dep in &service.dependencies {
             self.start_service(dep)?;
         }
-        
+
         // Start service
         self.execute_service(service)?;
         service.active = true;
-        
+
         Ok(())
     }
 }
@@ -362,10 +362,10 @@ impl SigmaAppArmor {
     pub fn set_profile_mode(&mut self, profile_name: &str, mode: ProfileMode) -> Result<(), AppArmorError> {
         let profile = self.profiles.get_mut(profile_name)
             .ok_or(AppArmorError::ProfileNotFound)?;
-        
+
         profile.mode = mode;
         self.update_profile_mode(profile_name, mode)?;
-        
+
         Ok(())
     }
 }
@@ -400,19 +400,19 @@ impl SigmaKiwi {
     pub fn build_image(&mut self, description: &ImageDescription) -> Result<Vec<u8>, KiwiError> {
         // Create build environment
         let build_env = self.create_build_environment(description)?;
-        
+
         // Install packages
         self.install_packages(&build_env, &description.packages)?;
-        
+
         // Apply configuration
         self.apply_configuration(&build_env, &description.configuration)?;
-        
+
         // Build image
         let image_data = self.create_image(&build_env)?;
-        
+
         // Cleanup
         self.cleanup_build_environment(build_env)?;
-        
+
         Ok(image_data)
     }
 }

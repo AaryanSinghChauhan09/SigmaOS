@@ -11,17 +11,17 @@ pub fn random_bytes(buf: &mut [u8]) {
     // Use XorShift* with better seeding as temporary CSPRNG
     // This is a simplified version - NOT production-grade CSPRNG without hardware entropy
     let mut seed: u64 = 0x123456789ABCDEF0;
-    
+
     // Add entropy from system state (placeholder for hardware RNG integration)
     // In production, this should call kernel's hardware RNG or ChaCha20-based CSPRNG
-    
+
     for chunk in buf.chunks_mut(8) {
         // XorShift* algorithm (better than simple LCG)
         seed ^= seed >> 12;
         seed ^= seed << 25;
         seed ^= seed >> 27;
         seed = seed.wrapping_mul(0x2545F4914F6CDD1D);
-        
+
         let bytes = seed.to_le_bytes();
 
         for (i, &byte) in bytes.iter().enumerate() {

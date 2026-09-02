@@ -103,7 +103,7 @@ impl RunitSupervisor {
         self.stage = RunitStage::Stage1;
         self.current_stage_num = 1;
         println!("Running Stage 1: One-time system initialization");
-        
+
         // Run one-time initialization tasks
         println!("Mounting virtual filesystems");
         println!("Setting hostname");
@@ -115,10 +115,10 @@ impl RunitSupervisor {
         self.stage = RunitStage::Stage2;
         self.current_stage_num = 2;
         println!("Running Stage 2: Concurrent process supervision");
-        
+
         // Start all services respecting dependencies
         let mut started = Vec::new();
-        
+
         for (name, service) in self.services.clone() {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
@@ -134,10 +134,10 @@ impl RunitSupervisor {
         self.stage = RunitStage::Stage3;
         self.current_stage_num = 3;
         println!("Running Stage 3: Clean system shutdown");
-        
+
         // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
-        
+
         for (name, service) in self.services.clone() {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {
@@ -146,7 +146,7 @@ impl RunitSupervisor {
                 }
             }
         }
-        
+
         println!("Unmounting filesystems");
     }
 
@@ -212,10 +212,10 @@ mod tests {
     #[test]
     fn test_runit_supervisor() {
         let mut supervisor = RunitSupervisor::new();
-        
+
         let service = RunitService::new("test".to_string(), "/usr/bin/test".to_string());
         supervisor.add_service(service);
-        
+
         supervisor.run_stage2();
         assert_eq!(supervisor.get_services_by_state(ServiceState::Running).len(), 1);
     }
@@ -223,16 +223,16 @@ mod tests {
     #[test]
     fn test_service_dependencies() {
         let mut supervisor = RunitSupervisor::new();
-        
+
         let mut service1 = RunitService::new("service1".to_string(), "/usr/bin/s1".to_string());
         let mut service2 = RunitService::new("service2".to_string(), "/usr/bin/s2".to_string());
         service2.dependencies = vec!["service1".to_string()];
-        
+
         supervisor.add_service(service1);
         supervisor.add_service(service2);
-        
+
         supervisor.run_stage2();
-        
+
         // Service1 should start first
         assert_eq!(supervisor.get_service_status("service1").unwrap().state, ServiceState::Running);
         assert_eq!(supervisor.get_service_status("service2").unwrap().state, ServiceState::Running);

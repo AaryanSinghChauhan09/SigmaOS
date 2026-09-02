@@ -105,6 +105,55 @@ impl Default for SystemdUnitHardeningProfile {
     }
 }
 
+/// BSD rc.d parallel boot execution stage solver
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(
+        engine: &SystemdEngine,
+        unit_ids: &[UnitID],
+    ) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let has_unresolved_prereq = remaining.iter().any(|&other| {
+                    if other == id {
+                        return false;
+                    }
+                    if let Some(u) = engine.find_unit(id) {
+                        if u.after.contains(&other) {
+                            return true;
+                        }
+                    }
+                    if let Some(other_u) = engine.find_unit(other) {
+                        if other_u.before.contains(&id) {
+                            return true;
+                        }
+                    }
+                    false
+                });
+
+                if !has_unresolved_prereq {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                stages.push(remaining);
+                break;
+            }
+
+            remaining.retain(|id| !current_stage.contains(id));
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 /// `systemd-analyze security` Auditor Engine
 #[derive(Debug, Clone)]
 pub struct SecurityAnalysisReport {
@@ -283,6 +332,51 @@ impl Default for TimerConfig {
             persistent: true,
             randomized_delay_sec: 0,
         }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[usize]) -> Vec<Vec<usize>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<usize> = unit_ids.to_vec();
+        let mut completed: Vec<usize> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                if let Some(unit) = engine.units.iter().find(|u| u.id == id) {
+                    let after_satisfied = unit
+                        .after
+                        .iter()
+                        .all(|dep| completed.contains(dep) || !unit_ids.contains(dep));
+                    let before_satisfied = !remaining.iter().any(|&other_id| {
+                        if other_id == id {
+                            return false;
+                        }
+                        if let Some(other) = engine.units.iter().find(|u| u.id == other_id) {
+                            other.before.contains(&id)
+                        } else {
+                            false
+                        }
+                    });
+                    if after_satisfied && before_satisfied {
+                        current_stage.push(id);
+                    }
+                } else {
+                    current_stage.push(id);
+                }
+            }
+            if current_stage.is_empty() {
+                current_stage = remaining.clone();
+            }
+            completed.extend(&current_stage);
+            remaining.retain(|id| !current_stage.contains(id));
+            stages.push(current_stage);
+        }
+        stages
     }
 }
 
@@ -750,61 +844,6 @@ impl SystemdServiceHardeningEvaluator {
             score -= 2.5;
         }
         score.max(0.0) // 0.0 is fully hardened
-    }
-}
-
-/// FreeBSD rc.d & OpenRC parallel boot execution stage solver
-pub struct BsdRcParallelStageSolver;
-
-impl BsdRcParallelStageSolver {
-    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
-        let mut stages = Vec::new();
-        let mut handled = Vec::new();
-        let all_ids: Vec<UnitID> = unit_ids.to_vec();
-
-        while handled.len() < all_ids.len() {
-            let mut current_stage = Vec::new();
-            for &id in &all_ids {
-                if handled.contains(&id) {
-                    continue;
-                }
-                let mut deps_satisfied = true;
-                if let Some(unit) = engine.find_unit(id) {
-                    for &prereq in &unit.after {
-                        if all_ids.contains(&prereq) && !handled.contains(&prereq) {
-                            deps_satisfied = false;
-                            break;
-                        }
-                    }
-                }
-                if deps_satisfied {
-                    for &other_id in &all_ids {
-                        if handled.contains(&other_id) || other_id == id {
-                            continue;
-                        }
-                        if let Some(other) = engine.find_unit(other_id) {
-                            if other.before.contains(&id) && !handled.contains(&other_id) {
-                                deps_satisfied = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if deps_satisfied {
-                    current_stage.push(id);
-                }
-            }
-            if current_stage.is_empty() {
-                let remaining: Vec<UnitID> = all_ids.iter().copied().filter(|i| !handled.contains(i)).collect();
-                stages.push(remaining.clone());
-                break;
-            }
-            for &id in &current_stage {
-                handled.push(id);
-            }
-            stages.push(current_stage);
-        }
-        stages
     }
 }
 
@@ -2183,11 +2222,21 @@ mod tests {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
 
+        let score_none = SystemdServiceHardeningEvaluator::calculate_hardening_score(false, false, false);
+        assert_eq!(score_none, 10.0);
+    }
+
+    #[test]
+    fn test_systemd_engine() {
         let mut engine = SystemdEngine::new();
         let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
-        target.requires.push(2);
+        target.duration_ms = 100;
+        target.after.push(2);
+
         let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
-        service.requires.push(3);
+        service.duration_ms = 150;
+        service.after.push(3);
+
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 

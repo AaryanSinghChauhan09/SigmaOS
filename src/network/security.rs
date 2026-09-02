@@ -98,11 +98,11 @@ impl Firewall {
     pub fn add_rule(&mut self, rule: FirewallRule) -> u32 {
         let id = self.next_rule_id;
         self.next_rule_id += 1;
-        
+
         let mut rule = rule;
         rule.id = id;
         self.rules.push(rule);
-        
+
         id
     }
 
@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn test_firewall_packet_evaluation() {
         let mut firewall = Firewall::new(FirewallAction::Deny);
-        
+
         let rule = FirewallRule::new(
             0,
             "192.168.1.1".to_string(),
@@ -318,10 +318,10 @@ mod tests {
     #[test]
     fn test_tls_config() {
         let mut config = TlsConfig::new(TlsVersion::TLS1_3);
-        
+
         config.add_cipher_suite(TlsCipherSuite::new("TLS_AES_256_GCM_SHA384".to_string(), 0x1302));
         config.set_verify_certificates(true);
-        
+
         assert_eq!(config.version, TlsVersion::TLS1_3);
         assert!(config.verify_certificates);
         assert_eq!(config.cipher_suites.len(), 1);

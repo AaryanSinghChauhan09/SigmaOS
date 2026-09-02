@@ -176,7 +176,7 @@ mod tests {
             protocol: Some("tcp".to_string()),
             enabled: true,
         };
-        
+
         dashboard.add_firewall_policy(policy);
         assert_eq!(dashboard.firewall_policies.len(), 1);
     }
@@ -192,7 +192,7 @@ mod tests {
             status: VpnStatus::Disconnected,
             connected_since: None,
         };
-        
+
         dashboard.add_vpn_tunnel(tunnel);
         dashboard.connect_vpn(0);
         assert_eq!(dashboard.vpn_tunnels[0].status, VpnStatus::Connected);

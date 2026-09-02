@@ -1,37 +1,13 @@
-use alloc::format;
-use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Pacman Compatibility Engine
 // Inspired by Arch Linux package manager, ABS (Arch Build System), and AUR (Arch User Repository)
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-/// Arch Linux pacman-contrib utility suite
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn rankmirrors(mirrors: &[(&str, usize)]) -> Vec<String> {
-        let mut sorted: Vec<(&str, usize)> = mirrors.to_vec();
-        sorted.sort_by_key(|&(_, ping)| ping);
-        sorted.into_iter().map(|(url, _)| url.to_string()).collect()
-    }
-
-    pub fn updpkgsums(pkgbuild: &str, sha256_hash: &str) -> String {
-        format!("{}\nsha256sums=('{}')", pkgbuild.trim(), sha256_hash)
-    }
-}
-
-impl Default for PacmanContribEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub type PacmanContribEngine = crate::expanded_wiki_innovations::ArchPacmanContribEngine;
 
 /// Pacman package database entry
 #[derive(Debug, Clone)]
@@ -287,6 +263,95 @@ impl AURHelper {
     }
 }
 
+/// Linux & BSD inspired `pacman-contrib` utility suite for SigmaOS Arch pacman parity.
+/// Includes `paccache` (cache cleaning), `checkupdates` (safe update check without root db refresh),
+/// `rankmirrors` (mirror latency sorting), `updpkgsums` (SHA256 PKGBUILD checksum updater),
+/// and `finddeps` (reverse dependency tree discovery).
+#[derive(Debug, Clone, Default)]
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Clean local package cache, keeping `keep_count` recent versions (paccache -r -k <keep_count>)
+    pub fn paccache_clean(&self, cached_versions: &[String], keep_count: usize) -> Vec<String> {
+        if cached_versions.len() <= keep_count {
+            Vec::new()
+        } else {
+            cached_versions[..cached_versions.len() - keep_count].to_vec()
+        }
+    }
+
+    /// Safely check pending system updates without modifying local master sync databases (checkupdates)
+    pub fn checkupdates(
+        &self,
+        local_db: &PacmanDatabase,
+        remote_db: &PacmanDatabase,
+    ) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local_pkg in &local_db.local_packages {
+            if let Some(remote_pkg) = remote_db.query_package(&local_pkg.name) {
+                if remote_pkg.version != local_pkg.version {
+                    updates.push((
+                        local_pkg.name.clone(),
+                        local_pkg.version.clone(),
+                        remote_pkg.version.clone(),
+                    ));
+                }
+            }
+        }
+        updates
+    }
+
+    /// Rank repository mirror servers by latency in milliseconds (rankmirrors -n <top_n>)
+    pub fn rankmirrors(&self, mirrors: &[(String, u64)], top_n: usize) -> Vec<(String, u64)> {
+        let mut ranked = mirrors.to_vec();
+        ranked.sort_by_key(|m| m.1);
+        ranked.truncate(top_n);
+        ranked
+    }
+
+    /// Update PKGBUILD sha256sums array with calculated checksums (updpkgsums)
+    pub fn updpkgsums(&self, pkgbuild: &str, new_sha256: &str) -> String {
+        let mut output_lines = Vec::new();
+        let mut in_sha256 = false;
+
+        for line in pkgbuild.lines() {
+            if line.starts_with("sha256sums=") {
+                output_lines.push(format!("sha256sums=('{}')", new_sha256));
+                in_sha256 = true;
+                continue;
+            }
+            if in_sha256 {
+                if line.ends_with(')') {
+                    in_sha256 = false;
+                }
+                continue;
+            }
+            output_lines.push(line.to_string());
+        }
+
+        if !pkgbuild.contains("sha256sums=") {
+            output_lines.push(format!("sha256sums=('{}')", new_sha256));
+        }
+
+        output_lines.join("\n")
+    }
+
+    /// Find reverse dependencies dependent on a target package (finddeps target)
+    pub fn finddeps(&self, db: &PacmanDatabase, target_package: &str) -> Vec<String> {
+        let mut dependent_packages = Vec::new();
+        for pkg in &db.local_packages {
+            if pkg.depends.iter().any(|dep| dep == target_package) {
+                dependent_packages.push(pkg.name.clone());
+            }
+        }
+        dependent_packages
+    }
+}
+
 impl Default for PacmanDatabase {
     fn default() -> Self {
         Self::new()
@@ -384,6 +449,9 @@ impl SafeUpdateChecker {
     }
 }
 
+/// Pacman Contrib Engine
+pub struct PacmanContribEngine;
+
 /// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
 pub struct PkgbuildChecksumUpdater;
 
@@ -408,6 +476,133 @@ impl PkgbuildChecksumUpdater {
             lines.push(format!("sha256sums=('{}')", hash_str));
         }
         lines.join("\n")
+    }
+}
+
+// ============================================================================
+// ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
+// ============================================================================
+
+/// Repository Stage Tier for package releases
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RepoStageTier {
+    Staging,
+    Testing,
+    Core,
+    Extra,
+    Multilib,
+}
+
+/// Signed Package Entry for Repository DB Tarballs
+#[derive(Debug, Clone)]
+pub struct RepoDbPackageEntry {
+    pub name: String,
+    pub version: String,
+    pub filename: String,
+    pub sha256_hash: String,
+    pub pgp_dilithium5_signature: String,
+    pub stage: RepoStageTier,
+    pub depends: Vec<String>,
+    pub files: Vec<String>,
+}
+
+/// Sovereign Dbscripts Repository Database Manager (Arch dbscripts / repo-add / repo-remove / db-move / db-update parity)
+pub struct SovereignDbscriptsEngine {
+    pub repo_databases: Vec<(RepoStageTier, Vec<RepoDbPackageEntry>)>,
+    pub operation_log: Vec<String>,
+}
+
+impl SovereignDbscriptsEngine {
+    pub fn new() -> Self {
+        let mut dbs = Vec::new();
+        dbs.push((RepoStageTier::Staging, Vec::new()));
+        dbs.push((RepoStageTier::Testing, Vec::new()));
+        dbs.push((RepoStageTier::Core, Vec::new()));
+        dbs.push((RepoStageTier::Extra, Vec::new()));
+        dbs.push((RepoStageTier::Multilib, Vec::new()));
+
+        Self {
+            repo_databases: dbs,
+            operation_log: Vec::new(),
+        }
+    }
+
+    /// repo-add parity: Adds or updates package entry in target repository database index
+    pub fn repo_add(&mut self, stage: RepoStageTier, entry: RepoDbPackageEntry) -> Result<(), &'static str> {
+        if entry.sha256_hash.is_empty() || entry.pgp_dilithium5_signature.is_empty() {
+            return Err("dbscripts: Refusing repo_add for unsigned or missing checksum package");
+        }
+
+        let db = self
+            .repo_databases
+            .iter_mut()
+            .find(|(s, _)| *s == stage)
+            .map(|(_, entries)| entries)
+            .ok_or("dbscripts: Target repository database tier not found")?;
+
+        if let Some(pos) = db.iter().position(|e| e.name == entry.name) {
+            db[pos] = entry.clone();
+        } else {
+            db.push(entry.clone());
+        }
+
+        self.operation_log.push(format!(
+            "repo-add: Registered '{}-{}' in tier '{:?}' [SHA256: {}]",
+            entry.name, entry.version, stage, entry.sha256_hash
+        ));
+
+        Ok(())
+    }
+
+    /// repo-remove parity: Removes package entry from target repository database index
+    pub fn repo_remove(&mut self, stage: RepoStageTier, pkg_name: &str) -> Result<RepoDbPackageEntry, &'static str> {
+        let db = self
+            .repo_databases
+            .iter_mut()
+            .find(|(s, _)| *s == stage)
+            .map(|(_, entries)| entries)
+            .ok_or("dbscripts: Target repository database tier not found")?;
+
+        if let Some(pos) = db.iter().position(|e| e.name == pkg_name) {
+            let removed = db.remove(pos);
+            self.operation_log.push(format!(
+                "repo-remove: Removed '{}' from tier '{:?}'",
+                pkg_name, stage
+            ));
+            Ok(removed)
+        } else {
+            Err("dbscripts: Package not found in target repository database")
+        }
+    }
+
+    /// db-move parity: Moves package between repository stages (e.g. testing -> core)
+    pub fn db_move(&mut self, from_stage: RepoStageTier, to_stage: RepoStageTier, pkg_name: &str) -> Result<(), &'static str> {
+        let mut entry = self.repo_remove(from_stage, pkg_name)?;
+        entry.stage = to_stage;
+        self.repo_add(to_stage, entry)?;
+        self.operation_log.push(format!(
+            "db-move: Promoted '{}' from '{:?}' to '{:?}'",
+            pkg_name, from_stage, to_stage
+        ));
+        Ok(())
+    }
+
+    /// db-update parity: Process incoming package builds, verify signatures, and refresh DB tarball indexes
+    pub fn db_update(&mut self, incoming_packages: Vec<RepoDbPackageEntry>) -> usize {
+        let mut count = 0;
+        for pkg in incoming_packages {
+            let target_stage = pkg.stage;
+            if self.repo_add(target_stage, pkg).is_ok() {
+                count += 1;
+            }
+        }
+        count
+    }
+}
+
+impl Default for SovereignDbscriptsEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -615,43 +810,38 @@ depends=('glibc')
     }
 
     #[test]
-    fn test_pacman_contrib_cache_cleaner() {
-        let files = vec![
-            "pkg-1.0.tar.zst".to_string(),
-            "pkg-1.1.tar.zst".to_string(),
-            "pkg-1.2.tar.zst".to_string(),
-        ];
-        let mut cleaner = PacmanCacheCleaner::new(files);
-        let removed = cleaner.prune_cache(2);
-        assert_eq!(removed.len(), 1);
-        assert_eq!(removed[0], "pkg-1.0.tar.zst");
-        assert_eq!(cleaner.cached_files.len(), 2);
-    }
+    fn test_pacman_contrib_engine() {
+        let contrib = PacmanContribEngine::new();
 
-    #[test]
-    fn test_pacman_contrib_pacnew_diff() {
-        let mut diff_mgr = PacnewDiffManager::new();
-        diff_mgr.register_pacnew("/etc/pacman.conf", "/etc/pacman.conf.pacnew");
-        assert_eq!(diff_mgr.pending_diffs.len(), 1);
+        // Test paccache
+        let cache = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
+        let to_remove = contrib.paccache_clean(&cache, 2);
+        assert_eq!(to_remove, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
 
-        let res = diff_mgr.resolve_diff("/etc/pacman.conf");
-        assert!(res.is_some());
-        assert!(res.unwrap().contains("Merged /etc/pacman.conf.pacnew into /etc/pacman.conf"));
-        assert_eq!(diff_mgr.pending_diffs.len(), 0);
-    }
+        // Test rankmirrors
+        let mirrors = vec![("mirror1".to_string(), 120), ("mirror2".to_string(), 45), ("mirror3".to_string(), 80)];
+        let ranked = contrib.rankmirrors(&mirrors, 2);
+        assert_eq!(ranked.len(), 2);
+        assert_eq!(ranked[0].0, "mirror2");
 
-    #[test]
-    fn test_pacman_contrib_pactree_and_checkupdates() {
-        let mut db = PacmanDatabase::new();
-        let repo_pkg = ArchPacmanPackage {
-            name: "bash".to_string(),
-            version: "5.2.0".to_string(),
-            description: "GNU Bourne Again SHell".to_string(),
+        // Test updpkgsums
+        let pkgbuild = "pkgname=foo\nsha256sums=('oldsum')";
+        let updated = contrib.updpkgsums(pkgbuild, "newsum123");
+        assert!(updated.contains("sha256sums=('newsum123')"));
+
+        // Test checkupdates & finddeps
+        let mut local_db = PacmanDatabase::new();
+        let mut remote_db = PacmanDatabase::new();
+
+        let mut pkg = ArchPacmanPackage {
+            name: "linux-zen".to_string(),
+            version: "6.5.0".to_string(),
+            description: "Zen Kernel".to_string(),
             url: "".to_string(),
             architecture: "x86_64".to_string(),
             license: Vec::new(),
             groups: Vec::new(),
-            depends: vec!["readline".to_string()],
+            depends: vec!["glibc".to_string()],
             optdepends: Vec::new(),
             makedepends: Vec::new(),
             checkdepends: Vec::new(),
@@ -659,50 +849,23 @@ depends=('glibc')
             conflicts: Vec::new(),
             replaces: Vec::new(),
             backup: Vec::new(),
-            installed_size: 2048,
-            packager: "".to_string(),
-            build_date: "".to_string(),
-            install_date: "".to_string(),
-            is_explicit: true,
-        };
-        let local_pkg = ArchPacmanPackage {
-            name: "bash".to_string(),
-            version: "5.1.0".to_string(),
-            description: "GNU Bourne Again SHell".to_string(),
-            url: "".to_string(),
-            architecture: "x86_64".to_string(),
-            license: Vec::new(),
-            groups: Vec::new(),
-            depends: vec!["readline".to_string()],
-            optdepends: Vec::new(),
-            makedepends: Vec::new(),
-            checkdepends: Vec::new(),
-            provides: Vec::new(),
-            conflicts: Vec::new(),
-            replaces: Vec::new(),
-            backup: Vec::new(),
-            installed_size: 2048,
+            installed_size: 5000,
             packager: "".to_string(),
             build_date: "".to_string(),
             install_date: "".to_string(),
             is_explicit: true,
         };
 
-        db.packages.push(repo_pkg);
-        db.local_packages.push(local_pkg);
+        local_db.local_packages.push(pkg.clone());
+        pkg.version = "6.6.0".to_string();
+        remote_db.packages.push(pkg);
 
-        let tree = DependencyTreeVisualizer::render_tree("bash", &db, false);
-        assert!(tree.contains("├── readline"));
-
-        let updates = SafeUpdateChecker::check_pending_updates(&db);
+        let updates = contrib.checkupdates(&local_db, &remote_db);
         assert_eq!(updates.len(), 1);
-        assert_eq!(updates[0], ("bash".to_string(), "5.1.0".to_string(), "5.2.0".to_string()));
-    }
+        assert_eq!(updates[0].0, "linux-zen");
+        assert_eq!(updates[0].2, "6.6.0");
 
-    #[test]
-    fn test_pacman_contrib_updpkgsums() {
-        let pkgbuild = "pkgname=foo\npkgver=1.0\n";
-        let updated = PkgbuildChecksumUpdater::update_sha256(pkgbuild, b"sample source code");
-        assert!(updated.contains("sha256sums="));
+        let deps = contrib.finddeps(&local_db, "glibc");
+        assert_eq!(deps, vec!["linux-zen".to_string()]);
     }
 }

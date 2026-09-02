@@ -123,14 +123,14 @@ impl NixPackageManager {
         let id = self.generations.len() as u64;
         let generation_number = (self.generations.len() + 1) as u32;
         let mut generation = SystemGeneration::new(id, generation_number, store_path);
-        
+
         // Set as current
         for gen in &mut self.generations {
             gen.is_current = false;
         }
         generation.set_current();
         self.current_generation = Some(id);
-        
+
         self.generations.push(generation);
         self.generations.last().unwrap().clone()
     }
@@ -188,14 +188,14 @@ impl NixPackageManager {
             println!("Building derivation: {}", name);
             println!("Builder: {}", derivation.builder);
             println!("Inputs: {}", derivation.inputs.len());
-            
+
             // In real implementation, would execute build
             let output_path = StorePath::new(
                 "hash123".to_string(),
                 derivation.name.clone(),
                 "1.0.0".to_string()
             );
-            
+
             self.add_to_store(output_path.clone());
             Ok(output_path)
         } else {
@@ -239,12 +239,12 @@ impl EnvironmentScrubber {
     /// Scrub environment variables
     pub fn scrub_environment(&self) -> BTreeMap<String, String> {
         let mut clean_env = BTreeMap::new();
-        
+
         // In real implementation, would scrub actual environment
         // For now, return minimal reproducible environment
         clean_env.insert("PATH".to_string(), "/usr/bin:/bin".to_string());
         clean_env.insert("LC_ALL".to_string(), "C.UTF-8".to_string());
-        
+
         clean_env
     }
 
@@ -275,10 +275,10 @@ mod tests {
     #[test]
     fn test_nix_manager() {
         let mut manager = NixPackageManager::new();
-        
+
         let store_path = StorePath::new("hash123".to_string(), "system".to_string(), "1.0.0".to_string());
         let generation = manager.create_generation(store_path);
-        
+
         assert_eq!(generation.is_current, true);
         assert!(manager.get_current_generation().is_some());
     }
@@ -286,13 +286,13 @@ mod tests {
     #[test]
     fn test_generation_switch() {
         let mut manager = NixPackageManager::new();
-        
+
         let store_path1 = StorePath::new("hash1".to_string(), "system".to_string(), "1.0.0".to_string());
         let store_path2 = StorePath::new("hash2".to_string(), "system".to_string(), "2.0.0".to_string());
-        
+
         manager.create_generation(store_path1);
         let gen2_id = manager.create_generation(store_path2).id;
-        
+
         manager.switch_generation(gen2_id).unwrap();
         assert_eq!(manager.get_current_generation().unwrap().generation_number, 2);
     }
@@ -301,7 +301,7 @@ mod tests {
     fn test_env_scrubber() {
         let scrubber = EnvironmentScrubber::new();
         let clean_env = scrubber.scrub_environment();
-        
+
         assert!(clean_env.contains_key("PATH"));
         assert_eq!(clean_env.get("PATH"), Some(&"/usr/bin:/bin".to_string()));
     }

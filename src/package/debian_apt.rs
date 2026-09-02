@@ -312,7 +312,7 @@ mod tests {
     #[test]
     fn test_apt_install() {
         let mut apt = SigmaAPT::new();
-        
+
         let pkg = AptPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -332,7 +332,7 @@ mod tests {
             source: "example".to_string(),
             homepage: "https://example.com".to_string(),
         };
-        
+
         apt.database.add_available(pkg);
         let result = apt.install(vec!["example-pkg".to_string()]);
         assert!(result.is_ok());
@@ -342,7 +342,7 @@ mod tests {
     #[test]
     fn test_apt_search() {
         let mut apt = SigmaAPT::new();
-        
+
         let pkg = AptPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -362,7 +362,7 @@ mod tests {
             source: "example".to_string(),
             homepage: "https://example.com".to_string(),
         };
-        
+
         apt.database.add_available(pkg);
         let results = apt.search("example");
         assert_eq!(results.len(), 1);

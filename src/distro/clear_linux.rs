@@ -95,7 +95,7 @@ impl ClearLinuxStatelessEngine {
         let overridden = self.configs.values()
             .filter(|s| s.location == ConfigLocation::System)
             .count();
-        
+
         format!(
             "Clear Linux Stateless Status\nRead-only Root: {}\nTotal Configs: {}\nOverridden: {}",
             self.readonly_root,
@@ -196,7 +196,7 @@ mod tests {
     fn test_stateless_engine() {
         let mut engine = ClearLinuxStatelessEngine::new();
         engine.add_default_config("/etc/hostname".to_string(), "sigmaos".to_string());
-        
+
         let config = engine.get_config("/etc/hostname");
         assert_eq!(config, Some("sigmaos".to_string()));
     }
@@ -206,7 +206,7 @@ mod tests {
         let mut engine = ClearLinuxStatelessEngine::new();
         engine.add_default_config("/etc/hostname".to_string(), "sigmaos".to_string());
         engine.override_config("/etc/hostname".to_string(), "custom-host".to_string());
-        
+
         let config = engine.get_config("/etc/hostname");
         assert_eq!(config, Some("custom-host".to_string()));
     }
@@ -214,14 +214,14 @@ mod tests {
     #[test]
     fn test_swupd_manager() {
         let mut manager = SwupdUpdateManager::new();
-        
+
         let bundle = SwupdBundle {
             name: "os-core".to_string(),
             version: "12345".to_string(),
             size: 1024 * 1024 * 100,
             dependencies: vec![],
         };
-        
+
         manager.add_bundle(bundle);
         let result = manager.install_bundle("os-core");
         assert!(result.is_ok());

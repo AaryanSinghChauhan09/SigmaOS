@@ -273,7 +273,7 @@ mod tests {
     fn test_selinux_manager() {
         let mut selinux = SigmaSELinux::new();
         selinux.set_boolean("httpd_enable_cgi".to_string(), true);
-        
+
         assert_eq!(selinux.get_boolean("httpd_enable_cgi"), Some(true));
         assert!(selinux.is_enforcing());
     }

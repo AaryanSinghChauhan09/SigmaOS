@@ -40,7 +40,7 @@ impl MemoryProtectionState {
 
         let has_write = matches!(current, MemoryPermission::Write | MemoryPermission::ReadWrite | MemoryPermission::ReadWriteExecute);
         let has_execute = matches!(requested, MemoryPermission::Execute | MemoryPermission::ReadExecute | MemoryPermission::ReadWriteExecute);
-        
+
         has_write && has_execute
     }
 
@@ -169,10 +169,10 @@ mod tests {
     #[test]
     fn test_wx_enforcement() {
         let state = MemoryProtectionState::new();
-        
+
         // Should allow read -> read/write
         assert!(!state.check_wx_violation(MemoryPermission::Read, MemoryPermission::ReadWrite));
-        
+
         // Should reject write -> read/write/execute
         assert!(state.check_wx_violation(MemoryPermission::Write, MemoryPermission::ReadWriteExecute));
     }
@@ -182,7 +182,7 @@ mod tests {
         let mut canary = StackCanary::new();
         let value1 = canary.generate();
         let value2 = canary.generate();
-        
+
         assert_ne!(value1, value2);
         assert!(canary.verify(value2));
     }
@@ -191,7 +191,7 @@ mod tests {
     fn test_security_config() {
         let mut config = SecurityHardeningConfig::new();
         config.apply_full_hardening();
-        
+
         assert!(config.memory_protection.enforce_wx);
         assert_eq!(config.relro_state, RelroState::Full);
         assert!(config.pie_enabled);

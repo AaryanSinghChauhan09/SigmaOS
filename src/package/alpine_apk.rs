@@ -219,7 +219,7 @@ mod tests {
     #[test]
     fn test_apk_install() {
         let mut apk = ApkPackageManager::new();
-        
+
         let package = ApkPackage {
             name: "musl".to_string(),
             version: "1.2.3".to_string(),
@@ -232,7 +232,7 @@ mod tests {
             install_if: vec![],
             size: 1024 * 1024,
         };
-        
+
         apk.add_available(package);
         let result = apk.install("musl");
         assert!(result.is_ok());
@@ -242,7 +242,7 @@ mod tests {
     #[test]
     fn test_apk_search() {
         let mut apk = ApkPackageManager::new();
-        
+
         let package = ApkPackage {
             name: "alpine-baselayout".to_string(),
             version: "3.0.0".to_string(),
@@ -255,7 +255,7 @@ mod tests {
             install_if: vec![],
             size: 1024 * 1024,
         };
-        
+
         apk.add_available(package);
         let results = apk.search("alpine");
         assert_eq!(results.len(), 1);

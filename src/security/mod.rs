@@ -45,7 +45,7 @@ pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
-    PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise, 
+    PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
     UnveilManager as BsdUnveilManager, UnveilPermission as BsdUnveilPermission, UnveilEntry as BsdUnveilEntry,
     WxEnforcer, MemoryPermission, PaxMprotect, AslrEngine, CapsicumManager,
     CapsicumCapability, BsdHardeningSuite,

@@ -136,7 +136,7 @@ mod tests {
     fn test_compliance_audit_logger() {
         let mut logger = ComplianceAuditLogger::new();
         logger.enable_framework(ComplianceFramework::HIPAA);
-        
+
         let event = ComplianceAuditEvent {
             timestamp: 1234567890,
             framework: ComplianceFramework::HIPAA,
@@ -146,7 +146,7 @@ mod tests {
             action: "READ".to_string(),
             outcome: "SUCCESS".to_string(),
         };
-        
+
         logger.log_event(event);
         assert_eq!(logger.get_audit_trail(ComplianceFramework::HIPAA).len(), 1);
     }
@@ -155,7 +155,7 @@ mod tests {
     fn test_tpm_attestation() {
         let mut tpm = TpmAttestationManager::new();
         tpm.extend_pcr(0, vec![1, 2, 3, 4], "BOOT_MEASUREMENT".to_string());
-        
+
         let pcr_value = tpm.get_pcr(0);
         assert!(pcr_value.is_some());
         assert_eq!(pcr_value.unwrap().len(), 4);

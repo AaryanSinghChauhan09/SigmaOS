@@ -167,32 +167,32 @@ mod tests {
     #[test]
     fn test_advanced_selinux() {
         let mut manager = AdvancedSELinuxManager::new();
-        
+
         let boolean = SELinuxBoolean {
             name: "httpd_enable_cgi".to_string(),
             value: false,
             description: "Enable CGI scripts in httpd".to_string(),
         };
-        
+
         manager.add_boolean(boolean);
         manager.set_boolean("httpd_enable_cgi", true).unwrap();
-        
+
         assert_eq!(manager.get_boolean("httpd_enable_cgi"), Some(true));
     }
 
     #[test]
     fn test_modules() {
         let mut manager = AdvancedSELinuxManager::new();
-        
+
         let module = SELinuxModule {
             name: "apache".to_string(),
             enabled: false,
             priority: 100,
         };
-        
+
         manager.add_module(module);
         manager.enable_module("apache").unwrap();
-        
+
         assert!(manager.modules.get("apache").unwrap().enabled);
     }
 }

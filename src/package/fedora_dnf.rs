@@ -270,7 +270,7 @@ mod tests {
     #[test]
     fn test_dnf_install() {
         let mut dnf = SigmaDNF::new();
-        
+
         let pkg = DnfPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -290,7 +290,7 @@ mod tests {
             installed_size: 2048,
             repository: "fedora".to_string(),
         };
-        
+
         dnf.add_package(pkg);
         let result = dnf.install(vec!["example-pkg".to_string()]);
         assert!(result.is_ok());
@@ -300,7 +300,7 @@ mod tests {
     #[test]
     fn test_dnf_search() {
         let mut dnf = SigmaDNF::new();
-        
+
         let pkg = DnfPackage {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -320,7 +320,7 @@ mod tests {
             installed_size: 2048,
             repository: "fedora".to_string(),
         };
-        
+
         dnf.add_package(pkg);
         let results = dnf.search("example");
         assert_eq!(results.len(), 1);

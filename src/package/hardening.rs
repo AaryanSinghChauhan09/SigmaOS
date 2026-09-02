@@ -125,10 +125,10 @@ mod tests {
     fn test_package_signing() {
         let mut engine = PackageSigningEngine::new();
         engine.add_trusted_key("test-key-1".to_string());
-        
+
         let package_data = b"test package data";
         let signature = engine.sign_package("test-key-1", package_data).unwrap();
-        
+
         assert_eq!(signature.key_id, "test-key-1");
     }
 
@@ -136,13 +136,13 @@ mod tests {
     fn test_signature_verification() {
         let mut engine = PackageSigningEngine::new();
         engine.add_trusted_key("test-key-1".to_string());
-        
+
         let signature = PackageSignature {
             signature_type: PackageSignatureType::Ed25519,
             signature_data: Vec::new(),
             key_id: "test-key-1".to_string(),
         };
-        
+
         let result = engine.verify_signature(&signature, b"test data");
         assert_eq!(result, PackageVerificationResult::Valid);
     }
@@ -150,13 +150,13 @@ mod tests {
     #[test]
     fn test_unknown_key() {
         let engine = PackageSigningEngine::new();
-        
+
         let signature = PackageSignature {
             signature_type: PackageSignatureType::Ed25519,
             signature_data: Vec::new(),
             key_id: "unknown-key".to_string(),
         };
-        
+
         let result = engine.verify_signature(&signature, b"test data");
         assert_eq!(result, PackageVerificationResult::UnknownKey);
     }

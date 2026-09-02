@@ -417,9 +417,9 @@ impl SigmaPkg {
     pub fn install_packages(&mut self, package_names: &[String]) -> Result<(), String> {
         println!("Resolving dependencies...");
         let transaction = self.resolve_dependencies(package_names)?;
-        
+
         self.display_transaction(&transaction);
-        
+
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Installation cancelled.");
@@ -588,9 +588,9 @@ impl SigmaPkg {
             transaction.download_size += new.size;
             transaction.install_size += new.installed_size - old.installed_size;
         }
-        
+
         self.display_transaction(&transaction);
-        
+
         if !self.config.no_confirm {
             if !self.confirm_transaction() {
                 println!("Upgrade cancelled.");

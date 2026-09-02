@@ -300,7 +300,7 @@ impl SigmaPortage {
     /// Calculate dependencies
     fn calculate_dependencies(&self, ebuild: &Ebuild) -> Result<Vec<String>, PortageError> {
         let mut deps = Vec::new();
-        
+
         for dep in &ebuild.depends {
             if !deps.contains(dep) {
                 deps.push(dep.clone());
@@ -315,7 +315,7 @@ impl SigmaPortage {
         for flag in flags {
             self.use_flags.enable_package_flag(package.to_string(), flag);
         }
-        
+
         // Rebuild package
         if self.database.is_installed(package) {
             self.emerge(package)?;
@@ -353,7 +353,7 @@ mod tests {
     #[test]
     fn test_portage_emerge() {
         let mut portage = SigmaPortage::new();
-        
+
         let ebuild = Ebuild {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -367,7 +367,7 @@ mod tests {
             pdepends: vec![],
             src_uri: vec![],
         };
-        
+
         portage.tree.add_ebuild(ebuild);
         let result = portage.emerge("example-pkg");
         assert!(result.is_ok());
@@ -377,7 +377,7 @@ mod tests {
     fn test_use_flags() {
         let mut manager = UseFlagManager::new();
         manager.enable_global_flag("X".to_string());
-        
+
         let ebuild = Ebuild {
             name: "example-pkg".to_string(),
             version: "1.0.0".to_string(),
@@ -391,7 +391,7 @@ mod tests {
             pdepends: vec![],
             src_uri: vec![],
         };
-        
+
         let flags = manager.resolve_for_package(&ebuild).unwrap();
         assert!(flags.contains(&"X".to_string()));
     }

@@ -61,7 +61,7 @@ impl SystemConfigManager {
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.config_dir, filename);
-        
+
         if !file_path.exists() {
             // Create default config if it doesn't exist
             self.create_default_config(filename)?;
@@ -112,7 +112,7 @@ impl SystemConfigManager {
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.config_dir, filename);
-        
+
         // Ensure directory exists
         if let Some(parent) = None::<&str> {
             fs::create_dir_all(parent)
@@ -289,7 +289,7 @@ impl ServiceUnit {
 
         content.push_str(&format!("\n[Install]\n"));
         content.push_str(&format!("WantedBy={}\n", self.wanted_by.join(" ")));
-        
+
         content
     }
 }
@@ -316,7 +316,7 @@ impl ServiceManager {
     /// Load service from file
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
-        
+
         let content = fs::read_to_string(&file_path)
             .map_err(|e| ConfigError::ReadError(file_path, e))?;
 
@@ -393,7 +393,7 @@ impl ServiceManager {
             .ok_or(ConfigError::NotFound(name.to_string()))?;
 
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
-        
+
         if let Some(parent) = None::<&str> {
             fs::create_dir_all(parent)
                 .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;

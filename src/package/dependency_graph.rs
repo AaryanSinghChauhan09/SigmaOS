@@ -102,7 +102,7 @@ impl DependencyGraph {
     /// Check for conflicts in proposed installation
     pub fn check_conflicts(&self, package_name: &str, installed: &[String]) -> Vec<String> {
         let mut conflicts = Vec::new();
-        
+
         if let Some(versions) = self.get_versions(package_name) {
             for version in versions {
                 for conflict in &version.conflicts {
@@ -112,7 +112,7 @@ impl DependencyGraph {
                 }
             }
         }
-        
+
         conflicts
     }
 
@@ -124,12 +124,12 @@ impl DependencyGraph {
     ) -> Result<Vec<String>, String> {
         let mut resolved = Vec::new();
         let mut to_resolve = vec![(package_name.to_string(), version)];
-        
+
         while let Some((name, ver)) = to_resolve.pop() {
             if resolved.contains(&name) {
                 continue;
             }
-            
+
             if let Some(versions) = self.get_versions(&name) {
                 if let Some(package) = versions.iter().find(|p| p.version == ver) {
                     for dep in &package.dependencies {
@@ -150,7 +150,7 @@ impl DependencyGraph {
                 return Err(format!("Package not found: {}", name));
             }
         }
-        
+
         Ok(resolved)
     }
 }
@@ -170,7 +170,7 @@ mod tests {
         let v1 = PackageVersion::new(1, 0, 0);
         let v2 = PackageVersion::new(1, 0, 1);
         let v3 = PackageVersion::new(2, 0, 0);
-        
+
         assert!(v2 > v1);
         assert!(v3 > v2);
         assert!(v1 < v3);
@@ -179,16 +179,16 @@ mod tests {
     #[test]
     fn test_dependency_graph() {
         let mut graph = DependencyGraph::new();
-        
+
         let pkg1 = PackageNode {
             name: "package1".to_string(),
             version: PackageVersion::new(1, 0, 0),
             dependencies: vec![],
             conflicts: vec![],
         };
-        
+
         graph.add_package(pkg1);
-        
+
         assert!(graph.get_versions("package1").is_some());
     }
 
@@ -196,7 +196,7 @@ mod tests {
     fn test_version_constraint() {
         let graph = DependencyGraph::new();
         let version = PackageVersion::new(1, 5, 0);
-        
+
         assert!(graph.satisfies_constraint(&version, &VersionConstraint::Any));
         assert!(graph.satisfies_constraint(&version, &VersionConstraint::Exact(PackageVersion::new(1, 5, 0))));
         assert!(graph.satisfies_constraint(&version, &VersionConstraint::GreaterOrEqual(PackageVersion::new(1, 0, 0))));

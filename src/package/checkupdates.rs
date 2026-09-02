@@ -39,7 +39,7 @@ impl CheckupdatesEngine {
     pub fn check_updates(&mut self) -> Vec<&PackageUpdate> {
         // In real implementation, would scan repository index diffs
         // For now, simulate with sample data
-        
+
         self.available_updates = vec![
             PackageUpdate {
                 name: "linux-kernel".to_string(),
