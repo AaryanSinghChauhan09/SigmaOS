@@ -1,27 +1,25 @@
 // SigmaOS Authentication & Identity Module
-pub mod user;
 pub mod access;
-pub mod identity;
 pub mod att_security;
 pub mod authentication_pipeline;
+pub mod identity;
+pub mod user;
 
-pub use user::{
-    UserID, UserState, User, AuthError, SimpleUser, AuthService, SimpleAuthService,
-};
+pub use user::{AuthError, AuthService, SimpleAuthService, SimpleUser, User, UserID, UserState};
 
 pub use access::{
-    PermissionID, PermissionType, AccessResult, Permission, SimplePermission, AccessControl,
-    AccessError, SimpleAccessControl,
+    AccessControl, AccessError, AccessResult, Permission, PermissionID, PermissionType,
+    SimpleAccessControl, SimplePermission,
 };
 
 pub use identity::{
-    IdentityID, IdentityType, IdentityError, DigitalIdentity, SimpleDigitalIdentity,
-    IdentityManager, SimpleIdentityManager, CredentialManager, SimpleCredentialManager,
-    DecentralizedAuth, SimpleDecentralizedAuth,
+    CredentialManager, DecentralizedAuth, DigitalIdentity, IdentityError, IdentityID,
+    IdentityManager, IdentityType, SimpleCredentialManager, SimpleDecentralizedAuth,
+    SimpleDigitalIdentity, SimpleIdentityManager,
 };
 
 pub use att_security::{
-    SensitivityLevel, IdentificationStep, AttSecurityError, UserIdentityClaim,
-    AdtAttributeRecord, AttributesDefinitionTable, AuthenticityVerifier,
-    AllocatedUserSession, AutomaticResourceManager, AttSecurityEngine,
+    AdtAttributeRecord, AllocatedUserSession, AttSecurityEngine, AttSecurityError,
+    AttributesDefinitionTable, AuthenticityVerifier, AutomaticResourceManager, IdentificationStep,
+    SensitivityLevel, UserIdentityClaim,
 };

@@ -16,6 +16,14 @@ pub mod improvements;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
+pub mod linux_bsd_distro_gaps;
+
+pub use linux_bsd_distro_gaps::{
+    BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
+    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
+    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
+    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+};
 pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
@@ -29,6 +37,13 @@ pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod wiki_ideas_implementation;
+pub mod sovereign_system_innovations;
+
+pub use sovereign_system_innovations::{
+    AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
+    GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler, UnifiedFirewallVpnOrchestrator,
+    VisualPolicyRule, VisualSandboxPolicyManager, WorkloadType, WmLayoutMode,
+};
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
@@ -48,8 +63,9 @@ pub use compat_layers::{
     RegistryValue, Win32Gdi, WindowsRegistry,
 };
 pub use developer::{
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
-    TargetArch,
+    ArchMakepkgDevEngine, BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit,
+    PackageBuildService, PortageCompilerTuner, PoudriereBulkBuildEngine, SbuildChrootSandboxEngine,
+    SovereignDevToolsSuite, TargetArch,
 };
 pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
@@ -69,9 +85,10 @@ pub use linux_bsd_parity_extended::{
     SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
+    AdminAction, AiSysAdmin, AtomicTrampolineGenerator, IntegrityState,
+    KernelPatchVerificationEngine, LivepatchArchitecture, LivepatchManager, LivepatchPatch,
+    NetplanConfig, NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    ThreadStackConsistencyChecker, TimeTravelCheckpoint, TimeTravelEngine,
 };
 pub use parity::{
     AppBundleRuntime, BundleError, ChannelManager, CpuArchitecture, HalError,
@@ -113,7 +130,7 @@ pub use missing_distro_innovations::{
 };
 
 pub use linux_bsd_inspirations::{
-    SovereignUniversalDistroBridge, DistroSubsystemMode,
+    SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType,
     SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
     NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
     SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
@@ -132,8 +149,12 @@ pub use sovereign_distro_dominance::{
     SovereignDistroDominanceSuite, NixGuixZeroCopyStore, CachyBoreDynamicAiScheduler,
     OpenBsdHardenedCapsicumPledge, ZfsBtrfsHybridSelfHealingCoW, SovereignMicrovmHypervisorGateway,
     SovereignPqcWireguardVpnEngine, MicrovmState, VirtioConfig, WireguardPeer,
+    PopOsSystem76AutoScheduler, ProcessPowerProfile, ManagedProcessAffinity,
+    TalosHeadlessMtlsClusterEngine, ClusterNodeConfig,
+    AlpineApkCASPackageCache, CasPackageBlob,
+    FreeBsdBhyveMicrovmJailBridge, IsolationType, HybridIsolationInstance,
 };
 
 pub mod void_xbps_src;
 pub mod universal_distro_super_matrix;
-pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile, LinuxDominanceSupermacyEngine, DistroDominanceMetrics};

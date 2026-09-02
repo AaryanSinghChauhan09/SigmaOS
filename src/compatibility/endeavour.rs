@@ -1,5 +1,5 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 // EndeavourOS Parity Engines for SigmaOS
@@ -8,7 +8,6 @@ extern crate alloc;
 // log sharing tool with sanitization, and the Yay AUR helper translator.
 // Expanded with unimplemented Github Wiki items: Makepkg Sandboxed Compiler,
 // AUR CLI Downloader Helper, and ALPM Sync DB to defeat Endeavour/Arch Linux.
-
 
 use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;

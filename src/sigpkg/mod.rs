@@ -4,17 +4,30 @@ use alloc::format;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
-pub mod arch_compat;
 pub mod alpine_apk_engine;
+pub mod arch_compat;
 pub mod arch_pacman_engine;
 pub mod client;
 pub mod daemon;
 pub mod aur;
 pub mod aur_helper;
+pub mod aurweb;
+
+pub use aurweb::{
+    AurComment, AurCommentThread, AurGitRepoManager, AurGitRepository, AurPackageRecord,
+    AurRpcQueryType, AurRpcResponse, AurVotingSystem, SovereignAurWebEngine,
+};
 pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod declarative_build;
+pub use declarative_build::{
+    ArchLinuxReproBuildInspector, BazelBuildEngine, BazelRuleType, BazelTarget,
+    DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer,
+    GentooPortageReproducibleEbuildEngine, NetBsdPkgsrcDeterministicBulkBuilder,
+    NixDerivation, PackageReview, PackageRatingsRegistry,
+    ReproducibleBuildDiffInspector,
+};
 pub mod fedora_rpm_engine;
 pub mod importer;
 pub mod linux_compat;
@@ -25,6 +38,7 @@ pub mod gentoo_use_flags;
 pub mod package_snapshot_rollback;
 pub mod sovereign_package_innovations;
 pub mod nix_shell;
+pub mod nixos;
 pub mod pacman;
 pub mod portage;
 pub mod recipe;
@@ -43,6 +57,12 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
+pub use crate::package::bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
+};
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
@@ -54,17 +74,12 @@ pub use universal_adapter::{
     UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
 };
 pub use sovereign_sigpkg::*;
-pub use sovereign_sigpkg::{
-    AppDirDesktopEntry, ChrootMountBind, DownloadChunk, PortageMaskRule,
-    SovereignAppDirContainer, SovereignChrootBuildSandbox, SovereignMultiChunkPackageDownloader,
-    SovereignPortagePackageMaskEngine,
-};
 
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager,
 };
-pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanDatabase};
+pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
@@ -101,10 +116,6 @@ pub use package_snapshot_rollback::{
 pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
     ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-    SlackBuildScript, SlackwarePackageArchive, SlackwareBuildPackageEngine,
-    ZypperPackageSpec, ZypperSatDependencyResolver,
-    MossStatelessPackage, MossStateTransaction, SolusMossStatelessTransactionEngine,
-    BsdPkgManifestSpec, BsdPkgManifestSignatureAuditor,
 };
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
 pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};

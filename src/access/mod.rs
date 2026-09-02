@@ -1,16 +1,15 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 #![allow(unused_imports)]
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SigmaOS Access Module
 // Access control management, LDAP, Wireless Access, Remote File & Tool Access, Process Migration
 // Inspired by Linux (credentials/cgroups/sec) & BSD (ucred/capsicum)
 // Zero-dependency implementation - no external libraries required
 
-
-pub mod control;
 pub mod append_rights;
+pub mod control;
 
 extern crate alloc;
 pub use crate::filesystem::ext4_ntfs_security::*;

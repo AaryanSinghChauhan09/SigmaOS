@@ -4,10 +4,10 @@ extern crate alloc;
 // Implements Nix package manager, declarative configuration, and functional package management
 
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::string::{String, ToString};
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. NIX PACKAGE MANAGER (Functional Package Management)
@@ -82,7 +82,9 @@ impl NixStore {
             return Err(NixError::EvaluationError);
         }
 
-        let path_opt = self.packages.get(package)
+        let path_opt = self
+            .packages
+            .get(package)
             .and_then(|pkg| pkg.outputs.get("out"))
             .cloned();
 

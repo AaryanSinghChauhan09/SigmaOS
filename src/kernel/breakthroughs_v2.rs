@@ -11,7 +11,6 @@ extern crate alloc;
 // 7. Cross-Mode Terminal Multiplexing
 // 8. AI-Driven Daemon Ecosystem
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

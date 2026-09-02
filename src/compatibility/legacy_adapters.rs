@@ -3,7 +3,6 @@ extern crate alloc;
 // Provides implementations for legacy personality adaptations, syscall translations,
 // and bridge structures as expected by the integration tests.
 
-
 use core::cell::Cell;
 
 /// Represents kernel personas supported for legacy environments
@@ -165,6 +164,7 @@ pub enum LibcVersion {
 
 /// Syscall Application Binary Interfaces
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum SyscallAbi {
     Oabi32,
     Eabi32,

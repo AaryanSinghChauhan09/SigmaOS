@@ -274,7 +274,8 @@ impl OpenBsdSandboxGuard {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 
@@ -296,6 +297,64 @@ impl OpenBsdSandboxGuard {
 }
 
 impl Default for OpenBsdSandboxGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// OpenBSD pf (Packet Filter) Firewall Parity Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PfAction {
+    Pass,
+    Block,
+}
+
+#[derive(Debug, Clone)]
+pub struct PfRule {
+    pub action: PfAction,
+    pub interface: String,
+    pub proto: String,
+    pub src_ip: String,
+    pub dst_port: u16,
+}
+
+pub struct OpenBsdPfFirewallEngine {
+    pub rules: Vec<PfRule>,
+    pub default_action: PfAction,
+}
+
+impl OpenBsdPfFirewallEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            default_action: PfAction::Pass,
+        }
+    }
+
+    pub fn add_rule(&mut self, rule: PfRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn evaluate_packet(&self, iface: &str, proto: &str, src_ip: &str, dst_port: u16) -> PfAction {
+        let mut final_action = self.default_action;
+        for rule in &self.rules {
+            let iface_match = rule.interface == "any" || rule.interface == iface;
+            let proto_match = rule.proto == "any" || rule.proto == proto;
+            let ip_match = rule.src_ip == "any" || rule.src_ip == src_ip;
+            let port_match = rule.dst_port == 0 || rule.dst_port == dst_port;
+
+            if iface_match && proto_match && ip_match && port_match {
+                final_action = rule.action;
+            }
+        }
+        final_action
+    }
+}
+
+impl Default for OpenBsdPfFirewallEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -381,6 +440,27 @@ mod tests {
         let provider = geom.lookup_provider("ada0p1").unwrap();
         assert_eq!(provider.class_type, GeomClassType::Partition);
         assert_eq!(provider.media_size_bytes, 1073741824);
+    }
+
+    #[test]
+    fn test_openbsd_pf_firewall() {
+        let mut pf = OpenBsdPfFirewallEngine::new();
+        pf.add_rule(PfRule {
+            action: PfAction::Block,
+            interface: "em0".to_string(),
+            proto: "tcp".to_string(),
+            src_ip: "10.0.0.5".to_string(),
+            dst_port: 22,
+        });
+
+        assert_eq!(
+            pf.evaluate_packet("em0", "tcp", "10.0.0.5", 22),
+            PfAction::Block
+        );
+        assert_eq!(
+            pf.evaluate_packet("em0", "tcp", "10.0.0.6", 22),
+            PfAction::Pass
+        );
     }
 
     #[test]

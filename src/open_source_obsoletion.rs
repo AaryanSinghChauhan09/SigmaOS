@@ -6,8 +6,6 @@ extern crate alloc;
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
-
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -1156,7 +1154,8 @@ impl SovereignCephMinioObjectStore {
             crc = crc.wrapping_add(b as u32).wrapping_mul(31);
         }
 
-        self.objects.retain(|o| !(o.bucket == bucket && o.key == key));
+        self.objects
+            .retain(|o| !(o.bucket == bucket && o.key == key));
         self.objects.push(S3Object {
             bucket: bucket.to_string(),
             key: key.to_string(),
@@ -1375,6 +1374,130 @@ impl Default for SovereignFalcoRuntimeThreatEngine {
 }
 
 // =========================================================================
+// 49. SOVEREIGN GRAFANA LOKI LOG ENGINE (Superseding Grafana Loki & Promtail)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SovereignLokiLogStream {
+    pub labels: Vec<(String, String)>,
+    pub entries: Vec<(u64, String)>,
+}
+
+pub struct SovereignGrafanaLokiLogEngine {
+    pub streams: Vec<SovereignLokiLogStream>,
+}
+
+impl SovereignGrafanaLokiLogEngine {
+    pub fn new() -> Self {
+        Self {
+            streams: Vec::new(),
+        }
+    }
+
+    pub fn push_log_entry(&mut self, labels: &[(&str, &str)], timestamp: u64, log_line: &str) {
+        let label_vec: Vec<(String, String)> = labels
+            .iter()
+            .map(|&(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+
+        if let Some(stream) = self.streams.iter_mut().find(|s| s.labels == label_vec) {
+            stream.entries.push((timestamp, log_line.to_string()));
+        } else {
+            self.streams.push(SovereignLokiLogStream {
+                labels: label_vec,
+                entries: vec![(timestamp, log_line.to_string())],
+            });
+        }
+    }
+
+    pub fn query_logs_by_label(&self, key: &str, value: &str) -> Vec<(u64, String)> {
+        let mut results = Vec::new();
+        for stream in &self.streams {
+            if stream.labels.iter().any(|(k, v)| k == key && v == value) {
+                results.extend(stream.entries.clone());
+            }
+        }
+        results
+    }
+}
+
+impl Default for SovereignGrafanaLokiLogEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 50. SOVEREIGN APACHE KAFKA STREAM ENGINE (Superseding Apache Kafka & Redpanda)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SovereignKafkaRecord {
+    pub offset: u64,
+    pub timestamp: u64,
+    pub key: Vec<u8>,
+    pub value: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignKafkaPartition {
+    pub partition_id: u32,
+    pub records: Vec<SovereignKafkaRecord>,
+    pub next_offset: u64,
+}
+
+pub struct SovereignApacheKafkaStreamEngine {
+    pub topic: String,
+    pub partitions: Vec<SovereignKafkaPartition>,
+}
+
+impl SovereignApacheKafkaStreamEngine {
+    pub fn new(topic: &str, num_partitions: u32) -> Self {
+        let mut partitions = Vec::new();
+        for id in 0..num_partitions {
+            partitions.push(SovereignKafkaPartition {
+                partition_id: id,
+                records: Vec::new(),
+                next_offset: 0,
+            });
+        }
+        Self {
+            topic: topic.to_string(),
+            partitions,
+        }
+    }
+
+    pub fn publish(&mut self, partition_id: u32, key: &[u8], value: &[u8], timestamp: u64) -> Result<u64, &'static str> {
+        if let Some(partition) = self.partitions.iter_mut().find(|p| p.partition_id == partition_id) {
+            let offset = partition.next_offset;
+            partition.records.push(SovereignKafkaRecord {
+                offset,
+                timestamp,
+                key: key.to_vec(),
+                value: value.to_vec(),
+            });
+            partition.next_offset += 1;
+            Ok(offset)
+        } else {
+            Err("Kafka: Partition not found")
+        }
+    }
+
+    pub fn consume(&self, partition_id: u32, from_offset: u64) -> Vec<SovereignKafkaRecord> {
+        if let Some(partition) = self.partitions.iter().find(|p| p.partition_id == partition_id) {
+            partition
+                .records
+                .iter()
+                .filter(|r| r.offset >= from_offset)
+                .cloned()
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+}
+
+// =========================================================================
 // 15. SOVEREIGN OPEN SOURCE OBSOLETION ORCHESTRATOR
 // =========================================================================
 
@@ -1397,6 +1520,12 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub envoy: SovereignEnvoyServiceMeshProxy,
     pub otel: SovereignOpenTelemetryTraceCollector,
     pub clickhouse: SovereignClickHouseColumnarEngine,
+    pub loki_log_engine: SovereignGrafanaLokiLogEngine,
+    pub kafka_stream_engine: SovereignApacheKafkaStreamEngine,
+    pub pgvector: SovereignPgVectorSearchEngine,
+    pub redis_cluster: SovereignRedisClusterEngine,
+    pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
+    pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -1427,13 +1556,22 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             envoy: SovereignEnvoyServiceMeshProxy::new(3),
             otel: SovereignOpenTelemetryTraceCollector::new(),
             clickhouse: SovereignClickHouseColumnarEngine::new(),
-            total_obsoleted_projects_count: 27,
+            loki_log_engine: SovereignGrafanaLokiLogEngine::new(),
+            kafka_stream_engine: SovereignApacheKafkaStreamEngine::new("system_events", 4),
+            pgvector: SovereignPgVectorSearchEngine::new(),
+            redis_cluster: SovereignRedisClusterEngine::new(),
+            cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
+            k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
+            total_obsoleted_projects_count: 33,
         }
     }
 
     pub fn bootstrap_sovereign_stack(&mut self) -> Result<String, &'static str> {
-        self.vcs.stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
-        let _commit = self.vcs.commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
+        self.vcs
+            .stage_file("kernel/main.rs", b"pub fn kernel_entry() {}");
+        let _commit = self
+            .vcs
+            .commit("SigmaOS", "Bootstrap Sovereign Stack", 1700000000)?;
 
         let init_unit = ServiceUnit {
             name: "sovereign_core".to_string(),
@@ -1446,7 +1584,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.supervisor.register_service(init_unit)?;
         self.supervisor.start_service("sovereign_core")?;
 
-        self.observability.record_metric("cpu_utilization", 12.5, 1700000000);
+        self.observability
+            .record_metric("cpu_utilization", 12.5, 1700000000);
         self.firewall.establish_pqc_vpn_tunnel(&[0x1D; 32]);
 
         Ok(format!(
@@ -1562,7 +1701,12 @@ impl SovereignZirconHandleManager {
         }
     }
 
-    pub fn create_handle(&mut self, object_type: &str, rights: ZirconRights, pqc_token: [u8; 16]) -> u32 {
+    pub fn create_handle(
+        &mut self,
+        object_type: &str,
+        rights: ZirconRights,
+        pqc_token: [u8; 16],
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.handles.push(ZirconHandle {
@@ -1685,7 +1829,11 @@ impl SovereignSolarisZoneEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(p) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
+        if let Some(p) = self
+            .probes
+            .iter_mut()
+            .find(|p| p.provider == provider && p.name == name)
+        {
             p.hit_count += 1;
             true
         } else {
@@ -1794,7 +1942,11 @@ impl SovereignQubesIsolationEngine {
         });
     }
 
-    pub fn copy_inter_vm_buffer(&mut self, src_domain: &str, payload: &[u8]) -> Result<(), &'static str> {
+    pub fn copy_inter_vm_buffer(
+        &mut self,
+        src_domain: &str,
+        payload: &[u8],
+    ) -> Result<(), &'static str> {
         if !self.domains.iter().any(|d| d.name == src_domain) {
             return Err("QubesIsolationEngine: Source domain does not exist");
         }
@@ -1888,8 +2040,17 @@ impl SovereignHaikuInterfaceEngine {
         });
     }
 
-    pub fn convert_media(&self, in_fmt: &str, out_fmt: &str, data: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if self.translators.iter().any(|t| t.input_format == in_fmt && t.output_format == out_fmt) {
+    pub fn convert_media(
+        &self,
+        in_fmt: &str,
+        out_fmt: &str,
+        data: &[u8],
+    ) -> Result<Vec<u8>, &'static str> {
+        if self
+            .translators
+            .iter()
+            .any(|t| t.input_format == in_fmt && t.output_format == out_fmt)
+        {
             let mut converted = data.to_vec();
             converted.reverse(); // Zero-copy representation transformation
             Ok(converted)
@@ -1927,7 +2088,13 @@ impl SovereignFirecrackerMicroVmManager {
         Self { vms: Vec::new() }
     }
 
-    pub fn launch_microvm(&mut self, vm_id: &str, vcpus: u32, mem_mb: u64, kernel: &str) -> Result<(), &'static str> {
+    pub fn launch_microvm(
+        &mut self,
+        vm_id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+        kernel: &str,
+    ) -> Result<(), &'static str> {
         if self.vms.iter().any(|v| v.vm_id == vm_id) {
             return Err("MicroVmManager: MicroVM ID already exists");
         }
@@ -2029,7 +2196,9 @@ pub struct SovereignSbomGeneratorPipeline {
 
 impl SovereignSbomGeneratorPipeline {
     pub fn new() -> Self {
-        Self { packages: Vec::new() }
+        Self {
+            packages: Vec::new(),
+        }
     }
 
     pub fn record_package(&mut self, name: &str, ver: &str, license: &str) {
@@ -2048,7 +2217,10 @@ impl SovereignSbomGeneratorPipeline {
             if i > 0 {
                 manifest.push(',');
             }
-            manifest.push_str(&format!("{{\"name\":\"{}\",\"version\":\"{}\",\"purl\":\"{}\"}}", pkg.name, pkg.version, pkg.purl));
+            manifest.push_str(&format!(
+                "{{\"name\":\"{}\",\"version\":\"{}\",\"purl\":\"{}\"}}",
+                pkg.name, pkg.version, pkg.purl
+            ));
         }
         manifest.push_str("]}");
         manifest
@@ -2181,7 +2353,10 @@ impl SovereignWeb3FsIpfsEngine {
     }
 
     pub fn fetch_block(&self, cid: &str) -> Option<&[u8]> {
-        self.blocks.iter().find(|b| b.cid == cid).map(|b| b.data.as_slice())
+        self.blocks
+            .iter()
+            .find(|b| b.cid == cid)
+            .map(|b| b.data.as_slice())
     }
 }
 
@@ -2208,7 +2383,9 @@ pub struct SovereignWasmCraneliftEngine {
 
 impl SovereignWasmCraneliftEngine {
     pub fn new() -> Self {
-        Self { modules: Vec::new() }
+        Self {
+            modules: Vec::new(),
+        }
     }
 
     pub fn load_wasm_bytecode(&mut self, name: &str, bytecode: &[u8]) {
@@ -2265,7 +2442,11 @@ impl SovereignReproducibleBuildFarm {
     }
 
     pub fn audit_build_reproducibility(&self, job_id: &str) -> bool {
-        self.jobs.iter().find(|j| j.job_id == job_id).map(|j| j.reproducible).unwrap_or(false)
+        self.jobs
+            .iter()
+            .find(|j| j.job_id == job_id)
+            .map(|j| j.reproducible)
+            .unwrap_or(false)
     }
 }
 
@@ -2416,7 +2597,10 @@ impl SovereignFlatpakAppImageSandbox {
 
     pub fn launch_sandboxed_app(&self, app_id: &str) -> Result<String, &'static str> {
         if let Some(app) = self.installed_bundles.iter().find(|b| b.app_id == app_id) {
-            Ok(format!("Bubblewrap Sandbox Spawned: {} v{}", app.app_id, app.version))
+            Ok(format!(
+                "Bubblewrap Sandbox Spawned: {} v{}",
+                app.app_id, app.version
+            ))
         } else {
             Err("FlatpakAppImageSandbox: App bundle not registered")
         }
@@ -2509,7 +2693,10 @@ impl SovereignCockroachDistributedStore {
     }
 
     pub fn raft_get(&self, key: &str) -> Option<&[u8]> {
-        self.store.iter().find(|k| k.key == key).map(|k| k.value.as_slice())
+        self.store
+            .iter()
+            .find(|k| k.key == key)
+            .map(|k| k.value.as_slice())
     }
 }
 
@@ -2910,6 +3097,347 @@ impl Default for SovereignClickHouseColumnarEngine {
 }
 
 // =========================================================================
+// 48. SOVEREIGN PGVECTOR SEARCH ENGINE (Superseding pgvector, Pinecone, Milvus)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct VectorDocument {
+    pub id: String,
+    pub embedding: Vec<f32>,
+    pub metadata: String,
+}
+
+pub struct SovereignPgVectorSearchEngine {
+    pub documents: Vec<VectorDocument>,
+}
+
+impl SovereignPgVectorSearchEngine {
+    pub fn new() -> Self {
+        Self {
+            documents: Vec::new(),
+        }
+    }
+
+    pub fn insert_document(&mut self, id: &str, embedding: Vec<f32>, metadata: &str) {
+        self.documents.push(VectorDocument {
+            id: id.to_string(),
+            embedding,
+            metadata: metadata.to_string(),
+        });
+    }
+
+    pub fn cosine_similarity(v1: &[f32], v2: &[f32]) -> f32 {
+        if v1.len() != v2.len() || v1.is_empty() {
+            return 0.0;
+        }
+        let dot_product: f32 = v1.iter().zip(v2.iter()).map(|(a, b)| a * b).sum();
+        let norm_v1: f32 = v1.iter().map(|a| a * a).sum::<f32>().sqrt();
+        let norm_v2: f32 = v2.iter().map(|b| b * b).sum::<f32>().sqrt();
+        if norm_v1 == 0.0 || norm_v2 == 0.0 {
+            return 0.0;
+        }
+        dot_product / (norm_v1 * norm_v2)
+    }
+
+    pub fn search_top_k(&self, query_vector: &[f32], k: usize) -> Vec<(&VectorDocument, f32)> {
+        let mut results: Vec<(&VectorDocument, f32)> = self
+            .documents
+            .iter()
+            .map(|doc| {
+                let score = Self::cosine_similarity(&doc.embedding, query_vector);
+                (doc, score)
+            })
+            .collect();
+
+        results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(core::cmp::Ordering::Equal));
+        results.truncate(k);
+        results
+    }
+}
+
+impl Default for SovereignPgVectorSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 51. SOVEREIGN REDIS CLUSTER ENGINE (Superseding Redis Sentinel, Redis Cluster, KeyDB)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClusterNodeRole {
+    Master,
+    Replica,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClusterNode {
+    pub node_id: String,
+    pub address: String,
+    pub role: ClusterNodeRole,
+    pub slots: Vec<u16>, // 0 to 16383
+    pub master_id: Option<String>,
+}
+
+pub struct SovereignRedisClusterEngine {
+    pub nodes: Vec<ClusterNode>,
+}
+
+impl SovereignRedisClusterEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn add_node(&mut self, node_id: &str, address: &str, role: ClusterNodeRole, slots: Vec<u16>, master_id: Option<&str>) {
+        self.nodes.push(ClusterNode {
+            node_id: node_id.to_string(),
+            address: address.to_string(),
+            role,
+            slots,
+            master_id: master_id.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn get_slot_for_key(key: &str) -> u16 {
+        let mut hash: u32 = 5381;
+        for byte in key.bytes() {
+            hash = ((hash << 5).wrapping_add(hash)).wrapping_add(byte as u32);
+        }
+        (hash % 16384) as u16
+    }
+
+    pub fn route_key(&self, key: &str) -> Option<&ClusterNode> {
+        let slot = Self::get_slot_for_key(key);
+        self.nodes.iter().find(|node| node.role == ClusterNodeRole::Master && node.slots.contains(&slot))
+    }
+
+    pub fn failover_master(&mut self, failed_master_id: &str) -> Result<String, &'static str> {
+        let failed_slots = if let Some(master) = self.nodes.iter().find(|n| n.node_id == failed_master_id) {
+            master.slots.clone()
+        } else {
+            Vec::new()
+        };
+
+        let replica_idx = self
+            .nodes
+            .iter()
+            .position(|n| n.role == ClusterNodeRole::Replica && n.master_id.as_deref() == Some(failed_master_id))
+            .ok_or("RedisCluster: No replica available for failover")?;
+
+        // Remove failed master
+        self.nodes.retain(|n| n.node_id != failed_master_id);
+
+        // Find replica index after retain
+        let new_master_idx = self
+            .nodes
+            .iter()
+            .position(|n| n.role == ClusterNodeRole::Replica && n.master_id.as_deref() == Some(failed_master_id))
+            .ok_or("RedisCluster: No replica available for failover")?;
+
+        // Promote replica
+        self.nodes[new_master_idx].role = ClusterNodeRole::Master;
+        self.nodes[new_master_idx].master_id = None;
+        self.nodes[new_master_idx].slots = failed_slots;
+
+        Ok(self.nodes[new_master_idx].node_id.clone())
+    }
+}
+
+impl Default for SovereignRedisClusterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 52. SOVEREIGN CILIUM BPF NETWORK ENGINE (Superseding Cilium, Calico, Flannel CNI)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PodNetworkEndpoint {
+    pub pod_name: String,
+    pub ip_address: String,
+    pub veth_interface: String,
+    pub security_identity: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CiliumNetworkPolicy {
+    pub policy_name: String,
+    pub target_identity: u32,
+    pub allowed_peer_identity: u32,
+    pub port: u16,
+}
+
+pub struct SovereignCiliumBpfNetworkEngine {
+    pub endpoints: Vec<PodNetworkEndpoint>,
+    pub policies: Vec<CiliumNetworkPolicy>,
+    pub allocated_ips: Vec<String>,
+}
+
+impl SovereignCiliumBpfNetworkEngine {
+    pub fn new() -> Self {
+        Self {
+            endpoints: Vec::new(),
+            policies: Vec::new(),
+            allocated_ips: Vec::new(),
+        }
+    }
+
+    pub fn register_endpoint(&mut self, pod_name: &str, ip: &str, veth: &str, identity: u32) {
+        self.endpoints.push(PodNetworkEndpoint {
+            pod_name: pod_name.to_string(),
+            ip_address: ip.to_string(),
+            veth_interface: veth.to_string(),
+            security_identity: identity,
+        });
+        self.allocated_ips.push(ip.to_string());
+    }
+
+    pub fn add_policy(&mut self, policy_name: &str, target_id: u32, peer_id: u32, port: u16) {
+        self.policies.push(CiliumNetworkPolicy {
+            policy_name: policy_name.to_string(),
+            target_identity: target_id,
+            allowed_peer_identity: peer_id,
+            port,
+        });
+    }
+
+    pub fn evaluate_ingress_bpf(&self, src_identity: u32, dst_identity: u32, dst_port: u16) -> bool {
+        // If no policy targets dst_identity, default allow
+        let has_target_policy = self.policies.iter().any(|p| p.target_identity == dst_identity);
+        if !has_target_policy {
+            return true;
+        }
+
+        self.policies.iter().any(|p| {
+            p.target_identity == dst_identity
+                && p.allowed_peer_identity == src_identity
+                && (p.port == 0 || p.port == dst_port)
+        })
+    }
+}
+
+impl Default for SovereignCiliumBpfNetworkEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 53. SOVEREIGN K8S ORCHESTRATOR ENGINE (Superseding Kubernetes, K3s, Nomad)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PodPhase {
+    Pending,
+    Running,
+    Failed,
+    Succeeded,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignPod {
+    pub name: String,
+    pub namespace: String,
+    pub container_image: String,
+    pub phase: PodPhase,
+    pub node_assigned: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignDeployment {
+    pub name: String,
+    pub replicas: u32,
+    pub image: String,
+}
+
+pub struct SovereignK8sOrchestratorEngine {
+    pub pods: Vec<SovereignPod>,
+    pub deployments: Vec<SovereignDeployment>,
+    pub nodes: Vec<String>,
+}
+
+impl SovereignK8sOrchestratorEngine {
+    pub fn new() -> Self {
+        Self {
+            pods: Vec::new(),
+            deployments: Vec::new(),
+            nodes: Vec::new(),
+        }
+    }
+
+    pub fn register_node(&mut self, node_name: &str) {
+        self.nodes.push(node_name.to_string());
+    }
+
+    pub fn create_deployment(&mut self, name: &str, replicas: u32, image: &str) {
+        self.deployments.push(SovereignDeployment {
+            name: name.to_string(),
+            replicas,
+            image: image.to_string(),
+        });
+
+        // Reconcile deployment -> spawn pods
+        for i in 0..replicas {
+            let pod_name = format!("{}-pod-{}", name, i);
+            let assigned_node = self.nodes.get(i as usize % self.nodes.len().max(1)).cloned();
+            self.pods.push(SovereignPod {
+                name: pod_name,
+                namespace: "default".to_string(),
+                container_image: image.to_string(),
+                phase: PodPhase::Running,
+                node_assigned: assigned_node,
+            });
+        }
+    }
+
+    pub fn scale_deployment(&mut self, name: &str, new_replicas: u32) -> Result<(), &'static str> {
+        let dep = self
+            .deployments
+            .iter_mut()
+            .find(|d| d.name == name)
+            .ok_or("K8s: Deployment not found")?;
+
+        let old_replicas = dep.replicas;
+        dep.replicas = new_replicas;
+
+        if new_replicas > old_replicas {
+            for i in old_replicas..new_replicas {
+                let pod_name = format!("{}-pod-{}", name, i);
+                let assigned_node = self.nodes.get(i as usize % self.nodes.len().max(1)).cloned();
+                self.pods.push(SovereignPod {
+                    name: pod_name,
+                    namespace: "default".to_string(),
+                    container_image: dep.image.clone(),
+                    phase: PodPhase::Running,
+                    node_assigned: assigned_node,
+                });
+            }
+        } else if new_replicas < old_replicas {
+            let prefix = format!("{}-pod-", name);
+            self.pods.retain(|p| {
+                if p.name.starts_with(&prefix) {
+                    if let Ok(idx) = p.name.trim_start_matches(&prefix).parse::<u32>() {
+                        return idx < new_replicas;
+                    }
+                }
+                true
+            });
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for SovereignK8sOrchestratorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -3230,7 +3758,9 @@ mod tests {
         let mut qubes = SovereignQubesIsolationEngine::new();
         qubes.create_domain("work-vault", "red", false);
 
-        assert!(qubes.copy_inter_vm_buffer("work-vault", b"secret_token").is_ok());
+        assert!(qubes
+            .copy_inter_vm_buffer("work-vault", b"secret_token")
+            .is_ok());
         assert_eq!(qubes.inter_vm_clipboard, Some(b"secret_token".to_vec()));
     }
 
@@ -3319,7 +3849,15 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum_sandbox() {
         let mut capsicum = SovereignCapsicumSandbox::new();
-        capsicum.limit_fd_rights(3, CapsicumCapRights { read: true, write: false, seek: true, fstat: true });
+        capsicum.limit_fd_rights(
+            3,
+            CapsicumCapRights {
+                read: true,
+                write: false,
+                seek: true,
+                fstat: true,
+            },
+        );
         // Prior to entering capability mode, checks pass
         assert!(capsicum.check_fd_right(3, true, true));
 
@@ -3396,7 +3934,10 @@ mod tests {
         let mut store = SovereignCephMinioObjectStore::new();
         store.put_object("assets", "logo.png", b"png_data_bytes");
 
-        assert_eq!(store.get_object("assets", "logo.png"), Some(&b"png_data_bytes"[..]));
+        assert_eq!(
+            store.get_object("assets", "logo.png"),
+            Some(&b"png_data_bytes"[..])
+        );
         assert_eq!(store.get_object("assets", "nonexistent"), None);
     }
 
@@ -3416,7 +3957,10 @@ mod tests {
         let mut mesh = SovereignTailscaleMeshEngine::new();
         mesh.join_mesh("node-alpha", "100.64.0.1", [0x01; 32]);
 
-        assert_eq!(mesh.route_mesh_packet("100.64.0.1"), Some("node-alpha".to_string()));
+        assert_eq!(
+            mesh.route_mesh_packet("100.64.0.1"),
+            Some("node-alpha".to_string())
+        );
         assert_eq!(mesh.route_mesh_packet("100.64.0.99"), None);
     }
 
@@ -3482,7 +4026,10 @@ mod tests {
         envoy.report_failure("10.0.0.1:8080");
         envoy.report_failure("10.0.0.1:8080");
 
-        assert_eq!(envoy.upstreams[0].circuit_breaker, CircuitBreakerState::Open);
+        assert_eq!(
+            envoy.upstreams[0].circuit_breaker,
+            CircuitBreakerState::Open
+        );
     }
 
     #[test]
@@ -3514,9 +4061,91 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_grafana_loki_log_engine() {
+        let mut loki = SovereignGrafanaLokiLogEngine::new();
+        loki.push_log_entry(&[("app", "kernel"), ("level", "info")], 1000, "Kernel booted");
+        loki.push_log_entry(&[("app", "kernel"), ("level", "error")], 1005, "Page fault handled");
+
+        let logs = loki.query_logs_by_label("app", "kernel");
+        assert_eq!(logs.len(), 2);
+        assert_eq!(logs[0].1, "Kernel booted");
+    }
+
+    #[test]
+    fn test_sovereign_apache_kafka_stream_engine() {
+        let mut kafka = SovereignApacheKafkaStreamEngine::new("audit_stream", 2);
+        let off0 = kafka.publish(0, b"key1", b"event_login", 100).unwrap();
+        let off1 = kafka.publish(0, b"key2", b"event_logout", 105).unwrap();
+
+        assert_eq!(off0, 0);
+        assert_eq!(off1, 1);
+
+        let records = kafka.consume(0, 0);
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[1].value, b"event_logout");
+    }
+
+    #[test]
+    fn test_sovereign_pgvector_search_engine() {
+        let mut pgvector = SovereignPgVectorSearchEngine::new();
+        pgvector.insert_document("doc1", vec![1.0, 0.0, 0.0], "metadata_1");
+        pgvector.insert_document("doc2", vec![0.0, 1.0, 0.0], "metadata_2");
+        pgvector.insert_document("doc3", vec![0.8, 0.2, 0.0], "metadata_3");
+
+        let results = pgvector.search_top_k(&[1.0, 0.0, 0.0], 2);
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0].0.id, "doc1");
+        assert_eq!(results[1].0.id, "doc3");
+    }
+
+    #[test]
+    fn test_sovereign_redis_cluster_engine() {
+        let mut cluster = SovereignRedisClusterEngine::new();
+        cluster.add_node("node1", "127.0.0.1:6379", ClusterNodeRole::Master, (0..8191).collect(), None);
+        cluster.add_node("node2", "127.0.0.1:6380", ClusterNodeRole::Replica, Vec::new(), Some("node1"));
+
+        let key = "user:session:123";
+        let slot = SovereignRedisClusterEngine::get_slot_for_key(key);
+        assert!(slot < 16384);
+
+        let new_master = cluster.failover_master("node1").unwrap();
+        assert_eq!(new_master, "node2");
+        assert_eq!(cluster.nodes.len(), 1);
+        assert_eq!(cluster.nodes[0].role, ClusterNodeRole::Master);
+    }
+
+    #[test]
+    fn test_sovereign_cilium_bpf_network_engine() {
+        let mut cilium = SovereignCiliumBpfNetworkEngine::new();
+        cilium.register_endpoint("frontend-pod", "10.244.0.5", "veth0", 101);
+        cilium.register_endpoint("backend-pod", "10.244.0.6", "veth1", 102);
+
+        cilium.add_policy("allow-frontend-to-backend", 102, 101, 8080);
+
+        assert!(cilium.evaluate_ingress_bpf(101, 102, 8080));
+        assert!(!cilium.evaluate_ingress_bpf(103, 102, 8080));
+    }
+
+    #[test]
+    fn test_sovereign_k8s_orchestrator_engine() {
+        let mut k8s = SovereignK8sOrchestratorEngine::new();
+        k8s.register_node("node-1");
+        k8s.register_node("node-2");
+
+        k8s.create_deployment("nginx-dep", 2, "nginx:latest");
+        assert_eq!(k8s.pods.len(), 2);
+
+        k8s.scale_deployment("nginx-dep", 4).unwrap();
+        assert_eq!(k8s.pods.len(), 4);
+
+        k8s.scale_deployment("nginx-dep", 1).unwrap();
+        assert_eq!(k8s.pods.len(), 1);
+    }
+
+    #[test]
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("27 legacy open-source projects obsoleted"));
+        assert!(status.contains("33 legacy open-source projects obsoleted"));
     }
 }

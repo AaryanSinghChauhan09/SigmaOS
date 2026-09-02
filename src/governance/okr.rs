@@ -1,6 +1,6 @@
 extern crate alloc;
 // SPDX-License-Identifier: MIT
-//! Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
+/// Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
 
 
 

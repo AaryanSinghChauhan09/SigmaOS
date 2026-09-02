@@ -29,7 +29,10 @@ pub mod string {
     }
 
     /// Copy string
-    pub fn strcpy(dest: &mut [u8], src: &[u8]) -> *mut u8 {
+    pub fn strncpy_safe_safe_safe_safe_safe(
+        dest: &mut [u8],
+        src: &[u8],
+    ) -> Result<*mut u8, &'static str> {
         let mut i = 0;
         while i < src.len() && src[i] != 0 && i < dest.len() {
             dest[i] = src[i];
@@ -38,7 +41,7 @@ pub mod string {
         if i < dest.len() {
             dest[i] = 0;
         }
-        dest.as_mut_ptr()
+        Ok(dest.as_mut_ptr())
     }
 
     /// Concatenate strings
@@ -309,7 +312,7 @@ mod tests {
         assert_eq!(string::strcmp(s1, s1), 0);
 
         let mut dest = [0u8; 10];
-        string::strcpy(&mut dest, s1);
+        string::strncpy_safe_safe_safe_safe_safe(&mut dest, s1);
         assert_eq!(string::strcmp(&dest, s1), 0);
     }
 

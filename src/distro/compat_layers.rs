@@ -16,11 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::format;
-
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;
@@ -296,20 +295,22 @@ pub enum KFilter {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KEvent {
-    pub ident: UPTR,     // File descriptor, process ID, or signal number
+    pub ident: uptr,     // File descriptor, process ID, or signal number
     pub filter: KFilter, // Event filter
     pub flags: u16,      // Event flags (e.g., EV_ADD, EV_DELETE, EV_ENABLE, EV_DISABLE)
     pub fflags: u32,     // Filter-specific flags
-    pub data: IPTR,      // Filter-specific data value
-    pub udata: UPTR,     // Opaque user-defined data
+    pub data: iptr,      // Filter-specific data value
+    pub udata: uptr,     // Opaque user-defined data
 }
 
-pub type UPTR = usize;
-pub type IPTR = isize;
+#[allow(non_camel_case_types)]
+pub type uptr = usize;
+#[allow(non_camel_case_types)]
+pub type iptr = isize;
 
 /// BSD kqueue event notifications manager
 pub struct KQueue {
-    pub registry: HashMap<(UPTR, KFilter), KEvent>,
+    pub registry: HashMap<(uptr, KFilter), KEvent>,
     pub active_events: Vec<KEvent>,
 }
 
@@ -328,7 +329,7 @@ impl KQueue {
     }
 
     /// Triggers a matched notification (used by kernel triggers like socket rx/tx or file modifications)
-    pub fn trigger_event(&mut self, ident: UPTR, filter: KFilter, data: IPTR) -> bool {
+    pub fn trigger_event(&mut self, ident: uptr, filter: KFilter, data: iptr) -> bool {
         let key = (ident, filter);
         if let Some(event) = self.registry.get(&key) {
             let mut active_event = *event;

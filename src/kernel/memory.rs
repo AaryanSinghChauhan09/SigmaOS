@@ -8,7 +8,25 @@ use alloc::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
+
+#[path = "memory/pmm_vmm.rs"]
+pub mod pmm_vmm;
+#[path = "memory/resource_allocator.rs"]
+pub mod resource_allocator;
+#[path = "memory/sigma_buddy.rs"]
+pub mod sigma_buddy;
+
+pub use pmm_vmm::*;
+pub use resource_allocator::{
+    ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,
+    PcieResourceAllocator, PcieResourceWindow, ResourceLimits, ResourceUsage,
+    SigmaResourceAllocatorHub, SlabObjectCacheAllocator, SlabSizeClass,
+};
+pub use sigma_buddy::*;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;

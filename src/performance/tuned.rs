@@ -2,7 +2,6 @@
 //! Adaptive ML tuning profiles, boot time performance analysis, and automated I/O/network optimization.
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -42,22 +41,36 @@ impl PerformanceTuner {
 
         match profile {
             TuningProfileKind::ThroughputPerformance => {
-                self.sysctl_optimizations.push(("kernel.sched_min_granularity_ns".to_string(), "10000000".to_string()));
-                self.sysctl_optimizations.push(("vm.dirty_ratio".to_string(), "40".to_string()));
+                self.sysctl_optimizations.push((
+                    "kernel.sched_min_granularity_ns".to_string(),
+                    "10000000".to_string(),
+                ));
+                self.sysctl_optimizations
+                    .push(("vm.dirty_ratio".to_string(), "40".to_string()));
             }
             TuningProfileKind::LatencyPerformance => {
-                self.sysctl_optimizations.push(("kernel.sched_min_granularity_ns".to_string(), "1000000".to_string()));
-                self.sysctl_optimizations.push(("net.core.busy_poll".to_string(), "50".to_string()));
+                self.sysctl_optimizations.push((
+                    "kernel.sched_min_granularity_ns".to_string(),
+                    "1000000".to_string(),
+                ));
+                self.sysctl_optimizations
+                    .push(("net.core.busy_poll".to_string(), "50".to_string()));
             }
             TuningProfileKind::Powersave => {
-                self.sysctl_optimizations.push(("vm.dirty_writeback_centisecs".to_string(), "1500".to_string()));
+                self.sysctl_optimizations.push((
+                    "vm.dirty_writeback_centisecs".to_string(),
+                    "1500".to_string(),
+                ));
             }
             TuningProfileKind::NetworkLatency => {
-                self.sysctl_optimizations.push(("net.ipv4.tcp_fastopen".to_string(), "3".to_string()));
-                self.sysctl_optimizations.push(("net.ipv4.tcp_low_latency".to_string(), "1".to_string()));
+                self.sysctl_optimizations
+                    .push(("net.ipv4.tcp_fastopen".to_string(), "3".to_string()));
+                self.sysctl_optimizations
+                    .push(("net.ipv4.tcp_low_latency".to_string(), "1".to_string()));
             }
             TuningProfileKind::VirtualHost => {
-                self.sysctl_optimizations.push(("vm.ksm_pages_to_scan".to_string(), "1000".to_string()));
+                self.sysctl_optimizations
+                    .push(("vm.ksm_pages_to_scan".to_string(), "1000".to_string()));
             }
         }
     }

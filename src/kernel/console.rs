@@ -4,8 +4,6 @@ use alloc::vec;
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-
-
 extern crate alloc;
 use alloc::string::String;
 use core::fmt::Write;
@@ -232,8 +230,7 @@ static mut GLOBAL_CONSOLE: Option<KernelConsole> = None;
 
 pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static str> {
     unsafe {
-        let console_ptr = &raw mut GLOBAL_CONSOLE;
-        if (*console_ptr).is_none() {
+        if (*(&raw const GLOBAL_CONSOLE)).is_none() {
             let mut console = KernelConsole::new();
             console.initialize(backend)?;
             *console_ptr = Some(console);

@@ -16,11 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
@@ -118,7 +118,10 @@ impl AutoInstallProvisioner {
     }
 
     /// Parses custom unattended Kickstart YAML profiles for automated deployments
-    pub fn load_profile_from_unattended_config(&mut self, config: &str) -> Result<(), &'static str> {
+    pub fn load_profile_from_unattended_config(
+        &mut self,
+        config: &str,
+    ) -> Result<(), &'static str> {
         if config.is_empty() {
             return Err("Empty configuration profile");
         }
@@ -153,7 +156,10 @@ impl AutoInstallProvisioner {
 
     /// Provision storage, format target partitions, and perform live system extraction
     pub fn execute_unattended_deployment(&mut self) -> Result<String, &'static str> {
-        let profile = self.active_profile.as_ref().ok_or("No active profile loaded")?;
+        let profile = self
+            .active_profile
+            .as_ref()
+            .ok_or("No active profile loaded")?;
         self.installation_completed = true;
         Ok(format!(
             "Deployment succeeded! Hostname: '{}', RootFS partitioned on '{}' using '{}' filesystem. Installed extra packages: {}.",
@@ -170,6 +176,66 @@ impl AutoInstallProvisioner {
 pub enum BootSlot {
     SlotA,
     SlotB,
+}
+
+/// Ubuntu `do-release-upgrade` Release Lifecycle Metadata
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReleaseLifecycleMeta {
+    pub codename: String,
+    pub release_version: String,
+    pub is_lts: bool,
+    pub end_of_life_unix_timestamp: u64,
+}
+
+impl ReleaseLifecycleMeta {
+    pub fn new(codename: &str, version: &str, is_lts: bool, eol_timestamp: u64) -> Self {
+        Self {
+            codename: codename.to_string(),
+            release_version: version.to_string(),
+            is_lts,
+            end_of_life_unix_timestamp: eol_timestamp,
+        }
+    }
+}
+
+/// Arch Linux Rolling Release Warning & News Notice
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RollingReleaseNewsNotice {
+    pub id: String,
+    pub title: String,
+    pub published_date: String,
+    pub requires_manual_intervention: bool,
+    pub advisory_text: String,
+}
+
+/// Fedora DNF System Upgrade Pre-Flight Diagnostic Checker
+pub struct UpgradePreflightCheck {
+    pub required_disk_space_bytes: u64,
+    pub available_disk_space_bytes: u64,
+    pub orphaned_packages: Vec<String>,
+}
+
+impl UpgradePreflightCheck {
+    pub fn new(required: u64, available: u64) -> Self {
+        Self {
+            required_disk_space_bytes: required,
+            available_disk_space_bytes: available,
+            orphaned_packages: Vec::new(),
+        }
+    }
+
+    pub fn is_upgrade_safe(&self) -> bool {
+        self.available_disk_space_bytes >= self.required_disk_space_bytes
+    }
+}
+
+/// FreeBSD `freebsd-update` Security Advisory & Patch Summary
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BsdSecurityAdvisorySummary {
+    pub advisory_id: String,
+    pub cve_list: Vec<String>,
+    pub affected_kernel_subsystems: Vec<String>,
+    pub requires_reboot: bool,
 }
 
 /// Transactional upgrade orchestrator managing zero-downtime hot reboots
@@ -550,7 +616,9 @@ mod tests {
         let mut provisioner = AutoInstallProvisioner::new();
         let profile_content = "hostname: sovereign-node\npartition: /dev/sda1\nfs_type: zfs\npackage: sigma-gcc\npackage: sigma-git";
 
-        provisioner.load_profile_from_unattended_config(profile_content).unwrap();
+        provisioner
+            .load_profile_from_unattended_config(profile_content)
+            .unwrap();
         let active = provisioner.active_profile.as_ref().unwrap();
         assert_eq!(active.hostname, "sovereign-node");
         assert_eq!(active.target_partition, "/dev/sda1");
@@ -575,5 +643,44 @@ mod tests {
         manager.commit_reboot_swap();
         assert_eq!(manager.current_active_slot, BootSlot::SlotB);
         assert!(!manager.is_staged_for_reboot);
+    }
+
+    #[test]
+    fn test_release_lifecycle_meta() {
+        let meta = ReleaseLifecycleMeta::new("noble", "24.04", true, 1871251200);
+        assert_eq!(meta.codename, "noble");
+        assert!(meta.is_lts);
+    }
+
+    #[test]
+    fn test_rolling_release_news_notice() {
+        let news = RollingReleaseNewsNotice {
+            id: "news_001".to_string(),
+            title: "GLIBC 2.38 Re-indexing Required".to_string(),
+            published_date: "2024-02-01".to_string(),
+            requires_manual_intervention: true,
+            advisory_text: "Run pacman -Syu --overwrite".to_string(),
+        };
+        assert!(news.requires_manual_intervention);
+    }
+
+    #[test]
+    fn test_upgrade_preflight_check() {
+        let check = UpgradePreflightCheck::new(10_000_000, 50_000_000);
+        assert!(check.is_upgrade_safe());
+
+        let check_fail = UpgradePreflightCheck::new(100_000_000, 50_000_000);
+        assert!(!check_fail.is_upgrade_safe());
+    }
+
+    #[test]
+    fn test_bsd_security_advisory_summary() {
+        let bsd = BsdSecurityAdvisorySummary {
+            advisory_id: "FreeBSD-SA-24:01.pf".to_string(),
+            cve_list: vec!["CVE-2024-1234".to_string()],
+            affected_kernel_subsystems: vec!["pf".to_string(), "netinet".to_string()],
+            requires_reboot: true,
+        };
+        assert!(bsd.requires_reboot);
     }
 }

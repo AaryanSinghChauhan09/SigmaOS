@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Atomic Bitmap, Atomic Integer & Async Procedure Call (APC) Subsystem for SigmaOS
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};

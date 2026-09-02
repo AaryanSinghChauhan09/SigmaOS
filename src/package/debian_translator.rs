@@ -3,11 +3,10 @@ extern crate alloc;
 // Sovereign Debian Package (.deb) Translation and Validation Engine for SigmaOS
 // Inspired by Debian dpkg and apt system, allowing native absorption of Debian control files and maintainer scripts.
 
-
+use crate::package::universal::{PackageFormat, PackageSource, UnifiedPackage};
 use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::string::ToString;
-use crate::package::universal::{UnifiedPackage, PackageFormat, PackageSource};
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DebianTranslatorError {
@@ -69,7 +68,10 @@ impl DebianPackageTranslator {
     }
 
     /// Parses and translates a raw Debian control file string (e.g. from DEBIAN/control)
-    pub fn parse_control_file(&self, control_content: &str) -> Result<DebianPackageMetadata, DebianTranslatorError> {
+    pub fn parse_control_file(
+        &self,
+        control_content: &str,
+    ) -> Result<DebianPackageMetadata, DebianTranslatorError> {
         let mut metadata = DebianPackageMetadata::new();
 
         for line in control_content.lines() {
@@ -107,7 +109,10 @@ impl DebianPackageTranslator {
         }
 
         // Validate required Debian fields
-        if metadata.package_name.is_empty() || metadata.version.is_empty() || metadata.architecture.is_empty() {
+        if metadata.package_name.is_empty()
+            || metadata.version.is_empty()
+            || metadata.architecture.is_empty()
+        {
             return Err(DebianTranslatorError::MissingRequiredField);
         }
 
@@ -155,7 +160,13 @@ impl DebianPackageTranslator {
             pkg = pkg.with_conflict(conflict.clone());
         }
 
-        pkg.source = PackageSource::Local { path: alloc::format!("/tmp/deb_absorb/{}_{}.deb", deb_meta.package_name, deb_meta.version) };
+        pkg.source = PackageSource::Local {
+            path: alloc::format!(
+                "/tmp/deb_absorb/{}_{}.deb",
+                deb_meta.package_name,
+                deb_meta.version
+            ),
+        };
         pkg
     }
 
@@ -224,7 +235,8 @@ mod tests {
                             /usr/bin/update-alternatives --install /usr/bin/write write /usr/bin/curl-write 50\n\
                             echo \"curl configured successfully\" > /var/log/curl_install.log\n";
 
-        let trigger = translator.translate_maintainer_script(DebianTriggerType::PostInst, raw_postinst);
+        let trigger =
+            translator.translate_maintainer_script(DebianTriggerType::PostInst, raw_postinst);
         assert_eq!(trigger.trigger_type, DebianTriggerType::PostInst);
         assert!(trigger.action_command.contains("/bin/update-alternatives"));
         assert!(trigger.action_command.contains("/log/curl_install.log"));

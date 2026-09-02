@@ -1,13 +1,13 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Gentoo Linux USE Flags Engine
 // Implements USE flag system for conditional compilation and feature selection
 
+use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::klib::collections::HashMap;
 
 /// USE flag definition
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -38,7 +38,7 @@ impl UseFlagManager {
             profiles: Vec::new(),
             current_profile: None,
         };
-        
+
         // Initialize common USE flags
         manager.initialize_common_flags();
         manager
@@ -115,17 +115,19 @@ impl UseFlagManager {
     /// Get effective flags for current profile
     pub fn get_effective_flags(&self) -> Vec<UseFlag> {
         let mut effective = Vec::new();
-        
+
         // Start with global flags
         for (_, flag) in &self.global_flags {
             effective.push(flag.clone());
         }
-        
+
         // Apply profile-specific overrides
         if let Some(profile_name) = &self.current_profile {
             if let Some(profile) = self.profiles.iter().find(|p| &p.name == profile_name) {
                 for profile_flag in &profile.flags {
-                    if let Some(global_flag) = effective.iter_mut().find(|f| f.name == profile_flag.name) {
+                    if let Some(global_flag) =
+                        effective.iter_mut().find(|f| f.name == profile_flag.name)
+                    {
                         global_flag.enabled = profile_flag.enabled;
                     } else {
                         effective.push(profile_flag.clone());
@@ -133,7 +135,7 @@ impl UseFlagManager {
                 }
             }
         }
-        
+
         effective
     }
 
@@ -145,10 +147,10 @@ impl UseFlagManager {
             } else {
                 (true, token)
             };
-            
+
             self.set_flag(flag_name, enabled)?;
         }
-        
+
         Ok(())
     }
 }
@@ -175,7 +177,7 @@ impl ConditionalDependency {
             let flag_name = condition.trim_end_matches('?');
             let negated = flag_name.starts_with('!');
             let actual_flag = if negated { &flag_name[1..] } else { flag_name };
-            
+
             if let Some(enabled) = use_manager.get_flag(actual_flag) {
                 negated != enabled
             } else {
@@ -194,10 +196,10 @@ mod tests {
     #[test]
     fn test_use_flag_manager() {
         let mut manager = UseFlagManager::new();
-        
+
         assert_eq!(manager.get_flag("X"), Some(true));
         assert_eq!(manager.get_flag("qt5"), Some(false));
-        
+
         manager.set_flag("gtk", false).unwrap();
         assert_eq!(manager.get_flag("gtk"), Some(false));
     }
@@ -206,7 +208,7 @@ mod tests {
     fn test_use_string_parsing() {
         let mut manager = UseFlagManager::new();
         manager.parse_use_string("X -gtk qt5").unwrap();
-        
+
         assert_eq!(manager.get_flag("X"), Some(true));
         assert_eq!(manager.get_flag("gtk"), Some(false));
         assert_eq!(manager.get_flag("qt5"), Some(true));
@@ -216,9 +218,9 @@ mod tests {
     fn test_conditional_dependency() {
         let mut manager = UseFlagManager::new();
         let dep = ConditionalDependency::new("x11-libs/libX11", Some("X?"));
-        
+
         assert!(dep.should_include(&manager));
-        
+
         manager.set_flag("X", false).unwrap();
         assert!(!dep.should_include(&manager));
     }
@@ -238,10 +240,10 @@ mod tests {
                 enabled: true,
             },
         ];
-        
+
         manager.create_profile("desktop", desktop_flags);
         manager.set_profile("desktop").unwrap();
-        
+
         let effective = manager.get_effective_flags();
         assert!(effective.iter().any(|f| f.name == "X" && f.enabled));
     }

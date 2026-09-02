@@ -1,9 +1,10 @@
 extern crate alloc;
 // OOP-based Native UI Toolkit for SigmaOS
-// Implements UI toolkit using OOP principles with traits and structs.
-
+// Implements GTK3/GTK4 inspired UI toolkit using OOP principles with traits, structs, and GLib-style signals.
 
 use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -21,6 +22,8 @@ pub enum WidgetType {
     ComboBox = 4,
     Slider = 5,
     Panel = 6,
+    HeaderBar = 7,
+    BoxContainer = 8,
 }
 
 /// Widget state
@@ -32,6 +35,26 @@ pub enum WidgetState {
     Pressed = 2,
     Disabled = 3,
     Hidden = 4,
+}
+
+/// GTK Orientation for layout containers (GtkBox / GtkGrid)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GtkOrientation {
+    Horizontal,
+    Vertical,
+}
+
+/// AT-SPI GTK Accessibility Roles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GtkAccessibilityRole {
+    Button,
+    Label,
+    Entry,
+    CheckBox,
+    HeaderBar,
+    Window,
+    Container,
+    Slider,
 }
 
 /// Widget trait (OOP interface)
@@ -62,6 +85,7 @@ pub enum UIError {
     RenderFailed = 1,
     InvalidState = 2,
     PermissionDenied = 3,
+    SignalError = 4,
 }
 
 /// Widget info
@@ -138,6 +162,8 @@ pub struct SimpleWidget {
     pub width: u32,
     pub height: u32,
     pub capability: WidgetCapability,
+    pub css_classes: Vec<String>,
+    pub accessibility_role: GtkAccessibilityRole,
 }
 
 impl SimpleWidget {
@@ -151,6 +177,16 @@ impl SimpleWidget {
         let label_len = label.len().min(127);
         label_array[..label_len].copy_from_slice(&label[..label_len]);
 
+        let role = match widget_type {
+            WidgetType::Button => GtkAccessibilityRole::Button,
+            WidgetType::Label => GtkAccessibilityRole::Label,
+            WidgetType::TextBox => GtkAccessibilityRole::Entry,
+            WidgetType::Checkbox => GtkAccessibilityRole::CheckBox,
+            WidgetType::HeaderBar => GtkAccessibilityRole::HeaderBar,
+            WidgetType::Slider => GtkAccessibilityRole::Slider,
+            _ => GtkAccessibilityRole::Container,
+        };
+
         SimpleWidget {
             id,
             widget_type,
@@ -161,6 +197,8 @@ impl SimpleWidget {
             width: 100,
             height: 30,
             capability,
+            css_classes: Vec::new(),
+            accessibility_role: role,
         }
     }
 
@@ -172,6 +210,20 @@ impl SimpleWidget {
     pub fn set_size(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
+    }
+
+    pub fn add_css_class(&mut self, class_name: &str) {
+        if !self.css_classes.iter().any(|c| c == class_name) {
+            self.css_classes.push(class_name.to_string());
+        }
+    }
+
+    pub fn remove_css_class(&mut self, class_name: &str) {
+        self.css_classes.retain(|c| c != class_name);
+    }
+
+    pub fn has_css_class(&self, class_name: &str) -> bool {
+        self.css_classes.iter().any(|c| c == class_name)
     }
 
     pub fn get_state(&self) -> WidgetState {
@@ -235,6 +287,212 @@ impl Widget for SimpleWidget {
     }
 }
 
+// ==========================================
+// GTK3 / GTK4 Client-Side Decoration (CSD) HeaderBar
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GtkHeaderBar {
+    pub id: WidgetID,
+    pub title: String,
+    pub subtitle: String,
+    pub show_close_button: bool,
+    pub show_minimize_button: bool,
+    pub show_maximize_button: bool,
+    pub start_widgets: Vec<WidgetID>,
+    pub end_widgets: Vec<WidgetID>,
+    pub custom_title_widget: Option<WidgetID>,
+}
+
+impl GtkHeaderBar {
+    pub fn new(id: WidgetID, title: &str, subtitle: &str) -> Self {
+        GtkHeaderBar {
+            id,
+            title: title.to_string(),
+            subtitle: subtitle.to_string(),
+            show_close_button: true,
+            show_minimize_button: true,
+            show_maximize_button: true,
+            start_widgets: Vec::new(),
+            end_widgets: Vec::new(),
+            custom_title_widget: None,
+        }
+    }
+
+    pub fn pack_start(&mut self, widget_id: WidgetID) {
+        self.start_widgets.push(widget_id);
+    }
+
+    pub fn pack_end(&mut self, widget_id: WidgetID) {
+        self.end_widgets.push(widget_id);
+    }
+
+    pub fn set_custom_title(&mut self, widget_id: Option<WidgetID>) {
+        self.custom_title_widget = widget_id;
+    }
+}
+
+// ==========================================
+// GTK Flex Box Container (GtkBox)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GtkBox {
+    pub id: WidgetID,
+    pub orientation: GtkOrientation,
+    pub spacing: u32,
+    pub homogeneous: bool,
+    pub packed_children: Vec<WidgetID>,
+}
+
+impl GtkBox {
+    pub fn new(id: WidgetID, orientation: GtkOrientation, spacing: u32) -> Self {
+        GtkBox {
+            id,
+            orientation,
+            spacing,
+            homogeneous: false,
+            packed_children: Vec::new(),
+        }
+    }
+
+    pub fn append(&mut self, widget_id: WidgetID) {
+        self.packed_children.push(widget_id);
+    }
+
+    pub fn remove(&mut self, widget_id: WidgetID) {
+        self.packed_children.retain(|&id| id != widget_id);
+    }
+}
+
+// ==========================================
+// GTK Style Context & CSS Styling Engine
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GtkStyleContext {
+    pub active_classes: Vec<String>,
+    pub theme_name: String,
+    pub dark_variant: bool,
+}
+
+impl GtkStyleContext {
+    pub fn new(theme_name: &str, dark_variant: bool) -> Self {
+        GtkStyleContext {
+            active_classes: Vec::new(),
+            theme_name: theme_name.to_string(),
+            dark_variant,
+        }
+    }
+
+    pub fn add_class(&mut self, class_name: &str) {
+        if !self.active_classes.iter().any(|c| c == class_name) {
+            self.active_classes.push(class_name.to_string());
+        }
+    }
+
+    pub fn remove_class(&mut self, class_name: &str) {
+        self.active_classes.retain(|c| c != class_name);
+    }
+
+    pub fn matches_selector(&self, selector: &str, state: WidgetState) -> bool {
+        if selector.starts_with('.') {
+            let class_target = &selector[1..];
+            if !self.active_classes.iter().any(|c| c == class_target) {
+                return false;
+            }
+        }
+        if selector.contains(":hover") && state != WidgetState::Hovered {
+            return false;
+        }
+        if selector.contains(":active") && state != WidgetState::Pressed {
+            return false;
+        }
+        if selector.contains(":disabled") && state != WidgetState::Disabled {
+            return false;
+        }
+        true
+    }
+}
+
+// ==========================================
+// GTK Signal & Event Routing Engine
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct GtkSignalEvent {
+    pub widget_id: WidgetID,
+    pub signal_name: String,
+    pub timestamp_ms: u64,
+}
+
+pub struct GtkSignalDispatcher {
+    pub pending_signals: Vec<GtkSignalEvent>,
+    pub handled_count: usize,
+}
+
+impl Default for GtkSignalDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl GtkSignalDispatcher {
+    pub fn new() -> Self {
+        GtkSignalDispatcher {
+            pending_signals: Vec::new(),
+            handled_count: 0,
+        }
+    }
+
+    pub fn emit_signal(&mut self, widget_id: WidgetID, signal_name: &str, timestamp_ms: u64) {
+        self.pending_signals.push(GtkSignalEvent {
+            widget_id,
+            signal_name: signal_name.to_string(),
+            timestamp_ms,
+        });
+    }
+
+    pub fn process_signals(&mut self, target_widget_id: WidgetID, signal_name: &str) -> usize {
+        let mut count = 0;
+        self.pending_signals.retain(|event| {
+            if event.widget_id == target_widget_id && event.signal_name == signal_name {
+                count += 1;
+                false
+            } else {
+                true
+            }
+        });
+        self.handled_count += count;
+        count
+    }
+}
+
+// ==========================================
+// GTK Display Metrics & HiDPI Scale Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct GtkDisplayMetrics {
+    pub screen_width: u32,
+    pub screen_height: u32,
+    pub scale_factor: u32, // 1 for normal, 2 for HiDPI 4K
+}
+
+impl GtkDisplayMetrics {
+    pub fn new(width: u32, height: u32, scale_factor: u32) -> Self {
+        GtkDisplayMetrics {
+            screen_width: width,
+            screen_height: height,
+            scale_factor: scale_factor.max(1),
+        }
+    }
+
+    pub fn scale_pixel_val(&self, px: u32) -> u32 {
+        px * self.scale_factor
+    }
+}
+
 /// UI layout trait (OOP interface)
 pub trait UILayout {
     /// Add widget
@@ -255,7 +513,7 @@ pub trait UILayout {
 pub struct LayoutStats {
     pub total_widgets: usize,
     pub visible_widgets: usize,
-    pub by_type: [usize; 7],
+    pub by_type: [usize; 9],
 }
 
 impl LayoutStats {
@@ -263,7 +521,7 @@ impl LayoutStats {
         LayoutStats {
             total_widgets: 0,
             visible_widgets: 0,
-            by_type: [0; 7],
+            by_type: [0; 9],
         }
     }
 }
@@ -280,6 +538,7 @@ pub struct SimpleUILayout {
     pub next_id: AtomicUsize,
     pub stats: LayoutStats,
     pub capability: LayoutCapability,
+    pub display_metrics: GtkDisplayMetrics,
 }
 
 /// Layout capability
@@ -322,7 +581,12 @@ impl SimpleUILayout {
             next_id: AtomicUsize::new(1),
             stats: LayoutStats::new(),
             capability,
+            display_metrics: GtkDisplayMetrics::new(1920, 1080, 1),
         }
+    }
+
+    pub fn set_display_metrics(&mut self, metrics: GtkDisplayMetrics) {
+        self.display_metrics = metrics;
     }
 }
 
@@ -337,7 +601,10 @@ impl UILayout for SimpleUILayout {
         self.widgets.push(Some(widget));
         self.stats.total_widgets += 1;
         self.stats.visible_widgets += 1;
-        self.stats.by_type[widget_type as usize] += 1;
+        let idx = widget_type as usize;
+        if idx < self.stats.by_type.len() {
+            self.stats.by_type[idx] += 1;
+        }
         Ok(id)
     }
 
@@ -363,7 +630,10 @@ impl UILayout for SimpleUILayout {
             self.widgets[i] = None;
             self.stats.total_widgets -= 1;
             self.stats.visible_widgets -= 1;
-            self.stats.by_type[widget_type as usize] -= 1;
+            let idx = widget_type as usize;
+            if idx < self.stats.by_type.len() {
+                self.stats.by_type[idx] -= 1;
+            }
             Ok(())
         } else {
             Err(UIError::InvalidState)
@@ -419,5 +689,47 @@ mod tests {
         let widget_ref = layout.get_widget(101).unwrap();
         assert_eq!(widget_ref.label(), b"Confirm");
         assert_eq!(widget_ref.state(), WidgetState::Normal);
+    }
+
+    #[test]
+    fn test_gtk_headerbar_csd() {
+        let mut headerbar = GtkHeaderBar::new(1, "Settings", "System Configuration");
+        headerbar.pack_start(10);
+        headerbar.pack_end(20);
+
+        assert_eq!(headerbar.title, "Settings");
+        assert_eq!(headerbar.subtitle, "System Configuration");
+        assert_eq!(headerbar.start_widgets, vec![10]);
+        assert_eq!(headerbar.end_widgets, vec![20]);
+    }
+
+    #[test]
+    fn test_gtk_box_container() {
+        let mut gtk_box = GtkBox::new(2, GtkOrientation::Vertical, 6);
+        gtk_box.append(100);
+        gtk_box.append(101);
+
+        assert_eq!(gtk_box.orientation, GtkOrientation::Vertical);
+        assert_eq!(gtk_box.spacing, 6);
+        assert_eq!(gtk_box.packed_children.len(), 2);
+
+        gtk_box.remove(100);
+        assert_eq!(gtk_box.packed_children, vec![101]);
+    }
+
+    #[test]
+    fn test_gtk_style_context_and_signals() {
+        let mut style = GtkStyleContext::new("Adwaita-Dark", true);
+        style.add_class("suggested-action");
+
+        assert!(style.matches_selector(".suggested-action", WidgetState::Normal));
+        assert!(style.matches_selector(":hover", WidgetState::Hovered));
+
+        let mut dispatcher = GtkSignalDispatcher::new();
+        dispatcher.emit_signal(101, "clicked", 1000);
+        dispatcher.emit_signal(101, "clicked", 1005);
+
+        let handled = dispatcher.process_signals(101, "clicked");
+        assert_eq!(handled, 2);
     }
 }

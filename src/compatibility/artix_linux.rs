@@ -4,8 +4,8 @@ extern crate alloc;
 // Implements OpenRC, Runit, and S6 init systems (systemd-free Arch Linux fork)
 
 use crate::klib::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. PACMAN PACKAGE MANAGER (Arch-compatible)
@@ -157,8 +157,9 @@ impl ArtixPacman {
 
         for (name, installed_pkg) in &self.installed {
             if let Some(available_pkg) = self.available.get(name) {
-                if available_pkg.version != installed_pkg.version || 
-                   available_pkg.release != installed_pkg.release {
+                if available_pkg.version != installed_pkg.version
+                    || available_pkg.release != installed_pkg.release
+                {
                     to_upgrade.push(name.clone());
                 }
             }
@@ -271,7 +272,12 @@ impl OpenRCInit {
         }
     }
 
-    pub fn rc_update(&mut self, service: &str, runlevel: &str, operation: &str) -> Result<(), &'static str> {
+    pub fn rc_update(
+        &mut self,
+        service: &str,
+        runlevel: &str,
+        operation: &str,
+    ) -> Result<(), &'static str> {
         if let Some(svc) = self.services.get_mut(service) {
             match operation {
                 "add" => {

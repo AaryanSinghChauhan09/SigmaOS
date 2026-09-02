@@ -9,9 +9,17 @@ pub mod rfc;
 pub mod strategic_vision;
 
 pub use okr::*;
+pub use strategic_vision::{
+    AdaptiveWorkloadType, CommunityPackageAuditRecord, ComplianceAuditVerdict,
+    RegulatedIndustryFramework, StrategicDifferentiationEngine, VisualDashboardOverlay,
+    VisualOverlayKind,
+};
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
+};
+pub use strategic_vision::{
+    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
 };
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};

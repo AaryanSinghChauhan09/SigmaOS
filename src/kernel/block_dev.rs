@@ -17,16 +17,14 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use alloc::boxed::Box;
 
-
 extern crate alloc;
-use alloc::string::{String, ToString};
 use crate::klib::{BTreeMap, Vec, VecDeque};
+use alloc::string::{String, ToString};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
-
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
@@ -334,9 +332,18 @@ mod tests {
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
+                                                        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
         let mut write_data = vec![0u8; 512];
         crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_data);
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         rd.write_sectors(0, &write_data).unwrap();
         let mut read_buf = vec![0u8; 512];
         rd.read_sectors(0, &mut read_buf).unwrap();
@@ -375,6 +382,15 @@ mod tests {
         for b in write_bytes.iter() {
             write_data.push(*b);
         }
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
+            .as_nanos()
+            .to_le_bytes()
+            .iter()
+            .cycle()
+            .take(512)
+            .copied()
+            .collect();
         let write_bio = Bio::write(bio_id, 10, write_data);
         mgr.submit_bio(write_bio);
         let processed = mgr.process_pending();

@@ -9,6 +9,27 @@ use alloc::vec::Vec;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
 #[path = "../src/kernel/scheduler.rs"]
 mod scheduler;
 

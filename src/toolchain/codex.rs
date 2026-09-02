@@ -2,8 +2,8 @@
 // Formulates compiler build codex logs for legacy reproducible tooling
 
 extern crate alloc;
-use alloc::string::{String, ToString};
 use crate::klib::collections::HashMap;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {

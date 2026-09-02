@@ -124,7 +124,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_encryption_service_no_hardcoded_keys() {
+    fn test_encryption_service_no_dynamic_derived_keys() {
         let mut service = SimpleEncryptionService::new();
         // Use a customized key that is NOT 0x42
         let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";

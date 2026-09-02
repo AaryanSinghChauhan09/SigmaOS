@@ -1,10 +1,15 @@
 // SigmaOS Network Stack Module
-pub mod commands;
+pub mod discovery;
 pub mod ring_buffer_stack;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod wireless_manager;
+
+pub use discovery::{
+    DiscoveredNetworkService, DiscoveryProtocolType, Icmpv6NdpEntry, LlmnrNbnsResolver,
+    NetworkDevicePeer, SovereignNetworkDiscoveryEngine, SsdpDiscoveryPacket,
+};
 
 pub use ring_buffer_stack::{
     compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,
@@ -17,9 +22,4 @@ pub use sovereign_remote_sharing::{
     SshCertificate, SshMatchRule, SshMultiplexControlMaster,
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use commands::{
-    FirewallAction, FirewallCommand, FirewallFilterRule, GLOBAL_FIREWALL,
-    GLOBAL_UFW_RULE, IpRoute2Command, LinkState, PingCommand, SocketStatsCommand, SocketStatsEntry,
-    UfwDefaultRule,
-};
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};

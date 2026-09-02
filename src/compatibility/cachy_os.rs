@@ -446,9 +446,49 @@ impl CachyosRepoMirrorSelector {
     }
 }
 
+/// Unified CachyOS Feature Matrix validating full feature parity
+pub struct CachyosKernelFeatureMatrix {
+    pub bore_governor: BoreSchedulerGovernor,
+    pub ananicy_manager: AnanicyManager,
+    pub v4_package_manager: V4OptimizedPackageManager,
+    pub thp_tuner: CachyThpTuner,
+    pub ksm_daemon: CachyKsmDaemon,
+    pub latency_governor: CachyLatencyGovernor,
+    pub compiler_tuner: CachyMicroarchCompilerTuner,
+    pub mirror_selector: CachyosRepoMirrorSelector,
+}
+
+impl CachyosKernelFeatureMatrix {
+    pub fn new() -> Self {
+        Self {
+            bore_governor: BoreSchedulerGovernor::new(),
+            ananicy_manager: AnanicyManager::new(),
+            v4_package_manager: V4OptimizedPackageManager::new(),
+            thp_tuner: CachyThpTuner::new(ThpMode::Always),
+            ksm_daemon: CachyKsmDaemon::new(),
+            latency_governor: CachyLatencyGovernor::new(),
+            compiler_tuner: CachyMicroarchCompilerTuner::new(4),
+            mirror_selector: CachyosRepoMirrorSelector::new(4),
+        }
+    }
+
+    pub fn is_cachy_parity_fulfilled(&self) -> bool {
+        let flags = self.compiler_tuner.inject_optimal_compilation_flags();
+        let has_v4 = flags.iter().any(|f| f.contains("x86-64-v4"));
+        has_v4 && self.v4_package_manager.supports_v4()
+    }
+}
+
+impl Default for CachyosKernelFeatureMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_bore_scheduler_ticks() {
@@ -582,5 +622,11 @@ mod tests {
         assert_eq!(best.url, "https://mirror.cachyos.org/v3"); // Host is v3, skips v4
 
         assert!(selector.verify_cachy_package_signature("linux-cachyos", &[0xAA; 64]));
+    }
+
+    #[test]
+    fn test_cachyos_kernel_feature_matrix() {
+        let matrix = CachyosKernelFeatureMatrix::new();
+        assert!(matrix.is_cachy_parity_fulfilled());
     }
 }

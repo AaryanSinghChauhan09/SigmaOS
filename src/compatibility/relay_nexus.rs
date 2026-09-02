@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 /// Relay-and-Nexus Subsystems for SigmaOS
 /// Implements KernelRelay, SyscallEncyclopedia, DriverVaultV2, FirmwareNexus,
 /// BuildChronicle, SecurityNexus, and PeripheralArchiveV2.

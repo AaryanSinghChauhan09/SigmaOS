@@ -1,0 +1,54 @@
+name: PR Fast Checks
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  fast-checks:
+    name: Fast PR Validation & Standalone Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check Formatting (rustfmt)
+        run: cargo fmt -- --check || true
+
+      - name: Run Clippy Lints
+        run: cargo clippy || true
+
+      - name: Run no_std Enforcement Check
+        run: |
+          chmod +x ./scripts/no_std_check.sh
+          ./scripts/no_std_check.sh
+
+      - name: Run Standalone Package Innovations Tests
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/package/bsd_linux_package_innovations.rs -o build/innovations_test
+          ./build/innovations_test
+
+      - name: Run Reproducible Package Engine Tests
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 tools/sigma_reproducible_package_engine.rs -o build/repro_engine_test
+          ./build/repro_engine_test
+
+      - name: Run Standalone File Tests for Modified Files
+        run: |
+          chmod +x ./scripts/changed_files_rustc_tests.sh
+          ./scripts/changed_files_rustc_tests.sh

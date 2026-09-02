@@ -94,22 +94,47 @@ mod tests {
         assert_eq!(sched.read_ahead_kb, 128);
 
         // Submit sequential reads
-        let req1 = IORequest { sector: 0, length_sectors: 8, is_write: false, timestamp_ms: 100 };
+        let req1 = IORequest {
+            sector: 0,
+            length_sectors: 8,
+            is_write: false,
+            timestamp_ms: 100,
+        };
         sched.record_io_request(&req1); // last_sector becomes 8
 
-        let req2 = IORequest { sector: 8, length_sectors: 8, is_write: false, timestamp_ms: 105 };
+        let req2 = IORequest {
+            sector: 8,
+            length_sectors: 8,
+            is_write: false,
+            timestamp_ms: 105,
+        };
         sched.record_io_request(&req2); // last_sector becomes 16
 
-        let req3 = IORequest { sector: 16, length_sectors: 8, is_write: false, timestamp_ms: 110 };
+        let req3 = IORequest {
+            sector: 16,
+            length_sectors: 8,
+            is_write: false,
+            timestamp_ms: 110,
+        };
         sched.record_io_request(&req3); // sequential strike!
 
-        let req4 = IORequest { sector: 24, length_sectors: 8, is_write: false, timestamp_ms: 115 };
+        let req4 = IORequest {
+            sector: 24,
+            length_sectors: 8,
+            is_write: false,
+            timestamp_ms: 115,
+        };
         sched.record_io_request(&req4); // sequential strike 2!
 
         assert!(sched.read_ahead_kb > 128);
 
         // Submit random read
-        let random_req = IORequest { sector: 5000, length_sectors: 8, is_write: false, timestamp_ms: 120 };
+        let random_req = IORequest {
+            sector: 5000,
+            length_sectors: 8,
+            is_write: false,
+            timestamp_ms: 120,
+        };
         sched.record_io_request(&random_req);
         assert_eq!(sched.read_ahead_kb, 128); // backing off
     }

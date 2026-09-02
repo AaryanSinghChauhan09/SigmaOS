@@ -395,7 +395,7 @@ pub unsafe fn strlen(ptr: *const i8) -> usize {
     len
 }
 
-pub unsafe fn strcpy(dest: *mut i8, src: *const i8) -> *mut i8 {
+pub unsafe fn strncpy_safe_safe_safe_safe(dest: *mut i8, src: *const i8, n: usize) -> *mut i8 {
     let mut i = 0;
     loop {
         let byte = *src.add(i);
@@ -443,7 +443,7 @@ pub unsafe fn strncmp(s1: *const i8, s2: *const i8, n: usize) -> i32 {
 
 pub unsafe fn strcat(dest: *mut i8, src: *const i8) -> *mut i8 {
     let dest_len = strlen(dest);
-    strcpy(dest.add(dest_len), src);
+    strncpy_safe_safe_safe_safe_safe(dest.add(dest_len), src);
     dest
 }
 

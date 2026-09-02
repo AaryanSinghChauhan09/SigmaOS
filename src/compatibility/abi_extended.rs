@@ -1,6 +1,7 @@
+extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Extended Application Binary Interface (ABI) Calling Conventions & Relocation for SigmaOS
 
 /// Target Application Binary Interface Type
@@ -10,6 +11,45 @@ pub enum TargetAbiConvention {
     WindowsX64,
     Arm64Aapcs,
     Riscv64G,
+    LinuxVdsoFastSyscall,
+    BsdSyscallAbi,
+}
+
+/// Linux ELF Auxiliary Vector (auxv) Entry for ABI initialization
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ElfAuxVectorEntry {
+    pub a_type: u64,
+    pub a_val: u64,
+}
+
+/// Linux vDSO (Virtual Dynamic Shared Object) Fast Syscall Table Map
+#[derive(Debug, Clone)]
+pub struct LinuxVdsoTableMap {
+    pub clock_gettime_addr: u64,
+    pub gettimeofday_addr: u64,
+    pub time_addr: u64,
+    pub getcpu_addr: u64,
+}
+
+impl LinuxVdsoTableMap {
+    pub fn default_x86_64() -> Self {
+        Self {
+            clock_gettime_addr: 0x7fff_ffff_f000,
+            gettimeofday_addr: 0x7fff_ffff_f200,
+            time_addr: 0x7fff_ffff_f400,
+            getcpu_addr: 0x7fff_ffff_f600,
+        }
+    }
+
+    pub fn resolve_fast_syscall(&self, symbol: &str) -> Option<u64> {
+        match symbol {
+            "clock_gettime" | "__vdso_clock_gettime" => Some(self.clock_gettime_addr),
+            "gettimeofday" | "__vdso_gettimeofday" => Some(self.gettimeofday_addr),
+            "time" | "__vdso_time" => Some(self.time_addr),
+            "getcpu" | "__vdso_getcpu" => Some(self.getcpu_addr),
+            _ => None,
+        }
+    }
 }
 
 /// System V AMD64 ABI Execution Frame Layout

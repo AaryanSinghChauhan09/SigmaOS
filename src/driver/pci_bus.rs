@@ -3,7 +3,6 @@ extern crate alloc;
 // Clean-room implementation taking inspiration from Linux (pci-sysfs, ECAM, BAR allocation, MSI/MSI-X, PCIe AER, PCIe ASPM)
 // and BSD distributions (FreeBSD devctl/pci ioctls, OpenBSD autoconf PCI matching).
 
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

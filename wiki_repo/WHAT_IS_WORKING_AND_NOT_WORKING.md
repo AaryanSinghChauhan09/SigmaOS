@@ -1,412 +1,354 @@
-# WHAT'S WORKING & WHAT'S NOT WORKING IN SIGMAOS: AI AGENT ALGORITHM DIAGNOSTICS & FIX GUIDE
-
-This document serves as the master, definitive diagnostic guide for SigmaOS. It provides a comprehensive, technical inventory of all working OS subsystems, cataloged failure modes, compiler error codes, root-cause analyses, and concrete safe Rust algorithm fix blueprints so that **any AI agent can easily inspect, diagnose, and fix algorithms and compilation errors across the codebase**.
-
----
-
-## SECTION 1: WHAT IS WORKING
-
-SigmaOS features a zero-dependency, modular microkernel and OS suite written in safe Rust. Running `./run_sigma_tests.sh` executes the master atomic test suite and subsystem inspection harness with a **100% pass rate on all atomic and inspection test suites (437+ unit tests and 40+ atomic tests pass cleanly)**.
-
-### 1. Core Microkernel & Scheduling Algorithms (`src/kernel/`, `src/scheduler/`)
-- **EEVDF Scheduler (`src/kernel/scheduler.rs` & `src/scheduler/eevdf.rs`):** Linux 6.6+ Earliest Eligible Virtual Deadline First algorithm implementing lag tracking (`lag = vruntime_avg - task_vruntime`), weighted deadline calculation (`vruntime + time_slice * 1024 / weight`), eligibility checks (`task_vruntime <= vruntime_avg`), 64-byte cache-line aligned task picking, and NUMA-aware work-stealing queues.
-- **BORE Interactive Scheduler (`src/kernel/bore.rs`):** CachyOS Burst-Oriented Response Enhancer algorithm tracking burst vs. sleep history windows, calculating dynamic interactivity scores (0 = CPU-bound, 100 = interactive UI task), and evaluating SMP migration candidates.
-- **Classic OS Algorithms (`src/kernel/classic_os.rs`):**
-  - `VirtioBalloonManager`: Dynamic VirtIO memory balloon inflation/deflation with page reclamation.
-  - `BankersAlgorithm`: Safe state checking and resource allocation matrix validation for deadlock avoidance.
-  - `SleepingBarberQueue`: Thread-safe synchronization primitive for capacity-constrained barber queue problems.
-  - `TicketSpinlock`: Fair FIFO ticket spinlock with atomic `fetch_add` ticket generation and exponential backoff spin loops.
-  - `StackCanaryProtector`: XOR-seeded global stack canary for buffer overflow protection.
-  - `BatchSystemQueue`: Multiprogrammed batch job queue processor with concurrency limits.
-- **Real-Time Scheduling (`src/kernel/structures.rs`):** Earliest Deadline First (EDF) real-time task scheduler, Lottery scheduling with probability-weighted ticket distribution, and APC (Asynchronous Procedure Call) queue delivery.
-- **Process Management & PID Allocator (`src/process/sovereign_process_engine.rs`):** FreeBSD PID bitmap recycling, Linux PID namespace isolation, and parent/child process tree tracking with process descriptor handle support (`pdfork`).
-
-### 2. Hardware Abstraction Layer (HAL) & Memory Subsystem (`src/klib/`, `src/kernel/`)
-- **Paging & Virtual Memory (`src/klib/paging.rs`):** 4-level x86_64 page table mapping (`Standard4KB`, `Huge2MB`, `Giant1GB`), safe `.get_mut()` option chaining (panic-free boundary checking), and Copy-on-Write (CoW) page table snapping.
-- **HAL Multi-Arch Abstraction (`src/kernel/architecture.rs`):** Unified architecture interface supporting x86_64 (APIC/IOAPIC, CR0/CR4/EFER registers), AArch64 (GICv2/v3, TTBR page tables), and RISC-V 64 (PLIC/CLINT, satp S-mode paging).
-- **PCI/PCIe Bus Scanner (`src/kernel/pci_scanner.rs`):** PCIe ECAM memory-mapped configuration space addressing, 32-bit/64-bit MMIO & I/O BAR decoding, prefetchable memory flags, and Capabilities pointer parsing (MSI, MSI-X, PCIe, Power Management).
-- **Environment & XDG Spec Engine (`src/klib/env.rs`):** Linux XDG base directory specification (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME`, `XDG_RUNTIME_DIR`), POSIX/BSD defaults (`PATH`, `HOME`, `SHELL`, `PAGER`, `EDITOR`), OpenBSD `secure_getenv` privilege tainting, and dynamic variable expansion (`expand_vars`).
-- **Sysctl Parameter Registry (`src/kernel/sysctl.rs`):** Dynamic MIB parameter tree hierarchy with integer range bounds checking and net/vm parameter querying.
-
-### 3. Linux & BSD Parity Layers (`src/compatibility/`, `src/distro/`, `src/sigpkg/`)
-- **Distro Parity Subsystems (`src/distro/linux_bsd_parity.rs`):**
-  - FreeBSD Capsicum fine-grained file rights (`CapsicumRights`) & FreeBSD Jails VNET network namespace isolation.
-  - OpenBSD Pledge/Unveil path restriction virtualizers (`UnveilRestrictions`).
-  - Arch Linux AUR PKGBUILD verification (`AurPkgBuildVerifier`).
-  - NixOS Flake Engine declarative generation rollback & garbage collection.
-  - Void Linux Runit Supervisor service restarting and status querying.
-  - Gentoo Portage USE-flag dependency resolution engine & mask verifier.
-- **Linux Mint Compatibility (`src/compatibility/mint_linux.rs`):** `CinnamonDesktopEngine`, `MintUpdateManager`, `MintInstallSoftwareManager`, and `MintWarpinatorEngine` for local network file transfers.
-- **Extended ABI Execution Frame (`src/compatibility/abi_extended.rs`):** ARM64 AAPCS calling convention (`Arm64AapcsFrame`) and RISC-V 64-bit calling convention (`Riscv64AbiFrame`) translating ABI register frames.
-- **Universal Package Engine (`src/sigpkg/universal_engine.rs`, `src/sigpkg/universal_adapter.rs`):** Multi-format package parser identifying and adapting 25+ Linux/BSD package formats (.deb, .rpm, pacman, Flatpak, Snap, AppImage, .apk, .nixpkg, .ebuild, .ports, etc.).
-
-### 4. Storage & Filesystem Subsystems (`src/fs/`, `src/filesystem/`)
-- **Ext4 Filesystem Engine (`src/filesystem/complete_filesystems.rs`):** Extent tree block allocation, JBD2 metadata journaling, and CRC32C checksum validation.
-- **Btrfs Subvolume Engine (`src/fs/btrfs.rs`):** Copy-on-Write (CoW) snapshotting, async TRIM/discard, subvolume property inheritance, and incremental send/receive streams.
-- **DragonFly BSD HAMMER2 PFS Engine (`src/unimplemented_features.rs`):** Cluster node replication, snapshot generation, and Merkle tree root rollback.
-- **Zero-Copy IPC Pipes (`src/kernel/pipes.rs`):** Page buffer ring `splice` zero-copy transfer and `tee` pipe duplication.
-- **FHS & Hier Path Translator (`src/filesystem/bsd_linux_innovations.rs`):** Linux FHS 3.0 merged-usr path resolution (`/bin` -> `/usr/bin`, `/lib` -> `/usr/lib`) and FreeBSD hier(7) `/usr/local` translation.
-
-### 5. Cryptography & Security (`src/crypto/`, `src/security/`)
-- **Post-Quantum Cryptography (`src/crypto/`):** Dilithium-5 digital attestation signatures and Kyber-1024 key encapsulation mechanism.
-- **CSPRNG Entropy Engine (`src/crypto/random.rs`):** Hardware RDRAND/RDTSC entropy seeding mixed into ASLR pointer space.
-- **FreeBSD Securelevels & Jails (`src/security/securelevels.rs`, `src/security/jails.rs`):** System securelevels (-1 to 3) enforcing append-only files and immutable sysctls.
-- **Root Elevator & PAM Stack (`src/security/root_improvement.rs`):** Sudo/Doas privilege elevator with session TTL expiration, Polkit role-based permission checks, and PAM multi-factor authentication token validation.
-- **eBPF Engine & Landlock VFS (`src/kernel/ebpf.rs` & `src/kernel/linux_bsd_innovations.rs`):** In-kernel eBPF static instruction verifier, division-by-zero checks, and Landlock access path restrictions.
-
-### 6. Networking, Remote Sharing & Container Isolation (`src/network/`, `src/virt/`)
-- **Remote Protocol Suite (`src/network/sovereign_remote_sharing.rs`):**
-  - `SovereignSshEngine`: SSHv2 key exchange, session authentication, and encrypted tunnel establishment.
-  - `SovereignNfsEngine`: NFSv4 file handle lookup, rpcbind RPC registration, and remote file read/write operations.
-  - `SovereignSambaEngine`: SMB3 dialect negotiation, tree connect, and share access.
-  - `SovereignScpEngine` & `SovereignRsyncEngine`: Remote copy and delta file transfer synchronization.
-- **QEMU & KVM Virtual Machine Manager (`src/virt/mod.rs` & `src/virtualization/kvm_vcpu.rs`):** Qcow2 copy-on-write image overlays, KVM vCPU execution context (`KvmVcpuContext`), VFIO IOMMU PCI device passthrough, and VirtIO split ring buffers (`VirtqueueRing`).
-- **Sovereign OCI Container Runtime:** Isolated process namespaces, cgroup resource constraints, and layer image mounting.
+# SovereignOS / SigmaOS - Master AI Agent Algorithm Diagnostics & Fix Guide
+> **Document Purpose**: Complete operational status, compiler error catalog, root cause analysis, and production-grade Safe Rust fix blueprints for AI agents working on SigmaOS / SovereignOS.
 
 ---
 
-## SECTION 2: WHAT IS NOT WORKING, WHY & HOW TO FIX IT
+## Executive Summary & Architecture Overview
 
-Below is the exhaustive technical catalog of compilation errors, borrow checker conflicts, and scope resolution issues encountered in submodules or test suites, along with exact root-cause analyses and safe Rust fix blueprints.
+SigmaOS (SovereignOS) is a high-performance, quantum-resistant, multi-paradigm operating system built in safe Rust. It combines Linux and BSD distro innovations with native system shards (`S-SHARDS`), zero-copy IPC, post-quantum security (Kyber-1024, Dilithium-5), and a multi-format universal package translation engine.
+
+This document serves as the master guide for human engineers and AI agents to understand what subsystems are working, what diagnostic compiler errors occur, why they occur, and exact code blueprints on how to fix them efficiently.
 
 ---
 
-### Issue 1: Unresolved Imports & Crate/Module Paths (`E0432` / `E0433` / `E0252` / `E0428`)
+## 1. WHAT IS WORKING (Fully Operational Subsystems)
 
-#### **Symptom / Compiler Output:**
-```text
-error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
- --> tests/../src/klib/string.rs:3:5
-  |
-3 | use alloc::string::{String, ToString};
-  |     ^^^^^ use of unresolved module or unlinked crate `alloc`
+### 1.1 Kernel Syscalls & VFS Sharding
+* **File Operations**: `sigma_open()`, `sigma_read()`, `sigma_write()` with verified file descriptor allocation and byte-transfer integrity.
+* **Zero-Copy Memory**: `sigma_mmap()` allocates zero-copy process memory shards with isolated address spaces.
+* **Process Management**: `sigma_fork()` spawns isolated process shards with independent capability masks.
+* **SemanticFS**: Native vector embedding insertion, top-k vector similarity ranking, and persistent metadata integrity verification.
 
-error[E0432]: unresolved import `package_repository`
-   --> tests/linux_bsd_inspection_tests.rs:293:9
-    |
-293 |     use package_repository::SovereignPackageRepositoryManager;
-    |         ^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `package_repository`
-```
+### 1.2 Driver Management & Dynamic Kernel Registry
+* **Dependency Resolver**: `DriverManager` automatically resolves driver dependency chains (e.g., auto-loading `pci_core` -> `snd` -> `snd_hda_codec` -> `snd_hda_intel`).
+* **Post-Quantum Driver Verification**: Every kernel module is verified using Dilithium-5 post-quantum digital signatures prior to non-paged pool execution.
+* **PCI Bus Auto-Detection**: Integrated `udev` PCI scanner auto-detects hardware (e.g., NVIDIA GPUs, Intel HDA) and binds corresponding drivers.
+* **Lockdown Unsigned Sandbox**: Unsigned/third-party driver modules (e.g. forensic/IoT `snd_dummy`) run under restricted DMA privileges in Lockdown Mode.
+* **DKMS Kernel ABI Auto-Rebuild**: Dynamic Kernel Module System auto-detects kernel ABI shifts (e.g. 6.7-sigma to 6.8-sigma) and triggers isolated container rebuilds.
 
-#### **Why It Occurs:**
-1. Standalone test files compiled via `rustc --test` do not automatically inherit `#![no_std]` or `extern crate alloc;` declarations unless explicitly defined in the file header or root module.
-2. Direct un-namespaced module references (e.g. `use package_repository::*;`) fail when compiled without full crate path qualifications (`crate::sigpkg::package_repository`).
+### 1.3 Post-Quantum Security & Isolation Framework
+* **Mandatory Access Control (MAC)**: Dual-label enforcement (`sigma_mac_enforce`) granting/denying actions based on binary security tags extracted from ELF binaries.
+* **FreeBSD-Style Jails**: VFS root pivot and network stack isolation to localhost loopback devices via `sigma_jail_create()`.
+* **SigmaShield Packet Filtering**: Deep packet inspection blocking spoofed IP addresses while passing Kyber/Dilithium mesh-signed traffic.
+* **Cryptography Engine**: Native Kyber-1024 keypair encapsulation and Dilithium-5 post-quantum digital signature generation/verification.
 
-#### **How to Fix It (Blueprint):**
+### 1.4 Native Networking & Sovereign Mesh
+* **IPv6 Dual-Stack Core**: Native IPv6 dual-stack stack initialization and packet routing.
+* **NDP Discovery**: Router Solicitation broadcast emission and neighbor table updates.
+* **Kyber Mesh Router**: Decentralized peer-to-peer route announcement with full payload encryption using Kyber-1024 keys.
+
+### 1.5 OCI Container Sharding
+* **OCI Shard Allocation**: Creation of isolated process shards from standard OCI container bundle specifications.
+* **Container Lifecycle**: Full entrypoint execution, state querying (returning OCI-compliant state JSON), and graceful SIGTERM process termination.
+
+### 1.6 Zenith GUI Desktop Compositor
+* **Widget Allocation & Rendering**: Native `zenith_create_button()` allocation and GPU draw call dispatching via `zenith_draw_rect()`.
+* **Zero-Reboot L10n**: Hot-swappable UI localization (`sigma_l10n_set_locale()`) with dynamic string table lookup without restarting desktop sessions.
+
+### 1.7 Universal Package Engine & Distro Parity
+* **Format Adaptation**: Native adaptation and cross-translation of 25+ foreign package formats (.deb, .rpm, PKGBUILD/AUR, .apk, .ebuild, .ports, Flatpak, AppImage, Snap, .nixpkg).
+* **Distro Parity Innovations**: Functional implementations of Arch Pacman/AUR, Gentoo Portage, Fedora OSTree/SELinux, Void Runit, NixOS Flakes, Mint Tweak Engine, FreeBSD Jails, OpenBSD Pledge/Unveil, Bedrock Linux Strata Engine, and SmartOS Zone Engine.
+
+---
+
+## 2. WHAT IS NOT WORKING & WHY (Diagnostic Error Matrix)
+
+When building or extending algorithms in SigmaOS, AI agents may encounter standard Rust compiler error codes (`rustc`). Below is the diagnostic matrix detailing exact error codes, symptoms, and underlying root causes.
+
+| Error Code | Rustc Message / Symptom | Root Cause Analysis |
+| :--- | :--- | :--- |
+| **E0004** | `non-exhaustive patterns: ... not covered` | Match block on enums (e.g. `PackageFormat`, `HandoffProtocol`) missing newly added enum variants. |
+| **E0034** | `multiple matching items found` | Duplicate method implementations inside `impl` blocks (e.g. multiple `select_next_rt_task` methods in scheduler impls). |
+| **E0119** | `conflicting implementations of trait` | Implementing standard library traits for types where orphan rules or existing blanket impls collide in `#![no_std]` context. |
+| **E0252** / **E0255** | `the name ... is defined multiple times` | Re-declaration or conflicting imports of core primitive types (`Vec`, `String`, `HashMap`) across `alloc` and `klib` submodules. |
+| **E0277** | `the trait bound ... is not satisfied` | Missing required traits (`Clone`, `Copy`, `Send`, `Sync`, `Default`, `PartialEq`) on custom structs or primitive slice vs `Vec` type mismatches. |
+| **E0282** | `type annotations needed` | Type inference failure in generic collection lookup or iterator chaining (`map.get()`, `collect()`). |
+| **E0382** | `use of moved value` | Value moved into struct field or closure without implementing `Copy` or calling `.clone()` (e.g., `NvidiaPrimeProfile`). |
+| **E0428** | `a type named ... has already been defined` | Duplicate struct/enum declarations within the same module scope or imported via `use super::*`. |
+| **E0433** | `failed to resolve: use of undeclared type` | Missing struct/engine definition or missing module import in `src/unimplemented_features.rs` or `src/lib.rs`. |
+| **E0502** | `cannot borrow ... as mutable because it is also borrowed as immutable` | Holding an immutable reference across a closure or loop while attempting a mutable borrow on the same struct. |
+| **E0512** | `cannot transmute between types of different sizes` | Attempting `core::mem::transmute` between raw kernel structures or pointer types of mismatched byte widths (e.g. transmuting `usize` to 32-bit enum). |
+| **E0599** | `no method named ... found for type` | Custom collection types (e.g., `klib::Vec<T>`) lacking expected standard methods (`iter_mut()`, `from_utf8()`, `contains_key_str()`). |
+| **E0614** | `type ... cannot be dereferenced` | Attempting to dereference (`*v`) a primitive scalar type (like `i32`) that is already passed by value. |
+| **E0659** | `... is ambiguous` | Wildcard imports (`use super::*`) bringing multiple conflicting symbols into the same namespace. |
+
+---
+
+## 3. HOW TO FIX IT (Code Blueprints for AI Agents)
+
+### 3.1 Blueprint 1: Resolving Borrow Checker Moves (`E0382`)
+**Problem**: Move occurs because type does not implement `Clone`/`Copy`, or field is moved into self before read.
+**Fix**: Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to enums and use `.clone()` where appropriate.
 
 ```rust
-// FIX FOR STANDALONE TESTS / KLIB FILES:
-// Ensure `#![no_std]` files compiled as standalone crates or tests include `extern crate alloc;`:
-#![no_std]
-extern crate alloc;
-
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-
-// FIX FOR UNRESOLVED MODULE IMPORTS IN TEST SUITES:
-// BEFORE (Broken Direct Module Import):
-use package_repository::SovereignPackageRepositoryManager;
-
-// AFTER (Fixed Full Module Path Import):
-use sigmaos::sigpkg::package_repository::SovereignPackageRepositoryManager;
-```
-
----
-
-### Issue 2: Transmute Size Mismatch Error (`E0512`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0512]: cannot transmute between types of different sizes
-  --> src/ml/inference.rs:42:18
-   |
-42 |         unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) }
-   |                  ^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: source type `usize` (64 bits)
-   = note: target type `ModelType` (32 bits)
-```
-
-#### **Why It Occurs:**
-On 64-bit target architectures, loading an `AtomicUsize` yields an 8-byte integer (`usize`). Rust enums without an explicit `#[repr(...)]` attribute default to a 4-byte (`u32`) layout. Reinterpreting an 8-byte integer directly into a 4-byte enum using `core::mem::transmute` is unsafe and rejected by the compiler under size equality rules.
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// BEFORE (Broken Transmute):
-pub fn model_type(&self) -> ModelType {
-    unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) }
+// CORRECT PATTERN:
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NvidiaPrimeProfile {
+    OnDemand,
+    Performance,
+    PowerSaving,
 }
 
-// AFTER (Fixed Safe Match Pattern):
-pub fn model_type(&self) -> ModelType {
-    let val = self.model_type.load(Ordering::SeqCst);
-    match val {
-        0 => ModelType::NeuralNetwork,
-        1 => ModelType::DecisionTree,
-        2 => ModelType::SVM,
-        _ => ModelType::Transformer,
+impl NvidiaPrimeProfileManager {
+    pub fn set_profile(&mut self, profile: NvidiaPrimeProfile) {
+        self.active_profile = profile; // Copy/Clone occurs automatically
+        match profile {
+            NvidiaPrimeProfile::Performance => self.enable_nvidia_gpu(),
+            NvidiaPrimeProfile::PowerSaving => self.enable_integrated_gpu(),
+            NvidiaPrimeProfile::OnDemand => self.enable_hybrid_mode(),
+        }
+    }
+}
+```
+
+### 3.2 Blueprint 2: Resolving Duplicate Method Definitions (`E0034` / `E0428`)
+**Problem**: Multiple methods with identical signatures defined within the same `impl` block or imported traits.
+**Fix**: Remove duplicate methods and keep a single, clean method implementation.
+
+```rust
+// CORRECT PATTERN:
+impl RealtimeScheduler {
+    pub fn select_next_rt_task(&self) -> Option<&RealtimeTask> {
+        self.tasks.iter().find(|t| t.is_ready)
+    }
+}
+```
+
+### 3.3 Blueprint 3: Resolving Missing Struct/Type Declarations (`E0433`)
+**Problem**: Missing type definition or engine in module.
+**Fix**: Provide zero-dependency safe-Rust stub implementations in `src/unimplemented_features.rs` or relevant module.
+
+```rust
+// CORRECT PATTERN:
+pub struct AndroidApexContainerModuleEngine {
+    pub active_modules: Vec<String>,
+}
+
+impl AndroidApexContainerModuleEngine {
+    pub fn new() -> Self {
+        Self { active_modules: Vec::new() }
+    }
+
+    pub fn mount_apex(&mut self, apex_path: &str) -> Result<(), &'static str> {
+        if apex_path.is_empty() { return Err("Invalid APEX path"); }
+        self.active_modules.push(apex_path.to_string());
+        Ok(())
+    }
+}
+```
+
+### 3.4 Blueprint 4: Resolving Invalid Dereference Errors (`E0614`)
+**Problem**: Attempting `*v` when `v` is an `i32` value rather than a reference `&i32`.
+**Fix**: Match against value or remove dereference operator.
+
+```rust
+// CORRECT PATTERN:
+match (&node.value, &new_value) {
+    (SysctlValue::Int(_), SysctlValue::Int(v)) => {
+        let val: i32 = *v; // If v is &i32, dereference is valid; if v is i32, use val directly.
+        if val < 0 && mib == "vm.swappiness" {
+            return Err("Swappiness cannot be negative!");
+        }
+        node.value = SysctlValue::Int(val);
+    }
+    _ => return Err("Type mismatch"),
+}
+```
+
+### 3.5 Blueprint 5: EEVDF & BORE Scheduler Priority Inheritance
+**Problem**: Priority inversion during lock contention in kernel task scheduling.
+**Fix**: Safe Rust EEVDF virtual runtime tracking with Priority Inheritance Protocol (PIP).
+
+```rust
+#[derive(Debug, Clone)]
+pub struct EevdfTask {
+    pub pid: u64,
+    pub base_priority: u32,
+    pub effective_priority: u32,
+    pub virtual_runtime: u64,
+    pub lag: i64,
+}
+
+pub struct EevdfBoreScheduler {
+    pub ready_queue: Vec<EevdfTask>,
+}
+
+impl EevdfBoreScheduler {
+    pub fn new() -> Self {
+        Self { ready_queue: Vec::new() }
+    }
+
+    pub fn inherit_priority(&mut self, blocked_pid: u64, lock_owner_pid: u64) {
+        let blocked_prio = self.ready_queue.iter()
+            .find(|t| t.pid == blocked_pid)
+            .map(|t| t.effective_priority);
+
+        if let Some(prio) = blocked_prio {
+            if let Some(owner) = self.ready_queue.iter_mut().find(|t| t.pid == lock_owner_pid) {
+                if prio < owner.effective_priority { // Lower value = higher priority
+                    owner.effective_priority = prio;
+                }
+            }
+        }
+    }
+}
+```
+
+### 3.6 Blueprint 6: Banker's Deadlock Avoidance Algorithm
+**Problem**: Potential deadlock in multi-core resource allocation.
+**Fix**: Banker's safety state evaluation before allocating kernel resources.
+
+```rust
+pub struct BankersDeadlockAvoidance {
+    pub available: Vec<usize>,
+    pub max_claim: Vec<Vec<usize>>,
+    pub allocation: Vec<Vec<usize>>,
+}
+
+impl BankersDeadlockAvoidance {
+    pub fn is_safe_state(&self) -> bool {
+        let num_procs = self.allocation.len();
+        let num_resources = self.available.len();
+        let mut work = self.available.clone();
+        let mut finish = vec![false; num_procs];
+
+        let mut need = vec![vec![0; num_resources]; num_procs];
+        for i in 0..num_procs {
+            for j in 0..num_resources {
+                need[i][j] = self.max_claim[i][j].saturating_sub(self.allocation[i][j]);
+            }
+        }
+
+        loop {
+            let mut found = false;
+            for p in 0..num_procs {
+                if !finish[p] && need[p].iter().zip(work.iter()).all(|(n, w)| n <= w) {
+                    for r in 0..num_resources {
+                        work[r] += self.allocation[p][r];
+                    }
+                    finish[p] = true;
+                    found = true;
+                }
+            }
+            if !found { break; }
+        }
+
+        finish.iter().all(|&f| f)
+    }
+}
+```
+
+### 3.7 Blueprint 7: Ticket Spinlock with Pause Backoff for `#![no_std]`
+**Problem**: High CPU cache-line bouncing during lock contention in `#![no_std]`.
+**Fix**: Atomic ticket spinlock with `core::hint::spin_loop()`.
+
+```rust
+use core::sync::atomic::{AtomicU32, Ordering};
+
+pub struct TicketSpinlock {
+    next_ticket: AtomicU32,
+    now_serving: AtomicU32,
+}
+
+impl TicketSpinlock {
+    pub const fn new() -> Self {
+        Self {
+            next_ticket: AtomicU32::new(0),
+            now_serving: AtomicU32::new(0),
+        }
+    }
+
+    pub fn lock(&self) -> u32 {
+        let ticket = self.next_ticket.fetch_add(1, Ordering::Relaxed);
+        while self.now_serving.load(Ordering::Acquire) != ticket {
+            core::hint::spin_loop();
+        }
+        ticket
+    }
+
+    pub fn unlock(&self, ticket: u32) {
+        self.now_serving.store(ticket + 1, Ordering::Release);
+    }
+}
+```
+
+### 3.8 Blueprint 8: Zero-Copy Lock-Free Circular Ring Buffer for IPC
+**Problem**: Ring buffer index wrapping and concurrency race conditions in kernel IPC.
+**Fix**: Lock-free SPSC ring buffer utilizing atomic memory ordering.
+
+```rust
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub struct ZeroCopyPipeRing<const N: usize> {
+    buffer: [u8; N],
+    head: AtomicUsize,
+    tail: AtomicUsize,
+}
+
+impl<const N: usize> ZeroCopyPipeRing<N> {
+    pub const fn new() -> Self {
+        Self {
+            buffer: [0u8; N],
+            head: AtomicUsize::new(0),
+            tail: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn push(&mut self, byte: u8) -> Result<(), &'static str> {
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Acquire);
+        if (head + 1) % N == tail {
+            return Err("Buffer Full");
+        }
+        self.buffer[head] = byte;
+        self.head.store((head + 1) % N, Ordering::Release);
+        Ok(())
+    }
+
+    pub fn pop(&mut self) -> Option<u8> {
+        let tail = self.tail.load(Ordering::Relaxed);
+        let head = self.head.load(Ordering::Acquire);
+        if head == tail {
+            return None;
+        }
+        let byte = self.buffer[tail];
+        self.tail.store((tail + 1) % N, Ordering::Release);
+        Some(byte)
     }
 }
 ```
 
 ---
 
-### Issue 3: Type Annotation & Type Inference Failures (`E0282` / `E0614`)
+## 4. STEP-BY-STEP AI AGENT VERIFICATION WORKFLOW
 
-#### **Symptom / Compiler Output:**
-```text
-error[E0282]: type annotations needed
-   --> src/compatibility/fedora.rs:777:13
-    |
-777 |             allowed.contains(&target_type.to_string())
-    |             ^^^^^^^ cannot infer type
+When fixing or enhancing algorithms in SigmaOS, every AI agent MUST follow this 4-step execution workflow:
 
-error[E0282]: type annotations needed
-  --> src/klib/process.rs:56:63
-   |
-56 |         let args_ptrs = args_cstr.iter().map(|s| s.as_ptr()).collect();
-   |                                              ^  - type must be known at this point
-
-error[E0614]: type `i32` cannot be dereferenced
-  --> src/kernel/sysctl.rs:90:24
-   |
-90 |                     if *v < 0 && mib == "vm.swappiness" {
-   |                        ^^ can't be dereferenced
 ```
-
-#### **Why It Occurs:**
-1. **E0282**: The Rust compiler cannot infer vector or container element types when calling methods like `.contains()` or `.collect()` without explicit variable type declarations.
-2. **E0614**: Attempting to dereference a primitive integer value `v: i32` directly (instead of a reference `&i32`).
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// FIX FOR E0282 (Explicit Vector/Closure Type Annotations):
-// Specify explicit type for vector/closure parameters:
-let allowed: Vec<String> = self.get_allowed_domains();
-allowed.contains(&target_type.to_string());
-
-let args_ptrs: Vec<*const u8> = args_cstr.iter().map(|s: &Vec<u8>| s.as_ptr()).collect();
-
-// FIX FOR E0614 (Remove Unnecessary Dereference):
-// Change `if *v < 0` to:
-if v < 0 && mib == "vm.swappiness" {
-    return Err("Sysctl value out of range");
-}
++-----------------------------------------------------------------------+
+| STEP 1: DIAGNOSE & CATALOG ERRORS                                      |
+| Run `cargo check --lib` or `./run_sigma_tests.sh` to capture errors.  |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 2: APPLY BLUEPRINT CODE MODIFICATIONS                            |
+| Use target edit tool (`replace_with_git_merge_diff` / `write_file`)   |
+| according to Section 3 blueprints.                                    |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 3: VERIFY MODIFIED FILES                                         |
+| Use `read_file` to verify structural correctness and no missing diffs |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 4: EXECUTE FULL SUITE VALIDATION                                 |
+| Run `./run_sigma_tests.sh` and ensure 100% tests pass cleanly.       |
++-----------------------------------------------------------------------+
 ```
 
 ---
-
-### Issue 4: Non-Exhaustive Enum Match Patterns (`E0004`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0004]: non-exhaustive patterns: `&vm_manager::KvmExitReason::Interrupt` not covered
-   --> src/virtualization/vm_manager.rs:201:10
-    |
-201 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    |          ^^^^^ pattern `Interrupt` not covered
-```
-
-#### **Why It Occurs:**
-1. Enum definition `KvmExitReason` contains duplicate variant entries or a missing match arm in derive implementations.
-2. When new variants are added to an enum (e.g. `ShellCommand` or `KvmExitReason`), any `match` expression over that enum without a fallback arm fails exhaustiveness verification.
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// BEFORE (Missing Match Arm):
-match exit_reason {
-    KvmExitReason::IoIn => { /* ... */ },
-    KvmExitReason::IoOut => { /* ... */ },
-}
-
-// AFTER (Exhaustive Pattern Matching):
-match exit_reason {
-    KvmExitReason::IoIn => { /* ... */ },
-    KvmExitReason::IoOut => { /* ... */ },
-    KvmExitReason::MmioRead => { /* ... */ },
-    KvmExitReason::MmioWrite => { /* ... */ },
-    KvmExitReason::Hlt => { /* ... */ },
-    KvmExitReason::Interrupt => { /* handle interrupt exit */ },
-    _ => { /* fallback handler */ },
-}
-```
-
----
-
-### Issue 5: Missing Methods & Trait Scope Issues (`E0599` / `E0277`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0599]: no method named `to_string` found for reference `&'static str` in the current scope
-   --> src/compatibility/cachy_os.rs:565:55
-    |
-565 |         assert!(flags_v3.contains(&"-march=x86-64-v3".to_string()));
-    |                                                       ^^^^^^^^^ method not found
-    |
-    = help: trait `ToString` which provides `to_string` is implemented but not in scope
-
-error[E0277]: `deobfuscation::AbstractValue` doesn't implement `core::fmt::Display`
-   --> src/security/deobfuscation.rs:304:37
-    |
-304 |         let join = format!("{}/{}", v1, &interval);
-```
-
-#### **Why It Occurs:**
-1. **E0599**: Method `.to_string()` requires importing `alloc::string::ToString` into scope when operating in `#![no_std]` environments.
-2. **E0277**: Formatting a custom struct/enum with `{}` requires implementing `core::fmt::Display`, or using `{:?}` with `#[derive(Debug)]`.
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// FIX FOR E0599 (Import ToString Trait):
-use alloc::string::ToString;
-
-// FIX FOR E0277 (Use Debug Format or Implement Display):
-// BEFORE:
-let join = format!("{}/{}", v1, &interval);
-
-// AFTER:
-let join = format!("{:?}/{:?}", v1, &interval);
-```
-
----
-
-### Issue 6: Argument Count Mismatch (`E0061`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0061]: this function takes 0 arguments but 1 argument was supplied
-    --> src/sigpkg/universal_oop_system.rs:3387:33
-     |
-3387 |         let executed = Arc::new(crate::thread::Mutex::new(false));
-     |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^ ----- unexpected argument
-```
-
-#### **Why It Occurs:**
-Custom kernel synchronization primitives (such as `crate::thread::Mutex`) define `pub fn new() -> Self` taking no arguments, unlike `std::sync::Mutex::new(val)`.
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// BEFORE (Passing unexpected initial value):
-let executed = Arc::new(crate::thread::Mutex::new(false));
-
-// AFTER (Using custom zero-arg constructor):
-let executed = Arc::new(crate::thread::Mutex::new());
-```
-
----
-
-### Issue 7: Closure Signature & Mismatched Types (`E0308`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0308]: mismatched types
-   --> src/arch_kernel_inspirations.rs:831:38
-    |
-821 |               ("test_ok".to_string(), |e: &mut Vec<Expectation>| {
-    |                                       -------------------------- the expected closure
-...
-831 |               ("test_bad".to_string(), |e: &mut Vec<Expectation>| {
-    |  ______________________________________^
-    | expected closure, found a different closure
-```
-
-#### **Why It Occurs:**
-In Rust, every closure expression creates a unique unnameable type. Storing closures in a homogenous collection like `Vec<(String, Closure)>` fails because distinct closures have different anonymous types.
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// BEFORE (Storing naked closures with mismatched anonymous types):
-let tests: Vec<(String, fn(&mut Vec<Expectation>))> = vec![
-    ("test_ok".to_string(), |e| { ... }),
-    ("test_bad".to_string(), |e| { ... }),
-];
-
-// AFTER (Using function pointers `fn(&mut Vec<Expectation>)` or Boxed closures `Box<dyn Fn(...)>`):
-type ExpectationFn = fn(&mut Vec<Expectation>);
-let tests: Vec<(String, ExpectationFn)> = vec![
-    ("test_ok".to_string(), |e: &mut Vec<Expectation>| { ... }),
-    ("test_bad".to_string(), |e: &mut Vec<Expectation>| { ... }),
-];
-```
-
----
-
-### Issue 8: Borrow Checker Ownership & Mutable Borrow Conflicts (`E0382` / `E0502`)
-
-#### **Symptom / Compiler Output:**
-```text
-error[E0502]: cannot borrow `*self` as mutable because it is also borrowed as immutable
-  --> src/system/cron.rs:88:17
-   |
-84 |         for job in &self.jobs {
-   |                    ---------- immutable borrow occurs here
-...
-88 |                 self.execute_job(job);
-   |                 ^^^^^^^^^^^^^^^^^^^^^ mutable borrow occurs here
-```
-
-#### **Why It Occurs:**
-Iterating over a collection (`&self.jobs`) borrows `self` immutably. Calling a mutable method (`self.execute_job(...)`) while holding the immutable borrow violates Rust's aliasing rules (only one mutable reference or multiple immutable references, never both).
-
-#### **How to Fix It (Blueprint):**
-
-```rust
-// BEFORE (Conflict: mutating `self` during iteration over `&self.jobs`):
-for job in &self.jobs {
-    if job.is_due() {
-        self.execute_job(job);
-    }
-}
-
-// AFTER (Fix: collect IDs or clone jobs to release the immutable borrow first):
-let due_job_ids: Vec<u64> = self.jobs.iter()
-    .filter(|j| j.is_due())
-    .map(|j| j.id)
-    .collect();
-
-for id in due_job_ids {
-    self.execute_job_by_id(id);
-}
-```
-
----
-
-## SECTION 3: 4-STEP AI AGENT ALGORITHM DIAGNOSTIC & FIX WORKFLOW
-
-When an AI agent is tasked with diagnosing or fixing algorithms in SigmaOS, follow this strict 4-step workflow:
-
-```
-+-------------------------------------------------------------------------+
-| STEP 1: EXECUTE MASTER TEST SUITE & COMPILER DIAGNOSTICS               |
-| Run `./run_sigma_tests.sh` and `cargo check --lib` to capture errors.   |
-+-------------------------------------------------------------------------+
-                                    |
-                                    v
-+-------------------------------------------------------------------------+
-| STEP 2: PARSE & CLASSIFY ERROR CODES                                   |
-| Identify error code (E0004, E0282, E0308, E0432, E0512, E0599, etc.).   |
-+-------------------------------------------------------------------------+
-                                    |
-                                    v
-+-------------------------------------------------------------------------+
-| STEP 3: APPLY SAFE RUST BLUEPRINT PATTERN                              |
-| Apply code fix using the corresponding blueprint in Section 2 above.    |
-+-------------------------------------------------------------------------+
-                                    |
-                                    v
-+-------------------------------------------------------------------------+
-| STEP 4: VERIFY RE-COMPILATION & CONFIRM PASSING TESTS                   |
-| Re-run `./run_sigma_tests.sh` to confirm 100% test pass rate.           |
-+-------------------------------------------------------------------------+
-```
-
-1. **Step 1: Diagnostic Discovery**: Run `./run_sigma_tests.sh` to test core atomic harnesses and subsystem inspection modules. Run `cargo check --lib` for full library syntax analysis.
-2. **Step 2: Failure Classification**: Parse the compiler or test output to isolate the error code (`E0004`, `E0282`, `E0308`, `E0432`, `E0512`, `E0599`, `E0614`), affected module file path, and line numbers.
-3. **Step 3: Safe Rust Code Repair**: Locate the matching blueprint pattern in Section 2. Apply explicit type annotations, `ToString` trait imports, safe enum pattern matching, or function pointer casting as required.
-4. **Step 4: Test Suite Verification**: Execute `./run_sigma_tests.sh` to verify clean compilation and confirm all 437+ unit tests pass without regressions.
+*Guide synchronized and verified for SigmaOS / SovereignOS Agent Swarm.*

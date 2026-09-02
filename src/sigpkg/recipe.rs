@@ -1,17 +1,17 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
-use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use crate::klib::collections::HashMap;
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::default::Default;
-use core::option::Option::{self, Some, None};
-use core::result::Result::{self, Ok, Err};
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

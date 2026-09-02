@@ -122,7 +122,8 @@ impl MultiGenLRU {
 
             for slot in &mut self.pages {
                 if let Some(ref mut page) = slot {
-                    if page.state == PageState::Active && page.generation == gen && !page.referenced {
+                    if page.state == PageState::Active && page.generation == gen && !page.referenced
+                    {
                         page.state = PageState::Evicted;
                         evicted += 1;
                         if evicted >= target_count {

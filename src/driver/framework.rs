@@ -4,8 +4,6 @@ extern crate alloc;
 // Basic Driver Framework Implementation
 // ==========================================
 
-
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -67,7 +65,6 @@ pub trait StorageDriver: Driver {
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
 
-
 #[repr(C)]
 #[derive(Debug)]
 pub struct SimpleStorageDriver {
@@ -87,9 +84,15 @@ impl SimpleStorageDriver {
 }
 
 impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID { self.id }
-    fn name(&self) -> &str { "SimpleStorageDriver" }
-    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        "SimpleStorageDriver"
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
             1 => DriverState::Active,
@@ -98,11 +101,13 @@ impl Driver for SimpleStorageDriver {
         }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -141,11 +146,13 @@ impl Driver for SimpleDriver {
         }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -549,7 +556,10 @@ mod tests {
         );
 
         framework.load_driver(101).unwrap();
-        assert_eq!(framework.get_driver(101).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(101).unwrap().state(),
+            DriverState::Active
+        );
 
         framework.unload_driver(101).unwrap();
         assert_eq!(
@@ -562,15 +572,11 @@ mod tests {
     fn test_wdm_irp_device_stack_flow() {
         unsafe {
             let mut drv_obj = DriverObject::new("TestDriver");
-            let mut dev_obj =
-                DeviceObject::new(&mut drv_obj as *mut DriverObject, true);
+            let mut dev_obj = DeviceObject::new(&mut drv_obj as *mut DriverObject, true);
             dev_obj.current_power_state = DevicePowerState::D0;
 
             // Register Create & Close Dispatch Routines
-            fn test_create_dispatch(
-                device: &mut DeviceObject,
-                irp: &mut Irp,
-            ) -> DriverError {
+            fn test_create_dispatch(device: &mut DeviceObject, irp: &mut Irp) -> DriverError {
                 device.device_extension = 0xAA55;
                 irp.input_buffer.push(0xCC);
                 DriverError::Success
@@ -583,8 +589,7 @@ mod tests {
 
             let mut create_irp = Irp::new(IrpMajorFunction::Create);
 
-            let res =
-                io_mgr.dispatch_irp(&mut dev_obj as *mut DeviceObject, &mut create_irp);
+            let res = io_mgr.dispatch_irp(&mut dev_obj as *mut DeviceObject, &mut create_irp);
             assert_eq!(res, DriverError::Success);
             assert_eq!(dev_obj.device_extension, 0xAA55);
             assert_eq!(create_irp.input_buffer[0], 0xCC);
@@ -597,30 +602,24 @@ mod tests {
             let mut keyboard_drv = DriverObject::new("KbdFilter");
             keyboard_drv.register_dispatch(IrpMajorFunction::Read, super::keyboard_filter_dispatch);
 
-            let mut keyboard_dev =
-                DeviceObject::new(&mut keyboard_drv as *mut DriverObject, true);
+            let mut keyboard_dev = DeviceObject::new(&mut keyboard_drv as *mut DriverObject, true);
 
             let mut usb_drv = DriverObject::new("UsbStorageFilter");
             usb_drv.register_dispatch(IrpMajorFunction::Write, super::usb_forensic_filter_dispatch);
 
-            let mut usb_dev =
-                DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
+            let mut usb_dev = DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
 
             let mut io_mgr = IoManager::new();
 
             // Test Keyboard Filter keystroke interception
             let mut kbd_irp = Irp::new(IrpMajorFunction::Read);
-            let res_kbd = io_mgr.dispatch_irp(
-                &mut keyboard_dev as *mut DeviceObject,
-                &mut kbd_irp,
-            );
+            let res_kbd = io_mgr.dispatch_irp(&mut keyboard_dev as *mut DeviceObject, &mut kbd_irp);
             assert_eq!(res_kbd, DriverError::Success);
             assert_eq!(kbd_irp.input_buffer[0], 0x41); // Key logged correctly!
 
             // Test USB Forensic Filter write protection
             let mut usb_irp = Irp::new(IrpMajorFunction::Write);
-            let res_usb =
-                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut usb_irp);
+            let res_usb = io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut usb_irp);
             assert_eq!(res_usb, DriverError::UnloadFailed); // Write blocked successfully!
         }
     }
@@ -634,8 +633,7 @@ mod tests {
                 super::usb_forensic_filter_dispatch,
             );
 
-            let mut usb_dev =
-                DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
+            let mut usb_dev = DeviceObject::new(&mut usb_drv as *mut DriverObject, true);
             let mut io_mgr = IoManager::new();
 
             // 1. Test METHOD_BUFFERED (valid unlock command)
@@ -648,10 +646,8 @@ mod tests {
             ));
             irp_buffered.input_buffer.push(0x99); // Unlock code
 
-            let res_buffered = io_mgr.dispatch_irp(
-                &mut usb_dev as *mut DeviceObject,
-                &mut irp_buffered,
-            );
+            let res_buffered =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_buffered);
             assert_eq!(res_buffered, DriverError::Success);
             assert_eq!(irp_buffered.output_buffer[0], 0x01);
 
@@ -680,10 +676,8 @@ mod tests {
             ));
             irp_neither_safe.user_mode_virtual_address = Some(0x0000_7FFF_FFFF_F000); // User space
 
-            let res_neither_safe = io_mgr.dispatch_irp(
-                &mut usb_dev as *mut DeviceObject,
-                &mut irp_neither_safe,
-            );
+            let res_neither_safe =
+                io_mgr.dispatch_irp(&mut usb_dev as *mut DeviceObject, &mut irp_neither_safe);
             assert_eq!(res_neither_safe, DriverError::Success);
             assert_eq!(irp_neither_safe.output_buffer[0], 0xFE);
 
@@ -741,17 +735,26 @@ mod tests {
     static mut RELEASE_CALLED: i32 = 0;
 
     fn mock_open() -> i32 {
-        unsafe { OPEN_CALLED += 1; }
+        unsafe {
+            OPEN_CALLED += 1;
+        }
         0
     }
 
     fn mock_release() -> i32 {
-        unsafe { RELEASE_CALLED += 1; }
+        unsafe {
+            RELEASE_CALLED += 1;
+        }
         0
     }
 
-    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
-    fn mock_write(_buf: &[u8]) -> i32 { 0 }
-    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
-
+    fn mock_read(_buf: &mut [u8]) -> i32 {
+        0
+    }
+    fn mock_write(_buf: &[u8]) -> i32 {
+        0
+    }
+    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 {
+        0
+    }
 }

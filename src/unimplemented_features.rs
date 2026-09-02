@@ -11,7 +11,7 @@ use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
@@ -288,7 +288,7 @@ impl UdfVm {
             }
 
             match instr.opcode {
-                OP_READ => {
+                0x10 => {
                     if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
                     {
                         return Err("UDF VM Safety Guard: Read address out of peripheral boundary");
@@ -296,7 +296,7 @@ impl UdfVm {
                     let val = hardware.read_register(instr.address_or_imm);
                     self.registers[instr.reg_dest as usize] = val;
                 }
-                OP_WRITE => {
+                0x20 => {
                     if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
                     {
                         return Err(
@@ -306,13 +306,13 @@ impl UdfVm {
                     let val = self.registers[instr.reg_src as usize];
                     hardware.write_register(instr.address_or_imm, val);
                 }
-                OP_ADD => {
+                0x30 => {
                     let r_dest = instr.reg_dest as usize;
                     let r_src = instr.reg_src as usize;
                     self.registers[r_dest] =
                         self.registers[r_dest].wrapping_add(self.registers[r_src]);
                 }
-                OP_HALT => {
+                0xF0 => {
                     self.is_halted = true;
                     return Ok(self.registers[instr.reg_dest as usize]);
                 }
@@ -1260,6 +1260,24 @@ impl ArchWikiKnowledgeBaseEngine {
                 content: "Btrfs provides copy-on-write snapshots, subvolumes, and compression...".to_string(),
             },
         );
+        articles.insert(
+            "PledgeUnveil".to_string(),
+            ArchWikiArticle {
+                title: "OpenBSD Pledge & Unveil Sandboxing".to_string(),
+                category: "Security".to_string(),
+                tags: vec!["pledge".to_string(), "unveil".to_string(), "sandboxing".to_string()],
+                content: "Pledge restricts process system call promises while unveiling limits path access...".to_string(),
+            },
+        );
+        articles.insert(
+            "ZFS".to_string(),
+            ArchWikiArticle {
+                title: "FreeBSD ZFS Storage Pools & Boot Environments".to_string(),
+                category: "Filesystems".to_string(),
+                tags: vec!["zfs".to_string(), "beadm".to_string(), "bectl".to_string()],
+                content: "ZFS zpools support transactional copy-on-write datasets and boot environment switching...".to_string(),
+            },
+        );
         Self { articles }
     }
 
@@ -1279,6 +1297,16 @@ impl ArchWikiKnowledgeBaseEngine {
         let mut matches = Vec::new();
         for article in self.articles.values() {
             if article.tags.iter().any(|t| t == tag) {
+                matches.push(article.clone());
+            }
+        }
+        matches
+    }
+
+    pub fn search_by_category(&self, category: &str) -> Vec<ArchWikiArticle> {
+        let mut matches = Vec::new();
+        for article in self.articles.values() {
+            if article.category == category {
                 matches.push(article.clone());
             }
         }
@@ -1638,25 +1666,25 @@ mod peripheral_tests {
 
         let program = [
             UdfInstruction {
-                opcode: OP_WRITE,
+                opcode: 0x20,
                 reg_dest: 0,
                 reg_src: 0,
                 address_or_imm: 4,
             }, // write R0 (0) to addr 4
             UdfInstruction {
-                opcode: OP_READ,
+                opcode: 0x10,
                 reg_dest: 1,
                 reg_src: 0,
                 address_or_imm: 4,
             }, // read addr 4 to R1
             UdfInstruction {
-                opcode: OP_ADD,
+                opcode: 0x30,
                 reg_dest: 1,
                 reg_src: 1,
                 address_or_imm: 0,
             }, // R1 = R1 + R1
             UdfInstruction {
-                opcode: OP_HALT,
+                opcode: 0xF0,
                 reg_dest: 1,
                 reg_src: 0,
                 address_or_imm: 0,
@@ -1668,7 +1696,7 @@ mod peripheral_tests {
 
         let invalid_program = [
             UdfInstruction {
-                opcode: OP_READ,
+                opcode: 0x10,
                 reg_dest: 0,
                 reg_src: 0,
                 address_or_imm: 100,
@@ -2295,6 +2323,784 @@ impl DragonFlyHammer2FsSnapshotV2 {
     }
 }
 
+// ==================================================================
+// 45. SLACKWARE PKGTOOL & LOG PACKAGES TRACKING ENGINE
+// ==================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SlackwarePackage {
+    pub name: String,
+    pub version: String,
+    pub arch: String,
+    pub build: String,
+    pub installed_files: Vec<String>,
+    pub post_install_script: Option<String>,
+}
+
+pub struct SlackwarePkgtoolEngine {
+    pub var_log_packages: Vec<SlackwarePackage>,
+}
+
+impl SlackwarePkgtoolEngine {
+    pub fn new() -> Self {
+        Self {
+            var_log_packages: Vec::new(),
+        }
+    }
+
+    pub fn install_pkg(&mut self, pkg: SlackwarePackage) -> Result<String, &'static str> {
+        if pkg.name.is_empty() || pkg.version.is_empty() {
+            return Err("Slackware Pkgtool: Invalid package name or version");
+        }
+        let log_entry_name = format!("{}-{}-{}-{}", pkg.name, pkg.version, pkg.arch, pkg.build);
+        self.var_log_packages.push(pkg);
+        Ok(format!("/var/log/packages/{}", log_entry_name))
+    }
+
+    pub fn remove_pkg(&mut self, name: &str) -> Result<usize, &'static str> {
+        let pos = self.var_log_packages.iter().position(|p| p.name == name);
+        if let Some(idx) = pos {
+            let removed = self.var_log_packages.remove(idx);
+            Ok(removed.installed_files.len())
+        } else {
+            Err("Slackware Pkgtool: Package not found in /var/log/packages")
+        }
+    }
+
+    pub fn run_doinst_script(&self, name: &str) -> bool {
+        if let Some(pkg) = self.var_log_packages.iter().find(|p| p.name == name) {
+            pkg.post_install_script.is_some()
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SlackwarePkgtoolEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 46. SOLUS EOPKG DELTA UPDATES & RAVEN PANEL GOVERNOR
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct SolusEopkgDeltaPackage {
+    pub package_name: String,
+    pub base_version: String,
+    pub target_version: String,
+    pub delta_size_bytes: u64,
+    pub full_size_bytes: u64,
+    pub sha1_hash: [u8; 20],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RavenWidgetState {
+    Collapsed,
+    Expanded,
+    Muted,
+}
+
+pub struct SolusEopkgRavenGovernor {
+    pub delta_packages: Vec<SolusEopkgDeltaPackage>,
+    pub raven_panel_open: bool,
+    pub audio_widget_state: RavenWidgetState,
+    pub notification_count: u32,
+}
+
+impl SolusEopkgRavenGovernor {
+    pub fn new() -> Self {
+        Self {
+            delta_packages: Vec::new(),
+            raven_panel_open: false,
+            audio_widget_state: RavenWidgetState::Collapsed,
+            notification_count: 0,
+        }
+    }
+
+    pub fn register_delta_package(&mut self, delta: SolusEopkgDeltaPackage) {
+        self.delta_packages.push(delta);
+    }
+
+    pub fn calculate_bandwidth_savings_percent(&self) -> u32 {
+        let mut total_delta = 0u64;
+        let mut total_full = 0u64;
+        for delta in &self.delta_packages {
+            total_delta += delta.delta_size_bytes;
+            total_full += delta.full_size_bytes;
+        }
+        if total_full == 0 {
+            0
+        } else {
+            100 - ((total_delta * 100) / total_full) as u32
+        }
+    }
+
+    pub fn toggle_raven_panel(&mut self) -> bool {
+        self.raven_panel_open = !self.raven_panel_open;
+        self.raven_panel_open
+    }
+
+    pub fn push_notification(&mut self) -> u32 {
+        self.notification_count += 1;
+        self.notification_count
+    }
+}
+
+impl Default for SolusEopkgRavenGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 47. MAGEIA URPMI SYNTHESIS & DRAKX MCC RESOLVER
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct MageiaSynthesisPackage {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub arch: String,
+    pub provides: Vec<String>,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct MageiaMirror {
+    pub url: String,
+    pub country: String,
+    pub priority: u32,
+}
+
+pub struct MageiaUrpmiMccResolver {
+    pub synthesis_db: Vec<MageiaSynthesisPackage>,
+    pub mirrors: Vec<MageiaMirror>,
+    pub hardware_auto_detected: bool,
+}
+
+impl MageiaUrpmiMccResolver {
+    pub fn new() -> Self {
+        Self {
+            synthesis_db: Vec::new(),
+            mirrors: Vec::new(),
+            hardware_auto_detected: false,
+        }
+    }
+
+    pub fn load_synthesis_hdlist(&mut self, pkg: MageiaSynthesisPackage) {
+        self.synthesis_db.push(pkg);
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, priority: u32) {
+        self.mirrors.push(MageiaMirror {
+            url: url.to_string(),
+            country: country.to_string(),
+            priority,
+        });
+    }
+
+    pub fn resolve_package_deps(&self, pkg_name: &str) -> Result<Vec<String>, &'static str> {
+        let pkg = self.synthesis_db.iter().find(|p| p.name == pkg_name)
+            .ok_or("Mageia URPMI: Package missing in synthesis.hdlist.cz")?;
+        let mut deps = Vec::new();
+        for req in &pkg.requires {
+            deps.push(req.clone());
+        }
+        Ok(deps)
+    }
+
+    pub fn run_drakx_mcc_hardware_probe(&mut self, pci_count: usize) -> bool {
+        self.hardware_auto_detected = pci_count > 0;
+        self.hardware_auto_detected
+    }
+}
+
+impl Default for MageiaUrpmiMccResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 48. DRAGONFLY BSD HAMMER2 BLOCK DEDUPLICATION ENGINE
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Hammer2Block {
+    pub block_offset: u64,
+    pub size_bytes: usize,
+    pub merkle_hash: u64,
+    pub ref_count: u32,
+}
+
+pub struct DragonFlyHammer2DeduplicationEngine {
+    pub blocks: Vec<Hammer2Block>,
+    pub saved_bytes: u64,
+}
+
+impl DragonFlyHammer2DeduplicationEngine {
+    pub fn new() -> Self {
+        Self {
+            blocks: Vec::new(),
+            saved_bytes: 0,
+        }
+    }
+
+    pub fn write_or_dedup_block(&mut self, offset: u64, size: usize, merkle_hash: u64) -> bool {
+        if let Some(existing) = self.blocks.iter_mut().find(|b| b.merkle_hash == merkle_hash) {
+            existing.ref_count += 1;
+            self.saved_bytes += size as u64;
+            true // Deduplicated
+        } else {
+            self.blocks.push(Hammer2Block {
+                block_offset: offset,
+                size_bytes: size,
+                merkle_hash,
+                ref_count: 1,
+            });
+            false // New unique block
+        }
+    }
+
+    pub fn get_dedup_ratio(&self) -> u32 {
+        let total_unique: u64 = self.blocks.iter().map(|b| b.size_bytes as u64).sum();
+        let total_logical = total_unique + self.saved_bytes;
+        if total_unique == 0 {
+            100
+        } else {
+            ((total_logical * 100) / total_unique) as u32
+        }
+    }
+}
+
+impl Default for DragonFlyHammer2DeduplicationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 49. NETBSD RUMP KERNEL MODULAR COMPONENT DISPATCHER
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RumpComponentType {
+    Vfs,
+    NetStack,
+    Crypto,
+    SyscallBridge,
+}
+
+pub struct RumpComponent {
+    pub name: &'static str,
+    pub component_type: RumpComponentType,
+    pub is_initialized: bool,
+}
+
+pub struct NetBsdRumpComponentEngine {
+    pub components: Vec<RumpComponent>,
+}
+
+impl NetBsdRumpComponentEngine {
+    pub fn new() -> Self {
+        Self {
+            components: Vec::new(),
+        }
+    }
+
+    pub fn register_component(&mut self, name: &'static str, component_type: RumpComponentType) {
+        self.components.push(RumpComponent {
+            name,
+            component_type,
+            is_initialized: false,
+        });
+    }
+
+    pub fn initialize_all_components(&mut self) -> usize {
+        let mut count = 0;
+        for comp in self.components.iter_mut() {
+            comp.is_initialized = true;
+            count += 1;
+        }
+        count
+    }
+
+    pub fn dispatch_rump_hypercall(&self, component_name: &str, syscall_id: u32) -> Result<u64, &'static str> {
+        let comp = self.components.iter().find(|c| c.name == component_name)
+            .ok_or("NetBSD Rump: Component not found")?;
+        if !comp.is_initialized {
+            return Err("NetBSD Rump: Component uninitialized");
+        }
+        Ok((syscall_id as u64) | 0x8000_0000)
+    }
+}
+
+impl Default for NetBsdRumpComponentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Android APEX Container Module Manager (Inspired by Android APEX modular system updates)
+#[derive(Debug, Clone)]
+pub struct AndroidApexModule {
+    pub package_name: String,
+    pub version_code: u64,
+    pub mount_point: String,
+    pub active: bool,
+}
+
+pub struct AndroidApexContainerModuleEngine {
+    pub modules: Vec<AndroidApexModule>,
+    pub active_mounts: usize,
+}
+
+impl AndroidApexContainerModuleEngine {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+            active_mounts: 0,
+        }
+    }
+
+    pub fn register_apex_module(&mut self, package_name: &str, version_code: u64, mount_point: &str) -> bool {
+        if self.modules.iter().any(|m| m.package_name == package_name && m.version_code == version_code) {
+            return false;
+        }
+        self.modules.push(AndroidApexModule {
+            package_name: package_name.to_string(),
+            version_code,
+            mount_point: mount_point.to_string(),
+            active: false,
+        });
+        true
+    }
+
+    pub fn activate_module(&mut self, package_name: &str, version_code: u64) -> Result<(), &'static str> {
+        let module = self.modules.iter_mut()
+            .find(|m| m.package_name == package_name && m.version_code == version_code)
+            .ok_or("APEX module not registered")?;
+        if module.active {
+            return Ok(());
+        }
+        module.active = true;
+        self.active_mounts += 1;
+        Ok(())
+    }
+
+    pub fn rollback_module(&mut self, package_name: &str) -> Result<u64, &'static str> {
+        let module = self.modules.iter_mut()
+            .find(|m| m.package_name == package_name && m.active)
+            .ok_or("Active APEX module not found for rollback")?;
+        module.active = false;
+        if self.active_mounts > 0 {
+            self.active_mounts -= 1;
+        }
+        Ok(module.version_code)
+    }
+}
+
+impl Default for AndroidApexContainerModuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic Binary Translator (Inspired by macOS Rosetta 2 & Android Houdini binary translation)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TargetArch {
+    AArch64,
+    RiscV64,
+}
+
+#[derive(Debug, Clone)]
+pub struct TranslatedInstructionBlock {
+    pub guest_address: u64,
+    pub host_instructions: Vec<u8>,
+    pub hit_count: u64,
+}
+
+pub struct RosettaDynamicBinaryTranslator {
+    pub target_arch: TargetArch,
+    pub translation_cache: Vec<TranslatedInstructionBlock>,
+    pub total_translations: u64,
+}
+
+impl RosettaDynamicBinaryTranslator {
+    pub fn new(target_arch: TargetArch) -> Self {
+        Self {
+            target_arch,
+            translation_cache: Vec::new(),
+            total_translations: 0,
+        }
+    }
+
+    pub fn translate_instruction_block(&mut self, guest_address: u64, x86_bytes: &[u8]) -> Vec<u8> {
+        if let Some(cached) = self.translation_cache.iter_mut().find(|b| b.guest_address == guest_address) {
+            cached.hit_count += 1;
+            return cached.host_instructions.clone();
+        }
+
+        let mut translated = Vec::new();
+        match self.target_arch {
+            TargetArch::AArch64 => {
+                translated.extend_from_slice(&[0x1F, 0x20, 0x03, 0xD5]);
+                translated.extend_from_slice(x86_bytes);
+            }
+            TargetArch::RiscV64 => {
+                translated.extend_from_slice(&[0x13, 0x00, 0x00, 0x00]);
+                translated.extend_from_slice(x86_bytes);
+            }
+        }
+
+        self.translation_cache.push(TranslatedInstructionBlock {
+            guest_address,
+            host_instructions: translated.clone(),
+            hit_count: 1,
+        });
+        self.total_translations += 1;
+        translated
+    }
+}
+
+/// Automated Performance Benchmark Engine (Inspired by Phoronix Test Suite)
+#[derive(Debug, Clone)]
+pub struct BenchmarkResult {
+    pub test_name: String,
+    pub metric_unit: String,
+    pub score: f64,
+}
+
+pub struct PhoronixAutomatedBenchmarkEngine {
+    pub test_suite_name: String,
+    pub results: Vec<BenchmarkResult>,
+}
+
+impl PhoronixAutomatedBenchmarkEngine {
+    pub fn new(test_suite_name: &str) -> Self {
+        Self {
+            test_suite_name: test_suite_name.to_string(),
+            results: Vec::new(),
+        }
+    }
+
+    pub fn run_test(&mut self, test_name: &str, metric_unit: &str, score: f64) {
+        self.results.push(BenchmarkResult {
+            test_name: test_name.to_string(),
+            metric_unit: metric_unit.to_string(),
+            score,
+        });
+    }
+
+    pub fn compute_composite_index(&self) -> f64 {
+        if self.results.is_empty() {
+            return 0.0;
+        }
+        let sum: f64 = self.results.iter().map(|r| r.score).sum();
+        sum / self.results.len() as f64
+    }
+}
+
+/// Distro Parity & Ecosystem Absorption Hub (Inspired by DistroWatch feature tracking)
+#[derive(Debug, Clone)]
+pub struct DistroParityScore {
+    pub distro_name: String,
+    pub absorption_percentage: u8,
+}
+
+pub struct DistroWatchParityMetricsHub {
+    pub distros: Vec<DistroParityScore>,
+}
+
+impl DistroWatchParityMetricsHub {
+    pub fn new() -> Self {
+        Self {
+            distros: Vec::new(),
+        }
+    }
+
+    pub fn record_distro_parity(&mut self, distro_name: &str, absorption_percentage: u8) {
+        if let Some(entry) = self.distros.iter_mut().find(|d| d.distro_name == distro_name) {
+            entry.absorption_percentage = absorption_percentage;
+        } else {
+            self.distros.push(DistroParityScore {
+                distro_name: distro_name.to_string(),
+                absorption_percentage,
+            });
+        }
+    }
+
+    pub fn average_ecosystem_parity(&self) -> f64 {
+        if self.distros.is_empty() {
+            return 0.0;
+        }
+        let total: u64 = self.distros.iter().map(|d| d.absorption_percentage as u64).sum();
+        total as f64 / self.distros.len() as f64
+    }
+}
+
+impl Default for DistroWatchParityMetricsHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Rocky Linux & AlmaLinux Enterprise Long-Term Support ABI Stability & Errata Governor
+#[derive(Debug, Clone)]
+pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub rhel_abi_compat_level: u32,
+    pub errata_patches_applied: usize,
+    pub security_advisories: Vec<String>,
+}
+
+impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub fn new(abi_level: u32) -> Self {
+        Self {
+            rhel_abi_compat_level: abi_level,
+            errata_patches_applied: 0,
+            security_advisories: Vec::new(),
+        }
+    }
+
+    pub fn apply_errata_patch(&mut self, advisory_id: &str) {
+        self.security_advisories.push(advisory_id.to_string());
+        self.errata_patches_applied += 1;
+    }
+
+    pub fn verify_abi_compatibility(&self, min_required: u32) -> bool {
+        self.rhel_abi_compat_level >= min_required
+    }
+}
+
+/// Void Linux XBPS Fast Binary Delta Package & Runit Service Engine
+#[derive(Debug, Clone)]
+pub struct VoidXbpsContainerEngine {
+    pub registered_packages: Vec<String>,
+    pub runit_services_active: Vec<String>,
+}
+
+impl VoidXbpsContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_packages: Vec::new(),
+            runit_services_active: Vec::new(),
+        }
+    }
+
+    pub fn install_xbps_package(&mut self, name: &str) {
+        self.registered_packages.push(name.to_string());
+    }
+
+    pub fn start_runit_service(&mut self, service: &str) {
+        if !self.runit_services_active.contains(&service.to_string()) {
+            self.runit_services_active.push(service.to_string());
+        }
+    }
+}
+
+impl Default for VoidXbpsContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Puppy Linux Squashed File System (SFS) Read-Only RAM Disk & Persistence Overlay
+#[derive(Debug, Clone)]
+pub struct PuppyLinuxOverlayRamdiskEngine {
+    pub ramdisk_size_mb: usize,
+    pub loaded_sfs_modules: Vec<String>,
+    pub persistence_save_file: Option<String>,
+}
+
+impl PuppyLinuxOverlayRamdiskEngine {
+    pub fn new(ramdisk_mb: usize) -> Self {
+        Self {
+            ramdisk_size_mb: ramdisk_mb,
+            loaded_sfs_modules: Vec::new(),
+            persistence_save_file: None,
+        }
+    }
+
+    pub fn load_sfs_module(&mut self, sfs_name: &str) {
+        self.loaded_sfs_modules.push(sfs_name.to_string());
+    }
+
+    pub fn mount_persistence(&mut self, savefile_path: &str) {
+        self.persistence_save_file = Some(savefile_path.to_string());
+    }
+}
+
+/// Tiny Core Linux TCZ Extension Loader & On-Demand Symlink Tree Manager
+#[derive(Debug, Clone)]
+pub struct TinyCoreModularTczLoader {
+    pub mounted_extensions: Vec<String>,
+    pub total_ram_used_kb: usize,
+}
+
+impl TinyCoreModularTczLoader {
+    pub fn new() -> Self {
+        Self {
+            mounted_extensions: Vec::new(),
+            total_ram_used_kb: 0,
+        }
+    }
+
+    pub fn mount_tcz(&mut self, ext_name: &str, size_kb: usize) {
+        self.mounted_extensions.push(ext_name.to_string());
+        self.total_ram_used_kb += size_kb;
+    }
+}
+
+impl Default for TinyCoreModularTczLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Deepin Desktop Environment (DDE) Inspired Control Center & Appearance Engine.
+pub struct DeepinDdeControlCenterEngine {
+    pub theme_mode: String,
+    pub wallpaper_slideshow: bool,
+    pub dock_position: String,
+    pub scale_factor: f32,
+}
+
+impl DeepinDdeControlCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            theme_mode: "Dark".to_string(),
+            wallpaper_slideshow: true,
+            dock_position: "Bottom".to_string(),
+            scale_factor: 1.0,
+        }
+    }
+
+    pub fn set_theme_mode(&mut self, mode: &str) {
+        self.theme_mode = mode.to_string();
+    }
+
+    pub fn toggle_slideshow(&mut self, enabled: bool) {
+        self.wallpaper_slideshow = enabled;
+    }
+
+    pub fn set_dock_position(&mut self, pos: &str) {
+        self.dock_position = pos.to_string();
+    }
+}
+
+impl Default for DeepinDdeControlCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Manjaro Hardware Detection (mhwd) Inspired Driver Auto-Configuration Engine.
+pub struct ManjaroHardwareDetectionEngine {
+    pub detected_pci_ids: Vec<u32>,
+    pub recommended_drivers: Vec<String>,
+    pub free_drivers_enabled: bool,
+}
+
+impl ManjaroHardwareDetectionEngine {
+    pub fn new() -> Self {
+        Self {
+            detected_pci_ids: Vec::new(),
+            recommended_drivers: Vec::new(),
+            free_drivers_enabled: true,
+        }
+    }
+
+    pub fn scan_pci_bus(&mut self, vendor_id: u16, device_id: u16) {
+        let combined_id = ((vendor_id as u32) << 16) | (device_id as u32);
+        self.detected_pci_ids.push(combined_id);
+
+        if vendor_id == 0x10DE {
+            self.recommended_drivers.push("video-nvidia".to_string());
+        } else if vendor_id == 0x1002 {
+            self.recommended_drivers.push("video-amdgpu".to_string());
+        } else {
+            self.recommended_drivers.push("video-modesetting".to_string());
+        }
+    }
+
+    pub fn auto_install_recommended_drivers(&mut self) -> usize {
+        self.recommended_drivers.len()
+    }
+}
+
+impl Default for ManjaroHardwareDetectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SteamOS Gamescope Inspired Micro-Compositor & Resolution Scaling Engine.
+pub struct SteamOsGamescopeCompositorEngine {
+    pub target_fps_limit: u32,
+    pub fsr_enabled: bool,
+    pub hdr_enabled: bool,
+    pub leased_surfaces_count: usize,
+}
+
+impl SteamOsGamescopeCompositorEngine {
+    pub fn new() -> Self {
+        Self {
+            target_fps_limit: 60,
+            fsr_enabled: false,
+            hdr_enabled: true,
+            leased_surfaces_count: 0,
+        }
+    }
+
+    pub fn enable_fsr(&mut self, enable: bool) {
+        self.fsr_enabled = enable;
+    }
+
+    pub fn set_fps_limit(&mut self, fps: u32) {
+        self.target_fps_limit = fps;
+    }
+
+    pub fn lease_drm_surface(&mut self) -> usize {
+        self.leased_surfaces_count += 1;
+        self.leased_surfaces_count
+    }
+}
+
+impl Default for SteamOsGamescopeCompositorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Phoronix Test Suite Inspired Automated Performance Benchmarking Engine.
+pub struct PhoronixTestSuiteRunner {
+    pub suite_name: String,
+    pub test_runs: Vec<(String, f64)>,
+    pub composite_score: f64,
+}
+
+impl PhoronixTestSuiteRunner {
+    pub fn new(suite_name: &str) -> Self {
+        Self {
+            suite_name: suite_name.to_string(),
+            test_runs: Vec::new(),
+            composite_score: 0.0,
+        }
+    }
+
+    pub fn execute_benchmark(&mut self, test_name: &str, score: f64) {
+        self.test_runs.push((test_name.to_string(), score));
+    }
+
+    pub fn calculate_composite_score(&mut self) -> f64 {
+        if self.test_runs.is_empty() {
+            return 0.0;
+        }
+        let total: f64 = self.test_runs.iter().map(|(_, s)| *s).sum();
+        self.composite_score = total / (self.test_runs.len() as f64);
+        self.composite_score
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -2594,5 +3400,196 @@ mod extra_unimplemented_tests {
         assert!(loop_engine.is_running);
     }
 
-}
+    #[test]
+    fn test_slackware_pkgtool_engine() {
+        let mut pkgtool = SlackwarePkgtoolEngine::new();
+        let pkg = SlackwarePackage {
+            name: "bash".to_string(),
+            version: "5.2.21".to_string(),
+            arch: "x86_64".to_string(),
+            build: "1".to_string(),
+            installed_files: vec!["/bin/bash".to_string(), "/usr/share/man/man1/bash.1".to_string()],
+            post_install_script: Some("install-info /usr/share/info/bash.info".to_string()),
+        };
+        let log_path = pkgtool.install_pkg(pkg).unwrap();
+        assert_eq!(log_path, "/var/log/packages/bash-5.2.21-x86_64-1");
+        assert!(pkgtool.run_doinst_script("bash"));
+        let removed_count = pkgtool.remove_pkg("bash").unwrap();
+        assert_eq!(removed_count, 2);
+    }
 
+    #[test]
+    fn test_solus_eopkg_raven_governor() {
+        let mut solus = SolusEopkgRavenGovernor::new();
+        solus.register_delta_package(SolusEopkgDeltaPackage {
+            package_name: "firefox".to_string(),
+            base_version: "120.0".to_string(),
+            target_version: "121.0".to_string(),
+            delta_size_bytes: 15_000_000,
+            full_size_bytes: 75_000_000,
+            sha1_hash: [0x12; 20],
+        });
+        assert_eq!(solus.calculate_bandwidth_savings_percent(), 80);
+        assert!(solus.toggle_raven_panel());
+        assert_eq!(solus.push_notification(), 1);
+    }
+
+    #[test]
+    fn test_mageia_urpmi_mcc_resolver() {
+        let mut mageia = MageiaUrpmiMccResolver::new();
+        mageia.load_synthesis_hdlist(MageiaSynthesisPackage {
+            name: "gimp".to_string(),
+            version: "2.10.36".to_string(),
+            release: "1.mga9".to_string(),
+            arch: "x86_64".to_string(),
+            provides: vec!["gimp".to_string()],
+            requires: vec!["libgegl".to_string(), "libbabl".to_string()],
+        });
+        mageia.add_mirror("https://mirror.mageia.org", "FR", 100);
+        let deps = mageia.resolve_package_deps("gimp").unwrap();
+        assert_eq!(deps, vec!["libgegl".to_string(), "libbabl".to_string()]);
+        assert!(mageia.run_drakx_mcc_hardware_probe(4));
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_deduplication_engine() {
+        let mut hammer2_dedup = DragonFlyHammer2DeduplicationEngine::new();
+        assert!(!hammer2_dedup.write_or_dedup_block(0, 4096, 0x1122334455667788));
+        assert!(hammer2_dedup.write_or_dedup_block(4096, 4096, 0x1122334455667788));
+        assert_eq!(hammer2_dedup.saved_bytes, 4096);
+        assert_eq!(hammer2_dedup.get_dedup_ratio(), 200);
+    }
+
+    #[test]
+    fn test_netbsd_rump_component_engine() {
+        let mut rump = NetBsdRumpComponentEngine::new();
+        rump.register_component("rumpvfs", RumpComponentType::Vfs);
+        rump.register_component("rumpnet", RumpComponentType::NetStack);
+        assert_eq!(rump.initialize_all_components(), 2);
+        let dispatch_res = rump.dispatch_rump_hypercall("rumpvfs", 5).unwrap();
+        assert_eq!(dispatch_res, 0x8000_0005);
+    }
+
+    #[test]
+    fn test_android_apex_container_module_engine() {
+        let mut engine = AndroidApexContainerModuleEngine::new();
+        assert!(engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+        assert!(!engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+
+        assert!(engine.activate_module("com.android.runtime", 330000000).is_ok());
+        assert_eq!(engine.active_mounts, 1);
+
+        let version = engine.rollback_module("com.android.runtime").unwrap();
+        assert_eq!(version, 330000000);
+        assert_eq!(engine.active_mounts, 0);
+    }
+
+    #[test]
+    fn test_rosetta_dynamic_binary_translator() {
+        let mut translator = RosettaDynamicBinaryTranslator::new(TargetArch::AArch64);
+        let x86_code = [0x90, 0x90, 0xc3]; // NOP NOP RET
+        let translated1 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 1);
+
+        let translated2 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translated1, translated2);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 2);
+    }
+
+    #[test]
+    fn test_phoronix_automated_benchmark_engine() {
+        let mut phoronix = PhoronixAutomatedBenchmarkEngine::new("Kernel Scheduler Suite");
+        phoronix.run_test("7-Zip Compression", "MIPS", 45000.0);
+        phoronix.run_test("Sysbench CPU", "events/sec", 15000.0);
+        assert_eq!(phoronix.results.len(), 2);
+        assert_eq!(phoronix.compute_composite_index(), 30000.0);
+    }
+
+    #[test]
+    fn test_distrowatch_parity_metrics_hub() {
+        let mut hub = DistroWatchParityMetricsHub::new();
+        hub.record_distro_parity("Arch Linux", 100);
+        hub.record_distro_parity("FreeBSD", 90);
+        assert_eq!(hub.distros.len(), 2);
+        assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+    #[test]
+    fn test_rocky_alma_enterprise_lifecycle_governor() {
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        assert!(gov.verify_abi_compatibility(8));
+        assert!(gov.verify_abi_compatibility(9));
+        assert!(!gov.verify_abi_compatibility(10));
+
+        gov.apply_errata_patch("RHSA-2026:1234");
+        assert_eq!(gov.errata_patches_applied, 1);
+        assert_eq!(gov.security_advisories[0], "RHSA-2026:1234");
+    }
+
+    #[test]
+    fn test_void_xbps_container_engine() {
+        let mut xbps = VoidXbpsContainerEngine::new();
+        xbps.install_xbps_package("xbps-src");
+        xbps.start_runit_service("dhcpcd");
+        xbps.start_runit_service("dhcpcd"); // duplicate check
+        assert_eq!(xbps.registered_packages.len(), 1);
+        assert_eq!(xbps.runit_services_active.len(), 1);
+    }
+
+    #[test]
+    fn test_puppy_linux_overlay_ramdisk_engine() {
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
+        puppy.load_sfs_module("puppy_sigma_2.0.sfs");
+        puppy.mount_persistence("/mnt/home/sigmasave.2fs");
+        assert_eq!(puppy.loaded_sfs_modules.len(), 1);
+        assert_eq!(puppy.persistence_save_file.unwrap(), "/mnt/home/sigmasave.2fs");
+    }
+
+    #[test]
+    fn test_tinycore_modular_tcz_loader() {
+        let mut tcz = TinyCoreModularTczLoader::new();
+        tcz.mount_tcz("wifi.tcz", 1024);
+        tcz.mount_tcz("openssh.tcz", 2048);
+        assert_eq!(tcz.mounted_extensions.len(), 2);
+        assert_eq!(tcz.total_ram_used_kb, 3072);
+    }
+
+    #[test]
+    fn test_deepin_dde_control_center_engine() {
+        let mut dde = DeepinDdeControlCenterEngine::new();
+        dde.set_theme_mode("Light");
+        dde.set_dock_position("Top");
+        assert_eq!(dde.theme_mode, "Light");
+        assert_eq!(dde.dock_position, "Top");
+    }
+
+    #[test]
+    fn test_manjaro_hardware_detection_engine() {
+        let mut mhwd = ManjaroHardwareDetectionEngine::new();
+        mhwd.scan_pci_bus(0x10DE, 0x1E84);
+        assert_eq!(mhwd.recommended_drivers[0], "video-nvidia");
+        assert_eq!(mhwd.auto_install_recommended_drivers(), 1);
+    }
+
+    #[test]
+    fn test_steamos_gamescope_compositor_engine() {
+        let mut gamescope = SteamOsGamescopeCompositorEngine::new();
+        gamescope.enable_fsr(true);
+        gamescope.set_fps_limit(120);
+        let leased = gamescope.lease_drm_surface();
+        assert!(gamescope.fsr_enabled);
+        assert_eq!(gamescope.target_fps_limit, 120);
+        assert_eq!(leased, 1);
+    }
+
+    #[test]
+    fn test_phoronix_test_suite_runner() {
+        let mut phoronix = PhoronixTestSuiteRunner::new("Graphics Suite");
+        phoronix.execute_benchmark("Unigine Heaven", 120.0);
+        phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
+        assert_eq!(phoronix.calculate_composite_score(), 100.0);
+    }
+
+}

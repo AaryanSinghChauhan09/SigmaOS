@@ -3,7 +3,6 @@ extern crate alloc;
 // Sovereign Linuxulator - Native Linux ELF Binary Loader and Syscall Translation Engine for SigmaOS
 // Inspired by the FreeBSD linuxulator, allowing unmodified Linux x86_64 binaries to run natively under microkernel isolation.
 
-
 use crate::driver::device::DeviceError;
 use crate::interrupt::handler::RegisterSet;
 use alloc::string::String;

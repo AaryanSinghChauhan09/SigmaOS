@@ -1,7 +1,7 @@
 // SigmaOS Logging and Diagnostics Subsystem Mod
 
-pub mod unified;
 pub mod rotation;
+pub mod unified;
 
 pub use rotation::{
     LogCompressor, LogFacility, LogFile, LogFileID, LogRotateConfig, LogRotator, LogSeverity,

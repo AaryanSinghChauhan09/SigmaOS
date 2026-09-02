@@ -17,9 +17,9 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // SigmaOS Disk Defragmenter for SigmaFS
 // OOP-based defragmentation with Merkle tree optimization
@@ -232,8 +232,8 @@ impl SigmaFsDefragStrategy {
             if entry_path.is_dir() {
                 self.collect_file_info(&entry_path, file_infos, total_size, fragmented_size)?;
             } else if entry_path.is_file() {
-                let metadata = Err("fs not available")
-                    .map_err(|e| DefragError::IoError(e.to_string()))?;
+                let metadata =
+                    Err("fs not available").map_err(|e| DefragError::IoError(e.to_string()))?;
 
                 let size = metadata.len();
                 let block_count = (size / self.block_size) as usize

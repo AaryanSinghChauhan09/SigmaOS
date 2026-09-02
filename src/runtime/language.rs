@@ -17,18 +17,26 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec as AllocVec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// OOP-based Language Runtime Management for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 14
 /// Implements unified handling for Python, Node, Java runtimes
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RuntimeID = usize;
 
@@ -331,103 +339,100 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
+pub struct SovereignLocaleEngine {
+    pub active_locale: String,
+    pub category_locales: BTreeMap<LocaleCategory, String>,
+    pub translation_catalogs: BTreeMap<String, BTreeMap<String, String>>, // Domain -> (msgid -> msgstr)
+}
+
+impl SovereignLocaleEngine {
+    pub fn new(default_locale: &str) -> Self {
+        let mut engine = Self {
+            active_locale: default_locale.to_string(),
+            category_locales: BTreeMap::new(),
+            translation_catalogs: BTreeMap::new(),
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        engine.set_locale(LocaleCategory::All, default_locale);
+        engine
     }
-}
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+    /// POSIX setlocale implementation
+    pub fn set_locale(&mut self, category: LocaleCategory, locale: &str) -> String {
+        if category == LocaleCategory::All {
+            self.active_locale = locale.to_string();
+            self.category_locales
+                .insert(LocaleCategory::Ctype, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Numeric, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Time, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Collate, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Monetary, locale.to_string());
+            self.category_locales
+                .insert(LocaleCategory::Messages, locale.to_string());
         } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+            self.category_locales.insert(category, locale.to_string());
         }
+        self.active_locale.clone()
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+    /// Register GNU gettext-style translation catalog
+    pub fn register_translation(&mut self, domain: &str, msgid: &str, msgstr: &str) {
+        self.translation_catalogs
+            .entry(domain.to_string())
+            .or_default()
+            .insert(msgid.to_string(), msgstr.to_string());
+    }
+
+    /// GNU gettext lookup
+    pub fn gettext(&self, domain: &str, msgid: &str) -> String {
+        if let Some(catalog) = self.translation_catalogs.get(domain) {
+            if let Some(msgstr) = catalog.get(msgid) {
+                return msgstr.clone();
+            }
         }
+        msgid.to_string()
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+impl Default for SovereignLocaleEngine {
+    fn default() -> Self {
+        let mut locale = Self::new("en_US.UTF-8");
+        locale.register_translation(
+            "sigmaos",
+            "Welcome to SigmaOS",
+            "Welcome to SigmaOS Sovereign System",
+        );
+        locale
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    #[test]
+    fn test_sovereign_locale_engine() {
+        let mut locale = SovereignLocaleEngine::new("en_US.UTF-8");
+        assert_eq!(
+            locale.set_locale(LocaleCategory::Time, "hi_IN.UTF-8"),
+            "en_US.UTF-8"
+        );
+        assert_eq!(
+            locale.category_locales.get(&LocaleCategory::Time).unwrap(),
+            "hi_IN.UTF-8"
+        );
+
+        locale.register_translation("desktop", "Settings", "सेटिंग्स");
+        assert_eq!(locale.gettext("desktop", "Settings"), "सेटिंग्स");
+        assert_eq!(locale.gettext("desktop", "Unknown"), "Unknown");
     }
 }

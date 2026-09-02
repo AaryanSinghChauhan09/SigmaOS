@@ -1,12 +1,12 @@
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-use crate::klib::HashMap;
 use crate::klib::path::PathBuf;
+use crate::klib::HashMap;
 use alloc::string::{String, ToString};
 
 /// Standardized next-generation hierarchy (SigmaFS)
@@ -187,6 +187,7 @@ impl DistributedSovereignFS {
     /// Verifies replication consensus. Returns true if the block is backed up on >= 2 distinct peer nodes.
     pub fn verify_replica_consensus(&self, block_hash: &str) -> bool {
         if let Some(replicas) = self.peer_replicas.get(block_hash) {
+            let replicas: &Vec<String> = replicas;
             replicas.len() >= 2
         } else {
             false
@@ -785,11 +786,17 @@ mod tests {
         // Start transaction
         let tx1 = journal.start_transaction("write", "/etc/resolv.conf", b"nameserver 1.1.1.1");
         assert_eq!(tx1, 1);
-        assert_eq!(journal.transactions.get(&1).unwrap().state, JournalState::Pending);
+        assert_eq!(
+            journal.transactions.get(&1).unwrap().state,
+            JournalState::Pending
+        );
 
         // Commit transaction
         journal.commit_transaction(1).unwrap();
-        assert_eq!(journal.transactions.get(&1).unwrap().state, JournalState::Committed);
+        assert_eq!(
+            journal.transactions.get(&1).unwrap().state,
+            JournalState::Committed
+        );
 
         // Start another transaction that gets abandoned (Pending)
         let tx2 = journal.start_transaction("write", "/home/user/test.txt", b"important data");
@@ -800,8 +807,14 @@ mod tests {
         // Trigger AI self-heal recovery (aborts empty, commits filled pending)
         let healed = journal.ai_self_heal_recovery();
         assert_eq!(healed, 2);
-        assert_eq!(journal.transactions.get(&2).unwrap().state, JournalState::Committed);
-        assert_eq!(journal.transactions.get(&3).unwrap().state, JournalState::Aborted);
+        assert_eq!(
+            journal.transactions.get(&2).unwrap().state,
+            JournalState::Committed
+        );
+        assert_eq!(
+            journal.transactions.get(&3).unwrap().state,
+            JournalState::Aborted
+        );
     }
 
     #[test]

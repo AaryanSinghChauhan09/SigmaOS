@@ -2778,7 +2778,13 @@ impl SysinternalsProcMon {
         self.is_capturing = false;
     }
 
-    pub fn record_event(&mut self, pid: u32, proc_name: &str, event_type: ProcMonEventType, detail: &str) {
+    pub fn record_event(
+        &mut self,
+        pid: u32,
+        proc_name: &str,
+        event_type: ProcMonEventType,
+        detail: &str,
+    ) {
         if self.is_capturing {
             let seq = self.sequence_counter;
             self.sequence_counter += 1;
@@ -2797,7 +2803,11 @@ impl SysinternalsProcMon {
     }
 
     pub fn filter_events_by_pid(&self, pid: u32) -> Vec<ProcMonEvent> {
-        self.captured_events.iter().filter(|e| e.pid == pid).cloned().collect()
+        self.captured_events
+            .iter()
+            .filter(|e| e.pid == pid)
+            .cloned()
+            .collect()
     }
 
     pub fn record_operation(&mut self, process: &str, pid: u32, op: &str, path: &str, res: &str) {
@@ -2831,6 +2841,87 @@ impl SysinternalsProcMon {
 impl Default for SysinternalsProcMon {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// FreeBSD bhyve virtio & PCI passthrough hypervisor engine
+pub struct FreeBsdBhyveHypervisorEngine {
+    pub vm_name: String,
+    pub memory_mb: u64,
+    pub vcpus: u32,
+    pub is_running: bool,
+    pub passthrough_pci_devices: Vec<String>,
+}
+
+impl FreeBsdBhyveHypervisorEngine {
+    pub fn new(vm_name: &str, memory_mb: u64, vcpus: u32) -> Self {
+        Self {
+            vm_name: vm_name.to_string(),
+            memory_mb,
+            vcpus,
+            is_running: false,
+            passthrough_pci_devices: Vec::new(),
+        }
+    }
+
+    pub fn register_pci_passthrough(&mut self, pci_addr: &str) {
+        self.passthrough_pci_devices.push(pci_addr.to_string());
+    }
+
+    pub fn spawn_vm(&mut self) -> Result<(), &'static str> {
+        if self.is_running {
+            return Err("VM already running");
+        }
+        self.is_running = true;
+        Ok(())
+    }
+
+    pub fn stop_vm(&mut self) -> Result<(), &'static str> {
+        if !self.is_running {
+            return Err("VM not running");
+        }
+        self.is_running = false;
+        Ok(())
+    }
+}
+
+/// NetBSD Rump Kernel isolated driver and subsystem runner
+pub struct NetBsdRumpKernelServer {
+    pub active_components: Vec<String>,
+    pub sysproxy_socket: String,
+}
+
+impl NetBsdRumpKernelServer {
+    pub fn new(sysproxy_socket: &str) -> Self {
+        Self {
+            active_components: Vec::new(),
+            sysproxy_socket: sysproxy_socket.to_string(),
+        }
+    }
+
+    pub fn load_component(&mut self, component_name: &str) -> bool {
+        if self.active_components.iter().any(|c| c == component_name) {
+            return false;
+        }
+        self.active_components.push(component_name.to_string());
+        true
+    }
+
+    pub fn unload_component(&mut self, component_name: &str) -> bool {
+        if let Some(idx) = self
+            .active_components
+            .iter()
+            .position(|c| c == component_name)
+        {
+            self.active_components.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_component_loaded(&self, component_name: &str) -> bool {
+        self.active_components.iter().any(|c| c == component_name)
     }
 }
 
@@ -3519,7 +3610,11 @@ impl MiseUniversalVersionManager {
     }
 
     pub fn install_tool(&mut self, tool: &str, version: &str) {
-        if let Some(existing) = self.installed_tools.iter_mut().find(|t| t.tool_name == tool) {
+        if let Some(existing) = self
+            .installed_tools
+            .iter_mut()
+            .find(|t| t.tool_name == tool)
+        {
             existing.active_version = version.to_string();
         } else {
             self.installed_tools.push(LanguageRuntimeVersion {
@@ -3565,7 +3660,8 @@ impl DevenvReproducibleEnvironment {
     }
 
     pub fn set_env_var(&mut self, key: &str, value: &str) {
-        self.environment_variables.push((key.to_string(), value.to_string()));
+        self.environment_variables
+            .push((key.to_string(), value.to_string()));
     }
 
     pub fn enter_shell(&mut self) -> Result<usize, &'static str> {
@@ -3602,7 +3698,14 @@ impl AircrackWirelessAuditor {
         }
     }
 
-    pub fn scan_airspace(&mut self, bssid: &str, ssid: &str, channel: u8, signal: i8, enc: &'static str) {
+    pub fn scan_airspace(
+        &mut self,
+        bssid: &str,
+        ssid: &str,
+        channel: u8,
+        signal: i8,
+        enc: &'static str,
+    ) {
         self.captured_access_points.push(AccessPointPacket {
             bssid: bssid.to_string(),
             ssid: ssid.to_string(),
@@ -3613,7 +3716,11 @@ impl AircrackWirelessAuditor {
     }
 
     pub fn capture_eapol_handshake(&mut self, target_bssid: &str) -> bool {
-        if self.captured_access_points.iter().any(|ap| ap.bssid == target_bssid) {
+        if self
+            .captured_access_points
+            .iter()
+            .any(|ap| ap.bssid == target_bssid)
+        {
             self.handshake_captured = true;
             return true;
         }
@@ -3711,11 +3818,13 @@ impl ClearLinuxStatelessEngine {
     }
 
     pub fn register_usr_default(&mut self, path: &str, content: &str) {
-        self.usr_defaults.push((path.to_string(), content.to_string()));
+        self.usr_defaults
+            .push((path.to_string(), content.to_string()));
     }
 
     pub fn override_etc(&mut self, path: &str, content: &str) {
-        self.sysconfdir_overrides.push((path.to_string(), content.to_string()));
+        self.sysconfdir_overrides
+            .push((path.to_string(), content.to_string()));
     }
 
     pub fn reset_etc_to_stateless_defaults(&mut self) -> usize {
@@ -3730,7 +3839,6 @@ impl Default for ClearLinuxStatelessEngine {
         Self::new()
     }
 }
-
 
 // =========================================================================
 // UNIT TESTS
@@ -4828,7 +4936,9 @@ mod tests {
     #[test]
     fn test_ubuntu_pro_livepatch_engine() {
         let mut engine_no_sub = UbuntuProLivepatchEngine::new(false);
-        assert!(engine_no_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_err());
+        assert!(engine_no_sub
+            .apply_hotpatch("LP-2026-001", "CWE-119")
+            .is_err());
 
         let mut engine_sub = UbuntuProLivepatchEngine::new(true);
         assert!(engine_sub.apply_hotpatch("LP-2026-001", "CWE-119").is_ok());
@@ -4847,10 +4957,35 @@ mod tests {
     #[test]
     fn test_clear_linux_stateless_engine() {
         let mut engine = ClearLinuxStatelessEngine::new();
-        engine.register_usr_default("/usr/share/defaults/etc/fstab", "LABEL=root / ext4 defaults 0 1");
+        engine.register_usr_default(
+            "/usr/share/defaults/etc/fstab",
+            "LABEL=root / ext4 defaults 0 1",
+        );
         engine.override_etc("/etc/fstab", "/dev/sda1 / ext4 defaults 0 1");
         assert_eq!(engine.sysconfdir_overrides.len(), 1);
         assert_eq!(engine.reset_etc_to_stateless_defaults(), 1);
         assert_eq!(engine.sysconfdir_overrides.len(), 0);
+    }
+
+    #[test]
+    fn test_freebsd_bhyve_hypervisor_engine() {
+        let mut bhyve = FreeBsdBhyveHypervisorEngine::new("freebsd-guest", 4096, 4);
+        bhyve.register_pci_passthrough("00:14.0");
+        assert_eq!(bhyve.passthrough_pci_devices.len(), 1);
+        assert!(!bhyve.is_running);
+        assert!(bhyve.spawn_vm().is_ok());
+        assert!(bhyve.is_running);
+        assert!(bhyve.stop_vm().is_ok());
+        assert!(!bhyve.is_running);
+    }
+
+    #[test]
+    fn test_netbsd_rump_kernel_server() {
+        let mut rump = NetBsdRumpKernelServer::new("/tmp/rump_sysproxy.sock");
+        assert!(rump.load_component("rumpvfs"));
+        assert!(rump.is_component_loaded("rumpvfs"));
+        assert!(!rump.load_component("rumpvfs"));
+        assert!(rump.unload_component("rumpvfs"));
+        assert!(!rump.is_component_loaded("rumpvfs"));
     }
 }

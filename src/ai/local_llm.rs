@@ -1,5 +1,5 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS Local LLM & Whisper Speech-to-Text Integration
 // Native wrapper interfacing with llama.cpp and OpenAI Whisper GGUF models
@@ -9,8 +9,10 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum QuantizationType {
     Q4KM,
+    Q4_K_M,
     Q8_0,
     F16,
 }

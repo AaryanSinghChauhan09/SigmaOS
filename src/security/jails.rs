@@ -89,7 +89,10 @@ impl VnetStack {
     }
 
     pub fn is_port_available(&self, ip: &str, port: u16) -> bool {
-        !self.bound_sockets.iter().any(|(s_ip, s_port)| s_ip == ip && *s_port == port)
+        !self
+            .bound_sockets
+            .iter()
+            .any(|(s_ip, s_port)| s_ip == ip && *s_port == port)
     }
 
     pub fn bind_socket(&mut self, ip: &str, port: u16) -> Result<(), &'static str> {

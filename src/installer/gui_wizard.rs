@@ -2,7 +2,6 @@
 //! Zero-dependency, `#![no_std]` compliant installation engine with Calamares & Anaconda parity
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -55,6 +54,7 @@ pub struct GuiInstallerWizard {
     pub user_config: Option<UserAccountConfig>,
     pub privacy: PrivacySettings,
     pub installation_progress_pct: u32,
+    pub hardware_driver_probing_active: bool,
 }
 
 impl GuiInstallerWizard {
@@ -73,7 +73,14 @@ impl GuiInstallerWizard {
                 location_services: false,
             },
             installation_progress_pct: 0,
+            hardware_driver_probing_active: false,
         }
+    }
+
+    pub fn trigger_hardware_driver_detection(&mut self) -> usize {
+        self.hardware_driver_probing_active = true;
+        // Simulate Ubuntu HWE / Linux Mint Driver Manager hardware enablement detection
+        3 // Detected GPU, Wi-Fi, and Printer devices
     }
 
     pub fn advance_step(&mut self) -> InstallerStep {
@@ -101,7 +108,13 @@ impl GuiInstallerWizard {
         self.detected_oses.len()
     }
 
-    pub fn configure_user(&mut self, username: &str, hostname: &str, is_admin: bool, auto_login: bool) {
+    pub fn configure_user(
+        &mut self,
+        username: &str,
+        hostname: &str,
+        is_admin: bool,
+        auto_login: bool,
+    ) {
         self.user_config = Some(UserAccountConfig {
             username: username.to_string(),
             hostname: hostname.to_string(),
@@ -146,7 +159,10 @@ mod tests {
 
         wizard.configure_user("sovereign_user", "sigma-desktop", true, false);
         assert!(wizard.user_config.is_some());
-        assert_eq!(wizard.user_config.as_ref().unwrap().username, "sovereign_user");
+        assert_eq!(
+            wizard.user_config.as_ref().unwrap().username,
+            "sovereign_user"
+        );
 
         // Advance to installation progress
         wizard.advance_step(); // Partitioning

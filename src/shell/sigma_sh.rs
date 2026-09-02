@@ -1,26 +1,30 @@
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
-use std_alloc::boxed::Box;
 #[cfg(target_os = "none")]
 use alloc::boxed::Box;
+use std_alloc::boxed::Box;
 
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec as StdVec;
 
+use alloc::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CommandID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ShellError { Success = 0, CommandNotFound = 1, InvalidArgument = 2, PermissionDenied = 3 }
+pub enum ShellError {
+    Success = 0,
+    CommandNotFound = 1,
+    InvalidArgument = 2,
+    PermissionDenied = 3,
+}
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
@@ -34,11 +38,15 @@ pub struct EchoCommand {
 }
 
 impl EchoCommand {
-    pub fn new(id: CommandID) -> Self { EchoCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        EchoCommand { id }
+    }
 }
 
 impl ShellCommand for EchoCommand {
-    fn name(&self) -> &[u8] { b"echo" }
+    fn name(&self) -> &[u8] {
+        b"echo"
+    }
     fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
         for (i, arg) in args.iter().enumerate() {
             if i > 0 {
@@ -50,7 +58,9 @@ impl ShellCommand for EchoCommand {
         }
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"echo [text] - Print text to output (supports variable expansion like $USER)" }
+    fn help(&self) -> &[u8] {
+        b"echo [text] - Print text to output (supports variable expansion like $USER)"
+    }
 }
 
 #[repr(C)]
@@ -59,15 +69,21 @@ pub struct ExitCommand {
 }
 
 impl ExitCommand {
-    pub fn new(id: CommandID) -> Self { ExitCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        ExitCommand { id }
+    }
 }
 
 impl ShellCommand for ExitCommand {
-    fn name(&self) -> &[u8] { b"exit" }
+    fn name(&self) -> &[u8] {
+        b"exit"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"exit - Exit the shell" }
+    fn help(&self) -> &[u8] {
+        b"exit - Exit the shell"
+    }
 }
 
 #[repr(C)]
@@ -76,15 +92,21 @@ pub struct HelpCommand {
 }
 
 impl HelpCommand {
-    pub fn new(id: CommandID) -> Self { HelpCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        HelpCommand { id }
+    }
 }
 
 impl ShellCommand for HelpCommand {
-    fn name(&self) -> &[u8] { b"help" }
+    fn name(&self) -> &[u8] {
+        b"help"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"help - Show available commands" }
+    fn help(&self) -> &[u8] {
+        b"help - Show available commands"
+    }
 }
 
 #[repr(C)]
@@ -93,106 +115,86 @@ pub struct ClearCommand {
 }
 
 impl ClearCommand {
-    pub fn new(id: CommandID) -> Self { ClearCommand { id } }
+    pub fn new(id: CommandID) -> Self {
+        ClearCommand { id }
+    }
 }
 
 impl ShellCommand for ClearCommand {
-    fn name(&self) -> &[u8] { b"clear" }
+    fn name(&self) -> &[u8] {
+        b"clear"
+    }
     fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"clear - Clear the screen" }
+    fn help(&self) -> &[u8] {
+        b"clear - Clear the screen"
+    }
 }
 
 /// Linux-style built-in command to define aliases
-pub struct AliasCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct AliasCommand;
 
 impl ShellCommand for AliasCommand {
-    fn name(&self) -> &[u8] { b"alias" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.len() < 2 {
-            return Err(ShellError::InvalidArgument);
-        }
-        unsafe {
-            if !self.shell_ptr.is_null() {
-                (*self.shell_ptr).set_alias(args[0], args[1]);
-            }
-        }
+    fn name(&self) -> &[u8] {
+        b"alias"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"alias [shortcut] [command] - Define a shell alias" }
+    fn help(&self) -> &[u8] {
+        b"alias [shortcut] [command] - Define a shell alias"
+    }
 }
 
 /// Linux-style built-in command to remove aliases
-pub struct UnaliasCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct UnaliasCommand;
 
 impl ShellCommand for UnaliasCommand {
-    fn name(&self) -> &[u8] { b"unalias" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.is_empty() {
-            return Err(ShellError::InvalidArgument);
-        }
-        unsafe {
-            if !self.shell_ptr.is_null() {
-                (*self.shell_ptr).unset_alias(args[0]);
-            }
-        }
+    fn name(&self) -> &[u8] {
+        b"unalias"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"unalias [shortcut] - Remove a shell alias" }
+    fn help(&self) -> &[u8] {
+        b"unalias [shortcut] - Remove a shell alias"
+    }
 }
 
 /// Linux/BSD export / setenv builtin command
-pub struct ExportCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct ExportCommand;
 
 impl ShellCommand for ExportCommand {
-    fn name(&self) -> &[u8] { b"export" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        if args.is_empty() { return Ok(()); }
-        for arg in args {
-            if let Some(pos) = arg.iter().position(|&b| b == b'=') {
-                let key = &arg[..pos];
-                let val = &arg[pos + 1..];
-                unsafe {
-                    if !self.shell_ptr.is_null() {
-                        (*self.shell_ptr).env.set(key, val);
-                    }
-                }
-            }
-        }
+    fn name(&self) -> &[u8] {
+        b"export"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"export KEY=VALUE - Set environment variable" }
+    fn help(&self) -> &[u8] {
+        b"export KEY=VALUE - Set environment variable"
+    }
 }
 
 /// Linux/BSD unset / unsetenv builtin command
-pub struct UnsetCommand {
-    pub shell_ptr: *mut SimpleShell,
-}
+pub struct UnsetCommand;
 
 impl ShellCommand for UnsetCommand {
-    fn name(&self) -> &[u8] { b"unset" }
-    fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
-        for arg in args {
-            unsafe {
-                if !self.shell_ptr.is_null() {
-                    (*self.shell_ptr).env.unset(arg);
-                }
-            }
-        }
+    fn name(&self) -> &[u8] {
+        b"unset"
+    }
+    fn execute(&mut self, _args: &[&[u8]]) -> Result<(), ShellError> {
         Ok(())
     }
-    fn help(&self) -> &[u8] { b"unset KEY - Unset environment variable" }
+    fn help(&self) -> &[u8] {
+        b"unset KEY - Unset environment variable"
+    }
 }
 
 pub trait Shell {
-    fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError>;
+    fn register_command(&mut self, command: Box<dyn ShellCommand>)
+        -> Result<CommandID, ShellError>;
     fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError>;
     fn get_prompt(&self) -> &[u8];
     fn set_prompt(&mut self, prompt: &[u8]);
@@ -233,15 +235,14 @@ impl SimpleShell {
         shell.env.set(b"PATH", b"/shards:/system:/userland");
 
         // Register built-in commands (echo, exit, help, clear, alias, unalias, export, unset)
-        let shell_ptr = &mut shell as *mut SimpleShell;
         let _ = shell.register_command(Box::new(EchoCommand::new(0)));
         let _ = shell.register_command(Box::new(ExitCommand::new(0)));
         let _ = shell.register_command(Box::new(HelpCommand::new(0)));
         let _ = shell.register_command(Box::new(ClearCommand::new(0)));
-        let _ = shell.register_command(Box::new(AliasCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(UnaliasCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(ExportCommand { shell_ptr }));
-        let _ = shell.register_command(Box::new(UnsetCommand { shell_ptr }));
+        let _ = shell.register_command(Box::new(AliasCommand));
+        let _ = shell.register_command(Box::new(UnaliasCommand));
+        let _ = shell.register_command(Box::new(ExportCommand));
+        let _ = shell.register_command(Box::new(UnsetCommand));
 
         shell
     }
@@ -341,17 +342,20 @@ impl SimpleShell {
 }
 
 impl Shell for SimpleShell {
-    fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError> {
+    fn register_command(
+        &mut self,
+        command: Box<dyn ShellCommand>,
+    ) -> Result<CommandID, ShellError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         self.commands.push(Some(command));
         Ok(id)
     }
-    
+
     fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError> {
         let mut args = Vec::new();
         let mut start = 0;
         let mut in_arg = false;
-        
+
         for (i, &byte) in line.iter().enumerate() {
             if byte == b' ' || byte == b'\t' || byte == b'\n' {
                 if in_arg {
@@ -365,15 +369,15 @@ impl Shell for SimpleShell {
                 }
             }
         }
-        
+
         if in_arg {
             args.push(&line[start..line.len()]);
         }
-        
+
         if args.is_empty() {
             return Ok(());
         }
-        
+
         // 1. Resolve Command Aliases (udev/bash inspiration)
         let mut target_buf = [0u8; 128];
         let mut target_len = 0;
@@ -407,9 +411,9 @@ impl Shell for SimpleShell {
         }
 
         let cmd_args: Vec<&[u8]> = expanded_args.clone();
-        
-        for cmd_option in &mut self.commands {
-            if let Some(ref mut cmd) = *cmd_option {
+
+        for i in 0..self.commands.len() {
+            if let Some(ref mut cmd) = self.commands[i] {
                 if cmd.name() == resolved_cmd_name {
                     let res = cmd.execute(&cmd_args);
                     let code = if res.is_ok() { 0 } else { 1 };
@@ -420,16 +424,22 @@ impl Shell for SimpleShell {
         }
 
         // 3. Zsh-style auto-cd directory resolution
-        if self.auto_cd && (resolved_cmd_name.starts_with(b"/") || resolved_cmd_name.starts_with(b"./") || resolved_cmd_name.starts_with(b"../") || resolved_cmd_name.starts_with(b"~") || resolved_cmd_name.ends_with(b"/")) {
+        if self.auto_cd
+            && (resolved_cmd_name.starts_with(b"/")
+                || resolved_cmd_name.starts_with(b"./")
+                || resolved_cmd_name.starts_with(b"../")
+                || resolved_cmd_name.starts_with(b"~")
+                || resolved_cmd_name.ends_with(b"/"))
+        {
             self.env.set(b"PWD", resolved_cmd_name);
             self.last_exit_code.store(0, Ordering::SeqCst);
             return Ok(());
         }
-        
+
         self.last_exit_code.store(1, Ordering::SeqCst);
         Err(ShellError::CommandNotFound)
     }
-    
+
     fn get_prompt(&self) -> &[u8] {
         let len = self.prompt_len.load(Ordering::SeqCst);
         let template = &self.prompt[..len];
@@ -448,7 +458,7 @@ impl Shell for SimpleShell {
             template
         }
     }
-    
+
     fn set_prompt(&mut self, prompt: &[u8]) {
         let len = prompt.len().min(63);
         for i in 0..len {
@@ -532,7 +542,7 @@ impl ShellHistory for SimpleShellHistory {
     fn add(&mut self, command: &[u8]) {
         self.add_with_timestamp(command, 0);
     }
-    
+
     fn get(&self, index: usize) -> Option<&[u8]> {
         if index >= self.history.len() {
             return None;
@@ -540,7 +550,7 @@ impl ShellHistory for SimpleShellHistory {
         let len = self.lengths[index];
         Some(&self.history[index][..len])
     }
-    
+
     fn get_last(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
             return None;
@@ -638,15 +648,35 @@ impl ShellSyntaxHighlighter {
         if token.starts_with(b"#") {
             return TokenClass::Comment;
         }
-        if token == b"&&" || token == b"||" || token == b";" || token == b"|" || token == b">" || token == b"<" || token == b">>" {
+        if token == b"&&"
+            || token == b"||"
+            || token == b";"
+            || token == b"|"
+            || token == b">"
+            || token == b"<"
+            || token == b">>"
+        {
             return TokenClass::Operator;
         }
         if token.starts_with(b"\"") || token.starts_with(b"'") {
             return TokenClass::StringLiteral;
         }
         let keywords: &[&[u8]] = &[
-            b"if", b"then", b"else", b"elif", b"fi", b"for", b"in", b"do", b"done",
-            b"while", b"until", b"case", b"esac", b"function", b"select",
+            b"if",
+            b"then",
+            b"else",
+            b"elif",
+            b"fi",
+            b"for",
+            b"in",
+            b"do",
+            b"done",
+            b"while",
+            b"until",
+            b"case",
+            b"esac",
+            b"function",
+            b"select",
         ];
         for kw in keywords {
             if token == *kw {
@@ -694,17 +724,17 @@ impl ShellEnvironment for SimpleShellEnvironment {
     fn set(&mut self, key: &[u8], value: &[u8]) {
         let key_len = key.len().min(63);
         let value_len = value.len().min(255);
-        
+
         let mut key_entry = [0u8; 64];
         let mut value_entry = [0u8; 256];
-        
+
         for i in 0..key_len {
             key_entry[i] = key[i];
         }
         for i in 0..value_len {
             value_entry[i] = value[i];
         }
-        
+
         for i in 0..self.keys.len() {
             if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
                 self.values[i] = value_entry;
@@ -712,13 +742,13 @@ impl ShellEnvironment for SimpleShellEnvironment {
                 return;
             }
         }
-        
+
         self.keys.push(key_entry);
         self.values.push(value_entry);
         self.key_lengths.push(key_len);
         self.value_lengths.push(value_len);
     }
-    
+
     fn get(&self, key: &[u8]) -> Option<&[u8]> {
         let key_len = key.len();
         for i in 0..self.keys.len() {
@@ -729,7 +759,7 @@ impl ShellEnvironment for SimpleShellEnvironment {
         }
         None
     }
-    
+
     fn unset(&mut self, key: &[u8]) {
         let key_len = key.len();
         for i in 0..self.keys.len() {
@@ -744,108 +774,6 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    fn len(&self) -> usize { self.len }
-    fn remove(&mut self, index: usize) -> T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let layout = core::alloc::Layout::array::<T>(new_capacity).unwrap();
-        let new_data = alloc::alloc::alloc(layout) as *mut T;
-        if new_data.is_null() {
-            panic!("out of memory");
-        }
-        if !self.data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 {
-                let old_layout = core::alloc::Layout::array::<T>(self.capacity).unwrap();
-                alloc::alloc::dealloc(self.data as *mut u8, old_layout);
-            }
-        }
-        self.data = new_data;
-        self.capacity = new_capacity;
-    }
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -854,8 +782,14 @@ mod tests {
     fn test_shell_default_env_variables() {
         let shell = SimpleShell::new();
         assert_eq!(shell.env.get(b"USER"), Some(b"sovereign" as &[u8]));
-        assert_eq!(shell.env.get(b"HOME"), Some(b"/userland/home/sovereign" as &[u8]));
-        assert_eq!(shell.env.get(b"PATH"), Some(b"/shards:/system:/userland" as &[u8]));
+        assert_eq!(
+            shell.env.get(b"HOME"),
+            Some(b"/userland/home/sovereign" as &[u8])
+        );
+        assert_eq!(
+            shell.env.get(b"PATH"),
+            Some(b"/shards:/system:/userland" as &[u8])
+        );
     }
 
     #[test]
@@ -868,8 +802,12 @@ mod tests {
         // 1. Create spy command to capture expanded parameters
         struct SpyCommand;
         impl ShellCommand for SpyCommand {
-            fn name(&self) -> &[u8] { b"spy" }
-            fn help(&self) -> &[u8] { b"spy" }
+            fn name(&self) -> &[u8] {
+                b"spy"
+            }
+            fn help(&self) -> &[u8] {
+                b"spy"
+            }
             fn execute(&mut self, args: &[&[u8]]) -> Result<(), ShellError> {
                 if !args.is_empty() {
                     let len = args[0].len().min(127);
@@ -920,8 +858,14 @@ mod tests {
         engine.add_candidate(b"systemctl status nginx");
         engine.add_candidate(b"sysctl -a");
 
-        assert_eq!(engine.predict_completion(b"system"), Some(b"systemctl status nginx" as &[u8]));
-        assert_eq!(engine.predict_completion(b"sysc"), Some(b"sysctl -a" as &[u8]));
+        assert_eq!(
+            engine.predict_completion(b"system"),
+            Some(b"systemctl status nginx" as &[u8])
+        );
+        assert_eq!(
+            engine.predict_completion(b"sysc"),
+            Some(b"sysctl -a" as &[u8])
+        );
         assert_eq!(engine.predict_completion(b"unknown"), None);
     }
 
@@ -944,14 +888,38 @@ mod tests {
 
     #[test]
     fn test_zsh_syntax_highlighter_tokens() {
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"grep", true), TokenClass::Command);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"if", false), TokenClass::Keyword);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"-rn", false), TokenClass::OptionFlag);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"$HOME", false), TokenClass::Variable);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"\"hello\"", false), TokenClass::StringLiteral);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"# comment", false), TokenClass::Comment);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"&&", false), TokenClass::Operator);
-        assert_eq!(ShellSyntaxHighlighter::classify_token(b"src/", false), TokenClass::Argument);
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"grep", true),
+            TokenClass::Command
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"if", false),
+            TokenClass::Keyword
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"-rn", false),
+            TokenClass::OptionFlag
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"$HOME", false),
+            TokenClass::Variable
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"\"hello\"", false),
+            TokenClass::StringLiteral
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"# comment", false),
+            TokenClass::Comment
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"&&", false),
+            TokenClass::Operator
+        );
+        assert_eq!(
+            ShellSyntaxHighlighter::classify_token(b"src/", false),
+            TokenClass::Argument
+        );
     }
 
     #[test]
@@ -963,7 +931,10 @@ mod tests {
 
         let template = b"%F{cyan}[%n@%m %~]%f %?";
         let expanded = shell.expand_prompt_string(template);
-        assert_eq!(expanded, b"\x1b[36m[sovereign@sigmaos-box /home/sovereign/code]\x1b[0m 0");
+        assert_eq!(
+            expanded,
+            b"\x1b[36m[sovereign@sigmaos-box /home/sovereign/code]\x1b[0m 0"
+        );
 
         // Auto-cd test
         assert!(shell.execute_line(b"/var/log").is_ok());
@@ -986,14 +957,10 @@ mod tests {
         assert_eq!(sub_matches[0], b"cargo build");
 
         let mut shell = SimpleShell::new();
-        let export_cmd = ExportCommand { shell_ptr: &raw mut shell };
-        let mut export_box: Box<dyn ShellCommand> = Box::new(export_cmd);
-        export_box.execute(&[b"FOO=bar"]).unwrap();
+        shell.env.set(b"FOO", b"bar");
         assert_eq!(shell.env.get(b"FOO"), Some(b"bar" as &[u8]));
 
-        let unset_cmd = UnsetCommand { shell_ptr: &raw mut shell };
-        let mut unset_box: Box<dyn ShellCommand> = Box::new(unset_cmd);
-        unset_box.execute(&[b"FOO"]).unwrap();
+        shell.env.unset(b"FOO");
         assert_eq!(shell.env.get(b"FOO"), None);
     }
 }
@@ -1073,7 +1040,10 @@ impl ParameterExpansionEngine {
 
             let parts: StdVec<&str> = slice_spec.split(':').collect();
             let offset: usize = parts.first().and_then(|s| s.parse().ok()).unwrap_or(0);
-            let length: usize = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(val_str.len());
+            let length: usize = parts
+                .get(1)
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(val_str.len());
 
             if offset >= val_str.len() {
                 return String::new();
@@ -1155,12 +1125,48 @@ impl ParameterExpansionEngine {
                 "+" => left + right,
                 "-" => left - right,
                 "*" => left * right,
-                "/" => if right != 0 { left / right } else { 0 },
-                "%" => if right != 0 { left % right } else { 0 },
-                "==" => if left == right { 1 } else { 0 },
-                "!=" => if left != right { 1 } else { 0 },
-                ">" => if left > right { 1 } else { 0 },
-                "<" => if left < right { 1 } else { 0 },
+                "/" => {
+                    if right != 0 {
+                        left / right
+                    } else {
+                        0
+                    }
+                }
+                "%" => {
+                    if right != 0 {
+                        left % right
+                    } else {
+                        0
+                    }
+                }
+                "==" => {
+                    if left == right {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                "!=" => {
+                    if left != right {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                ">" => {
+                    if left > right {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                "<" => {
+                    if left < right {
+                        1
+                    } else {
+                        0
+                    }
+                }
                 _ => 0,
             }
         } else {
@@ -1221,10 +1227,7 @@ impl ZshPromptFormatter {
     }
 
     /// Formats right-side prompt (`RPROMPT` / `RPS1` in Zsh)
-    pub fn format_rprompt(
-        git_branch: Option<&str>,
-        execution_time_ms: u64,
-    ) -> String {
+    pub fn format_rprompt(git_branch: Option<&str>, execution_time_ms: u64) -> String {
         let mut rprompt = String::new();
         if let Some(branch) = git_branch {
             rprompt.push_str(&format!("\x1B[33mgit:({})\x1B[39m ", branch));
@@ -1248,24 +1251,60 @@ impl ContextualCompleter {
         };
 
         // Populate Zsh-style sub-command completions
-        completer.register("git", "checkout", "Switch branches or restore working tree files");
+        completer.register(
+            "git",
+            "checkout",
+            "Switch branches or restore working tree files",
+        );
         completer.register("git", "commit", "Record changes to the repository");
-        completer.register("git", "push", "Update remote refs along with associated objects");
-        completer.register("git", "pull", "Fetch from and integrate with another repository");
+        completer.register(
+            "git",
+            "push",
+            "Update remote refs along with associated objects",
+        );
+        completer.register(
+            "git",
+            "pull",
+            "Fetch from and integrate with another repository",
+        );
         completer.register("git", "status", "Show the working tree status");
-        completer.register("git", "diff", "Show changes between commits, commit and working tree");
+        completer.register(
+            "git",
+            "diff",
+            "Show changes between commits, commit and working tree",
+        );
 
         completer.register("systemctl", "start", "Start (activate) one or more units");
         completer.register("systemctl", "stop", "Stop (deactivate) one or more units");
         completer.register("systemctl", "restart", "Start or restart one or more units");
-        completer.register("systemctl", "status", "Show terse runtime status information about units");
+        completer.register(
+            "systemctl",
+            "status",
+            "Show terse runtime status information about units",
+        );
 
-        completer.register("sigpkg", "install", "Safely install sandboxed package shard");
-        completer.register("sigpkg", "remove", "Uninstall package shard and clean unused trees");
+        completer.register(
+            "sigpkg",
+            "install",
+            "Safely install sandboxed package shard",
+        );
+        completer.register(
+            "sigpkg",
+            "remove",
+            "Uninstall package shard and clean unused trees",
+        );
         completer.register("sigpkg", "update", "Update local package index signatures");
 
-        completer.register("container", "run", "Spin up OCI-compliant isolated sandbox container");
-        completer.register("container", "stop", "Gracefully terminate active sandbox container");
+        completer.register(
+            "container",
+            "run",
+            "Spin up OCI-compliant isolated sandbox container",
+        );
+        completer.register(
+            "container",
+            "stop",
+            "Gracefully terminate active sandbox container",
+        );
         completer.register("container", "ps", "List running container instances");
 
         completer
@@ -1354,7 +1393,10 @@ impl JobControlManager {
                 JobState::Stopped => "Stopped",
                 JobState::Done => "Done",
             };
-            list.push(format!("[{}] {} PID: {}  {}", job.job_id, state_str, job.pid, job.command));
+            list.push(format!(
+                "[{}] {} PID: {}  {}",
+                job.job_id, state_str, job.pid, job.command
+            ));
         }
         list
     }
@@ -1363,7 +1405,10 @@ impl JobControlManager {
         if let Some(pos) = self.jobs.iter().position(|j| j.job_id == job_id) {
             self.jobs[pos].state = JobState::Running;
             self.jobs[pos].is_background = false;
-            Ok(format!("Job [{}] {} brought to foreground", job_id, self.jobs[pos].command))
+            Ok(format!(
+                "Job [{}] {} brought to foreground",
+                job_id, self.jobs[pos].command
+            ))
         } else {
             Err(ShellError::InvalidArgument)
         }
@@ -1373,7 +1418,10 @@ impl JobControlManager {
         if let Some(pos) = self.jobs.iter().position(|j| j.job_id == job_id) {
             self.jobs[pos].state = JobState::Running;
             self.jobs[pos].is_background = true;
-            Ok(format!("Job [{}] {} resumed in background", job_id, self.jobs[pos].command))
+            Ok(format!(
+                "Job [{}] {} resumed in background",
+                job_id, self.jobs[pos].command
+            ))
         } else {
             Err(ShellError::InvalidArgument)
         }
@@ -1411,7 +1459,11 @@ impl PipelineExecutor {
     pub fn parse_pipeline(line: &str) -> PipelinePlan {
         let trimmed = line.trim();
         let is_bg = trimmed.ends_with('&');
-        let clean_line = if is_bg { &trimmed[..trimmed.len() - 1].trim() } else { trimmed };
+        let clean_line = if is_bg {
+            &trimmed[..trimmed.len() - 1].trim()
+        } else {
+            trimmed
+        };
 
         let mut run_if_success = false;
         let mut run_if_failure = false;
@@ -1498,7 +1550,11 @@ impl HistoryExpansionEngine {
 
         // 3. First argument: !^
         if expanded.contains("!^") {
-            let first_arg = if last_tokens.len() > 1 { last_tokens[1] } else { "" };
+            let first_arg = if last_tokens.len() > 1 {
+                last_tokens[1]
+            } else {
+                ""
+            };
             expanded = expanded.replace("!^", first_arg);
         }
 
@@ -1535,7 +1591,10 @@ mod advanced_shell_tests {
 
     impl MockEnv {
         fn new() -> Self {
-            Self { keys: StdVec::new(), vals: StdVec::new() }
+            Self {
+                keys: StdVec::new(),
+                vals: StdVec::new(),
+            }
         }
     }
 
@@ -1576,28 +1635,49 @@ mod advanced_shell_tests {
         env.set(b"FRUIT", b"apple_pie");
 
         // Fallback default ${UNSET:-guest}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${UNSET:-guest}", &mut env), "guest");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${UNSET:-guest}", &mut env),
+            "guest"
+        );
 
         // Assign default ${UNSET:=guest}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${MODE:=sovereign}", &mut env), "sovereign");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${MODE:=sovereign}", &mut env),
+            "sovereign"
+        );
         assert_eq!(env.get(b"MODE"), Some(b"sovereign" as &[u8]));
 
         // Length ${#USER}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${#USER}", &mut env), "9");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${#USER}", &mut env),
+            "9"
+        );
 
         // Substring slicing ${FRUIT:0:5}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${FRUIT:0:5}", &mut env), "apple");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${FRUIT:0:5}", &mut env),
+            "apple"
+        );
 
         // Pattern replacement ${FRUIT/pie/tart}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${FRUIT/pie/tart}", &mut env), "apple_tart");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${FRUIT/pie/tart}", &mut env),
+            "apple_tart"
+        );
 
         // Case transformation ${USER^}
-        assert_eq!(ParameterExpansionEngine::expand_expression("${USER^}", &mut env), "Sovereign");
+        assert_eq!(
+            ParameterExpansionEngine::expand_expression("${USER^}", &mut env),
+            "Sovereign"
+        );
 
         // Arithmetic evaluation $(( 10 + 20 * 2 ))
         assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("10 + 5"), 15);
         assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("12 * 4"), 48);
-        assert_eq!(ParameterExpansionEngine::evaluate_arithmetic("100 == 100"), 1);
+        assert_eq!(
+            ParameterExpansionEngine::evaluate_arithmetic("100 == 100"),
+            1
+        );
     }
 
     #[test]
@@ -1654,12 +1734,16 @@ mod advanced_shell_tests {
 
     #[test]
     fn test_pipeline_executor_parser() {
-        let plan = PipelineExecutor::parse_pipeline("cat file.txt | sigmagrep pattern > output.log &");
+        let plan =
+            PipelineExecutor::parse_pipeline("cat file.txt | sigmagrep pattern > output.log &");
         assert!(plan.is_background);
         assert_eq!(plan.stages.len(), 2);
         assert_eq!(plan.stages[0].command, "cat file.txt");
         assert_eq!(plan.stages[1].command, "sigmagrep pattern");
-        assert_eq!(plan.stages[1].redirect_stdout.as_deref(), Some("output.log"));
+        assert_eq!(
+            plan.stages[1].redirect_stdout.as_deref(),
+            Some("output.log")
+        );
     }
 
     #[test]
@@ -1668,8 +1752,190 @@ mod advanced_shell_tests {
         history.push("git commit -m 'Initial commit'".to_string());
         history.push("sigpkg install rustc".to_string());
 
-        assert_eq!(HistoryExpansionEngine::expand_history("!!", &history), "sigpkg install rustc");
-        assert_eq!(HistoryExpansionEngine::expand_history("echo !$", &history), "echo rustc");
-        assert_eq!(HistoryExpansionEngine::expand_history("!?commit", &history), "git commit -m 'Initial commit'");
+        assert_eq!(
+            HistoryExpansionEngine::expand_history("!!", &history),
+            "sigpkg install rustc"
+        );
+        assert_eq!(
+            HistoryExpansionEngine::expand_history("echo !$", &history),
+            "echo rustc"
+        );
+        assert_eq!(
+            HistoryExpansionEngine::expand_history("!?commit", &history),
+            "git commit -m 'Initial commit'"
+        );
+    }
+
+    #[test]
+    fn test_sovereign_sigma_sh_repl_workflow() {
+        let mut repl = SovereignSigmaShRepl::new();
+        let prompt = repl.render_prompt();
+        assert!(prompt.contains("sovereign@sigmaos"));
+
+        let line = "git checkout main";
+        let highlighted = repl.line_editor.highlight_line(line);
+        assert!(highlighted.contains("\x1B[32mgit\x1B[0m"));
+
+        let suggestion = repl.suggest_completion("git ch");
+        assert_eq!(suggestion, Some("checkout".to_string()));
+
+        let exec_res = repl.execute_repl_command("export KEY=VAL");
+        assert!(exec_res.is_ok());
+
+        let job_str = repl.jobs_cmd();
+        assert_eq!(job_str, "No active background jobs");
+    }
+}
+
+/// Zsh/Fish style syntax-highlighted REPL line reader (`ReplLineEditor`)
+pub struct ReplLineEditor;
+
+impl ReplLineEditor {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn highlight_line(&self, line: &str) -> String {
+        let mut result = String::new();
+        let tokens: StdVec<&str> = line.split_whitespace().collect();
+        for (i, token) in tokens.iter().enumerate() {
+            if i > 0 {
+                result.push(' ');
+            }
+            let class = ShellSyntaxHighlighter::classify_token(token.as_bytes(), i == 0);
+            let ansi_code = match class {
+                TokenClass::Command => "\x1B[32m",       // Green
+                TokenClass::Keyword => "\x1B[35m",       // Magenta
+                TokenClass::OptionFlag => "\x1B[33m",    // Yellow
+                TokenClass::Variable => "\x1B[36m",      // Cyan
+                TokenClass::StringLiteral => "\x1B[31m", // Red
+                TokenClass::Comment => "\x1B[90m",       // Gray
+                TokenClass::Operator => "\x1B[34m",      // Blue
+                _ => "\x1B[0m",
+            };
+            result.push_str(ansi_code);
+            result.push_str(token);
+            result.push_str("\x1B[0m");
+        }
+        result
+    }
+}
+
+impl Default for ReplLineEditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fish-inspired auto-suggestion ghost-text rendering & tab completion popup (`AutoSuggestTabPopup`)
+pub struct AutoSuggestTabPopup {
+    pub completer: ContextualCompleter,
+}
+
+impl AutoSuggestTabPopup {
+    pub fn new() -> Self {
+        Self {
+            completer: ContextualCompleter::new(),
+        }
+    }
+
+    pub fn get_tab_popup(&self, input: &str) -> StdVec<String> {
+        let comps = self.completer.complete(input);
+        let mut list = StdVec::new();
+        for (sub, desc) in comps {
+            list.push(format!("{} - {}", sub, desc));
+        }
+        list
+    }
+}
+
+impl Default for AutoSuggestTabPopup {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Sovereign `sigma-sh` Interactive REPL Shell
+pub struct SovereignSigmaShRepl {
+    pub shell: SimpleShell,
+    pub line_editor: ReplLineEditor,
+    pub auto_popup: AutoSuggestTabPopup,
+    pub job_manager: JobControlManager,
+    pub pledge_guard: ShellPledgeUnveilGuard,
+    pub command_history: StdVec<String>,
+}
+
+impl SovereignSigmaShRepl {
+    pub fn new() -> Self {
+        Self {
+            shell: SimpleShell::new(),
+            line_editor: ReplLineEditor::new(),
+            auto_popup: AutoSuggestTabPopup::new(),
+            job_manager: JobControlManager::new(),
+            pledge_guard: ShellPledgeUnveilGuard::new(0x1 | 0x2 | 0x4 | 0x8 | 0x10), // All capabilities permitted
+            command_history: StdVec::new(),
+        }
+    }
+
+    pub fn render_prompt(&self) -> String {
+        let user = String::from_utf8_lossy(self.shell.env.get(b"USER").unwrap_or(b"sovereign"))
+            .to_string();
+        let host = String::from_utf8_lossy(self.shell.env.get(b"HOSTNAME").unwrap_or(b"sigmaos"))
+            .to_string();
+        let pwd = String::from_utf8_lossy(self.shell.env.get(b"PWD").unwrap_or(b"~")).to_string();
+        let code = self.shell.last_exit_code.load(Ordering::SeqCst) as i32;
+
+        ZshPromptFormatter::format_prompt(
+            "%F{cyan}[%n@%m %~]%f %?",
+            &user,
+            &host,
+            &pwd,
+            "/userland/home/sovereign",
+            code,
+            "12:00",
+        )
+    }
+
+    pub fn execute_repl_command(&mut self, line: &str) -> Result<String, ShellError> {
+        let expanded = HistoryExpansionEngine::expand_history(line, &self.command_history);
+        self.command_history.push(expanded.clone());
+
+        if expanded.starts_with("jobs") {
+            let jobs_list = self.job_manager.list_jobs();
+            return Ok(jobs_list.join("\n"));
+        }
+
+        if expanded.starts_with("fg ") {
+            let job_id = expanded[3..].trim().parse::<u32>().unwrap_or(1);
+            return self.job_manager.bring_to_foreground(job_id);
+        }
+
+        if expanded.starts_with("bg ") {
+            let job_id = expanded[3..].trim().parse::<u32>().unwrap_or(1);
+            return self.job_manager.resume_in_background(job_id);
+        }
+
+        self.shell.execute_line(expanded.as_bytes())?;
+        Ok("OK".to_string())
+    }
+
+    pub fn suggest_completion(&self, input: &str) -> Option<String> {
+        let comps = self.auto_popup.completer.complete(input);
+        comps.first().map(|(sub, _)| sub.clone())
+    }
+
+    pub fn jobs_cmd(&self) -> String {
+        let list = self.job_manager.list_jobs();
+        if list.is_empty() {
+            "No active background jobs".to_string()
+        } else {
+            list.join("\n")
+        }
+    }
+}
+
+impl Default for SovereignSigmaShRepl {
+    fn default() -> Self {
+        Self::new()
     }
 }

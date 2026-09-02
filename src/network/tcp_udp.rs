@@ -1,14 +1,13 @@
 extern crate alloc;
-use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 /// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 /// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+use core::mem;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type SocketID = usize;
@@ -187,11 +186,14 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::ConnectionFailed);
         }
 
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
 
         // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
@@ -419,7 +421,10 @@ impl NewRenoSackCongestionControl {
     }
 
     pub fn process_sack(&mut self, left: u32, right: u32) {
-        self.sack_blocks.push(SackBlock { left_edge: left, right_edge: right });
+        self.sack_blocks.push(SackBlock {
+            left_edge: left,
+            right_edge: right,
+        });
     }
 
     pub fn enter_fast_recovery(&mut self) {
@@ -512,16 +517,39 @@ impl TcpOptionParser {
                     let mut blocks = Vec::new();
                     let mut b_idx = idx + 2;
                     while b_idx + 8 <= idx + opt_len {
-                        let left = u32::from_be_bytes([raw_options[b_idx], raw_options[b_idx + 1], raw_options[b_idx + 2], raw_options[b_idx + 3]]);
-                        let right = u32::from_be_bytes([raw_options[b_idx + 4], raw_options[b_idx + 5], raw_options[b_idx + 6], raw_options[b_idx + 7]]);
-                        blocks.push(SackBlock { left_edge: left, right_edge: right });
+                        let left = u32::from_be_bytes([
+                            raw_options[b_idx],
+                            raw_options[b_idx + 1],
+                            raw_options[b_idx + 2],
+                            raw_options[b_idx + 3],
+                        ]);
+                        let right = u32::from_be_bytes([
+                            raw_options[b_idx + 4],
+                            raw_options[b_idx + 5],
+                            raw_options[b_idx + 6],
+                            raw_options[b_idx + 7],
+                        ]);
+                        blocks.push(SackBlock {
+                            left_edge: left,
+                            right_edge: right,
+                        });
                         b_idx += 8;
                     }
                     opts.push(TcpOption::Sack(blocks));
                 }
                 8 if opt_len == 10 => {
-                    let val = u32::from_be_bytes([raw_options[idx + 2], raw_options[idx + 3], raw_options[idx + 4], raw_options[idx + 5]]);
-                    let ecr = u32::from_be_bytes([raw_options[idx + 6], raw_options[idx + 7], raw_options[idx + 8], raw_options[idx + 9]]);
+                    let val = u32::from_be_bytes([
+                        raw_options[idx + 2],
+                        raw_options[idx + 3],
+                        raw_options[idx + 4],
+                        raw_options[idx + 5],
+                    ]);
+                    let ecr = u32::from_be_bytes([
+                        raw_options[idx + 6],
+                        raw_options[idx + 7],
+                        raw_options[idx + 8],
+                        raw_options[idx + 9],
+                    ]);
                     opts.push(TcpOption::Timestamps { val, ecr });
                 }
                 _ => {}
@@ -538,7 +566,13 @@ impl TcpOptionParser {
 pub struct UdpChecksumEngine;
 
 impl UdpChecksumEngine {
-    pub fn compute_checksum(src_ip: [u8; 4], dst_ip: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8]) -> u16 {
+    pub fn compute_checksum(
+        src_ip: [u8; 4],
+        dst_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        payload: &[u8],
+    ) -> u16 {
         let mut sum = 0u32;
 
         // Pseudo-Header
@@ -569,10 +603,21 @@ impl UdpChecksumEngine {
         }
 
         let checksum = !(sum as u16);
-        if checksum == 0 { 0xFFFF } else { checksum }
+        if checksum == 0 {
+            0xFFFF
+        } else {
+            checksum
+        }
     }
 
-    pub fn verify_checksum(src_ip: [u8; 4], dst_ip: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8], expected_checksum: u16) -> bool {
+    pub fn verify_checksum(
+        src_ip: [u8; 4],
+        dst_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        payload: &[u8],
+        expected_checksum: u16,
+    ) -> bool {
         let computed = Self::compute_checksum(src_ip, dst_ip, src_port, dst_port, payload);
         computed == expected_checksum
     }
@@ -1088,8 +1133,17 @@ mod tests {
         let csum = UdpChecksumEngine::compute_checksum(src, dst, 12345, 8080, payload);
         assert_ne!(csum, 0);
 
-        assert!(UdpChecksumEngine::verify_checksum(src, dst, 12345, 8080, payload, csum));
-        assert!(!UdpChecksumEngine::verify_checksum(src, dst, 12345, 8080, payload, csum ^ 0xFFFF));
+        assert!(UdpChecksumEngine::verify_checksum(
+            src, dst, 12345, 8080, payload, csum
+        ));
+        assert!(!UdpChecksumEngine::verify_checksum(
+            src,
+            dst,
+            12345,
+            8080,
+            payload,
+            csum ^ 0xFFFF
+        ));
     }
 
     #[test]

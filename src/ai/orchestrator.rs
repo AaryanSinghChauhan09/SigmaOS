@@ -3,7 +3,6 @@ extern crate alloc;
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
 // and self-diagnosis capabilities for system optimization
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -232,7 +231,7 @@ mod tests {
             .dispatch_task(b"RELOAD_CORES", Some(1))
             .unwrap();
         assert_eq!(
-            core::str::from_utf8(&response).unwrap(),
+            String::from_utf8(response).unwrap(),
             "TaskAgent: RELOAD_CORES"
         );
 
@@ -242,6 +241,6 @@ mod tests {
         assert_eq!(queue.size(), 2);
 
         let task = queue.dequeue().unwrap();
-        assert_eq!(core::str::from_utf8(&task).unwrap(), "TASK_PRIO_HIGH");
+        assert_eq!(String::from_utf8(task).unwrap(), "TASK_PRIO_HIGH");
     }
 }

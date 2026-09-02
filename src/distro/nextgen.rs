@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 use crate::klib::BTreeMap;
 
@@ -74,6 +74,142 @@ impl AiSysAdmin {
 }
 
 impl Default for AiSysAdmin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Linux kpatch / kGraft Inspired Livepatch Trampoline & Consistency Engine
+// ============================================================================
+
+/// Target Architecture for Livepatch Inline Trampolines
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LivepatchArchitecture {
+    X86_64,
+    AArch64,
+}
+
+/// Atomic Trampoline Code Generator for Zero-Downtime Kernel Redirection
+pub struct AtomicTrampolineGenerator;
+
+impl AtomicTrampolineGenerator {
+    /// Generates 12-byte 64-bit x86_64 absolute JMP trampoline: `movabs rax, <new_addr>; jmp rax`
+    pub fn generate_x86_64_trampoline(new_func_addr: usize) -> Vec<u8> {
+        let mut code = vec![0x48, 0xB8]; // movabs rax, imm64
+        code.extend_from_slice(&(new_func_addr as u64).to_le_bytes());
+        code.push(0xFF);
+        code.push(0xE0); // jmp rax
+        code
+    }
+
+    /// Generates 16-byte ARM64 trampoline: `MOVZ x16, imm16_0`, `MOVK x16, imm16_1`, `MOVK x16, imm16_2`, `BR x16`
+    pub fn generate_aarch64_trampoline(new_func_addr: usize) -> Vec<u8> {
+        let addr = new_func_addr as u64;
+        let mut code = Vec::new();
+        // MOVZ x16, #(addr & 0xffff)
+        let w0 = 0xD2800010u32 | (((addr & 0xffff) as u32) << 5);
+        code.extend_from_slice(&w0.to_le_bytes());
+
+        // MOVK x16, #((addr >> 16) & 0xffff), lsl #16
+        let w1 = 0xF2A00010u32 | ((((addr >> 16) & 0xffff) as u32) << 5);
+        code.extend_from_slice(&w1.to_le_bytes());
+
+        // MOVK x16, #((addr >> 32) & 0xffff), lsl #32
+        let w2 = 0xF2C00010u32 | ((((addr >> 32) & 0xffff) as u32) << 5);
+        code.extend_from_slice(&w2.to_le_bytes());
+
+        // BR x16
+        code.extend_from_slice(&0xD61F0200u32.to_le_bytes());
+        code
+    }
+}
+
+/// Call Stack Consistency Checker (kpatch / kGraft model)
+pub struct ThreadStackConsistencyChecker;
+
+impl ThreadStackConsistencyChecker {
+    /// Verifies no active kernel thread is currently executing inside the target function address range
+    pub fn is_callstack_safe(
+        target_symbol: &str,
+        thread_callstacks: &[&[usize]],
+        old_fn_start: usize,
+        old_fn_len: usize,
+    ) -> Result<(), &'static str> {
+        let old_fn_end = old_fn_start.saturating_add(old_fn_len);
+        for (tid, stack) in thread_callstacks.iter().enumerate() {
+            for &ip in *stack {
+                if ip >= old_fn_start && ip < old_fn_end {
+                    return Err("Thread active inside target livepatch function range - unsafe to apply patch");
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Advanced Verification and Livepatch Application Engine
+pub struct KernelPatchVerificationEngine {
+    pub livepatch_manager: LivepatchManager,
+    pub applied_patch_count: usize,
+}
+
+impl KernelPatchVerificationEngine {
+    pub fn new() -> Self {
+        Self {
+            livepatch_manager: LivepatchManager::new(),
+            applied_patch_count: 0,
+        }
+    }
+
+    /// Verifies cryptographic signature, stack consistency, and applies livepatch trampoline
+    pub fn apply_livepatch(
+        &mut self,
+        patch: LivepatchPatch,
+        thread_callstacks: &[&[usize]],
+        old_fn_len: usize,
+        arch: LivepatchArchitecture,
+        signature_valid: bool,
+    ) -> Result<Vec<u8>, &'static str> {
+        if !signature_valid {
+            return Err("Dilithium-5 / Ed25519 signature verification failed for kernel livepatch");
+        }
+
+        ThreadStackConsistencyChecker::is_callstack_safe(
+            &patch.target_symbol,
+            thread_callstacks,
+            patch.old_function_address,
+            old_fn_len,
+        )?;
+
+        let trampoline = match arch {
+            LivepatchArchitecture::X86_64 => {
+                AtomicTrampolineGenerator::generate_x86_64_trampoline(patch.new_function_address)
+            }
+            LivepatchArchitecture::AArch64 => {
+                AtomicTrampolineGenerator::generate_aarch64_trampoline(patch.new_function_address)
+            }
+        };
+
+        self.livepatch_manager.register_patch(patch)?;
+        self.applied_patch_count += 1;
+
+        Ok(trampoline)
+    }
+
+    /// Rollbacks an active livepatch by removing its symbol entry
+    pub fn rollback_livepatch(&mut self, symbol: &str) -> Result<(), &'static str> {
+        let key = symbol.to_string();
+        if self.livepatch_manager.active_patches.remove(&key).is_some() {
+            self.applied_patch_count = self.applied_patch_count.saturating_sub(1);
+            Ok(())
+        } else {
+            Err("Livepatch symbol not found for rollback")
+        }
+    }
+}
+
+impl Default for KernelPatchVerificationEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -732,6 +868,75 @@ mod tests {
             checksum: "invalid-checksum".to_string(),
         };
         assert!(patcher.register_patch(invalid_patch).is_err());
+    }
+
+    #[test]
+    fn test_atomic_trampoline_generator() {
+        let x86_tramp = AtomicTrampolineGenerator::generate_x86_64_trampoline(0xffffffffc0300100);
+        assert_eq!(x86_tramp.len(), 12);
+        assert_eq!(x86_tramp[0..2], [0x48, 0xB8]);
+        assert_eq!(x86_tramp[10..12], [0xFF, 0xE0]);
+
+        let arm_tramp = AtomicTrampolineGenerator::generate_aarch64_trampoline(0xffffffffc0300100);
+        assert_eq!(arm_tramp.len(), 16);
+    }
+
+    #[test]
+    fn test_thread_stack_consistency_checker() {
+        let safe_stacks: &[&[usize]] = &[&[0x4000, 0x5000], &[0x6000]];
+        assert!(ThreadStackConsistencyChecker::is_callstack_safe(
+            "sys_read",
+            safe_stacks,
+            0x1000,
+            0x100
+        ).is_ok());
+
+        let unsafe_stacks: &[&[usize]] = &[&[0x4000, 0x1050], &[0x6000]];
+        assert!(ThreadStackConsistencyChecker::is_callstack_safe(
+            "sys_read",
+            unsafe_stacks,
+            0x1000,
+            0x100
+        ).is_err());
+    }
+
+    #[test]
+    fn test_kernel_patch_verification_engine() {
+        let mut engine = KernelPatchVerificationEngine::new();
+        let patch = LivepatchPatch {
+            target_symbol: "sys_write".to_string(),
+            old_function_address: 0x10000,
+            new_function_address: 0x20000,
+            checksum: "patch-123-sha256".to_string(),
+        };
+
+        let safe_stacks: &[&[usize]] = &[&[0x30000]];
+        // Verification fails if signature invalid
+        assert!(engine.apply_livepatch(
+            patch.clone(),
+            safe_stacks,
+            0x200,
+            LivepatchArchitecture::X86_64,
+            false
+        ).is_err());
+
+        // Applies successfully with valid signature
+        let tramp = engine.apply_livepatch(
+            patch,
+            safe_stacks,
+            0x200,
+            LivepatchArchitecture::X86_64,
+            true
+        ).unwrap();
+
+        assert_eq!(tramp.len(), 12);
+        assert_eq!(engine.applied_patch_count, 1);
+        assert_eq!(engine.livepatch_manager.redirect_call("sys_write"), Some(0x20000));
+
+        // Rollback
+        assert!(engine.rollback_livepatch("sys_write").is_ok());
+        assert_eq!(engine.applied_patch_count, 0);
+        assert_eq!(engine.livepatch_manager.redirect_call("sys_write"), None);
     }
 
     #[test]

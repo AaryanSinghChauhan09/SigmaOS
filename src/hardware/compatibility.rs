@@ -2,7 +2,6 @@ extern crate alloc;
 // OOP-based Hardware Compatibility Matrix for SigmaOS
 // Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -36,7 +35,11 @@ impl SimpleAcpiManager {
         Ok(())
     }
 
-    pub fn set_device_power_state(&mut self, dev: DeviceID, state: AcpiPowerState) -> Result<(), &'static str> {
+    pub fn set_device_power_state(
+        &mut self,
+        dev: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str> {
         self.power_states.insert(dev, state);
         Ok(())
     }
@@ -471,13 +474,12 @@ impl DriverManager for SimpleDriverManager {
     }
 
     fn get_driver_status(&self, device_id: DeviceID) -> bool {
-            self.loaded_drivers.contains(&device_id)
+        self.loaded_drivers.contains(&device_id)
     }
 }
 
 pub trait CompatibilityCheck {
     fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
-    fn check_component(&self, name: &str) -> bool;
     fn run_full_scan(&self) -> CompatibilityReport;
 }
 
@@ -503,10 +505,6 @@ impl CompatibilityCheck for SimpleDiagnostics {
         } else {
             CompatibilityResult::Unknown
         }
-    }
-
-    fn check_component(&self, name: &str) -> bool {
-        self.matrix.devices.iter().any(|d| (**d).name() == name)
     }
 
     fn run_full_scan(&self) -> CompatibilityReport {
@@ -583,7 +581,10 @@ mod tests {
         assert_eq!(matrix.list_by_type(DeviceType::Audio).len(), 1);
 
         let nvme_id = matrix.find_by_vendor_device(0x144D, 0xA809).unwrap();
-        assert_eq!(matrix.get_device(nvme_id).unwrap().name(), "Samsung NVMe SSD Controller 980 Pro");
+        assert_eq!(
+            matrix.get_device(nvme_id).unwrap().name(),
+            "Samsung NVMe SSD Controller 980 Pro"
+        );
     }
 
     #[test]

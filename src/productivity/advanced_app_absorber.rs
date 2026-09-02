@@ -1,14 +1,14 @@
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Multi-Application Parity Integration Layer (advanced_app_absorber)
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use alloc::collections::{BTreeMap, VecDeque};
 use crate::klib::HashMap;
+use alloc::collections::{BTreeMap, VecDeque};
 // str/String not in no_std
 
 // =========================================================================

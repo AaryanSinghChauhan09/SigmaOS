@@ -8,7 +8,8 @@ SigmaOS.wiki/
 node_modules/
 
 # Build artifacts and compiled binaries
-build/
+build/*
+!build/.gitkeep
 *.iso
 *.bin
 *.img
@@ -21,3 +22,6 @@ build/
 *.elf
 test_runner
 wiki_push
+wiki/
+WIKI/
+__pycache__/

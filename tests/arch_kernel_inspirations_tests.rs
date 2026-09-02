@@ -3,18 +3,20 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 use sigmaos::arch_kernel_inspirations::{
-    AdvisorySeverity, AlpmAction, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine,
-    Expectation, ExpectationKind, HookAction, KUnitEngine, MkinitcpioHookFramework,
-    PackageSignoff, RebuildOrderSolver, ReproducibleBuildVerdict, ReproducibleStatus,
-    SecurityAdvisory, SecurityAdvisoryTracker, Signer, SignerPolicy, SignstarService,
+    AdvisorySeverity, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine, Expectation,
+    ExpectationKind, HookAction, KUnitEngine, MkinitcpioHookFramework, PackageSignoff,
+    RebuildOrderSolver, ReproducibleBuildVerdict, ReproducibleStatus, SecurityAdvisory,
+    SecurityAdvisoryTracker, SignerPolicy, SignstarService,
 };
+
+type KUnitTestCaseClosure = Box<dyn FnOnce(&mut Vec<Expectation>) + Send>;
 
 #[test]
 fn kunit_engine_reports_failures() {
     let mut eng = KUnitEngine::new();
     let eval = eng.evaluate(ExpectationKind::Eq, "42", "42", "foo.c", 10);
     assert!(eval.passed);
-    let cases: Vec<(String, Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+    let cases: Vec<(String, KUnitTestCaseClosure)> = vec![
         (
             "test_ok".to_string(),
             Box::new(|e: &mut Vec<Expectation>| {
@@ -132,7 +134,10 @@ fn security_tracker_flags_cves_and_upgrades() {
     });
     assert_eq!(t.affected("openssl", "1.1.1").len(), 1);
     assert_eq!(t.affected("openssl", "3.0.1").len(), 0);
-    assert_eq!(t.recommended_upgrades("bash", "5.1"), vec!["5.2".to_string()]);
+    assert_eq!(
+        t.recommended_upgrades("bash", "5.1"),
+        vec!["5.2".to_string()]
+    );
     assert_eq!(t.critical_count(), 1);
 }
 
@@ -154,13 +159,19 @@ fn mkinitcpio_hooks_build_payload() {
     let mut f = MkinitcpioHookFramework::new();
     f.add_hook(
         "block",
-        vec![HookAction::AddModule { module: "virtio_blk".into() }],
+        vec![HookAction::AddModule {
+            module: "virtio_blk".into(),
+        }],
     );
     f.add_hook(
         "filesystems",
         vec![
-            HookAction::AddModule { module: "ext4".into() },
-            HookAction::AddModule { module: "btrfs".into() },
+            HookAction::AddModule {
+                module: "ext4".into(),
+            },
+            HookAction::AddModule {
+                module: "btrfs".into(),
+            },
         ],
     );
     f.disable("filesystems");
@@ -179,10 +190,14 @@ fn rebuild_order_solves_topologically() {
     let order = solver.solve().unwrap();
     // libfoo must be built before libbar before app.
     assert_eq!(order[0], "libfoo");
-    assert!(order.iter().position(|p| p == "libfoo").unwrap()
-        < order.iter().position(|p| p == "libbar").unwrap());
-    assert!(order.iter().position(|p| p == "libbar").unwrap()
-        < order.iter().position(|p| p == "app").unwrap());
+    assert!(
+        order.iter().position(|p| p == "libfoo").unwrap()
+            < order.iter().position(|p| p == "libbar").unwrap()
+    );
+    assert!(
+        order.iter().position(|p| p == "libbar").unwrap()
+            < order.iter().position(|p| p == "app").unwrap()
+    );
 }
 
 #[test]

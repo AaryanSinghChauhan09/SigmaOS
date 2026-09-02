@@ -14,7 +14,7 @@ type SigmaBool = bool;
 type SigmaU64 = u64;
 
 /// Package states
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub enum ZypperPackageState {
     NotInstalled,
@@ -25,6 +25,7 @@ pub enum ZypperPackageState {
 
 /// Zypper package information
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ZypperPackage {
     pub name: [u8; 64],
     pub version: [u8; 32],
@@ -37,6 +38,7 @@ pub struct ZypperPackage {
 
 /// Zypper repository
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ZypperRepository {
     pub alias: [u8; 64],
     pub name: [u8; 128],
@@ -176,7 +178,7 @@ pub unsafe extern "C" fn zypper_list_repos(repos: *mut ZypperRepository, max_cou
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Install package
@@ -276,7 +278,7 @@ pub unsafe extern "C" fn zypper_search(query: *const u8, results: *mut SigmaU32,
         }
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Update repositories

@@ -71,7 +71,12 @@ mod tests {
     #[test]
     fn test_kmeans_and_pca() {
         let mut kmeans = KMeansClustering::new(2, 10);
-        let data = vec![vec![1.0, 2.0], vec![1.5, 1.8], vec![10.0, 10.0], vec![10.5, 9.8]];
+        let data = vec![
+            vec![1.0, 2.0],
+            vec![1.5, 1.8],
+            vec![10.0, 10.0],
+            vec![10.5, 9.8],
+        ];
         kmeans.fit(&data).unwrap();
 
         let cluster = kmeans.predict(&vec![1.2, 1.9]);

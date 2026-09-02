@@ -3,7 +3,6 @@ extern crate alloc;
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
-
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

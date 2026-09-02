@@ -3,7 +3,6 @@
 use alloc::vec;
 extern crate alloc;
 
-
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -135,7 +134,10 @@ impl HardwareVideoDecoder {
     }
 
     /// Decodes a demuxed packet into a zero-copy hardware surface
-    pub fn decode_packet(&mut self, packet: &DemuxedPacket) -> Result<HardwareVideoSurface, &'static str> {
+    pub fn decode_packet(
+        &mut self,
+        packet: &DemuxedPacket,
+    ) -> Result<HardwareVideoSurface, &'static str> {
         if packet.payload.is_empty() {
             return Err("Empty packet payload");
         }
@@ -271,7 +273,11 @@ impl SubtitleTrack {
                     let start_ms = parse_srt_time(times[0].trim());
                     let end_ms = parse_srt_time(times[1].trim());
                     let text = lines[2..].join("\n");
-                    self.cues.push(SubtitleCue { start_ms, end_ms, text });
+                    self.cues.push(SubtitleCue {
+                        start_ms,
+                        end_ms,
+                        text,
+                    });
                 }
             }
         }
@@ -348,7 +354,11 @@ impl Playlist {
     }
 
     pub fn add(&mut self, url: String, title: String, duration_ms: u64) {
-        self.items.push(PlaylistItem { url, title, duration_ms });
+        self.items.push(PlaylistItem {
+            url,
+            title,
+            duration_ms,
+        });
     }
 
     pub fn next(&mut self) -> Option<&PlaylistItem> {
@@ -699,6 +709,97 @@ impl NtpClient {
     }
 }
 
+// ==========================================
+// VLC-INSPIRED LIGHTWEIGHT VIDEO ENGINE ARCHITECTURE
+// ==========================================
+
+/// Video decoding state machine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VideoDecoderState {
+    Idle,
+    Demuxing,
+    Decoding,
+    Rendering,
+    Paused,
+    Error,
+}
+
+/// VLC-inspired modular demuxer & decoder video pipeline
+pub struct VlcLightweightMediaPipeline {
+    pub media_uri: String,
+    pub state: VideoDecoderState,
+    pub active_demuxer: Option<String>,
+    pub active_codec: Option<String>,
+    pub frame_ring_buffer: Vec<Vec<u8>>,
+    pub max_ring_capacity: usize,
+    pub direct_surface_hw_accel: bool,
+}
+
+impl VlcLightweightMediaPipeline {
+    pub fn new(media_uri: &str) -> Self {
+        Self {
+            media_uri: media_uri.to_string(),
+            state: VideoDecoderState::Idle,
+            active_demuxer: None,
+            active_codec: None,
+            frame_ring_buffer: Vec::new(),
+            max_ring_capacity: 16,
+            direct_surface_hw_accel: true,
+        }
+    }
+
+    pub fn open_demuxer(&mut self, format: &str) -> Result<(), &'static str> {
+        self.active_demuxer = Some(format.to_string());
+        self.state = VideoDecoderState::Demuxing;
+        Ok(())
+    }
+
+    pub fn initialize_decoder(&mut self, codec: &str) -> Result<(), &'static str> {
+        if self.state != VideoDecoderState::Demuxing {
+            return Err("Demuxer must be open before initializing video codec decoder");
+        }
+        self.active_codec = Some(codec.to_string());
+        self.state = VideoDecoderState::Decoding;
+        Ok(())
+    }
+
+    pub fn push_frame_zero_copy(&mut self, frame_data: Vec<u8>) -> Result<(), &'static str> {
+        if self.frame_ring_buffer.len() >= self.max_ring_capacity {
+            return Err("Zero-copy video frame ring buffer overflow");
+        }
+        self.frame_ring_buffer.push(frame_data);
+        Ok(())
+    }
+
+    pub fn render_direct_surface(&mut self) -> Result<usize, &'static str> {
+        if self.frame_ring_buffer.is_empty() {
+            return Err("No video frame available in ring buffer to render");
+        }
+        self.state = VideoDecoderState::Rendering;
+        let frame = self.frame_ring_buffer.remove(0);
+        let rendered_len = frame.len();
+        self.state = VideoDecoderState::Decoding;
+        Ok(rendered_len)
+    }
+
+    pub fn ring_buffer_len(&self) -> usize {
+        self.frame_ring_buffer.len()
+    }
+
+    pub fn close(&mut self) {
+        self.state = VideoDecoderState::Idle;
+        self.active_demuxer = None;
+        self.active_codec = None;
+        self.frame_ring_buffer.clear();
+    }
+}
+
+impl Default for VlcLightweightMediaPipeline {
+    fn default() -> Self {
+        Self::new("default.mp4")
+    }
+}
+
 impl Default for NtpClient {
     fn default() -> Self {
         Self::new()
@@ -779,7 +880,7 @@ mod tests {
     #[test]
     fn test_vlc_equalizer() {
         let mut eq = VlcEqualizer::new();
-        eq.set_band_gain(0, 6.0);  // +6dB at 60Hz
+        eq.set_band_gain(0, 6.0); // +6dB at 60Hz
         eq.set_band_gain(4, -3.0); // -3dB at 1kHz
 
         assert_eq!(eq.bands_db[0], 6.0);
@@ -860,5 +961,28 @@ https://media.sigmaos.dev/trailer_b.mp4
         let mut ntp = NtpClient::new();
         ntp.sync_time(1000, 950);
         assert_eq!(ntp.offset_nanos, 50);
+    }
+
+    #[test]
+    fn test_vlc_lightweight_media_pipeline() {
+        let mut pipeline = VlcLightweightMediaPipeline::new("4k_sample.mp4");
+        assert_eq!(pipeline.state, VideoDecoderState::Idle);
+
+        assert!(pipeline.open_demuxer("mp4").is_ok());
+        assert_eq!(pipeline.state, VideoDecoderState::Demuxing);
+
+        assert!(pipeline.initialize_decoder("h264").is_ok());
+        assert_eq!(pipeline.state, VideoDecoderState::Decoding);
+
+        let frame = vec![0x10; 1920 * 1080];
+        assert!(pipeline.push_frame_zero_copy(frame).is_ok());
+        assert_eq!(pipeline.ring_buffer_len(), 1);
+
+        let rendered_bytes = pipeline.render_direct_surface().unwrap();
+        assert_eq!(rendered_bytes, 1920 * 1080);
+        assert_eq!(pipeline.ring_buffer_len(), 0);
+
+        pipeline.close();
+        assert_eq!(pipeline.state, VideoDecoderState::Idle);
     }
 }

@@ -15,8 +15,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
+
+use super::nvidia_prime::{NvidiaPrimeEngine, PrimeProfile};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuState {
@@ -111,6 +113,7 @@ pub struct GpuDriver {
     pub dma_buffers: Vec<WaylandDmaBuf>,
     pub ws_terminals: Vec<OpenBsdWsdisplayVt>,
     pub active_vt: u32,
+    pub nvidia_prime_engine: NvidiaPrimeEngine,
 }
 
 impl GpuDriver {
@@ -124,13 +127,30 @@ impl GpuDriver {
             dma_buffers: Vec::new(),
             ws_terminals: Vec::new(),
             active_vt: 1,
+            nvidia_prime_engine: NvidiaPrimeEngine::new(),
         };
 
         // Pre-configure OpenBSD wsdisplay VTs 1-4
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 1, is_active: true, title: String::from("tty1") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 2, is_active: false, title: String::from("tty2") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 3, is_active: false, title: String::from("tty3") });
-        driver.ws_terminals.push(OpenBsdWsdisplayVt { vt_id: 4, is_active: false, title: String::from("tty4") });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 1,
+            is_active: true,
+            title: String::from("tty1"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 2,
+            is_active: false,
+            title: String::from("tty2"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 3,
+            is_active: false,
+            title: String::from("tty3"),
+        });
+        driver.ws_terminals.push(OpenBsdWsdisplayVt {
+            vt_id: 4,
+            is_active: false,
+            title: String::from("tty4"),
+        });
 
         driver
     }
@@ -289,6 +309,16 @@ impl GpuDriver {
         Ok(())
     }
 
+    /// Query total committed atomic plane count
+    pub fn get_atomic_plane_count(&self) -> usize {
+        self.atomic_planes.len()
+    }
+
+    /// Clear imported Wayland DMA-BUF buffers
+    pub fn clear_dma_buffers(&mut self) {
+        self.dma_buffers.clear();
+    }
+
     /// Wayland SHM Zero-Copy DMA-BUF Import
     pub fn import_dma_buf(&mut self, buf: WaylandDmaBuf) -> Result<usize, &'static str> {
         let size = buf.size;
@@ -358,26 +388,43 @@ mod tests {
     #[test]
     fn test_drm_kms_atomic_plane() {
         let mut driver = GpuDriver::new();
+        assert_eq!(driver.get_atomic_plane_count(), 0);
         let plane = DrmAtomicPlaneState {
-            plane_id: 1, crtc_id: 10, fb_id: 100,
-            src_x: 0, src_y: 0, src_w: 1920, src_h: 1080,
-            crtc_x: 0, crtc_y: 0, crtc_w: 1920, crtc_h: 1080,
+            plane_id: 1,
+            crtc_id: 10,
+            fb_id: 100,
+            src_x: 0,
+            src_y: 0,
+            src_w: 1920,
+            src_h: 1080,
+            crtc_x: 0,
+            crtc_y: 0,
+            crtc_w: 1920,
+            crtc_h: 1080,
             zpos: 0,
         };
         assert!(driver.commit_atomic_plane(plane).is_ok());
-        assert_eq!(driver.atomic_planes.len(), 1);
+        assert_eq!(driver.get_atomic_plane_count(), 1);
     }
 
     #[test]
     fn test_wayland_dma_buf_import() {
         let mut driver = GpuDriver::new();
         let buf = WaylandDmaBuf {
-            fd: 5, width: 1920, height: 1080,
-            format: PixelFormat::Rgba32, stride: 1920 * 4, offset: 0, size: 1920 * 1080 * 4,
+            fd: 5,
+            width: 1920,
+            height: 1080,
+            format: PixelFormat::Rgba32,
+            stride: 1920 * 4,
+            offset: 0,
+            size: 1920 * 1080 * 4,
         };
         let size = driver.import_dma_buf(buf).unwrap();
         assert_eq!(size, 1920 * 1080 * 4);
         assert_eq!(driver.dma_buffers.len(), 1);
+
+        driver.clear_dma_buffers();
+        assert_eq!(driver.dma_buffers.len(), 0);
     }
 
     #[test]

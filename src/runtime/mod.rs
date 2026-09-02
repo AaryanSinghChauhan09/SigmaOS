@@ -17,4 +17,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 pub mod language;
+pub mod node_distribution;
 pub mod process;
+
+pub use node_distribution::{
+    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeSecurityPolicy,
+    NodeStoreEntry, NodeTargetArch,
+};

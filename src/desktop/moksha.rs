@@ -16,12 +16,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // Moksha Desktop and EFL Engine for SigmaOS
 // Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
-
-
 
 extern crate alloc;
 #[cfg(test)]
@@ -170,7 +168,9 @@ impl TerminologyBackend {
 
     pub fn parse_terminology_media_escape(&self, escape_seq: &str) -> Option<String> {
         if escape_seq.starts_with("\x1b]10;file://") {
-            let path = escape_seq.trim_start_matches("\x1b]10;file://").trim_end_matches('\x07');
+            let path = escape_seq
+                .trim_start_matches("\x1b]10;file://")
+                .trim_end_matches('\x07');
             Some(path.to_string())
         } else {
             None
@@ -228,7 +228,10 @@ impl BodhiAppCenterInstaller {
         if package.is_empty() || package.contains('/') || package.contains(' ') {
             return Err("Invalid package name inside apturl");
         }
-        Ok(format!("Installed package '{}' successfully inside Bodhi AppCenter sandbox", package))
+        Ok(format!(
+            "Installed package '{}' successfully inside Bodhi AppCenter sandbox",
+            package
+        ))
     }
 }
 
@@ -284,6 +287,9 @@ mod tests {
         let installer = BodhiAppCenterInstaller::new("/opt/appcenter");
         let res = installer.install_from_apturl("apt:terminology");
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), "Installed package 'terminology' successfully inside Bodhi AppCenter sandbox");
+        assert_eq!(
+            res.unwrap(),
+            "Installed package 'terminology' successfully inside Bodhi AppCenter sandbox"
+        );
     }
 }

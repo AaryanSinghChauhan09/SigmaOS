@@ -2,7 +2,6 @@ extern crate alloc;
 /// Advanced Kernel Internals and Scheduler Data Structures for SigmaOS
 /// Inspired by Windows NT (EPROCESS, KPROCESS, ETHREAD, KTHREAD, KPCR/KPRCB),
 /// Linux task_struct, BSD vmspace, and iOS Mach thread models.
-
 use alloc::vec::Vec;
 
 /// Represents the alterable waiting state of a thread dispatcher (Windows NT/BSD style)
@@ -110,7 +109,14 @@ pub struct EThread {
 }
 
 impl EThread {
-    pub fn new(thread_id: usize, process_id: usize, start_address: usize, stack_base: usize, stack_limit: usize, base_priority: u8) -> Self {
+    pub fn new(
+        thread_id: usize,
+        process_id: usize,
+        start_address: usize,
+        stack_base: usize,
+        stack_limit: usize,
+        base_priority: u8,
+    ) -> Self {
         EThread {
             thread_id,
             process_id,

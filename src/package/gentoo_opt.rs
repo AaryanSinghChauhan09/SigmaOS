@@ -67,7 +67,12 @@ impl PortageSlotResolver {
     }
 
     /// Registers a package within a specific SLOT, allowing multiple versions of the same dependency to coexist (Slotted dependencies)
-    pub fn register_slotted_package(&mut self, name: &str, version: &str, slot: &str) -> Result<(), &'static str> {
+    pub fn register_slotted_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        slot: &str,
+    ) -> Result<(), &'static str> {
         self.packages.push(SlottedPackage {
             name: String::from(name),
             version: String::from(version),

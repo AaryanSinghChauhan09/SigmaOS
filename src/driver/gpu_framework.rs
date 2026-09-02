@@ -2,8 +2,6 @@
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
 extern crate alloc;
 
-
-
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

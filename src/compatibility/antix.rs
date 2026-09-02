@@ -1,7 +1,7 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
-use core::sync::atomic::{AtomicU8, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.
@@ -317,7 +317,6 @@ impl LegacyMemoryTrimmer {
         (available_ram_mb as usize) / aggressiveness
     }
 }
-
 
 pub static GLOBAL_ANTIX_DESKTOP: AntixDesktopProfiler = AntixDesktopProfiler::new();
 pub static GLOBAL_ANTIX_CONTROL: AntixControlCenter = AntixControlCenter::new();

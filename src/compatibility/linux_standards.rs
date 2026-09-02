@@ -22,9 +22,9 @@
 //! Filesystem Hierarchy Standard (FHS) compliance
 //! Systemd-style service management concepts
 //! Package management best practices
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 /// Linux Standard Base init script locations
 pub const LSB_INIT_SCRIPTS: &str = "/etc/init.d/";

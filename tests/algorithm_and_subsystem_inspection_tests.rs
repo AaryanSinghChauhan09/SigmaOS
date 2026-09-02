@@ -11,8 +11,13 @@ mod vm_manager;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
 
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod distro_inspirations;
+#[path = "../src/distro"]
+pub mod distro {
+    pub mod linux_bsd_inspirations;
+    pub mod sovereign_distro_dominance;
+    pub mod universal_distro_super_matrix;
+}
+use distro::linux_bsd_inspirations as distro_inspirations;
 
 #[cfg(test)]
 mod algorithm_inspection_tests {

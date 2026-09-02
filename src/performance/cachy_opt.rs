@@ -78,7 +78,11 @@ impl CachyBoreWakeupBooster {
     }
 
     /// Evaluates whether a thread waking up qualifies for an interactive priority boost
-    pub fn evaluate_wakeup_boost(&self, metric: &mut InteractiveThreadMetric, current_timestamp: u64) -> u32 {
+    pub fn evaluate_wakeup_boost(
+        &self,
+        metric: &mut InteractiveThreadMetric,
+        current_timestamp: u64,
+    ) -> u32 {
         let total_time = metric.sleep_duration_ms + metric.run_duration_ms;
         if total_time == 0 {
             metric.wakeup_boost_granted = true;
@@ -269,7 +273,11 @@ impl CachyMemoryCompactor {
     }
 
     /// Scans physical memory regions and merges contiguous 4KB pages into 2MB HugePages while reclaiming zeroed pages
-    pub fn compact_and_coalesce(&self, pages: &mut [Vec<u8>], page_size_bytes: usize) -> (usize, usize) {
+    pub fn compact_and_coalesce(
+        &self,
+        pages: &mut [Vec<u8>],
+        page_size_bytes: usize,
+    ) -> (usize, usize) {
         let mut huge_pages_formed = 0;
         let mut zero_pages = 0;
 
@@ -284,8 +292,10 @@ impl CachyMemoryCompactor {
         }
 
         let reclaimed_bytes = (zero_pages * page_size_bytes) as u64;
-        self.zero_pages_reclaimed.fetch_add(zero_pages as u64, Ordering::SeqCst);
-        self.saved_memory_bytes.fetch_add(reclaimed_bytes, Ordering::SeqCst);
+        self.zero_pages_reclaimed
+            .fetch_add(zero_pages as u64, Ordering::SeqCst);
+        self.saved_memory_bytes
+            .fetch_add(reclaimed_bytes, Ordering::SeqCst);
 
         (huge_pages_formed, zero_pages)
     }
@@ -340,7 +350,9 @@ pub struct CachySimdDispatcher {
 
 impl CachySimdDispatcher {
     pub fn new(level: u8) -> Self {
-        Self { level: level.clamp(1, 4) }
+        Self {
+            level: level.clamp(1, 4),
+        }
     }
 
     /// High-performance memory copy selecting optimal vectorization lane
@@ -508,7 +520,7 @@ impl Default for GarudaGameModeProfile {
 
 pub struct GarudaZramTuner {
     pub comp_algorithm: &'static str, // zstd, lz4
-    pub ram_percentage: u32,         // e.g., 150% ZRAM allocation
+    pub ram_percentage: u32,          // e.g., 150% ZRAM allocation
     pub max_compression_ratio: f32,
 }
 
@@ -534,7 +546,9 @@ pub struct GarudaIrqBalanceOptimizer {
 
 impl GarudaIrqBalanceOptimizer {
     pub fn new() -> Self {
-        Self { isolated_cores: Vec::new() }
+        Self {
+            isolated_cores: Vec::new(),
+        }
     }
 
     pub fn isolate_core_for_gaming(&mut self, core_id: u32) {
@@ -835,5 +849,4 @@ mod tests {
         assert_eq!(balancer.select_optimal_core_for_task(true), 0); // P-core
         assert_eq!(balancer.select_optimal_core_for_task(false), 2); // E-core
     }
-
 }

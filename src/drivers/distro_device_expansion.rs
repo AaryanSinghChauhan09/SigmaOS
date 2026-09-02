@@ -1030,6 +1030,775 @@ impl PeripheralDevice for CanBusSocketDriver {
 }
 
 // =========================================================================
+// 13. External USB Storage: USB Mass Storage Bulk-Only Transport (BOT) Driver
+// =========================================================================
+
+/// USB Mass Storage Bulk-Only Transport (BOT) External Flash / Disk Driver (Linux usb-storage / FreeBSD umass(4))
+pub struct UsbMassStorageBotDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    sector_size_bytes: u32,
+    total_sectors: u64,
+    cbw_tag: u32,
+}
+
+impl UsbMassStorageBotDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            sector_size_bytes: 512,
+            total_sectors: 125_000_000, // ~64GB USB Drive
+            cbw_tag: 1,
+        }
+    }
+
+    pub fn total_capacity_bytes(&self) -> u64 {
+        self.sector_size_bytes as u64 * self.total_sectors
+    }
+}
+
+impl PeripheralDevice for UsbMassStorageBotDriver {
+    fn name(&self) -> &'static str {
+        "USB Mass Storage Bulk-Only Transport (BOT) External Drive"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.cbw_tag = 1;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("USB Storage offline");
+        }
+        if buffer.len() >= 12 {
+            buffer[0..4].copy_from_slice(&self.sector_size_bytes.to_le_bytes());
+            buffer[4..12].copy_from_slice(&self.total_sectors.to_le_bytes());
+            Ok(12)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("USB Storage offline");
+        }
+        self.cbw_tag += 1;
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 14. External HID: USB HID Gamepad & Joystick Controller Driver
+// =========================================================================
+
+/// USB HID Gamepad & Joystick Controller Driver (Linux xpad/hid-generic / FreeBSD uhid(4))
+pub struct UsbGamepadControllerDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    buttons_mask: u16,
+    left_stick_x: i16,
+    left_stick_y: i16,
+}
+
+impl UsbGamepadControllerDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            buttons_mask: 0,
+            left_stick_x: 0,
+            left_stick_y: 0,
+        }
+    }
+
+    pub fn is_button_pressed(&self, button_bit: u8) -> bool {
+        (self.buttons_mask & (1 << button_bit)) != 0
+    }
+}
+
+impl PeripheralDevice for UsbGamepadControllerDriver {
+    fn name(&self) -> &'static str {
+        "USB HID External Gamepad & Joystick Controller"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.buttons_mask = 0x0001; // Button A active
+        self.left_stick_x = 100;
+        self.left_stick_y = -100;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Gamepad offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[0..2].copy_from_slice(&self.buttons_mask.to_le_bytes());
+            buffer[2..4].copy_from_slice(&self.left_stick_x.to_le_bytes());
+            buffer[4..6].copy_from_slice(&self.left_stick_y.to_le_bytes());
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Gamepad offline");
+        }
+        // Force feedback rumble packet
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.buttons_mask = 0;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 15. External Wireless: Bluetooth GATT External HID Device Driver
+// =========================================================================
+
+/// Bluetooth GATT External Human Interface Device Driver (Linux bluez / NetBSD bthidev(4))
+pub struct BluetoothExternalGattHidDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    device_mac: [u8; 6],
+    battery_level_pct: u8,
+    is_paired: bool,
+}
+
+impl BluetoothExternalGattHidDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            device_mac: [0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13],
+            battery_level_pct: 85,
+            is_paired: false,
+        }
+    }
+
+    pub fn battery_percent(&self) -> u8 {
+        self.battery_level_pct
+    }
+}
+
+impl PeripheralDevice for BluetoothExternalGattHidDriver {
+    fn name(&self) -> &'static str {
+        "Bluetooth LE External GATT Human Interface Device"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.is_paired = true;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Bluetooth HID offline");
+        }
+        if buffer.len() >= 7 {
+            buffer[0..6].copy_from_slice(&self.device_mac);
+            buffer[6] = self.battery_level_pct;
+            Ok(7)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Bluetooth HID offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.is_paired = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 16. External Display & Connectivity: USB Type-C / Thunderbolt External DisplayPort Alt-Mode Driver
+// =========================================================================
+
+/// USB Type-C / Thunderbolt External DisplayPort Alt-Mode Driver (Linux typec/thunderbolt / FreeBSD typec(4))
+pub struct ThunderboltExternalDisplayDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    dp_lanes_active: u8,
+    max_resolution_width: u16,
+    max_resolution_height: u16,
+}
+
+impl ThunderboltExternalDisplayDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            dp_lanes_active: 4,
+            max_resolution_width: 3840,
+            max_resolution_height: 2160, // 4K External Display
+        }
+    }
+
+    pub fn resolution(&self) -> (u16, u16) {
+        (self.max_resolution_width, self.max_resolution_height)
+    }
+}
+
+impl PeripheralDevice for ThunderboltExternalDisplayDriver {
+    fn name(&self) -> &'static str {
+        "USB Type-C / Thunderbolt External DisplayPort Alt-Mode"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Thunderbolt Display offline");
+        }
+        if buffer.len() >= 5 {
+            buffer[0] = self.dp_lanes_active;
+            buffer[1..3].copy_from_slice(&self.max_resolution_width.to_le_bytes());
+            buffer[3..5].copy_from_slice(&self.max_resolution_height.to_le_bytes());
+            Ok(5)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Thunderbolt Display offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 18. Legacy ISA Sound Card: Sound Blaster 16 ISA Driver
+// =========================================================================
+
+/// Creative Sound Blaster 16 ISA Audio Driver (Linux sb16 / FreeBSD sb(4))
+pub struct SoundBlaster16IsaDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    base_io_port: u16,
+    irq: u8,
+    dma_channel: u8,
+    sample_rate_hz: u16,
+}
+
+impl SoundBlaster16IsaDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            base_io_port: 0x220,
+            irq: 5,
+            dma_channel: 1,
+            sample_rate_hz: 22050,
+        }
+    }
+
+    pub fn io_port(&self) -> u16 {
+        self.base_io_port
+    }
+}
+
+impl PeripheralDevice for SoundBlaster16IsaDriver {
+    fn name(&self) -> &'static str {
+        "Creative Sound Blaster 16 ISA Audio Card"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Ancient
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Sound Blaster 16 offline");
+        }
+        if buffer.len() >= 4 {
+            buffer[0..2].copy_from_slice(&self.base_io_port.to_le_bytes());
+            buffer[2] = self.irq;
+            buffer[3] = self.dma_channel;
+            Ok(4)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Sound Blaster 16 offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 19. Legacy Network: 3Com 3c59x Fast Ethernet Driver
+// =========================================================================
+
+/// 3Com 3c59x Fast EtherLink PCI/EISA NIC Driver (Linux 3c59x / FreeBSD xl(4))
+pub struct ThreeCom3c59xEthernetDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    mac_address: [u8; 6],
+    link_speed_mbps: u32,
+}
+
+impl ThreeCom3c59xEthernetDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            mac_address: [0x00, 0x60, 0x08, 0x12, 0x34, 0x56],
+            link_speed_mbps: 100, // 100Mbps Fast Ethernet
+        }
+    }
+
+    pub fn mac_address(&self) -> [u8; 6] {
+        self.mac_address
+    }
+}
+
+impl PeripheralDevice for ThreeCom3c59xEthernetDriver {
+    fn name(&self) -> &'static str {
+        "3Com 3c59x Fast EtherLink PCI/EISA NIC"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Legacy
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("3Com NIC offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[..6].copy_from_slice(&self.mac_address);
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("3Com NIC offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 20. Legacy Storage: Floppy Disk Controller Driver
+// =========================================================================
+
+/// Standard 3.5" 1.44MB Floppy Disk Controller Driver (Linux floppy / FreeBSD fdc(4))
+pub struct FloppyDiskControllerDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    drive_count: u8,
+    motor_on: bool,
+}
+
+impl FloppyDiskControllerDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            drive_count: 2, // 2 drives (A:, B:)
+            motor_on: false,
+        }
+    }
+
+    pub fn drives(&self) -> u8 {
+        self.drive_count
+    }
+}
+
+impl PeripheralDevice for FloppyDiskControllerDriver {
+    fn name(&self) -> &'static str {
+        "Standard 3.5\" 1.44MB Floppy Disk Controller"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Ancient
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.motor_on = true;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Floppy controller offline");
+        }
+        if buffer.len() >= 2 {
+            buffer[0] = self.drive_count;
+            buffer[1] = if self.motor_on { 1 } else { 0 };
+            Ok(2)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Floppy controller offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.motor_on = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 21. Next-Gen Graphics: Intel Xe / Arc DRM/KMS Driver
+// =========================================================================
+
+/// Intel Xe / Arc Graphics DRM/KMS Driver (Linux xe / FreeBSD drm(4))
+pub struct IntelXeArcGpuDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    vram_size_mb: u32,
+    eu_count: u32,
+}
+
+impl IntelXeArcGpuDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            vram_size_mb: 16384, // 16GB GDDR6 VRAM
+            eu_count: 512,       // 512 Execution Units
+        }
+    }
+
+    pub fn eu_count(&self) -> u32 {
+        self.eu_count
+    }
+}
+
+impl PeripheralDevice for IntelXeArcGpuDriver {
+    fn name(&self) -> &'static str {
+        "Intel Xe / Arc Graphics DRM/KMS GPU"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Intel Xe GPU offline");
+        }
+        if buffer.len() >= 8 {
+            buffer[0..4].copy_from_slice(&self.vram_size_mb.to_le_bytes());
+            buffer[4..8].copy_from_slice(&self.eu_count.to_le_bytes());
+            Ok(8)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Intel Xe GPU offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 22. Next-Gen Memory: CXL 3.0 Memory Expander Driver
+// =========================================================================
+
+/// Compute Express Link (CXL 3.0) Type-3 Memory Expander Driver (Linux cxl / FreeBSD cxl(4))
+pub struct Cxl3MemoryExpanderDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    expanded_ram_gb: u64,
+    link_rate_gt_sec: u8,
+}
+
+impl Cxl3MemoryExpanderDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            expanded_ram_gb: 256,
+            link_rate_gt_sec: 64, // CXL 3.0 64 GT/s
+        }
+    }
+
+    pub fn ram_gb(&self) -> u64 {
+        self.expanded_ram_gb
+    }
+}
+
+impl PeripheralDevice for Cxl3MemoryExpanderDriver {
+    fn name(&self) -> &'static str {
+        "Compute Express Link (CXL 3.0) Type-3 Memory Expander"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CXL Expander offline");
+        }
+        if buffer.len() >= 9 {
+            buffer[0..8].copy_from_slice(&self.expanded_ram_gb.to_le_bytes());
+            buffer[8] = self.link_rate_gt_sec;
+            Ok(9)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CXL Expander offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 17. External Serial: CH340 / FTDI USB Serial Controller Driver
+// =========================================================================
+
+/// CH340 / FTDI External Serial USB Bridge Controller Driver (Linux ch341 / FreeBSD uchcom(4))
+pub struct Ch340ExternalSerialDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    baud_rate: u32,
+    rx_buffer: Vec<u8>,
+}
+
+impl Ch340ExternalSerialDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            baud_rate: 115200,
+            rx_buffer: Vec::new(),
+        }
+    }
+
+    pub fn baud_rate(&self) -> u32 {
+        self.baud_rate
+    }
+}
+
+impl PeripheralDevice for Ch340ExternalSerialDriver {
+    fn name(&self) -> &'static str {
+        "CH340 / FTDI USB-to-Serial External Controller Bridge"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        let len = buffer.len().min(self.rx_buffer.len());
+        if len > 0 {
+            let chunk: Vec<u8> = self.rx_buffer.drain(..len).collect();
+            buffer[..len].copy_from_slice(&chunk);
+            Ok(len)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        self.rx_buffer.extend_from_slice(data);
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.rx_buffer.clear();
+        Ok(())
+    }
+}
+
+// =========================================================================
 // Unit Tests
 // =========================================================================
 
@@ -1252,7 +2021,159 @@ mod tests {
     }
 
     #[test]
-    fn test_peripheral_manager_registration_with_all_12_distro_expansion_drivers() {
+    fn test_usb_mass_storage_bot_driver() {
+        let mut bot = UsbMassStorageBotDriver::new();
+        assert_eq!(bot.name(), "USB Mass Storage Bulk-Only Transport (BOT) External Drive");
+        assert_eq!(bot.generation(), DeviceGeneration::Modern);
+        assert_eq!(bot.total_capacity_bytes(), 64_000_000_000);
+
+        assert!(bot.initialize().is_ok());
+        let mut geom_buf = [0u8; 12];
+        assert_eq!(bot.read(&mut geom_buf).unwrap(), 12);
+        assert_eq!(u32::from_le_bytes([geom_buf[0], geom_buf[1], geom_buf[2], geom_buf[3]]), 512);
+
+        assert_eq!(bot.write(b"WRITE-BLOCK").unwrap(), 11);
+        assert!(bot.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_usb_gamepad_controller_driver() {
+        let mut pad = UsbGamepadControllerDriver::new();
+        assert_eq!(pad.name(), "USB HID External Gamepad & Joystick Controller");
+        assert_eq!(pad.generation(), DeviceGeneration::Modern);
+
+        assert!(pad.initialize().is_ok());
+        assert!(pad.is_button_pressed(0)); // Button A
+        let mut state_buf = [0u8; 6];
+        assert_eq!(pad.read(&mut state_buf).unwrap(), 6);
+
+        assert_eq!(pad.write(b"RUMBLE-FF").unwrap(), 9);
+        assert!(pad.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_bluetooth_external_gatt_hid_driver() {
+        let mut bt_hid = BluetoothExternalGattHidDriver::new();
+        assert_eq!(bt_hid.name(), "Bluetooth LE External GATT Human Interface Device");
+        assert_eq!(bt_hid.generation(), DeviceGeneration::Modern);
+        assert_eq!(bt_hid.battery_percent(), 85);
+
+        assert!(bt_hid.initialize().is_ok());
+        let mut report_buf = [0u8; 7];
+        assert_eq!(bt_hid.read(&mut report_buf).unwrap(), 7);
+        assert_eq!(report_buf[6], 85);
+
+        assert_eq!(bt_hid.write(b"LED-CMD").unwrap(), 7);
+        assert!(bt_hid.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_thunderbolt_external_display_driver() {
+        let mut tb_dp = ThunderboltExternalDisplayDriver::new();
+        assert_eq!(tb_dp.name(), "USB Type-C / Thunderbolt External DisplayPort Alt-Mode");
+        assert_eq!(tb_dp.generation(), DeviceGeneration::Modern);
+        assert_eq!(tb_dp.resolution(), (3840, 2160));
+
+        assert!(tb_dp.initialize().is_ok());
+        let mut dp_buf = [0u8; 5];
+        assert_eq!(tb_dp.read(&mut dp_buf).unwrap(), 5);
+        assert_eq!(dp_buf[0], 4); // 4 DP lanes
+
+        assert_eq!(tb_dp.write(b"MODE-SET").unwrap(), 8);
+        assert!(tb_dp.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_ch340_external_serial_driver() {
+        let mut serial = Ch340ExternalSerialDriver::new();
+        assert_eq!(serial.name(), "CH340 / FTDI USB-to-Serial External Controller Bridge");
+        assert_eq!(serial.generation(), DeviceGeneration::Modern);
+        assert_eq!(serial.baud_rate(), 115200);
+
+        assert!(serial.initialize().is_ok());
+        let mut rx_buf = [0u8; 4];
+        assert_eq!(serial.read(&mut rx_buf).unwrap(), 4);
+        assert_eq!(&rx_buf, b"OK\r\n");
+
+        assert_eq!(serial.write(b"AT\r\n").unwrap(), 4);
+        assert!(serial.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_sound_blaster_16_isa_driver() {
+        let mut sb16 = SoundBlaster16IsaDriver::new();
+        assert_eq!(sb16.name(), "Creative Sound Blaster 16 ISA Audio Card");
+        assert_eq!(sb16.generation(), DeviceGeneration::Ancient);
+        assert_eq!(sb16.io_port(), 0x220);
+
+        assert!(sb16.initialize().is_ok());
+        let mut cfg_buf = [0u8; 4];
+        assert_eq!(sb16.read(&mut cfg_buf).unwrap(), 4);
+        assert_eq!(cfg_buf[2], 5); // IRQ 5
+
+        assert!(sb16.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_three_com_3c59x_driver() {
+        let mut xl = ThreeCom3c59xEthernetDriver::new();
+        assert_eq!(xl.name(), "3Com 3c59x Fast EtherLink PCI/EISA NIC");
+        assert_eq!(xl.generation(), DeviceGeneration::Legacy);
+
+        assert!(xl.initialize().is_ok());
+        let mut mac_buf = [0u8; 6];
+        assert_eq!(xl.read(&mut mac_buf).unwrap(), 6);
+        assert_eq!(mac_buf[0], 0x00);
+
+        assert!(xl.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_floppy_disk_controller_driver() {
+        let mut fdc = FloppyDiskControllerDriver::new();
+        assert_eq!(fdc.name(), "Standard 3.5\" 1.44MB Floppy Disk Controller");
+        assert_eq!(fdc.generation(), DeviceGeneration::Ancient);
+        assert_eq!(fdc.drives(), 2);
+
+        assert!(fdc.initialize().is_ok());
+        let mut status_buf = [0u8; 2];
+        assert_eq!(fdc.read(&mut status_buf).unwrap(), 2);
+        assert_eq!(status_buf[1], 1); // Motor ON
+
+        assert!(fdc.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_intel_xe_arc_gpu_driver() {
+        let mut xe = IntelXeArcGpuDriver::new();
+        assert_eq!(xe.name(), "Intel Xe / Arc Graphics DRM/KMS GPU");
+        assert_eq!(xe.generation(), DeviceGeneration::Modern);
+        assert_eq!(xe.eu_count(), 512);
+
+        assert!(xe.initialize().is_ok());
+        let mut gpu_buf = [0u8; 8];
+        assert_eq!(xe.read(&mut gpu_buf).unwrap(), 8);
+
+        assert!(xe.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_cxl3_memory_expander_driver() {
+        let mut cxl = Cxl3MemoryExpanderDriver::new();
+        assert_eq!(cxl.name(), "Compute Express Link (CXL 3.0) Type-3 Memory Expander");
+        assert_eq!(cxl.generation(), DeviceGeneration::Modern);
+        assert_eq!(cxl.ram_gb(), 256);
+
+        assert!(cxl.initialize().is_ok());
+        let mut cxl_buf = [0u8; 9];
+        assert_eq!(cxl.read(&mut cxl_buf).unwrap(), 9);
+        assert_eq!(cxl_buf[8], 64); // 64 GT/s
+
+        assert!(cxl.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_peripheral_manager_registration_with_all_22_distro_expansion_drivers() {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
@@ -1268,8 +2189,18 @@ mod tests {
         assert!(manager.register_device(Box::new(RaspberryPiGpioMailboxDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(IntelI2cSmbusControllerDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(CanBusSocketDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(UsbMassStorageBotDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(UsbGamepadControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(BluetoothExternalGattHidDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(ThunderboltExternalDisplayDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Ch340ExternalSerialDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(SoundBlaster16IsaDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(ThreeCom3c59xEthernetDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(FloppyDiskControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(IntelXeArcGpuDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Cxl3MemoryExpanderDriver::new())).is_ok());
 
-        assert_eq!(manager.device_count(), 12);
+        assert_eq!(manager.device_count(), 22);
         manager.broadcast_power_state(PowerState::Sleep);
     }
 }

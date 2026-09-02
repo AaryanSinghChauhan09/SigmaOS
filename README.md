@@ -1,105 +1,67 @@
-# 🚀 SigmaOS Operating System
+# 🇸🇴 SigmaOS Sovereign Operating System
 
-[![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
-
-SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
+> **A sovereign, post-quantum resilient, zero-dependency operating system written in Rust, combining microkernel security with bare-metal performance.**
 
 ---
 
-## ✨ Features & Subsystems
+## 🌟 Architectural Highlights
 
-- **Sovereign Microkernel Core:** Memory isolation, capability bounding sets, and lightweight IPC channels (ALPC/Pipes).
-- **Multi-Distro Compatibility & Parity:** Adapters and translation layers for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), CachyOS (BORE scheduler), and FreeBSD (Jails/Capsicum/GEOM).
-- **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
-- **Zero-Trust Access Control:** Integrated Discretionary (DAC), Mandatory (MAC / Bell-LaPadula), and Role-Based (RBAC) access controls.
-- **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+SigmaOS is designed from the ground up to transcend POSIX legacy limitations and monolithic kernel bloat, drawing strategic inspiration from leading Linux and BSD distributions:
+
+- **Sovereign Microkernel Core**: Zero-allocation, capability-gated microkernel with isolated userspace shards (`BuddyAllocator`, `CapabilityGate`).
+- **NixOS / Guix Parity**: Purely declarative system state configurations, content-addressed package store (CAS), and instant atomic rollbacks.
+- **Arch Linux & Gentoo Parity**: SAT-based zero-allocation dependency solver (`SatSolver`), PKGBUILD recipe sandbox compiler, and Portage USE-flag compilation.
+- **Clear Linux Parity**: Stateless `/usr` configuration overlay architecture (`ClearLinuxStatelessOverlayEngine`).
+- **OpenBSD Security Hardening**: Hardware-enforced process restriction (`pledge`), file path masking (`unveil`), W^X memory execution policies, and Retguard return-address canaries.
+- **FreeBSD Isolation**: Jails virtualization with nested hierarchies, RACCT/RCTL resource controls, and Capsicum descriptor capability delegation.
+- **DragonFly BSD & openSUSE Parity**: HAMMER2 PFS multi-version B-tree filesystem, variant symlinks (`varsyms`), and Snapper CoW pre/post transaction recovery.
+- **Zenith Desktop Compositor**: Direct-to-hardware framebuffer rendering without Wayland/X11 bloat, featuring HiDPI fractional scaling, Variable Refresh Rate (VRR), Sway-style tiling matrices, and Gamescope-inspired direct scanout blitting.
 
 ---
 
-## 🛠️ Building & Running Tests
+## 🚀 Quick Start
 
-To build and run the full native test harness:
+### Prerequisites
+
+- Rust nightly toolchain
+- QEMU (`qemu-system-x86_64`)
+- GCC / G++ toolchain
+
+### Build & Run
 
 ```bash
+# Clone the repository
+git clone https://github.com/SigmaOS/SigmaOS.git
+cd SigmaOS
+
+# Run atomic test suite and inspection tests
 ./run_sigma_tests.sh
+
+# Build bootable ISO image
+bash scripts/build-iso.sh
+
+# Run QEMU smoke test
+python3 scripts/qemu_smoke_test.py
 ```
 
 ---
 
-## 📚 Canonical Documentation (GitHub Wiki)
+## 📚 Documentation & Wiki
 
-```text
-Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
-Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
-```
+Explore detailed specifications and guides in the `wiki/` directory and online GitHub Wiki:
 
-### Current Status
-
-**Kernel Core:**
-- ✅ Microkernel scheduler & IPC
-- ✅ Physical & virtual memory manager
-- ✅ Multi-core SMP support
-- 🔄 x86_64 / AArch64 / RISC-V HAL
-- 🔄 PCI / PCIe bus driver
-
-**Security Subsystem:**
-- ✅ Discretionary & Mandatory Access Control
-- ✅ Post-quantum cryptographic attestation (Dilithium-5 / Kyber-1024)
-- ✅ Capabilities & pledge sandboxing
-
-**Userland & Applications:**
-- ✅ Zenith Desktop frontend
-- ✅ Sovereign Video & Audio Editor
-- ✅ Disk usage analyzer
-- ✅ System monitor
-- ✅ Process manager
-- 🔄 Virtual machine manager (QEMU/KVM)
-- 🔄 Container manager (Docker/Podman)
-
-**Package Management:**
-- ✅ sigma-pkg CLI
-- 🔄 Universal package manager
-- 🔄 Rollback package snapshots
-
-**Networking:**
-- 🔄 Cloud sync engine
-- 🔄 Built-in torrent client
-- 🔄 Network traffic analyzer
-
-**AI & Automation:**
-- 🔄 AI orchestrator for system optimization
-
-**Customization:**
-- 🔄 Unified control center
-- ✅ Declarative theming engine
-
-**Boot & Deployment:**
-- 🔄 TCP/UDP stack - Partial
-- ✅ Ext4 + FAT32 filesystems
-- ✅ NVMe + USB xHCI drivers
-- ✅ Zenith Desktop prototype
-- ✅ sigma-pkg CLI
-- ⬜ Bootable ISO (Phase G)
-
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### High-Impact Areas
-
-- Round-robin scheduler implementation
-- Buddy allocator completion
-- sigma-sh REPL
-- USB HID keyboard driver
+- [Home](wiki/Home.md)
+- [Architecture](wiki/Architecture.md)
+- [Linux Distros Architecture & Parity Guide](wiki/Linux-Distros-Architecture.md)
+- [BSD Security Hardening Guide](wiki/BSD-Security-Hardening.md)
+- [Declarative Package Management](wiki/Declarative-Package-Management.md)
+- [Security Model](wiki/Security.md)
+- [Driver Development](wiki/Driver-Development.md)
+- [Installation Guide](wiki/Installation.md)
+- [Roadmap](wiki/Roadmap.md)
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+SigmaOS is licensed under the [MIT License](licensing.rs).

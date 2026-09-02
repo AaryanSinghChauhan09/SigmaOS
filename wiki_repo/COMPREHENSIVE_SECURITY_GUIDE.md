@@ -33,7 +33,7 @@ impl CapabilityToken {
             Operation::Execute => self.permissions.execute.contains(resource),
         }
     }
-    
+
     pub fn revoke(&mut self) -> Result<(), SecurityError> {
         self.revocation_key.revoke()?;
         Ok(())
@@ -62,18 +62,18 @@ impl PostQuantumCrypto {
     pub fn generate_keypair(&mut self) -> Result<KeyPair, CryptoError> {
         let kem_keypair = self.kem.generate_keypair()?;
         let sig_keypair = self.signatures.generate_keypair()?;
-        
+
         Ok(KeyPair {
             kem: kem_keypair,
             signature: sig_keypair,
         })
     }
-    
+
     pub fn encrypt(&self, plaintext: &[u8], public_key: &PublicKey) -> Result<Vec<u8>, CryptoError> {
         let ciphertext = self.kem.encrypt(plaintext, public_key)?;
         Ok(ciphertext)
     }
-    
+
     pub fn sign(&self, message: &[u8], private_key: &PrivateKey) -> Result<Signature, CryptoError> {
         let signature = self.signatures.sign(message, private_key)?;
         Ok(signature)
@@ -103,13 +103,13 @@ impl SecureBootManager {
     pub fn verify_bootchain(&self) -> Result<BootchainVerification, SecureBootError> {
         // Verify bootloader signature
         let bootloader_sig = self.verify_bootloader()?;
-        
+
         // Verify kernel signature
         let kernel_sig = self.verify_kernel()?;
-        
+
         // Verify initramfs signature
         let initramfs_sig = self.verify_initramfs()?;
-        
+
         Ok(BootchainVerification {
             bootloader: bootloader_sig,
             kernel: kernel_sig,
@@ -188,11 +188,11 @@ impl NetworkIsolation {
         self.namespaces.insert(name.to_string(), namespace.clone());
         Ok(namespace)
     }
-    
+
     pub fn configure_firewall(&mut self, network: &str, rules: Vec<FirewallRule>) -> Result<(), NetworkError> {
         let firewall = self.firewalls.get_mut(network)
             .ok_or(NetworkError::NetworkNotFound)?;
-        
+
         firewall.apply_rules(rules)?;
         Ok(())
     }
@@ -213,10 +213,10 @@ impl SecureCommunication {
     pub fn establish_secure_connection(&mut self, endpoint: &str) -> Result<SecureChannel, CryptoError> {
         // Perform TLS 1.3 handshake
         let tls_connection = self.tls.handshake(endpoint)?;
-        
+
         // Add post-quantum key exchange
         let pq_handshake = self.pq_extensions.perform_pq_handshake(&tls_connection)?;
-        
+
         Ok(SecureChannel {
             tls: tls_connection,
             pq: pq_handshake,
@@ -241,13 +241,13 @@ impl DiskEncryption {
     pub fn encrypt_volume(&mut self, device: &str, passphrase: &str) -> Result<(), EncryptionError> {
         // Generate encryption key
         let key = self.key_management.derive_key(passphrase)?;
-        
+
         // Setup LUKS2 header
         self.cryptsetup.luks_format(device, &key)?;
-        
+
         // Open encrypted volume
         self.cryptsetup.luks_open(device, "sigma_crypt", &key)?;
-        
+
         Ok(())
     }
 }
@@ -266,10 +266,10 @@ pub struct FileAccessControl {
 impl FileAccessControl {
     pub fn check_access(&mut self, file: &str, operation: FileOperation, token: &CapabilityToken) -> Result<bool, AccessError> {
         let allowed = token.verify(operation.into(), &Resource::File(file.to_string()));
-        
+
         // Log access attempt
         self.audit_log.log_access(file, operation, token, allowed);
-        
+
         Ok(allowed)
     }
 }
@@ -291,7 +291,7 @@ pub struct AuditSystem {
 impl AuditSystem {
     pub fn log_event(&mut self, event: AuditEvent) {
         self.events.push(event.clone());
-        
+
         // Check against rules
         for rule in &self.rules {
             if rule.matches(&event) {
@@ -319,12 +319,12 @@ impl IntrusionDetection {
         if let Some(signature) = self.check_signatures(&activity) {
             return DetectionResult::SignatureMatch(signature);
         }
-        
+
         // Check for anomalies
         if let Some(anomaly) = self.anomaly_detector.detect(&activity) {
             return DetectionResult::Anomaly(anomaly);
         }
-        
+
         DetectionResult::Normal
     }
 }
@@ -346,7 +346,7 @@ impl SecurityPolicyManager {
     pub fn enforce_policy(&mut self, policy_name: &str) -> Result<(), PolicyError> {
         let policy = self.policies.get(policy_name)
             .ok_or(PolicyError::NotFound)?;
-        
+
         self.enforcement.apply_policy(policy)?;
         Ok(())
     }
@@ -368,14 +368,14 @@ impl ComplianceManager {
         let framework = self.frameworks.iter()
             .find(|f| f.name == framework)
             .unwrap();
-        
+
         let mut report = ComplianceReport::new();
-        
+
         for control in &framework.controls {
             let status = self.evaluate_control(control);
             report.add_control(control.name.clone(), status);
         }
-        
+
         report
     }
 }
@@ -397,19 +397,19 @@ pub struct SecurityScanner {
 impl SecurityScanner {
     pub fn scan_system(&mut self) -> SecurityReport {
         let mut report = SecurityReport::new();
-        
+
         // Scan for vulnerabilities
         let vulns = self.vulnerability_scanner.scan();
         report.add_vulnerabilities(vulns);
-        
+
         // Scan configuration
         let config_issues = self.configuration_scanner.scan();
         report.add_configuration_issues(config_issues);
-        
+
         // Scan code
         let code_issues = self.code_scanner.scan();
         report.add_code_issues(code_issues);
-        
+
         report
     }
 }
@@ -428,13 +428,13 @@ pub struct PenetrationTest {
 impl PenetrationTest {
     pub fn run_all_tests(&mut self) -> TestReport {
         let mut report = TestReport::new();
-        
+
         for test in &self.tests {
             let result = test.execute();
             self.results.push(result.clone());
             report.add_result(result);
         }
-        
+
         report
     }
 }
@@ -457,13 +457,13 @@ impl IncidentManager {
         // Find appropriate playbook
         let playbook = self.response_playbooks.get(&incident.type_)
             .unwrap();
-        
+
         // Execute playbook
         let result = playbook.execute(&incident)?;
-        
+
         // Update incident status
         self.update_incident_status(&incident, result.status.clone());
-        
+
         result
     }
 }
@@ -483,19 +483,19 @@ pub struct ForensicsTool {
 impl ForensicsTool {
     pub fn analyze_incident(&mut self, incident: &Incident) -> ForensicsReport {
         let mut report = ForensicsReport::new();
-        
+
         // Analyze disk images
         let disk_evidence = self.image_analyzer.analyze(&incident.disk_images);
         report.add_disk_evidence(disk_evidence);
-        
+
         // Analyze logs
         let log_evidence = self.log_analyzer.analyze(&incident.logs);
         report.add_log_evidence(log_evidence);
-        
+
         // Analyze memory dumps
         let memory_evidence = self.memory_analyzer.analyze(&incident.memory_dumps);
         report.add_memory_evidence(memory_evidence);
-        
+
         report
     }
 }

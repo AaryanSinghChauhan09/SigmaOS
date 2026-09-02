@@ -1,16 +1,14 @@
-// SigmaOS Unified Control Center
-// Inspired by elementaryOS Switchboard, openSUSE YaST2 Control Center, and GNOME Settings
-// - Modular Switchboard plug architecture for dynamic setting category registration
-// - Comprehensive system settings management (Network, Display, Sound, Power, Users, Security, Storage, Printers, System)
-// - Hardware profiles, display resolution scaling, power governor toggles, and security policy management
-
 extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
+// Unified Control Center for SigmaOS
+// Inspired by elementaryOS Switchboard, GNOME Control Center, and openSUSE YaST2
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ControlCenterCategory {
     Network,
     Display,
@@ -23,117 +21,184 @@ pub enum ControlCenterCategory {
     System,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SystemSettingItem {
-    pub key: String,
-    pub label: String,
-    pub value: String,
-    pub is_editable: bool,
+pub trait SwitchboardPlug: Send + Sync {
+    fn id(&self) -> &str;
+    fn title(&self) -> &str;
+    fn category(&self) -> ControlCenterCategory;
+    fn get_setting(&self, key: &str) -> Option<String>;
+    fn set_setting(&mut self, key: &str, value: &str) -> Result<(), String>;
 }
 
-#[derive(Debug, Clone)]
-pub struct SwitchboardPlug {
-    pub plug_id: String,
-    pub name: String,
-    pub description: String,
-    pub category: ControlCenterCategory,
-    pub settings: Vec<SystemSettingItem>,
+/// Network Settings Plug
+pub struct NetworkSettingsPlug {
+    pub wifi_enabled: bool,
+    pub ethernet_up: bool,
+    pub hostname: String,
 }
 
-impl SwitchboardPlug {
-    pub fn new(plug_id: &str, name: &str, description: &str, category: ControlCenterCategory) -> Self {
-        Self {
-            plug_id: plug_id.to_string(),
-            name: name.to_string(),
-            description: description.to_string(),
-            category,
-            settings: Vec::new(),
+impl SwitchboardPlug for NetworkSettingsPlug {
+    fn id(&self) -> &str { "network" }
+    fn title(&self) -> &str { "Network & Wi-Fi" }
+    fn category(&self) -> ControlCenterCategory { ControlCenterCategory::Network }
+    fn get_setting(&self, key: &str) -> Option<String> {
+        match key {
+            "wifi_enabled" => Some(self.wifi_enabled.to_string()),
+            "ethernet_up" => Some(self.ethernet_up.to_string()),
+            "hostname" => Some(self.hostname.clone()),
+            _ => None,
         }
     }
-
-    pub fn add_setting(&mut self, key: &str, label: &str, value: &str, is_editable: bool) {
-        self.settings.push(SystemSettingItem {
-            key: key.to_string(),
-            label: label.to_string(),
-            value: value.to_string(),
-            is_editable,
-        });
-    }
-
-    pub fn set_value(&mut self, key: &str, new_value: &str) -> bool {
-        if let Some(item) = self.settings.iter_mut().find(|i| i.key == key) {
-            if item.is_editable {
-                item.value = new_value.to_string();
-                return true;
+    fn set_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
+        match key {
+            "wifi_enabled" => {
+                self.wifi_enabled = value.parse().map_err(|_| "Invalid boolean")?;
+                Ok(())
             }
+            "hostname" => {
+                self.hostname = value.to_string();
+                Ok(())
+            }
+            _ => Err(format!("Unknown key {}", key)),
         }
-        false
     }
 }
 
-/// Master Unified Control Center Engine
-#[derive(Debug, Clone)]
+/// Display Settings Plug
+pub struct DisplaySettingsPlug {
+    pub resolution: String,
+    pub scale_factor: f32,
+    pub night_light: bool,
+}
+
+impl SwitchboardPlug for DisplaySettingsPlug {
+    fn id(&self) -> &str { "display" }
+    fn title(&self) -> &str { "Display & Scaling" }
+    fn category(&self) -> ControlCenterCategory { ControlCenterCategory::Display }
+    fn get_setting(&self, key: &str) -> Option<String> {
+        match key {
+            "resolution" => Some(self.resolution.clone()),
+            "scale_factor" => Some(self.scale_factor.to_string()),
+            "night_light" => Some(self.night_light.to_string()),
+            _ => None,
+        }
+    }
+    fn set_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
+        match key {
+            "resolution" => {
+                self.resolution = value.to_string();
+                Ok(())
+            }
+            "scale_factor" => {
+                self.scale_factor = value.parse().map_err(|_| "Invalid float")?;
+                Ok(())
+            }
+            "night_light" => {
+                self.night_light = value.parse().map_err(|_| "Invalid boolean")?;
+                Ok(())
+            }
+            _ => Err(format!("Unknown key {}", key)),
+        }
+    }
+}
+
+/// Unified Control Center Manager
+#[cfg(not(target_os = "none"))]
+use std::sync::Mutex;
+
+#[cfg(target_os = "none")]
+pub struct Mutex<T>(core::cell::UnsafeCell<T>);
+
+#[cfg(target_os = "none")]
+pub struct BareGuard<'a, T>(&'a mut T);
+
+#[cfg(target_os = "none")]
+impl<'a, T> core::ops::Deref for BareGuard<'a, T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target { self.0 }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> core::ops::DerefMut for BareGuard<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target { self.0 }
+}
+
+#[cfg(target_os = "none")]
+unsafe impl<T: Send> Send for Mutex<T> {}
+#[cfg(target_os = "none")]
+unsafe impl<T: Send> Sync for Mutex<T> {}
+
+#[cfg(target_os = "none")]
+impl<T> Mutex<T> {
+    pub const fn new(value: T) -> Self {
+        Mutex(core::cell::UnsafeCell::new(value))
+    }
+    pub fn lock(&self) -> Result<BareGuard<'_, T>, ()> {
+        unsafe { Ok(BareGuard(&mut *self.0.get())) }
+    }
+}
+
 pub struct UnifiedControlCenter {
-    pub plugs: BTreeMap<String, SwitchboardPlug>,
-    pub dark_mode: bool,
-    pub active_category: ControlCenterCategory,
+    pub plugs: BTreeMap<String, alloc::sync::Arc<Mutex<dyn SwitchboardPlug>>>,
 }
 
 impl UnifiedControlCenter {
     pub fn new() -> Self {
-        let mut cc = Self {
+        let mut center = Self {
             plugs: BTreeMap::new(),
-            dark_mode: true,
-            active_category: ControlCenterCategory::Network,
         };
 
-        // Initialize default core system plugs (inspired by elementaryOS Switchboard)
-        let mut net_plug = SwitchboardPlug::new(
-            "plug_net",
-            "Network & Wireless",
-            "Manage Wi-Fi, Ethernet, and WireGuard VPNs",
-            ControlCenterCategory::Network,
-        );
-        net_plug.add_setting("wifi_enabled", "Wi-Fi Switch", "true", true);
-        net_plug.add_setting("ip_address", "IP Address", "192.168.1.100", false);
-        cc.register_plug(net_plug);
+        let net_plug = NetworkSettingsPlug {
+            wifi_enabled: true,
+            ethernet_up: true,
+            hostname: "sigmaos-desktop".to_string(),
+        };
+        center.register_plug(alloc::sync::Arc::new(Mutex::new(net_plug)));
 
-        let mut display_plug = SwitchboardPlug::new(
-            "plug_display",
-            "Display & Scaling",
-            "Configure resolution, 4K scaling, and Night Light",
-            ControlCenterCategory::Display,
-        );
-        display_plug.add_setting("resolution", "Resolution", "3840x2160", true);
-        display_plug.add_setting("scaling", "Fractional Scaling", "125%", true);
-        cc.register_plug(display_plug);
+        let display_plug = DisplaySettingsPlug {
+            resolution: "1920x1080".to_string(),
+            scale_factor: 1.0,
+            night_light: false,
+        };
+        center.register_plug(alloc::sync::Arc::new(Mutex::new(display_plug)));
 
-        let mut sec_plug = SwitchboardPlug::new(
-            "plug_security",
-            "Security & Privacy",
-            "OpenBSD pledge/unveil policies and Firewall controls",
-            ControlCenterCategory::Security,
-        );
-        sec_plug.add_setting("firewall_active", "Stateful PF Firewall", "true", true);
-        sec_plug.add_setting("securelevel", "BSD Securelevel", "1", true);
-        cc.register_plug(sec_plug);
-
-        cc
+        center
     }
 
-    pub fn register_plug(&mut self, plug: SwitchboardPlug) {
-        self.plugs.insert(plug.plug_id.clone(), plug);
+    pub fn register_plug(&mut self, plug: alloc::sync::Arc<Mutex<dyn SwitchboardPlug>>) {
+        let id = {
+            #[cfg(not(target_os = "none"))]
+            {
+                plug.lock().unwrap().id().to_string()
+            }
+            #[cfg(target_os = "none")]
+            {
+                plug.lock().unwrap().id().to_string()
+            }
+        };
+        self.plugs.insert(id, plug);
     }
 
-    pub fn get_plugs_by_category(&self, category: ControlCenterCategory) -> Vec<&SwitchboardPlug> {
-        self.plugs.values().filter(|p| p.category == category).collect()
+    pub fn get_plug_setting(&self, plug_id: &str, key: &str) -> Option<String> {
+        let plug = self.plugs.get(plug_id)?;
+        #[cfg(not(target_os = "none"))]
+        {
+            plug.lock().unwrap().get_setting(key)
+        }
+        #[cfg(target_os = "none")]
+        {
+            plug.lock().ok()?.get_setting(key)
+        }
     }
 
-    pub fn update_setting(&mut self, plug_id: &str, key: &str, value: &str) -> bool {
-        if let Some(plug) = self.plugs.get_mut(plug_id) {
-            plug.set_value(key, value)
-        } else {
-            false
+    pub fn set_plug_setting(&mut self, plug_id: &str, key: &str, value: &str) -> Result<(), String> {
+        let plug = self.plugs.get(plug_id).ok_or("Plug not found")?;
+        #[cfg(not(target_os = "none"))]
+        {
+            plug.lock().unwrap().set_setting(key, value)
+        }
+        #[cfg(target_os = "none")]
+        {
+            plug.lock().map_err(|_| "Lock error")?.set_setting(key, value)
         }
     }
 }
@@ -149,35 +214,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_control_center_category_plug_dispatch() {
-        let cc = UnifiedControlCenter::new();
-        let net_plugs = cc.get_plugs_by_category(ControlCenterCategory::Network);
-        assert_eq!(net_plugs.len(), 1);
-        assert_eq!(net_plugs[0].name, "Network & Wireless");
-    }
+    fn test_unified_control_center() {
+        let mut center = UnifiedControlCenter::new();
+        assert_eq!(center.get_plug_setting("network", "hostname").unwrap(), "sigmaos-desktop");
 
-    #[test]
-    fn test_system_settings_toggle() {
-        let mut cc = UnifiedControlCenter::new();
-        assert!(cc.update_setting("plug_display", "scaling", "150%"));
+        assert!(center.set_plug_setting("network", "hostname", "sigmaos-workstation").is_ok());
+        assert_eq!(center.get_plug_setting("network", "hostname").unwrap(), "sigmaos-workstation");
 
-        let display_plug = cc.plugs.get("plug_display").unwrap();
-        let scaling_item = display_plug.settings.iter().find(|i| i.key == "scaling").unwrap();
-        assert_eq!(scaling_item.value, "150%");
-    }
-
-    #[test]
-    fn test_plug_registration() {
-        let mut cc = UnifiedControlCenter::new();
-        let mut sound_plug = SwitchboardPlug::new(
-            "plug_sound",
-            "Sound & Audio",
-            "PipeWire audio devices and volume",
-            ControlCenterCategory::Sound,
-        );
-        sound_plug.add_setting("master_volume", "Master Volume", "80%", true);
-
-        cc.register_plug(sound_plug);
-        assert_eq!(cc.get_plugs_by_category(ControlCenterCategory::Sound).len(), 1);
+        assert_eq!(center.get_plug_setting("display", "resolution").unwrap(), "1920x1080");
+        assert!(center.set_plug_setting("display", "scale_factor", "1.25").is_ok());
+        assert_eq!(center.get_plug_setting("display", "scale_factor").unwrap(), "1.25");
     }
 }

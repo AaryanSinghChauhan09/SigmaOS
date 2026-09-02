@@ -2,7 +2,6 @@ extern crate alloc;
 // SPDX-License-Identifier: MIT
 /// SigmaOS Linux & BSD Distribution Compatibility & Userland Parity Subsystem (linux_compat)
 /// Linuxulator syscall translation, FreeBSD kqueue EVFILT multiplexing, OpenBSD pledge/unveil filtering, ProcFS, and ELF auxv loader.
-
 use alloc::collections::BTreeMap as HashMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -88,11 +87,12 @@ pub struct BsdKevent {
     pub filter: BsdKqueueFilter,
     pub flags: u16,
     pub fflags: u32,
-    pub data: IntPtrT,
+    pub data: intptr_t,
     pub udata: u64,
 }
 
-type IntPtrT = isize;
+#[allow(non_camel_case_types)]
+type intptr_t = isize;
 
 /// FreeBSD-inspired kqueue Event Multiplexer
 pub struct BsdKqueueMultiplexer {

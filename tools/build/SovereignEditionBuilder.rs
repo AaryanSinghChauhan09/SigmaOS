@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, static_mut_refs)]
 
-/// SigmaOS: SovereignEditionBuilder.rs
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
+// SigmaOS: SovereignEditionBuilder.rs
+// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+// All types hand-defined. OOP via struct + impl + trait patterns.
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -24,6 +24,12 @@ type SigmaUsize = usize;
 pub struct StaticVec<T: Copy, const N: usize> {
     data: [Option<T>; N],
     len: usize,
+}
+
+impl<T: Copy, const N: usize> Default for StaticVec<T, N> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T: Copy, const N: usize> StaticVec<T, N> {
@@ -82,9 +88,7 @@ impl EditionPackage {
     pub fn new(name_str: &[u8], required: bool) -> Self {
         let mut name = [0u8; 48];
         let len = name_str.len().min(47);
-        for i in 0..len {
-            name[i] = name_str[i];
-        }
+        name[..len].copy_from_slice(&name_str[..len]);
         Self { name, required }
     }
 
@@ -119,15 +123,11 @@ impl Edition {
     ) -> Self {
         let mut name = [0u8; 48];
         let name_len = name_str.len().min(47);
-        for i in 0..name_len {
-            name[i] = name_str[i];
-        }
+        name[..name_len].copy_from_slice(&name_str[..name_len]);
 
         let mut make_target = [0u8; 32];
         let make_len = make_str.len().min(31);
-        for i in 0..make_len {
-            make_target[i] = make_str[i];
-        }
+        make_target[..make_len].copy_from_slice(&make_str[..make_len]);
 
         Self {
             id,
@@ -148,11 +148,73 @@ impl Edition {
     }
 }
 
+/// Official Image Profile Kind inspired by Linux & BSD distros
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum DistroImageProfileKind {
+    LiveDesktopMintPop,     // Linux Mint / Pop!_OS inspired Live Workstation ISO
+    NetInstallArchDebian,   // Arch / Debian inspired minimal NetInstall ISO
+    HardenedAmnesicTails,   // Tails / OpenBSD inspired RAM-wiped Amnesic Hardened ISO
+    CloudHeadlessTalos,     // Talos / Alpine inspired immutable Cloud-Init Headless image
+    GamingHybridGpuCachy,   // CachyOS / Fedora inspired BORE/PRIME Hybrid GPU Workstation
+}
+
+/// Image Profile Manifest Metadata
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct DistroImageProfile {
+    pub kind: DistroImageProfileKind,
+    pub profile_name: [u8; 48],
+    pub compression_algo: [u8; 16], // e.g. "zstd", "xz", "squashfs"
+    pub is_read_only_rootfs: SigmaBool,
+    pub enable_live_persistence: SigmaBool,
+    pub sha256_checksum: [u8; 32],
+}
+
+impl DistroImageProfile {
+    pub fn new(
+        kind: DistroImageProfileKind,
+        name_str: &[u8],
+        algo_str: &[u8],
+        read_only: bool,
+        persistence: bool,
+    ) -> Self {
+        let mut profile_name = [0u8; 48];
+        let n_len = name_str.len().min(47);
+        profile_name[..n_len].copy_from_slice(&name_str[..n_len]);
+
+        let mut compression_algo = [0u8; 16];
+        let c_len = algo_str.len().min(15);
+        compression_algo[..c_len].copy_from_slice(&algo_str[..c_len]);
+
+        let mut checksum = [0u8; 32];
+        for (i, byte) in checksum.iter_mut().enumerate() {
+            *byte = (i as u8).wrapping_mul(7).wrapping_add(0x42);
+        }
+
+        Self {
+            kind,
+            profile_name,
+            compression_algo,
+            is_read_only_rootfs: read_only,
+            enable_live_persistence: persistence,
+            sha256_checksum: checksum,
+        }
+    }
+}
+
 /// EditionTarget — OOP singleton pattern.
 pub struct EditionTarget {
     pub initialized: SigmaBool,
     pub editions: StaticVec<Edition, 8>,
     pub packages: StaticVec<(SigmaU32, EditionPackage), 32>, // Mapped by (edition_id, package)
+    pub official_profiles: StaticVec<DistroImageProfile, 8>,
+}
+
+impl Default for EditionTarget {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EditionTarget {
@@ -161,11 +223,70 @@ impl EditionTarget {
             initialized: false,
             editions: StaticVec::new(),
             packages: StaticVec::new(),
+            official_profiles: StaticVec::new(),
         }
     }
 
     pub fn init(&mut self) {
         self.initialized = true;
+        let _ = self.register_default_distro_profiles();
+    }
+
+    /// Pre-configures official distro-inspired image profiles
+    pub fn register_default_distro_profiles(&mut self) -> Result<(), &'static str> {
+        let p1 = DistroImageProfile::new(
+            DistroImageProfileKind::LiveDesktopMintPop,
+            b"SigmaOS Live Workstation ISO (Mint/Pop)",
+            b"zstd",
+            true,
+            true,
+        );
+        let p2 = DistroImageProfile::new(
+            DistroImageProfileKind::NetInstallArchDebian,
+            b"SigmaOS NetInstall Minimal ISO (Arch/Debian)",
+            b"xz",
+            false,
+            false,
+        );
+        let p3 = DistroImageProfile::new(
+            DistroImageProfileKind::HardenedAmnesicTails,
+            b"SigmaOS Hardened Amnesic Security ISO (Tails/OpenBSD)",
+            b"squashfs",
+            true,
+            false,
+        );
+        let p4 = DistroImageProfile::new(
+            DistroImageProfileKind::CloudHeadlessTalos,
+            b"SigmaOS Immutable Cloud-Init Image (Talos/Alpine)",
+            b"zstd",
+            true,
+            false,
+        );
+        let p5 = DistroImageProfile::new(
+            DistroImageProfileKind::GamingHybridGpuCachy,
+            b"SigmaOS Cachy BORE / NVIDIA PRIME Hybrid ISO",
+            b"zstd",
+            false,
+            true,
+        );
+
+        self.official_profiles.push(p1)?;
+        self.official_profiles.push(p2)?;
+        self.official_profiles.push(p3)?;
+        self.official_profiles.push(p4)?;
+        self.official_profiles.push(p5)?;
+        Ok(())
+    }
+
+    pub fn get_profile_by_kind(&self, kind: DistroImageProfileKind) -> Option<&DistroImageProfile> {
+        for i in 0..self.official_profiles.len() {
+            if let Some(prof) = self.official_profiles.get(i) {
+                if prof.kind == kind {
+                    return Some(prof);
+                }
+            }
+        }
+        None
     }
 
     /// Add a brand new Edition template to the build engine
@@ -271,34 +392,58 @@ impl EditionTarget {
 
 static mut INSTANCE: EditionTarget = EditionTarget::new();
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn init() {
-    INSTANCE.init();
+    unsafe {
+        (&mut *core::ptr::addr_of_mut!(INSTANCE)).init();
+    }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setTorDefault() {
-    INSTANCE.setTorDefault(1, true);
+    unsafe {
+        (&mut *core::ptr::addr_of_mut!(INSTANCE)).setTorDefault(1, true);
+    }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn setMinimalGUI() {
-    INSTANCE.setMinimalGUI(1, true);
+    unsafe {
+        (&mut *core::ptr::addr_of_mut!(INSTANCE)).setMinimalGUI(1, true);
+    }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn printStatus() {}
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_init() {
-    INSTANCE.init();
+    unsafe {
+        (&mut *core::ptr::addr_of_mut!(INSTANCE)).init();
+    }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_build() {
-    let _ = INSTANCE.buildEdition(1);
+    unsafe {
+        let _ = (&mut *core::ptr::addr_of_mut!(INSTANCE)).buildEdition(1);
+    }
 }
 
+/// # Safety
+/// Caller must ensure thread-safe single-threaded access to global edition instance.
 #[no_mangle]
 pub unsafe extern "C" fn edition_status() {}
 
@@ -324,6 +469,32 @@ mod tests {
 
         assert_eq!(vec.get(1), Some(&20));
         assert_eq!(vec.get(3), None);
+    }
+
+    #[test]
+    fn test_distro_image_profiles() {
+        let mut builder = EditionTarget::new();
+        builder.init();
+
+        assert_eq!(builder.official_profiles.len(), 5);
+
+        let live_desktop = builder
+            .get_profile_by_kind(DistroImageProfileKind::LiveDesktopMintPop)
+            .unwrap();
+        assert!(live_desktop.is_read_only_rootfs);
+        assert!(live_desktop.enable_live_persistence);
+
+        let net_install = builder
+            .get_profile_by_kind(DistroImageProfileKind::NetInstallArchDebian)
+            .unwrap();
+        assert!(!net_install.is_read_only_rootfs);
+        assert!(!net_install.enable_live_persistence);
+
+        let hardened = builder
+            .get_profile_by_kind(DistroImageProfileKind::HardenedAmnesicTails)
+            .unwrap();
+        assert!(hardened.is_read_only_rootfs);
+        assert!(!hardened.enable_live_persistence);
     }
 
     #[test]

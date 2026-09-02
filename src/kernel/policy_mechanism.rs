@@ -3,8 +3,8 @@
 // Protection & Isolation, Optimization for the Common Case, Privilege Levels, and Interrupt Handling.
 
 extern crate alloc;
-use alloc::vec::Vec;
 use crate::security::CapabilityToken;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -259,7 +259,10 @@ pub struct AdaptivePolicy {
 }
 
 impl AdaptivePolicy {
-    pub const fn new(mechanism: &'static dyn KernelMechanism, policy: &'static dyn KernelPolicy) -> Self {
+    pub const fn new(
+        mechanism: &'static dyn KernelMechanism,
+        policy: &'static dyn KernelPolicy,
+    ) -> Self {
         Self { mechanism, policy }
     }
 

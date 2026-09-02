@@ -203,7 +203,7 @@ pub unsafe extern "C" fn xargs_get_args(
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Get arg count

@@ -33,6 +33,167 @@ pub struct RenderPipeline {
     pub is_prime_offloaded: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrimeProfile {
+    Integrated,
+    Nvidia,
+    HybridOnDemand,
+    ComputeOnly,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DynamicPowerState {
+    D0Active,
+    D3hot,
+    D3coldPowerOff,
+}
+
+#[derive(Debug, Clone)]
+pub struct PrimeOffloadEnv {
+    pub nv_prime_render_offload: u8,
+    pub glx_vendor_library_name: String,
+    pub vk_layer_nv_optimus: String,
+}
+
+impl PrimeOffloadEnv {
+    pub fn for_nvidia_offload() -> Self {
+        Self {
+            nv_prime_render_offload: 1,
+            glx_vendor_library_name: "nvidia".to_string(),
+            vk_layer_nv_optimus: "NVIDIA_only".to_string(),
+        }
+    }
+
+    pub fn for_integrated() -> Self {
+        Self {
+            nv_prime_render_offload: 0,
+            glx_vendor_library_name: "mesa".to_string(),
+            vk_layer_nv_optimus: "non_nvidia".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DmaBufHandle {
+    pub fd: i32,
+    pub size_bytes: usize,
+    pub stride_bytes: usize,
+    pub modifier: u64,
+    pub width: u32,
+    pub height: u32,
+}
+
+pub struct DmaBufSyncEngine {
+    pub exported_buffers: Vec<DmaBufHandle>,
+    pub imported_buffers: Vec<DmaBufHandle>,
+    pub sync_fences_count: usize,
+}
+
+impl DmaBufSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            exported_buffers: Vec::new(),
+            imported_buffers: Vec::new(),
+            sync_fences_count: 0,
+        }
+    }
+
+    pub fn export_dma_buf(&mut self, size: usize, stride: usize, width: u32, height: u32) -> DmaBufHandle {
+        let fd = (self.exported_buffers.len() + 10) as i32;
+        let handle = DmaBufHandle {
+            fd,
+            size_bytes: size,
+            stride_bytes: stride,
+            modifier: 0x0010_0000_0000_0001, // DRM_FORMAT_MOD_NVIDIA_16BX2_BLOCK_LINEAR
+            width,
+            height,
+        };
+        self.exported_buffers.push(handle.clone());
+        handle
+    }
+
+    pub fn import_dma_buf(&mut self, handle: DmaBufHandle) -> Result<(), &'static str> {
+        if handle.fd < 0 {
+            return Err("Invalid file descriptor for DMA-BUF handle");
+        }
+        self.imported_buffers.push(handle);
+        self.sync_fences_count += 1;
+        Ok(())
+    }
+}
+
+impl Default for DmaBufSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct NvidiaPrimeEngine {
+    pub active_profile: PrimeProfile,
+    pub power_state: DynamicPowerState,
+    pub offload_env: PrimeOffloadEnv,
+    pub sync_engine: DmaBufSyncEngine,
+    pub discrete_gpu_id: Option<usize>,
+    pub integrated_gpu_id: Option<usize>,
+}
+
+impl NvidiaPrimeEngine {
+    pub fn new() -> Self {
+        Self {
+            active_profile: PrimeProfile::HybridOnDemand,
+            power_state: DynamicPowerState::D3coldPowerOff,
+            offload_env: PrimeOffloadEnv::for_nvidia_offload(),
+            sync_engine: DmaBufSyncEngine::new(),
+            discrete_gpu_id: None,
+            integrated_gpu_id: None,
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: PrimeProfile) {
+        self.active_profile = profile;
+        match profile {
+            PrimeProfile::Integrated => {
+                self.offload_env = PrimeOffloadEnv::for_integrated();
+                self.power_state = DynamicPowerState::D3coldPowerOff;
+            }
+            PrimeProfile::Nvidia => {
+                self.offload_env = PrimeOffloadEnv::for_nvidia_offload();
+                self.power_state = DynamicPowerState::D0Active;
+            }
+            PrimeProfile::HybridOnDemand => {
+                self.offload_env = PrimeOffloadEnv::for_nvidia_offload();
+                self.power_state = DynamicPowerState::D3coldPowerOff;
+            }
+            PrimeProfile::ComputeOnly => {
+                self.offload_env = PrimeOffloadEnv::for_nvidia_offload();
+                self.power_state = DynamicPowerState::D0Active;
+            }
+        }
+    }
+
+    pub fn request_power_state(&mut self, state: DynamicPowerState) {
+        self.power_state = state;
+    }
+
+    pub fn offload_render_buffer(&mut self, width: u32, height: u32, stride: usize) -> Result<DmaBufHandle, &'static str> {
+        if self.power_state == DynamicPowerState::D3coldPowerOff {
+            self.power_state = DynamicPowerState::D0Active;
+        }
+
+        let size = (stride * height as usize) as usize;
+        let buf = self.sync_engine.export_dma_buf(size, stride, width, height);
+        self.sync_engine.import_dma_buf(buf.clone())?;
+
+        Ok(buf)
+    }
+}
+
+impl Default for NvidiaPrimeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct GraphicsManager {
     pub gpus: Vec<GpuDevice>,
     pub active_pipelines: Vec<RenderPipeline>,
@@ -51,6 +212,11 @@ impl GraphicsManager {
     }
 
     pub fn register_gpu(&mut self, gpu: GpuDevice) {
+        if gpu.is_discrete {
+            self.prime_engine.discrete_gpu_id = Some(gpu.gpu_id);
+        } else {
+            self.prime_engine.integrated_gpu_id = Some(gpu.gpu_id);
+        }
         self.gpus.push(gpu);
     }
 

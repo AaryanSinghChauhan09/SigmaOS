@@ -16,10 +16,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
+use crate::klib::VecDeque;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use crate::klib::VecDeque;
 use alloc::vec::Vec;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer

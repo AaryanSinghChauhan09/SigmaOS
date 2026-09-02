@@ -3,7 +3,6 @@ extern crate alloc;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
-
 use crate::klib::{BTreeMap, Vec};
 use alloc::string::{String, ToString};
 
@@ -37,7 +36,7 @@ pub enum CronField {
     Specific(u32),         // 5
     Range(u32, u32),       // 1-5
     List([u32; 8], usize), // 1,3,5 - fixed-size array with length
-    Step(u32, u32),       // */5 or 1-10/2
+    Step(u32, u32),        // */5 or 1-10/2
 }
 
 impl CronSchedule {
@@ -46,48 +45,60 @@ impl CronSchedule {
         let trimmed = schedule.trim();
         if trimmed.starts_with('@') {
             match trimmed {
-                "@reboot" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::Specific(0),
-                    day_of_month: CronField::All,
-                    month: CronField::All,
-                    day_of_week: CronField::All,
-                }),
-                "@hourly" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::All,
-                    day_of_month: CronField::All,
-                    month: CronField::All,
-                    day_of_week: CronField::All,
-                }),
-                "@daily" | "@midnight" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::Specific(0),
-                    day_of_month: CronField::All,
-                    month: CronField::All,
-                    day_of_week: CronField::All,
-                }),
-                "@weekly" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::Specific(0),
-                    day_of_month: CronField::All,
-                    month: CronField::All,
-                    day_of_week: CronField::Specific(0),
-                }),
-                "@monthly" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::Specific(0),
-                    day_of_month: CronField::Specific(1),
-                    month: CronField::All,
-                    day_of_week: CronField::All,
-                }),
-                "@yearly" | "@annually" => return Ok(CronSchedule {
-                    minute: CronField::Specific(0),
-                    hour: CronField::Specific(0),
-                    day_of_month: CronField::Specific(1),
-                    month: CronField::Specific(1),
-                    day_of_week: CronField::All,
-                }),
+                "@reboot" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::Specific(0),
+                        day_of_month: CronField::All,
+                        month: CronField::All,
+                        day_of_week: CronField::All,
+                    })
+                }
+                "@hourly" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::All,
+                        day_of_month: CronField::All,
+                        month: CronField::All,
+                        day_of_week: CronField::All,
+                    })
+                }
+                "@daily" | "@midnight" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::Specific(0),
+                        day_of_month: CronField::All,
+                        month: CronField::All,
+                        day_of_week: CronField::All,
+                    })
+                }
+                "@weekly" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::Specific(0),
+                        day_of_month: CronField::All,
+                        month: CronField::All,
+                        day_of_week: CronField::Specific(0),
+                    })
+                }
+                "@monthly" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::Specific(0),
+                        day_of_month: CronField::Specific(1),
+                        month: CronField::All,
+                        day_of_week: CronField::All,
+                    })
+                }
+                "@yearly" | "@annually" => {
+                    return Ok(CronSchedule {
+                        minute: CronField::Specific(0),
+                        hour: CronField::Specific(0),
+                        day_of_month: CronField::Specific(1),
+                        month: CronField::Specific(1),
+                        day_of_week: CronField::All,
+                    })
+                }
                 _ => return Err(CronError::InvalidFormat),
             }
         }
@@ -107,12 +118,19 @@ impl CronSchedule {
     }
 
     /// Check if current time matches schedule
-    pub fn matches(&self, minute: u32, hour: u32, day_of_month: u32, month: u32, day_of_week: u32) -> bool {
-        self.minute.matches(minute) &&
-        self.hour.matches(hour) &&
-        self.day_of_month.matches(day_of_month) &&
-        self.month.matches(month) &&
-        self.day_of_week.matches(day_of_week)
+    pub fn matches(
+        &self,
+        minute: u32,
+        hour: u32,
+        day_of_month: u32,
+        month: u32,
+        day_of_week: u32,
+    ) -> bool {
+        self.minute.matches(minute)
+            && self.hour.matches(hour)
+            && self.day_of_month.matches(day_of_month)
+            && self.month.matches(month)
+            && self.day_of_week.matches(day_of_week)
     }
 }
 
@@ -128,8 +146,16 @@ impl CronField {
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
-            let base = if parts[0] == "*" { min } else { parts[0].parse::<u32>().map_err(|_| CronError::InvalidField)? };
-            let step = parts[1].parse::<u32>().map_err(|_| CronError::InvalidField)?;
+            let base = if parts[0] == "*" {
+                min
+            } else {
+                parts[0]
+                    .parse::<u32>()
+                    .map_err(|_| CronError::InvalidField)?
+            };
+            let step = parts[1]
+                .parse::<u32>()
+                .map_err(|_| CronError::InvalidField)?;
             return Ok(CronField::Step(base, step));
         }
 
@@ -138,8 +164,12 @@ impl CronField {
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
-            let start = parts[0].parse::<u32>().map_err(|_| CronError::InvalidField)?;
-            let end = parts[1].parse::<u32>().map_err(|_| CronError::InvalidField)?;
+            let start = parts[0]
+                .parse::<u32>()
+                .map_err(|_| CronError::InvalidField)?;
+            let end = parts[1]
+                .parse::<u32>()
+                .map_err(|_| CronError::InvalidField)?;
             return Ok(CronField::Range(start, end));
         }
 
@@ -175,7 +205,7 @@ impl CronField {
                     }
                 }
                 false
-            },
+            }
             CronField::Step(base, step) => (value - base) % step == 0,
         }
     }
@@ -255,10 +285,10 @@ impl CronDaemon {
             if current_time >= job.next_run {
                 // Mark as run
                 job.last_run = Some(current_time);
-                
+
                 // Calculate next run time (simplified - normally would parse cron schedule)
                 job.next_run = current_time + 60; // Default to 1 minute for now
-                
+
                 let id_str: &str = AsRef::<str>::as_ref(id);
                 let job_id: String = id_str.into();
                 run_jobs.push(job_id);
@@ -320,7 +350,7 @@ pub struct SshDaemonConfig {
     pub max_auth_tries: u32,
     pub banner: Option<String>,
     pub subsystems: BTreeMap<String, String>, // e.g. "sftp" -> "/usr/libexec/sftp-server"
-    pub privilege_separation: bool,          // OpenBSD Privilege Separation
+    pub privilege_separation: bool,           // OpenBSD Privilege Separation
 }
 
 impl Default for SshDaemonConfig {
@@ -344,7 +374,10 @@ pub enum SshChannelType {
     PtySession,
     ExecCommand(String),
     Subsystem(String),
-    DirectTcpIp { target_host: String, target_port: u16 },
+    DirectTcpIp {
+        target_host: String,
+        target_port: u16,
+    },
 }
 
 pub struct SovereignSshDaemon {
@@ -379,7 +412,12 @@ impl SovereignSshDaemon {
         self.banned_ips.contains(&remote_ip.to_string())
     }
 
-    pub fn accept_connection(&mut self, remote_ip: &str, user: &str, algo: KeyExchangeAlgorithm) -> Result<u64, CronError> {
+    pub fn accept_connection(
+        &mut self,
+        remote_ip: &str,
+        user: &str,
+        algo: KeyExchangeAlgorithm,
+    ) -> Result<u64, CronError> {
         if self.is_ip_banned(remote_ip) {
             return Err(CronError::ExecutionError);
         }
@@ -395,7 +433,9 @@ impl SovereignSshDaemon {
         if self.config.deny_users.contains(&user.to_string()) {
             return Err(CronError::ExecutionError);
         }
-        if !self.config.allow_users.is_empty() && !self.config.allow_users.contains(&user.to_string()) {
+        if !self.config.allow_users.is_empty()
+            && !self.config.allow_users.contains(&user.to_string())
+        {
             return Err(CronError::ExecutionError);
         }
 
@@ -442,7 +482,12 @@ impl SovereignSshDaemon {
             true
         } else {
             // Fail2ban brute force failure tracking
-            let count = self.failed_auth_attempts.get(&remote_ip).cloned().unwrap_or(0) + 1;
+            let count = self
+                .failed_auth_attempts
+                .get(&remote_ip)
+                .cloned()
+                .unwrap_or(0)
+                + 1;
             self.failed_auth_attempts.insert(remote_ip.clone(), count);
             if count >= self.config.max_auth_tries {
                 self.banned_ips.push(remote_ip);
@@ -452,7 +497,10 @@ impl SovereignSshDaemon {
     }
 
     pub fn allocate_pty(&mut self, session_id: u64) -> Result<(), CronError> {
-        let session = self.active_sessions.get_mut(&session_id).ok_or(CronError::JobNotFound)?;
+        let session = self
+            .active_sessions
+            .get_mut(&session_id)
+            .ok_or(CronError::JobNotFound)?;
         if !session.authenticated {
             return Err(CronError::ExecutionError);
         }
@@ -461,20 +509,32 @@ impl SovereignSshDaemon {
     }
 
     pub fn set_chroot_isolation(&mut self, session_id: u64, dir: &str) -> Result<(), CronError> {
-        let session = self.active_sessions.get_mut(&session_id).ok_or(CronError::JobNotFound)?;
+        let session = self
+            .active_sessions
+            .get_mut(&session_id)
+            .ok_or(CronError::JobNotFound)?;
         session.chroot_dir = Some(dir.to_string());
         Ok(())
     }
 
     /// Dispatches an SSH channel multiplexing request (Pty, Exec, Subsystem/SFTP, DirectTcpIp)
-    pub fn open_channel(&self, session_id: u64, channel_type: SshChannelType) -> Result<String, CronError> {
-        let session = self.active_sessions.get(&session_id).ok_or(CronError::JobNotFound)?;
+    pub fn open_channel(
+        &self,
+        session_id: u64,
+        channel_type: SshChannelType,
+    ) -> Result<String, CronError> {
+        let session = self
+            .active_sessions
+            .get(&session_id)
+            .ok_or(CronError::JobNotFound)?;
         if !session.authenticated {
             return Err(CronError::ExecutionError);
         }
 
         match channel_type {
-            SshChannelType::PtySession => Ok(format!("PTY channel open for session {}", session_id)),
+            SshChannelType::PtySession => {
+                Ok(format!("PTY channel open for session {}", session_id))
+            }
             SshChannelType::ExecCommand(cmd) => Ok(format!("Exec channel open: '{}'", cmd)),
             SshChannelType::Subsystem(sub) => {
                 if let Some(path) = self.config.subsystems.get(&sub) {
@@ -483,9 +543,13 @@ impl SovereignSshDaemon {
                     Err(CronError::ExecutionError)
                 }
             }
-            SshChannelType::DirectTcpIp { target_host, target_port } => {
-                Ok(format!("DirectTcpIp forward channel open to {}:{}", target_host, target_port))
-            }
+            SshChannelType::DirectTcpIp {
+                target_host,
+                target_port,
+            } => Ok(format!(
+                "DirectTcpIp forward channel open to {}:{}",
+                target_host, target_port
+            )),
         }
     }
 }
@@ -500,9 +564,9 @@ pub struct SovereignCronDaemon {
     pub denied_users: Vec<String>,
     pub anacron_catchup_enabled: bool,
     pub executed_catchup_count: usize,
-    pub random_delay_max: u32,             // RANDOM_DELAY in minutes to prevent thundering herd
-    pub max_load_average_threshold: f32,    // Cronie / batch mode max load average guard
-    pub mail_to_user: Option<String>,       // MAILTO routing for cron job output
+    pub random_delay_max: u32, // RANDOM_DELAY in minutes to prevent thundering herd
+    pub max_load_average_threshold: f32, // Cronie / batch mode max load average guard
+    pub mail_to_user: Option<String>, // MAILTO routing for cron job output
     pub job_outputs: BTreeMap<String, String>, // Job ID -> Captured output
 }
 
@@ -589,7 +653,10 @@ impl SovereignCronDaemon {
                     ran += 1;
 
                     // Capture simulated job execution output and MAILTO notification
-                    let output = format!("Executed '{}' as user '{}' via Anacron (MAILTO={:?})", job.command, job.user, self.mail_to_user);
+                    let output = format!(
+                        "Executed '{}' as user '{}' via Anacron (MAILTO={:?})",
+                        job.command, job.user, self.mail_to_user
+                    );
                     self.job_outputs.insert(id.clone(), output);
                 }
             }
@@ -612,9 +679,18 @@ mod tests {
     #[test]
     fn test_cron_field_parse() {
         assert_eq!(CronField::parse("*", 0, 59).unwrap(), CronField::All);
-        assert_eq!(CronField::parse("5", 0, 59).unwrap(), CronField::Specific(5));
-        assert_eq!(CronField::parse("1-5", 0, 59).unwrap(), CronField::Range(1, 5));
-        assert_eq!(CronField::parse("*/5", 0, 59).unwrap(), CronField::Step(0, 5));
+        assert_eq!(
+            CronField::parse("5", 0, 59).unwrap(),
+            CronField::Specific(5)
+        );
+        assert_eq!(
+            CronField::parse("1-5", 0, 59).unwrap(),
+            CronField::Range(1, 5)
+        );
+        assert_eq!(
+            CronField::parse("*/5", 0, 59).unwrap(),
+            CronField::Step(0, 5)
+        );
         // Test list parsing
         let list_result = CronField::parse("1,3,5", 0, 59).unwrap();
         if let CronField::List(values, count) = list_result {
@@ -667,7 +743,7 @@ mod tests {
     #[test]
     fn test_cron_daemon() {
         let mut daemon = CronDaemon::new();
-        
+
         let job = CronJob {
             id: "test-job".to_string(),
             schedule: CronSchedule::from_string("0 0 * * *").unwrap(),
@@ -690,9 +766,21 @@ mod tests {
         let mut sshd = SovereignSshDaemon::new(22, "SHA256:kyber1024keyfp");
 
         // Root login prohibited by default
-        assert!(sshd.accept_connection("192.168.1.10", "root", KeyExchangeAlgorithm::Kyber1024Ed25519).is_err());
+        assert!(sshd
+            .accept_connection(
+                "192.168.1.10",
+                "root",
+                KeyExchangeAlgorithm::Kyber1024Ed25519
+            )
+            .is_err());
 
-        let sid = sshd.accept_connection("192.168.1.10", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).unwrap();
+        let sid = sshd
+            .accept_connection(
+                "192.168.1.10",
+                "alice",
+                KeyExchangeAlgorithm::Kyber1024Ed25519,
+            )
+            .unwrap();
         assert_eq!(sid, 1);
         assert!(sshd.privileged_child_pids.contains_key(&sid)); // Privilege Separation check
 
@@ -702,25 +790,36 @@ mod tests {
 
         assert!(sshd.allocate_pty(sid).is_ok());
         assert!(sshd.set_chroot_isolation(sid, "/jails/alice").is_ok());
-        assert_eq!(sshd.active_sessions.get(&sid).unwrap().chroot_dir, Some("/jails/alice".to_string()));
+        assert_eq!(
+            sshd.active_sessions.get(&sid).unwrap().chroot_dir,
+            Some("/jails/alice".to_string())
+        );
 
         // Channel multiplexing tests
         let pty_res = sshd.open_channel(sid, SshChannelType::PtySession).unwrap();
         assert!(pty_res.contains("PTY channel open"));
 
-        let exec_res = sshd.open_channel(sid, SshChannelType::ExecCommand("uname -a".to_string())).unwrap();
+        let exec_res = sshd
+            .open_channel(sid, SshChannelType::ExecCommand("uname -a".to_string()))
+            .unwrap();
         assert!(exec_res.contains("Exec channel open"));
 
-        let sftp_res = sshd.open_channel(sid, SshChannelType::Subsystem("sftp".to_string())).unwrap();
+        let sftp_res = sshd
+            .open_channel(sid, SshChannelType::Subsystem("sftp".to_string()))
+            .unwrap();
         assert!(sftp_res.contains("Subsystem channel open"));
 
         // Fail2ban brute-force protection test
-        let sid2 = sshd.accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).unwrap();
+        let sid2 = sshd
+            .accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519)
+            .unwrap();
         for _ in 0..3 {
             sshd.authenticate_public_key(sid2, b""); // Invalid empty key
         }
         assert!(sshd.is_ip_banned("10.0.0.5"));
-        assert!(sshd.accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519).is_err());
+        assert!(sshd
+            .accept_connection("10.0.0.5", "alice", KeyExchangeAlgorithm::Kyber1024Ed25519)
+            .is_err());
     }
 
     #[test]
@@ -755,6 +854,10 @@ mod tests {
         assert_eq!(ran, 1);
         assert_eq!(cron.executed_catchup_count, 1);
         assert!(cron.job_outputs.contains_key("anacron-job"));
-        assert!(cron.job_outputs.get("anacron-job").unwrap().contains("MAILTO"));
+        assert!(cron
+            .job_outputs
+            .get("anacron-job")
+            .unwrap()
+            .contains("MAILTO"));
     }
 }

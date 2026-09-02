@@ -138,7 +138,7 @@ jobs:
 
 
     - name: Download build artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      uses: actions/download-artifact@v4.2.1
 
       with:
         name: sigmaos-${{ matrix.arch }}-iso
@@ -253,10 +253,16 @@ jobs:
   benchmark:
     permissions:
       contents: read
+      issues: write
+      pull-requests: write
 
     name: Performance Benchmarks
     needs: boot-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
     steps:
     - name: Checkout code
@@ -264,7 +270,7 @@ jobs:
 
 
     - name: Download build artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      uses: actions/download-artifact@v4.2.1
 
       with:
         name: sigmaos-x86_64-iso
@@ -305,17 +311,21 @@ jobs:
     - name: Comment PR with benchmarks
       if: github.event_name == 'pull_request'
       uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
-
+      continue-on-error: true
       with:
         script: |
           const fs = require('fs');
           const report = fs.readFileSync('benchmark-report.md', 'utf8');
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: report
-          });
+          try {
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+          } catch (e) {
+            console.log("Could not comment on PR (permissions or fork constraint): " + e.message);
+          }
 
   security-scan:
     permissions:
@@ -329,11 +339,11 @@ jobs:
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
 
-    - name: Run Rust security audit
-      uses: actions-rs/audit-check@35b7b53b1e25b55642157ac01b4adceb5b9ebef3
+    - name: Install cargo-audit
+      run: cargo install cargo-audit --locked
 
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run Rust security audit
+      run: cargo audit
 
     - name: Run static analysis
       run: |

@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // Sovereign Linux Parity & Maturity Blueprint Implementation
 // Implements Live Installer, Update Channel Broker, Sandboxed App Bundle, and Multi-Arch HAL
 
@@ -472,6 +472,14 @@ mod tests {
             installer.get_current_step(),
             InstallerStep::DetectingHardware
         );
+
+        // Detect OS & set dual-boot mode
+        let os_list = installer.detect_existing_operating_systems();
+        assert_eq!(os_list.len(), 2);
+        assert_eq!(os_list[0].name, "Windows 11 Pro");
+
+        installer.set_installation_mode(InstallationMode::DualBootSovereign);
+        assert_eq!(installer.mode, InstallationMode::DualBootSovereign);
 
         // Detect OS & set dual-boot mode
         let os_list = installer.detect_existing_operating_systems();

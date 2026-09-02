@@ -1,16 +1,15 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // SigmaOS FreeDOS Emulation & Integration Engine (SigmaDOS Layer)
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
 
-
-
 use crate::klib::path::PathBuf as Path;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::path::PathBuf as Path;
 
 /// Represents CONFIG.SYS driver or parameter settings
 #[derive(Debug, Clone)]
@@ -261,13 +260,20 @@ impl FreeDosEmulator {
                 start_cluster: 55,
             },
         ];
-        self.fat_entries.insert(mount_point.to_str().unwrap().to_string(), root_dir);
-        self.output_stream.push(format!("FAT32 LBA partition cleanly mounted at {:?}", mount_point));
+        self.fat_entries
+            .insert(mount_point.to_str().unwrap().to_string(), root_dir);
+        self.output_stream.push(format!(
+            "FAT32 LBA partition cleanly mounted at {:?}",
+            mount_point
+        ));
     }
 
     pub fn list_fat_directory(&self, mount_point: &Path) -> Vec<String> {
         let mut list = Vec::new();
-        if let Some(entries) = self.fat_entries.get(&mount_point.to_str().unwrap().to_string()) {
+        if let Some(entries) = self
+            .fat_entries
+            .get(&mount_point.to_str().unwrap().to_string())
+        {
             for entry in entries {
                 let suffix = if entry.is_directory { "<DIR>" } else { "" };
                 list.push(format!(

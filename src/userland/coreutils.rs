@@ -2,8 +2,8 @@ extern crate alloc;
 
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::Ordering;
 
 pub enum CoreutilError {
@@ -26,7 +26,9 @@ pub trait SovereignUtility {
 
 pub struct LsUtility;
 impl SovereignUtility for LsUtility {
-    fn name(&self) -> &'static str { "ls" }
+    fn name(&self) -> &'static str {
+        "ls"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -34,7 +36,9 @@ impl SovereignUtility for LsUtility {
 
 pub struct CatUtility;
 impl SovereignUtility for CatUtility {
-    fn name(&self) -> &'static str { "cat" }
+    fn name(&self) -> &'static str {
+        "cat"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -42,7 +46,9 @@ impl SovereignUtility for CatUtility {
 
 pub struct GrepUtility;
 impl SovereignUtility for GrepUtility {
-    fn name(&self) -> &'static str { "grep" }
+    fn name(&self) -> &'static str {
+        "grep"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -50,7 +56,9 @@ impl SovereignUtility for GrepUtility {
 
 pub struct PsUtility;
 impl SovereignUtility for PsUtility {
-    fn name(&self) -> &'static str { "ps" }
+    fn name(&self) -> &'static str {
+        "ps"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -58,7 +66,9 @@ impl SovereignUtility for PsUtility {
 
 pub struct NetcfgUtility;
 impl SovereignUtility for NetcfgUtility {
-    fn name(&self) -> &'static str { "netcfg" }
+    fn name(&self) -> &'static str {
+        "netcfg"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -66,7 +76,9 @@ impl SovereignUtility for NetcfgUtility {
 
 pub struct PerfUtility;
 impl SovereignUtility for PerfUtility {
-    fn name(&self) -> &'static str { "perf" }
+    fn name(&self) -> &'static str {
+        "perf"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -74,7 +86,9 @@ impl SovereignUtility for PerfUtility {
 
 pub struct DrawUtility;
 impl SovereignUtility for DrawUtility {
-    fn name(&self) -> &'static str { "draw" }
+    fn name(&self) -> &'static str {
+        "draw"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -82,7 +96,9 @@ impl SovereignUtility for DrawUtility {
 
 pub struct PlayUtility;
 impl SovereignUtility for PlayUtility {
-    fn name(&self) -> &'static str { "play" }
+    fn name(&self) -> &'static str {
+        "play"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -90,7 +106,9 @@ impl SovereignUtility for PlayUtility {
 
 pub struct ThemeUtility;
 impl SovereignUtility for ThemeUtility {
-    fn name(&self) -> &'static str { "theme" }
+    fn name(&self) -> &'static str {
+        "theme"
+    }
     fn execute(&self, _args: &[&str]) -> Result<(), &'static str> {
         Ok(())
     }
@@ -121,19 +139,24 @@ impl Coreutils {
         let mut results = Vec::new();
         let show_hidden = args.iter().any(|a| a == "-a");
         let long_format = args.iter().any(|a| a == "-l");
-        
+
         let mut files = vec!["file1.txt", "file2.txt", ".hidden"];
         files.sort();
 
         for f in files {
-            if f.starts_with('.') && !show_hidden { continue; }
+            if f.starts_with('.') && !show_hidden {
+                continue;
+            }
             if long_format {
-                results.push(format!("-rw-r--r-- 1 root root {:>6} Jan 01 00:00 {}", 1024, f));
+                results.push(format!(
+                    "-rw-r--r-- 1 root root {:>6} Jan 01 00:00 {}",
+                    1024, f
+                ));
             } else {
                 results.push(f.to_string());
             }
         }
-        
+
         Ok(results)
     }
 
@@ -141,7 +164,7 @@ impl Coreutils {
         let lines = content.lines().count();
         let words = content.split_whitespace().count();
         let bytes = content.len();
-        
+
         if args.iter().any(|a| a == "-l") {
             Ok(format!("{}", lines))
         } else if args.iter().any(|a| a == "-w") {
@@ -166,7 +189,11 @@ impl Coreutils {
             } else {
                 a.cmp(b)
             };
-            if reverse { cmp.reverse() } else { cmp }
+            if reverse {
+                cmp.reverse()
+            } else {
+                cmp
+            }
         });
 
         Ok(sorted)
@@ -174,19 +201,23 @@ impl Coreutils {
 
     pub fn chmod(mode: &str, _file: &str) -> Result<(), CoreutilError> {
         if mode.chars().all(|c| c.is_digit(8)) {
-            let _octal_val = u32::from_str_radix(mode, 8).map_err(|_| CoreutilError::InvalidArgument)?;
+            let _octal_val =
+                u32::from_str_radix(mode, 8).map_err(|_| CoreutilError::InvalidArgument)?;
             return Ok(());
         }
-        
+
         let mut chars = mode.chars();
         let who = chars.next().unwrap_or('a');
         let op = chars.next().unwrap_or('+');
         let perm = chars.next().unwrap_or('x');
-        
-        if !['u','g','o','a'].contains(&who) || !['+','-','='].contains(&op) || !['r','w','x'].contains(&perm) {
+
+        if !['u', 'g', 'o', 'a'].contains(&who)
+            || !['+', '-', '='].contains(&op)
+            || !['r', 'w', 'x'].contains(&perm)
+        {
             return Err(CoreutilError::InvalidArgument);
         }
-        
+
         Ok(())
     }
 }

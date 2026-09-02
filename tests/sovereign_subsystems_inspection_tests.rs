@@ -73,6 +73,24 @@ fn test_open_source_obsoletion_subsystem_inspection() {
     let ok = part.create_partition(SovereignFsType::Ext4, 1000, "Primary-NVMe");
     assert!(ok.is_ok());
     assert!(part.verify_alignment());
+
+    // Verify pgvector, redis cluster, cilium bpf, and k8s orchestrator inspection
+    let mut pgvector = SovereignPgVectorSearchEngine::new();
+    pgvector.insert_document("emb1", vec![1.0, 0.0], "doc1");
+    assert_eq!(pgvector.search_top_k(&[1.0, 0.0], 1).len(), 1);
+
+    let mut redis_cls = SovereignRedisClusterEngine::new();
+    redis_cls.add_node("m1", "127.0.0.1:7000", ClusterNodeRole::Master, vec![0], None);
+    assert_eq!(redis_cls.nodes.len(), 1);
+
+    let mut cilium = SovereignCiliumBpfNetworkEngine::new();
+    cilium.register_endpoint("podA", "10.0.0.1", "veth0", 1);
+    assert_eq!(cilium.endpoints.len(), 1);
+
+    let mut k8s = SovereignK8sOrchestratorEngine::new();
+    k8s.register_node("node1");
+    k8s.create_deployment("app", 1, "app:v1");
+    assert_eq!(k8s.deployments.len(), 1);
 }
 
 #[test]

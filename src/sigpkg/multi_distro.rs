@@ -4,7 +4,6 @@ extern crate alloc;
 // Sovereign Multi-Distro Package Management Engine
 // Parity abstractions for APT, DNF, Pacman, Portage, and XBPS package systems.
 
-
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -88,14 +87,20 @@ impl DnfDeltaEngine {
             return Err("Invalid DRPM payload length");
         }
 
-        let diff_count = u32::from_le_bytes([payload[0], payload[1], payload[2], payload[3]]) as usize;
+        let diff_count =
+            u32::from_le_bytes([payload[0], payload[1], payload[2], payload[3]]) as usize;
         let mut cursor = 4;
 
         for _ in 0..diff_count {
             if cursor + 5 > payload.len() {
                 return Err("Truncated DRPM diff record");
             }
-            let idx = u32::from_le_bytes([payload[cursor], payload[cursor + 1], payload[cursor + 2], payload[cursor + 3]]) as usize;
+            let idx = u32::from_le_bytes([
+                payload[cursor],
+                payload[cursor + 1],
+                payload[cursor + 2],
+                payload[cursor + 3],
+            ]) as usize;
             let val = payload[cursor + 4];
             cursor += 5;
 
@@ -183,7 +188,13 @@ impl PacmanAlpmHookRegistry {
         self.db_locked = false;
     }
 
-    pub fn register_hook(&mut self, name: &str, phase: HookPhase, command: &str, triggers: &[&str]) {
+    pub fn register_hook(
+        &mut self,
+        name: &str,
+        phase: HookPhase,
+        command: &str,
+        triggers: &[&str],
+    ) {
         self.hooks.push(AlpmHook {
             name: name.to_string(),
             phase,
@@ -211,7 +222,9 @@ pub struct ParallelMirrorDownloader {
 
 impl ParallelMirrorDownloader {
     pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
+        Self {
+            mirrors: Vec::new(),
+        }
     }
 
     pub fn add_mirror(&mut self, url: &str, latency_ms: u32) {
@@ -223,7 +236,11 @@ impl ParallelMirrorDownloader {
     }
 
     pub fn get_top_mirrors(&self, count: usize) -> Vec<String> {
-        self.mirrors.iter().take(count).map(|(u, _)| u.clone()).collect()
+        self.mirrors
+            .iter()
+            .take(count)
+            .map(|(u, _)| u.clone())
+            .collect()
     }
 }
 
@@ -250,8 +267,16 @@ impl PortageSlotResolver {
         }
     }
 
-    pub fn install_slot(&mut self, package: &str, slot: &str, version: &str) -> Result<(), &'static str> {
-        let pkg_slots = self.slots.entry(package.to_string()).or_insert_with(BTreeMap::new);
+    pub fn install_slot(
+        &mut self,
+        package: &str,
+        slot: &str,
+        version: &str,
+    ) -> Result<(), &'static str> {
+        let pkg_slots = self
+            .slots
+            .entry(package.to_string())
+            .or_insert_with(BTreeMap::new);
         if let Some(existing) = pkg_slots.get(slot) {
             if existing == version {
                 return Ok(());
@@ -374,7 +399,8 @@ impl BsdPkgDb {
             }
         }
 
-        self.installed_packages.insert(manifest.name.clone(), manifest);
+        self.installed_packages
+            .insert(manifest.name.clone(), manifest);
         Ok(())
     }
 
@@ -427,7 +453,10 @@ impl NixFlakeLockVerifier {
         self.compute_nar_hash(content) == expected_nar_hash
     }
 
-    pub fn validate_hermetic_closure(&self, lockfile: &NixFlakeLockfile) -> Result<usize, &'static str> {
+    pub fn validate_hermetic_closure(
+        &self,
+        lockfile: &NixFlakeLockfile,
+    ) -> Result<usize, &'static str> {
         if lockfile.version < 1 {
             return Err("Invalid Nix flake lockfile version");
         }
@@ -500,7 +529,11 @@ impl GentooEbuildManifestEngine {
             .push((use_flag.to_string(), uri.to_string()));
     }
 
-    pub fn resolve_active_uris(&self, pkg_name: &str, active_use_flags: &BTreeSet<String>) -> Vec<String> {
+    pub fn resolve_active_uris(
+        &self,
+        pkg_name: &str,
+        active_use_flags: &BTreeSet<String>,
+    ) -> Vec<String> {
         let mut uris = Vec::new();
         if let Some(routes) = self.source_uri_routes.get(pkg_name) {
             for (flag, uri) in routes {
@@ -512,8 +545,16 @@ impl GentooEbuildManifestEngine {
         uris
     }
 
-    pub fn verify_entry_integrity(&self, filename: &str, content: &[u8]) -> Result<bool, &'static str> {
-        let entry = self.entries.iter().find(|e| e.filename == filename).ok_or("Manifest entry not found")?;
+    pub fn verify_entry_integrity(
+        &self,
+        filename: &str,
+        content: &[u8],
+    ) -> Result<bool, &'static str> {
+        let entry = self
+            .entries
+            .iter()
+            .find(|e| e.filename == filename)
+            .ok_or("Manifest entry not found")?;
         if entry.size != content.len() as u64 {
             return Ok(false);
         }
@@ -554,7 +595,8 @@ impl SovereignMultiDistroPackageManager {
     }
 
     pub fn stage_package(&mut self, pkg_name: &str, version: &str, priority: AptPinPriority) {
-        self.staged_txs.push(StagedTransaction::new(pkg_name, version, priority));
+        self.staged_txs
+            .push(StagedTransaction::new(pkg_name, version, priority));
         self.staged_txs.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
@@ -562,11 +604,17 @@ impl SovereignMultiDistroPackageManager {
         self.alpm_hooks.lock_database()?;
         let mut executed_count = 0;
         for tx in &self.staged_txs {
-            let hook_cmds = self.alpm_hooks.execute_hooks(HookPhase::PreTransaction, &tx.package_name);
+            let hook_cmds = self
+                .alpm_hooks
+                .execute_hooks(HookPhase::PreTransaction, &tx.package_name);
             for cmd in hook_cmds {
-                self.rollback_handler.record_action(&format!("EXEC_HOOK {}", cmd));
+                self.rollback_handler
+                    .record_action(&format!("EXEC_HOOK {}", cmd));
             }
-            self.rollback_handler.record_action(&format!("INSTALL {} {}", tx.package_name, tx.target_version));
+            self.rollback_handler.record_action(&format!(
+                "INSTALL {} {}",
+                tx.package_name, tx.target_version
+            ));
             executed_count += 1;
         }
         self.alpm_hooks.unlock_database();
@@ -577,6 +625,108 @@ impl SovereignMultiDistroPackageManager {
 impl Default for SovereignMultiDistroPackageManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// =========================================================================
+// MULTI-DISTRO PACKAGE DEPENDENCY INSTALLER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum DistroPackageManagerKind {
+    Apt,     // Debian/Ubuntu/Mint
+    Dnf,     // Fedora/RHEL
+    Pacman,  // Arch/Manjaro
+    Portage, // Gentoo
+    Xbps,    // Void
+    PkgNg,   // FreeBSD
+    Apk,     // Alpine
+}
+
+pub struct MultiDistroDependencyInstaller {
+    pub active_manager: DistroPackageManagerKind,
+    pub package_mappings: BTreeMap<String, BTreeMap<DistroPackageManagerKind, String>>, // canonical -> (mgr -> distro_pkg_name)
+}
+
+impl MultiDistroDependencyInstaller {
+    pub fn new(active_manager: DistroPackageManagerKind) -> Self {
+        let mut installer = Self {
+            active_manager,
+            package_mappings: BTreeMap::new(),
+        };
+
+        // Seed canonical library dependency mappings
+        installer.register_mapping("openssl", DistroPackageManagerKind::Apt, "libssl-dev");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Dnf, "openssl-devel");
+        installer.register_mapping("openssl", DistroPackageManagerKind::Pacman, "openssl");
+        installer.register_mapping(
+            "openssl",
+            DistroPackageManagerKind::Portage,
+            "dev-libs/openssl",
+        );
+        installer.register_mapping("openssl", DistroPackageManagerKind::Xbps, "openssl-devel");
+        installer.register_mapping(
+            "openssl",
+            DistroPackageManagerKind::PkgNg,
+            "security/openssl",
+        );
+        installer.register_mapping("openssl", DistroPackageManagerKind::Apk, "openssl-dev");
+
+        installer.register_mapping("zlib", DistroPackageManagerKind::Apt, "zlib1g-dev");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Dnf, "zlib-devel");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Pacman, "zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Portage, "sys-libs/zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Xbps, "zlib-devel");
+        installer.register_mapping("zlib", DistroPackageManagerKind::PkgNg, "devel/zlib");
+        installer.register_mapping("zlib", DistroPackageManagerKind::Apk, "zlib-dev");
+
+        installer
+    }
+
+    pub fn register_mapping(
+        &mut self,
+        canonical_name: &str,
+        manager: DistroPackageManagerKind,
+        distro_pkg_name: &str,
+    ) {
+        self.package_mappings
+            .entry(canonical_name.to_string())
+            .or_default()
+            .insert(manager, distro_pkg_name.to_string());
+    }
+
+    pub fn resolve_package_name(&self, canonical_name: &str) -> String {
+        if let Some(mgr_map) = self.package_mappings.get(canonical_name) {
+            if let Some(distro_name) = mgr_map.get(&self.active_manager) {
+                return distro_name.clone();
+            }
+        }
+        canonical_name.to_string()
+    }
+
+    /// Generate command string for installing a list of canonical dependencies
+    pub fn generate_install_command(&self, canonical_deps: &[&str]) -> String {
+        let distro_pkgs: Vec<String> = canonical_deps
+            .iter()
+            .map(|&dep| self.resolve_package_name(dep))
+            .collect();
+        let pkg_list = distro_pkgs.join(" ");
+
+        match self.active_manager {
+            DistroPackageManagerKind::Apt => format!("apt-get install -y {}", pkg_list),
+            DistroPackageManagerKind::Dnf => format!("dnf install -y {}", pkg_list),
+            DistroPackageManagerKind::Pacman => format!("pacman -S --noconfirm {}", pkg_list),
+            DistroPackageManagerKind::Portage => format!("emerge --ask=n {}", pkg_list),
+            DistroPackageManagerKind::Xbps => format!("xbps-install -Sy {}", pkg_list),
+            DistroPackageManagerKind::PkgNg => format!("pkg install -y {}", pkg_list),
+            DistroPackageManagerKind::Apk => format!("apk add --no-cache {}", pkg_list),
+        }
+    }
+}
+
+impl Default for MultiDistroDependencyInstaller {
+    fn default() -> Self {
+        Self::new(DistroPackageManagerKind::Apt)
     }
 }
 
@@ -622,7 +772,12 @@ mod tests {
     #[test]
     fn test_pacman_alpm_hooks_and_locking() {
         let mut registry = PacmanAlpmHookRegistry::new();
-        registry.register_hook("mkinitcpio", HookPhase::PostTransaction, "mkinitcpio -P", &["linux-kernel"]);
+        registry.register_hook(
+            "mkinitcpio",
+            HookPhase::PostTransaction,
+            "mkinitcpio -P",
+            &["linux-kernel"],
+        );
 
         assert!(registry.lock_database().is_ok());
         assert!(registry.lock_database().is_err()); // Already locked
@@ -667,16 +822,25 @@ mod tests {
         let mut bsd_db = BsdPkgDb::new();
         let mut manifest1 = BsdPkgManifest::new("libuv", "1.48.0");
         manifest1.shlibs_provided.push("libuv.so.1".to_string());
-        manifest1.directives.push(BsdPkgDirective::NewUser("_uv".to_string()));
-        manifest1.directives.push(BsdPkgDirective::NewGroup("_uv".to_string()));
+        manifest1
+            .directives
+            .push(BsdPkgDirective::NewUser("_uv".to_string()));
+        manifest1
+            .directives
+            .push(BsdPkgDirective::NewGroup("_uv".to_string()));
 
         assert!(bsd_db.install_package(manifest1).is_ok());
         assert!(bsd_db.created_users.contains("_uv"));
         assert!(bsd_db.created_groups.contains("_uv"));
-        assert_eq!(bsd_db.resolve_shlib_provider("libuv.so.1"), Some("libuv".to_string()));
+        assert_eq!(
+            bsd_db.resolve_shlib_provider("libuv.so.1"),
+            Some("libuv".to_string())
+        );
 
         let mut manifest2 = BsdPkgManifest::new("bad-pkg", "1.0");
-        manifest2.directives.push(BsdPkgDirective::Conflict("libuv".to_string()));
+        manifest2
+            .directives
+            .push(BsdPkgDirective::Conflict("libuv".to_string()));
         assert!(bsd_db.install_package(manifest2).is_err());
     }
 
@@ -721,9 +885,15 @@ mod tests {
             blake2b_hash: "blake2b-dummy".to_string(),
         });
 
-        assert!(engine.verify_entry_integrity("foo-1.0.tar.gz", file_content).unwrap());
+        assert!(engine
+            .verify_entry_integrity("foo-1.0.tar.gz", file_content)
+            .unwrap());
 
-        engine.add_source_route("sys-libs/zlib", "minizip", "https://zlib.net/minizip.tar.gz");
+        engine.add_source_route(
+            "sys-libs/zlib",
+            "minizip",
+            "https://zlib.net/minizip.tar.gz",
+        );
         engine.add_source_route("sys-libs/zlib", "*", "https://zlib.net/zlib-1.3.tar.gz");
 
         let mut active_flags = BTreeSet::new();
@@ -732,5 +902,26 @@ mod tests {
         let uris = engine.resolve_active_uris("sys-libs/zlib", &active_flags);
         assert_eq!(uris.len(), 2);
         assert!(uris.contains(&"https://zlib.net/minizip.tar.gz".to_string()));
+    }
+
+    #[test]
+    fn test_multi_distro_dependency_installer() {
+        let apt_installer = MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Apt);
+        assert_eq!(apt_installer.resolve_package_name("openssl"), "libssl-dev");
+        let apt_cmd = apt_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(apt_cmd, "apt-get install -y libssl-dev zlib1g-dev");
+
+        let dnf_installer = MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Dnf);
+        assert_eq!(
+            dnf_installer.resolve_package_name("openssl"),
+            "openssl-devel"
+        );
+        let dnf_cmd = dnf_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(dnf_cmd, "dnf install -y openssl-devel zlib-devel");
+
+        let pacman_installer =
+            MultiDistroDependencyInstaller::new(DistroPackageManagerKind::Pacman);
+        let pac_cmd = pacman_installer.generate_install_command(&["openssl", "zlib"]);
+        assert_eq!(pac_cmd, "pacman -S --noconfirm openssl zlib");
     }
 }

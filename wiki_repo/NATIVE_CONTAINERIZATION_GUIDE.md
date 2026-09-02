@@ -55,19 +55,19 @@ impl ContainerManager {
     ) -> Result<ContainerId, ContainerError> {
         // 1. Generate unique container ID
         let container_id = self.generate_container_id();
-        
+
         // 2. Create isolated namespaces
         let namespaces = self.create_namespaces(&config)?;
-        
+
         // 3. Set up root filesystem
         let rootfs = self.setup_rootfs(&image)?;
-        
+
         // 4. Generate capability token
         let capabilities = self.generate_container_capabilities(&config)?;
-        
+
         // 5. Create cgroup for resource limits
         let cgroup = self.setup_cgroup(&config.resource_limits)?;
-        
+
         let container = Container {
             id: container_id,
             namespace: namespaces,
@@ -76,7 +76,7 @@ impl ContainerManager {
             rootfs,
             state: ContainerState::Created,
         };
-        
+
         self.containers.insert(container_id, container);
         Ok(container_id)
     }
@@ -90,16 +90,16 @@ impl Container {
     pub fn start(&mut self) -> Result<(), ContainerError> {
         // Verify capability token
         self.verify_capabilities()?;
-        
+
         // Enter namespaces
         self.enter_namespaces()?;
-        
+
         // Set up cgroup limits
         self.apply_cgroup_limits()?;
-        
+
         // Execute container init process
         self.execute_init_process()?;
-        
+
         self.state = ContainerState::Running;
         Ok(())
     }
@@ -130,7 +130,7 @@ impl CpuController {
         self.cpu_quota = quota_us;
         self.cpu_period = period_us;
     }
-    
+
     pub fn set_cpu_affinity(&mut self, cpus: Vec<u32>) {
         self.cpus = cpus;
     }
@@ -153,19 +153,19 @@ impl ContainerNetwork {
     pub fn create_veth_pair(&mut self) -> Result<(), NetworkError> {
         // Create virtual ethernet pair
         let (host_veth, container_veth) = VethPair::new()?;
-        
+
         // Attach container veth to container namespace
         self.attach_to_namespace(container_veth)?;
-        
+
         // Attach host veth to bridge
         self.bridge.attach(host_veth)?;
-        
+
         // Configure IP addresses
         self.configure_ip_addresses()?;
-        
+
         // Set up firewall rules
         self.apply_firewall_rules()?;
-        
+
         Ok(())
     }
 }
@@ -197,7 +197,7 @@ impl LayeredFilesystem {
             upper: self.upper_layer.path.clone(),
             work: self.work_dir.clone(),
         };
-        
+
         mount_overlay(&options, target)?;
         Ok(())
     }
@@ -280,15 +280,15 @@ impl ImageRegistry {
     pub fn pull_image(&mut self, reference: &str) -> Result<ImageId, RegistryError> {
         // 1. Resolve reference to image ID
         let image_id = self.resolve_reference(reference)?;
-        
+
         // 2. Download layers
         for layer_id in &self.images[&image_id].layers {
             self.download_layer(layer_id)?;
         }
-        
+
         // 3. Verify layer digests
         self.verify_layers(&image_id)?;
-        
+
         Ok(image_id)
     }
 }

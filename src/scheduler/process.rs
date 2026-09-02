@@ -17,21 +17,20 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Process Scheduler for SigmaOS
 /// Implements process scheduling using OOP principles with traits and structs
 /// No dependency on external scheduling frameworks
 /// Based on Roadmap Item 5: Process scheduler
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Process ID
 pub type ProcessID = usize;
@@ -131,14 +130,19 @@ pub struct SimpleProcess {
     pub name: [u8; 64],
     /// Cached byte length of process name to avoid O(N) zero-byte linear scans
     pub name_len: u8,
-    pub state: AtomicUsize, // ProcessState as usize
+    pub state: AtomicUsize,    // ProcessState as usize
     pub priority: AtomicUsize, // ProcessPriority as usize
     pub cpu_time: AtomicUsize,
     pub capability: ProcessCapability,
 }
 
 impl SimpleProcess {
-    pub fn new(id: ProcessID, name: &[u8], priority: ProcessPriority, capability: ProcessCapability) -> Self {
+    pub fn new(
+        id: ProcessID,
+        name: &[u8],
+        priority: ProcessPriority,
+        capability: ProcessCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -239,7 +243,11 @@ impl Process for SimpleProcess {
 /// Process scheduler trait (OOP interface)
 pub trait ProcessScheduler {
     /// Create process
-    fn create_process(&mut self, name: &[u8], priority: ProcessPriority) -> Result<ProcessID, SchedulerError>;
+    fn create_process(
+        &mut self,
+        name: &[u8],
+        priority: ProcessPriority,
+    ) -> Result<ProcessID, SchedulerError>;
     /// Destroy process
     fn destroy_process(&mut self, id: ProcessID) -> Result<(), SchedulerError>;
     /// Schedule next process
@@ -331,7 +339,11 @@ impl SimpleProcessScheduler {
 }
 
 impl ProcessScheduler for SimpleProcessScheduler {
-    fn create_process(&mut self, name: &[u8], priority: ProcessPriority) -> Result<ProcessID, SchedulerError> {
+    fn create_process(
+        &mut self,
+        name: &[u8],
+        priority: ProcessPriority,
+    ) -> Result<ProcessID, SchedulerError> {
         if !self.capability.can_create {
             return Err(SchedulerError::PermissionDenied);
         }
@@ -477,7 +489,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -509,7 +525,12 @@ mod tests {
     #[test]
     fn test_simple_process_name_caching() {
         let process_name = b"init_daemon";
-        let proc = SimpleProcess::new(1, process_name, ProcessPriority::High, ProcessCapability::full());
+        let proc = SimpleProcess::new(
+            1,
+            process_name,
+            ProcessPriority::High,
+            ProcessCapability::full(),
+        );
         assert_eq!(proc.name(), b"init_daemon");
         assert_eq!(proc.name_len, 11);
     }
@@ -517,7 +538,9 @@ mod tests {
     #[test]
     fn test_simple_process_scheduler_operations() {
         let mut scheduler = SimpleProcessScheduler::new(SchedulerCapability::full());
-        let pid = scheduler.create_process(b"test_task", ProcessPriority::Normal).unwrap();
+        let pid = scheduler
+            .create_process(b"test_task", ProcessPriority::Normal)
+            .unwrap();
         assert_eq!(pid, 1);
 
         let process = scheduler.get_process(pid).expect("Process should exist");

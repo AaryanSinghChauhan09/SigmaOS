@@ -1,13 +1,15 @@
 extern crate alloc;
-use alloc::vec;
 use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 // SigmaOS User Management System
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
-use crate::klib::path::PathBuf;
+#[cfg(test)]
+use std::collections::HashMap;
 use std::fs;
 
 /// User account information
@@ -181,8 +183,7 @@ impl UserManager {
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
         let std_path = std::path::Path::new(&self.etc_dir);
-        fs::create_dir_all(std_path)
-            .map_err(|_| UserError::InitError(self.etc_dir.clone(), "failed to create etc dir".to_string()))?;
+        fs::create_dir_all(std_path).map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
         Ok(())
     }
 
@@ -420,7 +421,8 @@ impl UserManager {
             ));
         }
 
-        fs::write(&shadow_path, content).map_err(|e| UserError::WriteError(shadow_path.clone(), e))?;
+        fs::write(&shadow_path, content)
+            .map_err(|e| UserError::WriteError(shadow_path.clone(), e))?;
 
         Ok(())
     }
@@ -433,8 +435,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(shadow_path_str.clone(), e))?;
+        let content = fs::read_to_string(std_path)
+            .map_err(|e| UserError::ReadError(shadow_path_str.clone(), e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -487,7 +489,8 @@ impl UserManager {
             ));
         }
 
-        fs::write(&passwd_path, content).map_err(|e| UserError::WriteError(passwd_path.clone(), e))?;
+        fs::write(&passwd_path, content)
+            .map_err(|e| UserError::WriteError(passwd_path.clone(), e))?;
 
         Ok(())
     }
@@ -508,7 +511,8 @@ impl UserManager {
             ));
         }
 
-        fs::write(&group_path, content).map_err(|e| UserError::WriteError(group_path.clone(), e))?;
+        fs::write(&group_path, content)
+            .map_err(|e| UserError::WriteError(group_path.clone(), e))?;
 
         Ok(())
     }
@@ -522,8 +526,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(passwd_path_str.clone(), e))?;
+        let content = fs::read_to_string(std_path)
+            .map_err(|e| UserError::ReadError(passwd_path_str.clone(), e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -563,8 +567,8 @@ impl UserManager {
             return Ok(());
         }
 
-        let content =
-            fs::read_to_string(std_path).map_err(|e| UserError::ReadError(group_path_str.clone(), e))?;
+        let content = fs::read_to_string(std_path)
+            .map_err(|e| UserError::ReadError(group_path_str.clone(), e))?;
 
         for line in content.lines() {
             if line.is_empty() || line.starts_with('#') {
@@ -608,7 +612,7 @@ pub enum UserError {
     GroupNotFound(String),
     CannotDeleteRoot,
     SudoPermissionDenied(String, String),
-    InitError(String, String),
+    InitError(String, std::io::Error),
     ReadError(String, std::io::Error),
     WriteError(String, std::io::Error),
 }

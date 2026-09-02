@@ -1,8 +1,6 @@
 extern crate alloc;
 /// Advanced High-Fidelity Heterogeneous Interrupt Controller (APIC, GIC, PLIC) for SigmaOS
 /// Models x86_64 APIC Inter-Processor Interrupts (IPI), ARM GIC Fast Interrupts (FIQ), and RISC-V PLIC Supervisor targets.
-
-
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
@@ -86,7 +84,11 @@ impl SimpleInterruptController {
     }
 
     /// Configures priority level for specified IRQ line (e.g. mapping Fast Interrupt FIQ)
-    pub fn set_irq_priority(&mut self, irq: IRQNumber, priority: InterruptPriority) -> Result<(), IRQError> {
+    pub fn set_irq_priority(
+        &mut self,
+        irq: IRQNumber,
+        priority: InterruptPriority,
+    ) -> Result<(), IRQError> {
         if irq >= 256 {
             return Err(IRQError::InvalidIRQ);
         }
@@ -188,7 +190,11 @@ impl SimpleInterruptController {
     }
 
     /// Decides whether to prioritize incoming FIQ (Fast Interrupts) over pending Supervisor Traps
-    pub fn evaluate_priority_dispatch(&self, irq_a: IRQNumber, irq_b: IRQNumber) -> Option<IRQNumber> {
+    pub fn evaluate_priority_dispatch(
+        &self,
+        irq_a: IRQNumber,
+        irq_b: IRQNumber,
+    ) -> Option<IRQNumber> {
         if irq_a >= 256 || irq_b >= 256 {
             return None;
         }
@@ -235,8 +241,12 @@ mod tests {
         let mut controller = SimpleInterruptController::new(ControllerType::Gic);
 
         // Map IRQ 12 to FIQ (ARM Fast Interrupt) and IRQ 15 to Standard IRQ
-        controller.set_irq_priority(12, InterruptPriority::FastInterruptFiq).unwrap();
-        controller.set_irq_priority(15, InterruptPriority::StandardIrq).unwrap();
+        controller
+            .set_irq_priority(12, InterruptPriority::FastInterruptFiq)
+            .unwrap();
+        controller
+            .set_irq_priority(15, InterruptPriority::StandardIrq)
+            .unwrap();
 
         // Evaluate priority: FIQ (12) must always defeat standard IRQ (15)
         let selected = controller.evaluate_priority_dispatch(15, 12).unwrap();

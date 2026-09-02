@@ -27,6 +27,9 @@ SIGMA_CC="g++"
 
 export PATH="/usr/bin:/bin"
 export SOURCE_DATE_EPOCH
+export LC_ALL=C
+export TZ=UTC
+umask 0022
 
 echo "============================================"
 echo " SIGMA-REPRO-BUILD  v1.0"
@@ -34,6 +37,7 @@ echo "============================================"
 echo "[repro] SOURCE_DATE_EPOCH = $SOURCE_DATE_EPOCH"
 echo "[repro] SIGMA_CFLAGS      = $SIGMA_CFLAGS"
 echo "[repro] Compiler          = $SIGMA_CC"
+echo "[repro] Environment       = LC_ALL=C TZ=UTC UMASK=0022"
 
 # Collect source files for the manifest
 generate_buildinfo() {
@@ -43,7 +47,7 @@ generate_buildinfo() {
     echo "Build-Architecture: x86_64"                      >> "$BUILDINFO"
     echo ""                                                  >> "$BUILDINFO"
     echo "Checksums-Sha256:"                               >> "$BUILDINFO"
-    find kernel/ userland/ tests/ -name "*.cpp" \
+    find src/ tools/ kernel/ userland/ tests/ \( -name "*.cpp" -o -name "*.rs" -o -name "*.toml" \) \
         | sort \
         | xargs sha256sum \
         >> "$BUILDINFO"

@@ -3,8 +3,6 @@ use alloc::vec::Vec;
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuInstructionExtension {
     Avx512,

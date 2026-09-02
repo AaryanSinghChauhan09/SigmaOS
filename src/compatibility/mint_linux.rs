@@ -1,11 +1,11 @@
 extern crate alloc;
+use alloc::format;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -324,23 +324,61 @@ pub struct CinnamonDesklet {
     pub y: usize,
 }
 
+/// Cinnamon Theme Presets (Linux Mint Mint-Y, Mint-X, Yaru, Adapta)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CinnamonPreset {
+    MintYDark,
+    MintYLight,
+    MintYAqua,
+    MintYPurple,
+    MintYTeal,
+    MintXDefault,
+    CinnamonAdwaita,
+    CustomCinnamon,
+}
+
+/// Cinnamon Spices & Theme Preset Manager
 pub struct CinnamonThemeEngine {
     pub active_gtk_theme: [u8; 32],
+    pub current_preset: CinnamonPreset,
     pub desklets: Vec<Option<CinnamonDesklet>>,
     pub is_panel_enabled: bool,
+    pub panel_transparency_alpha: u8, // 0 to 255
+    pub applet_icon_theme: [u8; 32],
+    pub sound_scheme_enabled: bool,
 }
 
 impl CinnamonThemeEngine {
     pub fn new() -> Self {
         let mut theme = [0u8; 32];
+        let mut icon_theme = [0u8; 32];
         let default_name = b"Mint-Y-Dark";
+        let default_icons = b"Mint-Y";
         unsafe {
-            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(
+                default_name.as_ptr(),
+                theme.as_mut_ptr(),
+                default_name.len(),
+            );
+            core::ptr::copy_nonoverlapping(
+                default_name.as_ptr(),
+                theme.as_mut_ptr(),
+                default_name.len(),
+            );
+            core::ptr::copy_nonoverlapping(
+                default_icons.as_ptr(),
+                icon_theme.as_mut_ptr(),
+                default_icons.len(),
+            );
         }
         Self {
             active_gtk_theme: theme,
+            current_preset: CinnamonPreset::MintYDark,
             desklets: Vec::new(),
             is_panel_enabled: true,
+            panel_transparency_alpha: 230,
+            applet_icon_theme: icon_theme,
+            sound_scheme_enabled: true,
         }
     }
 
@@ -351,6 +389,28 @@ impl CinnamonThemeEngine {
             core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
         }
         self.active_gtk_theme = theme;
+    }
+
+    pub fn apply_preset(&mut self, preset: CinnamonPreset) {
+        self.current_preset = preset;
+        let (gtk_name, icon_name): (&[u8], &[u8]) = match preset {
+            CinnamonPreset::MintYDark => (b"Mint-Y-Dark", b"Mint-Y"),
+            CinnamonPreset::MintYLight => (b"Mint-Y", b"Mint-Y"),
+            CinnamonPreset::MintYAqua => (b"Mint-Y-Dark-Aqua", b"Mint-Y-Aqua"),
+            CinnamonPreset::MintYPurple => (b"Mint-Y-Dark-Purple", b"Mint-Y-Purple"),
+            CinnamonPreset::MintYTeal => (b"Mint-Y-Dark-Teal", b"Mint-Y-Teal"),
+            CinnamonPreset::MintXDefault => (b"Mint-X", b"Mint-X"),
+            CinnamonPreset::CinnamonAdwaita => (b"Adwaita-dark", b"Adwaita"),
+            CinnamonPreset::CustomCinnamon => (b"Custom-Cinnamon", b"Custom-Icons"),
+        };
+
+        self.set_gtk_theme(gtk_name);
+        let mut icon_arr = [0u8; 32];
+        let len = icon_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(icon_name.as_ptr(), icon_arr.as_mut_ptr(), len);
+        }
+        self.applet_icon_theme = icon_arr;
     }
 
     pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
@@ -420,7 +480,6 @@ impl Default for TimeshiftSystemRestorer {
         Self::new()
     }
 }
-
 
 /// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -597,6 +656,120 @@ impl MintDriverInfo {
 }
 
 /// MintDrivers-inspired Hardware Driver Manager
+// ==========================================
+// Linux Mint mint4win & Wubi Loopback Windows Installer Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LoopbackDiskFormat {
+    VhdFixed,
+    VhdDynamic,
+    RawNtfsImage,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowsBootloaderType {
+    Ntldr,        // Windows XP / Server 2003
+    BcdBootmgr,   // Windows Vista / 7 / 8 / 10 / 11
+    Grub4Dos,     // Legacy MBR chainloader
+    UefiEfiEntry, // UEFI NVRAM Boot Entry
+}
+
+#[derive(Debug, Clone)]
+pub struct Mint4WinInstallationConfig {
+    pub target_drive_letter: char, // e.g. 'C'
+    pub target_folder: String,     // e.g. "C:\mint4win"
+    pub disk_format: LoopbackDiskFormat,
+    pub bootloader_type: WindowsBootloaderType,
+    pub root_disk_size_mb: u64, // e.g. 32768 MB (32 GB)
+    pub swap_file_size_mb: u64, // e.g. 4096 MB (4 GB)
+    pub default_username: String,
+    pub host_os_version: String,
+}
+
+impl Mint4WinInstallationConfig {
+    pub fn default_windows_c(drive_letter: char, username: &str) -> Self {
+        Mint4WinInstallationConfig {
+            target_drive_letter: drive_letter,
+            target_folder: format!("{}:\\mint4win", drive_letter),
+            disk_format: LoopbackDiskFormat::RawNtfsImage,
+            bootloader_type: WindowsBootloaderType::BcdBootmgr,
+            root_disk_size_mb: 32768,
+            swap_file_size_mb: 4096,
+            default_username: username.to_string(),
+            host_os_version: "Windows 11".to_string(),
+        }
+    }
+}
+
+/// Linux Mint `mint4win` & Ubuntu `Wubi` inspired Windows Loopback Installer Engine
+pub struct Mint4WinInstallerEngine {
+    pub config: Mint4WinInstallationConfig,
+    pub loopback_root_vhd_created: bool,
+    pub bcd_entry_added: bool,
+    pub installed: bool,
+    pub bcd_guid: String,
+}
+
+impl Mint4WinInstallerEngine {
+    pub fn new(config: Mint4WinInstallationConfig) -> Self {
+        Mint4WinInstallerEngine {
+            config,
+            loopback_root_vhd_created: false,
+            bcd_entry_added: false,
+            installed: false,
+            bcd_guid: String::from("{a1b2c3d4-e5f6-7890-abcd-1234567890ab}"),
+        }
+    }
+
+    pub fn allocate_loopback_disks(&mut self) -> Result<String, &'static str> {
+        if self.config.root_disk_size_mb < 8192 {
+            return Err("mint4win: Minimum root disk size is 8192 MB (8 GB)");
+        }
+
+        self.loopback_root_vhd_created = true;
+        Ok(format!(
+            "Successfully allocated {} MB loopback root disk and {} MB swap file at {}",
+            self.config.root_disk_size_mb, self.config.swap_file_size_mb, self.config.target_folder
+        ))
+    }
+
+    pub fn configure_windows_bcd_boot_entry(&mut self) -> Result<String, &'static str> {
+        if !self.loopback_root_vhd_created {
+            return Err("mint4win: Must allocate loopback disk before configuring Windows BCD");
+        }
+
+        self.bcd_entry_added = true;
+        self.installed = true;
+        Ok(format!(
+            "Added Windows BCD boot entry [{}] 'SigmaOS (Linux Mint Dual-Boot)'",
+            self.bcd_guid
+        ))
+    }
+
+    pub fn generate_unattended_install_script(&self) -> String {
+        format!(
+            "unattended_user=\"{}\"\nloopback_root=\"{}\\disks\\root.disk\"\nloopback_swap=\"{}\\disks\\swap.disk\"\nbootloader=\"{:?}\"\n",
+            self.config.default_username,
+            self.config.target_folder,
+            self.config.target_folder,
+            self.config.bootloader_type
+        )
+    }
+
+    pub fn uninstall_mint4win(&mut self) -> Result<String, &'static str> {
+        if !self.installed {
+            return Err("mint4win is not installed");
+        }
+
+        self.bcd_entry_added = false;
+        self.loopback_root_vhd_created = false;
+        self.installed = false;
+
+        Ok("Successfully removed mint4win Windows boot entry and loopback disk files".to_string())
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -734,6 +907,16 @@ mod tests {
         assert!(style.menu_layout_compact);
         assert_eq!(style.opacity_percent, 85);
         assert!(!style.window_effects_enabled);
+
+        // Test Cinnamon Theme Presets
+        let mut cinnamon = CinnamonThemeEngine::new();
+        assert_eq!(cinnamon.current_preset, CinnamonPreset::MintYDark);
+        assert!(cinnamon.active_gtk_theme.starts_with(b"Mint-Y-Dark"));
+
+        cinnamon.apply_preset(CinnamonPreset::MintYAqua);
+        assert_eq!(cinnamon.current_preset, CinnamonPreset::MintYAqua);
+        assert!(cinnamon.active_gtk_theme.starts_with(b"Mint-Y-Dark-Aqua"));
+        assert!(cinnamon.applet_icon_theme.starts_with(b"Mint-Y-Aqua"));
     }
 
     #[test]
@@ -749,5 +932,254 @@ mod tests {
             .toggle_driver(b"Broadcom BCM4360 WiFi", true)
             .unwrap();
         assert!(drivers.available_drivers[0].active);
+    }
+
+    #[test]
+    fn test_mint4win_installer_flow() {
+        let config = Mint4WinConfig {
+            target_drive_letter: 'C',
+            install_folder: "sigmaos".to_string(),
+            root_disk_size_mb: 32768,
+            swap_disk_size_mb: 4096,
+            username: "mintuser".to_string(),
+            language: "en_US".to_string(),
+            bootloader_type: WindowsBootloaderType::BcdUefi,
+        };
+
+        let mut installer = Mint4WinInstaller::new(config);
+
+        // 1. Detect Fast Startup / Hibernation safety check
+        assert_eq!(
+            installer.detect_ntfs_fast_startup(true, false),
+            NtfsFastStartupState::DirtyHibernated
+        );
+
+        // Attempting to create loopback disk on hibernated NTFS fails for safety
+        assert!(installer.create_loopback_disks().is_err());
+
+        // Clear fast startup hibernation block
+        installer.detect_ntfs_fast_startup(false, false);
+        assert_eq!(installer.fast_startup_state, NtfsFastStartupState::Clean);
+
+        // 2. Allocate sparse loopback virtual disk images
+        assert!(installer.create_loopback_disks().is_ok());
+        let root_disk = installer.root_disk.as_ref().unwrap();
+        assert_eq!(root_disk.windows_path, "C:\\sigmaos\\disks\\root.disk");
+        assert_eq!(root_disk.size_mb, 32768);
+
+        // 3. Register BCD boot entry
+        let bcd_cmd = installer.register_windows_boot_entry();
+        assert!(bcd_cmd.contains("bcdedit /create"));
+        assert!(installer.bcd_entry_guid.is_some());
+
+        // 4. Register Windows Control Panel Uninstaller entry
+        let uninst = installer.register_windows_uninstaller();
+        assert!(uninst.key_path.contains("SigmaOS_mint4win"));
+        assert!(uninst
+            .uninstall_string
+            .contains("C:\\sigmaos\\uninstall.exe"));
+
+        // 5. Expand root loopback disk capacity dynamically
+        let new_size = installer.expand_root_disk(16384).unwrap();
+        assert_eq!(new_size, 49152);
+
+        // 6. Execute uninstallation and reclaim disk space
+        let reclaimed = installer.execute_uninstallation().unwrap();
+        assert_eq!(reclaimed, 53248); // 49152 + 4096 swap
+        assert!(installer.root_disk.is_none());
+    }
+}
+
+// ==========================================
+// Mint4Win Windows-Hosted Installer & Loopback Subsystem
+// Inspired by Linux Mint mint4win, Wubi, and BSD/Linux loopback VFS boot
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowsBootloaderType {
+    NtLdrLegacy,      // Windows XP / Server 2003 (boot.ini)
+    BcdUefi,          // Windows 7/8/10/11 UEFI & BIOS (BCD)
+    Grub4DosFallback, // GRUB4DOS fallback chainloader
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtfsFastStartupState {
+    Clean,
+    DirtyHibernated, // Fast Startup enabled (hiberfil.sys present)
+    UncleanShutdown,
+}
+
+#[derive(Debug, Clone)]
+pub struct LoopbackDiskImage {
+    pub name: String,
+    pub windows_path: String,
+    pub size_mb: u64,
+    pub allocated_mb: u64,
+    pub is_sparse: bool,
+    pub sha256_checksum: [u8; 32],
+}
+
+#[derive(Debug, Clone)]
+pub struct Mint4WinConfig {
+    pub target_drive_letter: char,
+    pub install_folder: String,
+    pub root_disk_size_mb: u64,
+    pub swap_disk_size_mb: u64,
+    pub username: String,
+    pub language: String,
+    pub bootloader_type: WindowsBootloaderType,
+}
+
+#[derive(Debug, Clone)]
+pub struct UninstallerRegistryEntry {
+    pub key_path: String,
+    pub display_name: String,
+    pub uninstall_string: String,
+    pub estimated_size_kb: u64,
+}
+
+pub struct Mint4WinInstaller {
+    pub config: Mint4WinConfig,
+    pub root_disk: Option<LoopbackDiskImage>,
+    pub swap_disk: Option<LoopbackDiskImage>,
+    pub fast_startup_state: NtfsFastStartupState,
+    pub bcd_entry_guid: Option<String>,
+    pub uninstaller_entry: Option<UninstallerRegistryEntry>,
+}
+
+impl Mint4WinInstaller {
+    pub fn new(config: Mint4WinConfig) -> Self {
+        Self {
+            config,
+            root_disk: None,
+            swap_disk: None,
+            fast_startup_state: NtfsFastStartupState::Clean,
+            bcd_entry_guid: None,
+            uninstaller_entry: None,
+        }
+    }
+
+    /// Detects Windows Fast Startup / Hibernation state (`hiberfil.sys` presence)
+    pub fn detect_ntfs_fast_startup(
+        &mut self,
+        is_hibernated: bool,
+        has_dirty_bit: bool,
+    ) -> NtfsFastStartupState {
+        if is_hibernated {
+            self.fast_startup_state = NtfsFastStartupState::DirtyHibernated;
+        } else if has_dirty_bit {
+            self.fast_startup_state = NtfsFastStartupState::UncleanShutdown;
+        } else {
+            self.fast_startup_state = NtfsFastStartupState::Clean;
+        }
+        self.fast_startup_state
+    }
+
+    /// Allocates sparse NTFS loopback virtual disks (`root.disk` and `swap.disk`)
+    pub fn create_loopback_disks(&mut self) -> Result<(), &'static str> {
+        if self.fast_startup_state == NtfsFastStartupState::DirtyHibernated {
+            return Err(
+                "Windows Fast Startup / Hibernation active. Cannot safely write loopback disks.",
+            );
+        }
+
+        let root_path = format!(
+            "{}:\\{}\\disks\\root.disk",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+        let swap_path = format!(
+            "{}:\\{}\\disks\\swap.disk",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+
+        self.root_disk = Some(LoopbackDiskImage {
+            name: "root.disk".to_string(),
+            windows_path: root_path,
+            size_mb: self.config.root_disk_size_mb,
+            allocated_mb: 64, // Initial sparse allocation
+            is_sparse: true,
+            sha256_checksum: [0xAA; 32],
+        });
+
+        if self.config.swap_disk_size_mb > 0 {
+            self.swap_disk = Some(LoopbackDiskImage {
+                name: "swap.disk".to_string(),
+                windows_path: swap_path,
+                size_mb: self.config.swap_disk_size_mb,
+                allocated_mb: self.config.swap_disk_size_mb, // Pre-allocated swap
+                is_sparse: false,
+                sha256_checksum: [0xBB; 32],
+            });
+        }
+
+        Ok(())
+    }
+
+    /// Registers dual-boot entry into Windows BCD / Boot.ini
+    pub fn register_windows_boot_entry(&mut self) -> String {
+        match self.config.bootloader_type {
+            WindowsBootloaderType::BcdUefi => {
+                let guid = "{77777777-1111-2222-3333-SIGMAOS12345}".to_string();
+                self.bcd_entry_guid = Some(guid.clone());
+                format!(
+                    "bcdedit /create {} /d \"SigmaOS (mint4win)\" /application bootsector",
+                    guid
+                )
+            }
+            WindowsBootloaderType::NtLdrLegacy => {
+                format!(
+                    "C:\\{}\\winboot\\wubildr.mbr=\"SigmaOS\"",
+                    self.config.install_folder
+                )
+            }
+            WindowsBootloaderType::Grub4DosFallback => {
+                "C:\\grldr=\"SigmaOS GRUB4DOS Loader\"".to_string()
+            }
+        }
+    }
+
+    /// Registers Windows Control Panel uninstaller (`Uninstall.exe` registry integration)
+    pub fn register_windows_uninstaller(&mut self) -> UninstallerRegistryEntry {
+        let key_path =
+            "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SigmaOS_mint4win"
+                .to_string();
+        let uninstall_cmd = format!(
+            "\"{}:\\{}\\uninstall.exe\"",
+            self.config.target_drive_letter, self.config.install_folder
+        );
+
+        let entry = UninstallerRegistryEntry {
+            key_path,
+            display_name: "SigmaOS (Linux Mint4Win Loopback)".to_string(),
+            uninstall_string: uninstall_cmd,
+            estimated_size_kb: (self.config.root_disk_size_mb + self.config.swap_disk_size_mb)
+                * 1024,
+        };
+
+        self.uninstaller_entry = Some(entry.clone());
+        entry
+    }
+
+    /// Dynamically expands loopback disk capacity without data loss
+    pub fn expand_root_disk(&mut self, additional_mb: u64) -> Result<u64, &'static str> {
+        if let Some(ref mut disk) = self.root_disk {
+            disk.size_mb += additional_mb;
+            Ok(disk.size_mb)
+        } else {
+            Err("Root loopback disk not created")
+        }
+    }
+
+    /// Performs clean uninstallation and Windows system state restoration
+    pub fn execute_uninstallation(&mut self) -> Result<u64, &'static str> {
+        let reclaimed_mb = self.root_disk.as_ref().map(|d| d.size_mb).unwrap_or(0)
+            + self.swap_disk.as_ref().map(|d| d.size_mb).unwrap_or(0);
+
+        self.root_disk = None;
+        self.swap_disk = None;
+        self.bcd_entry_guid = None;
+        self.uninstaller_entry = None;
+
+        Ok(reclaimed_mb)
     }
 }

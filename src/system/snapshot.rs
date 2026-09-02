@@ -16,18 +16,39 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
-use alloc::vec;
 use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS System Restore Snapshots
 // OOP-based system snapshot and restore functionality
 
+use crate::klib::path::PathBuf;
 use crate::klib::BTreeMap;
-// Path/PathBuf not in no_std
-// SystemTime not in no_std
+
+pub struct SystemTime;
+pub const UNIX_EPOCH: u64 = 0;
+
+impl SystemTime {
+    pub fn now() -> Self {
+        SystemTime
+    }
+    pub fn duration_since(&self, _earlier: u64) -> Result<Duration, ()> {
+        Ok(Duration::from_secs(0))
+    }
+}
+
+pub struct Duration;
+impl Duration {
+    pub fn from_secs(s: u64) -> Self {
+        Duration
+    }
+    pub fn as_secs(&self) -> u64 {
+        0
+    }
+}
 
 /// Snapshot metadata
 #[derive(Debug, Clone)]
@@ -133,9 +154,8 @@ impl SnapshotStorage for FileSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), &metadata.id);
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
         let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
@@ -143,8 +163,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
             metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
         );
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write snapshot data
         let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
@@ -170,7 +189,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), snapshot_id);
         let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
 
         if !data_path.exists() {
@@ -204,9 +223,8 @@ impl SnapshotStorage for FileSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), snapshot_id);
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
     }
@@ -256,9 +274,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             }
         }
 
-        let snapshot_path = self.format!("{}/{}", base_path, &metadata.id);
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), &metadata.id);
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
         let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
@@ -266,8 +283,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             "{{\"id\":\"{}\",\"name\":\"{}\",\"timestamp\":{},\"description\":\"{}\",\"size_bytes\":{},\"is_bootable\":{}}}",
             metadata.id, metadata.name, metadata.timestamp, metadata.description, metadata.size_bytes, metadata.is_bootable
         );
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Compute Merkle root hash
         let merkle_root = self.compute_merkle_root(data);
@@ -278,8 +294,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
 
         // Write Merkle root
         let merkle_path = format!("{}/{}", snapshot_path, "merkle_root.txt");
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         self.snapshots.insert(metadata.id.clone(), metadata.clone());
 
@@ -304,7 +319,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .get(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), snapshot_id);
         let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
         let merkle_path = format!("{}/{}", snapshot_path, "merkle_root.txt");
 
@@ -315,8 +331,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
         // Verify Merkle root
         let data = Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
         let computed_root = self.compute_merkle_root(&data);
-        let stored_root = Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let stored_root =
+            Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         if computed_root != stored_root.trim() {
             return Err(SnapshotError::IntegrityError(
@@ -350,9 +366,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let snapshot_path = self.format!("{}/{}", base_path, snapshot_id);
-        Err("fs not available")
-            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        let snapshot_path = format!("{}/{}", self.base_path.as_ref(), snapshot_id);
+        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
     }

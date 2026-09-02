@@ -1,49 +1,29 @@
 # Contributing to SigmaOS
 
-Thank you for considering contributing to SigmaOS!
+Thank you for your interest in contributing to SigmaOS!
 
-## Quick Start
+---
 
-```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-cargo build
-cargo test
-```
+## 📜 Principles & Standards
 
-## Ways to Contribute
+SigmaOS enforces strict engineering standards inspired by Arch Linux, FreeBSD, and OpenBSD:
 
-- 🐛 **Bug Reports**: Open a GitHub Issue
-- ✨ **Feature Requests**: Open a GitHub Issue with `[RFC]` prefix  
-- 📝 **Documentation**: Fix typos, add examples, improve clarity
-- 🔧 **Code**: See open issues labeled `good first issue`
-- 🔒 **Security**: See [SECURITY.md](SECURITY.md)
+1. **Zero External Unverified Dependencies**: Core kernel and userspace modules are written in standard-library-free, memory-safe Rust with explicit capability bounds.
+2. **PQC Cryptographic Signing**: All driver modules, package recipes, and security advisories must be signed using post-quantum Kyber-1024 or Dilithium-5 signatures.
+3. **Capability-Gated Isolation**: Every new feature or driver shard must run in userland under `pledge` and `unveil` sandboxing primitives.
+4. **Comprehensive Verification**: All pull requests must pass the atomic test suite (`./run_sigma_tests.sh`) and pass quality gates (`./scripts/sigma_quality_check.sh`).
 
-## Development Process
+---
 
-1. Fork the repository
-2. Create a feature branch: `feat/your-feature`
-3. Make changes with clear commits
-4. Run `cargo test` and `cargo clippy`
-5. Submit a Pull Request to `main`
+## 🛠️ Contribution Workflow
 
-## Code Style
+1. **Fork & Branch**: Create a feature branch off `main`.
+2. **Implement & Test**: Add code/tests and verify locally using `./run_sigma_tests.sh`.
+3. **Quality Check**: Run `./scripts/sigma_quality_check.sh --strict`.
+4. **Submit PR**: Open a pull request against `main`.
 
-- Follow Rust idioms and use `rustfmt`
-- Document all public APIs with `///` doc comments
-- Write tests for new functionality
-- Prefer `safe` Rust; document all `unsafe` blocks
+---
 
-## Commit Format
+## 🛡️ Security Disclosures
 
-```
-type(scope): description
-
-Body explaining WHY
-
-Fixes #issue
-```
-
-Types: `feat`, `fix`, `docs`, `refactor`, `test`, `perf`, `security`
-
-See [Contributing Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing) for full guide.
+Please report security vulnerabilities directly to the security team following `.github/SECURITY.md`.

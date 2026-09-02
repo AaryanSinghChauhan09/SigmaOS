@@ -4,11 +4,10 @@ extern crate alloc;
 // Implements 5-step User Identification, Verification, Authenticity of Information,
 // Attributes Definition Table (ADT), and Automatic Allocation & Management Engine.
 
-
-#[cfg(not(target_os = "none"))]
-use crate::klib::HashMap;
 #[cfg(target_os = "none")]
 use crate::klib::collections::HashMap;
+#[cfg(not(target_os = "none"))]
+use crate::klib::HashMap;
 
 use alloc::string::{String as AllocString, ToString};
 use alloc::vec::Vec;
@@ -266,21 +265,30 @@ impl AttSecurityEngine {
         };
 
         // Register default root user attribute record in ADT
-        engine.adt.register_attribute(AdtAttributeRecord::default_user_profile(0, "root"));
-        engine.registered_users.insert("root".to_string(), (0, [1u8; 32]));
+        engine
+            .adt
+            .register_attribute(AdtAttributeRecord::default_user_profile(0, "root"));
+        engine
+            .registered_users
+            .insert("root".to_string(), (0, [1u8; 32]));
 
         engine
     }
 
     pub fn register_user(&mut self, username: &str, password_hash: [u8; 32]) -> u32 {
         let uid = self.resource_manager.auto_allocate_uid();
-        self.registered_users.insert(username.to_string(), (uid, password_hash));
-        self.adt.register_attribute(AdtAttributeRecord::default_user_profile(uid, username));
+        self.registered_users
+            .insert(username.to_string(), (uid, password_hash));
+        self.adt
+            .register_attribute(AdtAttributeRecord::default_user_profile(uid, username));
         uid
     }
 
     /// Step 1: Claim Identity
-    pub fn step1_claim_identity(&mut self, claim: &UserIdentityClaim) -> Result<IdentificationStep, AttSecurityError> {
+    pub fn step1_claim_identity(
+        &mut self,
+        claim: &UserIdentityClaim,
+    ) -> Result<IdentificationStep, AttSecurityError> {
         if self.registered_users.get(&claim.username).is_none() {
             self.current_step = IdentificationStep::Failed;
             return Err(AttSecurityError::IdentityNotFound);
@@ -300,7 +308,10 @@ impl AttSecurityEngine {
             return Err(AttSecurityError::InvalidStepSequence);
         }
 
-        let user_info = self.registered_users.get(&username.to_string()).ok_or(AttSecurityError::IdentityNotFound)?;
+        let user_info = self
+            .registered_users
+            .get(&username.to_string())
+            .ok_or(AttSecurityError::IdentityNotFound)?;
         if user_info.1 != *password_hash {
             self.current_step = IdentificationStep::Failed;
             return Err(AttSecurityError::InvalidCredentials);
@@ -339,7 +350,10 @@ impl AttSecurityEngine {
             return Err(AttSecurityError::InvalidStepSequence);
         }
 
-        let attr = self.adt.get_attribute(uid).ok_or(AttSecurityError::AttributeAccessDenied)?;
+        let attr = self
+            .adt
+            .get_attribute(uid)
+            .ok_or(AttSecurityError::AttributeAccessDenied)?;
         if attr.sensitivity_level < required_level {
             self.current_step = IdentificationStep::Failed;
             return Err(AttSecurityError::AttributeAccessDenied);
@@ -359,8 +373,12 @@ impl AttSecurityEngine {
             return Err(AttSecurityError::InvalidStepSequence);
         }
 
-        let token = self.verifier.compute_authenticity_signature(username.as_bytes());
-        let session = self.resource_manager.auto_allocate_session(uid, username, token);
+        let token = self
+            .verifier
+            .compute_authenticity_signature(username.as_bytes());
+        let session = self
+            .resource_manager
+            .auto_allocate_session(uid, username, token);
 
         self.current_step = IdentificationStep::Completed;
         Ok(session)
@@ -379,7 +397,10 @@ impl AttSecurityEngine {
         self.step2_verify_credentials(&claim.username, password_hash)?;
         self.step3_verify_authenticity(payload, expected_sig)?;
 
-        let (uid, _) = *self.registered_users.get(&claim.username).ok_or(AttSecurityError::IdentityNotFound)?;
+        let (uid, _) = *self
+            .registered_users
+            .get(&claim.username)
+            .ok_or(AttSecurityError::IdentityNotFound)?;
         self.step4_evaluate_adt(uid, required_level)?;
         self.step5_automatic_allocation(uid, &claim.username)
     }
@@ -409,7 +430,13 @@ mod tests {
         let sig = engine.verifier.compute_authenticity_signature(payload);
 
         let session = engine
-            .execute_full_identification_pipeline(&claim, &pass_hash, payload, &sig, SensitivityLevel::Confidential)
+            .execute_full_identification_pipeline(
+                &claim,
+                &pass_hash,
+                payload,
+                &sig,
+                SensitivityLevel::Confidential,
+            )
             .unwrap();
 
         assert_eq!(session.uid, 1000);
@@ -471,7 +498,10 @@ mod tests {
         };
 
         // Unknown identity fails step 1
-        assert_eq!(engine.step1_claim_identity(&claim), Err(AttSecurityError::IdentityNotFound));
+        assert_eq!(
+            engine.step1_claim_identity(&claim),
+            Err(AttSecurityError::IdentityNotFound)
+        );
         assert_eq!(engine.current_step, IdentificationStep::Failed);
 
         // Sequence error when skipping steps

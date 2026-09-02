@@ -21,10 +21,25 @@
 //   - MintMenu            -> `MintMenuLayout`
 //   - Automate            -> `AutomateWorkflow`
 
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // =========================================================================
 // 1. WARPINATOR -> LanWarpEngine
@@ -133,7 +148,12 @@ impl LanWarpEngine {
         self.peers.len()
     }
 
-    pub fn send_file(&mut self, peer_address: &str, filename: &str, payload: &[u8]) -> TransferOutcome {
+    pub fn send_file(
+        &mut self,
+        peer_address: &str,
+        filename: &str,
+        payload: &[u8],
+    ) -> TransferOutcome {
         if !self.peers.iter().any(|p| p.address == peer_address) {
             return TransferOutcome::Interrupted { bytes: 0 };
         }
@@ -142,19 +162,27 @@ impl LanWarpEngine {
             let comp = payload.len().saturating_mul(85) / 100;
             TransferOutcome::Completed { bytes: comp }
         } else {
-            TransferOutcome::Completed { bytes: payload.len() }
+            TransferOutcome::Completed {
+                bytes: payload.len(),
+            }
         }
     }
 
     pub fn receive_file(&mut self, req: RequestIncoming) -> TransferOutcome {
         if req.auto_approvable && self.incoming_auto_approve {
             if self.isolation != IsolationMode::Legacy {
-                return TransferOutcome::Completed { bytes: req.size_bytes };
+                return TransferOutcome::Completed {
+                    bytes: req.size_bytes,
+                };
             }
-            return TransferOutcome::Completed { bytes: req.size_bytes };
+            return TransferOutcome::Completed {
+                bytes: req.size_bytes,
+            };
         }
         if req.approved {
-            TransferOutcome::Completed { bytes: req.size_bytes }
+            TransferOutcome::Completed {
+                bytes: req.size_bytes,
+            }
         } else {
             TransferOutcome::Rejected
         }
@@ -336,6 +364,78 @@ impl Default for WebappManager {
     }
 }
 
+// ============================================================================
+// 13. MINTUPGRADE -> MintUpgradeEngine
+//     Upgrades the OS across major LTS releases (e.g., Mint 20 -> Mint 21).
+// ============================================================================
+
+/// Phase of the major LTS system upgrade
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintUpgradePhase {
+    Idle,
+    PreflightCheck,
+    RepoSwitch,
+    DownloadPackages,
+    UpgradePackages,
+    Cleanup,
+    Complete,
+}
+
+/// Linux Mint `mintupgrade`-inspired major version system upgrade engine
+pub struct MintUpgradeEngine {
+    pub current_version: String,
+    pub target_version: String,
+    pub current_phase: MintUpgradePhase,
+    pub preflight_passed: bool,
+    pub packages_to_upgrade_count: usize,
+}
+
+impl MintUpgradeEngine {
+    pub fn new(current_version: &str, target_version: &str) -> Self {
+        Self {
+            current_version: current_version.to_string(),
+            target_version: target_version.to_string(),
+            current_phase: MintUpgradePhase::Idle,
+            preflight_passed: false,
+            packages_to_upgrade_count: 0,
+        }
+    }
+
+    /// Performs pre-flight checks (disk space, power supply, orphan PPA checks)
+    pub fn run_preflight_checks(&mut self, available_disk_gb: u64) -> Result<bool, &'static str> {
+        self.current_phase = MintUpgradePhase::PreflightCheck;
+        if available_disk_gb < 15 {
+            self.preflight_passed = false;
+            return Err("Insufficient disk space for major upgrade (15 GB required)");
+        }
+        self.preflight_passed = true;
+        self.packages_to_upgrade_count = 1420; // Simulated package count
+        Ok(true)
+    }
+
+    /// Switches system software repositories to target LTS release codename
+    pub fn switch_repositories(&mut self) -> Result<(), &'static str> {
+        if !self.preflight_passed {
+            return Err("Cannot switch repositories before passing pre-flight checks");
+        }
+        self.current_phase = MintUpgradePhase::RepoSwitch;
+        Ok(())
+    }
+
+    /// Executes major release upgrade process
+    pub fn execute_upgrade(&mut self) -> Result<(), &'static str> {
+        if self.current_phase != MintUpgradePhase::RepoSwitch {
+            return Err("Repositories must be switched before executing upgrade");
+        }
+        self.current_phase = MintUpgradePhase::DownloadPackages;
+        self.current_phase = MintUpgradePhase::UpgradePackages;
+        self.current_phase = MintUpgradePhase::Cleanup;
+        self.current_phase = MintUpgradePhase::Complete;
+        self.current_version = self.target_version.clone();
+        Ok(())
+    }
+}
+
 // =========================================================================
 // 4. CAPTAIN / APTURL -> CaptainInstaller
 //    Install .deb files and apt:// URLs with dependency resolution.
@@ -392,10 +492,12 @@ impl CaptainInstaller {
 
     /// Install from an `apt://pkgname` URL (apturl flow).
     pub fn install_from_apt_url(&mut self, url: &str) -> Result<String, &'static str> {
-        let pkg_name = url
-            .strip_prefix("apt://")
-            .ok_or("malformed apt URL")?;
-        let pkg = self.repo_packages.iter().find(|p| p.name == pkg_name).cloned();
+        let pkg_name = url.strip_prefix("apt://").ok_or("malformed apt URL")?;
+        let pkg = self
+            .repo_packages
+            .iter()
+            .find(|p| p.name == pkg_name)
+            .cloned();
         match pkg {
             Some(p) => {
                 self.install_deb(p)?;
@@ -481,7 +583,11 @@ impl HypnotixIptvPlayer {
                 self.channels.push(TvChannel {
                     id: entries[0].to_string(),
                     name: entries[0].to_string(),
-                    country: entries[1].split(':').last().unwrap_or("unknown").to_string(),
+                    country: entries[1]
+                        .split(':')
+                        .last()
+                        .unwrap_or("unknown")
+                        .to_string(),
                     provider: provider.to_string(),
                     url: entries[0].to_string(),
                 });
@@ -525,13 +631,26 @@ pub enum RenameRule {
     Append { suffix: String },
     LowerCase,
     UpperCase,
+    TitleCase,
     TrimWhitespace,
-    Sequence { start: u32, step: u32 },
+    Sequence { start: u32, step: u32, width: usize },
+    ChangeExtension { new_ext: String },
+    InsertAt { text: String, position: usize },
+    RemoveCharacters { count: usize, position: usize },
+    SanitizeFilename,
+    RegexReplace { pattern: String, replace: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RenameConflict {
+    pub target: String,
+    pub conflicting_sources: Vec<String>,
 }
 
 pub struct BulkyRenamer {
     pub files: Vec<String>,
     pub rules: Vec<RenameRule>,
+    pub undo_stack: Vec<Vec<RenamedFile>>,
 }
 
 impl BulkyRenamer {
@@ -539,6 +658,7 @@ impl BulkyRenamer {
         Self {
             files: Vec::new(),
             rules: Vec::new(),
+            undo_stack: Vec::new(),
         }
     }
 
@@ -554,7 +674,7 @@ impl BulkyRenamer {
         self.files
             .iter()
             .enumerate()
-            .map(|(i, f)| {
+            .map(|(i, f): (usize, &String)| {
                 let seq = i as u32;
                 let mut out = f.clone();
                 for rule in &self.rules {
@@ -568,10 +688,47 @@ impl BulkyRenamer {
             .collect()
     }
 
-    pub fn execute(&mut self) -> Vec<RenamedFile> {
+    pub fn preview_conflicts(&self) -> Vec<RenameConflict> {
+        let previews = self.preview();
+        let mut counts: Vec<(String, Vec<String>)> = Vec::new();
+
+        for p in previews {
+            if let Some(entry) = counts.iter_mut().find(|(target, _)| target == &p.renamed) {
+                entry.1.push(p.original);
+            } else {
+                counts.push((p.renamed, vec![p.original]));
+            }
+        }
+
+        counts
+            .into_iter()
+            .filter(|(_target, sources)| sources.len() > 1)
+            .map(|(target, sources)| RenameConflict {
+                target,
+                conflicting_sources: sources,
+            })
+            .collect()
+    }
+
+    pub fn execute(&mut self) -> Result<Vec<RenamedFile>, &'static str> {
+        let conflicts = self.preview_conflicts();
+        if !conflicts.is_empty() {
+            return Err("Naming conflict detected: multiple files resolve to the same target name");
+        }
+
         let renamed = self.preview();
+        self.undo_stack.push(renamed.clone());
         self.files = renamed.iter().map(|r| r.renamed.clone()).collect();
-        renamed
+        Ok(renamed)
+    }
+
+    pub fn undo(&mut self) -> Result<Vec<RenamedFile>, &'static str> {
+        let last_tx = self
+            .undo_stack
+            .pop()
+            .ok_or("No rename operations to undo")?;
+        self.files = last_tx.iter().map(|r| r.original.clone()).collect();
+        Ok(last_tx)
     }
 }
 
@@ -583,19 +740,88 @@ pub struct RenamedFile {
 
 fn apply_rule(rule: &RenameRule, input: &str, seq: u32) -> String {
     match rule {
-        RenameRule::FindReplace { find, replace } => {
-            input.replace(find.as_str(), replace.as_str())
-        }
+        RenameRule::FindReplace { find, replace } => input.replace(find.as_str(), replace.as_str()),
         RenameRule::Prepend { prefix } => format!("{}{}", prefix, input),
         RenameRule::Append { suffix } => format!("{}{}", input, suffix),
         RenameRule::LowerCase => input.to_lowercase(),
         RenameRule::UpperCase => input.to_uppercase(),
+        RenameRule::TitleCase => to_title_case(input),
         RenameRule::TrimWhitespace => input.trim().to_string(),
-        RenameRule::Sequence { start, step } => {
+        RenameRule::Sequence { start, step, width } => {
             let n = start + seq * step;
-            format!("{}{}", input, n)
+            let n_str = format!("{}", n);
+            if n_str.len() < *width {
+                let padding = "0".repeat(*width - n_str.len());
+                format!("{}{}{}", input, padding, n_str)
+            } else {
+                format!("{}{}", input, n_str)
+            }
+        }
+        RenameRule::ChangeExtension { new_ext } => {
+            if let Some(pos) = input.rfind('.') {
+                format!("{}.{}", &input[..pos], new_ext.trim_start_matches('.'))
+            } else {
+                format!("{}.{}", input, new_ext.trim_start_matches('.'))
+            }
+        }
+        RenameRule::InsertAt { text, position } => {
+            if *position >= input.len() {
+                format!("{}{}", input, text)
+            } else {
+                format!("{}{}{}", &input[..*position], text, &input[*position..])
+            }
+        }
+        RenameRule::RemoveCharacters { count, position } => {
+            if *position >= input.len() {
+                input.to_string()
+            } else {
+                let end = (*position + *count).min(input.len());
+                format!("{}{}", &input[..*position], &input[end..])
+            }
+        }
+        RenameRule::SanitizeFilename => {
+            let mut s = String::new();
+            for c in input.chars() {
+                if c.is_alphanumeric() || c == '.' || c == '-' || c == '_' {
+                    s.push(c);
+                } else if c.is_whitespace() {
+                    s.push('_');
+                }
+            }
+            s
+        }
+        RenameRule::RegexReplace { pattern, replace } => {
+            // Safe fallback substring match for no_std regex parity
+            if input.contains(pattern.as_str()) {
+                input.replace(pattern.as_str(), replace.as_str())
+            } else {
+                input.to_string()
+            }
         }
     }
+}
+
+fn to_title_case(s: &str) -> String {
+    let mut result = String::new();
+    let mut capitalize_next = true;
+
+    for c in s.chars() {
+        if c.is_whitespace() || c == '_' || c == '-' || c == '.' {
+            result.push(c);
+            capitalize_next = true;
+        } else if capitalize_next {
+            for uc in c.to_uppercase() {
+                result.push(uc);
+            }
+            capitalize_next = false;
+        } else {
+            for lc in c.to_lowercase() {
+                result.push(lc);
+            }
+        }
+    }
+
+    result
 }
 
 impl Default for BulkyRenamer {
@@ -700,10 +926,26 @@ pub struct MintWelcomeFlow {
 impl MintWelcomeFlow {
     pub fn new() -> Self {
         let steps = vec![
-            WelcomeStep { id: "update".into(), title: "Install system updates".into(), done: false },
-            WelcomeStep { id: "drivers".into(), title: "Enable driver manager".into(), done: false },
-            WelcomeStep { id: "codecs".into(), title: "Install media codecs".into(), done: false },
-            WelcomeStep { id: "backup".into(), title: "Configure automatic backups".into(), done: false },
+            WelcomeStep {
+                id: "update".into(),
+                title: "Install system updates".into(),
+                done: false,
+            },
+            WelcomeStep {
+                id: "drivers".into(),
+                title: "Enable driver manager".into(),
+                done: false,
+            },
+            WelcomeStep {
+                id: "codecs".into(),
+                title: "Install media codecs".into(),
+                done: false,
+            },
+            WelcomeStep {
+                id: "backup".into(),
+                title: "Configure automatic backups".into(),
+                done: false,
+            },
         ];
         Self {
             steps,
@@ -827,7 +1069,11 @@ impl MintStickFormatter {
         Ok(())
     }
 
-    pub fn restore_from_iso(&mut self, device: &UsbDevice, iso_size_mb: u64) -> Result<(), &'static str> {
+    pub fn restore_from_iso(
+        &mut self,
+        device: &UsbDevice,
+        iso_size_mb: u64,
+    ) -> Result<(), &'static str> {
         if iso_size_mb > device.size_mb {
             return Err("ISO larger than device");
         }
@@ -1008,13 +1254,85 @@ mod tests {
     }
 
     #[test]
+    fn bulky_advanced_renaming_rules_and_undo() {
+        let mut b = BulkyRenamer::new();
+        b.add_file("document_one.txt");
+        b.add_file("document_two.txt");
+
+        b.add_rule(RenameRule::TitleCase);
+        b.add_rule(RenameRule::ChangeExtension {
+            new_ext: "doc".to_string(),
+        });
+        b.add_rule(RenameRule::Sequence {
+            start: 1,
+            step: 1,
+            width: 2,
+        });
+
+        let previews = b.preview();
+        assert_eq!(previews[0].renamed, "Document_One.doc01");
+        assert_eq!(previews[1].renamed, "Document_Two.doc02");
+
+        assert!(b.execute().is_ok());
+        assert_eq!(b.files[0], "Document_One.doc01");
+
+        assert!(b.undo().is_ok());
+        assert_eq!(b.files[0], "document_one.txt");
+    }
+
+    #[test]
+    fn bulky_conflict_detection() {
+        let mut b = BulkyRenamer::new();
+        b.add_file("file1.txt");
+        b.add_file("file2.txt");
+
+        b.add_rule(RenameRule::FindReplace {
+            find: "2".to_string(),
+            replace: "1".to_string(),
+        });
+
+        let conflicts = b.preview_conflicts();
+        assert_eq!(conflicts.len(), 1);
+        assert_eq!(conflicts[0].target, "file1.txt");
+        assert!(b.execute().is_err());
+    }
+
+    #[test]
     fn nanny_allowlist_wins_over_blocklist() {
         let mut n = MintNannyFilter::new();
         n.block("adult.example");
         n.block("blocked.example");
         n.allow("docs.example");
-        assert_eq!(n.evaluate("https://media.adult.example/x"), NannyDecision::Block);
-        assert_eq!(n.evaluate("https://docs.example/guide"), NannyDecision::Allow);
+        assert_eq!(
+            n.evaluate("https://media.adult.example/x"),
+            NannyDecision::Block
+        );
+        assert_eq!(
+            n.evaluate("https://docs.example/guide"),
+            NannyDecision::Allow
+        );
         assert_eq!(n.evaluate("https://other.example/"), NannyDecision::Allow);
+    }
+
+    #[test]
+    fn test_mint_upgrade_engine() {
+        let mut engine = MintUpgradeEngine::new("20.3", "21.0");
+        assert_eq!(engine.current_phase, MintUpgradePhase::Idle);
+
+        // Preflight check fails with insufficient disk space
+        assert!(engine.run_preflight_checks(10).is_err());
+        assert!(!engine.preflight_passed);
+
+        // Preflight check passes
+        assert!(engine.run_preflight_checks(20).is_ok());
+        assert!(engine.preflight_passed);
+
+        // Switch repos and execute upgrade
+        assert!(engine.switch_repositories().is_ok());
+        assert_eq!(engine.current_phase, MintUpgradePhase::RepoSwitch);
+
+        assert!(engine.execute_upgrade().is_ok());
+        assert_eq!(engine.current_phase, MintUpgradePhase::Complete);
+        assert_eq!(engine.current_version, "21.0");
     }
 }

@@ -71,12 +71,7 @@ impl SmartSymlink {
     /// Resolves `$TOKEN` style environment variables embedded in a path using the
     /// internal context map. The `user` and `lang` parameters render the
     /// `{user}` and `{lang}` placeholders inside the mapped templates.
-    pub fn expand_environment_context(
-        &self,
-        path: &str,
-        user: &str,
-        lang: &str,
-    ) -> String {
+    pub fn expand_environment_context(&self, path: &str, user: &str, lang: &str) -> String {
         if let Some(dollar) = path.find('$') {
             let rest = &path[dollar + 1..];
             let end = rest
@@ -190,7 +185,8 @@ impl SmartSymlink {
             *depth
         };
 
-        let result = self.resolve_internal(persona.clone(), primary_exists, fallback_existence, rule);
+        let result =
+            self.resolve_internal(persona.clone(), primary_exists, fallback_existence, rule);
 
         match result {
             Ok(target) => {

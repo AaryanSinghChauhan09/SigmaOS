@@ -16,8 +16,8 @@ use sigmaos::compatibility::{
     ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
     SyscallAbi, TribeInstaller, TtsSynthesizer, UnifiedAppStore, WorkloadOptimizer,
     WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
+    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 use sigmaos::drivers::{
     Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
@@ -26,7 +26,7 @@ use sigmaos::drivers::{
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand,     SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
     UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_UFW_RULE,
 };
 use sigmaos::package::{
@@ -42,13 +42,12 @@ use sigmaos::performance::{
 };
 use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
+use sigmaos::security::parrot::SandboxPolicy;
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
-    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
+    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, GLOBAL_ANONSURF,
+    GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
-use sigmaos::security::parrot::SandboxPolicy;
 
 use sigmaos::kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
@@ -66,7 +65,153 @@ mod tests {
 
     #[test]
     fn test_system_integration() {
-        assert!(true);
+        // Linux-conforming Hard Link reference counting
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        vfs.create_hard_link(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+
+        vfs.delete_file(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.get_inode(inode_id).is_none()); // fully freed
+
+        // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
+        let log_file = SimpleLogFile::new(10, b"/var/log/cron")
+            .with_syslog(LogSeverity::Warn, LogFacility::Cron);
+        assert_eq!(log_file.severity, LogSeverity::Warn);
+        assert_eq!(log_file.facility, LogFacility::Cron);
+
+        let mut log_rotator = SimpleLogRotator::new();
+        log_rotator.shift_backup_generations("cron", 3);
+        assert_eq!(log_rotator.active_generations.as_slice()[0], "cron.1.gz");
+
+        let compressor = SimpleLogCompressor::new();
+        let raw_log = b"DEBUG INFO DEBUG DEBUG DEBUG";
+        let compressed = compressor.compress(raw_log).unwrap();
+        let decompressed = compressor.decompress(compressed.as_slice()).unwrap();
+        assert_eq!(decompressed.as_slice(), raw_log);
+
+        // 4. 12 World-Class Desktop Utility Engines Parity
+        let mut everything = EverythingSearchEngine::new();
+        everything.index_file("/usr/bin/obs", 409600, false);
+        assert_eq!(everything.query_files("obs")[0].path, "/usr/bin/obs");
+
+        let mut npp = NotepadPlusPlusBuffer::new();
+        npp.open_file("readme.md", "Task: Setup CCleaner");
+        npp.find_and_replace("Task", "Todo");
+        assert_eq!(npp.tabs[0].content, "Todo: Setup CCleaner");
+
+        let mut browser = SovereignBrowserEngine::new();
+        assert!(!browser.navigate_url("telemetry.analytics.com/push"));
+
+        let lzma_archiver = SevenZipEngine::new(CompressionMethod::Lzma);
+        let volumes = lzma_archiver.create_archive(b"RUST_COMPILER_SOURCES", "rust");
+        assert_eq!(volumes[0].name, "rust.001");
+
+        let mut flameshot = FlameshotAnnotator::new(1920, 1080);
+        flameshot.draw_annotation(
+            AnnotationShape::Arrow,
+            10,
+            10,
+            50,
+            50,
+            ColorRgba::new(0, 0, 255, 255),
+        );
+
+        let mut obs = ObsStudioMixer::new("Scene A");
+        obs.add_video_source("Display", 1.0, false);
+
+        let mut audacity = AudacityWaveEditor::new(48000, 2);
+        audacity.audio_samples = vec![0.1, -0.2, 0.005, 0.9];
+        audacity.apply_noise_gate(-20.0, 0.05); // Gate low signals
+
+        let mut vlc = VlcCodecPipeline::new();
+        vlc.volume_multiplier = 2.0; // 200% boost
+        assert_eq!(vlc.apply_vlc_audio_boost(0.4), 0.8);
+
+        let mut davinci = DaVinciTimeline::new();
+        davinci.add_clip("v1.mp4", 0, 100);
+
+        let onecommander = OneCommanderFileGrid::new();
+        assert_eq!(onecommander.get_metadata_age_tag(0), ItemAgeColor::HotNew);
+
+        let mut eartrumpet = EarTrumpetVolumeMatrix::new();
+        eartrumpet.set_app_volume("firefox", 0.7);
+        let peak = eartrumpet.query_peak_amplitude("firefox");
+        assert!((peak - 0.665).abs() < 1e-5);
+
+        let mut irfan = IrfanViewEngine::new();
+        assert_eq!(
+            irfan.batch_format_convert(&["img1.png", "img2.png"], "BMP"),
+            2
+        );
+
+        // 5. Zorin OS, antiX, and EndeavourOS Parity Features
+        let mut zorin_app = ZorinAppearanceSwitcher::new();
+        zorin_app.switch_layout_preset(ZorinLayoutPreset::MacOsLike);
+        assert_eq!(zorin_app.panel_height_pixels, 64);
+
+        let mut zorin_conn = ZorinConnectHub::new();
+        zorin_conn.pair_new_device("tab-12", "Sovereign Tablet");
+        assert_eq!(
+            zorin_conn.push_notification_to_all_devices("Test", "Zorin connect alert"),
+            1
+        );
+
+        let mut wine = ZorinWineLayer::new("~/.wine");
+        assert!(wine.launch_windows_executable("game.exe").is_ok());
+
+        let mut zorin_lite = ZorinLiteOptimizer::new();
+        zorin_lite.enable_zorin_lite_profile(true);
+        assert_eq!(zorin_lite.compositor_blur_radius, 0);
+
+        let mut antix_init = SigmaEcosystemInit::new();
+        antix_init.sequence_runlevel_transition(FhsRunlevel::Graphical);
+        assert_eq!(antix_init.active_runlevel, FhsRunlevel::Graphical);
+
+        let mut antix_prof = SigmaEcosystemProfiler::new();
+        antix_prof.apply_legacy_preset_rules(128); // 128MB RAM JWM preset
+        assert_eq!(antix_prof.graphic_preset, GraphicPresetMode::JwmPreset);
+
+        let mut eos_welcome = SigmaOnboardingWelcome::new();
+        let mut latencies = BTreeMap::new();
+        latencies.insert("https://mirror.org/repo".to_string(), 10);
+        eos_welcome.rank_package_mirrors(latencies);
+        assert_eq!(eos_welcome.mirrors_ranked[0], "https://mirror.org/repo");
+
+        let eos_log = SigmaOnboardingLog::new();
+        let censored = eos_log.sanitize_system_log("secret_key=999999");
+        assert!(censored.contains("secret_key= [REDACTED_FOR_SECURITY_COMPLIANCE]"));
+
+        // 6. Aegisub / Subtitle Edit Timing and Styling Parity
+        let mut subtitle_sync = SigmaSupportSubtitleSync::new();
+        let body = subtitle_sync.parse_ass_styling_tags("{\\fnImpact\\fs32}Styled Subtitle");
+        assert_eq!(body, "Styled Subtitle");
+        assert_eq!(subtitle_sync.font_name, "Impact");
+        assert_eq!(subtitle_sync.font_size, 32);
+
+        let mut subtitle_edit = SigmaSupportSubtitleEdit::new(gap_closure::SubtitleFormat::Ass);
+        subtitle_edit.insert_subtitle_entry(500, 1500, "Caption A");
+        subtitle_edit.shift_all_timings_ms(100);
+        assert_eq!(subtitle_edit.entries[0].start_ms, 600);
+        assert_eq!(subtitle_edit.entries[0].end_ms, 1600);
+
+        // 7. Glary Utilities / Advanced SystemCare RAM and CPU Compaction Parity
+        let mut resource_opt = SigmaSupportResourceOptimizer::new();
+        resource_opt.register_page_block(99, true, 4096);
+        let compacted = resource_opt.execute_ram_defragmentation();
+        assert_eq!(compacted, 1);
+        assert_eq!(resource_opt.total_defragmentations_completed, 1);
+
+        let mut priority_opt = SigmaSupportPriorityOptimizer::new();
+        priority_opt.register_running_process(1, "system_init", 0);
+        priority_opt.running_processes[0].current_cpu_usage = 0.90;
+        let reniced = priority_opt.optimize_cpu_priorities(1);
+        assert_eq!(reniced, 0); // No other processes to renice
     }
 
     #[test]
@@ -228,13 +373,8 @@ mod tests {
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning
-        let res3 = link1.resolve_symlink(
-            KernelPersona::Linux6X,
-            false,
-            &[false, false],
-            &rule,
-            None,
-        );
+        let res3 =
+            link1.resolve_symlink(KernelPersona::Linux6X, false, &[false, false], &rule, None);
         assert!(res3.is_err());
 
         // Case 4: ELOOP infinite recursion detection (nested lookup chains)

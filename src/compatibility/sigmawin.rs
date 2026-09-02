@@ -1,8 +1,8 @@
 extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 // SigmaOS Sovereign Win32 Compatibility Subsystem (SigmaWin)
 // Implementing complete Windows 11 Gap Closure & PE Loading / Registry / USER32/GDI32 Emulation
 // Enhanced with standard NT Kernel object management and advanced PE Section parsing.

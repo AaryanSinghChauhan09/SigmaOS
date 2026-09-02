@@ -1,3 +1,7 @@
+//! SigmaOS CPU Feature Detection and Optimization
+//! Implements Gentoo-like compiler-assisted target optimizations
+//! Zero-dependency CPU capability detection for bare-metal
+
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -8,11 +12,7 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
-use alloc::vec::Vec;
 
-// SigmaOS CPU Feature Detection and Optimization
-// Implements Gentoo-like compiler-assisted target optimizations
-// Zero-dependency CPU capability detection for bare-metal
 extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -223,11 +223,8 @@ static mut GLOBAL_CPU_OPTIMIZER: Option<SovereignCompilerOptimizer> = None;
 /// Initialize global CPU optimizer
 pub fn init_cpu_optimizer() {
     unsafe {
-        // Use addr_of_mut! so we never form a shared/mutable reference to the
-        // mutable static itself (which is UB under the static_mut_refs lint).
-        let slot = core::ptr::addr_of_mut!(GLOBAL_CPU_OPTIMIZER);
-        *slot = Some(SovereignCompilerOptimizer::new());
-        if let Some(optimizer) = &mut *slot {
+        GLOBAL_CPU_OPTIMIZER = Some(SovereignCompilerOptimizer::new());
+        if let Some(ref mut optimizer) = GLOBAL_CPU_OPTIMIZER {
             optimizer.detect_processor_extensions();
         }
     }
@@ -236,12 +233,7 @@ pub fn init_cpu_optimizer() {
 /// Get global CPU optimizer reference
 pub fn get_cpu_optimizer() -> &'static SovereignCompilerOptimizer {
     unsafe {
-        // Read through addr_of! (raw pointer) rather than as_ref(), which would
-        // hand out a reference to the mutable static.
-        match *core::ptr::addr_of!(GLOBAL_CPU_OPTIMIZER) {
-            Some(ref optimizer) => optimizer,
-            None => panic!("CPU optimizer not initialized"),
-        }
+        GLOBAL_CPU_OPTIMIZER.as_ref().expect("CPU optimizer not initialized")
     }
 }
 
@@ -736,6 +728,7 @@ impl Default for SovereignXcr0State {
 #[cfg(test)]
 mod tests {
     use super::*;
+    extern crate alloc;
     use alloc::vec;
 
     #[test]

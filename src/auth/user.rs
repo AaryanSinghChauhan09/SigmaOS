@@ -1,19 +1,22 @@
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
+use core::mem;
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type UserID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UserState { Active = 0, Inactive = 1, Locked = 2 }
+pub enum UserState {
+    Active = 0,
+    Inactive = 1,
+    Locked = 2,
+}
 
 pub trait User {
     fn id(&self) -> UserID;
@@ -24,7 +27,11 @@ pub trait User {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum AuthError { Success = 0, InvalidCredentials = 1, AccountLocked = 2 }
+pub enum AuthError {
+    Success = 0,
+    InvalidCredentials = 1,
+    AccountLocked = 2,
+}
 
 #[repr(C)]
 pub struct SimpleUser {
@@ -43,7 +50,11 @@ impl SimpleUser {
         let hash_len = password_hash.len().min(63);
         unsafe {
             core::ptr::copy_nonoverlapping(username.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(password_hash.as_ptr(), hash_array.as_mut_ptr(), hash_len);
+            core::ptr::copy_nonoverlapping(
+                password_hash.as_ptr(),
+                hash_array.as_mut_ptr(),
+                hash_len,
+            );
         }
         SimpleUser {
             id,
@@ -56,7 +67,9 @@ impl SimpleUser {
 }
 
 impl User for SimpleUser {
-    fn id(&self) -> UserID { self.id }
+    fn id(&self) -> UserID {
+        self.id
+    }
     fn username(&self) -> &[u8] {
         // Fast O(1) constant-time slice retrieval using cached username length
         &self.username[..self.username_len as usize]
@@ -70,7 +83,9 @@ impl User for SimpleUser {
         }
     }
     fn authenticate(&mut self, _password: &[u8]) -> Result<bool, AuthError> {
-        if self.state() == UserState::Locked { return Err(AuthError::AccountLocked); }
+        if self.state() == UserState::Locked {
+            return Err(AuthError::AccountLocked);
+        }
         Ok(true)
     }
 }
@@ -87,7 +102,12 @@ pub struct SimpleAuthService {
 }
 
 impl SimpleAuthService {
-    pub fn new() -> Self { SimpleAuthService { users: SovereignVec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleAuthService {
+            users: SovereignVec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl AuthService for SimpleAuthService {
@@ -101,7 +121,9 @@ impl AuthService for SimpleAuthService {
             unsafe {
                 let user_option = &mut *self.users.data.add(i);
                 if let Some(ref mut user) = *user_option {
-                    if user.username() == username { return user.authenticate(password); }
+                    if user.username() == username {
+                        return user.authenticate(password);
+                    }
                 }
             }
         }
@@ -112,7 +134,9 @@ impl AuthService for SimpleAuthService {
             unsafe {
                 let user_option = &*self.users.data.add(i);
                 if let Some(ref user) = *user_option {
-                    if user.id() == id { return Some(user.as_ref()); }
+                    if user.id() == id {
+                        return Some(user.as_ref());
+                    }
                 }
             }
         }
@@ -161,7 +185,10 @@ impl SovereignSingleUserEngine {
     }
 
     /// sulogin-style emergency maintenance login
-    pub fn execute_emergency_login(&mut self, password_input: &[u8]) -> Result<&'static str, &'static str> {
+    pub fn execute_emergency_login(
+        &mut self,
+        password_input: &[u8],
+    ) -> Result<&'static str, &'static str> {
         // Simple hash check
         let mut matches = true;
         for (i, &b) in password_input.iter().enumerate() {
@@ -181,7 +208,10 @@ impl SovereignSingleUserEngine {
     }
 
     /// Remounts the root filesystem as read-write after successful validation (fsck)
-    pub fn remount_root_read_write(&mut self, is_fsck_passed: bool) -> Result<&'static str, &'static str> {
+    pub fn remount_root_read_write(
+        &mut self,
+        is_fsck_passed: bool,
+    ) -> Result<&'static str, &'static str> {
         if self.maintenance_state != MaintenanceState::EmergencyShellActive {
             return Err("Remount denied: Emergency maintenance session not active or verified.");
         }
@@ -204,13 +234,25 @@ impl Default for SovereignSingleUserEngine {
     }
 }
 
-struct SovereignVec<T> { data: *mut T, len: usize, capacity: usize }
+struct SovereignVec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> SovereignVec<T> {
-    fn new() -> Self { SovereignVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        SovereignVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -218,18 +260,29 @@ impl<T> SovereignVec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -274,7 +327,10 @@ mod tests {
         // Attempt login with correct password
         let pass_res = engine.execute_emergency_login(root_hash);
         assert!(pass_res.is_ok());
-        assert_eq!(engine.maintenance_state, MaintenanceState::EmergencyShellActive);
+        assert_eq!(
+            engine.maintenance_state,
+            MaintenanceState::EmergencyShellActive
+        );
     }
 
     #[test]

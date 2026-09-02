@@ -1,6 +1,6 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaOS Open Computer Integration
 // Purpose-built, highly isolated, DOM/A11y-based agent microkernel environments.
 // Absorbs, merges, and enhances all features from Mintplex-Labs/anything-llm/open-computer.

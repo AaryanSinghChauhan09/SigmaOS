@@ -16,11 +16,11 @@ pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
 
-pub use media::{AudioChannel, GLOBAL_MEDIA_ENGINE, SigmaMediaEngine};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
+pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,
@@ -29,7 +29,7 @@ pub use sovereign_apps::{
 pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
 
 pub use mint_competitor::{
-    CinnamonApplet, CinnamonAppletEngine, NvidiaPowerState, NvidiaPrimeApplet,
-    NvidiaPrimeProfile, NvidiaPrimeTelemetry, OffloadCommand, SovereignDriverManager,
-    SovereignNvidiaPrimeEngine, SovereignSoftwareStore, SovereignUpdateManager,
+    CinnamonApplet, CinnamonAppletEngine, NvidiaPowerState, NvidiaPrimeApplet, NvidiaPrimeProfile,
+    NvidiaPrimeTelemetry, OffloadCommand, SovereignDriverManager, SovereignNvidiaPrimeEngine,
+    SovereignSoftwareStore, SovereignUpdateManager,
 };

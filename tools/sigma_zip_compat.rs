@@ -15,6 +15,7 @@ type SigmaU64 = u64;
 
 /// Zip entry
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct ZipEntry {
     pub name: [u8; 256],
     pub compressed_size: SigmaU64,
@@ -146,7 +147,7 @@ pub unsafe extern "C" fn zip_list(
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Add file to zip
