@@ -1,11 +1,29 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, and **System Manual Pages (`docs/man/`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, and **System Manual Pages (`docs/man/`)**.
 
 ---
 
-## 1. Multi-OS Distro Inspired System Manual Page Guidelines (`docs/man/`)
+## 1. Master Multi-OS Parity Execution Guidelines for Missing Capabilities
+
+Developers implementing missing Linux & BSD capabilities in SigmaOS must follow these architecture guidelines:
+
+### A. Linux `sched_ext` Extensible BPF Schedulers
+- **Guideline**: Allow dynamic, pluggable BPF scheduling policies without kernel rebuilds.
+- **Implementation**: Hook BPF scheduler policies into `PolicyAdaptiveEventScheduler` (`src/distro/sovereign_system_innovations.rs`).
+
+### B. FreeBSD Capsicum & Casper Capabilities
+- **Guideline**: Transition processes into capability mode where raw ambient syscall access is denied and only capability file descriptors are permitted.
+- **Implementation**: Wrap system operations in `CapsicumSandbox` capabilities inside `src/security/`.
+
+### C. Void/Gentoo Process Supervision & OpenRC
+- **Guideline**: Run lightweight, fast process supervisors maintaining process dependency graphs and automatic daemon restart.
+- **Implementation**: Integrate a zero-dependency process supervisor in `src/process/`.
+
+---
+
+## 2. Multi-OS Distro Inspired System Manual Page Guidelines (`docs/man/`)
 
 To evolve system manual pages in `docs/man/` into clear, machine-readable reference guides, documentation maintainers must follow these guidelines:
 
@@ -23,7 +41,7 @@ To evolve system manual pages in `docs/man/` into clear, machine-readable refere
 
 ---
 
-## 2. Multi-OS Distro Inspired ASP / ABS Build Tree Guidelines (`src/sigpkg/arch_pacman_engine.rs`)
+## 3. Multi-OS Distro Inspired ASP / ABS Build Tree Guidelines (`src/sigpkg/arch_pacman_engine.rs`)
 
 To evolve `ArchBuildSystem` in `src/sigpkg/arch_pacman_engine.rs` into a high-performance source checkout and package build framework, maintainers must follow these guidelines:
 
@@ -45,7 +63,7 @@ To evolve `ArchBuildSystem` in `src/sigpkg/arch_pacman_engine.rs` into a high-pe
 
 ---
 
-## 3. Multi-OS Distro Inspired Package Repository Infrastructure Guidelines
+## 4. Multi-OS Distro Inspired Package Repository Infrastructure Guidelines
 
 To evolve `registry_config.json` and `src/sigpkg/repository_manager.rs` into a global, zero-trust distribution network, repository maintainers must follow these guidelines:
 
@@ -67,7 +85,7 @@ To evolve `registry_config.json` and `src/sigpkg/repository_manager.rs` into a g
 
 ---
 
-## 4. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
+## 5. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
 
 To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, responsive, zero-jank web interface, front-end maintainers must adhere to the following guidelines:
 
@@ -89,7 +107,7 @@ To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, 
 
 ---
 
-## 5. Multi-OS Distro Inspired Installer Architecture Guidelines
+## 6. Multi-OS Distro Inspired Installer Architecture Guidelines
 
 To evolve `installer/sigma-installer.rs` into a high-reliability installer engine, developers must follow these architectural guidelines:
 
@@ -111,7 +129,7 @@ To evolve `installer/sigma-installer.rs` into a high-reliability installer engin
 
 ---
 
-## 6. Multi-OS Distro Inspired AUR Architecture Guidelines
+## 7. Multi-OS Distro Inspired AUR Architecture Guidelines
 
 To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign package ecosystem, maintainers must adhere to the following architectural guidelines:
 
@@ -137,7 +155,7 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 7. General Engineering & Quality Guidelines
+## 8. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -150,14 +168,15 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 8. Recommended Phased Implementation Sequence
+## 9. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
-3. **Phase 3: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
-4. **Phase 4: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
-5. **Phase 5: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
-6. **Phase 6: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
-7. **Phase 7: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
-8. **Phase 8: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
-9. **Phase 9: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
+3. **Phase 3: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
+4. **Phase 4: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
+5. **Phase 5: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
+6. **Phase 6: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
+7. **Phase 7: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
+8. **Phase 8: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
+9. **Phase 9: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
+10. **Phase 10: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.

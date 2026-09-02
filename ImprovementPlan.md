@@ -1,7 +1,22 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, **Package Repository Infrastructure**, and **System Manual Pages (man pages)**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+This document outlines the master technical improvement plan, architectural audit findings, compliance matrix, multi-OS Linux & BSD distro inspiration guidelines for **AUR**, **ASP / Arch Build System**, the **Installer**, the **Web UI**, **Package Repository Infrastructure**, **System Manual Pages**, and **Comprehensive Missing Features Parity Roadmap**, and recommended next steps for **SigmaOS** across all 8 major system dimensions and tri-agent domain areas (**Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**).
+
+---
+
+## Master Missing Features & Distro Parity Roadmap
+
+To achieve absolute technical supremacy over traditional Linux and BSD operating systems, SigmaOS incorporates the following missing subsystem capabilities into its core architecture:
+
+| Subsystem Domain | Missing Feature / Capability | Inspiration Source | SigmaOS Target Implementation |
+|------------------|------------------------------|--------------------|-------------------------------|
+| **Kernel Scheduler** | `sched_ext` BPF extensible scheduler hooks | Linux 6.12+ | Plug-and-play eBPF userland CPU scheduler policies (`PolicyAdaptiveEventScheduler`). |
+| **Userland Sandboxing** | Capsicum capability-mode & Casper daemon | FreeBSD | Fine-grained file descriptor sandbox isolation (`src/security/libgksu.rs`). |
+| **System Supervision** | `runit` parallel process supervision & OpenRC | Void / Gentoo | Supervision tree daemon managing process lifecycles with minimal memory overhead. |
+| **Userland Runtime** | NetBSD Rump Kernels (Userland drivers) | NetBSD | Run network and storage drivers safely in userland microkernel processes. |
+| **Declarative Profile** | NixOS immutable profile generation | NixOS | Atomic system-wide declarative configuration profiles with zero-downtime switching. |
+| **System Recovery** | ZFS/Btrfs Boot Environment Manager (`bectl`) | FreeBSD / Linux Mint | Instant pre-update snapshot rollbacks integrated into GRUB/systemd-boot menus. |
 
 ---
 
