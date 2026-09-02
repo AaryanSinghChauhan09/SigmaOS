@@ -207,6 +207,91 @@ impl Default for ClearLinuxStatelessOverlayEngine {
     }
 }
 
+/// Growth Domain Architecture Item
+#[derive(Debug, Clone)]
+pub struct GrowthDomainItem {
+    pub domain: String,
+    pub inspiration: String,
+    pub sigmaos_gap: String,
+    pub implementation_idea: String,
+}
+
+/// Growth Domain Synthesis & Architecture Engine
+#[derive(Debug, Default)]
+pub struct SigmaosGrowthArchitectureEngine {
+    pub items: Vec<GrowthDomainItem>,
+}
+
+impl SigmaosGrowthArchitectureEngine {
+    pub fn new() -> Self {
+        let items = vec![
+            GrowthDomainItem {
+                domain: "Package Management".to_string(),
+                inspiration: "Arch pacman, Nix reproducibility, BSD Ports".to_string(),
+                sigmaos_gap: "Limited modular workflows".to_string(),
+                implementation_idea: "Hybrid transactional + rolling manager".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Init & Service Control".to_string(),
+                inspiration: "systemd, OpenRC, BSD rc.d".to_string(),
+                sigmaos_gap: "No unified orchestration".to_string(),
+                implementation_idea: "YAML-based adaptive init overlays".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Filesystem".to_string(),
+                inspiration: "ZFS (BSD), Btrfs (Linux)".to_string(),
+                sigmaos_gap: "No advanced FS".to_string(),
+                implementation_idea: "Snapshotting, deduplication, rollback layers".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Security".to_string(),
+                inspiration: "SELinux, AppArmor, Capsicum".to_string(),
+                sigmaos_gap: "Compliance noted, but no MAC".to_string(),
+                implementation_idea: "Modular security profiles + sandboxing".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Networking".to_string(),
+                inspiration: "BSD PF firewall, Linux nftables".to_string(),
+                sigmaos_gap: "Basic networking only".to_string(),
+                implementation_idea: "Unified firewall + VPN orchestration".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Virtualization".to_string(),
+                inspiration: "KVM/QEMU, bhyve".to_string(),
+                sigmaos_gap: "No hypervisor integration".to_string(),
+                implementation_idea: "Native container + VM orchestration".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Desktop/UX".to_string(),
+                inspiration: "GNOME/KDE modularity, Xfce".to_string(),
+                sigmaos_gap: "UI experiments incomplete".to_string(),
+                implementation_idea: "Adaptive overlays + tiling WM".to_string(),
+            },
+            GrowthDomainItem {
+                domain: "Documentation".to_string(),
+                inspiration: "Arch Wiki, FreeBSD Handbook".to_string(),
+                sigmaos_gap: "Sparse .md files".to_string(),
+                implementation_idea: "Publisher-grade handbook expansion".to_string(),
+            },
+        ];
+
+        Self { items }
+    }
+
+    pub fn generate_synthesis_report(&self) -> String {
+        let mut report = String::from("# SigmaOS Growth Architecture Synthesis\n\n");
+        report.push_str("| Domain | Linux/BSD Inspiration | SigmaOS Gap | Implementation Idea |\n");
+        report.push_str("|---|---|---|---|\n");
+        for item in &self.items {
+            report.push_str(&format!(
+                "| {} | {} | {} | {} |\n",
+                item.domain, item.inspiration, item.sigmaos_gap, item.implementation_idea
+            ));
+        }
+        report
+    }
+}
+
 /// Alpine / Void Transactional Trigger Hook Engine
 pub struct AlpineVoidTriggerHookManager {
     pub registered_triggers: Vec<(String, String)>, // (pattern, hook_cmd)
@@ -573,6 +658,17 @@ mod expanded_wiki_tests {
         let bsd_wiki = DistroWikiPageDocumentationGenerator::generate_bsd_security_hardening_wiki();
         assert!(bsd_wiki.contains("OpenBSD"));
         assert!(bsd_wiki.contains("FreeBSD"));
+    }
+
+    #[test]
+    fn test_growth_architecture_engine() {
+        let engine = SigmaosGrowthArchitectureEngine::new();
+        assert_eq!(engine.items.len(), 8);
+
+        let report = engine.generate_synthesis_report();
+        assert!(report.contains("# SigmaOS Growth Architecture Synthesis"));
+        assert!(report.contains("Package Management"));
+        assert!(report.contains("Init & Service Control"));
     }
 
     #[test]
