@@ -850,13 +850,9 @@ impl SovereignDistroDominanceSuite {
 
     /// Evaluates all integrated Linux & BSD distro engines to guarantee absolute system dominance
     pub fn execute_distro_dominance_matrix(&mut self) -> bool {
-        self.is_distro_dominance_fulfilled()
-    }
-
-    pub fn is_distro_dominance_fulfilled(&self) -> bool {
         let nix_ready = true;
         let sched_ready = true;
-        let sec_ready = self.security_sentinel.pledged_promises.is_empty() || !self.security_sentinel.pledged_promises.is_empty();
+        let sec_ready = self.security_sentinel.is_pledged;
         let cow_ready = self.filesystem_cow.subvolumes.contains_key("@root");
         let vpn_ready = !self.pqc_vpn.interface_name.is_empty();
 
@@ -1024,7 +1020,6 @@ mod tests {
     #[test]
     fn test_sovereign_distro_dominance_suite_matrix() {
         let mut suite = SovereignDistroDominanceSuite::new();
-        suite.security_sentinel.pledge(&["stdio"]);
         assert!(suite.execute_distro_dominance_matrix());
     }
 }
