@@ -3,7 +3,6 @@ SigmaOS Core Unit Test Suite
 Validates individual system modules: File I/O, Process Scheduling, and Memory Management.
 """
 
-import pytest
 import time
 import math
 
@@ -142,8 +141,11 @@ def test_file_io_operations():
 
     assert vfs.delete_file(filename) is True
     assert vfs.delete_file(filename) is False
-    with pytest.raises(FileNotFoundError):
+    try:
         vfs.read_file(filename)
+        assert False, "Expected FileNotFoundError"
+    except FileNotFoundError:
+        pass
 
 
 def test_process_scheduling_fairness():

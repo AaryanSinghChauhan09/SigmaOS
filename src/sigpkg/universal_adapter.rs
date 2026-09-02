@@ -128,34 +128,6 @@ pub struct FlatpakManifest {
     pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
 }
 
-/// Description of FreeBSD pkg-ng manifest (+MANIFEST standard)
-#[derive(Debug, Clone)]
-pub struct FreeBsdPkgManifest {
-    pub name: String,
-    pub version: String,
-    pub comment: String,
-    pub origin: String,
-    pub deps: Vec<String>,
-}
-
-/// Description of OpenBSD pkg_add manifest (+CONTENTS standard)
-#[derive(Debug, Clone)]
-pub struct OpenBsdPkgManifest {
-    pub name: String,
-    pub version: String,
-    pub comment: String,
-    pub deps: Vec<String>,
-}
-
-/// Description of openSUSE One-Click install (.ymp) manifest
-#[derive(Debug, Clone)]
-pub struct OpenSuseYmpManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub repositories: Vec<String>,
-}
-
 pub struct UniversalPackageAdapter;
 
 impl UniversalPackageAdapter {
@@ -555,144 +527,6 @@ impl UniversalPackageAdapter {
         })
     }
 
-    /// Parses FreeBSD +MANIFEST text
-    pub fn parse_freebsd_pkg(&self, text: &str) -> Result<FreeBsdPkgManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut comment = String::new();
-        let mut origin = String::new();
-        let mut deps = Vec::new();
-
-        let mut in_deps = false;
-
-        for line in text.lines() {
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
-                continue;
-            }
-            if let Some(pos) = line.find(':') {
-                let key = line[..pos].trim();
-                let val = line[pos + 1..].trim();
-                if key == "deps" {
-                    in_deps = true;
-                    continue;
-                }
-                if !in_deps {
-                    match key {
-                        "name" => name = val.trim_matches(|c| c == '"' || c == '\'' || c == ',').to_string(),
-                        "version" => version = val.trim_matches(|c| c == '"' || c == '\'' || c == ',').to_string(),
-                        "comment" | "desc" => comment = val.trim_matches(|c| c == '"' || c == '\'' || c == ',').to_string(),
-                        "origin" => origin = val.trim_matches(|c| c == '"' || c == '\'' || c == ',').to_string(),
-                        _ => {}
-                    }
-                } else if in_deps && line.contains("origin:") {
-                    let dep_name = key.trim_matches(|c| c == '"' || c == '\'' || c == '{' || c == ' ');
-                    if !dep_name.is_empty() {
-                        deps.push(dep_name.to_string());
-                    }
-                } else if in_deps && line.ends_with('{') {
-                    let dep_name = key.trim_matches(|c| c == '"' || c == '\'' || c == ' ');
-                    if !dep_name.is_empty() {
-                        deps.push(dep_name.to_string());
-                    }
-                }
-            } else if line.starts_with('}') && in_deps {
-                in_deps = false;
-            }
-        }
-
-        if name.is_empty() {
-            return Err("Invalid FreeBSD +MANIFEST: missing name");
-        }
-        if version.is_empty() {
-            version = "1.0.0".to_string();
-        }
-
-        Ok(FreeBsdPkgManifest {
-            name,
-            version,
-            comment,
-            origin,
-            deps,
-        })
-    }
-
-    /// Parses OpenBSD +CONTENTS manifest text
-    pub fn parse_openbsd_pkg(&self, text: &str) -> Result<OpenBsdPkgManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::from("1.0.0");
-        let mut comment = String::new();
-        let mut deps = Vec::new();
-
-        for line in text.lines() {
-            let line = line.trim();
-            if line.starts_with("@name ") {
-                let full_name = line["@name ".len()..].trim();
-                if let Some(pos) = full_name.rfind('-') {
-                    name = full_name[..pos].to_string();
-                    version = full_name[pos + 1..].to_string();
-                } else {
-                    name = full_name.to_string();
-                }
-            } else if line.starts_with("@comment ") {
-                comment = line["@comment ".len()..].trim().to_string();
-            } else if line.starts_with("@depend ") {
-                let dep_str = line["@depend ".len()..].trim();
-                let dep_name = dep_str.split(':').next().unwrap_or(dep_str);
-                deps.push(dep_name.to_string());
-            }
-        }
-
-        if name.is_empty() {
-            return Err("Invalid OpenBSD +CONTENTS: missing @name");
-        }
-
-        Ok(OpenBsdPkgManifest {
-            name,
-            version,
-            comment,
-            deps,
-        })
-    }
-
-    /// Parses openSUSE One-Click Install (.ymp) manifest text
-    pub fn parse_opensuse_ymp(&self, text: &str) -> Result<OpenSuseYmpManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::from("1.0.0");
-        let mut summary = String::new();
-        let mut repositories = Vec::new();
-
-        for line in text.lines() {
-            let line = line.trim();
-            if line.contains("<name>") && line.contains("</name>") {
-                let s = line.find("<name>").unwrap() + 6;
-                let e = line.find("</name>").unwrap();
-                if name.is_empty() {
-                    name = line[s..e].trim().to_string();
-                }
-            } else if line.contains("<summary>") && line.contains("</summary>") {
-                let s = line.find("<summary>").unwrap() + 9;
-                let e = line.find("</summary>").unwrap();
-                summary = line[s..e].trim().to_string();
-            } else if line.contains("<url>") && line.contains("</url>") {
-                let s = line.find("<url>").unwrap() + 5;
-                let e = line.find("</url>").unwrap();
-                repositories.push(line[s..e].trim().to_string());
-            }
-        }
-
-        if name.is_empty() {
-            return Err("Invalid openSUSE .ymp: missing <name>");
-        }
-
-        Ok(OpenSuseYmpManifest {
-            name,
-            version,
-            summary,
-            repositories,
-        })
-    }
-
     /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
     pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
         let mut permissions = Vec::new();
@@ -709,6 +543,28 @@ impl UniversalPackageAdapter {
                 permissions.push(Permission::AudioPlayback);
             } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
                 permissions.push(Permission::DisplayAccess);
+            }
+        }
+        permissions
+    }
+
+    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
+    #[cfg(test)]
+    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<String> {
+        let mut permissions = Vec::new();
+        for arg in plugs_or_args {
+            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
+                permissions.push("NetworkTcp".to_string());
+                permissions.push("NetworkUdp".to_string());
+            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
+                permissions.push("FileRead".to_string());
+                permissions.push("FileWrite".to_string());
+            } else if arg == "--share=ipc" || arg == "ipc" {
+                permissions.push("Ipc".to_string());
+            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
+                permissions.push("AudioPlayback".to_string());
+            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
+                permissions.push("DisplayAccess".to_string());
             }
         }
         permissions
@@ -915,19 +771,6 @@ impl UniversalPackageAdapter {
                 deps.extend(ebuild.depend.clone());
                 self.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
             }
-            Some(PackageFormat::Pkg) | Some(PackageFormat::Ports) => {
-                if raw_text.contains("@name ") {
-                    let obsd = self.parse_openbsd_pkg(raw_text)?;
-                    self.translate_to_native_package(&obsd.name, &obsd.version, &obsd.comment, &obsd.deps)
-                } else {
-                    let fbsd = self.parse_freebsd_pkg(raw_text)?;
-                    self.translate_to_native_package(&fbsd.name, &fbsd.version, &fbsd.comment, &fbsd.deps)
-                }
-            }
-            Some(PackageFormat::Zypper) => {
-                let ymp = self.parse_opensuse_ymp(raw_text)?;
-                self.translate_to_native_package(&ymp.name, &ymp.version, &ymp.summary, &[])
-            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -953,15 +796,6 @@ impl UniversalPackageAdapter {
                 } else if raw_text.contains("Name:") && raw_text.contains("Version:") {
                     let spec = self.parse_rpm_spec(raw_text)?;
                     self.translate_to_native_package(&spec.name, &spec.version, &spec.summary, &spec.requires)
-                } else if raw_text.contains("@name ") {
-                    let obsd = self.parse_openbsd_pkg(raw_text)?;
-                    self.translate_to_native_package(&obsd.name, &obsd.version, &obsd.comment, &obsd.deps)
-                } else if raw_text.contains("origin:") || (raw_text.contains("name:") && raw_text.contains("version:")) {
-                    let fbsd = self.parse_freebsd_pkg(raw_text)?;
-                    self.translate_to_native_package(&fbsd.name, &fbsd.version, &fbsd.comment, &fbsd.deps)
-                } else if raw_text.contains("<metapackage>") || raw_text.contains("<software>") {
-                    let ymp = self.parse_opensuse_ymp(raw_text)?;
-                    self.translate_to_native_package(&ymp.name, &ymp.version, &ymp.summary, &[])
                 } else if raw_text.contains("name:") && raw_text.contains("confinement:") {
                     let snap = self.parse_snapcraft_yaml(raw_text)?;
                     self.translate_to_native_package(&snap.name, &snap.version, &snap.summary, &snap.plugs)
@@ -1301,29 +1135,21 @@ impl UniversalDependencyMapper {
         };
 
         match clean {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" | "libssl" | "openssl" => {
+            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" | "freebsd-libc" | "glibc-devel" => {
-                "libc".to_string()
-            }
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" | "zlib" | "libz" => {
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python3" | "python" | "lang/python3" | "dev-lang/python" | "python3-devel" => "python".to_string(),
-            "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" | "libcurl-dev" => "curl".to_string(),
+            "python3" | "python" | "lang/python3" | "dev-lang/python" => "python".to_string(),
+            "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
-            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" | "x11/libx11" | "libx11-dev" => "libx11".to_string(),
-            "wayland" | "dev-libs/wayland" | "graphics/wayland" | "wayland-devel" => "wayland".to_string(),
-            "pipewire" | "media-video/pipewire" | "multimedia/pipewire" => "pipewire".to_string(),
-            "dbus" | "sys-apps/dbus" | "devel/dbus" => "dbus".to_string(),
-            "pkgconf" | "pkg-config" | "dev-util/pkgconf" | "devel/pkgconf" => "pkgconf".to_string(),
-            "ncurses" | "libncursesw6" | "ncurses-devel" | "sys-libs/ncurses" | "devel/ncurses" => "ncurses".to_string(),
-            "xz" | "xz-utils" | "liblzma" | "archivers/xz" | "app-arch/xz-utils" => "xz".to_string(),
-            "zstd" | "libzstd" | "archivers/zstd" | "app-arch/zstd" => "zstd".to_string(),
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "databases/sqlite3" => "sqlite".to_string(),
-            "git" | "devel/git" | "dev-vcs/git" => "git".to_string(),
-            "gcc" | "lang/gcc" | "sys-devel/gcc" => "gcc".to_string(),
+            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
+            "wayland" | "dev-libs/wayland" => "wayland".to_string(),
+            "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
+            "dbus" | "sys-apps/dbus" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2020,52 +1846,5 @@ mod tests {
         assert!(sim_result.is_valid);
         assert_eq!(sim_result.package_name, "bash");
         assert_eq!(sim_result.resolved_dependencies[0], "libc");
-    }
-
-    #[test]
-    fn test_freebsd_and_openbsd_and_opensuse_manifest_parsing() {
-        let adapter = UniversalPackageAdapter::new();
-
-        let fbsd_manifest = r#"
-            name: "nginx"
-            version: "1.24.0,2"
-            origin: "www/nginx"
-            comment: "High performance HTTP(S) server"
-            deps: {
-              openssl: {origin: "security/openssl"},
-              pcre2: {origin: "devel/pcre2"}
-            }
-        "#;
-        let fbsd = adapter.parse_freebsd_pkg(fbsd_manifest).unwrap();
-        assert_eq!(fbsd.name, "nginx");
-        assert_eq!(fbsd.version, "1.24.0,2");
-        assert_eq!(fbsd.deps.len(), 2);
-
-        let obsd_manifest = r#"
-            @name nginx-1.24.0
-            @comment High performance HTTP server
-            @depend security/openssl:openssl-*:openssl->=3.0
-            @depend devel/pcre2:pcre2-*:pcre2->=10.42
-        "#;
-        let obsd = adapter.parse_openbsd_pkg(obsd_manifest).unwrap();
-        assert_eq!(obsd.name, "nginx");
-        assert_eq!(obsd.version, "1.24.0");
-        assert_eq!(obsd.deps.len(), 2);
-
-        let ymp_manifest = r#"
-            <metapackage>
-              <group>
-                <software>
-                  <item>
-                    <name>vlc</name>
-                    <summary>VLC media player</summary>
-                  </item>
-                </software>
-              </group>
-            </metapackage>
-        "#;
-        let ymp = adapter.parse_opensuse_ymp(ymp_manifest).unwrap();
-        assert_eq!(ymp.name, "vlc");
-        assert_eq!(ymp.summary, "VLC media player");
     }
 }
