@@ -144,6 +144,10 @@ impl V4OptimizedPackageManager {
         level
     }
 
+    pub fn supports_v4(&self) -> bool {
+        self.detected_level.load(Ordering::SeqCst) >= 4
+    }
+
     pub fn get_optimized_binary_suffix(&self) -> &'static str {
         match self.detected_level.load(Ordering::SeqCst) {
             4 => "_v4",
@@ -460,10 +464,12 @@ pub struct CachyosKernelFeatureMatrix {
 
 impl CachyosKernelFeatureMatrix {
     pub fn new() -> Self {
+        let pm = V4OptimizedPackageManager::new();
+        pm.detect_microarchitecture_level(true, true, true);
         Self {
             bore_governor: BoreSchedulerGovernor::new(),
             ananicy_manager: AnanicyManager::new(),
-            v4_package_manager: V4OptimizedPackageManager::new(),
+            v4_package_manager: pm,
             thp_tuner: CachyThpTuner::new(ThpMode::Always),
             ksm_daemon: CachyKsmDaemon::new(),
             latency_governor: CachyLatencyGovernor::new(),

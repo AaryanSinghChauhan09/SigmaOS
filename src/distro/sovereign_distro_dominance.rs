@@ -209,6 +209,7 @@ pub struct OpenBsdHardenedCapsicumPledge {
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
     pub unveiled_paths: BTreeMap<String, String>,   // path -> permissions e.g. "rwc"
+    pub is_pledged: bool,
 }
 
 impl OpenBsdHardenedCapsicumPledge {
@@ -217,10 +218,12 @@ impl OpenBsdHardenedCapsicumPledge {
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
+            is_pledged: true,
         }
     }
 
     pub fn pledge(&mut self, promises: &[&str]) {
+        self.is_pledged = true;
         for promise in promises {
             if !self.pledged_promises.contains(&promise.to_string()) {
                 self.pledged_promises.push(promise.to_string());

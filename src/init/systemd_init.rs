@@ -753,6 +753,57 @@ impl SystemdServiceHardeningEvaluator {
     }
 }
 
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut completed: Vec<UnitID> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut current_stage = Vec::new();
+            for &id in &remaining {
+                let mut can_run = true;
+                if let Some(unit) = engine.find_unit(id) {
+                    for &prereq in &unit.after {
+                        if unit_ids.contains(&prereq) && !completed.contains(&prereq) {
+                            can_run = false;
+                            break;
+                        }
+                    }
+                    for &dep in unit_ids {
+                        if dep != id && !completed.contains(&dep) {
+                            if let Some(dep_unit) = engine.find_unit(dep) {
+                                if dep_unit.before.contains(&id) {
+                                    can_run = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if can_run {
+                    current_stage.push(id);
+                }
+            }
+
+            if current_stage.is_empty() {
+                stages.push(remaining);
+                break;
+            }
+
+            for &id in &current_stage {
+                completed.push(id);
+                remaining.retain(|&x| x != id);
+            }
+            stages.push(current_stage);
+        }
+
+        stages
+    }
+}
+
 pub struct SystemdCgroupSliceGovernor {
     pub slice_name: String,
     pub cpu_weight: u32,
@@ -2127,6 +2178,18 @@ mod tests {
     fn test_systemd_service_hardening_evaluator() {
         let score_full = SystemdServiceHardeningEvaluator::calculate_hardening_score(true, true, true);
         assert_eq!(score_full, 2.5);
+    }
+
+    #[test]
+    fn test_systemd_critical_chain() {
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.duration_ms = 100;
+        target.requires.push(2);
+
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.duration_ms = 300;
+        service.requires.push(3);
 
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;

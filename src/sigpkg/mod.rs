@@ -64,12 +64,6 @@ pub use universal_oop_system::{
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use crate::package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
-    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
-    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
-};
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
@@ -86,10 +80,7 @@ pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager,
 };
-pub use arch_pacman_engine::{
-    AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase,
-    RepoDbPackageEntry, RepoStageTier, SovereignDbscriptsEngine,
-};
+pub use arch_pacman_engine::{AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanCacheCleaner, PacnewDiffManager, DependencyTreeVisualizer, SafeUpdateChecker, PkgbuildChecksumUpdater, PacmanDatabase};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
