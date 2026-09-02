@@ -1,8 +1,26 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
+
+#[path = "../src/package"]
+pub mod package {
+    #[path = "bsd_linux_package_innovations.rs"]
+    pub mod bsd_linux_package_innovations;
+}
+#[path = "../src/security/mod.rs"]
+pub mod security;
+#[path = "../src/sigpkg/mod.rs"]
+pub mod sigpkg;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
+use distro::{linux_bsd_inspirations, linux_bsd_parity, missing_distro_innovations, wiki_ideas_implementation as wiki_ideas};
 
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
@@ -30,20 +48,12 @@ mod hardening;
 mod kvm_vcpu;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
 #[path = "../src/network/protocols.rs"]
 mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
@@ -64,8 +74,6 @@ mod unimplemented_features;
 mod unveil;
 #[path = "../src/virtualization/vm_manager.rs"]
 mod vm_manager;
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
 #[path = "../src/desktop/zenith_advanced_features.rs"]
 mod zenith_advanced;
 #[path = "../src/compatibility/zorin.rs"]
@@ -74,7 +82,6 @@ mod zorin;
 use bsd_compat::{
     FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
 };
-use wiki_ideas_implementation as wiki_ideas;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -117,10 +124,6 @@ fn test_zorin_gap_closure_inspection() {
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
     use std::path::PathBuf;
-    use vm_manager::{
-        HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
-        VirtioNetDeviceConfig, VmConfig, VmState,
-    };
     use vm_manager::{
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
@@ -206,11 +209,12 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        NixDeclarativeSystemState, PolicyAction, SigmaZeroCopySpliceEngine,
-        SnapperTransactionGuard, SovereignSystemdParityEngine, SystemdUnitActiveState,
-        SystemdUnitType, CAP_READ, CAP_SEEK,
+        NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
+        SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
+        SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ,
+        CAP_SEEK,
     };
 
     // 1. NixOS Declarative System State
@@ -1102,4 +1106,40 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
             }
         }
     }
+}
+
+#[test]
+fn test_new_missing_distro_innovations_inspection() {
+    use missing_distro_innovations::{
+        FreeBsdPoudriereMatrixEngine, NixFlakeRegistry, OpenSuseSnapperRollbackEngine,
+        SlackwarePkgtoolEngine, VoidXbpsSrcTemplateEngine, XbpsSrcTemplate,
+    };
+
+    let mut nix_flake = NixFlakeRegistry::new("/etc/nixos/flake.lock");
+    nix_flake.register_flake_input("nixpkgs", "github:NixOS/nixpkgs/nixos-unstable", "hash1");
+    assert!(nix_flake.update_flake("nixpkgs", "hash2").is_ok());
+
+    let mut xbps_src = VoidXbpsSrcTemplateEngine::new("/void-packages/hostdir/binpkgs");
+    xbps_src.register_template(XbpsSrcTemplate {
+        pkgname: "bash".to_string(),
+        version: "5.2".to_string(),
+        revision: 1,
+        short_desc: "Bourne shell".to_string(),
+        hostmakedepends: vec![],
+        makedepends: vec![],
+    });
+    assert!(xbps_src.build_package_from_src("bash").unwrap().contains("bash-5.2_1.xbps"));
+
+    let mut poudriere = FreeBsdPoudriereMatrixEngine::new();
+    poudriere.create_poudriere_jail("14-stable", "14.0-RELEASE", "amd64");
+    poudriere.add_bulk_package("ports/sysutils");
+    assert_eq!(poudriere.execute_bulk_build("14-stable").unwrap(), 1);
+
+    let mut snapper = OpenSuseSnapperRollbackEngine::new();
+    let snap2 = snapper.create_snapshot("Post upgrade", 5000);
+    assert!(snapper.rollback_to_snapshot(snap2).is_ok());
+
+    let mut pkgtool = SlackwarePkgtoolEngine::new();
+    let msg = pkgtool.installpkg("zsh", "5.9", "x86_64", "1", &["/bin/zsh"]);
+    assert!(msg.contains("zsh-5.9-x86_64-1 installed"));
 }

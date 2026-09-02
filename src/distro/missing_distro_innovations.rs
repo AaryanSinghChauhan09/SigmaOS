@@ -57,6 +57,267 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
+/// 10. NixOS Nix Flake Input Registry Engine
+#[derive(Debug, Clone)]
+pub struct NixFlakeInputNode {
+    pub name: String,
+    pub url: String,
+    pub locked_hash: String,
+}
+
+pub struct NixFlakeRegistry {
+    pub flake_inputs: BTreeMap<String, NixFlakeInputNode>,
+    pub lock_file_path: String,
+}
+
+impl NixFlakeRegistry {
+    pub fn new(lock_file_path: &str) -> Self {
+        Self {
+            flake_inputs: BTreeMap::new(),
+            lock_file_path: lock_file_path.to_string(),
+        }
+    }
+
+    pub fn register_flake_input(&mut self, name: &str, url: &str, hash: &str) {
+        self.flake_inputs.insert(
+            name.to_string(),
+            NixFlakeInputNode {
+                name: name.to_string(),
+                url: url.to_string(),
+                locked_hash: hash.to_string(),
+            },
+        );
+    }
+
+    pub fn update_flake(&mut self, name: &str, new_hash: &str) -> Result<String, String> {
+        let input = self
+            .flake_inputs
+            .get_mut(name)
+            .ok_or_else(|| format!("Flake input {} not found", name))?;
+        input.locked_hash = new_hash.to_string();
+        Ok(format!("Updated flake input {} to hash {}", name, new_hash))
+    }
+}
+
+impl Default for NixFlakeRegistry {
+    fn default() -> Self {
+        Self::new("/etc/nixos/flake.lock")
+    }
+}
+
+/// 11. Void Linux xbps-src Template Build Engine
+#[derive(Debug, Clone)]
+pub struct XbpsSrcTemplate {
+    pub pkgname: String,
+    pub version: String,
+    pub revision: u32,
+    pub short_desc: String,
+    pub hostmakedepends: Vec<String>,
+    pub makedepends: Vec<String>,
+}
+
+pub struct VoidXbpsSrcTemplateEngine {
+    pub templates: BTreeMap<String, XbpsSrcTemplate>,
+    pub build_out_dir: String,
+}
+
+impl VoidXbpsSrcTemplateEngine {
+    pub fn new(out_dir: &str) -> Self {
+        Self {
+            templates: BTreeMap::new(),
+            build_out_dir: out_dir.to_string(),
+        }
+    }
+
+    pub fn register_template(&mut self, template: XbpsSrcTemplate) {
+        self.templates.insert(template.pkgname.clone(), template);
+    }
+
+    pub fn build_package_from_src(&self, pkgname: &str) -> Result<String, String> {
+        let tpl = self
+            .templates
+            .get(pkgname)
+            .ok_or_else(|| format!("xbps-src template for {} not found", pkgname))?;
+        Ok(format!(
+            "{}/{}-{}_{}.xbps",
+            self.build_out_dir, tpl.pkgname, tpl.version, tpl.revision
+        ))
+    }
+}
+
+impl Default for VoidXbpsSrcTemplateEngine {
+    fn default() -> Self {
+        Self::new("/void-packages/hostdir/binpkgs")
+    }
+}
+
+/// 12. FreeBSD Poudriere Matrix Bulk Repository Builder
+#[derive(Debug, Clone)]
+pub struct PoudriereJailSpec {
+    pub jail_name: String,
+    pub freebsd_version: String,
+    pub arch: String,
+}
+
+pub struct FreeBsdPoudriereMatrixEngine {
+    pub jails: BTreeMap<String, PoudriereJailSpec>,
+    pub bulk_packages_queue: Vec<String>,
+}
+
+impl FreeBsdPoudriereMatrixEngine {
+    pub fn new() -> Self {
+        Self {
+            jails: BTreeMap::new(),
+            bulk_packages_queue: Vec::new(),
+        }
+    }
+
+    pub fn create_poudriere_jail(&mut self, name: &str, version: &str, arch: &str) {
+        self.jails.insert(
+            name.to_string(),
+            PoudriereJailSpec {
+                jail_name: name.to_string(),
+                freebsd_version: version.to_string(),
+                arch: arch.to_string(),
+            },
+        );
+    }
+
+    pub fn add_bulk_package(&mut self, pkg_port: &str) {
+        if !self.bulk_packages_queue.contains(&pkg_port.to_string()) {
+            self.bulk_packages_queue.push(pkg_port.to_string());
+        }
+    }
+
+    pub fn execute_bulk_build(&self, jail_name: &str) -> Result<usize, String> {
+        if !self.jails.contains_key(jail_name) {
+            return Err(format!("Poudriere jail {} not found", jail_name));
+        }
+        Ok(self.bulk_packages_queue.len())
+    }
+}
+
+impl Default for FreeBsdPoudriereMatrixEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 13. openSUSE Snapper Timeline & Rollback Engine
+#[derive(Debug, Clone)]
+pub struct SnapperSnapshotNode {
+    pub snapshot_id: u32,
+    pub description: String,
+    pub timestamp: u64,
+    pub is_active: bool,
+}
+
+pub struct OpenSuseSnapperRollbackEngine {
+    pub snapshots: BTreeMap<u32, SnapperSnapshotNode>,
+    pub active_snapshot_id: u32,
+    pub next_snapshot_id: u32,
+}
+
+impl OpenSuseSnapperRollbackEngine {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(
+            1,
+            SnapperSnapshotNode {
+                snapshot_id: 1,
+                description: String::from("First Root Snapshot"),
+                timestamp: 1000,
+                is_active: true,
+            },
+        );
+        Self {
+            snapshots: map,
+            active_snapshot_id: 1,
+            next_snapshot_id: 2,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, description: &str, time: u64) -> u32 {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+        self.snapshots.insert(
+            id,
+            SnapperSnapshotNode {
+                snapshot_id: id,
+                description: description.to_string(),
+                timestamp: time,
+                is_active: false,
+            },
+        );
+        id
+    }
+
+    pub fn rollback_to_snapshot(&mut self, target_id: u32) -> Result<u32, String> {
+        if !self.snapshots.contains_key(&target_id) {
+            return Err(format!("Snapper snapshot {} not found", target_id));
+        }
+        for (id, node) in self.snapshots.iter_mut() {
+            node.is_active = *id == target_id;
+        }
+        self.active_snapshot_id = target_id;
+        Ok(target_id)
+    }
+}
+
+impl Default for OpenSuseSnapperRollbackEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 14. Slackware Pkgtool Package Installer Engine
+#[derive(Debug, Clone)]
+pub struct SlackwarePkgEntry {
+    pub pkgname: String,
+    pub version: String,
+    pub arch: String,
+    pub build: String,
+    pub installed_files: Vec<String>,
+}
+
+pub struct SlackwarePkgtoolEngine {
+    pub installed_packages: BTreeMap<String, SlackwarePkgEntry>,
+}
+
+impl SlackwarePkgtoolEngine {
+    pub fn new() -> Self {
+        Self {
+            installed_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn installpkg(&mut self, pkgname: &str, ver: &str, arch: &str, build: &str, files: &[&str]) -> String {
+        let entry = SlackwarePkgEntry {
+            pkgname: pkgname.to_string(),
+            version: ver.to_string(),
+            arch: arch.to_string(),
+            build: build.to_string(),
+            installed_files: files.iter().map(|s| s.to_string()).collect(),
+        };
+        self.installed_packages.insert(pkgname.to_string(), entry);
+        format!("installpkg: package {}-{}-{}-{} installed.", pkgname, ver, arch, build)
+    }
+
+    pub fn removepkg(&mut self, pkgname: &str) -> Result<String, String> {
+        if self.installed_packages.remove(pkgname).is_some() {
+            Ok(format!("removepkg: package {} removed.", pkgname))
+        } else {
+            Err(format!("removepkg: package {} is not installed.", pkgname))
+        }
+    }
+}
+
+impl Default for SlackwarePkgtoolEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Bedrock Linux Strata Virtualization Engine
 #[derive(Debug, Clone)]
 pub struct BedrockStratum {
@@ -755,5 +1016,55 @@ mod tests {
         auditor.log_violation(1234, "/etc/shadow", "r", 1000);
         assert_eq!(auditor.violations.len(), 1);
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
+    }
+
+    #[test]
+    fn test_nix_flake_registry() {
+        let mut reg = NixFlakeRegistry::new("/etc/nixos/flake.lock");
+        reg.register_flake_input("nixpkgs", "github:NixOS/nixpkgs/nixos-unstable", "hash1");
+        assert_eq!(reg.flake_inputs.len(), 1);
+        assert!(reg.update_flake("nixpkgs", "hash2").is_ok());
+        assert_eq!(reg.flake_inputs.get("nixpkgs").unwrap().locked_hash, "hash2");
+    }
+
+    #[test]
+    fn test_xbps_src_builder() {
+        let mut engine = VoidXbpsSrcTemplateEngine::new("/void-packages/hostdir/binpkgs");
+        engine.register_template(XbpsSrcTemplate {
+            pkgname: "neovim".to_string(),
+            version: "0.9.1".to_string(),
+            revision: 1,
+            short_desc: "Vim-fork".to_string(),
+            hostmakedepends: vec![],
+            makedepends: vec![],
+        });
+        let path = engine.build_package_from_src("neovim").unwrap();
+        assert!(path.contains("neovim-0.9.1_1.xbps"));
+    }
+
+    #[test]
+    fn test_poudriere_matrix() {
+        let mut poudriere = FreeBsdPoudriereMatrixEngine::new();
+        poudriere.create_poudriere_jail("14-stable", "14.0-RELEASE", "amd64");
+        poudriere.add_bulk_package("www/nginx");
+        let count = poudriere.execute_bulk_build("14-stable").unwrap();
+        assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn test_snapper_rollback() {
+        let mut snapper = OpenSuseSnapperRollbackEngine::new();
+        let snap2 = snapper.create_snapshot("Post-update", 2000);
+        assert_eq!(snap2, 2);
+        assert!(snapper.rollback_to_snapshot(2).is_ok());
+        assert_eq!(snapper.active_snapshot_id, 2);
+    }
+
+    #[test]
+    fn test_slackware_pkgtool() {
+        let mut pkgtool = SlackwarePkgtoolEngine::new();
+        let res = pkgtool.installpkg("bash", "5.2.15", "x86_64", "1", &["/bin/bash"]);
+        assert!(res.contains("installpkg: package bash-5.2.15-x86_64-1 installed."));
+        assert!(pkgtool.removepkg("bash").is_ok());
     }
 }

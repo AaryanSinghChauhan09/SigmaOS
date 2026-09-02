@@ -125,7 +125,8 @@ pub use missing_distro_innovations::{
     ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
     BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
-    SmartOsZoneEngine,
+    SmartOsZoneEngine, NixFlakeRegistry, VoidXbpsSrcTemplateEngine, XbpsSrcTemplate,
+    FreeBsdPoudriereMatrixEngine, OpenSuseSnapperRollbackEngine, SlackwarePkgtoolEngine,
 };
 
 pub use linux_bsd_inspirations::{
