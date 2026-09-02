@@ -551,6 +551,476 @@ impl Default for HaikuHpkgPackageFsEngine {
     }
 }
 
+// =========================================================================
+// 9. Slackware Pkgtool & Sbopkg SlackBuild Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SlackBuildInfo {
+    pub prgnam: String,
+    pub version: String,
+    pub homepage: String,
+    pub download: Vec<String>,
+    pub md5sum: Vec<String>,
+    pub requires: Vec<String>,
+    pub maintainer: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SlackPackageRecord {
+    pub package_name: String,
+    pub compressed_size_kb: u64,
+    pub uncompressed_size_kb: u64,
+    pub description: Vec<String>,
+    pub installed_files: Vec<String>,
+}
+
+pub struct SlackwarePkgtoolSlackBuildEngine {
+    pub slackbuilds: BTreeMap<String, SlackBuildInfo>,
+    pub installed_packages: BTreeMap<String, SlackPackageRecord>,
+}
+
+impl SlackwarePkgtoolSlackBuildEngine {
+    pub fn new() -> Self {
+        Self {
+            slackbuilds: BTreeMap::new(),
+            installed_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_slackbuild(&mut self, info: SlackBuildInfo) {
+        self.slackbuilds.insert(info.prgnam.clone(), info);
+    }
+
+    pub fn install_package(&mut self, record: SlackPackageRecord) {
+        self.installed_packages.insert(record.package_name.clone(), record);
+    }
+
+    pub fn remove_package(&mut self, package_name: &str) -> bool {
+        self.installed_packages.remove(package_name).is_some()
+    }
+
+    pub fn parse_slackbuild_info(content: &str) -> Result<SlackBuildInfo, &'static str> {
+        let mut prgnam = String::new();
+        let mut version = String::new();
+        let mut homepage = String::new();
+        let mut download = Vec::new();
+        let mut md5sum = Vec::new();
+        let mut requires = Vec::new();
+        let mut maintainer = String::new();
+
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("PRGNAM=") {
+                prgnam = line.strip_prefix("PRGNAM=").unwrap().trim_matches('"').to_string();
+            } else if line.starts_with("VERSION=") {
+                version = line.strip_prefix("VERSION=").unwrap().trim_matches('"').to_string();
+            } else if line.starts_with("HOMEPAGE=") {
+                homepage = line.strip_prefix("HOMEPAGE=").unwrap().trim_matches('"').to_string();
+            } else if line.starts_with("DOWNLOAD=") {
+                let urls = line.strip_prefix("DOWNLOAD=").unwrap().trim_matches('"');
+                for u in urls.split_whitespace() {
+                    download.push(u.to_string());
+                }
+            } else if line.starts_with("MD5SUM=") {
+                let sums = line.strip_prefix("MD5SUM=").unwrap().trim_matches('"');
+                for s in sums.split_whitespace() {
+                    md5sum.push(s.to_string());
+                }
+            } else if line.starts_with("REQUIRES=") {
+                let reqs = line.strip_prefix("REQUIRES=").unwrap().trim_matches('"');
+                for r in reqs.split_whitespace() {
+                    requires.push(r.to_string());
+                }
+            } else if line.starts_with("MAINTAINER=") {
+                maintainer = line.strip_prefix("MAINTAINER=").unwrap().trim_matches('"').to_string();
+            }
+        }
+
+        if prgnam.is_empty() {
+            return Err("Missing PRGNAM in SlackBuild info file");
+        }
+
+        Ok(SlackBuildInfo {
+            prgnam,
+            version,
+            homepage,
+            download,
+            md5sum,
+            requires,
+            maintainer,
+        })
+    }
+}
+
+impl Default for SlackwarePkgtoolSlackBuildEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. Ubuntu PPA & APT Pinning/Keyring Security Manager
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PpaRepository {
+    pub ppa_owner: String,
+    pub ppa_name: String,
+    pub distro_codename: String,
+    pub gpg_key_fingerprint: String,
+    pub is_enabled: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptPinRule {
+    pub package_pattern: String,
+    pub release_codename: String,
+    pub pin_priority: i32,
+}
+
+pub struct UbuntuPpaAptPinningEngine {
+    pub ppas: BTreeMap<String, PpaRepository>,
+    pub pin_rules: Vec<AptPinRule>,
+    pub trusted_gpg_keys: Vec<String>,
+}
+
+impl UbuntuPpaAptPinningEngine {
+    pub fn new() -> Self {
+        Self {
+            ppas: BTreeMap::new(),
+            pin_rules: Vec::new(),
+            trusted_gpg_keys: Vec::new(),
+        }
+    }
+
+    pub fn add_ppa(&mut self, owner: &str, ppa_name: &str, codename: &str, key_fp: &str) -> String {
+        let ppa_key = format!("ppa:{}/{}", owner, ppa_name);
+        let repo = PpaRepository {
+            ppa_owner: owner.to_string(),
+            ppa_name: ppa_name.to_string(),
+            distro_codename: codename.to_string(),
+            gpg_key_fingerprint: key_fp.to_string(),
+            is_enabled: true,
+        };
+        self.ppas.insert(ppa_key.clone(), repo);
+        self.trusted_gpg_keys.push(key_fp.to_string());
+        ppa_key
+    }
+
+    pub fn add_pin_rule(&mut self, pattern: &str, codename: &str, priority: i32) {
+        self.pin_rules.push(AptPinRule {
+            package_pattern: pattern.to_string(),
+            release_codename: codename.to_string(),
+            pin_priority: priority,
+        });
+    }
+
+    pub fn resolve_effective_priority(&self, package: &str, codename: &str) -> i32 {
+        let mut max_prio = 500; // Default APT priority
+        for rule in &self.pin_rules {
+            let pkg_matches = if rule.package_pattern == "*" {
+                true
+            } else if rule.package_pattern.ends_with('*') {
+                package.starts_with(rule.package_pattern.trim_end_matches('*'))
+            } else {
+                rule.package_pattern == package
+            };
+
+            let codename_matches = rule.release_codename == "*" || rule.release_codename == codename;
+
+            if pkg_matches && codename_matches {
+                if rule.pin_priority > max_prio {
+                    max_prio = rule.pin_priority;
+                }
+            }
+        }
+        max_prio
+    }
+
+    pub fn verify_key_trusted(&self, fingerprint: &str) -> bool {
+        self.trusted_gpg_keys.contains(&fingerprint.to_string())
+    }
+}
+
+impl Default for UbuntuPpaAptPinningEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. OpenSUSE Zypper Libzypp Multi-Repo Solver & Vendor Stickiness
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZypperRepository {
+    pub repo_alias: String,
+    pub name: String,
+    pub priority: u32, // Lower number = higher priority (Zypper convention: 1..99)
+    pub vendor: String,
+    pub is_enabled: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZypperPackageOffer {
+    pub package_name: String,
+    pub version: String,
+    pub vendor: String,
+    pub repo_alias: String,
+}
+
+pub struct OpenSuseZypperVendorStickinessEngine {
+    pub repositories: BTreeMap<String, ZypperRepository>,
+    pub vendor_change_allowed: bool,
+}
+
+impl OpenSuseZypperVendorStickinessEngine {
+    pub fn new() -> Self {
+        Self {
+            repositories: BTreeMap::new(),
+            vendor_change_allowed: false, // Vendor stickiness enabled by default
+        }
+    }
+
+    pub fn register_repo(&mut self, repo: ZypperRepository) {
+        self.repositories.insert(repo.repo_alias.clone(), repo);
+    }
+
+    pub fn select_best_offer(
+        &self,
+        current_installed_vendor: Option<&str>,
+        offers: &[ZypperPackageOffer],
+    ) -> Result<ZypperPackageOffer, &'static str> {
+        if offers.is_empty() {
+            return Err("No package offers available");
+        }
+
+        let mut candidate_offers: Vec<&ZypperPackageOffer> = offers.iter().collect();
+
+        // If vendor stickiness is active and we have an installed vendor, filter out differing vendors
+        if !self.vendor_change_allowed {
+            if let Some(cur_vendor) = current_installed_vendor {
+                let same_vendor_offers: Vec<&ZypperPackageOffer> = candidate_offers
+                    .iter()
+                    .filter(|o| o.vendor == cur_vendor)
+                    .cloned()
+                    .collect();
+                if !same_vendor_offers.is_empty() {
+                    candidate_offers = same_vendor_offers;
+                }
+            }
+        }
+
+        // Sort candidates by repo priority (lower number = higher priority), then version
+        candidate_offers.sort_by(|a, b| {
+            let prio_a = self.repositories.get(&a.repo_alias).map_or(99, |r| r.priority);
+            let prio_b = self.repositories.get(&b.repo_alias).map_or(99, |r| r.priority);
+            prio_a.cmp(&prio_b).then_with(|| b.version.cmp(&a.version))
+        });
+
+        Ok((*candidate_offers[0]).clone())
+    }
+}
+
+impl Default for OpenSuseZypperVendorStickinessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. Nix Flakes Lockfile & Reproducible Devshell Resolver
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FlakeInputLock {
+    pub input_name: String,
+    pub original_url: String,
+    pub locked_nar_hash: String,
+    pub rev: String,
+}
+
+pub struct NixFlakesDevshellResolverEngine {
+    pub locked_inputs: BTreeMap<String, FlakeInputLock>,
+    pub devshell_env_vars: BTreeMap<String, String>,
+    pub devshell_packages: Vec<String>,
+}
+
+impl NixFlakesDevshellResolverEngine {
+    pub fn new() -> Self {
+        Self {
+            locked_inputs: BTreeMap::new(),
+            devshell_env_vars: BTreeMap::new(),
+            devshell_packages: Vec::new(),
+        }
+    }
+
+    pub fn lock_input(&mut self, lock: FlakeInputLock) {
+        self.locked_inputs.insert(lock.input_name.clone(), lock);
+    }
+
+    pub fn export_devshell_var(&mut self, key: &str, val: &str) {
+        self.devshell_env_vars.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn add_devshell_package(&mut self, pkg: &str) {
+        if !self.devshell_packages.contains(&pkg.to_string()) {
+            self.devshell_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn verify_lockfile_reproducibility(&self) -> bool {
+        !self.locked_inputs.is_empty()
+            && self
+                .locked_inputs
+                .values()
+                .all(|l| !l.locked_nar_hash.is_empty() && !l.rev.is_empty())
+    }
+
+    pub fn generate_devshell_manifest(&self) -> String {
+        let mut manifest = String::from("# Nix Flakes DevShell Environment\n");
+        for (k, v) in &self.devshell_env_vars {
+            manifest.push_str(&format!("export {}=\"{}\"\n", k, v));
+        }
+        manifest.push_str("# Packages:\n");
+        for pkg in &self.devshell_packages {
+            manifest.push_str(&format!("- {}\n", pkg));
+        }
+        manifest
+    }
+}
+
+impl Default for NixFlakesDevshellResolverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. OpenBSD Signify & Pkg_add Multi-Location Mirror Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpenBsdPkgAddSignifyEngine {
+    pub signify_public_keys: BTreeMap<String, String>, // key_name -> pubkey_base64
+    pub pkg_path_mirrors: Vec<String>,
+}
+
+impl OpenBsdPkgAddSignifyEngine {
+    pub fn new() -> Self {
+        Self {
+            signify_public_keys: BTreeMap::new(),
+            pkg_path_mirrors: Vec::new(),
+        }
+    }
+
+    pub fn add_signify_key(&mut self, key_name: &str, pubkey_base64: &str) {
+        self.signify_public_keys
+            .insert(key_name.to_string(), pubkey_base64.to_string());
+    }
+
+    pub fn add_mirror(&mut self, mirror_url: &str) {
+        if !self.pkg_path_mirrors.contains(&mirror_url.to_string()) {
+            self.pkg_path_mirrors.push(mirror_url.to_string());
+        }
+    }
+
+    pub fn verify_signify_signature(&self, key_name: &str, signature_header: &str) -> bool {
+        if let Some(expected_key) = self.signify_public_keys.get(key_name) {
+            signature_header.contains(expected_key)
+        } else {
+            false
+        }
+    }
+
+    pub fn resolve_package_download_url(&self, package_tgz: &str) -> Result<String, &'static str> {
+        if self.pkg_path_mirrors.is_empty() {
+            return Err("PKG_PATH mirrors empty");
+        }
+        let primary_mirror = &self.pkg_path_mirrors[0];
+        let url = if primary_mirror.ends_with('/') {
+            format!("{}{}", primary_mirror, package_tgz)
+        } else {
+            format!("{}/{}", primary_mirror, package_tgz)
+        };
+        Ok(url)
+    }
+}
+
+impl Default for OpenBsdPkgAddSignifyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. Debian Debconf & Dpkg-Statoverride System Integration
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DebconfQuestionType {
+    String,
+    Boolean,
+    Select,
+    Password,
+    Note,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DebconfPreseedEntry {
+    pub package_owner: String,
+    pub question_template: String,
+    pub qtype: DebconfQuestionType,
+    pub answer_value: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DpkgStatoverrideRule {
+    pub owner_user: String,
+    pub owner_group: String,
+    pub mode_octal: u32,
+    pub target_path: String,
+}
+
+pub struct DebianDebconfStatoverrideEngine {
+    pub preseed_db: BTreeMap<String, DebconfPreseedEntry>,
+    pub statoverrides: BTreeMap<String, DpkgStatoverrideRule>,
+}
+
+impl DebianDebconfStatoverrideEngine {
+    pub fn new() -> Self {
+        Self {
+            preseed_db: BTreeMap::new(),
+            statoverrides: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_preseed_answer(&mut self, entry: DebconfPreseedEntry) {
+        let key = format!("{}/{}", entry.package_owner, entry.question_template);
+        self.preseed_db.insert(key, entry);
+    }
+
+    pub fn add_statoverride(&mut self, rule: DpkgStatoverrideRule) {
+        self.statoverrides.insert(rule.target_path.clone(), rule);
+    }
+
+    pub fn query_preseed_answer(&self, package: &str, question: &str) -> Option<String> {
+        let key = format!("{}/{}", package, question);
+        self.preseed_db.get(&key).map(|e| e.answer_value.clone())
+    }
+
+    pub fn get_statoverride_for_path(&self, path: &str) -> Option<&DpkgStatoverrideRule> {
+        self.statoverrides.get(path)
+    }
+}
+
+impl Default for DebianDebconfStatoverrideEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -691,5 +1161,138 @@ mod tests {
 
         assert!(engine.unmount_hpkg("haiku_base-r1"));
         assert_eq!(engine.active_mount_count(), 0);
+    }
+
+    #[test]
+    fn test_slackware_slackbuild_parser() {
+        let info_text = r#"
+PRGNAM="htop"
+VERSION="3.3.0"
+HOMEPAGE="https://htop.dev"
+DOWNLOAD="https://github.com/htop-dev/htop/archive/3.3.0.tar.gz"
+MD5SUM="abc123def456"
+REQUIRES="ncurses"
+MAINTAINER="SigmaOS"
+"#;
+        let info = SlackwarePkgtoolSlackBuildEngine::parse_slackbuild_info(info_text).unwrap();
+        assert_eq!(info.prgnam, "htop");
+        assert_eq!(info.version, "3.3.0");
+        assert_eq!(info.requires, vec!["ncurses".to_string()]);
+
+        let mut engine = SlackwarePkgtoolSlackBuildEngine::new();
+        engine.register_slackbuild(info);
+        assert_eq!(engine.slackbuilds.len(), 1);
+    }
+
+    #[test]
+    fn test_ubuntu_ppa_apt_pinning() {
+        let mut engine = UbuntuPpaAptPinningEngine::new();
+        let ppa = engine.add_ppa("graphics-drivers", "ppa", "jammy", "12345678ABCD");
+        assert_eq!(ppa, "ppa:graphics-drivers/ppa");
+        assert!(engine.verify_key_trusted("12345678ABCD"));
+
+        engine.add_pin_rule("nvidia-*", "jammy", 1001);
+        assert_eq!(engine.resolve_effective_priority("nvidia-driver-535", "jammy"), 1001);
+        assert_eq!(engine.resolve_effective_priority("curl", "jammy"), 500);
+    }
+
+    #[test]
+    fn test_opensuse_zypper_vendor_stickiness() {
+        let mut engine = OpenSuseZypperVendorStickinessEngine::new();
+        engine.register_repo(ZypperRepository {
+            repo_alias: "packman".to_string(),
+            name: "Packman Repository".to_string(),
+            priority: 90,
+            vendor: "Packman".to_string(),
+            is_enabled: true,
+        });
+        engine.register_repo(ZypperRepository {
+            repo_alias: "openSUSE-OSS".to_string(),
+            name: "openSUSE Main OSS".to_string(),
+            priority: 99,
+            vendor: "openSUSE".to_string(),
+            is_enabled: true,
+        });
+
+        let offers = vec![
+            ZypperPackageOffer {
+                package_name: "ffmpeg".to_string(),
+                version: "6.1.0".to_string(),
+                vendor: "Packman".to_string(),
+                repo_alias: "packman".to_string(),
+            },
+            ZypperPackageOffer {
+                package_name: "ffmpeg".to_string(),
+                version: "6.0.0".to_string(),
+                vendor: "openSUSE".to_string(),
+                repo_alias: "openSUSE-OSS".to_string(),
+            },
+        ];
+
+        // Stickiness enabled: retains openSUSE vendor
+        let offer = engine.select_best_offer(Some("openSUSE"), &offers).unwrap();
+        assert_eq!(offer.vendor, "openSUSE");
+
+        // Allow vendor change -> picks higher priority Packman repo
+        engine.vendor_change_allowed = true;
+        let offer2 = engine.select_best_offer(Some("openSUSE"), &offers).unwrap();
+        assert_eq!(offer2.vendor, "Packman");
+    }
+
+    #[test]
+    fn test_nix_flakes_devshell_resolver() {
+        let mut engine = NixFlakesDevshellResolverEngine::new();
+        engine.lock_input(FlakeInputLock {
+            input_name: "nixpkgs".to_string(),
+            original_url: "github:NixOS/nixpkgs/nixos-unstable".to_string(),
+            locked_nar_hash: "sha256-nar-hash-123".to_string(),
+            rev: "git-commit-rev-456".to_string(),
+        });
+
+        assert!(engine.verify_lockfile_reproducibility());
+
+        engine.export_devshell_var("CC", "gcc");
+        engine.add_devshell_package("pkg-config");
+
+        let manifest = engine.generate_devshell_manifest();
+        assert!(manifest.contains("export CC=\"gcc\""));
+        assert!(manifest.contains("- pkg-config"));
+    }
+
+    #[test]
+    fn test_openbsd_signify_pkg_add() {
+        let mut engine = OpenBsdPkgAddSignifyEngine::new();
+        engine.add_signify_key("openbsd-75-base", "pubkey_base64_data_xyz");
+        engine.add_mirror("https://cdn.openbsd.org/pub/OpenBSD/7.5/packages/amd64/");
+
+        assert!(engine.verify_signify_signature("openbsd-75-base", "signed_by_pubkey_base64_data_xyz"));
+
+        let url = engine.resolve_package_download_url("zsh-5.9.tgz").unwrap();
+        assert_eq!(url, "https://cdn.openbsd.org/pub/OpenBSD/7.5/packages/amd64/zsh-5.9.tgz");
+    }
+
+    #[test]
+    fn test_debian_debconf_statoverride() {
+        let mut engine = DebianDebconfStatoverrideEngine::new();
+        engine.add_preseed_answer(DebconfPreseedEntry {
+            package_owner: "tzdata".to_string(),
+            question_template: "zones/default".to_string(),
+            qtype: DebconfQuestionType::Select,
+            answer_value: "UTC".to_string(),
+        });
+
+        engine.add_statoverride(DpkgStatoverrideRule {
+            owner_user: "root".to_string(),
+            owner_group: "shadow".to_string(),
+            mode_octal: 0o4750,
+            target_path: "/usr/bin/expiry".to_string(),
+        });
+
+        let ans = engine.query_preseed_answer("tzdata", "zones/default");
+        assert_eq!(ans, Some("UTC".to_string()));
+
+        let stat = engine.get_statoverride_for_path("/usr/bin/expiry").unwrap();
+        assert_eq!(stat.mode_octal, 0o4750);
+        assert_eq!(stat.owner_group, "shadow");
     }
 }
