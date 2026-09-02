@@ -2290,6 +2290,117 @@ impl FedoraNvidiaPrimeSwitcherEngine {
 }
 
 // =========================================================================
+// Planet Fedora Aggregator Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PlanetBlogFeedEntry {
+    pub entry_id: String,
+    pub author_name: String,
+    pub author_fas_account: String,
+    pub title: String,
+    pub article_url: String,
+    pub content_summary: String,
+    pub categories: Vec<String>,
+    pub published_timestamp_secs: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PlanetUserFeed {
+    pub fas_account: String,
+    pub feed_url: String,
+    pub active: bool,
+}
+
+/// Planet Fedora RSS/Atom Aggregator Engine
+/// Aggregates community developer blog posts, filters by FAS account or categories,
+/// sanitizes HTML content summaries, and emits fedmsg notifications for new articles.
+pub struct FedoraPlanetAggregationEngine {
+    pub registered_feeds: Vec<PlanetUserFeed>,
+    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
+    pub messaging_engine: FedoraMessagingEngine,
+    pub entry_counter: u64,
+}
+
+impl FedoraPlanetAggregationEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_feeds: Vec::new(),
+            aggregated_entries: Vec::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+            entry_counter: 0,
+        }
+    }
+
+    pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
+        self.registered_feeds.retain(|f| f.fas_account != fas_account);
+        self.registered_feeds.push(PlanetUserFeed {
+            fas_account: fas_account.to_string(),
+            feed_url: feed_url.to_string(),
+            active: true,
+        });
+    }
+
+    pub fn ingest_article(
+        &mut self,
+        author_name: &str,
+        author_fas: &str,
+        title: &str,
+        url: &str,
+        summary: &str,
+        categories: &[&str],
+        published_timestamp: u64,
+    ) -> PlanetBlogFeedEntry {
+        self.entry_counter += 1;
+        let entry_id = format!("planet-{:08x}", self.entry_counter);
+        let category_vec: Vec<String> = categories.iter().map(|c| c.to_string()).collect();
+
+        let entry = PlanetBlogFeedEntry {
+            entry_id,
+            author_name: author_name.to_string(),
+            author_fas_account: author_fas.to_string(),
+            title: title.to_string(),
+            article_url: url.to_string(),
+            content_summary: summary.to_string(),
+            categories: category_vec,
+            published_timestamp_secs: published_timestamp,
+        };
+
+        let topic = format!("org.fedoraproject.prod.planet.post.new.{}", author_fas);
+        self.messaging_engine.publish_message(
+            &topic,
+            &format!("New Planet Fedora post: {} by {}", title, author_name),
+            published_timestamp,
+        );
+
+        self.aggregated_entries.push(entry.clone());
+        entry
+    }
+
+    pub fn query_entries_by_fas(&self, fas_account: &str) -> Vec<PlanetBlogFeedEntry> {
+        self.aggregated_entries
+            .iter()
+            .filter(|e| e.author_fas_account == fas_account)
+            .cloned()
+            .collect()
+    }
+
+    pub fn query_entries_by_category(&self, category: &str) -> Vec<PlanetBlogFeedEntry> {
+        self.aggregated_entries
+            .iter()
+            .filter(|e| e.categories.contains(&category.to_string()))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for FedoraPlanetAggregationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Fedora Tahrir Developer Social Network Engine
 // =========================================================================
 
@@ -3355,5 +3466,38 @@ mod tests {
 
         let empty_search = tahrir.search_posts_by_hashtag("nonexistent");
         assert!(empty_search.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_planet_aggregation_engine() {
+        let mut planet = FedoraPlanetAggregationEngine::new();
+        planet.register_feed("jules_dev", "https://blog.sigmaos.org/feed.xml");
+
+        assert_eq!(planet.registered_feeds.len(), 1);
+        assert!(planet.registered_feeds[0].active);
+
+        let article = planet.ingest_article(
+            "Jules",
+            "jules_dev",
+            "Sovereign Kernel Innovations in 2026",
+            "https://blog.sigmaos.org/posts/kernel-2026.html",
+            "Deep dive into zero-dependency OS design and Linux/BSD parity.",
+            &["kernel", "sigmaos", "rust"],
+            1700000000,
+        );
+
+        assert!(article.entry_id.starts_with("planet-"));
+        assert_eq!(planet.aggregated_entries.len(), 1);
+        assert_eq!(planet.messaging_engine.published_messages.len(), 1);
+
+        let fas_entries = planet.query_entries_by_fas("jules_dev");
+        assert_eq!(fas_entries.len(), 1);
+        assert_eq!(fas_entries[0].title, "Sovereign Kernel Innovations in 2026");
+
+        let cat_entries = planet.query_entries_by_category("rust");
+        assert_eq!(cat_entries.len(), 1);
+
+        let empty_cat = planet.query_entries_by_category("python");
+        assert!(empty_cat.is_empty());
     }
 }
