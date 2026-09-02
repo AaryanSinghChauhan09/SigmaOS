@@ -7,8 +7,6 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[path = "bsd_linux_package_innovations.rs"]
-pub mod bsd_linux_package_innovations;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;

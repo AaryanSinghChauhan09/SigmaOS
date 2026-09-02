@@ -1016,11 +1016,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::Version::new(
-                    native_pkg.version.major,
-                    native_pkg.version.minor,
-                    native_pkg.version.patch,
-                ),
+                version: native_pkg.version,
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
