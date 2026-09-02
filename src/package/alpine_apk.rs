@@ -71,21 +71,22 @@ impl ApkPackageManager {
     /// Install package
     pub fn install(&mut self, package_name: &str) -> Result<(), String> {
         let package = self.available.get(package_name)
-            .ok_or_else(|| format!("Package {} not found", package_name))?;
+            .ok_or_else(|| format!("Package {} not found", package_name))?
+            .clone();
 
         // Resolve dependencies
-        let dependencies = self.resolve_dependencies(package)?;
+        let dependencies = self.resolve_dependencies(&package)?;
 
         // Install dependencies first
-        for dep in dependencies {
-            if !self.installed.contains_key(&dep) {
-                self.install(&dep)?;
+        for dep in &dependencies {
+            if !self.installed.contains_key(dep) {
+                self.install(dep)?;
             }
         }
 
         // Install package
         println!("Installing {} ({})", package_name, package.version);
-        self.installed.insert(package_name.to_string(), package.clone());
+        self.installed.insert(package_name.to_string(), package);
 
         // Add to world
         if !self.world.packages.contains(&package_name.to_string()) {

@@ -271,18 +271,18 @@ impl SigmaPortage {
 
     /// Emerge package
     pub fn emerge(&mut self, package: &str) -> Result<(), PortageError> {
-        let ebuild = self.tree.find_ebuild(package)?;
+        let ebuild = self.tree.find_ebuild(package)?.clone();
 
         // Resolve USE flags
-        let use_flags = self.use_flags.resolve_for_package(ebuild)?;
+        let use_flags = self.use_flags.resolve_for_package(&ebuild)?;
 
         // Calculate dependencies
-        let dependencies = self.calculate_dependencies(ebuild)?;
+        let dependencies = self.calculate_dependencies(&ebuild)?;
 
         // Emerge dependencies first
-        for dep in dependencies {
-            if !self.database.is_installed(&dep) {
-                self.emerge(&dep)?;
+        for dep in &dependencies {
+            if !self.database.is_installed(dep) {
+                self.emerge(dep)?;
             }
         }
 
@@ -292,7 +292,7 @@ impl SigmaPortage {
         println!("Dependencies: {:?}", dependencies);
 
         // Update database
-        self.database.add_installed(ebuild)?;
+        self.database.add_installed(&ebuild)?;
 
         Ok(())
     }
