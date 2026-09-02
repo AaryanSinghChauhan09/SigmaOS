@@ -666,6 +666,230 @@ impl Default for DistroWatchParityMetricsHub {
 }
 
 // =========================================================================
+// 10. PLAN 9 UNION MOUNT TABLE (Bell Labs Plan 9 Union Mounts & Bind)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Plan9MountFlag {
+    Replace, // MREPL: Replace existing mount
+    Before,  // MBEFORE: Add to beginning of union
+    After,   // MAFTER: Add to end of union
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Plan9MountPoint {
+    pub target_spec: String,
+    pub mount_flag: Plan9MountFlag,
+}
+
+pub struct Plan9UnionMountTable {
+    pub union_mounts: BTreeMap<String, Vec<Plan9MountPoint>>,
+}
+
+impl Plan9UnionMountTable {
+    pub fn new() -> Self {
+        Self {
+            union_mounts: BTreeMap::new(),
+        }
+    }
+
+    pub fn mount(&mut self, mount_point: &str, target_spec: &str, flag: Plan9MountFlag) {
+        let entry = self
+            .union_mounts
+            .entry(mount_point.to_string())
+            .or_insert_with(Vec::new);
+
+        let new_mount = Plan9MountPoint {
+            target_spec: target_spec.to_string(),
+            mount_flag: flag,
+        };
+
+        match flag {
+            Plan9MountFlag::Replace => {
+                entry.clear();
+                entry.push(new_mount);
+            }
+            Plan9MountFlag::Before => {
+                entry.insert(0, new_mount);
+            }
+            Plan9MountFlag::After => {
+                entry.push(new_mount);
+            }
+        }
+    }
+
+    pub fn resolve_union_path(&self, mount_point: &str) -> Vec<String> {
+        if let Some(mounts) = self.union_mounts.get(mount_point) {
+            mounts.iter().map(|m| m.target_spec.clone()).collect()
+        } else {
+            Vec::new()
+        }
+    }
+}
+
+impl Default for Plan9UnionMountTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. SOLARIS / ILLUMOS DTRACE PROBE PROVIDER (Dynamic Tracing Framework)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DTraceProbe {
+    pub provider: String,
+    pub module: String,
+    pub function: String,
+    pub name: String,
+    pub is_enabled: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DTraceEventRecord {
+    pub probe_name: String,
+    pub timestamp_ns: u64,
+    pub arg0: u64,
+    pub arg1: u64,
+}
+
+pub struct DTraceProbeProvider {
+    pub probes: Vec<DTraceProbe>,
+    pub fired_events: Vec<DTraceEventRecord>,
+}
+
+impl DTraceProbeProvider {
+    pub fn new() -> Self {
+        Self {
+            probes: Vec::new(),
+            fired_events: Vec::new(),
+        }
+    }
+
+    pub fn register_probe(&mut self, provider: &str, module: &str, function: &str, name: &str) {
+        self.probes.push(DTraceProbe {
+            provider: provider.to_string(),
+            module: module.to_string(),
+            function: function.to_string(),
+            name: name.to_string(),
+            is_enabled: true,
+        });
+    }
+
+    pub fn fire_probe(&mut self, name: &str, arg0: u64, arg1: u64, now_ns: u64) -> bool {
+        if let Some(probe) = self.probes.iter().find(|p| p.name == name && p.is_enabled) {
+            self.fired_events.push(DTraceEventRecord {
+                probe_name: probe.name.clone(),
+                timestamp_ns: now_ns,
+                arg0,
+                arg1,
+            });
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for DTraceProbeProvider {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. OPENBSD KARL (Kernel Address Randomized Linker Entropy Generator)
+// =========================================================================
+
+pub struct OpenBsdKarlEntropyGenerator {
+    pub seed: u64,
+    pub randomized_function_offsets: BTreeMap<String, u64>,
+}
+
+impl OpenBsdKarlEntropyGenerator {
+    pub fn new(seed: u64) -> Self {
+        Self {
+            seed,
+            randomized_function_offsets: BTreeMap::new(),
+        }
+    }
+
+    /// Computes pseudo-randomized KARL function offset alignment shifts for kernel re-linking on boot
+    pub fn randomize_kernel_symbol(&mut self, symbol_name: &str, base_offset: u64) -> u64 {
+        let mut state = self.seed ^ base_offset;
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        let randomized_shift = (state % 0x10000) & !0xF; // 16-byte aligned shift up to 64KB
+        let final_offset = base_offset + randomized_shift;
+        self.randomized_function_offsets
+            .insert(symbol_name.to_string(), final_offset);
+        final_offset
+    }
+}
+
+// =========================================================================
+// 13. NETBSD RUMP VFS KERNEL CALL DISPATCHER
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RumpVfsNode {
+    pub path: String,
+    pub is_directory: bool,
+    pub size_bytes: u64,
+}
+
+pub struct NetBsdRumpVfsDispatcher {
+    pub virtual_vfs_nodes: BTreeMap<String, RumpVfsNode>,
+    pub dispatched_calls_count: u64,
+}
+
+impl NetBsdRumpVfsDispatcher {
+    pub fn new() -> Self {
+        Self {
+            virtual_vfs_nodes: BTreeMap::new(),
+            dispatched_calls_count: 0,
+        }
+    }
+
+    pub fn rump_sys_open(&mut self, path: &str, create: bool) -> Result<String, &'static str> {
+        self.dispatched_calls_count += 1;
+        if let Some(node) = self.virtual_vfs_nodes.get(path) {
+            Ok(format!("RUMP_FD:{}", node.path))
+        } else if create {
+            self.virtual_vfs_nodes.insert(
+                path.to_string(),
+                RumpVfsNode {
+                    path: path.to_string(),
+                    is_directory: false,
+                    size_bytes: 0,
+                },
+            );
+            Ok(format!("RUMP_FD:{}", path))
+        } else {
+            Err("NetBSD Rump VFS: File not found")
+        }
+    }
+
+    pub fn rump_sys_write(&mut self, path: &str, data_len: u64) -> Result<u64, &'static str> {
+        self.dispatched_calls_count += 1;
+        if let Some(node) = self.virtual_vfs_nodes.get_mut(path) {
+            node.size_bytes += data_len;
+            Ok(node.size_bytes)
+        } else {
+            Err("NetBSD Rump VFS: File not found for write")
+        }
+    }
+}
+
+impl Default for NetBsdRumpVfsDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -801,5 +1025,51 @@ mod tests {
         hub.record_distro_parity("FreeBSD", 90);
         assert_eq!(hub.distros.len(), 2);
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+
+    #[test]
+    fn test_plan9_union_mount_table() {
+        let mut table = Plan9UnionMountTable::new();
+        table.mount("/bin", "/n/local/bin", Plan9MountFlag::Replace);
+        table.mount("/bin", "/n/dist/bin", Plan9MountFlag::Before);
+        table.mount("/bin", "/n/custom/bin", Plan9MountFlag::After);
+
+        let union_paths = table.resolve_union_path("/bin");
+        assert_eq!(union_paths.len(), 3);
+        assert_eq!(union_paths[0], "/n/dist/bin");
+        assert_eq!(union_paths[1], "/n/local/bin");
+        assert_eq!(union_paths[2], "/n/custom/bin");
+    }
+
+    #[test]
+    fn test_dtrace_probe_provider() {
+        let mut dtrace = DTraceProbeProvider::new();
+        dtrace.register_probe("syscall", "kernel", "sys_open", "entry");
+
+        assert!(dtrace.fire_probe("entry", 1001, 0, 1000000000));
+        assert_eq!(dtrace.fired_events.len(), 1);
+        assert_eq!(dtrace.fired_events[0].arg0, 1001);
+    }
+
+    #[test]
+    fn test_openbsd_karl_entropy_generator() {
+        let mut karl = OpenBsdKarlEntropyGenerator::new(0xDEADBEEF);
+        let offset1 = karl.randomize_kernel_symbol("sys_pledge", 0x1000);
+        let offset2 = karl.randomize_kernel_symbol("sys_unveil", 0x2000);
+
+        assert!(offset1 >= 0x1000);
+        assert!(offset2 >= 0x2000);
+        assert_eq!(karl.randomized_function_offsets.len(), 2);
+    }
+
+    #[test]
+    fn test_netbsd_rump_vfs_dispatcher() {
+        let mut vfs = NetBsdRumpVfsDispatcher::new();
+        let fd_str = vfs.rump_sys_open("/var/log/syslog.log", true).unwrap();
+        assert!(fd_str.starts_with("RUMP_FD:"));
+
+        let written = vfs.rump_sys_write("/var/log/syslog.log", 128).unwrap();
+        assert_eq!(written, 128);
+        assert_eq!(vfs.dispatched_calls_count, 2);
     }
 }
