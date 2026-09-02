@@ -734,6 +734,41 @@ impl SystemdDynamicUserContext {
     }
 }
 
+/// BSD rc.d / Parallel Stage Boot Stage Solver
+pub struct BsdRcParallelStageSolver;
+
+impl BsdRcParallelStageSolver {
+    pub fn compute_parallel_stages(engine: &SystemdEngine, unit_ids: &[UnitID]) -> Vec<Vec<UnitID>> {
+        let mut stages = Vec::new();
+        let mut remaining: Vec<UnitID> = unit_ids.to_vec();
+        let mut completed: Vec<UnitID> = Vec::new();
+
+        while !remaining.is_empty() {
+            let mut stage = Vec::new();
+            for &id in &remaining {
+                if let Some(unit) = engine.find_unit(id) {
+                    let prereqs_met = unit.after.iter().all(|a| completed.contains(a))
+                        && unit.before.iter().all(|b| !remaining.contains(b) || *b == id);
+                    if prereqs_met {
+                        stage.push(id);
+                    }
+                } else {
+                    stage.push(id);
+                }
+            }
+            if stage.is_empty() {
+                stage = remaining.clone();
+            }
+            for &id in &stage {
+                completed.push(id);
+                remaining.retain(|&x| x != id);
+            }
+            stages.push(stage);
+        }
+        stages
+    }
+}
+
 /// Systemd Service Hardening Directives Evaluator (`systemd-analyze security`)
 pub struct SystemdServiceHardeningEvaluator;
 
@@ -2191,6 +2226,13 @@ mod tests {
         service.duration_ms = 300;
         service.requires.push(3);
 
+        let mut engine = SystemdEngine::new();
+        let mut target = SystemdUnit::new(1, b"graphical.target", UnitType::Target);
+        target.duration_ms = 100;
+        target.requires.push(2);
+        let mut service = SystemdUnit::new(2, b"display-manager.service", UnitType::Service);
+        service.duration_ms = 150;
+        service.requires.push(3);
         let mut network = SystemdUnit::new(3, b"network.target", UnitType::Target);
         network.duration_ms = 200;
 

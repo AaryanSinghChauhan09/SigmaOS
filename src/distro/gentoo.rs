@@ -12,7 +12,28 @@ use alloc::vec::Vec;
 
 use crate::klib::hashset::HashSet;
 use crate::klib::BTreeMap;
-use crate::sigpkg::Version;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self {
+            major,
+            minor,
+            patch,
+        }
+    }
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
 
 /// Portage USE Flag feature representation
 #[derive(Debug, Clone, PartialEq, Eq)]

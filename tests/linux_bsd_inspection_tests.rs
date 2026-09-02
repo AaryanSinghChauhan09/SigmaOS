@@ -6,6 +6,12 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[path = "../src/distro/mod.rs"]
+pub mod distro;
+
+#[path = "../src/init/systemd_init.rs"]
+pub mod systemd_init;
+
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/process/advanced_process_control.rs"]
@@ -83,6 +89,7 @@ use bsd_compat::{
     FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
 };
 use wiki_ideas_implementation as wiki_ideas;
+use wiki_ideas_implementation::{RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -124,6 +131,7 @@ fn test_zorin_gap_closure_inspection() {
 
 #[test]
 fn test_vm_manager_kvm_qemu_inspection() {
+    use std::path::PathBuf;
     use vm_manager::{
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
@@ -854,8 +862,8 @@ fn test_systemd_unit_dependency_engine_inspection() {
     );
 
     // Systemd Init Innovations Security & Diagnostics Inspection Test
-    use systemd_init::{
-        ProtectHomeLevel, ProtectSystemLevel, SystemdEngine, SystemdSecurityAuditor,
+    use super::systemd_init::{
+        BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine, SystemdSecurityAuditor,
         SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile, UnitType as SovUnitType,
     };
 
@@ -1064,7 +1072,7 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
 
 #[test]
 fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
-    use linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
+    use distro::linux_bsd_inspirations::{SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType};
 
     let modes = [
         DistroSubsystemMode::LinuxArch,
@@ -1080,7 +1088,7 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
     ];
 
     for mode in modes {
-        let mut bridge = SovereignUniversalDistroBridge::new(mode);
+        let bridge = SovereignUniversalDistroBridge::new(mode);
         assert!(bridge.verify_all_subsystems_compatibility());
         assert!(!bridge.translate_vfs_path("/etc").is_empty());
         assert!(!bridge.translate_vfs_path("/var/log").is_empty());

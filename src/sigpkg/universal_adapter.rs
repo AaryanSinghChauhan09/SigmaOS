@@ -528,7 +528,6 @@ impl UniversalPackageAdapter {
     }
 
     /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(not(test))]
     pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<Permission> {
         let mut permissions = Vec::new();
         for arg in plugs_or_args {
@@ -540,24 +539,6 @@ impl UniversalPackageAdapter {
                 permissions.push(Permission::FileWrite);
             } else if arg == "--share=ipc" {
                 permissions.push(Permission::Ipc);
-            }
-        }
-        permissions
-    }
-
-    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(test)]
-    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<String> {
-        let mut permissions = Vec::new();
-        for arg in plugs_or_args {
-            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
-                permissions.push("NetworkTcp".to_string());
-                permissions.push("NetworkUdp".to_string());
-            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
-                permissions.push("FileRead".to_string());
-                permissions.push("FileWrite".to_string());
-            } else if arg == "--share=ipc" {
-                permissions.push("Ipc".to_string());
             }
         }
         permissions
@@ -1113,11 +1094,13 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let name = foreign_name.trim().to_lowercase();
+        if name.contains("libc") || name == "glibc" || name.contains("musl") {
+            return "libc".to_string();
+        }
         match name.as_str() {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1525,16 +1508,8 @@ mod tests {
 
         // Verify container permissions map perfectly to SigmaOS capability permissions
         let perms = adapter.translate_sandbox_permissions(parsed.plugs.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileRead));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileRead".to_string()));
-        }
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileRead));
     }
 
     #[test]
@@ -1557,18 +1532,9 @@ mod tests {
         assert_eq!(parsed.finish_args.len(), 3);
 
         let perms = adapter.translate_sandbox_permissions(parsed.finish_args.as_slice());
-        #[cfg(not(test))]
-        {
-            assert!(perms.contains(&Permission::Ipc));
-            assert!(perms.contains(&Permission::NetworkTcp));
-            assert!(perms.contains(&Permission::FileWrite));
-        }
-        #[cfg(test)]
-        {
-            assert!(perms.contains(&"Ipc".to_string()));
-            assert!(perms.contains(&"NetworkTcp".to_string()));
-            assert!(perms.contains(&"FileWrite".to_string()));
-        }
+        assert!(perms.contains(&Permission::Ipc));
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileWrite));
     }
 
     #[test]
