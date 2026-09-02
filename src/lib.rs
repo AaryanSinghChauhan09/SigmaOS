@@ -19,6 +19,7 @@ pub mod driver;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -100,7 +101,7 @@ pub use driver::{
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
-    StrategicImportItem, StrategicImportPlanEngine,
+    GrowthDomainItem, SigmaosGrowthArchitectureEngine, StrategicImportItem, StrategicImportPlanEngine,
 };
 pub mod virtualization;
 

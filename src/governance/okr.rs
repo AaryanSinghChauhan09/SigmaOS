@@ -142,6 +142,168 @@ impl OkrTracker for StrategicOkrEvaluator {
     }
 }
 
+// ==========================================
+// 2. Milestone Dependency Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoadmapLayer {
+    Foundation,
+    Expansion,
+    Advanced,
+    Frontier,
+}
+
+#[derive(Debug, Clone)]
+pub struct MilestoneDependencyNode {
+    pub milestone_name: String,
+    pub core_dependencies: Vec<String>,
+    pub dependent_modules: Vec<String>,
+    pub impact: String,
+    pub layer: RoadmapLayer,
+}
+
+#[derive(Debug, Clone)]
+pub struct SigmaosMilestoneDependencyEngine {
+    pub nodes: Vec<MilestoneDependencyNode>,
+}
+
+impl SigmaosMilestoneDependencyEngine {
+    pub fn new() -> Self {
+        let nodes = vec![
+            MilestoneDependencyNode {
+                milestone_name: "SigmaCacheFlow".to_string(),
+                core_dependencies: Vec::new(),
+                dependent_modules: vec!["SigmaHyperKernel".to_string(), "SigmaVector".to_string()],
+                impact: "Predictive caching foundation".to_string(),
+                layer: RoadmapLayer::Foundation,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaThermal".to_string(),
+                core_dependencies: Vec::new(),
+                dependent_modules: vec!["SigmaHyperKernel".to_string()],
+                impact: "Smart thermal balancing".to_string(),
+                layer: RoadmapLayer::Foundation,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaRollback".to_string(),
+                core_dependencies: Vec::new(),
+                dependent_modules: vec!["SigmaRescue".to_string()],
+                impact: "Reliable rollback baseline".to_string(),
+                layer: RoadmapLayer::Foundation,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaAssist".to_string(),
+                core_dependencies: Vec::new(),
+                dependent_modules: vec!["SigmaDoc".to_string()],
+                impact: "AI troubleshooting".to_string(),
+                layer: RoadmapLayer::Foundation,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaMod".to_string(),
+                core_dependencies: vec!["Kernel modularity baseline".to_string()],
+                dependent_modules: vec!["SigmaProfile".to_string(), "SigmaContainer".to_string()],
+                impact: "Hot-swap modules".to_string(),
+                layer: RoadmapLayer::Expansion,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaProfile".to_string(),
+                core_dependencies: vec!["SigmaMod".to_string()],
+                dependent_modules: vec!["SigmaAurora".to_string()],
+                impact: "User-defined OS profiles".to_string(),
+                layer: RoadmapLayer::Expansion,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaLink".to_string(),
+                core_dependencies: vec!["Networking stack baseline".to_string()],
+                dependent_modules: vec!["SigmaSecureNet".to_string(), "SigmaCollab".to_string(), "SigmaEdgeNet".to_string()],
+                impact: "Unified connectivity".to_string(),
+                layer: RoadmapLayer::Expansion,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaSecureNet".to_string(),
+                core_dependencies: vec!["SigmaLink".to_string()],
+                dependent_modules: vec!["SigmaCollab".to_string()],
+                impact: "Encrypted networking".to_string(),
+                layer: RoadmapLayer::Expansion,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaCollab".to_string(),
+                core_dependencies: vec!["SigmaLink".to_string(), "SigmaSecureNet".to_string()],
+                dependent_modules: Vec::new(),
+                impact: "Real-time collaboration".to_string(),
+                layer: RoadmapLayer::Expansion,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaHyperKernel".to_string(),
+                core_dependencies: vec!["SigmaCacheFlow".to_string(), "SigmaThermal".to_string()],
+                dependent_modules: vec!["SigmaVector".to_string(), "SigmaNeuro".to_string()],
+                impact: "AI-driven kernel".to_string(),
+                layer: RoadmapLayer::Advanced,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaVector".to_string(),
+                core_dependencies: vec!["SigmaCacheFlow".to_string()],
+                dependent_modules: vec!["SigmaHyperKernel".to_string()],
+                impact: "SIMD acceleration".to_string(),
+                layer: RoadmapLayer::Advanced,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaContainer".to_string(),
+                core_dependencies: vec!["SigmaMod".to_string()],
+                dependent_modules: vec!["SigmaEdgeNet".to_string()],
+                impact: "Native container orchestration".to_string(),
+                layer: RoadmapLayer::Advanced,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaEdgeNet".to_string(),
+                core_dependencies: vec!["SigmaLink".to_string(), "SigmaContainer".to_string()],
+                dependent_modules: Vec::new(),
+                impact: "Edge-aware networking".to_string(),
+                layer: RoadmapLayer::Frontier,
+            },
+            MilestoneDependencyNode {
+                milestone_name: "SigmaRescue".to_string(),
+                core_dependencies: vec!["SigmaRollback".to_string()],
+                dependent_modules: Vec::new(),
+                impact: "Disaster recovery mode".to_string(),
+                layer: RoadmapLayer::Frontier,
+            },
+        ];
+
+        Self { nodes }
+    }
+
+    pub fn generate_dependency_chart(&self) -> String {
+        let mut chart = String::from("# SigmaOS Milestone Dependency Chart\n\n");
+        chart.push_str("| Milestone | Core Dependencies | Dependent Modules | Impact |\n");
+        chart.push_str("|---|---|---|---|\n");
+        for node in &self.nodes {
+            let deps = if node.core_dependencies.is_empty() {
+                "None (baseline)".to_string()
+            } else {
+                node.core_dependencies.join(", ")
+            };
+            let dependents = if node.dependent_modules.is_empty() {
+                "None".to_string()
+            } else {
+                node.dependent_modules.join(", ")
+            };
+            chart.push_str(&format!(
+                "| {} | {} | {} | {} |\n",
+                node.milestone_name, deps, dependents, node.impact
+            ));
+        }
+        chart
+    }
+}
+
+impl Default for SigmaosMilestoneDependencyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -235,5 +397,16 @@ mod tests {
         let tracker = CustomOkrTracker;
         assert_eq!(tracker.name(), "CustomOkrTracker");
         assert_eq!(tracker.evaluate_progress(), 88.5);
+    }
+
+    #[test]
+    fn test_milestone_dependency_engine() {
+        let engine = SigmaosMilestoneDependencyEngine::new();
+        assert_eq!(engine.nodes.len(), 14);
+
+        let chart = engine.generate_dependency_chart();
+        assert!(chart.contains("# SigmaOS Milestone Dependency Chart"));
+        assert!(chart.contains("SigmaCacheFlow"));
+        assert!(chart.contains("SigmaHyperKernel"));
     }
 }
