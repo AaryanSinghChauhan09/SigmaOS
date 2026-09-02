@@ -87,7 +87,13 @@ fn cmd_install(args: &[String]) {
         };
         let text = String::from_utf8_lossy(&data);
         match adapter.parse_and_translate_manifest(target, &text) {
-            Ok(parsed) => (parsed, data),
+            Ok(mut parsed) => {
+                parsed.name = dep_mapper.to_canonical_name(&parsed.name);
+                for dep in &mut parsed.dependencies {
+                    dep.name = dep_mapper.to_canonical_name(&dep.name);
+                }
+                (parsed, data)
+            }
             Err(_) => {
                 // If parsing raw text fails, synthesize a package from filename
                 let name = path
@@ -106,14 +112,14 @@ fn cmd_install(args: &[String]) {
                 (pkg, data)
             }
         }
-    } else if adapter.detect_format_by_extension(target).is_some() {
+    } else if let Some(fmt) = adapter.detect_format_by_extension(target) {
         // Filename specified with foreign package extension but file not found on disk: parse spec/name
         let clean_name = target.split('.').next().unwrap_or(target);
         let canonical_name = dep_mapper.to_canonical_name(clean_name);
         let pkg = Package::new(
             canonical_name,
             Version::parse("1.0.0").unwrap(),
-            format!("Foreign format package spec {}", target),
+            format!("Foreign format {:?} package spec {}", fmt, target),
             Vec::new(),
             format!("sha256-{}", target),
         );
