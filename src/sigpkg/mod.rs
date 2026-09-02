@@ -54,6 +54,13 @@ pub mod transaction_log;
 pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
+pub use universal_oop_system::{
+    AuditedPackageDecorator, ConffileMergeEngine, DebianDiverterEngine, IPackageCommand,
+    IPackageObserver, NixStoreGcEngine, PackageBuildPhase, PackageEvent, PackageEventManager,
+    PacmanHook, PacmanHookEngine, PacmanHookWhen, RpmMacroEvaluator, SandboxedPackageDecorator,
+    SovereignAlternativesEngine, TransactionRollbackExecutor, UserDefinedFunctionPipeline,
+    UserDefinedPhaseClosure,
+};
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
