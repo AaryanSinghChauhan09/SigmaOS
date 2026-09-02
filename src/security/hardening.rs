@@ -51,6 +51,27 @@ impl MemoryProtectionState {
         } else {
             Ok(requested)
         }
+
+        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
+        for i in 0..self.logs.len() {
+            let log = &self.logs[i];
+            if log.previous_hash != expected_prev {
+                return false; // Chain broken! Tampering detected!
+            }
+
+            let payload: u64 = log.process_id
+                ^ (log.permission as u64)
+                ^ (if log.status_allowed { 1u64 } else { 0u64 });
+            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
+
+            if log.entry_hash != calculated_hash {
+                return false; // Entry hash mismatch! Tampering detected!
+            }
+
+            expected_prev = log.entry_hash;
+        }
+
+        true
     }
 }
 

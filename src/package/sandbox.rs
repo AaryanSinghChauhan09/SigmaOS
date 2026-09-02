@@ -32,7 +32,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SandboxID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum SandboxState {
     Created = 0,
@@ -350,6 +350,11 @@ impl ResourceQuota for SimpleResourceQuota {
     }
 }
 
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
     fn new() -> Self {

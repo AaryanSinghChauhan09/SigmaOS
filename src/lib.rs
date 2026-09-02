@@ -5,6 +5,7 @@
 // Core working modules
 pub mod ai;
 pub mod app;
+pub mod futuristic_modules;
 pub mod auth;
 pub mod accessibility;
 pub mod automation;
@@ -125,6 +126,7 @@ pub mod crypto {
 }
 
 pub mod logging;
+pub mod ai;
 // pub mod system;
 pub mod installer;
 pub mod performance;

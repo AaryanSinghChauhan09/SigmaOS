@@ -1,16 +1,14 @@
 // SigmaOS Desktop Module
-pub mod compositor;
 pub mod mate_betsy;
 pub mod moksha;
 pub mod pantheon;
-pub mod screensaver;
 pub mod zenith_compositor;
 
-pub use compositor::{Compositor, Surface, Window, WindowGeometry, WindowLayer, WindowState};
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
+pub mod screensaver;
 
 pub use screensaver::{
     DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
@@ -28,6 +26,6 @@ pub use moksha::{
     WallpaperTransition,
 };
 pub use zenith_compositor::{
-    DamageRegion, InputEvent, InputEventData, InputEventType, Output, SurfaceType,
-    ZenithCompositor, ZenithWindow,
+    DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
+    WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };

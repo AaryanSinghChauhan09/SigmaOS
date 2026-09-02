@@ -373,6 +373,9 @@ mod tests_agent_memory {
         assert!(marketplace.verify_model_provenance(1));
     }
 
+    #[test]
+    fn test_model_marketplace_pqc_verification() {
+        let mut marketplace = ModelMarketplace::new();
         let model_id = marketplace.register_signed_model(
             "DeepSeek-R1-Distill",
             "1.5B",
@@ -381,7 +384,12 @@ mod tests_agent_memory {
         assert_eq!(model_id, 1);
         assert!(marketplace.verify_model_provenance(1));
     }
+}
 
+/// Curated AI Model Marketplace supporting PQC-signed provenance verification (Roadmap Item 92)
+pub struct ModelMarketplace {
+    pub registered_models: Vec<(usize, String, String, String, bool)>, // (id, name, ver, pqc_sig, verified)
+}
 
 impl ModelMarketplace {
     pub fn new() -> Self {

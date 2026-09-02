@@ -307,7 +307,7 @@ pub trait ConflictResolver {
     fn get_resolution_strategy(&self) -> ResolutionStrategy;
 }
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResolutionStrategy {
     Newest = 0,
@@ -347,6 +347,11 @@ impl ConflictResolver for SimpleConflictResolver {
     }
 }
 
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
     fn new() -> Self {

@@ -23,12 +23,11 @@ pub mod bsd_linux_package_innovations;
 pub mod cache;
 pub mod debian;
 pub mod debian_translator;
-pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod gentoo_opt;
-pub mod hardening;
 pub mod linux_translation;
 pub mod manager;
+pub mod repository;
 pub mod repository;
 pub mod resolver;
 pub mod sandbox;
@@ -36,6 +35,8 @@ pub mod sigma_pkg;
 pub mod signing;
 pub mod spac;
 pub mod store;
+pub mod store;
+pub mod universal;
 pub mod universal;
 pub mod updater;
 
@@ -71,4 +72,10 @@ pub use store::{
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, ArchSplitPackageHookRunnerEngine,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine,
+    NixGuixCasGcProfileEngine, XbpsSonameAndOrphanEngine,
 };
