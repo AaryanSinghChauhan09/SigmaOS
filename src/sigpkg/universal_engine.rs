@@ -621,19 +621,19 @@ impl IPackageAdapter for PetPackageAdapter {
 
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::Apt } // or custom snap mapping
+    fn format(&self) -> PackageFormat { PackageFormat::Snap }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() { return Err("Empty Snap payload"); }
-        Ok(PackageContext { name: "snap-compat-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Apt, dependencies: vec![], files: vec![], hash: [0x21; 32] })
+        Ok(PackageContext { name: "snap-compat-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Snap, dependencies: vec![], files: vec![], hash: [0x21; 32] })
     }
     fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> { Ok(()) }
 }
 
 impl IPackageAdapter for FlatpakPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::Apt }
+    fn format(&self) -> PackageFormat { PackageFormat::Flatpak }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() { return Err("Empty Flatpak payload"); }
-        Ok(PackageContext { name: "flatpak-compat-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Apt, dependencies: vec![], files: vec![], hash: [0x22; 32] })
+        Ok(PackageContext { name: "flatpak-compat-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Flatpak, dependencies: vec![], files: vec![], hash: [0x22; 32] })
     }
     fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> { Ok(()) }
 }
