@@ -11,7 +11,7 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
-#[path = "memory/pmm_vmm.rs"]
+#[path = "../memory/pmm_vmm.rs"]
 pub mod pmm_vmm;
 #[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;

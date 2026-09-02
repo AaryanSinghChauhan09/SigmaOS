@@ -234,12 +234,24 @@ impl<T> Vec<T> {
         }
     }
 
+    /// Optimized by Bolt ⚡: replaces element-by-element push loops with a single capacity
+    /// reservation and bulk memory copy (`copy_nonoverlapping`), converting O(N) reallocations
+    /// and checks into an O(1) bulk SIMD/memcpy write.
     pub fn extend_from_slice(&mut self, other: &[T])
     where
         T: Copy,
     {
-        for &item in other {
-            self.push(item);
+        if other.is_empty() {
+            return;
+        }
+        self.reserve(other.len());
+        unsafe {
+            core::ptr::copy_nonoverlapping(
+                other.as_ptr(),
+                self.data.add(self.len),
+                other.len(),
+            );
+            self.len += other.len();
         }
     }
 
