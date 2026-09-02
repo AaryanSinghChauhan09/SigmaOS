@@ -68,27 +68,27 @@ impl SigmaXBPS {
                 self.update_repository_metadata(repo)?;
             }
         }
-        
+
         let updates = self.get_package_updates()?;
         for update in updates {
             self.update_package(&update)?;
         }
-        
+
         Ok(())
     }
 
     pub fn set_alternative(&mut self, group: &str, path: &str, priority: i32) -> Result<(), XbpsError> {
         let alt_group = self.alternatives.groups.get_mut(group)
             .ok_or(XbpsError::AlternativeGroupNotFound)?;
-        
+
         let alternative = Alternative {
             path: path.to_string(),
             priority,
         };
-        
+
         alt_group.alternatives.push(alternative);
         alt_group.current = path.to_string();
-        
+
         self.update_alternative_symlinks(group)?;
         Ok(())
     }
@@ -128,27 +128,27 @@ impl SigmaRunit {
     pub fn enable_service(&mut self, service_name: &str) -> Result<(), RunitError> {
         let service = self.services.get_mut(service_name)
             .ok_or(RunitError::ServiceNotFound)?;
-        
+
         service.enabled = true;
         self.create_symlink(service_name)?;
-        
+
         Ok(())
     }
 
     pub fn disable_service(&mut self, service_name: &str) -> Result<(), RunitError> {
         let service = self.services.get_mut(service_name)
             .ok_or(RunitError::ServiceNotFound)?;
-        
+
         service.enabled = false;
         self.remove_symlink(service_name)?;
-        
+
         Ok(())
     }
 
     pub fn sv(&mut self, service_name: &str, command: SvCommand) -> Result<(), RunitError> {
         let service = self.services.get_mut(service_name)
             .ok_or(RunitError::ServiceNotFound)?;
-        
+
         match command {
             SvCommand::Up => {
                 self.start_service(service)?;
@@ -165,7 +165,7 @@ impl SigmaRunit {
                 service.status = self.check_service_status(service_name)?;
             }
         }
-        
+
         Ok(())
     }
 }
@@ -246,10 +246,10 @@ impl SigmaPackageSignatures {
     pub fn sign_package(&self, package: &Package, key_id: &str) -> Result<Vec<u8>, SignatureError> {
         let key = self.keys.get(key_id)
             .ok_or(SignatureError::KeyNotFound)?;
-        
+
         let private_key = key.private_key.as_ref()
             .ok_or(SignatureError::NoPrivateKey)?;
-        
+
         self.sign_with_key(package, private_key)
     }
 }
