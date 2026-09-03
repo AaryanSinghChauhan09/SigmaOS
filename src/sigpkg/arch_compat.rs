@@ -1004,6 +1004,10 @@ mod tests {
     }
 
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
         let mut verifier = SAurP2pVerifier::new(

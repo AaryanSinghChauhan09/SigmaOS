@@ -14,6 +14,9 @@ use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
+    use alloc::format;
+    use alloc::string::{String, ToString};
+
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,

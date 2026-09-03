@@ -252,7 +252,7 @@ mod tests {
     fn test_fedora_flask_oidc_provider() {
         let issuer = "https://id.fedoraproject.org/openidc/";
         let client_id = "sigmaos-client";
-        let client_secret = "test_mock_secret123";
+        let client_secret = "mock_test_secret_321";
 
         let mut provider = FedoraFlaskOidcProvider::new(issuer, client_id, client_secret);
 

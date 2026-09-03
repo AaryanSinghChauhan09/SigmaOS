@@ -156,6 +156,7 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
+
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
@@ -176,8 +177,11 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
+            DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
 
@@ -331,7 +335,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
             | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -345,6 +348,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
         };
