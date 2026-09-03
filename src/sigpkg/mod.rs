@@ -158,6 +158,8 @@ pub use pacman_contrib::{
 };
 pub use svntogit_repro::{
     SovereignSvnToGitMigrator, SvnRevisionLog, ConvertedGitCommit, SvnBranchType,
+    SvnActionType, SvnXattrProperties, PkgctlSplitMigrationEngine, SplitPackageRepoConfig,
+    BsdPortsCvsSvnToGitMapper, BsdPortsRcsTag,
     ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
     ReproducibilityAttestationReport,
 };

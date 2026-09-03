@@ -881,104 +881,69 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_universal_distro_gap_resolver() {
-        let mut resolver = SovereignUniversalDistroGapResolver::new();
-        assert_eq!(resolver.resolve_dracut_initramfs_dependencies(), 5);
-        assert!(resolver.verify_bsd_geom_storage_readiness());
+    fn test_sovereign_dns_tls_resolver_engine() {
+        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let localhost = resolver.resolve_query(b"localhost");
+        assert_eq!(localhost, Some([127, 0, 0, 1]));
 
-        assert_eq!(resolver.lookup_modprobe_alias("char-major-10-200"), Some("tun"));
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+        let example = resolver.resolve_query(b"example.org");
+        assert_eq!(example, Some([10, 0, 0, 50]));
 
-        assert!(!resolver.faillock_guard.record_failure());
-        assert!(!resolver.faillock_guard.record_failure());
-        assert!(resolver.faillock_guard.record_failure());
-        assert!(resolver.faillock_guard.is_locked);
-
-        resolver.faillock_guard.reset();
-        assert!(!resolver.faillock_guard.is_locked);
-    }
-}
-
-// ============================================================================
-// 7. Universal Linux & BSD Distro Gap Resolver
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PamFaillockGuard {
-    pub failed_attempts: u32,
-    pub max_failures: u32,
-    pub is_locked: bool,
-}
-
-impl PamFaillockGuard {
-    pub fn new(max_failures: u32) -> Self {
-        Self {
-            failed_attempts: 0,
-            max_failures,
-            is_locked: false,
-        }
+        resolver.clear_cache();
+        assert_eq!(resolver.cache.len(), 1);
     }
 
-    pub fn record_failure(&mut self) -> bool {
-        self.failed_attempts += 1;
-        if self.failed_attempts >= self.max_failures {
-            self.is_locked = true;
-        }
-        self.is_locked
+    #[test]
+    fn test_sovereign_dynamic_devfs_engine() {
+        let mut devfs = SovereignDynamicDevfsEngine::new();
+        let null_node = devfs.lookup_node(b"/dev/null");
+        assert!(null_node.is_some());
+
+        devfs.register_node(DynamicDeviceNode {
+            name: Vec::from(b"/dev/sda1".as_slice()),
+            major: 8,
+            minor: 1,
+            node_type: DeviceNodeType::BlockDevice,
+            permissions_octal: 0o600,
+            symlinks: Vec::new(),
+        });
+
+        assert!(devfs.add_uuid_symlink(b"/dev/sda1", b"/dev/disk/by-uuid/1234-5678"));
+        let lookup_symlink = devfs.lookup_node(b"/dev/disk/by-uuid/1234-5678");
+        assert!(lookup_symlink.is_some());
+        assert_eq!(lookup_symlink.unwrap().name, b"/dev/sda1");
     }
 
-    pub fn reset(&mut self) {
-        self.failed_attempts = 0;
-        self.is_locked = false;
-    }
-}
+    #[test]
+    fn test_sovereign_stateful_nat_engine() {
+        let mut nat = SovereignStatefulNatEngine::new();
+        nat.add_rule(NatRule {
+            id: 1,
+            rule_kind: NatRuleKind::DnatPortForwarding,
+            original_ip: [203, 0, 113, 10],
+            original_port: 8080,
+            translated_ip: [192, 168, 1, 100],
+            translated_port: 80,
+        });
 
-#[derive(Debug, Clone)]
-pub struct SovereignUniversalDistroGapResolver {
-    pub dracut_modules_loaded: Vec<&'static str>,
-    pub faillock_guard: PamFaillockGuard,
-    pub bsd_geom_layers: Vec<&'static str>,
-    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
-}
-
-impl SovereignUniversalDistroGapResolver {
-    pub fn new() -> Self {
-        #[cfg(not(target_os = "none"))]
-        use std::vec;
-
-        let mut auto_modprobe_aliases = Vec::new();
-        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
-        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
-        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
-
-        Self {
-            dracut_modules_loaded: vec!["bash", "systemd", "kernel-modules", "rootfs-generator", "network"],
-            faillock_guard: PamFaillockGuard::new(3),
-            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
-            auto_modprobe_aliases,
-        }
+        let (dst_ip, dst_port) = nat.process_packet([198, 51, 100, 5], 54321, [203, 0, 113, 10], 8080, 6);
+        assert_eq!(dst_ip, [192, 168, 1, 100]);
+        assert_eq!(dst_port, 80);
+        assert_eq!(nat.conntrack_table.len(), 1);
     }
 
-    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
-        self.dracut_modules_loaded.len()
-    }
+    #[test]
+    fn test_sovereign_journald_binary_storage_engine() {
+        let mut journal = SovereignJournaldBinaryStorageEngine::new(2);
+        journal.append_entry(1000, JournalLogLevel::Info, b"kernel", b"Boot completed");
+        journal.append_entry(2000, JournalLogLevel::Error, b"sshd", b"Auth failed");
+        assert_eq!(journal.records.len(), 2);
 
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        for &(a, mod_name) in &self.auto_modprobe_aliases {
-            if a == alias {
-                return Some(mod_name);
-            }
-        }
-        None
-    }
+        journal.append_entry(3000, JournalLogLevel::Warning, b"kernel", b"OOM pressure");
+        assert_eq!(journal.records.len(), 2);
 
-    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
-        !self.bsd_geom_layers.is_empty()
-    }
-}
-
-impl Default for SovereignUniversalDistroGapResolver {
-    fn default() -> Self {
-        Self::new()
+        let kernel_logs = journal.query_by_identifier(b"kernel");
+        assert_eq!(kernel_logs.len(), 1);
+        assert_eq!(kernel_logs[0].message, b"OOM pressure");
     }
 }

@@ -60,6 +60,13 @@ pub mod legacy_adapters;
 pub mod linux_adapter;
 pub mod linux_compat;
 pub mod linux_distro_parity;
+pub use linux_distro_parity::{
+    FstabEntry, LinuxCoreDumpFilterEngine, LinuxFstabEngine, LinuxLdSoLoader,
+    LinuxModulesLoadEngine, LinuxPamAuthenticationEngine, LinuxRunlevel, LinuxRunlevelGovernor,
+    LinuxSwapfileManagerEngine, LinuxSysctlGovernor, LinuxSystemdTmpfilesEngine,
+    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice,
+    SwapKind, TmpfileItemType, TmpfileRule, UdevRule,
+};
 pub mod linux_init;
 pub mod linux_network;
 pub mod linux_security;
