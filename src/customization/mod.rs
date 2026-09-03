@@ -14,6 +14,8 @@ pub use profile::{
     ProfileSwitcher, ZenithProfile,
 };
 
-pub use cursor::{
-    CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine,
+pub use cursor::{CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine};
+pub use theme::{
+    IconThemeEngine, SigmaSoundscape, SovereignCssColorEngine,
+    ThemeEngine, ThemeProvider, ZenithBackdropFilter,
 };

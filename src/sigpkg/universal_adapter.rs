@@ -548,6 +548,7 @@ impl UniversalPackageAdapter {
         permissions
     }
 
+
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
         let f = filename.to_lowercase();

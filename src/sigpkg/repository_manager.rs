@@ -38,6 +38,32 @@ impl PpaRepository {
 }
 
 
+pub struct MirrorBenchmarkEngine;
+
+impl MirrorBenchmarkEngine {
+    pub fn benchmark_mirrors(mirrors: &[String]) -> Vec<MirrorBenchmark> {
+        let mut results = Vec::new();
+        for (idx, url) in mirrors.iter().enumerate() {
+            // Simulated latency and speed benchmark calculation
+            let latency = 20 + ((idx * 15) % 100) as u32;
+            let speed = 10000 - (latency * 30);
+            results.push(MirrorBenchmark {
+                url: url.clone(),
+                latency_ms: latency,
+                download_speed_kbps: speed,
+            });
+        }
+        results
+    }
+}
+
+/// GPG Key Verification for Repositories
+#[derive(Debug, Clone)]
+pub struct RepositoryGpgKey {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_valid: bool,
+}
 
 impl RepositoryGpgKey {
     pub fn new(key_id: &str, owner_email: &str) -> Self {

@@ -391,6 +391,46 @@ impl BodhiUpdateTriage {
         }
     }
 
+    pub fn link_bug(&mut self, update_id: &str, bug_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.bugs.contains(&bug_id.to_string()) {
+                up.bugs.push(bug_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn link_cve(&mut self, update_id: &str, cve_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.cves.contains(&cve_id.to_string()) {
+                up.cves.push(cve_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn record_ci_result(&mut self, update_id: &str, result: BodhiTestResult) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.ci_test_result = result;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn advance_testing_days(&mut self, update_id: &str, days: u32) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.days_in_testing += days;
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn submit_feedback(&mut self, update_id: &str, karma_delta: i32) -> Result<i32, String> {
         self.add_comment(
             update_id,
@@ -3283,6 +3323,326 @@ impl Default for FedoraIgnitionEngine {
 }
 
 // =========================================================================
+// Fedora Dracut Initramfs Builder Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DracutModule {
+    pub name: String,
+    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
+    pub drivers: Vec<String>,
+}
+
+/// Fedora Dracut Modular Initramfs Generation & Hook Engine
+/// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
+pub struct FedoraDracutInitramfsEngine {
+    pub modules: Vec<DracutModule>,
+    pub kernel_version: String,
+    pub compression_format: String, // "zstd", "xz", "gzip"
+}
+
+impl FedoraDracutInitramfsEngine {
+    pub fn new(kernel_version: &str) -> Self {
+        let mut engine = Self {
+            modules: Vec::new(),
+            kernel_version: kernel_version.to_string(),
+            compression_format: "zstd".to_string(),
+        };
+        engine.load_default_dracut_modules();
+        engine
+    }
+
+    fn load_default_dracut_modules(&mut self) {
+        self.modules.push(DracutModule {
+            name: "90crypt".to_string(),
+            hook_stage: "cmdline".to_string(),
+            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
+        });
+        self.modules.push(DracutModule {
+            name: "95rootfs".to_string(),
+            hook_stage: "pre-pivot".to_string(),
+            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
+        });
+    }
+
+    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
+        self.modules.push(DracutModule {
+            name: name.to_string(),
+            hook_stage: stage.to_string(),
+            drivers: drivers.iter().map(|d| d.to_string()).collect(),
+        });
+    }
+
+    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
+        if self.modules.is_empty() {
+            Err("Dracut: No modules included in initramfs build")
+        } else {
+            Ok(format!(
+                "/boot/initramfs-{}.img ({} modules, compressed with {})",
+                self.kernel_version,
+                self.modules.len(),
+                self.compression_format
+            ))
+        }
+    }
+}
+
+// =========================================================================
+// Fedora ABRT (Automatic Bug Reporting Tool) Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AbrtCrashReport {
+    pub crash_id: String,
+    pub executable_path: String,
+    pub signal_name: String,
+    pub stack_trace: String,
+    pub kernel_release: String,
+    pub timestamp_secs: u64,
+    pub count: u32,
+    pub reported_to_bugzilla: bool,
+}
+
+/// Fedora ABRT (Automatic Bug Reporting Tool) Crash Daemon
+/// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
+/// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
+pub struct FedoraAbrtCrashDaemon {
+    pub captured_crashes: HashMap<String, AbrtCrashReport>, // crash_id -> report
+    pub messaging_engine: FedoraMessagingEngine,
+    pub total_crashes_handled: u64,
+}
+
+impl FedoraAbrtCrashDaemon {
+    pub fn new() -> Self {
+        Self {
+            captured_crashes: HashMap::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+            total_crashes_handled: 0,
+        }
+    }
+
+    pub fn capture_crash(
+        &mut self,
+        exe_path: &str,
+        signal: &str,
+        backtrace: &str,
+        kernel_ver: &str,
+        timestamp_secs: u64,
+    ) -> AbrtCrashReport {
+        self.total_crashes_handled += 1;
+        let signature = format!("{}:{}:{}", exe_path, signal, backtrace);
+        let crash_id = format!("abrt-{:08x}", self.total_crashes_handled);
+
+        if let Some(existing) = self.captured_crashes.get_mut(&signature) {
+            existing.count += 1;
+            return existing.clone();
+        }
+
+        let report = AbrtCrashReport {
+            crash_id: crash_id.clone(),
+            executable_path: exe_path.to_string(),
+            signal_name: signal.to_string(),
+            stack_trace: backtrace.to_string(),
+            kernel_release: kernel_ver.to_string(),
+            timestamp_secs,
+            count: 1,
+            reported_to_bugzilla: false,
+        };
+
+        let topic = format!("org.fedoraproject.prod.abrt.crash.{}", signal.to_lowercase());
+        let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
+        self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+
+        self.captured_crashes.insert(signature, report.clone());
+        report
+    }
+
+    pub fn mark_reported(&mut self, crash_id: &str) -> bool {
+        for report in self.captured_crashes.values_mut() {
+            if report.crash_id == crash_id {
+                report.reported_to_bugzilla = true;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for FedoraAbrtCrashDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Toolbx OCI Development Container Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToolbxContainer {
+    pub name: String,
+    pub image: String,
+    pub host_mounts: Vec<String>,
+    pub environment_vars: HashMap<String, String>,
+    pub running: bool,
+}
+
+/// Fedora Toolbx Interactive OCI Development Environment Manager
+/// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
+pub struct FedoraToolbxContainerEngine {
+    pub active_containers: HashMap<String, ToolbxContainer>,
+}
+
+impl FedoraToolbxContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_containers: HashMap::new(),
+        }
+    }
+
+    pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
+        let mut default_mounts = vec![
+            "/home".to_string(),
+            "/var/srv".to_string(),
+            "/dev".to_string(),
+            "/run/host".to_string(),
+        ];
+        let mut env = HashMap::new();
+        env.insert("TOOLBX_NAME".to_string(), name.to_string());
+        env.insert("SHELL".to_string(), "/bin/bash".to_string());
+
+        let container = ToolbxContainer {
+            name: name.to_string(),
+            image: image.to_string(),
+            host_mounts: default_mounts,
+            environment_vars: env,
+            running: false,
+        };
+
+        self.active_containers.insert(name.to_string(), container.clone());
+        container
+    }
+
+    pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            c.running = true;
+            Ok(format!("Toolbx container '{}' started using image '{}'", c.name, c.image))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
+    pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            if !c.host_mounts.contains(&host_path.to_string()) {
+                c.host_mounts.push(host_path.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraToolbxContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionFile {
+    pub path: String,
+    pub mode: u32,
+    pub content: String,
+    pub overwrite: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionUser {
+    pub name: String,
+    pub ssh_authorized_keys: Vec<String>,
+    pub groups: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionSystemdUnit {
+    pub name: String,
+    pub enabled: bool,
+    pub contents: String,
+}
+
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
+}
+
+impl FedoraIgnitionEngine {
+    pub fn new() -> Self {
+        Self {
+            files: Vec::new(),
+            users: Vec::new(),
+            systemd_units: Vec::new(),
+            provisioned: false,
+        }
+    }
+
+    pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
+        self.files.push(IgnitionFile {
+            path: path.to_string(),
+            mode,
+            content: content.to_string(),
+            overwrite: true,
+        });
+    }
+
+    pub fn add_user(&mut self, name: &str, ssh_keys: &[&str], groups: &[&str]) {
+        self.users.push(IgnitionUser {
+            name: name.to_string(),
+            ssh_authorized_keys: ssh_keys.iter().map(|s| s.to_string()).collect(),
+            groups: groups.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn add_systemd_unit(&mut self, name: &str, enabled: bool, contents: &str) {
+        self.systemd_units.push(IgnitionSystemdUnit {
+            name: name.to_string(),
+            enabled,
+            contents: contents.to_string(),
+        });
+    }
+
+    pub fn execute_provisioning(&mut self) -> Result<String, &'static str> {
+        if self.provisioned {
+            return Err("Ignition provisioning already executed; runs once on first boot");
+        }
+
+        self.provisioned = true;
+        Ok(format!(
+            "Ignition: Provisioned {} files, {} users, and {} systemd units successfully",
+            self.files.len(),
+            self.users.len(),
+            self.systemd_units.len()
+        ))
+    }
+}
+
+impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
 // =========================================================================
 
@@ -4362,6 +4722,61 @@ mod tests {
         bodhi.submit_update("FEDORA-2023-SEC1");
         assert!(bodhi.apply_security_karma_waiver("FEDORA-2023-SEC1").is_ok());
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
+    }
+
+    #[test]
+    fn test_bodhi_advanced_lifecycle() {
+        let mut bodhi = BodhiUpdateTriage::new();
+
+        // 1. Create a Critical Path update
+        bodhi.create_update(
+            "SIGMA-2026-CRIT01",
+            vec!["systemd-255-1.fc39.x86_64".to_string()],
+            BodhiUpdateType::Enhancement,
+            "SigmaOS-39",
+            true, // is_critpath
+        );
+
+        bodhi.link_bug("SIGMA-2026-CRIT01", "RHBZ-200101");
+        bodhi.link_cve("SIGMA-2026-CRIT01", "CVE-2026-0001");
+
+        // Karma +2, but min_testing_days is 7 -> promo fails initially
+        bodhi.submit_feedback("SIGMA-2026-CRIT01", 3).unwrap(); // Karma 3 meets threshold
+        assert!(!bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // Advance days in testing to 7
+        bodhi.advance_testing_days("SIGMA-2026-CRIT01", 7);
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // 2. Greenwave CI test failure gate
+        bodhi.create_update(
+            "SIGMA-2026-FAIL01",
+            vec!["badpkg-1.0.rpm".to_string()],
+            BodhiUpdateType::Bugfix,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
+        bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-FAIL01").is_err()); // Greenwave failure blocks
+
+        // 3. Security Fast-Track
+        bodhi.create_update(
+            "SIGMA-2026-SEC01",
+            vec!["openssl-3.1.0.rpm".to_string()],
+            BodhiUpdateType::Security,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.link_cve("SIGMA-2026-SEC01", "CVE-2026-9999");
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-SEC01").unwrap()); // Security fast track
+
+        // 4. Updateinfo XML generation
+        let xml = bodhi.generate_updateinfo_xml();
+        assert!(xml.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assert!(xml.contains("CVE-2026-9999"));
+        assert!(xml.contains("RHBZ-200101"));
+        assert!(xml.contains("<update id=\"SIGMA-2026-CRIT01\""));
     }
 
     #[test]

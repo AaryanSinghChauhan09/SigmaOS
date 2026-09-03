@@ -167,10 +167,12 @@ pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
 };
 pub use mint_linux::{
-    Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
+    LoopbackDiskFormat, Mint4WinInstallationConfig,
+    Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
     MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
-    MintReportSystem, MintSoftwareManager, MintTimeshiftEngine,
-    MintUpdateManager, MintUpdatePackage, TimeshiftSnapshot,
+    MintReportAlertSeverity, MintReportSystem, MintSoftwareManager, MintTimeshiftEngine,
+    MintUpdateLevel, MintUpdateManager, MintUpdatePackage, TimeshiftSnapshot,
+    WindowsBootloaderType,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};

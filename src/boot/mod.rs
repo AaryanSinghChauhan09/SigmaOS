@@ -23,9 +23,9 @@ pub use firmware::{
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use plymouth::{GtkPlymouthBootsplashEngine, PlymouthMode, PlymouthTheme};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
-pub use sigma_boot::{BootEntry, BootManager, BootTheme};
-pub use plymouth::{
-    GtkPlymouthBootsplashEngine, PlymouthMode, PlymouthTheme,
+pub use sigma_boot::{
+    BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
+    SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
 };
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
