@@ -9,6 +9,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap as HashMap;
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::collections::HashMap;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -33,27 +34,74 @@ pub struct RpmPackage {
     pub obsoletes: Vec<String>,
 }
 
+/// RPM macro expander for Fedora build macros
+#[derive(Debug, Clone)]
+pub struct RpmMacroExpander {
+    macros: HashMap<String, String>,
+}
+
+impl RpmMacroExpander {
+    pub fn new() -> Self {
+        let mut macros = HashMap::new();
+        macros.insert("_bindir".to_string(), "/usr/bin".to_string());
+        macros.insert("_sbindir".to_string(), "/usr/sbin".to_string());
+        macros.insert("_sysconfdir".to_string(), "/etc".to_string());
+        macros.insert("_datadir".to_string(), "/usr/share".to_string());
+        macros.insert("_includedir".to_string(), "/usr/include".to_string());
+        macros.insert("_libdir".to_string(), "/usr/lib64".to_string());
+        macros.insert("_mandir".to_string(), "/usr/share/man".to_string());
+        macros.insert("_docdir".to_string(), "/usr/share/doc".to_string());
+        macros.insert("dist".to_string(), ".fc40".to_string());
+        Self { macros }
+    }
+
+    pub fn set_macro(&mut self, key: &str, val: &str) {
+        self.macros.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn expand(&self, text: &str) -> String {
+        let mut result = text.to_string();
+        for (k, v) in &self.macros {
+            let pattern1 = format!("%{{{}}}", k);
+            let pattern2 = format!("%{{?{}}}", k);
+            result = result.replace(&pattern1, v);
+            result = result.replace(&pattern2, v);
+        }
+        result
+    }
+}
+
+impl Default for RpmMacroExpander {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// RPM spec file parser
 pub struct RpmSpecParser {
     sections: HashMap<String, Vec<String>>,
+    headers: HashMap<String, String>,
+    expander: RpmMacroExpander,
 }
 
 impl RpmSpecParser {
     pub fn new() -> Self {
         Self {
             sections: HashMap::new(),
+            headers: HashMap::new(),
+            expander: RpmMacroExpander::new(),
         }
     }
 
     /// Parse RPM spec file content
     pub fn parse_spec(&mut self, spec_content: &str) -> Result<RpmPackage, String> {
-        let mut current_section = String::new();
+        let mut current_section = String::from("%header");
         let mut current_lines: Vec<String> = Vec::new();
 
         for line in spec_content.lines() {
-            let line = line.trim();
+            let line_trimmed = line.trim();
 
-            if line.starts_with('%') {
+            if line_trimmed.starts_with('%') && !line_trimmed.starts_with("%{") && !line_trimmed.starts_with("%?") {
                 // Save previous section
                 if !current_section.is_empty() {
                     self.sections
@@ -61,11 +109,18 @@ impl RpmSpecParser {
                 }
 
                 // Start new section
-                let section_name = line.split_whitespace().next().unwrap_or("").to_string();
+                let section_name = line_trimmed.split_whitespace().next().unwrap_or("").to_string();
                 current_section = section_name;
                 current_lines.clear();
+            } else if current_section == "%header" && line_trimmed.contains(':') && !line_trimmed.starts_with('#') {
+                let parts: Vec<&str> = line_trimmed.splitn(2, ':').collect();
+                if parts.len() == 2 {
+                    let key = parts[0].trim().to_string();
+                    let val = self.expander.expand(parts[1].trim());
+                    self.headers.insert(key, val);
+                }
             } else {
-                current_lines.push(line.to_string());
+                current_lines.push(self.expander.expand(line_trimmed));
             }
         }
 
@@ -79,22 +134,22 @@ impl RpmSpecParser {
 
     fn extract_package_info(&self) -> Result<RpmPackage, String> {
         let mut package = RpmPackage {
-            name: String::new(),
-            version: String::new(),
-            release: String::new(),
-            epoch: 0,
-            architecture: "x86_64".to_string(),
-            summary: String::new(),
+            name: self.headers.get("Name").cloned().unwrap_or_default(),
+            version: self.headers.get("Version").cloned().unwrap_or_default(),
+            release: self.headers.get("Release").cloned().unwrap_or_default(),
+            epoch: self.headers.get("Epoch").and_then(|e: &String| e.parse::<u32>().ok()).unwrap_or(0),
+            architecture: self.headers.get("BuildArch").cloned().unwrap_or_else(|| "x86_64".to_string()),
+            summary: self.headers.get("Summary").cloned().unwrap_or_default(),
             description: String::new(),
-            license: String::new(),
-            url: String::new(),
-            vendor: String::new(),
+            license: self.headers.get("License").cloned().unwrap_or_default(),
+            url: self.headers.get("Url").or_else(|| self.headers.get("URL")).cloned().unwrap_or_default(),
+            vendor: self.headers.get("Vendor").cloned().unwrap_or_else(|| "Fedora Project".to_string()),
             build_time: 0,
             size: 0,
-            requires: Vec::new(),
-            provides: Vec::new(),
-            conflicts: Vec::new(),
-            obsoletes: Vec::new(),
+            requires: self.headers.get("Requires").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
+            provides: self.headers.get("Provides").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
+            conflicts: self.headers.get("Conflicts").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
+            obsoletes: self.headers.get("Obsoletes").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
         };
 
         // Extract from %description section
@@ -123,6 +178,12 @@ impl RpmSpecParser {
     /// Get section content
     pub fn get_section(&self, section_name: &str) -> Option<&Vec<String>> {
         self.sections.get(section_name)
+    }
+}
+
+impl Default for RpmSpecParser {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -319,20 +380,44 @@ mod tests {
 
     #[test]
     fn test_rpm_spec_parser() {
-        let spec_content = r#"%description
+        let spec_content = r#"Name: test-pkg
+Version: 2.1.0
+Release: 1%{?dist}
+Summary: Comprehensive Fedora SPEC test
+License: MIT
+URL: https://fedoraproject.org
+
+%description
 This is a test package for SigmaOS RPM compatibility.
 It provides essential functionality for the system.
 
 %files
-/usr/bin/test-app
-/usr/share/doc/test-app/README
+%{_bindir}/test-app
+%{_docdir}/test-app/README
 "#;
 
         let mut parser = RpmSpecParser::new();
         let package = parser.parse_spec(spec_content).unwrap();
 
+        assert_eq!(package.name, "test-pkg");
+        assert_eq!(package.version, "2.1.0");
+        assert_eq!(package.release, "1.fc40");
+        assert_eq!(package.summary, "Comprehensive Fedora SPEC test");
+        assert_eq!(package.license, "MIT");
         assert!(package.description.contains("test package"));
         assert_eq!(parser.get_section("%description").unwrap().len(), 3);
+
+        let files = parser.get_section("%files").unwrap();
+        assert_eq!(files[0], "/usr/bin/test-app");
+        assert_eq!(files[1], "/usr/share/doc/test-app/README");
+    }
+
+    #[test]
+    fn test_rpm_macro_expander() {
+        let expander = RpmMacroExpander::new();
+        assert_eq!(expander.expand("%{_bindir}/app"), "/usr/bin/app");
+        assert_eq!(expander.expand("%{_sysconfdir}/app.conf"), "/etc/app.conf");
+        assert_eq!(expander.expand("release-1%{?dist}"), "release-1.fc40");
     }
 
     #[test]

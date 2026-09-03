@@ -8,6 +8,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 pub type PacmanContribEngine = crate::expanded_wiki_innovations::ArchPacmanContribEngine;
+
 /// Pacman package database entry
 #[derive(Debug, Clone)]
 pub struct ArchPacmanPackage {

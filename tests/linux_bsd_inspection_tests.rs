@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
+extern crate alloc;
+
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
