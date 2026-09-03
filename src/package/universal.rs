@@ -14,22 +14,24 @@ use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
-    use alloc::format;
-    use alloc::string::{String, ToString};
+    use super::*;
 
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
         Glibc,
     }
+    #[derive(Debug, Clone)]
     pub enum NodeReleaseStream {
         Lts,
         Current,
     }
+    #[derive(Debug, Clone)]
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,
     }
+    #[derive(Debug, Clone)]
     pub struct NodeBinaryPackage {
         pub version: String,
     }
@@ -49,6 +51,7 @@ pub mod node_distribution_dummy {
             }
         }
     }
+    #[derive(Debug, Clone)]
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
         pub fn new() -> Self {

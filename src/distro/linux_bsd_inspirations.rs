@@ -174,9 +174,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
-                format!("{}.pkg", input_pkg)
-            }
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
             DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),

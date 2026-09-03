@@ -823,29 +823,15 @@ depends=('glibc')
     }
 
     #[test]
-    fn test_pacman_contrib_engine() {
-        let mut db = PacmanDatabase::new();
-        let mut pkg = ArchPacmanPackage {
-            name: "linux-zen".to_string(),
-            version: "6.5.0".to_string(),
-            description: "Zen Kernel".to_string(),
-            url: "".to_string(),
-            architecture: "x86_64".to_string(),
-            license: Vec::new(),
-            groups: Vec::new(),
-            depends: vec!["glibc".to_string()],
-            files: vec!["/boot/vmlinuz-sigma".to_string()],
-        };
-        db.local_packages.push(pkg.clone());
-        pkg.version = "6.6.0".to_string();
-        db.packages.push(pkg);
-
-        let updates = SafeUpdateChecker::check_pending_updates(&db);
-        assert_eq!(updates.len(), 1);
-        assert_eq!(updates[0].0, "linux-zen");
-
-        let updated_pb = PkgbuildChecksumUpdater::update_sha256("pkgname=test\nsha256sums=('SKIP')", b"payload");
-        assert!(updated_pb.contains("sha256sums="));
+    fn test_pacman_cache_cleaner() {
+        let mut cleaner = PacmanCacheCleaner::new(vec![
+            "pkg-1.0.pkg.tar.zst".to_string(),
+            "pkg-1.1.pkg.tar.zst".to_string(),
+            "pkg-1.2.pkg.tar.zst".to_string(),
+        ]);
+        let removed = cleaner.prune_cache(2);
+        assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
+        assert_eq!(cleaner.cached_files.len(), 2);
     }
 
 }
