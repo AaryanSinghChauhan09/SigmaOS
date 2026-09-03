@@ -1182,10 +1182,16 @@ impl CoprAurBuildRepositoryGatewayEngine {
 
         let cmd = match source.backend {
             CommunityRepoBackend::FedoraCopr => {
-                format!("copr-cli build-package {} --chroot fedora-rawhide-x86_64", source.name)
+                format!(
+                    "copr-cli build-package {} --chroot fedora-rawhide-x86_64",
+                    source.name
+                )
             }
             CommunityRepoBackend::ArchAur => {
-                format!("makepkg --syncdeps --clean --noconfirm --dir /sandbox/aur/{}", source.name)
+                format!(
+                    "makepkg --syncdeps --clean --noconfirm --dir /sandbox/aur/{}",
+                    source.name
+                )
             }
             CommunityRepoBackend::OpenSuseObs => {
                 format!("osc build --noservice {}", source.name)
@@ -1233,7 +1239,8 @@ impl NetBsdPkgsrcOptionsFrameworkEngine {
             self.suggested_options.push(spec.option_name.clone());
             self.active_options.push(spec.option_name.clone());
         }
-        self.supported_options.insert(spec.option_name.clone(), spec);
+        self.supported_options
+            .insert(spec.option_name.clone(), spec);
     }
 
     pub fn toggle_option(&mut self, option_str: &str) -> Result<(), &'static str> {
@@ -1259,12 +1266,18 @@ impl NetBsdPkgsrcOptionsFrameworkEngine {
             if let Some(spec) = self.supported_options.get(opt) {
                 for req in &spec.requires_options {
                     if !self.active_options.contains(req) {
-                        return Err(format!("Option '{}' requires missing option '{}'", opt, req));
+                        return Err(format!(
+                            "Option '{}' requires missing option '{}'",
+                            opt, req
+                        ));
                     }
                 }
                 for conf in &spec.conflicts_with {
                     if self.active_options.contains(conf) {
-                        return Err(format!("Option '{}' conflicts with active option '{}'", opt, conf));
+                        return Err(format!(
+                            "Option '{}' conflicts with active option '{}'",
+                            opt, conf
+                        ));
                     }
                 }
             }
@@ -1292,9 +1305,9 @@ pub enum PortageEapiLevel {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SlotOperator {
-    AnySlot,             // '*'
-    SubslotEqual,        // ':='
-    ExactSlot(String),   // ':slot'
+    AnySlot,           // '*'
+    SubslotEqual,      // ':='
+    ExactSlot(String), // ':slot'
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1321,7 +1334,11 @@ impl GentooPortageEapiSlotOperatorEngine {
         self.slots.insert(record.atom.clone(), record);
     }
 
-    pub fn check_eapi_feature_support(&self, atom: &str, feature: &str) -> Result<bool, &'static str> {
+    pub fn check_eapi_feature_support(
+        &self,
+        atom: &str,
+        feature: &str,
+    ) -> Result<bool, &'static str> {
         let record = self.slots.get(atom).ok_or("Atom not found")?;
         match feature {
             "BDEPEND" => Ok(record.eapi >= PortageEapiLevel::Eapi7),
@@ -1476,7 +1493,10 @@ impl DebianDpkgTriggersAptListbugsGuardEngine {
                 if sev == "critical" || sev == "grave" {
                     return (
                         true,
-                        Some(format!("Blocked by bug #{} [{}]: {}", bug.bug_id, bug.severity, bug.title)),
+                        Some(format!(
+                            "Blocked by bug #{} [{}]: {}",
+                            bug.bug_id, bug.severity, bug.title
+                        )),
                     );
                 }
             }
@@ -1845,7 +1865,9 @@ MAINTAINER="SigmaOS"
             slot_operator: SlotOperator::SubslotEqual,
         });
 
-        assert!(engine.check_eapi_feature_support("dev-libs/openssl", "IDEPEND").unwrap());
+        assert!(engine
+            .check_eapi_feature_support("dev-libs/openssl", "IDEPEND")
+            .unwrap());
         assert!(engine.requires_abi_rebuild("dev-libs/openssl", "3.2"));
         assert!(!engine.requires_abi_rebuild("dev-libs/openssl", "3.0"));
     }
