@@ -17,7 +17,7 @@ use std::collections::HashMap;
 pub mod resource_allocator;
 pub mod sigma_buddy;
 
-// pub use pmm_vmm::*;
+pub use pmm_vmm::*;
 pub use resource_allocator::{
     ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     PcieResourceAllocator, PcieResourceWindow, ResourceLimits, ResourceUsage,

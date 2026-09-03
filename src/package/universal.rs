@@ -1,4 +1,3 @@
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
 use alloc::string::{String, ToString};

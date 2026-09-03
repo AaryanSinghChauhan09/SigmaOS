@@ -30,11 +30,8 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(all(not(feature = "standalone_test"), test))]
+#[cfg(test)]
 use std::collections::HashMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
 
 use alloc::sync::Arc;
 
