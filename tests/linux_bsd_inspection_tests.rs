@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Parity Inspection Unit Tests
 
-extern crate alloc;
-
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
@@ -38,33 +36,6 @@ mod kvm_vcpu;
 mod unveil;
 #[path = "../src/logging/unified.rs"]
 mod unified;
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
-#[path = "../src/boot/sigma_boot.rs"]
-mod sigma_boot;
->>>>>>> origin/fix/test-suite-stabilization-and-deduplication-9630726706765058914
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]

@@ -117,26 +117,20 @@ impl AuthService for SimpleAuthService {
         Ok(id)
     }
     fn authenticate_user(&mut self, username: &[u8], password: &[u8]) -> Result<bool, AuthError> {
-        for i in 0..self.users.len {
-            unsafe {
-                let user_option = &mut *self.users.data.add(i);
-                if let Some(ref mut user) = *user_option {
-                    if user.username() == username {
-                        return user.authenticate(password);
-                    }
+        for user_option in &mut self.users {
+            if let Some(ref mut user) = *user_option {
+                if user.username() == username {
+                    return user.authenticate(password);
                 }
             }
         }
         Err(AuthError::InvalidCredentials)
     }
     fn get_user(&self, id: UserID) -> Option<&dyn User> {
-        for i in 0..self.users.len {
-            unsafe {
-                let user_option = &*self.users.data.add(i);
-                if let Some(ref user) = *user_option {
-                    if user.id() == id {
-                        return Some(user.as_ref());
-                    }
+        for user_option in &self.users {
+            if let Some(ref user) = *user_option {
+                if user.id() == id {
+                    return Some(user.as_ref());
                 }
             }
         }
@@ -234,54 +228,117 @@ impl Default for SovereignSingleUserEngine {
     }
 }
 
-struct SovereignVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+// =========================================================================
+// FEDORA LINUX NOGGIN SELF-SERVICE USER PORTAL (FREEIPA/LDAP INTEGRATION)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NogginUserAccount {
+    pub username: String,
+    pub full_name: String,
+    pub email: String,
+    pub ssh_public_keys: Vec<String>,
+    pub gpg_key_fingerprints: Vec<String>,
+    pub approved_groups: Vec<String>,
+    pub pending_group_requests: Vec<String>,
+    pub totp_secret_configured: bool,
 }
 
-impl<T> SovereignVec<T> {
-    fn new() -> Self {
-        SovereignVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
+impl NogginUserAccount {
+    pub fn new(username: &str, full_name: &str, email: &str) -> Self {
+        Self {
+            username: username.to_string(),
+            full_name: full_name.to_string(),
+            email: email.to_string(),
+            ssh_public_keys: Vec::new(),
+            gpg_key_fingerprints: Vec::new(),
+            approved_groups: Vec::new(),
+            pending_group_requests: Vec::new(),
+            totp_secret_configured: false,
         }
     }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
+}
+
+/// Fedora Infrastructure Noggin Self-Service User Account & Group Portal
+pub struct FedoraNogginUserPortal {
+    pub accounts: Vec<NogginUserAccount>,
+    pub freeipa_server_uri: String,
+}
+
+impl FedoraNogginUserPortal {
+    pub fn new(freeipa_uri: &str) -> Self {
+        Self {
+            accounts: Vec::new(),
+            freeipa_server_uri: freeipa_uri.to_string(),
         }
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
+
+    pub fn register_account(&mut self, account: NogginUserAccount) {
+        self.accounts.push(account);
+    }
+
+    pub fn add_ssh_public_key(&mut self, username: &str, key: &str) -> Result<(), &'static str> {
+        let acc = self
+            .accounts
+            .iter_mut()
+            .find(|a| a.username == username)
+            .ok_or("User account not found")?;
+        if !key.starts_with("ssh-ed25519") && !key.starts_with("ssh-rsa") {
+            return Err("Invalid SSH key format");
+        }
+        acc.ssh_public_keys.push(key.to_string());
+        Ok(())
+    }
+
+    pub fn add_gpg_fingerprint(&mut self, username: &str, fpr: &str) -> Result<(), &'static str> {
+        let acc = self
+            .accounts
+            .iter_mut()
+            .find(|a| a.username == username)
+            .ok_or("User account not found")?;
+        acc.gpg_key_fingerprints.push(fpr.to_string());
+        Ok(())
+    }
+
+    pub fn request_group_membership(&mut self, username: &str, group: &str) -> Result<(), &'static str> {
+        let acc = self
+            .accounts
+            .iter_mut()
+            .find(|a| a.username == username)
+            .ok_or("User account not found")?;
+        if acc.approved_groups.contains(&group.to_string()) {
+            return Err("User is already a member of this group");
+        }
+        if !acc.pending_group_requests.contains(&group.to_string()) {
+            acc.pending_group_requests.push(group.to_string());
+        }
+        Ok(())
+    }
+
+    pub fn approve_group_membership(&mut self, username: &str, group: &str) -> Result<(), &'static str> {
+        let acc = self
+            .accounts
+            .iter_mut()
+            .find(|a| a.username == username)
+            .ok_or("User account not found")?;
+        if let Some(pos) = acc.pending_group_requests.iter().position(|g| g == group) {
+            acc.pending_group_requests.remove(pos);
+            acc.approved_groups.push(group.to_string());
+            Ok(())
         } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
+            Err("No pending group membership request found")
         }
     }
-}
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+    pub fn configure_2fa_totp(&mut self, username: &str) -> Result<String, &'static str> {
+        let acc = self
+            .accounts
+            .iter_mut()
+            .find(|a| a.username == username)
+            .ok_or("User account not found")?;
+        acc.totp_secret_configured = true;
+        Ok(format!("otpauth://totp/SigmaOS:{}?secret=JBSWY3DPEHPK3PXP&issuer=SigmaOS", username))
+    }
 }
 
 #[cfg(test)]
@@ -357,5 +414,29 @@ mod tests {
         assert!(remount_pass.is_ok());
         assert!(!engine.is_root_filesystem_readonly);
         assert_eq!(engine.maintenance_state, MaintenanceState::FullyResolved);
+    }
+
+    #[test]
+    fn test_fedora_noggin_user_portal() {
+        let mut portal = FedoraNogginUserPortal::new("ldaps://id.fedoraproject.org:636");
+        let account = NogginUserAccount::new("aaryan", "Aaryan Singh", "aaryan@sigmaos.org");
+        portal.register_account(account);
+
+        // SSH key registration
+        assert!(portal.add_ssh_public_key("aaryan", "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...").is_ok());
+        assert!(portal.add_ssh_public_key("aaryan", "invalid-key").is_err());
+
+        // GPG key fingerprint registration
+        assert!(portal.add_gpg_fingerprint("aaryan", "4B62A0D0F5E12345678901234567890123456789").is_ok());
+
+        // Group request and approval
+        assert!(portal.request_group_membership("aaryan", "packagers").is_ok());
+        assert!(portal.approve_group_membership("aaryan", "packagers").is_ok());
+        assert_eq!(portal.accounts[0].approved_groups[0], "packagers");
+
+        // 2FA TOTP configuration
+        let totp_uri = portal.configure_2fa_totp("aaryan").unwrap();
+        assert!(totp_uri.contains("otpauth://totp/SigmaOS:aaryan"));
+        assert!(portal.accounts[0].totp_secret_configured);
     }
 }

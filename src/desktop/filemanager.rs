@@ -385,38 +385,3 @@ mod tests {
         assert!(diff.is_modified);
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dual_pane_view() {
-        let mut dp = DualPaneView::new(b"/home/user", b"/var/log");
-        assert_eq!(dp.active_pane, ActivePane::Left);
-        dp.switch_active_pane();
-        assert_eq!(dp.active_pane, ActivePane::Right);
-    }
-
-    #[test]
-    fn test_file_tag_store() {
-        let mut store = FileTagStore::new();
-        store.add_tag(101, b"important");
-        assert!(store.has_tag(101, b"important"));
-        assert!(!store.has_tag(101, b"work"));
-    }
-
-    #[test]
-    fn test_miller_columns_navigation() {
-        let mut mc = MillerColumnsView::new();
-        mc.push_column(0);
-        mc.select_item(0, 42);
-        assert_eq!(mc.columns[0].selected_id, Some(42));
-    }
-
-    #[test]
-    fn test_file_snapshot_diff() {
-        let diff = FileSnapshotDiff::compare(1, 2, 10, 1024, 2048);
-        assert!(diff.is_modified);
-    }
-}
