@@ -98,7 +98,11 @@ pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
-pub use fedora_rpm_engine::{DnfRepository, FedoraMirrorManager2Engine, MirrorSiteRecord, RpmPackage};
+pub use fedora_rpm_engine::{
+    AnityaFedoraMessagingEngine, AnityaMessageTopic, AnityaPackageMapping,
+    AnityaVersionUpdateMessage, DnfRepository, FedoraAnityaReleaseMonitoringEngine,
+    FedoraMirrorManager2Engine, MirrorSiteRecord, RpmPackage,
+};
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };

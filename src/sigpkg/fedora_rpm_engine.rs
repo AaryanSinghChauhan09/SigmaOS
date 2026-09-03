@@ -453,6 +453,14 @@ gpgcheck=1
             engine.projects.get("curl").unwrap().latest_upstream_version,
             "8.5.0"
         );
+
+        let msgs = engine.messaging_bus.get_messages_for_project(101);
+        assert_eq!(msgs.len(), 1);
+        assert_eq!(msgs[0].topic, AnityaMessageTopic::ProjectVersionUpdate);
+        assert_eq!(msgs[0].old_version, "8.4.0");
+        assert_eq!(msgs[0].new_version, "8.5.0");
+        assert!(msgs[0].to_json_summary().contains("org.fedoraproject.prod.anitya.project.version.update"));
+        assert_eq!(msgs[0].packages.len(), 2);
     }
 
     #[test]
@@ -529,15 +537,129 @@ pub struct AnityaProjectRecord {
     pub updated_available: bool,
 }
 
+/// Fedora Messaging Topic Type for Anitya Upstream Events
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AnityaMessageTopic {
+    ProjectVersionUpdate, // org.fedoraproject.prod.anitya.project.version.update
+    ProjectMapNew,        // org.fedoraproject.prod.anitya.project.map.new
+    ProjectVersionFlag,   // org.fedoraproject.prod.anitya.project.version.flag
+}
+
+impl AnityaMessageTopic {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            AnityaMessageTopic::ProjectVersionUpdate => "org.fedoraproject.prod.anitya.project.version.update",
+            AnityaMessageTopic::ProjectMapNew => "org.fedoraproject.prod.anitya.project.map.new",
+            AnityaMessageTopic::ProjectVersionFlag => "org.fedoraproject.prod.anitya.project.version.flag",
+        }
+    }
+}
+
+/// Cross-Distro Package Mapping in Anitya
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaPackageMapping {
+    pub distro: String,       // e.g. "Fedora", "EPEL", "SigmaOS"
+    pub package_name: String, // e.g. "curl"
+}
+
+/// Fedora Messaging Standard Schema Payload for Anitya Upstream Release Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaVersionUpdateMessage {
+    pub message_id: String,
+    pub topic: AnityaMessageTopic,
+    pub project_id: u32,
+    pub project_name: String,
+    pub ecosystem: String,
+    pub old_version: String,
+    pub new_version: String,
+    pub packages: Vec<AnityaPackageMapping>,
+    pub timestamp: u64,
+}
+
+impl AnityaVersionUpdateMessage {
+    pub fn to_json_summary(&self) -> String {
+        format!(
+            "{{\"msg_id\":\"{}\",\"topic\":\"{}\",\"project_id\":{},\"project\":\"{}\",\"ecosystem\":\"{}\",\"old_version\":\"{}\",\"new_version\":\"{}\",\"timestamp\":{}}}",
+            self.message_id,
+            self.topic.as_str(),
+            self.project_id,
+            self.project_name,
+            self.ecosystem,
+            self.old_version,
+            self.new_version,
+            self.timestamp
+        )
+    }
+}
+
+/// Fedora Messaging Event Engine for Anitya Notifications
+pub struct AnityaFedoraMessagingEngine {
+    pub published_messages: Vec<AnityaVersionUpdateMessage>,
+    pub next_msg_seq: u64,
+}
+
+impl AnityaFedoraMessagingEngine {
+    pub fn new() -> Self {
+        Self {
+            published_messages: Vec::new(),
+            next_msg_seq: 1,
+        }
+    }
+
+    pub fn publish_version_update(
+        &mut self,
+        project_id: u32,
+        project_name: &str,
+        ecosystem: &str,
+        old_version: &str,
+        new_version: &str,
+        packages: Vec<AnityaPackageMapping>,
+        timestamp: u64,
+    ) -> AnityaVersionUpdateMessage {
+        let msg_id = format!("anitya-msg-{}", self.next_msg_seq);
+        self.next_msg_seq += 1;
+
+        let msg = AnityaVersionUpdateMessage {
+            message_id: msg_id,
+            topic: AnityaMessageTopic::ProjectVersionUpdate,
+            project_id,
+            project_name: project_name.to_string(),
+            ecosystem: ecosystem.to_string(),
+            old_version: old_version.to_string(),
+            new_version: new_version.to_string(),
+            packages,
+            timestamp,
+        };
+
+        self.published_messages.push(msg.clone());
+        msg
+    }
+
+    pub fn get_messages_for_project(&self, project_id: u32) -> Vec<&AnityaVersionUpdateMessage> {
+        self.published_messages
+            .iter()
+            .filter(|m| m.project_id == project_id)
+            .collect()
+    }
+}
+
+impl Default for AnityaFedoraMessagingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Fedora Anitya Upstream Release Monitoring Engine
 pub struct FedoraAnityaReleaseMonitoringEngine {
     pub projects: HashMap<String, AnityaProjectRecord>,
+    pub messaging_bus: AnityaFedoraMessagingEngine,
 }
 
 impl FedoraAnityaReleaseMonitoringEngine {
     pub fn new() -> Self {
         Self {
             projects: HashMap::new(),
+            messaging_bus: AnityaFedoraMessagingEngine::new(),
         }
     }
 
@@ -548,8 +670,33 @@ impl FedoraAnityaReleaseMonitoringEngine {
     pub fn check_upstream_version(&mut self, project_name: &str, latest_version: &str) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
+            let old_ver = record.current_version.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
+
+            if is_new {
+                let pid = record.project_id;
+                let pname = record.name.clone();
+                self.messaging_bus.publish_version_update(
+                    pid,
+                    &pname,
+                    "pypi",
+                    &old_ver,
+                    latest_version,
+                    vec![
+                        AnityaPackageMapping {
+                            distro: "Fedora".to_string(),
+                            package_name: pname.clone(),
+                        },
+                        AnityaPackageMapping {
+                            distro: "SigmaOS".to_string(),
+                            package_name: pname.clone(),
+                        },
+                    ],
+                    1700000000,
+                );
+            }
+
             Some(is_new)
         } else {
             None
