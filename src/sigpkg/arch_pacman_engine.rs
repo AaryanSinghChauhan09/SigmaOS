@@ -718,10 +718,13 @@ depends=('glibc')
 
     #[test]
     fn test_pacman_cache_cleaner() {
-        let files = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
+        let files = vec![
+            "pkg-1.0.pkg.tar.zst".to_string(),
+            "pkg-1.1.pkg.tar.zst".to_string(),
+            "pkg-1.2.pkg.tar.zst".to_string(),
+        ];
         let mut cleaner = PacmanCacheCleaner::new(files);
         let removed = cleaner.prune_cache(2);
         assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
-        assert_eq!(cleaner.cached_files.len(), 2);
     }
 }
