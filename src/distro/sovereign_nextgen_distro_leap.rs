@@ -115,7 +115,8 @@ impl SovereignSchedExtEngine {
                 // Select task with lowest latency_class then lowest vruntime_us
                 let mut min_val = (u8::MAX, u64::MAX);
                 for (pid, task) in &self.tasks {
-                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted {
+                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted
+                    {
                         let key = (task.latency_class, task.vruntime_us);
                         if key < min_val {
                             min_val = key;
@@ -128,7 +129,8 @@ impl SovereignSchedExtEngine {
                 // Select task with highest cachy_bore_score
                 let mut max_score = 0;
                 for (pid, task) in &self.tasks {
-                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted {
+                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted
+                    {
                         if task.cachy_bore_score >= max_score {
                             max_score = task.cachy_bore_score;
                             selected_pid = Some(*pid);
@@ -139,7 +141,8 @@ impl SovereignSchedExtEngine {
             ScxSchedulerKind::ScxCentral => {
                 // Round-robin selection
                 for (pid, task) in &self.tasks {
-                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted {
+                    if task.state == ScxTaskState::Runnable || task.state == ScxTaskState::Preempted
+                    {
                         selected_pid = Some(*pid);
                         break;
                     }
@@ -168,7 +171,11 @@ impl SovereignSchedExtEngine {
         self.current_running_pid
     }
 
-    pub fn migrate_task_numa(&mut self, pid: usize, target_numa_node: u32) -> Result<(), &'static str> {
+    pub fn migrate_task_numa(
+        &mut self,
+        pid: usize,
+        target_numa_node: u32,
+    ) -> Result<(), &'static str> {
         let task = self.tasks.get_mut(&pid).ok_or("Task PID not found")?;
         if task.numa_node_id != target_numa_node {
             task.numa_node_id = target_numa_node;
@@ -468,7 +475,9 @@ impl SovereignHighAvailabilityMeshEngine {
     }
 
     pub fn process_carp_advertisement(&mut self, advert_token: u64, sender_role: ClusterNodeRole) {
-        if sender_role == ClusterNodeRole::MasterActive && self.role == ClusterNodeRole::MasterActive {
+        if sender_role == ClusterNodeRole::MasterActive
+            && self.role == ClusterNodeRole::MasterActive
+        {
             // Master collision, split brain mitigation
             if advert_token > self.shared_secret {
                 self.role = ClusterNodeRole::BackupStandby;
@@ -477,7 +486,11 @@ impl SovereignHighAvailabilityMeshEngine {
     }
 
     pub fn sync_pfsync_state(&mut self, entry: HaStateEntry) {
-        if let Some(existing) = self.state_table.iter_mut().find(|e| e.connection_id == entry.connection_id) {
+        if let Some(existing) = self
+            .state_table
+            .iter_mut()
+            .find(|e| e.connection_id == entry.connection_id)
+        {
             existing.packets_counter = entry.packets_counter;
             existing.bytes_counter = entry.bytes_counter;
         } else {
@@ -515,7 +528,12 @@ impl SovereignDistroLeapSuite {
             sched_ext: SovereignSchedExtEngine::new(ScxSchedulerKind::ScxBpfland),
             landlock_guard: SovereignLandlockV5Guard::new(),
             cas_store: SovereignHermeticCasStoreEngine::new(),
-            ha_mesh: SovereignHighAvailabilityMeshEngine::new(1, ClusterNodeRole::MasterActive, 10, 0x12345678),
+            ha_mesh: SovereignHighAvailabilityMeshEngine::new(
+                1,
+                ClusterNodeRole::MasterActive,
+                10,
+                0x12345678,
+            ),
         }
     }
 
@@ -562,7 +580,10 @@ mod tests {
     #[test]
     fn test_sovereign_landlock_v5_guard() {
         let mut guard = SovereignLandlockV5Guard::new();
-        guard.add_path_rule("/usr/bin", &[LandlockAccessType::FsRead, LandlockAccessType::FsExecute]);
+        guard.add_path_rule(
+            "/usr/bin",
+            &[LandlockAccessType::FsRead, LandlockAccessType::FsExecute],
+        );
         guard.add_net_rule(443, &[LandlockAccessType::NetConnectTcp]);
         guard.enable_enforcement();
 
@@ -592,7 +613,12 @@ mod tests {
 
     #[test]
     fn test_sovereign_high_availability_mesh_engine() {
-        let mut ha = SovereignHighAvailabilityMeshEngine::new(1, ClusterNodeRole::MasterActive, 1, 0x11223344);
+        let mut ha = SovereignHighAvailabilityMeshEngine::new(
+            1,
+            ClusterNodeRole::MasterActive,
+            1,
+            0x11223344,
+        );
         let token = ha.send_carp_advertisement();
         assert!(token > 0);
 
