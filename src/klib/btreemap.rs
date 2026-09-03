@@ -1,3 +1,4 @@
+extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 // Custom BTreeMap implementation for SigmaOS

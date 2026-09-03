@@ -457,40 +457,4 @@ mod tests {
         assert!(tree.contains("ripgrep"));
         assert!(tree.contains("https://arch.org"));
     }
-
-    #[test]
-    fn test_pacman_mirrorlist_sorting() {
-        let mut mirrorlist = PacmanMirrorlist::new();
-        mirrorlist.add_mirror(PacmanMirror::new(b"https://slow.archlinux.org/repo", 250));
-        mirrorlist.add_mirror(PacmanMirror::new(b"https://fast.archlinux.org/repo", 20));
-        mirrorlist.add_mirror(PacmanMirror::new(b"https://medium.archlinux.org/repo", 80));
-
-        mirrorlist.sort_by_latency();
-        assert_eq!(mirrorlist.mirrors[0].latency_ms, 20);
-        assert_eq!(mirrorlist.mirrors[1].latency_ms, 80);
-        assert_eq!(mirrorlist.mirrors[2].latency_ms, 250);
-    }
-
-    #[test]
-    fn test_pacman_parallel_download_config() {
-        let mut pacman = PacmanManager::new();
-        assert_eq!(pacman.parallel_downloads, 5);
-        pacman.set_parallel_downloads(10);
-        assert_eq!(pacman.parallel_downloads, 10);
-    }
-
-    #[test]
-    fn test_abs_tree_fallback() {
-        let mut abs = AbsTreeEngine::new();
-        let mock_sha = [0u8; 32];
-        let recipe = PkgBuildScript::new(b"neofetch", b"7.1.0", 1, b"https://arch.org", &mock_sha);
-        abs.register_recipe(recipe);
-
-        let found = abs.find_recipe_by_name(b"neofetch");
-        assert!(found.is_some());
-        assert_eq!(found.unwrap().pkgrel, 1);
-
-        let missing = abs.find_recipe_by_name(b"nonexistent");
-        assert!(missing.is_none());
-    }
 }

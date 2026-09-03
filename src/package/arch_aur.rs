@@ -121,15 +121,16 @@ impl SigmaAUR {
     /// Install package
     pub fn install_package(&mut self, pkg_name: &str) -> Result<(), BuildError> {
         let pkg = self.package_db.get(pkg_name)
-            .ok_or(BuildError::PackageNotFound)?;
+            .ok_or(BuildError::PackageNotFound)?
+            .clone();
 
         // Resolve dependencies
-        let dependencies = self.resolve_dependencies(pkg)?;
+        let dependencies = self.resolve_dependencies(&pkg)?;
 
         // Install dependencies first
-        for dep in dependencies {
-            if !self.installed_packages.contains_key(&dep) {
-                self.install_package(&dep)?;
+        for dep in &dependencies {
+            if !self.installed_packages.contains_key(dep) {
+                self.install_package(dep)?;
             }
         }
 
@@ -139,7 +140,7 @@ impl SigmaAUR {
         println!("Dependencies: {:?}", dependencies);
 
         // Mark as installed
-        self.installed_packages.insert(pkg_name.to_string(), pkg.version.clone());
+        self.installed_packages.insert(pkg_name.to_string(), pkg.version);
 
         Ok(())
     }

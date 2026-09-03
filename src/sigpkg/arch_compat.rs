@@ -907,6 +907,8 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
+}
+
 // --- Arch Linux svntogit Repository Migration Engine ---
 
 #[derive(Debug, Clone)]
@@ -953,6 +955,11 @@ impl SvntogitMigrationEngine {
             pkgname, svn_revision, pkgname
         ))
     }
+}
+
+#[cfg(test)]
+mod tests_extra {
+    use super::*;
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {

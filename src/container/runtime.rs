@@ -995,6 +995,7 @@ pub mod oci {
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
     use super::*;
     use alloc::string::ToString;
     use alloc::vec;
