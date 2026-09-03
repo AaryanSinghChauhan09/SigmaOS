@@ -281,10 +281,10 @@ impl SupplyChainAttestation for SimpleSupplyChainAttestation {
     }
 
     fn verify_builder(&self, _attestation: &[u8], builder: &[u8]) -> bool {
+        let b_len = builder.len().min(63);
         for i in 0..self.builders.len() {
             let &(ref b, _) = &self.builders[i];
-            let len = b.iter().position(|&byte| byte == 0).unwrap_or(64);
-            if &b[..len] == builder {
+            if &b[..b_len] == builder && (b_len == 64 || b[b_len] == 0) {
                 return true;
             }
         }

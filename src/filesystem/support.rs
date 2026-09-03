@@ -129,10 +129,10 @@ impl BtrfsFeatures for SimpleBtrfsFS {
     }
 
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
+        let p_len = path.len().min(255);
         for i in 0..self.subvolumes.len() {
             let subvol = &self.subvolumes[i];
-            let len = subvol.iter().position(|&b| b == 0).unwrap_or(256);
-            if &subvol[..len] == path {
+            if &subvol[..p_len] == path && (p_len == 256 || subvol[p_len] == 0) {
                 self.subvolumes.remove(i);
                 return Ok(());
             }
@@ -195,10 +195,10 @@ impl ZFSFeatures for SimpleZFS {
     }
 
     fn rollback_snapshot(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError> {
+        let s_len = snapshot.len().min(255);
         for i in 0..self.snapshots.len() {
             let snap = &self.snapshots[i];
-            let len = snap.iter().position(|&b| b == 0).unwrap_or(256);
-            if &snap[..len] == snapshot {
+            if &snap[..s_len] == snapshot && (s_len == 256 || snap[s_len] == 0) {
                 return Ok(());
             }
         }

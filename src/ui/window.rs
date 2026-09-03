@@ -62,6 +62,7 @@ pub trait Window {
 pub struct SimpleWindow {
     pub id: WindowID,
     pub title: [u8; 128],
+    pub title_len: u8,
     pub x: AtomicUsize,
     pub y: AtomicUsize,
     pub width: AtomicUsize,
@@ -79,6 +80,7 @@ impl SimpleWindow {
         SimpleWindow {
             id,
             title: title_array,
+            title_len: title_len as u8,
             x: AtomicUsize::new(x as usize),
             y: AtomicUsize::new(y as usize),
             width: AtomicUsize::new(width as usize),
@@ -91,8 +93,8 @@ impl SimpleWindow {
 impl Window for SimpleWindow {
     fn id(&self) -> WindowID { self.id }
     fn title(&self) -> &[u8] {
-        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.title[..len]
+        // O(1) slice lookup using cached title_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.title[..self.title_len as usize]
     }
     fn x(&self) -> i32 { self.x.load(Ordering::SeqCst) as i32 }
     fn y(&self) -> i32 { self.y.load(Ordering::SeqCst) as i32 }

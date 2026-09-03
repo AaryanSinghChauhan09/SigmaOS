@@ -953,6 +953,7 @@ impl SvntogitMigrationEngine {
             pkgname, svn_revision, pkgname
         ))
     }
+}
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {

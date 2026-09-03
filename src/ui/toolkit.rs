@@ -156,6 +156,7 @@ pub struct SimpleWidget {
     pub id: WidgetID,
     pub widget_type: WidgetType,
     pub label: [u8; 128],
+    pub label_len: u8,
     pub state: AtomicUsize, // WidgetState as usize
     pub x: u32,
     pub y: u32,
@@ -191,6 +192,7 @@ impl SimpleWidget {
             id,
             widget_type,
             label: label_array,
+            label_len: label_len as u8,
             state: AtomicUsize::new(WidgetState::Normal as usize),
             x: 0,
             y: 0,
@@ -247,14 +249,15 @@ impl Widget for SimpleWidget {
     }
 
     fn label(&self) -> &[u8] {
-        let len = self.label.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.label[..len]
+        // O(1) slice lookup using cached label_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.label[..self.label_len as usize]
     }
 
     fn set_label(&mut self, label: &[u8]) {
         let len = label.len().min(127);
         self.label = [0; 128];
         self.label[..len].copy_from_slice(&label[..len]);
+        self.label_len = len as u8;
     }
 
     fn state(&self) -> WidgetState {

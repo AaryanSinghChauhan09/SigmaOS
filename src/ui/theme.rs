@@ -86,6 +86,7 @@ pub trait Theme {
 pub struct SimpleTheme {
     pub id: ThemeID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub colors: Vec<([u8; 32], Option<Box<dyn Color>>)>,
 }
 
@@ -99,6 +100,7 @@ impl SimpleTheme {
         SimpleTheme {
             id,
             name: name_array,
+            name_len: name_len as u8,
             colors: Vec::new(),
         }
     }
@@ -107,8 +109,8 @@ impl SimpleTheme {
 impl Theme for SimpleTheme {
     fn id(&self) -> ThemeID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.name[..self.name_len as usize]
     }
 
     fn get_color(&self, color_name: &[u8]) -> Option<&dyn Color> {
