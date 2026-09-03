@@ -63,6 +63,30 @@ mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
 
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd_compat;
+#[path = "../src/distro/wiki_ideas_implementation.rs"]
+mod wiki_ideas_implementation;
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+#[path = "../src/compatibility/zorin.rs"]
+mod zorin;
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+#[path = "../src/package/hardening.rs"]
+mod hardening;
+#[path = "../src/sigpkg/mod.rs"]
+mod sigpkg;
+#[path = "../src/open_source_os_gap_closure.rs"]
+mod open_source_os_gap_closure;
+
+#[path = "../src/security/capability.rs"]
+mod capability;
+
+pub mod security {
+    pub use super::capability::Permission;
+}
+
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
 
@@ -247,9 +271,8 @@ fn test_wiki_distro_innovations_inspection() {
         Ok(SystemdUnitActiveState::Active)
     );
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations};
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask { pid: 1, class: distro::wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    sched.add_task(wiki_ideas_implementation::RealtimeTask { pid: 1, class: wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -683,26 +706,27 @@ fn test_bgp_routing_table_manager_inspection() {
 
 #[test]
 fn test_pam_authentication_policy_engine_inspection() {
-    use hardening::{PamAuthenticationPolicyEngine, PamControlFlag, PamModuleType};
-    let mut pam = PamAuthenticationPolicyEngine::new(true);
-    pam.add_rule(
-        PamModuleType::Auth,
-        PamControlFlag::Required,
-        "pam_unix",
-        true,
+    use root_improvement::{
+        PamControlFlag, PamEngine, PamGroup, PamResult, PamRule, PamUnixModule,
+    };
+    let mut engine = PamEngine::new();
+    let db = vec![("admin".to_string(), "hash_secret".to_string())];
+    let unix_mod = std::sync::Arc::new(PamUnixModule::new(db));
+    engine.add_rule(
+        PamGroup::Auth,
+        PamRule {
+            control_flag: PamControlFlag::Required,
+            module: unix_mod,
+        },
     );
-    pam.add_rule(
-        PamModuleType::Auth,
-        PamControlFlag::Required,
-        "pam_tpm2",
-        true,
+    assert_eq!(
+        engine.execute_group(PamGroup::Auth, "admin", "hash_secret"),
+        PamResult::Success
     );
-    assert!(pam
-        .authenticate_pam_stack(PamModuleType::Auth, true)
-        .unwrap());
-    assert!(pam
-        .authenticate_pam_stack(PamModuleType::Auth, false)
-        .is_err());
+    assert_eq!(
+        engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"),
+        PamResult::AuthError
+    );
 }
 
 #[test]
@@ -820,7 +844,7 @@ fn test_systemd_unit_dependency_engine_inspection() {
     );
 
     // Systemd Init Innovations Security & Diagnostics Inspection Test
-    use super::systemd_init::{
+    use systemd_init::{
         BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine, SystemdSecurityAuditor,
         SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile, UnitType as SovUnitType,
     };
@@ -1128,4 +1152,48 @@ fn test_svntogit_repro_and_aur_rules_inspection() {
     let res = pipeline.build_and_package("zstd", "1.5.5", "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }", Some("0x123"));
     assert_eq!(res.status, MakepkgBuildStatus::Success);
     assert_eq!(res.package_filename, "zstd-1.5.5-x86_64.pkg.tar.zst");
+}
+
+#[test]
+fn test_open_source_project_supremacy_suite_inspection() {
+    use open_source_os_gap_closure::OpenSourceProjectSupremacySuite;
+
+    let mut suite = OpenSourceProjectSupremacySuite::new();
+
+    // 1. Tails OS Amnesic Volatile RAM Wiping
+    let mut ram_buf = [0xFFu8; 1024];
+    assert_eq!(suite.amnesic_ram_wipe(&mut ram_buf), 1024);
+    assert!(ram_buf.iter().all(|&b| b == 0));
+
+    // 2. Clear Linux Stateless Architecture
+    assert_eq!(
+        suite.resolve_stateless_config("issue", false),
+        "/usr/share/factory/etc/issue"
+    );
+
+    // 3. NixOS CAS GC
+    suite.register_nix_gc_root("/nix/store/kernel-6.8", true);
+    suite.register_nix_gc_root("/nix/store/old-build", false);
+    assert_eq!(suite.prune_nix_gc_roots(), 1);
+
+    // 4. Void Linux Runit Supervision
+    assert!(suite.register_runit_service("dinitd").is_ok());
+    assert!(suite.start_runit_service("dinitd", 200).is_ok());
+
+    // 5. Pop!_OS COSMIC Dynamic BSP Auto-Tiling
+    assert_ne!(suite.split_cosmic_tile(), "Unknown");
+
+    // 6. FreeBSD/OpenBSD Security Capabilities
+    assert!(suite.apply_pledge_and_unveil(&["stdio", "rpath"], "/usr", "r").is_ok());
+
+    // 7. DragonFly BSD HAMMER2 PFS CoW
+    suite.write_hammer2_block("@root", 42, b"block_data_merkle");
+    assert!(suite.verify_hammer2_pfs("@root"));
+
+    // 8. OpenStack Cinder Block Volume
+    let vol = suite.provision_cinder_volume("cinder-vol-100", 500, true).unwrap();
+    assert_eq!(vol.capacity_gb, 500);
+    assert!(vol.encrypted);
+
+    assert!(suite.evaluate_open_source_project_supremacy());
 }

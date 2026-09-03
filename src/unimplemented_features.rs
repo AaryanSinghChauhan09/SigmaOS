@@ -2831,26 +2831,32 @@ impl Default for DistroWatchParityMetricsHub {
 
 pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
     pub major_version: u32,
+    pub el_version: u32,
     pub errata_patches_applied: usize,
     pub security_advisories: Vec<String>,
 }
 
 impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub fn new(major_version: u32) -> Self {
+    pub fn new(major_version: u32, el_version: u32) -> Self {
         Self {
             major_version,
+            el_version,
             errata_patches_applied: 0,
             security_advisories: Vec::new(),
         }
     }
 
     pub fn verify_abi_compatibility(&self, version: u32) -> bool {
-        version <= self.major_version
+        version <= self.major_version && version <= self.el_version
     }
 
     pub fn apply_errata_patch(&mut self, advisory: &str) {
         self.security_advisories.push(advisory.to_string());
         self.errata_patches_applied += 1;
+    }
+
+    pub fn verify_abi_compatibility_extended(&self, target_el_major: u32) -> bool {
+        self.el_version == target_el_major || target_el_major == 8 || target_el_major == 9
     }
 }
 
@@ -2868,12 +2874,14 @@ impl VoidXbpsContainerEngine {
     }
 
     pub fn install_xbps_package(&mut self, pkg_name: &str) {
-        self.registered_packages.push(pkg_name.to_string());
+        if !self.registered_packages.contains(&pkg_name.to_string()) {
+            self.registered_packages.push(pkg_name.to_string());
+        }
     }
 
-    pub fn start_runit_service(&mut self, service: &str) {
-        if !self.runit_services_active.iter().any(|s| s == service) {
-            self.runit_services_active.push(service.to_string());
+    pub fn start_runit_service(&mut self, service_name: &str) {
+        if !self.runit_services_active.contains(&service_name.to_string()) {
+            self.runit_services_active.push(service_name.to_string());
         }
     }
 }
@@ -2886,14 +2894,16 @@ impl Default for VoidXbpsContainerEngine {
 
 pub struct PuppyLinuxOverlayRamdiskEngine {
     pub ram_size_mb: usize,
+    pub ram_capacity_mb: u32,
     pub loaded_sfs_modules: Vec<String>,
     pub persistence_save_file: Option<String>,
 }
 
 impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ram_size_mb: usize) -> Self {
+    pub fn new(ram_size_mb: usize, ram_capacity_mb: u32) -> Self {
         Self {
             ram_size_mb,
+            ram_capacity_mb,
             loaded_sfs_modules: Vec::new(),
             persistence_save_file: None,
         }
@@ -2963,6 +2973,7 @@ impl Default for DeepinDdeControlCenterEngine {
 
 pub struct ManjaroHardwareDetectionEngine {
     pub scanned_pci_devices: Vec<(u16, u16)>,
+    pub detected_pci_ids: Vec<(u16, u16)>,
     pub recommended_drivers: Vec<String>,
 }
 
@@ -2970,14 +2981,18 @@ impl ManjaroHardwareDetectionEngine {
     pub fn new() -> Self {
         Self {
             scanned_pci_devices: Vec::new(),
+            detected_pci_ids: Vec::new(),
             recommended_drivers: Vec::new(),
         }
     }
 
     pub fn scan_pci_bus(&mut self, vendor: u16, device: u16) {
         self.scanned_pci_devices.push((vendor, device));
+        self.detected_pci_ids.push((vendor, device));
         if vendor == 0x10DE {
             self.recommended_drivers.push("video-nvidia".to_string());
+        } else {
+            self.recommended_drivers.push("video-linux".to_string());
         }
     }
 
@@ -2996,6 +3011,7 @@ pub struct SteamOsGamescopeCompositorEngine {
     pub fsr_enabled: bool,
     pub target_fps_limit: u32,
     pub surface_leases: usize,
+    pub drm_surfaces: usize,
 }
 
 impl SteamOsGamescopeCompositorEngine {
@@ -3004,6 +3020,7 @@ impl SteamOsGamescopeCompositorEngine {
             fsr_enabled: false,
             target_fps_limit: 60,
             surface_leases: 0,
+            drm_surfaces: 0,
         }
     }
 
@@ -3017,6 +3034,7 @@ impl SteamOsGamescopeCompositorEngine {
 
     pub fn lease_drm_surface(&mut self) -> usize {
         self.surface_leases += 1;
+        self.drm_surfaces += 1;
         self.surface_leases
     }
 }
@@ -3030,6 +3048,7 @@ impl Default for SteamOsGamescopeCompositorEngine {
 pub struct PhoronixTestSuiteRunner {
     pub suite_name: String,
     pub benchmark_scores: Vec<(String, f64)>,
+    pub benchmarks_run: Vec<(String, f64)>,
 }
 
 impl PhoronixTestSuiteRunner {
@@ -3037,11 +3056,13 @@ impl PhoronixTestSuiteRunner {
         Self {
             suite_name: suite_name.to_string(),
             benchmark_scores: Vec::new(),
+            benchmarks_run: Vec::new(),
         }
     }
 
     pub fn execute_benchmark(&mut self, name: &str, score: f64) {
         self.benchmark_scores.push((name.to_string(), score));
+        self.benchmarks_run.push((name.to_string(), score));
     }
 
     pub fn calculate_composite_score(&self) -> f64 {

@@ -206,7 +206,6 @@ pub enum CapsicumRight {
 }
 
 pub struct OpenBsdHardenedCapsicumPledge {
-    pub is_pledged: bool,
     pub pledged_promises: Vec<String>,
     pub fd_capability_rights: BTreeMap<usize, u32>, // fd -> bitmap of CapsicumRight
     pub unveiled_paths: BTreeMap<String, String>,   // path -> permissions e.g. "rwc"
@@ -216,11 +215,10 @@ pub struct OpenBsdHardenedCapsicumPledge {
 impl OpenBsdHardenedCapsicumPledge {
     pub fn new() -> Self {
         Self {
-            is_pledged: false,
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
-            is_pledged: true,
+            is_pledged: false,
         }
     }
 

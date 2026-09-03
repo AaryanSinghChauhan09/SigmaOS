@@ -591,18 +591,6 @@ impl MirrorSyncEngine {
             mirror.active = false;
         }
     }
-
-    pub fn mark_failure(&mut self, url: &str) {
-        if let Some(mirror) = self.mirrors.iter_mut().find(|m| m.url == url) {
-            mirror.active = false;
-        }
-    }
-
-    pub fn mark_failure(&mut self, url: &str) {
-        if let Some(mirror) = self.mirrors.iter_mut().find(|m| m.url == url) {
-            mirror.active = false;
-        }
-    }
 }
 
 impl Default for MirrorSyncEngine {
