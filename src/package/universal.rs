@@ -15,6 +15,9 @@ use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
+    use alloc::format;
+    use alloc::string::{String, ToString};
+
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
@@ -23,11 +26,14 @@ pub mod node_distribution_dummy {
     pub enum NodeReleaseStream {
         Lts,
         Current,
+    }
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,
+    }
     pub struct NodeBinaryPackage {
         pub version: String,
+    }
     impl NodeBinaryPackage {
         pub fn new(
             version: &str,
@@ -43,10 +49,12 @@ pub mod node_distribution_dummy {
                 version: version.to_string(),
             }
         }
+    }
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
         pub fn new() -> Self {
             Self
+        }
         pub fn install_to_store(
             &self,
             pkg: &NodeBinaryPackage,
@@ -54,6 +62,8 @@ pub mod node_distribution_dummy {
             _npm: &str,
         ) -> Result<String, &'static str> {
             Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
+        }
+    }
 }
 use node_distribution_dummy::*;
 /// Package format type
