@@ -126,7 +126,6 @@ mod tests {
     fn test_zero_dependency_architecture() {
         assert!(is_zero_dependency_build());
     }
-
     #[test]
     fn test_zero_dependency_primitive_hub() {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");

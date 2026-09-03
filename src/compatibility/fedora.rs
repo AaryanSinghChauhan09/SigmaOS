@@ -1564,15 +1564,17 @@ pub enum CryptoPolicyLevel {
     Legacy,
     Future,
     Fips,
+    Custom(String),
 }
 
 /// Fedora System-Wide Crypto Policies Engine (crypto-policies)
-/// Enforces system-wide TLS, SSH, and IPsec cryptographic security profiles.
+/// Enforces system-wide TLS, SSH, and IPsec cryptographic security profiles with sub-profile customization.
 pub struct FedoraCryptoPoliciesEngine {
     pub current_policy: CryptoPolicyLevel,
     pub min_rsa_key_size: usize,
     pub allow_sha1: bool,
     pub require_quantum_resistant: bool,
+    pub active_subprofiles: Vec<String>,
 }
 
 impl FedoraCryptoPoliciesEngine {
@@ -1582,11 +1584,12 @@ impl FedoraCryptoPoliciesEngine {
             min_rsa_key_size: 2048,
             allow_sha1: false,
             require_quantum_resistant: false,
+            active_subprofiles: Vec::new(),
         }
     }
 
     pub fn set_policy(&mut self, policy: CryptoPolicyLevel) {
-        match policy {
+        match &policy {
             CryptoPolicyLevel::Legacy => {
                 self.min_rsa_key_size = 1024;
                 self.allow_sha1 = true;
@@ -1607,8 +1610,34 @@ impl FedoraCryptoPoliciesEngine {
                 self.allow_sha1 = false;
                 self.require_quantum_resistant = true;
             }
+            CryptoPolicyLevel::Custom(name) => {
+                if name.contains("SHA1") {
+                    self.allow_sha1 = true;
+                }
+                if name.contains("PQC") {
+                    self.require_quantum_resistant = true;
+                }
+            }
         }
         self.current_policy = policy;
+    }
+
+    pub fn enable_subprofile(&mut self, subprofile: &str) {
+        if !self.active_subprofiles.contains(&subprofile.to_string()) {
+            self.active_subprofiles.push(subprofile.to_string());
+            if subprofile == "SHA1" {
+                self.allow_sha1 = true;
+            } else if subprofile == "PQC" {
+                self.require_quantum_resistant = true;
+            }
+        }
+    }
+
+    pub fn disable_subprofile(&mut self, subprofile: &str) {
+        self.active_subprofiles.retain(|s| s != subprofile);
+        if subprofile == "SHA1" && self.current_policy != CryptoPolicyLevel::Legacy {
+            self.allow_sha1 = false;
+        }
     }
 
     pub fn validate_cipher_suite(&self, cipher: &str, rsa_bits: usize) -> bool {
@@ -1629,11 +1658,13 @@ impl FedoraCryptoPoliciesEngine {
 }
 
 /// Fedora Silverblue / Atomic Desktop rpm-ostree Staging and Layering Engine
-/// Manages atomic filesystem trees, layered RPM overlays, and system rollbacks.
+/// Manages atomic filesystem trees, layered RPM overlays, pinned deployments, and stream rebasing.
 pub struct FedoraSilverblueRpmOstreeEngine {
     pub active_commit: String,
     pub staged_commit: Option<String>,
     pub layered_packages: Vec<String>,
+    pub pinned_deployments: Vec<String>,
+    pub current_stream: String,
     pub pending_reboot: bool,
 }
 
@@ -1643,6 +1674,8 @@ impl FedoraSilverblueRpmOstreeEngine {
             active_commit: initial_commit.to_string(),
             staged_commit: None,
             layered_packages: Vec::new(),
+            pinned_deployments: Vec::new(),
+            current_stream: "fedora/39/x86_64/silverblue".to_string(),
             pending_reboot: false,
         }
     }
@@ -1650,6 +1683,24 @@ impl FedoraSilverblueRpmOstreeEngine {
     pub fn stage_upgrade(&mut self, new_commit: &str) {
         self.staged_commit = Some(new_commit.to_string());
         self.pending_reboot = true;
+    }
+
+    pub fn pin_deployment(&mut self, commit: &str) -> bool {
+        if !self.pinned_deployments.contains(&commit.to_string()) {
+            self.pinned_deployments.push(commit.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn rebase_stream(&mut self, new_stream: &str, target_commit: &str) -> Result<String, &'static str> {
+        if new_stream.is_empty() || target_commit.is_empty() {
+            return Err("Stream and target commit cannot be empty");
+        }
+        self.current_stream = new_stream.to_string();
+        self.stage_upgrade(target_commit);
+        Ok(format!("Rebased to stream '{}' at commit '{}'", new_stream, target_commit))
     }
 
     pub fn overlay_layer_package(&mut self, pkg: &str) {
@@ -3795,6 +3846,26 @@ impl FedoraToolbxContainerEngine {
         }
     }
 
+    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            c.running = false;
+            Ok(format!("Toolbx container '{}' stopped", c.name))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
+    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            if !c.running {
+                c.running = true;
+            }
+            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
     pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
         if let Some(c) = self.active_containers.get_mut(name) {
             if !c.host_mounts.contains(&host_path.to_string()) {
@@ -4560,6 +4631,14 @@ mod tests {
         assert!(engine.validate_cipher_suite("ECDHE-RSA-AES256-GCM-SHA384", 2048));
         assert!(!engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 2048)); // SHA1 disabled in DEFAULT
 
+        // Enable subprofile SHA1
+        engine.enable_subprofile("SHA1");
+        assert!(engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 2048));
+
+        // Disable subprofile SHA1
+        engine.disable_subprofile("SHA1");
+        assert!(!engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 2048));
+
         // Switch to LEGACY
         engine.set_policy(CryptoPolicyLevel::Legacy);
         assert!(engine.validate_cipher_suite("ECDHE-RSA-AES128-SHA1", 1024));
@@ -4576,12 +4655,18 @@ mod tests {
         assert_eq!(ostree.active_commit, "commit-v1.0.0");
         assert!(!ostree.pending_reboot);
 
-        ostree.stage_upgrade("commit-v1.1.0");
+        // Test Pinning
+        assert!(ostree.pin_deployment("commit-v1.0.0"));
+        assert_eq!(ostree.pinned_deployments.len(), 1);
+
+        // Test Stream Rebasing
+        let rebase_res = ostree.rebase_stream("fedora/40/x86_64/silverblue", "commit-v2.0.0").unwrap();
+        assert!(rebase_res.contains("fedora/40/x86_64/silverblue"));
         assert!(ostree.pending_reboot);
 
         let res = ostree.apply_staged_deployment().unwrap();
-        assert!(res.contains("commit-v1.1.0"));
-        assert_eq!(ostree.active_commit, "commit-v1.1.0");
+        assert!(res.contains("commit-v2.0.0"));
+        assert_eq!(ostree.active_commit, "commit-v2.0.0");
         assert!(!ostree.pending_reboot);
 
         // Layering package
