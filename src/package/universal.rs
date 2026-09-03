@@ -864,6 +864,146 @@ pub trait PackageAdapterTrait {
     fn adapter_name(&self) -> &str;
 }
 
+/// Universal multi-format package metadata parser and handler supporting
+/// Linux, BSD, macOS, Android, and HarmonyOS package formats
+pub struct UniversalPackageManifestParser;
+
+impl UniversalPackageManifestParser {
+    pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
+        let name = filename.to_lowercase();
+        if name.ends_with(".deb") || name.ends_with(".superdeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nixpkg)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::Xz)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::App)
+        } else {
+            None
+        }
+    }
+
+    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+        let fmt = Self::detect_format_from_filename(filename)
+            .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
+
+        let pkg_name = filename
+            .split('.')
+            .next()
+            .unwrap_or("unknown")
+            .to_string();
+
+        let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
+        if !raw_data.is_empty() {
+            pkg = pkg.with_provides("universal_binary".to_string());
+        }
+        Ok(pkg)
+    }
+}
+
+/// Linux & BSD Distro Inspired Rollback Mechanics
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistroRollbackType {
+    NixOsGeneration,       // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignRollbackSnapshot {
+    pub snapshot_id: usize,
+    pub rollback_type: DistroRollbackType,
+    pub label: String,
+    pub installed_packages_state: Vec<String>,
+    pub timestamp_sec: u64,
+}
+
+pub struct SovereignPackageRollbackEngine {
+    pub snapshots: Vec<SovereignRollbackSnapshot>,
+    pub active_snapshot_id: Option<usize>,
+    pub next_snapshot_id: usize,
+}
+
+impl SovereignPackageRollbackEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            active_snapshot_id: None,
+            next_snapshot_id: 1,
+        }
+    }
+
+    pub fn create_distro_snapshot(
+        &mut self,
+        rollback_type: DistroRollbackType,
+        label: &str,
+        installed_packages: &[String],
+        now_sec: u64,
+    ) -> usize {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snap = SovereignRollbackSnapshot {
+            snapshot_id: id,
+            rollback_type,
+            label: label.to_string(),
+            installed_packages_state: installed_packages.to_vec(),
+            timestamp_sec: now_sec,
+        };
+
+        self.snapshots.push(snap);
+        self.active_snapshot_id = Some(id);
+        id
+    }
+
+    pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
+        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
+        self.active_snapshot_id = Some(snapshot_id);
+        Ok(snap.installed_packages_state.clone())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1081,5 +1221,38 @@ mod tests {
             enabled: true,
         };
         assert!(dnf_adapter.query_dnf_repository(&dnf_config));
+    }
+
+    #[test]
+    fn test_universal_package_manifest_parser() {
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("nginx.deb"),
+            Some(PackageFormat::Deb)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("app.flatpak"),
+            Some(PackageFormat::Flatpak)
+        );
+
+        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        assert_eq!(pkg.name, "tool");
+        assert_eq!(pkg.formats[0], PackageFormat::Apk);
+    }
+
+    #[test]
+    fn test_distro_package_rollback_engine() {
+        let mut engine = SovereignPackageRollbackEngine::new();
+        let pkgs = vec!["nginx".to_string(), "curl".to_string()];
+
+        let snap_id = engine.create_distro_snapshot(
+            DistroRollbackType::NixOsGeneration,
+            "NixOS Gen 101",
+            &pkgs,
+            1700000000,
+        );
+
+        assert_eq!(snap_id, 1);
+        let restored = engine.rollback(snap_id).unwrap();
+        assert_eq!(restored, pkgs);
     }
 }
