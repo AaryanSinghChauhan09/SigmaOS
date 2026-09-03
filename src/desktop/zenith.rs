@@ -136,6 +136,7 @@ impl WindowCapability {
 pub struct SimpleWindow {
     pub id: WindowID,
     pub title: [u8; 128],
+    pub title_len: usize,
     pub x: u32,
     pub y: u32,
     pub width: u32,
@@ -153,6 +154,7 @@ impl SimpleWindow {
         SimpleWindow {
             id,
             title: title_array,
+            title_len,
             x: 100,
             y: 100,
             width: 800,
@@ -187,8 +189,8 @@ impl Window for SimpleWindow {
     }
 
     fn title(&self) -> &[u8] {
-        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.title[..len]
+        // O(1) constant-time slice access using cached title_len, replacing O(N) zero-byte linear scan
+        &self.title[..self.title_len]
     }
 
     fn show(&mut self) -> Result<(), DesktopError> {

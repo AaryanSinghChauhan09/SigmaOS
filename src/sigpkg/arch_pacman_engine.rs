@@ -386,6 +386,71 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
+/// Pacman Contrib Engine aggregating pacman-contrib utilities
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        PacmanContribEngine
+    }
+
+    pub fn paccache_clean(&self, files: &[String], keep_count: usize) -> Vec<String> {
+        let mut cleaner = PacmanCacheCleaner::new(files.to_vec());
+        cleaner.prune_cache(keep_count)
+    }
+
+    pub fn rankmirrors(&self, mirrors: &[(String, u64)], top_k: usize) -> Vec<(String, u64)> {
+        let mut sorted = mirrors.to_vec();
+        sorted.sort_by_key(|m| m.1);
+        sorted.truncate(top_k);
+        sorted
+    }
+
+    pub fn updpkgsums(&self, pkgbuild_text: &str, new_hash: &str) -> String {
+        let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
+        let mut found = false;
+        for line in &mut lines {
+            if line.starts_with("sha256sums=") {
+                *line = format!("sha256sums=('{}')", new_hash);
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            lines.push(format!("sha256sums=('{}')", new_hash));
+        }
+        lines.join("\n")
+    }
+
+    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local in &local_db.local_packages {
+            if let Some(repo_pkg) = remote_db.packages.iter().find(|p| p.name == local.name) {
+                if repo_pkg.version != local.version {
+                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
+                }
+            }
+        }
+        updates
+    }
+
+    pub fn finddeps(&self, local_db: &PacmanDatabase, target_dep: &str) -> Vec<String> {
+        let mut dependents = Vec::new();
+        for pkg in &local_db.local_packages {
+            if pkg.depends.contains(&target_dep.to_string()) {
+                dependents.push(pkg.name.clone());
+            }
+        }
+        dependents
+    }
+}
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
 // ============================================================================
