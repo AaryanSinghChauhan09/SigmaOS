@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 // SigmaOS Network Protocol Layer
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing

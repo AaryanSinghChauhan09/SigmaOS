@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 use alloc::format;
 // SigmaOS Workflow Module
 // Workflow automation engine

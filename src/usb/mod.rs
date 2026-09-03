@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Usb Module
 // USB device subsystem
 // Zero-dependency implementation - no external libraries required

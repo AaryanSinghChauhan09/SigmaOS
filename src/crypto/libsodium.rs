@@ -4,9 +4,6 @@
 #![allow(clippy::type_complexity)]
 #![allow(clippy::needless_range_loop)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 //! libsodium Compatibility Layer for SigmaOS
 //! 
 //! This module provides a compatibility layer for libsodium cryptographic primitives,

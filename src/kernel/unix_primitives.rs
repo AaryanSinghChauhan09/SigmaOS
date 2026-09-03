@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_imports)]
 //! SigmaOS Unix Kernel Primitives
 //!
 //! Production-oriented reimplementations of foundational Linux and BSD kernel

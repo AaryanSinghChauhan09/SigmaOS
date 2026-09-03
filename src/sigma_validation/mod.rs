@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS SigmaValidation Module
 // System validation and verification
 // Zero-dependency implementation - no external libraries required

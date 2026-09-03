@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS RuntimeString Module
 // Zero-copy string type
 // Zero-dependency implementation - no external libraries required

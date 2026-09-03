@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Time Module
 // Real-time clock and timer management
 // Zero-dependency implementation - no external libraries required

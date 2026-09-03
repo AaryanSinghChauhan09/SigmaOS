@@ -1,4 +1,3 @@
-#![allow(unused, dead_code)]
 use alloc::boxed::Box;
 extern crate alloc;
 

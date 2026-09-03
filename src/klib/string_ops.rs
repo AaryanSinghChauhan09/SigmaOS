@@ -27,7 +27,7 @@ pub fn custom_strcmp(s1: *const u8, s2: *const u8) -> i32 {
     }
 }
 
-pub fn custom_strncpy_safe_safe_safe_safe_safe(dest: *mut u8, src: *const u8) -> *mut u8 {
+pub fn custom_strncpy_secure(dest: *mut u8, src: *const u8) -> *mut u8 {
     let mut i = 0;
     unsafe {
         loop {

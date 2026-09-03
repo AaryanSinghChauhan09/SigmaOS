@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Timer Module
 // High-resolution timer subsystem
 // Zero-dependency implementation - no external libraries required

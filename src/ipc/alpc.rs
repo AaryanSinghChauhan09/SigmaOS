@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 //! Advanced Local Procedure Call (ALPC/LPC) Subsystem for SigmaOS
 //! Inspired by Windows NT ALPC, Mach IPC Ports, and Linux/BSD High-Performance Fast IPC.
 //!

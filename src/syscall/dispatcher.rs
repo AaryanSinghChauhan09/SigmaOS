@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 
 /// Custom Syscall Dispatcher for SigmaOS
 /// Implements syscall handling without relying on Linux kernel syscalls

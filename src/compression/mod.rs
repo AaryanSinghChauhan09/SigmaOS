@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Compression Module
 // Data compression algorithms & archive management
 // Zero-dependency implementation - no external libraries required

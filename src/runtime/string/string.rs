@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -443,7 +440,7 @@ pub unsafe fn strncmp(s1: *const i8, s2: *const i8, n: usize) -> i32 {
 
 pub unsafe fn strcat(dest: *mut i8, src: *const i8) -> *mut i8 {
     let dest_len = strlen(dest);
-    strncpy_safe_safe_safe_safe_safe(dest.add(dest_len), src);
+    strncpy_secure(dest.add(dest_len), src);
     dest
 }
 

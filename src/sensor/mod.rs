@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Sensor Module
 // Sensor data acquisition
 // Zero-dependency implementation - no external libraries required
