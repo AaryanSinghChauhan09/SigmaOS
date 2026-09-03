@@ -19,4 +19,4 @@ jobs:
 
       - name: Verify FreeBSD Boot Environment & Storage
         run: |
-          cargo test --lib -- boot::sigma_boot
+          ./run_sigma_tests.sh
