@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
+# run_sigma_tests.sh
+# Main test suite runner for SigmaOS CI/CD pipelines.
+
 set -e
 
 echo "=== SigmaOS / SovereignOS Master CI Test Runner ==="
 
 # 1. Run Python integration test suite if pytest module is available
 echo "[1/5] Checking Python integration test suite..."
-if python3 -c "import pytest" &>/dev/null; then
+if command -v pytest &>/dev/null; then
     pytest
+elif command -v python3 &>/dev/null && python3 -m pytest --version &>/dev/null; then
+    python3 -m pytest
 else
-    echo "pytest module not installed in python environment; skipping python tests."
+    echo "pytest not available in environment; skipping python tests."
 fi
 
 # 2. Run Open Source OS Gap Closure standalone tests

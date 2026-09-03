@@ -19,7 +19,7 @@ jobs:
 
       - name: Verify OpenBSD Pledge & Unveil Primitives
         run: |
-          rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o /tmp/test_wiki && /tmp/test_wiki
+          ./scripts/changed_files_rustc_tests.sh src/expanded_wiki_innovations.rs
 
       - name: Run OpenBSD Parity Verification
         run: |

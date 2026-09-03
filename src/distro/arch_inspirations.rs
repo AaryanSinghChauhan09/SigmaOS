@@ -293,7 +293,7 @@ impl MakePkg {
             "validate".to_string(),
             self.phase_validate(pkgbuild),
         ));
-        if results.last().map(|(_, s)| s) == Some(&BuildStatus::Success).as_ref().map(|s| s) {
+        if results.last().map(|(_, s)| s) == Some(&BuildStatus::Success) {
             // nothing — continue
         }
 
