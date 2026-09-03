@@ -388,9 +388,7 @@ impl AlpmTransactionEngine {
 
         let mut pre_cmds = AllocVec::new();
         for target in &self.targets {
-            let cmds = self
-                .hook_manager
-                .trigger_hooks(HookWhen::PreTransaction, target.as_str());
+            let cmds = self.hook_manager.trigger_hooks(HookWhen::PreTransaction, target.as_str());
             pre_cmds.extend(cmds);
         }
 
@@ -407,9 +405,7 @@ impl AlpmTransactionEngine {
         let mut post_cmds = AllocVec::new();
         for target in &self.targets {
             self.installed.insert(target.clone(), Version::new(1, 0, 0));
-            let cmds = self
-                .hook_manager
-                .trigger_hooks(HookWhen::PostTransaction, target.as_str());
+            let cmds = self.hook_manager.trigger_hooks(HookWhen::PostTransaction, target.as_str());
             post_cmds.extend(cmds);
         }
 
@@ -455,9 +451,7 @@ pub struct AlpmDatabaseSync {
 
 impl AlpmDatabaseSync {
     pub fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
+        Self { entries: Vec::new() }
     }
 
     /// Parses Pacman formatted `.db.tar.gz` sync metadata content
@@ -478,17 +472,13 @@ impl AlpmDatabaseSync {
             } else if line == "%PROVIDES%" {
                 while let Some(nxt) = lines.next() {
                     let nxt = nxt.trim();
-                    if nxt.is_empty() || nxt.starts_with('%') {
-                        break;
-                    }
+                    if nxt.is_empty() || nxt.starts_with('%') { break; }
                     cur_provides.push(nxt.to_string());
                 }
             } else if line == "%CONFLICTS%" {
                 while let Some(nxt) = lines.next() {
                     let nxt = nxt.trim();
-                    if nxt.is_empty() || nxt.starts_with('%') {
-                        break;
-                    }
+                    if nxt.is_empty() || nxt.starts_with('%') { break; }
                     cur_conflicts.push(nxt.to_string());
                 }
             }
@@ -524,9 +514,7 @@ impl AlpmConflictSolver {
     pub fn check_conflicts(entries: &[AlpmSyncEntry], target_pkg: &str) -> Option<String> {
         let target = entries.iter().find(|e| e.name == target_pkg)?;
         for other in entries {
-            if other.name == target_pkg {
-                continue;
-            }
+            if other.name == target_pkg { continue; }
             for conflict in &target.conflicts {
                 if other.name == *conflict || other.provides.contains(conflict) {
                     return Some(other.name.clone());

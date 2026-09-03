@@ -2,9 +2,9 @@
 // Implements BSD-style security hardening features for SigmaOS
 // Inspired by OpenBSD, FreeBSD, DragonFly BSD, and HardenedBSD
 
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
 /// OpenBSD pledge-style syscall restriction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -414,10 +414,7 @@ mod tests {
     #[test]
     fn test_unveil() {
         let mut unveil = UnveilManager::new();
-        unveil.add_unveil(
-            "/tmp".to_string(),
-            vec![UnveilPermission::Read, UnveilPermission::Write],
-        );
+        unveil.add_unveil("/tmp".to_string(), vec![UnveilPermission::Read, UnveilPermission::Write]);
         unveil.unveil().unwrap();
         assert!(unveil.check_access("/tmp/file", UnveilPermission::Read));
     }

@@ -126,10 +126,7 @@ impl DisplayManager {
             users: Vec::new(),
             autologin: None,
             current_session: None,
-            active_greeter_theme: Some(MdmGreeterTheme::new(
-                "Mint-HTML5-Default",
-                GreeterEngineStyle::Html5WebKit,
-            )),
+            active_greeter_theme: Some(MdmGreeterTheme::new("Mint-HTML5-Default", GreeterEngineStyle::Html5WebKit)),
             accessibility_overlay: GreeterAccessibilityOverlay::new(),
         }
     }

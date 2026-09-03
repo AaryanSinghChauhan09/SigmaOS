@@ -10,8 +10,6 @@ pub mod buddy_allocator;
 pub mod collections;
 #[macro_use]
 pub mod console;
-pub mod base64;
-pub mod config_parser;
 pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
@@ -24,11 +22,9 @@ pub mod hashmap;
 pub mod hashset;
 pub mod io;
 pub mod isa;
-pub mod json;
 pub mod linked_list;
 pub mod math;
 pub mod math_ops;
-pub mod merkle;
 pub mod net;
 pub mod paging;
 pub mod path;
@@ -48,21 +44,25 @@ pub mod string_ops;
 pub mod string_parser;
 pub mod time;
 pub mod time_impl;
-pub mod toml;
-pub mod utf8_utils;
 pub mod uuid;
 pub mod uvm;
 pub mod vec;
+pub mod base64;
+pub mod config_parser;
+pub mod utf8_utils;
+pub mod merkle;
+pub mod toml;
+pub mod json;
 
-pub use alloc::collections::BTreeMap;
-pub use alloc::string::{String, ToString};
-pub use collections::VecDeque;
-pub use hashmap::HashMap;
-pub use json::{SovereignJsonParser, SovereignJsonValue};
-pub use path::PathBuf;
-pub use string::SigmaString;
-pub use time::{Duration, Instant, Time};
+pub use json::{SovereignJsonValue, SovereignJsonParser};
 pub use vec::Vec;
+pub use alloc::collections::BTreeMap;
+pub use hashmap::HashMap;
+pub use path::PathBuf;
+pub use collections::VecDeque;
+pub use string::SigmaString;
+pub use alloc::string::{String, ToString};
+pub use time::{Duration, Instant, Time};
 
 pub const fn is_zero_dependency_build() -> bool {
     true

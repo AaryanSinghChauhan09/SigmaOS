@@ -155,7 +155,8 @@ impl SnapshotStorage for FileSnapshotStorage {
         }
 
         let snapshot_path = format!("{}/{}", self.base_path, &metadata.id);
-        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available")
+            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
         let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
@@ -224,7 +225,8 @@ impl SnapshotStorage for FileSnapshotStorage {
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
-        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available")
+            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
     }
@@ -275,7 +277,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
         }
 
         let snapshot_path = format!("{}/{}", self.base_path, &metadata.id);
-        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available")
+            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         // Write metadata
         let metadata_path = format!("{}/{}", snapshot_path, "metadata.json");
@@ -366,7 +369,8 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
-        Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
+        Err("fs not available")
+            .map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
     }

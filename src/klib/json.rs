@@ -59,13 +59,7 @@ impl SovereignJsonValue {
     pub fn to_json_string(&self) -> String {
         match self {
             SovereignJsonValue::Null => "null".to_string(),
-            SovereignJsonValue::Bool(b) => {
-                if *b {
-                    "true".to_string()
-                } else {
-                    "false".to_string()
-                }
-            }
+            SovereignJsonValue::Bool(b) => if *b { "true".to_string() } else { "false".to_string() },
             SovereignJsonValue::Number(n) => {
                 if n.fract() == 0.0 {
                     format!("{}", *n as i64)
@@ -228,9 +222,7 @@ impl<'a> SovereignJsonParser<'a> {
             match c {
                 '"' => return Ok(out),
                 '\\' => {
-                    let esc = self
-                        .next_char()
-                        .ok_or("JSON Parser: Unterminated string escape")?;
+                    let esc = self.next_char().ok_or("JSON Parser: Unterminated string escape")?;
                     match esc {
                         '"' => out.push('"'),
                         '\\' => out.push('\\'),

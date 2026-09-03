@@ -354,10 +354,7 @@ impl LinuxDominanceSupermacyEngine {
     }
 
     /// Evaluate dominance metrics for a specific target distribution
-    pub fn evaluate_distro_dominance(
-        &self,
-        target_distro: &str,
-    ) -> Option<&DistroDominanceMetrics> {
+    pub fn evaluate_distro_dominance(&self, target_distro: &str) -> Option<&DistroDominanceMetrics> {
         self.benchmark_records.get(target_distro)
     }
 

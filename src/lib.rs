@@ -1,11 +1,13 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+
 // Core working modules
-pub mod accessibility;
 pub mod ai;
 pub mod app;
+pub mod futuristic_modules;
 pub mod auth;
+pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -15,7 +17,6 @@ pub mod desktop;
 pub mod device;
 pub mod driver;
 pub mod filesystem;
-pub mod futuristic_modules;
 pub mod kernel;
 pub mod klib;
 pub use klib::ZeroDependencyPrimitiveHub;
@@ -35,41 +36,24 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub use process::{
-    AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
-    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
-    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
-    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
-    WNOHANG, WUNTRACED,
+    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
+    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
+    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
+    SigQueuePayload, AdvancedIpcHub, SovereignProcessState, SovereignProcess, ZeroCopyIpcChannel,
+    SovereignProcessManager,
 };
-pub mod access;
 pub mod community;
-pub mod open_source_os_gap_closure;
+pub mod access;
 pub mod tools;
-pub use open_source_os_gap_closure::*;
-pub mod open_source_obsoletion;
 pub mod open_source_os_gap_closure;
+pub use open_source_os_gap_closure::*;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod open_source_obsoletion;
+pub mod open_source_os_gap_closure;
 
-pub use distro::{
-    missing_distro_innovations::{
-        CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
-    },
-    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode, FreeBsdGeomVdevTopology,
-    GarudaZenPerformanceEngine, GeomVdevNode, GuixShepherdServiceEngine, HaStateEntry,
-    HermeticClosureRecord, HermeticStoreClosureEngine, LandlockAccessType, LandlockV5Rule,
-    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, OpenBsdFdPledgeGate, SchedExtTask,
-    ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite, SovereignHermeticCasStoreEngine,
-    SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    StoreClosurePackage, SystemGenerationRecord, ZfsPoolState, ZramCompressionAlgorithm,
-};
-pub use driver::{
-    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
-    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
-    UbuntuLivepatchDriverHook,
-};
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
@@ -80,35 +64,51 @@ pub use package::bsd_linux_package_innovations::{
     SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
     UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
-pub use security::{
-    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
-    GksuSecurityGuard, HardenedSyscallDispatcher, HardenedSyscallError, KaliAirgeddonWifiAudit,
-    KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer, LibGksuGraphicalSudoEngine,
-    MemoryAccessError, PagePermissions, PcapPacketHeader, PiaDedicatedIpBinding, PiaMaceAdBlocker,
-    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion, PiaSplitTunnelGovernor,
-    PiaStrictKillSwitch, PiaVpnManager, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
-    SovereignKaslrEngine, SplitTunnelRule, WifiFrameType,
-};
 pub use unimplemented_features::{
-    AlpineApkPackageIndex, AndroidApexContainerModuleEngine, AndroidApexModule,
+    AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
+    DistroWatchParityMetricsHub, ManjaroHardwareDetectionEngine, PhoronixAutomatedBenchmarkEngine,
+    PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine, RockyAlmaLinuxEnterpriseLifecycleGovernor,
+    RosettaDynamicBinaryTranslator, SteamOsGamescopeCompositorEngine, TargetArch,
+    TinyCoreModularTczLoader, VoidXbpsContainerEngine,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
-    DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub, DragonFlyHammer2DeduplicationEngine,
-    DragonFlyHammer2FsSnapshot, GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator,
-    HaikuTranslatorEngine, Hammer2Block, Jbd2TransactionLedger, LegacyController, MageiaMirror,
-    MageiaSynthesisPackage, MageiaUrpmiMccResolver, ManjaroHardwareDetectionEngine,
-    ModernController, NetBsdRumpComponentEngine, NixOsDeclarativeConfigEngine, PciBusScanner,
-    PhoronixAutomatedBenchmarkEngine, PhoronixTestSuiteRunner, PowerState,
-    PuppyLinuxOverlayRamdiskEngine, RavenWidgetState, RockyAlmaLinuxEnterpriseLifecycleGovernor,
-    RosettaDynamicBinaryTranslator, RumpComponent, RumpComponentType, SatSolverEngine,
-    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage, SlackwarePkgtoolEngine,
-    SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
-    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, UdfVm,
-    VoidXbpsContainerEngine, ZorinAppMapping, ZorinWinAppDbRegistry,
+    GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
+    LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
+    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
+    ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+    SlackwarePkgtoolEngine, SlackwarePackage, SolusEopkgRavenGovernor, SolusEopkgDeltaPackage, RavenWidgetState,
+    MageiaUrpmiMccResolver, MageiaSynthesisPackage, MageiaMirror, DragonFlyHammer2DeduplicationEngine, Hammer2Block,
+    NetBsdRumpComponentEngine, RumpComponent, RumpComponentType,
+};
+pub use distro::{
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
+    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
+    SovereignSchedExtEngine, ScxSchedulerKind, ScxTaskState, SchedExtTask,
+    SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
+    SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
+    SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
+    SovereignDistroLeapSuite,
+};
+pub use security::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
+    PagePermissions, RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, WifiFrameType, PiaDedicatedIpBinding, PiaMaceAdBlocker,
+    PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use driver::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
-    GrowthDomainItem, SigmaosGrowthArchitectureEngine, StrategicImportItem,
-    StrategicImportPlanEngine,
+    GrowthDomainItem, SigmaosGrowthArchitectureEngine, StrategicImportItem, StrategicImportPlanEngine,
 };
 pub mod virtualization;
 
@@ -150,9 +150,9 @@ pub use update::distro_update_parity::{
     SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
 };
 pub mod installer;
-pub mod iot;
-pub mod ml;
 pub mod performance;
+pub mod ml;
+pub mod iot;
 
 // Temporarily disabled problematic modules
 // pub mod accessibility;

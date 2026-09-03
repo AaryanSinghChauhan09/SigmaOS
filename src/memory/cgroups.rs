@@ -214,9 +214,7 @@ mod tests {
             (205, 50 * 1024, true), // Highest PID (youngest)
         ];
 
-        let killed = manager
-            .trigger_oom_killer_with_policy(container_cg, &mut processes, OomPolicy::KillYoungest)
-            .unwrap();
+        let killed = manager.trigger_oom_killer_with_policy(container_cg, &mut processes, OomPolicy::KillYoungest).unwrap();
         assert_eq!(killed, 205);
         assert_eq!(processes[1].2, false);
     }

@@ -120,20 +120,16 @@ impl SovereignUniversalDistroBridge {
         let pkg_spec = self.translate_package_specifier("coreutils");
         let vfs_etc = self.translate_vfs_path("/etc");
 
-        !pkg_spec.is_empty()
-            && !vfs_etc.is_empty()
-            && match self.mode {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora => supervisor == ServiceSupervisorType::Systemd,
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-                DistroSubsystemMode::LinuxAlpine => supervisor == ServiceSupervisorType::Runit,
-                DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+        !pkg_spec.is_empty() && !vfs_etc.is_empty() && match self.mode {
+            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                supervisor == ServiceSupervisorType::Systemd
             }
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                supervisor == ServiceSupervisorType::OpenRC
+            }
+            DistroSubsystemMode::LinuxAlpine => supervisor == ServiceSupervisorType::Runit,
+            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+        }
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {

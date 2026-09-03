@@ -21,14 +21,12 @@ mod network_analyzer;
 #[path = "../src/security/kernel_hardening.rs"]
 mod kernel_hardening;
 
-use comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest};
-use kernel_hardening::{
-    HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine, SyscallFilterRule,
-};
-use kernel_paging::{DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason};
 use linux_bsd_inspirations::CachyBoreScheduler;
-use network_analyzer::{OperatingSystemType, PacketHeader, PacketRingBuffer, ProtocolType};
-use vfs::{InodeType, Vfs};
+use comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest};
+use kernel_paging::{DemandPagingSubsystem, DemandPageZone, DemandPageType, PageFaultReason};
+use vfs::{Vfs, InodeType};
+use network_analyzer::{PacketRingBuffer, PacketHeader, ProtocolType, OperatingSystemType};
+use kernel_hardening::{SovereignKaslrEngine, SmepSmapEnforcer, HardenedSyscallDispatcher, SyscallFilterRule};
 
 #[test]
 fn test_cachy_bore_scheduler_algorithm_inspection() {
@@ -38,14 +36,10 @@ fn test_cachy_bore_scheduler_algorithm_inspection() {
 
     // Simulate task execution bursts
     bore.update_task_execution(101, 15, 200, 4); // Short burst, long sleep -> interactive
-    bore.update_task_execution(102, 300, 10, 4); // Long burst, short sleep -> CPU bound
+    bore.update_task_execution(102, 300, 10, 4);  // Long burst, short sleep -> CPU bound
 
     let selected_interactive = bore.pick_next_task(4);
-    assert_eq!(
-        selected_interactive,
-        Some(101),
-        "CachyOS BORE algorithm must prioritize interactive tasks with higher score"
-    );
+    assert_eq!(selected_interactive, Some(101), "CachyOS BORE algorithm must prioritize interactive tasks with higher score");
 }
 
 #[test]
@@ -61,10 +55,7 @@ fn test_anticipatory_io_scheduler_algorithm_inspection() {
     assert_eq!(req1.pid, 1);
 
     let req2 = io_sched.dispatch_next().unwrap();
-    assert_eq!(
-        req2.pid, 2,
-        "Anticipatory scheduler must exploit spatial locality for read operations"
-    );
+    assert_eq!(req2.pid, 2, "Anticipatory scheduler must exploit spatial locality for read operations");
 }
 
 #[test]
@@ -78,10 +69,7 @@ fn test_demand_paging_subsystem_algorithm_inspection() {
     });
 
     let res = paging.handle_demand_fault(0x00400008, PageFaultReason::PageNotPresent);
-    assert!(
-        res.is_ok(),
-        "Demand paging must allocate page on zero-fill page fault"
-    );
+    assert!(res.is_ok(), "Demand paging must allocate page on zero-fill page fault");
     assert_eq!(paging.get_active_mapped_pages_count(), 1);
 }
 
@@ -90,9 +78,7 @@ fn test_vfs_inode_and_link_count_algorithm_inspection() {
     let mut vfs = Vfs::new();
 
     let root = vfs.get_root();
-    let file_inode = vfs
-        .create_file(root, "test_file.txt", InodeType::File)
-        .expect("File creation failed");
+    let file_inode = vfs.create_file(root, "test_file.txt", InodeType::File).expect("File creation failed");
 
     // Inspect initial link counts
     let inode_ref = vfs.get_inode(file_inode).expect("Inode lookup failed");
@@ -100,28 +86,20 @@ fn test_vfs_inode_and_link_count_algorithm_inspection() {
     assert_eq!(inode_ref.hard_links_count, 1);
 
     // Create hard link
-    vfs.create_hard_link(file_inode, root, "test_file_link.txt")
-        .expect("Hard link creation failed");
+    vfs.create_hard_link(file_inode, root, "test_file_link.txt").expect("Hard link creation failed");
     let inode_ref2 = vfs.get_inode(file_inode).expect("Inode lookup failed");
     assert_eq!(inode_ref2.link_count, 2);
     assert_eq!(inode_ref2.hard_links_count, 2);
 
     // Unlink first reference
-    vfs.delete_file(root, "test_file.txt")
-        .expect("Delete file failed");
-    let inode_ref3 = vfs
-        .get_inode(file_inode)
-        .expect("Inode must persist after unlinking one hard link");
+    vfs.delete_file(root, "test_file.txt").expect("Delete file failed");
+    let inode_ref3 = vfs.get_inode(file_inode).expect("Inode must persist after unlinking one hard link");
     assert_eq!(inode_ref3.link_count, 1);
     assert_eq!(inode_ref3.hard_links_count, 1);
 
     // Unlink final reference
-    vfs.delete_file(root, "test_file_link.txt")
-        .expect("Delete hard link failed");
-    assert!(
-        vfs.get_inode(file_inode).is_none(),
-        "Inode must be freed when hard link count reaches zero"
-    );
+    vfs.delete_file(root, "test_file_link.txt").expect("Delete hard link failed");
+    assert!(vfs.get_inode(file_inode).is_none(), "Inode must be freed when hard link count reaches zero");
 }
 
 #[test]
@@ -150,10 +128,7 @@ fn test_kernel_hardening_kaslr_smep_and_syscalls_inspection() {
     // 1. KASLR Virtual Address Slide Inspection
     let mut kaslr = SovereignKaslrEngine::new(0xFFFF800000000000);
     let slide = kaslr.calculate_randomized_slide(0x123456789ABCDEF0);
-    assert!(
-        slide > 0,
-        "KASLR slide must be non-zero when entropy is applied"
-    );
+    assert!(slide > 0, "KASLR slide must be non-zero when entropy is applied");
     assert_eq!(kaslr.get_kernel_text_base(), 0xFFFF800000000000 + slide);
 
     // 2. SMEP / SMAP Execution Control Inspection
@@ -165,12 +140,7 @@ fn test_kernel_hardening_kaslr_smep_and_syscalls_inspection() {
     assert!(smep_smap.is_smap_active());
 
     // User-space execution trap inspection
-    assert!(
-        smep_smap
-            .verify_instruction_fetch(0x00007FFF00001000, true)
-            .is_err(),
-        "SMEP must prevent kernel from executing user-space code"
-    );
+    assert!(smep_smap.verify_instruction_fetch(0x00007FFF00001000, true).is_err(), "SMEP must prevent kernel from executing user-space code");
 
     // 3. Hardened Syscall Dispatcher Filtering
     let mut dispatcher = HardenedSyscallDispatcher::new();
@@ -178,8 +148,5 @@ fn test_kernel_hardening_kaslr_smep_and_syscalls_inspection() {
     dispatcher.add_filter_rule(59, SyscallFilterRule::DenyWithEperm); // sys_execve
 
     assert_eq!(dispatcher.dispatch_syscall(1, &[0, 0, 0]), Ok(0));
-    assert!(
-        dispatcher.dispatch_syscall(59, &[0, 0, 0]).is_err(),
-        "Dispatcher must block denied syscalls"
-    );
+    assert!(dispatcher.dispatch_syscall(59, &[0, 0, 0]).is_err(), "Dispatcher must block denied syscalls");
 }

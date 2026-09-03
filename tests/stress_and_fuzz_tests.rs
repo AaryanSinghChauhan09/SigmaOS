@@ -1,10 +1,10 @@
 // SigmaOS Modular Test Suite (Unit, Integration, System, Stress, Fuzz & Matrix)
 // Validates file I/O, process scheduling, memory allocation, devices, networking, security, and boot sequences.
 
-use sigmaos::boot::{BootType, KernelCmdlineOptions, UefiBootloader};
-use sigmaos::filesystem::{FileType, VirtualFilesystem};
-use sigmaos::kernel::{BuddyAllocator, Priority, Process, ProcessState};
+use sigmaos::filesystem::{VirtualFilesystem, FileType};
+use sigmaos::kernel::{Process, ProcessState, Priority, BuddyAllocator};
 use sigmaos::network::{DhcpClient, DhcpState, DnsResolver};
+use sigmaos::boot::{UefiBootloader, BootType, KernelCmdlineOptions};
 use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
 
 #[test]
@@ -54,12 +54,8 @@ fn test_matrix_syscall_fuzzing() {
     // Invalid path unveil fuzzing
     let mut unveil = UnveilManager::new();
     unveil.unveil("/var", "r").unwrap();
-    assert!(unveil
-        .validate_path("/etc/shadow", UnveilPermission::Read)
-        .is_err());
-    assert!(unveil
-        .validate_path("\0\0\0/invalid_fuzz", UnveilPermission::Write)
-        .is_err());
+    assert!(unveil.validate_path("/etc/shadow", UnveilPermission::Read).is_err());
+    assert!(unveil.validate_path("\0\0\0/invalid_fuzz", UnveilPermission::Write).is_err());
 }
 
 #[test]
@@ -72,19 +68,14 @@ fn test_matrix_boot_sequence_and_cmdline() {
 
     let mut bootloader = UefiBootloader::new(BootType::UefiGpt);
     assert!(bootloader.parse_gpt_header(&[0u8; 512]).is_ok());
-    assert!(bootloader
-        .load_kernel_elf(b"\x7FELF_STRESS_BOOT_TEST")
-        .is_ok());
+    assert!(bootloader.load_kernel_elf(b"\x7FELF_STRESS_BOOT_TEST").is_ok());
 }
 
 #[test]
 fn test_matrix_networking_dhcp_dns() {
     let mut dhcp = DhcpClient::new([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
     assert_eq!(dhcp.send_discover(), DhcpState::Discover);
-    assert_eq!(
-        dhcp.process_offer("10.0.0.150", "10.0.0.1"),
-        DhcpState::Bound
-    );
+    assert_eq!(dhcp.process_offer("10.0.0.150", "10.0.0.1"), DhcpState::Bound);
 
     let dns = DnsResolver::new();
     assert_eq!(dns.resolve_a_record("dns.google").unwrap(), "8.8.8.8");

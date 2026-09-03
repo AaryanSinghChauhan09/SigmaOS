@@ -241,10 +241,7 @@ impl XappAppsSuite {
     }
 
     pub fn get_favorites(&self) -> Vec<&RecentDocument> {
-        self.recent_documents
-            .iter()
-            .filter(|d| d.is_favorite)
-            .collect()
+        self.recent_documents.iter().filter(|d| d.is_favorite).collect()
     }
 }
 
@@ -329,10 +326,7 @@ mod tests {
         assert_eq!(spices.desklets[0].name, "Desktop Clock");
 
         spices.register_action("open_terminal", "alacritty");
-        assert_eq!(
-            spices.custom_actions.get("open_terminal").unwrap(),
-            "alacritty"
-        );
+        assert_eq!(spices.custom_actions.get("open_terminal").unwrap(), "alacritty");
     }
 
     #[test]

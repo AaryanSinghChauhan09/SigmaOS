@@ -1,12 +1,13 @@
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
+use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
@@ -1581,14 +1582,15 @@ impl UniversalPackageManifestParser {
         }
     }
 
-    pub fn parse_manifest_auto(
-        filename: &str,
-        raw_data: &[u8],
-    ) -> Result<UnifiedPackage, &'static str> {
+    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
         let fmt = Self::detect_format_from_filename(filename)
             .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
 
-        let pkg_name = filename.split('.').next().unwrap_or("unknown").to_string();
+        let pkg_name = filename
+            .split('.')
+            .next()
+            .unwrap_or("unknown")
+            .to_string();
 
         let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
         if !raw_data.is_empty() {
@@ -1601,11 +1603,11 @@ impl UniversalPackageManifestParser {
 /// Linux & BSD Distro Inspired Rollback Mechanics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRollbackType {
-    NixOsGeneration,   // NixOS atomic generation profile rollback
-    FreeBsdZfsBootEnv, // FreeBSD ZFS boot environment (bectl / beadm) rollback
-    OpenSuseSnapper,   // openSUSE Snapper CoW snapshot rollback
-    FedoraRpmOstree,   // Fedora Silverblue / rpm-ostree deployment rollback
-    AlpineApkCache,    // Alpine Linux local apk tarball cache rollback
+    NixOsGeneration,       // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
 }
 
 #[derive(Debug, Clone)]
@@ -1656,11 +1658,7 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
-        let snap = self
-            .snapshots
-            .iter()
-            .find(|s| s.snapshot_id == snapshot_id)
-            .ok_or("Rollback Engine: Snapshot not found")?;
+        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
         self.active_snapshot_id = Some(snapshot_id);
         Ok(snap.installed_packages_state.clone())
     }
@@ -1969,8 +1967,7 @@ mod tests {
             Some(PackageFormat::Flatpak)
         );
 
-        let pkg =
-            UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }

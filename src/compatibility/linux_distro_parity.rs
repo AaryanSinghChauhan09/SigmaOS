@@ -8,12 +8,12 @@ extern crate alloc;
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use alloc::string::String;
-use alloc::string::ToString;
-#[cfg(test)]
-use alloc::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
+#[cfg(test)]
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
 
 // ==========================================
 // 1. Linux Standard Base (LSB) & /etc/os-release
@@ -273,8 +273,7 @@ impl LinuxPamAuthenticationEngine {
 
         // Simulate pam_unix.so credential check
         let is_valid = password == "sigma_pass" || password == "root_pass";
-        self.authenticated_sessions
-            .insert(username.to_string(), is_valid);
+        self.authenticated_sessions.insert(username.to_string(), is_valid);
         Ok(is_valid)
     }
 
@@ -297,9 +296,7 @@ impl LinuxSysctlGovernor {
         params.insert("vm.swappiness".to_string(), "60".to_string());
         params.insert("net.ipv4.ip_forward".to_string(), "0".to_string());
         params.insert("fs.file-max".to_string(), "2097152".to_string());
-        Self {
-            sysctl_params: params,
-        }
+        Self { sysctl_params: params }
     }
 
     pub fn parse_sysctl_conf(&mut self, content: &str) {
@@ -368,10 +365,7 @@ impl LinuxUdevRulesEngine {
         let mut mode = None;
 
         for token in trimmed.split(',') {
-            let parts: Vec<&str> = token
-                .split('=')
-                .map(|s| s.trim().trim_matches('"'))
-                .collect();
+            let parts: Vec<&str> = token.split('=').map(|s| s.trim().trim_matches('"')).collect();
             if parts.len() == 2 {
                 let key = parts[0].trim_end_matches(':').trim_end_matches('+');
                 let val = parts[1];
@@ -517,10 +511,7 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
 
         let ok = pam.authenticate("sovereign_user", "sigma_pass").unwrap();
         assert!(ok);
-        assert_eq!(
-            pam.authenticated_sessions.get("sovereign_user"),
-            Some(&true)
-        );
+        assert_eq!(pam.authenticated_sessions.get("sovereign_user"), Some(&true));
 
         pam.close_session("sovereign_user");
         assert!(pam.authenticated_sessions.get("sovereign_user").is_none());
@@ -579,9 +570,6 @@ wireguard
 kvm
 "#;
         modules.parse_modules_load_conf(conf);
-        assert_eq!(
-            modules.modules_to_load,
-            vec!["wireguard".to_string(), "kvm".to_string()]
-        );
+        assert_eq!(modules.modules_to_load, vec!["wireguard".to_string(), "kvm".to_string()]);
     }
 }

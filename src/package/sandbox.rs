@@ -86,9 +86,7 @@ impl SimpleBuildSandbox {
 }
 
 impl BuildSandbox for SimpleBuildSandbox {
-    fn id(&self) -> SandboxID {
-        self.id
-    }
+    fn id(&self) -> SandboxID { self.id }
     fn state(&self) -> SandboxState {
         match self.state.load(Ordering::SeqCst) {
             0 => SandboxState::Created,
@@ -270,9 +268,7 @@ impl SandboxManager for SimpleSandboxManager {
     fn get_sandbox(&self, id: SandboxID) -> Option<&dyn BuildSandbox> {
         for sandbox_option in &self.sandboxes {
             if let Some(ref sandbox) = *sandbox_option {
-                if sandbox.id == id {
-                    return Some(sandbox as &dyn BuildSandbox);
-                }
+                if sandbox.id == id { return Some(sandbox as &dyn BuildSandbox); }
             }
         }
         None

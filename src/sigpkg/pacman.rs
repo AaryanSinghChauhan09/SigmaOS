@@ -291,19 +291,12 @@ impl PaccacheEngine {
 pub struct CheckupdatesEngine;
 
 impl CheckupdatesEngine {
-    pub fn scan_pending_updates(
-        installed: &[PkgBuildScript],
-        repo: &[PkgBuildScript],
-    ) -> Vec<(String, u32, u32)> {
+    pub fn scan_pending_updates(installed: &[PkgBuildScript], repo: &[PkgBuildScript]) -> Vec<(String, u32, u32)> {
         let mut pending = Vec::new();
         for inst in installed {
-            let inst_name = core::str::from_utf8(&inst.pkgname)
-                .unwrap_or("")
-                .trim_matches('\0');
+            let inst_name = core::str::from_utf8(&inst.pkgname).unwrap_or("").trim_matches('\0');
             for r in repo {
-                let r_name = core::str::from_utf8(&r.pkgname)
-                    .unwrap_or("")
-                    .trim_matches('\0');
+                let r_name = core::str::from_utf8(&r.pkgname).unwrap_or("").trim_matches('\0');
                 if inst_name == r_name && r.pkgrel > inst.pkgrel {
                     pending.push((inst_name.to_string(), inst.pkgrel, r.pkgrel));
                 }
@@ -327,14 +320,10 @@ pub struct PactreeEngine;
 
 impl PactreeEngine {
     pub fn render_dependency_tree(pkg: &PkgBuildScript, abs: &AbsTreeEngine) -> String {
-        let name = core::str::from_utf8(&pkg.pkgname)
-            .unwrap_or("")
-            .trim_matches('\0');
+        let name = core::str::from_utf8(&pkg.pkgname).unwrap_or("").trim_matches('\0');
         let mut tree = format!("{}\n", name);
         if let Some(recipe) = abs.find_recipe_by_name(&pkg.pkgname) {
-            let source_url = core::str::from_utf8(&recipe.source_url)
-                .unwrap_or("")
-                .trim_matches('\0');
+            let source_url = core::str::from_utf8(&recipe.source_url).unwrap_or("").trim_matches('\0');
             tree.push_str(&format!("  └── src: {}\n", source_url));
         }
         tree

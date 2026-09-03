@@ -57,20 +57,13 @@ impl ComplianceAuditLogger {
 
     /// Get audit trail for specific framework
     pub fn get_audit_trail(&self, framework: ComplianceFramework) -> Vec<&ComplianceAuditEvent> {
-        self.events
-            .iter()
-            .filter(|e| e.framework == framework)
-            .collect()
+        self.events.iter().filter(|e| e.framework == framework).collect()
     }
 
     /// Generate compliance report
     pub fn generate_report(&self, framework: ComplianceFramework) -> String {
         let events = self.get_audit_trail(framework);
-        format!(
-            "Compliance Report for {:?}\nTotal Events: {}\n",
-            framework,
-            events.len()
-        )
+        format!("Compliance Report for {:?}\nTotal Events: {}\n", framework, events.len())
     }
 }
 
@@ -125,10 +118,7 @@ impl TpmAttestationManager {
 
     /// Generate attestation report
     pub fn generate_attestation_report(&self) -> String {
-        format!(
-            "TPM Attestation Report\nPCR Measurements: {}\n",
-            self.measurements.len()
-        )
+        format!("TPM Attestation Report\nPCR Measurements: {}\n", self.measurements.len())
     }
 }
 

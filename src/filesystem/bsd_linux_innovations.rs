@@ -493,10 +493,7 @@ impl GoboLinuxPathResolver {
 
     pub fn generate_system_index_symlink(&self, name: &str, binary: &str) -> Option<String> {
         let target = self.resolve_program_binary(name, binary)?;
-        Some(format!(
-            "{}/bin/{} -> {}",
-            self.system_index_path, binary, target
-        ))
+        Some(format!("{}/bin/{} -> {}", self.system_index_path, binary, target))
     }
 }
 

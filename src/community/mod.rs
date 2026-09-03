@@ -1,12 +1,12 @@
 // SigmaOS Community Module
-pub mod contrib;
 pub mod infrastructure;
 pub mod toolkit;
+pub mod contrib;
 
 pub use contrib::{
-    ContribBounty, ContribBountyEngine, ContribPackageVerifier, ContribRecipe, MaintainerCandidate,
-    MaintainerStage, NewMaintainerPipeline, RfcStatus, SovereignContribHub, SovereignRfc,
-    SovereignRfcManager,
+    ContribBounty, ContribBountyEngine, ContribPackageVerifier, ContribRecipe,
+    MaintainerCandidate, MaintainerStage, NewMaintainerPipeline, RfcStatus, SovereignContribHub,
+    SovereignRfc, SovereignRfcManager,
 };
 
 pub use infrastructure::{

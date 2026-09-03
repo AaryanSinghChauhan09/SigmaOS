@@ -104,10 +104,7 @@ impl SovereignPackageSnapshotRollbackEngine {
     }
 
     pub fn create_pre_update_snapshot(&mut self, target_pkg: &str) -> u32 {
-        let desc = format!(
-            "Timeshift/Snapper Pre-Update Snapshot prior to updating {}",
-            target_pkg
-        );
+        let desc = format!("Timeshift/Snapper Pre-Update Snapshot prior to updating {}", target_pkg);
         self.create_snapshot(&desc)
     }
 

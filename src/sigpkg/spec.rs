@@ -509,6 +509,7 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchLevel {

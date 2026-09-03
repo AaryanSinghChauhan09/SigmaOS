@@ -12,8 +12,8 @@ pub use mate_betsy::{
 };
 
 pub use mint_tools::{
-    AppMetadata, MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, SnapshotType,
-    TimeshiftSnapshot, UpdateLevel, UpdatePackage,
+    MintUpdateManager, UpdatePackage, UpdateLevel, MintTimeshiftEngine, TimeshiftSnapshot,
+    SnapshotType, MintSoftwareManager, AppMetadata,
 };
 
 pub use screensaver::{

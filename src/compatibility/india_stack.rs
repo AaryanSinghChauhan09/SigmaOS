@@ -247,9 +247,7 @@ mod tests {
 
         // Stale cheque (> 90 days)
         let stale_cheque = ChequeValidationRecord {
-            presentation_timestamp_secs: 1000000
-                + SovereignChequeProcessingEngine::STALE_PERIOD_SECS
-                + 1,
+            presentation_timestamp_secs: 1000000 + SovereignChequeProcessingEngine::STALE_PERIOD_SECS + 1,
             ..valid_cheque.clone()
         };
         assert_eq!(
@@ -280,64 +278,39 @@ mod tests {
 
         // Test classification of all 9 cheque types
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, true, false, false, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, true, false, false, false, 100, 100),
             ChequeType::BearerCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, false, false, false, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 100, 100),
             ChequeType::OrderCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                true, false, false, false, false, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(true, false, false, false, false, false, 100, 100),
             ChequeType::CrossedCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                true, true, false, false, false, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(true, true, false, false, false, false, 100, 100),
             ChequeType::AccountPayeeCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                100,
-                100 + SovereignChequeProcessingEngine::STALE_PERIOD_SECS + 10
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 100, 100 + SovereignChequeProcessingEngine::STALE_PERIOD_SECS + 10),
             ChequeType::StaleCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, false, false, false, false, 200, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 200, 100),
             ChequeType::PostDatedCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, false, true, false, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, true, false, false, 100, 100),
             ChequeType::BankersCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, false, false, true, false, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, true, false, 100, 100),
             ChequeType::SelfCheque
         );
         assert_eq!(
-            SovereignChequeProcessingEngine::classify_cheque(
-                false, false, false, false, false, true, 100, 100
-            ),
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, true, 100, 100),
             ChequeType::MutilatedCheque
         );
     }
@@ -416,10 +389,7 @@ impl SovereignChequeProcessingEngine {
         }
 
         // Verify stale cheque (issue date older than 90 days / 3 months)
-        if record
-            .presentation_timestamp_secs
-            .saturating_sub(record.issue_timestamp_secs)
-            > Self::STALE_PERIOD_SECS
+        if record.presentation_timestamp_secs.saturating_sub(record.issue_timestamp_secs) > Self::STALE_PERIOD_SECS
             || record.cheque_type == ChequeType::StaleCheque
         {
             return ChequeStatus::StaleExpired;

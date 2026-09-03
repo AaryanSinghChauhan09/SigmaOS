@@ -16,11 +16,7 @@ pub struct PackageVersion {
 
 impl PackageVersion {
     pub fn new(major: u16, minor: u16, patch: u16) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
+        Self { major, minor, patch }
     }
 }
 
@@ -92,11 +88,7 @@ impl DependencyGraph {
     }
 
     /// Check if a version satisfies a constraint
-    fn satisfies_constraint(
-        &self,
-        version: &PackageVersion,
-        constraint: &VersionConstraint,
-    ) -> bool {
+    fn satisfies_constraint(&self, version: &PackageVersion, constraint: &VersionConstraint) -> bool {
         match constraint {
             VersionConstraint::Exact(v) => version == v,
             VersionConstraint::GreaterThan(v) => version > v,
@@ -141,9 +133,10 @@ impl DependencyGraph {
             if let Some(versions) = self.get_versions(&name) {
                 if let Some(package) = versions.iter().find(|p| p.version == ver) {
                     for dep in &package.dependencies {
-                        if let Some(dep_package) =
-                            self.find_satisfying_version(&dep.package_name, &dep.version_constraint)
-                        {
+                        if let Some(dep_package) = self.find_satisfying_version(
+                            &dep.package_name,
+                            &dep.version_constraint,
+                        ) {
                             to_resolve.push((dep.package_name.clone(), dep_package.version));
                         } else {
                             return Err(format!("Cannot satisfy dependency: {}", dep.package_name));
@@ -205,17 +198,8 @@ mod tests {
         let version = PackageVersion::new(1, 5, 0);
 
         assert!(graph.satisfies_constraint(&version, &VersionConstraint::Any));
-        assert!(graph.satisfies_constraint(
-            &version,
-            &VersionConstraint::Exact(PackageVersion::new(1, 5, 0))
-        ));
-        assert!(graph.satisfies_constraint(
-            &version,
-            &VersionConstraint::GreaterOrEqual(PackageVersion::new(1, 0, 0))
-        ));
-        assert!(!graph.satisfies_constraint(
-            &version,
-            &VersionConstraint::LessThan(PackageVersion::new(1, 0, 0))
-        ));
+        assert!(graph.satisfies_constraint(&version, &VersionConstraint::Exact(PackageVersion::new(1, 5, 0))));
+        assert!(graph.satisfies_constraint(&version, &VersionConstraint::GreaterOrEqual(PackageVersion::new(1, 0, 0))));
+        assert!(!graph.satisfies_constraint(&version, &VersionConstraint::LessThan(PackageVersion::new(1, 0, 0))));
     }
 }

@@ -432,9 +432,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {

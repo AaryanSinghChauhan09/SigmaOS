@@ -187,17 +187,11 @@ fn cmd_convert(args: &[String]) {
             println!("  Package Name:         {}", result.package_name);
             println!("  Format:               {:?}", result.target_format);
             println!("  Valid Manifest:       {}", result.is_valid);
-            println!(
-                "  Resolved Dependencies ({})",
-                result.resolved_dependencies.len()
-            );
+            println!("  Resolved Dependencies ({})", result.resolved_dependencies.len());
             for dep in &result.resolved_dependencies {
                 println!("    - {}", dep);
             }
-            println!(
-                "  Capability Sandboxing ({})",
-                result.required_permissions.len()
-            );
+            println!("  Capability Sandboxing ({})", result.required_permissions.len());
             for perm in &result.required_permissions {
                 println!("    - {}", perm);
             }

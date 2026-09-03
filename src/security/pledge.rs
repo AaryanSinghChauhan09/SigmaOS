@@ -213,9 +213,7 @@ impl PledgeManager {
                     Permission::FileWrite => token = token.allow_write("/tmp"),
                     Permission::ProcessExec => token = token.allow_exec(),
                     Permission::Ipc => token = token.allow_ipc(),
-                    Permission::AudioPlayback | Permission::DisplayAccess => {
-                        token.allow_capability(1 << perm as u64)
-                    }
+                    Permission::AudioPlayback | Permission::DisplayAccess => token.allow_capability(1 << perm as u64),
                 }
             }
             self.gate.set_capability(token);
