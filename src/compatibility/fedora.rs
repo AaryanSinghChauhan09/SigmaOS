@@ -2290,6 +2290,112 @@ impl FedoraNvidiaPrimeSwitcherEngine {
 }
 
 // =========================================================================
+// Fedora The New Hotness (Anitya Upstream Release Monitoring) Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaPackageMapping {
+    pub anitya_project_id: u64,
+    pub upstream_name: String,
+    pub fedora_package_name: String,
+    pub current_stable_version: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UpstreamReleaseEvent {
+    pub project_id: u64,
+    pub fedora_package_name: String,
+    pub old_version: String,
+    pub new_version: String,
+    pub release_url: String,
+    pub timestamp_secs: u64,
+}
+
+/// Fedora "The New Hotness" & Anitya Upstream Release Monitoring Engine
+/// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
+/// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
+pub struct FedoraTheNewHotnessEngine {
+    pub mappings: Vec<AnityaPackageMapping>,
+    pub release_events: Vec<UpstreamReleaseEvent>,
+    pub messaging_engine: FedoraMessagingEngine,
+}
+
+impl FedoraTheNewHotnessEngine {
+    pub fn new() -> Self {
+        Self {
+            mappings: Vec::new(),
+            release_events: Vec::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+        }
+    }
+
+    pub fn register_anitya_mapping(
+        &mut self,
+        anitya_project_id: u64,
+        upstream_name: &str,
+        fedora_pkg_name: &str,
+        current_version: &str,
+    ) {
+        self.mappings.retain(|m| m.anitya_project_id != anitya_project_id);
+        self.mappings.push(AnityaPackageMapping {
+            anitya_project_id,
+            upstream_name: upstream_name.to_string(),
+            fedora_package_name: fedora_pkg_name.to_string(),
+            current_stable_version: current_version.to_string(),
+        });
+    }
+
+    pub fn process_upstream_release_check(
+        &mut self,
+        anitya_project_id: u64,
+        latest_upstream_version: &str,
+        release_url: &str,
+        timestamp_secs: u64,
+    ) -> Result<Option<UpstreamReleaseEvent>, &'static str> {
+        let mapping_idx = self
+            .mappings
+            .iter()
+            .position(|m| m.anitya_project_id == anitya_project_id)
+            .ok_or("TheNewHotness: Anitya project ID not mapped")?;
+
+        let old_ver = self.mappings[mapping_idx].current_stable_version.clone();
+
+        if old_ver != latest_upstream_version {
+            let fedora_pkg = self.mappings[mapping_idx].fedora_package_name.clone();
+            self.mappings[mapping_idx].current_stable_version = latest_upstream_version.to_string();
+
+            let event = UpstreamReleaseEvent {
+                project_id: anitya_project_id,
+                fedora_package_name: fedora_pkg.clone(),
+                old_version: old_ver.clone(),
+                new_version: latest_upstream_version.to_string(),
+                release_url: release_url.to_string(),
+                timestamp_secs,
+            };
+
+            let topic = format!("org.fedoraproject.prod.hotness.update.{}", fedora_pkg);
+            let body = format!(
+                "{{\"project_id\": {}, \"package\": \"{}\", \"old_version\": \"{}\", \"version\": \"{}\", \"url\": \"{}\"}}",
+                anitya_project_id, fedora_pkg, old_ver, latest_upstream_version, release_url
+            );
+
+            self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+            self.release_events.push(event.clone());
+
+            Ok(Some(event))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+impl Default for FedoraTheNewHotnessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Planet Fedora Aggregator Engine
 // =========================================================================
 
@@ -3499,5 +3605,35 @@ mod tests {
 
         let empty_cat = planet.query_entries_by_category("python");
         assert!(empty_cat.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_the_new_hotness_engine() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.0");
+
+        assert_eq!(hotness.mappings.len(), 1);
+        assert_eq!(hotness.mappings[0].current_stable_version, "8.2.0");
+
+        // Same version check -> no event
+        let no_event = hotness
+            .process_upstream_release_check(1234, "8.2.0", "https://curl.se/release", 1700000000)
+            .unwrap();
+        assert!(no_event.is_none());
+
+        // New version release check -> event generated & fedmsg published
+        let event = hotness
+            .process_upstream_release_check(1234, "8.3.0", "https://curl.se/release-8.3.0", 1700000100)
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(event.old_version, "8.2.0");
+        assert_eq!(event.new_version, "8.3.0");
+        assert_eq!(event.fedora_package_name, "curl");
+        assert_eq!(hotness.release_events.len(), 1);
+        assert_eq!(hotness.messaging_engine.published_messages.len(), 1);
+        assert!(hotness.messaging_engine.published_messages[0]
+            .topic
+            .contains("org.fedoraproject.prod.hotness.update.curl"));
     }
 }
