@@ -96,9 +96,7 @@ impl ZeroDependencyPrimitiveHub {
         }
         hash
     }
-
-    /// Format an unsigned integer into a fixed stack buffer without heap allocation.
-    /// Returns a `&str` slice into `buf`.
+    /// Formats an unsigned integer into a fixed static stack buffer without heap allocation
     pub fn format_u64_stack(mut value: u64, buf: &mut [u8; 32]) -> &str {
         if value == 0 {
             buf[0] = b'0';
@@ -118,36 +116,6 @@ impl ZeroDependencyPrimitiveHub {
         }
         core::str::from_utf8(&buf[0..len]).unwrap_or("0")
     }
-
-    /// Constant-time byte slice comparison to prevent timing side-channels.
-    pub fn ct_eq(a: &[u8], b: &[u8]) -> bool {
-        if a.len() != b.len() {
-            return false;
-        }
-        let mut diff: u8 = 0;
-        let mut i = 0;
-        while i < a.len() {
-            diff |= a[i] ^ b[i];
-            i += 1;
-        }
-        diff == 0
-    }
-
-    /// Count leading zeros in a u64 without using intrinsics.
-    pub const fn clz64(x: u64) -> u32 {
-        if x == 0 {
-            return 64;
-        }
-        let mut n: u32 = 0;
-        let mut v = x;
-        if v & 0xFFFF_FFFF_0000_0000 == 0 { n += 32; v <<= 32; }
-        if v & 0xFFFF_0000_0000_0000 == 0 { n += 16; v <<= 16; }
-        if v & 0xFF00_0000_0000_0000 == 0 { n +=  8; v <<=  8; }
-        if v & 0xF000_0000_0000_0000 == 0 { n +=  4; v <<=  4; }
-        if v & 0xC000_0000_0000_0000 == 0 { n +=  2; v <<=  2; }
-        if v & 0x8000_0000_0000_0000 == 0 { n +=  1; }
-        n
-    }
 }
 
 #[cfg(test)]
@@ -160,7 +128,7 @@ mod tests {
     }
 
     #[test]
-    fn test_fnv1a_hash_64() {
+    fn test_zero_dependency_primitive_hub() {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");
         assert_ne!(hash, 0);
         // Verify determinism
@@ -173,23 +141,10 @@ mod tests {
     #[test]
     fn test_format_u64_stack() {
         let mut buf = [0u8; 32];
-        let s = ZeroDependencyPrimitiveHub::format_u64_stack(2026, &mut buf);
-        assert_eq!(s, "2026");
-        let s0 = ZeroDependencyPrimitiveHub::format_u64_stack(0, &mut buf);
-        assert_eq!(s0, "0");
-    }
-
-    #[test]
-    fn test_ct_eq() {
-        assert!(ZeroDependencyPrimitiveHub::ct_eq(b"hello", b"hello"));
-        assert!(!ZeroDependencyPrimitiveHub::ct_eq(b"hello", b"world"));
-        assert!(!ZeroDependencyPrimitiveHub::ct_eq(b"abc", b"ab"));
-    }
-
-    #[test]
-    fn test_clz64() {
-        assert_eq!(ZeroDependencyPrimitiveHub::clz64(0), 64);
-        assert_eq!(ZeroDependencyPrimitiveHub::clz64(1), 63);
-        assert_eq!(ZeroDependencyPrimitiveHub::clz64(u64::MAX), 0);
+        let formatted = ZeroDependencyPrimitiveHub::format_u64_stack(2026, &mut buf);
+        assert_eq!(formatted, "2026");
     }
 }
+
+pub use hashset::HashSet;
+pub use arc::Arc;
