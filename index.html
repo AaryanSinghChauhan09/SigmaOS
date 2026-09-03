@@ -505,21 +505,21 @@
     <div id="kernel-logs" class="auto-style-73"></div>
 
     <!-- Bottom Dock -->
-    <div class="dock-container">
-        <div class="dock-icon" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</div>
-        <div class="dock-icon" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</div>
-        <div class="dock-icon" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</div>
-        <div class="dock-icon" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</div>
-        <div class="dock-icon" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</div>
-        <div class="dock-icon" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</div>
-        <div class="dock-icon" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</div>
-        <div class="dock-icon" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</div>
-        <div class="dock-icon" data-tooltip="Developer Portal" onclick="launchApp('Dev Portal')">📖</div>
-        <div class="dock-icon" data-tooltip="Kernel Emulator" onclick="launchApp('Emulator')">💿</div>
-        <div class="dock-icon" data-tooltip="Build Analytics" onclick="launchApp('Analytics')">📈</div>
-        <div class="auto-style-74"></div>
-        <div class="dock-icon" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</div>
-    </div>
+    <nav class="dock-container" aria-label="Desktop Dock" role="toolbar">
+        <button type="button" class="dock-icon" aria-label="Launch File Manager" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</button>
+        <button type="button" class="dock-icon" aria-label="Launch OmniShell Terminal" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</button>
+        <button type="button" class="dock-icon" aria-label="Launch Observability Matrix" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</button>
+        <button type="button" class="dock-icon" aria-label="Launch Neural Core" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</button>
+        <button type="button" class="dock-icon" aria-label="Launch Lattice Settings" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</button>
+        <button type="button" class="dock-icon" aria-label="Launch Pro Tools" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</button>
+        <button type="button" class="dock-icon" aria-label="Launch Marketplace" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</button>
+        <button type="button" class="dock-icon" aria-label="Launch Zenith Installer" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</button>
+        <button type="button" class="dock-icon" aria-label="Launch Developer Portal" data-tooltip="Developer Portal" onclick="launchApp('Dev Portal')">📖</button>
+        <button type="button" class="dock-icon" aria-label="Launch Kernel Emulator" data-tooltip="Kernel Emulator" onclick="launchApp('Emulator')">💿</button>
+        <button type="button" class="dock-icon" aria-label="Launch Build Analytics" data-tooltip="Build Analytics" onclick="launchApp('Analytics')">📈</button>
+        <div class="auto-style-74" role="separator"></div>
+        <button type="button" class="dock-icon" aria-label="Open Help Matrix" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</button>
+    </nav>
 
     <!-- Right-Click Context Menu -->
     <div id="context-menu">
