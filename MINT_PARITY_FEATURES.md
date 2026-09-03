@@ -68,13 +68,13 @@ pub enum UpdateLevel {
 impl MintUpdateManager {
     pub fn check_updates(&self) -> Vec<PackageUpdate> {
         let mut updates = Vec::new();
-        
+
         // Check level 1 updates (always safe)
         updates.extend(self.get_level1_updates());
-        
+
         // Check security updates
         updates.extend(self.security_updates.get_security_updates());
-        
+
         updates
     }
 
@@ -122,10 +122,10 @@ impl MintTimeshift {
             description: description.to_string(),
             snapshot_type: SnapshotType::Manual,
         };
-        
+
         self.create_filesystem_snapshot(&snapshot)?;
         self.snapshots.push(snapshot);
-        
+
         Ok(())
     }
 
@@ -172,10 +172,10 @@ impl MintSoftwareManager {
     pub fn install_application(&mut self, app_name: &str) -> Result<(), SoftwareError> {
         let app = self.database.applications.get(app_name)
             .ok_or(SoftwareError::AppNotFound)?;
-        
+
         // Install via appropriate package manager
         self.install_via_manager(app)?;
-        
+
         Ok(())
     }
 }
