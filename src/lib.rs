@@ -98,6 +98,8 @@ pub use security::{
     PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SplitTunnelRule,
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
 };
 pub use driver::{
     DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,

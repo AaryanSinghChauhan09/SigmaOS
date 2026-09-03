@@ -28,6 +28,10 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod pqc_measurement;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
