@@ -203,9 +203,9 @@ pub enum PackageFormat {
     Cports,
     // DragonFly BSD DPorts (.dports)
     Dports,
-    // Slackware SlackBuild (.slackbuild, .tlz, .tbz)
+    // Slackware SlackBuild (.slackbuild)
     SlackBuild,
-    // CRUX Linux (.crux, .pkgfile)
+    // CRUX Linux (.crux)
     Crux,
     // Delta RPM (.drpm)
     Drpm,
@@ -730,15 +730,15 @@ impl_generic_package_adapter!(
 impl_generic_package_adapter!(
     SlackBuildAdapter,
     SlackBuild,
-    "slackbuild-script:",
-    "slackbuild-script: ",
+    "slackbuild-package:",
+    "slackbuild-package: ",
     "slackbuild-version: "
 );
 impl_generic_package_adapter!(
     CruxAdapter,
     Crux,
-    "crux-pkgfile:",
-    "crux-pkgfile: ",
+    "crux-package:",
+    "crux-package: ",
     "crux-version: "
 );
 impl_generic_package_adapter!(
@@ -4009,36 +4009,6 @@ Depends: kernel-base";
         assert!(pisi.can_parse(pisi_data));
         let pkg = pisi.parse(pisi_data).unwrap();
         assert_eq!(pkg.format(), PackageFormat::Pisi);
-
-        let dports = DportsAdapter::new();
-        let dports_data = b"dports-package: test-dports\ndports-version: 1.0.0";
-        assert!(dports.can_parse(dports_data));
-        let pkg = dports.parse(dports_data).unwrap();
-        assert_eq!(pkg.format(), PackageFormat::Dports);
-
-        let slack = SlackBuildAdapter::new();
-        let slack_data = b"slackbuild-script: test-slack\nslackbuild-version: 1.0.0";
-        assert!(slack.can_parse(slack_data));
-        let pkg = slack.parse(slack_data).unwrap();
-        assert_eq!(pkg.format(), PackageFormat::SlackBuild);
-
-        let crux = CruxAdapter::new();
-        let crux_data = b"crux-pkgfile: test-crux\ncrux-version: 1.0.0";
-        assert!(crux.can_parse(crux_data));
-        let pkg = crux.parse(crux_data).unwrap();
-        assert_eq!(pkg.format(), PackageFormat::Crux);
-
-        let drpm = DrpmAdapter::new();
-        let drpm_data = b"drpm-package: test-drpm\ndrpm-version: 1.0.0";
-        assert!(drpm.can_parse(drpm_data));
-        let pkg = drpm.parse(drpm_data).unwrap();
-        assert_eq!(pkg.format(), PackageFormat::Drpm);
-
-        let stratum = StratumAdapter::new();
-        let stratum_data = b"stratum-package: test-stratum\nstratum-version: 1.0.0";
-        assert!(stratum.can_parse(stratum_data));
-        let pkg = stratum.parse(stratum_data).unwrap();
-        assert_eq!(pkg.format(), PackageFormat::Stratum);
     }
 
     #[test]

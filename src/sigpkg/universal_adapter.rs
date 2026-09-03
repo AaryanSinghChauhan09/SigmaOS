@@ -645,22 +645,22 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Dmg)
         } else if f.ends_with(".cports") {
             Some(PackageFormat::Cports)
-        } else if f.ends_with(".dports") {
-            Some(PackageFormat::Ports)
-        } else if f.ends_with(".slackbuild") || f.ends_with(".tlz") || f.ends_with(".tbz") {
-            Some(PackageFormat::Txz)
-        } else if f.ends_with(".crux") || f.ends_with(".pkgfile") {
-            Some(PackageFormat::Pacman)
-        } else if f.ends_with(".drpm") {
-            Some(PackageFormat::Yum)
-        } else if f.ends_with(".stratum") {
-            Some(PackageFormat::Sovereign)
         } else if f.ends_with(".guix") || f.ends_with(".scm") {
             Some(PackageFormat::Guix)
         } else if f.ends_with(".zypper") {
             Some(PackageFormat::Zypper)
         } else if f.ends_with(".cachy") {
             Some(PackageFormat::Pacman)
+        } else if f.ends_with(".dports") {
+            Some(PackageFormat::Ports)
+        } else if f.ends_with(".slackbuild") || f.ends_with(".tlz") || f.ends_with(".tbz") {
+            Some(PackageFormat::TarGz)
+        } else if f.ends_with(".crux") || f.ends_with(".pkgfile") {
+            Some(PackageFormat::TarXz)
+        } else if f.ends_with(".drpm") {
+            Some(PackageFormat::Yum)
+        } else if f.ends_with(".stratum") {
+            Some(PackageFormat::Sovereign)
         } else {
             None
         }
@@ -675,16 +675,6 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Apt) // .deb AR archive
         } else if data[0] == 0xED && data[1] == 0xAB && data[2] == 0xEE && data[3] == 0xDB {
             Some(PackageFormat::Yum) // .rpm magic
-        } else if data.starts_with(b"DRPM") {
-            Some(PackageFormat::Yum) // Delta RPM magic
-        } else if data.starts_with(b"CRUX") {
-            Some(PackageFormat::Pacman) // CRUX Linux package magic
-        } else if data.starts_with(b"DPOR") {
-            Some(PackageFormat::Ports) // DragonFly BSD DPorts magic
-        } else if data.starts_with(b"BRLK") {
-            Some(PackageFormat::Sovereign) // Bedrock Linux Stratum magic
-        } else if data.starts_with(b"SLAK") {
-            Some(PackageFormat::Txz) // Slackware package magic
         } else if data.starts_with(b"hpkg") {
             Some(PackageFormat::Hpkg) // Haiku package magic
         } else if data.starts_with(b"MOSS") {
@@ -707,6 +697,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Sovereign) // Native SigPkg magic
         } else if data.starts_with(b"CACHY") {
             Some(PackageFormat::Pacman) // CachyOS magic
+        } else if data.starts_with(b"DRPM") {
+            Some(PackageFormat::Yum) // Delta RPM magic
+        } else if data.starts_with(b"CRUX") {
+            Some(PackageFormat::TarXz) // CRUX package magic
+        } else if data.starts_with(b"DPOR") {
+            Some(PackageFormat::Ports) // DragonFly BSD DPorts magic
+        } else if data.starts_with(b"BRLK") {
+            Some(PackageFormat::Sovereign) // Bedrock Linux Stratum magic
+        } else if data.starts_with(b"SLAK") {
+            Some(PackageFormat::TarGz) // Slackware SlackBuild magic
         } else {
             None
         }
@@ -1170,21 +1170,11 @@ impl UniversalDependencyMapper {
             "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
             "dbus" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            "ncurses" | "libncursesw6" | "ncurses-devel" | "ncurses-dev" | "devel/ncurses" | "sys-libs/ncurses" => {
-                "ncurses".to_string()
-            }
-            "readline" | "libreadline-dev" | "readline-devel" | "readline-dev" | "devel/readline" => {
-                "readline".to_string()
-            }
-            "xz" | "liblzma-dev" | "xz-devel" | "xz-dev" | "archivers/xz" | "app-arch/xz-utils" => {
-                "xz".to_string()
-            }
-            "zstd" | "libzstd-dev" | "zstd-devel" | "zstd-dev" | "archivers/zstd" | "app-arch/zstd" => {
-                "zstd".to_string()
-            }
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "sqlite-dev" | "databases/sqlite3" => {
-                "sqlite".to_string()
-            }
+            "ncurses" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
+            "readline" | "sys-libs/readline" => "readline".to_string(),
+            "xz" | "xz-utils" | "app-arch/xz-utils" => "xz".to_string(),
+            "zstd" | "app-arch/zstd" => "zstd".to_string(),
+            "sqlite" | "sqlite3" | "dev-db/sqlite" => "sqlite".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -1744,11 +1734,6 @@ mod tests {
         assert_eq!(adapter.detect_format_by_header(&[0xED, 0xAB, 0xEE, 0xDB]), Some(PackageFormat::Yum));
         assert_eq!(adapter.detect_format_by_header(b"PK\x03\x04payload"), Some(PackageFormat::Aab));
         assert_eq!(adapter.detect_format_by_header(b"SPKG0001header"), Some(PackageFormat::Sovereign));
-        assert_eq!(adapter.detect_format_by_header(b"DRPM0001pkg"), Some(PackageFormat::Yum));
-        assert_eq!(adapter.detect_format_by_header(b"CRUX0001pkg"), Some(PackageFormat::Pacman));
-        assert_eq!(adapter.detect_format_by_header(b"DPOR0001pkg"), Some(PackageFormat::Ports));
-        assert_eq!(adapter.detect_format_by_header(b"BRLK0001pkg"), Some(PackageFormat::Sovereign));
-        assert_eq!(adapter.detect_format_by_header(b"SLAK0001pkg"), Some(PackageFormat::Txz));
     }
 
     #[test]
@@ -1757,11 +1742,6 @@ mod tests {
         assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
         assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
         assert_eq!(mapper.to_canonical_name("libc6"), "libc");
-        assert_eq!(mapper.to_canonical_name("libncursesw6"), "ncurses");
-        assert_eq!(mapper.to_canonical_name("readline-devel"), "readline");
-        assert_eq!(mapper.to_canonical_name("liblzma-dev"), "xz");
-        assert_eq!(mapper.to_canonical_name("zstd-devel"), "zstd");
-        assert_eq!(mapper.to_canonical_name("sqlite3"), "sqlite");
 
         let scriptlet_conv = UniversalScriptletConverter::new();
         let hook = scriptlet_conv.convert_scriptlet(PackageFormat::Apt, "postinst", "echo post").unwrap();

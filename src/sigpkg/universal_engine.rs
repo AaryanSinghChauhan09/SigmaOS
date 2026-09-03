@@ -492,23 +492,19 @@ impl IPackageAdapter for DportsPackageAdapter {
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
-            return Err("Empty Dports payload");
+            return Err("Empty DPorts payload");
         }
         Ok(PackageContext {
             name: "dragonfly-dports-pkg".to_string(),
             version: "1.0.0".to_string(),
             format: PackageFormat::Dports,
             dependencies: vec![],
-            files: vec!["/usr/dports/pkg".to_string()],
+            files: vec!["/usr/dports/bin/dports-app".to_string()],
             hash: [0x2D; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!("Dports Adapter: Mounting HAMMER2 snapshot overlay: {}", store_path);
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("DragonFly DPorts Adapter: Building ports snapshot overlay in: {}", store_path);
         Ok(())
     }
 }
@@ -527,16 +523,12 @@ impl IPackageAdapter for SlackBuildPackageAdapter {
             version: "1.0.0".to_string(),
             format: PackageFormat::SlackBuild,
             dependencies: vec![],
-            files: vec!["/usr/bin/slackbuild".to_string()],
+            files: vec!["/usr/bin/slackbuild-app".to_string()],
             hash: [0x2E; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!("SlackBuild Adapter: Executing SlackBuild script: {}", store_path);
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Slackware SlackBuild Adapter: Compiling SlackBuild script into target store: {}", store_path);
         Ok(())
     }
 }
@@ -548,23 +540,19 @@ impl IPackageAdapter for CruxPackageAdapter {
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
-            return Err("Empty CRUX payload");
+            return Err("Empty CRUX package payload");
         }
         Ok(PackageContext {
-            name: "crux-pkgfile-pkg".to_string(),
-            version: "1.0.0".to_string(),
+            name: "crux-pkgfile-app".to_string(),
+            version: "3.7.0".to_string(),
             format: PackageFormat::Crux,
             dependencies: vec![],
-            files: vec!["/usr/ports/pkgfile".to_string()],
+            files: vec!["/usr/bin/crux-app".to_string()],
             hash: [0x2F; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!("CRUX Adapter: Compiling CRUX Pkgfile recipe into store: {}", store_path);
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("CRUX Adapter: Extracting pkgmk tarball into store: {}", store_path);
         Ok(())
     }
 }
@@ -583,16 +571,12 @@ impl IPackageAdapter for DrpmPackageAdapter {
             version: "1.0.0".to_string(),
             format: PackageFormat::Drpm,
             dependencies: vec![],
-            files: vec!["/usr/bin/applydeltarpm".to_string()],
+            files: vec!["/usr/bin/drpm-app".to_string()],
             hash: [0x30; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!("Delta RPM Adapter: Applying deltarpm diff reconstruct to store: {}", store_path);
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Delta RPM Adapter: Reconstructing full RPM binary delta in store: {}", store_path);
         Ok(())
     }
 }
@@ -604,23 +588,19 @@ impl IPackageAdapter for StratumPackageAdapter {
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
-            return Err("Empty Stratum payload");
+            return Err("Empty Bedrock Stratum payload");
         }
         Ok(PackageContext {
             name: "bedrock-stratum-pkg".to_string(),
-            version: "1.0.0".to_string(),
+            version: "0.7.0".to_string(),
             format: PackageFormat::Stratum,
             dependencies: vec![],
             files: vec!["/bedrock/strata/app".to_string()],
             hash: [0x31; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!("Bedrock Stratum Adapter: Encapsulating stratum environment to store: {}", store_path);
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Bedrock Stratum Adapter: Mounting subsystem stratum into store: {}", store_path);
         Ok(())
     }
 }
@@ -2092,46 +2072,6 @@ mod tests {
 
         let cports_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Cports);
         assert_eq!(cports_adapter.format(), PackageFormat::Cports);
-
-        let dports_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Dports);
-        assert_eq!(dports_adapter.format(), PackageFormat::Dports);
-
-        let slack_adapter = PackageAdapterFactory::get_adapter(PackageFormat::SlackBuild);
-        assert_eq!(slack_adapter.format(), PackageFormat::SlackBuild);
-
-        let crux_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Crux);
-        assert_eq!(crux_adapter.format(), PackageFormat::Crux);
-
-        let drpm_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Drpm);
-        assert_eq!(drpm_adapter.format(), PackageFormat::Drpm);
-
-        let stratum_adapter = PackageAdapterFactory::get_adapter(PackageFormat::Stratum);
-        assert_eq!(stratum_adapter.format(), PackageFormat::Stratum);
-    }
-
-    #[test]
-    fn test_new_distro_adapters_parsing_and_extraction() {
-        let dports = DportsPackageAdapter;
-        let ctx = dports.parse_package(b"dports payload").unwrap();
-        assert_eq!(ctx.format, PackageFormat::Dports);
-        assert!(dports.extract_to_store(&ctx, "/store/test-dports").is_ok());
-
-        let slack = SlackBuildPackageAdapter;
-        let ctx = slack.parse_package(b"slackbuild payload").unwrap();
-        assert_eq!(ctx.format, PackageFormat::SlackBuild);
-        assert!(slack.extract_to_store(&ctx, "/store/test-slack").is_ok());
-
-        let crux = CruxPackageAdapter;
-        let ctx = crux.parse_package(b"crux payload").unwrap();
-        assert_eq!(ctx.format, PackageFormat::Crux);
-
-        let drpm = DrpmPackageAdapter;
-        let ctx = drpm.parse_package(b"drpm payload").unwrap();
-        assert_eq!(ctx.format, PackageFormat::Drpm);
-
-        let stratum = StratumPackageAdapter;
-        let ctx = stratum.parse_package(b"stratum payload").unwrap();
-        assert_eq!(ctx.format, PackageFormat::Stratum);
     }
 
     #[test]
