@@ -720,6 +720,55 @@ impl MakepkgBuilder {
     }
 }
 
+// --- Arch Linux svntogit Repository Migration Engine ---
+
+#[derive(Debug, Clone)]
+pub struct SvnPackageMetadata {
+    pub pkgname: String,
+    pub repo: String, // e.g. "core", "extra", "community"
+    pub svn_revision: u64,
+    pub has_pkgbuild: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct SvntogitMigrationEngine {
+    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
+}
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: alloc::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgname.is_empty() || pkgbuild_content.is_empty() {
+            return Err("Invalid SVN repository package content");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+
+        Ok(format!(
+            "packages/{}/trunk/PKGBUILD -> git main branch migration complete",
+            pkgname
+        ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -953,6 +1002,7 @@ impl SvntogitMigrationEngine {
             pkgname, svn_revision, pkgname
         ))
     }
+}
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
