@@ -90,7 +90,7 @@ pub struct TpmAttestationManager {
 impl TpmAttestationManager {
     pub fn new() -> Self {
         Self {
-            pcr_registers: [Vec::new(); 24],
+            pcr_registers: core::array::from_fn(|_| Vec::new()),
             measurements: Vec::new(),
         }
     }

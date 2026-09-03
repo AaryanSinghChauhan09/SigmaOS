@@ -16,8 +16,6 @@ pub use profile::{
 
 pub use cursor::{CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine};
 pub use theme::{
-    CanvasParticle, IconThemeEngine, MdmAccessibilitySettings, MdmBackgroundType,
-    MdmMonitorPosition, MdmMultiMonitorConfig, MdmPamAuthStage, MdmPowerAction, MdmThemeEngineKind,
-    MdmThemeInfo, MdmUserAvatar, SigmaSoundscape, SovereignCssColorEngine, SovereignMdmThemeEngine,
-    ThemeEngine, ThemeProvider, ZenithBackdropFilter,
+    IconThemeEngine, SigmaSoundscape, SovereignCssColorEngine,
+    ThemeEngine, ZenithBackdropFilter,
 };
