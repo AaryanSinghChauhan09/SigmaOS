@@ -146,23 +146,25 @@ This document presents a comparative dashboard, Gantt-style timeline roadmap, an
 
 ## 📐 Dependency Flowchart & Systems Map
 
-    [Kernel Hybrid]
-          ↓
-    [Transactional Filesystem]
-          ↓
-    [Adaptive Scheduler]
-          ↓
-    [Visual Sandbox GUI]
-          ↓
-    [Unified Firewall Dashboard]
-          ↓
-    [Native Containers + VM Orchestration]
-          ↓
-    [Zenith Desktop Overlays]
-          ↓
-    [Compliance Handbook + Community Modules]
+```
+[Kernel Hybrid]
+      ↓
+[Transactional Filesystem]
+      ↓
+[Adaptive Scheduler]
+      ↓
+[Visual Sandbox GUI]
+      ↓
+[Unified Firewall Dashboard]
+      ↓
+[Native Containers + VM Orchestration]
+      ↓
+[Zenith Desktop Overlays]
+      ↓
+[Compliance Handbook + Community Modules]
+```
 
-***
+---
 
 ## 🚨 Ranked Gap Analysis Matrix
 
@@ -172,7 +174,7 @@ This document presents a comparative dashboard, Gantt-style timeline roadmap, an
 | **Important** | Fault Tolerance, Enterprise, Docs | Robust orchestration, AD/LDAP, handbooks | Task resilience, AD/LDAP hooks, compliance handbook |
 | **Optional** | Proc Scaling, Community, UI | Large scaling, strong communities, polished UX | Workload scaling, contributor verification, Zenith overlays |
 
-***
+---
 
 ## 📊 Quarterly Compliance Scorecard (Q1–Q6)
 
@@ -185,7 +187,7 @@ This document presents a comparative dashboard, Gantt-style timeline roadmap, an
 | **Q5** | Differentiation Start | Native container orchestration, Zenith overlays prototype, distributed FS overlay alpha | Container launch < 2s, Desktop uptime ≥ 90% |
 | **Q6** | Differentiation Complete | Optimized container runtime, Zenith overlays refinement, distributed FS overlay beta | Container launch < 1.5s, Sync accuracy ≥ 99.9% |
 
-***
+---
 
 ## 🚀 Future Development Roadmap for SigmaOS
 

@@ -299,24 +299,23 @@ All Alpine Linux parity components are verified through the automated test runne
 ```
 
 Specific tests include:
-
-*   `test_apk_package_manager`: Verifies APK package operations
-*   `test_musl_integration`: Verifies Musl C library features
-*   `test_openrc_service_management`: Verifies OpenRC service operations
-*   `test_busybox_applets`: Verifies BusyBox applet functionality
-*   `test_grsecurity_hardening`: Verifies security hardening features
+- `test_apk_package_manager`: Verifies APK package operations
+- `test_musl_integration`: Verifies Musl C library features
+- `test_openrc_service_management`: Verifies OpenRC service operations
+- `test_busybox_applets`: Verifies BusyBox applet functionality
+- `test_grsecurity_hardening`: Verifies security hardening features
 
 ## Best Practices
 
-1.  **Minimal Footprint**: Keep binaries and packages as small as possible
-2.  **Security First**: Implement grsecurity and PaX for kernel hardening
-3.  **Musl Compatibility**: Ensure full compatibility with Musl C library
-4.  **BusyBox Integration**: Use BusyBox for core utilities
-5.  **Resource Efficiency**: Optimize for minimal memory and CPU usage
+1. **Minimal Footprint**: Keep binaries and packages as small as possible
+2. **Security First**: Implement grsecurity and PaX for kernel hardening
+3. **Musl Compatibility**: Ensure full compatibility with Musl C library
+4. **BusyBox Integration**: Use BusyBox for core utilities
+5. **Resource Efficiency**: Optimize for minimal memory and CPU usage
 
 ## References
 
-*   [Alpine Linux Documentation](https://wiki.alpinelinux.org/)
-*   [APK Package Manager](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper)
-*   [OpenRC Documentation](https://github.com/OpenRC/openrc)
-*   [BusyBox Documentation](https://busybox.net/)
+* [Alpine Linux Documentation](https://wiki.alpinelinux.org/)
+* [APK Package Manager](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper)
+* [OpenRC Documentation](https://github.com/OpenRC/openrc)
+* [BusyBox Documentation](https://busybox.net/)

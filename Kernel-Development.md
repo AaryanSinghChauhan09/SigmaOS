@@ -2,22 +2,22 @@
 
 This document covers the internals of the SigmaOS kernel.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Kernel Entry Point](#kernel-entry-point)
-2.  [Memory Management](#memory-management)
-3.  [Scheduler](#scheduler)
-4.  [System Calls](#system-calls)
-5.  [Interrupt Handling](#interrupt-handling)
-6.  [Device Drivers](#device-drivers)
-7.  [Virtual Filesystem (VFS)](#virtual-filesystem-vfs)
-8.  [IPC](#ipc)
-9.  [Process Model](#process-model)
+1. [Kernel Entry Point](#kernel-entry-point)
+2. [Memory Management](#memory-management)
+3. [Scheduler](#scheduler)
+4. [System Calls](#system-calls)
+5. [Interrupt Handling](#interrupt-handling)
+6. [Device Drivers](#device-drivers)
+7. [Virtual Filesystem (VFS)](#virtual-filesystem-vfs)
+8. [IPC](#ipc)
+9. [Process Model](#process-model)
 10. [Kernel Hardening](#kernel-hardening)
 
-***
+---
 
 ## Kernel Entry Point
 
@@ -50,13 +50,12 @@ fn sigma_main(boot_info: &BootInfo) -> ! {
 ```
 
 Boot sequence:
+1. Bootloader (GRUB2 / sigma-boot) loads kernel to physical memory
+2. Early assembly stub sets up 64-bit mode, page tables, stack
+3. `sigma_main` initialises all subsystems in order
+4. PID 1 (sigma-init) is spawned in userspace
 
-1.  Bootloader (GRUB2 / sigma-boot) loads kernel to physical memory
-2.  Early assembly stub sets up 64-bit mode, page tables, stack
-3.  `sigma_main` initialises all subsystems in order
-4.  PID 1 (sigma-init) is spawned in userspace
-
-***
+---
 
 ## Memory Management
 
@@ -66,24 +65,24 @@ Boot sequence:
 
 The buddy allocator manages physical pages. Pages are grouped in power-of-2 orders:
 
-    Order 0: 4 KB  (1 page)
-    Order 1: 8 KB  (2 pages)
-    Order 2: 16 KB (4 pages)
-    ...
-    Order 9: 2 MB  (512 pages)
-    Order 10: 4 MB (1024 pages)
+```
+Order 0: 4 KB  (1 page)
+Order 1: 8 KB  (2 pages)
+Order 2: 16 KB (4 pages)
+...
+Order 9: 2 MB  (512 pages)
+Order 10: 4 MB (1024 pages)
+```
 
 **Allocation** (O(log n)):
-
-1.  Find smallest order ≥ requested
-2.  If exact order free list empty, split a higher-order block
-3.  Return one half, put the "buddy" on its freelist
+1. Find smallest order ≥ requested
+2. If exact order free list empty, split a higher-order block
+3. Return one half, put the "buddy" on its freelist
 
 **Deallocation** (O(log n)):
-
-1.  Mark page free at its order
-2.  Check if buddy is also free
-3.  If so, coalesce and recurse at order+1
+1. Mark page free at its order
+2. Check if buddy is also free
+3. If so, coalesce and recurse at order+1
 
 ```rust
 use crate::klib::buddy_allocator::BuddyAllocator;
@@ -100,9 +99,9 @@ alloc.free(page, 0);
 
 On top of the buddy allocator, the slab allocator provides O(1) allocation for fixed-size kernel objects:
 
-*   Each slab cache serves objects of one size
-*   Objects are pre-constructed and cached between uses
-*   Per-CPU magazines for lock-free hot-path alloc/free
+- Each slab cache serves objects of one size
+- Objects are pre-constructed and cached between uses
+- Per-CPU magazines for lock-free hot-path alloc/free
 
 ```rust
 // Create a cache for 64-byte kernel objects
@@ -115,14 +114,12 @@ cache.free(obj);
 
 `src/klib/paging.rs`
 
-x86\_64 4-level page tables:
-
-*   PML4 → PDPT → PD → PT → Physical page
-*   Each table has 512 entries of 8 bytes
-*   Maps 48-bit virtual address space (256 TB)
+x86_64 4-level page tables:
+- PML4 → PDPT → PD → PT → Physical page
+- Each table has 512 entries of 8 bytes
+- Maps 48-bit virtual address space (256 TB)
 
 Key operations:
-
 ```rust
 // Map virtual page to physical frame
 paging::map_page(virt_addr, phys_addr, PageFlags::PRESENT | PageFlags::WRITABLE);
@@ -133,11 +130,10 @@ invlpg(virt_addr);
 ```
 
 Hardware-enforced protections:
-
-*   **NX/XD bit** — non-executable data pages (W^X)
-*   **SMEP** — kernel cannot execute userspace pages
-*   **SMAP** — kernel cannot read/write userspace without explicit STAC/CLAC
-*   **PCID** — Process Context Identifiers (avoid full TLB flush on context switch)
+- **NX/XD bit** — non-executable data pages (W^X)
+- **SMEP** — kernel cannot execute userspace pages
+- **SMAP** — kernel cannot read/write userspace without explicit STAC/CLAC
+- **PCID** — Process Context Identifiers (avoid full TLB flush on context switch)
 
 ### Custom Vec Optimisation
 
@@ -161,7 +157,7 @@ unsafe {
 }
 ```
 
-***
+---
 
 ## Scheduler
 
@@ -173,7 +169,9 @@ SigmaOS uses a hybrid scheduler:
 
 Normal processes use virtual runtime (vruntime) to ensure proportional CPU time:
 
-    vruntime += actual_runtime × (NICE_0_LOAD / task_weight)
+```
+vruntime += actual_runtime × (NICE_0_LOAD / task_weight)
+```
 
 The task with the lowest vruntime runs next (red-black tree ordered by vruntime).
 
@@ -184,20 +182,19 @@ Real-time tasks use EDF: the task with the soonest deadline runs next. Guarantee
 ### BORE Integration
 
 CachyOS-inspired BORE (Burst-Oriented Response Enhancer):
-
-*   Tracks burst score per task
-*   Gives interactive tasks priority boost after CPU-bound bursts
-*   Reduces scheduling latency for desktop workloads
+- Tracks burst score per task
+- Gives interactive tasks priority boost after CPU-bound bursts
+- Reduces scheduling latency for desktop workloads
 
 ### NUMA Scheduling
 
 `src/kernel/numa_scheduler.rs`
 
-*   Task placement prefers the NUMA node whose memory the task uses most
-*   Migration threshold: only migrate if imbalance > 25%
-*   NUMA balancing: periodic page migration to improve locality
+- Task placement prefers the NUMA node whose memory the task uses most
+- Migration threshold: only migrate if imbalance > 25%
+- NUMA balancing: periodic page migration to improve locality
 
-***
+---
 
 ## System Calls
 
@@ -207,37 +204,37 @@ SigmaOS implements both a native Sigma syscall ABI and POSIX compatibility:
 
 ### Native Sigma Syscalls
 
-    sigma_read(fd, buf, len) → ssize_t
-    sigma_write(fd, buf, len) → ssize_t
-    sigma_open(path, flags, mode) → fd
-    sigma_close(fd) → void
-    sigma_mmap(addr, len, prot, flags, fd, off) → *void
-    sigma_pledge(promises, execpromises) → int
-    sigma_unveil(path, permissions) → int
-    sigma_cap_enter() → int
-    sigma_cap_rights_limit(fd, rights) → int
-    sigma_jail_create(path, hostname) → jailid
-    sigma_spawn(path, args, env) → pid
+```
+sigma_read(fd, buf, len) → ssize_t
+sigma_write(fd, buf, len) → ssize_t
+sigma_open(path, flags, mode) → fd
+sigma_close(fd) → void
+sigma_mmap(addr, len, prot, flags, fd, off) → *void
+sigma_pledge(promises, execpromises) → int
+sigma_unveil(path, permissions) → int
+sigma_cap_enter() → int
+sigma_cap_rights_limit(fd, rights) → int
+sigma_jail_create(path, hostname) → jailid
+sigma_spawn(path, args, env) → pid
+```
 
 ### POSIX Compatibility Layer
 
 POSIX syscalls are translated to Sigma equivalents:
+- `open(2)` → `sigma_open` with flag translation
+- `mmap(2)` → `sigma_mmap`
+- `clone(2)` → `sigma_spawn` with namespace flags
 
-*   `open(2)` → `sigma_open` with flag translation
-*   `mmap(2)` → `sigma_mmap`
-*   `clone(2)` → `sigma_spawn` with namespace flags
-
-***
+---
 
 ## Interrupt Handling
 
 `src/kernel/irq/`
 
 Interrupt Descriptor Table (IDT) entries for:
-
-*   CPU exceptions (0–31): divide-by-zero, page fault, GP fault, etc.
-*   Hardware IRQs (32–47): PIC/APIC-remapped hardware interrupts
-*   Software interrupts (48+): syscall entry points
+- CPU exceptions (0–31): divide-by-zero, page fault, GP fault, etc.
+- Hardware IRQs (32–47): PIC/APIC-remapped hardware interrupts
+- Software interrupts (48+): syscall entry points
 
 ```rust
 // Register a hardware IRQ handler
@@ -247,14 +244,13 @@ irq::register_handler(IRQ_NIC, network_interrupt_handler);
 ```
 
 Page fault handler performs:
+1. Read CR2 (faulting address)
+2. Check if address is in a valid VMA
+3. If copy-on-write: allocate new page, copy, update PTE
+4. If stack growth: extend stack VMA
+5. Otherwise: deliver SIGSEGV to process
 
-1.  Read CR2 (faulting address)
-2.  Check if address is in a valid VMA
-3.  If copy-on-write: allocate new page, copy, update PTE
-4.  If stack growth: extend stack VMA
-5.  Otherwise: deliver SIGSEGV to process
-
-***
+---
 
 ## Device Drivers
 
@@ -273,15 +269,14 @@ pub trait SigmaDriver {
 ```
 
 Implemented drivers:
+- NVMe block device
+- virtio-net (QEMU network)
+- virtio-blk (QEMU disk)
+- USB HID keyboard/mouse (`src/klib/...`)
+- PCI scanner + BAR mapping
+- VGA framebuffer (direct)
 
-*   NVMe block device
-*   virtio-net (QEMU network)
-*   virtio-blk (QEMU disk)
-*   USB HID keyboard/mouse (`src/klib/...`)
-*   PCI scanner + BAR mapping
-*   VGA framebuffer (direct)
-
-***
+---
 
 ## Virtual Filesystem (VFS)
 
@@ -302,12 +297,11 @@ pub trait FileSystem {
 ```
 
 Mount table management:
+- Each mount point stores: device, filesystem type, mount flags, superblock
+- Lookups traverse the dcache (directory entry cache) before hitting disk
+- Negative caching for fast "file not found" responses
 
-*   Each mount point stores: device, filesystem type, mount flags, superblock
-*   Lookups traverse the dcache (directory entry cache) before hitting disk
-*   Negative caching for fast "file not found" responses
-
-***
+---
 
 ## IPC
 
@@ -320,27 +314,26 @@ SigmaOS provides multiple IPC mechanisms:
 | Capability channels | Microkernel message passing | ~1 µs |
 | Unix sockets | POSIX compatibility | ~5 µs |
 | Shared memory | Large data sharing | ~100 ns |
-| io\_uring rings | Async I/O batching | ~500 ns |
+| io_uring rings | Async I/O batching | ~500 ns |
 | Signals | Async notifications | ~2 µs |
 
-***
+---
 
 ## Process Model
 
 `src/kernel/process.rs`
 
 Process descriptor fields:
+- `pid` — process ID
+- `ppid` — parent PID
+- `uid`, `gid` — credentials
+- `pledge_set` — declared syscall classes
+- `cap_mode` — Capsicum capability mode flag
+- `jail_id` — jail membership (0 = host)
+- `vmas` — virtual memory areas
+- `fd_table` — file descriptor table with capability rights
 
-*   `pid` — process ID
-*   `ppid` — parent PID
-*   `uid`, `gid` — credentials
-*   `pledge_set` — declared syscall classes
-*   `cap_mode` — Capsicum capability mode flag
-*   `jail_id` — jail membership (0 = host)
-*   `vmas` — virtual memory areas
-*   `fd_table` — file descriptor table with capability rights
-
-***
+---
 
 ## Kernel Hardening
 
@@ -355,14 +348,12 @@ No page is both writable and executable simultaneously. `mprotect(PROT_WRITE | P
 ### Retguard
 
 On function entry:
-
-1.  Save return address to a shadow stack page (randomly placed)
-2.  XOR return address on stack with a per-process cookie
+1. Save return address to a shadow stack page (randomly placed)
+2. XOR return address on stack with a per-process cookie
 
 On function return:
-
-1.  Verify return address matches shadow stack copy
-2.  Mismatch → kernel panic (stack-smashing detected)
+1. Verify return address matches shadow stack copy
+2. Mismatch → kernel panic (stack-smashing detected)
 
 ### Stack Canaries
 

@@ -2,24 +2,24 @@
 
 sigpkg is SigmaOS's universal, multi-format package manager. It can install, build, and manage packages from all major Linux and BSD distribution formats.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Quick Start](#quick-start)
-2.  [Package Formats](#package-formats)
-3.  [Command Reference](#command-reference)
-4.  [Package Store](#package-store)
-5.  [Dependency Resolution](#dependency-resolution)
-6.  [PKGBUILD Recipes](#pkgbuild-recipes)
-7.  [Atomic Upgrades and Rollback](#atomic-upgrades-and-rollback)
-8.  [Reproducible Builds](#reproducible-builds)
-9.  [AUR Bridge](#aur-bridge)
+1. [Quick Start](#quick-start)
+2. [Package Formats](#package-formats)
+3. [Command Reference](#command-reference)
+4. [Package Store](#package-store)
+5. [Dependency Resolution](#dependency-resolution)
+6. [PKGBUILD Recipes](#pkgbuild-recipes)
+7. [Atomic Upgrades and Rollback](#atomic-upgrades-and-rollback)
+8. [Reproducible Builds](#reproducible-builds)
+9. [AUR Bridge](#aur-bridge)
 10. [Distro Bridges](#distro-bridges)
 11. [Creating Packages](#creating-packages)
 12. [Configuration](#configuration)
 
-***
+---
 
 ## Quick Start
 
@@ -43,7 +43,7 @@ sigpkg rollback
 sigpkg list --installed
 ```
 
-***
+---
 
 ## Package Formats
 
@@ -75,7 +75,7 @@ sigpkg install package.rpm
 sigpkg install package.apk
 ```
 
-***
+---
 
 ## Command Reference
 
@@ -170,28 +170,30 @@ sigpkg unhold nginx
 sigpkg list --held
 ```
 
-***
+---
 
 ## Package Store
 
 sigpkg uses a **content-addressed store** at `/sigma/store/`:
 
-    /sigma/store/
-    └── sha256-abc123def456.../    ← package hash is its path
-        ├── bin/
-        ├── lib/
-        ├── share/
-        └── .sigma-meta/
-            ├── manifest.toml
-            ├── files.sha256
-            └── signature.ed25519
+```
+/sigma/store/
+└── sha256-abc123def456.../    ← package hash is its path
+    ├── bin/
+    ├── lib/
+    ├── share/
+    └── .sigma-meta/
+        ├── manifest.toml
+        ├── files.sha256
+        └── signature.ed25519
+```
 
 ### Store Properties
 
-*   **Immutable**: installed packages are never modified
-*   **Deduplicated**: identical files share storage via hard links
-*   **Atomic**: installation either fully succeeds or fails (no partial state)
-*   **Parallel**: multiple package versions coexist in the store
+- **Immutable**: installed packages are never modified
+- **Deduplicated**: identical files share storage via hard links
+- **Atomic**: installation either fully succeeds or fails (no partial state)
+- **Parallel**: multiple package versions coexist in the store
 
 ### Generations
 
@@ -208,22 +210,21 @@ sigpkg generations activate 42
 sigpkg generations gc --keep-last 5
 ```
 
-***
+---
 
 ## Dependency Resolution
 
 sigpkg uses a **SAT (Boolean Satisfiability) solver** for dependency resolution:
 
-1.  Parse all package dependency expressions into SAT clauses
-2.  Add user-requested packages as unit clauses (must be true)
-3.  Solve the SAT problem (DPLL algorithm with conflict-driven clause learning)
-4.  Translate solution back to package installation plan
+1. Parse all package dependency expressions into SAT clauses
+2. Add user-requested packages as unit clauses (must be true)
+3. Solve the SAT problem (DPLL algorithm with conflict-driven clause learning)
+4. Translate solution back to package installation plan
 
 This guarantees:
-
-*   Complete dependency resolution (no missing dependencies)
-*   Conflict detection before installation begins
-*   Minimal installation (only what's needed)
+- Complete dependency resolution (no missing dependencies)
+- Conflict detection before installation begins
+- Minimal installation (only what's needed)
 
 ### Dependency Syntax
 
@@ -237,7 +238,7 @@ This guarantees:
 "!java" = {}           # Conflict
 ```
 
-***
+---
 
 ## PKGBUILD Recipes
 
@@ -277,28 +278,29 @@ sigpkg install myapp-1.0.0-1-x86_64.spkg
 ### Sandboxed Builds
 
 All package builds run in an isolated environment:
+- Read-only access to system libraries
+- Network blocked during compilation (for reproducibility)
+- Separate build user with no write access outside build directory
 
-*   Read-only access to system libraries
-*   Network blocked during compilation (for reproducibility)
-*   Separate build user with no write access outside build directory
-
-***
+---
 
 ## Atomic Upgrades and Rollback
 
 sigpkg's **two-phase commit** ensures upgrades never leave the system in a broken state:
 
-    Phase 1 (Prepare):
-      ├── Download all packages
-      ├── Verify signatures
-      ├── Check disk space
-      └── Build new generation in /sigma/store/
+```
+Phase 1 (Prepare):
+  ├── Download all packages
+  ├── Verify signatures
+  ├── Check disk space
+  └── Build new generation in /sigma/store/
 
-    Phase 2 (Commit — atomic):
-      └── Atomically update /sigma/current symlink
+Phase 2 (Commit — atomic):
+  └── Atomically update /sigma/current symlink
 
-    Rollback (instant):
-      └── Atomically revert /sigma/current symlink to previous generation
+Rollback (instant):
+  └── Atomically revert /sigma/current symlink to previous generation
+```
 
 ```bash
 # Upgrade
@@ -311,17 +313,17 @@ sigpkg rollback
 sigpkg rollback --generation 41
 ```
 
-***
+---
 
 ## Reproducible Builds
 
 sigpkg guarantees reproducibility:
 
-1.  **Hermetic build environment** — build dependencies exactly pinned
-2.  **No network during build** — all sources fetched before build starts
-3.  **Deterministic timestamps** — SOURCE\_DATE\_EPOCH set to 0
-4.  **Path normalisation** — absolute paths stripped from binaries
-5.  **Content addressing** — package hash is computed from inputs, not outputs
+1. **Hermetic build environment** — build dependencies exactly pinned
+2. **No network during build** — all sources fetched before build starts
+3. **Deterministic timestamps** — SOURCE_DATE_EPOCH set to 0
+4. **Path normalisation** — absolute paths stripped from binaries
+5. **Content addressing** — package hash is computed from inputs, not outputs
 
 Verify reproducibility:
 
@@ -330,7 +332,7 @@ Verify reproducibility:
 sigpkg makepkg --verify-reproducible PKGBUILD
 ```
 
-***
+---
 
 ## AUR Bridge
 
@@ -349,7 +351,7 @@ sigpkg aur upgrade
 
 Source: `src/sigpkg/arch_compat.rs`
 
-***
+---
 
 ## Distro Bridges
 
@@ -359,7 +361,7 @@ sigpkg can pull packages from distro repositories directly:
 # Use Fedora repository
 sigpkg --repo fedora install dnf-plugin-core
 
-# Use Debian repository
+# Use Debian repository  
 sigpkg --repo debian install apt-utils
 
 # Use Alpine repository
@@ -388,7 +390,7 @@ type = "rpm"
 priority = 30
 ```
 
-***
+---
 
 ## Creating Packages
 
@@ -424,7 +426,7 @@ sigpkg build manifest.toml
 sigpkg sign myapp-1.0.0.spkg --key /etc/sigma/signing.key
 ```
 
-***
+---
 
 ## Configuration
 

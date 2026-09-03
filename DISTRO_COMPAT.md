@@ -2,7 +2,7 @@
 
 SigmaOS implements comprehensive parity with major Linux and BSD distributions, drawing the best features from each into a unified sovereign OS.
 
-***
+---
 
 ## Supported Distributions
 
@@ -24,7 +24,7 @@ SigmaOS implements comprehensive parity with major Linux and BSD distributions, 
 | DragonFly BSD | Storage | ✅ Full |
 | NetBSD | Portable | ✅ Partial |
 
-***
+---
 
 ## Arch Linux (`src/distro/arch_inspirations.rs`)
 
@@ -41,7 +41,6 @@ pub enum RollingChannel {
 ```
 
 Configure in `/etc/sigma/release.toml`:
-
 ```toml
 [release]
 channel = "stable"  # edge | stable | lts
@@ -60,12 +59,11 @@ sigpkg aur install brave-bin
 ```
 
 `SigmaMakePkg` implements:
-
-*   PKGBUILD parsing (bash variable extraction)
-*   Source download with checksum verification
-*   Sandboxed build environment
-*   `.pkg.tar.zst` packaging
-*   Signature with local keyring
+- PKGBUILD parsing (bash variable extraction)
+- Source download with checksum verification
+- Sandboxed build environment
+- `.pkg.tar.zst` packaging
+- Signature with local keyring
 
 ### Pacman Compatibility
 
@@ -78,7 +76,7 @@ sigpkg sync  # equivalent to pacman -Sy
 sigpkg sync --full  # equivalent to pacman -Syuu
 ```
 
-***
+---
 
 ## NixOS (`src/distro/nixos_inspirations.rs`)
 
@@ -115,7 +113,6 @@ Define the entire system state in `/etc/sigma/configuration.sigma`:
 ```
 
 Apply configuration:
-
 ```bash
 sigma-apply /etc/sigma/configuration.sigma
 ```
@@ -124,18 +121,21 @@ sigma-apply /etc/sigma/configuration.sigma
 
 All packages live in `/sigma/store/<hash>/`:
 
-    /sigma/store/
-    ├── sha256-abc123.../   ← nginx 1.25.3
-    ├── sha256-def456.../   ← openssl 3.1.0
-    └── sha256-789ghi.../   ← curl 8.2.0
+```
+/sigma/store/
+├── sha256-abc123.../   ← nginx 1.25.3
+├── sha256-def456.../   ← openssl 3.1.0
+└── sha256-789ghi.../   ← curl 8.2.0
+```
 
 The store is immutable — packages are never modified after installation. Multiple versions coexist without conflict.
 
 ### Atomic Upgrades
 
 The **active generation** is a symlink:
-
-    /sigma/current → /sigma/store/generation-47-abc123.../
+```
+/sigma/current → /sigma/store/generation-47-abc123.../
+```
 
 Switching generations (upgrade or rollback) is a single atomic `rename(2)` call. The system can never be caught in a half-upgraded state.
 
@@ -154,7 +154,7 @@ sigma-gen rollback 45
 # Boot menu also shows all generations (GRUB integration)
 ```
 
-***
+---
 
 ## Gentoo (`src/distro/gentoo_inspirations.rs`)
 
@@ -219,14 +219,13 @@ src_install() {
 }
 ```
 
-***
+---
 
 ## Fedora (`src/compatibility/fedora.rs`)
 
 ### Fedora Services
 
 **Cockpit Web Console** (`src/remote/`):
-
 ```bash
 # Enable and start Cockpit
 sigpkg install sigma-cockpit
@@ -235,7 +234,6 @@ sigma-service start cockpit
 ```
 
 **PipeWire Audio**:
-
 ```bash
 # PipeWire replaces PulseAudio/JACK
 sigpkg install sigma-pipewire
@@ -243,7 +241,6 @@ sigma-service start pipewire pipewire-pulse
 ```
 
 **FreeIPA / Kerberos**:
-
 ```bash
 # Join a FreeIPA domain
 sigma-ipa join ipa.example.com --user admin
@@ -275,7 +272,7 @@ sigpkg check-upstream
 sigma-anitya configure --backend github --project sigmaos/sigmaos
 ```
 
-***
+---
 
 ## CachyOS (`src/compatibility/cachy_os.rs`)
 
@@ -294,7 +291,6 @@ sigma-sysctl kernel.sched_burst_penalty_scale=1280
 ### Performance Optimisations
 
 **LLVM PGO (Profile-Guided Optimisation)**:
-
 ```bash
 # Build PGO-optimised kernel
 sigma-build --pgo
@@ -304,7 +300,6 @@ sigma-build --pgo-use=/var/sigma/kernel.profdata
 ```
 
 **x86-64-v3 Microarchitecture**:
-
 ```bash
 # Build packages for x86-64-v3 (AVX2, BMI2, FMA)
 sigma-emerge build --march=x86-64-v3 nginx
@@ -316,15 +311,14 @@ sigma-emerge build --march=x86-64-v3 nginx
 ### CachyOS Kernel Feature Matrix
 
 `CachyosKernelFeatureMatrix` unifies:
+- BORE scheduler
+- LLVM ThinLTO
+- Clang CFI
+- ZSTD kernel compression
+- NVIDIA DKMS headers
+- TCP BBR2 congestion control
 
-*   BORE scheduler
-*   LLVM ThinLTO
-*   Clang CFI
-*   ZSTD kernel compression
-*   NVIDIA DKMS headers
-*   TCP BBR2 congestion control
-
-***
+---
 
 ## OpenBSD (`src/security/`)
 
@@ -359,12 +353,11 @@ process.unveil_lock()?;
 ### KARL (Kernel Address Randomised Link)
 
 At each boot, the kernel binary is relinked with randomised section order:
+- Makes ROP gadget exploitation unreliable
+- Different offset each boot (not just at install time)
+- Enabled by default
 
-*   Makes ROP gadget exploitation unreliable
-*   Different offset each boot (not just at install time)
-*   Enabled by default
-
-***
+---
 
 ## FreeBSD (`src/security/`)
 
@@ -412,18 +405,20 @@ zfs snapshot tank/data@backup-2026
 zfs rollback tank/data@backup-2026
 ```
 
-***
+---
 
 ## DragonFly BSD — HAMMER2
 
 SigmaOS's native filesystem draws from DragonFly BSD's HAMMER2:
 
-    Features:
-    - Multi-master clustering
-    - On-the-fly compression (LZ4, ZSTD)
-    - Deduplication
-    - Snapshots (CoW, near-instant)
-    - Multiple PFS (pseudo-filesystems) per volume
+```
+Features:
+- Multi-master clustering
+- On-the-fly compression (LZ4, ZSTD)
+- Deduplication
+- Snapshots (CoW, near-instant)
+- Multiple PFS (pseudo-filesystems) per volume
+```
 
 ```bash
 # Create HAMMER2 volume
@@ -436,7 +431,7 @@ sigma-hammer2 pfs-create my-volume/data
 sigma-hammer2 snapshot my-volume/data snap-2026-09
 ```
 
-***
+---
 
 ## Alpine Linux
 
@@ -463,7 +458,7 @@ sigma-toolbox ls
 sigma-toolbox grep pattern /etc/sigma
 ```
 
-***
+---
 
 ## openSUSE
 
@@ -491,7 +486,7 @@ zypper search "web server"
 zypper update
 ```
 
-***
+---
 
 ## Void Linux
 

@@ -427,24 +427,23 @@ All openSUSE parity components are verified through the automated test runner:
 ```
 
 Specific tests include:
-
-*   `test_yast_network_configuration`: Verifies YaST network module
-*   `test_zypper_package_management`: Verifies Zypper package operations
-*   `test_btrfs_subvolume_management`: Verifies Btrfs subvolume operations
-*   `test_snapper_snapshot_creation`: Verifies Snapper snapshot functionality
-*   `test_apparmor_profile_management`: Verifies AppArmor profile operations
+- `test_yast_network_configuration`: Verifies YaST network module
+- `test_zypper_package_management`: Verifies Zypper package operations
+- `test_btrfs_subvolume_management`: Verifies Btrfs subvolume operations
+- `test_snapper_snapshot_creation`: Verifies Snapper snapshot functionality
+- `test_apparmor_profile_management`: Verifies AppArmor profile operations
 
 ## Best Practices
 
-1.  **Btrfs First**: Leverage Btrfs features for snapshots and filesystem management
-2.  **YaST Integration**: Provide unified configuration interface
-3.  **Enterprise Ready**: Focus on stability and manageability
-4.  **Security First**: Implement AppArmor for mandatory access control
-5.  **Image Building**: Support system image creation for deployment
+1. **Btrfs First**: Leverage Btrfs features for snapshots and filesystem management
+2. **YaST Integration**: Provide unified configuration interface
+3. **Enterprise Ready**: Focus on stability and manageability
+4. **Security First**: Implement AppArmor for mandatory access control
+5. **Image Building**: Support system image creation for deployment
 
 ## References
 
-*   [openSUSE Documentation](https://en.opensuse.org/Portal:Documentation)
-*   [YaST Documentation](https://doc.opensuse.org/documentation/Leap/)
-*   [Btrfs Documentation](https://btrfs.wiki.kernel.org/)
-*   [Snapper Documentation](https://snapper.io/)
+* [openSUSE Documentation](https://en.opensuse.org/Portal:Documentation)
+* [YaST Documentation](https://doc.opensuse.org/documentation/Leap/)
+* [Btrfs Documentation](https://btrfs.wiki.kernel.org/)
+* [Snapper Documentation](https://snapper.io/)

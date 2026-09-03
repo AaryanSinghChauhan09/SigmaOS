@@ -354,23 +354,22 @@ All Linux Mint parity components are verified through the automated test runner:
 ```
 
 Specific tests include:
-
-*   `test_mint_update_manager`: Verifies level 1-5 update classification
-*   `test_mint_timeshift_restore`: Verifies snapshot creation and restoration
-*   `test_mint_software_manager`: Verifies application installation and management
-*   `test_mint_driver_manager`: Verifies hardware detection and driver installation
-*   `test_mintstick_formatter`: Verifies USB formatting and ISO writing
+- `test_mint_update_manager`: Verifies level 1-5 update classification
+- `test_mint_timeshift_restore`: Verifies snapshot creation and restoration
+- `test_mint_software_manager`: Verifies application installation and management
+- `test_mint_driver_manager`: Verifies hardware detection and driver installation
+- `test_mintstick_formatter`: Verifies USB formatting and ISO writing
 
 ## Best Practices
 
-1.  **User Safety First**: Always prioritize stability and user experience
-2.  **Gradual Updates**: Implement tiered update system for safety
-3.  **Backup Integration**: Integrate Timeshift for automatic system backups
-4.  **Hardware Compatibility**: Ensure broad hardware support through driver management
-5.  **Community Feedback**: Implement system for user reports and diagnostics
+1. **User Safety First**: Always prioritize stability and user experience
+2. **Gradual Updates**: Implement tiered update system for safety
+3. **Backup Integration**: Integrate Timeshift for automatic system backups
+4. **Hardware Compatibility**: Ensure broad hardware support through driver management
+5. **Community Feedback**: Implement system for user reports and diagnostics
 
 ## References
 
-*   [Linux Mint Documentation](https://linuxmint.com/documentation.php)
-*   [Cinnamon Spices](https://cinnamon-spices.linuxmint.com/)
-*   [Timeshift Documentation](https://github.com/teejee2008/timeshift)
+* [Linux Mint Documentation](https://linuxmint.com/documentation.php)
+* [Cinnamon Spices](https://cinnamon-spices.linuxmint.com/)
+* [Timeshift Documentation](https://github.com/teejee2008/timeshift)
