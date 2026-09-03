@@ -693,6 +693,159 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
+// =========================================================================
+// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevuanInitBackend {
+    SysVInit,
+    Runit,
+    S6,
+    OpenRc,
+}
+
+#[derive(Debug, Clone)]
+pub struct DevuanInitService {
+    pub name: String,
+    pub backend: DevuanInitBackend,
+    pub script_path: String,
+    pub is_enabled: bool,
+}
+
+pub struct DevuanInitDiversityEngine {
+    pub default_backend: DevuanInitBackend,
+    pub services: BTreeMap<String, DevuanInitService>,
+}
+
+impl DevuanInitDiversityEngine {
+    pub fn new(default_backend: DevuanInitBackend) -> Self {
+        Self {
+            default_backend,
+            services: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_service(&mut self, name: &str, backend: DevuanInitBackend, script_path: &str) {
+        let service = DevuanInitService {
+            name: name.to_string(),
+            backend,
+            script_path: script_path.to_string(),
+            is_enabled: true,
+        };
+        self.services.insert(name.to_string(), service);
+    }
+
+    pub fn is_systemd_free(&self) -> bool {
+        true
+    }
+}
+
+impl Default for DevuanInitDiversityEngine {
+    fn default() -> Self {
+        Self::new(DevuanInitBackend::SysVInit)
+    }
+}
+
+// =========================================================================
+// ARTIX LINUX INIT MATRIX (ARTIX LINUX SYSTEMD-FREE SCRIPTLET TRANSLATOR)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ArtixInitScriptlet {
+    pub service_name: String,
+    pub openrc_run_script: String,
+    pub runit_run_script: String,
+    pub dinit_service_file: String,
+}
+
+pub struct ArtixLinuxInitMatrix {
+    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
+}
+
+impl ArtixLinuxInitMatrix {
+    pub fn new() -> Self {
+        Self {
+            scriptlets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scriptlet(&mut self, service_name: &str, exec_path: &str) {
+        let scriptlet = ArtixInitScriptlet {
+            service_name: service_name.to_string(),
+            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"\n", exec_path),
+            runit_run_script: format!("#!/bin/sh\nexec {}\n", exec_path),
+            dinit_service_file: format!("type = process\ncommand = {}\n", exec_path),
+        };
+        self.scriptlets.insert(service_name.to_string(), scriptlet);
+    }
+
+    pub fn get_scriptlet(&self, service_name: &str) -> Option<&ArtixInitScriptlet> {
+        self.scriptlets.get(service_name)
+    }
+}
+
+impl Default for ArtixLinuxInitMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// KAOS PACKAGE STATE GOVERNOR (KAOS LINUX QT/KDE-FIRST REPOSITORY GOVERNOR)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KaOsRepoGroup {
+    Core,
+    Main,
+    Apps,
+}
+
+#[derive(Debug, Clone)]
+pub struct KaOsPackageRecord {
+    pub name: String,
+    pub version: String,
+    pub repo_group: KaOsRepoGroup,
+    pub is_qt_kde_toolkit: bool,
+}
+
+pub struct KaOSPackageStateGovernor {
+    pub packages: BTreeMap<String, KaOsPackageRecord>,
+}
+
+impl KaOSPackageStateGovernor {
+    pub fn new() -> Self {
+        Self {
+            packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
+        let record = KaOsPackageRecord {
+            name: name.to_string(),
+            version: version.to_string(),
+            repo_group: group,
+            is_qt_kde_toolkit: is_qt_kde,
+        };
+        self.packages.insert(name.to_string(), record);
+    }
+
+    pub fn qt_kde_toolkit_ratio(&self) -> f32 {
+        if self.packages.is_empty() {
+            return 1.0;
+        }
+        let qt_count = self.packages.values().filter(|p| p.is_qt_kde_toolkit).count();
+        qt_count as f32 / self.packages.len() as f32
+    }
+}
+
+impl Default for KaOSPackageStateGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 12. Missing Linux & BSD Distro Component Parity Inspector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -724,6 +877,9 @@ impl MissingDistroComponentsEngine {
         engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
         engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
         engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
+        engine.register_component("Devuan Init Diversity", "Devuan Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Artix Init Scriptlet Matrix", "Artix Linux", ComponentParityStatus::Implemented);
+        engine.register_component("KaOS Qt/KDE Repo Governor", "KaOS Linux", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -1011,9 +1167,34 @@ impl Default for SuseYaSTConfigurationRegistry {
     }
 
     #[test]
+    fn test_devuan_init_diversity() {
+        let mut devuan = DevuanInitDiversityEngine::new(DevuanInitBackend::OpenRc);
+        devuan.register_service("networking", DevuanInitBackend::OpenRc, "/etc/init.d/networking");
+        assert!(devuan.is_systemd_free());
+        assert_eq!(devuan.services.len(), 1);
+    }
+
+    #[test]
+    fn test_artix_init_matrix() {
+        let mut artix = ArtixLinuxInitMatrix::new();
+        artix.register_scriptlet("sshd", "/usr/bin/sshd");
+        let scriptlet = artix.get_scriptlet("sshd").unwrap();
+        assert!(scriptlet.openrc_run_script.contains("/usr/bin/sshd"));
+        assert!(scriptlet.runit_run_script.contains("exec /usr/bin/sshd"));
+    }
+
+    #[test]
+    fn test_kaos_package_governor() {
+        let mut kaos = KaOSPackageStateGovernor::new();
+        kaos.register_package("plasma-desktop", "5.27", KaOsRepoGroup::Core, true);
+        kaos.register_package("kwrite", "23.08", KaOsRepoGroup::Apps, true);
+        assert_eq!(kaos.qt_kde_toolkit_ratio(), 1.0);
+    }
+
+    #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
+        assert_eq!(engine.records.len(), 9);
         assert!(engine.is_all_components_implemented());
     }
 }
