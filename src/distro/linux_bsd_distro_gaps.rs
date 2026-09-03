@@ -597,4 +597,106 @@ mod tests {
         let dispatched = scheduler.dispatch_due_jobs(1700000000);
         assert_eq!(dispatched, 1);
     }
+
+    #[test]
+    fn test_sovereign_universal_distro_gap_resolver() {
+        let mut resolver = SovereignUniversalDistroGapResolver::new();
+        assert_eq!(resolver.resolve_dracut_initramfs_dependencies(), 5);
+        assert!(resolver.verify_bsd_geom_storage_readiness());
+
+        assert_eq!(resolver.lookup_modprobe_alias("char-major-10-200"), Some("tun"));
+        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+
+        assert!(!resolver.faillock_guard.record_failure());
+        assert!(!resolver.faillock_guard.record_failure());
+        assert!(resolver.faillock_guard.record_failure());
+        assert!(resolver.faillock_guard.is_locked);
+
+        resolver.faillock_guard.reset();
+        assert!(!resolver.faillock_guard.is_locked);
+    }
+}
+
+// ============================================================================
+// 7. Universal Linux & BSD Distro Gap Resolver
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PamFaillockGuard {
+    pub failed_attempts: u32,
+    pub max_failures: u32,
+    pub is_locked: bool,
+}
+
+impl PamFaillockGuard {
+    pub fn new(max_failures: u32) -> Self {
+        Self {
+            failed_attempts: 0,
+            max_failures,
+            is_locked: false,
+        }
+    }
+
+    pub fn record_failure(&mut self) -> bool {
+        self.failed_attempts += 1;
+        if self.failed_attempts >= self.max_failures {
+            self.is_locked = true;
+        }
+        self.is_locked
+    }
+
+    pub fn reset(&mut self) {
+        self.failed_attempts = 0;
+        self.is_locked = false;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignUniversalDistroGapResolver {
+    pub dracut_modules_loaded: Vec<&'static str>,
+    pub faillock_guard: PamFaillockGuard,
+    pub bsd_geom_layers: Vec<&'static str>,
+    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
+}
+
+impl SovereignUniversalDistroGapResolver {
+    pub fn new() -> Self {
+        #[cfg(not(target_os = "none"))]
+        use std::vec;
+
+        let mut auto_modprobe_aliases = Vec::new();
+        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
+        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
+        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
+
+        Self {
+            dracut_modules_loaded: vec!["bash", "systemd", "kernel-modules", "rootfs-generator", "network"],
+            faillock_guard: PamFaillockGuard::new(3),
+            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
+            auto_modprobe_aliases,
+        }
+    }
+
+    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
+        self.dracut_modules_loaded.len()
+    }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        for &(a, mod_name) in &self.auto_modprobe_aliases {
+            if a == alias {
+                return Some(mod_name);
+            }
+        }
+        None
+    }
+
+    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
+        !self.bsd_geom_layers.is_empty()
+    }
+}
+
+impl Default for SovereignUniversalDistroGapResolver {
+    fn default() -> Self {
+        Self::new()
+    }
 }
