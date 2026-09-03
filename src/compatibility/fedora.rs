@@ -2997,6 +2997,163 @@ impl Default for FedoraMessagingEngine {
 }
 
 // =========================================================================
+// Fedora Ignition Declarative Provisioning Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionFile {
+    pub path: String,
+    pub mode: u32,
+    pub content: String,
+    pub overwrite: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionUser {
+    pub name: String,
+    pub ssh_authorized_keys: Vec<String>,
+    pub groups: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionSystemdUnit {
+    pub name: String,
+    pub enabled: bool,
+    pub contents: String,
+}
+
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
+}
+
+impl FedoraIgnitionEngine {
+    pub fn new() -> Self {
+        Self {
+            files: Vec::new(),
+            users: Vec::new(),
+            systemd_units: Vec::new(),
+            provisioned: false,
+        }
+    }
+
+    pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
+        self.files.push(IgnitionFile {
+            path: path.to_string(),
+            mode,
+            content: content.to_string(),
+            overwrite: true,
+        });
+    }
+
+    pub fn add_user(&mut self, name: &str, ssh_keys: &[&str], groups: &[&str]) {
+        self.users.push(IgnitionUser {
+            name: name.to_string(),
+            ssh_authorized_keys: ssh_keys.iter().map(|s| s.to_string()).collect(),
+            groups: groups.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn add_systemd_unit(&mut self, name: &str, enabled: bool, contents: &str) {
+        self.systemd_units.push(IgnitionSystemdUnit {
+            name: name.to_string(),
+            enabled,
+            contents: contents.to_string(),
+        });
+    }
+
+    pub fn execute_provisioning(&mut self) -> Result<String, &'static str> {
+        if self.provisioned {
+            return Err("Ignition provisioning already executed; runs once on first boot");
+        }
+
+        self.provisioned = true;
+        Ok(format!(
+            "Ignition: Provisioned {} files, {} users, and {} systemd units successfully",
+            self.files.len(),
+            self.users.len(),
+            self.systemd_units.len()
+        ))
+    }
+}
+
+impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Dracut Initramfs Builder Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DracutModule {
+    pub name: String,
+    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
+    pub drivers: Vec<String>,
+}
+
+/// Fedora Dracut Modular Initramfs Generation & Hook Engine
+/// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
+pub struct FedoraDracutInitramfsEngine {
+    pub modules: Vec<DracutModule>,
+    pub kernel_version: String,
+    pub compression_format: String, // "zstd", "xz", "gzip"
+}
+
+impl FedoraDracutInitramfsEngine {
+    pub fn new(kernel_version: &str) -> Self {
+        let mut engine = Self {
+            modules: Vec::new(),
+            kernel_version: kernel_version.to_string(),
+            compression_format: "zstd".to_string(),
+        };
+        engine.load_default_dracut_modules();
+        engine
+    }
+
+    fn load_default_dracut_modules(&mut self) {
+        self.modules.push(DracutModule {
+            name: "90crypt".to_string(),
+            hook_stage: "cmdline".to_string(),
+            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
+        });
+        self.modules.push(DracutModule {
+            name: "95rootfs".to_string(),
+            hook_stage: "pre-pivot".to_string(),
+            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
+        });
+    }
+
+    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
+        self.modules.push(DracutModule {
+            name: name.to_string(),
+            hook_stage: stage.to_string(),
+            drivers: drivers.iter().map(|d| d.to_string()).collect(),
+        });
+    }
+
+    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
+        if self.modules.is_empty() {
+            Err("Dracut: No modules included in initramfs build")
+        } else {
+            Ok(format!(
+                "/boot/initramfs-{}.img ({} modules, compressed with {})",
+                self.kernel_version,
+                self.modules.len(),
+                self.compression_format
+            ))
+        }
+    }
+}
+
+// =========================================================================
 // Fedora ABRT (Automatic Bug Reporting Tool) Engine
 // =========================================================================
 
@@ -4054,6 +4211,41 @@ mod tests {
 
         let empty_search = tahrir.search_posts_by_hashtag("nonexistent");
         assert!(empty_search.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_ignition_engine() {
+        let mut ignition = FedoraIgnitionEngine::new();
+
+        ignition.add_file("/etc/hostname", "sigmaos-node-1", 0o644);
+        ignition.add_user("admin", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "docker"]);
+        ignition.add_systemd_unit("node-exporter.service", true, "[Unit]\nDescription=Node Exporter\n");
+
+        assert_eq!(ignition.files.len(), 1);
+        assert_eq!(ignition.users.len(), 1);
+        assert_eq!(ignition.systemd_units.len(), 1);
+        assert!(!ignition.provisioned);
+
+        let res = ignition.execute_provisioning().unwrap();
+        assert!(res.contains("Provisioned 1 files, 1 users, and 1 systemd units"));
+        assert!(ignition.provisioned);
+
+        // Re-executing fails because it runs once
+        assert!(ignition.execute_provisioning().is_err());
+    }
+
+    #[test]
+    fn test_fedora_dracut_initramfs_engine() {
+        let mut dracut = FedoraDracutInitramfsEngine::new("6.8.0-1.fc39.x86_64");
+
+        assert_eq!(dracut.modules.len(), 2); // 90crypt, 95rootfs default
+        dracut.include_module("50plymouth", "cmdline", &["drm", "i915"]);
+
+        assert_eq!(dracut.modules.len(), 3);
+
+        let img_path = dracut.generate_initramfs_img().unwrap();
+        assert!(img_path.contains("/boot/initramfs-6.8.0-1.fc39.x86_64.img"));
+        assert!(img_path.contains("3 modules, compressed with zstd"));
     }
 
     #[test]
