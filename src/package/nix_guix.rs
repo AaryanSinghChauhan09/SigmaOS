@@ -151,16 +151,15 @@ impl NixPackageManager {
 
     /// Switch to generation
     pub fn switch_generation(&mut self, generation_id: u64) -> Result<(), String> {
-        if let Some(gen) = self.generations.get_mut(generation_id as usize) {
-            for g in &mut self.generations {
-                g.is_current = false;
-            }
-            gen.set_current();
-            self.current_generation = Some(generation_id);
-            Ok(())
-        } else {
-            Err("Generation not found".to_string())
+        if generation_id as usize >= self.generations.len() {
+            return Err("Generation not found".to_string());
         }
+        for g in &mut self.generations {
+            g.is_current = false;
+        }
+        self.generations[generation_id as usize].set_current();
+        self.current_generation = Some(generation_id);
+        Ok(())
     }
 
     /// Get current generation

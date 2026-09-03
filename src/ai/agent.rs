@@ -372,16 +372,4 @@ mod tests_agent_memory {
         assert_eq!(model_id, 1);
         assert!(marketplace.verify_model_provenance(1));
     }
-
-    #[test]
-    fn test_model_marketplace_pqc_verification() {
-        let mut marketplace = ModelMarketplace::new();
-        let model_id = marketplace.register_signed_model(
-            "DeepSeek-R1-Distill",
-            "1.5B",
-            "Dilithium5_Verified_Signature",
-        );
-        assert_eq!(model_id, 1);
-        assert!(marketplace.verify_model_provenance(1));
-    }
 }
