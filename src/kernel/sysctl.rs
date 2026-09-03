@@ -121,7 +121,7 @@ impl SysctlRegistry {
 
     pub fn reset_defaults(&mut self) {
         self.nodes.clear();
-        self.register_default_nodes();
+        self.register_defaults();
     }
 }
 

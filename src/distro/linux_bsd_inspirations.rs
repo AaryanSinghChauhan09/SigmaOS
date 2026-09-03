@@ -153,14 +153,24 @@ impl SovereignUniversalDistroBridge {
             }
 
             let valid_supervisor = match m {
-                DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
                 }
-                DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
                 }
-                DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
-                DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+                DistroSubsystemMode::LinuxAlpine => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit
+                }
+                DistroSubsystemMode::LinuxNix => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd
+                }
             };
 
             if !valid_supervisor {
