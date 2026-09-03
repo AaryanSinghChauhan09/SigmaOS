@@ -414,6 +414,113 @@ impl Default for SovereignNetworkFilterRulesEngine {
 }
 
 // =========================================================================
+// 6. APPARMOR / SELINUX MANDATORY ACCESS CONTROL TYPE ENFORCEMENT RULES
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LsmTypeRule {
+    pub subject_domain: String,
+    pub target_type: String,
+    pub allowed_permission: String, // e.g. "read", "write", "exec", "bind"
+}
+
+pub struct SovereignLsmTypeEnforcementRules {
+    pub rules: Vec<LsmTypeRule>,
+}
+
+impl SovereignLsmTypeEnforcementRules {
+    pub fn new() -> Self {
+        let mut engine = Self { rules: Vec::new() };
+        engine.register_default_lsm_rules();
+        engine
+    }
+
+    fn register_default_lsm_rules(&mut self) {
+        self.add_rule("httpd_t", "httpd_sys_content_t", "read");
+        self.add_rule("httpd_t", "httpd_log_t", "write");
+        self.add_rule("user_t", "user_home_t", "read_write_exec");
+    }
+
+    pub fn add_rule(&mut self, domain: &str, target: &str, perm: &str) {
+        self.rules.push(LsmTypeRule {
+            subject_domain: domain.to_string(),
+            target_type: target.to_string(),
+            allowed_permission: perm.to_string(),
+        });
+    }
+
+    pub fn check_permission(&self, domain: &str, target: &str, perm: &str) -> bool {
+        for rule in &self.rules {
+            if rule.subject_domain == domain && rule.target_type == target {
+                if rule.allowed_permission.contains(perm) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignLsmTypeEnforcementRules {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 7. FREEBSD CAPSICUM FILE DESCRIPTOR CAPABILITY RIGHTS RULES
+// =========================================================================
+
+pub const CAP_RIGHT_READ: u64 = 1 << 0;
+pub const CAP_RIGHT_WRITE: u64 = 1 << 1;
+pub const CAP_RIGHT_MMAP: u64 = 1 << 2;
+pub const CAP_RIGHT_FSTAT: u64 = 1 << 3;
+
+pub struct CapsicumFdRule {
+    pub fd: i32,
+    pub allowed_rights: u64,
+}
+
+pub struct SovereignCapsicumRightsRules {
+    pub fd_rules: BTreeMap<i32, CapsicumFdRule>,
+    pub capability_mode_active: bool,
+}
+
+impl SovereignCapsicumRightsRules {
+    pub fn new() -> Self {
+        Self {
+            fd_rules: BTreeMap::new(),
+            capability_mode_active: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.capability_mode_active = true;
+    }
+
+    pub fn limit_fd_rights(&mut self, fd: i32, rights: u64) {
+        self.fd_rules.insert(fd, CapsicumFdRule { fd, allowed_rights: rights });
+    }
+
+    pub fn check_fd_right(&self, fd: i32, required_right: u64) -> bool {
+        if !self.capability_mode_active {
+            return true;
+        }
+        if let Some(rule) = self.fd_rules.get(&fd) {
+            (rule.allowed_rights & required_right) == required_right
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignCapsicumRightsRules {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -480,5 +587,19 @@ mod tests {
             pf.evaluate_packet("em0", "TCP", "1.2.3.4", 443),
             PfAction::Pass
         );
+    }
+
+    #[test]
+    fn test_lsm_and_capsicum_rules() {
+        let lsm = SovereignLsmTypeEnforcementRules::new();
+        assert!(lsm.check_permission("httpd_t", "httpd_sys_content_t", "read"));
+        assert!(!lsm.check_permission("httpd_t", "httpd_sys_content_t", "write"));
+
+        let mut cap = SovereignCapsicumRightsRules::new();
+        cap.limit_fd_rights(3, CAP_RIGHT_READ | CAP_RIGHT_FSTAT);
+        cap.enter_capability_mode();
+
+        assert!(cap.check_fd_right(3, CAP_RIGHT_READ));
+        assert!(!cap.check_fd_right(3, CAP_RIGHT_WRITE));
     }
 }
