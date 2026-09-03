@@ -52,7 +52,6 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 pub mod open_source_obsoletion;
-pub mod open_source_os_gap_closure;
 
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
@@ -85,6 +84,14 @@ pub use distro::{
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
     NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
+    SovereignSchedExtEngine, ScxSchedulerKind, ScxTaskState, SchedExtTask,
+    SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
+    SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
+    SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
+    SovereignDistroLeapSuite, DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
+    GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
+    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignStatefulNatEngine,
+    SovereignJournaldBinaryStorageEngine,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
