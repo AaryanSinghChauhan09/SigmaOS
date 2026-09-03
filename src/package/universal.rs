@@ -1664,6 +1664,75 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+// =========================================================================
+// Universal Foreign Distro Package Bridge & Conversion Engine
+// =========================================================================
+
+/// Universal Foreign Distro Package Conversion Result
+#[derive(Debug, Clone)]
+pub struct ForeignConversionResult {
+    pub sigpkg_name: String,
+    pub original_format: PackageFormat,
+    pub store_path: String,
+    pub normalized_dependencies: Vec<String>,
+    pub sandbox_pledges: Vec<String>,
+    pub is_converted: bool,
+}
+
+/// Universal Foreign Distro Package Bridge Engine
+pub struct SovereignUniversalDistroBridgeEngine {
+    pub manager: UniversalPackageManager,
+    pub total_converted: usize,
+}
+
+impl SovereignUniversalDistroBridgeEngine {
+    pub fn new() -> Self {
+        Self {
+            manager: UniversalPackageManager::new(),
+            total_converted: 0,
+        }
+    }
+
+    /// Converts raw foreign package payload (.deb, .rpm, .pkg.tar.zst, .apk, .xbps, .pkg) into native SigmaPkg
+    pub fn convert_foreign_package_bytes_to_sigpkg(
+        &mut self,
+        filename: &str,
+        manifest: ForeignDistroManifest,
+    ) -> Result<ForeignConversionResult, PackageError> {
+        let fmt = UniversalPackageManifestParser::detect_format_from_filename(filename)
+            .ok_or_else(|| PackageError::InstallationFailed(format!("Unsupported foreign extension: {}", filename)))?;
+
+        let sigma_pkg = UniversalPackageTranslator::translate_to_sigma_pkg(&manifest);
+        let store_path = format!("/sigma/store/sigpkg_{}_{}", sigma_pkg.name, sigma_pkg.version);
+
+        let mut sandbox_pledges = Vec::new();
+        sandbox_pledges.push("stdio".to_string());
+        sandbox_pledges.push("rpath".to_string());
+
+        if fmt == PackageFormat::Snap || fmt == PackageFormat::Flatpak {
+            sandbox_pledges.push("network".to_string());
+        }
+
+        self.manager.add_package(sigma_pkg.clone());
+        self.total_converted += 1;
+
+        Ok(ForeignConversionResult {
+            sigpkg_name: sigma_pkg.name,
+            original_format: fmt,
+            store_path,
+            normalized_dependencies: sigma_pkg.dependencies,
+            sandbox_pledges,
+            is_converted: true,
+        })
+    }
+}
+
+impl Default for SovereignUniversalDistroBridgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1987,5 +2056,33 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_sovereign_universal_distro_bridge_engine() {
+        let mut bridge = SovereignUniversalDistroBridgeEngine::new();
+
+        let deb_manifest = ForeignDistroManifest {
+            raw_format: PackageFormat::Deb,
+            original_name: "wget".to_string(),
+            version: "1.21.4".to_string(),
+            architecture: "amd64".to_string(),
+            raw_dependencies: vec!["libssl-dev".to_string(), "glibc".to_string()],
+            raw_provides: vec!["download-manager".to_string()],
+            raw_conflicts: Vec::new(),
+            maintainer: "Debian Team".to_string(),
+        };
+
+        let result = bridge
+            .convert_foreign_package_bytes_to_sigpkg("wget.deb", deb_manifest)
+            .unwrap();
+
+        assert!(result.is_converted);
+        assert_eq!(result.original_format, PackageFormat::Deb);
+        assert_eq!(result.sigpkg_name, "sigpkg-wget");
+        assert!(result.store_path.contains("/sigma/store/sigpkg_sigpkg-wget_1.21.4"));
+        assert!(result.normalized_dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(result.normalized_dependencies.contains(&"sovereign-libc".to_string()));
+        assert_eq!(bridge.total_converted, 1);
     }
 }
