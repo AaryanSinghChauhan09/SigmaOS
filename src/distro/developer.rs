@@ -16,9 +16,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;
@@ -411,10 +411,18 @@ mod tests {
         // Test sbuild chroot sandbox
         assert!(suite.sbuild.build_in_sandbox("curl").is_err());
         suite.sbuild.setup_clean_chroot().unwrap();
-        assert!(suite.sbuild.build_in_sandbox("curl").unwrap().contains("sid"));
+        assert!(suite
+            .sbuild
+            .build_in_sandbox("curl")
+            .unwrap()
+            .contains("sid"));
 
         // Test Arch makepkg phases
-        assert!(suite.makepkg.execute_phase("build").unwrap().contains("sigma-core"));
+        assert!(suite
+            .makepkg
+            .execute_phase("build")
+            .unwrap()
+            .contains("sigma-core"));
         assert!(suite.makepkg.execute_phase("invalid").is_err());
 
         // Test Portage CFLAGS tuner

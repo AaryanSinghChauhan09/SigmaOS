@@ -2,9 +2,9 @@
 // Implements AUR-like package system for SigmaOS
 // Inspired by Arch Linux's AUR for community-driven packages
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// AUR package metadata
 #[derive(Debug, Clone)]
@@ -80,11 +80,15 @@ impl SigmaAUR {
     /// Search for packages
     pub fn search(&self, query: &str) -> Vec<&AURPackage> {
         let query_lower = query.to_lowercase();
-        self.package_db.values()
+        self.package_db
+            .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower) ||
-                pkg.description.to_lowercase().contains(&query_lower) ||
-                pkg.keywords.iter().any(|k| k.to_lowercase().contains(&query_lower))
+                pkg.name.to_lowercase().contains(&query_lower)
+                    || pkg.description.to_lowercase().contains(&query_lower)
+                    || pkg
+                        .keywords
+                        .iter()
+                        .any(|k| k.to_lowercase().contains(&query_lower))
             })
             .collect()
     }
@@ -120,7 +124,9 @@ impl SigmaAUR {
 
     /// Install package
     pub fn install_package(&mut self, pkg_name: &str) -> Result<(), BuildError> {
-        let pkg = self.package_db.get(pkg_name)
+        let pkg = self
+            .package_db
+            .get(pkg_name)
             .ok_or(BuildError::PackageNotFound)?;
 
         // Resolve dependencies
@@ -139,14 +145,17 @@ impl SigmaAUR {
         println!("Dependencies: {:?}", dependencies);
 
         // Mark as installed
-        self.installed_packages.insert(pkg_name.to_string(), pkg.version.clone());
+        self.installed_packages
+            .insert(pkg_name.to_string(), pkg.version.clone());
 
         Ok(())
     }
 
     /// Update package
     pub fn update_package(&mut self, pkg_name: &str) -> Result<(), BuildError> {
-        let pkg = self.package_db.get(pkg_name)
+        let pkg = self
+            .package_db
+            .get(pkg_name)
             .ok_or(BuildError::PackageNotFound)?;
 
         let current_version = self.installed_packages.get(pkg_name);
@@ -156,7 +165,12 @@ impl SigmaAUR {
         }
 
         if current_version.unwrap() != &pkg.version {
-            println!("Updating {} from {} to {}", pkg_name, current_version.unwrap(), pkg.version);
+            println!(
+                "Updating {} from {} to {}",
+                pkg_name,
+                current_version.unwrap(),
+                pkg.version
+            );
             self.install_package(pkg_name)?;
         }
 

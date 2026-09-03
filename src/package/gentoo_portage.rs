@@ -2,9 +2,9 @@
 // Implements Gentoo-style source-based package management for SigmaOS
 // Inspired by Gentoo's Portage for performance optimization and customization
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Portage error types
 #[derive(Debug, Clone)]
@@ -161,10 +161,11 @@ impl PortageTree {
     /// Search ebuilds
     pub fn search(&self, query: &str) -> Vec<&Ebuild> {
         let query_lower = query.to_lowercase();
-        self.ebuilds.values()
+        self.ebuilds
+            .values()
             .filter(|e| {
-                e.name.to_lowercase().contains(&query_lower) ||
-                e.description.to_lowercase().contains(&query_lower)
+                e.name.to_lowercase().contains(&query_lower)
+                    || e.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
@@ -190,7 +191,8 @@ impl PackageDatabase {
 
     /// Add installed package
     pub fn add_installed(&mut self, ebuild: &Ebuild) -> Result<(), PortageError> {
-        self.installed.insert(ebuild.name.clone(), ebuild.version.clone());
+        self.installed
+            .insert(ebuild.name.clone(), ebuild.version.clone());
         Ok(())
     }
 
@@ -311,9 +313,14 @@ impl SigmaPortage {
     }
 
     /// Update USE flags for package
-    pub fn update_use_flags(&mut self, package: &str, flags: Vec<String>) -> Result<(), PortageError> {
+    pub fn update_use_flags(
+        &mut self,
+        package: &str,
+        flags: Vec<String>,
+    ) -> Result<(), PortageError> {
         for flag in flags {
-            self.use_flags.enable_package_flag(package.to_string(), flag);
+            self.use_flags
+                .enable_package_flag(package.to_string(), flag);
         }
 
         // Rebuild package

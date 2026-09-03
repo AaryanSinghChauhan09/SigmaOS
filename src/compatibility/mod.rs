@@ -70,8 +70,8 @@ pub mod lubuntu;
 pub mod macos_darwin;
 pub mod mate_betsy;
 pub mod mesh_hub;
-pub mod mint_linux;
 pub mod mint_ecosystem;
+pub mod mint_linux;
 
 pub use mint_ecosystem::{
     CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,

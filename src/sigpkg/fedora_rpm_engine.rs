@@ -474,7 +474,11 @@ impl FedoraAnityaReleaseMonitoringEngine {
         self.projects.insert(record.name.clone(), record);
     }
 
-    pub fn check_upstream_version(&mut self, project_name: &str, latest_version: &str) -> Option<bool> {
+    pub fn check_upstream_version(
+        &mut self,
+        project_name: &str,
+        latest_version: &str,
+    ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
             record.latest_upstream_version = latest_version.to_string();

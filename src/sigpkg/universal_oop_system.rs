@@ -3048,7 +3048,8 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> = matched_paths.iter().map(|s: &String| s.as_str()).collect();
+                let paths_ref: Vec<&str> =
+                    matched_paths.iter().map(|s: &String| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3425,7 +3426,7 @@ pub struct AlternativeChoice {
 
 pub struct SovereignAlternativesEngine {
     pub alternatives: HashMap<String, Vec<AlternativeChoice>>, // Name -> Choices
-    pub active_selections: HashMap<String, String>,             // Name -> Selected Path
+    pub active_selections: HashMap<String, String>,            // Name -> Selected Path
 }
 
 impl SovereignAlternativesEngine {
@@ -3516,7 +3517,10 @@ impl PortageSlotResolver {
     }
 
     pub fn register_package_slot(&mut self, pkg_name: &str, slot: &str, subslot: Option<&str>) {
-        let entry = self.installed_slots.entry(pkg_name.to_string()).or_default();
+        let entry = self
+            .installed_slots
+            .entry(pkg_name.to_string())
+            .or_default();
         let slot_info = PortageSlotInfo {
             slot: slot.to_string(),
             subslot: subslot.map(|s| s.to_string()),
@@ -4552,10 +4556,7 @@ Description: Hook test";
         let mut macro_eval = RpmMacroEvaluator::new();
         macro_eval.define("prefix", "/opt/sigma");
 
-        assert_eq!(
-            macro_eval.expand("%{prefix}/bin/app"),
-            "/opt/sigma/bin/app"
-        );
+        assert_eq!(macro_eval.expand("%{prefix}/bin/app"), "/opt/sigma/bin/app");
         assert_eq!(macro_eval.expand("%_bindir/app"), "/usr/bin/app");
 
         let merger = ConffileMergeEngine::new();
@@ -4579,7 +4580,10 @@ Description: Hook test";
 
         gc.register_path(
             "/nix/store/system-profile",
-            vec!["/nix/store/bash".to_string(), "/nix/store/glibc".to_string()],
+            vec![
+                "/nix/store/bash".to_string(),
+                "/nix/store/glibc".to_string(),
+            ],
         );
 
         gc.add_gc_root("/nix/store/system-profile");
