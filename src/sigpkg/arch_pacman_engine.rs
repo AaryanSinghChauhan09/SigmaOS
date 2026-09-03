@@ -445,14 +445,6 @@ impl SafeUpdateChecker {
         updates
     }
 }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/palette-accessibility-enhancements-5681828335780279275
-=======
->>>>>>> origin/perf/package-cache-bulk-copy-12674946530223427762
 /// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
 pub struct PkgbuildChecksumUpdater;
 
