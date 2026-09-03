@@ -40,8 +40,14 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod unveil;
 pub mod vault;
+pub mod firmitas;
 pub mod vpn;
 pub mod vulnerability;
+
+pub use firmitas::{
+    FirmitasDeploymentSlot, FirmitasEngine, FirmitasIgnitionConfig, FirmitasImaEvmSignature,
+    FirmitasRootMountMode, FirmitasSlotStatus,
+};
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{

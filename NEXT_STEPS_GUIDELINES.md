@@ -1,7 +1,7 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, and **System Manual Pages (`docs/man/`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, **Firmitas System Integrity & Immutability Engine (`src/security/firmitas.rs`)**, and **System Manual Pages (`docs/man/`)**.
 
 ---
 
@@ -173,7 +173,29 @@ To elevate container registry and OCI image management in SigmaOS, developers mu
 
 ---
 
-## 9. General Engineering & Quality Guidelines
+## 9. Fedora Silverblue / CoreOS Inspired Firmitas System Integrity & Immutability Guidelines (`src/security/firmitas.rs`)
+
+To elevate system immutability and A/B atomic boot updates in SigmaOS, security engineers must follow these Firmitas engine guidelines:
+
+### A. Read-Only Root Filesystem Immutability
+- **Guideline**: Enforce read-only mounts on `/system` and `/usr` with overlayfs mutable layers on `/var` and `/etc`.
+- **Implementation**: Utilize `FirmitasEngine::set_mount_mode(FirmitasRootMountMode::ReadOnlySystemRoot)` inside `src/security/firmitas.rs`.
+
+### B. A/B Atomic Boot Deployment Slots
+- **Guideline**: Maintain atomic active, staging, and rollback deployment slots for $O(1)$ pointer swaps during system upgrades.
+- **Implementation**: Utilize `atomic_switch_active_slot` to switch system roots safely with automatic rollback on boot failure.
+
+### C. Ignition First-Boot System Provisioning
+- **Guideline**: Provision system configuration declaratively on first boot before user space initialization.
+- **Implementation**: Parse and execute `FirmitasIgnitionConfig` for user creation, SSH authorized keys, and storage mount units.
+
+### D. IMA/EVM Post-Quantum Kernel File Signatures
+- **Guideline**: Enforce Integrity Measurement Architecture (IMA) and Extended Verification Module (EVM) signature validation on all system executables.
+- **Implementation**: Verify Dilithium-5 signatures via `verify_file_integrity` before kernel execution.
+
+---
+
+## 10. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -182,19 +204,19 @@ To elevate container registry and OCI image management in SigmaOS, developers mu
 ### B. Tri-Agent Autonomous Principles
 - **Bolt ⚡ (Performance)**: Prioritize zero-copy allocations, SLUB slab caches, lock-free atomic swaps, and zero-copy byte slice iteration (`input.as_bytes()`).
 - **Palette 🎨 (UX & Accessibility)**: Enforce ARIA labels (`aria-label`, `aria-checked`), keyboard focus navigation (`focus-visible:ring-2`), and high-contrast desktop themes.
-- **Sentinel 🛡️ (Security & Compliance)**: Enforce strict input validation, zero hardcoded secrets, OCI post-quantum image signatures, and compliance with GDPR, HIPAA, WCAG 2.1 AA, and ISO 27001 standards.
+- **Sentinel 🛡️ (Security & Compliance)**: Enforce strict input validation, zero hardcoded secrets, Firmitas system immutability, OCI post-quantum image signatures, and compliance with GDPR, HIPAA, WCAG 2.1 AA, and ISO 27001 standards.
 
 ---
 
-## 10. Recommended Phased Implementation Sequence
+## 11. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
-3. **Phase 3: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
-4. **Phase 4: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
-5. **Phase 5: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.
-6. **Phase 6: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
-7. **Phase 7: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
-8. **Phase 8: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
-9. **Phase 9: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
-10. **Phase 10: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
+3. **Phase 3: Firmitas System Integrity & Immutability**: Integrate `FirmitasEngine` read-only root mounts and A/B atomic boot deployment slots.
+4. **Phase 4: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
+5. **Phase 5: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
+6. **Phase 6: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.
+7. **Phase 7: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
+8. **Phase 8: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
+9. **Phase 9: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
+10. **Phase 10: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
