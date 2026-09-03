@@ -264,22 +264,23 @@ All Void Linux parity components are verified through the automated test runner:
 ```
 
 Specific tests include:
-- `test_xbps_package_manager`: Verifies XBPS package operations
-- `test_runit_service_supervision`: Verifies Runit service management
-- `test_libressl_integration`: Verifies LibreSSL features
-- `test_package_signatures`: Verifies Ed25519 signature verification
+
+*   `test_xbps_package_manager`: Verifies XBPS package operations
+*   `test_runit_service_supervision`: Verifies Runit service management
+*   `test_libressl_integration`: Verifies LibreSSL features
+*   `test_package_signatures`: Verifies Ed25519 signature verification
 
 ## Best Practices
 
-1. **Native Packages**: Use native binary packages instead of source compilation
-2. **Simple Init**: Use Runit for simple and reliable service supervision
-3. **Modern Crypto**: Use LibreSSL for modern cryptography
-4. **Security**: Implement Ed25519 package signatures
-5. **Minimal Dependencies**: Keep dependencies to a minimum
+1.  **Native Packages**: Use native binary packages instead of source compilation
+2.  **Simple Init**: Use Runit for simple and reliable service supervision
+3.  **Modern Crypto**: Use LibreSSL for modern cryptography
+4.  **Security**: Implement Ed25519 package signatures
+5.  **Minimal Dependencies**: Keep dependencies to a minimum
 
 ## References
 
-* [Void Linux Documentation](https://voidlinux.org/)
-* [XBPS Package Manager](https://github.com/void-linux/xbps)
-* [Runit Documentation](http://smarden.org/runit/)
-* [LibreSSL Project](https://www.libressl.org/)
+*   [Void Linux Documentation](https://voidlinux.org/)
+*   [XBPS Package Manager](https://github.com/void-linux/xbps)
+*   [Runit Documentation](http://smarden.org/runit/)
+*   [LibreSSL Project](https://www.libressl.org/)
