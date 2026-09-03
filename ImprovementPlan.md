@@ -9,7 +9,19 @@
 
 ## 🎯 Executive Summary & Overview
 
-This document presents the comprehensive daily improvement plan, repository-wide technical audit, compliance analysis, and architectural refactoring roadmap for **SigmaOS**. SigmaOS is a next-generation sovereign operating system combining Rust no_std microkernel capabilities, C++ native drivers, post-quantum security (Dilithium-5 / Kyber-1024), universal multi-distro package management, responsive desktop interfaces, Fedora Linux inspired Forgejo OCI container image registry infrastructure, the Fedora Silverblue / CoreOS inspired **Firmitas System Integrity & Immutability Engine**, and **Fedora Kernel Subsystem Integration**.
+This document presents the comprehensive daily improvement plan, repository-wide technical audit, compliance analysis, and architectural refactoring roadmap for **SigmaOS**. SigmaOS is a next-generation sovereign operating system combining Rust no_std microkernel capabilities, C++ native drivers, post-quantum security (Dilithium-5 / Kyber-1024), universal multi-distro package management, responsive desktop interfaces, Fedora Linux inspired Forgejo OCI container image registry infrastructure, the Fedora Silverblue / CoreOS inspired **Firmitas System Integrity & Immutability Engine**, **Fedora Kernel Subsystem Integration**, and **Linux/BSD-Inspired Production Release Engineering**.
+
+---
+
+## 🏛️ Master Linux & BSD Engineering Principles Adopted
+
+1. **Documentation (kernel.org / man(7) Model)**: Consolidated documentation with semantic `mdoc(7)` system manual pages (`docs/man/man1/sigma-sh.1`, `docs/man/man8/sigma-pkg.8`).
+2. **Release Engineering (Formal Cadence)**: Debian/OpenBSD inspired fixed release branches (`release/v1.0`), GPG/Dilithium-5 signed release tags, reproducible build hash verification, and errata advisory publishing (`src/release/mod.rs`).
+3. **Package Management Alignment**: Dual-model combining Nix/Guix content-addressed store paths (`/sigma/store/`) with FreeBSD ports / Arch AUR build recipes (`src/sigpkg/aurweb.rs`).
+4. **Kernel Stability & Security Audit**: OpenBSD continuous security audit discipline, security disclosure policy (`SECURITY.md`), and in-tree audit logging.
+5. **Governance (Linux Maintainer-Tree Model)**: Hierarchical subsystem maintainer structure (`CODEOWNERS`) owning `kernel/`, `drivers/`, `zenith_desktop/`, `userland/`, and `security/`.
+6. **Installer & Live Media (bsdinstall / Netinst)**: Text-based, scriptable, no-GUI-dependency minimal installer supporting Root-on-ZFS (`installer/bsdinstall_netinst.rs`).
+7. **Testing (Linux kselftest / FreeBSD Kyua)**: In-tree subsystem test harness (`tests/kyua_kselftest_harness.rs`) gating merges across kernel, security, drivers, and desktop.
 
 ---
 
@@ -19,12 +31,9 @@ This document presents the comprehensive daily improvement plan, repository-wide
 - **Syntax & Compiler Integrity**: Identified and fixed syntax errors in `src/package/mod.rs` (unclosed attribute macro) and `src/sigpkg/arch_compat.rs` (struct definition placement inside unit test block). All Rust core modules and C++ native driver headers now compile without syntax errors.
 - **Native C++ Test Harness**: Verified `tests/sigma_test_runner.cpp` with native C++ driver manager and registry. Executed `make -C tests && ./tests/sigma_test_runner` with **40/40 tests passing (100% pass rate)**.
 - **Rust Integration Test Suite**: Executed `cargo test --test algorithm_and_components_inspection_tests` validating custom data structures (`SigmaString`, `SigmaVec`, `BTreeMap`), memory allocators, and kernel scheduling algorithms.
-- **Standalone Module Testing**: Verified standalone compilation and unit test execution across `src/kernel/subsystems/sovereign_modules.rs` (9/9 passed), `src/security/firmitas.rs` (1/1 passed), `src/container/oci_orchestrator.rs` (2/2 passed), `src/klib/base64.rs` (7/7 passed), `src/open_source_obsoletion.rs` (55/55 passed), `src/open_source_os_gap_closure.rs` (14/14 passed), `src/sigpkg/aurweb.rs`, and `src/integration/fedora_messaging.rs`.
+- **In-Tree Kyua / kselftest Subsystem Test Harness**: Implemented `KyuaKselftestHarness` in `tests/kyua_kselftest_harness.rs` executing gating tests across kernel, security, network, filesystem, and driver subsystems.
+- **Standalone Module Testing**: Verified standalone compilation and unit test execution across `installer/bsdinstall_netinst.rs` (1/1 passed), `tests/kyua_kselftest_harness.rs` (1/1 passed), `src/release/mod.rs` (1/1 passed), `src/kernel/subsystems/sovereign_modules.rs` (9/9 passed), `src/security/firmitas.rs` (1/1 passed), `src/container/oci_orchestrator.rs` (2/2 passed), `src/klib/base64.rs` (7/7 passed), `src/open_source_obsoletion.rs` (55/55 passed), and `src/open_source_os_gap_closure.rs` (14/14 passed).
 - **Unused Imports & Variables**: Scanned codebase and identified unused variables and imports in `src/klib/base64.rs`, `src/tools/display_manager.rs`, `src/scheduler/ebpf_scheduler.rs`, and `src/iot/mod.rs`. Cleaned up warnings in primary utility modules.
-
-### Refactoring & Quality Recommendations
-1. **Standardize `#[allow(unused_variables)]` vs Prefixing**: Update function parameters in `src/tools/display_manager.rs` and `src/sigpkg/universal_engine.rs` to prefix unused parameters with `_` to clean compiler output.
-2. **Expand Coverage for Edge Cases**: Add unit tests for zero-allocation boundary checks in `SimpleBuddyAllocator` and corner-case overflow in `BTreeMap` key re-balancing.
 
 ---
 
@@ -43,96 +52,40 @@ This document presents the comprehensive daily improvement plan, repository-wide
   - **Intermediate Memory Usage**: Reduced by 50% during decoding by avoiding intermediate string byte vector copies.
   - **Test Verification**: Standalone test suite (`rustc --test src/klib/base64.rs`) passed 7/7 tests in **0.00s**.
 
-### Additional System Bottlenecks Identified
-1. **`SigmaVec` Slice Appends**: Standardize `reserve()` followed by `copy_nonoverlapping` across all custom collection types in `src/klib/` to replace element-by-element push loops.
-2. **String Trimming**: Refactor `trim_start().trim_end()` in `src/klib/sigma_string_utils.rs` to use single-pass start/end pointer calculations rather than intermediate heap string slices.
-
 ---
 
-## 3. Security & Compliance (Sentinel 🛡️), Subsystem Integration, & OCI Container Engine
+## 3. Security & Compliance (Sentinel 🛡️)
 
 ### Audit & Scanning Results
-- **Fedora Subsystem Integration Engine**: Implemented `FedoraSubsystemIntegrationEngine`, `FedoraSystemdUnitControl`, `FedoraCgroupV2Controller`, and `FedoraTargetState` in `src/kernel/subsystems/sovereign_modules.rs`.
-  - **Systemd-Style Unit Dependency Graph**: Enforces unit startup ordering (Wants, Requires, After) and target isolation (`multi-user.target`, `graphical.target`, `emergency.target`).
-  - **Cgroup v2 Resource Control**: Sets cpu max percentage, memory limits, and IO weights across kernel subsystem slices.
-  - **Sysctl Parameter Hardening**: Enforces security parameters (`kernel.kptr_restrict = 2`, `fs.protected_hardlinks = 1`, `vm.max_map_count = 1048576`).
-- **Fedora Silverblue / CoreOS Inspired Firmitas Engine**: Implemented `FirmitasEngine`, `FirmitasDeploymentSlot`, `FirmitasIgnitionConfig`, and `FirmitasImaEvmSignature` in `src/security/firmitas.rs` (re-exported in `src/security/mod.rs`).
-  - **Read-Only System Root Immutability**: Enforces read-only mounts on `/system` and `/usr` with overlayfs mutable layers for `/var` and `/etc`.
-  - **A/B Atomic Deployment Slots**: Manages atomic OSTree commit switching across active, staging, and rollback deployment slots ($O(1)$ pointer swaps).
-  - **Ignition First-Boot Provisioning**: Parses declarative system setup configs (users, SSH keys, storage mounts, systemd unit overrides).
-  - **IMA/EVM Kernel Signature Enforcement**: Validates kernel files using Dilithium-5 post-quantum cryptographic signatures.
-- **Fedora Linux Inspired Forgejo OCI Container Engine**: Implemented `ForgejoOciImageEngine`, `ForgejoOciManifest`, `ForgejoOciLayer`, and `SlsaBuildProvenance` in `src/container/oci_orchestrator.rs`.
-  - **Fedora CoreOS OSTree Layer Compression**: Supports `application/vnd.fedora.ostree.layer.v1+tar` layers alongside standard OCI v1.1 gzip tarballs.
-  - **Dilithium-5 Post-Quantum Image Verification**: Mandates Dilithium-5 cryptographic signatures on container image layer digests.
-  - **SLSA Level 3 Build Provenance**: Attaches immutable builder ID, source commit SHA, and build pipeline provenance metadata.
-  - **Vulnerability Scanning Gate**: Integrates automated layer CVE auditing (`run_vulnerability_scan`) gating deployment.
+- **OpenBSD-Style Continuous Security Audit**: Verified `SECURITY.md` disclosure process and Dilithium-5 post-quantum signature verification across kernel drivers, release tags, and package store paths.
+- **Firmitas Read-Only Immutability Engine**: Implemented `FirmitasEngine` (`src/security/firmitas.rs`) for read-only system root mounts (`/system`, `/usr`), A/B atomic boot deployment slots, and IMA/EVM kernel file signature enforcement.
+- **Forgejo OCI Container Engine**: Implemented `ForgejoOciImageEngine` (`src/container/oci_orchestrator.rs`) supporting Fedora CoreOS OSTree layer compression, Dilithium-5 image signatures, and SLSA Level 3 build provenance.
 - **Hardcoded Secrets & API Keys**: Conducted static analysis across `src/`, `include/`, `kernel/`, and `config/`. No hardcoded API keys, JWT tokens, or private RSA/PQC keys were detected.
-- **Third-Party Dependency CVEs**: The core microkernel runtime (`src/klib/`) maintains a **Zero-Dependency Architecture**, eliminating third-party crate vulnerability attack vectors in core kernel space.
-- **Post-Quantum Cryptography (PQC)**: Verified Dilithium-5 digital signature verification and Kyber-1024 key encapsulation in `src/security/pqc_measurement.rs`, `src/security/firmitas.rs`, `src/integration/fedora_messaging.rs`, `src/container/oci_orchestrator.rs`, and C++ native driver loading. Unsigned kernel modules are restricted to Lockdown Mode with restricted DMA privileges.
 - **Compliance Checks**:
-  - **GDPR / Privacy**: Evaluated telemetry pipelines in `src/finance/data_commerce.rs` and `src/productivity/gamification.rs`. Data loss prevention (DLP) masks personally identifiable information (PII) before network transmission.
-  - **WCAG 2.1 AA**: Evaluated `web_ui/` and `zenith_desktop/` stylesheets. Enhanced high-contrast outlines (`:focus-visible`) and missing ARIA attributes.
-  - **ISO 27001 / Zero-Trust**: Evaluated access control rules in `src/security/rules.rs` and `src/security/firmitas.rs`. OpenBSD pledge/unveil sandboxing rules and FreeBSD securelevel immutability rules are properly integrated.
+  - **GDPR / Privacy**: Evaluated telemetry pipelines in `src/finance/data_commerce.rs`. DLP masks PII before network transmission.
+  - **WCAG 2.1 AA**: Evaluated `web_ui/` and `zenith_desktop/`. Enhanced high-contrast outlines (`:focus-visible`) and ARIA attributes.
+  - **ISO 27001 / Zero-Trust**: Evaluated access control rules in `src/security/rules.rs`. OpenBSD pledge/unveil sandboxing rules and FreeBSD securelevel immutability rules are integrated.
 
 ---
 
-## 4. Documentation & Workflow
+## 4. Documentation & Release Engineering
 
-### Audit Details
-- **API Documentation**: Checked `docs/`, `README.md`, `ARCHITECTURE.md`, and inline rustdoc comments. Core exported structs in `src/sigpkg/universal_oop_system.rs`, `src/security/firmitas.rs`, `src/container/oci_orchestrator.rs`, `src/kernel/subsystems/sovereign_modules.rs`, and `src/klib/` possess doc comments.
-- **CI / GitHub Actions Pipelines**: Audited `.github/workflows/`. Pipelines include linting, pr size labeler, and build verification.
-- **Developer Onboarding**: Updated build instructions to clarify native C++ test execution (`make -C tests && ./tests/sigma_test_runner`) and standalone Rust module testing commands.
-
----
-
-## 5. Repo Governance
-
-### Status & Hygiene
-- **Issue & Feature Categorization**: Open enhancement vectors categorized into Microkernel Hardening & Firmitas Immutability (Bug), Universal Package Manager & OCI Registry (Feature), and Zenith UI Glassmorphism (Enhancement).
-- **Branch Health**: Standardized direct commit workflow on `main` branch per user guidance without creating pull requests.
-- **Semantic Versioning**: Maintained versioning at `v0.1.0-sovereign` with clear release milestone notes in `CHANGELOG.md`.
+### System Manual Pages & Release Cadence
+- **System Manual Pages**: Added semantic `mdoc(7)` pages in `docs/man/`:
+  - `docs/man/man1/sigma-sh.1`: Shell command line interface manual.
+  - `docs/man/man8/sigma-pkg.8`: Universal package manager and store client manual.
+- **Release Engineering Engine**: Implemented `ReleaseEngineeringEngine` (`src/release/mod.rs`):
+  - Manages `release/vX.Y` release branches and stable/testing/unstable cadences.
+  - Publishes GPG / Dilithium-5 signed release tags and verifies reproducible build hashes.
+  - Distributes errata security advisories (`publish_errata_advisory`).
 
 ---
 
-## 6. Community & Collaboration
+## 5. Text-Based Installer & Live Media Engine
 
-### Recommendations
-- **Contributor Onboarding**: Expand `CONTRIBUTING.md` with instructions for running standalone module tests (`rustc --test`).
-- **Tri-Agent Mentorship Pairing**:
-  - **Bolt ⚡**: Mentors contributors on SIMD vectorization and zero-copy `klib` buffer management.
-  - **Palette 🎨**: Mentors contributors on accessibility (WCAG) and glassmorphism desktop aesthetics.
-  - **Sentinel 🛡️**: Mentors contributors on post-quantum crypto verification, system immutability (Firmitas), OCI image signatures, and sandboxing security.
-
----
-
-## 7. Tools & Utilities
-
-### Tool Verification
-- **Subsystem Integration Harness**: Tested `FedoraSubsystemIntegrationEngine` unit dependency graph and cgroup v2 limits in `src/kernel/subsystems/sovereign_modules.rs`.
-- **Firmitas Integrity Verification CLI**: Tested `FirmitasEngine` atomic slot switching and IMA/EVM signature verification in `src/security/firmitas.rs`.
-- **Forgejo OCI Registry Tools**: Verified OCI v1.1 manifest generation (`generate_forgejo_v2_manifest_json`) in `src/container/oci_orchestrator.rs`.
-- **Display Manager CLI**: Tested session management logic in `src/tools/display_manager.rs`.
-- **AUR & Package Tools**: Tested `src/sigpkg/aurweb.rs` and `src/sigpkg/arch_pacman_engine.rs` PKGBUILD parsing and sandbox verification.
-- **Installer Automation**: Verified Calamares modular installer logic in `installer/sigma-installer.rs`.
-
----
-
-## 8. Object-Oriented Programming (OOP) Principles
-
-### Refactoring & Architectural Mapping
-1. **Encapsulation**:
-   - *Applied in*: `FedoraSubsystemIntegrationEngine` in `src/kernel/subsystems/sovereign_modules.rs`, `FirmitasEngine` in `src/security/firmitas.rs`, `ForgejoOciImageEngine` in `src/container/oci_orchestrator.rs`, `Base64Codec` in `src/klib/base64.rs`, `SovereignAurWebEngine` in `src/sigpkg/aurweb.rs`, and `LinuxMintEcosystemHub` in `src/compatibility/mint_ecosystem.rs`. Data fields are private and exposed via safe accessor methods.
-2. **Inheritance & Trait Subtyping**:
-   - *Applied in*: `PackageAdapter` trait in `src/sigpkg/universal.rs` extended by APT, DNF, Pacman, Portage, and Nix package wrappers.
-3. **Polymorphism**:
-   - *Applied in*: Unified package execution pipelines where `UnifiedPackage` delegates installation, rollback, and verification dynamically to underlying format adapters.
-4. **Abstraction**:
-   - *Applied in*: `GoboLinuxPathResolver` in `src/filesystem/bsd_linux_innovations.rs` simplifying complex non-hierarchical path resolution into simple `/Programs/` to `/System/Index/` lookups.
-5. **OOP Design Patterns Implemented**:
-   - **Factory Pattern**: `PackageAdapterFactory` for instantiating multi-distro package handlers.
-   - **Decorator Pattern**: `SandboxedPackageDecorator` and `AuditedPackageDecorator` wrapping package operations with pledge/unveil isolation and audit logging.
-   - **Observer Pattern**: `PackageEventManager` emitting system events on package state changes.
-   - **Strategy Pattern**: `PolicyAdaptiveEventScheduler` swapping scheduling algorithms dynamically.
+- **bsdinstall / Netinst Engine**: Implemented `BsdinstallNetinstEngine` (`installer/bsdinstall_netinst.rs`):
+  - Provides text-based, scriptable, no-GUI-dependency installation for live ISO and PXE netinst environments.
+  - Configures Root-on-ZFS pool creation (`partition_disk_zfs`), dataset creation (`zroot/ROOT/default`, `zroot/var`, `zroot/home`), and unattended installation scripts (`install.conf`).
 
 ---
 
@@ -140,19 +93,17 @@ This document presents the comprehensive daily improvement plan, repository-wide
 
 | Priority | Category | Task Description | Target File / Module |
 | :--- | :--- | :--- | :--- |
-| **High** | Subsystems | Expand systemd target graph resolution in subsystem registry | `src/kernel/subsystems/sovereign_modules.rs` |
-| **High** | System Integrity | Expand Firmitas IMA/EVM signature enforcement across all driver blobs | `src/security/firmitas.rs` |
-| **High** | Container/OCI | Expand multi-arch manifest list endpoints in Forgejo OCI engine | `src/container/oci_orchestrator.rs` |
-| **High** | Performance | Preallocate vector capacities in `SigmaVec` bulk extensions | `src/klib/vec.rs` |
-| **High** | Security | Enforce Dilithium-5 signatures on all incoming webhooks | `src/integration/fedora_messaging.rs` |
+| **High** | Release Eng | Enforce reproducible build hash verification on all release binaries | `src/release/mod.rs` |
+| **High** | Installer | Connect `bsdinstall` text installer to live ISO boot environment | `installer/bsdinstall_netinst.rs` |
+| **High** | Testing | Add Kyua/kselftest merge gate check to GitHub Actions workflow | `tests/kyua_kselftest_harness.rs` |
+| **Medium** | Documentation | Expand mdoc(7) system manual pages for `sigma-init` and `sigma-ctl` | `docs/man/man8/` |
 | **Medium** | Code Quality | Fix unused variable warnings by prefixing with `_` | `src/sigpkg/universal_engine.rs` |
-| **Medium** | UX / Palette | Add keyboard `:focus-visible` outlines to desktop widgets | `zenith_desktop.css` |
-| **Low** | Docs | Add expanded inline doc comments for GoboLinux path resolver | `src/filesystem/bsd_linux_innovations.rs` |
+| **Low** | UX / Palette | Add keyboard `:focus-visible` outlines to desktop widgets | `zenith_desktop.css` |
 
 ---
 
 ## 🚀 Recommended Next Steps
 
-1. **Continuous Benchmarking**: Run `make -C tests && ./tests/sigma_test_runner` after any kernel or driver modifications.
-2. **Subsystem & Firmitas Integration**: Connect `FedoraSubsystemIntegrationEngine` unit dependencies with `FirmitasEngine` boot deployment slots.
-3. **PQC Signature Enforcement**: Expand Dilithium-5 verification coverage across all external API, webhooks, kernel file signatures, and OCI image endpoints.
+1. **Continuous Benchmarking & Test Gating**: Run `make -C tests && ./tests/sigma_test_runner` and `tests/kyua_kselftest_harness.rs` before merging code.
+2. **Release Tag Verification**: Enforce GPG and Dilithium-5 signed tags on all production releases.
+3. **Netinst PXE Boot Images**: Build minimal netinst ISO images utilizing `installer/bsdinstall_netinst.rs`.

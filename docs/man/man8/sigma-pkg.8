@@ -1,0 +1,68 @@
+.\"-
+.\" Copyright (s) 2025 SigmaOS Project
+.\" All rights reserved.
+.\"
+.Dd March 3, 2025
+.Dt SIGMA-PKG 8
+.Os SigmaOS
+.Sh NAME
+.Nm sigma-pkg
+.Nd Sovereign universal package manager and content-addressed store client
+.Sh SYNOPSIS
+.Nm
+.Ar command
+.Op Fl -config Ar file
+.Op Fl -y
+.Op Ar package_name ...
+.Sh DESCRIPTION
+The
+.Nm
+utility is the primary package manager for
+.Dx SigmaOS .
+It provides universal package management across multi-distro formats
+.Pq Pacman, APT, DNF, Portage, Nix, APK
+using content-addressed store paths under
+.Pa /sigma/store/
+and Dilithium-5 post-quantum cryptographic signature validation.
+.Pp
+.Nm
+executes package installations, upgrades, rollbacks, and sandboxed builds
+inside FreeBSD poudriere-style clean chroot containers.
+.Sh COMMANDS
+The following primary commands are supported by
+.Nm :
+.Bl -tag -width "install"
+.It Cm install Ar package
+Download, verify, and install the specified
+.Ar package
+into the active system profile.
+.It Cm remove Ar package
+Remove
+.Ar package
+and clean up unreferenced store dependencies.
+.It Cm update
+Synchronize repository metadata mirrors and check for pending rolling upgrades.
+.It Cm rollback
+Atomically revert the active system profile to the previous generation state.
+.It Cm build Ar pkgbuild
+Compile a source build recipe inside a clean poudriere chroot container sandbox.
+.El
+.Sh FILES
+.Bl -tag -width "/etc/sigma/registry_config.json"
+.It Pa /etc/sigma/registry_config.json
+Package repository mirror configuration and public cryptographic keys.
+.It Pa /sigma/store/
+Content-addressed binary store directory.
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr sigma-sh 1 ,
+.Xr pkg 8 ,
+.Xr pacman 8
+.Sh AUTHORS
+The
+.Nm
+utility was developed for the
+.Dx SigmaOS
+Sovereign Package Registry project.

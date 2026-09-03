@@ -1,222 +1,86 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, **Firmitas System Integrity & Immutability Engine (`src/security/firmitas.rs`)**, **Fedora Kernel Subsystem Integration (`src/kernel/subsystems/sovereign_modules.rs`)**, and **System Manual Pages (`docs/man/`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs` & `installer/bsdinstall_netinst.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, **Firmitas System Integrity & Immutability Engine (`src/security/firmitas.rs`)**, **Fedora Kernel Subsystem Integration (`src/kernel/subsystems/sovereign_modules.rs`)**, **Release Engineering Infrastructure (`src/release/mod.rs`)**, **In-Tree Kyua/kselftest Harness (`tests/kyua_kselftest_harness.rs`)**, and **System Manual Pages (`docs/man/`)**.
 
 ---
 
-## 1. Master Multi-OS Parity Execution Guidelines for Missing Capabilities
+## 🏛️ Master Linux & BSD Production Models Adopted
 
-Developers implementing missing Linux & BSD capabilities in SigmaOS must follow these architecture guidelines:
-
-### A. Linux `sched_ext` Extensible BPF Schedulers
-- **Guideline**: Allow dynamic, pluggable BPF scheduling policies without kernel rebuilds.
-- **Implementation**: Hook BPF scheduler policies into `PolicyAdaptiveEventScheduler` (`src/distro/sovereign_system_innovations.rs`).
-
-### B. FreeBSD Capsicum & Casper Capabilities
-- **Guideline**: Transition processes into capability mode where raw ambient syscall access is denied and only capability file descriptors are permitted.
-- **Implementation**: Wrap system operations in `CapsicumSandbox` capabilities inside `src/security/`.
-
-### C. Void/Gentoo Process Supervision & OpenRC
-- **Guideline**: Run lightweight, fast process supervisors maintaining process dependency graphs and automatic daemon restart.
-- **Implementation**: Integrate a zero-dependency process supervisor in `src/process/`.
+1. **Documentation — kernel.org / man(7) Model**: Consolidate documentation into canonical guides (`ARCHITECTURE.md`, `ROADMAP.md`, `SECURITY.md`) and author semantic `mdoc(7)` manual pages (`docs/man/man1/sigma-sh.1`, `docs/man/man8/sigma-pkg.8`).
+2. **Release Engineering — Formal Release Cadence**: Debian stable/testing/unstable branches and OpenBSD 6-month release cadence with GPG/Dilithium-5 signed tags, reproducible build hashes, and errata advisories (`src/release/mod.rs`).
+3. **Package Management — Dual Content-Addressed & Recipe Model**: Nix/Guix content-addressed store paths (`/sigma/store/`) combined with FreeBSD ports / Arch AUR build recipes (`src/sigpkg/aurweb.rs`).
+4. **Driver/Kernel Stability — OpenBSD Security-Audit Discipline**: Continuous code audits, small maintainer committer set, explicit disclosure policy (`SECURITY.md`), and in-tree security audit logs.
+5. **Governance — Linux Maintainer-Tree Model**: Hierarchical subsystem maintainers (`kernel/`, `drivers/`, `zenith_desktop/`, `userland/`) managing subtree merges (`CODEOWNERS`).
+6. **Installer & Live Media — bsdinstall & Netinst Engine**: Text-based, scriptable, no-GUI-dependency minimal installer supporting Root-on-ZFS (`installer/bsdinstall_netinst.rs`).
+7. **Testing — Linux kselftest / FreeBSD Kyua Harness**: In-tree subsystem test harness (`tests/kyua_kselftest_harness.rs`) gating merges across kernel, drivers, security, and userland.
 
 ---
 
-## 2. Multi-OS Distro Inspired System Manual Page Guidelines (`docs/man/`)
-
-To evolve system manual pages in `docs/man/` into clear, machine-readable reference guides, documentation maintainers must follow these guidelines:
+## 1. System Manual Pages & Documentation Guidelines (`docs/man/`)
 
 ### A. BSD `mdoc(7)` Macro Format Standard
-- **Guideline**: Author all manual pages using semantic `mdoc(7)` macro syntax (`.Dd`, `.Dt`, `.Sh NAME`, `.Sh SYNOPSIS`, `.Sh DESCRIPTION`, `.Sh EXAMPLES`, `.Sh EXIT STATUS`) rather than plain presentation troff macros.
-- **Implementation**: Maintain `mdoc` source files under `docs/man/man1/`, `docs/man/man5/`, and `docs/man/man8/`.
+- **Guideline**: Author all system manual pages using semantic `mdoc(7)` macro syntax (`.Dd`, `.Dt`, `.Sh NAME`, `.Sh SYNOPSIS`, `.Sh DESCRIPTION`, `.Sh EXAMPLES`, `.Sh EXIT STATUS`).
+- **Implementation**: Maintain `mdoc` source files under `docs/man/man1/` (e.g. `sigma-sh.1`) and `docs/man/man8/` (e.g. `sigma-pkg.8`).
 
 ### B. OpenBSD `mandoc -Tlint` CI Quality Gate
 - **Guideline**: Enforce static manual page linting during continuous integration.
 - **Implementation**: Run `mandoc -Tlint` across all `docs/man/` files in CI to catch formatting warnings and macro syntax errors.
 
-### C. Arch Linux `man-db` Binary Indexing
-- **Guideline**: Enable fast keyword and `apropos` search indexing for system command utilities.
-- **Implementation**: Pre-render `mandb` binary index databases during system image building.
+---
+
+## 2. Release Engineering Guidelines (`src/release/mod.rs`)
+
+### A. Formal Release Branch Cadence
+- **Guideline**: Maintain `main` for active development, cut `release/vX.Y` branches for stable cycles, and publish errata advisories for security fixes.
+- **Implementation**: Utilize `ReleaseEngineeringEngine::cut_release_branch` to register release tags and track stable/testing/unstable cadences.
+
+### B. Signed Tags & Reproducible Build Hash Verification
+- **Guideline**: Every official release tag must be cryptographically signed with GPG or Dilithium-5 post-quantum keys, and publish reproducible build SHA256 hashes.
+- **Implementation**: Verify reproducible build hashes via `verify_reproducible_build_hash` before distribution.
 
 ---
 
-## 3. Multi-OS Distro Inspired ASP / ABS Build Tree Guidelines (`src/sigpkg/arch_pacman_engine.rs`)
+## 3. Package Management Architecture Guidelines
 
-To evolve `ArchBuildSystem` in `src/sigpkg/arch_pacman_engine.rs` into a high-performance source checkout and package build framework, maintainers must follow these guidelines:
+### A. Nix Pure Content-Addressed Binary Store
+- **Guideline**: Binaries and store objects output to immutable `/sigma/store/<hash>-<name>-<version>` paths to prevent dependency conflicts and enable instant $O(1)$ rollbacks.
+- **Implementation**: Utilize content-addressed store paths in `src/sigpkg/universal_oop_system.rs`.
 
-### A. Arch Linux ASP Git-Backed Source Tree Checkout
-- **Guideline**: Support checking out PKGBUILD source trees directly from Git mirrors without downloading full tarballs (`asp checkout <package>`).
-- **Implementation**: Parse `.SRCINFO` metadata directly from shallow git clones of package source repositories.
-
-### B. FreeBSD Ports Tree Structured Hierarchy
-- **Guideline**: Maintain a local hierarchical ports tree structure in `/sigma/ports/<category>/<package>`.
-- **Implementation**: Support MAKE variables (`CFLAGS`, `LDFLAGS`, `WITH_DEBUG`) and automated checksum verification against `distinfo`.
-
-### C. OpenBSD `dpb` Distributed Parallel Build Scheduling
-- **Guideline**: Accelerate bulk compilation via distributed multi-node compile job distribution.
-- **Implementation**: Schedule build jobs across local CPU cores and remote build worker nodes using lock-free job queues.
-
-### D. Void Linux `xbps-src` Unprivileged Container Sandboxing
-- **Guideline**: Ensure build scripts run inside unprivileged user namespaces and isolated temp roots.
-- **Implementation**: Enforce non-root build privileges inside clean container namespaces during `makepkg` execution.
+### B. FreeBSD Ports & Arch AUR Build Recipes
+- **Guideline**: Community-maintained build recipes (`PKGBUILD`, `srecipe`) compiled inside FreeBSD poudriere clean chroot containers.
+- **Implementation**: Utilize `AurBuildSandbox` (`src/sigpkg/aurweb.rs`) to build packages safely.
 
 ---
 
-## 4. Multi-OS Distro Inspired Package Repository Infrastructure Guidelines
+## 4. FreeBSD `bsdinstall` & Netinst Text Installer Guidelines (`installer/bsdinstall_netinst.rs`)
 
-To evolve `registry_config.json` and `src/sigpkg/repository_manager.rs` into a global, zero-trust distribution network, repository maintainers must follow these guidelines:
+### A. Text-Based Scriptable Installation
+- **Guideline**: Provide a lightweight, text-based installer independent of desktop GUI compositors for headless server, cloud, and live ISO installations.
+- **Implementation**: Utilize `BsdinstallNetinstEngine` (`installer/bsdinstall_netinst.rs`) supporting unattended script generation (`install.conf`).
 
-### A. FreeBSD DNS SRV Record Auto-Discovery
-- **Guideline**: Implement dynamic mirror discovery using DNS SRV records to eliminate hardcoded mirror lists.
-- **Implementation**: Query `_https._tcp.repo.sigmaos.org` to dynamically resolve geographical mirror hosts with automatic fallback on timeout.
-
-### B. Nix Cryptographically Signed Binary Caches
-- **Guideline**: All pre-compiled binary packages and store objects must be signed with Ed25519 cryptographic signatures.
-- **Implementation**: Enforce signature checking before extracting binary archives, storing trusted public keys in `registry_config.json`.
-
-### C. Linux Mint Automated Mirror Speed & Latency Benchmarks
-- **Guideline**: Automatically measure mirror latency and throughput before bulk updates.
-- **Implementation**: Expand `MirrorBenchmarkEngine` (`src/sigpkg/repository_manager.rs`) to benchmark mirror endpoints and rank active sources automatically.
-
-### D. Ubuntu/Debian PPA Snippets & GPG Verification
-- **Guideline**: Allow modular third-party repository additions via `PpaRepository`.
-- **Implementation**: Automatically fetch and verify GPG key fingerprints for custom repository entries added to `/etc/sigma/sources.list.d/`.
+### B. Root-on-ZFS & Partitioning
+- **Guideline**: Automatically create ZFS storage pools (`zroot`) with boot environment datasets (`zroot/ROOT/default`, `zroot/var`, `zroot/home`).
+- **Implementation**: Utilize `partition_disk_zfs` to set up Root-on-ZFS topologies.
 
 ---
 
-## 5. Multi-OS Distro Inspired Web UI Architecture Guidelines (`web_ui/`)
+## 5. In-Tree Kyua / kselftest Subsystem Test Harness Guidelines (`tests/kyua_kselftest_harness.rs`)
 
-To evolve `web_ui/index.html` and `web_ui/styles/style.css` into an accessible, responsive, zero-jank web interface, front-end maintainers must adhere to the following guidelines:
+### A. Subsystem Test Discovery & Execution
+- **Guideline**: Maintain in-tree test suites per subsystem (Kernel, Security, Network, Filesystem, Drivers) that gate code merges.
+- **Implementation**: Utilize `KyuaKselftestHarness::register_test_suite` and `run_all_subsystem_tests` in `tests/kyua_kselftest_harness.rs`.
 
-### A. OpenBSD Zero-JavaScript Progressive Enhancement
-- **Guideline**: Ensure all critical information (release notes, ISO download mirrors, installation steps) remains fully functional when JavaScript is disabled or when rendered in text-based user agents (`lynx`, `w3m`, `links`).
-- **Implementation**: Form elements and installer steppers must rely on standard semantic `<form>` actions with server fallback routes alongside client-side JS.
-
-### B. NixOS Interactive Option & Package Search
-- **Guideline**: Implement instant client-side package and configuration searching directly in the web UI.
-- **Implementation**: Embed a lightweight, zero-dependency client-side fuzzy search index (`web_ui/index.js`) for searching kernel modules, package names, and configuration parameters.
-
-### C. FreeBSD SSG Documentation & Static Mirroring
-- **Guideline**: Build self-contained static documentation bundles that can be served offline from local ISO media.
-- **Implementation**: Compile wiki pages and specifications into offline static HTML bundles stored in `docs/` and accessible directly from the live ISO installer interface.
-
-### D. Linux Mint Responsive Glassmorphism Design System
-- **Guideline**: Maintain a modern, accessible glassmorphism visual aesthetic with full dark mode support and WCAG 2.1 AA contrast compliance.
-- **Implementation**: Standardize CSS custom variables (`--bg-glass`, `--accent-sig`, `--text-primary`) in `web_ui/styles/style.css`, enforcing `focus-visible:ring-2` keyboard outline rings across all interactive buttons.
+### B. TAP & JUnit XML Test Reporting
+- **Guideline**: Output standardized Test Anything Protocol (TAP) and JUnit XML reports for CI pipeline consumption.
+- **Implementation**: Export test execution logs via `generate_junit_tap_report`.
 
 ---
 
-## 6. Multi-OS Distro Inspired Installer Architecture Guidelines
-
-To evolve `installer/sigma-installer.rs` into a high-reliability installer engine, developers must follow these architectural guidelines:
-
-### A. Calamares-Inspired Plugin Modularization
-- **Guideline**: Decouple monolithic installer routines into modular, isolated steps (Language, Timezone, DiskPartition, UserAccount, PackageSelection, BootloaderInstall, PostInstallHooks).
-- **Implementation**: Define a Rust `InstallerPlugin` trait with `prepare()`, `validate()`, and `execute()` callbacks.
-
-### B. FreeBSD `bsdinstall` Root-on-ZFS & Boot Environments
-- **Guideline**: Support automatic ZFS pool creation with Boot Environments (`bectl`/`beadm`).
-- **Implementation**: Allow user selection of `FilesystemType::ZFS`, automatically generating zpool root datasets (`zroot/ROOT/default`, `zroot/home`, `zroot/var`).
-
-### C. OpenBSD Autoinstall (`install.conf`) & Debian Preseed
-- **Guideline**: Support non-interactive headless PXE/HTTP automated installations.
-- **Implementation**: Expand `preseed_file` parsing to accept OpenBSD-style key-value answer files (`install.conf`) or JSON/YAML unattended install scripts.
-
-### D. Ubuntu Subiquity Cloud-Init & Network Provisioning
-- **Guideline**: Integrate declarative network and cloud-init post-installation provisioners.
-- **Implementation**: Automatically output netplan/NetworkManager YAML files and cloud-init metadata during stage 2 target disk chroot setup.
-
----
-
-## 7. Multi-OS Distro Inspired AUR Architecture Guidelines
-
-To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign package ecosystem, maintainers must adhere to the following architectural guidelines:
-
-### A. FreeBSD `poudriere` Clean Chroot & FLAVORS
-- **Guideline**: Never compile untrusted user build recipes directly on the host root filesystem.
-- **Implementation**: Utilize `AurBuildSandbox` (`src/sigpkg/aurweb.rs`) to spawn isolated clean chroot containers. Implement FLAVORS support allowing users to build variants (e.g., `pkg-nox`, `pkg-qt6`, `pkg-gtk4`).
-
-### B. OpenBSD `pledge(2)` and `unveil(2)` Security Restrictions
-- **Guideline**: Restrict system call access and filesystem path visibility during package build steps.
-- **Implementation**: Enforce `pledge` rules (`stdio rpath wpath cpath inet`) and `unveil` restrictions (limiting write access strictly to `/tmp/sigma_aur_builds`).
-
-### C. Gentoo Portage USE Flags & EBUILD Conditional Compilation
-- **Guideline**: Provide fine-grained feature toggles for package dependencies and compilation options.
-- **Implementation**: Integrate `PortageUseFlagPipeline` (`src/sigpkg/universal_oop_system.rs`) into PKGBUILD processing, allowing flags like `+wayland`, `-x11`, `+cuda`.
-
-### D. Nix Pure Functional Store Paths & Atomic Rollbacks
-- **Guideline**: Ensure zero dependency conflicts through content-addressed store paths.
-- **Implementation**: Package binaries output to `/sigma/store/<hash>-<name>-<version>` before symlinking into system profiles, enabling instant $O(1)$ rollback capability.
-
-### E. Arch Linux `namcap` & Security Audit Linting
-- **Guideline**: Perform automated static analysis on all user-submitted package recipes prior to repository index publication.
-- **Implementation**: Run `NamcapSecurityAuditor` (`src/sigpkg/aurweb.rs`) to verify file permissions, missing dependencies, redundant library linkages, and hardcoded path vulnerabilities.
-
----
-
-## 8. Fedora Linux Inspired Forgejo OCI Container Image Guidelines (`src/container/oci_orchestrator.rs`)
-
-To elevate container registry and OCI image management in SigmaOS, developers must adhere to the following Fedora CoreOS / Fedora OCI guidelines:
-
-### A. Fedora CoreOS OSTree Layering & OCI v1.1 Manifests
-- **Guideline**: Support OSTree immutable base OS layers (`application/vnd.fedora.ostree.layer.v1+tar`) alongside standard OCI v1.1 layer specs.
-- **Implementation**: Utilize `ForgejoOciImageEngine` (`src/container/oci_orchestrator.rs`) to register OSTree layers and generate valid OCI v2 manifest JSON.
-
-### B. Cosign & Dilithium-5 Post-Quantum Image Signatures
-- **Guideline**: All OCI container image layers published to Forgejo registries must be signed with Dilithium-5 post-quantum signatures.
-- **Implementation**: Enforce `sign_image_dilithium5` signature verification before extracting image layers into container runtime roots.
-
-### C. SLSA Level 3 Build Provenance Metadata
-- **Guideline**: Embed cryptographic build provenance metadata into container images to prevent supply-chain tampering.
-- **Implementation**: Attach `SlsaBuildProvenance` metadata (builder ID, source repo URL, commit SHA) to OCI tags.
-
----
-
-## 9. Fedora Silverblue / CoreOS Inspired Firmitas System Integrity & Immutability Guidelines (`src/security/firmitas.rs`)
-
-To elevate system immutability and A/B atomic boot updates in SigmaOS, security engineers must follow these Firmitas engine guidelines:
-
-### A. Read-Only Root Filesystem Immutability
-- **Guideline**: Enforce read-only mounts on `/system` and `/usr` with overlayfs mutable layers on `/var` and `/etc`.
-- **Implementation**: Utilize `FirmitasEngine::set_mount_mode(FirmitasRootMountMode::ReadOnlySystemRoot)` inside `src/security/firmitas.rs`.
-
-### B. A/B Atomic Boot Deployment Slots
-- **Guideline**: Maintain atomic active, staging, and rollback deployment slots for $O(1)$ pointer swaps during system upgrades.
-- **Implementation**: Utilize `atomic_switch_active_slot` to switch system roots safely with automatic rollback on boot failure.
-
-### C. Ignition First-Boot System Provisioning
-- **Guideline**: Provision system configuration declaratively on first boot before user space initialization.
-- **Implementation**: Parse and execute `FirmitasIgnitionConfig` for user creation, SSH authorized keys, and storage mount units.
-
-### D. IMA/EVM Post-Quantum Kernel File Signatures
-- **Guideline**: Enforce Integrity Measurement Architecture (IMA) and Extended Verification Module (EVM) signature validation on all system executables.
-- **Implementation**: Verify Dilithium-5 signatures via `verify_file_integrity` before kernel execution.
-
----
-
-## 10. Fedora Linux Inspired Kernel Subsystem Integration Guidelines (`src/kernel/subsystems/sovereign_modules.rs`)
-
-To elevate kernel subsystem orchestration and process isolation, kernel developers must follow these Fedora subsystem guidelines:
-
-### A. Systemd-Style Unit Dependency Graph
-- **Guideline**: Manage subsystem startup ordering using explicit unit dependencies (Requires, Wants, After).
-- **Implementation**: Utilize `FedoraSubsystemIntegrationEngine::register_unit` and `start_unit` in `src/kernel/subsystems/sovereign_modules.rs`.
-
-### B. Cgroup v2 Unified Resource Control
-- **Guideline**: Apply unified cgroup v2 resource limits (CPU max %, memory max MB, IO weight) across subsystem slices.
-- **Implementation**: Utilize `set_cgroup_v2_limits` to isolate subsystem resource usage.
-
-### C. Kernel Sysctl Security Hardening
-- **Guideline**: Enforce default sysctl security parameters across all running kernel subsystems.
-- **Implementation**: Set sysctl defaults (`kernel.kptr_restrict = 2`, `fs.protected_hardlinks = 1`, `vm.max_map_count = 1048576`).
-
----
-
-## 11. General Engineering & Quality Guidelines
+## 6. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
-- **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
+- **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]`.
 - **Linting & Warnings**: Fix unused variables and unneeded `mut` annotations in `src/sigpkg/` and `src/driver/`.
 
 ### B. Tri-Agent Autonomous Principles
@@ -226,15 +90,13 @@ To elevate kernel subsystem orchestration and process isolation, kernel develope
 
 ---
 
-## 12. Recommended Phased Implementation Sequence
+## 7. Recommended Phased Implementation Sequence
 
-1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
-2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
-3. **Phase 3: Firmitas System Integrity & Immutability**: Integrate `FirmitasEngine` read-only root mounts and A/B atomic boot deployment slots.
-4. **Phase 4: Fedora Kernel Subsystem Integration**: Integrate `FedoraSubsystemIntegrationEngine` systemd unit dependencies and cgroup v2 controllers.
-5. **Phase 5: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
-6. **Phase 6: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
-7. **Phase 7: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.
-8. **Phase 8: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
-9. **Phase 9: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
-10. **Phase 10: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
+1. **Phase 1: Release Engineering & Signed Tags**: Deploy `ReleaseEngineeringEngine` for managing stable release branches and reproducible build hash validation.
+2. **Phase 2: In-Tree Kyua / kselftest Test Harness**: Integrate `KyuaKselftestHarness` into CI pipelines for subsystem merge gating.
+3. **Phase 3: Text-Based bsdinstall Netinst Engine**: Integrate `BsdinstallNetinstEngine` into live ISO media for Root-on-ZFS text installs.
+4. **Phase 4: System Manual Page Standardization**: Author additional `mdoc(7)` manual pages in `docs/man/` (`sigma-init.8`, `sigma-ctl.8`).
+5. **Phase 5: Sovereign AUR Clean Chroot Sandboxing**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
+6. **Phase 6: Firmitas System Integrity & Immutability**: Integrate `FirmitasEngine` read-only root mounts and A/B atomic boot deployment slots.
+7. **Phase 7: Fedora Kernel Subsystem Integration**: Integrate `FedoraSubsystemIntegrationEngine` systemd unit dependencies and cgroup v2 controllers.
+8. **Phase 8: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.

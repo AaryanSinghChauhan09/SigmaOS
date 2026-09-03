@@ -27,6 +27,7 @@ pub mod orchestration;
 pub mod package;
 pub mod process;
 pub mod productivity;
+pub mod release;
 pub mod remote;
 pub mod resilience;
 pub mod runtime;

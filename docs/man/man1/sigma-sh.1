@@ -1,0 +1,67 @@
+.\"-
+.\" Copyright (s) 2025 SigmaOS Project
+.\" All rights reserved.
+.\"
+.Dd March 3, 2025
+.Dt SIGMA-SH 1
+.Os SigmaOS
+.Sh NAME
+.Nm sigma-sh
+.Nd Sovereign POSIX and zero-trust interactive command shell
+.Sh SYNOPSIS
+.Nm
+.Op Fl c Ar command
+.Op Fl i
+.Op Fl s
+.Op Ar script_file
+.Sh DESCRIPTION
+The
+.Nm
+utility is the primary sovereign command language interpreter for
+.Dx SigmaOS .
+It executes commands read from standard input, specified strings, or script files.
+.Pp
+.Nm
+features built-in post-quantum cryptographic security enforcement, process isolation
+via OpenBSD-style pledge and unveil sandboxing, and direct integration with
+the SigmaOS kernel microservice IPC layer.
+.Sh OPTIONS
+The following options are supported by
+.Nm :
+.Bl -tag -width Fl
+.It Fl c Ar command
+Read and execute commands from the string
+.Ar command .
+.It Fl i
+Force interactive shell execution with prompt printing and line editing.
+.It Fl s
+Read commands from standard input.
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width "SIGMA_PATH"
+.It Ev PATH
+Search path for executable binaries, defaults to
+.Pa /system/bin:/usr/bin .
+.It Ev SIGMA_PLEDGE
+Default pledge sandbox restrictions enforced on child processes spawned by
+.Nm .
+.El
+.Sh FILES
+.Bl -tag -width "~/.sigmashrc"
+.It Pa /etc/sigmashrc
+System-wide shell initialization configuration file.
+.It Pa ~/.sigmashrc
+User-specific shell configuration file.
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr sigma-pkg 8 ,
+.Xr sh 1 ,
+.Xr pledge 2
+.Sh AUTHORS
+The
+.Nm
+utility was created for the
+.Dx SigmaOS
+Sovereign Operating System project.
