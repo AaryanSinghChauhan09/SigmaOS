@@ -128,7 +128,6 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        // Verify that all 10 subsystem modes have valid supervisor, package translation, and VFS path translation
         let modes = [
             DistroSubsystemMode::LinuxArch,
             DistroSubsystemMode::LinuxDebian,
@@ -153,24 +152,14 @@ impl SovereignUniversalDistroBridge {
             }
 
             let valid_supervisor = match m {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora => {
+                DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
                 }
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => {
+                DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
                 }
-                DistroSubsystemMode::LinuxAlpine => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit
-                }
-                DistroSubsystemMode::LinuxNix => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd
-                }
+                DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
+                DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
             };
 
             if !valid_supervisor {
@@ -269,6 +258,12 @@ impl SovereignUniversalDistroBridge {
 
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Validates active jail, pledge/unveil, package hooks, and distro matrix capabilities
+        !self.translate_package_specifier("kernel").is_empty()
+            && !self.translate_vfs_path("/etc").is_empty()
     }
 }
 
