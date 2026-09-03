@@ -1,4 +1,4 @@
-# 🇸🇴 SigmaOS Sovereign Operating System
+# 🚀 SigmaOS Operating System
 
 [![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -9,7 +9,7 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 
 ---
 
-## 🌟 Architectural Highlights
+## ✨ Features & Subsystems
 
 - **Sovereign Microkernel Core:** Memory isolation, CachyOS BORE / EEVDF scheduler, capability bounding sets, and zero-copy IPC channels.
 - **Systemd Betsy Init Supervisor:** Full unit parsing, Cgroup v2 slice memory quotas, watchdog health monitoring, and alternative init bridging.
@@ -37,27 +37,10 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 
 ## 🛠️ Building & Running Tests
 
-### Prerequisites
-
-- Rust nightly toolchain
-- QEMU (`qemu-system-x86_64`)
-- GCC / G++ toolchain
-
-### Build & Run
+To build and run the full native test harness:
 
 ```bash
-# Clone the repository
-git clone https://github.com/SigmaOS/SigmaOS.git
-cd SigmaOS
-
-# Run atomic test suite and inspection tests
 ./run_sigma_tests.sh
-
-# Build bootable ISO image
-bash scripts/build-iso.sh
-
-# Run QEMU smoke test
-python3 scripts/qemu_smoke_test.py
 ```
 
 ---
@@ -95,4 +78,4 @@ Phase H (Global Deployment)    ████████████████�
 
 ## 📄 License
 
-SigmaOS is licensed under the [MIT License](licensing.rs).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

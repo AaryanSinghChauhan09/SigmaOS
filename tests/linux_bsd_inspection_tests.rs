@@ -62,6 +62,12 @@ mod sigma_boot;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;

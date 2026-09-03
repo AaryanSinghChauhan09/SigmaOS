@@ -308,4 +308,3 @@ mod tests {
         assert_eq!(h, 1060);
     }
 }
-

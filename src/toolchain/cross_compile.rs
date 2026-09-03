@@ -7,6 +7,7 @@ extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::format;
+use alloc::string::String;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

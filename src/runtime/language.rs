@@ -14,6 +14,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 extern crate alloc;
 
+// (no_std only applicable at crate root - removed)
+// #![no_main]  // crate-root only
+
+extern crate alloc;
+
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::format;
@@ -327,6 +332,7 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
+/// Linux (glibc/musl) & BSD inspired POSIX setlocale and GNU gettext Locale Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum LocaleCategory {
     All,

@@ -132,6 +132,10 @@ impl<T> Mutex<T> {
     pub const fn new(value: T) -> Self {
         Mutex(core::cell::UnsafeCell::new(value))
     }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> Mutex<T> {
     pub fn lock(&self) -> Result<BareGuard<'_, T>, ()> {
         unsafe { Ok(BareGuard(&mut *self.0.get())) }
     }
