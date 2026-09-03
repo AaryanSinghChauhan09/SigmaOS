@@ -93,26 +93,19 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxPopOs
-            | DistroSubsystemMode::LinuxClear
-            | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
-
+            | DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
-
-            DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
-
-            DistroSubsystemMode::LinuxNix
-            | DistroSubsystemMode::LinuxGuix => ServiceSupervisorType::Shepherd,
-
-            DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                ServiceSupervisorType::Runit
+            }
+            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::SysVInit,
+            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
         }
     }
 
@@ -121,12 +114,7 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
             (DistroSubsystemMode::LinuxNix, "/var/lib/pkg") => "/nix/store".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::FreeBsd, "/var/lib/pkg") => "/var/db/pkg".to_string(),
-            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
-            (DistroSubsystemMode::LinuxDebian, "/var/lib/pkg") => "/var/lib/dpkg".to_string(),
-            (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
-            (DistroSubsystemMode::LinuxGentoo, "/var/lib/pkg") => "/var/db/pkg".to_string(),
-            (DistroSubsystemMode::LinuxFedora, "/var/lib/pkg") => "/var/lib/rpm".to_string(),
+            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
             (
                 DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
@@ -168,7 +156,6 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
-
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
@@ -189,9 +176,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
-            DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
 
@@ -335,8 +321,35 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
-    pub fn verify_all_subsystems_compatibility(&mut self) -> bool {
-        self.dominance_suite.execute_distro_dominance_matrix()
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+
+        let supervisor_valid = match self.mode {
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse
+            | DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
+
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                supervisor == ServiceSupervisorType::Runit
+            }
+
+            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+        };
+
+        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
     }
 }
 

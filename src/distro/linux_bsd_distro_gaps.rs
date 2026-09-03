@@ -512,12 +512,12 @@ impl Default for CronJobScheduler {
 }
 
 // ============================================================================
-// 7. Sovereign DNS-over-TLS (DoT) & DNSSEC Encrypted Resolver Engine
+// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DnsRecord {
-    pub domain: Vec<u8>,
+#[derive(Debug, Clone)]
+pub struct DnsRecordEntry {
+    pub domain_name: &'static str,
     pub ip_address: [u8; 4],
     pub ttl_seconds: u32,
     pub dnssec_validated: bool,
@@ -525,108 +525,140 @@ pub struct DnsRecord {
 
 #[derive(Debug)]
 pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dot_server: [u8; 4],
-    pub dot_port: u16,
-    pub cache: Vec<DnsRecord>,
+    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
+    pub dot_port: u16,                // 853
+    pub local_cache: Vec<DnsRecordEntry>,
+    pub dnssec_enforced: bool,
 }
 
 impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dot_server: [u8; 4]) -> Self {
-        let mut resolver = Self {
-            primary_dot_server,
+    pub fn new(dot_server: [u8; 4]) -> Self {
+        let mut engine = Self {
+            upstream_dot_server: dot_server,
             dot_port: 853,
-            cache: Vec::new(),
+            local_cache: Vec::new(),
+            dnssec_enforced: true,
         };
 
-        // Seed static sovereign local resolution
-        resolver.cache.push(DnsRecord {
-            domain: Vec::from(b"localhost".as_slice()),
-            ip_address: [127, 0, 0, 1],
-            ttl_seconds: 86400,
-            dnssec_validated: true,
-        });
+        // Pre-populate localhost & sovereign system records
+        engine.cache_record("localhost", [127, 0, 0, 1], 86400, true);
+        engine.cache_record("sigma.local", [192, 168, 1, 250], 3600, true);
 
-        resolver
+        engine
     }
 
-    pub fn resolve_query(&mut self, domain: &[u8]) -> Option<[u8; 4]> {
-        if let Some(record) = self.cache.iter().find(|r| r.domain == domain) {
-            return Some(record.ip_address);
+    pub fn cache_record(
+        &mut self,
+        domain: &'static str,
+        ip: [u8; 4],
+        ttl: u32,
+        dnssec_validated: bool,
+    ) {
+        if let Some(existing) = self.local_cache.iter_mut().find(|r| r.domain_name == domain) {
+            existing.ip_address = ip;
+            existing.ttl_seconds = ttl;
+            existing.dnssec_validated = dnssec_validated;
+        } else {
+            self.local_cache.push(DnsRecordEntry {
+                domain_name: domain,
+                ip_address: ip,
+                ttl_seconds: ttl,
+                dnssec_validated,
+            });
+        }
+    }
+
+    pub fn resolve_domain(&mut self, domain: &'static str) -> Result<[u8; 4], &'static str> {
+        if let Some(record) = self.local_cache.iter().find(|r| r.domain_name == domain) {
+            if self.dnssec_enforced && !record.dnssec_validated {
+                return Err("DNSSEC validation failed for cached record");
+            }
+            return Ok(record.ip_address);
         }
 
-        // Mock encrypted DoT lookup and DNSSEC validation
-        let resolved_ip = [10, 0, 0, 50];
-        self.cache.push(DnsRecord {
-            domain: Vec::from(domain),
-            ip_address: resolved_ip,
-            ttl_seconds: 3600,
-            dnssec_validated: true,
-        });
-
-        Some(resolved_ip)
-    }
-
-    pub fn clear_cache(&mut self) {
-        self.cache.retain(|r| r.domain == b"localhost");
+        // Simulate DNS-over-TLS query over TLS port 853
+        let resolved_ip = [93, 184, 216, 34]; // example.com
+        self.cache_record(domain, resolved_ip, 300, true);
+        Ok(resolved_ip)
     }
 }
 
 // ============================================================================
-// 8. Dynamic Devfs Device Allocation & Symlink Manager (udev/devfs Parity)
+// 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceNodeType {
-    BlockDevice,
-    CharacterDevice,
+    Block,
+    Character,
 }
 
 #[derive(Debug, Clone)]
-pub struct DynamicDeviceNode {
-    pub name: Vec<u8>,
+pub struct DeviceNodeEntry {
+    pub name: &'static str,
+    pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
-    pub node_type: DeviceNodeType,
-    pub permissions_octal: u16,
-    pub symlinks: Vec<Vec<u8>>,
+    pub owner_uid: u32,
+    pub group_gid: u32,
+    pub mode_octal: u16,
+    pub symlink_paths: Vec<&'static str>,
 }
 
 #[derive(Debug)]
 pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DynamicDeviceNode>,
+    pub devices: Vec<DeviceNodeEntry>,
 }
 
 impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
-        let mut devfs = Self { nodes: Vec::new() };
+        let mut devfs = Self {
+            devices: Vec::new(),
+        };
 
-        devfs.register_node(DynamicDeviceNode {
-            name: Vec::from(b"/dev/null".as_slice()),
-            major: 1,
-            minor: 3,
-            node_type: DeviceNodeType::CharacterDevice,
-            permissions_octal: 0o666,
-            symlinks: Vec::new(),
-        });
+        // Populate default device nodes
+        devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
+        devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
+        devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
 
         devfs
     }
 
-    pub fn register_node(&mut self, node: DynamicDeviceNode) {
-        self.nodes.push(node);
+    pub fn create_node(
+        &mut self,
+        name: &'static str,
+        node_type: DeviceNodeType,
+        major: u32,
+        minor: u32,
+        owner_uid: u32,
+        group_gid: u32,
+        mode_octal: u16,
+    ) {
+        self.devices.push(DeviceNodeEntry {
+            name,
+            node_type,
+            major,
+            minor,
+            owner_uid,
+            group_gid,
+            mode_octal,
+            symlink_paths: Vec::new(),
+        });
     }
 
-    pub fn add_uuid_symlink(&mut self, dev_name: &[u8], uuid_symlink: &[u8]) -> bool {
-        if let Some(node) = self.nodes.iter_mut().find(|n| n.name == dev_name) {
-            node.symlinks.push(Vec::from(uuid_symlink));
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink);
             true
         } else {
             false
         }
     }
 
-    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
-        self.nodes.iter().find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+    pub fn find_node(&self, name_or_symlink: &str) -> Option<&DeviceNodeEntry> {
+        self.devices.iter().find(|d| {
+            d.name == name_or_symlink || d.symlink_paths.contains(&name_or_symlink)
+        })
     }
 }
 
@@ -637,159 +669,122 @@ impl Default for SovereignDynamicDevfsEngine {
 }
 
 // ============================================================================
-// 9. Stateful NAT & Connection Tracking Table Engine (iptables/nftables/pf Parity)
+// 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatRuleKind {
-    SnatSourceTranslation,
-    DnatPortForwarding,
+pub enum NatType {
+    Snat,
+    Dnat,
 }
 
 #[derive(Debug, Clone)]
-pub struct NatRule {
-    pub id: u32,
-    pub rule_kind: NatRuleKind,
-    pub original_ip: [u8; 4],
-    pub original_port: u16,
+pub struct ConntrackTableEntry {
+    pub original_src: [u8; 4],
+    pub original_dst: [u8; 4],
+    pub src_port: u16,
+    pub dst_port: u16,
     pub translated_ip: [u8; 4],
     pub translated_port: u16,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectionTrackEntry {
-    pub src_ip: [u8; 4],
-    pub src_port: u16,
-    pub dst_ip: [u8; 4],
-    pub dst_port: u16,
-    pub protocol: u8,
+    pub nat_type: NatType,
     pub packets_counter: u64,
 }
 
 #[derive(Debug)]
 pub struct SovereignStatefulNatEngine {
-    pub rules: Vec<NatRule>,
-    pub conntrack_table: Vec<ConnectionTrackEntry>,
+    pub conntrack_table: Vec<ConntrackTableEntry>,
+    pub public_ip: [u8; 4],
 }
 
 impl SovereignStatefulNatEngine {
-    pub fn new() -> Self {
+    pub fn new(public_ip: [u8; 4]) -> Self {
         Self {
-            rules: Vec::new(),
             conntrack_table: Vec::new(),
+            public_ip,
         }
     }
 
-    pub fn add_rule(&mut self, rule: NatRule) {
-        self.rules.push(rule);
-    }
-
-    pub fn process_packet(
+    pub fn create_snat_mapping(
         &mut self,
-        src_ip: [u8; 4],
-        src_port: u16,
+        internal_src: [u8; 4],
         dst_ip: [u8; 4],
+        src_port: u16,
         dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        // Search conntrack
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.src_ip == src_ip && c.src_port == src_port && c.dst_ip == dst_ip && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConnectionTrackEntry {
-                src_ip,
-                src_port,
-                dst_ip,
-                dst_port,
-                protocol,
-                packets_counter: 1,
-            });
-        }
+    ) -> ( [u8; 4], u16 ) {
+        let translated_port = 10000 + (self.conntrack_table.len() as u16);
+        let entry = ConntrackTableEntry {
+            original_src: internal_src,
+            original_dst: dst_ip,
+            src_port,
+            dst_port,
+            translated_ip: self.public_ip,
+            translated_port,
+            nat_type: NatType::Snat,
+            packets_counter: 1,
+        };
+        self.conntrack_table.push(entry);
+        (self.public_ip, translated_port)
+    }
 
-        // Apply matching translation rule
-        for rule in &self.rules {
-            if rule.rule_kind == NatRuleKind::DnatPortForwarding
-                && dst_ip == rule.original_ip
-                && dst_port == rule.original_port
-            {
-                return (rule.translated_ip, rule.translated_port);
+    pub fn lookup_conntrack(
+        &mut self,
+        translated_dst_ip: [u8; 4],
+        translated_dst_port: u16,
+    ) -> Option<([u8; 4], u16)> {
+        for entry in &mut self.conntrack_table {
+            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
+                entry.packets_counter += 1;
+                return Some((entry.original_src, entry.src_port));
             }
         }
-
-        (dst_ip, dst_port)
-    }
-}
-
-impl Default for SovereignStatefulNatEngine {
-    fn default() -> Self {
-        Self::new()
+        None
     }
 }
 
 // ============================================================================
-// 10. Binary Journald Log Storage Engine (systemd-journald Parity)
+// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
 // ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum JournalLogLevel {
-    Emergency = 0,
-    Alert = 1,
-    Critical = 2,
-    Error = 3,
-    Warning = 4,
-    Notice = 5,
-    Info = 6,
-    Debug = 7,
-}
 
 #[derive(Debug, Clone)]
-pub struct JournalBinaryRecord {
-    pub timestamp_micros: u64,
-    pub priority: JournalLogLevel,
-    pub identifier: Vec<u8>,
-    pub message: Vec<u8>,
+pub struct JournaldLogRecord {
+    pub timestamp_unix_epoch: u64,
+    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
+    pub unit_name: &'static str,
+    pub message: &'static str,
 }
 
 #[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
-    pub records: Vec<JournalBinaryRecord>,
-    pub max_capacity: usize,
+    pub logs: Vec<JournaldLogRecord>,
+    pub max_logs_capacity: usize,
 }
 
 impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(max_capacity: usize) -> Self {
+    pub fn new(capacity: usize) -> Self {
         Self {
-            records: Vec::new(),
-            max_capacity,
+            logs: Vec::new(),
+            max_logs_capacity: capacity,
         }
     }
 
-    pub fn append_entry(
-        &mut self,
-        timestamp_micros: u64,
-        priority: JournalLogLevel,
-        identifier: &[u8],
-        message: &[u8],
-    ) {
-        if self.records.len() >= self.max_capacity {
-            self.records.remove(0); // Rotate journal log
+    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
+        if self.logs.len() >= self.max_logs_capacity {
+            self.logs.remove(0); // Journal rotation
         }
-
-        self.records.push(JournalBinaryRecord {
-            timestamp_micros,
+        self.logs.push(JournaldLogRecord {
+            timestamp_unix_epoch: timestamp,
             priority,
-            identifier: Vec::from(identifier),
-            message: Vec::from(message),
+            unit_name: unit,
+            message: msg,
         });
     }
 
-    pub fn query_by_identifier(&self, identifier: &[u8]) -> Vec<&JournalBinaryRecord> {
-        self.records
-            .iter()
-            .filter(|r| r.identifier == identifier)
-            .collect()
+    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
+        self.logs.iter().filter(|l| l.unit_name == unit).collect()
+    }
+
+    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
+        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
     }
 }
 
@@ -881,69 +876,55 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_dns_tls_resolver_engine() {
+    fn test_sovereign_dns_tls_resolver() {
         let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
-        let localhost = resolver.resolve_query(b"localhost");
-        assert_eq!(localhost, Some([127, 0, 0, 1]));
+        let localhost_ip = resolver.resolve_domain("localhost").unwrap();
+        assert_eq!(localhost_ip, [127, 0, 0, 1]);
 
-        let example = resolver.resolve_query(b"example.org");
-        assert_eq!(example, Some([10, 0, 0, 50]));
-
-        resolver.clear_cache();
-        assert_eq!(resolver.cache.len(), 1);
+        let resolved = resolver.resolve_domain("example.com").unwrap();
+        assert_eq!(resolved, [93, 184, 216, 34]);
+        assert_eq!(resolver.local_cache.len(), 3);
     }
 
     #[test]
-    fn test_sovereign_dynamic_devfs_engine() {
+    fn test_sovereign_dynamic_devfs() {
         let mut devfs = SovereignDynamicDevfsEngine::new();
-        let null_node = devfs.lookup_node(b"/dev/null");
-        assert!(null_node.is_some());
+        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
 
-        devfs.register_node(DynamicDeviceNode {
-            name: Vec::from(b"/dev/sda1".as_slice()),
-            major: 8,
-            minor: 1,
-            node_type: DeviceNodeType::BlockDevice,
-            permissions_octal: 0o600,
-            symlinks: Vec::new(),
-        });
-
-        assert!(devfs.add_uuid_symlink(b"/dev/sda1", b"/dev/disk/by-uuid/1234-5678"));
-        let lookup_symlink = devfs.lookup_node(b"/dev/disk/by-uuid/1234-5678");
-        assert!(lookup_symlink.is_some());
-        assert_eq!(lookup_symlink.unwrap().name, b"/dev/sda1");
+        let node = devfs.find_node("disk/by-uuid/1234-ABCD").unwrap();
+        assert_eq!(node.name, "sda");
+        assert_eq!(node.major, 8);
+        assert_eq!(node.node_type, DeviceNodeType::Block);
     }
 
     #[test]
-    fn test_sovereign_stateful_nat_engine() {
-        let mut nat = SovereignStatefulNatEngine::new();
-        nat.add_rule(NatRule {
-            id: 1,
-            rule_kind: NatRuleKind::DnatPortForwarding,
-            original_ip: [203, 0, 113, 10],
-            original_port: 8080,
-            translated_ip: [192, 168, 1, 100],
-            translated_port: 80,
-        });
+    fn test_sovereign_stateful_nat() {
+        let mut nat = SovereignStatefulNatEngine::new([203, 0, 113, 5]);
+        let (trans_ip, trans_port) = nat.create_snat_mapping([192, 168, 1, 100], [93, 184, 216, 34], 54321, 80);
+        assert_eq!(trans_ip, [203, 0, 113, 5]);
+        assert_eq!(trans_port, 10000);
 
-        let (dst_ip, dst_port) = nat.process_packet([198, 51, 100, 5], 54321, [203, 0, 113, 10], 8080, 6);
-        assert_eq!(dst_ip, [192, 168, 1, 100]);
-        assert_eq!(dst_port, 80);
-        assert_eq!(nat.conntrack_table.len(), 1);
+        let original = nat.lookup_conntrack([203, 0, 113, 5], 10000).unwrap();
+        assert_eq!(original, ([192, 168, 1, 100], 54321));
     }
 
     #[test]
-    fn test_sovereign_journald_binary_storage_engine() {
-        let mut journal = SovereignJournaldBinaryStorageEngine::new(2);
-        journal.append_entry(1000, JournalLogLevel::Info, b"kernel", b"Boot completed");
-        journal.append_entry(2000, JournalLogLevel::Error, b"sshd", b"Auth failed");
-        assert_eq!(journal.records.len(), 2);
+    fn test_sovereign_journald_storage() {
+        let mut journal = SovereignJournaldBinaryStorageEngine::new(3);
+        journal.log(1700000000, 6, "networkd.service", "Interface eth0 UP");
+        journal.log(1700000005, 3, "networkd.service", "Link lost on eth0");
+        journal.log(1700000010, 6, "kernel", "CPU thermal throttle cleared");
 
-        journal.append_entry(3000, JournalLogLevel::Warning, b"kernel", b"OOM pressure");
-        assert_eq!(journal.records.len(), 2);
+        let net_logs = journal.query_unit("networkd.service");
+        assert_eq!(net_logs.len(), 2);
 
-        let kernel_logs = journal.query_by_identifier(b"kernel");
-        assert_eq!(kernel_logs.len(), 1);
-        assert_eq!(kernel_logs[0].message, b"OOM pressure");
+        let err_logs = journal.query_priority(3);
+        assert_eq!(err_logs.len(), 1);
+        assert_eq!(err_logs[0].message, "Link lost on eth0");
+
+        // Rotation test
+        journal.log(1700000015, 6, "systemd", "Reached target Multi-User");
+        assert_eq!(journal.logs.len(), 3);
+        assert_eq!(journal.logs[0].message, "Link lost on eth0"); // First record rotated out
     }
 }
