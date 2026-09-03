@@ -13,18 +13,18 @@ pub mod ecosystem_dimensions;
 pub mod endeavour_os;
 pub mod enterprise;
 pub mod fedora_parity;
+pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
 pub mod i18n;
 pub mod improvements;
+pub mod linux_bsd_distro_gaps;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
-pub mod linux_bsd_distro_gaps;
-pub mod garuda_nomad_innovations;
 
 pub use linux_bsd_distro_gaps::{
-    BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
+    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
     SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
     WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
@@ -32,35 +32,46 @@ pub use linux_bsd_distro_gaps::{
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
-    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
-    ZfsPoolState, ZramCompressionAlgorithm,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService, ZfsPoolState,
+    ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;
 pub mod manjaro;
+pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;
 pub mod parity;
 pub mod power_network_tools;
-pub mod missing_distro_innovations;
 pub mod preseed;
 pub mod ready_to_use;
 pub mod recovery;
+pub mod sovereign_system_innovations;
 pub mod specialized;
 pub mod stable_components;
 pub mod tiny_core;
 pub mod visual_dashboard;
 pub mod void_runit;
 pub mod wiki_ideas_implementation;
-pub mod sovereign_system_innovations;
 
-pub use clear_linux::{ClearLinuxStatelessEngine, ConfigState, ConfigLocation, SwupdBundle, SwupdUpdateManager};
-pub use void_runit::{RunitSupervisor, RunitService, RunitStage, ServiceState as RunitServiceState};
-pub use compliance::{ComplianceAuditLogger, ComplianceAuditEvent, ComplianceFramework, TpmAttestationManager, TpmPcrMeasurement};
-pub use visual_dashboard::{VisualDashboardManager, FirewallPolicy, FirewallAction, VpnTunnel, VpnType, VpnStatus, ProcessCapability, HardwareTelemetry};
+pub use clear_linux::{
+    ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
+};
+pub use compliance::{
+    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, TpmAttestationManager,
+    TpmPcrMeasurement,
+};
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
-    GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler, UnifiedFirewallVpnOrchestrator,
-    VisualPolicyRule, VisualSandboxPolicyManager, WorkloadType, WmLayoutMode,
+    GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler,
+    UnifiedFirewallVpnOrchestrator, VisualPolicyRule, VisualSandboxPolicyManager, WmLayoutMode,
+    WorkloadType,
+};
+pub use visual_dashboard::{
+    FirewallAction, FirewallPolicy, HardwareTelemetry, ProcessCapability, VisualDashboardManager,
+    VpnStatus, VpnTunnel, VpnType,
+};
+pub use void_runit::{
+    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
 
@@ -115,83 +126,81 @@ pub use parity::{
     SigmaAppBundle, SovereignBundleRuntime, SovereignChannelManager, SovereignHal,
     SovereignInstaller, SystemStateStatus, UpdateChannel, UpdateError,
 };
+pub use ready_to_use::{
+    DeviceCategory, DeviceNode, DistroServiceManager, HardwareEvent, InteractiveUserEnvironment,
+    MountEntry, MountType, PlugAndPlayHardwareManager, ServiceUnit, SessionEnvironment,
+    UniversalMountEngine, UserAccount,
+};
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
+    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
+    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
 };
-pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
+pub use tiny_core::{AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine};
 pub use wiki_ideas_implementation::{
-    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
-    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
-    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
-    DvfsPowerGovernor, JournalLogEntry, NumaNodeAffinity, SovereignHybridSchedulerInnovations,
-    SovereignSystemdParityEngine, SovereignSystemdUnit, SystemdUnitState, SystemdUnitType,
-    RtlaneRealtimeTask,
-};
-pub use ready_to_use::{
-    DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
-    UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
-    HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
+    ArchRecipeSandboxCompiler, CapsicumCapability, DvfsPowerGovernor, EbpfSyscallPolicyVerifier,
+    FreeBsdCapsicumDescriptorDelegate, Generation, JournalLogEntry, NixDeclarativeSystemState,
+    NumaNodeAffinity, PolicyAction, RtlaneRealtimeTask, SigmaZeroCopySpliceEngine, SigpkgRecipe,
+    SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard,
+    SovereignHybridSchedulerInnovations, SovereignSystemdParityEngine, SovereignSystemdUnit,
+    SystemdUnitState, SystemdUnitType, CAP_FSTAT, CAP_READ, CAP_SEEK, CAP_WRITE,
 };
 
 pub use missing_distro_innovations::{
-    TailsAmnesicEngine, DinitServiceState, DinitService,
-    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
-    BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
-    SmartOsZoneEngine, ComponentParityStatus, MissingDistroComponentsEngine,
+    BedrockLinuxStrataEngine, BedrockStratum, ChimeraDinitSupervisor, ComponentParityStatus,
+    DinitService, DinitServiceState, MageiaUrpmiEngine, MissingDistroComponentsEngine,
+    SmartOsImage, SmartOsVmBrand, SmartOsVmConfig, SmartOsVmState, SmartOsZoneEngine,
+    SolusEopkgManager, TailsAmnesicEngine,
 };
 
 pub use linux_bsd_inspirations::{
-    SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType,
-    SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
-    NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
-    SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
-    BsdCapsicumRights, Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
-    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, SovereignDTraceEngine, SovereignRaidSelfHealer,
-    SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
-    FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
-    SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
-    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
-    HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
-    GpuSwitchMode, Hammer2PfsClusterQuorumEngine, PfsNodeVote, HardenedBsdPaxGuardEngine,
-    PaxViolationType, PaxViolationLog, ApkXbpsHookEngine, OpenBsdRetguardEngine,
+    ApkChrootBuildSandboxEngine, ApkXbpsHookEngine, AptPinStore, ArchDependencyResolver,
+    BsdCapsicumRights, CachyBoreScheduler, DistroSubsystemMode, DrmModeInfo, FreeBSDJail,
+    FreeBsdGeomVdevTopology, FreeBsdRacctVnetGuard, GentooUseFlagsManager, GeomVdevNode,
+    GpuSwitchMode, Hammer2MultiVersionEngine, Hammer2PfsClusterQuorumEngine,
+    HardenedBsdPaxGuardEngine, HermeticStoreClosureEngine, NetBsdRumpRouter, NixStyleStore,
+    OpenBSDPledge, OpenBSDUnveil, OpenBsdFdPledgeGate, OpenBsdPledgeUnveilSentinel,
+    OpenBsdRetguardEngine, OpenRCService, PaxViolationLog, PaxViolationType, PfsNodeVote,
+    PowerProfileMode, SerpentMossEngine, ServiceSupervisorType, SovereignBcachefsTieringEngine,
+    SovereignBpfCoReEngine, SovereignDTraceEngine, SovereignDeclarativeSystemEngine,
+    SovereignDragonflyNpotEngine, SovereignEbpfEngine, SovereignIllumosZonesEngine,
+    SovereignIoUring, SovereignKaslrWxAllocator, SovereignLandlockLsm, SovereignOstreeEngine,
+    SovereignPrivSepSandbox, SovereignRaidSelfHealer, SovereignRingBuffer,
+    SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine, StorageTier,
+    StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
 };
 
 pub use sovereign_distro_dominance::{
-    SovereignDistroDominanceSuite, NixGuixZeroCopyStore, CachyBoreDynamicAiScheduler,
-    OpenBsdHardenedCapsicumPledge, ZfsBtrfsHybridSelfHealingCoW, SovereignMicrovmHypervisorGateway,
-    SovereignPqcWireguardVpnEngine, MicrovmState, VirtioConfig, WireguardPeer,
-    PopOsSystem76AutoScheduler, ProcessPowerProfile, ManagedProcessAffinity,
-    TalosHeadlessMtlsClusterEngine, ClusterNodeConfig,
-    AlpineApkCASPackageCache, CasPackageBlob,
-    FreeBsdBhyveMicrovmJailBridge, IsolationType, HybridIsolationInstance,
+    AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
+    FreeBsdBhyveMicrovmJailBridge, HybridIsolationInstance, IsolationType, ManagedProcessAffinity,
+    MicrovmState, NixGuixZeroCopyStore, OpenBsdHardenedCapsicumPledge, PopOsSystem76AutoScheduler,
+    ProcessPowerProfile, SovereignDistroDominanceSuite, SovereignMicrovmHypervisorGateway,
+    SovereignPqcWireguardVpnEngine, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
+    ZfsBtrfsHybridSelfHealingCoW,
 };
 
-pub mod void_xbps_src;
 pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
-pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub mod void_xbps_src;
 pub use nextgen_innovations::{
-    SigmaHyperKernel, PredictedTask, WorkloadLatencyClass, SigmaCacheFlow, AdaptiveCacheModule,
-    SigmaVector, SimdInstructionSet, SigmaThermal, ThermalGovernorState, SigmaMod,
-    KernelModuleHeader, SigmaContainer, NativeContainerSpec, SigmaProfile, OperatingProfileKind,
-    SigmaLayer, OSLayer, SigmaLink, NetworkMediaKind, SigmaEdgeNet, SigmaSecureNet, SigmaCollab,
-    CollabWorkspacePeer, SigmaAssist, TroubleshootingDiagnostic, SigmaRollback, SystemSnapshot,
-    SigmaDoc, DocumentationTopic, SigmaRescue,
+    AdaptiveCacheModule, CollabWorkspacePeer, DocumentationTopic, KernelModuleHeader,
+    NativeContainerSpec, NetworkMediaKind, OSLayer, OperatingProfileKind, PredictedTask,
+    SigmaAssist, SigmaCacheFlow, SigmaCollab, SigmaContainer, SigmaDoc, SigmaEdgeNet,
+    SigmaHyperKernel, SigmaLayer, SigmaLink, SigmaMod, SigmaProfile, SigmaRescue, SigmaRollback,
+    SigmaSecureNet, SigmaThermal, SigmaVector, SimdInstructionSet, SystemSnapshot,
+    ThermalGovernorState, TroubleshootingDiagnostic, WorkloadLatencyClass,
+};
+pub use universal_distro_super_matrix::{
+    DistroCapabilityProfile, DistroCategory, UniversalDistroSuperMatrix,
 };
 
 pub mod sovereign_nextgen_distro_leap;
 pub use sovereign_nextgen_distro_leap::{
-    SovereignSchedExtEngine, ScxSchedulerKind, ScxTaskState, SchedExtTask,
-    SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
-    SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
-    SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
-    SovereignDistroLeapSuite,
+    ClusterNodeRole, HaStateEntry, HermeticClosureRecord, LandlockAccessType, LandlockV5Rule,
+    SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
+    SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
+    SovereignSchedExtEngine, SystemGenerationRecord,
 };

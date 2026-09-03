@@ -329,7 +329,11 @@ impl SimpleConflictResolver {
 }
 
 impl ConflictResolver for SimpleConflictResolver {
-    fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError> {
+    fn resolve_conflict(
+        &mut self,
+        pkg1: PackageID,
+        pkg2: PackageID,
+    ) -> Result<PackageID, ResolverError> {
         let strategy = match self.strategy.load(Ordering::SeqCst) {
             0 => ResolutionStrategy::Newest,
             1 => ResolutionStrategy::Oldest,
@@ -350,4 +354,3 @@ impl ConflictResolver for SimpleConflictResolver {
         }
     }
 }
-

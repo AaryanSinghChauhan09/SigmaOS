@@ -61,11 +61,11 @@ pub struct Plan9Message {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Plan9RforkFlags {
-    pub copy_name_space: bool,   // RFNAMEG
-    pub new_environment: bool,  // RFENVG
+    pub copy_name_space: bool,       // RFNAMEG
+    pub new_environment: bool,       // RFENVG
     pub copy_file_descriptors: bool, // RFFDG
-    pub new_proc: bool,          // RFPROC
-    pub mount_namespace: bool,   // RFMNT
+    pub new_proc: bool,              // RFPROC
+    pub mount_namespace: bool,       // RFMNT
 }
 
 impl Default for Plan9RforkFlags {
@@ -338,7 +338,13 @@ impl HaikuBfsAttributeEngine {
         Self { files: Vec::new() }
     }
 
-    pub fn add_file_attribute(&mut self, path: &str, key: &str, val_str: &str, val_int: Option<i64>) {
+    pub fn add_file_attribute(
+        &mut self,
+        path: &str,
+        key: &str,
+        val_str: &str,
+        val_int: Option<i64>,
+    ) {
         let attr = BfsAttribute {
             key: key.to_string(),
             value_string: val_str.to_string(),
@@ -359,7 +365,11 @@ impl HaikuBfsAttributeEngine {
     pub fn query_by_attribute(&self, key: &str, val_str: &str) -> Vec<String> {
         self.files
             .iter()
-            .filter(|f| f.attributes.iter().any(|a| a.key == key && a.value_string == val_str))
+            .filter(|f| {
+                f.attributes
+                    .iter()
+                    .any(|a| a.key == key && a.value_string == val_str)
+            })
             .map(|f| f.file_path.clone())
             .collect()
     }
@@ -457,8 +467,17 @@ impl AndroidApexContainerModuleEngine {
         }
     }
 
-    pub fn register_apex_module(&mut self, pkg_name: &str, version: u64, mount_point: &str) -> bool {
-        if self.modules.iter().any(|m| m.package_name == pkg_name && m.version_code == version) {
+    pub fn register_apex_module(
+        &mut self,
+        pkg_name: &str,
+        version: u64,
+        mount_point: &str,
+    ) -> bool {
+        if self
+            .modules
+            .iter()
+            .any(|m| m.package_name == pkg_name && m.version_code == version)
+        {
             return false;
         }
         self.modules.push(AndroidApexModule {
@@ -559,7 +578,11 @@ impl RosettaDynamicBinaryTranslator {
     }
 
     pub fn translate_instruction_block(&mut self, src_addr: u64, src_code: &[u8]) -> Vec<u8> {
-        if let Some(block) = self.translation_cache.iter_mut().find(|b| b.source_addr == src_addr) {
+        if let Some(block) = self
+            .translation_cache
+            .iter_mut()
+            .find(|b| b.source_addr == src_addr)
+        {
             block.hit_count += 1;
             return block.translated_instructions.clone();
         }
@@ -654,7 +677,11 @@ impl DistroWatchParityMetricsHub {
         if self.distros.is_empty() {
             return 0.0;
         }
-        let sum: u64 = self.distros.iter().map(|d| d.parity_percentage as u64).sum();
+        let sum: u64 = self
+            .distros
+            .iter()
+            .map(|d| d.parity_percentage as u64)
+            .sum();
         (sum as f64) / (self.distros.len() as f64)
     }
 }
@@ -805,7 +832,8 @@ impl Hammer2StorageEngine {
 
     pub fn write_block(&mut self, pfs_name: &str, block_id: u64, payload: &[u8]) {
         let checksum = Self::compute_checksum(payload);
-        self.blocks.retain(|b| !(b.pfs_name == pfs_name && b.block_id == block_id));
+        self.blocks
+            .retain(|b| !(b.pfs_name == pfs_name && b.block_id == block_id));
         self.blocks.push(Hammer2Block {
             block_id,
             pfs_name: pfs_name.to_string(),
@@ -820,7 +848,9 @@ impl Hammer2StorageEngine {
         let snap_id = (self.snapshots.len() + 1) as u32;
         let mut merkle_sum: u64 = 0;
         for b in self.blocks.iter().filter(|b| b.pfs_name == pfs_name) {
-            merkle_sum = merkle_sum.wrapping_add(b.crc32_checksum as u64).wrapping_mul(6364136223846793005);
+            merkle_sum = merkle_sum
+                .wrapping_add(b.crc32_checksum as u64)
+                .wrapping_mul(6364136223846793005);
         }
 
         self.snapshots.push(Hammer2PfsSnapshot {
@@ -1158,7 +1188,10 @@ mod tests {
 
         let walk_res = engine.process_message(walk_req).unwrap();
         assert_eq!(walk_res.msg_type, Plan9MessageType::Rwalk);
-        assert_eq!(engine.active_fids.get(&11), Some(&"/n/local/bin".to_string()));
+        assert_eq!(
+            engine.active_fids.get(&11),
+            Some(&"/n/local/bin".to_string())
+        );
     }
 
     #[test]
@@ -1201,7 +1234,9 @@ mod tests {
     fn test_smartos_crossbow_vnic_engine() {
         let mut crossbow = SmartOsCrossbowVnicEngine::new();
         crossbow.create_etherstub("stub0");
-        assert!(crossbow.create_vnic("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000).is_ok());
+        assert!(crossbow
+            .create_vnic("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000)
+            .is_ok());
 
         let vnic = crossbow.lookup_vnic("vnic0").unwrap();
         assert_eq!(vnic.parent_interface, "stub0");
@@ -1211,10 +1246,20 @@ mod tests {
     #[test]
     fn test_android_apex_container_module_engine() {
         let mut engine = AndroidApexContainerModuleEngine::new();
-        assert!(engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
-        assert!(!engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+        assert!(engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
+        assert!(!engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
 
-        assert!(engine.activate_module("com.android.runtime", 330000000).is_ok());
+        assert!(engine
+            .activate_module("com.android.runtime", 330000000)
+            .is_ok());
         assert_eq!(engine.active_mounts, 1);
 
         let version = engine.rollback_module("com.android.runtime").unwrap();
@@ -1292,7 +1337,10 @@ mod tests {
         vnet.add_interface(1, "epair0a", "192.168.1.10");
         vnet.add_route(1, "0.0.0.0/0", "192.168.1.1");
 
-        assert_eq!(vnet.route_lookup(1, "8.8.8.8"), Some("192.168.1.1".to_string()));
+        assert_eq!(
+            vnet.route_lookup(1, "8.8.8.8"),
+            Some("192.168.1.1".to_string())
+        );
     }
 
     #[test]

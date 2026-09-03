@@ -5050,7 +5050,8 @@ mod tests {
 
     #[test]
     fn test_freebsd_jail_sandbox_engine() {
-        let mut jail = FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
+        let mut jail =
+            FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
         assert!(!jail.is_running);
         assert!(jail.start_jail().is_ok());
         assert!(jail.is_running);

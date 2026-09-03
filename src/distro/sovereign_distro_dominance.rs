@@ -588,7 +588,11 @@ impl PopOsSystem76AutoScheduler {
             ProcessPowerProfile::BackgroundBatch | ProcessPowerProfile::PowerSaver => vec![0, 1],
         };
         let gpu_offload = matches!(profile, ProcessPowerProfile::ForegroundGame);
-        let frame_target = if profile == ProcessPowerProfile::ForegroundGame { 144 } else { 60 };
+        let frame_target = if profile == ProcessPowerProfile::ForegroundGame {
+            144
+        } else {
+            60
+        };
 
         let proc_info = ManagedProcessAffinity {
             pid,
@@ -604,14 +608,18 @@ impl PopOsSystem76AutoScheduler {
     }
 
     pub fn adjust_frame_pacing(&mut self, pid: usize, measured_fps: u32) -> Result<u32, String> {
-        let proc_info = self.managed_processes.get_mut(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
+        let proc_info = self
+            .managed_processes
+            .get_mut(&pid)
+            .ok_or_else(|| format!("PID {} not found", pid))?;
         if proc_info.profile != ProcessPowerProfile::ForegroundGame {
             return Err(format!("Process {} is not a foreground game", pid));
         }
 
         if measured_fps < proc_info.frame_target_fps {
             // Frame rate dip detected, boost GPU clock and reduce frame delay target
-            proc_info.current_frame_delay_ms = proc_info.current_frame_delay_ms.saturating_sub(1).max(2);
+            proc_info.current_frame_delay_ms =
+                proc_info.current_frame_delay_ms.saturating_sub(1).max(2);
             self.total_frame_pacing_adjustments += 1;
         } else if measured_fps > proc_info.frame_target_fps + 10 {
             // Uncapped FPS, throttle slightly to conserve power & prevent tearing
@@ -668,8 +676,16 @@ impl TalosHeadlessMtlsClusterEngine {
         self.cluster_peers.insert(node_id.to_string(), node);
     }
 
-    pub fn sync_declarative_state(&mut self, peer_node_id: &str, peer_cert_hash: &str, new_state_hash: &str) -> Result<bool, String> {
-        let peer = self.cluster_peers.get_mut(peer_node_id).ok_or_else(|| format!("Peer node {} not found", peer_node_id))?;
+    pub fn sync_declarative_state(
+        &mut self,
+        peer_node_id: &str,
+        peer_cert_hash: &str,
+        new_state_hash: &str,
+    ) -> Result<bool, String> {
+        let peer = self
+            .cluster_peers
+            .get_mut(peer_node_id)
+            .ok_or_else(|| format!("Peer node {} not found", peer_node_id))?;
         if peer.mtls_client_cert_sha256 != peer_cert_hash {
             return Err("mTLS Certificate SHA-256 verification failed!".to_string());
         }
@@ -714,7 +730,10 @@ impl AlpineApkCASPackageCache {
     }
 
     pub fn insert_cas_blob(&mut self, name: &str, version: &str, payload: &[u8]) -> String {
-        let hash_cas = format!("sha256_cas_{:x}", name.len() * 19 + version.len() * 13 + payload.len() * 7);
+        let hash_cas = format!(
+            "sha256_cas_{:x}",
+            name.len() * 19 + version.len() * 13 + payload.len() * 7
+        );
         let blob = CasPackageBlob {
             hash_cas: hash_cas.clone(),
             pkg_name: name.to_string(),
@@ -731,13 +750,18 @@ impl AlpineApkCASPackageCache {
         }
 
         let old_hash = self.installed_index.get(name).cloned().unwrap_or_default();
-        self.installed_index.insert(name.to_string(), hash_cas.to_string());
-        self.transaction_log.push((String::from("INSTALL"), name.to_string(), old_hash));
+        self.installed_index
+            .insert(name.to_string(), hash_cas.to_string());
+        self.transaction_log
+            .push((String::from("INSTALL"), name.to_string(), old_hash));
         Ok(())
     }
 
     pub fn rollback_last_transaction(&mut self) -> Result<String, String> {
-        let (_action, pkg_name, old_hash) = self.transaction_log.pop().ok_or_else(|| "No transactions to rollback".to_string())?;
+        let (_action, pkg_name, old_hash) = self
+            .transaction_log
+            .pop()
+            .ok_or_else(|| "No transactions to rollback".to_string())?;
         if old_hash.is_empty() {
             self.installed_index.remove(&pkg_name);
         } else {
@@ -784,7 +808,12 @@ impl FreeBsdBhyveMicrovmJailBridge {
         }
     }
 
-    pub fn create_sandbox(&mut self, name: &str, kind: IsolationType, capsicum_rights: u32) -> usize {
+    pub fn create_sandbox(
+        &mut self,
+        name: &str,
+        kind: IsolationType,
+        capsicum_rights: u32,
+    ) -> usize {
         let id = self.next_instance_id;
         self.next_instance_id += 1;
 
@@ -843,7 +872,10 @@ impl SovereignDistroDominanceSuite {
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
             popos_scheduler: PopOsSystem76AutoScheduler::new(),
-            talos_cluster: TalosHeadlessMtlsClusterEngine::new("talos-master-01", "hash_init_declarative_001"),
+            talos_cluster: TalosHeadlessMtlsClusterEngine::new(
+                "talos-master-01",
+                "hash_init_declarative_001",
+            ),
             apk_cas_cache: AlpineApkCASPackageCache::new(),
             bhyve_jail_bridge: FreeBsdBhyveMicrovmJailBridge::new(),
         }
@@ -975,7 +1007,11 @@ mod tests {
     fn test_popos_system76_auto_scheduler() {
         let mut sched = PopOsSystem76AutoScheduler::new();
         sched.register_process(501, "cyberpunk_2077", ProcessPowerProfile::ForegroundGame);
-        let initial_delay = sched.managed_processes.get(&501).unwrap().current_frame_delay_ms;
+        let initial_delay = sched
+            .managed_processes
+            .get(&501)
+            .unwrap()
+            .current_frame_delay_ms;
 
         // Simulate frame rate drop (100 FPS measured vs 144 target)
         let new_delay = sched.adjust_frame_pacing(501, 100).unwrap();
@@ -989,11 +1025,15 @@ mod tests {
         cluster.register_peer_node("worker-1", "cert_sha256_xyz", "worker");
 
         // Sync state with correct cert
-        let synced = cluster.sync_declarative_state("worker-1", "cert_sha256_xyz", "hash_state_v1").unwrap();
+        let synced = cluster
+            .sync_declarative_state("worker-1", "cert_sha256_xyz", "hash_state_v1")
+            .unwrap();
         assert!(synced);
 
         // Sync with invalid cert fails
-        assert!(cluster.sync_declarative_state("worker-1", "bad_cert", "hash_state_v1").is_err());
+        assert!(cluster
+            .sync_declarative_state("worker-1", "bad_cert", "hash_state_v1")
+            .is_err());
     }
 
     #[test]

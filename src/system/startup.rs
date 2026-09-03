@@ -343,9 +343,9 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
 /// Void Linux / FreeBSD rc.d Init Boot Stage Profiler
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitBootStage {
-    EarlyStage1, // Sysinit / devtmpfs / hostname
+    EarlyStage1,   // Sysinit / devtmpfs / hostname
     ServiceStage2, // Runit / rc.d supervised daemons
-    UserStage3, // Login display manager & session
+    UserStage3,    // Login display manager & session
 }
 
 pub struct InitStageBootProfiler {
@@ -375,7 +375,9 @@ pub struct OpenRcDependencyGraph {
 
 impl OpenRcDependencyGraph {
     pub fn new() -> Self {
-        Self { services: Vec::new() }
+        Self {
+            services: Vec::new(),
+        }
     }
 
     pub fn add_service(&mut self, name: &str) {
@@ -738,7 +740,10 @@ mod tests {
         graph.add_service("sshd");
         let batches = graph.resolve_parallel_runlevels();
         assert_eq!(batches.len(), 1);
-        assert_eq!(batches[0], vec!["networking".to_string(), "sshd".to_string()]);
+        assert_eq!(
+            batches[0],
+            vec!["networking".to_string(), "sshd".to_string()]
+        );
     }
 
     #[test]
@@ -749,7 +754,9 @@ mod tests {
 
     #[test]
     fn test_immutable_boot_validator() {
-        assert!(ImmutableBootValidator::is_root_read_only("ro,relatime,errors=remount-ro"));
+        assert!(ImmutableBootValidator::is_root_read_only(
+            "ro,relatime,errors=remount-ro"
+        ));
         assert!(!ImmutableBootValidator::is_root_read_only("rw,relatime"));
     }
 }

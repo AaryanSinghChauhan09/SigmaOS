@@ -1,9 +1,9 @@
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
@@ -405,7 +405,8 @@ mod tests {
         let mut cla = ContributorLicenseAgreementEngine::new();
         cla.sign_cla("jules-agent", "Jules Engineer", "jules@sigmaos.dev");
 
-        let valid_msg = "feat: Add CLA verification\n\nSigned-off-by: Jules Engineer <jules@sigmaos.dev>";
+        let valid_msg =
+            "feat: Add CLA verification\n\nSigned-off-by: Jules Engineer <jules@sigmaos.dev>";
         let invalid_msg = "feat: Add CLA verification\n\nNo signoff";
 
         assert!(cla.verify_dco_signoff("jules-agent", valid_msg));

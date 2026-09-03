@@ -368,4 +368,3 @@ impl OfflineMode for SimpleOfflineMode {
         Ok(())
     }
 }
-
