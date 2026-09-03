@@ -123,6 +123,9 @@ impl SigmaAUR {
         let pkg = self.package_db.get(pkg_name)
             .ok_or(BuildError::PackageNotFound)?.clone();
 
+        let pkg_name_str = pkg.name.clone();
+        let pkg_ver_str = pkg.version.clone();
+
         // Resolve dependencies
         let dependencies = self.resolve_dependencies(&pkg)?;
 
@@ -139,7 +142,7 @@ impl SigmaAUR {
         println!("Dependencies: {:?}", dependencies);
 
         // Mark as installed
-        self.installed_packages.insert(pkg_name.to_string(), pkg.version);
+        self.installed_packages.insert(pkg_name.to_string(), pkg_ver_str);
 
         Ok(())
     }

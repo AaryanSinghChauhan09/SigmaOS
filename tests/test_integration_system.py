@@ -224,6 +224,3 @@ def test_universal_distro_subsystem_bridge():
         assert pkg_name.endswith(spec["pkg_ext"])
         assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Rcd"]
         assert len(spec["vfs_etc"]) > 0
-
-
-test_universal_package_manager_cli_simulation = test_universal_distro_subsystem_bridge

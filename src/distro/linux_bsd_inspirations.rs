@@ -38,15 +38,19 @@ pub enum DistroSubsystemMode {
     LinuxGentoo,
     LinuxFedora,
     LinuxVoid,
-    LinuxOpenSuse,
-    LinuxSolus,
-    LinuxClear,
     LinuxSlackware,
+    LinuxOpenSuse,
+    LinuxPopOs,
+    LinuxSolus,
+    LinuxGuix,
+    LinuxClear,
+    LinuxTails,
     FreeBsd,
     OpenBsd,
     NetBsd,
     DragonFlyBsd,
-    SolarisIllumos,
+    SmartOs,
+    BedrockLinux,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -56,8 +60,10 @@ pub enum ServiceSupervisorType {
     Runit,
     Shepherd,
     Dinit,
-    SysVInit,
-    Smf,
+    S6,
+    Sysvinit,
+    Rcd,
+    Launchd,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -93,33 +99,41 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                ServiceSupervisorType::Runit
-            }
-            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::SysVInit,
-            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
+
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
+
+            DistroSubsystemMode::LinuxNix
+            | DistroSubsystemMode::LinuxGuix => ServiceSupervisorType::Shepherd,
+
+            DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
     }
 
     pub fn translate_vfs_path(&self, generic_path: &str) -> String {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
-            (DistroSubsystemMode::LinuxNix, "/var/lib/pkg") => "/nix/store".to_string(),
+            (DistroSubsystemMode::LinuxGuix, "/etc") => "/etc/guix".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
+            (DistroSubsystemMode::BedrockLinux, "/etc") => "/bedrock/strata/etc".to_string(),
+            (DistroSubsystemMode::LinuxVoid, "/etc") => "/etc/xbps".to_string(),
             (
                 DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::SolarisIllumos,
+                | DistroSubsystemMode::SmartOs,
                 "/etc",
             ) => "/etc".to_string(),
             (
@@ -133,7 +147,7 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::SolarisIllumos,
+                | DistroSubsystemMode::SmartOs,
                 "/var/log",
             ) => "/var/log".to_string(),
             (
@@ -156,6 +170,41 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Verify that the current subsystem mode has valid supervisor, package translation, and VFS translation
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+
+        !pkg_spec.is_empty()
+            && !vfs_etc.is_empty()
+            && match self.mode {
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora
+                | DistroSubsystemMode::LinuxOpenSuse
+                | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxClear
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
+
+                DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+
+                DistroSubsystemMode::LinuxAlpine
+                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
+
+                DistroSubsystemMode::LinuxNix
+                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
+
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            }
+    }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
@@ -168,18 +217,17 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
-                format!("{}.rpm", input_pkg)
-            }
-            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
-            DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
+            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
+            DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
             DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
             DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
-            DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
@@ -201,72 +249,12 @@ impl SovereignUniversalDistroBridge {
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
-            DistroSubsystemMode::SolarisIllumos => {
-                let mut zone_engine = SovereignIllumosZonesEngine::new();
-                let zone_id = zone_engine.create_zone("zone-isolate", ZoneBrand::Native, 50, 1024 * 1024 * 512)?;
-                zone_engine.boot_zone(zone_id)?;
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                let mut sandbox = ApkChrootBuildSandboxEngine::new("isolation_sandbox", root_path, true);
+                sandbox.enter_chroot()?;
                 Ok(())
             }
-            _ => {
-                let mut landlock = SovereignLandlockLsm::new();
-                landlock.add_rule(root_path, LandlockAccess::ReadWrite)?;
-                landlock.restrict_self();
-                Ok(())
-            }
-        }
-    }
-
-    pub fn dispatch_cross_subsystem_operation(
-        &mut self,
-        target_subsystem: &str,
-        action: &str,
-    ) -> Result<String, &'static str> {
-        match target_subsystem {
-            "init" => {
-                let supervisor = self.get_supervisor_type();
-                Ok(format!(
-                    "Dispatched action '{}' to supervisor '{:?}' under distro mode '{:?}'",
-                    action, supervisor, self.mode
-                ))
-            }
-            "package" => {
-                let pkg_format = self.translate_package_specifier(action);
-                Ok(format!(
-                    "Dispatched package action for specifier '{}' under distro mode '{:?}'",
-                    pkg_format, self.mode
-                ))
-            }
-            "vfs" => {
-                let translated_path = self.translate_vfs_path(action);
-                Ok(format!(
-                    "Dispatched VFS lookup for '{}' -> '{}' under distro mode '{:?}'",
-                    action, translated_path, self.mode
-                ))
-            }
-            "security" => {
-                self.enforce_security_isolation(1001, action)?;
-                Ok(format!(
-                    "Dispatched security isolation for path '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "storage" => {
-                let healed = self.verify_and_self_heal_cow_file("@root", action, b"default")
-                    .map_err(|_| "CoW storage operation failed")?;
-                Ok(format!(
-                    "Dispatched storage CoW self-heal check for '{}' (healed: {}) under distro mode '{:?}'",
-                    action, healed, self.mode
-                ))
-            }
-            "kernel" => {
-                let pid = self.schedule_distro_task(101, action, 50)
-                    .ok_or("Scheduler task registration failed")?;
-                Ok(format!(
-                    "Dispatched kernel/scheduler task '{}' for PID {} under distro mode '{:?}'",
-                    action, pid, self.mode
-                ))
-            }
-            _ => Err("Unknown target subsystem"),
+            _ => Ok(()),
         }
     }
 

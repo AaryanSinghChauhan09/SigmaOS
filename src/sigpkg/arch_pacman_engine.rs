@@ -360,6 +360,7 @@ impl SafeUpdateChecker {
     }
 }
 
+
 /// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
 pub struct PkgbuildChecksumUpdater;
 
