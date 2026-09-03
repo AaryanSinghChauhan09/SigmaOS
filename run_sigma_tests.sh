@@ -54,12 +54,12 @@ else
   echo "UI/UX accessibility test script not found; skipping."
 fi
 
-# 8. Run Universal Package Manager CLI simulation tests
-echo "[8/12] Running Universal Package Manager CLI simulation tests..."
+# 8. Run Sovereign Wiki Master Engine Integration tests
+echo "[8/12] Running Sovereign Wiki Master Engine Integration tests..."
 if command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_package_manager_cli_simulation(); print('Universal package manager CLI simulation test passed.')"
+  python3 -c "import tests.test_integration_system as t1; t1.test_sovereign_wiki_master_engine_integration(); print('Sovereign wiki master engine integration test passed.')"
 else
-  echo "Python3 not available; skipping universal package manager tests."
+  echo "Python3 not available; skipping sovereign wiki integration tests."
 fi
 
 # 9. Run SigmaOS Sovereign Parity & Component Inspection Tests (Performance Optimization)
