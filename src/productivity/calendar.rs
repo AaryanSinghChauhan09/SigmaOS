@@ -25,7 +25,10 @@ use alloc::vec::Vec;
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
+#[cfg(not(test))]
 use crate::klib::BTreeMap;
+#[cfg(test)]
+use alloc::collections::BTreeMap;
 use core::time::Duration;
 // SystemTime not in no_std
 
@@ -62,6 +65,28 @@ pub enum EventStatus {
     Completed,
 }
 
+/// Fedora-inspired Sub-Calendar Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SubCalendarCategory {
+    FedoraQa,
+    FesCo,
+    Council,
+    RelEng,
+    Mindshare,
+    Personal,
+    Community,
+}
+
+/// Sub-Calendar container
+#[derive(Debug, Clone)]
+pub struct SubCalendar {
+    pub id: String,
+    pub name: String,
+    pub category: SubCalendarCategory,
+    pub color_hex: String,
+    pub is_visible: bool,
+}
+
 /// Calendar event
 #[derive(Debug, Clone)]
 pub struct CalendarEvent {
@@ -77,6 +102,28 @@ pub struct CalendarEvent {
     pub status: EventStatus,
     pub reminder_minutes_before: Vec<u32>,
     pub color: String,
+    pub sub_calendar_id: Option<String>,
+}
+
+impl CalendarEvent {
+    /// Render event in RFC 5545 iCalendar (.ics) format
+    pub fn export_icalendar_format(&self) -> String {
+        let mut ics = String::new();
+        ics.push_str("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SigmaOS//Fedocal Engine//EN\r\nBEGIN:VEVENT\r\n");
+        ics.push_str(&format!("UID:{}\r\n", self.id));
+        ics.push_str(&format!("SUMMARY:{}\r\n", self.title));
+        ics.push_str(&format!("DESCRIPTION:{}\r\n", self.description));
+        ics.push_str(&format!("DTSTART:{}\r\n", self.start_time));
+        ics.push_str(&format!("DTEND:{}\r\n", self.end_time));
+        if let Some(ref loc) = self.location {
+            ics.push_str(&format!("LOCATION:{}\r\n", loc));
+        }
+        for attendee in &self.attendees {
+            ics.push_str(&format!("ATTENDEE:MAILTO:{}\r\n", attendee));
+        }
+        ics.push_str("END:VEVENT\r\nEND:VCALENDAR\r\n");
+        ics
+    }
 }
 
 /// Calendar view
@@ -335,6 +382,21 @@ impl CalendarApp {
     pub fn go_to_today(&mut self) {
         self.current_date = 1700000000u64;
     }
+
+    /// Detect meeting schedule collisions
+    pub fn detect_event_collisions(&self, event: &CalendarEvent) -> Vec<CalendarEvent> {
+        self.storage
+            .get_all_events()
+            .into_iter()
+            .filter(|e| {
+                e.id != event.id
+                    && e.status != EventStatus::Cancelled
+                    && ((event.start_time >= e.start_time && event.start_time < e.end_time)
+                        || (event.end_time > e.start_time && event.end_time <= e.end_time)
+                        || (event.start_time <= e.start_time && event.end_time >= e.end_time))
+            })
+            .collect()
+    }
 }
 
 impl Default for CalendarApp {
@@ -370,8 +432,12 @@ mod tests {
             status: EventStatus::Confirmed,
             reminder_minutes_before: vec![15],
             color: "#FF0000".to_string(),
+            sub_calendar_id: Some("fedora-qa".to_string()),
         };
         assert_eq!(event.title, "Meeting");
+        let ics = event.export_icalendar_format();
+        assert!(ics.contains("BEGIN:VCALENDAR"));
+        assert!(ics.contains("SUMMARY:Meeting"));
     }
 
     #[test]
@@ -402,6 +468,7 @@ mod tests {
             status: EventStatus::Confirmed,
             reminder_minutes_before: vec![15],
             color: "#FF0000".to_string(),
+            sub_calendar_id: None,
         };
         app.add_event(event).unwrap();
         assert_eq!(app.get_all_events().len(), 1);
@@ -423,9 +490,51 @@ mod tests {
             status: EventStatus::Confirmed,
             reminder_minutes_before: vec![15],
             color: "#FF0000".to_string(),
+            sub_calendar_id: None,
         };
         app.add_event(event).unwrap();
         let results = app.search_events("team");
         assert_eq!(results.len(), 1);
+    }
+
+    #[test]
+    fn test_detect_event_collisions() {
+        let mut app = CalendarApp::default();
+        let event1 = CalendarEvent {
+            id: "m1".to_string(),
+            title: "FEsCo Meeting".to_string(),
+            description: "FEsCo weekly meeting".to_string(),
+            event_type: EventType::Meeting,
+            start_time: 1700000000,
+            end_time: 1700003600,
+            location: Some("#fedora-meeting".to_string()),
+            attendees: vec![],
+            recurrence: RecurrencePattern::Weekly,
+            status: EventStatus::Confirmed,
+            reminder_minutes_before: vec![10],
+            color: "#0000FF".to_string(),
+            sub_calendar_id: Some("fesco".to_string()),
+        };
+        app.add_event(event1).unwrap();
+
+        let event2 = CalendarEvent {
+            id: "m2".to_string(),
+            title: "Overlapping Meeting".to_string(),
+            description: "Conflict".to_string(),
+            event_type: EventType::Meeting,
+            start_time: 1700001800,
+            end_time: 1700005400,
+            location: None,
+            attendees: vec![],
+            recurrence: RecurrencePattern::None,
+            status: EventStatus::Confirmed,
+            reminder_minutes_before: vec![],
+            color: "#FF0000".to_string(),
+            sub_calendar_id: None,
+        };
+
+        let collisions = app.detect_event_collisions(&event2);
+        assert_eq!(collisions.len(), 1);
+        assert_eq!(collisions[0].id, "m1");
     }
 }
