@@ -21,6 +21,7 @@ build/*
 *.exe
 *.elf
 test_runner
+tests/sigma_test_runner
 wiki_push
 wiki/
 WIKI/
