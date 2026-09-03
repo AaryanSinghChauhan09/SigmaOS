@@ -119,17 +119,32 @@ impl UniversalPackageImporter {
             .unwrap_or("unknown")
             .to_string();
 
+        let (license, default_deps) = match format {
+            UniversalPackageFormat::DebianDeb => ("GPL-3.0-or-later", vec!["libc6".to_string()]),
+            UniversalPackageFormat::ArchPacman => ("MIT", vec!["glibc".to_string()]),
+            UniversalPackageFormat::FedoraRpm => ("GPLv2+", vec!["glibc".to_string(), "bash".to_string()]),
+            UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string()]),
+            UniversalPackageFormat::FreeBsdPkg => ("BSD-2-Clause", vec!["freebsd-runtime".to_string()]),
+            UniversalPackageFormat::OpenBsdPkg => ("ISC/BSD", vec!["openbsd-sys".to_string()]),
+            UniversalPackageFormat::NetBsdPkgsrc => ("BSD-3-Clause", vec!["pkgsrc-core".to_string()]),
+            UniversalPackageFormat::SlackwarePkg => ("GPL", vec!["slack-base".to_string()]),
+            UniversalPackageFormat::NixDerivation => ("MIT/Apache-2.0", vec!["nix-store".to_string()]),
+            UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string()]),
+            UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string()]),
+            _ => ("GPL/MIT/BSD", vec![]),
+        };
+
         Ok(Package {
             name: pkg_name.clone(),
             version: "1.0.0-universal".to_string(),
             description: format!("Imported {:?} package '{}'", format, pkg_name),
-            dependencies: vec![],
+            dependencies: default_deps,
             conflicts: vec![],
             provides: vec![pkg_name.clone()],
             size: 10_000_000,
             installed_size: 25_000_000,
             url: Some(format!("file://{}", filename)),
-            license: "GPL/MIT/BSD".to_string(),
+            license: license.to_string(),
             groups: vec!["universal-imported".to_string()],
             architecture: "x86_64".to_string(),
             repository: format!("universal-{:?}", format).to_lowercase(),
@@ -712,5 +727,11 @@ mod tests {
         let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
         assert_eq!(pkg.name, "curl");
         assert_eq!(pkg.repository, "universal-debiandeb");
+        assert_eq!(pkg.license, "GPL-3.0-or-later");
+        assert!(pkg.dependencies.contains(&"libc6".to_string()));
+
+        let apk_pkg = UniversalPackageImporter::parse_foreign_package("htop.apk", UniversalPackageFormat::AlpineApk).unwrap();
+        assert_eq!(apk_pkg.license, "MIT/GPL-2.0");
+        assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }

@@ -420,6 +420,12 @@ impl TemplateVmManager {
     }
 }
 
+impl Default for TemplateVmManager {
+    fn default() -> Self {
+        Self::new(1)
+    }
+}
+
 /// Hierarchical XenStore key-value tree node for Xen hypervisor Dom0 control interface
 #[derive(Debug, Clone)]
 pub struct XenStoreNode {
