@@ -235,16 +235,6 @@ impl PackageFormat {
             Some(PackageFormat::Pet)
         } else if name.ends_with(".tar") {
             Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
         } else {
             None
         }

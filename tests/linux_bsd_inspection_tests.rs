@@ -38,8 +38,6 @@ mod kvm_vcpu;
 mod unveil;
 #[path = "../src/logging/unified.rs"]
 mod unified;
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 #[path = "../src/distro/universal_distro_super_matrix.rs"]
@@ -48,8 +46,6 @@ mod universal_distro_super_matrix;
 mod systemd_init;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 #[path = "../src/kernel/module_loader.rs"]
@@ -60,21 +56,12 @@ mod package_repository;
 mod protocols;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
->>>>>>> origin/fix/test-suite-stabilization-and-deduplication-9630726706765058914
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
