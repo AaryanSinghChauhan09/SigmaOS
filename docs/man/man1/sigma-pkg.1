@@ -1,0 +1,26 @@
+.TH SIGMA-PKG 1 "May 2024" "SigmaOS 0.2.0" "User Commands"
+.SH NAME
+sigma-pkg \- Universal content-addressed package manager for SigmaOS
+.SH SYNOPSIS
+.B sigma-pkg
+[\fICOMMAND\fR] [\fIOPTIONS\fR] [\fIPACKAGE\fR]
+.SH DESCRIPTION
+.B sigma-pkg
+is the primary package manager for SigmaOS. It provides atomic, reproducible
+installations, content-addressed storage (CAS) rollbacks, and multi-format adapters
+for 18 major distribution formats (Debian, RPM, Pacman, Alpine, Nix, Flatpak, etc.).
+.SH COMMANDS
+.TP
+.B install \fIPACKAGE\fR
+Install \fIPACKAGE\fR with automatic dependency resolution and capability sandboxing.
+.TP
+.B remove \fIPACKAGE\fR
+Remove \fIPACKAGE\fR and unneeded dependencies.
+.TP
+.B rollback \fICHECKPOINT_ID\fR
+Atomically rollback system state to \fICHECKPOINT_ID\fR.
+.TP
+.B search \fIQUERY\fR
+Search available package repositories for \fIQUERY\fR.
+.SH SEE ALSO
+.BR sigma-sh (1)

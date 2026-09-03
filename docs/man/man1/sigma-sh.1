@@ -1,0 +1,23 @@
+.TH SIGMA-SH 1 "May 2024" "SigmaOS 0.2.0" "User Commands"
+.SH NAME
+sigma-sh \- Zero-dependency, capability-secured POSIX-like shell for SigmaOS
+.SH SYNOPSIS
+.B sigma-sh
+[\fIOPTION\fR]... [\fIFILE\fR]
+.SH DESCRIPTION
+.B sigma-sh
+is the native interactive command shell and scripting interpreter for SigmaOS.
+It operates in Ring 3 with zero dynamic C-library dependencies, providing built-in
+capability gating, history logging, and AST-level pre-compiled evaluation.
+.SH OPTIONS
+.TP
+.BR \-c \ \fIcommand\fR
+Execute \fIcommand\fR string and exit.
+.TP
+.BR \-i
+Interactive shell mode.
+.TP
+.BR \-v ", " \-\-version
+Output version information and exit.
+.SH SEE ALSO
+.BR sigma-pkg (1)

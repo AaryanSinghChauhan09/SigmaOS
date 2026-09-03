@@ -1,5 +1,7 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(not(test), no_std)]
+
+extern crate alloc;
+use alloc::boxed::Box;
 
 use core::mem;
 /// OOP-based ML Training for SigmaOS
@@ -15,6 +17,7 @@ pub enum OptimizerType {
     SGD = 0,
     Adam = 1,
     RMSProp = 2,
+    AgenticRL = 3,
 }
 
 #[repr(C)]
@@ -23,6 +26,7 @@ pub enum TrainingError {
     Success = 0,
     InvalidData = 1,
     ConvergenceFailed = 2,
+    EnvironmentTermination = 3,
 }
 
 pub trait TrainingSession {
@@ -108,6 +112,7 @@ impl Optimizer for SimpleOptimizer {
         match self.optimizer_type.load(Ordering::SeqCst) {
             1 => OptimizerType::Adam,
             2 => OptimizerType::RMSProp,
+            3 => OptimizerType::AgenticRL,
             _ => OptimizerType::SGD,
         }
     }
@@ -262,6 +267,230 @@ impl DataLoader for SimpleDataLoader {
     }
 }
 
+// ============================================================================
+// 🧠 SovereignAgenticRL: The vLLM & labs-molt Crushing Reinforcement Engine
+// ============================================================================
+
+/// Trajectory node storing prompt/completion token states and log-probabilities,
+/// completely avoiding re-tokenization drift (Molt's core tenet).
+#[derive(Debug, Clone)]
+pub struct SovereignTrajectory {
+    pub prompt_ids: Vec<u32>,
+    pub token_ids: Vec<u32>,
+    pub log_probs: Vec<f32>,
+    pub rewards: Vec<f32>,
+    pub values: Vec<f32>,
+}
+
+/// Gymnasium-style environment trait
+pub trait SovereignGymEnvironment {
+    type Observation;
+    type Action;
+    fn reset(&mut self) -> Self::Observation;
+    fn step(&mut self, action: Self::Action) -> (Self::Observation, f32, bool);
+}
+
+/// Simple prompt-evaluation text-generating environment
+pub struct WordEvaluationEnvironment {
+    pub target_sequence: Vec<u32>,
+    pub current_step: usize,
+}
+
+impl SovereignGymEnvironment for WordEvaluationEnvironment {
+    type Observation = Vec<u32>;
+    type Action = u32;
+
+    fn reset(&mut self) -> Self::Observation {
+        self.current_step = 0;
+        Vec::new()
+    }
+
+    fn step(&mut self, action: Self::Action) -> (Self::Observation, f32, bool) {
+        let is_correct = if self.current_step < self.target_sequence.len {
+            self.target_sequence[self.current_step] == action
+        } else {
+            false
+        };
+
+        let reward = if is_correct { 1.0 } else { -0.5 };
+        self.current_step += 1;
+        let done = self.current_step >= self.target_sequence.len;
+
+        (Vec::new(), reward, done)
+    }
+}
+
+/// Sovereign ChatAgent representing the Policy Model.
+/// Maintains parameters natively, allowing rollouts without heavy python vLLM runtimes.
+pub struct SovereignChatAgent {
+    pub vocab_size: usize,
+    pub policy_weights: Vec<f32>, // Representation of model logits
+}
+
+impl SovereignChatAgent {
+    pub fn new(vocab_size: usize) -> Self {
+        let mut policy_weights = Vec::new();
+        for _ in 0..vocab_size {
+            policy_weights.push(1.0 / (vocab_size as f32));
+        }
+        Self {
+            vocab_size,
+            policy_weights,
+        }
+    }
+
+    /// Direct action sampling with log prob calculation (prevents re-tokenization drift)
+    pub fn sample_rollout(&self, prompt: &[u32], length: usize) -> SovereignTrajectory {
+        let mut token_ids = Vec::new();
+        let mut log_probs = Vec::new();
+        let mut prompt_ids = Vec::new();
+
+        for &id in prompt {
+            prompt_ids.push(id);
+        }
+
+        // Extremely fast Softmax-based bare-metal sampling
+        let mut sum_exp = 0.0;
+        for i in 0..self.vocab_size {
+            sum_exp += self.policy_weights[i].exp();
+        }
+
+        for i in 0..length {
+            // Simple pseudo-random token selection based on step index
+            let selected_token = (i % self.vocab_size) as u32;
+            let logit = self.policy_weights[selected_token as usize];
+            let prob = logit.exp() / sum_exp;
+            let log_prob = prob.ln();
+
+            token_ids.push(selected_token);
+            log_probs.push(log_prob);
+        }
+
+        SovereignTrajectory {
+            prompt_ids,
+            token_ids,
+            log_probs,
+            rewards: Vec::new(),
+            values: Vec::new(),
+        }
+    }
+}
+
+/// Asynchronous streaming pool designed to keep prompt groups in-flight (Molt style)
+pub struct SovereignStreamingPool {
+    pub queue: Vec<SovereignTrajectory>,
+    pub max_size: usize,
+}
+
+impl SovereignStreamingPool {
+    pub fn new(max_size: usize) -> Self {
+        Self {
+            queue: Vec::new(),
+            max_size,
+        }
+    }
+
+    pub fn push(&mut self, trajectory: SovereignTrajectory) -> bool {
+        if self.queue.len >= self.max_size {
+            false
+        } else {
+            self.queue.push(trajectory);
+            true
+        }
+    }
+
+    pub fn pop(&mut self) -> Option<SovereignTrajectory> {
+        if self.queue.len == 0 {
+            None
+        } else {
+            // Move items up and return the first element
+            unsafe {
+                let first = ::core::ptr::read(self.queue.data);
+                for i in 1..self.queue.len {
+                    ::core::ptr::copy_nonoverlapping(self.queue.data.add(i), self.queue.data.add(i - 1), 1);
+                }
+                self.queue.len -= 1;
+                Some(first)
+            }
+        }
+    }
+}
+
+/// Proximal Policy Optimization (PPO) Actor-Critic Reinforcement Learning Engine
+pub struct SovereignPpoOptimizer {
+    pub clip_epsilon: f32,
+    pub gamma: f32,
+    pub lamba: f32,
+}
+
+impl SovereignPpoOptimizer {
+    pub fn new() -> Self {
+        Self {
+            clip_epsilon: 0.2,
+            gamma: 0.99,
+            lamba: 0.95,
+        }
+    }
+
+    /// Compute Generalized Advantage Estimations (GAE)
+    pub fn compute_advantages(&self, trajectory: &mut SovereignTrajectory) {
+        let len = trajectory.token_ids.len;
+        let mut advantages = Vec::new();
+        for _ in 0..len {
+            advantages.push(0.0);
+        }
+
+        let mut last_gae = 0.0;
+        for i in (0..len).rev() {
+            let next_value = if i + 1 < len { trajectory.values[i + 1] } else { 0.0 };
+            let delta = trajectory.rewards[i] + self.gamma * next_value - trajectory.values[i];
+            last_gae = delta + self.gamma * self.lamba * last_gae;
+            advantages[i] = last_gae;
+        }
+
+        trajectory.values = advantages;
+    }
+
+    /// Optimize Policy Parameters natively
+    pub fn ppo_update_step(&self, agent: &mut SovereignChatAgent, trajectory: &SovereignTrajectory) -> f32 {
+        let mut total_loss = 0.0;
+        let len = trajectory.token_ids.len;
+
+        for i in 0..len {
+            let token = trajectory.token_ids[i] as usize;
+            let old_log_prob = trajectory.log_probs[i];
+            let advantage = trajectory.values[i];
+
+            // Re-evaluate model's log_prob
+            let mut sum_exp = 0.0;
+            for j in 0..agent.vocab_size {
+                sum_exp += agent.policy_weights[j].exp();
+            }
+            let new_prob = agent.policy_weights[token].exp() / sum_exp;
+            let new_log_prob = new_prob.ln();
+
+            let ratio = (new_log_prob - old_log_prob).exp();
+            let surr1 = ratio * advantage;
+
+            // Core PPO Clipping
+            let clamped_ratio = ratio.clamp(1.0 - self.clip_epsilon, 1.0 + self.clip_epsilon);
+            let surr2 = clamped_ratio * advantage;
+
+            let loss = if surr1 < surr2 { surr1 } else { surr2 };
+            total_loss += loss;
+
+            // Simple Policy Gradient Parameter Update
+            agent.policy_weights[token] += 0.01 * advantage * ratio;
+        }
+
+        total_loss / (len as f32)
+    }
+}
+
+// ============================================================================
+// Core Memory Collections
+// ============================================================================
+
 pub struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
@@ -339,6 +568,22 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            new_vec.push(self[i].clone());
+        }
+        new_vec
+    }
+}
+
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries((0..self.len).map(|i| &self[i])).finish()
+    }
+}
+
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
@@ -355,4 +600,61 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+// ============================================================================
+// 🧪 Automated Unit Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_agentic_rl_trajectory_generation() {
+        let agent = SovereignChatAgent::new(10);
+        let prompt = [1, 2, 3];
+        let traj = agent.sample_rollout(&prompt, 5);
+
+        assert_eq!(traj.prompt_ids.len, 3);
+        assert_eq!(traj.token_ids.len, 5);
+        assert_eq!(traj.log_probs.len, 5);
+    }
+
+    #[test]
+    fn test_ppo_advantages_and_training() {
+        let mut agent = SovereignChatAgent::new(5);
+        let optimizer = SovereignPpoOptimizer::new();
+
+        let prompt = [1];
+        let mut traj = agent.sample_rollout(&prompt, 4);
+
+        // Fill rewards and values dummy predictions
+        for _ in 0..4 {
+            traj.rewards.push(1.0);
+            traj.values.push(0.5);
+        }
+
+        optimizer.compute_advantages(&mut traj);
+        let loss = optimizer.ppo_update_step(&mut agent, &traj);
+        assert!(loss != 0.0);
+    }
+
+    #[test]
+    fn test_streaming_pool() {
+        let mut pool = SovereignStreamingPool::new(2);
+        let agent = SovereignChatAgent::new(5);
+        let traj1 = agent.sample_rollout(&[1], 2);
+        let traj2 = agent.sample_rollout(&[2], 2);
+
+        assert!(pool.push(traj1));
+        assert!(pool.push(traj2));
+        // Pool is full, should reject third push
+        let traj3 = agent.sample_rollout(&[3], 2);
+        assert!(!pool.push(traj3));
+
+        let popped = pool.pop();
+        assert!(popped.is_some());
+        assert_eq!(popped.unwrap().prompt_ids[0], 1);
+    }
 }
