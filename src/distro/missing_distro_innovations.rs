@@ -16,6 +16,13 @@ use crate::klib::HashMap;
 // - Void Linux XBPS Package Manager & Ed25519 Signatures
 // - FreeBSD VNET Virtualized Network Stack Per-Jail Isolation
 // - OpenBSD Unveil Access Violation Audit Sentinel
+// - NetBSD Rump Kernel Server Engine
+// - Illumos DTrace Probe Engine
+// - SUSE YaST Configuration Registry
+// - DragonFly BSD HAMMER2 Emergency CoW & Deduplication
+// - Sovereign Fast Initramfs CPIO Generator
+// - Gentoo Portage EAPI 8 Slot Operator Engine
+// - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
 use alloc::collections::BTreeMap;
 use alloc::format;
@@ -748,67 +755,6 @@ impl Default for MissingDistroComponentsEngine {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_clear_linux_stateless() {
-        let mut clear = ClearLinuxStatelessEngine::new();
-        clear.set_vendor_default("/etc/nginx.conf", "worker_processes 1;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 1;"
-        );
-
-        clear.set_user_override("/etc/nginx.conf", "worker_processes 4;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 4;"
-        );
-    }
-
-    #[test]
-    fn test_tails_amnesic_scrubbing() {
-        let mut tails = TailsAmnesicEngine::new();
-        tails.allocate_session_page(&[0xFF, 0xAA, 0xBB]);
-        assert_eq!(tails.ram_pages.len(), 1);
-
-        let wiped_count = tails.wipe_all_memory_on_shutdown();
-        assert_eq!(wiped_count, 1);
-        assert_eq!(tails.ram_pages.len(), 0);
-    }
-
-    #[test]
-    fn test_chimera_dinit_supervisor() {
-        let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
-        assert_eq!(
-            dinit.services.get("networking").unwrap().state,
-            DinitServiceState::Stopped
-        );
-    }
-
-    #[test]
-    fn test_solus_eopkg_manager() {
-        let mut eopkg = SolusEopkgManager::new();
-        eopkg
-            .installed_packages
-            .insert("firefox".to_string(), "115.0".to_string());
-        let res = eopkg
-            .apply_eopkg_delta("firefox", "115.0", "116.0")
-            .unwrap();
-        assert!(res.contains("firefox-116.0.eopkg.delta applied"));
-    }
-
-    #[test]
-    fn test_freebsd_vnet_stack() {
-        let mut vnet_engine = FreeBsdVnetStackEngine::new();
-        let stack = vnet_engine.create_vnet_stack(5, "10.0.0.5");
-        assert!(stack.loopback_up);
-        assert_eq!(stack.ip_address, "10.0.0.5");
-    }
-
 // =========================================================================
 // NETBSD RUMP KERNEL SERVER ENGINE (NETBSD RUMP KERNEL USERLAND PARITY)
 // =========================================================================
@@ -1192,6 +1138,67 @@ impl Default for FedoraSelinuxMlsMcsGovernor {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clear_linux_stateless() {
+        let mut clear = ClearLinuxStatelessEngine::new();
+        clear.set_vendor_default("/etc/nginx.conf", "worker_processes 1;");
+        assert_eq!(
+            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
+            "worker_processes 1;"
+        );
+
+        clear.set_user_override("/etc/nginx.conf", "worker_processes 4;");
+        assert_eq!(
+            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
+            "worker_processes 4;"
+        );
+    }
+
+    #[test]
+    fn test_tails_amnesic_scrubbing() {
+        let mut tails = TailsAmnesicEngine::new();
+        tails.allocate_session_page(&[0xFF, 0xAA, 0xBB]);
+        assert_eq!(tails.ram_pages.len(), 1);
+
+        let wiped_count = tails.wipe_all_memory_on_shutdown();
+        assert_eq!(wiped_count, 1);
+        assert_eq!(tails.ram_pages.len(), 0);
+    }
+
+    #[test]
+    fn test_chimera_dinit_supervisor() {
+        let mut dinit = ChimeraDinitSupervisor::new();
+        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
+        assert_eq!(
+            dinit.services.get("networking").unwrap().state,
+            DinitServiceState::Stopped
+        );
+    }
+
+    #[test]
+    fn test_solus_eopkg_manager() {
+        let mut eopkg = SolusEopkgManager::new();
+        eopkg
+            .installed_packages
+            .insert("firefox".to_string(), "115.0".to_string());
+        let res = eopkg
+            .apply_eopkg_delta("firefox", "115.0", "116.0")
+            .unwrap();
+        assert!(res.contains("firefox-116.0.eopkg.delta applied"));
+    }
+
+    #[test]
+    fn test_freebsd_vnet_stack() {
+        let mut vnet_engine = FreeBsdVnetStackEngine::new();
+        let stack = vnet_engine.create_vnet_stack(5, "10.0.0.5");
+        assert!(stack.loopback_up);
+        assert_eq!(stack.ip_address, "10.0.0.5");
+    }
 
     #[test]
     fn test_dragonfly_hammer2_emergency_cow() {
