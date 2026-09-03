@@ -407,6 +407,115 @@ impl Default for SovereignDynamicKernelModuleManager {
     }
 }
 
+/// 11. Fedora Linux Inspired Kernel Subsystem Integration Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FedoraTargetState {
+    EmergencyTarget,
+    RescueTarget,
+    MultiUserTarget,
+    GraphicalTarget,
+}
+
+impl Default for FedoraTargetState {
+    fn default() -> Self {
+        Self::MultiUserTarget
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraSystemdUnitControl {
+    pub unit_name: String,
+    pub is_active: bool,
+    pub requires: Vec<String>,
+    pub wants: Vec<String>,
+    pub after: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraCgroupV2Controller {
+    pub cgroup_path: String,
+    pub cpu_max_pct: u32,
+    pub memory_max_mb: u64,
+    pub io_weight: u32,
+}
+
+#[derive(Debug, Default)]
+pub struct FedoraSubsystemIntegrationEngine {
+    pub active_target: FedoraTargetState,
+    pub systemd_units: alloc::collections::BTreeMap<String, FedoraSystemdUnitControl>,
+    pub cgroups: alloc::collections::BTreeMap<String, FedoraCgroupV2Controller>,
+    pub sysctl_params: alloc::collections::BTreeMap<String, String>,
+}
+
+impl FedoraSubsystemIntegrationEngine {
+    pub fn new() -> Self {
+        let mut sysctl_params = alloc::collections::BTreeMap::new();
+        sysctl_params.insert("kernel.kptr_restrict".to_string(), "2".to_string());
+        sysctl_params.insert("fs.protected_hardlinks".to_string(), "1".to_string());
+        sysctl_params.insert("vm.max_map_count".to_string(), "1048576".to_string());
+
+        Self {
+            active_target: FedoraTargetState::MultiUserTarget,
+            systemd_units: alloc::collections::BTreeMap::new(),
+            cgroups: alloc::collections::BTreeMap::new(),
+            sysctl_params,
+        }
+    }
+
+    pub fn register_unit(&mut self, unit: FedoraSystemdUnitControl) {
+        self.systemd_units.insert(unit.unit_name.clone(), unit);
+    }
+
+    pub fn start_unit(&mut self, unit_name: &str) -> Result<(), &'static str> {
+        let requires = {
+            let unit = self
+                .systemd_units
+                .get(unit_name)
+                .ok_or("FedoraSubsystem: Unit not found")?;
+            unit.requires.clone()
+        };
+
+        // Verify dependencies
+        for req in &requires {
+            if let Some(req_unit) = self.systemd_units.get(req) {
+                if !req_unit.is_active {
+                    return Err("FedoraSubsystem: Required unit is not active");
+                }
+            } else {
+                return Err("FedoraSubsystem: Missing required unit dependency");
+            }
+        }
+
+        if let Some(unit) = self.systemd_units.get_mut(unit_name) {
+            unit.is_active = true;
+        }
+        Ok(())
+    }
+
+    pub fn set_cgroup_v2_limits(
+        &mut self,
+        cgroup_path: &str,
+        cpu_max_pct: u32,
+        mem_max_mb: u64,
+    ) {
+        let controller = FedoraCgroupV2Controller {
+            cgroup_path: cgroup_path.to_string(),
+            cpu_max_pct,
+            memory_max_mb: mem_max_mb,
+            io_weight: 100,
+        };
+        self.cgroups.insert(cgroup_path.to_string(), controller);
+    }
+
+    pub fn set_sysctl(&mut self, key: &str, value: &str) {
+        self.sysctl_params.insert(key.to_string(), value.to_string());
+    }
+
+    pub fn get_sysctl(&self, key: &str) -> Option<&String> {
+        self.sysctl_params.get(key)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -549,5 +658,49 @@ mod tests {
         // Now unloading base module succeeds!
         assert!(kmod.rmmod_kldunload("snd_core").is_ok());
         assert!(!kmod.global_symbol_table.contains_key("snd_pcm_write"));
+    }
+
+    #[test]
+    fn test_fedora_subsystem_integration_engine() {
+        let mut engine = FedoraSubsystemIntegrationEngine::new();
+
+        // Check default sysctl hardening
+        assert_eq!(engine.get_sysctl("kernel.kptr_restrict").unwrap(), "2");
+
+        // Register dbus.service
+        let dbus_unit = FedoraSystemdUnitControl {
+            unit_name: "dbus.service".to_string(),
+            is_active: false,
+            requires: Vec::new(),
+            wants: Vec::new(),
+            after: Vec::new(),
+        };
+        engine.register_unit(dbus_unit);
+
+        // Register NetworkManager.service requiring dbus.service
+        let nm_unit = FedoraSystemdUnitControl {
+            unit_name: "NetworkManager.service".to_string(),
+            is_active: false,
+            requires: vec!["dbus.service".to_string()],
+            wants: Vec::new(),
+            after: vec!["dbus.service".to_string()],
+        };
+        engine.register_unit(nm_unit);
+
+        // Attempting to start NetworkManager before dbus fails!
+        assert!(engine.start_unit("NetworkManager.service").is_err());
+
+        // Start dbus first
+        assert!(engine.start_unit("dbus.service").is_ok());
+
+        // Now starting NetworkManager succeeds
+        assert!(engine.start_unit("NetworkManager.service").is_ok());
+
+        // Cgroup v2 resource limit assignment
+        engine.set_cgroup_v2_limits("/sys/fs/cgroup/system.slice/NetworkManager.service", 50, 256);
+        assert_eq!(
+            engine.cgroups.get("/sys/fs/cgroup/system.slice/NetworkManager.service").unwrap().memory_max_mb,
+            256
+        );
     }
 }

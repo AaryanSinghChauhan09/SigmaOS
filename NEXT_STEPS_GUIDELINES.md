@@ -1,7 +1,7 @@
 # SigmaOS Next Steps Guidelines & Multi-OS Distro Integration Roadmap
 
 ## Executive Summary
-This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, **Firmitas System Integrity & Immutability Engine (`src/security/firmitas.rs`)**, and **System Manual Pages (`docs/man/`)**.
+This document provides concrete execution guidelines and an architectural roadmap for developers and maintainers contributing to **SigmaOS**. It integrates multi-OS inspirations from Linux (Arch, Gentoo, Void, NixOS, Alpine, Ubuntu, Debian, Fedora) and BSD (FreeBSD, OpenBSD, NetBSD) ecosystems, focusing on enhancing **Kernel Scheduling**, **Userland Capabilities**, **System Supervision**, the **SigmaOS User Repository (AUR / Sovereign AUR)**, the **SigmaOS Arch Build System / Protocol (ASP / ABS in `src/sigpkg/arch_pacman_engine.rs`)**, the **SigmaOS Sovereign Installer (`installer/sigma-installer.rs`)**, the **SigmaOS Web Interface (`web_ui/`)**, **Package Repository Infrastructure (`src/sigpkg/repository_manager.rs`)**, **Forgejo OCI Image Registry Infrastructure (`src/container/oci_orchestrator.rs`)**, **Firmitas System Integrity & Immutability Engine (`src/security/firmitas.rs`)**, **Fedora Kernel Subsystem Integration (`src/kernel/subsystems/sovereign_modules.rs`)**, and **System Manual Pages (`docs/man/`)**.
 
 ---
 
@@ -195,7 +195,25 @@ To elevate system immutability and A/B atomic boot updates in SigmaOS, security 
 
 ---
 
-## 10. General Engineering & Quality Guidelines
+## 10. Fedora Linux Inspired Kernel Subsystem Integration Guidelines (`src/kernel/subsystems/sovereign_modules.rs`)
+
+To elevate kernel subsystem orchestration and process isolation, kernel developers must follow these Fedora subsystem guidelines:
+
+### A. Systemd-Style Unit Dependency Graph
+- **Guideline**: Manage subsystem startup ordering using explicit unit dependencies (Requires, Wants, After).
+- **Implementation**: Utilize `FedoraSubsystemIntegrationEngine::register_unit` and `start_unit` in `src/kernel/subsystems/sovereign_modules.rs`.
+
+### B. Cgroup v2 Unified Resource Control
+- **Guideline**: Apply unified cgroup v2 resource limits (CPU max %, memory max MB, IO weight) across subsystem slices.
+- **Implementation**: Utilize `set_cgroup_v2_limits` to isolate subsystem resource usage.
+
+### C. Kernel Sysctl Security Hardening
+- **Guideline**: Enforce default sysctl security parameters across all running kernel subsystems.
+- **Implementation**: Set sysctl defaults (`kernel.kptr_restrict = 2`, `fs.protected_hardlinks = 1`, `vm.max_map_count = 1048576`).
+
+---
+
+## 11. General Engineering & Quality Guidelines
 
 ### A. Code Quality & Type Safety
 - **Rust Atomic Enum Transmutes**: Ensure all enums backed by atomic store operations are marked with `#[repr(usize)]` or `#[repr(u32)]` to match platform word sizes and eliminate transmute size mismatches.
@@ -208,15 +226,15 @@ To elevate system immutability and A/B atomic boot updates in SigmaOS, security 
 
 ---
 
-## 11. Recommended Phased Implementation Sequence
+## 12. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
 3. **Phase 3: Firmitas System Integrity & Immutability**: Integrate `FirmitasEngine` read-only root mounts and A/B atomic boot deployment slots.
-4. **Phase 4: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
-5. **Phase 5: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
-6. **Phase 6: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.
-7. **Phase 7: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
-8. **Phase 8: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
-9. **Phase 9: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.
-10. **Phase 10: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
+4. **Phase 4: Fedora Kernel Subsystem Integration**: Integrate `FedoraSubsystemIntegrationEngine` systemd unit dependencies and cgroup v2 controllers.
+5. **Phase 5: Extensible BPF Scheduling & Capsicum Sandbox**: Integrate `sched_ext` BPF hooks and Capsicum fd capability sandboxes.
+6. **Phase 6: ASP / ABS Source Tree Checkout**: Integrate Git-backed `.SRCINFO` PKGBUILD checkout routines in `src/sigpkg/arch_pacman_engine.rs`.
+7. **Phase 7: Fedora Forgejo OCI Container Image Registry**: Integrate `ForgejoOciImageEngine` into `src/container/` for zero-trust OCI container deployments.
+8. **Phase 8: Calamares-style Installer Plugin Modularization**: Refactor `installer/sigma-installer.rs` into modular Rust plugin modules.
+9. **Phase 9: Web UI Zero-JS Progressive Enhancement & Search**: Enhance `web_ui/index.html` with OpenBSD-style zero-JS fallbacks and client-side package option search.
+10. **Phase 10: System Manual Page Standardization**: Author system tool man pages in `docs/man/` using `mdoc(7)` macro syntax with `mandoc -Tlint` CI validation.

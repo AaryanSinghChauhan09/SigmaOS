@@ -9,7 +9,7 @@
 
 ## 🎯 Executive Summary & Overview
 
-This document presents the comprehensive daily improvement plan, repository-wide technical audit, compliance analysis, and architectural refactoring roadmap for **SigmaOS**. SigmaOS is a next-generation sovereign operating system combining Rust no_std microkernel capabilities, C++ native drivers, post-quantum security (Dilithium-5 / Kyber-1024), universal multi-distro package management, responsive desktop interfaces, Fedora Linux inspired Forgejo OCI container image registry infrastructure, and the Fedora Silverblue / CoreOS inspired **Firmitas System Integrity & Immutability Engine**.
+This document presents the comprehensive daily improvement plan, repository-wide technical audit, compliance analysis, and architectural refactoring roadmap for **SigmaOS**. SigmaOS is a next-generation sovereign operating system combining Rust no_std microkernel capabilities, C++ native drivers, post-quantum security (Dilithium-5 / Kyber-1024), universal multi-distro package management, responsive desktop interfaces, Fedora Linux inspired Forgejo OCI container image registry infrastructure, the Fedora Silverblue / CoreOS inspired **Firmitas System Integrity & Immutability Engine**, and **Fedora Kernel Subsystem Integration**.
 
 ---
 
@@ -19,7 +19,7 @@ This document presents the comprehensive daily improvement plan, repository-wide
 - **Syntax & Compiler Integrity**: Identified and fixed syntax errors in `src/package/mod.rs` (unclosed attribute macro) and `src/sigpkg/arch_compat.rs` (struct definition placement inside unit test block). All Rust core modules and C++ native driver headers now compile without syntax errors.
 - **Native C++ Test Harness**: Verified `tests/sigma_test_runner.cpp` with native C++ driver manager and registry. Executed `make -C tests && ./tests/sigma_test_runner` with **40/40 tests passing (100% pass rate)**.
 - **Rust Integration Test Suite**: Executed `cargo test --test algorithm_and_components_inspection_tests` validating custom data structures (`SigmaString`, `SigmaVec`, `BTreeMap`), memory allocators, and kernel scheduling algorithms.
-- **Standalone Module Testing**: Verified standalone compilation and unit test execution across `src/security/firmitas.rs` (1/1 passed), `src/container/oci_orchestrator.rs` (2/2 passed), `src/klib/base64.rs` (7/7 passed), `src/open_source_obsoletion.rs` (55/55 passed), `src/open_source_os_gap_closure.rs` (14/14 passed), `src/sigpkg/aurweb.rs`, and `src/integration/fedora_messaging.rs`.
+- **Standalone Module Testing**: Verified standalone compilation and unit test execution across `src/kernel/subsystems/sovereign_modules.rs` (9/9 passed), `src/security/firmitas.rs` (1/1 passed), `src/container/oci_orchestrator.rs` (2/2 passed), `src/klib/base64.rs` (7/7 passed), `src/open_source_obsoletion.rs` (55/55 passed), `src/open_source_os_gap_closure.rs` (14/14 passed), `src/sigpkg/aurweb.rs`, and `src/integration/fedora_messaging.rs`.
 - **Unused Imports & Variables**: Scanned codebase and identified unused variables and imports in `src/klib/base64.rs`, `src/tools/display_manager.rs`, `src/scheduler/ebpf_scheduler.rs`, and `src/iot/mod.rs`. Cleaned up warnings in primary utility modules.
 
 ### Refactoring & Quality Recommendations
@@ -49,9 +49,13 @@ This document presents the comprehensive daily improvement plan, repository-wide
 
 ---
 
-## 3. Security & Compliance (Sentinel 🛡️), Firmitas Engine, & Fedora Forgejo OCI Container Engine
+## 3. Security & Compliance (Sentinel 🛡️), Subsystem Integration, & OCI Container Engine
 
 ### Audit & Scanning Results
+- **Fedora Subsystem Integration Engine**: Implemented `FedoraSubsystemIntegrationEngine`, `FedoraSystemdUnitControl`, `FedoraCgroupV2Controller`, and `FedoraTargetState` in `src/kernel/subsystems/sovereign_modules.rs`.
+  - **Systemd-Style Unit Dependency Graph**: Enforces unit startup ordering (Wants, Requires, After) and target isolation (`multi-user.target`, `graphical.target`, `emergency.target`).
+  - **Cgroup v2 Resource Control**: Sets cpu max percentage, memory limits, and IO weights across kernel subsystem slices.
+  - **Sysctl Parameter Hardening**: Enforces security parameters (`kernel.kptr_restrict = 2`, `fs.protected_hardlinks = 1`, `vm.max_map_count = 1048576`).
 - **Fedora Silverblue / CoreOS Inspired Firmitas Engine**: Implemented `FirmitasEngine`, `FirmitasDeploymentSlot`, `FirmitasIgnitionConfig`, and `FirmitasImaEvmSignature` in `src/security/firmitas.rs` (re-exported in `src/security/mod.rs`).
   - **Read-Only System Root Immutability**: Enforces read-only mounts on `/system` and `/usr` with overlayfs mutable layers for `/var` and `/etc`.
   - **A/B Atomic Deployment Slots**: Manages atomic OSTree commit switching across active, staging, and rollback deployment slots ($O(1)$ pointer swaps).
@@ -75,7 +79,7 @@ This document presents the comprehensive daily improvement plan, repository-wide
 ## 4. Documentation & Workflow
 
 ### Audit Details
-- **API Documentation**: Checked `docs/`, `README.md`, `ARCHITECTURE.md`, and inline rustdoc comments. Core exported structs in `src/sigpkg/universal_oop_system.rs`, `src/security/firmitas.rs`, `src/container/oci_orchestrator.rs`, and `src/klib/` possess doc comments.
+- **API Documentation**: Checked `docs/`, `README.md`, `ARCHITECTURE.md`, and inline rustdoc comments. Core exported structs in `src/sigpkg/universal_oop_system.rs`, `src/security/firmitas.rs`, `src/container/oci_orchestrator.rs`, `src/kernel/subsystems/sovereign_modules.rs`, and `src/klib/` possess doc comments.
 - **CI / GitHub Actions Pipelines**: Audited `.github/workflows/`. Pipelines include linting, pr size labeler, and build verification.
 - **Developer Onboarding**: Updated build instructions to clarify native C++ test execution (`make -C tests && ./tests/sigma_test_runner`) and standalone Rust module testing commands.
 
@@ -104,6 +108,7 @@ This document presents the comprehensive daily improvement plan, repository-wide
 ## 7. Tools & Utilities
 
 ### Tool Verification
+- **Subsystem Integration Harness**: Tested `FedoraSubsystemIntegrationEngine` unit dependency graph and cgroup v2 limits in `src/kernel/subsystems/sovereign_modules.rs`.
 - **Firmitas Integrity Verification CLI**: Tested `FirmitasEngine` atomic slot switching and IMA/EVM signature verification in `src/security/firmitas.rs`.
 - **Forgejo OCI Registry Tools**: Verified OCI v1.1 manifest generation (`generate_forgejo_v2_manifest_json`) in `src/container/oci_orchestrator.rs`.
 - **Display Manager CLI**: Tested session management logic in `src/tools/display_manager.rs`.
@@ -116,7 +121,7 @@ This document presents the comprehensive daily improvement plan, repository-wide
 
 ### Refactoring & Architectural Mapping
 1. **Encapsulation**:
-   - *Applied in*: `FirmitasEngine` in `src/security/firmitas.rs`, `ForgejoOciImageEngine` in `src/container/oci_orchestrator.rs`, `Base64Codec` in `src/klib/base64.rs`, `SovereignAurWebEngine` in `src/sigpkg/aurweb.rs`, and `LinuxMintEcosystemHub` in `src/compatibility/mint_ecosystem.rs`. Data fields are private and exposed via safe accessor methods.
+   - *Applied in*: `FedoraSubsystemIntegrationEngine` in `src/kernel/subsystems/sovereign_modules.rs`, `FirmitasEngine` in `src/security/firmitas.rs`, `ForgejoOciImageEngine` in `src/container/oci_orchestrator.rs`, `Base64Codec` in `src/klib/base64.rs`, `SovereignAurWebEngine` in `src/sigpkg/aurweb.rs`, and `LinuxMintEcosystemHub` in `src/compatibility/mint_ecosystem.rs`. Data fields are private and exposed via safe accessor methods.
 2. **Inheritance & Trait Subtyping**:
    - *Applied in*: `PackageAdapter` trait in `src/sigpkg/universal.rs` extended by APT, DNF, Pacman, Portage, and Nix package wrappers.
 3. **Polymorphism**:
@@ -135,6 +140,7 @@ This document presents the comprehensive daily improvement plan, repository-wide
 
 | Priority | Category | Task Description | Target File / Module |
 | :--- | :--- | :--- | :--- |
+| **High** | Subsystems | Expand systemd target graph resolution in subsystem registry | `src/kernel/subsystems/sovereign_modules.rs` |
 | **High** | System Integrity | Expand Firmitas IMA/EVM signature enforcement across all driver blobs | `src/security/firmitas.rs` |
 | **High** | Container/OCI | Expand multi-arch manifest list endpoints in Forgejo OCI engine | `src/container/oci_orchestrator.rs` |
 | **High** | Performance | Preallocate vector capacities in `SigmaVec` bulk extensions | `src/klib/vec.rs` |
@@ -148,5 +154,5 @@ This document presents the comprehensive daily improvement plan, repository-wide
 ## 🚀 Recommended Next Steps
 
 1. **Continuous Benchmarking**: Run `make -C tests && ./tests/sigma_test_runner` after any kernel or driver modifications.
-2. **Firmitas & OCI Integration**: Connect `FirmitasEngine` A/B deployment slots with `ForgejoOciImageEngine` for OSTree-based atomic OS image updates.
+2. **Subsystem & Firmitas Integration**: Connect `FedoraSubsystemIntegrationEngine` unit dependencies with `FirmitasEngine` boot deployment slots.
 3. **PQC Signature Enforcement**: Expand Dilithium-5 verification coverage across all external API, webhooks, kernel file signatures, and OCI image endpoints.
