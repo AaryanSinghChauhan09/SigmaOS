@@ -68,6 +68,12 @@ pub enum UniversalPackageFormat {
     GentooEbuild,     // .ebuild (portage)
     VoidXbps,         // .xbps (xbps)
     FreeBsdPkg,       // .txz / .pkg (pkg)
+    OpenBsdPkg,       // .tgz / .pkg (OpenBSD pkg_add)
+    NetBsdPkgsrc,     // .tgz / .tgz (NetBSD pkgsrc)
+    SlackwarePkg,     // .txz / .tgz (Slackware installpkg)
+    NixDerivation,    // .nix / .drv (NixOS store derivation)
+    GuixPackage,      // .scm (GNU Guix package scheme)
+    HaikuHpkg,        // .hpkg (Haiku package format)
     FlatpakBundle,    // .flatpak
     SnapPackage,      // .snap
     AppImageBinary,   // .AppImage
@@ -90,8 +96,20 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::GentooEbuild)
         } else if filename.ends_with(".xbps") {
             Some(UniversalPackageFormat::VoidXbps)
+        } else if filename.ends_with(".openbsd.tgz") {
+            Some(UniversalPackageFormat::OpenBsdPkg)
+        } else if filename.ends_with(".pkgsrc.tgz") {
+            Some(UniversalPackageFormat::NetBsdPkgsrc)
+        } else if filename.ends_with(".slackware.txz") || filename.ends_with(".slackware.tgz") {
+            Some(UniversalPackageFormat::SlackwarePkg)
         } else if filename.ends_with(".txz") || filename.ends_with(".pkg") {
             Some(UniversalPackageFormat::FreeBsdPkg)
+        } else if filename.ends_with(".nix") || filename.ends_with(".drv") {
+            Some(UniversalPackageFormat::NixDerivation)
+        } else if filename.ends_with(".scm") || filename.ends_with(".guix") {
+            Some(UniversalPackageFormat::GuixPackage)
+        } else if filename.ends_with(".hpkg") {
+            Some(UniversalPackageFormat::HaikuHpkg)
         } else if filename.ends_with(".flatpak") {
             Some(UniversalPackageFormat::FlatpakBundle)
         } else if filename.ends_with(".snap") {
@@ -113,17 +131,32 @@ impl UniversalPackageImporter {
             .unwrap_or("unknown")
             .to_string();
 
+        let (license, default_deps) = match format {
+            UniversalPackageFormat::DebianDeb => ("GPL-3.0-or-later", vec!["libc6".to_string()]),
+            UniversalPackageFormat::ArchPacman => ("MIT", vec!["glibc".to_string()]),
+            UniversalPackageFormat::FedoraRpm => ("GPLv2+", vec!["glibc".to_string(), "bash".to_string()]),
+            UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string()]),
+            UniversalPackageFormat::FreeBsdPkg => ("BSD-2-Clause", vec!["freebsd-runtime".to_string()]),
+            UniversalPackageFormat::OpenBsdPkg => ("ISC/BSD", vec!["openbsd-sys".to_string()]),
+            UniversalPackageFormat::NetBsdPkgsrc => ("BSD-3-Clause", vec!["pkgsrc-core".to_string()]),
+            UniversalPackageFormat::SlackwarePkg => ("GPL", vec!["slack-base".to_string()]),
+            UniversalPackageFormat::NixDerivation => ("MIT/Apache-2.0", vec!["nix-store".to_string()]),
+            UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string()]),
+            UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string()]),
+            _ => ("GPL/MIT/BSD", vec![]),
+        };
+
         Ok(Package {
             name: pkg_name.clone(),
             version: "1.0.0-universal".to_string(),
             description: format!("Imported {:?} package '{}'", format, pkg_name),
-            dependencies: vec![],
+            dependencies: default_deps,
             conflicts: vec![],
             provides: vec![pkg_name.clone()],
             size: 10_000_000,
             installed_size: 25_000_000,
             url: Some(format!("file://{}", filename)),
-            license: "GPL/MIT/BSD".to_string(),
+            license: license.to_string(),
             groups: vec!["universal-imported".to_string()],
             architecture: "x86_64".to_string(),
             repository: format!("universal-{:?}", format).to_lowercase(),
@@ -691,8 +724,26 @@ mod tests {
         let fmt_rpm = UniversalPackageImporter::autodetect_format("htop-3.2.1.rpm");
         assert_eq!(fmt_rpm, Some(UniversalPackageFormat::FedoraRpm));
 
+        let fmt_slack = UniversalPackageImporter::autodetect_format("bash.slackware.txz");
+        assert_eq!(fmt_slack, Some(UniversalPackageFormat::SlackwarePkg));
+
+        let fmt_nix = UniversalPackageImporter::autodetect_format("hello.nix");
+        assert_eq!(fmt_nix, Some(UniversalPackageFormat::NixDerivation));
+
+        let fmt_guix = UniversalPackageImporter::autodetect_format("gnu-hello.scm");
+        assert_eq!(fmt_guix, Some(UniversalPackageFormat::GuixPackage));
+
+        let fmt_haiku = UniversalPackageImporter::autodetect_format("bash.hpkg");
+        assert_eq!(fmt_haiku, Some(UniversalPackageFormat::HaikuHpkg));
+
         let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
         assert_eq!(pkg.name, "curl");
         assert_eq!(pkg.repository, "universal-debiandeb");
+        assert_eq!(pkg.license, "GPL-3.0-or-later");
+        assert!(pkg.dependencies.contains(&"libc6".to_string()));
+
+        let apk_pkg = UniversalPackageImporter::parse_foreign_package("htop.apk", UniversalPackageFormat::AlpineApk).unwrap();
+        assert_eq!(apk_pkg.license, "MIT/GPL-2.0");
+        assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }
