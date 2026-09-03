@@ -2902,6 +2902,118 @@ impl FedoraMirrorManager2Engine {
     }
 }
 
+// =========================================================================
+// Fedora Shared System Infrastructure & Runtime Manager
+// =========================================================================
+
+/// Fedora Shared Library Dependency & Soname Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraSharedLibraryEntry {
+    pub soname: String,
+    pub real_path: String,
+    pub abi_version: String,
+    pub exported_symbols: Vec<String>,
+}
+
+/// Fedora Shared DNF Repository Cache Transaction Lock
+#[derive(Debug, Clone)]
+pub struct FedoraDnfSharedCacheLock {
+    pub lock_file_path: String,
+    pub is_locked: bool,
+    pub lock_owner_pid: u32,
+}
+
+/// Fedora System-wide Shared Runtime Environment (/run/user/UID & /dev/shm)
+#[derive(Debug, Clone)]
+pub struct FedoraSharedRuntimeEnvironment {
+    pub runtime_dir: String,
+    pub shm_dir: String,
+    pub allocated_shm_blocks: HashMap<String, usize>,
+}
+
+/// Fedora-inspired Shared System Manager for SigmaOS
+pub struct FedoraSharedSystemManager {
+    pub shared_libraries: HashMap<String, FedoraSharedLibraryEntry>,
+    pub cache_lock: FedoraDnfSharedCacheLock,
+    pub runtime_env: FedoraSharedRuntimeEnvironment,
+}
+
+impl FedoraSharedSystemManager {
+    pub fn new(uid: u32) -> Self {
+        Self {
+            shared_libraries: HashMap::new(),
+            cache_lock: FedoraDnfSharedCacheLock {
+                lock_file_path: "/var/cache/dnf/metadata_lock.pid".to_string(),
+                is_locked: false,
+                lock_owner_pid: 0,
+            },
+            runtime_env: FedoraSharedRuntimeEnvironment {
+                runtime_dir: format!("/run/user/{}", uid),
+                shm_dir: "/dev/shm".to_string(),
+                allocated_shm_blocks: HashMap::new(),
+            },
+        }
+    }
+
+    pub fn register_shared_library(
+        &mut self,
+        soname: &str,
+        path: &str,
+        abi_ver: &str,
+        symbols: &[&str],
+    ) {
+        let sym_vec = symbols.iter().map(|s| s.to_string()).collect();
+        self.shared_libraries.insert(
+            soname.to_string(),
+            FedoraSharedLibraryEntry {
+                soname: soname.to_string(),
+                real_path: path.to_string(),
+                abi_version: abi_ver.to_string(),
+                exported_symbols: sym_vec,
+            },
+        );
+    }
+
+    pub fn acquire_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
+        if self.cache_lock.is_locked {
+            if self.cache_lock.lock_owner_pid == pid {
+                return Ok(());
+            }
+            return Err("FedoraDnfSharedCache: Lock currently held by another process");
+        }
+        self.cache_lock.is_locked = true;
+        self.cache_lock.lock_owner_pid = pid;
+        Ok(())
+    }
+
+    pub fn release_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
+        if !self.cache_lock.is_locked {
+            return Ok(());
+        }
+        if self.cache_lock.lock_owner_pid != pid {
+            return Err("FedoraDnfSharedCache: Cannot release lock owned by another process");
+        }
+        self.cache_lock.is_locked = false;
+        self.cache_lock.lock_owner_pid = 0;
+        Ok(())
+    }
+
+    pub fn allocate_shared_memory_block(&mut self, key: &str, size_bytes: usize) -> String {
+        self.runtime_env
+            .allocated_shm_blocks
+            .insert(key.to_string(), size_bytes);
+        format!("{}/{}", self.runtime_env.shm_dir, key)
+    }
+
+    pub fn resolve_shared_library_symbol(&self, soname: &str, symbol: &str) -> bool {
+        if let Some(lib) = self.shared_libraries.get(soname) {
+            lib.exported_symbols.contains(&symbol.to_string())
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3795,5 +3907,36 @@ mod tests {
         assert_eq!(optimal[1].host_id, "us-mirror-1");
         // Third choice should be EU high-bandwidth mirror
         assert_eq!(optimal[2].host_id, "eu-high-bw-mirror");
+    }
+
+    #[test]
+    fn test_fedora_shared_system_manager() {
+        let mut mgr = FedoraSharedSystemManager::new(1000);
+        assert_eq!(mgr.runtime_env.runtime_dir, "/run/user/1000");
+
+        // Register shared library
+        mgr.register_shared_library(
+            "libc.so.6",
+            "/usr/lib64/libc.so.6",
+            "GLIBC_2.38",
+            &["malloc", "free", "printf"],
+        );
+        assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
+        assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
+
+        // DNF Shared Cache Lock
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok());
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok()); // Re-entrant same PID ok
+        assert!(mgr.acquire_dnf_cache_lock(9999).is_err()); // Other PID blocked
+        assert!(mgr.release_dnf_cache_lock(9999).is_err()); // Invalid owner release
+        assert!(mgr.release_dnf_cache_lock(4201).is_ok()); // Valid release
+
+        // Shared Memory Allocation
+        let shm_path = mgr.allocate_shared_memory_block("sigma_ipc_shm", 4096);
+        assert_eq!(shm_path, "/dev/shm/sigma_ipc_shm");
+        assert_eq!(
+            mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
+            Some(&4096)
+        );
     }
 }
