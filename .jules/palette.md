@@ -1,0 +1,3 @@
+## 2025-03-03 - Accessible Desktop Controls and High-Contrast Glassmorphism Design
+**Learning:** System control widgets and glassmorphism desktop components (such as Control Center tiles, volume sliders, and dark mode toggles) require explicit `aria-label`, `aria-checked`, and `role="switch"` attributes for screen reader parity. Relying solely on CSS hover states causes keyboard navigation dead-ends; explicit `:focus-visible` focus rings are mandatory for accessible system navigation.
+**Action:** Always wrap interactive desktop components in semantic `<button>` or `<input>` elements with ARIA state bindings and high-contrast `:focus-visible` outlines.

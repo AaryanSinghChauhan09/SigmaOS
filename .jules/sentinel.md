@@ -1,0 +1,3 @@
+## 2025-03-03 - Dilithium-5 Post-Quantum Cryptographic Signature Enforcement in Package and Kernel Pipelines
+**Learning:** Hardcoded cryptographic keys or unverified package manifests in package manager pipelines expose systems to supply-chain tampering and man-in-the-middle attacks. Enforcing Dilithium-5 post-quantum signatures and Kyber-1024 key encapsulation across both Rust package modules (`src/sigpkg/`) and C++ driver registries ensures zero-trust security even against quantum threats.
+**Action:** Always validate post-quantum signatures on module and package manifests before execution, and restrict unsigned or legacy binaries to sandboxed lockdown mode with restricted DMA privileges.

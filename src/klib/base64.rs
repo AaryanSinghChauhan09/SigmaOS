@@ -3,11 +3,12 @@
 // Reduces reliance on external base64 crates
 
 extern crate alloc;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
 
 const BASE64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+#[inline(always)]
 fn char_to_val(c: u8) -> Option<u8> {
     match c {
         b'A'..=b'Z' => Some(c - b'A'),
@@ -19,10 +20,16 @@ fn char_to_val(c: u8) -> Option<u8> {
     }
 }
 
-/// Encode raw bytes into a base64 string
+/// Encode raw bytes into a base64 string with preallocated capacity
 pub fn encode(input: &[u8]) -> String {
-    let mut result = String::new();
-    let mut chunks = input.chunks(3);
+    if input.is_empty() {
+        return String::new();
+    }
+
+    // Preallocate total capacity needed to eliminate reallocations
+    let capacity = ((input.len() + 2) / 3) * 4;
+    let mut result = String::with_capacity(capacity);
+    let chunks = input.chunks(3);
 
     for chunk in chunks {
         let b0 = chunk[0];
@@ -48,14 +55,17 @@ pub fn encode(input: &[u8]) -> String {
     result
 }
 
-/// Decode a base64 string into raw bytes
+/// Decode a base64 string into raw bytes without intermediate heap allocations
 pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
-    let bytes = input.bytes().collect::<Vec<u8>>();
-    let mut result = Vec::new();
+    let bytes = input.as_bytes();
 
     if bytes.len() % 4 != 0 {
         return Err("Base64 input length must be a multiple of 4");
     }
+
+    // Preallocate byte vector to eliminate capacity resizes
+    let capacity = (bytes.len() / 4) * 3;
+    let mut result = Vec::with_capacity(capacity);
 
     for chunk in bytes.chunks(4) {
         if chunk.is_empty() {

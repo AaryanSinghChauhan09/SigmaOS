@@ -162,7 +162,7 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 - **Linting & Warnings**: Fix unused variables and unneeded `mut` annotations in `src/sigpkg/` and `src/driver/`.
 
 ### B. Tri-Agent Autonomous Principles
-- **Bolt ⚡ (Performance)**: Prioritize zero-copy allocations, SLUB slab caches, and lock-free atomic swaps.
+- **Bolt ⚡ (Performance)**: Prioritize zero-copy allocations, SLUB slab caches, lock-free atomic swaps, and zero-copy byte slice iteration (`input.as_bytes()`).
 - **Palette 🎨 (UX & Accessibility)**: Enforce ARIA labels (`aria-label`, `aria-checked`), keyboard focus navigation (`focus-visible:ring-2`), and high-contrast desktop themes.
 - **Sentinel 🛡️ (Security & Compliance)**: Enforce strict input validation, zero hardcoded secrets, and compliance with GDPR, HIPAA, WCAG 2.1 AA, and ISO 27001 standards.
 
