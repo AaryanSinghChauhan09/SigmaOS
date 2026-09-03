@@ -1116,6 +1116,37 @@ fn test_pacman_contrib_suite_inspection() {
 }
 
 #[test]
+fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
+    use linux_bsd_inspirations::{
+        DistroSubsystemMode, ServiceSupervisorType, SovereignUniversalDistroBridge,
+    };
+
+    let modes = [
+        (DistroSubsystemMode::LinuxArch, "zsh.pkg.tar.zst", ServiceSupervisorType::Systemd, "/var/lib/pacman"),
+        (DistroSubsystemMode::LinuxDebian, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/dpkg"),
+        (DistroSubsystemMode::LinuxAlpine, "zsh.apk", ServiceSupervisorType::Runit, "/lib/apk/db"),
+        (DistroSubsystemMode::LinuxNix, "zsh.nix", ServiceSupervisorType::Shepherd, "/nix/store"),
+        (DistroSubsystemMode::LinuxGentoo, "zsh.ebuild", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+        (DistroSubsystemMode::LinuxFedora, "zsh.rpm", ServiceSupervisorType::Systemd, "/var/lib/rpm"),
+        (DistroSubsystemMode::FreeBsd, "zsh.pkg", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+        (DistroSubsystemMode::OpenBsd, "zsh.tgz", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+        (DistroSubsystemMode::NetBsd, "zsh.tgz", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+        (DistroSubsystemMode::DragonFlyBsd, "zsh.pkg", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+    ];
+
+    for (mode, expected_pkg, expected_supervisor, expected_pkg_db) in modes {
+        let mut bridge = SovereignUniversalDistroBridge::new(mode);
+        assert_eq!(bridge.translate_package_specifier("zsh"), expected_pkg);
+        assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
+        assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), expected_pkg_db);
+        assert!(bridge.enforce_security_isolation(1001, "/sandbox/root").is_ok());
+    }
+
+    let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+    assert!(bridge.verify_all_subsystems_compatibility());
+}
+
+#[test]
 fn test_svntogit_repro_and_aur_rules_inspection() {
     use sigpkg::{
         SovereignSvnToGitMigrator, SvnRevisionLog, SvnBranchType, ReproduciblePackageBuilder, ReproducibleBuildEnvironment,
