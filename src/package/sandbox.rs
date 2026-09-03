@@ -340,4 +340,3 @@ impl ResourceQuota for SimpleResourceQuota {
         Ok(())
     }
 }
-

@@ -350,4 +350,3 @@ impl ConflictResolver for SimpleConflictResolver {
         }
     }
 }
-

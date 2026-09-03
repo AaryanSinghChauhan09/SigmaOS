@@ -79,13 +79,13 @@ impl AurClient {
             package_cache: BTreeMap::new(),
         }
     }
-    
+
     /// Search for packages in AUR
     pub fn search(&mut self, query: &str) -> Result<Vec<AurPackage>, AurError> {
         // In a real implementation, this would query the AUR API
         // For now, return mock results
         let mut results = Vec::new();
-        
+
         if query == "network" || query == "net" {
             results.push(AurPackage {
                 name: String::from("networkmanager"),
@@ -102,26 +102,26 @@ impl AurClient {
                 last_updated: 1699876543,
             });
         }
-        
+
         // Cache results
         for pkg in &results {
             self.package_cache.insert(pkg.name.clone(), pkg.clone());
         }
-        
+
         Ok(results)
     }
-    
+
     /// Get package information
     pub fn get_package_info(&mut self, name: &str) -> Result<AurPackage, AurError> {
         // Check cache first
         if let Some(pkg) = self.package_cache.get(name) {
             return Ok(pkg.clone());
         }
-        
+
         // In a real implementation, this would query the AUR API
         Err(AurError::PackageNotFound)
     }
-    
+
     /// Fetch PKGBUILD for a package
     pub fn fetch_pkgbuild(&self, name: &str) -> Result<PkgBuildRecipe, AurError> {
         // In a real implementation, this would fetch from AUR
@@ -147,7 +147,7 @@ impl AurClient {
             check_function: None,
         })
     }
-    
+
     /// Create build sandbox
     pub fn create_build_sandbox(&self, recipe: &PkgBuildRecipe) -> BuildSandboxConfig {
         BuildSandboxConfig {
@@ -160,7 +160,7 @@ impl AurClient {
             cpu_limit: Some(2.0),
         }
     }
-    
+
     /// Build package from PKGBUILD
     pub fn build_package(&self, recipe: &PkgBuildRecipe, sandbox: &BuildSandboxConfig) -> Result<BuiltPackage, BuildError> {
         // In a real implementation, this would:
@@ -170,7 +170,7 @@ impl AurClient {
         // 4. Execute build function
         // 5. Execute package function
         // 6. Sign package
-        
+
         Ok(BuiltPackage {
             name: recipe.pkgname.clone(),
             version: format!("{}-{}", recipe.pkgver, recipe.pkgrel),
@@ -179,7 +179,7 @@ impl AurClient {
             build_time_ms: 5000,
         })
     }
-    
+
     /// Install built package
     pub fn install_package(&self, _package: &BuiltPackage) -> Result<(), InstallError> {
         // In a real implementation, this would:
@@ -188,7 +188,7 @@ impl AurClient {
         // 3. Install files
         // 4. Run install scripts
         // 5. Update database
-        
+
         Ok(())
     }
 
@@ -299,10 +299,10 @@ impl PkgBuildParser {
             prepare_function: None,
             check_function: None,
         };
-        
+
         for line in content.lines() {
             let line = line.trim();
-            
+
             if line.starts_with("pkgname=") {
                 recipe.pkgname = Self::parse_string_value(line);
             } else if line.starts_with("pkgver=") {
@@ -321,19 +321,19 @@ impl PkgBuildParser {
                 recipe.source = Self::parse_array_value(line);
             }
         }
-        
+
         Ok(recipe)
     }
-    
+
     fn parse_string_value(line: &str) -> String {
         let value = line.split('=').nth(1).unwrap_or("");
         value.trim_matches('"').trim_matches('\'').to_string()
     }
-    
+
     fn parse_array_value(line: &str) -> Vec<String> {
         let array_content = line.split('(').nth(1).unwrap_or("");
         let array_content = array_content.trim_end_matches(')');
-        
+
         array_content
             .split_whitespace()
             .map(|s| s.trim_matches('"').trim_matches('\'').to_string())
@@ -376,7 +376,7 @@ depends=("glibc" "gcc")
 makedepends=("make")
 source=("https://example.com/source.tar.gz")
 "#;
-        
+
         let recipe = PkgBuildParser::parse(pkgbuild_content).unwrap();
         assert_eq!(recipe.pkgname, "test-package");
         assert_eq!(recipe.pkgver, "1.0.0");
@@ -406,7 +406,7 @@ source=("https://example.com/source.tar.gz")
             prepare_function: None,
             check_function: None,
         };
-        
+
         let sandbox = client.create_build_sandbox(&recipe);
         assert!(!sandbox.allow_internet);
         assert!(sandbox.chroot_environment);
@@ -435,7 +435,7 @@ source=("https://example.com/source.tar.gz")
             prepare_function: None,
             check_function: None,
         };
-        
+
         let sandbox = client.create_build_sandbox(&recipe);
         let built = client.build_package(&recipe, &sandbox).unwrap();
         assert_eq!(built.name, "test");

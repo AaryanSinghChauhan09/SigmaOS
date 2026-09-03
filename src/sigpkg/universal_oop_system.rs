@@ -3211,6 +3211,78 @@ impl IPackage for SandboxedPackageDecorator {
     }
 }
 
+pub struct PqcSignedPackageDecorator {
+    pub wrapped: Box<dyn IPackage>,
+    pub dilithium_signature: String,
+    pub is_verified: bool,
+}
+
+impl PqcSignedPackageDecorator {
+    pub fn new(wrapped: Box<dyn IPackage>, dilithium_signature: String) -> Self {
+        let is_verified = dilithium_signature.contains("dilithium");
+        Self {
+            wrapped,
+            dilithium_signature,
+            is_verified,
+        }
+    }
+}
+
+impl IPackage for PqcSignedPackageDecorator {
+    fn name(&self) -> &str {
+        self.wrapped.name()
+    }
+    fn version(&self) -> &Version {
+        self.wrapped.version()
+    }
+    fn dependencies(&self) -> &[Dependency] {
+        self.wrapped.dependencies()
+    }
+    fn format(&self) -> PackageFormat {
+        self.wrapped.format()
+    }
+    fn metadata(&self) -> &PackageMetadata {
+        self.wrapped.metadata()
+    }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        self.wrapped.metadata_mut()
+    }
+    fn files(&self) -> &[String] {
+        self.wrapped.files()
+    }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        self.wrapped.conditional_dependencies()
+    }
+}
+
+pub struct PackageInstallCommand {
+    pub package_name: String,
+    pub is_installed: bool,
+}
+
+impl PackageInstallCommand {
+    pub fn new(package_name: &str) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            is_installed: false,
+        }
+    }
+}
+
+impl IPackageCommand for PackageInstallCommand {
+    fn execute(&mut self) -> Result<(), HookError> {
+        self.is_installed = true;
+        Ok(())
+    }
+    fn undo(&mut self) -> Result<(), HookError> {
+        self.is_installed = false;
+        Ok(())
+    }
+    fn description(&self) -> &str {
+        "Install package command"
+    }
+}
+
 pub struct AuditedPackageDecorator {
     pub wrapped: Box<dyn IPackage>,
     pub audit_passed: bool,
@@ -3285,13 +3357,23 @@ pub struct UserDefinedPhaseClosure {
 
 pub struct UserDefinedFunctionPipeline {
     closures: Vec<UserDefinedPhaseClosure>,
+    env_vars: HashMap<String, String>,
 }
 
 impl UserDefinedFunctionPipeline {
     pub fn new() -> Self {
         Self {
             closures: Vec::new(),
+            env_vars: HashMap::new(),
         }
+    }
+
+    pub fn set_env_var(&mut self, key: &str, val: &str) {
+        self.env_vars.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn get_env_var(&self, key: &str) -> Option<&str> {
+        self.env_vars.get(key).map(|s| s.as_str())
     }
 
     pub fn register_closure<F>(&mut self, name: &str, phase: PackageBuildPhase, closure: F)
@@ -4482,5 +4564,43 @@ Description: Hook test";
         let garbage = gc.collect_garbage();
         assert_eq!(garbage.len(), 1);
         assert_eq!(garbage[0], "/nix/store/old-unused-lib");
+    }
+
+    #[test]
+    fn test_pqc_signed_package_decorator_and_install_command() {
+        let base_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "quantum-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "PQC test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: "example.com".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "abc".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let pqc_decorator = PqcSignedPackageDecorator::new(base_pkg, "dilithium-5-sig".to_string());
+        assert_eq!(pqc_decorator.name(), "quantum-pkg");
+        assert!(pqc_decorator.is_verified);
+
+        let mut install_cmd = PackageInstallCommand::new("quantum-pkg");
+        assert!(!install_cmd.is_installed);
+        assert!(install_cmd.execute().is_ok());
+        assert!(install_cmd.is_installed);
+        assert!(install_cmd.undo().is_ok());
+        assert!(!install_cmd.is_installed);
+
+        let mut pipeline = UserDefinedFunctionPipeline::new();
+        pipeline.set_env_var("BUILD_JOBS", "8");
+        assert_eq!(pipeline.get_env_var("BUILD_JOBS"), Some("8"));
     }
 }

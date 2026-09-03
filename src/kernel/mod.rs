@@ -82,3 +82,4 @@ pub use structures::*;
 pub use nextgen_breakthroughs::*;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+pub use linux_parity::*;
