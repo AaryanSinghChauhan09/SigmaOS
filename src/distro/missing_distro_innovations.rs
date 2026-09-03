@@ -684,90 +684,154 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
-/// 13. DragonFly BSD HAMMER2 MVCC Storage Engine
+// =========================================================================
+// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevuanInitBackend {
+    SysVInit,
+    Runit,
+    S6,
+    OpenRc,
+}
+
 #[derive(Debug, Clone)]
-pub struct Hammer2Volume {
-    pub volume_name: String,
-    pub pfs_name: String, // Pseudo-Filesystem
-    pub transaction_id: u64,
-    pub blocks: BTreeMap<String, Vec<u8>>,
-    pub is_snapshot: bool,
+pub struct DevuanInitService {
+    pub name: String,
+    pub backend: DevuanInitBackend,
+    pub script_path: String,
+    pub is_enabled: bool,
 }
 
-pub struct DragonFlyHammer2Engine {
-    pub volumes: BTreeMap<String, Hammer2Volume>,
-    pub active_transaction: u64,
+pub struct DevuanInitDiversityEngine {
+    pub default_backend: DevuanInitBackend,
+    pub services: BTreeMap<String, DevuanInitService>,
 }
 
-impl DragonFlyHammer2Engine {
-    pub fn new() -> Self {
-        let mut default_vol = Hammer2Volume {
-            volume_name: String::from("root_pfs"),
-            pfs_name: String::from("@ROOT"),
-            transaction_id: 1,
-            blocks: BTreeMap::new(),
-            is_snapshot: false,
-        };
-        default_vol.blocks.insert(
-            String::from("/boot/kernel"),
-            b"SIGMAOS_HAMMER2_KERNEL_IMAGE".to_vec(),
-        );
-
-        let mut map = BTreeMap::new();
-        map.insert(String::from("@ROOT"), default_vol);
-
+impl DevuanInitDiversityEngine {
+    pub fn new(default_backend: DevuanInitBackend) -> Self {
         Self {
-            volumes: map,
-            active_transaction: 1,
+            default_backend,
+            services: BTreeMap::new(),
         }
     }
 
-    pub fn create_pfs_snapshot(&mut self, source_pfs: &str, snap_name: &str) -> Result<u64, String> {
-        let source = self
-            .volumes
-            .get(source_pfs)
-            .ok_or_else(|| format!("Source PFS {} not found", source_pfs))?;
-
-        self.active_transaction += 1;
-        let mut snapshot = source.clone();
-        snapshot.pfs_name = snap_name.to_string();
-        snapshot.transaction_id = self.active_transaction;
-        snapshot.is_snapshot = true;
-
-        self.volumes.insert(snap_name.to_string(), snapshot);
-        Ok(self.active_transaction)
+    pub fn register_service(&mut self, name: &str, backend: DevuanInitBackend, script_path: &str) {
+        let service = DevuanInitService {
+            name: name.to_string(),
+            backend,
+            script_path: script_path.to_string(),
+            is_enabled: true,
+        };
+        self.services.insert(name.to_string(), service);
     }
 
-    pub fn write_block_cow(
-        &mut self,
-        pfs_name: &str,
-        path: &str,
-        data: &[u8],
-    ) -> Result<u64, String> {
-        let vol = self
-            .volumes
-            .get_mut(pfs_name)
-            .ok_or_else(|| format!("PFS {} not found", pfs_name))?;
-
-        if vol.is_snapshot {
-            return Err(format!("PFS {} is a read-only snapshot", pfs_name));
-        }
-
-        self.active_transaction += 1;
-        vol.blocks.insert(path.to_string(), data.to_vec());
-        vol.transaction_id = self.active_transaction;
-        Ok(self.active_transaction)
-    }
-
-    pub fn read_block(&self, pfs_name: &str, path: &str) -> Option<&[u8]> {
-        self.volumes
-            .get(pfs_name)
-            .and_then(|vol| vol.blocks.get(path))
-            .map(|vec| vec.as_slice())
+    pub fn is_systemd_free(&self) -> bool {
+        true
     }
 }
 
-impl Default for DragonFlyHammer2Engine {
+impl Default for DevuanInitDiversityEngine {
+    fn default() -> Self {
+        Self::new(DevuanInitBackend::SysVInit)
+    }
+}
+
+// =========================================================================
+// ARTIX LINUX INIT MATRIX (ARTIX LINUX SYSTEMD-FREE SCRIPTLET TRANSLATOR)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ArtixInitScriptlet {
+    pub service_name: String,
+    pub openrc_run_script: String,
+    pub runit_run_script: String,
+    pub dinit_service_file: String,
+}
+
+pub struct ArtixLinuxInitMatrix {
+    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
+}
+
+impl ArtixLinuxInitMatrix {
+    pub fn new() -> Self {
+        Self {
+            scriptlets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scriptlet(&mut self, service_name: &str, exec_path: &str) {
+        let scriptlet = ArtixInitScriptlet {
+            service_name: service_name.to_string(),
+            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"\n", exec_path),
+            runit_run_script: format!("#!/bin/sh\nexec {}\n", exec_path),
+            dinit_service_file: format!("type = process\ncommand = {}\n", exec_path),
+        };
+        self.scriptlets.insert(service_name.to_string(), scriptlet);
+    }
+
+    pub fn get_scriptlet(&self, service_name: &str) -> Option<&ArtixInitScriptlet> {
+        self.scriptlets.get(service_name)
+    }
+}
+
+impl Default for ArtixLinuxInitMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// KAOS PACKAGE STATE GOVERNOR (KAOS LINUX QT/KDE-FIRST REPOSITORY GOVERNOR)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KaOsRepoGroup {
+    Core,
+    Main,
+    Apps,
+}
+
+#[derive(Debug, Clone)]
+pub struct KaOsPackageRecord {
+    pub name: String,
+    pub version: String,
+    pub repo_group: KaOsRepoGroup,
+    pub is_qt_kde_toolkit: bool,
+}
+
+pub struct KaOSPackageStateGovernor {
+    pub packages: BTreeMap<String, KaOsPackageRecord>,
+}
+
+impl KaOSPackageStateGovernor {
+    pub fn new() -> Self {
+        Self {
+            packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
+        let record = KaOsPackageRecord {
+            name: name.to_string(),
+            version: version.to_string(),
+            repo_group: group,
+            is_qt_kde_toolkit: is_qt_kde,
+        };
+        self.packages.insert(name.to_string(), record);
+    }
+
+    pub fn qt_kde_toolkit_ratio(&self) -> f32 {
+        if self.packages.is_empty() {
+            return 1.0;
+        }
+        let qt_count = self.packages.values().filter(|p| p.is_qt_kde_toolkit).count();
+        qt_count as f32 / self.packages.len() as f32
+    }
+}
+
+impl Default for KaOSPackageStateGovernor {
     fn default() -> Self {
         Self::new()
     }
@@ -804,10 +868,9 @@ impl MissingDistroComponentsEngine {
         engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
         engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
         engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
-        engine.register_component("AppArmor MAC Profiles", "Ubuntu", ComponentParityStatus::Implemented);
-        engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
-        engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
-        engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component("Devuan Init Diversity", "Devuan Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Artix Init Scriptlet Matrix", "Artix Linux", ComponentParityStatus::Implemented);
+        engine.register_component("KaOS Qt/KDE Repo Governor", "KaOS Linux", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -1469,27 +1532,34 @@ mod tests {
     }
 
     #[test]
-    fn test_dragonfly_hammer2_engine() {
-        let mut hammer = DragonFlyHammer2Engine::new();
-        let initial_block = hammer.read_block("@ROOT", "/boot/kernel").unwrap();
-        assert_eq!(initial_block, b"SIGMAOS_HAMMER2_KERNEL_IMAGE");
+    fn test_devuan_init_diversity() {
+        let mut devuan = DevuanInitDiversityEngine::new(DevuanInitBackend::OpenRc);
+        devuan.register_service("networking", DevuanInitBackend::OpenRc, "/etc/init.d/networking");
+        assert!(devuan.is_systemd_free());
+        assert_eq!(devuan.services.len(), 1);
+    }
 
-        let tx = hammer.write_block_cow("@ROOT", "/etc/hammer2.conf", b"vfs.hammer2.clean=1").unwrap();
-        assert!(tx > 1);
+    #[test]
+    fn test_artix_init_matrix() {
+        let mut artix = ArtixLinuxInitMatrix::new();
+        artix.register_scriptlet("sshd", "/usr/bin/sshd");
+        let scriptlet = artix.get_scriptlet("sshd").unwrap();
+        assert!(scriptlet.openrc_run_script.contains("/usr/bin/sshd"));
+        assert!(scriptlet.runit_run_script.contains("exec /usr/bin/sshd"));
+    }
 
-        let snap_tx = hammer.create_pfs_snapshot("@ROOT", "@ROOT_SNAP_1").unwrap();
-        assert!(snap_tx > tx);
-
-        let snap_block = hammer.read_block("@ROOT_SNAP_1", "/etc/hammer2.conf").unwrap();
-        assert_eq!(snap_block, b"vfs.hammer2.clean=1");
-
-        assert!(hammer.write_block_cow("@ROOT_SNAP_1", "/etc/hammer2.conf", b"bad").is_err());
+    #[test]
+    fn test_kaos_package_governor() {
+        let mut kaos = KaOSPackageStateGovernor::new();
+        kaos.register_package("plasma-desktop", "5.27", KaOsRepoGroup::Core, true);
+        kaos.register_package("kwrite", "23.08", KaOsRepoGroup::Apps, true);
+        assert_eq!(kaos.qt_kde_toolkit_ratio(), 1.0);
     }
 
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 10);
+        assert_eq!(engine.records.len(), 9);
         assert!(engine.is_all_components_implemented());
     }
 

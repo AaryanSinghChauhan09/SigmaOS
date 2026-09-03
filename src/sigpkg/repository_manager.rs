@@ -59,7 +59,6 @@ pub enum OfficialArchiveSource {
     Backports,
 }
 
-
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
 pub struct Repository {

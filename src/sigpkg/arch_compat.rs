@@ -1003,25 +1003,6 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
         let mut verifier = SAurP2pVerifier::new(

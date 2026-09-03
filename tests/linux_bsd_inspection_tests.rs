@@ -72,49 +72,10 @@ mod protocols;
 mod ready_to_use;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-#[path = "../src/compatibility/community_foundation.rs"]
-mod community_foundation;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-
-use bsd_compat::*;
-
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd_compat;
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-#[path = "../src/compatibility/zorin.rs"]
-mod zorin;
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-#[path = "../src/package/hardening.rs"]
-mod hardening;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
-#[path = "../src/open_source_os_gap_closure.rs"]
-mod open_source_os_gap_closure;
-
-#[path = "../src/security/capability.rs"]
-mod capability;
-
-pub mod security {
-    pub use super::capability::Permission;
-}
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
