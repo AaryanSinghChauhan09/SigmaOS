@@ -107,11 +107,22 @@ WikiSyncEngine_run_sync() {
 
     echo "[WikiSyncEngine::run_sync] Syncing files from '$wiki_dir' to '$target_dir'..."
 
-    # 1. Re-sync README to Home.md in the WIKI directory first
-    if [ -f "README.md" ]; then
+    # 1. Re-sync README to Home.md in the WIKI directory first if WIKI exists
+    if [ -f "README.md" ] && [ -d "$wiki_dir" ]; then
         echo "  [WikiSyncEngine::run_sync] Aligning README.md -> $wiki_dir/Home.md"
         cp README.md "$wiki_dir/Home.md"
     fi
+
+    # Synchronize core documentation files from root and docs/ to target_dir
+    local core_docs=("SECURITY.md" "INSTALL.md" "ARCHITECTURE.md" "ROADMAP.md" "docs/PACKAGE_MANAGER.md" "docs/DISTRO_COMPAT.md" "docs/KERNEL.md")
+    for doc in "${core_docs[@]}"; do
+        if [ -f "$doc" ]; then
+            local base
+            base=$(basename "$doc")
+            echo "  [WikiSyncEngine::run_sync] Syncing core doc: $doc -> $target_dir/$base"
+            cp "$doc" "$target_dir/$base"
+        fi
+    done
 
     # 2. Iterate and sync each page object
     local count=0
@@ -138,14 +149,16 @@ main() {
     WikiSyncEngine_new engine "$wiki_dir" "$target_dir"
     WikiSyncEngine_initialize_env "$engine"
 
-    # Scan WIKI directory and dynamically construct WikiPage objects
-    for filepath in "$wiki_dir"/*.md; do
-        if [ -f "$filepath" ]; then
-            local page
-            WikiPage_new page "$filepath"
-            WikiSyncEngine_add_page "$engine" "$page"
-        fi
-    done
+    # Scan WIKI directory (if it exists) and dynamically construct WikiPage objects
+    if [ -d "$wiki_dir" ]; then
+        for filepath in "$wiki_dir"/*.md; do
+            if [ -f "$filepath" ]; then
+                local page
+                WikiPage_new page "$filepath"
+                WikiSyncEngine_add_page "$engine" "$page"
+            fi
+        done
+    fi
 
     # Perform full batch sync
     WikiSyncEngine_run_sync "$engine"
@@ -154,13 +167,15 @@ main() {
     local engine_wiki
     WikiSyncEngine_new engine_wiki "$wiki_dir" "wiki"
     WikiSyncEngine_initialize_env "$engine_wiki"
-    for filepath in "$wiki_dir"/*.md; do
-        if [ -f "$filepath" ]; then
-            local page
-            WikiPage_new page "$filepath"
-            WikiSyncEngine_add_page "$engine_wiki" "$page"
-        fi
-    done
+    if [ -d "$wiki_dir" ]; then
+        for filepath in "$wiki_dir"/*.md; do
+            if [ -f "$filepath" ]; then
+                local page
+                WikiPage_new page "$filepath"
+                WikiSyncEngine_add_page "$engine_wiki" "$page"
+            fi
+        done
+    fi
     WikiSyncEngine_run_sync "$engine_wiki"
 
     echo "=== Wiki Synchronization Complete! ==="
