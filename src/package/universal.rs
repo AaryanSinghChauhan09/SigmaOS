@@ -130,6 +130,11 @@ pub enum PackageFormat {
     Dmg,      // macOS Disk Image (.dmg)
     Cports,   // Chimera Linux (.cports)
     Cachy,    // CachyOS Package (.cachy)
+    Dports,   // DragonFly BSD DPorts (.dports)
+    SlackBuild, // Slackware SlackBuild (.slackbuild, .tlz, .tbz)
+    Crux,     // CRUX Linux (.crux, .pkgfile)
+    Drpm,     // Delta RPM (.drpm)
+    Stratum,  // Bedrock Linux Stratum (.stratum)
 }
 
 impl PackageFormat {
@@ -204,6 +209,16 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if name.ends_with(".cachy") {
             Some(PackageFormat::Cachy)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".drpm") {
+            Some(PackageFormat::Drpm)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
         } else if name.ends_with(".hap") {
@@ -220,6 +235,16 @@ impl PackageFormat {
             Some(PackageFormat::Pet)
         } else if name.ends_with(".tar") {
             Some(PackageFormat::Tar)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".drpm") {
+            Some(PackageFormat::Drpm)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
         } else {
             None
         }
@@ -1338,6 +1363,26 @@ impl UniversalPackageManager {
             PackageFormat::Cports,
             PackageAdapter::new(PackageFormat::Cports, "cports".to_string()),
         );
+        self.adapters.insert(
+            PackageFormat::Dports,
+            PackageAdapter::new(PackageFormat::Dports, "dports".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::SlackBuild,
+            PackageAdapter::new(PackageFormat::SlackBuild, "slackbuild".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Crux,
+            PackageAdapter::new(PackageFormat::Crux, "crux".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Drpm,
+            PackageAdapter::new(PackageFormat::Drpm, "drpm".to_string()),
+        );
+        self.adapters.insert(
+            PackageFormat::Stratum,
+            PackageAdapter::new(PackageFormat::Stratum, "stratum".to_string()),
+        );
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -1577,6 +1622,16 @@ impl UniversalPackageManifestParser {
             Some(PackageFormat::Tar)
         } else if name.ends_with(".app") {
             Some(PackageFormat::App)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".drpm") {
+            Some(PackageFormat::Drpm)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
         } else {
             None
         }
@@ -1671,8 +1726,45 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert!(manager.adapters.len() >= 25);
+        assert!(manager.adapters.len() >= 30);
         assert!(manager.distro_repo_sync.registered_repos.len() >= 5);
+    }
+
+    #[test]
+    fn test_expanded_new_distro_format_detection() {
+        assert_eq!(
+            PackageFormat::from_filename("hammer2.dports"),
+            Some(PackageFormat::Dports)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("script.slackbuild"),
+            Some(PackageFormat::SlackBuild)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("recipe.crux"),
+            Some(PackageFormat::Crux)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("update.drpm"),
+            Some(PackageFormat::Drpm)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("linux.stratum"),
+            Some(PackageFormat::Stratum)
+        );
+
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("hammer2.dports"),
+            Some(PackageFormat::Dports)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("script.slackbuild"),
+            Some(PackageFormat::SlackBuild)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_filename("recipe.crux"),
+            Some(PackageFormat::Crux)
+        );
     }
 
     #[test]
