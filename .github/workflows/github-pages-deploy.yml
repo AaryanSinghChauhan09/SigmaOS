@@ -1,0 +1,39 @@
+name: GitHub Pages Documentation Deployment
+
+on:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Sync Wiki Documentation
+        run: ./scripts/sync_wiki.sh || true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@983d7736d9b0f578b082e72e42e15291cb11d532
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        with:
+          path: 'WIKI'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db598b2e8824f1146f6630f5d023b723508492

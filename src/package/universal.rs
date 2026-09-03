@@ -15,19 +15,12 @@ use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
+    use super::*;
     #[derive(Debug, Clone)]
-    pub enum LibcFlavor {
-        Musl,
-        Glibc,
-    }
-    pub enum NodeReleaseStream {
-        Lts,
-        Current,
-    pub enum NodeTargetArch {
-        X86_64,
-        Aarch64,
-    pub struct NodeBinaryPackage {
-        pub version: String,
+    pub enum LibcFlavor { Musl, Glibc }
+    pub enum NodeReleaseStream { Lts, Current }
+    pub enum NodeTargetArch { X86_64, Aarch64 }
+    pub struct NodeBinaryPackage { pub version: String }
     impl NodeBinaryPackage {
         pub fn new(
             version: &str,
@@ -39,14 +32,12 @@ pub mod node_distribution_dummy {
             _sig: [u8; 64],
             _size: u64,
         ) -> Self {
-            Self {
-                version: version.to_string(),
-            }
+            Self { version: version.to_string() }
         }
+    }
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
-        pub fn new() -> Self {
-            Self
+        pub fn new() -> Self { Self }
         pub fn install_to_store(
             &self,
             pkg: &NodeBinaryPackage,
@@ -54,6 +45,8 @@ pub mod node_distribution_dummy {
             _npm: &str,
         ) -> Result<String, &'static str> {
             Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
+        }
+    }
 }
 use node_distribution_dummy::*;
 /// Package format type
