@@ -548,28 +548,6 @@ impl UniversalPackageAdapter {
         permissions
     }
 
-    /// Translates sandboxed containerized permissions (Flatpak/Snap) into SigmaOS native Capability permissions
-    #[cfg(test)]
-    pub fn translate_sandbox_permissions(&self, plugs_or_args: &[String]) -> Vec<String> {
-        let mut permissions = Vec::new();
-        for arg in plugs_or_args {
-            if arg == "network" || arg == "network-bind" || arg == "--share=network" {
-                permissions.push("NetworkTcp".to_string());
-                permissions.push("NetworkUdp".to_string());
-            } else if arg == "home" || arg == "--filesystem=home" || arg == "--filesystem=host" {
-                permissions.push("FileRead".to_string());
-                permissions.push("FileWrite".to_string());
-            } else if arg == "--share=ipc" || arg == "ipc" {
-                permissions.push("Ipc".to_string());
-            } else if arg == "pulseaudio" || arg == "audio-playback" || arg == "--socket=pulseaudio" {
-                permissions.push("AudioPlayback".to_string());
-            } else if arg == "x11" || arg == "wayland" || arg == "--socket=x11" || arg == "--socket=wayland" {
-                permissions.push("DisplayAccess".to_string());
-            }
-        }
-        permissions
-    }
-
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
         let f = filename.to_lowercase();
