@@ -425,4 +425,69 @@ gpgcheck=1
 
         assert!(deps.contains(&"dep-pkg".to_string()));
     }
+
+    #[test]
+    fn test_fedora_anitya_release_monitoring() {
+        let mut engine = FedoraAnityaReleaseMonitoringEngine::new();
+        engine.register_project(AnityaProjectRecord {
+            project_id: 101,
+            name: "curl".to_string(),
+            homepage: "https://curl.se".to_string(),
+            current_version: "8.4.0".to_string(),
+            latest_upstream_version: "8.4.0".to_string(),
+            updated_available: false,
+        });
+
+        let is_updated = engine.check_upstream_version("curl", "8.5.0").unwrap();
+        assert!(is_updated);
+        assert_eq!(
+            engine.projects.get("curl").unwrap().latest_upstream_version,
+            "8.5.0"
+        );
+    }
+}
+
+/// Fedora Anitya (release-monitoring.org) Upstream Project Tracking Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaProjectRecord {
+    pub project_id: u32,
+    pub name: String,
+    pub homepage: String,
+    pub current_version: String,
+    pub latest_upstream_version: String,
+    pub updated_available: bool,
+}
+
+/// Fedora Anitya Upstream Release Monitoring Engine
+pub struct FedoraAnityaReleaseMonitoringEngine {
+    pub projects: HashMap<String, AnityaProjectRecord>,
+}
+
+impl FedoraAnityaReleaseMonitoringEngine {
+    pub fn new() -> Self {
+        Self {
+            projects: HashMap::new(),
+        }
+    }
+
+    pub fn register_project(&mut self, record: AnityaProjectRecord) {
+        self.projects.insert(record.name.clone(), record);
+    }
+
+    pub fn check_upstream_version(&mut self, project_name: &str, latest_version: &str) -> Option<bool> {
+        if let Some(record) = self.projects.get_mut(project_name) {
+            let is_new = record.current_version != latest_version;
+            record.latest_upstream_version = latest_version.to_string();
+            record.updated_available = is_new;
+            Some(is_new)
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for FedoraAnityaReleaseMonitoringEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }

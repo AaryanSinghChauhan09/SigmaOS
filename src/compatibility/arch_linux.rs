@@ -908,6 +908,16 @@ impl MkinitcpioGenerator {
         }
     }
 
+    pub fn add_hooks(&mut self, hooks: &[&str]) {
+        for &h in hooks {
+            self.add_hook(h);
+        }
+    }
+
+    pub fn validate_boot_readiness(&self) -> bool {
+        self.hooks.contains(&"base".to_string()) && self.hooks.contains(&"filesystems".to_string())
+    }
+
     pub fn generate_preset_config(&self) -> String {
         let mut config = String::new();
         config.push_str("HOOKS=(");
@@ -1345,6 +1355,15 @@ mod tests {
         let conf = gen.generate_preset_config();
         assert!(conf.contains("encrypt"));
         assert!(conf.contains("COMPRESSION=\"zstd\""));
+    }
+
+    #[test]
+    fn test_mkinitcpio_generator_bulk_hooks() {
+        let mut gen = MkinitcpioGenerator::new();
+        gen.add_hooks(&["encrypt", "lvm2"]);
+        assert!(gen.hooks.contains(&"encrypt".to_string()));
+        assert!(gen.hooks.contains(&"lvm2".to_string()));
+        assert!(gen.validate_boot_readiness());
     }
 
     #[test]

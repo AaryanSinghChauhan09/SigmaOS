@@ -124,6 +124,48 @@ class HeapManager:
         return 1.0 - (max_free / total_free)
 
 
+# --- Mock / Simulation Classes for SQLAlchemy Helper (Fedora DataLab Inspired) ---
+class SQLAlchemyDataLabHelper:
+    def __init__(self, connection_string: str = "sqlite:///:memory:"):
+        self.connection_string = connection_string
+        self.tables = {}
+        self.uncommitted_records = {}
+
+    def create_table(self, table_name: str, schema: dict) -> bool:
+        if table_name in self.tables:
+            return False
+        self.tables[table_name] = {"schema": schema, "records": []}
+        return True
+
+    def insert_record(self, table_name: str, record: dict) -> bool:
+        if table_name not in self.tables:
+            raise KeyError(f"Table '{table_name}' does not exist.")
+        if table_name not in self.uncommitted_records:
+            self.uncommitted_records[table_name] = []
+        self.uncommitted_records[table_name].append(record)
+        return True
+
+    def commit(self) -> int:
+        count = 0
+        for table_name, records in self.uncommitted_records.items():
+            if table_name in self.tables:
+                self.tables[table_name]["records"].extend(records)
+                count += len(records)
+        self.uncommitted_records.clear()
+        return count
+
+    def rollback(self):
+        self.uncommitted_records.clear()
+
+    def query_records(self, table_name: str, filter_key: str = None, filter_val: str = None) -> list:
+        if table_name not in self.tables:
+            return []
+        all_records = self.tables[table_name]["records"]
+        if not filter_key or filter_val is None:
+            return list(all_records)
+        return [r for r in all_records if r.get(filter_key) == filter_val]
+
+
 # --- Unit Test Cases ---
 
 def test_file_io_operations():
@@ -193,3 +235,26 @@ def test_memory_management_alloc_free_leak():
     assert len(heap.blocks) == 1  # Fully coalesced into single free block
     assert heap.blocks[0].size == 4096
     assert heap.get_fragmentation_ratio() == 0.0
+
+
+def test_sqlalchemy_datalab_helper():
+    db = SQLAlchemyDataLabHelper()
+    assert db.create_table("packages", {"id": "int", "name": "str"}) is True
+    assert db.create_table("packages", {"id": "int", "name": "str"}) is False
+
+    db.insert_record("packages", {"id": 1, "name": "sigma-kernel"})
+    db.insert_record("packages", {"id": 2, "name": "sigma-shell"})
+
+    # Uncommitted rollback check
+    db.rollback()
+    assert len(db.query_records("packages")) == 0
+
+    # Commit and query
+    db.insert_record("packages", {"id": 1, "name": "sigma-kernel"})
+    db.insert_record("packages", {"id": 2, "name": "sigma-shell"})
+    committed = db.commit()
+    assert committed == 2
+
+    records = db.query_records("packages", filter_key="name", filter_val="sigma-kernel")
+    assert len(records) == 1
+    assert records[0]["id"] == 1

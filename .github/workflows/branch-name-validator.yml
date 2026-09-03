@@ -41,4 +41,27 @@ jobs:
               core.setFailed(`Branch name '${branchName}' does not start with a valid prefix.`);
             } else {
               console.log(`✅ Branch name '${branchName}' satisfies naming guidelines.`);
+
+              // Fedora Linux style automatic PR branch categorization labeling
+              if (context.payload && context.payload.pull_request) {
+                let branchLabel = 'component';
+                if (branchName.startsWith('feat/') || branchName.startsWith('impl/')) branchLabel = 'feature';
+                else if (branchName.startsWith('fix/')) branchLabel = 'bugfix';
+                else if (branchName.startsWith('docs/')) branchLabel = 'documentation';
+                else if (branchName.startsWith('pkg/') || branchName.startsWith('universal-')) branchLabel = 'packaging';
+                else if (branchName.startsWith('kernel/') || branchName.startsWith('arch/')) branchLabel = 'kernel';
+                else if (branchName.startsWith('security/') || branchName.startsWith('sentinel/')) branchLabel = 'security';
+                else if (branchName.startsWith('perf/') || branchName.startsWith('bolt/')) branchLabel = 'performance';
+
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.pull_request.number,
+                    labels: [branchLabel]
+                  });
+                } catch (e) {
+                  console.log(`Note: Unable to add label '${branchLabel}': ${e.message}`);
+                }
+              }
             }
