@@ -5,6 +5,9 @@ extern crate alloc;
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::collections::HashMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -96,13 +99,19 @@ impl RpmSpecParser {
 
         // Extract from %description section
         if let Some(desc_lines) = self.sections.get("%description") {
-            package.description = desc_lines.join("\n");
+            let mut desc = String::new();
+            for l in desc_lines {
+                desc.push_str(l);
+                desc.push('\n');
+            }
+            package.description = desc;
         }
 
         // Extract from %files section (usually contains some metadata)
         if let Some(files_lines) = self.sections.get("%files") {
             for line in files_lines {
-                if line.starts_with("%doc") || line.starts_with("%config") {
+                let l_str: &str = line.as_str();
+                if l_str.starts_with("%doc") || l_str.starts_with("%config") {
                     // Process file markers
                 }
             }
@@ -227,7 +236,7 @@ impl RpmDatabase {
         let keys_to_remove: Vec<String> = self
             .installed_packages
             .keys()
-            .filter(|k| k.starts_with(name))
+            .filter(|k: &&String| k.starts_with(name))
             .cloned()
             .collect();
 
@@ -445,6 +454,68 @@ gpgcheck=1
             "8.5.0"
         );
     }
+
+    #[test]
+    fn test_fedora_mirrormanager2_routing_and_freshness() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(86400); // 24h staleness
+        mm2.register_mirror(MirrorSiteRecord {
+            url: "https://mirror.us.fedora.org".to_string(),
+            country_code: "US".to_string(),
+            asn_number: 1234,
+            categories: vec!["fedora".to_string(), "updates".to_string()],
+            architectures: vec!["x86_64".to_string()],
+            bandwidth_mbps: 10000,
+            last_synced_timestamp: 1000000,
+            is_active: true,
+        });
+        mm2.register_mirror(MirrorSiteRecord {
+            url: "https://mirror.eu.fedora.org".to_string(),
+            country_code: "DE".to_string(),
+            asn_number: 5678,
+            categories: vec!["fedora".to_string(), "updates".to_string()],
+            architectures: vec!["x86_64".to_string()],
+            bandwidth_mbps: 1000,
+            last_synced_timestamp: 1000000,
+            is_active: true,
+        });
+
+        let routed = mm2.route_client_request("US", 1234, "fedora", "x86_64", 1000100);
+        assert_eq!(routed.len(), 2);
+        assert_eq!(routed[0].country_code, "US");
+
+        // Test staleness
+        let stale_demoted = mm2.verify_mirror_freshness(1000000 + 100000);
+        assert_eq!(stale_demoted, 2);
+        assert!(!mm2.mirrors[0].is_active);
+    }
+
+    #[test]
+    fn test_fedora_mirrormanager2_metalink_xml_generation() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(86400);
+        mm2.register_mirror(MirrorSiteRecord {
+            url: "https://dl.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/".to_string(),
+            country_code: "US".to_string(),
+            asn_number: 100,
+            categories: vec!["fedora".to_string()],
+            architectures: vec!["x86_64".to_string()],
+            bandwidth_mbps: 10000,
+            last_synced_timestamp: 2000000,
+            is_active: true,
+        });
+
+        let xml = mm2.generate_metalink_xml(
+            "repodata/repomd.xml",
+            "fedora",
+            "x86_64",
+            "US",
+            2, // Countme bucket 2 (1-6 months old system)
+            2000100,
+        );
+
+        assert!(xml.contains("metalink version=\"3.0\""));
+        assert!(xml.contains("repodata/repomd.xml"));
+        assert!(xml.contains("countme=2"));
+    }
 }
 
 /// Fedora Anitya (release-monitoring.org) Upstream Project Tracking Record
@@ -489,5 +560,120 @@ impl FedoraAnityaReleaseMonitoringEngine {
 impl Default for FedoraAnityaReleaseMonitoringEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// =========================================================================
+// FEDORA MIRRORMANAGER2 SUB-SYSTEM ENGINE
+// =========================================================================
+
+/// Fedora MirrorManager2 Mirror Site Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MirrorSiteRecord {
+    pub url: String,
+    pub country_code: String,
+    pub asn_number: u32,
+    pub categories: Vec<String>, // "fedora", "epel", "updates", "testing"
+    pub architectures: Vec<String>, // "x86_64", "aarch64", "riscv64"
+    pub bandwidth_mbps: u32,
+    pub last_synced_timestamp: u64,
+    pub is_active: bool,
+}
+
+/// Fedora MirrorManager2 Engine
+pub struct FedoraMirrorManager2Engine {
+    pub mirrors: Vec<MirrorSiteRecord>,
+    pub max_staleness_secs: u64,
+}
+
+impl FedoraMirrorManager2Engine {
+    pub fn new(max_staleness_secs: u64) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            max_staleness_secs,
+        }
+    }
+
+    pub fn register_mirror(&mut self, site: MirrorSiteRecord) {
+        self.mirrors.retain(|m| m.url != site.url);
+        self.mirrors.push(site);
+    }
+
+    /// Selects optimal mirrors matched by country code or ASN, architecture, and category, weighted by bandwidth
+    pub fn route_client_request(
+        &self,
+        country: &str,
+        asn: u32,
+        category: &str,
+        arch: &str,
+        current_timestamp: u64,
+    ) -> Vec<MirrorSiteRecord> {
+        let mut candidates: Vec<MirrorSiteRecord> = self
+            .mirrors
+            .iter()
+            .filter(|m| {
+                m.is_active
+                    && m.categories.iter().any(|c| c == category)
+                    && m.architectures.iter().any(|a| a == arch)
+                    && current_timestamp.saturating_sub(m.last_synced_timestamp) <= self.max_staleness_secs
+            })
+            .cloned()
+            .collect();
+
+        // Sort by proximity: ASN match first, Country match second, then bandwidth descending
+        candidates.sort_by(|a, b| {
+            let score_a = (if a.asn_number == asn { 1000 } else if a.country_code == country { 100 } else { 0 }) + a.bandwidth_mbps;
+            let score_b = (if b.asn_number == asn { 1000 } else if b.country_code == country { 100 } else { 0 }) + b.bandwidth_mbps;
+            score_b.cmp(&score_a)
+        });
+
+        candidates
+    }
+
+    pub fn verify_mirror_freshness(&mut self, current_timestamp: u64) -> usize {
+        let mut stale_count = 0;
+        for mirror in &mut self.mirrors {
+            if current_timestamp.saturating_sub(mirror.last_synced_timestamp) > self.max_staleness_secs {
+                mirror.is_active = false;
+                stale_count += 1;
+            }
+        }
+        stale_count
+    }
+
+    pub fn generate_metalink_xml(
+        &self,
+        repo_file_path: &str,
+        category: &str,
+        arch: &str,
+        country: &str,
+        countme_bucket: u32,
+        current_timestamp: u64,
+    ) -> String {
+        let active_mirrors = self.route_client_request(country, 0, category, arch, current_timestamp);
+
+        let mut xml = format!(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<metalink version=\"3.0\" xmlns=\"http://www.metalinker.org/\" origin=\"Fedora-MirrorManager2\">\n  <files>\n    <file name=\"{}\">\n      <resources>\n",
+            repo_file_path
+        );
+
+        for (preference, mirror) in active_mirrors.iter().enumerate() {
+            xml.push_str(&format!(
+                "        <url protocol=\"https\" type=\"https\" location=\"{}\" preference=\"{}\">{}?countme={}</url>\n",
+                mirror.country_code,
+                100 - preference,
+                mirror.url,
+                countme_bucket
+            ));
+        }
+
+        xml.push_str("      </resources>\n    </file>\n  </files>\n</metalink>");
+        xml
+    }
+}
+
+impl Default for FedoraMirrorManager2Engine {
+    fn default() -> Self {
+        Self::new(86400) // Default 24h staleness limit
     }
 }
