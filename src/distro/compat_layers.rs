@@ -304,7 +304,9 @@ pub struct KEvent {
     pub udata: uptr,     // Opaque user-defined data
 }
 
+#[allow(non_camel_case_types)]
 pub type uptr = usize;
+#[allow(non_camel_case_types)]
 pub type iptr = isize;
 
 /// BSD kqueue event notifications manager

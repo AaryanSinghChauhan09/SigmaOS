@@ -1,4 +1,5 @@
 // SigmaOS Customization Module
+pub mod cursor;
 pub mod profile;
 pub mod routines;
 pub mod theme;
@@ -11,4 +12,8 @@ pub use routines::{
 pub use profile::{
     GameDifficultyBalancer, GamifiedProductivity as CustomGamifiedProductivity, PerformanceProfile,
     ProfileSwitcher, ZenithProfile,
+};
+
+pub use cursor::{
+    CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine,
 };

@@ -506,7 +506,7 @@ impl<'a> Parser<'a> {
             let peek_c = self.peek();
             if peek_c == Some('>') || peek_c == Some('<') || self.starts_with("&>") || self.starts_with(">&") {
                 if let Some(spec) = self.parse_redirect_operator(explicit_fd) {
-                    redirects.push(spec);
+                    redirects.push(spec.into());
                     continue;
                 } else {
                     self.pos = current_pos;

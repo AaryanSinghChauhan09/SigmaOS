@@ -92,6 +92,7 @@ pub struct BsdKevent {
     pub udata: u64,
 }
 
+#[allow(non_camel_case_types)]
 type intptr_t = isize;
 
 /// FreeBSD-inspired kqueue Event Multiplexer

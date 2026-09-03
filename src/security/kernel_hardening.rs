@@ -9,17 +9,8 @@
 //! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
 extern crate alloc;
 
-#[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-#[cfg(test)]
-use crate::klib::HashMap;
-
-#[cfg(not(test))]
-#[cfg(not(test))]
 use alloc::string::{String, ToString};
-
-#[cfg(test)]
-use alloc::string::ToString;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

@@ -334,9 +334,8 @@ mod tests {
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-        let write_data: Vec<u8> = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()
             .to_le_bytes()
             .iter()
@@ -375,9 +374,8 @@ mod tests {
         assert_eq!(mgr.device_count(), 1);
 
         let bio_id = mgr.next_bio_id();
-        let write_data: Vec<u8> = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+        let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
+            .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()
             .to_le_bytes()
             .iter()

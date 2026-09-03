@@ -25,10 +25,7 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use crate::sigpkg::universal_engine::PackageFormat;
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
 use crate::security::Permission;
-#[cfg(test)]
-use crate::access_control::AclEntry as Permission;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
