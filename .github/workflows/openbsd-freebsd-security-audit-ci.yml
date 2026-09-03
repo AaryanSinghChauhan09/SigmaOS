@@ -1,0 +1,29 @@
+name: OpenBSD & FreeBSD Hardened Security Audit CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  bsd-security-verification:
+    name: OpenBSD Pledge/Unveil & FreeBSD ZFS/Jail Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: pip install pytest
+
+      - name: Run OpenBSD & FreeBSD Security Suite
+        run: PYTHONDONTWRITEBYTECODE=1 pytest tests/test_unit_core.py tests/test_integration_system.py
