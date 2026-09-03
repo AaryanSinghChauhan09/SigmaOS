@@ -57,7 +57,7 @@ fi
 # 8. Run Universal Package Manager CLI simulation tests
 echo "[8/12] Running Universal Package Manager CLI simulation tests..."
 if command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_package_manager_cli_simulation(); print('Universal package manager CLI simulation test passed.')"
+  python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal distro subsystem bridge simulation test passed.')"
 else
   echo "Python3 not available; skipping universal package manager tests."
 fi
