@@ -915,6 +915,109 @@ impl Default for IllumosDTraceProbeEngine {
 }
 
 // =========================================================================
+// DRAGONFLY BSD HAMMER2 ZERO-COST SNAPSHOT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsSnapshot {
+    pub pfs_name: String,
+    pub snapshot_id: u64,
+    pub timestamp: u64,
+    pub is_mounted: bool,
+}
+
+pub struct DragonFlyBsdHammerSnapshotEngine {
+    pub snapshots: Vec<Hammer2PfsSnapshot>,
+    pub next_id: u64,
+}
+
+impl DragonFlyBsdHammerSnapshotEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            next_id: 100,
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, pfs_name: &str) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.snapshots.push(Hammer2PfsSnapshot {
+            pfs_name: pfs_name.to_string(),
+            snapshot_id: id,
+            timestamp: 1672531199 + id,
+            is_mounted: false,
+        });
+        id
+    }
+
+    pub fn mount_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
+        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
+            snap.is_mounted = true;
+            Ok(format!("/media/hammer2/@snap_{}", snapshot_id))
+        } else {
+            Err("HAMMER2: Snapshot not found")
+        }
+    }
+}
+
+impl Default for DragonFlyBsdHammerSnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// VANILLA OS APX CONTAINERIZED SUBSYSTEM ENGINE (APX / ABROOT PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApxSubsystemContainer {
+    pub name: String,
+    pub base_distro: String, // e.g. "ubuntu", "arch", "fedora"
+    pub installed_apps: Vec<String>,
+    pub is_active: bool,
+}
+
+pub struct VanillaOsApxSubsystemEngine {
+    pub containers: Vec<ApxSubsystemContainer>,
+}
+
+impl VanillaOsApxSubsystemEngine {
+    pub fn new() -> Self {
+        Self { containers: Vec::new() }
+    }
+
+    pub fn create_apx_container(&mut self, name: &str, base_distro: &str) -> Result<(), &'static str> {
+        if self.containers.iter().any(|c| c.name == name) {
+            return Err("APX: Container name already exists");
+        }
+        self.containers.push(ApxSubsystemContainer {
+            name: name.to_string(),
+            base_distro: base_distro.to_string(),
+            installed_apps: Vec::new(),
+            is_active: true,
+        });
+        Ok(())
+    }
+
+    pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == container_name) {
+            c.installed_apps.push(app.to_string());
+            Ok(())
+        } else {
+            Err("APX: Container not found")
+        }
+    }
+}
+
+impl Default for VanillaOsApxSubsystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // SUSE YAST CONFIGURATION REGISTRY (OPENSUSE YAST / AUTOYAST PARITY)
 // =========================================================================
 
@@ -980,6 +1083,19 @@ impl Default for SuseYaSTConfigurationRegistry {
 
         assert!(yast.apply_configuration("network").unwrap());
         assert!(yast.modules[0].is_applied);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer_and_vanilla_apx() {
+        let mut hammer = DragonFlyBsdHammerSnapshotEngine::new();
+        let sid = hammer.create_pfs_snapshot("root_pfs");
+        let path = hammer.mount_snapshot(sid).unwrap();
+        assert!(path.contains("snap_100"));
+
+        let mut apx = VanillaOsApxSubsystemEngine::new();
+        assert!(apx.create_apx_container("arch-subsystem", "arch").is_ok());
+        assert!(apx.install_apx_app("arch-subsystem", "neofetch").is_ok());
+        assert_eq!(apx.containers[0].installed_apps.len(), 1);
     }
 
     #[test]
