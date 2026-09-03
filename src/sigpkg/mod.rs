@@ -99,6 +99,10 @@ pub use arch_pacman_engine::{
     PacmanCacheCleaner, PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater,
     SafeUpdateChecker,
 };
+pub use arch_pacman_engine::{
+    AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase,
+    RepoDbPackageEntry, RepoStageTier, SovereignDbscriptsEngine,
+};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,

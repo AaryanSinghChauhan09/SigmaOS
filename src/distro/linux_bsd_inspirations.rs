@@ -335,6 +335,9 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
+    pub fn verify_all_subsystems_compatibility(&mut self) -> bool {
+        self.dominance_suite.execute_distro_dominance_matrix()
+    }
 }
 
 // ==========================================

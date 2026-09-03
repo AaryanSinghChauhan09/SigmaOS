@@ -727,4 +727,45 @@ depends=('glibc')
         let removed = cleaner.prune_cache(2);
         assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
     }
+
+    #[test]
+    fn test_sovereign_dbscripts_engine() {
+        let mut dbscripts = SovereignDbscriptsEngine::new();
+
+        let entry = RepoDbPackageEntry {
+            name: "sigma-kernel".to_string(),
+            version: "6.12.0".to_string(),
+            filename: "sigma-kernel-6.12.0-1-x86_64.pkg.tar.zst".to_string(),
+            sha256_hash: "a1b2c3d4e5f67890".to_string(),
+            pgp_dilithium5_signature: "dilithium5-sig-12345".to_string(),
+            stage: RepoStageTier::Testing,
+            depends: vec!["glibc".to_string()],
+            files: vec!["/boot/vmlinuz-sigma".to_string()],
+        };
+
+        // Unsigned repo_add should fail
+        let mut unsigned_entry = entry.clone();
+        unsigned_entry.pgp_dilithium5_signature = String::new();
+        assert!(dbscripts.repo_add(RepoStageTier::Testing, unsigned_entry).is_err());
+
+        // Valid repo_add
+        assert!(dbscripts.repo_add(RepoStageTier::Testing, entry.clone()).is_ok());
+
+        // db-move from Testing to Core
+        assert!(dbscripts.db_move(RepoStageTier::Testing, RepoStageTier::Core, "sigma-kernel").is_ok());
+
+        let core_db = dbscripts.repo_databases.iter().find(|(s, _)| *s == RepoStageTier::Core).unwrap();
+        assert_eq!(core_db.1.len(), 1);
+        assert_eq!(core_db.1[0].name, "sigma-kernel");
+
+        // db-update
+        let mut incoming = entry.clone();
+        incoming.name = "zsh".to_string();
+        incoming.stage = RepoStageTier::Extra;
+        assert_eq!(dbscripts.db_update(vec![incoming]), 1);
+
+        // repo-remove
+        let removed = dbscripts.repo_remove(RepoStageTier::Core, "sigma-kernel").unwrap();
+        assert_eq!(removed.name, "sigma-kernel");
+    }
 }
