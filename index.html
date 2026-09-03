@@ -50,7 +50,7 @@
                     <div class="terminal-output" id="terminal-output"></div>
                     <div class="terminal-input-line">
                         <span class="term-prompt">sovereign@sigma:~$</span>
-                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type help..." autofocus autocomplete="off">
+                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type help..." autofocus autocomplete="off" aria-label="OmniShell Terminal command input">
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
             <div class="window-body">
                 <div class="fm-layout">
                     <div class="fm-toolbar">
-                        <button class="fm-btn" onclick="fmBack()">Back</button>
+                        <button type="button" class="fm-btn" onclick="fmBack()" aria-label="Navigate back in folder history" title="Navigate back in folder history">← Back</button>
                         <span class="fm-breadcrumbs" id="fm-breadcrumbs">/home/sovereign</span>
                     </div>
                     <div class="fm-grid" id="fm-grid"></div>
@@ -141,11 +141,11 @@
                     <div class="settings-content">
                         <div class="settings-group">
                             <h4>Dynamic Theme Engine</h4>
-                            <div class="theme-selector-grid">
-                                <button class="theme-button theme-cyan" onclick="setTheme('cyan')">Cyan</button>
-                                <button class="theme-button theme-gold" onclick="setTheme('gold')">Gold</button>
-                                <button class="theme-button theme-solar" onclick="setTheme('solar')">Solar</button>
-                                <button class="theme-button theme-crimson" onclick="setTheme('crimson')">Crimson</button>
+                            <div class="theme-selector-grid" role="group" aria-label="Color Theme Selection">
+                                <button type="button" class="theme-button theme-cyan" onclick="setTheme('cyan')" aria-label="Switch to Cyan theme" title="Switch to Cyan theme">Cyan</button>
+                                <button type="button" class="theme-button theme-gold" onclick="setTheme('gold')" aria-label="Switch to Gold theme" title="Switch to Gold theme">Gold</button>
+                                <button type="button" class="theme-button theme-solar" onclick="setTheme('solar')" aria-label="Switch to Solar theme" title="Switch to Solar theme">Solar</button>
+                                <button type="button" class="theme-button theme-crimson" onclick="setTheme('crimson')" aria-label="Switch to Crimson theme" title="Switch to Crimson theme">Crimson</button>
                             </div>
                         </div>
                         <div class="settings-group">
@@ -185,16 +185,16 @@
                     <div class="settings-group">
                         <h4 class="auto-style-19">Zero-Loss paise GST Calculator</h4>
                         <div class="auto-style-20">
-                            <input class="cmd-input auto-style-21" type="number" id="gst-amount" placeholder="Amount (in paise)">
-                            <input class="cmd-input auto-style-22" type="number" id="gst-rate" placeholder="GST Rate %">
+                            <input class="cmd-input auto-style-21" type="number" id="gst-amount" placeholder="Amount (in paise)" aria-label="GST amount in paise">
+                            <input class="cmd-input auto-style-22" type="number" id="gst-rate" placeholder="GST Rate %" aria-label="GST rate percentage">
                         </div>
-                        <button class="wizard-btn auto-style-23" onclick="calculateGST()">COMPUTE GST</button>
+                        <button type="button" class="wizard-btn auto-style-23" onclick="calculateGST()" aria-label="Compute GST calculation">COMPUTE GST</button>
                         <div class="auto-style-24" id="gst-result">> Result: Ready</div>
                     </div>
                     <div class="settings-group">
                         <h4 class="auto-style-25">BNS Legal Complier</h4>
-                        <input class="cmd-input auto-style-26" type="text" id="legal-query" placeholder="Search BNS section...">
-                        <button class="wizard-btn auto-style-27" onclick="checkLegalCompliance()">MAP COMPLIANCE</button>
+                        <input class="cmd-input auto-style-26" type="text" id="legal-query" placeholder="Search BNS section..." aria-label="Search BNS legal section">
+                        <button type="button" class="wizard-btn auto-style-27" onclick="checkLegalCompliance()" aria-label="Map legal compliance section">MAP COMPLIANCE</button>
                         <div class="auto-style-28" id="legal-result">> Mapping Status: Active</div>
                     </div>
                 </div>
@@ -352,7 +352,7 @@
                         <!-- Syscall Docs -->
                         <div id="dev-syscall-docs" class="dev-portal-tab-content active">
                             <h3>Syscall & API Reference</h3>
-                            <input type="text" class="cmd-input" id="syscall-search" placeholder="Search syscalls (e.g., sys_write, sys_exit)..." oninput="searchSyscalls()">
+                            <input type="text" class="cmd-input" id="syscall-search" placeholder="Search syscalls (e.g., sys_write, sys_exit)..." oninput="searchSyscalls()" aria-label="Search syscall documentation">
                             <div class="syscall-list-container" id="syscall-list-container">
                                 <!-- Populated dynamically -->
                             </div>
@@ -425,9 +425,9 @@
                 <div id="emulator-controls" class="emulator-bottom-panel">
                     <div class="emulator-input-box">
                         <span>&gt;</span>
-                        <input type="text" id="emulator-input" class="emulator-terminal-input" placeholder="Type command (boot, help, neofetch)..." onkeydown="handleEmulatorCommand(event)">
+                        <input type="text" id="emulator-input" class="emulator-terminal-input" placeholder="Type command (boot, help, neofetch)..." onkeydown="handleEmulatorCommand(event)" aria-label="Kernel emulator command input">
                     </div>
-                    <button class="wizard-btn" onclick="bootEmulator()">BOOT ENGINE</button>
+                    <button type="button" class="wizard-btn" onclick="bootEmulator()" aria-label="Boot kernel emulator engine">BOOT ENGINE</button>
                 </div>
             </div>
         </div>
@@ -549,8 +549,8 @@
     </div>
 
     <!-- Alt + Space Command Center -->
-    <div id="cmd-palette">
-        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands...">
+    <div id="cmd-palette" role="dialog" aria-label="Command Center">
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands..." aria-label="Search system commands">
         <div class="cmd-results" id="cmd-results"></div>
     </div>
 

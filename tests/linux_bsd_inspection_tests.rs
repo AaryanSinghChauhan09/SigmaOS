@@ -64,7 +64,7 @@ mod ready_to_use;
 mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
->>>>>>> origin/fix/test-suite-stabilization-and-deduplication-9630726706765058914
+
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
