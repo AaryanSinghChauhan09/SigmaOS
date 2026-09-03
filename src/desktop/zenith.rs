@@ -136,6 +136,8 @@ impl WindowCapability {
 pub struct SimpleWindow {
     pub id: WindowID,
     pub title: [u8; 128],
+    /// Bolt ⚡ Performance Optimization: Pre-computed title byte length.
+    /// Eliminates linear O(N) null-byte scans on every title() invocation.
     pub title_len: usize,
     pub x: u32,
     pub y: u32,
@@ -189,7 +191,7 @@ impl Window for SimpleWindow {
     }
 
     fn title(&self) -> &[u8] {
-        // O(1) constant-time slice access using cached title_len, replacing O(N) zero-byte linear scan
+        // Bolt ⚡ O(1) constant-time slice access using cached title_len
         &self.title[..self.title_len]
     }
 

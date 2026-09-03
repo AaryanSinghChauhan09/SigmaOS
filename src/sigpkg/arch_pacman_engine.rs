@@ -386,71 +386,6 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
-/// Pacman Contrib Engine aggregating pacman-contrib utilities
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        PacmanContribEngine
-    }
-
-    pub fn paccache_clean(&self, files: &[String], keep_count: usize) -> Vec<String> {
-        let mut cleaner = PacmanCacheCleaner::new(files.to_vec());
-        cleaner.prune_cache(keep_count)
-    }
-
-    pub fn rankmirrors(&self, mirrors: &[(String, u64)], top_k: usize) -> Vec<(String, u64)> {
-        let mut sorted = mirrors.to_vec();
-        sorted.sort_by_key(|m| m.1);
-        sorted.truncate(top_k);
-        sorted
-    }
-
-    pub fn updpkgsums(&self, pkgbuild_text: &str, new_hash: &str) -> String {
-        let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
-        let mut found = false;
-        for line in &mut lines {
-            if line.starts_with("sha256sums=") {
-                *line = format!("sha256sums=('{}')", new_hash);
-                found = true;
-                break;
-            }
-        }
-        if !found {
-            lines.push(format!("sha256sums=('{}')", new_hash));
-        }
-        lines.join("\n")
-    }
-
-    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
-        let mut updates = Vec::new();
-        for local in &local_db.local_packages {
-            if let Some(repo_pkg) = remote_db.packages.iter().find(|p| p.name == local.name) {
-                if repo_pkg.version != local.version {
-                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
-                }
-            }
-        }
-        updates
-    }
-
-    pub fn finddeps(&self, local_db: &PacmanDatabase, target_dep: &str) -> Vec<String> {
-        let mut dependents = Vec::new();
-        for pkg in &local_db.local_packages {
-            if pkg.depends.contains(&target_dep.to_string()) {
-                dependents.push(pkg.name.clone());
-            }
-        }
-        dependents
-    }
-}
-
-impl Default for PacmanContribEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // ============================================================================
 // ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
 // ============================================================================
@@ -782,62 +717,11 @@ depends=('glibc')
     }
 
     #[test]
-    fn test_pacman_contrib_engine() {
-        let contrib = PacmanContribEngine::new();
-
-        // Test paccache
-        let cache = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
-        let to_remove = contrib.paccache_clean(&cache, 2);
-        assert_eq!(to_remove, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
-
-        // Test rankmirrors
-        let mirrors = vec![("mirror1".to_string(), 120), ("mirror2".to_string(), 45), ("mirror3".to_string(), 80)];
-        let ranked = contrib.rankmirrors(&mirrors, 2);
-        assert_eq!(ranked.len(), 2);
-        assert_eq!(ranked[0].0, "mirror2");
-
-        // Test updpkgsums
-        let pkgbuild = "pkgname=foo\nsha256sums=('oldsum')";
-        let updated = contrib.updpkgsums(pkgbuild, "newsum123");
-        assert!(updated.contains("sha256sums=('newsum123')"));
-
-        // Test checkupdates & finddeps
-        let mut local_db = PacmanDatabase::new();
-        let mut remote_db = PacmanDatabase::new();
-
-        let mut pkg = ArchPacmanPackage {
-            name: "linux-zen".to_string(),
-            version: "6.5.0".to_string(),
-            description: "Zen Kernel".to_string(),
-            url: "".to_string(),
-            architecture: "x86_64".to_string(),
-            license: Vec::new(),
-            groups: Vec::new(),
-            depends: vec!["glibc".to_string()],
-            optdepends: Vec::new(),
-            makedepends: Vec::new(),
-            checkdepends: Vec::new(),
-            provides: Vec::new(),
-            conflicts: Vec::new(),
-            replaces: Vec::new(),
-            backup: Vec::new(),
-            installed_size: 5000,
-            packager: "".to_string(),
-            build_date: "".to_string(),
-            install_date: "".to_string(),
-            is_explicit: true,
-        };
-
-        local_db.local_packages.push(pkg.clone());
-        pkg.version = "6.6.0".to_string();
-        remote_db.packages.push(pkg);
-
-        let updates = contrib.checkupdates(&local_db, &remote_db);
-        assert_eq!(updates.len(), 1);
-        assert_eq!(updates[0].0, "linux-zen");
-        assert_eq!(updates[0].2, "6.6.0");
-
-        let deps = contrib.finddeps(&local_db, "glibc");
-        assert_eq!(deps, vec!["linux-zen".to_string()]);
+    fn test_pacman_cache_cleaner() {
+        let files = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
+        let mut cleaner = PacmanCacheCleaner::new(files);
+        let removed = cleaner.prune_cache(2);
+        assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
+        assert_eq!(cleaner.cached_files.len(), 2);
     }
 }
