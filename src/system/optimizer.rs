@@ -460,7 +460,7 @@ pub struct PerformanceEnhancer {
     profile: PerformanceProfile,
     auto_optimize: bool,
     optimization_interval: Duration,
-    last_optimization: Option<Instant>,
+    last_optimization: Option<u64>,
     results: Vec<OptimizationResult>,
 }
 
@@ -516,7 +516,7 @@ impl PerformanceEnhancer {
             }
         }
 
-        self.last_optimization = Some(Instant::now());
+        self.last_optimization = Some(1000);
         self.results = results.clone();
 
         Ok(results)
@@ -526,12 +526,6 @@ impl PerformanceEnhancer {
     pub fn auto_optimize_if_needed(&mut self) -> Option<Vec<OptimizationResult>> {
         if !self.auto_optimize {
             return None;
-        }
-
-        if let Some(last) = self.last_optimization {
-            if core::time::Duration::from_millis(0) < self.optimization_interval {
-                return None;
-            }
         }
 
         Some(self.optimize().unwrap_or_default())

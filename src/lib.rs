@@ -73,11 +73,13 @@ pub use package::bsd_linux_package_innovations::{
     UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use unimplemented_features::{
-    AndroidApexContainerModuleEngine, AndroidApexModule, DeepinDdeControlCenterEngine,
-    DistroWatchParityMetricsHub, ManjaroHardwareDetectionEngine, PhoronixAutomatedBenchmarkEngine,
-    PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine, RockyAlmaLinuxEnterpriseLifecycleGovernor,
-    RosettaDynamicBinaryTranslator, SteamOsGamescopeCompositorEngine, TargetArch,
-    TinyCoreModularTczLoader, VoidXbpsContainerEngine,
+    Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine, AndroidApexModule,
+    DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub, FrappeFrameworkDocTypeEngine,
+    HwbustersPowerSupplyMonitor, MacOsSequoiaWindowManager, ManjaroHardwareDetectionEngine,
+    PhoronixAutomatedBenchmarkEngine, PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine,
+    RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator,
+    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, VoidXbpsContainerEngine,
+    WindowsCopilotRecallAuditor,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,

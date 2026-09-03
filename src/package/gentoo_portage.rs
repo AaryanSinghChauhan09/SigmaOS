@@ -273,6 +273,8 @@ impl SigmaPortage {
     pub fn emerge(&mut self, package: &str) -> Result<(), PortageError> {
         let ebuild = self.tree.find_ebuild(package)?.clone();
 
+        let ebuild_clone = ebuild.clone();
+
         // Resolve USE flags
         let use_flags = self.use_flags.resolve_for_package(&ebuild)?;
 
@@ -287,7 +289,7 @@ impl SigmaPortage {
         }
 
         // Simulate build process
-        println!("Emerging {} ({})", package, ebuild.version);
+        println!("Emerging {} ({})", package, ebuild_clone.version);
         println!("USE flags: {:?}", use_flags);
         println!("Dependencies: {:?}", dependencies);
 

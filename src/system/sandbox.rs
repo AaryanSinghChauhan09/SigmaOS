@@ -23,7 +23,8 @@ use alloc::vec::Vec;
 // OOP-based process sandboxing with capability-based security
 
 use crate::klib::BTreeMap;
-// Path/PathBuf not in no_std
+pub type Path = str;
+pub type PathBuf = String;
 
 /// Sandbox profile
 #[derive(Debug, Clone)]
@@ -70,7 +71,7 @@ impl Default for ResourceLimits {
 pub struct SandboxProcess {
     pub pid: u64,
     pub profile_name: String,
-    pub start_time: std::time::Instant,
+    pub start_time: u64,
     pub is_active: bool,
     pub resource_usage: ResourceUsage,
 }
@@ -304,9 +305,10 @@ impl ProcessSandboxManager {
         let profile = self
             .profiles
             .get(&key)
+            .cloned()
             .ok_or_else(|| SandboxError::ProfileNotFound(profile_name.to_string()))?;
 
-        let result = self.enforcer.apply_sandbox(pid, profile)?;
+        let result = self.enforcer.apply_sandbox(pid, &profile)?;
 
         self.active_processes.push(SandboxProcess {
             pid,

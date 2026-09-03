@@ -10,6 +10,43 @@ use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 
+/// Ubuntu PPA (Personal Package Archive) representation
+#[derive(Debug, Clone)]
+pub struct PpaRepository {
+    pub owner: String,
+    pub name: String,
+    pub gpg_fingerprint: String,
+    pub enabled: bool,
+}
+
+impl PpaRepository {
+    pub fn new(owner: &str, name: &str, fingerprint: &str) -> Self {
+        Self {
+            owner: owner.to_string(),
+            name: name.to_string(),
+            gpg_fingerprint: fingerprint.to_string(),
+            enabled: true,
+        }
+    }
+
+    pub fn to_sources_list_entry(&self) -> String {
+        format!(
+            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
+            self.owner, self.name
+        )
+    }
+}
+
+
+
+
+/// Linux Mint Sources Mirror Benchmark Engine
+#[derive(Debug, Clone)]
+pub struct MirrorBenchmark {
+    pub url: String,
+    pub latency_ms: u32,
+    pub download_speed_kbps: u32,
+}
 
 pub struct MirrorBenchmarkEngine;
 

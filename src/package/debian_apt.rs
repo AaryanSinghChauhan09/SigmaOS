@@ -6,6 +6,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use crate::klib::collections::HashSet;
+use alloc::collections::{BTreeMap, BTreeSet};
 
 /// APT error types
 #[derive(Debug, Clone)]
@@ -55,7 +56,7 @@ pub struct SourcesEntry {
 pub struct AptDatabase {
     pub installed: BTreeMap<String, AptPackage>,
     pub available: BTreeMap<String, AptPackage>,
-    pub held_packages: HashSet<String>,
+    pub held_packages: BTreeSet<String>,
 }
 
 impl AptDatabase {
@@ -63,7 +64,7 @@ impl AptDatabase {
         Self {
             installed: BTreeMap::new(),
             available: BTreeMap::new(),
-            held_packages: HashSet::new(),
+            held_packages: BTreeSet::new(),
         }
     }
 

@@ -51,27 +51,6 @@ impl MemoryProtectionState {
         } else {
             Ok(requested)
         }
-
-        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
-        for i in 0..self.logs.len() {
-            let log = &self.logs[i];
-            if log.previous_hash != expected_prev {
-                return false; // Chain broken! Tampering detected!
-            }
-
-            let payload: u64 = log.process_id
-                ^ (log.permission as u64)
-                ^ (if log.status_allowed { 1u64 } else { 0u64 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
-
-            if log.entry_hash != calculated_hash {
-                return false; // Entry hash mismatch! Tampering detected!
-            }
-
-            expected_prev = log.entry_hash;
-        }
-
-        true
     }
 }
 
@@ -159,6 +138,61 @@ impl SecurityHardeningConfig {
 impl Default for SecurityHardeningConfig {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub fn secure_zeroize(buffer: &mut [u8]) {
+    for byte in buffer.iter_mut() {
+        unsafe { core::ptr::write_volatile(byte, 0) };
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IntrusionSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct AuditLogEntry {
+    pub timestamp_ms: u64,
+    pub event: alloc::string::String,
+    pub severity: IntrusionSeverity,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct HardenedAuditTrail {
+    pub logs: alloc::vec::Vec<AuditLogEntry>,
+}
+
+impl HardenedAuditTrail {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn record_event(&mut self, event: &str, severity: IntrusionSeverity) {
+        self.logs.push(AuditLogEntry {
+            timestamp_ms: 1000,
+            event: event.into(),
+            severity,
+        });
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct IntrusionMonitor {
+    pub audit_trail: HardenedAuditTrail,
+}
+
+impl IntrusionMonitor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn log_intrusion_attempt(&mut self, source: &str, severity: IntrusionSeverity) {
+        self.audit_trail.record_event(source, severity);
     }
 }
 

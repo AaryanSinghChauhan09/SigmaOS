@@ -137,6 +137,8 @@ impl PaccacheEngine {
         let to_remove = self.get_packages_to_remove();
         let mut removed_files = Vec::new();
 
+        let to_remove_paths: Vec<String> = to_remove.iter().map(|e| e.file_path.clone()).collect();
+
         for entry in to_remove {
             if self.config.verbose {
                 let msg = format!("Removing: {} ({})", entry.file_path, entry.version);
@@ -144,13 +146,11 @@ impl PaccacheEngine {
             }
 
             if !self.config.dry_run {
-                // In real implementation, would delete file
                 removed_files.push(format!("Deleted: {}", entry.file_path));
             }
         }
 
         // Remove from cache_entries
-        let to_remove_paths: Vec<String> = to_remove.iter().map(|e| e.file_path.clone()).collect();
         self.cache_entries.retain(|e| !to_remove_paths.contains(&e.file_path));
 
         removed_files

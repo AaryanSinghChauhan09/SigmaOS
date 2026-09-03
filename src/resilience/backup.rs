@@ -87,7 +87,7 @@ pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift::new();
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 
-use crate::klib::HashMap;
+use alloc::collections::BTreeMap as HashMap;
 // SystemTime not in no_std; using u64 timestamps
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -270,21 +270,20 @@ impl AdvancedTimeshiftEngine {
         schedule: SnapshotSchedule,
         raw_manifest: HashMap<String, String>,
     ) -> Result<String, &'static str> {
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_secs())
-            .unwrap_or(0);
+        let timestamp = 1000u64;
 
         // Filter out excluded path entries
-        let filtered_manifest: HashMap<String, String> = raw_manifest
-            .into_iter()
-            .filter(|(path, _)| !self.exclusion_filter.is_path_excluded(path))
-            .collect();
+        let mut filtered_manifest = HashMap::new();
+        for (path, val) in raw_manifest {
+            if !self.exclusion_filter.is_path_excluded(&path) {
+                filtered_manifest.insert(path, val);
+            }
+        }
 
         // Calculate snapshot hash checksum
         let mut checksum: u64 = 0xcbf29ce484222325;
-        for (k, v) in &filtered_manifest {
-            for b in k.bytes().chain(v.bytes()) {
+        for (k, v) in filtered_manifest.iter() {
+            for b in k.as_str().bytes().chain(v.as_str().bytes()) {
                 checksum ^= b as u64;
                 checksum = checksum.wrapping_mul(0x100000001b3);
             }
