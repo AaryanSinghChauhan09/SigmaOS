@@ -26,7 +26,9 @@ pub trait Terminal {
 pub struct SimpleTerminal {
     pub id: TerminalID,
     pub title: [u8; 128],
+    pub title_len: u8,
     pub working_directory: [u8; 256],
+    pub dir_len: u16,
 }
 
 impl SimpleTerminal {
@@ -34,15 +36,18 @@ impl SimpleTerminal {
         let mut title_array = [0u8; 128];
         let mut dir_array = [0u8; 256];
         let title_len = title.len().min(127);
-        let dir_len = b"/home/user".len().min(255);
+        let default_dir = b"/home/user";
+        let dir_len = default_dir.len().min(255);
         unsafe {
             core::ptr::copy_nonoverlapping(title.as_ptr(), title_array.as_mut_ptr(), title_len);
-            core::ptr::copy_nonoverlapping(b"/home/user".as_ptr(), dir_array.as_mut_ptr(), dir_len);
+            core::ptr::copy_nonoverlapping(default_dir.as_ptr(), dir_array.as_mut_ptr(), dir_len);
         }
         SimpleTerminal {
             id,
             title: title_array,
+            title_len: title_len as u8,
             working_directory: dir_array,
+            dir_len: dir_len as u16,
         }
     }
 }
@@ -50,12 +55,16 @@ impl SimpleTerminal {
 impl Terminal for SimpleTerminal {
     fn id(&self) -> TerminalID { self.id }
     fn title(&self) -> &[u8] {
-        let len = self.title.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.title[..len]
+        // Bolt ⚡ Optimization: Store explicit title length on creation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every title query,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.title[..self.title_len as usize]
     }
     fn working_directory(&self) -> &[u8] {
-        let len = self.working_directory.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.working_directory[..len]
+        // Bolt ⚡ Optimization: Store explicit working directory length to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every directory lookup,
+        // reducing slice retrieval to instantaneous O(1) constant time.
+        &self.working_directory[..self.dir_len as usize]
     }
     
     fn set_working_directory(&mut self, path: &[u8]) {
@@ -63,6 +72,7 @@ impl Terminal for SimpleTerminal {
         unsafe {
             core::ptr::copy_nonoverlapping(path.as_ptr(), self.working_directory.as_mut_ptr(), path_len);
         }
+        self.dir_len = path_len as u16;
     }
 }
 
@@ -143,18 +153,21 @@ pub trait ShellIntegration {
 #[repr(C)]
 pub struct SimpleShellIntegration {
     pub shell: [u8; 64],
-    pub env_vars: Vec<([u8; 64], [u8; 256])>,
+    pub shell_len: u8,
+    pub env_vars: Vec<([u8; 64], u8, [u8; 256], u16)>,
 }
 
 impl SimpleShellIntegration {
     pub fn new() -> Self {
         let mut shell_array = [0u8; 64];
-        let shell_len = b"/bin/bash".len().min(63);
+        let default_shell = b"/bin/bash";
+        let shell_len = default_shell.len().min(63);
         for i in 0..shell_len {
-            shell_array[i] = b"/bin/bash"[i];
+            shell_array[i] = default_shell[i];
         }
         SimpleShellIntegration {
             shell: shell_array,
+            shell_len: shell_len as u8,
             env_vars: Vec::new(),
         }
     }
@@ -162,8 +175,8 @@ impl SimpleShellIntegration {
 
 impl ShellIntegration for SimpleShellIntegration {
     fn get_shell(&self) -> &[u8] {
-        let len = self.shell.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.shell[..len]
+        // Bolt ⚡ Optimization: Use cached shell length for O(1) constant-time slice retrieval
+        &self.shell[..self.shell_len as usize]
     }
     
     fn set_shell(&mut self, shell: &[u8]) {
@@ -171,14 +184,15 @@ impl ShellIntegration for SimpleShellIntegration {
         for i in 0..shell_len {
             self.shell[i] = shell[i];
         }
+        self.shell_len = shell_len as u8;
     }
     
     fn get_env_var(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, ref v) in &self.env_vars {
-            let k_len = k.iter().position(|&b| b == 0).unwrap_or(64);
-            if &k[..k_len] == key {
-                let v_len = v.iter().position(|&b| b == 0).unwrap_or(256);
-                return Some(&v[..v_len]);
+        for &(ref k, k_len, ref v, v_len) in &self.env_vars {
+            // Bolt ⚡ Optimization: Instantaneous O(1) slice lookup using cached lengths,
+            // bypassing O(N) zero-byte searches on every environment variable access.
+            if &k[..k_len as usize] == key {
+                return Some(&v[..v_len as usize]);
             }
         }
         None
@@ -191,7 +205,7 @@ impl ShellIntegration for SimpleShellIntegration {
         let value_len = value.len().min(255);
         for i in 0..key_len { key_array[i] = key[i]; }
         for i in 0..value_len { value_array[i] = value[i]; }
-        self.env_vars.push((key_array, value_array));
+        self.env_vars.push((key_array, key_len as u8, value_array, value_len as u16));
     }
 }
 
@@ -233,7 +247,7 @@ impl AnsiEscapeInterpreter {
         if code.len() >= 4 && code[0] == b'\x1b' && code[1] == b']' {
             let last_byte = code[code.len() - 1];
             if last_byte == b'\x07' || last_byte == b'\\' {
-                if (code.len() >= 5 && (code[2] == b'0' || code[2] == b'2') && code[3] == b';') {
+                if code.len() >= 5 && (code[2] == b'0' || code[2] == b'2') && code[3] == b';' {
                     let title_slice = &code[4..code.len() - 1];
                     let len = title_slice.len().min(127);
                     self.window_title[..len].copy_from_slice(&title_slice[..len]);
@@ -503,7 +517,23 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(not(test))]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
+    malloc(size)
+}
 
 
 impl<T> core::ops::Deref for Vec<T> {
@@ -545,5 +575,36 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_terminal_cached_slice_access() {
+        let mut term = SimpleTerminal::new(1, b"Sigma Term");
+        assert_eq!(term.title(), b"Sigma Term");
+        assert_eq!(term.working_directory(), b"/home/user");
+
+        term.set_working_directory(b"/var/log");
+        assert_eq!(term.working_directory(), b"/var/log");
+    }
+
+    #[test]
+    fn test_simple_shell_integration_cached_slice_access() {
+        let mut shell_integration = SimpleShellIntegration::new();
+        assert_eq!(shell_integration.get_shell(), b"/bin/bash");
+
+        shell_integration.set_shell(b"/bin/zsh");
+        assert_eq!(shell_integration.get_shell(), b"/bin/zsh");
+
+        shell_integration.set_env_var(b"PATH", b"/usr/bin:/bin");
+        shell_integration.set_env_var(b"TERM", b"xterm-256color");
+
+        assert_eq!(shell_integration.get_env_var(b"PATH"), Some(&b"/usr/bin:/bin"[..]));
+        assert_eq!(shell_integration.get_env_var(b"TERM"), Some(&b"xterm-256color"[..]));
+        assert_eq!(shell_integration.get_env_var(b"NONEXISTENT"), None);
     }
 }
