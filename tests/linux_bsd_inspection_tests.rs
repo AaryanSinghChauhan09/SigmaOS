@@ -221,6 +221,11 @@ fn test_wiki_distro_innovations_inspection() {
         NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
         SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
         SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ, CAP_SEEK,
+    use wiki_ideas::{
+        NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
+        SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
+        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
+        SovereignSystemdParityEngine, SystemdUnitActiveState,
     };
 
     // 1. NixOS Declarative System State
