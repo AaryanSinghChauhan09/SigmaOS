@@ -18,7 +18,6 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::format;
 
 // (no_std only applicable at crate root - removed)
@@ -47,6 +46,7 @@ pub trait FingerprintTemplate {
 pub struct SimpleFingerprintTemplate {
     pub id: FingerID,
     pub data: [u8; 512],
+    pub data_len: u16,
     pub quality: AtomicUsize,
 }
 
@@ -60,6 +60,7 @@ impl SimpleFingerprintTemplate {
         SimpleFingerprintTemplate {
             id,
             data: data_array,
+            data_len: data_len as u16,
             quality: AtomicUsize::new(quality as usize),
         }
     }
@@ -68,8 +69,10 @@ impl SimpleFingerprintTemplate {
 impl FingerprintTemplate for SimpleFingerprintTemplate {
     fn id(&self) -> FingerID { self.id }
     fn data(&self) -> &[u8] {
-        let len = self.data.iter().position(|&b| b == 0).unwrap_or(512);
-        &self.data[..len]
+        // Bolt ⚡ Optimization: Store explicit template byte length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every fingerprint template data access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.data[..self.data_len as usize]
     }
     fn quality(&self) -> u32 { self.quality.load(Ordering::SeqCst) as u32 }
 }
@@ -77,7 +80,7 @@ impl FingerprintTemplate for SimpleFingerprintTemplate {
 pub trait FingerprintScanner {
     fn scan(&mut self) -> Result<Box<dyn FingerprintTemplate>, ScanError>;
     fn enroll(&mut self, _user_id: usize) -> Result<FingerID, ScanError>;
-    def verify(&self, template: &dyn FingerprintTemplate) -> Result<bool, ScanError>;
+    fn verify(&self, template: &dyn FingerprintTemplate) -> Result<bool, ScanError>;
 }
 
 #[repr(C)]
@@ -172,17 +175,19 @@ impl<T> Vec<T> {
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_layout = core::alloc::Layout::array::<T>(new_capacity).unwrap();
+        let new_data = alloc::alloc::alloc(new_layout) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            if self.capacity > 0 {
+                let old_layout = core::alloc::Layout::array::<T>(self.capacity).unwrap();
+                alloc::alloc::dealloc(self.data as *mut u8, old_layout);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 
 impl<T> core::ops::Deref for Vec<T> {
@@ -224,5 +229,30 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_fingerprint_template_o1_lookup() {
+        let raw_data = b"fingerprint_template_sample_bytes_12345";
+        let template = SimpleFingerprintTemplate::new(1, raw_data, 95);
+        assert_eq!(template.id(), 1);
+        assert_eq!(template.data(), raw_data);
+        assert_eq!(template.quality(), 95);
+    }
+
+    #[test]
+    fn test_simple_fingerprint_scanner() {
+        let mut scanner = SimpleFingerprintScanner::new();
+        let scanned = scanner.scan().unwrap();
+        assert_eq!(scanned.data(), b"fingerprint_data");
+
+        let enrolled_id = scanner.enroll(42).unwrap();
+        assert!(enrolled_id > 0);
+        assert!(scanner.verify(scanned.as_ref()).unwrap());
     }
 }

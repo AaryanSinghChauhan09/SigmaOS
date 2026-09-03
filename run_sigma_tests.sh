@@ -7,7 +7,7 @@ set -e
 echo "=== SigmaOS / SovereignOS Master CI Test Runner ==="
 
 # 1. Run Python integration test suite if pytest module is available
-echo "[1/7] Checking Python integration test suite..."
+echo "[1/8] Checking Python integration test suite..."
 if command -v pytest &>/dev/null; then
   pytest tests/
 elif python3 -m pytest --version &>/dev/null; then
@@ -19,28 +19,28 @@ else
 fi
 
 # 2. Run Open Source OS Gap Closure standalone tests
-echo "[2/7] Running Open Source OS Gap Closure standalone tests..."
+echo "[2/8] Running Open Source OS Gap Closure standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o /tmp/test_gap
 /tmp/test_gap
 
 # 3. Run Expanded Wiki Innovations standalone tests
-echo "[3/7] Running Expanded Wiki Innovations standalone tests..."
+echo "[3/8] Running Expanded Wiki Innovations standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o /tmp/test_wiki
 /tmp/test_wiki
 
 # 4. Run Arch Pacman & Boot standalone tests
-echo "[4/7] Running Arch Pacman & Boot standalone tests..."
+echo "[4/8] Running Arch Pacman & Boot standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o /tmp/test_arch
 /tmp/test_arch
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o /tmp/test_boot
 /tmp/test_boot
 
 # 5. Run changed files standalone tests runner
-echo "[5/7] Running changed files standalone rustc test runner..."
+echo "[5/8] Running changed files standalone rustc test runner..."
 ./scripts/changed_files_rustc_tests.sh || true
 
 # 6. Run UI/UX accessibility tests
-echo "[6/7] Running UI/UX accessibility tests..."
+echo "[6/8] Running UI/UX accessibility tests..."
 if [ -f "./scripts/uiux_accessibility_test.sh" ]; then
     ./scripts/uiux_accessibility_test.sh
 else
@@ -48,11 +48,19 @@ else
 fi
 
 # 7. Run Universal Package Manager CLI simulation tests
-echo "[7/7] Running Universal Package Manager CLI simulation tests..."
+echo "[7/8] Running Universal Package Manager CLI simulation tests..."
 if command -v python3 &>/dev/null; then
-    python3 -c "import tests.test_integration_system as t1; t1.test_universal_package_manager_cli_simulation(); print('Universal package manager CLI simulation test passed.')"
+  python3 -c "import tests.test_integration_system as t1; t1.test_universal_package_manager_cli_simulation(); print('Universal package manager CLI simulation test passed.')"
 else
-    echo "Python3 not available; skipping universal package manager tests."
+  echo "Python3 not available; skipping universal package manager tests."
+fi
+
+# 8. Run SigmaOS Sovereign Parity & Component Inspection Tests (Performance Optimization)
+echo "[8/8] Running SigmaOS Sovereign Parity & Component Inspection Tests..."
+if [ -f "./algorithm_and_components_inspection_tests" ]; then
+    ./algorithm_and_components_inspection_tests
+else
+    rustc --edition 2021 --test tests/linux_bsd_inspection_tests.rs -o build/linux_bsd_tests && ./build/linux_bsd_tests
 fi
 
 echo "=== All SigmaOS CI test suites passed successfully ==="
