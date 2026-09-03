@@ -5,6 +5,7 @@ extern crate alloc;
 // and Advanced Disk/I/O Schedulers (Anticipatory I/O, CFQ, BFQ, Deadline).
 // Inspired by Linux (CFQ/BFQ/eBPF) & BSD (CAM/ULE/Kqueue) architectures under #![no_std]
 
+
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 
@@ -21,13 +22,13 @@ pub enum ProcessLifecycleState {
 #[derive(Debug, Clone)]
 pub struct ProcessTaskControlBlock {
     pub pid: u32,
-    pub priority: u32,       // 0 = highest, 139 = lowest
-    pub burst_time: u32,     // Estimated or actual execution ticks
-    pub remaining_time: u32, // Remaining ticks
-    pub time_quantum: u32,   // Quantum for RR/MLFQ
+    pub priority: u32,          // 0 = highest, 139 = lowest
+    pub burst_time: u32,       // Estimated or actual execution ticks
+    pub remaining_time: u32,   // Remaining ticks
+    pub time_quantum: u32,     // Quantum for RR/MLFQ
     pub state: ProcessLifecycleState,
     pub arrival_time: u64,
-    pub age_ticks: u32, // Starvation aging counter
+    pub age_ticks: u32,        // Starvation aging counter
     pub is_interactive: bool,
 }
 
@@ -55,9 +56,7 @@ impl LongTermJobScheduler {
 
     pub fn admit_jobs(&mut self, active_ready_count: usize) -> Vec<ProcessTaskControlBlock> {
         let mut admitted = Vec::new();
-        let available_slots = self
-            .max_degree_of_multiprogramming
-            .saturating_sub(active_ready_count);
+        let available_slots = self.max_degree_of_multiprogramming.saturating_sub(active_ready_count);
 
         for _ in 0..available_slots {
             if !self.job_pool.is_empty() {
@@ -190,8 +189,8 @@ impl Default for ShortTermCpuScheduler {
 
 /// 5 & 6. Multilevel Feedback Queue Scheduler (MLFQ): 3 priority queues with dynamic demotion/promotion
 pub struct MultilevelFeedbackQueueScheduler {
-    pub q0_high_rr: Vec<ProcessTaskControlBlock>, // Quantum = 4
-    pub q1_med_rr: Vec<ProcessTaskControlBlock>,  // Quantum = 8
+    pub q0_high_rr: Vec<ProcessTaskControlBlock>,  // Quantum = 4
+    pub q1_med_rr: Vec<ProcessTaskControlBlock>,   // Quantum = 8
     pub q2_low_fcfs: Vec<ProcessTaskControlBlock>, // FCFS
 }
 
@@ -221,12 +220,7 @@ impl MultilevelFeedbackQueueScheduler {
     }
 
     /// Demotes CPU-bound tasks or promotes interactive I/O tasks
-    pub fn requeue_after_quantum_expiry(
-        &mut self,
-        pcb: ProcessTaskControlBlock,
-        used_ticks: u32,
-        allocated_quantum: u32,
-    ) {
+    pub fn requeue_after_quantum_expiry(&mut self, pcb: ProcessTaskControlBlock, used_ticks: u32, allocated_quantum: u32) {
         if used_ticks >= allocated_quantum {
             // Demote to lower queue
             if allocated_quantum == 4 {
@@ -393,9 +387,7 @@ impl AnticipatoryIoScheduler {
         stats.last_request_tick = req.arrival_tick;
 
         if let Some(last_sector) = self.last_dispatched_sector {
-            if req.sector >= last_sector
-                && req.sector <= last_sector + self.spatial_anticipation_span_sectors
-            {
+            if req.sector >= last_sector && req.sector <= last_sector + self.spatial_anticipation_span_sectors {
                 stats.sequential_hits += 1;
             }
         }
@@ -450,12 +442,8 @@ impl AnticipatoryIoScheduler {
             let mut min_forward_dist = u64::MAX;
 
             for (i, req) in self.request_queue.iter().enumerate() {
-                if req.req_type == IoRequestType::Read
-                    && (active_pid.is_none() || req.pid == target_pid)
-                {
-                    if req.sector >= last_sector
-                        && req.sector <= last_sector + self.spatial_anticipation_span_sectors
-                    {
+                if req.req_type == IoRequestType::Read && (active_pid.is_none() || req.pid == target_pid) {
+                    if req.sector >= last_sector && req.sector <= last_sector + self.spatial_anticipation_span_sectors {
                         let dist = req.sector - last_sector;
                         if dist < min_forward_dist {
                             min_forward_dist = dist;
@@ -485,14 +473,8 @@ impl AnticipatoryIoScheduler {
         // Try same direction first
         for (i, req) in self.request_queue.iter().enumerate() {
             let (valid_direction, dist) = match self.head_direction {
-                ElevatorDirection::Ascending => (
-                    req.sector >= self.current_head_sector,
-                    req.sector.saturating_sub(self.current_head_sector),
-                ),
-                ElevatorDirection::Descending => (
-                    req.sector <= self.current_head_sector,
-                    self.current_head_sector.saturating_sub(req.sector),
-                ),
+                ElevatorDirection::Ascending => (req.sector >= self.current_head_sector, req.sector.saturating_sub(self.current_head_sector)),
+                ElevatorDirection::Descending => (req.sector <= self.current_head_sector, self.current_head_sector.saturating_sub(req.sector)),
             };
 
             if valid_direction && dist < best_dist {
@@ -510,14 +492,8 @@ impl AnticipatoryIoScheduler {
 
             for (i, req) in self.request_queue.iter().enumerate() {
                 let (valid_direction, dist) = match self.head_direction {
-                    ElevatorDirection::Ascending => (
-                        req.sector >= self.current_head_sector,
-                        req.sector.saturating_sub(self.current_head_sector),
-                    ),
-                    ElevatorDirection::Descending => (
-                        req.sector <= self.current_head_sector,
-                        self.current_head_sector.saturating_sub(req.sector),
-                    ),
+                    ElevatorDirection::Ascending => (req.sector >= self.current_head_sector, req.sector.saturating_sub(self.current_head_sector)),
+                    ElevatorDirection::Descending => (req.sector <= self.current_head_sector, self.current_head_sector.saturating_sub(req.sector)),
                 };
 
                 if valid_direction && dist < best_dist {
@@ -562,15 +538,10 @@ impl AnticipatoryIoScheduler {
 
         // Enable anticipation pause if it was a read request with good think-time profile
         if req.req_type == IoRequestType::Read {
-            let avg_think = self
-                .process_stats
-                .get(&req.pid)
-                .map(|s| s.average_think_time())
-                .unwrap_or(0);
+            let avg_think = self.process_stats.get(&req.pid).map(|s| s.average_think_time()).unwrap_or(0);
             if avg_think <= u64::from(self.anticipation_window_ticks) {
                 self.active_anticipation_pid = Some(req.pid);
-                self.active_anticipation_until_tick =
-                    self.current_tick + u64::from(self.anticipation_window_ticks);
+                self.active_anticipation_until_tick = self.current_tick + u64::from(self.anticipation_window_ticks);
             } else {
                 self.active_anticipation_pid = None;
             }

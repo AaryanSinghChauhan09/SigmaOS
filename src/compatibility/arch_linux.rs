@@ -980,12 +980,7 @@ impl ArchTestingRepository {
     }
 
     /// Add a new package candidate to staging/testing repository
-    pub fn stage_testing_package(
-        &mut self,
-        pkg: ArchPackage,
-        repo_kind: ArchRepositoryKind,
-        required_signoffs: usize,
-    ) {
+    pub fn stage_testing_package(&mut self, pkg: ArchPackage, repo_kind: ArchRepositoryKind, required_signoffs: usize) {
         self.staging_packages.push(TestingPackageEntry {
             package: pkg,
             repo_kind,
@@ -996,11 +991,7 @@ impl ArchTestingRepository {
     }
 
     /// Record a testing signoff for a staged package
-    pub fn signoff_testing_package(
-        &mut self,
-        pkg_name: &str,
-        user: &str,
-    ) -> Result<bool, &'static str> {
+    pub fn signoff_testing_package(&mut self, pkg_name: &str, user: &str) -> Result<bool, &'static str> {
         let entry = self
             .staging_packages
             .iter_mut()
@@ -1538,20 +1529,14 @@ mod tests {
         assert_eq!(repo.staging_packages.len(), 1);
 
         // Signoff 1
-        let ready1 = repo
-            .signoff_testing_package("linux-testing", "qa_user_1")
-            .unwrap();
+        let ready1 = repo.signoff_testing_package("linux-testing", "qa_user_1").unwrap();
         assert!(!ready1);
 
         // Duplicate signoff fails
-        assert!(repo
-            .signoff_testing_package("linux-testing", "qa_user_1")
-            .is_err());
+        assert!(repo.signoff_testing_package("linux-testing", "qa_user_1").is_err());
 
         // Signoff 2 -> ready for promotion
-        let ready2 = repo
-            .signoff_testing_package("linux-testing", "qa_user_2")
-            .unwrap();
+        let ready2 = repo.signoff_testing_package("linux-testing", "qa_user_2").unwrap();
         assert!(ready2);
 
         // Promote candidate to stable

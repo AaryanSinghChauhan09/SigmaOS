@@ -221,7 +221,11 @@ impl SignstarSigningService {
     }
 
     /// Verify a generated Signstar response against artifact SHA256
-    pub fn verify_response(&self, resp: &SignstarSigningResponse, expected_sha256: &str) -> bool {
+    pub fn verify_response(
+        &self,
+        resp: &SignstarSigningResponse,
+        expected_sha256: &str,
+    ) -> bool {
         !resp.signature_pgp_armored.is_empty()
             && resp.signature_pqc_hex.contains(expected_sha256)
             && (!self.hsm_enabled || resp.signed_by_hsm)
@@ -344,23 +348,15 @@ mod tests {
         let request = SignstarSigningRequest {
             package_name: "sigma-core".to_string(),
             package_version: "1.0.0".to_string(),
-            artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                .to_string(),
+            artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
             key_id: "key-david-runge-01".to_string(),
             format: "openpgp+dilithium5".to_string(),
         };
 
-        let response = service
-            .process_signing_request(&request)
-            .expect("Signing failed");
+        let response = service.process_signing_request(&request).expect("Signing failed");
         assert!(response.signed_by_hsm);
-        assert!(response
-            .signature_pgp_armored
-            .contains("BEGIN PGP SIGNATURE"));
-        assert!(service.verify_response(
-            &response,
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        ));
+        assert!(response.signature_pgp_armored.contains("BEGIN PGP SIGNATURE"));
+        assert!(service.verify_response(&response, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
 
         // Fail case: Untrusted key
         let untrusted_request = SignstarSigningRequest {
@@ -368,9 +364,7 @@ mod tests {
             ..request
         };
         assert_eq!(
-            service
-                .process_signing_request(&untrusted_request)
-                .unwrap_err(),
+            service.process_signing_request(&untrusted_request).unwrap_err(),
             VerifyError::KeyNotFound
         );
     }

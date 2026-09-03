@@ -1,15 +1,15 @@
 extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 // SigmaOS Package Manager (sigma-pkg)
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
 use crate::klib::HashMap;
-use std::fs;
 use std::path::{Path, PathBuf};
+use std::fs;
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -49,22 +49,22 @@ pub struct Transaction {
 /// Supported Linux & BSD Universal Foreign Package Formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageFormat {
-    DebianDeb,      // .deb (APT/dpkg)
-    ArchPacman,     // .pkg.tar.zst (pacman)
-    FedoraRpm,      // .rpm (dnf/rpm)
-    AlpineApk,      // .apk (apk)
-    GentooEbuild,   // .ebuild (portage)
-    VoidXbps,       // .xbps (xbps)
-    FreeBsdPkg,     // .txz / .pkg (pkg)
-    OpenBsdPkg,     // .tgz / .pkg (OpenBSD pkg_add)
-    NetBsdPkgsrc,   // .tgz / .tgz (NetBSD pkgsrc)
-    SlackwarePkg,   // .txz / .tgz (Slackware installpkg)
-    NixDerivation,  // .nix / .drv (NixOS store derivation)
-    GuixPackage,    // .scm (GNU Guix package scheme)
-    HaikuHpkg,      // .hpkg (Haiku package format)
-    FlatpakBundle,  // .flatpak
-    SnapPackage,    // .snap
-    AppImageBinary, // .AppImage
+    DebianDeb,        // .deb (APT/dpkg)
+    ArchPacman,       // .pkg.tar.zst (pacman)
+    FedoraRpm,        // .rpm (dnf/rpm)
+    AlpineApk,        // .apk (apk)
+    GentooEbuild,     // .ebuild (portage)
+    VoidXbps,         // .xbps (xbps)
+    FreeBsdPkg,       // .txz / .pkg (pkg)
+    OpenBsdPkg,       // .tgz / .pkg (OpenBSD pkg_add)
+    NetBsdPkgsrc,     // .tgz / .tgz (NetBSD pkgsrc)
+    SlackwarePkg,     // .txz / .tgz (Slackware installpkg)
+    NixDerivation,    // .nix / .drv (NixOS store derivation)
+    GuixPackage,      // .scm (GNU Guix package scheme)
+    HaikuHpkg,        // .hpkg (Haiku package format)
+    FlatpakBundle,    // .flatpak
+    SnapPackage,      // .snap
+    AppImageBinary,   // .AppImage
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -253,7 +253,7 @@ impl SigmaPkg {
             // Parse repository configuration
             // Format: [repo_name] or Server = url
             if line.starts_with('[') && line.ends_with(']') {
-                let repo_name = line[1..line.len() - 1].to_string();
+                let repo_name = line[1..line.len()-1].to_string();
                 self.repositories.push(Repository {
                     name: repo_name,
                     url: String::new(),
@@ -337,9 +337,8 @@ impl SigmaPkg {
             }
 
             for (name, package) in &repo.packages {
-                if name.to_lowercase().contains(&query_lower)
-                    || package.description.to_lowercase().contains(&query_lower)
-                {
+                if name.to_lowercase().contains(&query_lower) ||
+                   package.description.to_lowercase().contains(&query_lower) {
                     results.push(package);
                 }
             }
@@ -382,11 +381,7 @@ impl SigmaPkg {
         Ok(transaction)
     }
 
-    fn resolve_package_dependencies(
-        &self,
-        name: &str,
-        transaction: &mut Transaction,
-    ) -> Result<(), String> {
+    fn resolve_package_dependencies(&self, name: &str, transaction: &mut Transaction) -> Result<(), String> {
         // Find package in repositories
         let package = self.find_package(name)?;
 
@@ -446,13 +441,10 @@ impl SigmaPkg {
         println!("Installing {} {}...", package.name, package.version);
 
         // Download package
-        let package_url = format!(
-            "{}/{}-{}.sigmpkg",
-            package.repository, package.name, package.version
-        );
-        let package_path = self
-            .cache_dir
-            .join(format!("{}-{}.sigmpkg", package.name, package.version));
+        let package_url = format!("{}/{}-{}.sigmpkg",
+            package.repository, package.name, package.version);
+        let package_path = self.cache_dir.join(format!("{}-{}.sigmpkg",
+            package.name, package.version));
 
         // Simulate download
         println!("Downloading from {}", package_url);
@@ -464,8 +456,7 @@ impl SigmaPkg {
         println!("Installing files...");
 
         // Update local database
-        self.local_packages
-            .insert(package.name.clone(), package.clone());
+        self.local_packages.insert(package.name.clone(), package.clone());
 
         // Run post-install scripts
         self.run_hooks("post_install", package)?;
@@ -478,14 +469,8 @@ impl SigmaPkg {
         println!("  Install: {} packages", transaction.install.len());
         println!("  Remove: {} packages", transaction.remove.len());
         println!("  Upgrade: {} packages", transaction.upgrade.len());
-        println!(
-            "  Total Download Size: {} MB",
-            transaction.download_size / 1024 / 1024
-        );
-        println!(
-            "  Total Installed Size: {} MB",
-            transaction.install_size / 1024 / 1024
-        );
+        println!("  Total Download Size: {} MB", transaction.download_size / 1024 / 1024);
+        println!("  Total Installed Size: {} MB", transaction.install_size / 1024 / 1024);
 
         if !transaction.install.is_empty() {
             println!("\nPackages to install:");
@@ -535,10 +520,8 @@ impl SigmaPkg {
         // Check for reverse dependencies
         let dependents = self.find_dependents(&package.name);
         if !dependents.is_empty() {
-            return Err(format!(
-                "Cannot remove {}: required by {:?}",
-                package.name, dependents
-            ));
+            return Err(format!("Cannot remove {}: required by {:?}",
+                package.name, dependents));
         }
 
         // Run pre-remove hooks
@@ -665,8 +648,7 @@ impl SigmaPkg {
             "Successfully imported foreign package '{}' ({:?}) into Sigma-pkg universal engine.",
             package.name, format
         );
-        self.local_packages
-            .insert(package.name.clone(), package.clone());
+        self.local_packages.insert(package.name.clone(), package.clone());
         Ok(package)
     }
 }
@@ -709,8 +691,7 @@ mod tests {
         let fmt_deb = UniversalPackageImporter::autodetect_format("nginx_1.24.deb");
         assert_eq!(fmt_deb, Some(UniversalPackageFormat::DebianDeb));
 
-        let fmt_arch =
-            UniversalPackageImporter::autodetect_format("ripgrep-13.0.0-1-x86_64.pkg.tar.zst");
+        let fmt_arch = UniversalPackageImporter::autodetect_format("ripgrep-13.0.0-1-x86_64.pkg.tar.zst");
         assert_eq!(fmt_arch, Some(UniversalPackageFormat::ArchPacman));
 
         let fmt_rpm = UniversalPackageImporter::autodetect_format("htop-3.2.1.rpm");
@@ -728,11 +709,7 @@ mod tests {
         let fmt_haiku = UniversalPackageImporter::autodetect_format("bash.hpkg");
         assert_eq!(fmt_haiku, Some(UniversalPackageFormat::HaikuHpkg));
 
-        let pkg = UniversalPackageImporter::parse_foreign_package(
-            "curl_8.0.deb",
-            UniversalPackageFormat::DebianDeb,
-        )
-        .unwrap();
+        let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
         assert_eq!(pkg.name, "curl");
         assert_eq!(pkg.repository, "universal-debiandeb");
     }

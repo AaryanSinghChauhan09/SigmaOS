@@ -241,9 +241,7 @@ impl SovereignSecurelevelRuleEngine {
 
     pub fn raise_securelevel(&mut self, new_level: SecurelevelState) -> Result<(), &'static str> {
         if new_level < self.current_level {
-            return Err(
-                "Securelevel: Cannot lower securelevel once raised (FreeBSD immutable rule)",
-            );
+            return Err("Securelevel: Cannot lower securelevel once raised (FreeBSD immutable rule)");
         }
         self.current_level = new_level;
         Ok(())
@@ -319,9 +317,7 @@ impl SovereignSysctlHardeningRules {
     }
 
     pub fn is_fully_hardened(&self) -> bool {
-        self.parameters
-            .iter()
-            .all(|p| p.active_value == p.desired_value)
+        self.parameters.iter().all(|p| p.active_value == p.desired_value)
     }
 }
 
@@ -394,13 +390,7 @@ impl SovereignNetworkFilterRulesEngine {
         });
     }
 
-    pub fn evaluate_packet(
-        &mut self,
-        iface: &str,
-        proto: &str,
-        src_ip: &str,
-        dst_port: u16,
-    ) -> PfAction {
+    pub fn evaluate_packet(&mut self, iface: &str, proto: &str, src_ip: &str, dst_port: u16) -> PfAction {
         for rule in &self.rules {
             if rule.interface == iface
                 && rule.protocol == proto

@@ -6,40 +6,54 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+#[path = "../src/distro/linux_bsd_parity.rs"]
+mod linux_bsd_parity;
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+#[path = "../src/security/root_improvement.rs"]
+mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
 mod fs_bsd_linux_innovations;
+#[path = "../src/memory/tlb_associative.rs"]
+mod tlb_associative;
+#[path = "../src/desktop/zenith_advanced_features.rs"]
+mod zenith_advanced;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/logging/unified.rs"]
+mod unified;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
 #[path = "../src/network/protocols.rs"]
@@ -48,36 +62,21 @@ mod protocols;
 mod ready_to_use;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
+>>>>>>> origin/fix/test-suite-stabilization-and-deduplication-9630726706765058914
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-#[path = "../src/memory/tlb_associative.rs"]
-mod tlb_associative;
-#[path = "../src/logging/unified.rs"]
-mod unified;
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/desktop/zenith_advanced_features.rs"]
-mod zenith_advanced;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
 
-use bsd_compat::{
-    FreeBsdJailManager, NetBsdRumpKernelRouter, OpenBsdSysctlKernelMib, RumpHypercall,
-};
+use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;
 
 #[test]
@@ -261,17 +260,9 @@ fn test_wiki_distro_innovations_inspection() {
         Ok(SystemdUnitActiveState::Active)
     );
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations,
-    };
+    use wiki_ideas_implementation::{RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations};
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask {
-        pid: 1,
-        class: distro::wiki_ideas_implementation::SchedulerClass::RTLane,
-        deadline_us: 50,
-        wcet_us: 5,
-        numa_node: 0,
-    });
+    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask { pid: 1, class: distro::wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -355,19 +346,8 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(ls_out.len(), 1);
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
-    kmod_mgr
-        .set_module_parameter("virtio_gpu", "modeset", "1")
-        .unwrap();
-    assert_eq!(
-        kmod_mgr
-            .loaded_modules
-            .get("virtio_gpu")
-            .unwrap()
-            .parameters
-            .get("modeset")
-            .map(|s: &String| s.as_str()),
-        Some("1")
-    );
+    kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
+    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
@@ -854,9 +834,8 @@ fn test_systemd_unit_dependency_engine_inspection() {
 
     // Systemd Init Innovations Security & Diagnostics Inspection Test
     use super::systemd_init::{
-        BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine,
-        SystemdSecurityAuditor, SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile,
-        UnitType as SovUnitType,
+        BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine, SystemdSecurityAuditor,
+        SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile, UnitType as SovUnitType,
     };
 
     let mut sys_engine = SystemdEngine::new();
@@ -1065,9 +1044,8 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
 #[test]
 fn test_pacman_contrib_suite_inspection() {
     use sigpkg::pacman_contrib::{
-        CheckUpdatesEngine, InstalledPackage, PacCacheTrimmer, PacDiffAction, PacDiffCandidate,
-        PacDiffConfigResolver, PacListRepoFilter, PacLogAuditor, PackageCacheEntry, SyncPackage,
-        UpdPkgSumsGenerator,
+        PacCacheTrimmer, PackageCacheEntry, PacDiffConfigResolver, PacDiffCandidate, PacDiffAction,
+        CheckUpdatesEngine, InstalledPackage, SyncPackage, PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor,
     };
 
     // 1. Paccache trimmer
@@ -1099,23 +1077,13 @@ fn test_pacman_contrib_suite_inspection() {
         current_content: "ILoveBar".to_string(),
         new_content: "ILoveBar\nVerbosePkgLists".to_string(),
     };
-    let merged = resolver
-        .resolve(&candidate, PacDiffAction::Merge3Way)
-        .unwrap();
+    let merged = resolver.resolve(&candidate, PacDiffAction::Merge3Way).unwrap();
     assert!(merged.contains("VerbosePkgLists"));
 
     // 3. Checkupdates
     let chk = CheckUpdatesEngine::new();
-    let inst = vec![InstalledPackage {
-        name: "bash".to_string(),
-        current_version: "5.1".to_string(),
-        repository: "core".to_string(),
-    }];
-    let sync = vec![SyncPackage {
-        name: "bash".to_string(),
-        sync_version: "5.2".to_string(),
-        repository: "core".to_string(),
-    }];
+    let inst = vec![InstalledPackage { name: "bash".to_string(), current_version: "5.1".to_string(), repository: "core".to_string() }];
+    let sync = vec![SyncPackage { name: "bash".to_string(), sync_version: "5.2".to_string(), repository: "core".to_string() }];
     let updates = chk.check_updates(&inst, &sync);
     assert_eq!(updates.len(), 1);
     assert_eq!(updates[0].new_version, "5.2");
@@ -1127,8 +1095,7 @@ fn test_pacman_contrib_suite_inspection() {
 
     // 5. Updpkgsums
     let upd = UpdPkgSumsGenerator::new();
-    let updated_pkgbuild =
-        upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
+    let updated_pkgbuild = upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
     assert!(updated_pkgbuild.contains("sha256sums=('"));
 
     // 6. Paclog
@@ -1140,9 +1107,8 @@ fn test_pacman_contrib_suite_inspection() {
 #[test]
 fn test_svntogit_repro_and_aur_rules_inspection() {
     use sigpkg::{
-        AurRuleEngine, MakepkgBuildStatus, MakepkgReproduciblePipeline,
-        ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
-        SvnBranchType, SvnRevisionLog,
+        SovereignSvnToGitMigrator, SvnRevisionLog, SvnBranchType, ReproduciblePackageBuilder, ReproducibleBuildEnvironment,
+        AurRuleEngine, MakepkgReproduciblePipeline, MakepkgBuildStatus,
     };
 
     // 1. SVN-to-Git Migrator
@@ -1172,12 +1138,7 @@ fn test_svntogit_repro_and_aur_rules_inspection() {
     assert!(findings.len() >= 1);
 
     let pipeline = MakepkgReproduciblePipeline::new();
-    let res = pipeline.build_and_package(
-        "zstd",
-        "1.5.5",
-        "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }",
-        Some("0x123"),
-    );
+    let res = pipeline.build_and_package("zstd", "1.5.5", "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }", Some("0x123"));
     assert_eq!(res.status, MakepkgBuildStatus::Success);
     assert_eq!(res.package_filename, "zstd-1.5.5-x86_64.pkg.tar.zst");
 }

@@ -889,8 +889,7 @@ mod tests {
             safe_stacks,
             0x1000,
             0x100
-        )
-        .is_ok());
+        ).is_ok());
 
         let unsafe_stacks: &[&[usize]] = &[&[0x4000, 0x1050], &[0x6000]];
         assert!(ThreadStackConsistencyChecker::is_callstack_safe(
@@ -898,8 +897,7 @@ mod tests {
             unsafe_stacks,
             0x1000,
             0x100
-        )
-        .is_err());
+        ).is_err());
     }
 
     #[test]
@@ -914,33 +912,26 @@ mod tests {
 
         let safe_stacks: &[&[usize]] = &[&[0x30000]];
         // Verification fails if signature invalid
-        assert!(engine
-            .apply_livepatch(
-                patch.clone(),
-                safe_stacks,
-                0x200,
-                LivepatchArchitecture::X86_64,
-                false
-            )
-            .is_err());
+        assert!(engine.apply_livepatch(
+            patch.clone(),
+            safe_stacks,
+            0x200,
+            LivepatchArchitecture::X86_64,
+            false
+        ).is_err());
 
         // Applies successfully with valid signature
-        let tramp = engine
-            .apply_livepatch(
-                patch,
-                safe_stacks,
-                0x200,
-                LivepatchArchitecture::X86_64,
-                true,
-            )
-            .unwrap();
+        let tramp = engine.apply_livepatch(
+            patch,
+            safe_stacks,
+            0x200,
+            LivepatchArchitecture::X86_64,
+            true
+        ).unwrap();
 
         assert_eq!(tramp.len(), 12);
         assert_eq!(engine.applied_patch_count, 1);
-        assert_eq!(
-            engine.livepatch_manager.redirect_call("sys_write"),
-            Some(0x20000)
-        );
+        assert_eq!(engine.livepatch_manager.redirect_call("sys_write"), Some(0x20000));
 
         // Rollback
         assert!(engine.rollback_livepatch("sys_write").is_ok());

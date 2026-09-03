@@ -13,6 +13,7 @@ extern crate alloc;
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
+
 use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -44,10 +45,7 @@ impl ArchPacmanContribEngine {
     }
 
     /// Emulates `checkupdates`: Safely checks for available repository updates without syncing DB
-    pub fn checkupdates(
-        &self,
-        remote_versions: &[(String, String)],
-    ) -> Vec<(String, String, String)> {
+    pub fn checkupdates(&self, remote_versions: &[(String, String)]) -> Vec<(String, String, String)> {
         let mut pending = Vec::new();
         for (pkg, remote_ver) in remote_versions {
             if let Some((_, local_ver)) = self.cached_pkg_versions.iter().find(|(p, _)| p == pkg) {
@@ -69,25 +67,14 @@ impl ArchPacmanContribEngine {
     /// Emulates `updpkgsums`: Auto-generates and updates PKGBUILD sha256 checksums
     pub fn updpkgsums(pkgbuild_content: &str, mock_sha256: &str) -> String {
         if pkgbuild_content.contains("sha256sums=") {
-            pkgbuild_content.replace(
-                "sha256sums=('SKIP')",
-                &format!("sha256sums=('{}')", mock_sha256),
-            )
+            pkgbuild_content.replace("sha256sums=('SKIP')", &format!("sha256sums=('{}')", mock_sha256))
         } else {
-            format!(
-                "{}\nsha256sums=('{}')",
-                pkgbuild_content.trim(),
-                mock_sha256
-            )
+            format!("{}\nsha256sums=('{}')", pkgbuild_content.trim(), mock_sha256)
         }
     }
 
     /// Emulates `finddeps`: Finds all installed packages that depend on a target library
-    pub fn finddeps(
-        &self,
-        target_dep: &str,
-        pkg_deps_map: &[(String, Vec<String>)],
-    ) -> Vec<String> {
+    pub fn finddeps(&self, target_dep: &str, pkg_deps_map: &[(String, Vec<String>)]) -> Vec<String> {
         let mut dependents = Vec::new();
         for (pkg, deps) in pkg_deps_map {
             if deps.iter().any(|d| d == target_dep) {
@@ -120,16 +107,14 @@ impl DebianDpkgTriggersEngine {
 
     /// Registers interest in a trigger (e.g. `update-desktop-database`, `update-mime-database`)
     pub fn register_interest(&mut self, trigger_name: &str, path: &str) {
-        self.pending_triggers
-            .push((trigger_name.to_string(), path.to_string()));
+        self.pending_triggers.push((trigger_name.to_string(), path.to_string()));
     }
 
     /// Processes all deferred post-transaction triggers
     pub fn process_triggers(&mut self) -> usize {
         let count = self.pending_triggers.len();
         for (trigger, path) in self.pending_triggers.drain(..) {
-            self.executed_triggers
-                .push(format!("Executed {}: {}", trigger, path));
+            self.executed_triggers.push(format!("Executed {}: {}", trigger, path));
         }
         count
     }
@@ -154,15 +139,11 @@ impl FreeBsdPkgAuditEngine {
     }
 
     pub fn add_vulnerability(&mut self, pkg: &str, cve_id: &str, severity: &str) {
-        self.vulnerability_cve_db
-            .push((pkg.to_string(), cve_id.to_string(), severity.to_string()));
+        self.vulnerability_cve_db.push((pkg.to_string(), cve_id.to_string(), severity.to_string()));
     }
 
     /// Scans installed packages against known FreeBSD VuXML CVE database (`pkg audit`)
-    pub fn audit_vulnerabilities(
-        &self,
-        installed_pkgs: &[String],
-    ) -> Vec<(String, String, String)> {
+    pub fn audit_vulnerabilities(&self, installed_pkgs: &[String]) -> Vec<(String, String, String)> {
         let mut found = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
             if installed_pkgs.iter().any(|p| p.starts_with(pkg)) {
@@ -173,11 +154,7 @@ impl FreeBsdPkgAuditEngine {
     }
 
     /// Identifies orphan leaf dependencies no longer required by any installed package (`pkg autoremove`)
-    pub fn autoremove_orphans(
-        &self,
-        installed_pkgs: &[String],
-        required_deps: &[String],
-    ) -> Vec<String> {
+    pub fn autoremove_orphans(&self, installed_pkgs: &[String], required_deps: &[String]) -> Vec<String> {
         let mut orphans = Vec::new();
         for pkg in installed_pkgs {
             if !required_deps.contains(pkg) {
@@ -209,9 +186,7 @@ pub struct FedoraCryptoPoliciesEngine {
 
 impl FedoraCryptoPoliciesEngine {
     pub fn new(policy: CryptoPolicyLevel) -> Self {
-        Self {
-            current_policy: policy,
-        }
+        Self { current_policy: policy }
     }
 
     pub fn set_policy(&mut self, policy: CryptoPolicyLevel) {
@@ -253,20 +228,14 @@ impl FedoraToolboxContainerEngine {
 
     pub fn enter_container(&mut self) -> Result<String, &'static str> {
         self.active = true;
-        Ok(format!(
-            "Entered Fedora Toolbox container: {}",
-            self.container_name
-        ))
+        Ok(format!("Entered Fedora Toolbox container: {}", self.container_name))
     }
 
     pub fn run_command(&self, cmd: &str) -> Result<String, &'static str> {
         if !self.active {
             return Err("Container not active");
         }
-        Ok(format!(
-            "[Toolbox:{}] Executed: {}",
-            self.container_name, cmd
-        ))
+        Ok(format!("[Toolbox:{}] Executed: {}", self.container_name, cmd))
     }
 }
 
@@ -289,11 +258,7 @@ impl NixHomeManagerEnvironment {
     }
 
     pub fn switch_user_environment(&self) -> String {
-        format!(
-            "Home-Manager applied {} packages for user {}",
-            self.packages.len(),
-            self.username
-        )
+        format!("Home-Manager applied {} packages for user {}", self.packages.len(), self.username)
     }
 }
 
@@ -304,22 +269,16 @@ pub struct MiseUniversalVersionManager {
 
 impl MiseUniversalVersionManager {
     pub fn new() -> Self {
-        Self {
-            runtimes: Vec::new(),
-        }
+        Self { runtimes: Vec::new() }
     }
 
     pub fn set_version(&mut self, runtime: &str, version: &str) {
         self.runtimes.retain(|(r, _)| r != runtime);
-        self.runtimes
-            .push((runtime.to_string(), version.to_string()));
+        self.runtimes.push((runtime.to_string(), version.to_string()));
     }
 
     pub fn get_version(&self, runtime: &str) -> Option<String> {
-        self.runtimes
-            .iter()
-            .find(|(r, _)| r == runtime)
-            .map(|(_, v)| v.clone())
+        self.runtimes.iter().find(|(r, _)| r == runtime).map(|(_, v)| v.clone())
     }
 }
 
@@ -348,11 +307,7 @@ impl DevenvReproducibleEnvironment {
     }
 
     pub fn up(&self) -> String {
-        format!(
-            "Devenv environment '{}' started with {} services",
-            self.env_name,
-            self.services.len()
-        )
+        format!("Devenv environment '{}' started with {} services", self.env_name, self.services.len())
     }
 }
 
@@ -399,10 +354,7 @@ impl UbuntuProLivepatchEngine {
             return Err("Invalid patch ID");
         }
         self.patches_applied += 1;
-        Ok(format!(
-            "Livepatch {} applied to kernel {}",
-            patch_id, self.kernel_version
-        ))
+        Ok(format!("Livepatch {} applied to kernel {}", patch_id, self.kernel_version))
     }
 }
 
@@ -421,10 +373,7 @@ impl FlatpakSdkContainerBuilder {
     }
 
     pub fn build_bundle(&self) -> String {
-        format!(
-            "Flatpak bundle {} built with SDK {}",
-            self.app_id, self.sdk_version
-        )
+        format!("Flatpak bundle {} built with SDK {}", self.app_id, self.sdk_version)
     }
 }
 
@@ -555,8 +504,7 @@ impl AlpineVoidTriggerHookManager {
     }
 
     pub fn register_trigger(&mut self, pattern: &str, hook_cmd: &str) {
-        self.registered_triggers
-            .push((pattern.to_string(), hook_cmd.to_string()));
+        self.registered_triggers.push((pattern.to_string(), hook_cmd.to_string()));
     }
 
     pub fn execute_triggers_for_package(&self, pkg_name: &str) -> Vec<String> {
@@ -612,9 +560,7 @@ pub struct DragonFlyVarsymsPfsResolver {
 
 impl DragonFlyVarsymsPfsResolver {
     pub fn new() -> Self {
-        let mut resolver = Self {
-            varsyms: Vec::new(),
-        };
+        let mut resolver = Self { varsyms: Vec::new() };
         resolver.set_varsym("MACHINE", "x86_64");
         resolver.set_varsym("SYS", "SigmaOS");
         resolver
@@ -662,8 +608,7 @@ impl OpenBsdSecuritySandboxWikiEngine {
     }
 
     pub fn unveil(&mut self, path: &str, perms: &str) {
-        self.unveiled_paths
-            .push((path.to_string(), perms.to_string()));
+        self.unveiled_paths.push((path.to_string(), perms.to_string()));
     }
 
     pub fn generate_sandbox_summary(&self) -> String {
@@ -688,17 +633,13 @@ impl DistroWikiPageDocumentationGenerator {
     pub fn generate_linux_distros_architecture_wiki() -> String {
         let mut wiki = String::new();
         wiki.push_str("# Linux Distributions Architecture & Parity Guide\n\n");
-        wiki.push_str(
-            "SigmaOS integrates architectural concepts from premier Linux distributions:\n",
-        );
+        wiki.push_str("SigmaOS integrates architectural concepts from premier Linux distributions:\n");
         wiki.push_str("- **Arch Linux**: Rolling package release resolution, PKGBUILD recipes, and pacman-contrib.\n");
         wiki.push_str("- **Debian**: dpkg triggers and post-transaction package Hooks.\n");
         wiki.push_str("- **Fedora**: Crypto Policies and Silverblue rpm-ostree atomic trees.\n");
         wiki.push_str("- **FreeBSD**: pkg audit CVE scanner and physical page queues.\n");
         wiki.push_str("- **NixOS**: Declarative system generations and atomic rollback.\n");
-        wiki.push_str(
-            "- **Clear Linux**: Intel auto-vectorized x86-64-v3/v4 FMV performance tuning.\n",
-        );
+        wiki.push_str("- **Clear Linux**: Intel auto-vectorized x86-64-v3/v4 FMV performance tuning.\n");
         wiki
     }
 
@@ -708,9 +649,7 @@ impl DistroWikiPageDocumentationGenerator {
         wiki.push_str("SigmaOS incorporates security paradigms from BSD systems:\n");
         wiki.push_str("- **OpenBSD**: Pledge syscall restrictions, unveil file path masking, W^X, and Retguard canaries.\n");
         wiki.push_str("- **FreeBSD**: RACCT/RCTL resource controls, Capsicum capability delegation, and pkg audit.\n");
-        wiki.push_str(
-            "- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n",
-        );
+        wiki.push_str("- **DragonFly BSD**: HAMMER2 PFS snapshotting and varsyms path resolution.\n");
         wiki
     }
 }
@@ -807,15 +746,9 @@ mod expanded_wiki_tests {
     #[test]
     fn test_arch_pacman_contrib_engine() {
         let mut contrib = ArchPacmanContribEngine::new();
-        contrib
-            .cached_pkg_versions
-            .push(("curl".to_string(), "7.85.0".to_string()));
-        contrib
-            .cached_pkg_versions
-            .push(("curl".to_string(), "7.86.0".to_string()));
-        contrib
-            .cached_pkg_versions
-            .push(("curl".to_string(), "8.2.1".to_string()));
+        contrib.cached_pkg_versions.push(("curl".to_string(), "7.85.0".to_string()));
+        contrib.cached_pkg_versions.push(("curl".to_string(), "7.86.0".to_string()));
+        contrib.cached_pkg_versions.push(("curl".to_string(), "8.2.1".to_string()));
 
         let removed = contrib.paccache_clean(1);
         assert_eq!(removed, 2);
@@ -827,8 +760,7 @@ mod expanded_wiki_tests {
         ]);
         assert_eq!(ranked[0], "https://fast.mirror");
 
-        let updated =
-            ArchPacmanContribEngine::updpkgsums("pkgname=test\nsha256sums=('SKIP')", "abc123hash");
+        let updated = ArchPacmanContribEngine::updpkgsums("pkgname=test\nsha256sums=('SKIP')", "abc123hash");
         assert!(updated.contains("sha256sums=('abc123hash')"));
     }
 
@@ -854,10 +786,7 @@ mod expanded_wiki_tests {
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].1, "CVE-2024-0001");
 
-        let orphans = audit.autoremove_orphans(
-            &["orphan-lib".to_string(), "core-pkg".to_string()],
-            &["core-pkg".to_string()],
-        );
+        let orphans = audit.autoremove_orphans(&["orphan-lib".to_string(), "core-pkg".to_string()], &["core-pkg".to_string()]);
         assert_eq!(orphans.len(), 1);
         assert_eq!(orphans[0], "orphan-lib");
     }
@@ -888,10 +817,7 @@ mod expanded_wiki_tests {
         let mut hm = NixHomeManagerEnvironment::new("developer");
         hm.add_user_package("neovim");
         hm.add_user_package("git");
-        assert_eq!(
-            hm.switch_user_environment(),
-            "Home-Manager applied 2 packages for user developer"
-        );
+        assert_eq!(hm.switch_user_environment(), "Home-Manager applied 2 packages for user developer");
     }
 
     #[test]
@@ -910,10 +836,7 @@ mod expanded_wiki_tests {
         devenv.add_service("postgres");
         devenv.add_service("redis");
 
-        assert_eq!(
-            devenv.up(),
-            "Devenv environment 'fullstack' started with 2 services"
-        );
+        assert_eq!(devenv.up(), "Devenv environment 'fullstack' started with 2 services");
     }
 
     #[test]
@@ -933,23 +856,14 @@ mod expanded_wiki_tests {
     #[test]
     fn test_flatpak_sdk_builder() {
         let builder = FlatpakSdkContainerBuilder::new("org.sigmaos.ZenithDesktop", "23.08");
-        assert_eq!(
-            builder.build_bundle(),
-            "Flatpak bundle org.sigmaos.ZenithDesktop built with SDK 23.08"
-        );
+        assert_eq!(builder.build_bundle(), "Flatpak bundle org.sigmaos.ZenithDesktop built with SDK 23.08");
     }
 
     #[test]
     fn test_clear_linux_stateless_overlay() {
         let engine = ClearLinuxStatelessOverlayEngine::new();
-        assert_eq!(
-            engine.resolve_config_file("nginx/nginx.conf"),
-            "/etc/nginx/nginx.conf"
-        );
-        assert_eq!(
-            engine.fallback_factory_default("nginx/nginx.conf"),
-            "/usr/share/defaults/nginx/nginx.conf"
-        );
+        assert_eq!(engine.resolve_config_file("nginx/nginx.conf"), "/etc/nginx/nginx.conf");
+        assert_eq!(engine.fallback_factory_default("nginx/nginx.conf"), "/usr/share/defaults/nginx/nginx.conf");
     }
 
     #[test]
@@ -992,16 +906,12 @@ mod expanded_wiki_tests {
         sandbox.unveil("/usr/lib", "r");
 
         let summary = sandbox.generate_sandbox_summary();
-        assert_eq!(
-            summary,
-            "Sandbox configured with 2 pledge promises and 1 unveiled paths"
-        );
+        assert_eq!(summary, "Sandbox configured with 2 pledge promises and 1 unveiled paths");
     }
 
     #[test]
     fn test_distro_wiki_page_documentation_generator() {
-        let linux_wiki =
-            DistroWikiPageDocumentationGenerator::generate_linux_distros_architecture_wiki();
+        let linux_wiki = DistroWikiPageDocumentationGenerator::generate_linux_distros_architecture_wiki();
         assert!(linux_wiki.contains("Arch Linux"));
         assert!(linux_wiki.contains("Clear Linux"));
 

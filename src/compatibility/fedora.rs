@@ -2435,8 +2435,7 @@ impl FedoraPlanetAggregationEngine {
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
-        self.registered_feeds
-            .retain(|f| f.fas_account != fas_account);
+        self.registered_feeds.retain(|f| f.fas_account != fas_account);
         self.registered_feeds.push(PlanetUserFeed {
             fas_account: fas_account.to_string(),
             feed_url: feed_url.to_string(),
@@ -2563,11 +2562,10 @@ impl FedoraTahrirEngine {
         let hashtags = Self::extract_hashtags(content);
 
         let topic = format!("org.fedoraproject.prod.tahrir.post.{}", author);
-        let fedmsg = self.messaging_gateway.messaging_engine.publish_message(
-            &topic,
-            content,
-            timestamp_secs,
-        );
+        let fedmsg = self
+            .messaging_gateway
+            .messaging_engine
+            .publish_message(&topic, content, timestamp_secs);
 
         let post = TahrirMessagePost {
             post_id,
@@ -3450,24 +3448,15 @@ mod tests {
     #[test]
     fn test_fedora_status_fpo_engine() {
         let mut status = FedoraStatusFpoEngine::new();
-        assert_eq!(
-            status.service_states.get("Koji"),
-            Some(&StatusFpoServiceHealth::Good)
-        );
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
         assert_eq!(status.calculate_uptime_sla_percentage(), 100.0);
 
         status.report_incident(101, "Koji", "Database connectivity degradation");
-        assert_eq!(
-            status.service_states.get("Koji"),
-            Some(&StatusFpoServiceHealth::MajorOutage)
-        );
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::MajorOutage));
         assert_eq!(status.incidents.len(), 1);
 
         assert!(status.resolve_incident(101));
-        assert_eq!(
-            status.service_states.get("Koji"),
-            Some(&StatusFpoServiceHealth::Good)
-        );
+        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
 
         let summary = status.generate_status_summary();
         assert!(summary.contains("status.fpo"));
@@ -3536,8 +3525,7 @@ mod tests {
         let payload = FedoraWebhookPayload {
             source_service: "github".to_string(),
             event_type: "push".to_string(),
-            raw_json_body: "{\"ref\": \"refs/heads/main\", \"repository\": \"sigmaos\"}"
-                .to_string(),
+            raw_json_body: "{\"ref\": \"refs/heads/main\", \"repository\": \"sigmaos\"}".to_string(),
             hmac_signature: "sha256=abcdef123456".to_string(),
         };
 
@@ -3545,9 +3533,15 @@ mod tests {
             .process_and_dispatch_webhook(&payload, "webhook_secret", 1700000000)
             .unwrap();
 
-        assert_eq!(msg.topic, "org.fedoraproject.prod.webhook.github.push");
+        assert_eq!(
+            msg.topic,
+            "org.fedoraproject.prod.webhook.github.push"
+        );
         assert_eq!(gateway.processed_webhooks_count, 1);
-        assert_eq!(gateway.messaging_engine.published_messages.len(), 1);
+        assert_eq!(
+            gateway.messaging_engine.published_messages.len(),
+            1
+        );
 
         let fetched = gateway
             .messaging_engine
@@ -3580,10 +3574,7 @@ mod tests {
 
         assert_eq!(post.post_id, 1);
         assert!(post.fedmsg_dispatched);
-        assert_eq!(
-            post.hashtags,
-            vec!["SigmaOS".to_string(), "PQC".to_string()]
-        );
+        assert_eq!(post.hashtags, vec!["SigmaOS".to_string(), "PQC".to_string()]);
 
         let user_timeline = tahrir.fetch_user_timeline("jules_dev");
         assert_eq!(user_timeline.len(), 1);

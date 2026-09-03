@@ -103,11 +103,7 @@ impl DemandPagingSubsystem {
         self.mapped_zones.push(zone);
     }
 
-    pub fn handle_demand_fault(
-        &mut self,
-        vaddr: u64,
-        reason: PageFaultReason,
-    ) -> Result<(), &'static str> {
+    pub fn handle_demand_fault(&mut self, vaddr: u64, reason: PageFaultReason) -> Result<(), &'static str> {
         let matching_zone = self.mapped_zones.iter().find(|z| {
             vaddr >= z.start_vaddr && vaddr < z.start_vaddr + (z.page_count as u64 * 4096)
         });

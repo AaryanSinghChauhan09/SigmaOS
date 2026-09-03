@@ -5,9 +5,9 @@
 // - Signal handling delivery and masks
 // - Memory management (mmap/mprotect/munmap)
 
-use sigmaos::filesystem::{FileType, VirtualFilesystem};
-use sigmaos::kernel::{Pcb, Priority, ProcessState};
+use sigmaos::filesystem::{VirtualFilesystem, FileType};
 use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
+use sigmaos::kernel::{Pcb, ProcessState, Priority};
 
 #[test]
 fn test_posix_ltp_filesystem_and_hardlinks() {
@@ -38,13 +38,7 @@ fn test_posix_ltp_unveil_sandboxing_compliance() {
     let mut unveil = UnveilManager::new();
     unveil.unveil("/tmp", "rwc").unwrap();
 
-    assert!(unveil
-        .validate_path("/tmp/scratch.txt", UnveilPermission::Read)
-        .is_ok());
-    assert!(unveil
-        .validate_path("/tmp/scratch.txt", UnveilPermission::Create)
-        .is_ok());
-    assert!(unveil
-        .validate_path("/root/secret", UnveilPermission::Read)
-        .is_err());
+    assert!(unveil.validate_path("/tmp/scratch.txt", UnveilPermission::Read).is_ok());
+    assert!(unveil.validate_path("/tmp/scratch.txt", UnveilPermission::Create).is_ok());
+    assert!(unveil.validate_path("/root/secret", UnveilPermission::Read).is_err());
 }

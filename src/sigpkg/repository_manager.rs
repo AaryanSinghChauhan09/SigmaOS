@@ -112,10 +112,7 @@ impl PpaRepository {
     }
 
     pub fn to_sources_list_entry(&self) -> String {
-        format!(
-            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
-            self.owner, self.name
-        )
+        format!("deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main", self.owner, self.name)
     }
 }
 
@@ -323,18 +320,12 @@ mod tests {
     fn test_ppa_repository() {
         let ppa = PpaRepository::new("graphics-drivers", "ppa", "0x12345678");
         assert_eq!(ppa.owner, "graphics-drivers");
-        assert_eq!(
-            ppa.to_sources_list_entry(),
-            "deb https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu main"
-        );
+        assert_eq!(ppa.to_sources_list_entry(), "deb https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu main");
     }
 
     #[test]
     fn test_mirror_benchmark_engine() {
-        let mirrors = vec![
-            "https://mirror1.org".to_string(),
-            "https://mirror2.org".to_string(),
-        ];
+        let mirrors = vec!["https://mirror1.org".to_string(), "https://mirror2.org".to_string()];
         let bench = MirrorBenchmarkEngine::benchmark_mirrors(&mirrors);
         assert_eq!(bench.len(), 2);
         assert!(bench[0].latency_ms < bench[1].latency_ms);

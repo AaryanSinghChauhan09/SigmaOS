@@ -319,10 +319,7 @@ mod tests {
     fn test_tls_config() {
         let mut config = TlsConfig::new(TlsVersion::TLS1_3);
 
-        config.add_cipher_suite(TlsCipherSuite::new(
-            "TLS_AES_256_GCM_SHA384".to_string(),
-            0x1302,
-        ));
+        config.add_cipher_suite(TlsCipherSuite::new("TLS_AES_256_GCM_SHA384".to_string(), 0x1302));
         config.set_verify_certificates(true);
 
         assert_eq!(config.version, TlsVersion::TLS1_3);

@@ -56,20 +56,13 @@ impl HolographicWorkspaceLayer {
         self.widgets.insert(id.to_string(), widget);
     }
 
-    pub fn process_spatial_gesture(
-        &mut self,
-        gesture_name: &str,
-        target_id: &str,
-    ) -> Result<String, &'static str> {
+    pub fn process_spatial_gesture(&mut self, gesture_name: &str, target_id: &str) -> Result<String, &'static str> {
         let widget = self
             .widgets
             .get_mut(target_id)
             .ok_or("SigmaHolo: Target 3D widget not found")?;
 
-        let msg = format!(
-            "SigmaHolo: Processed spatial gesture '{}' on widget '{}'",
-            gesture_name, widget.title
-        );
+        let msg = format!("SigmaHolo: Processed spatial gesture '{}' on widget '{}'", gesture_name, widget.title);
         self.gesture_input_log.push(msg.clone());
         Ok(msg)
     }
@@ -121,11 +114,7 @@ impl BiometricKernelAuth {
         hash
     }
 
-    pub fn authenticate_biometric_sample(
-        &mut self,
-        username: &str,
-        sample: &BiometricSample,
-    ) -> Result<bool, &'static str> {
+    pub fn authenticate_biometric_sample(&mut self, username: &str, sample: &BiometricSample) -> Result<bool, &'static str> {
         let profile_hash = self
             .user_profiles
             .get(username)
@@ -139,9 +128,7 @@ impl BiometricKernelAuth {
         let is_valid = sample_hash == *profile_hash && sample.confidence_score_pct >= 85;
         self.auth_event_log.push(format!(
             "SigmaBio: Auth attempt for '{}' via {:?} -> {}",
-            username,
-            sample.signal_type,
-            if is_valid { "GRANTED" } else { "DENIED" }
+            username, sample.signal_type, if is_valid { "GRANTED" } else { "DENIED" }
         ));
 
         Ok(is_valid)
@@ -246,24 +233,15 @@ impl SigmaGaiaEcoDashboard {
         self.grid_carbon_intensity = g_co2_kwh;
     }
 
-    pub fn schedule_green_process(
-        &mut self,
-        task_name: &str,
-        estimated_wh: f32,
-    ) -> Result<String, &'static str> {
+    pub fn schedule_green_process(&mut self, task_name: &str, estimated_wh: f32) -> Result<String, &'static str> {
         if self.grid_carbon_intensity > 250.0 {
-            return Err(
-                "SigmaGaia: High carbon intensity grid - deferring non-urgent background task",
-            );
+            return Err("SigmaGaia: High carbon intensity grid - deferring non-urgent background task");
         }
 
         self.energy_wh_counter += estimated_wh;
         self.green_tasks_executed += 1;
 
-        Ok(format!(
-            "SigmaGaia: Executed green task '{}' (Carbon Intensity: {} gCO2/kWh)",
-            task_name, self.grid_carbon_intensity
-        ))
+        Ok(format!("SigmaGaia: Executed green task '{}' (Carbon Intensity: {} gCO2/kWh)", task_name, self.grid_carbon_intensity))
     }
 
     pub fn get_report(&self) -> CarbonTelemetryReport {
@@ -368,12 +346,7 @@ impl SigmaForgeBuildFarm {
         }
     }
 
-    pub fn submit_and_compile_job(
-        &mut self,
-        id: &str,
-        lang: BuildLanguage,
-        files_count: usize,
-    ) -> ForgeBuildJob {
+    pub fn submit_and_compile_job(&mut self, id: &str, lang: BuildLanguage, files_count: usize) -> ForgeBuildJob {
         let job = ForgeBuildJob {
             job_id: id.to_string(),
             language: lang,
@@ -467,10 +440,7 @@ pub struct SigmaAtlasGeoEngine {
 impl SigmaAtlasGeoEngine {
     pub fn new(country: &str, region: &str) -> Self {
         let compliance = match country {
-            "IN" => vec![
-                "DPDP_ACT_2023".to_string(),
-                "RBI_DATA_LOCALIZATION".to_string(),
-            ],
+            "IN" => vec!["DPDP_ACT_2023".to_string(), "RBI_DATA_LOCALIZATION".to_string()],
             "EU" | "DE" | "FR" => vec!["GDPR".to_string(), "EU_AI_ACT".to_string()],
             "US" => vec!["CCPA".to_string(), "HIPAA".to_string()],
             _ => vec!["GLOBAL_ISO27001".to_string()],
@@ -565,20 +535,11 @@ impl SigmaCortexWorkflowInterpreter {
     pub fn interpret_and_execute(&mut self, query_text: &str) -> CognitiveWorkflowAction {
         let lower = query_text.to_lowercase();
         let (cat, summary) = if lower.contains("legal") || lower.contains("compliance") {
-            (
-                WorkflowCategory::LegalComplianceCheck,
-                "Verified contract terms against GDPR/DPDP rules",
-            )
+            (WorkflowCategory::LegalComplianceCheck, "Verified contract terms against GDPR/DPDP rules")
         } else if lower.contains("refactor") || lower.contains("code") {
-            (
-                WorkflowCategory::TechnicalCodeRefactor,
-                "Generated zero-allocation memory-safe Rust refactor",
-            )
+            (WorkflowCategory::TechnicalCodeRefactor, "Generated zero-allocation memory-safe Rust refactor")
         } else {
-            (
-                WorkflowCategory::CreativeMediaCompositing,
-                "Applied AI neural style transfer to media canvas",
-            )
+            (WorkflowCategory::CreativeMediaCompositing, "Applied AI neural style transfer to media canvas")
         };
 
         let action = CognitiveWorkflowAction {
@@ -609,16 +570,7 @@ mod tests {
     #[test]
     fn test_sigma_holo() {
         let mut holo = HolographicWorkspaceLayer::new();
-        holo.spawn_3d_widget(
-            "w1",
-            "Analytics",
-            Vector3D {
-                x: 0.0,
-                y: 1.0,
-                z: 2.5,
-            },
-            1,
-        );
+        holo.spawn_3d_widget("w1", "Analytics", Vector3D { x: 0.0, y: 1.0, z: 2.5 }, 1);
         assert_eq!(holo.widgets.len(), 1);
 
         let res = holo.process_spatial_gesture("pinch_zoom", "w1");
@@ -693,10 +645,7 @@ mod tests {
     #[test]
     fn test_sigma_atlas() {
         let atlas = SigmaAtlasGeoEngine::new("IN", "KA");
-        assert!(atlas
-            .current_profile
-            .active_compliance_standards
-            .contains(&"DPDP_ACT_2023".to_string()));
+        assert!(atlas.current_profile.active_compliance_standards.contains(&"DPDP_ACT_2023".to_string()));
     }
 
     #[test]

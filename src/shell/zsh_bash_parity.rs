@@ -1239,10 +1239,7 @@ impl UniversalShellCompatibilityEngine {
     }
 
     /// Transpiles any script into a vector of executable POSIX `/bin/sh` pipelines
-    pub fn execute_script_as_sh(
-        &mut self,
-        script: &str,
-    ) -> Result<Vec<ShellPipeline>, &'static str> {
+    pub fn execute_script_as_sh(&mut self, script: &str) -> Result<Vec<ShellPipeline>, &'static str> {
         let dialect = Self::detect_shebang_dialect(script);
         let posix_script = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
 
@@ -1281,9 +1278,7 @@ impl UniversalScriptTranspiler {
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
                 ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
-                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
-                    Self::transpile_bash_zsh_line(trimmed)
-                }
+                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => Self::transpile_bash_zsh_line(trimmed),
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
@@ -1299,9 +1294,7 @@ impl UniversalScriptTranspiler {
 
         // 1. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
         if l.starts_with("set -x ") || l.starts_with("set -gx ") {
-            let rest = l
-                .trim_start_matches("set -x ")
-                .trim_start_matches("set -gx ");
+            let rest = l.trim_start_matches("set -x ").trim_start_matches("set -gx ");
             if let Some(space_idx) = rest.find(' ') {
                 let var = &rest[..space_idx];
                 let val = &rest[space_idx + 1..];
@@ -1716,8 +1709,7 @@ mod tests {
     #[test]
     fn test_universal_script_transpiler_and_sh_execution() {
         let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done";
-        let posix_fish =
-            UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
+        let posix_fish = UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
         assert!(posix_fish.contains("#!/bin/sh"));
         assert!(posix_fish.contains("export TARGET=/usr/bin"));
         assert!(posix_fish.contains("build_all() {"));
@@ -1725,14 +1717,12 @@ mod tests {
         assert!(posix_fish.contains("&& echo done"));
 
         let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la";
-        let posix_tcsh =
-            UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
+        let posix_tcsh = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
         assert!(posix_tcsh.contains("export PORT=8080"));
         assert!(posix_tcsh.contains("alias ll=ls -la"));
 
         let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]";
-        let posix_bash =
-            UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
+        let posix_bash = UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
         assert!(posix_bash.contains("echo \"test_string\" | grep test"));
         assert!(posix_bash.contains("[ -f /tmp/foo ]"));
 

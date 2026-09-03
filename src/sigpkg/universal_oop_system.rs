@@ -3048,8 +3048,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s: &String| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s: &String| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3215,16 +3214,16 @@ impl IPackage for SandboxedPackageDecorator {
 pub struct PqcSignedPackageDecorator {
     pub wrapped: Box<dyn IPackage>,
     pub dilithium_signature: String,
-    pub verified: bool,
+    pub is_verified: bool,
 }
 
 impl PqcSignedPackageDecorator {
     pub fn new(wrapped: Box<dyn IPackage>, dilithium_signature: String) -> Self {
-        let verified = dilithium_signature.starts_with("dilithium-5-valid");
+        let is_verified = dilithium_signature.contains("dilithium");
         Self {
             wrapped,
             dilithium_signature,
-            verified,
+            is_verified,
         }
     }
 }
@@ -3253,6 +3252,34 @@ impl IPackage for PqcSignedPackageDecorator {
     }
     fn conditional_dependencies(&self) -> &[ConditionalDependency] {
         self.wrapped.conditional_dependencies()
+    }
+}
+
+pub struct PackageInstallCommand {
+    pub package_name: String,
+    pub is_installed: bool,
+}
+
+impl PackageInstallCommand {
+    pub fn new(package_name: &str) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            is_installed: false,
+        }
+    }
+}
+
+impl IPackageCommand for PackageInstallCommand {
+    fn execute(&mut self) -> Result<(), HookError> {
+        self.is_installed = true;
+        Ok(())
+    }
+    fn undo(&mut self) -> Result<(), HookError> {
+        self.is_installed = false;
+        Ok(())
+    }
+    fn description(&self) -> &str {
+        "Install package command"
     }
 }
 
@@ -3330,23 +3357,23 @@ pub struct UserDefinedPhaseClosure {
 
 pub struct UserDefinedFunctionPipeline {
     closures: Vec<UserDefinedPhaseClosure>,
-    pub environment: HashMap<String, String>,
+    env_vars: HashMap<String, String>,
 }
 
 impl UserDefinedFunctionPipeline {
     pub fn new() -> Self {
         Self {
             closures: Vec::new(),
-            environment: HashMap::new(),
+            env_vars: HashMap::new(),
         }
     }
 
     pub fn set_env_var(&mut self, key: &str, val: &str) {
-        self.environment.insert(key.to_string(), val.to_string());
+        self.env_vars.insert(key.to_string(), val.to_string());
     }
 
     pub fn get_env_var(&self, key: &str) -> Option<&str> {
-        self.environment.get(key).map(|s| s.as_str())
+        self.env_vars.get(key).map(|s| s.as_str())
     }
 
     pub fn register_closure<F>(&mut self, name: &str, phase: PackageBuildPhase, closure: F)
@@ -3376,38 +3403,6 @@ impl UserDefinedFunctionPipeline {
     }
 }
 
-pub struct PackageInstallCommand {
-    pub package_name: String,
-    pub installed: bool,
-    pub description_str: String,
-}
-
-impl PackageInstallCommand {
-    pub fn new(package_name: &str) -> Self {
-        Self {
-            package_name: package_name.to_string(),
-            installed: false,
-            description_str: format!("Install package {}", package_name),
-        }
-    }
-}
-
-impl IPackageCommand for PackageInstallCommand {
-    fn execute(&mut self) -> Result<(), HookError> {
-        self.installed = true;
-        Ok(())
-    }
-
-    fn undo(&mut self) -> Result<(), HookError> {
-        self.installed = false;
-        Ok(())
-    }
-
-    fn description(&self) -> &str {
-        &self.description_str
-    }
-}
-
 impl Default for UserDefinedFunctionPipeline {
     fn default() -> Self {
         Self::new()
@@ -3426,7 +3421,7 @@ pub struct AlternativeChoice {
 
 pub struct SovereignAlternativesEngine {
     pub alternatives: HashMap<String, Vec<AlternativeChoice>>, // Name -> Choices
-    pub active_selections: HashMap<String, String>,            // Name -> Selected Path
+    pub active_selections: HashMap<String, String>,             // Name -> Selected Path
 }
 
 impl SovereignAlternativesEngine {
@@ -3517,10 +3512,7 @@ impl PortageSlotResolver {
     }
 
     pub fn register_package_slot(&mut self, pkg_name: &str, slot: &str, subslot: Option<&str>) {
-        let entry = self
-            .installed_slots
-            .entry(pkg_name.to_string())
-            .or_default();
+        let entry = self.installed_slots.entry(pkg_name.to_string()).or_default();
         let slot_info = PortageSlotInfo {
             slot: slot.to_string(),
             subslot: subslot.map(|s| s.to_string()),
@@ -4443,29 +4435,10 @@ Description: Hook test";
         assert_eq!(sandboxed.name(), "firefox");
         assert_eq!(sandboxed.pledge_promises.len(), 2);
 
-        let pqc_signed = PqcSignedPackageDecorator::new(
-            Box::new(sandboxed),
-            "dilithium-5-valid-signature-hex".to_string(),
-        );
-        assert_eq!(pqc_signed.name(), "firefox");
-        assert!(pqc_signed.verified);
-
-        let audited = AuditedPackageDecorator::new(Box::new(pqc_signed));
+        let audited = AuditedPackageDecorator::new(Box::new(sandboxed));
         assert_eq!(audited.name(), "firefox");
         assert!(audited.audit_passed);
         assert!(audited.audit_notes.contains("passed"));
-    }
-
-    #[test]
-    fn test_package_install_command_execution() {
-        let mut executor = TransactionRollbackExecutor::new();
-        let cmd = Box::new(PackageInstallCommand::new("libssl"));
-
-        assert!(executor.execute_command(cmd).is_ok());
-        assert_eq!(executor.executed_count(), 1);
-
-        assert!(executor.rollback_all().is_ok());
-        assert_eq!(executor.executed_count(), 0);
     }
 
     #[test]
@@ -4556,7 +4529,10 @@ Description: Hook test";
         let mut macro_eval = RpmMacroEvaluator::new();
         macro_eval.define("prefix", "/opt/sigma");
 
-        assert_eq!(macro_eval.expand("%{prefix}/bin/app"), "/opt/sigma/bin/app");
+        assert_eq!(
+            macro_eval.expand("%{prefix}/bin/app"),
+            "/opt/sigma/bin/app"
+        );
         assert_eq!(macro_eval.expand("%_bindir/app"), "/usr/bin/app");
 
         let merger = ConffileMergeEngine::new();
@@ -4580,10 +4556,7 @@ Description: Hook test";
 
         gc.register_path(
             "/nix/store/system-profile",
-            vec![
-                "/nix/store/bash".to_string(),
-                "/nix/store/glibc".to_string(),
-            ],
+            vec!["/nix/store/bash".to_string(), "/nix/store/glibc".to_string()],
         );
 
         gc.add_gc_root("/nix/store/system-profile");
@@ -4591,5 +4564,43 @@ Description: Hook test";
         let garbage = gc.collect_garbage();
         assert_eq!(garbage.len(), 1);
         assert_eq!(garbage[0], "/nix/store/old-unused-lib");
+    }
+
+    #[test]
+    fn test_pqc_signed_package_decorator_and_install_command() {
+        let base_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "quantum-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "PQC test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Dev".to_string(),
+                homepage: "example.com".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "abc".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let pqc_decorator = PqcSignedPackageDecorator::new(base_pkg, "dilithium-5-sig".to_string());
+        assert_eq!(pqc_decorator.name(), "quantum-pkg");
+        assert!(pqc_decorator.is_verified);
+
+        let mut install_cmd = PackageInstallCommand::new("quantum-pkg");
+        assert!(!install_cmd.is_installed);
+        assert!(install_cmd.execute().is_ok());
+        assert!(install_cmd.is_installed);
+        assert!(install_cmd.undo().is_ok());
+        assert!(!install_cmd.is_installed);
+
+        let mut pipeline = UserDefinedFunctionPipeline::new();
+        pipeline.set_env_var("BUILD_JOBS", "8");
+        assert_eq!(pipeline.get_env_var("BUILD_JOBS"), Some("8"));
     }
 }

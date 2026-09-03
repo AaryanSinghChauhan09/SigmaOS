@@ -278,8 +278,8 @@ pub enum DoasAction {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DoasRule {
     pub action: DoasAction,
-    pub identity: String,    // User or :group
-    pub target_user: String, // e.g. "root"
+    pub identity: String,      // User or :group
+    pub target_user: String,  // e.g. "root"
     pub no_pass: bool,
     pub keep_env: Vec<String>,
     pub command_path: Option<String>,
@@ -423,18 +423,14 @@ impl SovereignSecureHelperDaemon {
             audit_logs: Vec::new(),
         };
 
-        daemon
-            .doas_evaluator
-            .add_rule(DoasRule::permit("admin", "root"));
+        daemon.doas_evaluator.add_rule(DoasRule::permit("admin", "root"));
 
-        daemon
-            .polkit_registry
-            .register_action(PolkitActionDefinition {
-                action_id: "org.sigmaos.pkg.install".to_string(),
-                description: "Install Sovereign Packages".to_string(),
-                implicit_active: PolkitImplicitResult::AuthAdmin,
-                implicit_inactive: PolkitImplicitResult::No,
-            });
+        daemon.polkit_registry.register_action(PolkitActionDefinition {
+            action_id: "org.sigmaos.pkg.install".to_string(),
+            description: "Install Sovereign Packages".to_string(),
+            implicit_active: PolkitImplicitResult::AuthAdmin,
+            implicit_inactive: PolkitImplicitResult::No,
+        });
 
         daemon
     }
@@ -456,10 +452,7 @@ impl SovereignSecureHelperDaemon {
 
         match doas_eval {
             Some((DoasAction::Deny, _, _)) => {
-                let msg = format!(
-                    "SecureHelperDaemon: Denied by doas.conf policy for user {}",
-                    calling_user
-                );
+                let msg = format!("SecureHelperDaemon: Denied by doas.conf policy for user {}", calling_user);
                 self.audit_logs.push(msg);
                 return Err("SecureHelperDaemon: Policy Denied");
             }
@@ -468,16 +461,11 @@ impl SovereignSecureHelperDaemon {
             }
             None => {
                 if let Some(ref action_id) = request.action_id {
-                    let polkit_res = self
-                        .polkit_registry
-                        .check_action_authorization(action_id, true);
+                    let polkit_res = self.polkit_registry.check_action_authorization(action_id, true);
                     if polkit_res != PolkitImplicitResult::No {
                         permitted = true;
                     } else {
-                        let msg = format!(
-                            "SecureHelperDaemon: Denied by Polkit action policy for action {}",
-                            action_id
-                        );
+                        let msg = format!("SecureHelperDaemon: Denied by Polkit action policy for action {}", action_id);
                         self.audit_logs.push(msg);
                         return Err("SecureHelperDaemon: Polkit Policy Denied");
                     }
@@ -486,17 +474,12 @@ impl SovereignSecureHelperDaemon {
         }
 
         if !permitted {
-            let msg = format!(
-                "SecureHelperDaemon: Default Deny policy enforced for user [{}] cmd [{}]",
-                calling_user, request.command
-            );
+            let msg = format!("SecureHelperDaemon: Default Deny policy enforced for user [{}] cmd [{}]", calling_user, request.command);
             self.audit_logs.push(msg);
             return Err("SecureHelperDaemon: Default Deny Policy");
         }
 
-        let result = self
-            .gksu_engine
-            .execute_elevated(request, pass_input.as_bytes(), raw_env)?;
+        let result = self.gksu_engine.execute_elevated(request, pass_input.as_bytes(), raw_env)?;
 
         let audit_msg = format!(
             "SecureHelperDaemon: User [{}] executed [{}] as [{}] -> Success={}",
@@ -589,14 +572,10 @@ mod tests {
             command_path: None,
         });
 
-        let alice_eval = doas
-            .evaluate_authorization("alice", "root", "/usr/bin/htop")
-            .unwrap();
+        let alice_eval = doas.evaluate_authorization("alice", "root", "/usr/bin/htop").unwrap();
         assert_eq!(alice_eval.0, DoasAction::Permit);
 
-        let bob_eval = doas
-            .evaluate_authorization("bob", "root", "/usr/bin/htop")
-            .unwrap();
+        let bob_eval = doas.evaluate_authorization("bob", "root", "/usr/bin/htop").unwrap();
         assert_eq!(bob_eval.0, DoasAction::Deny);
     }
 
@@ -623,13 +602,10 @@ mod tests {
     #[test]
     fn test_sovereign_secure_helper_daemon() {
         let mut daemon = SovereignSecureHelperDaemon::new();
-        let req =
-            GksuExecutionRequest::new("/usr/bin/pacman").with_auth_backend(GksuAuthBackend::Sudo);
+        let req = GksuExecutionRequest::new("/usr/bin/pacman").with_auth_backend(GksuAuthBackend::Sudo);
         let env = vec![("PATH".to_string(), "/usr/bin".to_string())];
 
-        let res = daemon
-            .dispatch_helper_execution("admin", &req, "correct_root_pass", &env)
-            .unwrap();
+        let res = daemon.dispatch_helper_execution("admin", &req, "correct_root_pass", &env).unwrap();
         assert!(res.success);
         assert!(!daemon.audit_logs.is_empty());
     }

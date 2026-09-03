@@ -2,9 +2,9 @@
 // Implements Fedora-style package management for SigmaOS
 // Inspired by Fedora's DNF for modern package operations
 
-use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
 /// DNF error types
 #[derive(Debug, Clone)]
@@ -43,25 +43,11 @@ pub struct DnfPackage {
 /// Transaction operation
 #[derive(Debug, Clone)]
 pub enum TransactionOperation {
-    Install {
-        package: String,
-        version: String,
-    },
-    Remove {
-        package: String,
-    },
-    Update {
-        package: String,
-        from_version: String,
-        to_version: String,
-    },
-    Obsolete {
-        package: String,
-    },
-    Reinstall {
-        package: String,
-        version: String,
-    },
+    Install { package: String, version: String },
+    Remove { package: String },
+    Update { package: String, from_version: String, to_version: String },
+    Obsolete { package: String },
+    Reinstall { package: String, version: String },
 }
 
 /// Transaction
@@ -188,9 +174,9 @@ impl SigmaDNF {
 
         for spec in specs {
             if self.installed.contains_key(&spec) {
-                transaction
-                    .operations
-                    .push(TransactionOperation::Remove { package: spec });
+                transaction.operations.push(TransactionOperation::Remove {
+                    package: spec,
+                });
             } else {
                 return Err(DnfError::PackageNotInstalled);
             }
@@ -203,12 +189,11 @@ impl SigmaDNF {
     /// Search for packages
     pub fn search(&self, query: &str) -> Vec<&DnfPackage> {
         let query_lower = query.to_lowercase();
-        self.database
-            .values()
+        self.database.values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower)
-                    || pkg.summary.to_lowercase().contains(&query_lower)
-                    || pkg.description.to_lowercase().contains(&query_lower)
+                pkg.name.to_lowercase().contains(&query_lower) ||
+                pkg.summary.to_lowercase().contains(&query_lower) ||
+                pkg.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
@@ -239,15 +224,8 @@ impl SigmaDNF {
                     println!("Removing {}", package);
                     self.installed.remove(&package);
                 }
-                TransactionOperation::Update {
-                    package,
-                    from_version,
-                    to_version,
-                } => {
-                    println!(
-                        "Updating {} from {} to {}",
-                        package, from_version, to_version
-                    );
+                TransactionOperation::Update { package, from_version, to_version } => {
+                    println!("Updating {} from {} to {}", package, from_version, to_version);
                     self.installed.insert(package, to_version);
                 }
                 TransactionOperation::Obsolete { package } => {

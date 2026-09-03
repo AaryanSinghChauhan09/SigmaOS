@@ -6,10 +6,10 @@ extern crate alloc;
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
 
 use crate::klib::path::PathBuf as Path;
-use crate::klib::path::PathBuf as Path;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::path::PathBuf as Path;
 
 /// Represents CONFIG.SYS driver or parameter settings
 #[derive(Debug, Clone)]

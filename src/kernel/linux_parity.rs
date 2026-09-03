@@ -500,12 +500,7 @@ impl UserfaultfdEngine {
         }
     }
 
-    pub fn register_range(
-        &mut self,
-        start: usize,
-        length: usize,
-        mode: UffdMode,
-    ) -> Result<(), &'static str> {
+    pub fn register_range(&mut self, start: usize, length: usize, mode: UffdMode) -> Result<(), &'static str> {
         if start % 4096 != 0 || length % 4096 != 0 {
             return Err("userfaultfd: Unaligned page address or length");
         }
@@ -519,10 +514,9 @@ impl UserfaultfdEngine {
 
     pub fn trigger_page_fault(&mut self, fault_addr: usize) -> bool {
         let page_base = fault_addr & !(4096 - 1);
-        let is_monitored = self
-            .registrations
-            .iter()
-            .any(|r| page_base >= r.start_addr && page_base < (r.start_addr + r.length));
+        let is_monitored = self.registrations.iter().any(|r| {
+            page_base >= r.start_addr && page_base < (r.start_addr + r.length)
+        });
 
         if is_monitored {
             if !self.pending_fault_addrs.contains(&page_base) {
@@ -534,16 +528,8 @@ impl UserfaultfdEngine {
         }
     }
 
-    pub fn copy_page_and_resolve(
-        &mut self,
-        page_base: usize,
-        _data: &[u8],
-    ) -> Result<(), &'static str> {
-        if let Some(pos) = self
-            .pending_fault_addrs
-            .iter()
-            .position(|&addr| addr == page_base)
-        {
+    pub fn copy_page_and_resolve(&mut self, page_base: usize, _data: &[u8]) -> Result<(), &'static str> {
+        if let Some(pos) = self.pending_fault_addrs.iter().position(|&addr| addr == page_base) {
             self.pending_fault_addrs.remove(pos);
             Ok(())
         } else {
@@ -742,10 +728,7 @@ mod tests {
 
         // 2. epoll tests
         let mut epoll_eng = LinuxEpollEngine::new(5);
-        let event = EpollEvent {
-            events: EPOLLIN | EPOLLET,
-            data: 42,
-        };
+        let event = EpollEvent { events: EPOLLIN | EPOLLET, data: 42 };
         assert!(epoll_eng.epoll_ctl(EPOLL_CTL_ADD, 10, event).is_ok());
 
         epoll_eng.trigger_event(10, EPOLLIN);
@@ -755,13 +738,9 @@ mod tests {
 
         // 3. userfaultfd tests
         let mut uffd = UserfaultfdEngine::new();
-        assert!(uffd
-            .register_range(0x7fff_0000, 4096, UffdMode::Missing)
-            .is_ok());
+        assert!(uffd.register_range(0x7fff_0000, 4096, UffdMode::Missing).is_ok());
         assert!(uffd.trigger_page_fault(0x7fff_0100));
-        assert!(uffd
-            .copy_page_and_resolve(0x7fff_0000, &[0u8; 4096])
-            .is_ok());
+        assert!(uffd.copy_page_and_resolve(0x7fff_0000, &[0u8; 4096]).is_ok());
 
         // 4. PSI metrics tests
         let mut psi = PressureStallInfoEngine::new();

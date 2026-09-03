@@ -1478,18 +1478,8 @@ impl SovereignApacheKafkaStreamEngine {
         }
     }
 
-    pub fn publish(
-        &mut self,
-        partition_id: u32,
-        key: &[u8],
-        value: &[u8],
-        timestamp: u64,
-    ) -> Result<u64, &'static str> {
-        if let Some(partition) = self
-            .partitions
-            .iter_mut()
-            .find(|p| p.partition_id == partition_id)
-        {
+    pub fn publish(&mut self, partition_id: u32, key: &[u8], value: &[u8], timestamp: u64) -> Result<u64, &'static str> {
+        if let Some(partition) = self.partitions.iter_mut().find(|p| p.partition_id == partition_id) {
             let offset = partition.next_offset;
             partition.records.push(SovereignKafkaRecord {
                 offset,
@@ -1505,11 +1495,7 @@ impl SovereignApacheKafkaStreamEngine {
     }
 
     pub fn consume(&self, partition_id: u32, from_offset: u64) -> Vec<SovereignKafkaRecord> {
-        if let Some(partition) = self
-            .partitions
-            .iter()
-            .find(|p| p.partition_id == partition_id)
-        {
+        if let Some(partition) = self.partitions.iter().find(|p| p.partition_id == partition_id) {
             partition
                 .records
                 .iter()
@@ -3214,14 +3200,7 @@ impl SovereignRedisClusterEngine {
         Self { nodes: Vec::new() }
     }
 
-    pub fn add_node(
-        &mut self,
-        node_id: &str,
-        address: &str,
-        role: ClusterNodeRole,
-        slots: Vec<u16>,
-        master_id: Option<&str>,
-    ) {
+    pub fn add_node(&mut self, node_id: &str, address: &str, role: ClusterNodeRole, slots: Vec<u16>, master_id: Option<&str>) {
         self.nodes.push(ClusterNode {
             node_id: node_id.to_string(),
             address: address.to_string(),
@@ -3241,26 +3220,20 @@ impl SovereignRedisClusterEngine {
 
     pub fn route_key(&self, key: &str) -> Option<&ClusterNode> {
         let slot = Self::get_slot_for_key(key);
-        self.nodes
-            .iter()
-            .find(|node| node.role == ClusterNodeRole::Master && node.slots.contains(&slot))
+        self.nodes.iter().find(|node| node.role == ClusterNodeRole::Master && node.slots.contains(&slot))
     }
 
     pub fn failover_master(&mut self, failed_master_id: &str) -> Result<String, &'static str> {
-        let failed_slots =
-            if let Some(master) = self.nodes.iter().find(|n| n.node_id == failed_master_id) {
-                master.slots.clone()
-            } else {
-                Vec::new()
-            };
+        let failed_slots = if let Some(master) = self.nodes.iter().find(|n| n.node_id == failed_master_id) {
+            master.slots.clone()
+        } else {
+            Vec::new()
+        };
 
         let _replica_idx = self
             .nodes
             .iter()
-            .position(|n| {
-                n.role == ClusterNodeRole::Replica
-                    && n.master_id.as_deref() == Some(failed_master_id)
-            })
+            .position(|n| n.role == ClusterNodeRole::Replica && n.master_id.as_deref() == Some(failed_master_id))
             .ok_or("RedisCluster: No replica available for failover")?;
 
         // Remove failed master
@@ -3270,10 +3243,7 @@ impl SovereignRedisClusterEngine {
         let new_master_idx = self
             .nodes
             .iter()
-            .position(|n| {
-                n.role == ClusterNodeRole::Replica
-                    && n.master_id.as_deref() == Some(failed_master_id)
-            })
+            .position(|n| n.role == ClusterNodeRole::Replica && n.master_id.as_deref() == Some(failed_master_id))
             .ok_or("RedisCluster: No replica available for failover")?;
 
         // Promote replica
@@ -3345,17 +3315,9 @@ impl SovereignCiliumBpfNetworkEngine {
         });
     }
 
-    pub fn evaluate_ingress_bpf(
-        &self,
-        src_identity: u32,
-        dst_identity: u32,
-        dst_port: u16,
-    ) -> bool {
+    pub fn evaluate_ingress_bpf(&self, src_identity: u32, dst_identity: u32, dst_port: u16) -> bool {
         // If no policy targets dst_identity, default allow
-        let has_target_policy = self
-            .policies
-            .iter()
-            .any(|p| p.target_identity == dst_identity);
+        let has_target_policy = self.policies.iter().any(|p| p.target_identity == dst_identity);
         if !has_target_policy {
             return true;
         }
@@ -3431,10 +3393,7 @@ impl SovereignK8sOrchestratorEngine {
         // Reconcile deployment -> spawn pods
         for i in 0..replicas {
             let pod_name = format!("{}-pod-{}", name, i);
-            let assigned_node = self
-                .nodes
-                .get(i as usize % self.nodes.len().max(1))
-                .cloned();
+            let assigned_node = self.nodes.get(i as usize % self.nodes.len().max(1)).cloned();
             self.pods.push(SovereignPod {
                 name: pod_name,
                 namespace: "default".to_string(),
@@ -3458,10 +3417,7 @@ impl SovereignK8sOrchestratorEngine {
         if new_replicas > old_replicas {
             for i in old_replicas..new_replicas {
                 let pod_name = format!("{}-pod-{}", name, i);
-                let assigned_node = self
-                    .nodes
-                    .get(i as usize % self.nodes.len().max(1))
-                    .cloned();
+                let assigned_node = self.nodes.get(i as usize % self.nodes.len().max(1)).cloned();
                 self.pods.push(SovereignPod {
                     name: pod_name,
                     namespace: "default".to_string(),
@@ -3512,9 +3468,7 @@ mod tests {
         assert_eq!(vcs.staging_area.len(), 1);
         assert_eq!(vcs.staging_area[0].path, "PKGBUILD@r1048");
 
-        let commit = vcs
-            .commit("Jules", "Checkout SVN r1048", 1700000000)
-            .unwrap();
+        let commit = vcs.commit("Jules", "Checkout SVN r1048", 1700000000).unwrap();
         assert_ne!(commit, "");
     }
 
@@ -4136,16 +4090,8 @@ mod tests {
     #[test]
     fn test_sovereign_grafana_loki_log_engine() {
         let mut loki = SovereignGrafanaLokiLogEngine::new();
-        loki.push_log_entry(
-            &[("app", "kernel"), ("level", "info")],
-            1000,
-            "Kernel booted",
-        );
-        loki.push_log_entry(
-            &[("app", "kernel"), ("level", "error")],
-            1005,
-            "Page fault handled",
-        );
+        loki.push_log_entry(&[("app", "kernel"), ("level", "info")], 1000, "Kernel booted");
+        loki.push_log_entry(&[("app", "kernel"), ("level", "error")], 1005, "Page fault handled");
 
         let logs = loki.query_logs_by_label("app", "kernel");
         assert_eq!(logs.len(), 2);
@@ -4182,20 +4128,8 @@ mod tests {
     #[test]
     fn test_sovereign_redis_cluster_engine() {
         let mut cluster = SovereignRedisClusterEngine::new();
-        cluster.add_node(
-            "node1",
-            "127.0.0.1:6379",
-            ClusterNodeRole::Master,
-            (0..8191).collect(),
-            None,
-        );
-        cluster.add_node(
-            "node2",
-            "127.0.0.1:6380",
-            ClusterNodeRole::Replica,
-            Vec::new(),
-            Some("node1"),
-        );
+        cluster.add_node("node1", "127.0.0.1:6379", ClusterNodeRole::Master, (0..8191).collect(), None);
+        cluster.add_node("node2", "127.0.0.1:6380", ClusterNodeRole::Replica, Vec::new(), Some("node1"));
 
         let key = "user:session:123";
         let slot = SovereignRedisClusterEngine::get_slot_for_key(key);

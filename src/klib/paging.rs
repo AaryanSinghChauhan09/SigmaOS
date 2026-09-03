@@ -279,11 +279,7 @@ impl SimpleVMM {
 
         let pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx;
 
-        if let Some(ref mut pt) = self
-            .pt_tables
-            .get_mut(pt_table_idx)
-            .and_then(|opt| opt.as_mut())
-        {
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pt_table_idx).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
             pt_entry.set_cow(true);
             pt_entry.set_writable(false);
@@ -293,24 +289,12 @@ impl SimpleVMM {
     }
 
     /// FreeBSD Superpages inspired 2MB contiguous physical frame allocation
-    pub fn allocate_superpage_2mb(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        user: bool,
-        writable: bool,
-    ) -> Result<(), PageFaultError> {
+    pub fn allocate_superpage_2mb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Huge2MB, user, writable)
     }
 
     /// FreeBSD Superpages inspired 1GB contiguous physical frame allocation
-    pub fn allocate_superpage_1gb(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        user: bool,
-        writable: bool,
-    ) -> Result<(), PageFaultError> {
+    pub fn allocate_superpage_1gb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Giant1GB, user, writable)
     }
 
@@ -520,11 +504,7 @@ impl VirtualMemoryManager for SimpleVMM {
 
         let pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx;
 
-        if let Some(ref mut pt) = self
-            .pt_tables
-            .get_mut(pt_table_idx)
-            .and_then(|opt| opt.as_mut())
-        {
+        if let Some(ref mut pt) = self.pt_tables.get_mut(pt_table_idx).and_then(|opt| opt.as_mut()) {
             let pt_entry = pt.get_entry(pt_idx);
             pt_entry.set_present(false);
             return Ok(());
@@ -555,11 +535,7 @@ impl VirtualMemoryManager for SimpleVMM {
             }
 
             let pd_table_idx = pml4_idx * 512 + pdpt_idx;
-            if let Some(ref pd) = self
-                .pd_tables
-                .get(pd_table_idx)
-                .and_then(|opt| opt.as_ref())
-            {
+            if let Some(ref pd) = self.pd_tables.get(pd_table_idx).and_then(|opt| opt.as_ref()) {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
@@ -571,11 +547,7 @@ impl VirtualMemoryManager for SimpleVMM {
                 }
 
                 let pt_table_idx = pd_table_idx * 512 + pd_idx;
-                if let Some(ref pt) = self
-                    .pt_tables
-                    .get(pt_table_idx)
-                    .and_then(|opt| opt.as_ref())
-                {
+                if let Some(ref pt) = self.pt_tables.get(pt_table_idx).and_then(|opt| opt.as_ref()) {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;
