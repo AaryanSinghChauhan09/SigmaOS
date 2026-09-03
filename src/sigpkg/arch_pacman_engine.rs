@@ -249,9 +249,9 @@ impl AURHelper {
 
     /// Install AUR package
     pub fn install_aur_package(&mut self, package_name: &str) -> Result<(), String> {
-        if let Some(pkg) = self.get_aur_package(package_name) {
+        if let Some(_pkg) = self.get_aur_package(package_name) {
             // Clone PKGBUILD and build
-            let mut abs = ArchBuildSystem::new();
+            let abs = ArchBuildSystem::new();
             // In a real implementation, this would clone from AUR and build
             abs.build_package()?;
             Ok(())
@@ -513,6 +513,66 @@ impl Default for SovereignDbscriptsEngine {
     }
 }
 
+/// Pacman Contrib Utilities Engine (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
+#[derive(Debug, Default, Clone)]
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn paccache_clean(&self, files: &[String], keep: usize) -> Vec<String> {
+        let mut cleaner = PacmanCacheCleaner::new(files.to_vec());
+        cleaner.prune_cache(keep)
+    }
+
+    pub fn rankmirrors(&self, mirrors: &[(String, u64)], top_n: usize) -> Vec<(String, u64)> {
+        let mut sorted = mirrors.to_vec();
+        sorted.sort_by_key(|m| m.1);
+        sorted.truncate(top_n);
+        sorted
+    }
+
+    pub fn updpkgsums(&self, pkgbuild: &str, new_hash: &str) -> String {
+        let mut lines: Vec<String> = pkgbuild.lines().map(|l| l.to_string()).collect();
+        let mut found = false;
+        for line in &mut lines {
+            if line.starts_with("sha256sums=") {
+                *line = format!("sha256sums=('{}')", new_hash);
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            lines.push(format!("sha256sums=('{}')", new_hash));
+        }
+        lines.join("\n")
+    }
+
+    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local in &local_db.local_packages {
+            if let Some(repo_pkg) = remote_db.packages.iter().find(|p| p.name == local.name) {
+                if repo_pkg.version != local.version {
+                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
+                }
+            }
+        }
+        updates
+    }
+
+    pub fn finddeps(&self, db: &PacmanDatabase, target_dep: &str) -> Vec<String> {
+        let mut dependent_pkgs = Vec::new();
+        for pkg in &db.local_packages {
+            if pkg.depends.iter().any(|d| d == target_dep) {
+                dependent_pkgs.push(pkg.name.clone());
+            }
+        }
+        dependent_pkgs
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -605,8 +665,8 @@ depends=('glibc')
 
     #[test]
     fn test_aur_helper_search() {
-        let mut aur = AURHelper::new();
-        let test_pkg = ArchPacmanPackage {
+        let aur = AURHelper::new();
+        let _test_pkg = ArchPacmanPackage {
             name: "aur-test".to_string(),
             version: "1.0.0".to_string(),
             description: "AUR test package".to_string(),
