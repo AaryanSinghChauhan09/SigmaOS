@@ -72,6 +72,7 @@ mod protocols;
 mod ready_to_use;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
+
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
