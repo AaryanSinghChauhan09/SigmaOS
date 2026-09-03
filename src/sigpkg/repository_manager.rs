@@ -45,9 +45,6 @@ pub struct MirrorBenchmark {
     pub download_speed_kbps: u32,
 }
 
-
-
-
 pub struct MirrorBenchmarkEngine;
 
 impl MirrorBenchmarkEngine {
@@ -66,7 +63,6 @@ impl MirrorBenchmarkEngine {
         results
     }
 }
-
 /// GPG Key Verification for Repositories
 #[derive(Debug, Clone)]
 pub struct RepositoryGpgKey {
