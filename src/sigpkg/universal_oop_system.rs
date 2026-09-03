@@ -3211,6 +3211,50 @@ impl IPackage for SandboxedPackageDecorator {
     }
 }
 
+pub struct PqcSignedPackageDecorator {
+    pub wrapped: Box<dyn IPackage>,
+    pub dilithium_signature: String,
+    pub verified: bool,
+}
+
+impl PqcSignedPackageDecorator {
+    pub fn new(wrapped: Box<dyn IPackage>, dilithium_signature: String) -> Self {
+        let verified = dilithium_signature.starts_with("dilithium-5-valid");
+        Self {
+            wrapped,
+            dilithium_signature,
+            verified,
+        }
+    }
+}
+
+impl IPackage for PqcSignedPackageDecorator {
+    fn name(&self) -> &str {
+        self.wrapped.name()
+    }
+    fn version(&self) -> &Version {
+        self.wrapped.version()
+    }
+    fn dependencies(&self) -> &[Dependency] {
+        self.wrapped.dependencies()
+    }
+    fn format(&self) -> PackageFormat {
+        self.wrapped.format()
+    }
+    fn metadata(&self) -> &PackageMetadata {
+        self.wrapped.metadata()
+    }
+    fn metadata_mut(&mut self) -> &mut PackageMetadata {
+        self.wrapped.metadata_mut()
+    }
+    fn files(&self) -> &[String] {
+        self.wrapped.files()
+    }
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        self.wrapped.conditional_dependencies()
+    }
+}
+
 pub struct AuditedPackageDecorator {
     pub wrapped: Box<dyn IPackage>,
     pub audit_passed: bool,
@@ -3285,13 +3329,23 @@ pub struct UserDefinedPhaseClosure {
 
 pub struct UserDefinedFunctionPipeline {
     closures: Vec<UserDefinedPhaseClosure>,
+    pub environment: HashMap<String, String>,
 }
 
 impl UserDefinedFunctionPipeline {
     pub fn new() -> Self {
         Self {
             closures: Vec::new(),
+            environment: HashMap::new(),
         }
+    }
+
+    pub fn set_env_var(&mut self, key: &str, val: &str) {
+        self.environment.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn get_env_var(&self, key: &str) -> Option<&str> {
+        self.environment.get(key).map(|s| s.as_str())
     }
 
     pub fn register_closure<F>(&mut self, name: &str, phase: PackageBuildPhase, closure: F)
@@ -3318,6 +3372,38 @@ impl UserDefinedFunctionPipeline {
             }
         }
         Ok(executed)
+    }
+}
+
+pub struct PackageInstallCommand {
+    pub package_name: String,
+    pub installed: bool,
+    pub description_str: String,
+}
+
+impl PackageInstallCommand {
+    pub fn new(package_name: &str) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            installed: false,
+            description_str: format!("Install package {}", package_name),
+        }
+    }
+}
+
+impl IPackageCommand for PackageInstallCommand {
+    fn execute(&mut self) -> Result<(), HookError> {
+        self.installed = true;
+        Ok(())
+    }
+
+    fn undo(&mut self) -> Result<(), HookError> {
+        self.installed = false;
+        Ok(())
+    }
+
+    fn description(&self) -> &str {
+        &self.description_str
     }
 }
 
@@ -4353,10 +4439,29 @@ Description: Hook test";
         assert_eq!(sandboxed.name(), "firefox");
         assert_eq!(sandboxed.pledge_promises.len(), 2);
 
-        let audited = AuditedPackageDecorator::new(Box::new(sandboxed));
+        let pqc_signed = PqcSignedPackageDecorator::new(
+            Box::new(sandboxed),
+            "dilithium-5-valid-signature-hex".to_string(),
+        );
+        assert_eq!(pqc_signed.name(), "firefox");
+        assert!(pqc_signed.verified);
+
+        let audited = AuditedPackageDecorator::new(Box::new(pqc_signed));
         assert_eq!(audited.name(), "firefox");
         assert!(audited.audit_passed);
         assert!(audited.audit_notes.contains("passed"));
+    }
+
+    #[test]
+    fn test_package_install_command_execution() {
+        let mut executor = TransactionRollbackExecutor::new();
+        let cmd = Box::new(PackageInstallCommand::new("libssl"));
+
+        assert!(executor.execute_command(cmd).is_ok());
+        assert_eq!(executor.executed_count(), 1);
+
+        assert!(executor.rollback_all().is_ok());
+        assert_eq!(executor.executed_count(), 0);
     }
 
     #[test]
