@@ -1773,35 +1773,35 @@ MAINTAINER="SigmaOS"
     }
 
     #[test]
-    fn test_arch_cachyos_microarch() {
+    fn test_arch_cachyos_microarch_optimization() {
         let mut engine = ArchCachyosMicroarchOptimizationEngine::new();
-        engine.register_repo_route(MicroarchitectureLevel::V1, "https://repo.sigmaos.org/core/x86_64");
-        engine.register_repo_route(MicroarchitectureLevel::V3, "https://repo.sigmaos.org/cachyos/x86_64-v3");
+        engine.register_repo_route(MicroarchitectureLevel::V1, "https://repo.sigmaos.org/v1");
+        engine.register_repo_route(MicroarchitectureLevel::V3, "https://repo.sigmaos.org/v3");
 
-        let level = engine.detect_microarch_level(&[
-            "sse3", "ssse3", "sse4_1", "sse4_2", "popcnt", "avx", "avx2", "bmi1", "bmi2", "fma", "f16c", "lzcnt",
+        let detected = engine.detect_microarch_level(&[
+            "sse3", "ssse3", "sse4_1", "sse4_2", "popcnt", "avx", "avx2", "bmi1", "bmi2", "fma",
+            "f16c", "lzcnt",
         ]);
-        assert_eq!(level, MicroarchitectureLevel::V3);
+        assert_eq!(detected, MicroarchitectureLevel::V3);
 
-        let repo = engine.resolve_optimal_repo();
-        assert_eq!(repo, "https://repo.sigmaos.org/cachyos/x86_64-v3");
+        let optimal = engine.resolve_optimal_repo();
+        assert_eq!(optimal, "https://repo.sigmaos.org/v3");
     }
 
     #[test]
-    fn test_copr_aur_obs_gateway() {
+    fn test_copr_aur_obs_build_gateway() {
         let mut engine = CoprAurBuildRepositoryGatewayEngine::new();
         engine.register_source(CommunityPackageBuildSource {
-            name: "yay".to_string(),
+            name: "zen-browser".to_string(),
             backend: CommunityRepoBackend::ArchAur,
-            repository_owner: "Jguer".to_string(),
-            source_url: "https://aur.archlinux.org/yay.git".to_string(),
+            repository_owner: "community".to_string(),
+            source_url: "https://aur.archlinux.org/zen-browser.git".to_string(),
             trust_score: 85,
             is_sandboxed_build: true,
         });
 
-        assert!(engine.can_build_safely("yay").unwrap());
-
-        let cmd = engine.generate_build_sandbox_cmd("yay").unwrap();
+        assert!(engine.can_build_safely("zen-browser").unwrap());
+        let cmd = engine.generate_build_sandbox_cmd("zen-browser").unwrap();
         assert!(cmd.contains("makepkg"));
     }
 
@@ -1811,30 +1811,31 @@ MAINTAINER="SigmaOS"
         engine.register_option(
             PkgsrcOptionSpec {
                 option_name: "ssl".to_string(),
-                description: "Enable OpenSSL support".to_string(),
+                description: "OpenSSL support".to_string(),
                 requires_options: vec![],
-                conflicts_with: vec![],
+                conflicts_with: vec!["gnutls".to_string()],
             },
             true,
         );
 
+        assert!(engine.validate_options().is_ok());
+
         engine.register_option(
             PkgsrcOptionSpec {
-                option_name: "inet6".to_string(),
-                description: "Enable IPv6 support".to_string(),
+                option_name: "gnutls".to_string(),
+                description: "GnuTLS support".to_string(),
                 requires_options: vec![],
-                conflicts_with: vec![],
+                conflicts_with: vec!["ssl".to_string()],
             },
             false,
         );
 
-        assert!(engine.validate_options().is_ok());
-        engine.toggle_option("+inet6").unwrap();
-        assert_eq!(engine.active_options.len(), 2);
+        assert!(engine.toggle_option("+gnutls").is_ok());
+        assert!(engine.validate_options().is_err());
     }
 
     #[test]
-    fn test_gentoo_portage_eapi_slots() {
+    fn test_portage_eapi_slot_operator() {
         let mut engine = GentooPortageEapiSlotOperatorEngine::new();
         engine.register_ebuild_slot(EbuildSlotRecord {
             atom: "dev-libs/openssl".to_string(),
@@ -1845,45 +1846,45 @@ MAINTAINER="SigmaOS"
         });
 
         assert!(engine.check_eapi_feature_support("dev-libs/openssl", "IDEPEND").unwrap());
-        assert!(engine.requires_abi_rebuild("dev-libs/openssl", "3.1"));
+        assert!(engine.requires_abi_rebuild("dev-libs/openssl", "3.2"));
         assert!(!engine.requires_abi_rebuild("dev-libs/openssl", "3.0"));
     }
 
     #[test]
-    fn test_hammer2_dports_snapshot() {
+    fn test_dragonfly_dports_hammer2_snapshot() {
         let mut engine = DragonFlyDportsHammer2SnapshotEngine::new();
         let snap = engine.create_pre_transaction_snapshot(
             "nginx",
-            &["/usr/local/sbin/nginx", "/etc/nginx/nginx.conf"],
+            &["/usr/local/etc/nginx.conf", "/usr/local/sbin/nginx"],
             1700000000,
         );
-        assert!(snap.contains("nginx"));
 
-        let restored = engine.rollback_snapshot(&snap).unwrap();
-        assert_eq!(restored.len(), 2);
+        assert!(snap.contains("hammer2_snap_tx_1_nginx"));
+
+        let rolled_back = engine.rollback_snapshot(&snap).unwrap();
+        assert_eq!(rolled_back.len(), 2);
     }
 
     #[test]
-    fn test_debian_dpkg_triggers_apt_listbugs() {
+    fn test_dpkg_triggers_apt_listbugs_guard() {
         let mut engine = DebianDpkgTriggersAptListbugsGuardEngine::new();
         engine.register_bug_report(AptBugReport {
-            bug_id: 1029384,
-            package_name: "libglib2.0-0".to_string(),
+            bug_id: 105001,
+            package_name: "glibc".to_string(),
             severity: "critical".to_string(),
-            title: "Memory corruption in g_string_append".to_string(),
+            title: "Memory corruption on dynamic symbol lookup".to_string(),
         });
 
-        let (blocked, reason) = engine.should_block_installation("libglib2.0-0");
+        let (blocked, reason) = engine.should_block_installation("glibc");
         assert!(blocked);
-        assert!(reason.unwrap().contains("Blocked by bug #1029384"));
+        assert!(reason.unwrap().contains("#105001"));
 
         engine.register_trigger(DpkgTrigger {
-            name: "glib-compile-schemas".to_string(),
-            kind: DpkgTriggerKind::InterestNoAwait,
-            target_package: "libglib2.0-0".to_string(),
+            name: "man-db".to_string(),
+            kind: DpkgTriggerKind::Interest,
+            target_package: "man-db".to_string(),
         });
 
-        let processed = engine.process_deferred_triggers();
-        assert_eq!(processed, 1);
+        assert_eq!(engine.process_deferred_triggers(), 1);
     }
 }
