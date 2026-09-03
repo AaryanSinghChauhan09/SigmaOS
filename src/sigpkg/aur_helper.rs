@@ -36,6 +36,19 @@ pub struct AurPackage {
     pub popularity: f32,
 }
 
+impl PartialEq for AurPackage {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.version == other.version
+            && self.description == other.description
+            && self.url == other.url
+            && self.depends == other.depends
+            && self.makedepends == other.makedepends
+            && self.keywords == other.keywords
+            && self.popularity.to_bits() == other.popularity.to_bits()
+    }
+}
+
 impl Eq for AurPackage {}
 
 /// AUR metadata parser

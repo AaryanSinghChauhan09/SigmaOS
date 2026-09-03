@@ -95,7 +95,7 @@ impl PkgbuildParser {
 
             // Parse variable assignments
             if line.contains('=') && !line.starts_with("function ") {
-                let parts: Vec<&str> = line.splitn(2, '=').collect();
+                let parts: std::vec::Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
                     let value = parts[1]

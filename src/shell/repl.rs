@@ -59,6 +59,17 @@ pub enum ShellCommand {
     Exit,
     Pwd,
     WhoAmI,
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
+    },
+    Mkdir {
+        dirname: String,
+    },
+    Rm {
+        filename: String,
+    },
     Su {
         username: String,
         password: Option<String>,
@@ -239,37 +250,64 @@ pub enum ShellCommand {
     Unknown(String),
 }
 
+/// Represents an automated action task executed by an AI agent
+#[derive(Debug, Clone)]
+pub struct AgentTask {
+    pub task_id: usize,
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+/// AI Agent Automation Engine inside SigmaOS REPL
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_task_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine {
+            registered_tasks: std::collections::HashMap::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_task_id;
+        self.next_task_id += 1;
+        self.registered_tasks.insert(
+            id,
+            AgentTask {
+                task_id: id,
+                description,
+                commands,
+            },
+        );
+        id
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Shell REPL
 pub struct ShellRepl {
-    pub running: bool,
-    pub variables: crate::klib::HashMap<String, String>,
-    pub aliases: crate::klib::HashMap<String, String>,
-    pub prompt: String,
-    pub agent_engine: AgentAutomationEngine,
-    pub current_user: String,
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
+    prompt: String,
+    agent_engine: AgentAutomationEngine,
     pub current_dir: String,
-    pub services: crate::klib::HashMap<String, String>,
-    pub installed_packages: HashSet<String>,
+    pub current_user: String,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
-    pub a11y_features: crate::klib::HashMap<String, bool>,
-    pub command_history: Vec<String>,
-
-    // Keep internal instances of engines for persistent state during shell interaction
-    pub customization: CustomizationEngine,
-    pub accessibility: AccessibilityFramework,
-    pub package_manager: UniversalPackageManager,
-    pub virt_orchestrator: VirtualizationOrchestrator,
-    pub compatibility: CompatibilityManager,
-    pub self_healing: SelfHealingModule,
-
-    // Advanced Zsh, Bash, Fish & BSD Parity components
-    pub prompt_builder: PowerlinePromptBuilder,
-    pub fuzzy_completer: FuzzyCompletionEngine,
-    pub highlighter: ZshSyntaxHighlighter,
-    pub dir_stack: BsdDirectoryStack,
-    pub job_control: ShellJobControl,
-    pub job_manager: JobControlManager,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -321,13 +359,20 @@ impl ShellRepl {
         shell
     }
 
-    /// Renders powerline/starship styled prompt string
-    pub fn get_rendered_prompt(&self) -> String {
-        let mut builder = PowerlinePromptBuilder::new();
-        builder.user = self.current_user.clone();
-        builder.current_dir = self.current_dir.clone();
-        builder.home_dir = "/home/ubuntu".to_string();
-        builder.render_prompt()
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
+            agent_engine: AgentAutomationEngine::new(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
+        }
     }
 
     pub fn run(&mut self) {
