@@ -114,6 +114,7 @@ impl TaskCapability {
 pub struct SimpleKernelTask {
     pub id: TaskID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub state: AtomicUsize, // TaskState as usize
     pub capability: TaskCapability,
 }
@@ -130,6 +131,7 @@ impl SimpleKernelTask {
         SimpleKernelTask {
             id,
             name: name_array,
+            name_len: name_len as u8,
             state: AtomicUsize::new(TaskState::Ready as usize),
             capability,
         }
@@ -152,8 +154,10 @@ impl KernelTask for SimpleKernelTask {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every kernel task name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     fn state(&self) -> TaskState {
@@ -441,5 +445,31 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_kernel_task_name_lookup_and_execution() {
+        let task_name = b"kthread_worker";
+        let mut task = SimpleKernelTask::new(101, task_name, TaskCapability::full());
+
+        assert_eq!(task.id(), 101);
+        assert_eq!(task.name(), task_name);
+        assert_eq!(task.name_len, 14);
+
+        let info = task.info();
+        assert_eq!(info.id, 101);
+
+        let mut core = SimpleKernelCore::new(CoreCapability::full());
+        let reg_id = core.register_task(Box::new(task)).unwrap();
+        assert_eq!(reg_id, 101);
+
+        assert!(core.execute_task(101).is_ok());
+        let stats = core.stats();
+        assert_eq!(stats.total_tasks, 1);
     }
 }
