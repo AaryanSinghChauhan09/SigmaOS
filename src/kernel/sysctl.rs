@@ -112,9 +112,8 @@ impl SysctlRegistry {
 
     pub fn list_by_prefix(&self, prefix: &str) -> Vec<(String, SysctlValue)> {
         let mut results = Vec::new();
-        for (mib, node) in &self.nodes {
-            let mib_str: &str = mib.as_str();
-            if mib_str.starts_with(prefix) {
+        for (mib, node) in self.nodes.iter() {
+            if mib.as_str().starts_with(prefix) {
                 results.push((mib.clone(), node.value.clone()));
             }
         }
