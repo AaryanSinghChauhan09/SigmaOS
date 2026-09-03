@@ -148,10 +148,6 @@ impl V4OptimizedPackageManager {
         level
     }
 
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
-    }
-
     pub fn get_optimized_binary_suffix(&self) -> &'static str {
         match self.detected_level.load(Ordering::SeqCst) {
             4 => "_v4",
@@ -159,10 +155,6 @@ impl V4OptimizedPackageManager {
             2 => "_v2",
             _ => "",
         }
-    }
-
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 }
 

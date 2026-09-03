@@ -220,9 +220,8 @@ impl LogRotator for SimpleLogRotator {
                     log_file.reset_size();
                     // Use standard alloc::string::ToString
                     use alloc::string::ToString;
-                    let path_str = core::String::from_utf8(log_file.path())
-                        .unwrap_or("log")
-                        .to_string();
+                    let path_str = alloc::string::String::from_utf8(log_file.path().to_vec())
+                        .unwrap_or_else(|_| alloc::string::String::from("log"));
                     path_to_shift = Some(path_str);
                     break;
                 }

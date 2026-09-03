@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 
 /// Update level (1-5 tier system from Linux Mint)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UpdateLevel {
     Level1, // Safe updates
     Level2, // Recommended updates

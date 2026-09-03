@@ -168,7 +168,21 @@ To elevate the SigmaOS User Repository (AUR) into a world-class, sovereign packa
 
 ---
 
-## 9. Recommended Phased Implementation Sequence
+## 10. Strategic Operating System Focus & Pragmatic Engineering Priorities
+
+To ensure SigmaOS successfully bridges the gap between ambitious architecture and boot-to-desktop reality, maintainers must adhere to these 7 concrete engineering priorities:
+
+1. **Documentation Consolidation**: Unify and deduplicate overlapping strategy/roadmap documents into canonical references. Eliminate redundant prose in favor of precise technical specifications and hardware support matrices.
+2. **Bootable Artifact Readiness**: Accelerate Phase I QEMU/ISO image generation and installer workflows (`installer/system_installer.rs`), prioritizing runnable boot media.
+3. **Hardware & Driver Readiness**: Prioritize Wi-Fi, Bluetooth, Audio, and GPU driver infrastructure (`src/driver/`) to support daily-driver usability.
+4. **Universal Package Ecosystem**: Broaden `UniversalPackageTranslator` and `SigmaPkg` multi-format router capabilities (`.deb`, `.rpm`, `PKGBUILD`, `.apk`) to maximize real-world application availability.
+5. **Empirical Performance Benchmarks**: Maintain transparent CPU overhead, syscall latency, boot duration, and post-quantum crypto (Kyber-1024/Dilithium-5) benchmark suites.
+6. **Linux ELF & WASM Compatibility Layer**: Mature `WasmWasiRuntime` and Linux ELF translation pipelines in `src/compatibility/` to run unmodified Linux software seamlessly.
+7. **Flagship Differentiation**: Focus core marketing and engineering around capability-security sandboxing (Capsicum/Pledge) combined with deterministic reproducible builds.
+
+---
+
+## 11. Recommended Phased Implementation Sequence
 
 1. **Phase 1: Compiler & Transmute Hardening**: Fix Rust atomic transmutation mismatches across `src/package/`.
 2. **Phase 2: Sovereign AUR Sandbox Expansion**: Mandate `poudriere` chroot and `unveil` path isolation for all package builds.
