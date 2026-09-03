@@ -721,6 +721,8 @@ impl MissingDistroComponentsEngine {
         engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
         engine.register_component("AppArmor MAC Profiles", "Ubuntu", ComponentParityStatus::Implemented);
         engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
+        engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
+        engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -861,6 +863,121 @@ impl NixOsFlakesEngine {
 }
 
 impl Default for NixOsFlakesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// DRAGONFLY BSD HAMMER2 PSEUDO FILE SYSTEM (PFS) CLUSTERING & SNAPSHOT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Hammer2PfsType {
+    Master,
+    Slave,
+    Snapshot,
+    Cache,
+}
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsNode {
+    pub pfs_id: u32,
+    pub name: String,
+    pub pfs_type: Hammer2PfsType,
+    pub cluster_quorum_votes: u32,
+}
+
+pub struct DragonFlyHammer2PfsEngine {
+    pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
+    pub active_snapshots: Vec<String>,
+}
+
+impl DragonFlyHammer2PfsEngine {
+    pub fn new() -> Self {
+        Self {
+            pfs_nodes: BTreeMap::new(),
+            active_snapshots: Vec::new(),
+        }
+    }
+
+    pub fn create_pfs(&mut self, pfs_id: u32, name: &str, pfs_type: Hammer2PfsType) -> Hammer2PfsNode {
+        let node = Hammer2PfsNode {
+            pfs_id,
+            name: name.to_string(),
+            pfs_type,
+            cluster_quorum_votes: if pfs_type == Hammer2PfsType::Master { 1 } else { 0 },
+        };
+        self.pfs_nodes.insert(pfs_id, node.clone());
+        node
+    }
+
+    pub fn create_pfs_snapshot(&mut self, source_pfs_id: u32, snap_name: &str) -> Result<u32, &'static str> {
+        if let Some(src) = self.pfs_nodes.get(&source_pfs_id) {
+            let snap_id = (self.pfs_nodes.len() + 1) as u32;
+            let name = format!("{}@{}", src.name, snap_name);
+            self.create_pfs(snap_id, &name, Hammer2PfsType::Snapshot);
+            self.active_snapshots.push(name);
+            Ok(snap_id)
+        } else {
+            Err("HAMMER2: Source PFS node not found")
+        }
+    }
+}
+
+impl Default for DragonFlyHammer2PfsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// NETBSD PKGSRC PORTABLE PACKAGE BUILD & LICENSE COMPLIANCE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PkgsrcPackageSpec {
+    pub pkgname: String,
+    pub category: String,
+    pub license: String,
+    pub buildlink3_deps: Vec<String>,
+}
+
+pub struct NetBsdPkgsrcEngine {
+    pub acceptable_licenses: Vec<String>,
+    pub installed_packages: BTreeMap<String, PkgsrcPackageSpec>,
+}
+
+impl NetBsdPkgsrcEngine {
+    pub fn new() -> Self {
+        Self {
+            acceptable_licenses: vec![
+                "gnu-gpl-v2".to_string(),
+                "gnu-gpl-v3".to_string(),
+                "modified-bsd".to_string(),
+                "mit".to_string(),
+            ],
+            installed_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn accept_license(&mut self, license: &str) {
+        if !self.acceptable_licenses.contains(&license.to_string()) {
+            self.acceptable_licenses.push(license.to_string());
+        }
+    }
+
+    pub fn build_and_install(&mut self, spec: PkgsrcPackageSpec) -> Result<String, &'static str> {
+        if !self.acceptable_licenses.contains(&spec.license) {
+            return Err("pkgsrc: License not in ACCEPTABLE_LICENSES");
+        }
+        let name = spec.pkgname.clone();
+        self.installed_packages.insert(name.clone(), spec);
+        Ok(format!("pkgsrc: Successfully built and installed {}", name))
+    }
+}
+
+impl Default for NetBsdPkgsrcEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1131,8 +1248,42 @@ impl Default for SuseYaSTConfigurationRegistry {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 8);
+        assert_eq!(engine.records.len(), 10);
         assert!(engine.is_all_components_implemented());
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_pfs_engine() {
+        let mut h2 = DragonFlyHammer2PfsEngine::new();
+        let master = h2.create_pfs(1, "ROOT", Hammer2PfsType::Master);
+        assert_eq!(master.pfs_type, Hammer2PfsType::Master);
+
+        let snap_id = h2.create_pfs_snapshot(1, "2026-03-03-0100").unwrap();
+        assert_eq!(snap_id, 2);
+        assert_eq!(h2.active_snapshots.len(), 1);
+        assert!(h2.active_snapshots[0].contains("ROOT@2026-03-03-0100"));
+    }
+
+    #[test]
+    fn test_netbsd_pkgsrc_engine() {
+        let mut pkgsrc = NetBsdPkgsrcEngine::new();
+        let spec = PkgsrcPackageSpec {
+            pkgname: "tcsh".to_string(),
+            category: "shells".to_string(),
+            license: "modified-bsd".to_string(),
+            buildlink3_deps: vec!["ncurses".to_string()],
+        };
+
+        let res = pkgsrc.build_and_install(spec).unwrap();
+        assert!(res.contains("tcsh"));
+
+        let proprietary_spec = PkgsrcPackageSpec {
+            pkgname: "closed-app".to_string(),
+            category: "misc".to_string(),
+            license: "no-commercial-use".to_string(),
+            buildlink3_deps: Vec::new(),
+        };
+        assert!(pkgsrc.build_and_install(proprietary_spec).is_err());
     }
 
     #[test]
