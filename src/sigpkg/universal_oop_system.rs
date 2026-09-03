@@ -201,6 +201,16 @@ pub enum PackageFormat {
     Dmg,
     // Chimera Linux (.cports)
     Cports,
+    // DragonFly BSD DPorts (.dports)
+    Dports,
+    // Slackware SlackBuild (.slackbuild)
+    SlackBuild,
+    // CRUX Linux (.crux)
+    Crux,
+    // Delta RPM (.drpm)
+    Drpm,
+    // Bedrock Linux Stratum (.stratum)
+    Stratum,
 }
 
 /// Package metadata structure
@@ -709,6 +719,41 @@ impl_generic_package_adapter!(
     "cports-package:",
     "cports-package: ",
     "cports-version: "
+);
+impl_generic_package_adapter!(
+    DportsAdapter,
+    Dports,
+    "dports-package:",
+    "dports-package: ",
+    "dports-version: "
+);
+impl_generic_package_adapter!(
+    SlackBuildAdapter,
+    SlackBuild,
+    "slackbuild-package:",
+    "slackbuild-package: ",
+    "slackbuild-version: "
+);
+impl_generic_package_adapter!(
+    CruxAdapter,
+    Crux,
+    "crux-package:",
+    "crux-package: ",
+    "crux-version: "
+);
+impl_generic_package_adapter!(
+    DrpmAdapter,
+    Drpm,
+    "drpm-package:",
+    "drpm-package: ",
+    "drpm-version: "
+);
+impl_generic_package_adapter!(
+    StratumAdapter,
+    Stratum,
+    "stratum-package:",
+    "stratum-package: ",
+    "stratum-version: "
 );
 
 /// Fedora/RHEL .rpm adapter
@@ -2389,6 +2434,11 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(PukAdapter::new()));
         factory.register_parser(Box::new(DmgAdapter::new()));
         factory.register_parser(Box::new(CportsAdapter::new()));
+        factory.register_parser(Box::new(DportsAdapter::new()));
+        factory.register_parser(Box::new(SlackBuildAdapter::new()));
+        factory.register_parser(Box::new(CruxAdapter::new()));
+        factory.register_parser(Box::new(DrpmAdapter::new()));
+        factory.register_parser(Box::new(StratumAdapter::new()));
 
         factory
     }
