@@ -19,4 +19,4 @@ jobs:
 
       - name: Verify Arch Pacman & Contrib Engine
         run: |
-          ./run_sigma_tests.sh
+          cargo test --lib -- sigpkg::arch_pacman_engine
