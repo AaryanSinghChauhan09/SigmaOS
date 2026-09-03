@@ -213,6 +213,19 @@ def test_sovereign_wiki_master_engine_integration():
         "S-SHARD 12": "SovereignVMM Virtualization",
     }
 
+    distro_matrix = {
+        "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+        "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxGentoo": {"pkg_ext": ".ebuild", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+        "LinuxFedora": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "FreeBsd": {"pkg_ext": ".txz", "supervisor": "Rcd", "vfs_etc": "/etc"},
+        "OpenBsd": {"pkg_ext": ".tgz", "supervisor": "Rcd", "vfs_etc": "/etc"},
+        "NetBsd": {"pkg_ext": ".tgz", "supervisor": "Rcd", "vfs_etc": "/etc"},
+        "DragonFlyBsd": {"pkg_ext": ".txz", "supervisor": "Rcd", "vfs_etc": "/etc"},
+    }
+
     for mode, spec in distro_matrix.items():
         pkg_name = f"coreutils{spec['pkg_ext']}"
         assert pkg_name.endswith(spec["pkg_ext"])

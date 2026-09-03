@@ -3995,9 +3995,6 @@ impl Default for FedoraSystemRolesEngine {
         Self::new()
     }
 }
-
-#[cfg(test)]
-mod tests {
     use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

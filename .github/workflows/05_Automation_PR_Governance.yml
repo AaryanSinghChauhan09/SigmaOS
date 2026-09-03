@@ -21,25 +21,23 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: PR Size Labeler
-        uses: pascalgn/size-label-action@b700fbe937b4f5358055bf1ee5593c72d65016c5
+        uses: pascalgn/size-label-action@v0.5.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          sizes: >-
-            {
-              "0": "size/XS",
-              "50": "size/S",
-              "250": "size/M",
-              "500": "size/L",
-              "1000": "size/XL"
-            }
+          sizes: |
+            0: "size/XS"
+            50: "size/S"
+            250: "size/M"
+            500: "size/L"
+            1000: "size/XL"
 
       - name: Validate Branch Naming Convention
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
         with:
           script: |
             const branchName = context.payload.pull_request ? context.payload.pull_request.head.ref : context.ref.replace('refs/heads/', '');
-            const validPrefixes = ['feat/', 'fix/', 'docs/', 'style/', 'refactor/', 'perf/', 'test/', 'chore/', 'revert/', 'impl/', 'driver/', 'security/', 'kernel/', 'arch/', 'ci/', 'pkg/', 'ai/', 'ux/', 'sdk/', 'boot/', 'bolt/', 'palette/', 'sentinel/', 'jules-'];
+            const validPrefixes = ['feat/', 'fix/', 'docs/', 'style/', 'refactor/', 'perf/', 'test/', 'chore/', 'revert/', 'impl/', 'driver/', 'security/', 'kernel/', 'arch/', 'ci/', 'pkg/', 'ai/', 'ux/', 'sdk/', 'boot/', 'bolt/', 'palette/', 'sentinel/', 'jules-', 'master-', 'master', 'main'];
             const isValid = validPrefixes.some(prefix => branchName.startsWith(prefix));
             if (!isValid) {
               console.log(`Branch name '${branchName}' does not start with a valid prefix: ${validPrefixes.join(', ')}`);

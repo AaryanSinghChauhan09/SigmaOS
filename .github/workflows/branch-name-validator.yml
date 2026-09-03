@@ -23,7 +23,7 @@ jobs:
               'test/', 'chore/', 'revert/', 'impl/', 'driver/', 'security/',
               'kernel/', 'arch/', 'ci/', 'pkg/', 'ai/', 'ux/', 'sdk/', 'boot/',
               'bolt/', 'palette/', 'sentinel/', 'jules-', 'universal-',
-              'palette-', 'bolt-', 'sentinel-'
+              'palette-', 'bolt-', 'sentinel-', 'master-', 'master', 'main'
             ];
 
             const isValid = validPrefixes.some(prefix => branchName.startsWith(prefix));
@@ -32,12 +32,16 @@ jobs:
               const errorMsg = `❌ Branch name \`${branchName}\` does not follow Conventional Branch Naming rules.\n\n` +
                 `Valid prefixes include: ${validPrefixes.map(p => `\`${p}\``).join(', ')}.`;
 
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                body: errorMsg
-              });
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  body: errorMsg
+                });
+              } catch (e) {
+                console.log(`Unable to create comment: ${e.message}`);
+              }
 
               core.setFailed(`Branch name '${branchName}' does not start with a valid prefix.`);
             } else {
