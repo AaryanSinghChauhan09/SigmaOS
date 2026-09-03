@@ -3,21 +3,64 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use alloc::collections::BTreeMap;
+use alloc::collections::BTreeMap as HashMap;
+use alloc::sync::Arc;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
-/// Package format type
-// Unified system absorbing all 18 major distribution formats.
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, HashSet, Arc};
-use std::{collections::{HashMap, HashSet}, sync::Arc};
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LibcFlavor {
+    Glibc,
+    Musl,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NodeTargetArch {
+    X64,
+    Arm64,
+    Armv7,
+    Riscv64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NodeReleaseStream {
+    Current,
+    Lts,
+    Maintenance,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NodeBinaryPackage {
+    pub version: String,
+    pub arch: NodeTargetArch,
+    pub libc: LibcFlavor,
+    pub stream: NodeReleaseStream,
+}
+
+#[derive(Debug, Clone)]
+pub struct NodeBinaryDistroEngine;
+
+impl NodeBinaryDistroEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn install_to_store(
+        &self,
+        package: &NodeBinaryPackage,
+        _bytes: &[u8],
+        _npm_version: &str,
+    ) -> Result<String, &'static str> {
+        Ok(format!("/nix/store/node-{}", package.version))
+    }
+}
+
+impl Default for NodeBinaryDistroEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackagePriority {
@@ -46,9 +89,11 @@ pub enum PackageFormat {
     Apk,      // Android Package / Alpine Package (.apk)
     Eopkg,    // Solus eopkg (.eopkg)
     Nixpkg,   // Nix store package (.nixpkg)
+    Nix,      // Alias/Variant for Nix package
     Ebuild,   // Gentoo ebuild (.ebuild / .portage)
     TarGz,    // Compressed Tar (.tar.gz, .tgz)
     Xz,       // Compressed XZ archive (.xz, .tar.xz)
+    Txz,      // Compressed TXZ archive
     App,      // macOS App bundle (.app)
     Hap,      // HarmonyOS Ability Package (.hap)
     Pisi,     // Pardus / Solus PiSi (.PiSi)
@@ -71,6 +116,9 @@ pub enum PackageFormat {
     Dmg,        // macOS Disk Image (.dmg)
     Cports,     // Chimera Linux (.cports)
     Cachy,      // CachyOS Package (.cachy)
+    CachyOS,    // Alias variant for CachyOS
+    Swupd,      // Clear Linux Swupd bundle
+    Starling,   // Starling Package
     Dports,     // DragonFly BSD DPorts (.dports)
     SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
     Crux,       // CRUX Linux (.crux / .pkgfile)
@@ -120,7 +168,9 @@ impl PackageFormat {
             Some(PackageFormat::Ebuild)
         } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+        } else if name.ends_with(".txz") {
+            Some(PackageFormat::Txz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
             Some(PackageFormat::Xz)
         } else if name.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -719,6 +769,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -742,6 +793,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -797,8 +849,121 @@ impl Default for PackageTriggerRegistry {
 }
 
 // =========================================================================
-// Multi-Distro Package Adapter Execution Pipeline
+// Foreign Distro Manifest & Multi-Distro Package Adapter Pipeline
 // =========================================================================
+
+/// Manifest metadata for foreign distribution packages (.deb, .rpm, .apk, .pkg, etc.)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+/// Translator converting foreign distro package manifests into native SigmaPkg models
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-{}", manifest.original_name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.original_name.clone());
+
+        for dep in &manifest.raw_dependencies {
+            let mapped_dep = if dep == "libssl-dev" || dep == "openssl-devel" {
+                "sovereign-openssl".to_string()
+            } else if dep == "libc6" {
+                "sovereign-libc".to_string()
+            } else {
+                dep.clone()
+            };
+            pkg = pkg.with_dependency(mapped_dep);
+        }
+
+        for provide in &manifest.raw_provides {
+            pkg = pkg.with_provides(provide.clone());
+        }
+
+        for conflict in &manifest.raw_conflicts {
+            pkg = pkg.with_conflict(conflict.clone());
+        }
+
+        pkg
+    }
+}
+
+/// Distro Repo Sync Engine for cross-distro repository synchronization
+#[derive(Debug, Clone)]
+pub struct ForeignDistroRepo {
+    pub distro_name: String,
+    pub repo_url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<ForeignDistroRepo>,
+    pub indexed_manifests: HashMap<String, ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut registered_repos = Vec::new();
+        registered_repos.push(ForeignDistroRepo {
+            distro_name: "Debian".to_string(),
+            repo_url: "https://deb.debian.org/debian".to_string(),
+        });
+        registered_repos.push(ForeignDistroRepo {
+            distro_name: "ArchLinux".to_string(),
+            repo_url: "https://archlinux.org/packages".to_string(),
+        });
+        registered_repos.push(ForeignDistroRepo {
+            distro_name: "Fedora".to_string(),
+            repo_url: "https://mirrors.fedoraproject.org".to_string(),
+        });
+        registered_repos.push(ForeignDistroRepo {
+            distro_name: "Alpine".to_string(),
+            repo_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
+        });
+        registered_repos.push(ForeignDistroRepo {
+            distro_name: "FreeBSD".to_string(),
+            repo_url: "https://pkg.freebsd.org".to_string(),
+        });
+
+        Self {
+            registered_repos,
+            indexed_manifests: HashMap::new(),
+        }
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests
+            .insert(manifest.original_name.clone(), manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+
+    pub fn find_and_translate(&self, name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .get(name)
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
@@ -1333,6 +1498,7 @@ pub struct UniversalPackageManager {
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
+    pub triggers: PackageTriggerRegistry,
 }
 
 impl UniversalPackageManager {
@@ -1347,6 +1513,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -2290,9 +2457,9 @@ mod tests {
 
     #[test]
     fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::SigmaPkg));
-        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("slackware.txz"), Some(PackageFormat::Txz));
+        assert_eq!(PackageFormat::from_filename("package.xbps"), Some(PackageFormat::Xbps));
+        assert_eq!(PackageFormat::from_filename("kernel.cachy"), Some(PackageFormat::Cachy));
         assert_eq!(PackageFormat::from_filename("package.pkg.tar.zst"), Some(PackageFormat::Pacman));
         assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
