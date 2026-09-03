@@ -93,27 +93,36 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                ServiceSupervisorType::Runit
-            }
-            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::SysVInit,
-            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
+
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
+
+            DistroSubsystemMode::LinuxNix
+            | DistroSubsystemMode::LinuxGuix => ServiceSupervisorType::Shepherd,
+
+            DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
     }
 
     pub fn translate_vfs_path(&self, generic_path: &str) -> String {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
+            (DistroSubsystemMode::LinuxGuix, "/etc") => "/etc/guix".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
+            (DistroSubsystemMode::BedrockLinux, "/etc") => "/bedrock/strata/etc".to_string(),
+            (DistroSubsystemMode::LinuxVoid, "/etc") => "/etc/xbps".to_string(),
             (
                 DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
@@ -133,27 +142,68 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd,
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::SmartOs,
                 "/proc",
             ) => "/proc".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd,
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::SmartOs,
                 "/sys",
             ) => "/sys".to_string(),
             _ => generic_path.to_string(),
         }
     }
 
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        // Verify that the current subsystem mode has valid supervisor, package translation, and VFS translation
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+
+        !pkg_spec.is_empty()
+            && !vfs_etc.is_empty()
+            && match self.mode {
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora
+                | DistroSubsystemMode::LinuxOpenSuse
+                | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxClear
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
+
+                DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+
+                DistroSubsystemMode::LinuxAlpine
+                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
+
+                DistroSubsystemMode::LinuxNix
+                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
+
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            }
+    }
+
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
-            DistroSubsystemMode::LinuxDebian => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxTails => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
+            DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
             DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
                 format!("{}.rpm", input_pkg)
@@ -163,9 +213,18 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
-            }
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
+            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
+            DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
 
@@ -175,7 +234,7 @@ impl SovereignUniversalDistroBridge {
         root_path: &str,
     ) -> Result<(), &'static str> {
         match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd | DistroSubsystemMode::SmartOs => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
                 Ok(())
@@ -4465,6 +4524,7 @@ mod tests {
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
         assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
         assert_eq!(bridge.translate_vfs_path("/etc"), "/etc");
+        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::LinuxNix);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.nix");
@@ -4473,6 +4533,7 @@ mod tests {
             ServiceSupervisorType::Shepherd
         );
         assert_eq!(bridge.translate_vfs_path("/etc"), "/etc/nixos");
+        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
@@ -4480,10 +4541,33 @@ mod tests {
         assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/local/etc");
         assert!(bridge.enforce_security_isolation(101, "/jails/web").is_ok());
         assert!(bridge.active_jail.is_some());
+        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
         assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
+        assert!(bridge.verify_all_subsystems_compatibility());
+
+        // Test all additional distro subsystem modes
+        let modes = [
+            (DistroSubsystemMode::LinuxVoid, "xbps", ServiceSupervisorType::Runit),
+            (DistroSubsystemMode::LinuxSlackware, "txz", ServiceSupervisorType::Sysvinit),
+            (DistroSubsystemMode::LinuxOpenSuse, "rpm", ServiceSupervisorType::Systemd),
+            (DistroSubsystemMode::LinuxPopOs, "deb", ServiceSupervisorType::Systemd),
+            (DistroSubsystemMode::LinuxSolus, "eopkg", ServiceSupervisorType::Dinit),
+            (DistroSubsystemMode::LinuxGuix, "scm", ServiceSupervisorType::Shepherd),
+            (DistroSubsystemMode::LinuxClear, "swupd", ServiceSupervisorType::Systemd),
+            (DistroSubsystemMode::LinuxTails, "deb", ServiceSupervisorType::Systemd),
+            (DistroSubsystemMode::SmartOs, "tgz", ServiceSupervisorType::Rcd),
+            (DistroSubsystemMode::BedrockLinux, "stratum", ServiceSupervisorType::Systemd),
+        ];
+
+        for (mode, ext, expected_supervisor) in modes {
+            bridge.set_subsystem_mode(mode);
+            assert_eq!(bridge.translate_package_specifier("testpkg"), format!("testpkg.{}", ext));
+            assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
+            assert!(bridge.verify_all_subsystems_compatibility());
+        }
     }
 
     #[test]

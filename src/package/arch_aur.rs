@@ -124,6 +124,9 @@ impl SigmaAUR {
             .ok_or(BuildError::PackageNotFound)?
             .clone();
 
+        let pkg_name_str = pkg.name.clone();
+        let pkg_ver_str = pkg.version.clone();
+
         // Resolve dependencies
         let dependencies = self.resolve_dependencies(&pkg)?;
 
@@ -135,8 +138,8 @@ impl SigmaAUR {
         }
 
         // Simulate build process
-        println!("Building package: {}", pkg.name);
-        println!("Version: {}", pkg.version);
+        println!("Building package: {}", pkg_name_str);
+        println!("Version: {}", pkg_ver_str);
         println!("Dependencies: {:?}", dependencies);
 
         // Mark as installed
