@@ -168,49 +168,6 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
-    pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        let modes = [
-            DistroSubsystemMode::LinuxArch,
-            DistroSubsystemMode::LinuxDebian,
-            DistroSubsystemMode::LinuxAlpine,
-            DistroSubsystemMode::LinuxNix,
-            DistroSubsystemMode::LinuxGentoo,
-            DistroSubsystemMode::LinuxFedora,
-            DistroSubsystemMode::FreeBsd,
-            DistroSubsystemMode::OpenBsd,
-            DistroSubsystemMode::NetBsd,
-            DistroSubsystemMode::DragonFlyBsd,
-        ];
-
-        !pkg_spec.is_empty()
-            && !vfs_etc.is_empty()
-            && match self.mode {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora
-                | DistroSubsystemMode::LinuxOpenSuse
-                | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxClear
-                | DistroSubsystemMode::LinuxTails
-                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
-
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-
-                DistroSubsystemMode::LinuxAlpine
-                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
-
-                DistroSubsystemMode::LinuxNix
-                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
-
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
-    }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
@@ -390,7 +347,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
             | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -404,6 +360,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
         };
