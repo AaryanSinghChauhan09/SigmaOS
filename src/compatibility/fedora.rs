@@ -197,11 +197,69 @@ impl KojiBuildServer {
     }
 }
 
+/// Type of Bodhi software update.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiUpdateType {
+    Bugfix,
+    Enhancement,
+    Security,
+    NewPackage,
+}
+
+/// Status of a Bodhi update in its release lifecycle.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiUpdateStatus {
+    Pending,
+    Testing,
+    Stable,
+    Obsolete,
+    Rejected,
+}
+
+/// Automated CI test result gate (e.g., OpenQA / Greenwave).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiTestResult {
+    Pending,
+    Passed,
+    Failed,
+    Waived,
+}
+
+/// Comment & feedback entry on a Bodhi update.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BodhiComment {
+    pub author: String,
+    pub text: String,
+    pub karma: i32,
+    pub timestamp_secs: u64,
+}
+
+/// Comprehensive Bodhi Update object modeling Fedora update release metadata.
+#[derive(Debug, Clone)]
+pub struct BodhiUpdate {
+    pub update_id: String,
+    pub builds: Vec<String>,
+    pub update_type: BodhiUpdateType,
+    pub status: BodhiUpdateStatus,
+    pub release_target: String,
+    pub bugs: Vec<String>,
+    pub cves: Vec<String>,
+    pub karma: i32,
+    pub ci_test_result: BodhiTestResult,
+    pub comments: Vec<BodhiComment>,
+    pub days_in_testing: u32,
+    pub is_critpath: bool,
+    pub stable_karma_threshold: i32,
+    pub unstable_karma_threshold: i32,
+    pub min_testing_days: u32,
+}
+
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
-/// It handles community feedback, accumulates karma, and gates the transition to stable.
+/// It handles community feedback, accumulates karma, evaluates Greenwave CI gates,
+/// enforces critical-path testing durations, and gates promotion to stable release repos.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>,       // update_id -> karma
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
+    pub updates: HashMap<String, BodhiUpdate>,
+    pub stable_gated: HashMap<String, bool>, // update_id -> is_promoted
 }
 
 impl BodhiUpdateTriage {
@@ -212,20 +270,166 @@ impl BodhiUpdateTriage {
         }
     }
 
+    /// Backwards-compatible simple update submission
     pub fn submit_update(&mut self, update_id: &str) {
-        self.updates.insert(update_id.to_string(), 0);
+        self.create_update(
+            update_id,
+            vec![format!("{}-1.0.0.rpm", update_id)],
+            BodhiUpdateType::Bugfix,
+            "SigmaOS-1.0",
+            false,
+        );
+    }
+
+    /// Create a detailed Bodhi update request
+    pub fn create_update(
+        &mut self,
+        update_id: &str,
+        builds: Vec<String>,
+        update_type: BodhiUpdateType,
+        release_target: &str,
+        is_critpath: bool,
+    ) {
+        let (stable_thresh, min_days) = match (update_type, is_critpath) {
+            (BodhiUpdateType::Security, _) => (1, 0),
+            (_, true) => (3, 7),
+            (_, false) => (2, 3),
+        };
+
+        let update = BodhiUpdate {
+            update_id: update_id.to_string(),
+            builds,
+            update_type,
+            status: BodhiUpdateStatus::Testing,
+            release_target: release_target.to_string(),
+            bugs: Vec::new(),
+            cves: Vec::new(),
+            karma: 0,
+            ci_test_result: BodhiTestResult::Passed, // default passed unless flagged
+            comments: Vec::new(),
+            days_in_testing: 0,
+            is_critpath,
+            stable_karma_threshold: stable_thresh,
+            unstable_karma_threshold: -3,
+            min_testing_days: min_days,
+        };
+
+        self.updates.insert(update_id.to_string(), update);
         self.stable_gated.insert(update_id.to_string(), false);
     }
 
+    pub fn link_bug(&mut self, update_id: &str, bug_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.bugs.contains(&bug_id.to_string()) {
+                up.bugs.push(bug_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn link_cve(&mut self, update_id: &str, cve_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.cves.contains(&cve_id.to_string()) {
+                up.cves.push(cve_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn record_ci_result(&mut self, update_id: &str, result: BodhiTestResult) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.ci_test_result = result;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn advance_testing_days(&mut self, update_id: &str, days: u32) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.days_in_testing += days;
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn submit_feedback(&mut self, update_id: &str, karma_delta: i32) -> Result<i32, String> {
-        if let Some(karma) = self.updates.get_mut(update_id) {
-            *karma += karma_delta;
-            let current_karma = *karma;
-            // Auto-promote when karma hits >= 3, auto-reject when karma <= -3
-            if current_karma >= 3 {
+        self.add_comment(
+            update_id,
+            "tester",
+            "Community QA feedback submitted",
+            karma_delta,
+            0,
+        )
+    }
+
+    pub fn add_comment(
+        &mut self,
+        update_id: &str,
+        author: &str,
+        text: &str,
+        karma: i32,
+        timestamp_secs: u64,
+    ) -> Result<i32, String> {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.karma += karma;
+            up.comments.push(BodhiComment {
+                author: author.to_string(),
+                text: text.to_string(),
+                karma,
+                timestamp_secs,
+            });
+
+            let current_karma = up.karma;
+
+            // Auto-promote/reject check
+            if current_karma <= up.unstable_karma_threshold {
+                up.status = BodhiUpdateStatus::Rejected;
+                self.stable_gated.insert(update_id.to_string(), false);
+            } else if current_karma >= up.stable_karma_threshold
+                && up.ci_test_result != BodhiTestResult::Failed
+            {
+                up.status = BodhiUpdateStatus::Stable;
                 self.stable_gated.insert(update_id.to_string(), true);
             }
+
             Ok(current_karma)
+        } else {
+            Err("Update package not found".to_string())
+        }
+    }
+
+    /// Evaluates if an update satisfies requirements to transition to Stable repository status
+    pub fn eval_stable_promotion(&mut self, update_id: &str) -> Result<bool, String> {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if up.status == BodhiUpdateStatus::Stable {
+                return Ok(true);
+            }
+
+            if up.ci_test_result == BodhiTestResult::Failed {
+                return Err("Cannot promote to stable: Automated Greenwave CI tests failed".to_string());
+            }
+
+            // Security fast-track
+            if up.update_type == BodhiUpdateType::Security && (up.karma >= 1 || up.ci_test_result == BodhiTestResult::Passed) {
+                up.status = BodhiUpdateStatus::Stable;
+                self.stable_gated.insert(update_id.to_string(), true);
+                return Ok(true);
+            }
+
+            // Standard criteria
+            if up.karma >= up.stable_karma_threshold && up.days_in_testing >= up.min_testing_days {
+                up.status = BodhiUpdateStatus::Stable;
+                self.stable_gated.insert(update_id.to_string(), true);
+                Ok(true)
+            } else {
+                Ok(false)
+            }
         } else {
             Err("Update package not found".to_string())
         }
@@ -233,6 +437,52 @@ impl BodhiUpdateTriage {
 
     pub fn is_promoted_to_stable(&self, update_id: &str) -> bool {
         *self.stable_gated.get(update_id).unwrap_or(&false)
+    }
+
+    /// Generates repodata `updateinfo.xml` content for DNF/RPM metadata
+    pub fn generate_updateinfo_xml(&self) -> String {
+        let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<updates>\n");
+        for up in self.updates.values() {
+            let type_str = match up.update_type {
+                BodhiUpdateType::Bugfix => "bugfix",
+                BodhiUpdateType::Enhancement => "recommended",
+                BodhiUpdateType::Security => "security",
+                BodhiUpdateType::NewPackage => "newpackage",
+            };
+            let status_str = match up.status {
+                BodhiUpdateStatus::Pending => "pending",
+                BodhiUpdateStatus::Testing => "testing",
+                BodhiUpdateStatus::Stable => "stable",
+                BodhiUpdateStatus::Obsolete => "obsolete",
+                BodhiUpdateStatus::Rejected => "rejected",
+            };
+
+            xml.push_str(&format!(
+                "  <update id=\"{}\" type=\"{}\" status=\"{}\" release=\"{}\">\n",
+                up.update_id, type_str, status_str, up.release_target
+            ));
+            xml.push_str(&format!("    <title>Update {}</title>\n", up.update_id));
+
+            if !up.cves.is_empty() {
+                xml.push_str("    <references>\n");
+                for cve in &up.cves {
+                    xml.push_str(&format!("      <reference href=\"https://cve.mitre.org/cgi-bin/cvename.cgi?name={}\" id=\"{}\" type=\"cve\"/>\n", cve, cve));
+                }
+                for bug in &up.bugs {
+                    xml.push_str(&format!("      <reference href=\"https://bugzilla.redhat.com/show_bug.cgi?id={}\" id=\"{}\" type=\"bugzilla\"/>\n", bug, bug));
+                }
+                xml.push_str("    </references>\n");
+            }
+
+            xml.push_str("    <pkglist>\n      <collection short=\"SigmaOS\">\n");
+            for build in &up.builds {
+                xml.push_str(&format!("        <package name=\"{}\"/>\n", build));
+            }
+            xml.push_str("      </collection>\n    </pkglist>\n");
+            xml.push_str("  </update>\n");
+        }
+        xml.push_str("</updates>");
+        xml
     }
 }
 
@@ -2860,6 +3110,61 @@ mod tests {
         // Direct promotion
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
+    }
+
+    #[test]
+    fn test_bodhi_advanced_lifecycle() {
+        let mut bodhi = BodhiUpdateTriage::new();
+
+        // 1. Create a Critical Path update
+        bodhi.create_update(
+            "SIGMA-2026-CRIT01",
+            vec!["systemd-255-1.fc39.x86_64".to_string()],
+            BodhiUpdateType::Enhancement,
+            "SigmaOS-39",
+            true, // is_critpath
+        );
+
+        bodhi.link_bug("SIGMA-2026-CRIT01", "RHBZ-200101");
+        bodhi.link_cve("SIGMA-2026-CRIT01", "CVE-2026-0001");
+
+        // Karma +2, but min_testing_days is 7 -> promo fails initially
+        bodhi.submit_feedback("SIGMA-2026-CRIT01", 3).unwrap(); // Karma 3 meets threshold
+        assert!(!bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // Advance days in testing to 7
+        bodhi.advance_testing_days("SIGMA-2026-CRIT01", 7);
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // 2. Greenwave CI test failure gate
+        bodhi.create_update(
+            "SIGMA-2026-FAIL01",
+            vec!["badpkg-1.0.rpm".to_string()],
+            BodhiUpdateType::Bugfix,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
+        bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-FAIL01").is_err()); // Greenwave failure blocks
+
+        // 3. Security Fast-Track
+        bodhi.create_update(
+            "SIGMA-2026-SEC01",
+            vec!["openssl-3.1.0.rpm".to_string()],
+            BodhiUpdateType::Security,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.link_cve("SIGMA-2026-SEC01", "CVE-2026-9999");
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-SEC01").unwrap()); // Security fast track
+
+        // 4. Updateinfo XML generation
+        let xml = bodhi.generate_updateinfo_xml();
+        assert!(xml.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assert!(xml.contains("CVE-2026-9999"));
+        assert!(xml.contains("RHBZ-200101"));
+        assert!(xml.contains("<update id=\"SIGMA-2026-CRIT01\""));
     }
 
     #[test]
