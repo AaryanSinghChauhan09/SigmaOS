@@ -7,6 +7,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+pub type PacmanContribEngine = crate::expanded_wiki_innovations::ArchPacmanContribEngine;
 
 /// Pacman package database entry
 #[derive(Debug, Clone)]
@@ -448,6 +449,8 @@ impl SafeUpdateChecker {
     }
 }
 
+/// Pacman Contrib Engine
+pub struct PacmanContribEngine;
 
 /// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
 pub struct PkgbuildChecksumUpdater;

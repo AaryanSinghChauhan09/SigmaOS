@@ -9,6 +9,7 @@ use crate::klib::path::PathBuf as Path;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::klib::path::PathBuf as Path;
 
 /// Represents CONFIG.SYS driver or parameter settings
 #[derive(Debug, Clone)]
