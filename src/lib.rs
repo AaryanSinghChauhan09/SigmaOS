@@ -55,13 +55,18 @@ pub mod open_source_obsoletion;
 pub mod open_source_os_gap_closure;
 
 pub use package::bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptPinRule,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine,
+    CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
-    DpkgStatoverrideRule, FedoraDnf5AdvisoryAndDeltaRpmEngine, FlakeInputLock,
-    FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageSubslotAndUseExpandEngine,
-    HaikuHpkgPackageFsEngine, NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine,
-    OpenBsdPkgAddSignifyEngine, OpenSuseZypperVendorStickinessEngine, PpaRepository,
-    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
+    DebianDpkgTriggersAptListbugsGuardEngine, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
+    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
+    FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
+    MicroarchitectureLevel, MicroarchRepoRoute, NetBsdPkgsrcOptionsFrameworkEngine,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenSuseZypperVendorStickinessEngine, PkgsrcOptionSpec, PortageEapiLevel, PpaRepository,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator,
     UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use unimplemented_features::{

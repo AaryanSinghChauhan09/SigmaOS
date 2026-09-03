@@ -1021,6 +1021,482 @@ impl Default for DebianDebconfStatoverrideEngine {
     }
 }
 
+// =========================================================================
+// 15. Arch / CachyOS x86-64 Microarchitecture Level Optimization Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum MicroarchitectureLevel {
+    V1, // Generic x86-64
+    V2, // CMPXCHG16B, LAHF-SAHF, POPCNT, SSE3, SSSE3, SSE4.1, SSE4.2
+    V3, // AVX, AVX2, BMI1, BMI2, F16C, FMA, LZCNT, MOVBE, OSXSAVE
+    V4, // AVX512F, AVX512BW, AVX512CD, AVX512DQ, AVX512VL
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MicroarchRepoRoute {
+    pub level: MicroarchitectureLevel,
+    pub repo_url: String,
+    pub is_enabled: bool,
+}
+
+pub struct ArchCachyosMicroarchOptimizationEngine {
+    pub detected_level: MicroarchitectureLevel,
+    pub cpu_flags: Vec<String>,
+    pub repo_routes: Vec<MicroarchRepoRoute>,
+}
+
+impl ArchCachyosMicroarchOptimizationEngine {
+    pub fn new() -> Self {
+        Self {
+            detected_level: MicroarchitectureLevel::V1,
+            cpu_flags: Vec::new(),
+            repo_routes: Vec::new(),
+        }
+    }
+
+    pub fn detect_microarch_level(&mut self, flags: &[&str]) -> MicroarchitectureLevel {
+        let mut flag_set = Vec::new();
+        for &f in flags {
+            flag_set.push(f.to_lowercase());
+        }
+        self.cpu_flags = flag_set.clone();
+
+        let has_v2 = ["sse3", "ssse3", "sse4_1", "sse4_2", "popcnt"]
+            .iter()
+            .all(|f| flag_set.contains(&f.to_string()));
+
+        let has_v3 = has_v2
+            && ["avx", "avx2", "bmi1", "bmi2", "fma", "f16c", "lzcnt"]
+                .iter()
+                .all(|f| flag_set.contains(&f.to_string()));
+
+        let has_v4 = has_v3
+            && ["avx512f", "avx512bw", "avx512cd", "avx512dq", "avx512vl"]
+                .iter()
+                .all(|f| flag_set.contains(&f.to_string()));
+
+        let level = if has_v4 {
+            MicroarchitectureLevel::V4
+        } else if has_v3 {
+            MicroarchitectureLevel::V3
+        } else if has_v2 {
+            MicroarchitectureLevel::V2
+        } else {
+            MicroarchitectureLevel::V1
+        };
+
+        self.detected_level = level;
+        level
+    }
+
+    pub fn register_repo_route(&mut self, level: MicroarchitectureLevel, repo_url: &str) {
+        self.repo_routes.push(MicroarchRepoRoute {
+            level,
+            repo_url: repo_url.to_string(),
+            is_enabled: true,
+        });
+    }
+
+    pub fn resolve_optimal_repo(&self) -> String {
+        let mut best_route: Option<&MicroarchRepoRoute> = None;
+        for route in &self.repo_routes {
+            if route.is_enabled && route.level <= self.detected_level {
+                if best_route.map_or(true, |r| route.level > r.level) {
+                    best_route = Some(route);
+                }
+            }
+        }
+        best_route
+            .map(|r| r.repo_url.clone())
+            .unwrap_or_else(|| "https://repo.sigmaos.org/core/x86_64".to_string())
+    }
+}
+
+impl Default for ArchCachyosMicroarchOptimizationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. Fedora COPR, Arch AUR & OBS Community Build Gateway Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CommunityRepoBackend {
+    FedoraCopr,
+    ArchAur,
+    OpenSuseObs,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CommunityPackageBuildSource {
+    pub name: String,
+    pub backend: CommunityRepoBackend,
+    pub repository_owner: String,
+    pub source_url: String,
+    pub trust_score: u32, // 0..100
+    pub is_sandboxed_build: bool,
+}
+
+pub struct CoprAurBuildRepositoryGatewayEngine {
+    pub registered_sources: BTreeMap<String, CommunityPackageBuildSource>,
+    pub min_trust_score_required: u32,
+}
+
+impl CoprAurBuildRepositoryGatewayEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_sources: BTreeMap::new(),
+            min_trust_score_required: 50,
+        }
+    }
+
+    pub fn register_source(&mut self, source: CommunityPackageBuildSource) {
+        self.registered_sources.insert(source.name.clone(), source);
+    }
+
+    pub fn can_build_safely(&self, pkg_name: &str) -> Result<bool, &'static str> {
+        let source = self
+            .registered_sources
+            .get(pkg_name)
+            .ok_or("Community build source not registered")?;
+
+        if !source.is_sandboxed_build {
+            return Ok(false);
+        }
+
+        if source.trust_score < self.min_trust_score_required {
+            return Ok(false);
+        }
+
+        Ok(true)
+    }
+
+    pub fn generate_build_sandbox_cmd(&self, pkg_name: &str) -> Result<String, &'static str> {
+        let source = self
+            .registered_sources
+            .get(pkg_name)
+            .ok_or("Community build source not registered")?;
+
+        let cmd = match source.backend {
+            CommunityRepoBackend::FedoraCopr => {
+                format!("copr-cli build-package {} --chroot fedora-rawhide-x86_64", source.name)
+            }
+            CommunityRepoBackend::ArchAur => {
+                format!("makepkg --syncdeps --clean --noconfirm --dir /sandbox/aur/{}", source.name)
+            }
+            CommunityRepoBackend::OpenSuseObs => {
+                format!("osc build --noservice {}", source.name)
+            }
+        };
+        Ok(cmd)
+    }
+}
+
+impl Default for CoprAurBuildRepositoryGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. NetBSD Pkgsrc Options Framework Selector
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PkgsrcOptionSpec {
+    pub option_name: String,
+    pub description: String,
+    pub requires_options: Vec<String>,
+    pub conflicts_with: Vec<String>,
+}
+
+pub struct NetBsdPkgsrcOptionsFrameworkEngine {
+    pub supported_options: BTreeMap<String, PkgsrcOptionSpec>,
+    pub suggested_options: Vec<String>,
+    pub active_options: Vec<String>,
+}
+
+impl NetBsdPkgsrcOptionsFrameworkEngine {
+    pub fn new() -> Self {
+        Self {
+            supported_options: BTreeMap::new(),
+            suggested_options: Vec::new(),
+            active_options: Vec::new(),
+        }
+    }
+
+    pub fn register_option(&mut self, spec: PkgsrcOptionSpec, suggested: bool) {
+        if suggested {
+            self.suggested_options.push(spec.option_name.clone());
+            self.active_options.push(spec.option_name.clone());
+        }
+        self.supported_options.insert(spec.option_name.clone(), spec);
+    }
+
+    pub fn toggle_option(&mut self, option_str: &str) -> Result<(), &'static str> {
+        if option_str.starts_with('+') {
+            let opt = option_str.trim_start_matches('+');
+            if !self.supported_options.contains_key(opt) {
+                return Err("Unsupported option");
+            }
+            if !self.active_options.contains(&opt.to_string()) {
+                self.active_options.push(opt.to_string());
+            }
+        } else if option_str.starts_with('-') {
+            let opt = option_str.trim_start_matches('-');
+            self.active_options.retain(|o| o != opt);
+        } else {
+            return Err("Option toggle must start with '+' or '-'");
+        }
+        Ok(())
+    }
+
+    pub fn validate_options(&self) -> Result<(), String> {
+        for opt in &self.active_options {
+            if let Some(spec) = self.supported_options.get(opt) {
+                for req in &spec.requires_options {
+                    if !self.active_options.contains(req) {
+                        return Err(format!("Option '{}' requires missing option '{}'", opt, req));
+                    }
+                }
+                for conf in &spec.conflicts_with {
+                    if self.active_options.contains(conf) {
+                        return Err(format!("Option '{}' conflicts with active option '{}'", opt, conf));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for NetBsdPkgsrcOptionsFrameworkEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 18. Gentoo Portage EAPI Specification & Slot Operator Solver
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PortageEapiLevel {
+    Eapi7,
+    Eapi8,
+    Eapi9,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SlotOperator {
+    AnySlot,             // '*'
+    SubslotEqual,        // ':='
+    ExactSlot(String),   // ':slot'
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EbuildSlotRecord {
+    pub atom: String,
+    pub slot: String,
+    pub subslot: String,
+    pub eapi: PortageEapiLevel,
+    pub slot_operator: SlotOperator,
+}
+
+pub struct GentooPortageEapiSlotOperatorEngine {
+    pub slots: BTreeMap<String, EbuildSlotRecord>,
+}
+
+impl GentooPortageEapiSlotOperatorEngine {
+    pub fn new() -> Self {
+        Self {
+            slots: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_ebuild_slot(&mut self, record: EbuildSlotRecord) {
+        self.slots.insert(record.atom.clone(), record);
+    }
+
+    pub fn check_eapi_feature_support(&self, atom: &str, feature: &str) -> Result<bool, &'static str> {
+        let record = self.slots.get(atom).ok_or("Atom not found")?;
+        match feature {
+            "BDEPEND" => Ok(record.eapi >= PortageEapiLevel::Eapi7),
+            "IDEPEND" => Ok(record.eapi >= PortageEapiLevel::Eapi8),
+            "PROPERTIES_ACCUMULATE" => Ok(record.eapi >= PortageEapiLevel::Eapi8),
+            _ => Ok(true),
+        }
+    }
+
+    pub fn requires_abi_rebuild(&self, atom: &str, target_subslot: &str) -> bool {
+        if let Some(record) = self.slots.get(atom) {
+            match record.slot_operator {
+                SlotOperator::SubslotEqual => record.subslot != target_subslot,
+                _ => false,
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for GentooPortageEapiSlotOperatorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 19. DragonFly BSD DPorts & HAMMER2 Transactional Snapshot Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hammer2PfsSnapshot {
+    pub snapshot_name: String,
+    pub transaction_id: u64,
+    pub timestamp_sec: u64,
+    pub target_pkg: String,
+    pub modified_files: Vec<String>,
+}
+
+pub struct DragonFlyDportsHammer2SnapshotEngine {
+    pub snapshots: Vec<Hammer2PfsSnapshot>,
+    pub current_tx_counter: u64,
+}
+
+impl DragonFlyDportsHammer2SnapshotEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            current_tx_counter: 1,
+        }
+    }
+
+    pub fn create_pre_transaction_snapshot(
+        &mut self,
+        target_pkg: &str,
+        modified_files: &[&str],
+        now_sec: u64,
+    ) -> String {
+        let tx_id = self.current_tx_counter;
+        self.current_tx_counter += 1;
+
+        let snap_name = format!("@hammer2_snap_tx_{}_{}", tx_id, target_pkg);
+        let snapshot = Hammer2PfsSnapshot {
+            snapshot_name: snap_name.clone(),
+            transaction_id: tx_id,
+            timestamp_sec: now_sec,
+            target_pkg: target_pkg.to_string(),
+            modified_files: modified_files.iter().map(|s| s.to_string()).collect(),
+        };
+        self.snapshots.push(snapshot);
+        snap_name
+    }
+
+    pub fn rollback_snapshot(&mut self, snap_name: &str) -> Result<Vec<String>, &'static str> {
+        let idx = self
+            .snapshots
+            .iter()
+            .position(|s| s.snapshot_name == snap_name)
+            .ok_or("Snapshot not found")?;
+
+        let snap = self.snapshots.remove(idx);
+        Ok(snap.modified_files)
+    }
+}
+
+impl Default for DragonFlyDportsHammer2SnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 20. Debian Dpkg Triggers & Apt-Listbugs Early Bug Guard
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DpkgTriggerKind {
+    Interest,
+    Activate,
+    InterestNoAwait,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DpkgTrigger {
+    pub name: String,
+    pub kind: DpkgTriggerKind,
+    pub target_package: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptBugReport {
+    pub bug_id: u32,
+    pub package_name: String,
+    pub severity: String, // "critical", "grave", "normal"
+    pub title: String,
+}
+
+pub struct DebianDpkgTriggersAptListbugsGuardEngine {
+    pub pending_triggers: Vec<DpkgTrigger>,
+    pub known_bugs: Vec<AptBugReport>,
+    pub block_on_critical_bugs: bool,
+}
+
+impl DebianDpkgTriggersAptListbugsGuardEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_triggers: Vec::new(),
+            known_bugs: Vec::new(),
+            block_on_critical_bugs: true,
+        }
+    }
+
+    pub fn register_trigger(&mut self, trigger: DpkgTrigger) {
+        if !self.pending_triggers.contains(&trigger) {
+            self.pending_triggers.push(trigger);
+        }
+    }
+
+    pub fn register_bug_report(&mut self, bug: AptBugReport) {
+        self.known_bugs.push(bug);
+    }
+
+    pub fn should_block_installation(&self, package_name: &str) -> (bool, Option<String>) {
+        if !self.block_on_critical_bugs {
+            return (false, None);
+        }
+
+        for bug in &self.known_bugs {
+            if bug.package_name == package_name {
+                let sev = bug.severity.to_lowercase();
+                if sev == "critical" || sev == "grave" {
+                    return (
+                        true,
+                        Some(format!("Blocked by bug #{} [{}]: {}", bug.bug_id, bug.severity, bug.title)),
+                    );
+                }
+            }
+        }
+        (false, None)
+    }
+
+    pub fn process_deferred_triggers(&mut self) -> usize {
+        let count = self.pending_triggers.len();
+        self.pending_triggers.clear();
+        count
+    }
+}
+
+impl Default for DebianDpkgTriggersAptListbugsGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1294,5 +1770,120 @@ MAINTAINER="SigmaOS"
         let stat = engine.get_statoverride_for_path("/usr/bin/expiry").unwrap();
         assert_eq!(stat.mode_octal, 0o4750);
         assert_eq!(stat.owner_group, "shadow");
+    }
+
+    #[test]
+    fn test_arch_cachyos_microarch() {
+        let mut engine = ArchCachyosMicroarchOptimizationEngine::new();
+        engine.register_repo_route(MicroarchitectureLevel::V1, "https://repo.sigmaos.org/core/x86_64");
+        engine.register_repo_route(MicroarchitectureLevel::V3, "https://repo.sigmaos.org/cachyos/x86_64-v3");
+
+        let level = engine.detect_microarch_level(&[
+            "sse3", "ssse3", "sse4_1", "sse4_2", "popcnt", "avx", "avx2", "bmi1", "bmi2", "fma", "f16c", "lzcnt",
+        ]);
+        assert_eq!(level, MicroarchitectureLevel::V3);
+
+        let repo = engine.resolve_optimal_repo();
+        assert_eq!(repo, "https://repo.sigmaos.org/cachyos/x86_64-v3");
+    }
+
+    #[test]
+    fn test_copr_aur_obs_gateway() {
+        let mut engine = CoprAurBuildRepositoryGatewayEngine::new();
+        engine.register_source(CommunityPackageBuildSource {
+            name: "yay".to_string(),
+            backend: CommunityRepoBackend::ArchAur,
+            repository_owner: "Jguer".to_string(),
+            source_url: "https://aur.archlinux.org/yay.git".to_string(),
+            trust_score: 85,
+            is_sandboxed_build: true,
+        });
+
+        assert!(engine.can_build_safely("yay").unwrap());
+
+        let cmd = engine.generate_build_sandbox_cmd("yay").unwrap();
+        assert!(cmd.contains("makepkg"));
+    }
+
+    #[test]
+    fn test_pkgsrc_options_framework() {
+        let mut engine = NetBsdPkgsrcOptionsFrameworkEngine::new();
+        engine.register_option(
+            PkgsrcOptionSpec {
+                option_name: "ssl".to_string(),
+                description: "Enable OpenSSL support".to_string(),
+                requires_options: vec![],
+                conflicts_with: vec![],
+            },
+            true,
+        );
+
+        engine.register_option(
+            PkgsrcOptionSpec {
+                option_name: "inet6".to_string(),
+                description: "Enable IPv6 support".to_string(),
+                requires_options: vec![],
+                conflicts_with: vec![],
+            },
+            false,
+        );
+
+        assert!(engine.validate_options().is_ok());
+        engine.toggle_option("+inet6").unwrap();
+        assert_eq!(engine.active_options.len(), 2);
+    }
+
+    #[test]
+    fn test_gentoo_portage_eapi_slots() {
+        let mut engine = GentooPortageEapiSlotOperatorEngine::new();
+        engine.register_ebuild_slot(EbuildSlotRecord {
+            atom: "dev-libs/openssl".to_string(),
+            slot: "0".to_string(),
+            subslot: "3.0".to_string(),
+            eapi: PortageEapiLevel::Eapi8,
+            slot_operator: SlotOperator::SubslotEqual,
+        });
+
+        assert!(engine.check_eapi_feature_support("dev-libs/openssl", "IDEPEND").unwrap());
+        assert!(engine.requires_abi_rebuild("dev-libs/openssl", "3.1"));
+        assert!(!engine.requires_abi_rebuild("dev-libs/openssl", "3.0"));
+    }
+
+    #[test]
+    fn test_hammer2_dports_snapshot() {
+        let mut engine = DragonFlyDportsHammer2SnapshotEngine::new();
+        let snap = engine.create_pre_transaction_snapshot(
+            "nginx",
+            &["/usr/local/sbin/nginx", "/etc/nginx/nginx.conf"],
+            1700000000,
+        );
+        assert!(snap.contains("nginx"));
+
+        let restored = engine.rollback_snapshot(&snap).unwrap();
+        assert_eq!(restored.len(), 2);
+    }
+
+    #[test]
+    fn test_debian_dpkg_triggers_apt_listbugs() {
+        let mut engine = DebianDpkgTriggersAptListbugsGuardEngine::new();
+        engine.register_bug_report(AptBugReport {
+            bug_id: 1029384,
+            package_name: "libglib2.0-0".to_string(),
+            severity: "critical".to_string(),
+            title: "Memory corruption in g_string_append".to_string(),
+        });
+
+        let (blocked, reason) = engine.should_block_installation("libglib2.0-0");
+        assert!(blocked);
+        assert!(reason.unwrap().contains("Blocked by bug #1029384"));
+
+        engine.register_trigger(DpkgTrigger {
+            name: "glib-compile-schemas".to_string(),
+            kind: DpkgTriggerKind::InterestNoAwait,
+            target_package: "libglib2.0-0".to_string(),
+        });
+
+        let processed = engine.process_deferred_triggers();
+        assert_eq!(processed, 1);
     }
 }
