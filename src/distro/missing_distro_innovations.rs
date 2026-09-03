@@ -972,6 +972,264 @@ impl Default for SuseYaSTConfigurationRegistry {
     }
 }
 
+// =========================================================================
+// 13. DRAGONFLY BSD HAMMER2 EMERGENCY COW & DEDUPLICATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2BlockMeta {
+    pub block_offset: u64,
+    pub length: usize,
+    pub hash_fnv: u64,
+    pub is_read_only: bool,
+}
+
+pub struct DragonFlyHammer2EmergencyCowEngine {
+    pub free_space_bytes: u64,
+    pub is_emergency_read_only: bool,
+    pub deduplicated_blocks: BTreeMap<u64, Hammer2BlockMeta>, // hash -> block
+    pub total_dedup_savings_bytes: u64,
+}
+
+impl DragonFlyHammer2EmergencyCowEngine {
+    pub fn new(initial_free_bytes: u64) -> Self {
+        Self {
+            free_space_bytes: initial_free_bytes,
+            is_emergency_read_only: false,
+            deduplicated_blocks: BTreeMap::new(),
+            total_dedup_savings_bytes: 0,
+        }
+    }
+
+    pub fn write_data_block(&mut self, offset: u64, data: &[u8]) -> Result<u64, &'static str> {
+        if self.is_emergency_read_only {
+            return Err("HAMMER2: Storage capacity critical! Filesystem forced to emergency read-only");
+        }
+
+        if self.free_space_bytes < 1024 * 1024 { // Less than 1MB free
+            self.is_emergency_read_only = true;
+            return Err("HAMMER2: Free space depleted! Emergency CoW snapshot activated");
+        }
+
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in data {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        if let Some(_existing) = self.deduplicated_blocks.get(&hash) {
+            self.total_dedup_savings_bytes += data.len() as u64;
+            Ok(hash)
+        } else {
+            let meta = Hammer2BlockMeta {
+                block_offset: offset,
+                length: data.len(),
+                hash_fnv: hash,
+                is_read_only: false,
+            };
+            self.deduplicated_blocks.insert(hash, meta);
+            self.free_space_bytes = self.free_space_bytes.saturating_sub(data.len() as u64);
+            Ok(hash)
+        }
+    }
+}
+
+impl Default for DragonFlyHammer2EmergencyCowEngine {
+    fn default() -> Self {
+        Self::new(10 * 1024 * 1024)
+    }
+}
+
+// =========================================================================
+// 14. SOVEREIGN FAST INITRAMFS CPIO GENERATOR (ALPINE/VOID PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct InitramfsFileEntry {
+    pub path: String,
+    pub mode: u32,
+    pub content: Vec<u8>,
+}
+
+pub struct SovereignFastInitramfsGenerator {
+    pub files: Vec<InitramfsFileEntry>,
+}
+
+impl SovereignFastInitramfsGenerator {
+    pub fn new() -> Self {
+        Self { files: Vec::new() }
+    }
+
+    pub fn add_file(&mut self, path: &str, mode: u32, content: &[u8]) {
+        self.files.push(InitramfsFileEntry {
+            path: path.to_string(),
+            mode,
+            content: content.to_vec(),
+        });
+    }
+
+    pub fn build_cpio_archive(&self) -> Vec<u8> {
+        let mut archive = Vec::new();
+        for file in &self.files {
+            let header = format!("070701{:08X}{:08X}\n", file.path.len(), file.content.len());
+            archive.extend_from_slice(header.as_bytes());
+            archive.extend_from_slice(file.path.as_bytes());
+            archive.extend_from_slice(&file.content);
+        }
+        archive.extend_from_slice(b"07070100000000TRAILER!!!\n");
+        archive
+    }
+}
+
+impl Default for SovereignFastInitramfsGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 15. GENTOO PORTAGE EAPI 8 SLOT OPERATOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PortageSlotDependency {
+    pub package_name: String,
+    pub slot: String,
+    pub subslot: String,
+    pub is_operator_rebuild_required: bool,
+}
+
+pub struct GentooPortageSlotOperatorEngine {
+    pub slots: BTreeMap<String, PortageSlotDependency>,
+}
+
+impl GentooPortageSlotOperatorEngine {
+    pub fn new() -> Self {
+        Self { slots: BTreeMap::new() }
+    }
+
+    pub fn register_package_slot(&mut self, pkg: &str, slot: &str, subslot: &str) {
+        let dep = PortageSlotDependency {
+            package_name: pkg.to_string(),
+            slot: slot.to_string(),
+            subslot: subslot.to_string(),
+            is_operator_rebuild_required: false,
+        };
+        self.slots.insert(pkg.to_string(), dep);
+    }
+
+    pub fn update_subslot_and_trigger_rebuilds(&mut self, pkg: &str, new_subslot: &str) -> Vec<String> {
+        let mut rebuilds = Vec::new();
+        if let Some(dep) = self.slots.get_mut(pkg) {
+            if dep.subslot != new_subslot {
+                dep.subslot = new_subslot.to_string();
+                dep.is_operator_rebuild_required = true;
+                rebuilds.push(pkg.to_string());
+            }
+        }
+        rebuilds
+    }
+}
+
+impl Default for GentooPortageSlotOperatorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. FEDORA / RHEL SELINUX MLS / MCS GOVERNOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SelinuxMlsMcsContext {
+    pub user: String,
+    pub role: String,
+    pub domain_type: String,
+    pub sensitivity_level: u8, // e.g. s0, s1, s2
+    pub categories: Vec<u16>,  // e.g. c0, c100, c1023
+}
+
+pub struct FedoraSelinuxMlsMcsGovernor {
+    pub active_contexts: BTreeMap<usize, SelinuxMlsMcsContext>, // pid -> context
+}
+
+impl FedoraSelinuxMlsMcsGovernor {
+    pub fn new() -> Self {
+        Self { active_contexts: BTreeMap::new() }
+    }
+
+    pub fn assign_context(&mut self, pid: usize, user: &str, role: &str, domain: &str, level: u8, cats: &[u16]) {
+        let ctx = SelinuxMlsMcsContext {
+            user: user.to_string(),
+            role: role.to_string(),
+            domain_type: domain.to_string(),
+            sensitivity_level: level,
+            categories: cats.to_vec(),
+        };
+        self.active_contexts.insert(pid, ctx);
+    }
+
+    pub fn authorize_mls_mcs_access(&self, subj_pid: usize, obj_level: u8, obj_cats: &[u16]) -> bool {
+        if let Some(subj) = self.active_contexts.get(&subj_pid) {
+            if subj.sensitivity_level < obj_level {
+                return false; // Sensitivity level dominated
+            }
+            for cat in obj_cats {
+                if !subj.categories.contains(cat) {
+                    return false; // Missing MCS category compartment
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraSelinuxMlsMcsGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+    #[test]
+    fn test_dragonfly_hammer2_emergency_cow() {
+        let mut hammer = DragonFlyHammer2EmergencyCowEngine::new(5 * 1024 * 1024);
+        let h1 = hammer.write_data_block(0, b"DATA_PAYLOAD_BLOCK").unwrap();
+        let h2 = hammer.write_data_block(4096, b"DATA_PAYLOAD_BLOCK").unwrap();
+        assert_eq!(h1, h2);
+        assert_eq!(hammer.total_dedup_savings_bytes, 18);
+    }
+
+    #[test]
+    fn test_sovereign_fast_initramfs_generator() {
+        let mut initramfs = SovereignFastInitramfsGenerator::new();
+        initramfs.add_file("/init", 0o755, b"#!/bin/sh\necho init");
+        let cpio = initramfs.build_cpio_archive();
+        assert!(cpio.len() > 0);
+        assert!(cpio.ends_with(b"07070100000000TRAILER!!!\n"));
+    }
+
+    #[test]
+    fn test_gentoo_portage_slot_operator() {
+        let mut portage = GentooPortageSlotOperatorEngine::new();
+        portage.register_package_slot("dev-libs/openssl", "0", "1.1");
+        let rebuilds = portage.update_subslot_and_trigger_rebuilds("dev-libs/openssl", "3.0");
+        assert_eq!(rebuilds.len(), 1);
+        assert_eq!(rebuilds[0], "dev-libs/openssl");
+    }
+
+    #[test]
+    fn test_fedora_selinux_mls_mcs_governor() {
+        let mut selinux = FedoraSelinuxMlsMcsGovernor::new();
+        selinux.assign_context(100, "system_u", "system_r", "httpd_t", 2, &[1, 2, 3]);
+
+        assert!(selinux.authorize_mls_mcs_access(100, 1, &[1, 2]));
+        assert!(!selinux.authorize_mls_mcs_access(100, 3, &[1])); // Higher sensitivity
+        assert!(!selinux.authorize_mls_mcs_access(100, 1, &[4])); // Missing category
+    }
+
     #[test]
     fn test_suse_yast_configuration_registry() {
         let mut yast = SuseYaSTConfigurationRegistry::new();

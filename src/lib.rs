@@ -52,7 +52,6 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 pub mod open_source_obsoletion;
-pub mod open_source_os_gap_closure;
 
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptPinRule, ArchSplitPackageHookRunnerEngine,
@@ -89,7 +88,8 @@ pub use distro::{
     SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
     SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
     SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
-    SovereignDistroLeapSuite,
+    SovereignDistroLeapSuite, DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
+    GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,

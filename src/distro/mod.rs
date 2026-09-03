@@ -146,6 +146,8 @@ pub use missing_distro_innovations::{
     ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
     BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
     SmartOsZoneEngine, ComponentParityStatus, MissingDistroComponentsEngine,
+    DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
+    GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
 };
 
 pub use linux_bsd_inspirations::{
