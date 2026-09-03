@@ -1,5 +1,3 @@
-## 2026-09-02 - Accessible Window Controls in Web Desktop Interfaces
-
-**Learning:** Custom window controls (e.g. minimize, maximize, close dots) in web-based desktop operating systems are frequently styled as simple `div` or `span` tags, making them invisible to keyboard focus traps and screen readers. Converting these to semantic `<button type="button">` elements with explicit `aria-label` and `title` attributes (e.g., `aria-label="Minimize OmniShell Terminal"`) alongside CSS reset rules (`border: none; padding: 0; outline: none`) preserves exact visual aesthetics while making window management WCAG 2.1 AA compliant.
-
-**Action:** Whenever building custom window titlebars or desktop controls, always use native `<button>` tags with explicit, context-aware `aria-label`s and `:focus-visible` focus rings.
+## 2025-05-17 - Web Desktop Control Accessibility and ARIA Annotations
+**Learning:** In web-based OS desktops (such as Zenith), interactive inputs, theme selectors, and toolbar controls often omit explicit `type="button"`, `aria-label`, and `title` attributes, rendering them invisible or ambiguous to screen reader users and breaking standard WCAG 2.1 form navigation.
+**Action:** Always ensure all interactive controls and inputs in web UI components have explicit `aria-label` descriptions, `type="button"` attributes on non-submit buttons, and visible focus indicators.
