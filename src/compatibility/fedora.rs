@@ -3995,7 +3995,6 @@ impl Default for FedoraSystemRolesEngine {
         Self::new()
     }
 }
-    use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DracutModule {
