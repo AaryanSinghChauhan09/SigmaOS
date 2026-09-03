@@ -1,8 +1,7 @@
 # SovereignOS / SigmaOS - Master AI Agent Algorithm Diagnostics & Fix Guide
-
 > **Document Purpose**: Complete operational status, compiler error catalog, root cause analysis, and production-grade Safe Rust fix blueprints for AI agents working on SigmaOS / SovereignOS.
 
-***
+---
 
 ## Executive Summary & Architecture Overview
 
@@ -10,54 +9,47 @@ SigmaOS (SovereignOS) is a high-performance, quantum-resistant, multi-paradigm o
 
 This document serves as the master guide for human engineers and AI agents to understand what subsystems are working, what diagnostic compiler errors occur, why they occur, and exact code blueprints on how to fix them efficiently.
 
-***
+---
 
 ## 1. WHAT IS WORKING (Fully Operational Subsystems)
 
 ### 1.1 Kernel Syscalls & VFS Sharding
-
-*   **File Operations**: `sigma_open()`, `sigma_read()`, `sigma_write()` with verified file descriptor allocation and byte-transfer integrity.
-*   **Zero-Copy Memory**: `sigma_mmap()` allocates zero-copy process memory shards with isolated address spaces.
-*   **Process Management**: `sigma_fork()` spawns isolated process shards with independent capability masks.
-*   **SemanticFS**: Native vector embedding insertion, top-k vector similarity ranking, and persistent metadata integrity verification.
+* **File Operations**: `sigma_open()`, `sigma_read()`, `sigma_write()` with verified file descriptor allocation and byte-transfer integrity.
+* **Zero-Copy Memory**: `sigma_mmap()` allocates zero-copy process memory shards with isolated address spaces.
+* **Process Management**: `sigma_fork()` spawns isolated process shards with independent capability masks.
+* **SemanticFS**: Native vector embedding insertion, top-k vector similarity ranking, and persistent metadata integrity verification.
 
 ### 1.2 Driver Management & Dynamic Kernel Registry
-
-*   **Dependency Resolver**: `DriverManager` automatically resolves driver dependency chains (e.g., auto-loading `pci_core` -> `snd` -> `snd_hda_codec` -> `snd_hda_intel`).
-*   **Post-Quantum Driver Verification**: Every kernel module is verified using Dilithium-5 post-quantum digital signatures prior to non-paged pool execution.
-*   **PCI Bus Auto-Detection**: Integrated `udev` PCI scanner auto-detects hardware (e.g., NVIDIA GPUs, Intel HDA) and binds corresponding drivers.
-*   **Lockdown Unsigned Sandbox**: Unsigned/third-party driver modules (e.g. forensic/IoT `snd_dummy`) run under restricted DMA privileges in Lockdown Mode.
-*   **DKMS Kernel ABI Auto-Rebuild**: Dynamic Kernel Module System auto-detects kernel ABI shifts (e.g. 6.7-sigma to 6.8-sigma) and triggers isolated container rebuilds.
+* **Dependency Resolver**: `DriverManager` automatically resolves driver dependency chains (e.g., auto-loading `pci_core` -> `snd` -> `snd_hda_codec` -> `snd_hda_intel`).
+* **Post-Quantum Driver Verification**: Every kernel module is verified using Dilithium-5 post-quantum digital signatures prior to non-paged pool execution.
+* **PCI Bus Auto-Detection**: Integrated `udev` PCI scanner auto-detects hardware (e.g., NVIDIA GPUs, Intel HDA) and binds corresponding drivers.
+* **Lockdown Unsigned Sandbox**: Unsigned/third-party driver modules (e.g. forensic/IoT `snd_dummy`) run under restricted DMA privileges in Lockdown Mode.
+* **DKMS Kernel ABI Auto-Rebuild**: Dynamic Kernel Module System auto-detects kernel ABI shifts (e.g. 6.7-sigma to 6.8-sigma) and triggers isolated container rebuilds.
 
 ### 1.3 Post-Quantum Security & Isolation Framework
-
-*   **Mandatory Access Control (MAC)**: Dual-label enforcement (`sigma_mac_enforce`) granting/denying actions based on binary security tags extracted from ELF binaries.
-*   **FreeBSD-Style Jails**: VFS root pivot and network stack isolation to localhost loopback devices via `sigma_jail_create()`.
-*   **SigmaShield Packet Filtering**: Deep packet inspection blocking spoofed IP addresses while passing Kyber/Dilithium mesh-signed traffic.
-*   **Cryptography Engine**: Native Kyber-1024 keypair encapsulation and Dilithium-5 post-quantum digital signature generation/verification.
+* **Mandatory Access Control (MAC)**: Dual-label enforcement (`sigma_mac_enforce`) granting/denying actions based on binary security tags extracted from ELF binaries.
+* **FreeBSD-Style Jails**: VFS root pivot and network stack isolation to localhost loopback devices via `sigma_jail_create()`.
+* **SigmaShield Packet Filtering**: Deep packet inspection blocking spoofed IP addresses while passing Kyber/Dilithium mesh-signed traffic.
+* **Cryptography Engine**: Native Kyber-1024 keypair encapsulation and Dilithium-5 post-quantum digital signature generation/verification.
 
 ### 1.4 Native Networking & Sovereign Mesh
-
-*   **IPv6 Dual-Stack Core**: Native IPv6 dual-stack stack initialization and packet routing.
-*   **NDP Discovery**: Router Solicitation broadcast emission and neighbor table updates.
-*   **Kyber Mesh Router**: Decentralized peer-to-peer route announcement with full payload encryption using Kyber-1024 keys.
+* **IPv6 Dual-Stack Core**: Native IPv6 dual-stack stack initialization and packet routing.
+* **NDP Discovery**: Router Solicitation broadcast emission and neighbor table updates.
+* **Kyber Mesh Router**: Decentralized peer-to-peer route announcement with full payload encryption using Kyber-1024 keys.
 
 ### 1.5 OCI Container Sharding
-
-*   **OCI Shard Allocation**: Creation of isolated process shards from standard OCI container bundle specifications.
-*   **Container Lifecycle**: Full entrypoint execution, state querying (returning OCI-compliant state JSON), and graceful SIGTERM process termination.
+* **OCI Shard Allocation**: Creation of isolated process shards from standard OCI container bundle specifications.
+* **Container Lifecycle**: Full entrypoint execution, state querying (returning OCI-compliant state JSON), and graceful SIGTERM process termination.
 
 ### 1.6 Zenith GUI Desktop Compositor
-
-*   **Widget Allocation & Rendering**: Native `zenith_create_button()` allocation and GPU draw call dispatching via `zenith_draw_rect()`.
-*   **Zero-Reboot L10n**: Hot-swappable UI localization (`sigma_l10n_set_locale()`) with dynamic string table lookup without restarting desktop sessions.
+* **Widget Allocation & Rendering**: Native `zenith_create_button()` allocation and GPU draw call dispatching via `zenith_draw_rect()`.
+* **Zero-Reboot L10n**: Hot-swappable UI localization (`sigma_l10n_set_locale()`) with dynamic string table lookup without restarting desktop sessions.
 
 ### 1.7 Universal Package Engine & Distro Parity
+* **Format Adaptation**: Native adaptation and cross-translation of 25+ foreign package formats (.deb, .rpm, PKGBUILD/AUR, .apk, .ebuild, .ports, Flatpak, AppImage, Snap, .nixpkg).
+* **Distro Parity Innovations**: Functional implementations of Arch Pacman/AUR, Gentoo Portage, Fedora OSTree/SELinux, Void Runit, NixOS Flakes, Mint Tweak Engine, FreeBSD Jails, OpenBSD Pledge/Unveil, Bedrock Linux Strata Engine, and SmartOS Zone Engine.
 
-*   **Format Adaptation**: Native adaptation and cross-translation of 25+ foreign package formats (.deb, .rpm, PKGBUILD/AUR, .apk, .ebuild, .ports, Flatpak, AppImage, Snap, .nixpkg).
-*   **Distro Parity Innovations**: Functional implementations of Arch Pacman/AUR, Gentoo Portage, Fedora OSTree/SELinux, Void Runit, NixOS Flakes, Mint Tweak Engine, FreeBSD Jails, OpenBSD Pledge/Unveil, Bedrock Linux Strata Engine, and SmartOS Zone Engine.
-
-***
+---
 
 ## 2. WHAT IS NOT WORKING & WHY (Diagnostic Error Matrix)
 
@@ -80,12 +72,11 @@ When building or extending algorithms in SigmaOS, AI agents may encounter standa
 | **E0614** | `type ... cannot be dereferenced` | Attempting to dereference (`*v`) a primitive scalar type (like `i32`) that is already passed by value. |
 | **E0659** | `... is ambiguous` | Wildcard imports (`use super::*`) bringing multiple conflicting symbols into the same namespace. |
 
-***
+---
 
 ## 3. HOW TO FIX IT (Code Blueprints for AI Agents)
 
 ### 3.1 Blueprint 1: Resolving Borrow Checker Moves (`E0382`)
-
 **Problem**: Move occurs because type does not implement `Clone`/`Copy`, or field is moved into self before read.
 **Fix**: Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to enums and use `.clone()` where appropriate.
 
@@ -111,7 +102,6 @@ impl NvidiaPrimeProfileManager {
 ```
 
 ### 3.2 Blueprint 2: Resolving Duplicate Method Definitions (`E0034` / `E0428`)
-
 **Problem**: Multiple methods with identical signatures defined within the same `impl` block or imported traits.
 **Fix**: Remove duplicate methods and keep a single, clean method implementation.
 
@@ -125,7 +115,6 @@ impl RealtimeScheduler {
 ```
 
 ### 3.3 Blueprint 3: Resolving Missing Struct/Type Declarations (`E0433`)
-
 **Problem**: Missing type definition or engine in module.
 **Fix**: Provide zero-dependency safe-Rust stub implementations in `src/unimplemented_features.rs` or relevant module.
 
@@ -149,7 +138,6 @@ impl AndroidApexContainerModuleEngine {
 ```
 
 ### 3.4 Blueprint 4: Resolving Invalid Dereference Errors (`E0614`)
-
 **Problem**: Attempting `*v` when `v` is an `i32` value rather than a reference `&i32`.
 **Fix**: Match against value or remove dereference operator.
 
@@ -168,7 +156,6 @@ match (&node.value, &new_value) {
 ```
 
 ### 3.5 Blueprint 5: EEVDF & BORE Scheduler Priority Inheritance
-
 **Problem**: Priority inversion during lock contention in kernel task scheduling.
 **Fix**: Safe Rust EEVDF virtual runtime tracking with Priority Inheritance Protocol (PIP).
 
@@ -208,7 +195,6 @@ impl EevdfBoreScheduler {
 ```
 
 ### 3.6 Blueprint 6: Banker's Deadlock Avoidance Algorithm
-
 **Problem**: Potential deadlock in multi-core resource allocation.
 **Fix**: Banker's safety state evaluation before allocating kernel resources.
 
@@ -253,7 +239,6 @@ impl BankersDeadlockAvoidance {
 ```
 
 ### 3.7 Blueprint 7: Ticket Spinlock with Pause Backoff for `#![no_std]`
-
 **Problem**: High CPU cache-line bouncing during lock contention in `#![no_std]`.
 **Fix**: Atomic ticket spinlock with `core::hint::spin_loop()`.
 
@@ -288,7 +273,6 @@ impl TicketSpinlock {
 ```
 
 ### 3.8 Blueprint 8: Zero-Copy Lock-Free Circular Ring Buffer for IPC
-
 **Problem**: Ring buffer index wrapping and concurrency race conditions in kernel IPC.
 **Fix**: Lock-free SPSC ring buffer utilizing atomic memory ordering.
 
@@ -334,36 +318,37 @@ impl<const N: usize> ZeroCopyPipeRing<N> {
 }
 ```
 
-***
+---
 
 ## 4. STEP-BY-STEP AI AGENT VERIFICATION WORKFLOW
 
 When fixing or enhancing algorithms in SigmaOS, every AI agent MUST follow this 4-step execution workflow:
 
-    +-----------------------------------------------------------------------+
-    | STEP 1: DIAGNOSE & CATALOG ERRORS                                      |
-    | Run `cargo check --lib` or `./run_sigma_tests.sh` to capture errors.  |
-    +-----------------------------------------------------------------------+
-                                      |
-                                      v
-    +-----------------------------------------------------------------------+
-    | STEP 2: APPLY BLUEPRINT CODE MODIFICATIONS                            |
-    | Use target edit tool (`replace_with_git_merge_diff` / `write_file`)   |
-    | according to Section 3 blueprints.                                    |
-    +-----------------------------------------------------------------------+
-                                      |
-                                      v
-    +-----------------------------------------------------------------------+
-    | STEP 3: VERIFY MODIFIED FILES                                         |
-    | Use `read_file` to verify structural correctness and no missing diffs |
-    +-----------------------------------------------------------------------+
-                                      |
-                                      v
-    +-----------------------------------------------------------------------+
-    | STEP 4: EXECUTE FULL SUITE VALIDATION                                 |
-    | Run `./run_sigma_tests.sh` and ensure 100% tests pass cleanly.       |
-    +-----------------------------------------------------------------------+
+```
++-----------------------------------------------------------------------+
+| STEP 1: DIAGNOSE & CATALOG ERRORS                                      |
+| Run `cargo check --lib` or `./run_sigma_tests.sh` to capture errors.  |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 2: APPLY BLUEPRINT CODE MODIFICATIONS                            |
+| Use target edit tool (`replace_with_git_merge_diff` / `write_file`)   |
+| according to Section 3 blueprints.                                    |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 3: VERIFY MODIFIED FILES                                         |
+| Use `read_file` to verify structural correctness and no missing diffs |
++-----------------------------------------------------------------------+
+                                  |
+                                  v
++-----------------------------------------------------------------------+
+| STEP 4: EXECUTE FULL SUITE VALIDATION                                 |
+| Run `./run_sigma_tests.sh` and ensure 100% tests pass cleanly.       |
++-----------------------------------------------------------------------+
+```
 
-***
-
+---
 *Guide synchronized and verified for SigmaOS / SovereignOS Agent Swarm.*
