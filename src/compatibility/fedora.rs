@@ -3014,6 +3014,143 @@ impl FedoraSharedSystemManager {
     }
 }
 
+// =========================================================================
+// Fedora Badges (badges.fedoraproject.org) Community Achievement Engine
+// =========================================================================
+
+/// Fedora Community Contribution Badge Alignment
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraBadge {
+    pub badge_id: String,
+    pub name: String,
+    pub description: String,
+    pub category: String, // "development", "qa", "community", "governance"
+    pub points: u32,
+}
+
+/// Fedora Badges & OpenBadges Community Achievement Engine
+pub struct FedoraBadgesEngine {
+    pub badges: HashMap<String, FedoraBadge>,
+    pub user_awarded_badges: HashMap<String, Vec<String>>, // fas_username -> badge_ids
+}
+
+impl FedoraBadgesEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            badges: HashMap::new(),
+            user_awarded_badges: HashMap::new(),
+        };
+        engine.register_default_badges();
+        engine
+    }
+
+    fn register_default_badges(&mut self) {
+        self.badges.insert(
+            "pkg-first-build".to_string(),
+            FedoraBadge {
+                badge_id: "pkg-first-build".to_string(),
+                name: "First Package Build".to_string(),
+                description: "Built first official RPM package in Koji/Copr".to_string(),
+                category: "development".to_string(),
+                points: 10,
+            },
+        );
+        self.badges.insert(
+            "qa-test-day".to_string(),
+            FedoraBadge {
+                badge_id: "qa-test-day".to_string(),
+                name: "QA Test Day Hero".to_string(),
+                description: "Participated in official Fedora QA test day".to_string(),
+                category: "qa".to_string(),
+                points: 15,
+            },
+        );
+    }
+
+    pub fn award_badge(&mut self, fas_username: &str, badge_id: &str) -> Result<u32, &'static str> {
+        if !self.badges.contains_key(badge_id) {
+            return Err("FedoraBadges: Invalid badge ID");
+        }
+        let user_badges = self
+            .user_awarded_badges
+            .entry(fas_username.to_string())
+            .or_insert_with(Vec::new);
+
+        if !user_badges.contains(&badge_id.to_string()) {
+            user_badges.push(badge_id.to_string());
+        }
+
+        let total_points = user_badges
+            .iter()
+            .filter_map(|id| self.badges.get(id))
+            .map(|b| b.points)
+            .sum();
+
+        Ok(total_points)
+    }
+}
+
+impl Default for FedoraBadgesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora System Roles (linux-system-roles) Declarative Engine
+// =========================================================================
+
+/// Fedora System Role Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemRoleKind {
+    Timesync,
+    Network,
+    Firewall,
+    Selinux,
+    Storage,
+}
+
+/// Fedora System Roles (linux-system-roles) Declarative Automation Engine
+pub struct FedoraSystemRolesEngine {
+    pub applied_roles: Vec<SystemRoleKind>,
+    pub chrony_ntp_servers: Vec<String>,
+    pub configured_firewall_ports: Vec<u16>,
+}
+
+impl FedoraSystemRolesEngine {
+    pub fn new() -> Self {
+        Self {
+            applied_roles: Vec::new(),
+            chrony_ntp_servers: Vec::new(),
+            configured_firewall_ports: Vec::new(),
+        }
+    }
+
+    pub fn apply_timesync_role(&mut self, ntp_servers: &[&str]) {
+        self.chrony_ntp_servers = ntp_servers.iter().map(|s| s.to_string()).collect();
+        if !self.applied_roles.contains(&SystemRoleKind::Timesync) {
+            self.applied_roles.push(SystemRoleKind::Timesync);
+        }
+    }
+
+    pub fn apply_firewall_role(&mut self, open_ports: &[u16]) {
+        for &p in open_ports {
+            if !self.configured_firewall_ports.contains(&p) {
+                self.configured_firewall_ports.push(p);
+            }
+        }
+        if !self.applied_roles.contains(&SystemRoleKind::Firewall) {
+            self.applied_roles.push(SystemRoleKind::Firewall);
+        }
+    }
+}
+
+impl Default for FedoraSystemRolesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3938,5 +4075,33 @@ mod tests {
             mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
             Some(&4096)
         );
+    }
+
+    #[test]
+    fn test_fedora_badges_engine() {
+        let mut badges = FedoraBadgesEngine::new();
+        assert_eq!(badges.badges.len(), 2);
+
+        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
+        assert_eq!(pts1, 10);
+
+        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
+        assert_eq!(pts2, 25);
+
+        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
+    }
+
+    #[test]
+    fn test_fedora_system_roles_engine() {
+        let mut roles = FedoraSystemRolesEngine::new();
+        assert!(roles.applied_roles.is_empty());
+
+        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
+        assert_eq!(roles.applied_roles.len(), 1);
+        assert_eq!(roles.chrony_ntp_servers.len(), 2);
+
+        roles.apply_firewall_role(&[80, 443, 8080]);
+        assert_eq!(roles.applied_roles.len(), 2);
+        assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
 }
