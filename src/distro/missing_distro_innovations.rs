@@ -684,6 +684,95 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
+/// 13. DragonFly BSD HAMMER2 MVCC Storage Engine
+#[derive(Debug, Clone)]
+pub struct Hammer2Volume {
+    pub volume_name: String,
+    pub pfs_name: String, // Pseudo-Filesystem
+    pub transaction_id: u64,
+    pub blocks: BTreeMap<String, Vec<u8>>,
+    pub is_snapshot: bool,
+}
+
+pub struct DragonFlyHammer2Engine {
+    pub volumes: BTreeMap<String, Hammer2Volume>,
+    pub active_transaction: u64,
+}
+
+impl DragonFlyHammer2Engine {
+    pub fn new() -> Self {
+        let mut default_vol = Hammer2Volume {
+            volume_name: String::from("root_pfs"),
+            pfs_name: String::from("@ROOT"),
+            transaction_id: 1,
+            blocks: BTreeMap::new(),
+            is_snapshot: false,
+        };
+        default_vol.blocks.insert(
+            String::from("/boot/kernel"),
+            b"SIGMAOS_HAMMER2_KERNEL_IMAGE".to_vec(),
+        );
+
+        let mut map = BTreeMap::new();
+        map.insert(String::from("@ROOT"), default_vol);
+
+        Self {
+            volumes: map,
+            active_transaction: 1,
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, source_pfs: &str, snap_name: &str) -> Result<u64, String> {
+        let source = self
+            .volumes
+            .get(source_pfs)
+            .ok_or_else(|| format!("Source PFS {} not found", source_pfs))?;
+
+        self.active_transaction += 1;
+        let mut snapshot = source.clone();
+        snapshot.pfs_name = snap_name.to_string();
+        snapshot.transaction_id = self.active_transaction;
+        snapshot.is_snapshot = true;
+
+        self.volumes.insert(snap_name.to_string(), snapshot);
+        Ok(self.active_transaction)
+    }
+
+    pub fn write_block_cow(
+        &mut self,
+        pfs_name: &str,
+        path: &str,
+        data: &[u8],
+    ) -> Result<u64, String> {
+        let vol = self
+            .volumes
+            .get_mut(pfs_name)
+            .ok_or_else(|| format!("PFS {} not found", pfs_name))?;
+
+        if vol.is_snapshot {
+            return Err(format!("PFS {} is a read-only snapshot", pfs_name));
+        }
+
+        self.active_transaction += 1;
+        vol.blocks.insert(path.to_string(), data.to_vec());
+        vol.transaction_id = self.active_transaction;
+        Ok(self.active_transaction)
+    }
+
+    pub fn read_block(&self, pfs_name: &str, path: &str) -> Option<&[u8]> {
+        self.volumes
+            .get(pfs_name)
+            .and_then(|vol| vol.blocks.get(path))
+            .map(|vec| vec.as_slice())
+    }
+}
+
+impl Default for DragonFlyHammer2Engine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 12. Missing Linux & BSD Distro Component Parity Inspector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -1377,6 +1466,24 @@ mod tests {
         auditor.log_violation(1234, "/etc/shadow", "r", 1000);
         assert_eq!(auditor.violations.len(), 1);
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_engine() {
+        let mut hammer = DragonFlyHammer2Engine::new();
+        let initial_block = hammer.read_block("@ROOT", "/boot/kernel").unwrap();
+        assert_eq!(initial_block, b"SIGMAOS_HAMMER2_KERNEL_IMAGE");
+
+        let tx = hammer.write_block_cow("@ROOT", "/etc/hammer2.conf", b"vfs.hammer2.clean=1").unwrap();
+        assert!(tx > 1);
+
+        let snap_tx = hammer.create_pfs_snapshot("@ROOT", "@ROOT_SNAP_1").unwrap();
+        assert!(snap_tx > tx);
+
+        let snap_block = hammer.read_block("@ROOT_SNAP_1", "/etc/hammer2.conf").unwrap();
+        assert_eq!(snap_block, b"vfs.hammer2.clean=1");
+
+        assert!(hammer.write_block_cow("@ROOT_SNAP_1", "/etc/hammer2.conf", b"bad").is_err());
     }
 
     #[test]

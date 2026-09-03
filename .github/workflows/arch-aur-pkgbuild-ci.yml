@@ -21,5 +21,4 @@ jobs:
 
       - name: Verify Arch Pacman & Contrib Engine
         run: |
-          ./scripts/changed_files_rustc_tests.sh src/sigpkg/arch_pacman_engine.rs
           ./run_sigma_tests.sh

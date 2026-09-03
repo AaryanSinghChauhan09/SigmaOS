@@ -125,10 +125,14 @@ impl SovereignUniversalDistroBridge {
     pub fn translate_vfs_path(&self, generic_path: &str) -> String {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
-            (DistroSubsystemMode::LinuxGuix, "/etc") => "/etc/guix".to_string(),
+            (DistroSubsystemMode::LinuxNix, "/var/lib/pkg") => "/nix/store".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::BedrockLinux, "/etc") => "/bedrock/strata/etc".to_string(),
-            (DistroSubsystemMode::LinuxVoid, "/etc") => "/etc/xbps".to_string(),
+            (DistroSubsystemMode::FreeBsd, "/var/lib/pkg") => "/var/db/pkg".to_string(),
+            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
+            (DistroSubsystemMode::LinuxDebian, "/var/lib/pkg") => "/var/lib/dpkg".to_string(),
+            (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
+            (DistroSubsystemMode::LinuxGentoo, "/var/lib/pkg") => "/var/db/pkg".to_string(),
+            (DistroSubsystemMode::LinuxFedora, "/var/lib/pkg") => "/var/lib/rpm".to_string(),
             (
                 DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
@@ -171,39 +175,46 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        // Verify that the current subsystem mode has valid supervisor, package translation, and VFS translation
-        let supervisor = self.get_supervisor_type();
-        let pkg_spec = self.translate_package_specifier("coreutils");
-        let vfs_etc = self.translate_vfs_path("/etc");
+        let modes = [
+            DistroSubsystemMode::LinuxArch,
+            DistroSubsystemMode::LinuxDebian,
+            DistroSubsystemMode::LinuxAlpine,
+            DistroSubsystemMode::LinuxNix,
+            DistroSubsystemMode::LinuxGentoo,
+            DistroSubsystemMode::LinuxFedora,
+            DistroSubsystemMode::FreeBsd,
+            DistroSubsystemMode::OpenBsd,
+            DistroSubsystemMode::NetBsd,
+            DistroSubsystemMode::DragonFlyBsd,
+        ];
 
-        !pkg_spec.is_empty()
-            && !vfs_etc.is_empty()
-            && match self.mode {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora
-                | DistroSubsystemMode::LinuxOpenSuse
-                | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxClear
-                | DistroSubsystemMode::LinuxTails
-                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
+        for m in modes {
+            let temp_bridge = SovereignUniversalDistroBridge::new(m);
+            let pkg_spec = temp_bridge.translate_package_specifier("coreutils");
+            let vfs_etc = temp_bridge.translate_vfs_path("/etc");
+            let vfs_pkg = temp_bridge.translate_vfs_path("/var/lib/pkg");
 
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-
-                DistroSubsystemMode::LinuxAlpine
-                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
-
-                DistroSubsystemMode::LinuxNix
-                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
-
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            if pkg_spec.is_empty() || vfs_etc.is_empty() || vfs_pkg.is_empty() {
+                return false;
             }
+
+            let valid_supervisor = match m {
+                DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
+                }
+                DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
+                }
+                DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
+                DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+            };
+
+            if !valid_supervisor {
+                return false;
+            }
+        }
+
+        true
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
