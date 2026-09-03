@@ -2797,6 +2797,111 @@ impl Default for FedoraOfflineUpdateEngine {
     }
 }
 
+// =========================================================================
+// Fedora MirrorManager 2 (mirrormanager2) System Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MirrorProtocol {
+    Https,
+    Http,
+    Rsync,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MirrorSyncStatus {
+    UpToDate,
+    Syncing,
+    Outdated,
+    Unreachable,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraMirrorHost {
+    pub host_id: String,
+    pub base_url: String,
+    pub country_code: String,
+    pub asn: u32,
+    pub bandwidth_mbps: u32,
+    pub protocols: Vec<MirrorProtocol>,
+    pub sync_status: MirrorSyncStatus,
+    pub lag_seconds: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ClientLocationContext {
+    pub client_ip: String,
+    pub country_code: String,
+    pub asn: u32,
+    pub preferred_protocol: MirrorProtocol,
+}
+
+/// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
+pub struct FedoraMirrorManager2Engine {
+    pub mirrors: Vec<FedoraMirrorHost>,
+    pub max_allowed_lag_secs: u64,
+}
+
+impl FedoraMirrorManager2Engine {
+    pub fn new(max_lag_secs: u64) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            max_allowed_lag_secs: max_lag_secs,
+        }
+    }
+
+    pub fn register_mirror(&mut self, mirror: FedoraMirrorHost) {
+        self.mirrors.retain(|m| m.host_id != mirror.host_id);
+        self.mirrors.push(mirror);
+    }
+
+    pub fn update_mirror_status(
+        &mut self,
+        host_id: &str,
+        status: MirrorSyncStatus,
+        lag_secs: u64,
+    ) -> bool {
+        if let Some(m) = self.mirrors.iter_mut().find(|m| m.host_id == host_id) {
+            m.sync_status = status;
+            m.lag_seconds = lag_secs;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn select_optimal_mirrors(&self, client: &ClientLocationContext) -> Vec<FedoraMirrorHost> {
+        let mut candidates: Vec<FedoraMirrorHost> = self
+            .mirrors
+            .iter()
+            .filter(|m| {
+                m.sync_status == MirrorSyncStatus::UpToDate
+                    && m.lag_seconds <= self.max_allowed_lag_secs
+                    && m.protocols.contains(&client.preferred_protocol)
+            })
+            .cloned()
+            .collect();
+
+        candidates.sort_by(|a, b| {
+            let a_asn = a.asn == client.asn;
+            let b_asn = b.asn == client.asn;
+            if a_asn != b_asn {
+                return b_asn.cmp(&a_asn);
+            }
+
+            let a_country = a.country_code == client.country_code;
+            let b_country = b.country_code == client.country_code;
+            if a_country != b_country {
+                return b_country.cmp(&a_country);
+            }
+
+            b.bandwidth_mbps.cmp(&a.bandwidth_mbps)
+        });
+
+        candidates
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3619,5 +3724,76 @@ mod tests {
 
         let empty_cat = planet.query_entries_by_category("python");
         assert!(empty_cat.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_mirror_manager_2_engine() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(3600); // 1 hour max lag
+
+        let m1 = FedoraMirrorHost {
+            host_id: "us-mirror-1".to_string(),
+            base_url: "https://us.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 7018,
+            bandwidth_mbps: 10000,
+            protocols: vec![MirrorProtocol::Https, MirrorProtocol::Http],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 300,
+        };
+
+        let m2 = FedoraMirrorHost {
+            host_id: "us-local-asn-mirror".to_string(),
+            base_url: "https://asn.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345, // Client ASN match
+            bandwidth_mbps: 1000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 600,
+        };
+
+        let m3 = FedoraMirrorHost {
+            host_id: "eu-high-bw-mirror".to_string(),
+            base_url: "https://eu.dl.fedoraproject.org".to_string(),
+            country_code: "DE".to_string(),
+            asn: 3320,
+            bandwidth_mbps: 40000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 1200,
+        };
+
+        let m_outdated = FedoraMirrorHost {
+            host_id: "outdated-mirror".to_string(),
+            base_url: "https://outdated.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            bandwidth_mbps: 100000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::Outdated,
+            lag_seconds: 86400,
+        };
+
+        mm2.register_mirror(m1);
+        mm2.register_mirror(m2);
+        mm2.register_mirror(m3);
+        mm2.register_mirror(m_outdated);
+
+        let client = ClientLocationContext {
+            client_ip: "192.0.2.1".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            preferred_protocol: MirrorProtocol::Https,
+        };
+
+        let optimal = mm2.select_optimal_mirrors(&client);
+        assert_eq!(optimal.len(), 3); // m_outdated excluded due to sync status / lag
+
+        // First choice should be ASN match (us-local-asn-mirror)
+        assert_eq!(optimal[0].host_id, "us-local-asn-mirror");
+        // Second choice should be same country (us-mirror-1)
+        assert_eq!(optimal[1].host_id, "us-mirror-1");
+        // Third choice should be EU high-bandwidth mirror
+        assert_eq!(optimal[2].host_id, "eu-high-bw-mirror");
     }
 }
