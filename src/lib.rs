@@ -95,6 +95,14 @@ pub use distro::{
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
     NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
+    SovereignSchedExtEngine, ScxSchedulerKind, ScxTaskState, SchedExtTask,
+    SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
+    SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
+    SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
+    SovereignDistroLeapSuite, DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
+    GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
+    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignStatefulNatEngine,
+    SovereignJournaldBinaryStorageEngine,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
