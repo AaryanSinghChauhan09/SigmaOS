@@ -162,7 +162,7 @@ impl AutoInstallProvisioner {
             .ok_or("No active profile loaded")?;
         self.installation_completed = true;
         Ok(format!(
-            "Deployment succeeded! Hostname: {}, RootFS partitioned on {} using {} filesystem.",
+            "Deployment succeeded! Hostname: {}, RootFS partitioned on {} using {} filesystem. Packages: {}.",
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
