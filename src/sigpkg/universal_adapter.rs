@@ -651,6 +651,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Zypper)
         } else if f.ends_with(".cachy") {
             Some(PackageFormat::Pacman)
+        } else if f.ends_with(".dports") {
+            Some(PackageFormat::Ports)
+        } else if f.ends_with(".slackbuild") || f.ends_with(".tlz") || f.ends_with(".tbz") {
+            Some(PackageFormat::TarGz)
+        } else if f.ends_with(".crux") || f.ends_with(".pkgfile") {
+            Some(PackageFormat::TarXz)
+        } else if f.ends_with(".drpm") {
+            Some(PackageFormat::Yum)
+        } else if f.ends_with(".stratum") {
+            Some(PackageFormat::Sovereign)
         } else {
             None
         }
@@ -687,6 +697,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Sovereign) // Native SigPkg magic
         } else if data.starts_with(b"CACHY") {
             Some(PackageFormat::Pacman) // CachyOS magic
+        } else if data.starts_with(b"DRPM") {
+            Some(PackageFormat::Yum) // Delta RPM magic
+        } else if data.starts_with(b"CRUX") {
+            Some(PackageFormat::TarXz) // CRUX package magic
+        } else if data.starts_with(b"DPOR") {
+            Some(PackageFormat::Ports) // DragonFly BSD DPorts magic
+        } else if data.starts_with(b"BRLK") {
+            Some(PackageFormat::Sovereign) // Bedrock Linux Stratum magic
+        } else if data.starts_with(b"SLAK") {
+            Some(PackageFormat::TarGz) // Slackware SlackBuild magic
         } else {
             None
         }
@@ -1150,6 +1170,11 @@ impl UniversalDependencyMapper {
             "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
             "dbus" | "sys-apps/dbus" => "dbus".to_string(),
             "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
+            "ncurses" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
+            "readline" | "sys-libs/readline" => "readline".to_string(),
+            "xz" | "xz-utils" | "app-arch/xz-utils" => "xz".to_string(),
+            "zstd" | "app-arch/zstd" => "zstd".to_string(),
+            "sqlite" | "sqlite3" | "dev-db/sqlite" => "sqlite".to_string(),
             _ => clean.to_string(),
         }
     }

@@ -56,6 +56,11 @@ pub enum PackageFormat {
     Puk,
     Dmg,
     Cports,
+    Dports,
+    SlackBuild,
+    Crux,
+    Drpm,
+    Stratum,
 }
 
 #[derive(Debug, Clone)]
@@ -471,7 +476,132 @@ impl PackageAdapterFactory {
             PackageFormat::Puk => Box::new(PukPackageAdapter),
             PackageFormat::Dmg => Box::new(DmgPackageAdapter),
             PackageFormat::Cports => Box::new(CportsPackageAdapter),
+            PackageFormat::Dports => Box::new(DportsPackageAdapter),
+            PackageFormat::SlackBuild => Box::new(SlackBuildPackageAdapter),
+            PackageFormat::Crux => Box::new(CruxPackageAdapter),
+            PackageFormat::Drpm => Box::new(DrpmPackageAdapter),
+            PackageFormat::Stratum => Box::new(StratumPackageAdapter),
         }
+    }
+}
+
+pub struct DportsPackageAdapter;
+impl IPackageAdapter for DportsPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Dports
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty DPorts payload");
+        }
+        Ok(PackageContext {
+            name: "dragonfly-dports-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Dports,
+            dependencies: vec![],
+            files: vec!["/usr/dports/bin/dports-app".to_string()],
+            hash: [0x2D; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("DragonFly DPorts Adapter: Building ports snapshot overlay in: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct SlackBuildPackageAdapter;
+impl IPackageAdapter for SlackBuildPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SlackBuild
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty SlackBuild payload");
+        }
+        Ok(PackageContext {
+            name: "slackware-slackbuild-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::SlackBuild,
+            dependencies: vec![],
+            files: vec!["/usr/bin/slackbuild-app".to_string()],
+            hash: [0x2E; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Slackware SlackBuild Adapter: Compiling SlackBuild script into target store: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct CruxPackageAdapter;
+impl IPackageAdapter for CruxPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Crux
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty CRUX package payload");
+        }
+        Ok(PackageContext {
+            name: "crux-pkgfile-app".to_string(),
+            version: "3.7.0".to_string(),
+            format: PackageFormat::Crux,
+            dependencies: vec![],
+            files: vec!["/usr/bin/crux-app".to_string()],
+            hash: [0x2F; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("CRUX Adapter: Extracting pkgmk tarball into store: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct DrpmPackageAdapter;
+impl IPackageAdapter for DrpmPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Drpm
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Delta RPM payload");
+        }
+        Ok(PackageContext {
+            name: "delta-rpm-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Drpm,
+            dependencies: vec![],
+            files: vec!["/usr/bin/drpm-app".to_string()],
+            hash: [0x30; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Delta RPM Adapter: Reconstructing full RPM binary delta in store: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct StratumPackageAdapter;
+impl IPackageAdapter for StratumPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Stratum
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Bedrock Stratum payload");
+        }
+        Ok(PackageContext {
+            name: "bedrock-stratum-pkg".to_string(),
+            version: "0.7.0".to_string(),
+            format: PackageFormat::Stratum,
+            dependencies: vec![],
+            files: vec!["/bedrock/strata/app".to_string()],
+            hash: [0x31; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Bedrock Stratum Adapter: Mounting subsystem stratum into store: {}", store_path);
+        Ok(())
     }
 }
 

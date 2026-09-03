@@ -531,6 +531,545 @@ impl Default for ComponentTree {
     }
 }
 
+// ============================================================================
+// FEDORA-INSPIRED COMPONENT SYSTEM INNOVATIONS
+// ============================================================================
+
+/// Fedora `comps.xml` style requirement level for component group inclusion
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CompsGroupRequirement {
+    Mandatory = 0, // Must be installed for group functionality
+    Default = 1,   // Installed by default unless excluded
+    Optional = 2,  // Additional opt-in components
+    Conditional = 3, // Dynamically required if condition is met
+}
+
+/// AppStream Metadata for component presentation in GUI software catalogs
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppStreamMetadata {
+    pub component_id: String,
+    pub name: String,
+    pub summary: String,
+    pub icon_name: String,
+    pub developer_name: String,
+    pub categories: Vec<String>,
+    pub keywords: Vec<String>,
+}
+
+/// Fedora `comps.xml` Component Group definition
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraComponentGroup {
+    pub group_id: String,
+    pub name: String,
+    pub description: String,
+    pub components: BTreeMap<String, CompsGroupRequirement>,
+    pub appstream_meta: Option<AppStreamMetadata>,
+}
+
+/// Engine managing Fedora `comps.xml` component groups and AppStream metadata
+pub struct FedoraCompsComponentGroupEngine {
+    pub groups: BTreeMap<String, FedoraComponentGroup>,
+}
+
+impl FedoraCompsComponentGroupEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            groups: BTreeMap::new(),
+        };
+        engine.register_default_comps_groups();
+        engine
+    }
+
+    fn register_default_comps_groups(&mut self) {
+        let mut base_components = BTreeMap::new();
+        base_components.insert("systemd".to_string(), CompsGroupRequirement::Mandatory);
+        base_components.insert("kernel-core".to_string(), CompsGroupRequirement::Mandatory);
+        base_components.insert("glibc".to_string(), CompsGroupRequirement::Mandatory);
+        base_components.insert("selinux-policy".to_string(), CompsGroupRequirement::Default);
+        base_components.insert("bash-completion".to_string(), CompsGroupRequirement::Optional);
+
+        self.groups.insert(
+            "core".to_string(),
+            FedoraComponentGroup {
+                group_id: "core".to_string(),
+                name: "Core System".to_string(),
+                description: "Essential OS core runtime components".to_string(),
+                components: base_components,
+                appstream_meta: Some(AppStreamMetadata {
+                    component_id: "org.sigmaos.core".to_string(),
+                    name: "SigmaOS Core".to_string(),
+                    summary: "Core system components".to_string(),
+                    icon_name: "system-run".to_string(),
+                    developer_name: "SigmaOS Project".to_string(),
+                    categories: vec!["System".to_string()],
+                    keywords: vec!["core".to_string(), "base".to_string()],
+                }),
+            },
+        );
+    }
+
+    pub fn register_group(&mut self, group: FedoraComponentGroup) {
+        self.groups.insert(group.group_id.clone(), group);
+    }
+
+    pub fn get_mandatory_components(&self, group_id: &str) -> Vec<String> {
+        if let Some(group) = self.groups.get(group_id) {
+            group
+                .components
+                .iter()
+                .filter(|(_, &req)| req == CompsGroupRequirement::Mandatory)
+                .map(|(name, _)| name.clone())
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn get_default_components(&self, group_id: &str) -> Vec<String> {
+        if let Some(group) = self.groups.get(group_id) {
+            group
+                .components
+                .iter()
+                .filter(|(_, &req)| {
+                    req == CompsGroupRequirement::Mandatory
+                        || req == CompsGroupRequirement::Default
+                })
+                .map(|(name, _)| name.clone())
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn generate_comps_xml(&self) -> String {
+        let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<comps>\n");
+        for group in self.groups.values() {
+            xml.push_str("  <group>\n");
+            xml.push_str(&format!("    <id>{}</id>\n", group.group_id));
+            xml.push_str(&format!("    <name>{}</name>\n", group.name));
+            xml.push_str(&format!("    <description>{}</description>\n", group.description));
+            xml.push_str("    <packagelist>\n");
+            for (comp, req) in &group.components {
+                let req_type = match req {
+                    CompsGroupRequirement::Mandatory => "mandatory",
+                    CompsGroupRequirement::Default => "default",
+                    CompsGroupRequirement::Optional => "optional",
+                    CompsGroupRequirement::Conditional => "conditional",
+                };
+                xml.push_str(&format!("      <packagereq type=\"{}\">{}</packagereq>\n", req_type, comp));
+            }
+            xml.push_str("    </packagelist>\n  </group>\n");
+        }
+        xml.push_str("</comps>");
+        xml
+    }
+}
+
+impl Default for FedoraCompsComponentGroupEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Modularity (`modulemd.yaml`) stream profile
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModulemdProfile {
+    pub profile_name: String,
+    pub components: Vec<String>,
+}
+
+/// Fedora Modularity stream definition
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModulemdStream {
+    pub module_name: String,
+    pub stream_version: String,
+    pub summary: String,
+    pub profiles: BTreeMap<String, ModulemdProfile>,
+    pub api_surface: Vec<String>,
+    pub artifact_mapping: BTreeMap<String, String>, // Component -> Store Hash/Path
+}
+
+/// Engine managing Fedora Modularity streams, profiles, and API surface filtering
+pub struct FedoraModulemdComponentEngine {
+    pub streams: BTreeMap<String, BTreeMap<String, ModulemdStream>>, // Module -> (StreamVersion -> Stream)
+    pub active_stream_selections: BTreeMap<String, String>,           // Module -> Selected StreamVersion
+}
+
+impl FedoraModulemdComponentEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            streams: BTreeMap::new(),
+            active_stream_selections: BTreeMap::new(),
+        };
+        engine.register_default_modules();
+        engine
+    }
+
+    fn register_default_modules(&mut self) {
+        let mut node18_profiles = BTreeMap::new();
+        node18_profiles.insert(
+            "default".to_string(),
+            ModulemdProfile {
+                profile_name: "default".to_string(),
+                components: vec!["nodejs-18.18.0".to_string(), "npm-9.8.1".to_string()],
+            },
+        );
+        node18_profiles.insert(
+            "development".to_string(),
+            ModulemdProfile {
+                profile_name: "development".to_string(),
+                components: vec![
+                    "nodejs-18.18.0".to_string(),
+                    "npm-9.8.1".to_string(),
+                    "nodejs-devel-18.18.0".to_string(),
+                ],
+            },
+        );
+
+        let stream18 = ModulemdStream {
+            module_name: "nodejs".to_string(),
+            stream_version: "18".to_string(),
+            summary: "Node.js JavaScript runtime stream 18".to_string(),
+            profiles: node18_profiles,
+            api_surface: vec!["node".to_string(), "npm".to_string(), "npx".to_string()],
+            artifact_mapping: BTreeMap::new(),
+        };
+
+        let mut node20_profiles = BTreeMap::new();
+        node20_profiles.insert(
+            "default".to_string(),
+            ModulemdProfile {
+                profile_name: "default".to_string(),
+                components: vec!["nodejs-20.9.0".to_string(), "npm-10.1.0".to_string()],
+            },
+        );
+
+        let stream20 = ModulemdStream {
+            module_name: "nodejs".to_string(),
+            stream_version: "20".to_string(),
+            summary: "Node.js JavaScript runtime stream 20".to_string(),
+            profiles: node20_profiles,
+            api_surface: vec!["node".to_string(), "npm".to_string(), "npx".to_string()],
+            artifact_mapping: BTreeMap::new(),
+        };
+
+        let mut node_streams = BTreeMap::new();
+        node_streams.insert("18".to_string(), stream18);
+        node_streams.insert("20".to_string(), stream20);
+
+        self.streams.insert("nodejs".to_string(), node_streams);
+        self.active_stream_selections
+            .insert("nodejs".to_string(), "20".to_string());
+    }
+
+    pub fn register_stream(&mut self, stream: ModulemdStream) {
+        self.streams
+            .entry(stream.module_name.clone())
+            .or_default()
+            .insert(stream.stream_version.clone(), stream);
+    }
+
+    pub fn select_stream(&mut self, module_name: &str, stream_version: &str) -> Result<(), &'static str> {
+        if let Some(module_streams) = self.streams.get(module_name) {
+            if module_streams.contains_key(stream_version) {
+                self.active_stream_selections
+                    .insert(module_name.to_string(), stream_version.to_string());
+                Ok(())
+            } else {
+                Err("Stream version not found for module")
+            }
+        } else {
+            Err("Module not found")
+        }
+    }
+
+    pub fn get_active_profile_components(&self, module_name: &str, profile_name: &str) -> Option<Vec<String>> {
+        let active_ver = self.active_stream_selections.get(module_name)?;
+        let stream = self.streams.get(module_name)?.get(active_ver)?;
+        let profile = stream.profiles.get(profile_name)?;
+        Some(profile.components.clone())
+    }
+}
+
+impl Default for FedoraModulemdComponentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Silverblue / CoreOS / rpm-ostree Atomic Layer Type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AtomicLayerType {
+    BaseSystem,     // Core immutable OS image base
+    Overlay,        // Layered rpm-ostree component overlay
+    HotSwap,        // Transient runtime component hot-swap
+    Ephemeral,      // Temporary tmpfs development layer
+}
+
+/// Fedora Atomic Component Layer representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AtomicComponentLayer {
+    pub layer_id: String,
+    pub layer_type: AtomicLayerType,
+    pub component_names: Vec<String>,
+    pub checksum: String,
+    pub mount_target: String,
+}
+
+/// Snapshot deployment commit for Fedora Atomic updates
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AtomicDeploymentSnapshot {
+    pub deployment_hash: String,
+    pub timestamp_sec: u64,
+    pub layers: Vec<AtomicComponentLayer>,
+    pub is_active: bool,
+}
+
+/// Engine managing Fedora Silverblue / rpm-ostree atomic component layering and snapshots
+pub struct FedoraAtomicComponentLayerEngine {
+    pub deployments: Vec<AtomicDeploymentSnapshot>,
+    pub active_deployment_hash: Option<String>,
+}
+
+impl FedoraAtomicComponentLayerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            deployments: Vec::new(),
+            active_deployment_hash: None,
+        };
+        engine.register_base_deployment();
+        engine
+    }
+
+    fn register_base_deployment(&mut self) {
+        let base_layer = AtomicComponentLayer {
+            layer_id: "layer-base-0".to_string(),
+            layer_type: AtomicLayerType::BaseSystem,
+            component_names: vec!["kernel".to_string(), "systemd".to_string(), "glibc".to_string()],
+            checksum: "sha256:base000000000000000000000000000000000000000000000000000000000000".to_string(),
+            mount_target: "/sysroot/ostree/deploy/base".to_string(),
+        };
+
+        let snapshot = AtomicDeploymentSnapshot {
+            deployment_hash: "fedora-silverblue-base-hash-1".to_string(),
+            timestamp_sec: 1700000000,
+            layers: vec![base_layer],
+            is_active: true,
+        };
+
+        self.deployments.push(snapshot);
+        self.active_deployment_hash = Some("fedora-silverblue-base-hash-1".to_string());
+    }
+
+    pub fn apply_component_overlay(&mut self, overlay_id: &str, components: &[String]) -> String {
+        let current_layers = if let Some(active_hash) = &self.active_deployment_hash {
+            self.deployments
+                .iter()
+                .find(|d| d.deployment_hash == *active_hash)
+                .map(|d| d.layers.clone())
+                .unwrap_or_default()
+        } else {
+            Vec::new()
+        };
+
+        let mut new_layers = current_layers;
+        let overlay_layer = AtomicComponentLayer {
+            layer_id: overlay_id.to_string(),
+            layer_type: AtomicLayerType::Overlay,
+            component_names: components.to_vec(),
+            checksum: format!("sha256:overlay_{}", overlay_id),
+            mount_target: format!("/sysroot/ostree/deploy/overlay/{}", overlay_id),
+        };
+        new_layers.push(overlay_layer);
+
+        // Deactivate previous
+        for dep in &mut self.deployments {
+            dep.is_active = false;
+        }
+
+        let new_hash = format!("deployment-hash-{}", self.deployments.len() + 1);
+        let new_snapshot = AtomicDeploymentSnapshot {
+            deployment_hash: new_hash.clone(),
+            timestamp_sec: 1700000050,
+            layers: new_layers,
+            is_active: true,
+        };
+
+        self.deployments.push(new_snapshot);
+        self.active_deployment_hash = Some(new_hash.clone());
+        new_hash
+    }
+
+    pub fn rollback_deployment(&mut self) -> Result<String, &'static str> {
+        if self.deployments.len() <= 1 {
+            return Err("No prior atomic deployment snapshot available for rollback");
+        }
+
+        self.deployments.pop(); // Remove active
+        if let Some(prev) = self.deployments.last_mut() {
+            prev.is_active = true;
+            let prev_hash = prev.deployment_hash.clone();
+            self.active_deployment_hash = Some(prev_hash.clone());
+            Ok(prev_hash)
+        } else {
+            Err("Failed to activate previous deployment")
+        }
+    }
+}
+
+impl Default for FedoraAtomicComponentLayerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Toolbx / Podman socket passthrough configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToolboxSocketPassthrough {
+    pub display_socket: bool,   // X11 / Wayland display socket passthrough
+    pub audio_socket: bool,     // PulseAudio / PipeWire socket passthrough
+    pub dbus_session: bool,     // DBus session bus socket passthrough
+    pub ssh_agent: bool,        // SSH agent socket passthrough
+    pub host_udev: bool,        // Device node access
+}
+
+/// Fedora Toolbx containerized component sandbox configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToolboxComponentSandbox {
+    pub container_name: String,
+    pub base_image: String,
+    pub host_workdir_mount: String,
+    pub passthrough: ToolboxSocketPassthrough,
+    pub installed_tools: Vec<String>,
+    pub is_running: bool,
+}
+
+/// Engine managing Fedora Toolbx / Podman development component sandboxes
+pub struct FedoraToolboxComponentSandboxEngine {
+    pub sandboxes: BTreeMap<String, ToolboxComponentSandbox>,
+}
+
+impl FedoraToolboxComponentSandboxEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            sandboxes: BTreeMap::new(),
+        };
+        engine.create_default_sandbox("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39");
+        engine
+    }
+
+    pub fn create_default_sandbox(&mut self, name: &str, image: &str) {
+        let sandbox = ToolboxComponentSandbox {
+            container_name: name.to_string(),
+            base_image: image.to_string(),
+            host_workdir_mount: "/var/home/user/workspace".to_string(),
+            passthrough: ToolboxSocketPassthrough {
+                display_socket: true,
+                audio_socket: true,
+                dbus_session: true,
+                ssh_agent: true,
+                host_udev: false,
+            },
+            installed_tools: vec!["gcc".to_string(), "gdb".to_string(), "make".to_string(), "git".to_string()],
+            is_running: false,
+        };
+        self.sandboxes.insert(name.to_string(), sandbox);
+    }
+
+    pub fn start_sandbox(&mut self, name: &str) -> Result<(), &'static str> {
+        if let Some(sandbox) = self.sandboxes.get_mut(name) {
+            sandbox.is_running = true;
+            Ok(())
+        } else {
+            Err("Toolbox component sandbox not found")
+        }
+    }
+
+    pub fn install_tool_in_sandbox(&mut self, name: &str, tool: &str) -> Result<(), &'static str> {
+        if let Some(sandbox) = self.sandboxes.get_mut(name) {
+            if !sandbox.installed_tools.contains(&tool.to_string()) {
+                sandbox.installed_tools.push(tool.to_string());
+            }
+            Ok(())
+        } else {
+            Err("Toolbox component sandbox not found")
+        }
+    }
+}
+
+impl Default for FedoraToolboxComponentSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Component Health and Compliance Audit Report
+#[derive(Debug, Clone, PartialEq)]
+pub struct ComponentHealthReport {
+    pub component_id: usize,
+    pub name: String,
+    pub selinux_context: String,
+    pub license_spdx: String,
+    pub security_score: f32, // 0.0 to 10.0
+    pub is_compliant: bool,
+    pub audit_issues: Vec<String>,
+}
+
+/// Engine managing Fedora component security scoring, SELinux context verification, and license compliance auditing
+pub struct FedoraComponentHealthAuditorEngine;
+
+impl FedoraComponentHealthAuditorEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn audit_component(
+        &self,
+        component_id: usize,
+        name: &str,
+        selinux_context: &str,
+        license_spdx: &str,
+    ) -> ComponentHealthReport {
+        let mut audit_issues = Vec::new();
+        let mut score = 10.0f32;
+
+        // Verify SELinux context format (e.g. system_u:object_r:daemon_exec_t:s0)
+        if !selinux_context.contains(":object_r:") && !selinux_context.contains(":system_r:") {
+            audit_issues.push("Invalid or non-standard SELinux security context".to_string());
+            score -= 3.0;
+        }
+
+        // Verify Open Source license compliance
+        let is_open_source = license_spdx.contains("GPL")
+            || license_spdx.contains("MIT")
+            || license_spdx.contains("Apache")
+            || license_spdx.contains("BSD");
+
+        if !is_open_source {
+            audit_issues.push("Component uses proprietary or non-standard license".to_string());
+            score -= 2.5;
+        }
+
+        let is_compliant = score >= 7.0 && audit_issues.is_empty();
+
+        ComponentHealthReport {
+            component_id,
+            name: name.to_string(),
+            selinux_context: selinux_context.to_string(),
+            license_spdx: license_spdx.to_string(),
+            security_score: score.max(0.0),
+            is_compliant,
+            audit_issues,
+        }
+    }
+}
+
+impl Default for FedoraComponentHealthAuditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -575,5 +1114,86 @@ mod tests {
 
         let child = tree.get_component(child_id).unwrap();
         assert!(child.get_resource_usage(ResourceType::Memory) > 0);
+    }
+
+    #[test]
+    fn test_fedora_comps_component_group_engine() {
+        let comps_engine = FedoraCompsComponentGroupEngine::new();
+        let mandatory = comps_engine.get_mandatory_components("core");
+        assert!(mandatory.contains(&"systemd".to_string()));
+        assert!(mandatory.contains(&"kernel-core".to_string()));
+
+        let defaults = comps_engine.get_default_components("core");
+        assert!(defaults.contains(&"selinux-policy".to_string()));
+
+        let xml = comps_engine.generate_comps_xml();
+        assert!(xml.contains("<comps>"));
+        assert!(xml.contains("<id>core</id>"));
+        assert!(xml.contains("<packagereq type=\"mandatory\">systemd</packagereq>"));
+    }
+
+    #[test]
+    fn test_fedora_modulemd_component_engine() {
+        let mut module_engine = FedoraModulemdComponentEngine::new();
+        let node20_comps = module_engine.get_active_profile_components("nodejs", "default").unwrap();
+        assert!(node20_comps.contains(&"nodejs-20.9.0".to_string()));
+
+        // Switch stream to Node.js 18
+        assert!(module_engine.select_stream("nodejs", "18").is_ok());
+        let node18_dev_comps = module_engine.get_active_profile_components("nodejs", "development").unwrap();
+        assert!(node18_dev_comps.contains(&"nodejs-devel-18.18.0".to_string()));
+    }
+
+    #[test]
+    fn test_fedora_atomic_component_layer_engine() {
+        let mut atomic_engine = FedoraAtomicComponentLayerEngine::new();
+        assert_eq!(atomic_engine.deployments.len(), 1);
+
+        let new_hash = atomic_engine.apply_component_overlay("dev-tools", &["gcc".to_string(), "gdb".to_string()]);
+        assert_eq!(atomic_engine.deployments.len(), 2);
+        assert_eq!(atomic_engine.active_deployment_hash.as_deref(), Some(new_hash.as_str()));
+
+        // Rollback atomic deployment
+        let prev_hash = atomic_engine.rollback_deployment().unwrap();
+        assert_eq!(atomic_engine.deployments.len(), 1);
+        assert_eq!(prev_hash, "fedora-silverblue-base-hash-1");
+    }
+
+    #[test]
+    fn test_fedora_toolbox_component_sandbox_engine() {
+        let mut toolbox_engine = FedoraToolboxComponentSandboxEngine::new();
+        assert!(toolbox_engine.start_sandbox("fedora-toolbox-39").is_ok());
+
+        assert!(toolbox_engine.install_tool_in_sandbox("fedora-toolbox-39", "clang").is_ok());
+        let sandbox = toolbox_engine.sandboxes.get("fedora-toolbox-39").unwrap();
+        assert!(sandbox.is_running);
+        assert!(sandbox.installed_tools.contains(&"clang".to_string()));
+        assert!(sandbox.passthrough.display_socket);
+    }
+
+    #[test]
+    fn test_fedora_component_health_auditor_engine() {
+        let auditor = FedoraComponentHealthAuditorEngine::new();
+        let report = auditor.audit_component(
+            1,
+            "kernel-core",
+            "system_u:object_r:kernel_t:s0",
+            "GPL-2.0-only",
+        );
+
+        assert!(report.is_compliant);
+        assert_eq!(report.security_score, 10.0);
+        assert!(report.audit_issues.is_empty());
+
+        let bad_report = auditor.audit_component(
+            2,
+            "proprietary-driver",
+            "invalid_context",
+            "Proprietary",
+        );
+
+        assert!(!bad_report.is_compliant);
+        assert!(bad_report.security_score < 7.0);
+        assert_eq!(bad_report.audit_issues.len(), 2);
     }
 }
