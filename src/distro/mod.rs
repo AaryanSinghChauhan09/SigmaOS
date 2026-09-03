@@ -32,7 +32,7 @@ pub use linux_bsd_distro_gaps::{
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
-    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset,
     ZfsPoolState, ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;
