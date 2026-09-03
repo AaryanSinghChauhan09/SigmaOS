@@ -697,7 +697,6 @@ mod tests {
         let fmt_rpm = UniversalPackageImporter::autodetect_format("htop-3.2.1.rpm");
         assert_eq!(fmt_rpm, Some(UniversalPackageFormat::FedoraRpm));
 
-<<<<<<< HEAD
         let fmt_slack = UniversalPackageImporter::autodetect_format("bash.slackware.txz");
         assert_eq!(fmt_slack, Some(UniversalPackageFormat::SlackwarePkg));
 
@@ -710,8 +709,6 @@ mod tests {
         let fmt_haiku = UniversalPackageImporter::autodetect_format("bash.hpkg");
         assert_eq!(fmt_haiku, Some(UniversalPackageFormat::HaikuHpkg));
 
-=======
->>>>>>> origin/fix-path-traversal-validation-bypass-15238822297680022651
         let pkg = UniversalPackageImporter::parse_foreign_package("curl_8.0.deb", UniversalPackageFormat::DebianDeb).unwrap();
         assert_eq!(pkg.name, "curl");
         assert_eq!(pkg.repository, "universal-debiandeb");
