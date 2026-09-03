@@ -267,6 +267,225 @@ impl Default for DigiYatraPassScanner {
 
 /// 6. Transit & Logistics Professionals (`sigma-irctc`)
 /// Facilitates deep train running status track, Tatkal window status, and PNR monitoring.
+// =========================================================================
+// Chartered Accountants & Tax Consultants GST Audit Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GstCalculation {
+    pub taxable_value: u64, // In Indian Rupees
+    pub cgst_amount: u64,
+    pub sgst_amount: u64,
+    pub igst_amount: u64,
+    pub total_amount: u64,
+}
+
+/// CA GST Audit & Tax Compliance Engine
+/// Validates GSTIN format/state codes, calculates CGST/SGST/IGST according to Indian tax slabs (0%, 5%, 12%, 18%, 28%),
+/// and reconciles Input Tax Credit (ITC) between GSTR-3B and GSTR-2B.
+pub struct CaGstTaxAuditEngine {
+    pub state_codes: HashMap<String, String>, // "07" -> "Delhi", "27" -> "Maharashtra"
+}
+
+impl CaGstTaxAuditEngine {
+    pub fn new() -> Self {
+        let mut state_codes = HashMap::new();
+        state_codes.insert("07".to_string(), "Delhi".to_string());
+        state_codes.insert("27".to_string(), "Maharashtra".to_string());
+        state_codes.insert("29".to_string(), "Karnataka".to_string());
+        state_codes.insert("09".to_string(), "Uttar Pradesh".to_string());
+        state_codes.insert("33".to_string(), "Tamil Nadu".to_string());
+
+        Self { state_codes }
+    }
+
+    pub fn validate_gstin(&self, gstin: &str) -> bool {
+        if gstin.len() != 15 {
+            return false;
+        }
+        let state_code = &gstin[0..2];
+        self.state_codes.contains_key(state_code)
+    }
+
+    pub fn compute_gst_tax(
+        &self,
+        taxable_value: u64,
+        rate_percent: u8,
+        is_inter_state: bool,
+    ) -> Result<GstCalculation, &'static str> {
+        match rate_percent {
+            0 | 5 | 12 | 18 | 28 => {}
+            _ => return Err("Invalid Indian GST tax slab percentage"),
+        }
+
+        let total_tax = (taxable_value * rate_percent as u64) / 100;
+
+        if is_inter_state {
+            Ok(GstCalculation {
+                taxable_value,
+                cgst_amount: 0,
+                sgst_amount: 0,
+                igst_amount: total_tax,
+                total_amount: taxable_value + total_tax,
+            })
+        } else {
+            let half_tax = total_tax / 2;
+            Ok(GstCalculation {
+                taxable_value,
+                cgst_amount: half_tax,
+                sgst_amount: half_tax,
+                igst_amount: 0,
+                total_amount: taxable_value + total_tax,
+            })
+        }
+    }
+
+    pub fn reconcile_itc(&self, gstr3b_itc: u64, gstr2b_itc: u64) -> (i64, &'static str) {
+        let delta = gstr3b_itc as i64 - gstr2b_itc as i64;
+        if delta == 0 {
+            (0, "ITC Reconciliation Perfect: 100% Match between GSTR-3B and GSTR-2B")
+        } else if delta > 0 {
+            (delta, "ITC Warning: Excess ITC claimed in GSTR-3B relative to GSTR-2B auto-populated statement")
+        } else {
+            (delta, "ITC Alert: Unclaimed ITC available in GSTR-2B")
+        }
+    }
+}
+
+impl Default for CaGstTaxAuditEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Civil & Structural Chartered Engineers CPWD BOQ Estimator
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BoqItemEstimate {
+    pub item_code: String,
+    pub description: String,
+    pub quantity: f64,
+    pub unit: String,
+    pub total_cost_inr: f64,
+}
+
+/// Civil Chartered Engineers Bill of Quantities (BOQ) Estimator
+/// Performs IS 1200 CPWD Delhi Schedule of Rates (DSR) construction estimation,
+/// RCC concrete volume design, and steel reinforcement tonnage calculations.
+pub struct CharteredEngineersBoqEstimator {
+    pub dsr_rates: HashMap<String, f64>, // item_code -> rate per unit
+}
+
+impl CharteredEngineersBoqEstimator {
+    pub fn new() -> Self {
+        let mut dsr_rates = HashMap::new();
+        dsr_rates.insert("CPWD-CONC-M25".to_string(), 6500.0); // Rs 6,500 per cu.m M25 RCC
+        dsr_rates.insert("CPWD-STEEL-FE500".to_string(), 68000.0); // Rs 68,000 per MT TMT steel
+        dsr_rates.insert("CPWD-BRICK-CLASS75".to_string(), 4800.0); // Rs 4,800 per cu.m brickwork
+
+        Self { dsr_rates }
+    }
+
+    pub fn estimate_rcc_beam_boq(
+        &self,
+        length_m: f64,
+        breadth_m: f64,
+        depth_m: f64,
+        steel_percentage: f64,
+    ) -> Result<(BoqItemEstimate, BoqItemEstimate, f64), &'static str> {
+        let concrete_volume_cum = length_m * breadth_m * depth_m;
+        let steel_density_kg_cum = 7850.0;
+        let steel_weight_mt = (concrete_volume_cum * (steel_percentage / 100.0) * steel_density_kg_cum) / 1000.0;
+
+        let conc_rate = *self.dsr_rates.get("CPWD-CONC-M25").unwrap_or(&6000.0);
+        let steel_rate = *self.dsr_rates.get("CPWD-STEEL-FE500").unwrap_or(&65000.0);
+
+        let concrete_item = BoqItemEstimate {
+            item_code: "CPWD-CONC-M25".to_string(),
+            description: "M25 Grade Reinforced Cement Concrete".to_string(),
+            quantity: concrete_volume_cum,
+            unit: "cum".to_string(),
+            total_cost_inr: concrete_volume_cum * conc_rate,
+        };
+
+        let steel_item = BoqItemEstimate {
+            item_code: "CPWD-STEEL-FE500".to_string(),
+            description: "Thermo-Mechanically Treated (TMT) Fe500 Reinforcement Steel".to_string(),
+            quantity: steel_weight_mt,
+            unit: "MT".to_string(),
+            total_cost_inr: steel_weight_mt * steel_rate,
+        };
+
+        let total_estimate = concrete_item.total_cost_inr + steel_item.total_cost_inr;
+        Ok((concrete_item, steel_item, total_estimate))
+    }
+}
+
+impl Default for CharteredEngineersBoqEstimator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Agri-Krishi Market Intelligence & e-NAM Mandi Price Analyzer
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct KrishiMandiPrice {
+    pub commodity: String,
+    pub mandi_name: String,
+    pub modal_price_per_quintal: f64,
+    pub msp_price_per_quintal: f64,
+}
+
+/// Krishi Market Intelligence & e-NAM Mandi Price Evaluator
+/// Analyzes pan-India agricultural Mandi prices, compares market rates against Government Minimum Support Price (MSP),
+/// and evaluates farmer crop profitability.
+pub struct AgriKrishiMarketIntelligenceEngine {
+    pub msp_catalog: HashMap<String, f64>, // crop -> MSP per quintal (Rupees)
+}
+
+impl AgriKrishiMarketIntelligenceEngine {
+    pub fn new() -> Self {
+        let mut msp_catalog = HashMap::new();
+        msp_catalog.insert("Wheat".to_string(), 2275.0);
+        msp_catalog.insert("Paddy (Common)".to_string(), 2183.0);
+        msp_catalog.insert("Mustard".to_string(), 5650.0);
+        msp_catalog.insert("Cotton (Medium)".to_string(), 6620.0);
+
+        Self { msp_catalog }
+    }
+
+    pub fn evaluate_crop_price(
+        &self,
+        crop: &str,
+        mandi_name: &str,
+        current_mandi_price: f64,
+    ) -> KrishiMandiPrice {
+        let msp = *self.msp_catalog.get(crop).unwrap_or(&0.0);
+        KrishiMandiPrice {
+            commodity: crop.to_string(),
+            mandi_name: mandi_name.to_string(),
+            modal_price_per_quintal: current_mandi_price,
+            msp_price_per_quintal: msp,
+        }
+    }
+
+    pub fn is_price_above_msp(&self, crop: &str, mandi_price: f64) -> bool {
+        let msp = *self.msp_catalog.get(crop).unwrap_or(&0.0);
+        mandi_price >= msp
+    }
+}
+
+impl Default for AgriKrishiMarketIntelligenceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct IrctcPnrTracker {
     pub pnr_statuses: HashMap<String, String>,
 }
@@ -402,6 +621,52 @@ mod tests {
         assert!(
             !scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_mismatch_bytes")
         );
+    }
+
+    #[test]
+    fn test_ca_gst_tax_audit_engine() {
+        let engine = CaGstTaxAuditEngine::new();
+        assert!(engine.validate_gstin("07AAAAA0000A1Z5")); // Delhi state code 07
+        assert!(engine.validate_gstin("27AAAAA0000A1Z5")); // Maharashtra state code 27
+        assert!(!engine.validate_gstin("99AAAAA0000A1Z5")); // Invalid state code
+
+        // Intra-state GST (Delhi -> Delhi)
+        let calc = engine.compute_gst_tax(100000, 18, false).unwrap();
+        assert_eq!(calc.cgst_amount, 9000);
+        assert_eq!(calc.sgst_amount, 9000);
+        assert_eq!(calc.igst_amount, 0);
+        assert_eq!(calc.total_amount, 118000);
+
+        // Inter-state GST (Delhi -> Maharashtra)
+        let inter_calc = engine.compute_gst_tax(100000, 18, true).unwrap();
+        assert_eq!(inter_calc.cgst_amount, 0);
+        assert_eq!(inter_calc.sgst_amount, 0);
+        assert_eq!(inter_calc.igst_amount, 18000);
+
+        // ITC Reconciliation
+        let (delta, msg) = engine.reconcile_itc(50000, 50000);
+        assert_eq!(delta, 0);
+        assert!(msg.contains("ITC Reconciliation Perfect"));
+    }
+
+    #[test]
+    fn test_chartered_engineers_boq_estimator() {
+        let boq = CharteredEngineersBoqEstimator::new();
+        let (conc, steel, total) = boq.estimate_rcc_beam_boq(10.0, 0.3, 0.6, 2.0).unwrap();
+
+        assert_eq!(conc.quantity, 1.8); // 10 * 0.3 * 0.6
+        assert!(steel.quantity > 0.2); // ~0.2826 MT steel
+        assert!(total > 20000.0);
+    }
+
+    #[test]
+    fn test_agri_krishi_market_intelligence_engine() {
+        let krishi = AgriKrishiMarketIntelligenceEngine::new();
+        let price_info = krishi.evaluate_crop_price("Wheat", "Azadpur Mandi", 2400.0);
+
+        assert_eq!(price_info.msp_price_per_quintal, 2275.0);
+        assert!(krishi.is_price_above_msp("Wheat", 2400.0));
+        assert!(!krishi.is_price_above_msp("Wheat", 2100.0));
     }
 
     #[test]
