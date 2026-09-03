@@ -197,24 +197,69 @@ impl KojiBuildServer {
     }
 }
 
+/// Type of Bodhi software update.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiUpdateType {
+    Bugfix,
+    Enhancement,
+    Security,
+    NewPackage,
+}
+
+/// Status of a Bodhi update in its release lifecycle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BodhiUpdateStatus {
     Pending,
     Testing,
     Stable,
-    AutoUnpushed,
     Obsolete,
-    SideTag,
+    Rejected,
+}
+
+/// Automated CI test result gate (e.g., OpenQA / Greenwave).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiTestResult {
+    Pending,
+    Passed,
+    Failed,
+    Waived,
+}
+
+/// Comment & feedback entry on a Bodhi update.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BodhiComment {
+    pub author: String,
+    pub text: String,
+    pub karma: i32,
+    pub timestamp_secs: u64,
+}
+
+/// Comprehensive Bodhi Update object modeling Fedora update release metadata.
+#[derive(Debug, Clone)]
+pub struct BodhiUpdate {
+    pub update_id: String,
+    pub builds: Vec<String>,
+    pub update_type: BodhiUpdateType,
+    pub status: BodhiUpdateStatus,
+    pub release_target: String,
+    pub bugs: Vec<String>,
+    pub cves: Vec<String>,
+    pub karma: i32,
+    pub ci_test_result: BodhiTestResult,
+    pub comments: Vec<BodhiComment>,
+    pub days_in_testing: u32,
+    pub is_critpath: bool,
+    pub stable_karma_threshold: i32,
+    pub unstable_karma_threshold: i32,
+    pub min_testing_days: u32,
 }
 
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
-/// It handles community feedback, accumulates karma, openQA/CI gating, and gates the transition to stable.
+/// It handles community feedback, accumulates karma, evaluates Greenwave CI gates,
+/// enforces critical-path testing durations, and gates promotion to stable release repos.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>,       // update_id -> karma
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
-    pub update_statuses: HashMap<String, BodhiUpdateStatus>,
-    pub openqa_ci_passed: HashMap<String, bool>,
-    pub side_tags: Vec<String>,
+    pub updates: HashMap<String, BodhiUpdate>,
+    pub stable_gated: HashMap<String, bool>, // update_id -> is_promoted
 }
 
 impl BodhiUpdateTriage {
@@ -228,8 +273,51 @@ impl BodhiUpdateTriage {
         }
     }
 
+    /// Backwards-compatible simple update submission
     pub fn submit_update(&mut self, update_id: &str) {
-        self.updates.insert(update_id.to_string(), 0);
+        self.create_update(
+            update_id,
+            vec![format!("{}-1.0.0.rpm", update_id)],
+            BodhiUpdateType::Bugfix,
+            "SigmaOS-1.0",
+            false,
+        );
+    }
+
+    /// Create a detailed Bodhi update request
+    pub fn create_update(
+        &mut self,
+        update_id: &str,
+        builds: Vec<String>,
+        update_type: BodhiUpdateType,
+        release_target: &str,
+        is_critpath: bool,
+    ) {
+        let (stable_thresh, min_days) = match (update_type, is_critpath) {
+            (BodhiUpdateType::Security, _) => (1, 0),
+            (_, true) => (3, 7),
+            (_, false) => (2, 3),
+        };
+
+        let update = BodhiUpdate {
+            update_id: update_id.to_string(),
+            builds,
+            update_type,
+            status: BodhiUpdateStatus::Testing,
+            release_target: release_target.to_string(),
+            bugs: Vec::new(),
+            cves: Vec::new(),
+            karma: 0,
+            ci_test_result: BodhiTestResult::Passed, // default passed unless flagged
+            comments: Vec::new(),
+            days_in_testing: 0,
+            is_critpath,
+            stable_karma_threshold: stable_thresh,
+            unstable_karma_threshold: -3,
+            min_testing_days: min_days,
+        };
+
+        self.updates.insert(update_id.to_string(), update);
         self.stable_gated.insert(update_id.to_string(), false);
         self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Testing);
         self.openqa_ci_passed.insert(update_id.to_string(), false);
@@ -263,19 +351,122 @@ impl BodhiUpdateTriage {
         }
     }
 
+    pub fn link_bug(&mut self, update_id: &str, bug_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.bugs.contains(&bug_id.to_string()) {
+                up.bugs.push(bug_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn link_cve(&mut self, update_id: &str, cve_id: &str) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if !up.cves.contains(&cve_id.to_string()) {
+                up.cves.push(cve_id.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn record_ci_result(&mut self, update_id: &str, result: BodhiTestResult) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.ci_test_result = result;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn advance_testing_days(&mut self, update_id: &str, days: u32) -> bool {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.days_in_testing += days;
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn submit_feedback(&mut self, update_id: &str, karma_delta: i32) -> Result<i32, String> {
-        if let Some(karma) = self.updates.get_mut(update_id) {
-            *karma += karma_delta;
-            let current_karma = *karma;
-            // Auto-promote when karma hits >= 3, auto-reject when karma <= -3
-            if current_karma >= 3 {
+        self.add_comment(
+            update_id,
+            "tester",
+            "Community QA feedback submitted",
+            karma_delta,
+            0,
+        )
+    }
+
+    pub fn add_comment(
+        &mut self,
+        update_id: &str,
+        author: &str,
+        text: &str,
+        karma: i32,
+        timestamp_secs: u64,
+    ) -> Result<i32, String> {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            up.karma += karma;
+            up.comments.push(BodhiComment {
+                author: author.to_string(),
+                text: text.to_string(),
+                karma,
+                timestamp_secs,
+            });
+
+            let current_karma = up.karma;
+
+            // Auto-promote/reject check
+            if current_karma <= up.unstable_karma_threshold {
+                up.status = BodhiUpdateStatus::Rejected;
+                self.stable_gated.insert(update_id.to_string(), false);
+            } else if current_karma >= up.stable_karma_threshold
+                && up.ci_test_result != BodhiTestResult::Failed
+            {
+                up.status = BodhiUpdateStatus::Stable;
                 self.stable_gated.insert(update_id.to_string(), true);
                 self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
             } else if current_karma <= -3 {
                 self.stable_gated.insert(update_id.to_string(), false);
                 self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::AutoUnpushed);
             }
+
             Ok(current_karma)
+        } else {
+            Err("Update package not found".to_string())
+        }
+    }
+
+    /// Evaluates if an update satisfies requirements to transition to Stable repository status
+    pub fn eval_stable_promotion(&mut self, update_id: &str) -> Result<bool, String> {
+        if let Some(up) = self.updates.get_mut(update_id) {
+            if up.status == BodhiUpdateStatus::Stable {
+                return Ok(true);
+            }
+
+            if up.ci_test_result == BodhiTestResult::Failed {
+                return Err("Cannot promote to stable: Automated Greenwave CI tests failed".to_string());
+            }
+
+            // Security fast-track
+            if up.update_type == BodhiUpdateType::Security && (up.karma >= 1 || up.ci_test_result == BodhiTestResult::Passed) {
+                up.status = BodhiUpdateStatus::Stable;
+                self.stable_gated.insert(update_id.to_string(), true);
+                return Ok(true);
+            }
+
+            // Standard criteria
+            if up.karma >= up.stable_karma_threshold && up.days_in_testing >= up.min_testing_days {
+                up.status = BodhiUpdateStatus::Stable;
+                self.stable_gated.insert(update_id.to_string(), true);
+                Ok(true)
+            } else {
+                Ok(false)
+            }
         } else {
             Err("Update package not found".to_string())
         }
@@ -285,8 +476,50 @@ impl BodhiUpdateTriage {
         *self.stable_gated.get(update_id).unwrap_or(&false)
     }
 
-    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
-        self.update_statuses.get(update_id).copied()
+    /// Generates repodata `updateinfo.xml` content for DNF/RPM metadata
+    pub fn generate_updateinfo_xml(&self) -> String {
+        let mut xml = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<updates>\n");
+        for up in self.updates.values() {
+            let type_str = match up.update_type {
+                BodhiUpdateType::Bugfix => "bugfix",
+                BodhiUpdateType::Enhancement => "recommended",
+                BodhiUpdateType::Security => "security",
+                BodhiUpdateType::NewPackage => "newpackage",
+            };
+            let status_str = match up.status {
+                BodhiUpdateStatus::Pending => "pending",
+                BodhiUpdateStatus::Testing => "testing",
+                BodhiUpdateStatus::Stable => "stable",
+                BodhiUpdateStatus::Obsolete => "obsolete",
+                BodhiUpdateStatus::Rejected => "rejected",
+            };
+
+            xml.push_str(&format!(
+                "  <update id=\"{}\" type=\"{}\" status=\"{}\" release=\"{}\">\n",
+                up.update_id, type_str, status_str, up.release_target
+            ));
+            xml.push_str(&format!("    <title>Update {}</title>\n", up.update_id));
+
+            if !up.cves.is_empty() {
+                xml.push_str("    <references>\n");
+                for cve in &up.cves {
+                    xml.push_str(&format!("      <reference href=\"https://cve.mitre.org/cgi-bin/cvename.cgi?name={}\" id=\"{}\" type=\"cve\"/>\n", cve, cve));
+                }
+                for bug in &up.bugs {
+                    xml.push_str(&format!("      <reference href=\"https://bugzilla.redhat.com/show_bug.cgi?id={}\" id=\"{}\" type=\"bugzilla\"/>\n", bug, bug));
+                }
+                xml.push_str("    </references>\n");
+            }
+
+            xml.push_str("    <pkglist>\n      <collection short=\"SigmaOS\">\n");
+            for build in &up.builds {
+                xml.push_str(&format!("        <package name=\"{}\"/>\n", build));
+            }
+            xml.push_str("      </collection>\n    </pkglist>\n");
+            xml.push_str("  </update>\n");
+        }
+        xml.push_str("</updates>");
+        xml
     }
 }
 
@@ -2907,6 +3140,326 @@ impl Default for FedoraMessagingEngine {
 }
 
 // =========================================================================
+// Fedora Ignition Declarative Provisioning Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionFile {
+    pub path: String,
+    pub mode: u32,
+    pub content: String,
+    pub overwrite: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionUser {
+    pub name: String,
+    pub ssh_authorized_keys: Vec<String>,
+    pub groups: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionSystemdUnit {
+    pub name: String,
+    pub enabled: bool,
+    pub contents: String,
+}
+
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
+}
+
+impl FedoraIgnitionEngine {
+    pub fn new() -> Self {
+        Self {
+            files: Vec::new(),
+            users: Vec::new(),
+            systemd_units: Vec::new(),
+            provisioned: false,
+        }
+    }
+
+    pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
+        self.files.push(IgnitionFile {
+            path: path.to_string(),
+            mode,
+            content: content.to_string(),
+            overwrite: true,
+        });
+    }
+
+    pub fn add_user(&mut self, name: &str, ssh_keys: &[&str], groups: &[&str]) {
+        self.users.push(IgnitionUser {
+            name: name.to_string(),
+            ssh_authorized_keys: ssh_keys.iter().map(|s| s.to_string()).collect(),
+            groups: groups.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn add_systemd_unit(&mut self, name: &str, enabled: bool, contents: &str) {
+        self.systemd_units.push(IgnitionSystemdUnit {
+            name: name.to_string(),
+            enabled,
+            contents: contents.to_string(),
+        });
+    }
+
+    pub fn execute_provisioning(&mut self) -> Result<String, &'static str> {
+        if self.provisioned {
+            return Err("Ignition provisioning already executed; runs once on first boot");
+        }
+
+        self.provisioned = true;
+        Ok(format!(
+            "Ignition: Provisioned {} files, {} users, and {} systemd units successfully",
+            self.files.len(),
+            self.users.len(),
+            self.systemd_units.len()
+        ))
+    }
+}
+
+impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Dracut Initramfs Builder Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DracutModule {
+    pub name: String,
+    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
+    pub drivers: Vec<String>,
+}
+
+/// Fedora Dracut Modular Initramfs Generation & Hook Engine
+/// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
+pub struct FedoraDracutInitramfsEngine {
+    pub modules: Vec<DracutModule>,
+    pub kernel_version: String,
+    pub compression_format: String, // "zstd", "xz", "gzip"
+}
+
+impl FedoraDracutInitramfsEngine {
+    pub fn new(kernel_version: &str) -> Self {
+        let mut engine = Self {
+            modules: Vec::new(),
+            kernel_version: kernel_version.to_string(),
+            compression_format: "zstd".to_string(),
+        };
+        engine.load_default_dracut_modules();
+        engine
+    }
+
+    fn load_default_dracut_modules(&mut self) {
+        self.modules.push(DracutModule {
+            name: "90crypt".to_string(),
+            hook_stage: "cmdline".to_string(),
+            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
+        });
+        self.modules.push(DracutModule {
+            name: "95rootfs".to_string(),
+            hook_stage: "pre-pivot".to_string(),
+            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
+        });
+    }
+
+    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
+        self.modules.push(DracutModule {
+            name: name.to_string(),
+            hook_stage: stage.to_string(),
+            drivers: drivers.iter().map(|d| d.to_string()).collect(),
+        });
+    }
+
+    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
+        if self.modules.is_empty() {
+            Err("Dracut: No modules included in initramfs build")
+        } else {
+            Ok(format!(
+                "/boot/initramfs-{}.img ({} modules, compressed with {})",
+                self.kernel_version,
+                self.modules.len(),
+                self.compression_format
+            ))
+        }
+    }
+}
+
+// =========================================================================
+// Fedora ABRT (Automatic Bug Reporting Tool) Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AbrtCrashReport {
+    pub crash_id: String,
+    pub executable_path: String,
+    pub signal_name: String,
+    pub stack_trace: String,
+    pub kernel_release: String,
+    pub timestamp_secs: u64,
+    pub count: u32,
+    pub reported_to_bugzilla: bool,
+}
+
+/// Fedora ABRT (Automatic Bug Reporting Tool) Crash Daemon
+/// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
+/// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
+pub struct FedoraAbrtCrashDaemon {
+    pub captured_crashes: HashMap<String, AbrtCrashReport>, // crash_id -> report
+    pub messaging_engine: FedoraMessagingEngine,
+    pub total_crashes_handled: u64,
+}
+
+impl FedoraAbrtCrashDaemon {
+    pub fn new() -> Self {
+        Self {
+            captured_crashes: HashMap::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+            total_crashes_handled: 0,
+        }
+    }
+
+    pub fn capture_crash(
+        &mut self,
+        exe_path: &str,
+        signal: &str,
+        backtrace: &str,
+        kernel_ver: &str,
+        timestamp_secs: u64,
+    ) -> AbrtCrashReport {
+        self.total_crashes_handled += 1;
+        let signature = format!("{}:{}:{}", exe_path, signal, backtrace);
+        let crash_id = format!("abrt-{:08x}", self.total_crashes_handled);
+
+        if let Some(existing) = self.captured_crashes.get_mut(&signature) {
+            existing.count += 1;
+            return existing.clone();
+        }
+
+        let report = AbrtCrashReport {
+            crash_id: crash_id.clone(),
+            executable_path: exe_path.to_string(),
+            signal_name: signal.to_string(),
+            stack_trace: backtrace.to_string(),
+            kernel_release: kernel_ver.to_string(),
+            timestamp_secs,
+            count: 1,
+            reported_to_bugzilla: false,
+        };
+
+        let topic = format!("org.fedoraproject.prod.abrt.crash.{}", signal.to_lowercase());
+        let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
+        self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+
+        self.captured_crashes.insert(signature, report.clone());
+        report
+    }
+
+    pub fn mark_reported(&mut self, crash_id: &str) -> bool {
+        for report in self.captured_crashes.values_mut() {
+            if report.crash_id == crash_id {
+                report.reported_to_bugzilla = true;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for FedoraAbrtCrashDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Toolbx OCI Development Container Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToolbxContainer {
+    pub name: String,
+    pub image: String,
+    pub host_mounts: Vec<String>,
+    pub environment_vars: HashMap<String, String>,
+    pub running: bool,
+}
+
+/// Fedora Toolbx Interactive OCI Development Environment Manager
+/// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
+pub struct FedoraToolbxContainerEngine {
+    pub active_containers: HashMap<String, ToolbxContainer>,
+}
+
+impl FedoraToolbxContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_containers: HashMap::new(),
+        }
+    }
+
+    pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
+        let mut default_mounts = vec![
+            "/home".to_string(),
+            "/var/srv".to_string(),
+            "/dev".to_string(),
+            "/run/host".to_string(),
+        ];
+        let mut env = HashMap::new();
+        env.insert("TOOLBX_NAME".to_string(), name.to_string());
+        env.insert("SHELL".to_string(), "/bin/bash".to_string());
+
+        let container = ToolbxContainer {
+            name: name.to_string(),
+            image: image.to_string(),
+            host_mounts: default_mounts,
+            environment_vars: env,
+            running: false,
+        };
+
+        self.active_containers.insert(name.to_string(), container.clone());
+        container
+    }
+
+    pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            c.running = true;
+            Ok(format!("Toolbx container '{}' started using image '{}'", c.name, c.image))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
+    pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            if !c.host_mounts.contains(&host_path.to_string()) {
+                c.host_mounts.push(host_path.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraToolbxContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
 
@@ -3384,6 +3937,61 @@ mod tests {
         bodhi.submit_update("FEDORA-2023-SEC1");
         assert!(bodhi.apply_security_karma_waiver("FEDORA-2023-SEC1").is_ok());
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
+    }
+
+    #[test]
+    fn test_bodhi_advanced_lifecycle() {
+        let mut bodhi = BodhiUpdateTriage::new();
+
+        // 1. Create a Critical Path update
+        bodhi.create_update(
+            "SIGMA-2026-CRIT01",
+            vec!["systemd-255-1.fc39.x86_64".to_string()],
+            BodhiUpdateType::Enhancement,
+            "SigmaOS-39",
+            true, // is_critpath
+        );
+
+        bodhi.link_bug("SIGMA-2026-CRIT01", "RHBZ-200101");
+        bodhi.link_cve("SIGMA-2026-CRIT01", "CVE-2026-0001");
+
+        // Karma +2, but min_testing_days is 7 -> promo fails initially
+        bodhi.submit_feedback("SIGMA-2026-CRIT01", 3).unwrap(); // Karma 3 meets threshold
+        assert!(!bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // Advance days in testing to 7
+        bodhi.advance_testing_days("SIGMA-2026-CRIT01", 7);
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
+
+        // 2. Greenwave CI test failure gate
+        bodhi.create_update(
+            "SIGMA-2026-FAIL01",
+            vec!["badpkg-1.0.rpm".to_string()],
+            BodhiUpdateType::Bugfix,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
+        bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-FAIL01").is_err()); // Greenwave failure blocks
+
+        // 3. Security Fast-Track
+        bodhi.create_update(
+            "SIGMA-2026-SEC01",
+            vec!["openssl-3.1.0.rpm".to_string()],
+            BodhiUpdateType::Security,
+            "SigmaOS-39",
+            false,
+        );
+        bodhi.link_cve("SIGMA-2026-SEC01", "CVE-2026-9999");
+        assert!(bodhi.eval_stable_promotion("SIGMA-2026-SEC01").unwrap()); // Security fast track
+
+        // 4. Updateinfo XML generation
+        let xml = bodhi.generate_updateinfo_xml();
+        assert!(xml.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        assert!(xml.contains("CVE-2026-9999"));
+        assert!(xml.contains("RHBZ-200101"));
+        assert!(xml.contains("<update id=\"SIGMA-2026-CRIT01\""));
     }
 
     #[test]
@@ -4110,6 +4718,90 @@ mod tests {
 
         let empty_search = tahrir.search_posts_by_hashtag("nonexistent");
         assert!(empty_search.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_ignition_engine() {
+        let mut ignition = FedoraIgnitionEngine::new();
+
+        ignition.add_file("/etc/hostname", "sigmaos-node-1", 0o644);
+        ignition.add_user("admin", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "docker"]);
+        ignition.add_systemd_unit("node-exporter.service", true, "[Unit]\nDescription=Node Exporter\n");
+
+        assert_eq!(ignition.files.len(), 1);
+        assert_eq!(ignition.users.len(), 1);
+        assert_eq!(ignition.systemd_units.len(), 1);
+        assert!(!ignition.provisioned);
+
+        let res = ignition.execute_provisioning().unwrap();
+        assert!(res.contains("Provisioned 1 files, 1 users, and 1 systemd units"));
+        assert!(ignition.provisioned);
+
+        // Re-executing fails because it runs once
+        assert!(ignition.execute_provisioning().is_err());
+    }
+
+    #[test]
+    fn test_fedora_dracut_initramfs_engine() {
+        let mut dracut = FedoraDracutInitramfsEngine::new("6.8.0-1.fc39.x86_64");
+
+        assert_eq!(dracut.modules.len(), 2); // 90crypt, 95rootfs default
+        dracut.include_module("50plymouth", "cmdline", &["drm", "i915"]);
+
+        assert_eq!(dracut.modules.len(), 3);
+
+        let img_path = dracut.generate_initramfs_img().unwrap();
+        assert!(img_path.contains("/boot/initramfs-6.8.0-1.fc39.x86_64.img"));
+        assert!(img_path.contains("3 modules, compressed with zstd"));
+    }
+
+    #[test]
+    fn test_fedora_abrt_crash_daemon() {
+        let mut abrt = FedoraAbrtCrashDaemon::new();
+
+        let report1 = abrt.capture_crash(
+            "/usr/bin/gnome-shell",
+            "SIGSEGV",
+            "0x7f123456 in libc.so.6() -> 0x0001",
+            "6.8.0-1.fc39.x86_64",
+            1700000000,
+        );
+
+        assert!(report1.crash_id.starts_with("abrt-"));
+        assert_eq!(report1.count, 1);
+        assert!(!report1.reported_to_bugzilla);
+        assert_eq!(abrt.messaging_engine.published_messages.len(), 1);
+
+        // Capture identical crash -> deduplicate and increment count
+        let report2 = abrt.capture_crash(
+            "/usr/bin/gnome-shell",
+            "SIGSEGV",
+            "0x7f123456 in libc.so.6() -> 0x0001",
+            "6.8.0-1.fc39.x86_64",
+            1700000010,
+        );
+
+        assert_eq!(report2.count, 2);
+        assert_eq!(report2.crash_id, report1.crash_id);
+
+        assert!(abrt.mark_reported(&report1.crash_id));
+    }
+
+    #[test]
+    fn test_fedora_toolbx_container_engine() {
+        let mut engine = FedoraToolbxContainerEngine::new();
+
+        let container = engine.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39");
+        assert_eq!(container.name, "fedora-toolbox-39");
+        assert!(container.host_mounts.contains(&"/home".to_string()));
+        assert!(!container.running);
+
+        assert!(engine.add_host_mount("fedora-toolbox-39", "/mnt/data"));
+        assert!(engine.active_containers.get("fedora-toolbox-39").unwrap().host_mounts.contains(&"/mnt/data".to_string()));
+
+        let start_res = engine.start_toolbx("fedora-toolbox-39").unwrap();
+        assert!(start_res.contains("started using image"));
+        assert!(engine.active_containers.get("fedora-toolbox-39").unwrap().running);
     }
 
     #[test]

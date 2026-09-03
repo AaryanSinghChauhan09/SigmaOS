@@ -1003,6 +1003,8 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
+}
+
 // --- Arch Linux svntogit Repository Migration Engine ---
 
 #[derive(Debug, Clone)]
