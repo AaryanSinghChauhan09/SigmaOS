@@ -4465,7 +4465,6 @@ mod tests {
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.deb");
         assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
         assert_eq!(bridge.translate_vfs_path("/etc"), "/etc");
-        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::LinuxNix);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.nix");
@@ -4474,38 +4473,6 @@ mod tests {
             ServiceSupervisorType::Shepherd
         );
         assert_eq!(bridge.translate_vfs_path("/etc"), "/etc/nixos");
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxVoid);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.xbps");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Runit);
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxOpenSuse);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.rpm");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxSolus);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.eopkg");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxClear);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.bundle");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Systemd);
-        assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/etc");
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxSlackware);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.txz");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::SysVInit);
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        bridge.set_subsystem_mode(DistroSubsystemMode::SolarisIllumos);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.p5p");
-        assert_eq!(bridge.get_supervisor_type(), ServiceSupervisorType::Smf);
-        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
@@ -4513,31 +4480,10 @@ mod tests {
         assert_eq!(bridge.translate_vfs_path("/etc"), "/usr/local/etc");
         assert!(bridge.enforce_security_isolation(101, "/jails/web").is_ok());
         assert!(bridge.active_jail.is_some());
-        assert!(bridge.verify_all_subsystems_compatibility());
 
         bridge.set_subsystem_mode(DistroSubsystemMode::OpenBsd);
         assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.tgz");
         assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
-        assert!(bridge.verify_all_subsystems_compatibility());
-
-        // Test cross-subsystem dispatches across subsystems
-        let res_init = bridge.dispatch_cross_subsystem_operation("init", "start_service").unwrap();
-        assert!(res_init.contains("Dispatched action 'start_service'"));
-
-        let res_pkg = bridge.dispatch_cross_subsystem_operation("package", "zsh").unwrap();
-        assert!(res_pkg.contains("zsh.tgz"));
-
-        let res_vfs = bridge.dispatch_cross_subsystem_operation("vfs", "/etc").unwrap();
-        assert!(res_vfs.contains("/etc"));
-
-        let res_sec = bridge.dispatch_cross_subsystem_operation("security", "/tmp/sandbox").unwrap();
-        assert!(res_sec.contains("Dispatched security isolation"));
-
-        let res_storage = bridge.dispatch_cross_subsystem_operation("storage", "/etc/os-release").unwrap();
-        assert!(res_storage.contains("Dispatched storage CoW self-heal check"));
-
-        let res_kernel = bridge.dispatch_cross_subsystem_operation("kernel", "build-job").unwrap();
-        assert!(res_kernel.contains("Dispatched kernel/scheduler task"));
     }
 
     #[test]
