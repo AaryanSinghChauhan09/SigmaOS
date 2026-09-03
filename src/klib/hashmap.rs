@@ -145,16 +145,20 @@ where
         if let Some(ref mut bucket) = self.buckets[hash] {
             for item in bucket.iter_mut() {
                 if item.0 == key {
+                    // Key already exists — update value WITHOUT incrementing len.
                     item.1 = value;
                     return;
                 }
             }
+            // New key in an existing bucket.
             bucket.push((key, value));
         } else {
+            // No bucket yet — create one.
             let mut bucket = Vec::new();
             bucket.push((key, value));
             self.buckets[hash] = Some(bucket);
         }
+        // Only reached for genuinely new keys.
         self.len += 1;
     }
 

@@ -307,14 +307,22 @@ impl<T> Vec<T> {
     unsafe fn grow_to(&mut self, new_capacity: usize) {
         // SAFETY: `new_capacity * size_of::<T>()` is the correct byte count.
         // If the allocator returns null we leave the vec unchanged (capacity stays).
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_byte_size = new_capacity * mem::size_of::<T>();
+        if new_byte_size == 0 {
+            return;
+        }
+        let new_data = alloc(new_byte_size) as *mut T;
         if !new_data.is_null() {
-            if self.capacity > 0 && !self.data.is_null() {
+            if self.capacity > 0 && !self.data.is_null() && self.len > 0 {
+                // Bulk copy: O(1) single memcpy instead of element-by-element loop.
                 // SAFETY: `self.data..self.data+self.len` and `new_data..new_data+self.len`
                 // do not overlap because they come from distinct allocations.
-                for i in 0..self.len {
-                    core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-                }
+                core::ptr::copy_nonoverlapping(self.data, new_data, self.len);
+            }
+            if self.capacity > 0 && !self.data.is_null() {
+                #[cfg(not(target_os = "none"))]
+                free_sized(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }
             self.data = new_data;
@@ -547,6 +555,9 @@ impl<T> Drop for Vec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
+                #[cfg(not(target_os = "none"))]
+                free_sized(self.data as *mut u8, self.capacity * core::mem::size_of::<T>());
+                #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }
         }
@@ -599,18 +610,39 @@ impl<'a, T> Drop for Drain<'a, T> {
     }
 }
 
+/// Allocate `size` bytes with 8-byte alignment.
+/// On hosted targets uses the global allocator; on bare-metal delegates to the
+/// kernel's C allocator via FFI.
+///
+/// # Safety
+/// Caller must ensure `size > 0`.  The returned pointer must be freed with
+/// the corresponding `free()` call once done.
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use alloc::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
+    // Layout::from_size_align can only fail if align is not a power of two or
+    // size overflows; both conditions are impossible here (align=8, size>0).
+    let layout = Layout::from_size_align(size, 8).expect("invalid layout");
     std_alloc(layout)
 }
 
+/// Free memory previously returned by `alloc(size)`.
+/// On hosted targets this calls the global dealloc with the same layout; on
+/// bare-metal it forwards to the kernel's C free via FFI.
+///
+/// # Safety
+/// `ptr` must have been returned by `alloc(size)` with the same `size`, and
+/// must not be used after this call.
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+unsafe fn free_sized(ptr: *mut u8, size: usize) {
+    use alloc::alloc::{dealloc, Layout};
+    if !ptr.is_null() && size > 0 {
+        let layout = Layout::from_size_align(size, 8).expect("invalid layout");
+        dealloc(ptr, layout);
+    }
 }
 
+/// Bare-metal target: all allocation/free is handled by the kernel C runtime.
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
