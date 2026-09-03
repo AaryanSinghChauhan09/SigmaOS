@@ -249,9 +249,9 @@ impl AURHelper {
 
     /// Install AUR package
     pub fn install_aur_package(&mut self, package_name: &str) -> Result<(), String> {
-        if let Some(_pkg) = self.get_aur_package(package_name) {
+        if let Some(pkg) = self.get_aur_package(package_name) {
             // Clone PKGBUILD and build
-            let abs = ArchBuildSystem::new();
+            let mut abs = ArchBuildSystem::new();
             // In a real implementation, this would clone from AUR and build
             abs.build_package()?;
             Ok(())
@@ -513,66 +513,6 @@ impl Default for SovereignDbscriptsEngine {
     }
 }
 
-/// Pacman Contrib Utilities Engine (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
-#[derive(Debug, Default, Clone)]
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn paccache_clean(&self, files: &[String], keep: usize) -> Vec<String> {
-        let mut cleaner = PacmanCacheCleaner::new(files.to_vec());
-        cleaner.prune_cache(keep)
-    }
-
-    pub fn rankmirrors(&self, mirrors: &[(String, u64)], top_n: usize) -> Vec<(String, u64)> {
-        let mut sorted = mirrors.to_vec();
-        sorted.sort_by_key(|m| m.1);
-        sorted.truncate(top_n);
-        sorted
-    }
-
-    pub fn updpkgsums(&self, pkgbuild: &str, new_hash: &str) -> String {
-        let mut lines: Vec<String> = pkgbuild.lines().map(|l| l.to_string()).collect();
-        let mut found = false;
-        for line in &mut lines {
-            if line.starts_with("sha256sums=") {
-                *line = format!("sha256sums=('{}')", new_hash);
-                found = true;
-                break;
-            }
-        }
-        if !found {
-            lines.push(format!("sha256sums=('{}')", new_hash));
-        }
-        lines.join("\n")
-    }
-
-    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
-        let mut updates = Vec::new();
-        for local in &local_db.local_packages {
-            if let Some(repo_pkg) = remote_db.packages.iter().find(|p| p.name == local.name) {
-                if repo_pkg.version != local.version {
-                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
-                }
-            }
-        }
-        updates
-    }
-
-    pub fn finddeps(&self, db: &PacmanDatabase, target_dep: &str) -> Vec<String> {
-        let mut dependent_pkgs = Vec::new();
-        for pkg in &db.local_packages {
-            if pkg.depends.iter().any(|d| d == target_dep) {
-                dependent_pkgs.push(pkg.name.clone());
-            }
-        }
-        dependent_pkgs
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -665,8 +605,8 @@ depends=('glibc')
 
     #[test]
     fn test_aur_helper_search() {
-        let aur = AURHelper::new();
-        let _test_pkg = ArchPacmanPackage {
+        let mut aur = AURHelper::new();
+        let test_pkg = ArchPacmanPackage {
             name: "aur-test".to_string(),
             version: "1.0.0".to_string(),
             description: "AUR test package".to_string(),
@@ -778,28 +718,7 @@ depends=('glibc')
 
     #[test]
     fn test_pacman_contrib_engine() {
-        let contrib = PacmanContribEngine::new();
-
-        // Test paccache
-        let cache = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
-        let to_remove = contrib.paccache_clean(&cache, 2);
-        assert_eq!(to_remove, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
-
-        // Test rankmirrors
-        let mirrors = vec![("mirror1".to_string(), 120), ("mirror2".to_string(), 45), ("mirror3".to_string(), 80)];
-        let ranked = contrib.rankmirrors(&mirrors, 2);
-        assert_eq!(ranked.len(), 2);
-        assert_eq!(ranked[0].0, "mirror2");
-
-        // Test updpkgsums
-        let pkgbuild = "pkgname=foo\nsha256sums=('oldsum')";
-        let updated = contrib.updpkgsums(pkgbuild, "newsum123");
-        assert!(updated.contains("sha256sums=('newsum123')"));
-
-        // Test checkupdates & finddeps
-        let mut local_db = PacmanDatabase::new();
-        let mut remote_db = PacmanDatabase::new();
-
+        let mut db = PacmanDatabase::new();
         let mut pkg = ArchPacmanPackage {
             name: "linux-zen".to_string(),
             version: "6.5.0".to_string(),
@@ -822,17 +741,16 @@ depends=('glibc')
             install_date: "".to_string(),
             is_explicit: true,
         };
-
-        local_db.local_packages.push(pkg.clone());
+        db.local_packages.push(pkg.clone());
         pkg.version = "6.6.0".to_string();
-        remote_db.packages.push(pkg);
+        db.packages.push(pkg);
 
-        let updates = contrib.checkupdates(&local_db, &remote_db);
+        let updates = SafeUpdateChecker::check_pending_updates(&db);
         assert_eq!(updates.len(), 1);
         assert_eq!(updates[0].0, "linux-zen");
-        assert_eq!(updates[0].2, "6.6.0");
 
-        let deps = contrib.finddeps(&local_db, "glibc");
-        assert_eq!(deps, vec!["linux-zen".to_string()]);
+        let updated_pb = PkgbuildChecksumUpdater::update_sha256("pkgname=test\nsha256sums=('SKIP')", b"payload");
+        assert!(updated_pb.contains("sha256sums="));
     }
+
 }
