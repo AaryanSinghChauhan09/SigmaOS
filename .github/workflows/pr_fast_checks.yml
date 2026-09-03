@@ -1,0 +1,52 @@
+name: SigmaOS PR Fast Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  fast-checks:
+    name: Fast PR Checks & Standalone Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Code Formatting Check
+        run: cargo fmt --check
+
+      - name: Clippy Warnings Deny
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: no_std Compliance Verification
+        run: |
+          chmod +x ./scripts/no_std_check.sh
+          ./scripts/no_std_check.sh
+
+      - name: Run Standalone File Tests for Modified Files
+        run: |
+          chmod +x ./scripts/changed_files_rustc_tests.sh
+          ./scripts/changed_files_rustc_tests.sh
+
+      - name: Quick Boot Smoke Test Trigger Check
+        run: |
+          CHANGED_BOOT_FILES=$(git diff --name-only origin/main...HEAD | grep -E '^(src/boot|kernel/|src/kernel/boot)' || true)
+          if [ -n "$CHANGED_BOOT_FILES" ]; then
+            echo "Boot or kernel initialization files changed. Triggering quick boot smoke test..."
+            python3 scripts/qemu_smoke_test.py || exit 1
+          else
+            echo "No core boot files modified. Skipping full QEMU smoke test for fast check PR lane."
+          fi
