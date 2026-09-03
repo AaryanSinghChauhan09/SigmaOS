@@ -5,7 +5,6 @@ Covers: Shell ↔ Syscall routing, Hardware Driver mocking (disk/network),
 Network sockets, Security policy enforcement, and Cold Boot configurations.
 """
 
-import pytest
 import time
 
 
@@ -135,8 +134,11 @@ def test_device_driver_mocking():
     read_back = disk.read_sector(0)
 
     assert read_back == sector_data
-    with pytest.raises(ValueError):
+    try:
         disk.read_sector(999)
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
 
 
 def test_network_socket_packet_transfer():
