@@ -729,7 +729,29 @@ depends=('glibc')
 
     #[test]
     fn test_aur_helper_search() {
-        let aur = AURHelper::new();
+        let mut aur = AURHelper::new();
+        let test_pkg = ArchPacmanPackage {
+            name: "aur-test".to_string(),
+            version: "1.0.0".to_string(),
+            description: "AUR test package".to_string(),
+            url: "https://aur.archlinux.org".to_string(),
+            architecture: "x86_64".to_string(),
+            license: vec!["MIT".to_string()],
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 1024,
+            packager: "AUR".to_string(),
+            build_date: "2026-08-24".to_string(),
+            install_date: "2026-08-24".to_string(),
+            is_explicit: true,
+        };
 
         // Note: In a real implementation, we'd add this to aur_packages
         let results = aur.search_aur("test");

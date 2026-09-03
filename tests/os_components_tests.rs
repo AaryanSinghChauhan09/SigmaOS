@@ -70,12 +70,12 @@ pub mod security;
 mod segmentation_paging;
 #[path = "../src/filesystem/sigma_fs.rs"]
 mod sigma_fs_extended;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-#[path = "../src/init/systemd_init.rs"]
-pub mod systemd_init;
-#[path = "../src/expanded_wiki_innovations.rs"]
-pub mod expanded_wiki_innovations;
+#[path = "../src/event/epoll.rs"]
+mod epoll;
+#[path = "../src/loader/elf/relocation.rs"]
+mod elf_relocation;
+#[path = "../src/security/mod.rs"]
+pub mod security;
 #[path = "../src/sigpkg/mod.rs"]
 mod sigpkg;
 #[path = "../src/dashboard/statutory_compliance.rs"]

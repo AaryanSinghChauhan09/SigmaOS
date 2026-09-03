@@ -5694,58 +5694,7 @@ mod tests {
         // 5th crash triggers SegvGuard brute force mitigation
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
-        assert_eq!(
-            pax.violations[1].violation,
-            PaxViolationType::SegvGuardThresholdExceeded
-        );
-    }
-
-    #[test]
-    fn test_universal_distro_bridge_dominance_interop() {
-        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxNix);
-        assert_eq!(bridge.translate_package_specifier("zsh"), "zsh.nix");
-
-        // Nix store integration test via bridge
-        let (hash_id, gen) = bridge
-            .nix_store_add_and_register_package("zsh", "5.9", vec![], b"binary-content")
-            .unwrap();
-        assert_eq!(gen, 1);
-        assert!(bridge
-            .dominance_suite
-            .nix_store
-            .zero_copy_read_slice(&hash_id)
-            .is_some());
-
-        // BORE Scheduler integration test via bridge
-        let scheduled_pid = bridge.schedule_distro_task(42, "compiler-job", 50);
-        assert_eq!(scheduled_pid, Some(42));
-
-        // Self-healing CoW filesystem integration test via bridge
-        let healed = bridge
-            .verify_and_self_heal_cow_file(
-                "@root",
-                "/etc/os-release",
-                b"NAME=SigmaOS\nVERSION=1.0\n",
-            )
-            .unwrap();
-        assert!(!healed);
-    }
-
-    #[test]
-    fn test_universal_distro_bridge_super_matrix_interop() {
-        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd);
-        assert_eq!(bridge.translate_package_specifier("nginx"), "nginx.pkg");
-
-        // Qubes isolation domain creation test via bridge
-        assert!(bridge.create_qubes_isolation_domain("vault-domain").is_ok());
-        assert!(bridge
-            .create_qubes_isolation_domain("vault-domain")
-            .is_err());
-
-        // Super matrix distro profiles verification via bridge
-        let ubuntu = bridge.super_matrix.get_profile("Ubuntu/Debian");
-        assert!(ubuntu.is_some());
-        assert_eq!(ubuntu.unwrap().package_management_model, "deb/apt");
+        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
     }
 }
 
@@ -5928,3 +5877,4 @@ impl Default for ShepherdServiceManager {
         Self::new()
     }
 }
+

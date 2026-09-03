@@ -183,7 +183,8 @@ impl UserManager {
     /// Initialize user management system
     pub fn initialize(&self) -> Result<(), UserError> {
         let std_path = std::path::Path::new(&self.etc_dir);
-        fs::create_dir_all(std_path).map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
+        fs::create_dir_all(std_path)
+            .map_err(|e| UserError::InitError(self.etc_dir.clone(), e))?;
         Ok(())
     }
 

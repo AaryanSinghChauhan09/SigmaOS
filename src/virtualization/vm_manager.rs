@@ -8,6 +8,8 @@ use alloc::collections::BTreeMap as HashMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]

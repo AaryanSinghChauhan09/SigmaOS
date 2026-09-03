@@ -163,8 +163,9 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
-pub use legacy_adapters::{LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter};
-pub use mate_betsy::{MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine};
+pub use mate_betsy::{
+    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
+};
 pub use mint_linux::{
     Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
     MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,

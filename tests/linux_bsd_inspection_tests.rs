@@ -20,6 +20,20 @@ mod sysctl;
 mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+#[path = "../src/distro/ready_to_use.rs"]
+mod ready_to_use;
+#[path = "../src/compatibility/garuda_zen.rs"]
+mod garuda_zen;
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+#[path = "../src/compatibility/zorin.rs"]
+mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
@@ -68,6 +82,14 @@ mod package_repository;
 mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod linux_bsd_inspirations;
+#[path = "../src/compatibility/community_foundation.rs"]
+mod community_foundation;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
+
+use bsd_compat::*;
 
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd_compat;

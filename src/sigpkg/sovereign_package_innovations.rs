@@ -231,6 +231,76 @@ mod tests {
             NixFlakeHermeticCacheStore::compute_flake_hash("github:nixos/nixpkgs", "lock_data");
 
         store.store_build(&hash, b"HERMETIC_NIX_OUTPUT");
+        assert_eq!(store.fetch_cached_build(&hash).unwrap(), b"HERMETIC_NIX_OUTPUT");
+    }
+
+    #[test]
+    fn test_slackware_build_engine() {
+        let mut engine = SlackwareBuildPackageEngine::new();
+        engine.register_slackbuild(SlackBuildScript {
+            name: "htop".to_string(),
+            version: "3.2.1".to_string(),
+            build_number: 1,
+            arch: "x86_64".to_string(),
+            configure_flags: vec!["--prefix=/usr".to_string()],
+        });
+
+        let txz = engine.compile_slackbuild("htop", &["/usr/bin/htop", "/usr/man/man1/htop.1"], "htop process viewer").unwrap();
+        assert_eq!(txz, "htop-3.2.1-x86_64-1.txz");
+
+        let exploded = engine.explode_txz_archive(&txz).unwrap();
+        assert_eq!(exploded.len(), 2);
+        assert!(exploded.contains(&"/usr/bin/htop".to_string()));
+    }
+
+    #[test]
+    fn test_zypper_sat_resolver_vendor_lock() {
+        let mut resolver = ZypperSatDependencyResolver::new(false); // Vendor lock enabled
+
+        let pkg_opensuse = ZypperPackageSpec {
+            name: "libcurl".to_string(),
+            version: "8.0.0".to_string(),
+            vendor: "openSUSE".to_string(),
+            priority: 100,
+            dependencies: vec![],
+            conflicts: vec![],
+        };
+
+        let pkg_packman = ZypperPackageSpec {
+            name: "libcurl".to_string(),
+            version: "8.1.0".to_string(),
+            vendor: "Packman".to_string(),
+            priority: 200, // Higher priority but different vendor!
+            dependencies: vec![],
+            conflicts: vec![],
+        };
+
+        resolver.register_available_package(pkg_opensuse.clone());
+        resolver.register_available_package(pkg_packman.clone());
+
+        // Currently installed from openSUSE
+        resolver.install_package_record(pkg_opensuse.clone());
+
+        // Resolution should pick openSUSE candidate due to vendor lock despite Packman having higher priority
+        let selected = resolver.resolve_sat_selection("libcurl").unwrap();
+        assert_eq!(selected.vendor, "openSUSE");
+    }
+
+    #[test]
+    fn test_solus_moss_stateless_engine() {
+        let mut moss = SolusMossStatelessTransactionEngine::new();
+
+        let pkg = MossStatelessPackage {
+            name: "nano".to_string(),
+            version: "7.2".to_string(),
+            build_release: 1,
+            hash_id: "hash_nano_1".to_string(),
+            default_configs: vec![("/etc/nanorc".to_string(), "set syntaxon".to_string())],
+        };
+
+        let state_1 = moss.commit_state_transaction(vec![pkg]);
+        assert_eq!(state_1, 1);
+
         assert_eq!(
             store.fetch_cached_build(&hash).unwrap(),
             b"HERMETIC_NIX_OUTPUT"

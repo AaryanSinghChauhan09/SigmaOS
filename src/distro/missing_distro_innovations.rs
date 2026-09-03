@@ -120,12 +120,7 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!(
-                "Executed '{} {}' from stratum '{}'",
-                cmd,
-                args.join(" "),
-                stratum_name
-            ))
+            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -231,19 +226,13 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }

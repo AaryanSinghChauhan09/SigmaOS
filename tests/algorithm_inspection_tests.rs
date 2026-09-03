@@ -10,6 +10,7 @@ use sigmaos::ai::{
 };
 use sigmaos::distro::OpenBSDUnveil;
 use sigmaos::security::selinux::SelinuxEngine;
+use sigmaos::distro::OpenBSDUnveil;
 use sigmaos::virtualization::kvm_vcpu::{KvmExitCode, KvmVcpu, RAX_HLT_SIGNAL};
 
 #[test]
