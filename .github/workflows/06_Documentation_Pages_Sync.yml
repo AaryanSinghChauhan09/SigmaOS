@@ -1,0 +1,27 @@
+name: "06 📚 Documentation & Pages Sync Suite"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync-wiki-and-docs:
+    name: Sync Documentation & Wiki Repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+
+      - name: Execute Wiki Synchronization
+        run: |
+          chmod +x ./scripts/sync_wiki.sh
+          ./scripts/sync_wiki.sh
