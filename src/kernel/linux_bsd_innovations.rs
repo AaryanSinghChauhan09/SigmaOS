@@ -2,6 +2,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::collections::BTreeMap;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
@@ -340,6 +341,255 @@ impl OpenBsdPledge {
             }
         }
         false
+    }
+}
+
+// =========================================================================
+// LINUX 6.12+ SCHED_EXT & IO_URING / FREEBSD KQUEUE / OPENBSD PINSYSCALL
+// =========================================================================
+
+/// Linux 6.12+ `sched_ext` Extensible BPF Scheduling Policy
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SchedExtPolicyType {
+    Fifo,
+    FairWeighted,
+    RealtimeBore,
+    CustomBpf(String),
+}
+
+/// Linux 6.12+ `sched_ext` Extensible BPF Scheduling Policy Manager
+pub struct LinuxSchedExtPolicyManager {
+    pub active_policy: SchedExtPolicyType,
+    pub bpf_policy_loaded: bool,
+    pub task_priorities: BTreeMap<u32, u32>,
+}
+
+impl LinuxSchedExtPolicyManager {
+    pub fn new() -> Self {
+        Self {
+            active_policy: SchedExtPolicyType::FairWeighted,
+            bpf_policy_loaded: false,
+            task_priorities: BTreeMap::new(),
+        }
+    }
+
+    pub fn load_bpf_policy(&mut self, policy_name: &str) -> Result<(), &'static str> {
+        self.active_policy = SchedExtPolicyType::CustomBpf(policy_name.to_string());
+        self.bpf_policy_loaded = true;
+        Ok(())
+    }
+
+    pub fn select_next_task(&self, available_pids: &[u32]) -> Option<u32> {
+        if available_pids.is_empty() {
+            return None;
+        }
+        let mut highest_pid = available_pids[0];
+        let mut highest_prio = 0;
+
+        for &pid in available_pids {
+            let prio = self.task_priorities.get(&pid).copied().unwrap_or(10);
+            if prio > highest_prio {
+                highest_prio = prio;
+                highest_pid = pid;
+            }
+        }
+        Some(highest_pid)
+    }
+}
+
+impl Default for LinuxSchedExtPolicyManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Linux `io_uring` Submission Queue Entry (SQE)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IoUringSqe {
+    pub opcode: u8, // 0 = Read, 1 = Write, 2 = Nop, 3 = Splice
+    pub fd: i32,
+    pub addr: u64,
+    pub len: u32,
+    pub user_data: u64,
+}
+
+/// Linux `io_uring` Completion Queue Entry (CQE)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IoUringCqe {
+    pub user_data: u64,
+    pub result: i32,
+    pub flags: u32,
+}
+
+/// Linux `io_uring` Zero-Copy Ring Buffer Executor
+pub struct LinuxIoUringRingBuffer {
+    pub sqe_ring: Vec<IoUringSqe>,
+    pub cqe_ring: Vec<IoUringCqe>,
+    pub ring_capacity: usize,
+}
+
+impl LinuxIoUringRingBuffer {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            sqe_ring: Vec::new(),
+            cqe_ring: Vec::new(),
+            ring_capacity: capacity,
+        }
+    }
+
+    pub fn submit_sqe(&mut self, sqe: IoUringSqe) -> Result<(), &'static str> {
+        if self.sqe_ring.len() >= self.ring_capacity {
+            return Err("io_uring SQE ring is full");
+        }
+        self.sqe_ring.push(sqe);
+        Ok(())
+    }
+
+    pub fn process_ring(&mut self) -> usize {
+        let mut processed = 0;
+        let pending = core::mem::take(&mut self.sqe_ring);
+        for sqe in pending {
+            let cqe = IoUringCqe {
+                user_data: sqe.user_data,
+                result: sqe.len as i32,
+                flags: 0,
+            };
+            self.cqe_ring.push(cqe);
+            processed += 1;
+        }
+        processed
+    }
+}
+
+/// FreeBSD `kqueue` / `kevent` Filter Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FreeBsdKevent {
+    pub ident: u64,
+    pub filter: i16, // -1 = Read, -2 = Write, -3 = Vnode, -4 = Signal, -5 = Timer
+    pub flags: u16,  // EV_ADD, ...
+    pub fflags: u32,
+    pub data: i64,
+    pub udata: u64,
+}
+
+/// FreeBSD `kqueue` Event Multiplexing Engine
+pub struct FreeBsdKqueueEngine {
+    pub registered_events: Vec<FreeBsdKevent>,
+    pub triggered_events: Vec<FreeBsdKevent>,
+}
+
+impl FreeBsdKqueueEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_events: Vec::new(),
+            triggered_events: Vec::new(),
+        }
+    }
+
+    pub fn kevent_register(&mut self, ev: FreeBsdKevent) {
+        self.registered_events.push(ev);
+    }
+
+    pub fn kevent_trigger(&mut self, ident: u64, filter: i16, data: i64) {
+        if let Some(ev) = self.registered_events.iter().find(|e| e.ident == ident && e.filter == filter) {
+            let mut triggered = ev.clone();
+            triggered.data = data;
+            self.triggered_events.push(triggered);
+        }
+    }
+}
+
+impl Default for FreeBsdKqueueEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenBSD `pinsyscall(2)` System Call Location Security Enforcer
+pub struct OpenBsdPinSyscallEnforcer {
+    pub pinned_syscall_ranges: BTreeMap<u32, (u64, u64)>, // Syscall NR -> (Start Addr, End Addr)
+}
+
+impl OpenBsdPinSyscallEnforcer {
+    pub fn new() -> Self {
+        Self {
+            pinned_syscall_ranges: BTreeMap::new(),
+        }
+    }
+
+    pub fn pin_syscall(&mut self, syscall_nr: u32, start_addr: u64, end_addr: u64) {
+        self.pinned_syscall_ranges.insert(syscall_nr, (start_addr, end_addr));
+    }
+
+    pub fn validate_syscall_entry(&self, syscall_nr: u32, instruction_ptr: u64) -> bool {
+        if let Some(&(start, end)) = self.pinned_syscall_ranges.get(&syscall_nr) {
+            instruction_ptr >= start && instruction_ptr <= end
+        } else {
+            true // If not pinned, permit execution by default
+        }
+    }
+}
+
+impl Default for OpenBsdPinSyscallEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod kernel_innovations_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_sched_ext_policy_manager() {
+        let mut mgr = LinuxSchedExtPolicyManager::new();
+        mgr.task_priorities.insert(101, 20);
+        mgr.task_priorities.insert(102, 50);
+
+        let selected = mgr.select_next_task(&[101, 102]);
+        assert_eq!(selected, Some(102));
+
+        assert!(mgr.load_bpf_policy("sched_bore_bpf").is_ok());
+        assert!(mgr.bpf_policy_loaded);
+    }
+
+    #[test]
+    fn test_linux_io_uring_ring_buffer() {
+        let mut ring = LinuxIoUringRingBuffer::new(4);
+        let sqe = IoUringSqe {
+            opcode: 0,
+            fd: 3,
+            addr: 0x1000,
+            len: 512,
+            user_data: 0xDEADBEEF,
+        };
+        assert!(ring.submit_sqe(sqe).is_ok());
+        let count = ring.process_ring();
+        assert_eq!(count, 1);
+        assert_eq!(ring.cqe_ring[0].user_data, 0xDEADBEEF);
+        assert_eq!(ring.cqe_ring[0].result, 512);
+    }
+
+    #[test]
+    fn test_freebsd_kqueue_and_openbsd_pinsyscall() {
+        let mut kq = FreeBsdKqueueEngine::new();
+        let ev = FreeBsdKevent {
+            ident: 10,
+            filter: -1, // Read
+            flags: 0x1, // EV_ADD
+            fflags: 0,
+            data: 0,
+            udata: 0,
+        };
+        kq.kevent_register(ev);
+        kq.kevent_trigger(10, -1, 1024);
+        assert_eq!(kq.triggered_events.len(), 1);
+        assert_eq!(kq.triggered_events[0].data, 1024);
+
+        let mut pin = OpenBsdPinSyscallEnforcer::new();
+        pin.pin_syscall(1, 0x4000, 0x4050); // read syscall pinned to 0x4000..0x4050
+        assert!(pin.validate_syscall_entry(1, 0x4020));
+        assert!(!pin.validate_syscall_entry(1, 0x8000));
     }
 }
 

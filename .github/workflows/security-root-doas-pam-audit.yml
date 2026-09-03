@@ -1,0 +1,25 @@
+name: Security - BSD Securelevel, Doas & PAM Stack Audit
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  doas-pam-security-audit:
+    name: Root Improvement, Doas & PAM Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Doas & PAM Root Improvement Unit Tests
+        run: |
+          mkdir -p build
+          rustc --edition=2021 --test src/security/root_improvement.rs -o build/root_test
+          ./build/root_test
+          rm -f build/root_test

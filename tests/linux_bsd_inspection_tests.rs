@@ -67,8 +67,6 @@ mod package_repository;
 mod module_loader;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
-#[path = "../src/klib/mod.rs"]
-mod klib;
 
 use bsd_compat::*;
 
@@ -232,9 +230,6 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(systemd.start_unit("test.service"), Ok(SystemdUnitActiveState::Active));
 
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{
-        RealtimeTask, SchedulerClass,
-    };
     let mut sched = SovereignHybridSchedulerInnovations::new();
     sched.add_task(RealtimeTask { pid: 1, class: SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
