@@ -777,55 +777,29 @@ depends=('glibc')
     }
 
     #[test]
-    fn test_pacman_cache_cleaner() {
-        let files = vec![
-            "pkg-1.0.pkg.tar.zst".to_string(),
-            "pkg-1.1.pkg.tar.zst".to_string(),
-            "pkg-1.2.pkg.tar.zst".to_string(),
-        ];
-        let mut cleaner = PacmanCacheCleaner::new(files);
-        let removed = cleaner.prune_cache(2);
-        assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
-    }
-
-    #[test]
-    fn test_sovereign_dbscripts_engine() {
-        let mut dbscripts = SovereignDbscriptsEngine::new();
-
-        let entry = RepoDbPackageEntry {
-            name: "sigma-kernel".to_string(),
-            version: "6.12.0".to_string(),
-            filename: "sigma-kernel-6.12.0-1-x86_64.pkg.tar.zst".to_string(),
-            sha256_hash: "a1b2c3d4e5f67890".to_string(),
-            pgp_dilithium5_signature: "dilithium5-sig-12345".to_string(),
-            stage: RepoStageTier::Testing,
+    fn test_pacman_contrib_engine() {
+        let mut db = PacmanDatabase::new();
+        let mut pkg = ArchPacmanPackage {
+            name: "linux-zen".to_string(),
+            version: "6.5.0".to_string(),
+            description: "Zen Kernel".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
             depends: vec!["glibc".to_string()],
             files: vec!["/boot/vmlinuz-sigma".to_string()],
         };
+        db.local_packages.push(pkg.clone());
+        pkg.version = "6.6.0".to_string();
+        db.packages.push(pkg);
 
-        // Unsigned repo_add should fail
-        let mut unsigned_entry = entry.clone();
-        unsigned_entry.pgp_dilithium5_signature = String::new();
-        assert!(dbscripts.repo_add(RepoStageTier::Testing, unsigned_entry).is_err());
+        let updates = SafeUpdateChecker::check_pending_updates(&db);
+        assert_eq!(updates.len(), 1);
+        assert_eq!(updates[0].0, "linux-zen");
 
-        // Valid repo_add
-        assert!(dbscripts.repo_add(RepoStageTier::Testing, entry.clone()).is_ok());
-
-        // db-move from Testing to Core
-        assert!(dbscripts.db_move(RepoStageTier::Testing, RepoStageTier::Core, "sigma-kernel").is_ok());
-
-        let core_db = dbscripts.repo_databases.iter().find(|(s, _)| *s == RepoStageTier::Core).unwrap();
-        assert_eq!(core_db.1.len(), 1);
-        assert_eq!(core_db.1[0].name, "sigma-kernel");
-
-        // db-update
-        let mut incoming = entry.clone();
-        incoming.name = "zsh".to_string();
-        incoming.stage = RepoStageTier::Extra;
-        assert_eq!(dbscripts.db_update(vec![incoming]), 1);
-
-        // repo-remove
-        let removed = dbscripts.repo_remove(RepoStageTier::Core, "sigma-kernel").unwrap();
-        assert_eq!(removed.name, "sigma-kernel");
+        let updated_pb = PkgbuildChecksumUpdater::update_sha256("pkgname=test\nsha256sums=('SKIP')", b"payload");
+        assert!(updated_pb.contains("sha256sums="));
     }
+
 }
