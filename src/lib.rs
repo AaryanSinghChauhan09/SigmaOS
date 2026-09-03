@@ -1,4 +1,6 @@
-// SigmaOS Library — Core library for SigmaOS operating system
+// SigmaOS Library
+// Core library for SigmaOS operating system
+
 extern crate alloc;
 
 // Core working modules

@@ -335,36 +335,6 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
-    pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        let supervisor = self.get_supervisor_type();
-        let pkg_spec = self.translate_package_specifier("coreutils");
-        let vfs_etc = self.translate_vfs_path("/etc");
-
-        let supervisor_valid = match self.mode {
-            DistroSubsystemMode::LinuxArch
-            | DistroSubsystemMode::LinuxDebian
-            | DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::FreeBsd
-            | DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
-
-            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
-            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
-        };
-
-        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
-    }
 }
 
 // ==========================================

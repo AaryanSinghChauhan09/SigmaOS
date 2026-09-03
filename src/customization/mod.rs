@@ -17,5 +17,5 @@ pub use profile::{
 pub use cursor::{CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine};
 pub use theme::{
     IconThemeEngine, SigmaSoundscape, SovereignCssColorEngine,
-    ThemeEngine, ThemeProvider, ZenithBackdropFilter,
+    ThemeEngine, ZenithBackdropFilter,
 };

@@ -275,11 +275,13 @@ impl SigmaPortage {
 
         let ebuild_clone = ebuild.clone();
 
+        let ebuild_clone = ebuild.clone();
+
         // Resolve USE flags
-        let use_flags = self.use_flags.resolve_for_package(&ebuild)?;
+        let use_flags = self.use_flags.resolve_for_package(&ebuild_clone)?;
 
         // Calculate dependencies
-        let dependencies = self.calculate_dependencies(&ebuild)?;
+        let dependencies = self.calculate_dependencies(&ebuild_clone)?;
 
         // Emerge dependencies first
         for dep in &dependencies {
@@ -294,7 +296,7 @@ impl SigmaPortage {
         println!("Dependencies: {:?}", dependencies);
 
         // Update database
-        self.database.add_installed(&ebuild)?;
+        self.database.add_installed(&ebuild_clone)?;
 
         Ok(())
     }

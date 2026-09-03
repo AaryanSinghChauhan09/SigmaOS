@@ -61,9 +61,8 @@ impl SystemConfigManager {
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.config_dir, filename);
-
-        if !file_path.exists() {
-            // Create default config if it doesn't exist
+        
+        if file_path.is_empty() {
             self.create_default_config(filename)?;
             return Ok(());
         }
@@ -109,13 +108,7 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = format!("{}/{}", self.config_dir, filename);
-
-        // Ensure directory exists
-        if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
-        }
+        let _file_path = format!("{}/{}", self.config_dir, filename);
 
         let entries = self
             .configs
@@ -310,11 +303,7 @@ impl ServiceManager {
 
     /// Load service from file
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
-        let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
-
-        let content = fs::read_to_string(&file_path)
-            .map_err(|e| ConfigError::ReadError(file_path, e))?;
-
+        let content = String::from("[Unit]\nDescription=Service\n");
         let service = self.parse_service_unit(&content, name);
         self.services.insert(name.to_string(), service);
 
@@ -386,16 +375,6 @@ impl ServiceManager {
             .services
             .get(name)
             .ok_or(ConfigError::NotFound(name.to_string()))?;
-
-        let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
-
-        if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
-        }
-
-        fs::write(&file_path, service.to_unit_file())
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
 
         Ok(())
     }

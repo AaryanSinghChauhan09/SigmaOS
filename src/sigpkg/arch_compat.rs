@@ -1003,6 +1003,7 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
+
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
         let mut verifier = SAurP2pVerifier::new(
