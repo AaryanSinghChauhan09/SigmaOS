@@ -6,7 +6,6 @@ extern crate alloc;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
 
 // ============================================================================
@@ -31,6 +30,23 @@ pub struct SvnRevisionLog {
     pub branch_type: SvnBranchType,
 }
 
+/// SVN action type for granular revision history tracking
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SvnActionType {
+    Add,
+    Modify,
+    Delete,
+    Replace,
+}
+
+/// SVN xattr / property key-value attributes (svn:executable, svn:ignore)
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SvnXattrProperties {
+    pub is_executable: bool,
+    pub ignore_patterns: Vec<String>,
+    pub mime_type: Option<String>,
+}
+
 /// Git commit result converted from an SVN revision
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConvertedGitCommit {
@@ -40,6 +56,9 @@ pub struct ConvertedGitCommit {
     pub author_email: String,
     pub commit_message: String,
     pub git_branch: String,
+    pub git_notes: String,
+    pub file_mode_octal: u32,
+    pub generated_gitignore: Vec<String>,
 }
 
 /// SVN-to-Git migration engine (`svntogit` parity)
@@ -82,6 +101,8 @@ impl SovereignSvnToGitMigrator {
                 SvnBranchType::Tag => format!("tags/{}", log.path.split('/').last().unwrap_or("v1.0")),
             };
 
+            let git_notes = format!("Svn-Revision: {}\nSvn-Path: {}\nConverted-By: SigmaOS-svntogit", log.revision, log.path);
+
             let commit = ConvertedGitCommit {
                 commit_hash,
                 svn_revision: log.revision,
@@ -89,6 +110,9 @@ impl SovereignSvnToGitMigrator {
                 author_email: email,
                 commit_message: format!("{} (svn r{})", log.message, log.revision),
                 git_branch,
+                git_notes,
+                file_mode_octal: 0o644,
+                generated_gitignore: Vec::new(),
             };
 
             results.push(commit.clone());
@@ -100,7 +124,101 @@ impl SovereignSvnToGitMigrator {
 }
 
 // ============================================================================
-// 2. ReproduciblePackageBuilder (Reproducible Builds parity)
+// 2. PkgctlSplitMigrationEngine (Arch Linux pkgctl repo split parity)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SplitPackageRepoConfig {
+    pub pkgbase: String,
+    pub target_git_url: String,
+    pub sign_tags_gpg: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct PkgctlSplitMigrationEngine {
+    pub split_configs: Vec<SplitPackageRepoConfig>,
+}
+
+impl PkgctlSplitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            split_configs: Vec::new(),
+        }
+    }
+
+    pub fn register_pkgbase(&mut self, pkgbase: &str, target_git_url: &str, sign_tags: bool) {
+        self.split_configs.push(SplitPackageRepoConfig {
+            pkgbase: pkgbase.to_string(),
+            target_git_url: target_git_url.to_string(),
+            sign_tags_gpg: sign_tags,
+        });
+    }
+
+    pub fn execute_split(&self, pkgbase: &str, commits: &[ConvertedGitCommit]) -> Option<Vec<ConvertedGitCommit>> {
+        let _config = self.split_configs.iter().find(|c| c.pkgbase == pkgbase)?;
+        let mut pkg_commits = Vec::new();
+
+        for commit in commits {
+            if commit.git_notes.contains(pkgbase) || commit.commit_message.contains(pkgbase) {
+                let mut isolated = commit.clone();
+                isolated.git_branch = format!("pkgbases/{}", pkgbase);
+                pkg_commits.push(isolated);
+            }
+        }
+
+        Some(pkg_commits)
+    }
+}
+
+// ============================================================================
+// 3. BsdPortsCvsSvnToGitMapper (FreeBSD / NetBSD Ports CVS/SVN-to-Git Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BsdPortsRcsTag {
+    pub rcs_keyword: String, // e.g. "$FreeBSD$" or "$NetBSD$"
+    pub rcs_revision: String,
+    pub author: String,
+    pub date_iso: String,
+}
+
+#[derive(Debug, Default)]
+pub struct BsdPortsCvsSvnToGitMapper {
+    pub rcs_tags: Vec<BsdPortsRcsTag>,
+}
+
+impl BsdPortsCvsSvnToGitMapper {
+    pub fn new() -> Self {
+        Self { rcs_tags: Vec::new() }
+    }
+
+    pub fn parse_rcs_header(&mut self, content: &str) -> Option<BsdPortsRcsTag> {
+        if let Some(start) = content.find("$FreeBSD: ") {
+            let rest = &content[start + 10..];
+            if let Some(end) = rest.find(" $") {
+                let parts: Vec<&str> = rest[..end].split_whitespace().collect();
+                if parts.len() >= 5 {
+                    let tag = BsdPortsRcsTag {
+                        rcs_keyword: "$FreeBSD$".to_string(),
+                        rcs_revision: parts[1].to_string(),
+                        author: parts[4].to_string(),
+                        date_iso: format!("{} {}", parts[2], parts[3]),
+                    };
+                    self.rcs_tags.push(tag.clone());
+                    return Some(tag);
+                }
+            }
+        }
+        None
+    }
+
+    pub fn convert_rcs_to_git_tag(&self, rcs_tag: &BsdPortsRcsTag) -> String {
+        format!("ports/{}/v{}", rcs_tag.author, rcs_tag.rcs_revision.replace('.', "_"))
+    }
+}
+
+// ============================================================================
+// 4. ReproduciblePackageBuilder (Reproducible Builds parity)
 // ============================================================================
 
 /// Environment and build metadata for bit-for-bit reproducibility
@@ -239,5 +357,40 @@ mod tests {
         assert!(report.is_reproducible);
         assert_eq!(report.artifact_count, 2);
         assert_ne!(report.sha256_checksum, "");
+    }
+
+    #[test]
+    fn test_pkgctl_split_migration_engine() {
+        let mut migrator = SovereignSvnToGitMigrator::new();
+        migrator.add_svn_log(SvnRevisionLog {
+            revision: 500,
+            author: "maintainer".to_string(),
+            message: "upgpkg: ripgrep 14.0.0-1".to_string(),
+            path: "trunk/ripgrep".to_string(),
+            branch_type: SvnBranchType::Trunk,
+        });
+
+        let commits = migrator.migrate_svn_to_git("archlinux.org");
+
+        let mut splitter = PkgctlSplitMigrationEngine::new();
+        splitter.register_pkgbase("ripgrep", "https://gitlab.archlinux.org/archlinux/packaging/packages/ripgrep.git", true);
+
+        let split_commits = splitter.execute_split("ripgrep", &commits).unwrap();
+        assert_eq!(split_commits.len(), 1);
+        assert_eq!(split_commits[0].git_branch, "pkgbases/ripgrep");
+    }
+
+    #[test]
+    fn test_bsd_ports_cvs_svn_to_git_mapper() {
+        let mut mapper = BsdPortsCvsSvnToGitMapper::new();
+        let header = "# $FreeBSD: head/ports/sysutils/ripgrep/Makefile 550000 2020-10-01 12:00:00Z bsddev $";
+        let tag = mapper.parse_rcs_header(header).unwrap();
+
+        assert_eq!(tag.rcs_keyword, "$FreeBSD$");
+        assert_eq!(tag.rcs_revision, "550000");
+        assert_eq!(tag.author, "bsddev");
+
+        let git_tag = mapper.convert_rcs_to_git_tag(&tag);
+        assert_eq!(git_tag, "ports/bsddev/v550000");
     }
 }
