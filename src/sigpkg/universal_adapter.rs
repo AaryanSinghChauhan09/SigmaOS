@@ -802,6 +802,15 @@ impl UniversalPackageAdapter {
                 } else if raw_text.contains("\"app-id\"") {
                     let flatpak = self.parse_flatpak_json(raw_text)?;
                     self.translate_to_native_package(&flatpak.app_id, "1.0.0", "Flatpak Sandboxed App", &flatpak.finish_args)
+                } else if raw_text.contains("@name ") || raw_text.contains("@depend ") {
+                    let obs = self.parse_openbsd_contents(raw_text)?;
+                    self.translate_to_native_package(&obs.pkgname, &obs.version, &obs.comment, &obs.depends)
+                } else if raw_text.contains("deps:") || raw_text.contains("origin:") {
+                    let bsd = self.parse_freebsd_ucl_manifest(raw_text)?;
+                    self.translate_to_native_package(&bsd.name, &bsd.version, &bsd.comment, &bsd.deps)
+                } else if raw_text.contains("PRGNAM=") || raw_text.contains("slack-desc") {
+                    let slack = self.parse_slackware_pkg(raw_text)?;
+                    self.translate_to_native_package(&slack.name, &slack.version, &slack.description, &slack.slack_required)
                 } else {
                     Err("Unrecognized package manifest format")
                 }
@@ -1015,6 +1024,23 @@ impl SigPkgUniversalBridgeEngine {
                 deps.extend(ebuild.depend.clone());
                 self.adapter.translate_to_native_package(&ebuild.package_name, &ebuild.version, &ebuild.description, &deps)
             }
+            PackageFormat::Pkg | PackageFormat::Ports => {
+                if manifest_text.contains("@name") {
+                    let obs = self.adapter.parse_openbsd_contents(&manifest_text)?;
+                    self.adapter.translate_to_native_package(&obs.pkgname, &obs.version, &obs.comment, &obs.depends)
+                } else {
+                    let bsd = self.adapter.parse_freebsd_ucl_manifest(&manifest_text)?;
+                    self.adapter.translate_to_native_package(&bsd.name, &bsd.version, &bsd.comment, &bsd.deps)
+                }
+            }
+            PackageFormat::Zypper => {
+                let zyp = self.adapter.parse_zypper_spec(&manifest_text)?;
+                self.adapter.translate_to_native_package(&zyp.name, &zyp.version, &zyp.summary, &zyp.requires)
+            }
+            PackageFormat::Pkgsrc => {
+                let net = self.adapter.parse_netbsd_pkgsrc(&manifest_text)?;
+                self.adapter.translate_to_native_package(&net.pkgname, &net.version, &net.comment, &net.depends)
+            }
             _ => {
                 self.adapter.parse_and_translate_manifest(filename, &manifest_text)
             }
@@ -1224,6 +1250,215 @@ impl UniversalScriptletConverter {
 }
 
 impl Default for UniversalScriptletConverter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal Sandbox Capability Matrix for mapping foreign security permissions into SigmaOS Capabilities
+pub struct UniversalSandboxCapabilityMatrix;
+
+impl UniversalSandboxCapabilityMatrix {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Maps Snap plugs, Flatpak finish-args, OpenBSD pledge/unveil, and FreeBSD RACCT rules into SigmaOS permissions
+    pub fn map_foreign_capabilities(&self, raw_caps: &[String]) -> Vec<Permission> {
+        let mut perms = Vec::new();
+
+        for cap in raw_caps {
+            let c = cap.trim().to_lowercase();
+            if c == "network" || c == "network-bind" || c == "--share=network" || c == "inet" || c == "inet6" {
+                perms.push(Permission::NetworkTcp);
+                perms.push(Permission::NetworkUdp);
+            } else if c == "home" || c == "--filesystem=home" || c == "--filesystem=host" || c == "rpath" || c == "wpath" || c == "cpath" {
+                perms.push(Permission::FileRead);
+                perms.push(Permission::FileWrite);
+            } else if c == "--share=ipc" || c == "ipc" || c == "ps" {
+                perms.push(Permission::Ipc);
+            } else if c == "audio-playback" || c == "pulseaudio" || c == "--socket=pulseaudio" || c == "audio" {
+                perms.push(Permission::AudioPlayback);
+            } else if c == "x11" || c == "wayland" || c == "--socket=x11" || c == "--socket=wayland" {
+                perms.push(Permission::DisplayAccess);
+            } else if c == "system-observe" || c == "proc" || c == "sysctl" {
+                perms.push(Permission::ProcessControl);
+            } else if c == "exec" || c == "execpromises" {
+                perms.push(Permission::Execute);
+            }
+        }
+        if perms.is_empty() {
+            perms.push(Permission::FileRead);
+        }
+        perms
+    }
+}
+
+impl Default for UniversalSandboxCapabilityMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UniversalPmOperation {
+    Install,
+    Remove,
+    Upgrade,
+    Search,
+    QueryInfo,
+    CleanCache,
+}
+
+#[derive(Debug, Clone)]
+pub struct DispatchedPmAction {
+    pub source_pm: String,
+    pub operation: UniversalPmOperation,
+    pub target_packages: Vec<String>,
+    pub dry_run: bool,
+}
+
+/// Universal Foreign Package Manager Command Dispatcher Bridge
+pub struct UniversalPmCommandDispatcher;
+
+impl UniversalPmCommandDispatcher {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Parses foreign PM command invocation (apt, pacman, dnf, apk, pkg, zypper, xbps) and translates into canonical sigpkg action
+    pub fn dispatch_command(&self, full_cmd: &str) -> Result<DispatchedPmAction, &'static str> {
+        let tokens: Vec<&str> = full_cmd.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Err("Empty package manager command");
+        }
+
+        let pm = tokens[0].to_lowercase();
+        let args = &tokens[1..];
+
+        let mut operation = UniversalPmOperation::Install;
+        let mut target_packages = Vec::new();
+        let mut dry_run = false;
+
+        match pm.as_str() {
+            "apt" | "apt-get" | "dpkg" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "-i" => operation = UniversalPmOperation::Install,
+                        "remove" | "purge" | "-r" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "dist-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "show" | "status" => operation = UniversalPmOperation::QueryInfo,
+                        "clean" | "autoclean" => operation = UniversalPmOperation::CleanCache,
+                        "-s" | "--dry-run" | "--simulate" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pacman" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
+                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
+                        "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
+                        "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
+                        "--print" | "--dryrun" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "dnf" | "yum" | "zypper" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" => operation = UniversalPmOperation::Install,
+                        "remove" | "erase" | "rm" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "up" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "se" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "clean" => operation = UniversalPmOperation::CleanCache,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "apk" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "add" => operation = UniversalPmOperation::Install,
+                        "del" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-s" | "--simulate" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg" | "pkg_add" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "xbps-install" | "xbps-remove" | "xbps-query" => {
+                if pm == "xbps-install" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "xbps-remove" {
+                    operation = UniversalPmOperation::Remove;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" || *arg == "--dry-run" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            _ => {
+                for arg in args {
+                    if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+        }
+
+        Ok(DispatchedPmAction {
+            source_pm: pm,
+            operation,
+            target_packages,
+            dry_run,
+        })
+    }
+}
+
+impl Default for UniversalPmCommandDispatcher {
     fn default() -> Self {
         Self::new()
     }
@@ -1846,5 +2081,137 @@ mod tests {
         assert!(sim_result.is_valid);
         assert_eq!(sim_result.package_name, "bash");
         assert_eq!(sim_result.resolved_dependencies[0], "libc");
+    }
+
+    #[test]
+    fn test_freebsd_ucl_manifest_parsing() {
+        let adapter = UniversalPackageAdapter::new();
+        let ucl_text = r#"
+            name: "nginx"
+            origin: "www/nginx"
+            version: "1.24.0"
+            comment: "Robust HTTP server and reverse proxy"
+            maintainer: "osa@FreeBSD.org"
+            deps {
+                "openssl": { origin: "security/openssl", version: "3.0.8" }
+                "pcre2": { origin: "devel/pcre2", version: "10.42" }
+            }
+        "#;
+
+        let parsed = adapter.parse_freebsd_ucl_manifest(ucl_text).unwrap();
+        assert_eq!(parsed.name, "nginx");
+        assert_eq!(parsed.version, "1.24.0");
+        assert_eq!(parsed.deps.len(), 2);
+
+        let native = adapter.translate_to_native_package(&parsed.name, &parsed.version, &parsed.comment, &parsed.deps).unwrap();
+        assert_eq!(native.name, "nginx");
+        assert_eq!(native.version, Version::new(1, 24, 0));
+    }
+
+    #[test]
+    fn test_openbsd_contents_parsing() {
+        let adapter = UniversalPackageAdapter::new();
+        let contents_text = r#"
+            @name rsync-3.2.7p0
+            @comment Remote file copy tool
+            @depend net/rsync:rsync-3.2.7
+            @pkgdep security/openssl:openssl-3.0.8
+            @exec echo "Installing rsync..."
+            @unexec echo "Removing rsync..."
+        "#;
+
+        let parsed = adapter.parse_openbsd_contents(contents_text).unwrap();
+        assert_eq!(parsed.pkgname, "rsync");
+        assert_eq!(parsed.version, "3.2.7p0");
+        assert_eq!(parsed.depends.len(), 2);
+        assert_eq!(parsed.exec_commands.len(), 1);
+        assert_eq!(parsed.unexec_commands.len(), 1);
+    }
+
+    #[test]
+    fn test_netbsd_pkgsrc_parsing() {
+        let adapter = UniversalPackageAdapter::new();
+        let pkgsrc_text = r#"
+            PKGNAME=git-base-2.41.0
+            COMMENT=Fast, scalable, distributed revision control system
+            REQUIRES=security/openssl
+            REQUIRES=devel/zlib
+        "#;
+
+        let parsed = adapter.parse_netbsd_pkgsrc(pkgsrc_text).unwrap();
+        assert_eq!(parsed.pkgname, "git-base");
+        assert_eq!(parsed.version, "2.41.0");
+        assert_eq!(parsed.depends.len(), 2);
+    }
+
+    #[test]
+    fn test_universal_dependency_canonicalizer() {
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
+        assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
+        assert_eq!(mapper.to_canonical_name("security/openssl"), "openssl");
+        assert_eq!(mapper.to_canonical_name("libc6"), "libc");
+        assert_eq!(mapper.to_canonical_name("musl-dev"), "libc");
+        assert_eq!(mapper.to_canonical_name("python3-dev"), "python");
+        assert_eq!(mapper.to_canonical_name("zlib1g-dev"), "zlib");
+    }
+
+    #[test]
+    fn test_universal_scriptlet_hook_transpiler() {
+        let converter = UniversalScriptletConverter::new();
+
+        let deb_hook = converter.convert_scriptlet(PackageFormat::Apt, "postinst", "echo post").unwrap();
+        assert_eq!(deb_hook.hook_type, SigmaPkgHookType::PostInstall);
+
+        let rpm_hook = converter.convert_scriptlet(PackageFormat::Yum, "%posttrans", "echo post").unwrap();
+        assert_eq!(rpm_hook.hook_type, SigmaPkgHookType::PostInstall);
+
+        let bsd_hook = converter.convert_scriptlet(PackageFormat::Pkg, "+POST_INSTALL", "echo bsd").unwrap();
+        assert_eq!(bsd_hook.hook_type, SigmaPkgHookType::PostInstall);
+    }
+
+    #[test]
+    fn test_universal_sandbox_capability_matrix() {
+        let matrix = UniversalSandboxCapabilityMatrix::new();
+        let caps = vec![
+            "network".to_string(),
+            "--filesystem=home".to_string(),
+            "audio-playback".to_string(),
+            "wayland".to_string(),
+        ];
+
+        let perms = matrix.map_foreign_capabilities(&caps);
+        assert!(perms.contains(&crate::security::Permission::NetworkTcp));
+        assert!(perms.contains(&crate::security::Permission::FileRead));
+        assert!(perms.contains(&crate::security::Permission::AudioPlayback));
+        assert!(perms.contains(&crate::security::Permission::DisplayAccess));
+    }
+
+    #[test]
+    fn test_universal_pm_command_dispatcher() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        let apt_action = dispatcher.dispatch_command("apt install nginx curl -y").unwrap();
+        assert_eq!(apt_action.source_pm, "apt");
+        assert_eq!(apt_action.operation, UniversalPmOperation::Install);
+        assert_eq!(apt_action.target_packages, vec!["nginx", "curl"]);
+
+        let pacman_action = dispatcher.dispatch_command("pacman -Syu --dryrun").unwrap();
+        assert_eq!(pacman_action.source_pm, "pacman");
+        assert_eq!(pacman_action.operation, UniversalPmOperation::Upgrade);
+        assert!(pacman_action.dry_run);
+
+        let dnf_action = dispatcher.dispatch_command("dnf remove httpd").unwrap();
+        assert_eq!(dnf_action.source_pm, "dnf");
+        assert_eq!(dnf_action.operation, UniversalPmOperation::Remove);
+
+        let apk_action = dispatcher.dispatch_command("apk add alpine-baselayout").unwrap();
+        assert_eq!(apk_action.source_pm, "apk");
+        assert_eq!(apk_action.operation, UniversalPmOperation::Install);
+
+        let bsd_action = dispatcher.dispatch_command("pkg install -n postgresql15-server").unwrap();
+        assert_eq!(bsd_action.source_pm, "pkg");
+        assert_eq!(bsd_action.operation, UniversalPmOperation::Install);
+        assert!(bsd_action.dry_run);
     }
 }
