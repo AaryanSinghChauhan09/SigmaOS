@@ -489,6 +489,120 @@ pub enum NvidiaPrimeProfile {
     OffloadCompute,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuPowerState {
+    D0Active,
+    D3Hot,
+    D3ColdPowerOff,
+}
+
+#[derive(Debug, Clone)]
+pub struct NvidiaPrimeTelemetry {
+    pub active_profile: NvidiaPrimeProfile,
+    pub power_state: GpuPowerState,
+    pub active_offloaded_processes_count: usize,
+    pub gpu_temp_celsius: u32,
+    pub power_draw_watts: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct OffloadCommand {
+    pub binary_path: String,
+    pub env_vars: BTreeMap<String, String>,
+}
+
+pub struct SovereignNvidiaPrimeEngine {
+    pub applet: NvidiaPrimeApplet,
+    pub power_state: GpuPowerState,
+    pub offloaded_pids: Vec<usize>,
+}
+
+impl SovereignNvidiaPrimeEngine {
+    pub fn new() -> Self {
+        Self {
+            applet: NvidiaPrimeApplet::new(),
+            power_state: GpuPowerState::D3Hot,
+            offloaded_pids: Vec::new(),
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: NvidiaPrimeProfile) {
+        self.applet.switch_profile(profile);
+        match profile {
+            NvidiaPrimeProfile::IntegratedIntelRadeon => {
+                self.power_state = GpuPowerState::D3ColdPowerOff;
+            }
+            NvidiaPrimeProfile::NvidiaOnDemand => {
+                self.power_state = if self.offloaded_pids.is_empty() {
+                    GpuPowerState::D3Hot
+                } else {
+                    GpuPowerState::D0Active
+                };
+            }
+            NvidiaPrimeProfile::NvidiaPerformance | NvidiaPrimeProfile::OffloadCompute => {
+                self.power_state = GpuPowerState::D0Active;
+            }
+        }
+    }
+
+    pub fn register_offloaded_process(&mut self, pid: usize) {
+        if !self.offloaded_pids.contains(&pid) {
+            self.offloaded_pids.push(pid);
+        }
+        if self.applet.active_profile == NvidiaPrimeProfile::NvidiaOnDemand {
+            self.power_state = GpuPowerState::D0Active;
+        }
+    }
+
+    pub fn unregister_offloaded_process(&mut self, pid: usize) {
+        self.offloaded_pids.retain(|p| *p != pid);
+        if self.offloaded_pids.is_empty() && self.applet.active_profile == NvidiaPrimeProfile::NvidiaOnDemand {
+            self.power_state = GpuPowerState::D3Hot;
+        }
+    }
+
+    pub fn generate_offload_command(&self, binary_path: &str) -> OffloadCommand {
+        let envs = match self.applet.active_profile {
+            NvidiaPrimeProfile::IntegratedIntelRadeon => BTreeMap::new(),
+            NvidiaPrimeProfile::NvidiaOnDemand | NvidiaPrimeProfile::NvidiaPerformance => {
+                let mut map = BTreeMap::new();
+                map.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+                map.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+                if self.applet.active_profile == NvidiaPrimeProfile::NvidiaPerformance {
+                    map.insert("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string());
+                }
+                map
+            }
+            NvidiaPrimeProfile::OffloadCompute => {
+                let mut map = BTreeMap::new();
+                map.insert("CUDA_VISIBLE_DEVICES".to_string(), "0".to_string());
+                map
+            }
+        };
+
+        OffloadCommand {
+            binary_path: binary_path.to_string(),
+            env_vars: envs,
+        }
+    }
+
+    pub fn get_telemetry(&self) -> NvidiaPrimeTelemetry {
+        NvidiaPrimeTelemetry {
+            active_profile: self.applet.active_profile,
+            power_state: self.power_state,
+            active_offloaded_processes_count: self.offloaded_pids.len(),
+            gpu_temp_celsius: self.applet.gpu_temp_celsius,
+            power_draw_watts: self.applet.gpu_power_draw_watts,
+        }
+    }
+}
+
+impl Default for SovereignNvidiaPrimeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct NvidiaPrimeApplet {
     pub active_profile: NvidiaPrimeProfile,
     pub is_relogin_required: bool,

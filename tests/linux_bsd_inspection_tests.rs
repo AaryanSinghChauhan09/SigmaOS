@@ -1076,7 +1076,7 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
     ];
 
     for mode in modes {
-        let bridge = SovereignUniversalDistroBridge::new(mode);
+        let mut bridge = SovereignUniversalDistroBridge::new(mode);
         assert!(bridge.verify_all_subsystems_compatibility());
         assert!(!bridge.translate_vfs_path("/etc").is_empty());
         assert!(!bridge.translate_vfs_path("/var/log").is_empty());

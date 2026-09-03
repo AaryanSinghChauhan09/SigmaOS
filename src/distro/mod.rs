@@ -47,7 +47,8 @@ pub use sovereign_system_innovations::{
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
-    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
+    SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -85,9 +86,10 @@ pub use linux_bsd_parity_extended::{
     SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
+    AdminAction, AiSysAdmin, AtomicTrampolineGenerator, IntegrityState,
+    KernelPatchVerificationEngine, LivepatchArchitecture, LivepatchManager, LivepatchPatch,
+    NetplanConfig, NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    ThreadStackConsistencyChecker, TimeTravelCheckpoint, TimeTravelEngine,
 };
 pub use parity::{
     AppBundleRuntime, BundleError, ChannelManager, CpuArchitecture, HalError,

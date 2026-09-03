@@ -225,4 +225,219 @@ mod tests {
         let ta_welcome = MultilingualSupport::translate(b"ta", b"welcome").unwrap();
         assert!(ta_welcome.len() > 0);
     }
+
+    #[test]
+    fn test_banking_cheque_types_and_clearing() {
+        let valid_cheque = ChequeValidationRecord {
+            cheque_number: 100201,
+            micr_code: *b"400240012",
+            ifsc_code: *b"SBIN0001234",
+            issue_timestamp_secs: 1000000,
+            presentation_timestamp_secs: 2000000,
+            amount_in_paisa: 500000, // 5000 INR
+            cheque_type: ChequeType::AccountPayeeCheque,
+            is_mutilated: false,
+            is_signature_valid: true,
+            is_account_payee_only: true,
+        };
+
+        // Valid cheque clearing
+        let status = SovereignChequeProcessingEngine::validate_cheque(&valid_cheque);
+        assert_eq!(status, ChequeStatus::ValidForClearing);
+
+        // Stale cheque (> 90 days)
+        let stale_cheque = ChequeValidationRecord {
+            presentation_timestamp_secs: 1000000 + SovereignChequeProcessingEngine::STALE_PERIOD_SECS + 1,
+            ..valid_cheque.clone()
+        };
+        assert_eq!(
+            SovereignChequeProcessingEngine::validate_cheque(&stale_cheque),
+            ChequeStatus::StaleExpired
+        );
+
+        // Post-dated cheque (future issue date)
+        let post_dated_cheque = ChequeValidationRecord {
+            issue_timestamp_secs: 3000000,
+            presentation_timestamp_secs: 2000000,
+            ..valid_cheque.clone()
+        };
+        assert_eq!(
+            SovereignChequeProcessingEngine::validate_cheque(&post_dated_cheque),
+            ChequeStatus::PostDatedFuture
+        );
+
+        // Mutilated cheque
+        let mutilated_cheque = ChequeValidationRecord {
+            is_mutilated: true,
+            ..valid_cheque.clone()
+        };
+        assert_eq!(
+            SovereignChequeProcessingEngine::validate_cheque(&mutilated_cheque),
+            ChequeStatus::MutilatedDamaged
+        );
+
+        // Test classification of all 9 cheque types
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, true, false, false, false, 100, 100),
+            ChequeType::BearerCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 100, 100),
+            ChequeType::OrderCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(true, false, false, false, false, false, 100, 100),
+            ChequeType::CrossedCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(true, true, false, false, false, false, 100, 100),
+            ChequeType::AccountPayeeCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 100, 100 + SovereignChequeProcessingEngine::STALE_PERIOD_SECS + 10),
+            ChequeType::StaleCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, false, 200, 100),
+            ChequeType::PostDatedCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, true, false, false, 100, 100),
+            ChequeType::BankersCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, true, false, 100, 100),
+            ChequeType::SelfCheque
+        );
+        assert_eq!(
+            SovereignChequeProcessingEngine::classify_cheque(false, false, false, false, false, true, 100, 100),
+            ChequeType::MutilatedCheque
+        );
+    }
+}
+
+/// Types of Banking Cheques supported by Sovereign Banking Clearing Engine
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChequeType {
+    BearerCheque = 1,
+    OrderCheque = 2,
+    CrossedCheque = 3,
+    AccountPayeeCheque = 4,
+    StaleCheque = 5,
+    PostDatedCheque = 6,
+    BankersCheque = 7,
+    SelfCheque = 8,
+    MutilatedCheque = 9,
+}
+
+/// Cheque clearing and validation status
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChequeStatus {
+    ValidForClearing = 0,
+    StaleExpired = 1,
+    PostDatedFuture = 2,
+    MutilatedDamaged = 3,
+    DrawerSignatureMismatch = 4,
+    AccountPayeeRestricted = 5,
+    InvalidMicrCode = 6,
+}
+
+/// Record representing a Banking Cheque presented for clearing
+#[derive(Debug, Clone)]
+pub struct ChequeValidationRecord {
+    pub cheque_number: u32,
+    pub micr_code: [u8; 9],
+    pub ifsc_code: [u8; 11],
+    pub issue_timestamp_secs: u64,
+    pub presentation_timestamp_secs: u64,
+    pub amount_in_paisa: u64,
+    pub cheque_type: ChequeType,
+    pub is_mutilated: bool,
+    pub is_signature_valid: bool,
+    pub is_account_payee_only: bool,
+}
+
+/// Sovereign Banking Cheque Processing Engine
+pub struct SovereignChequeProcessingEngine;
+
+impl SovereignChequeProcessingEngine {
+    /// Three months validity period in seconds (90 days = 90 * 24 * 3600 = 7,776,000s)
+    pub const STALE_PERIOD_SECS: u64 = 7_776_000;
+
+    /// Validate and clear a presented cheque
+    pub fn validate_cheque(record: &ChequeValidationRecord) -> ChequeStatus {
+        // Verify MICR code (9 digits)
+        if record.micr_code.iter().any(|&b| !b.is_ascii_digit()) {
+            return ChequeStatus::InvalidMicrCode;
+        }
+
+        // Verify signature validity
+        if !record.is_signature_valid {
+            return ChequeStatus::DrawerSignatureMismatch;
+        }
+
+        // Verify physical damage / mutilation
+        if record.is_mutilated || record.cheque_type == ChequeType::MutilatedCheque {
+            return ChequeStatus::MutilatedDamaged;
+        }
+
+        // Verify post-dated cheque (issue date in the future)
+        if record.issue_timestamp_secs > record.presentation_timestamp_secs {
+            return ChequeStatus::PostDatedFuture;
+        }
+
+        // Verify stale cheque (issue date older than 90 days / 3 months)
+        if record.presentation_timestamp_secs.saturating_sub(record.issue_timestamp_secs) > Self::STALE_PERIOD_SECS
+            || record.cheque_type == ChequeType::StaleCheque
+        {
+            return ChequeStatus::StaleExpired;
+        }
+
+        // Verify account payee restriction
+        if record.is_account_payee_only && record.cheque_type == ChequeType::BearerCheque {
+            return ChequeStatus::AccountPayeeRestricted;
+        }
+
+        ChequeStatus::ValidForClearing
+    }
+
+    /// Identify cheque classification from attributes
+    pub fn classify_cheque(
+        is_crossed: bool,
+        is_account_payee: bool,
+        is_bearer: bool,
+        is_banker_issued: bool,
+        is_self: bool,
+        is_damaged: bool,
+        issue_time: u64,
+        present_time: u64,
+    ) -> ChequeType {
+        if is_damaged {
+            return ChequeType::MutilatedCheque;
+        }
+        if issue_time > present_time {
+            return ChequeType::PostDatedCheque;
+        }
+        if present_time.saturating_sub(issue_time) > Self::STALE_PERIOD_SECS {
+            return ChequeType::StaleCheque;
+        }
+        if is_banker_issued {
+            return ChequeType::BankersCheque;
+        }
+        if is_self {
+            return ChequeType::SelfCheque;
+        }
+        if is_account_payee {
+            return ChequeType::AccountPayeeCheque;
+        }
+        if is_crossed {
+            return ChequeType::CrossedCheque;
+        }
+        if is_bearer {
+            return ChequeType::BearerCheque;
+        }
+        ChequeType::OrderCheque
+    }
 }
