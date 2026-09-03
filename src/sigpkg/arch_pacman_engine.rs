@@ -449,9 +449,6 @@ impl SafeUpdateChecker {
     }
 }
 
-/// Pacman Contrib Engine
-pub struct PacmanContribEngine;
-
 /// Utility for updating checksums in PKGBUILD manifests (updpkgsums parity)
 pub struct PkgbuildChecksumUpdater;
 

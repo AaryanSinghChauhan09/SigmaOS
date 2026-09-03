@@ -45,6 +45,7 @@ pub struct SimpleAuditEvent {
     pub event_type: AtomicUsize,
     pub timestamp: AtomicUsize,
     pub user_id: AtomicUsize,
+    pub desc_len: u16,
     pub description: [u8; 256],
 }
 
@@ -60,6 +61,7 @@ impl SimpleAuditEvent {
             event_type: AtomicUsize::new(event_type as usize),
             timestamp: AtomicUsize::new(0),
             user_id: AtomicUsize::new(user_id),
+            desc_len: desc_len as u16,
             description: desc_array,
         }
     }
@@ -83,8 +85,8 @@ impl AuditEvent for SimpleAuditEvent {
     }
 
     fn description(&self) -> &[u8] {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.description[..len]
+        // O(1) slice lookup using cached desc_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.description[..self.desc_len as usize]
     }
 }
 
