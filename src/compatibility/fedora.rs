@@ -197,11 +197,24 @@ impl KojiBuildServer {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BodhiUpdateStatus {
+    Pending,
+    Testing,
+    Stable,
+    AutoUnpushed,
+    Obsolete,
+    SideTag,
+}
+
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
-/// It handles community feedback, accumulates karma, and gates the transition to stable.
+/// It handles community feedback, accumulates karma, openQA/CI gating, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
     pub updates: HashMap<String, i32>,       // update_id -> karma
     pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
+    pub update_statuses: HashMap<String, BodhiUpdateStatus>,
+    pub openqa_ci_passed: HashMap<String, bool>,
+    pub side_tags: Vec<String>,
 }
 
 impl BodhiUpdateTriage {
@@ -209,12 +222,45 @@ impl BodhiUpdateTriage {
         BodhiUpdateTriage {
             updates: HashMap::new(),
             stable_gated: HashMap::new(),
+            update_statuses: HashMap::new(),
+            openqa_ci_passed: HashMap::new(),
+            side_tags: Vec::new(),
         }
     }
 
     pub fn submit_update(&mut self, update_id: &str) {
         self.updates.insert(update_id.to_string(), 0);
         self.stable_gated.insert(update_id.to_string(), false);
+        self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Testing);
+        self.openqa_ci_passed.insert(update_id.to_string(), false);
+    }
+
+    pub fn set_ci_test_result(&mut self, update_id: &str, passed: bool) {
+        self.openqa_ci_passed.insert(update_id.to_string(), passed);
+        if passed {
+            if let Some(&karma) = self.updates.get(update_id) {
+                if karma >= 3 {
+                    self.stable_gated.insert(update_id.to_string(), true);
+                    self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+                }
+            }
+        }
+    }
+
+    pub fn apply_security_karma_waiver(&mut self, update_id: &str) -> Result<(), String> {
+        if self.updates.contains_key(update_id) {
+            self.stable_gated.insert(update_id.to_string(), true);
+            self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+            Ok(())
+        } else {
+            Err("Update package not found".to_string())
+        }
+    }
+
+    pub fn create_side_tag(&mut self, tag_name: &str) {
+        if !self.side_tags.iter().any(|t| t == tag_name) {
+            self.side_tags.push(tag_name.to_string());
+        }
     }
 
     pub fn submit_feedback(&mut self, update_id: &str, karma_delta: i32) -> Result<i32, String> {
@@ -224,6 +270,10 @@ impl BodhiUpdateTriage {
             // Auto-promote when karma hits >= 3, auto-reject when karma <= -3
             if current_karma >= 3 {
                 self.stable_gated.insert(update_id.to_string(), true);
+                self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+            } else if current_karma <= -3 {
+                self.stable_gated.insert(update_id.to_string(), false);
+                self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::AutoUnpushed);
             }
             Ok(current_karma)
         } else {
@@ -233,6 +283,10 @@ impl BodhiUpdateTriage {
 
     pub fn is_promoted_to_stable(&self, update_id: &str) -> bool {
         *self.stable_gated.get(update_id).unwrap_or(&false)
+    }
+
+    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
+        self.update_statuses.get(update_id).copied()
     }
 }
 
@@ -2850,6 +2904,7 @@ mod tests {
         let mut bodhi = BodhiUpdateTriage::new();
         bodhi.submit_update("FEDORA-2023-A8F8");
 
+        assert_eq!(bodhi.get_update_status("FEDORA-2023-A8F8"), Some(BodhiUpdateStatus::Testing));
         assert!(!bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
 
         // Increase karma
@@ -2860,6 +2915,15 @@ mod tests {
         // Direct promotion
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
+        assert_eq!(bodhi.get_update_status("FEDORA-2023-A8F8"), Some(BodhiUpdateStatus::Stable));
+
+        // Side-tag and security waiver testing
+        bodhi.create_side_tag("f39-build-sidetag");
+        assert_eq!(bodhi.side_tags.len(), 1);
+
+        bodhi.submit_update("FEDORA-2023-SEC1");
+        assert!(bodhi.apply_security_karma_waiver("FEDORA-2023-SEC1").is_ok());
+        assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
     }
 
     #[test]
