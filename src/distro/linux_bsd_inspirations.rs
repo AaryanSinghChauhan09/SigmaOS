@@ -8,8 +8,22 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+#[cfg(not(feature = "standalone_test"))]
 use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;
+#[cfg(not(feature = "standalone_test"))]
 use super::universal_distro_super_matrix::UniversalDistroSuperMatrix;
+
+#[cfg(feature = "standalone_test")]
+#[path = "sovereign_distro_dominance.rs"]
+pub mod sovereign_distro_dominance;
+#[cfg(feature = "standalone_test")]
+use sovereign_distro_dominance::SovereignDistroDominanceSuite;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal_distro_super_matrix.rs"]
+pub mod universal_distro_super_matrix;
+#[cfg(feature = "standalone_test")]
+use universal_distro_super_matrix::UniversalDistroSuperMatrix;
 
 // ==========================================
 // 0. SOVEREIGN UNIVERSAL DISTRO BRIDGE
@@ -23,10 +37,16 @@ pub enum DistroSubsystemMode {
     LinuxNix,
     LinuxGentoo,
     LinuxFedora,
+    LinuxVoid,
+    LinuxOpenSuse,
+    LinuxSolus,
+    LinuxClear,
+    LinuxSlackware,
     FreeBsd,
     OpenBsd,
     NetBsd,
     DragonFlyBsd,
+    SolarisIllumos,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,6 +55,9 @@ pub enum ServiceSupervisorType {
     OpenRC,
     Runit,
     Shepherd,
+    Dinit,
+    SysVInit,
+    Smf,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -68,14 +91,21 @@ impl SovereignUniversalDistroBridge {
         match self.mode {
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxDebian
-            | DistroSubsystemMode::LinuxFedora => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse
+            | DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
-            DistroSubsystemMode::LinuxAlpine => ServiceSupervisorType::Runit,
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                ServiceSupervisorType::Runit
+            }
             DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::SysVInit,
+            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
         }
     }
 
@@ -83,17 +113,20 @@ impl SovereignUniversalDistroBridge {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
             (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
+            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
             (
                 DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd,
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::SolarisIllumos,
                 "/etc",
             ) => "/etc".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd,
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::SolarisIllumos,
                 "/var/log",
             ) => "/var/log".to_string(),
             (
@@ -114,36 +147,25 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
-    pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        // Verify that the current subsystem mode has valid supervisor, package translation, and VFS translation
-        let supervisor = self.get_supervisor_type();
-        let pkg_spec = self.translate_package_specifier("coreutils");
-        let vfs_etc = self.translate_vfs_path("/etc");
-
-        !pkg_spec.is_empty() && !vfs_etc.is_empty() && match self.mode {
-            DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
-                supervisor == ServiceSupervisorType::Systemd
-            }
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
-                supervisor == ServiceSupervisorType::OpenRC
-            }
-            DistroSubsystemMode::LinuxAlpine => supervisor == ServiceSupervisorType::Runit,
-            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
-        }
-    }
-
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
+            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::FreeBsd => format!("{}.pkg", input_pkg),
-            DistroSubsystemMode::OpenBsd => format!("{}.tgz", input_pkg),
-            DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
-            DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
+            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
+                format!("{}.rpm", input_pkg)
+            }
+            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
+            DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                format!("{}.pkg", input_pkg)
+            }
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
         }
     }
 
@@ -164,7 +186,72 @@ impl SovereignUniversalDistroBridge {
                 self.pledge_sentinel.unveil_process(pid, root_path, "rw")?;
                 Ok(())
             }
-            _ => Ok(()),
+            DistroSubsystemMode::SolarisIllumos => {
+                let mut zone_engine = SovereignIllumosZonesEngine::new();
+                let zone_id = zone_engine.create_zone("zone-isolate", ZoneBrand::Native, 50, 1024 * 1024 * 512)?;
+                zone_engine.boot_zone(zone_id)?;
+                Ok(())
+            }
+            _ => {
+                let mut landlock = SovereignLandlockLsm::new();
+                landlock.add_rule(root_path, LandlockAccess::ReadWrite)?;
+                landlock.restrict_self();
+                Ok(())
+            }
+        }
+    }
+
+    pub fn dispatch_cross_subsystem_operation(
+        &mut self,
+        target_subsystem: &str,
+        action: &str,
+    ) -> Result<String, &'static str> {
+        match target_subsystem {
+            "init" => {
+                let supervisor = self.get_supervisor_type();
+                Ok(format!(
+                    "Dispatched action '{}' to supervisor '{:?}' under distro mode '{:?}'",
+                    action, supervisor, self.mode
+                ))
+            }
+            "package" => {
+                let pkg_format = self.translate_package_specifier(action);
+                Ok(format!(
+                    "Dispatched package action for specifier '{}' under distro mode '{:?}'",
+                    pkg_format, self.mode
+                ))
+            }
+            "vfs" => {
+                let translated_path = self.translate_vfs_path(action);
+                Ok(format!(
+                    "Dispatched VFS lookup for '{}' -> '{}' under distro mode '{:?}'",
+                    action, translated_path, self.mode
+                ))
+            }
+            "security" => {
+                self.enforce_security_isolation(1001, action)?;
+                Ok(format!(
+                    "Dispatched security isolation for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "storage" => {
+                let healed = self.verify_and_self_heal_cow_file("@root", action, b"default")
+                    .map_err(|_| "CoW storage operation failed")?;
+                Ok(format!(
+                    "Dispatched storage CoW self-heal check for '{}' (healed: {}) under distro mode '{:?}'",
+                    action, healed, self.mode
+                ))
+            }
+            "kernel" => {
+                let pid = self.schedule_distro_task(101, action, 50)
+                    .ok_or("Scheduler task registration failed")?;
+                Ok(format!(
+                    "Dispatched kernel/scheduler task '{}' for PID {} under distro mode '{:?}'",
+                    action, pid, self.mode
+                ))
+            }
+            _ => Err("Unknown target subsystem"),
         }
     }
 
@@ -220,6 +307,37 @@ impl SovereignUniversalDistroBridge {
 
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
+    }
+
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+
+        let supervisor_valid = match self.mode {
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse
+            | DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
+
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                supervisor == ServiceSupervisorType::Runit
+            }
+
+            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+        };
+
+        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
     }
 }
 
