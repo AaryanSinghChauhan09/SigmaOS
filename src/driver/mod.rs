@@ -9,6 +9,7 @@ pub mod irp_system;
 pub mod mapper;
 pub mod network_framework;
 pub mod pci_bus;
+pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
@@ -23,6 +24,10 @@ pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
+};
+pub use pci_enumeration::{
+    PciEnumerator, PciDeviceInfo, PciBar, PciDriver, PciDriverManager, PciBarType as EnumPciBarType,
+    pci_read_u8, pci_read_u16, pci_read_u32, pci_write_u8, pci_write_u16, pci_write_u32,
 };
 pub use pods::{PeripheralPod, PodType};
 pub use rootkit::{
