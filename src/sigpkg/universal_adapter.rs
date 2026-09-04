@@ -111,6 +111,16 @@ pub struct XbpsManifest {
     pub run_depends: Vec<String>,
 }
 
+/// Description of Haiku .hpkg package manifest
+#[derive(Debug, Clone)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct SnapcraftManifest {
     pub name: String,
@@ -475,6 +485,62 @@ impl UniversalPackageAdapter {
             summary,
             confinement,
             plugs,
+        })
+    }
+
+    /// Parses Haiku .hpkg package manifest text
+    pub fn parse_haiku_hpkg(&self, text: &str) -> Result<HaikuHpkgManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut summary = String::new();
+        let mut architecture = String::from("x86_64");
+        let mut requires = Vec::new();
+
+        let mut in_requires_block = false;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if line.starts_with("name") {
+                if let Some(pos) = line.find(' ') {
+                    name = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                }
+            } else if line.starts_with("version") {
+                if let Some(pos) = line.find(' ') {
+                    version = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                }
+            } else if line.starts_with("summary") {
+                if let Some(pos) = line.find(' ') {
+                    summary = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                }
+            } else if line.starts_with("architecture") {
+                if let Some(pos) = line.find(' ') {
+                    architecture = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                }
+            } else if line.starts_with("requires {") || line == "requires {" || line.starts_with("requires") {
+                in_requires_block = true;
+            } else if line.starts_with('}') {
+                in_requires_block = false;
+            } else if in_requires_block {
+                let clean_req = line.trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ';');
+                if !clean_req.is_empty() {
+                    requires.push(clean_req.to_string());
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid Haiku .hpkg manifest: missing name or version");
+        }
+
+        Ok(HaikuHpkgManifest {
+            name,
+            version,
+            summary,
+            architecture,
+            requires,
         })
     }
 
@@ -1038,6 +1104,10 @@ impl SigPkgUniversalBridgeEngine {
             PackageFormat::Pkgsrc => {
                 let net = self.adapter.parse_netbsd_pkgsrc(&manifest_text)?;
                 self.adapter.translate_to_native_package(&net.pkgname, &net.version, &net.comment, &net.depends)
+            }
+            PackageFormat::Hpkg => {
+                let hpkg = self.adapter.parse_haiku_hpkg(&manifest_text)?;
+                self.adapter.translate_to_native_package(&hpkg.name, &hpkg.version, &hpkg.summary, &hpkg.requires)
             }
             _ => {
                 self.adapter.parse_and_translate_manifest(filename, &manifest_text)
@@ -2216,5 +2286,30 @@ mod tests {
         assert_eq!(bsd_action.source_pm, "pkg");
         assert_eq!(bsd_action.operation, UniversalPmOperation::Install);
         assert!(bsd_action.dry_run);
+    }
+
+    #[test]
+    fn test_haiku_hpkg_manifest_parsing_and_bridge() {
+        let adapter = UniversalPackageAdapter::new();
+        let hpkg_text = r#"
+name haiku_dep
+version 1.0.0
+summary "Haiku Desktop Utility"
+architecture x86_64
+requires {
+    haiku_core
+    libssl
+}
+"#;
+        let manifest = adapter.parse_haiku_hpkg(hpkg_text).unwrap();
+        assert_eq!(manifest.name, "haiku_dep");
+        assert_eq!(manifest.version, "1.0.0");
+        assert_eq!(manifest.summary, "Haiku Desktop Utility");
+        assert_eq!(manifest.requires, vec!["haiku_core", "libssl"]);
+
+        let mut engine = SigPkgUniversalBridgeEngine::new();
+        let pkg = engine.absorb_and_register("app.hpkg", hpkg_text.as_bytes()).unwrap();
+        assert_eq!(pkg.name, "haiku_dep");
+        assert!(engine.is_package_registered("haiku_dep"));
     }
 }
