@@ -136,5 +136,14 @@ pub use sovereign_distro_dominance::{
 };
 
 pub mod void_xbps_src;
+pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub use nextgen_innovations::{
+    SigmaHyperKernel, PredictedTask, WorkloadLatencyClass, SigmaCacheFlow, AdaptiveCacheModule,
+    SigmaVector, SimdInstructionSet, SigmaThermal, ThermalGovernorState, SigmaMod,
+    KernelModuleHeader, SigmaContainer, NativeContainerSpec, SigmaProfile, OperatingProfileKind,
+    SigmaLayer, OSLayer, SigmaLink, NetworkMediaKind, SigmaEdgeNet, SigmaSecureNet, SigmaCollab,
+    CollabWorkspacePeer, SigmaAssist, TroubleshootingDiagnostic, SigmaRollback, SystemSnapshot,
+    SigmaDoc, DocumentationTopic, SigmaRescue,
+};
