@@ -7,19 +7,18 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
     use super::*;
+}
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, HashSet, Arc};
+#[cfg(feature = "standalone_test")]
 use std::{collections::{HashMap, HashSet}, sync::Arc};
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -803,6 +802,43 @@ impl Default for PackageTriggerRegistry {
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
 
+/// Foreign distribution package manifest
+#[derive(Debug, Clone)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+/// Cross-distro package translator converting foreign manifests into native UnifiedPackage
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(manifest.original_name.clone(), manifest.version.clone())
+            .with_format(manifest.raw_format);
+        for dep in &manifest.raw_dependencies {
+            pkg = pkg.with_dependency(dep.clone());
+        }
+        for prov in &manifest.raw_provides {
+            pkg = pkg.with_provides(prov.clone());
+        }
+        for conf in &manifest.raw_conflicts {
+            pkg = pkg.with_conflict(conf.clone());
+        }
+        pkg
+    }
+
+    pub fn normalize_dependency_name(raw_dep: &str) -> String {
+        raw_dep.to_string()
+    }
+}
+
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
 
@@ -1184,15 +1220,16 @@ impl DependencyResolver {
     pub fn detect_conflicts(&self, packages: &[String]) -> Vec<(String, String)> {
         let mut conflicts = Vec::new();
 
+        // Bolt ⚡ Optimization: Hoist `pkg1` map lookup out of inner loop to avoid
+        // N-1 redundant lookups per outer loop iteration, reducing total map lookups
+        // from N(N-1) to N(N+1)/2 (~50% lookup reduction).
         for (i, pkg1_name) in packages.iter().enumerate() {
-            for pkg2_name in packages.iter().skip(i + 1) {
-                if let (Some(pkg1), Some(pkg2)) =
-                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
-                {
-                    let pkg1: &UnifiedPackage = pkg1;
-                    let pkg2: &UnifiedPackage = pkg2;
-                    if pkg1.has_conflict_with(pkg2) {
-                        conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+            if let Some(pkg1) = self.packages.get(pkg1_name) {
+                for pkg2_name in packages.iter().skip(i + 1) {
+                    if let Some(pkg2) = self.packages.get(pkg2_name) {
+                        if pkg1.has_conflict_with(pkg2) {
+                            conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                        }
                     }
                 }
             }
@@ -1324,6 +1361,18 @@ impl Default for TransactionalHistory {
 // ============================================================================
 // Main Universal Package Manager Facade
 // ============================================================================
+
+#[derive(Debug, Default, Clone)]
+pub struct DistroRepoSyncEngine {
+    pub active_mirrors: Vec<String>,
+    pub last_sync_timestamp: u64,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
 /// Universal package manager
 pub struct UniversalPackageManager {
@@ -2300,10 +2349,5 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-    }
-
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
     }
 }
