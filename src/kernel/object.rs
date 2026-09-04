@@ -677,16 +677,16 @@ impl Default for NtObjectManager {
 // Windows-inspired Non-Paged Pool Memory & Driver Loading Subsystem
 // ==========================================
 
-pub struct NonPagedPoolMemory {
+pub struct KernelNonPagedPoolMemory {
     pub total_bytes: usize,
     pub allocated_bytes: usize,
     pub allocations: HashMap<u64, usize>, // Addr -> size
     next_free_addr: u64,
 }
 
-impl NonPagedPoolMemory {
+impl KernelNonPagedPoolMemory {
     pub fn new(capacity: usize) -> Self {
-        NonPagedPoolMemory {
+        KernelNonPagedPoolMemory {
             total_bytes: capacity,
             allocated_bytes: 0,
             allocations: HashMap::new(),

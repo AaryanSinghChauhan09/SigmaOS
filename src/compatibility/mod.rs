@@ -4,7 +4,6 @@ pub mod canonical;
 pub mod chakra;
 pub mod cross_platform;
 pub mod zorin;
-pub mod antix;
 
 pub use zorin::{
     ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
@@ -34,7 +33,6 @@ pub mod fedora;
 pub mod debian;
 pub mod cachy_os;
 
-pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,

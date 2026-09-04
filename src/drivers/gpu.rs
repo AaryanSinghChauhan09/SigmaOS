@@ -26,7 +26,6 @@ pub struct DrmConnector {
     pub connected: bool,
 }
 
-
 /// GPU command type
 #[derive(Debug, Clone)]
 pub enum GpuCommand {
@@ -142,8 +141,6 @@ pub struct GpuDriver {
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
     pub reset_state: GpuResetState,
-    pub crtc: Option<DrmCrtc>,
-    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -164,8 +161,6 @@ impl GpuDriver {
                 pipeline_reconstructed_count: 0,
                 is_hardware_ready: true,
             },
-            crtc: None,
-            connector: None,
         }
     }
 
@@ -223,11 +218,10 @@ impl GpuDriver {
                 if self.bound_pipeline_id.is_none() {
                     return Err(GpuError::InvalidCommand);
                 }
-                // Simulate draw call using current bound pipeline settings (e.g. color shading)
                 let color = if self.bound_pipeline_id == Some(1) {
-                    0xFF00FF // Magenta for test pipeline 1
+                    0xFF00FF
                 } else {
-                    0x00FFFF // Cyan
+                    0x00FFFF
                 };
                 for i in 0..index_count.min(self.frame_buffer.len()) {
                     self.frame_buffer[i] = color;
@@ -242,7 +236,6 @@ impl GpuDriver {
         Ok(())
     }
 
-    /// Submits a Vulkan-parity recorded command buffer to the graphics ring
     pub fn submit_command_buffer(&mut self, buf: GpuCommandBuffer) -> Result<(), GpuError> {
         if !buf.is_recorded {
             return Err(GpuError::InvalidCommand);
@@ -263,28 +256,20 @@ impl GpuDriver {
         Ok(())
     }
 
-    /// Self-healing DRM GPU recovery and pipeline reconstruction mimicking Linux/DRM reset
     pub fn recover_and_reset_gpu(&mut self) {
         println!("[mesa/drm] Initiating DRM driver GPU ring-reset (TDR active)...");
-
-        // 1. Recover and safely clear framebuffer to fallback diagnostic color
-        self.frame_buffer.fill(0x333333); // Slate gray fallback background
-
-        // 2. Increment recovered counts
+        self.frame_buffer.fill(0x333333);
         self.reset_state.total_hangs_recovered += 1;
         self.reset_state.pipeline_reconstructed_count += self.registered_pipelines.len();
         self.reset_state.last_reset_timestamp = 1716000000;
 
-        // 3. Reconstruct / Compile cached pipelines registry
         for pipeline in &mut self.registered_pipelines {
-            // Simulate reloading and compiling cached shader objects
             println!(
                 "[mesa/drm] Recompiled & reconstructed pipeline #{}",
                 pipeline.id
             );
         }
 
-        // 4. Restore state variables
         self.bound_pipeline_id = None;
         self.reset_state.is_hardware_ready = true;
         println!(

@@ -38,9 +38,6 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
-pub mod observability {
-    pub mod profiler;
-}
 pub mod ai {
     pub mod agent;
     pub mod orchestrator;
@@ -102,7 +99,7 @@ pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    VesaModeInfo, ModernNvmeDriver, AhciStorageDriver, ModernUsbController, ModernAudioIntelHda, ModernWifiDriver, E1000Driver,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -145,7 +142,6 @@ pub use distro::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -153,7 +149,8 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, DeclarativeAppManifest,
+    HardwareAccessPermissions, ImmutableAppLayer, ShardsMarketplace,
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
@@ -181,7 +178,7 @@ pub use shell::{
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter as SigPackageFormatAdapter, UniversalPackageManager as SigUniversalPackageManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{

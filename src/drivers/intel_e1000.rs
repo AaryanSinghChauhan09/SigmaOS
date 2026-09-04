@@ -247,3 +247,33 @@ impl PeripheralDevice for E1000Driver {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_e1000_driver_probe_and_init() {
+        let dev_intel = DeviceId { vendor: 0x8086, device: 0x100E };
+        assert!(E1000Driver::probe(&dev_intel));
+
+        let dev_other = DeviceId { vendor: 0x10EC, device: 0x8168 };
+        assert!(!E1000Driver::probe(&dev_other));
+
+        let caps = CapabilityToken::from_bits(0x02); // Network cap
+        let mut driver = E1000Driver::new(0, caps);
+        assert_eq!(driver.name(), "Intel e1000 Gigabit NIC");
+        assert_eq!(driver.generation(), DeviceGeneration::Modern);
+
+        driver.initialize().unwrap();
+        assert_eq!(driver.power_state, PowerState::On);
+
+        // Write packet over TX descriptor ring
+        let packet = [0x55u8; 64];
+        let bytes_sent = driver.write(&packet).unwrap();
+        assert_eq!(bytes_sent, 64);
+
+        driver.shutdown().unwrap();
+        assert_eq!(driver.power_state, PowerState::Off);
+    }
+}

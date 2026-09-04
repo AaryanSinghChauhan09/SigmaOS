@@ -225,11 +225,11 @@ impl Component {
     /// Check if component has specific capability rights
     pub fn has_capability_rights(&self, handle_id: u32, required_rights: CapabilityRights) -> bool {
         if let Some(&rights) = self.capabilities.get(&handle_id) {
-            (required_rights.can_read || !rights.can_read) &&
-            (required_rights.can_write || !rights.can_write) &&
-            (required_rights.can_execute || !rights.can_execute) &&
-            (required_rights.can_delegate || !rights.can_delegate) &&
-            (required_rights.can_create_child || !rights.can_create_child)
+            (!required_rights.can_read || rights.can_read) &&
+            (!required_rights.can_write || rights.can_write) &&
+            (!required_rights.can_execute || rights.can_execute) &&
+            (!required_rights.can_delegate || rights.can_delegate) &&
+            (!required_rights.can_create_child || rights.can_create_child)
         } else {
             false
         }
