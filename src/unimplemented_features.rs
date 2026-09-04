@@ -1,3 +1,5 @@
+extern crate alloc;
+
 use std::format;
 use std::vec;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
