@@ -72,4 +72,4 @@ SigmaOS follows **Coordinated Vulnerability Disclosure (CVD)**:
 ## Security Contacts
 
 - Primary: [@AaryanSinghChauhan09](https://github.com/AaryanSinghChauhan09)
-- Email: aaryansinghchauhan09@gmail.com
+- Email: aaryansinghchauhan090305@gmail.com
