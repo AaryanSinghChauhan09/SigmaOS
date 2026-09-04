@@ -1184,15 +1184,16 @@ impl DependencyResolver {
     pub fn detect_conflicts(&self, packages: &[String]) -> Vec<(String, String)> {
         let mut conflicts = Vec::new();
 
+        // Bolt ⚡ Optimization: Hoist `pkg1` map lookup out of inner loop to avoid
+        // N-1 redundant lookups per outer loop iteration, reducing total map lookups
+        // from N(N-1) to N(N+1)/2 (~50% lookup reduction).
         for (i, pkg1_name) in packages.iter().enumerate() {
-            for pkg2_name in packages.iter().skip(i + 1) {
-                if let (Some(pkg1), Some(pkg2)) =
-                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
-                {
-                    let pkg1: &UnifiedPackage = pkg1;
-                    let pkg2: &UnifiedPackage = pkg2;
-                    if pkg1.has_conflict_with(pkg2) {
-                        conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+            if let Some(pkg1) = self.packages.get(pkg1_name) {
+                for pkg2_name in packages.iter().skip(i + 1) {
+                    if let Some(pkg2) = self.packages.get(pkg2_name) {
+                        if pkg1.has_conflict_with(pkg2) {
+                            conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
+                        }
                     }
                 }
             }
