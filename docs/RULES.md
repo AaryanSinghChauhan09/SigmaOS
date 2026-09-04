@@ -31,3 +31,15 @@ This document establishes the fundamental architectural, security, and contribut
 ## 5. Subsystem Maintainer Governance Rule (Linux Kernel Parity)
 - **Principle:** Codebase modifications are reviewed and gated by designated subsystem maintainers according to `docs/MAINTAINERS.md`.
 - **Enforcement:** All pull requests require Developer Certificate of Origin (DCO `Signed-off-by`) trailers and automated CI test suite approval (`./run_sigma_tests.sh`).
+
+---
+
+## 6. Universal Package Transpilation Rule (Multi-Distro Parity)
+- **Principle:** Packages from foreign Linux and BSD package formats (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `pkg`, `.xbps`, `.nix`) must be automatically detected, unpacked, and transpiled into native `SigmaPkg` format (`.sigpkg`) with zero manual conversion steps.
+- **Enforcement:** Implementation of `UniversalPackageFormatBridge` with automated format detection and sandbox isolation.
+
+---
+
+## 7. Universal Component & Driver Absorption Rule (Linux & BSD Hardware Parity)
+- **Principle:** Driver shards and system daemons inspired by Linux (`udev`, `systemd`, `cgroups v2`) or BSD (`devd`, `rc.d`, `Capsicum`, `PF`) must be modularly wrapped in `CrossOsDriverShim` and sandboxed within `SovereignModularDeviceSupportEngine`.
+- **Enforcement:** Capability-ring security isolation and DMA/IRQ sanity validation before hardware registration.
