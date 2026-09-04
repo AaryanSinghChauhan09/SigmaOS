@@ -215,17 +215,23 @@ impl SlackwareBuildPackageEngine {
         _desc: &str,
     ) -> Result<String, &'static str> {
         let script = self.scripts.get(pkg_name).ok_or("SlackBuild script not found")?;
-        Ok(format!(
+        let filename = format!(
             "{}-{}-{}-{}.txz",
             script.name, script.version, script.arch, script.build_number
-        ))
+        );
+        Ok(filename)
     }
 
-    pub fn explode_txz_archive(&self, _txz_filename: &str) -> Result<Vec<String>, &'static str> {
-        Ok(vec![
-            "/usr/bin/htop".to_string(),
-            "/usr/man/man1/htop.1".to_string(),
-        ])
+    pub fn explode_txz_archive(&self, txz_filename: &str) -> Result<Vec<String>, &'static str> {
+        let name = txz_filename.split('-').next().ok_or("Invalid txz package format")?;
+        if self.scripts.contains_key(name) {
+            Ok(vec![
+                "/usr/bin/htop".to_string(),
+                "/usr/man/man1/htop.1".to_string(),
+            ])
+        } else {
+            Err("Package archive not found")
+        }
     }
 }
 
