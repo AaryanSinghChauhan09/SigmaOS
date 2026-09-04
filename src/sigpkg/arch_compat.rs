@@ -1014,6 +1014,7 @@ mod tests {
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
+} // end mod tests (arch_compat first block)
 
 // --- Arch Linux svntogit Repository Migration Engine ---
 
@@ -1062,10 +1063,6 @@ impl SvntogitMigrationEngine {
         ))
     }
 }
-#[cfg(test)]
-mod tests {
-    use super::*;
-
 #[cfg(test)]
 mod tests {
     use super::*;

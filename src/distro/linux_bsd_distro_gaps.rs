@@ -749,6 +749,8 @@ impl SovereignStatefulNatEngine {
                 packets_counter: 1,
             });
         }
+        (self.public_ip, src_port)
+    }
 
     pub fn lookup_conntrack(
         &mut self,
@@ -1010,3 +1012,4 @@ impl Default for SovereignUniversalDistroGapResolver {
         Self::new()
     }
 }
+} // end mod tests
