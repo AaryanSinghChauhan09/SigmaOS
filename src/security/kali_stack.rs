@@ -1,4 +1,3 @@
-
 use crate::klib::Vec;
 use core::mem;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS

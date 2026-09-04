@@ -13,25 +13,29 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based RSA Encryption for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements RSA-4096 encryption and signature verification
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type KeyPairID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RSAError { Success = 0, KeyGenerationFailed = 1, EncryptionFailed = 2, InvalidKey = 3 }
+pub enum RSAError {
+    Success = 0,
+    KeyGenerationFailed = 1,
+    EncryptionFailed = 2,
+    InvalidKey = 3,
+}
 
 pub trait RSAKeyPair {
     fn id(&self) -> KeyPairID;
@@ -69,10 +73,18 @@ impl SimpleRSAKeyPair {
 }
 
 impl RSAKeyPair for SimpleRSAKeyPair {
-    fn id(&self) -> KeyPairID { self.id }
-    fn public_key(&self) -> &[u8] { &self.public_key }
-    fn private_key(&self) -> &[u8] { &self.private_key }
-    fn key_size(&self) -> usize { 4096 }
+    fn id(&self) -> KeyPairID {
+        self.id
+    }
+    fn public_key(&self) -> &[u8] {
+        &self.public_key
+    }
+    fn private_key(&self) -> &[u8] {
+        &self.private_key
+    }
+    fn key_size(&self) -> usize {
+        4096
+    }
 }
 
 pub trait RSAEncryption {
@@ -85,7 +97,9 @@ pub struct SimpleRSAEncryption;
 
 impl SimpleRSAEncryption {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleRSAEncryption }
+    pub fn new() -> Self {
+        SimpleRSAEncryption
+    }
 }
 
 impl RSAEncryption for SimpleRSAEncryption {
@@ -132,7 +146,9 @@ pub struct SimpleRSASignature;
 
 impl SimpleRSASignature {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self { SimpleRSASignature }
+    pub fn new() -> Self {
+        SimpleRSASignature
+    }
 }
 
 impl RSASignature for SimpleRSASignature {
@@ -205,7 +221,9 @@ impl RSAKeyManager for SimpleRSAKeyManager {
     fn get_keypair(&self, id: KeyPairID) -> Option<&dyn RSAKeyPair> {
         for keypair_option in &self.keypairs {
             if let Some(ref keypair) = *keypair_option {
-                if keypair.id() == id { return Some(keypair.as_ref()); }
+                if keypair.id() == id {
+                    return Some(keypair.as_ref());
+                }
             }
         }
         None
@@ -223,13 +241,25 @@ impl RSAKeyManager for SimpleRSAKeyManager {
     }
 }
 
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
+struct VecImpl<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        VecImpl {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -237,19 +267,29 @@ impl<T> VecImpl<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -281,7 +321,6 @@ impl<'a, T> IntoIterator for &'a VecImpl<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

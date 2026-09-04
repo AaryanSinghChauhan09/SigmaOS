@@ -4,9 +4,9 @@ use std::vec::Vec;
 // Custom memory allocator for fixed-size object allocation pools
 // No external dependencies - fully sovereign implementation
 
+use core::ptr::NonNull;
 #[allow(dead_code)]
 use core::std::Layout;
-use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A slab cache for fixed-size allocations.

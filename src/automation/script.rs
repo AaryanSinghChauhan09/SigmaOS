@@ -1,12 +1,12 @@
 use std::boxed::Box;
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ScriptID = usize;
 

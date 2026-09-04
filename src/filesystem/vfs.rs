@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
+use core::fmt;
 /// SigmaOS: Virtual File System (VFS) Layer
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
-
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::fmt;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,15 +49,33 @@ impl FileMode {
 
     pub fn to_u32(&self) -> u32 {
         let mut mode = 0u32;
-        if self.owner_read { mode |= 0o400; }
-        if self.owner_write { mode |= 0o200; }
-        if self.owner_execute { mode |= 0o100; }
-        if self.group_read { mode |= 0o040; }
-        if self.group_write { mode |= 0o020; }
-        if self.group_execute { mode |= 0o010; }
-        if self.other_read { mode |= 0o004; }
-        if self.other_write { mode |= 0o002; }
-        if self.other_execute { mode |= 0o001; }
+        if self.owner_read {
+            mode |= 0o400;
+        }
+        if self.owner_write {
+            mode |= 0o200;
+        }
+        if self.owner_execute {
+            mode |= 0o100;
+        }
+        if self.group_read {
+            mode |= 0o040;
+        }
+        if self.group_write {
+            mode |= 0o020;
+        }
+        if self.group_execute {
+            mode |= 0o010;
+        }
+        if self.other_read {
+            mode |= 0o004;
+        }
+        if self.other_write {
+            mode |= 0o002;
+        }
+        if self.other_execute {
+            mode |= 0o001;
+        }
         mode
     }
 }
@@ -163,10 +180,20 @@ pub trait FileSystem: Send + Sync {
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError>;
 
     /// Read data from inode at offset
-    fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError>;
+    fn read_data(
+        &self,
+        inode_number: u64,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<usize, VfsError>;
 
     /// Write data to inode at offset
-    fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError>;
+    fn write_data(
+        &mut self,
+        inode_number: u64,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<usize, VfsError>;
 
     /// List directory entries
     fn list_dir(&self, inode_number: u64) -> Result<Vec<DirEntry>, VfsError>;
@@ -218,7 +245,11 @@ impl VirtualFileSystem {
     }
 
     /// Register a filesystem type
-    pub fn register_filesystem(&mut self, fs_type: String, block_device_id: u64) -> Result<(), VfsError> {
+    pub fn register_filesystem(
+        &mut self,
+        fs_type: String,
+        block_device_id: u64,
+    ) -> Result<(), VfsError> {
         // Check if already registered
         for (ft, _) in &self.filesystems {
             if ft == &fs_type {
@@ -320,19 +351,22 @@ impl VirtualFileSystem {
     pub fn seek(&mut self, fd: i32, offset: i64, whence: u32) -> Result<u64, VfsError> {
         if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
             match whence {
-                0 => { // SEEK_SET
+                0 => {
+                    // SEEK_SET
                     if offset < 0 {
                         return Err(VfsError::InvalidArgument);
                     }
                     handle.position = offset as u64;
                 }
-                1 => { // SEEK_CUR
+                1 => {
+                    // SEEK_CUR
                     if offset < 0 && (offset.abs() as u64) > handle.position {
                         return Err(VfsError::InvalidArgument);
                     }
                     handle.position = ((handle.position as i64) + offset) as u64;
                 }
-                2 => { // SEEK_END
+                2 => {
+                    // SEEK_END
                     // Would need file size from actual filesystem
                     return Err(VfsError::InvalidArgument);
                 }
@@ -390,7 +424,7 @@ mod tests {
         let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
         assert!(fd >= 3);
         assert_eq!(vfs.open_file_count(), 1);
-        
+
         vfs.close(fd).unwrap();
         assert_eq!(vfs.open_file_count(), 0);
     }
@@ -418,15 +452,15 @@ mod tests {
     fn test_seek_operations() {
         let mut vfs = VirtualFileSystem::new();
         let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
-        
+
         // SEEK_SET
         let pos = vfs.seek(fd, 100, 0).unwrap();
         assert_eq!(pos, 100);
-        
+
         // SEEK_CUR
         let pos = vfs.seek(fd, 50, 1).unwrap();
         assert_eq!(pos, 150);
-        
+
         vfs.close(fd).unwrap();
     }
 }

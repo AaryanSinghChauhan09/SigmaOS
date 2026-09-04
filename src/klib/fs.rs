@@ -1,10 +1,10 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
 
-use std::string::String;
-use std::vec::Vec;
 use core::ffi::c_char;
 use core::fmt;
+use std::string::String;
+use std::vec::Vec;
 
 /// Raw file descriptor type
 pub type RawFd = i32;

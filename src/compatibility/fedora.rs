@@ -1702,13 +1702,20 @@ impl FedoraSilverblueRpmOstreeEngine {
         }
     }
 
-    pub fn rebase_stream(&mut self, new_stream: &str, target_commit: &str) -> Result<String, &'static str> {
+    pub fn rebase_stream(
+        &mut self,
+        new_stream: &str,
+        target_commit: &str,
+    ) -> Result<String, &'static str> {
         if new_stream.is_empty() || target_commit.is_empty() {
             return Err("Stream and target commit cannot be empty");
         }
         self.current_stream = new_stream.to_string();
         self.stage_upgrade(target_commit);
-        Ok(format!("Rebased to stream '{}' at commit '{}'", new_stream, target_commit))
+        Ok(format!(
+            "Rebased to stream '{}' at commit '{}'",
+            new_stream, target_commit
+        ))
     }
 
     pub fn overlay_layer_package(&mut self, pkg: &str) {
@@ -1845,14 +1852,16 @@ impl FedoraKeyringPamModule {
         // Security: Never use hardcoded credentials in production.
         // Authentication must be verified against a secure credential store (PAM, SSSD, etc.)
         // This implementation uses a constant-time comparison against the configured credential.
-        let expected = std::env::var("SIGMA_PAM_TEST_SECRET")
-            .unwrap_or_else(|_| String::new());
+        let expected = std::env::var("SIGMA_PAM_TEST_SECRET").unwrap_or_else(|_| String::new());
         // Constant-time comparison to prevent timing attacks
         let pass_bytes = pass.as_bytes();
         let expected_bytes = expected.as_bytes();
         let matches = if pass_bytes.len() == expected_bytes.len() && !expected.is_empty() {
-            pass_bytes.iter().zip(expected_bytes.iter())
-                .fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0
+            pass_bytes
+                .iter()
+                .zip(expected_bytes.iter())
+                .fold(0u8, |acc, (a, b)| acc | (a ^ b))
+                == 0
         } else {
             false
         };
@@ -2779,7 +2788,13 @@ impl FedoraTahrirIdentityApiEngine {
         format!("{:016x}", hash)
     }
 
-    pub fn register_user_avatar(&mut self, user_id: &str, email: &str, avatar_data: &[u8], mime: &str) -> String {
+    pub fn register_user_avatar(
+        &mut self,
+        user_id: &str,
+        email: &str,
+        avatar_data: &[u8],
+        mime: &str,
+    ) -> String {
         let email_hash = Self::calculate_email_hash(email);
         self.user_avatars.retain(|a| a.user_id != user_id);
         self.user_avatars.push(TahrirUserAvatar {
@@ -2792,10 +2807,18 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn resolve_avatar_by_hash(&self, email_hash: &str) -> Option<&TahrirUserAvatar> {
-        self.user_avatars.iter().find(|a| a.email_sha256 == email_hash)
+        self.user_avatars
+            .iter()
+            .find(|a| a.email_sha256 == email_hash)
     }
 
-    pub fn issue_badge_assertion(&mut self, badge_id: &str, recipient_email: &str, issuer: &str, timestamp: u64) -> TahrirBadgeAssertion {
+    pub fn issue_badge_assertion(
+        &mut self,
+        badge_id: &str,
+        recipient_email: &str,
+        issuer: &str,
+        timestamp: u64,
+    ) -> TahrirBadgeAssertion {
         let recipient_hash = Self::calculate_email_hash(recipient_email);
         let digest = format!("{}:{}:{}:{}", badge_id, recipient_hash, issuer, timestamp);
         let assertion = TahrirBadgeAssertion {
@@ -2811,7 +2834,9 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn verify_badge_assertion(&self, assertion: &TahrirBadgeAssertion) -> bool {
-        self.issued_badges.iter().any(|b| b.assertion_digest == assertion.assertion_digest)
+        self.issued_badges
+            .iter()
+            .any(|b| b.assertion_digest == assertion.assertion_digest)
     }
 }
 
@@ -2847,8 +2872,10 @@ impl FedoraFmnMessagingEngine {
         let mut dispatched_count = 0;
 
         for rule in &self.filter_rules {
-            let pkg_match = rule.package_pattern == "*" || rule.package_pattern == event.package_name;
-            let topic_match = rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
+            let pkg_match =
+                rule.package_pattern == "*" || rule.package_pattern == event.package_name;
+            let topic_match =
+                rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
             let severity_match = event.severity >= rule.min_severity;
 
             if pkg_match && topic_match && severity_match {
@@ -3707,7 +3734,10 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+            Ok(format!(
+                "Toolbx '{}' executed command: '{}'",
+                c.name, command
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -3727,7 +3757,10 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+            Ok(format!(
+                "Toolbx '{}' executed command: '{}'",
+                c.name, command
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -3755,11 +3788,7 @@ impl Default for FedoraToolbxContainerEngine {
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Debug, Clone, PartialEq, Eq, Debug, Clone, PartialEq, Eq)]
 pub struct IgnitionSystemdUnit {
     pub name: String,
     pub enabled: bool,
@@ -3769,7 +3798,6 @@ pub struct IgnitionSystemdUnit {
 /// Fedora Ignition First-Boot Declarative Provisioning Engine
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.
-
 
 impl Default for FedoraIgnitionEngine {
     fn default() -> Self {
@@ -4146,7 +4174,6 @@ impl Default for FedoraSystemRolesEngine {
 /// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
 /// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
 
-
 impl Default for FedoraAbrtCrashDaemon {
     fn default() -> Self {
         Self::new()
@@ -4191,9 +4218,7 @@ pub enum MirrorSyncStatus {
     Unreachable,
 }
 
-#[derive(Debug, Clone)]
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Debug, Clone)]
 
 /// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
 
@@ -4607,7 +4632,6 @@ mod tests {
         assert!(xml.contains("<update id=\"SIGMA-2026-CRIT01\""));
     }
 
-
     #[test]
     fn test_sigma_change_process() {
         let mut engine = SigmaChangeProcessEngine::new();
@@ -4849,7 +4873,9 @@ mod tests {
         assert_eq!(ostree.pinned_deployments.len(), 1);
 
         // Test Stream Rebasing
-        let rebase_res = ostree.rebase_stream("fedora/40/x86_64/silverblue", "commit-v2.0.0").unwrap();
+        let rebase_res = ostree
+            .rebase_stream("fedora/40/x86_64/silverblue", "commit-v2.0.0")
+            .unwrap();
         assert!(rebase_res.contains("fedora/40/x86_64/silverblue"));
         assert!(ostree.pending_reboot);
 
@@ -5027,7 +5053,9 @@ mod tests {
         assert!(sssd.authenticate_ldap("alice", "wrong_pass").is_err());
 
         // Test: LDAP auth with a sufficiently long password (8+ chars) passes validation
-        let tgt = sssd.authenticate_ldap("alice", "longenoughpassword").unwrap();
+        let tgt = sssd
+            .authenticate_ldap("alice", "longenoughpassword")
+            .unwrap();
         assert!(tgt.contains("tgt_alice_fedora_CORP.FEDORA.INTERNAL"));
         assert_eq!(sssd.authenticated_users.len(), 1);
     }
@@ -5267,7 +5295,10 @@ mod tests {
         });
         assert_eq!(count2, 1);
         assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+        assert_eq!(
+            fmn.dispatched_notifications_log[0].1,
+            FmnNotificationTransport::Matrix
+        );
 
         // Event 3: Critical security update for openssl -> Bob matches!
         let count3 = fmn.publish_event(FmnMessageEvent {
@@ -5280,7 +5311,10 @@ mod tests {
         });
         assert_eq!(count3, 1);
         assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
+        assert_eq!(
+            fmn.dispatched_notifications_log[1].1,
+            FmnNotificationTransport::Email
+        );
     }
 
     #[test]

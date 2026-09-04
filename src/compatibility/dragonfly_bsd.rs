@@ -6,10 +6,10 @@
 //! - Concurrent Slate Lock NUMA synchronization primitives
 
 use crate::klib::HashMap;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 // ==========================================
 // 1. HAMMER2 Transactional Snapshot & Logging

@@ -1,8 +1,8 @@
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 /// Custom Penetration Assistant Compatibility Layer for SigmaOS
 /// Implements standard PenetrationAssistant trait, Assessment records, and DefaultAssistant no-ops
 use std::string::String;
 use std::string::ToString;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Severity {

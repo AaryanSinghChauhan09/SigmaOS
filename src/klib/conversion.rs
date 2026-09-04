@@ -164,7 +164,11 @@ pub fn parse_u64_str(s: &str) -> Result<u64, ()> {
             return Err(());
         }
         let digit = (b - b'0') as u64;
-        val = val.checked_mul(10).ok_or(())?.checked_add(digit).ok_or(())?;
+        val = val
+            .checked_mul(10)
+            .ok_or(())?
+            .checked_add(digit)
+            .ok_or(())?;
     }
     Ok(val)
 }

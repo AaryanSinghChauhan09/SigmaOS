@@ -3,9 +3,9 @@ use std::string::{String, ToString};
 // Basic Driver Framework Implementation
 // ==========================================
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 

@@ -3,7 +3,6 @@
 // Native Rust implementation of pacman-contrib utilities:
 // Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;

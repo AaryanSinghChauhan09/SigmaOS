@@ -508,7 +508,13 @@ impl SovereignCapsicumRightsRules {
     }
 
     pub fn limit_fd_rights(&mut self, fd: i32, rights: u64) {
-        self.fd_rules.insert(fd, CapsicumFdRule { fd, allowed_rights: rights });
+        self.fd_rules.insert(
+            fd,
+            CapsicumFdRule {
+                fd,
+                allowed_rights: rights,
+            },
+        );
     }
 
     pub fn check_fd_right(&self, fd: i32, required_right: u64) -> bool {

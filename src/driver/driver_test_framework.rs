@@ -2,10 +2,10 @@
 // SigmaOS Driver Testing Framework
 // Unified test harness for Phase 2 hardware drivers with QEMU simulation support
 
-use std::boxed::Box;
-use std::vec::Vec;
-use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================================
 // Test Infrastructure
@@ -325,7 +325,11 @@ impl StorageTestSuite {
     }
 
     fn test_nvme_namespace_identification(&mut self) {
-        let result = TestResult::new("Storage: NVMe Namespace Identification", TestStatus::Passed, 5);
+        let result = TestResult::new(
+            "Storage: NVMe Namespace Identification",
+            TestStatus::Passed,
+            5,
+        );
         self.results.push(result);
     }
 

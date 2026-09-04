@@ -2,9 +2,9 @@ use std::vec;
 // Interim OS and MNT Reform compatibility subsystem for SigmaOS
 // Implements a safe, zero-dependency Lisp interpreter VM and MNT LPC telemetry drivers.
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. INTERIM LISP INTERPRETER VM

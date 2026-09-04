@@ -1,9 +1,8 @@
-
+use core::cmp::Ordering;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::cmp::Ordering;
 
 pub enum CoreutilError {
     FileNotFound(String),

@@ -15,8 +15,8 @@
 use std::boxed::Box;
 
 use crate::klib::{BTreeMap, Vec, VecDeque};
-use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use std::string::{String, ToString};
 
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c

@@ -1,4 +1,3 @@
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -46,20 +45,68 @@ impl UniversalSyscallAbiShim {
 
         match self.active_abi {
             EcosystemAbi::LinuxX86_64 => match syscall_num {
-                0 => SyscallTranslationResult { host_capability: "cap_read".to_string(), return_code: arg3 as isize, translated_ok: true },
-                1 => SyscallTranslationResult { host_capability: "cap_write".to_string(), return_code: arg3 as isize, translated_ok: true },
-                2 => SyscallTranslationResult { host_capability: "cap_open".to_string(), return_code: 3, translated_ok: true },
-                3 => SyscallTranslationResult { host_capability: "cap_close".to_string(), return_code: 0, translated_ok: true },
-                9 => SyscallTranslationResult { host_capability: "cap_mmap".to_string(), return_code: 0x7f000000, translated_ok: true },
-                60 => SyscallTranslationResult { host_capability: "cap_exit".to_string(), return_code: 0, translated_ok: true },
-                _ => SyscallTranslationResult { host_capability: "cap_generic_linux".to_string(), return_code: 0, translated_ok: true },
+                0 => SyscallTranslationResult {
+                    host_capability: "cap_read".to_string(),
+                    return_code: arg3 as isize,
+                    translated_ok: true,
+                },
+                1 => SyscallTranslationResult {
+                    host_capability: "cap_write".to_string(),
+                    return_code: arg3 as isize,
+                    translated_ok: true,
+                },
+                2 => SyscallTranslationResult {
+                    host_capability: "cap_open".to_string(),
+                    return_code: 3,
+                    translated_ok: true,
+                },
+                3 => SyscallTranslationResult {
+                    host_capability: "cap_close".to_string(),
+                    return_code: 0,
+                    translated_ok: true,
+                },
+                9 => SyscallTranslationResult {
+                    host_capability: "cap_mmap".to_string(),
+                    return_code: 0x7f000000,
+                    translated_ok: true,
+                },
+                60 => SyscallTranslationResult {
+                    host_capability: "cap_exit".to_string(),
+                    return_code: 0,
+                    translated_ok: true,
+                },
+                _ => SyscallTranslationResult {
+                    host_capability: "cap_generic_linux".to_string(),
+                    return_code: 0,
+                    translated_ok: true,
+                },
             },
             EcosystemAbi::FreeBSD64 => match syscall_num {
-                3 => SyscallTranslationResult { host_capability: "cap_freebsd_read".to_string(), return_code: arg3 as isize, translated_ok: true },
-                4 => SyscallTranslationResult { host_capability: "cap_freebsd_write".to_string(), return_code: arg3 as isize, translated_ok: true },
-                5 => SyscallTranslationResult { host_capability: "cap_freebsd_open".to_string(), return_code: 3, translated_ok: true },
-                1 => SyscallTranslationResult { host_capability: "cap_freebsd_exit".to_string(), return_code: 0, translated_ok: true },
-                _ => SyscallTranslationResult { host_capability: "cap_generic_bsd".to_string(), return_code: 0, translated_ok: true },
+                3 => SyscallTranslationResult {
+                    host_capability: "cap_freebsd_read".to_string(),
+                    return_code: arg3 as isize,
+                    translated_ok: true,
+                },
+                4 => SyscallTranslationResult {
+                    host_capability: "cap_freebsd_write".to_string(),
+                    return_code: arg3 as isize,
+                    translated_ok: true,
+                },
+                5 => SyscallTranslationResult {
+                    host_capability: "cap_freebsd_open".to_string(),
+                    return_code: 3,
+                    translated_ok: true,
+                },
+                1 => SyscallTranslationResult {
+                    host_capability: "cap_freebsd_exit".to_string(),
+                    return_code: 0,
+                    translated_ok: true,
+                },
+                _ => SyscallTranslationResult {
+                    host_capability: "cap_generic_bsd".to_string(),
+                    return_code: 0,
+                    translated_ok: true,
+                },
             },
             EcosystemAbi::OpenBSD64 | EcosystemAbi::NetBSD64 => SyscallTranslationResult {
                 host_capability: "cap_bsd_pledge_unveil".to_string(),
@@ -114,11 +161,17 @@ impl MultiFormatPackageBridge {
 
         for line in raw_metadata.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("Package:") || trimmed.starts_with("pkgname=") || trimmed.starts_with("name:") {
+            if trimmed.starts_with("Package:")
+                || trimmed.starts_with("pkgname=")
+                || trimmed.starts_with("name:")
+            {
                 if let Some(pos) = trimmed.find(|c| c == ':' || c == '=') {
                     name = trimmed[pos + 1..].trim().trim_matches('"').to_string();
                 }
-            } else if trimmed.starts_with("Version:") || trimmed.starts_with("pkgver=") || trimmed.starts_with("version:") {
+            } else if trimmed.starts_with("Version:")
+                || trimmed.starts_with("pkgver=")
+                || trimmed.starts_with("version:")
+            {
                 if let Some(pos) = trimmed.find(|c| c == ':' || c == '=') {
                     version = trimmed[pos + 1..].trim().trim_matches('"').to_string();
                 }
@@ -159,7 +212,8 @@ impl PosixSharedMemoryIpcBridge {
     }
 
     pub fn shm_open_allocate(&mut self, name: &str, size_bytes: usize) -> Result<(), String> {
-        self.shared_memory_blocks.insert(name.to_string(), vec![0u8; size_bytes]);
+        self.shared_memory_blocks
+            .insert(name.to_string(), vec![0u8; size_bytes]);
         Ok(())
     }
 
@@ -218,7 +272,9 @@ mod tests {
     fn test_multi_format_package_bridge() {
         let bridge = MultiFormatPackageBridge::new();
         let deb_metadata = "Package: nginx\nVersion: 1.24.0\nDepends: libssl3";
-        let manifest = bridge.convert_manifest(deb_metadata, PackageSourceFormat::DebianDeb).unwrap();
+        let manifest = bridge
+            .convert_manifest(deb_metadata, PackageSourceFormat::DebianDeb)
+            .unwrap();
 
         assert_eq!(manifest.name, "nginx");
         assert_eq!(manifest.version, "1.24.0");

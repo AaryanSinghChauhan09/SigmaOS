@@ -16,8 +16,8 @@ pub enum SecurityError {
 pub enum SigmaError {
     Security(SecurityError),
 }
-use std::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
+use std::vec::Vec;
 
 /// Granular system capabilities inspired by Linux capability sets
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

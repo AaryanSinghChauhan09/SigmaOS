@@ -4,11 +4,11 @@
 // volume lifecycle (create, attach, detach, snapshot, clone, backup), QoS rate limiting,
 // volume encryption at rest, and multi-attach capabilities.
 
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 pub type VolumeId = u64;
 pub type SnapshotId = u64;

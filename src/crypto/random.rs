@@ -17,19 +17,21 @@ use std::string::{String, ToString};
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Cryptographic Random Number Generator for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements CSPRNG with entropy collection
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-
 
 pub type RNGID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RNGError { Success = 0, InsufficientEntropy = 1, SeedingFailed = 2 }
+pub enum RNGError {
+    Success = 0,
+    InsufficientEntropy = 1,
+    SeedingFailed = 2,
+}
 
 pub trait RandomGenerator {
     fn id(&self) -> RNGID;
@@ -99,7 +101,9 @@ impl SimpleRandomGenerator {
 }
 
 impl RandomGenerator for SimpleRandomGenerator {
-    fn id(&self) -> RNGID { self.id }
+    fn id(&self) -> RNGID {
+        self.id
+    }
 
     fn next_byte(&mut self) -> Result<u8, RNGError> {
         let counter = self.counter.fetch_add(1, Ordering::SeqCst);
@@ -148,7 +152,10 @@ impl RandomGenerator for SimpleRandomGenerator {
         let result = ((state.wrapping_mul(1103515245).wrapping_add(12345) + counter) % 256) as u8;
         let final_result = result ^ hw_byte;
 
-        self.state.store(state.wrapping_mul(1103515245).wrapping_add(12345), Ordering::SeqCst);
+        self.state.store(
+            state.wrapping_mul(1103515245).wrapping_add(12345),
+            Ordering::SeqCst,
+        );
         Ok(final_result)
     }
 
@@ -203,12 +210,17 @@ impl EntropyCollector for SimpleEntropyCollector {
         for &byte in data {
             self.entropy_pool.push(byte.wrapping_add(source));
         }
-        self.entropy_estimate.fetch_add(data.len(), Ordering::SeqCst);
+        self.entropy_estimate
+            .fetch_add(data.len(), Ordering::SeqCst);
     }
 
-    fn get_entropy_estimate(&self) -> usize { self.entropy_estimate.load(Ordering::SeqCst) }
+    fn get_entropy_estimate(&self) -> usize {
+        self.entropy_estimate.load(Ordering::SeqCst)
+    }
 
-    fn is_ready(&self) -> bool { self.entropy_estimate.load(Ordering::SeqCst) >= 256 }
+    fn is_ready(&self) -> bool {
+        self.entropy_estimate.load(Ordering::SeqCst) >= 256
+    }
 }
 
 pub trait CSPRNG {
@@ -267,7 +279,9 @@ pub struct HardwareRng {
 
 impl HardwareRng {
     pub fn new() -> Self {
-        Self { total_harvested_bytes: 0 }
+        Self {
+            total_harvested_bytes: 0,
+        }
     }
 
     /// Tries to harvest secure entropy directly from the physical hardware RNG instruction (RDRAND)
@@ -291,7 +305,9 @@ impl HardwareRng {
             // Dynamic cycle-counter jitter entropy source on non-x86 architectures
             let mut state: u64 = 0x517cc1b727220a95;
             for i in 0..16 {
-                state = state.wrapping_mul(6364136223846793005).wrapping_add(i as u64 + 1);
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(i as u64 + 1);
             }
             value = state;
             success = 1;
@@ -341,19 +357,32 @@ impl ProductionCryptoEnclave {
 
         SecurityAuditReport {
             verified_algorithms: algs,
-            hardware_rng_active: hrng.total_harvested_bytes > 0 || cfg!(not(target_arch = "x86_64")),
+            hardware_rng_active: hrng.total_harvested_bytes > 0
+                || cfg!(not(target_arch = "x86_64")),
             signatures_intact: true,
         }
     }
 }
 
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
+struct VecImpl<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        VecImpl {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -361,18 +390,29 @@ impl<T> VecImpl<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {

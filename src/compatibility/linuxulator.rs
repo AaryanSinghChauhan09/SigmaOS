@@ -4,9 +4,9 @@ use std::vec;
 
 use crate::driver::device::DeviceError;
 use crate::interrupt::handler::RegisterSet;
+use core::sync::atomic::{AtomicU64, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxulatorError {

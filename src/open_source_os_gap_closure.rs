@@ -279,7 +279,11 @@ impl EbpfSockmapRedirectEngine {
     }
 
     /// Redirect packet zero-copy bypassing full TCP/IP stack
-    pub fn redirect_socket_msg(&mut self, src_fd: u64, payload: &[u8]) -> Result<(u32, Vec<u8>), &'static str> {
+    pub fn redirect_socket_msg(
+        &mut self,
+        src_fd: u64,
+        payload: &[u8],
+    ) -> Result<(u32, Vec<u8>), &'static str> {
         if let Some(&target_fd) = self.sock_map.get(&src_fd) {
             self.active_redirects += 1;
             Ok((target_fd, payload.to_vec()))
@@ -305,7 +309,7 @@ impl Default for EbpfSockmapRedirectEngine {
 
 /// Arch Linux Pacman ALPM hook triggers & dynamic PKGBUILD source patcher
 pub struct PacmanAurHookPatchEngine {
-    hooks: Vec<(String, String)>, // (event_type, command)
+    hooks: Vec<(String, String)>,          // (event_type, command)
     applied_patches: Vec<(String, usize)>, // (patch_name, bytes_patched)
 }
 
@@ -332,12 +336,17 @@ impl PacmanAurHookPatchEngine {
     }
 
     /// Apply dynamic PKGBUILD patch diff to source file
-    pub fn apply_pkgbuild_patch(&mut self, patch_name: &str, patch_diff: &str) -> Result<usize, &'static str> {
+    pub fn apply_pkgbuild_patch(
+        &mut self,
+        patch_name: &str,
+        patch_diff: &str,
+    ) -> Result<usize, &'static str> {
         if patch_name.is_empty() || patch_diff.is_empty() {
             return Err("Pacman/AUR: Invalid patch name or content");
         }
         let bytes_patched = patch_diff.len();
-        self.applied_patches.push((patch_name.to_string(), bytes_patched));
+        self.applied_patches
+            .push((patch_name.to_string(), bytes_patched));
         Ok(bytes_patched)
     }
 
@@ -371,7 +380,12 @@ impl VhostUserGpuEngine {
     }
 
     /// Allocate virtio-gpu 2D/3D resource buffer
-    pub fn create_gpu_resource(&mut self, res_id: u32, width: u32, height: u32) -> Result<usize, &'static str> {
+    pub fn create_gpu_resource(
+        &mut self,
+        res_id: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<usize, &'static str> {
         if width == 0 || height == 0 {
             return Err("Vhost-User-GPU: Invalid dimensions");
         }
@@ -381,7 +395,11 @@ impl VhostUserGpuEngine {
     }
 
     /// Submit zero-copy 3D render command payload for virtio GPU dispatch
-    pub fn submit_3d_render_cmd(&mut self, res_id: u32, cmd_bytes: &[u8]) -> Result<usize, &'static str> {
+    pub fn submit_3d_render_cmd(
+        &mut self,
+        res_id: u32,
+        cmd_bytes: &[u8],
+    ) -> Result<usize, &'static str> {
         if !self.resources.contains_key(&res_id) {
             return Err("Vhost-User-GPU: Resource ID not allocated");
         }
@@ -3105,7 +3123,6 @@ impl OpenSourceProjectSupremacySuite {
             .insert(volume_id.to_string(), record.clone());
         Ok(record)
     }
-
 
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {

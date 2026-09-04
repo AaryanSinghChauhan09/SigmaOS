@@ -23,9 +23,9 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
+use core::time::Duration;
 #[cfg(test)]
 use std::collections::BTreeMap;
-use core::time::Duration;
 // SystemTime not in no_std
 
 /// Event type

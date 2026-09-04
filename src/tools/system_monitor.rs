@@ -2,11 +2,11 @@
 // SigmaOS Advanced System Monitor
 // Real implementation of system monitoring tools (btop, fastfetch, power diagnostics)
 
-use std::boxed::Box;
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::format;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================================
 // Process Information & Tracking
@@ -16,7 +16,7 @@ use core::sync::atomic::{AtomicU32, Ordering};
 pub struct ProcessInfo {
     pub pid: u32,
     pub name: String,
-    pub cpu_usage: f32,      // 0-100%
+    pub cpu_usage: f32, // 0-100%
     pub memory_mb: u64,
     pub state: ProcessState,
 }
@@ -177,11 +177,26 @@ impl BtopSystemMonitor {
         }
     }
 
-    pub fn update_memory(&mut self, total_kb: u64, free_kb: u64, available_kb: u64, buffers_kb: u64, cached_kb: u64) {
-        self.memory.update(total_kb, free_kb, available_kb, buffers_kb, cached_kb);
+    pub fn update_memory(
+        &mut self,
+        total_kb: u64,
+        free_kb: u64,
+        available_kb: u64,
+        buffers_kb: u64,
+        cached_kb: u64,
+    ) {
+        self.memory
+            .update(total_kb, free_kb, available_kb, buffers_kb, cached_kb);
     }
 
-    pub fn set_cpu_info(&mut self, model: &str, cores: u32, threads: u32, base_mhz: u32, max_mhz: u32) {
+    pub fn set_cpu_info(
+        &mut self,
+        model: &str,
+        cores: u32,
+        threads: u32,
+        base_mhz: u32,
+        max_mhz: u32,
+    ) {
         self.cpu.model_name = model.to_string();
         self.cpu.cores = cores;
         self.cpu.threads = threads;
@@ -205,7 +220,14 @@ impl BtopSystemMonitor {
         self.uptime_seconds = seconds;
     }
 
-    pub fn add_process(&mut self, pid: u32, name: &str, cpu: f32, memory_mb: u64, state: ProcessState) {
+    pub fn add_process(
+        &mut self,
+        pid: u32,
+        name: &str,
+        cpu: f32,
+        memory_mb: u64,
+        state: ProcessState,
+    ) {
         self.processes.push(ProcessInfo {
             pid,
             name: name.to_string(),
@@ -213,7 +235,8 @@ impl BtopSystemMonitor {
             memory_mb,
             state,
         });
-        self.process_count.store(self.processes.len() as u32, Ordering::SeqCst);
+        self.process_count
+            .store(self.processes.len() as u32, Ordering::SeqCst);
     }
 
     pub fn update_process(&mut self, pid: u32, cpu: f32, memory_mb: u64) -> bool {
@@ -228,7 +251,8 @@ impl BtopSystemMonitor {
     pub fn remove_process(&mut self, pid: u32) -> bool {
         if let Some(pos) = self.processes.iter().position(|p| p.pid == pid) {
             self.processes.remove(pos);
-            self.process_count.store(self.processes.len() as u32, Ordering::SeqCst);
+            self.process_count
+                .store(self.processes.len() as u32, Ordering::SeqCst);
             return true;
         }
         false
@@ -236,18 +260,20 @@ impl BtopSystemMonitor {
 
     pub fn get_top_processes(&self, count: usize, sort_by: SortBy) -> Vec<&ProcessInfo> {
         let mut processes = self.processes.iter().collect::<Vec<_>>();
-        
+
         match sort_by {
             SortBy::Cpu => {
                 processes.sort_by(|a, b| {
-                    b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(core::cmp::Ordering::Equal)
+                    b.cpu_usage
+                        .partial_cmp(&a.cpu_usage)
+                        .unwrap_or(core::cmp::Ordering::Equal)
                 });
             }
             SortBy::Memory => {
                 processes.sort_by(|a, b| b.memory_mb.cmp(&a.memory_mb));
             }
         }
-        
+
         processes.into_iter().take(count).collect()
     }
 

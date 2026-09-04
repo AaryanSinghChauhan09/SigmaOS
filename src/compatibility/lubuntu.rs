@@ -1,9 +1,9 @@
 // Lubuntu-Inspired Lightweight System Configuration & Hardware Optimizer
 // Focuses on extreme memory conservation, diagnostics, and running flawlessly on legacy/low-end systems.
 
+use core::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuGovernor {

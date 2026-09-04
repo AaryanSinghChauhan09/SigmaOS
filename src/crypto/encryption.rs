@@ -2,17 +2,20 @@ use std::vec::Vec;
 
 use std::boxed::Box;
 
+use core::mem;
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
+pub enum CipherType {
+    AES = 0,
+    ChaCha20 = 1,
+    XOR = 2,
+}
 
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
@@ -34,13 +37,21 @@ impl SimpleEncryptionKey {
         unsafe {
             core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
         }
-        SimpleEncryptionKey { id, cipher_type, key_data: key_array }
+        SimpleEncryptionKey {
+            id,
+            cipher_type,
+            key_data: key_array,
+        }
     }
 }
 
 impl EncryptionKey for SimpleEncryptionKey {
-    fn id(&self) -> KeyID { self.id }
-    fn cipher_type(&self) -> CipherType { self.cipher_type }
+    fn id(&self) -> KeyID {
+        self.id
+    }
+    fn cipher_type(&self) -> CipherType {
+        self.cipher_type
+    }
     fn key_data(&self) -> &[u8] {
         let len = self.key_data.iter().position(|&b| b == 0).unwrap_or(32);
         &self.key_data[..len]
@@ -55,7 +66,12 @@ pub trait EncryptionService {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
+pub enum CryptoError {
+    Success = 0,
+    KeyNotFound = 1,
+    EncryptionFailed = 2,
+    InvalidKey = 3,
+}
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
@@ -63,7 +79,12 @@ pub struct SimpleEncryptionService {
 }
 
 impl SimpleEncryptionService {
-    pub fn new() -> Self { SimpleEncryptionService { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleEncryptionService {
+            keys: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl EncryptionService for SimpleEncryptionService {

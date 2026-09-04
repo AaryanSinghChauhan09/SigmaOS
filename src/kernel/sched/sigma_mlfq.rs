@@ -1,5 +1,5 @@
-use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::vec::Vec;
 
 use crate::filesystem::FsError;
 use crate::kernel::sched::scheduler::{RunQueue, SchedClass};

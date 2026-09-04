@@ -339,4 +339,3 @@ mod tests {
         assert_eq!(cpu_arm.ring, CpuRing::Ring0);
     }
 }
-

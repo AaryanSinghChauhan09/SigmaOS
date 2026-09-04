@@ -4,9 +4,9 @@
 // All implementations follow secure coding patterns with no unsafe unless necessary.
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // ══════════════════════════════════════════════════════
 // 1. NixOS-Style Declarative Package Management
@@ -203,11 +203,18 @@ impl AlpineApkPackage {
             } else if let Some(val) = line.strip_prefix("pkgdesc=") {
                 pkg.description = val.trim_matches('"').to_string();
             } else if let Some(val) = line.strip_prefix("depends=") {
-                pkg.dependencies = val.trim_matches('"').split_whitespace()
-                    .map(|s| s.to_string()).collect();
+                pkg.dependencies = val
+                    .trim_matches('"')
+                    .split_whitespace()
+                    .map(|s| s.to_string())
+                    .collect();
             }
         }
-        if pkg.name.is_empty() { None } else { Some(pkg) }
+        if pkg.name.is_empty() {
+            None
+        } else {
+            Some(pkg)
+        }
     }
 }
 
@@ -228,7 +235,9 @@ impl BusyboxDispatcher {
     }
 
     pub fn dispatch(&self, argv: &[&str]) -> i32 {
-        if argv.is_empty() { return 1; }
+        if argv.is_empty() {
+            return 1;
+        }
         if let Some(cmd) = self.commands.get(argv[0]) {
             cmd(&argv[1..])
         } else {
@@ -237,11 +246,26 @@ impl BusyboxDispatcher {
     }
 }
 
-fn busybox_echo(args: &[&str]) -> i32 { let _ = args; 0 }
-fn busybox_cat(args: &[&str]) -> i32 { let _ = args; 0 }
-fn busybox_ls(args: &[&str]) -> i32 { let _ = args; 0 }
-fn busybox_sh(args: &[&str]) -> i32 { let _ = args; 0 }
-fn busybox_mount(args: &[&str]) -> i32 { let _ = args; 0 }
+fn busybox_echo(args: &[&str]) -> i32 {
+    let _ = args;
+    0
+}
+fn busybox_cat(args: &[&str]) -> i32 {
+    let _ = args;
+    0
+}
+fn busybox_ls(args: &[&str]) -> i32 {
+    let _ = args;
+    0
+}
+fn busybox_sh(args: &[&str]) -> i32 {
+    let _ = args;
+    0
+}
+fn busybox_mount(args: &[&str]) -> i32 {
+    let _ = args;
+    0
+}
 
 // ══════════════════════════════════════════════════════
 // 3. Pop!_OS: System76 Auto-Tiling + Recovery Partition
@@ -294,7 +318,11 @@ pub enum WorkspaceLayout {
 impl CosmicAutoTilingEngine {
     pub fn new() -> Self {
         Self {
-            workspaces: vec![Workspace { id: 0, windows: Vec::new(), layout: WorkspaceLayout::Horizontal }],
+            workspaces: vec![Workspace {
+                id: 0,
+                windows: Vec::new(),
+                layout: WorkspaceLayout::Horizontal,
+            }],
             active_workspace: 0,
             tiling_mode: TilingMode::Auto,
             gap_size: 8,
@@ -305,7 +333,9 @@ impl CosmicAutoTilingEngine {
     pub fn tile_windows(&mut self, screen_width: u32, screen_height: u32) {
         let ws = &mut self.workspaces[self.active_workspace];
         let n = ws.windows.len();
-        if n == 0 { return; }
+        if n == 0 {
+            return;
+        }
         let gap = self.gap_size;
         let outer = self.outer_gap;
         let usable_w = screen_width.saturating_sub(outer * 2);
@@ -331,7 +361,10 @@ pub struct RecoveryPartitionManager {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum BootSlot { A, B }
+pub enum BootSlot {
+    A,
+    B,
+}
 
 impl RecoveryPartitionManager {
     pub fn new() -> Self {
@@ -365,10 +398,10 @@ impl RecoveryPartitionManager {
 /// ChromeOS-style verified boot state machine
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum VerifiedBootState {
-    Normal,          // All signatures valid
-    Dev,             // Developer mode (BIOS screen shown)
-    Recovery,        // Recovery mode
-    FailedVerify,    // Signature verification failed
+    Normal,       // All signatures valid
+    Dev,          // Developer mode (BIOS screen shown)
+    Recovery,     // Recovery mode
+    FailedVerify, // Signature verification failed
 }
 
 /// A/B partition update manager (ChromeOS Omaha-style)
@@ -482,7 +515,9 @@ impl AmnesicSessionManager {
 
     pub fn wipe_session(&mut self) {
         // Zero-fill session key (secure erase)
-        for b in self.session_key.iter_mut() { *b = 0; }
+        for b in self.session_key.iter_mut() {
+            *b = 0;
+        }
         self.persistent_paths.clear();
         self.ram_only = true;
     }
@@ -538,10 +573,30 @@ pub enum PolicyAction {
 impl QubesSecurityPolicy {
     pub fn new_default() -> Self {
         let rules = vec![
-            PolicyRule { from: SecurityDomain::Work, to: SecurityDomain::Vault, service: "*".to_string(), action: PolicyAction::Deny },
-            PolicyRule { from: SecurityDomain::Personal, to: SecurityDomain::Work, service: "*".to_string(), action: PolicyAction::Deny },
-            PolicyRule { from: SecurityDomain::Untrusted, to: SecurityDomain::Dom0, service: "*".to_string(), action: PolicyAction::Deny },
-            PolicyRule { from: SecurityDomain::Disposable, to: SecurityDomain::Sys, service: "qubes.Network".to_string(), action: PolicyAction::Allow },
+            PolicyRule {
+                from: SecurityDomain::Work,
+                to: SecurityDomain::Vault,
+                service: "*".to_string(),
+                action: PolicyAction::Deny,
+            },
+            PolicyRule {
+                from: SecurityDomain::Personal,
+                to: SecurityDomain::Work,
+                service: "*".to_string(),
+                action: PolicyAction::Deny,
+            },
+            PolicyRule {
+                from: SecurityDomain::Untrusted,
+                to: SecurityDomain::Dom0,
+                service: "*".to_string(),
+                action: PolicyAction::Deny,
+            },
+            PolicyRule {
+                from: SecurityDomain::Disposable,
+                to: SecurityDomain::Sys,
+                service: "qubes.Network".to_string(),
+                action: PolicyAction::Allow,
+            },
         ];
         Self { rules }
     }
@@ -568,7 +623,11 @@ pub struct DisposableVmFactory {
 
 impl DisposableVmFactory {
     pub fn new(template: &str) -> Self {
-        Self { template: template.to_string(), next_id: 1, active_dispvms: Vec::new() }
+        Self {
+            template: template.to_string(),
+            next_id: 1,
+            active_dispvms: Vec::new(),
+        }
     }
 
     pub fn create(&mut self) -> u64 {
@@ -638,7 +697,9 @@ impl BedrockCrossStratumResolver {
     /// Resolve a command across strata, returning (stratum_name, binary_path)
     pub fn resolve_command(&self, cmd: &str) -> Option<(String, String)> {
         for s in &self.strata {
-            if !s.enabled { continue; }
+            if !s.enabled {
+                continue;
+            }
             let path = format!("{}/usr/bin/{}", s.root_path, cmd);
             // In real impl: check actual filesystem
             return Some((s.name.clone(), path));
@@ -649,7 +710,8 @@ impl BedrockCrossStratumResolver {
     /// List all packages available across strata
     pub fn cross_stratum_packages(&self) -> Vec<(String, String)> {
         // (stratum, package_name) pairs
-        self.strata.iter()
+        self.strata
+            .iter()
             .filter(|s| s.enabled)
             .map(|s| (s.name.clone(), s.distro.clone()))
             .collect()
@@ -717,7 +779,8 @@ impl LivePatchManager {
     }
 
     pub fn list_applied_cves(&self) -> Vec<String> {
-        self.applied_patches.iter()
+        self.applied_patches
+            .iter()
             .flat_map(|p| p.cve_ids.iter().cloned())
             .collect()
     }
@@ -791,15 +854,22 @@ impl AppArmorProfile {
     }
 
     pub fn allow_path(&mut self, pattern: &str, perms: AppArmorPermissions) {
-        self.rules.push(AppArmorRule { path_pattern: pattern.to_string(), permissions: perms });
+        self.rules.push(AppArmorRule {
+            path_pattern: pattern.to_string(),
+            permissions: perms,
+        });
     }
 
     pub fn check_access(&self, path: &str, read: bool, write: bool) -> bool {
-        if self.mode == AppArmorMode::Disabled { return true; }
+        if self.mode == AppArmorMode::Disabled {
+            return true;
+        }
         for rule in &self.rules {
             if path_matches_pattern(path, &rule.path_pattern) {
                 let ok = (!read || rule.permissions.read) && (!write || rule.permissions.write);
-                if ok { return true; }
+                if ok {
+                    return true;
+                }
             }
         }
         // Default deny in enforce mode
@@ -936,7 +1006,13 @@ pub struct VersionConstraint {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum VersionOp { Eq, Lt, Le, Gt, Ge }
+pub enum VersionOp {
+    Eq,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+}
 
 #[derive(Debug, Clone, Copy, Default)]
 pub enum DebianPriority {
@@ -954,7 +1030,11 @@ impl DebianControl {
         let mut in_description = false;
         for line in content.lines() {
             if in_description {
-                if line.starts_with(' ') { continue; } else { in_description = false; }
+                if line.starts_with(' ') {
+                    continue;
+                } else {
+                    in_description = false;
+                }
             }
             if let Some(v) = line.strip_prefix("Package: ") {
                 ctrl.package = v.to_string();
@@ -1015,12 +1095,17 @@ impl RpmSpec {
             }
             if section.is_empty() {
                 // Header section
-                if let Some(v) = line_trim.strip_prefix("Name:") { spec.name = v.trim().to_string(); }
-                else if let Some(v) = line_trim.strip_prefix("Version:") { spec.version = v.trim().to_string(); }
-                else if let Some(v) = line_trim.strip_prefix("Release:") { spec.release = v.trim().to_string(); }
-                else if let Some(v) = line_trim.strip_prefix("Summary:") { spec.summary = v.trim().to_string(); }
-                else if let Some(v) = line_trim.strip_prefix("License:") { spec.license = v.trim().to_string(); }
-                else if let Some(v) = line_trim.strip_prefix("Requires:") {
+                if let Some(v) = line_trim.strip_prefix("Name:") {
+                    spec.name = v.trim().to_string();
+                } else if let Some(v) = line_trim.strip_prefix("Version:") {
+                    spec.version = v.trim().to_string();
+                } else if let Some(v) = line_trim.strip_prefix("Release:") {
+                    spec.release = v.trim().to_string();
+                } else if let Some(v) = line_trim.strip_prefix("Summary:") {
+                    spec.summary = v.trim().to_string();
+                } else if let Some(v) = line_trim.strip_prefix("License:") {
+                    spec.license = v.trim().to_string();
+                } else if let Some(v) = line_trim.strip_prefix("Requires:") {
                     spec.requires.push(v.trim().to_string());
                 } else if let Some(v) = line_trim.strip_prefix("BuildRequires:") {
                     spec.build_requires.push(v.trim().to_string());
@@ -1038,8 +1123,12 @@ impl RpmSpec {
 fn compute_derivation_hash(name: &str, version: &str, src: &str, inputs: &[String]) -> [u8; 32] {
     // Simple non-cryptographic hash for demonstration; real impl uses SHA-256
     let mut hash = [0u8; 32];
-    let data: Vec<u8> = name.bytes().chain(version.bytes()).chain(src.bytes())
-        .chain(inputs.iter().flat_map(|s| s.bytes())).collect();
+    let data: Vec<u8> = name
+        .bytes()
+        .chain(version.bytes())
+        .chain(src.bytes())
+        .chain(inputs.iter().flat_map(|s| s.bytes()))
+        .collect();
     for (i, b) in data.iter().enumerate() {
         hash[i % 32] ^= b.wrapping_add((i / 32) as u8);
     }
@@ -1073,23 +1162,31 @@ fn path_matches_pattern(path: &str, pattern: &str) -> bool {
 }
 
 fn parse_bash_array(s: &str) -> Vec<String> {
-    s.trim_end_matches(')').split_whitespace()
+    s.trim_end_matches(')')
+        .split_whitespace()
         .map(|t| t.trim_matches('"').trim_matches('\'').to_string())
         .filter(|s| !s.is_empty())
         .collect()
 }
 
 fn parse_debian_deps(s: &str) -> Vec<DebianDependency> {
-    s.split(',').map(|d| {
-        let d = d.trim();
-        let parts: Vec<&str> = d.splitn(2, ' ').collect();
-        DebianDependency {
-            package: parts[0].to_string(),
-            version_constraint: if parts.len() > 1 {
-                Some(VersionConstraint { operator: VersionOp::Ge, version: parts[1].trim_matches(|c| c == '(' || c == ')').to_string() })
-            } else { None },
-        }
-    }).collect()
+    s.split(',')
+        .map(|d| {
+            let d = d.trim();
+            let parts: Vec<&str> = d.splitn(2, ' ').collect();
+            DebianDependency {
+                package: parts[0].to_string(),
+                version_constraint: if parts.len() > 1 {
+                    Some(VersionConstraint {
+                        operator: VersionOp::Ge,
+                        version: parts[1].trim_matches(|c| c == '(' || c == ')').to_string(),
+                    })
+                } else {
+                    None
+                },
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -1098,7 +1195,12 @@ mod tests {
 
     #[test]
     fn test_nix_derivation() {
-        let drv = NixDerivation::new("sigma-kernel", "6.1.0", "https://example.com/sigma-6.1.0.tar.gz", vec!["gcc".to_string(), "make".to_string()]);
+        let drv = NixDerivation::new(
+            "sigma-kernel",
+            "6.1.0",
+            "https://example.com/sigma-6.1.0.tar.gz",
+            vec!["gcc".to_string(), "make".to_string()],
+        );
         assert!(drv.store_path.starts_with("/sigma/store/"));
         assert!(drv.store_path.contains("sigma-kernel"));
     }
@@ -1126,7 +1228,13 @@ mod tests {
     #[test]
     fn test_apparmor_profile() {
         let mut profile = AppArmorProfile::new_deny_all("test-app");
-        let perms = AppArmorPermissions { read: true, write: false, execute: false, mmap_exec: false, link: false };
+        let perms = AppArmorPermissions {
+            read: true,
+            write: false,
+            execute: false,
+            mmap_exec: false,
+            link: false,
+        };
         profile.allow_path("/etc/passwd", perms);
         assert!(profile.check_access("/etc/passwd", true, false));
         assert!(!profile.check_access("/etc/shadow", true, false));
@@ -1169,7 +1277,8 @@ depends=("glibc" "openssl")
 
     #[test]
     fn test_alpine_apk_parse() {
-        let content = "pkgname=sigma\npkgver=1.0\npkgdesc=\"SigmaOS Alpine package\"\ndepends=\"musl libc\"";
+        let content =
+            "pkgname=sigma\npkgver=1.0\npkgdesc=\"SigmaOS Alpine package\"\ndepends=\"musl libc\"";
         let pkg = AlpineApkPackage::parse_apkbuild(content).unwrap();
         assert_eq!(pkg.name, "sigma");
     }
@@ -1177,9 +1286,15 @@ depends=("glibc" "openssl")
     #[test]
     fn test_livepatch() {
         let mut mgr = LivePatchManager::new("5.15.0-91-generic");
-        let mut patch = KernelLivePatch::new("lp-2024-001", vec!["CVE-2024-1234".to_string()], "5.15.0-91-generic");
+        let mut patch = KernelLivePatch::new(
+            "lp-2024-001",
+            vec!["CVE-2024-1234".to_string()],
+            "5.15.0-91-generic",
+        );
         patch.patch_data = vec![0x90]; // NOP sled placeholder
         assert!(mgr.apply_patch(patch).is_ok());
-        assert!(mgr.list_applied_cves().contains(&"CVE-2024-1234".to_string()));
+        assert!(mgr
+            .list_applied_cves()
+            .contains(&"CVE-2024-1234".to_string()));
     }
 }

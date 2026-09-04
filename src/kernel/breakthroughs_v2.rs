@@ -10,10 +10,10 @@ use std::format;
 // 7. Cross-Mode Terminal Multiplexing
 // 8. AI-Driven Daemon Ecosystem
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. NEURO-SYMBOLIC OS INTELLIGENCE

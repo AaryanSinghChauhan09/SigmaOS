@@ -1,10 +1,10 @@
 // SigmaOS BSD-inspired Zone / UMA (Universal Memory Allocator) Allocator
 // Implements type-stable object caching for kernel resources
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy)]
 pub struct ZoneStats {

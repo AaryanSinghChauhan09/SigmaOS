@@ -31,7 +31,6 @@ pub struct AurPackage {
     pub popularity: f32,
 }
 
-
 impl Eq for AurPackage {}
 
 /// AUR metadata parser

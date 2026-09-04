@@ -7,11 +7,11 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec as StdVec;
 
-use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 pub type CommandID = usize;
 
@@ -1681,7 +1681,6 @@ impl HistoryExpansionEngine {
     }
 }
 
-
 #[cfg(test)]
 mod advanced_shell_tests {
     use super::*;
@@ -1867,6 +1866,4 @@ mod advanced_shell_tests {
             "git commit -m 'Initial commit'"
         );
     }
-
-
 }

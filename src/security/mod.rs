@@ -71,9 +71,7 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
-pub use hardening::{
-    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
-};
+pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,

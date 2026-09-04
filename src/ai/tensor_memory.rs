@@ -1,9 +1,9 @@
 // Zero-Copy AI Tensor Memory Manager for SigmaOS
 // Inspired by Linux TTM/GEM graphics translation memory and FreeBSD UMA / contigmalloc.
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Precision and format of tensor data elements.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -2,7 +2,6 @@
 // SigmaOS SVN-to-Git Migration & Reproducible Package Builder Subsystem
 // Native Rust implementation of Arch Linux svntogit and Reproducible Builds parity
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -105,7 +104,10 @@ impl SovereignSvnToGitMigrator {
                 }
             };
 
-            let git_notes = format!("Svn-Revision: {}\nSvn-Path: {}\nConverted-By: SigmaOS-svntogit", log.revision, log.path);
+            let git_notes = format!(
+                "Svn-Revision: {}\nSvn-Path: {}\nConverted-By: SigmaOS-svntogit",
+                log.revision, log.path
+            );
 
             let commit = ConvertedGitCommit {
                 commit_hash,
@@ -158,7 +160,11 @@ impl PkgctlSplitMigrationEngine {
         });
     }
 
-    pub fn execute_split(&self, pkgbase: &str, commits: &[ConvertedGitCommit]) -> Option<Vec<ConvertedGitCommit>> {
+    pub fn execute_split(
+        &self,
+        pkgbase: &str,
+        commits: &[ConvertedGitCommit],
+    ) -> Option<Vec<ConvertedGitCommit>> {
         let _config = self.split_configs.iter().find(|c| c.pkgbase == pkgbase)?;
         let mut pkg_commits = Vec::new();
 
@@ -193,7 +199,9 @@ pub struct BsdPortsCvsSvnToGitMapper {
 
 impl BsdPortsCvsSvnToGitMapper {
     pub fn new() -> Self {
-        Self { rcs_tags: Vec::new() }
+        Self {
+            rcs_tags: Vec::new(),
+        }
     }
 
     pub fn parse_rcs_header(&mut self, content: &str) -> Option<BsdPortsRcsTag> {
@@ -217,7 +225,11 @@ impl BsdPortsCvsSvnToGitMapper {
     }
 
     pub fn convert_rcs_to_git_tag(&self, rcs_tag: &BsdPortsRcsTag) -> String {
-        format!("ports/{}/v{}", rcs_tag.author, rcs_tag.rcs_revision.replace('.', "_"))
+        format!(
+            "ports/{}/v{}",
+            rcs_tag.author,
+            rcs_tag.rcs_revision.replace('.', "_")
+        )
     }
 }
 
@@ -305,7 +317,10 @@ impl GitPackagingRepositorySplitter {
 
         for commit in converted_commits {
             let pkg_name = if commit.git_branch.starts_with("packages/") {
-                commit.git_branch.trim_start_matches("packages/").to_string()
+                commit
+                    .git_branch
+                    .trim_start_matches("packages/")
+                    .to_string()
             } else {
                 "core-base".to_string()
             };
@@ -363,8 +378,16 @@ impl DebianGitBuildpackageEngine {
     }
 
     /// Reconstructs the exact pristine upstream orig.tar.gz from pristine-tar branch delta
-    pub fn reconstruct_upstream_tarball(&self, pkg_name: &str, version: &str) -> Result<String, &'static str> {
-        if let Some(delta) = self.pristine_tar_deltas.iter().find(|d| d.package_name == pkg_name && d.version == version) {
+    pub fn reconstruct_upstream_tarball(
+        &self,
+        pkg_name: &str,
+        version: &str,
+    ) -> Result<String, &'static str> {
+        if let Some(delta) = self
+            .pristine_tar_deltas
+            .iter()
+            .find(|d| d.package_name == pkg_name && d.version == version)
+        {
             Ok(delta.tarball_filename.clone())
         } else {
             Err("gbp: Pristine-tar delta not found for package version")
@@ -396,10 +419,18 @@ pub struct SovereignGitOverlaySyncEngine {
 
 impl SovereignGitOverlaySyncEngine {
     pub fn new() -> Self {
-        Self { overlays: Vec::new() }
+        Self {
+            overlays: Vec::new(),
+        }
     }
 
-    pub fn sync_overlay(&mut self, overlay_name: &str, repo_url: &str, commit: &str, gpg_valid: bool) -> Result<(), &'static str> {
+    pub fn sync_overlay(
+        &mut self,
+        overlay_name: &str,
+        repo_url: &str,
+        commit: &str,
+        gpg_valid: bool,
+    ) -> Result<(), &'static str> {
         if !gpg_valid {
             return Err("Git Overlay Sync: Commit signature verification failed");
         }
@@ -452,7 +483,8 @@ impl FedoraDistGitNamespaceEngine {
     }
 
     pub fn register_lookaside_hash(&mut self, tarball_filename: &str, sha512_hash: &str) {
-        self.lookaside_hashes.insert(tarball_filename.to_string(), sha512_hash.to_string());
+        self.lookaside_hashes
+            .insert(tarball_filename.to_string(), sha512_hash.to_string());
     }
 
     pub fn verify_lookaside_cache(&self, tarball_filename: &str, expected_hash: &str) -> bool {
@@ -463,7 +495,12 @@ impl FedoraDistGitNamespaceEngine {
         }
     }
 
-    pub fn create_side_tag(&mut self, pkgname: &str, target_release: &str, side_tag_id: &str) -> Result<String, &'static str> {
+    pub fn create_side_tag(
+        &mut self,
+        pkgname: &str,
+        target_release: &str,
+        side_tag_id: &str,
+    ) -> Result<String, &'static str> {
         if let Some(entry) = self.namespaces.iter_mut().find(|n| n.pkgname == pkgname) {
             let side_tag = format!("{}-build-side-{}", target_release, side_tag_id);
             entry.active_side_tags.push(side_tag.clone());
@@ -498,10 +535,17 @@ impl GentooEbuildGitManifestEngine {
     }
 
     pub fn add_trust_key(&mut self, gpg_fingerprint: &str) {
-        self.trusted_gpg_fingerprints.push(gpg_fingerprint.to_string());
+        self.trusted_gpg_fingerprints
+            .push(gpg_fingerprint.to_string());
     }
 
-    pub fn add_manifest_entry(&mut self, file_type: &str, file_name: &str, file_size: usize, sha512_hash: &str) {
+    pub fn add_manifest_entry(
+        &mut self,
+        file_type: &str,
+        file_name: &str,
+        file_size: usize,
+        sha512_hash: &str,
+    ) {
         self.manifest_entries.push(EbuildManifestFileEntry {
             file_type: file_type.to_string(),
             file_name: file_name.to_string(),
@@ -511,7 +555,8 @@ impl GentooEbuildGitManifestEngine {
     }
 
     pub fn verify_manifest_signature(&self, signer_fingerprint: &str) -> bool {
-        self.trusted_gpg_fingerprints.contains(&signer_fingerprint.to_string())
+        self.trusted_gpg_fingerprints
+            .contains(&signer_fingerprint.to_string())
     }
 
     pub fn auto_regenerate_manifest(&mut self, ebuild_path: &str, ebuild_content: &[u8]) -> String {
@@ -549,7 +594,8 @@ impl AlpineAportsCommitSigner {
     }
 
     pub fn verify_ed25519_tag_signature(&self, pubkey_hex: &str) -> bool {
-        self.verified_ed25519_pubkeys.contains(&pubkey_hex.to_string())
+        self.verified_ed25519_pubkeys
+            .contains(&pubkey_hex.to_string())
     }
 
     pub fn bump_apkbuild_checksums(&self, apkbuild_content: &str, new_sha512: &str) -> String {
@@ -677,7 +723,11 @@ mod tests {
         let commits = migrator.migrate_svn_to_git("archlinux.org");
 
         let mut splitter = PkgctlSplitMigrationEngine::new();
-        splitter.register_pkgbase("ripgrep", "https://gitlab.archlinux.org/archlinux/packaging/packages/ripgrep.git", true);
+        splitter.register_pkgbase(
+            "ripgrep",
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/ripgrep.git",
+            true,
+        );
 
         let split_commits = splitter.execute_split("ripgrep", &commits).unwrap();
         assert_eq!(split_commits.len(), 1);
@@ -687,7 +737,8 @@ mod tests {
     #[test]
     fn test_bsd_ports_cvs_svn_to_git_mapper() {
         let mut mapper = BsdPortsCvsSvnToGitMapper::new();
-        let header = "# $FreeBSD: head/ports/sysutils/ripgrep/Makefile 550000 2020-10-01 12:00:00Z bsddev $";
+        let header =
+            "# $FreeBSD: head/ports/sysutils/ripgrep/Makefile 550000 2020-10-01 12:00:00Z bsddev $";
         let tag = mapper.parse_rcs_header(header).unwrap();
 
         assert_eq!(tag.rcs_keyword, "$FreeBSD$");
@@ -719,7 +770,10 @@ mod tests {
         assert!(gentoo.verify_manifest_signature("FINGERPRINT123"));
         assert!(!gentoo.verify_manifest_signature("UNTRUSTED456"));
 
-        let manifest_line = gentoo.auto_regenerate_manifest("/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild", b"SLOT=0");
+        let manifest_line = gentoo.auto_regenerate_manifest(
+            "/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild",
+            b"SLOT=0",
+        );
         assert!(manifest_line.starts_with("EBUILD ripgrep-13.0.0.ebuild"));
         assert_eq!(gentoo.manifest_entries.len(), 1);
     }
@@ -757,7 +811,10 @@ mod tests {
         assert!(gentoo.verify_manifest_signature("FINGERPRINT123"));
         assert!(!gentoo.verify_manifest_signature("UNTRUSTED456"));
 
-        let manifest_line = gentoo.auto_regenerate_manifest("/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild", b"SLOT=0");
+        let manifest_line = gentoo.auto_regenerate_manifest(
+            "/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild",
+            b"SLOT=0",
+        );
         assert!(manifest_line.starts_with("EBUILD ripgrep-13.0.0.ebuild"));
         assert_eq!(gentoo.manifest_entries.len(), 1);
     }
@@ -795,7 +852,10 @@ mod tests {
         assert!(gentoo.verify_manifest_signature("FINGERPRINT123"));
         assert!(!gentoo.verify_manifest_signature("UNTRUSTED456"));
 
-        let manifest_line = gentoo.auto_regenerate_manifest("/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild", b"SLOT=0");
+        let manifest_line = gentoo.auto_regenerate_manifest(
+            "/usr/portage/app-misc/ripgrep/ripgrep-13.0.0.ebuild",
+            b"SLOT=0",
+        );
         assert!(manifest_line.starts_with("EBUILD ripgrep-13.0.0.ebuild"));
         assert_eq!(gentoo.manifest_entries.len(), 1);
     }

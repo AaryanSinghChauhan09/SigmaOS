@@ -11,7 +11,6 @@ use crate::klib::HashMap;
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 
-
 /// Contributor onboarding stages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OnboardingStage {

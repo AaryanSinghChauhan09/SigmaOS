@@ -10,11 +10,11 @@ use std::vec;
 
 use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Represents a package mirror in the SigmaOS network.
 #[derive(Debug, Clone, PartialEq)]

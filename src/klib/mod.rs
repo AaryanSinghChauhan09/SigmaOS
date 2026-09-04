@@ -53,14 +53,14 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-pub use std::collections::BTreeMap;
-pub use std::string::{String, ToString};
 pub use arc::Arc;
 pub use collections::VecDeque;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
 pub use json::{SovereignJsonParser, SovereignJsonValue};
 pub use path::PathBuf;
+pub use std::collections::BTreeMap;
+pub use std::string::{String, ToString};
 pub use string::SigmaString;
 pub use time::{Duration, Instant, Time};
 pub use vec::Vec;
@@ -125,10 +125,7 @@ mod tests {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");
         assert_ne!(hash, 0);
         // Verify determinism
-        assert_eq!(
-            ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos"),
-            hash
-        );
+        assert_eq!(ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos"), hash);
     }
 
     #[test]
@@ -139,5 +136,5 @@ mod tests {
     }
 }
 
-pub use hashset::HashSet;
 pub use arc::Arc;
+pub use hashset::HashSet;

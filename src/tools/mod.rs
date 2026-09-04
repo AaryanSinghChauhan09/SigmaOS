@@ -9,8 +9,8 @@ pub mod sovereign_commands;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
-    DataPipelineEtlEngine, DataQueryEngine, DataValue, ParquetArrowDataEngine,
-    DataVisualizationEngine,
+    DataPipelineEtlEngine, DataQueryEngine, DataValue, DataVisualizationEngine,
+    ParquetArrowDataEngine,
 };
 
 pub use simple_scan::{

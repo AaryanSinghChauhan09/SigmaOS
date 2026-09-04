@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: Socket Implementation
 /// BSD-compatible socket API for TCP/UDP/ICMP
-
 use super::zenithnet::{Ipv4Addr, NetworkError, TcpState};
+use core::fmt;
 use std::collections::BTreeMap;
 use std::vec::Vec;
-use core::fmt;
 
 /// Socket Address Family
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -201,7 +200,9 @@ impl Socket {
             return Err(SocketError::NotConnected);
         }
 
-        let to_send = data.len().min(self.options.send_buffer_size - self.send_buffer.len());
+        let to_send = data
+            .len()
+            .min(self.options.send_buffer_size - self.send_buffer.len());
 
         if to_send == 0 {
             return Err(SocketError::BufferFull);
@@ -276,9 +277,7 @@ impl SocketTable {
 
     /// Get socket
     pub fn get_socket(&mut self, fd: i32) -> Result<&mut Socket, SocketError> {
-        self.sockets
-            .get_mut(&fd)
-            .ok_or(SocketError::InvalidSocket)
+        self.sockets.get_mut(&fd).ok_or(SocketError::InvalidSocket)
     }
 
     /// Close socket

@@ -2,12 +2,11 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-
+use core::cell::Cell;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]

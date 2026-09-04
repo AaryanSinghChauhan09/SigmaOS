@@ -1,10 +1,10 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 /// Relay-and-Nexus Subsystems for SigmaOS
 /// Implements KernelRelay, SyscallEncyclopedia, DriverVaultV2, FirmwareNexus,
 /// BuildChronicle, SecurityNexus, and PeripheralArchiveV2.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Kernel Personality Relay

@@ -3,10 +3,10 @@
 // driver entry contexts, dynamic unloading, and Non-Paged Pool memory tracking.
 
 use crate::klib::collections::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {

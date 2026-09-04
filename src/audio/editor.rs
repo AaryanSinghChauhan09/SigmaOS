@@ -1,8 +1,8 @@
-use std::vec;
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
 use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
 
 pub trait AudioEffect {

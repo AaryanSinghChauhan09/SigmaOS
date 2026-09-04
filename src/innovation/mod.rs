@@ -5,13 +5,13 @@
 //! - OpenBSD: Security hardening, pledge/unveil-inspired capabilities
 //! - postmarketOS: Mainline kernel approach, mobile optimizations
 //! - Ubuntu: Modern installer patterns, accessibility
-use std::vec;
 use std::format;
+use std::vec;
 
 use std::boxed::Box;
-use std::vec::Vec;
-use std::string::{String, ToString};
 use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -75,7 +75,7 @@ impl LLMIntegration {
         if !self.enabled.load(Ordering::SeqCst) {
             return vec![];
         }
-        
+
         vec![
             "Consider enabling AI-powered scheduling for better performance".to_string(),
             "System security analysis shows no critical vulnerabilities".to_string(),
@@ -112,14 +112,18 @@ impl IntelligentScheduler {
         self.active.store(true, Ordering::SeqCst);
     }
 
-    pub fn make_scheduling_decision(&mut self, process_id: usize, priority: u8) -> SchedulingDecision {
+    pub fn make_scheduling_decision(
+        &mut self,
+        process_id: usize,
+        priority: u8,
+    ) -> SchedulingDecision {
         let decision = SchedulingDecision {
             process_id,
             priority,
             cpu_affinity: vec![0], // Simplified
-            timestamp: 0, // Would use real timestamp
+            timestamp: 0,          // Would use real timestamp
         };
-        
+
         self.performance_history.push(decision.clone());
         decision
     }
@@ -137,7 +141,7 @@ impl PredictiveOptimizer {
         predictions.insert("memory_usage".to_string(), 0.75);
         predictions.insert("cpu_load".to_string(), 0.60);
         predictions.insert("disk_io".to_string(), 0.30);
-        
+
         PredictiveOptimizer {
             enabled: AtomicBool::new(false),
             predictions,
@@ -183,7 +187,7 @@ impl HotPatchingSystem {
         if !self.enabled.load(Ordering::SeqCst) {
             return Err(HotPatchError::SystemDisabled);
         }
-        
+
         // In real implementation, would safely apply kernel patch
         self.active_patches.push(patch);
         Ok(())
@@ -235,13 +239,13 @@ impl TrustedExecutionEnvironment {
 
     pub fn create_secure_session(&mut self, permissions: Vec<String>) -> String {
         let session_id = format!("tee_session_{}", self.secure_enclave.active_sessions.len());
-        
+
         let session = TEESession {
             session_id: session_id.clone(),
             permissions,
             active: true,
         };
-        
+
         self.secure_enclave.active_sessions.push(session);
         session_id
     }
@@ -284,7 +288,7 @@ impl PledgeSystem {
                 return Err(PledgeError::InvalidPromise);
             }
         }
-        
+
         self.active_promises = promises;
         Ok(())
     }
@@ -320,7 +324,11 @@ impl UnveilSystem {
         }
     }
 
-    pub fn unveil(&mut self, path: &str, permissions: UnveilPermissions) -> Result<(), UnveilError> {
+    pub fn unveil(
+        &mut self,
+        path: &str,
+        permissions: UnveilPermissions,
+    ) -> Result<(), UnveilError> {
         self.unveiled_paths.insert(path.to_string(), permissions);
         Ok(())
     }
@@ -381,7 +389,7 @@ impl WebAssemblySandbox {
         if !self.enabled.load(Ordering::SeqCst) {
             return Err(WASMError::SandboxDisabled);
         }
-        
+
         self.active_modules.push(module);
         Ok(())
     }
@@ -408,7 +416,11 @@ impl SecurityHardening {
         self.pledge_system.pledge(promises)
     }
 
-    pub fn enable_unveil(&mut self, path: &str, permissions: UnveilPermissions) -> Result<(), UnveilError> {
+    pub fn enable_unveil(
+        &mut self,
+        path: &str,
+        permissions: UnveilPermissions,
+    ) -> Result<(), UnveilError> {
         self.unveil_system.unveil(path, permissions)
     }
 
@@ -463,7 +475,8 @@ impl TouchOptimization {
     }
 
     pub fn enable_gestures(&mut self) {
-        self.gesture_recognition_enabled.store(true, Ordering::SeqCst);
+        self.gesture_recognition_enabled
+            .store(true, Ordering::SeqCst);
     }
 }
 
@@ -599,9 +612,15 @@ impl AdaptiveComplianceDashboard {
 
     pub fn audit_overall_compliance_score(&self) -> u32 {
         let mut score = 0;
-        if self.gdpr_compliant.load(Ordering::SeqCst) { score += 35; }
-        if self.hipaa_compliant.load(Ordering::SeqCst) { score += 35; }
-        if self.pci_dss_compliant.load(Ordering::SeqCst) { score += 30; }
+        if self.gdpr_compliant.load(Ordering::SeqCst) {
+            score += 35;
+        }
+        if self.hipaa_compliant.load(Ordering::SeqCst) {
+            score += 35;
+        }
+        if self.pci_dss_compliant.load(Ordering::SeqCst) {
+            score += 30;
+        }
         score
     }
 }
@@ -630,7 +649,10 @@ impl AiNativeOsDebugger {
     pub fn analyze_log_line(&self, log_entry: &str) -> Option<String> {
         self.analyzed_logs_count.fetch_add(1, Ordering::SeqCst);
         if log_entry.contains("SEGFAULT") || log_entry.contains("Panic") {
-            Some(format!("[AI-DEBUGGER-PATCH] Auto-resolved crash event in entry: '{}'", log_entry))
+            Some(format!(
+                "[AI-DEBUGGER-PATCH] Auto-resolved crash event in entry: '{}'",
+                log_entry
+            ))
         } else {
             None
         }
@@ -751,7 +773,9 @@ impl GamifiedOSProductivityHub {
 
     pub fn complete_task(&self, task_difficulty_xp: usize) -> usize {
         self.unlocked_badges_count.fetch_add(1, Ordering::SeqCst);
-        self.total_xp.fetch_add(task_difficulty_xp, Ordering::SeqCst) + task_difficulty_xp
+        self.total_xp
+            .fetch_add(task_difficulty_xp, Ordering::SeqCst)
+            + task_difficulty_xp
     }
 }
 
@@ -775,7 +799,8 @@ impl UniversalOfflineConversionHub {
     }
 
     pub fn convert_asset(&self, input_filename: &str, target_format: &str) -> String {
-        self.conversions_performed_count.fetch_add(1, Ordering::SeqCst);
+        self.conversions_performed_count
+            .fetch_add(1, Ordering::SeqCst);
         let base = input_filename.split('.').next().unwrap_or(input_filename);
         format!("{}.{}", base, target_format)
     }
@@ -852,20 +877,29 @@ impl LayeredKernelPersonalitiesEngine {
         self.registered_processes.insert(pid, personality);
     }
 
-    pub fn dispatch_syscall(&mut self, pid: usize, syscall_name: &str) -> Result<String, &'static str> {
+    pub fn dispatch_syscall(
+        &mut self,
+        pid: usize,
+        syscall_name: &str,
+    ) -> Result<String, &'static str> {
         let personality = self
             .registered_processes
             .get(&pid)
             .copied()
             .unwrap_or(self.active_personality);
 
-        let count = self.syscall_counts.entry(syscall_name.to_string()).or_insert(0);
+        let count = self
+            .syscall_counts
+            .entry(syscall_name.to_string())
+            .or_insert(0);
         *count += 1;
 
         match personality {
             KernelPersonality::Posix => Ok(format!("[POSIX-SYSCALL] Executed {}", syscall_name)),
             KernelPersonality::WindowsNt => Ok(format!("[NT-SYSCALL] Executed Nt{}", syscall_name)),
-            KernelPersonality::FreeBsd => Ok(format!("[BSD-SYSCALL] Executed sys_{}", syscall_name)),
+            KernelPersonality::FreeBsd => {
+                Ok(format!("[BSD-SYSCALL] Executed sys_{}", syscall_name))
+            }
         }
     }
 }
@@ -1060,7 +1094,10 @@ impl NetworkNativeOsStateEngine {
         serialized
     }
 
-    pub fn resume_session_state(&mut self, state_str: &str) -> Result<OsSessionState, &'static str> {
+    pub fn resume_session_state(
+        &mut self,
+        state_str: &str,
+    ) -> Result<OsSessionState, &'static str> {
         if state_str.contains("session:") && state_str.contains("hash:") {
             let session = OsSessionState {
                 session_id: "resumed_session".to_string(),
@@ -1111,7 +1148,11 @@ impl ImmutableUserlandLayersEngine {
     }
 
     pub fn atomic_swap_layer(&mut self, target_layer_id: &str) -> bool {
-        if self.stacked_layers.iter().any(|l| l.layer_id == target_layer_id) {
+        if self
+            .stacked_layers
+            .iter()
+            .any(|l| l.layer_id == target_layer_id)
+        {
             self.active_layer_id = target_layer_id.to_string();
             true
         } else {
@@ -1206,7 +1247,8 @@ impl RetrocompatibilitySandboxEngine {
             isolated_memory_mb: memory_mb,
             active: true,
         };
-        self.sessions.insert(session_id.to_string(), session.clone());
+        self.sessions
+            .insert(session_id.to_string(), session.clone());
         session
     }
 
@@ -1278,20 +1320,65 @@ impl InnovativeOSFeatures {
     /// Get system status report
     pub fn get_status_report(&self) -> String {
         let mut report = String::new();
-        
+
         report.push_str("=== SigmaOS Innovative Features Status ===\n");
-        report.push_str(&format!("AI-Native OS: {}\n", 
-            if self.ai_native.llm_integration.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Hot Patching: {}\n",
-            if self.hot_patching.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Trusted Execution: {}\n",
-            if self.tee.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
+        report.push_str(&format!(
+            "AI-Native OS: {}\n",
+            if self
+                .ai_native
+                .llm_integration
+                .enabled
+                .load(Ordering::SeqCst)
+            {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Hot Patching: {}\n",
+            if self.hot_patching.enabled.load(Ordering::SeqCst) {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Trusted Execution: {}\n",
+            if self.tee.enabled.load(Ordering::SeqCst) {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
         report.push_str(&format!("Security Hardening: Active\n"));
-        report.push_str(&format!("Mobile Optimizations: {}\n",
-            if self.mobile_optimizations.power_management.battery_saver_mode.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
-        report.push_str(&format!("Accessibility: {}\n",
-            if self.accessibility.screen_reader.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
-        
+        report.push_str(&format!(
+            "Mobile Optimizations: {}\n",
+            if self
+                .mobile_optimizations
+                .power_management
+                .battery_saver_mode
+                .load(Ordering::SeqCst)
+            {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+        report.push_str(&format!(
+            "Accessibility: {}\n",
+            if self
+                .accessibility
+                .screen_reader
+                .enabled
+                .load(Ordering::SeqCst)
+            {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        ));
+
         report
     }
 }
@@ -1310,7 +1397,7 @@ mod tests {
     fn test_ai_native_os() {
         let mut ai_os = AINativeOS::new();
         ai_os.initialize();
-        
+
         assert!(ai_os.llm_integration.enabled.load(Ordering::SeqCst));
         let recommendations = ai_os.get_recommendations();
         assert!(!recommendations.is_empty());
@@ -1320,24 +1407,24 @@ mod tests {
     fn test_hot_patching() {
         let mut hot_patch = HotPatchingSystem::new();
         hot_patch.enable();
-        
+
         let patch = HotPatch {
             id: "test_patch".to_string(),
             target_component: "kernel".to_string(),
             patch_data: vec![0x01, 0x02, 0x03],
             applied: false,
         };
-        
+
         assert!(hot_patch.apply_patch(patch).is_ok());
     }
 
     #[test]
     fn test_security_hardening() {
         let mut security = SecurityHardening::new();
-        
+
         let promises = vec!["stdio".to_string(), "rpath".to_string()];
         assert!(security.enable_pledge(promises).is_ok());
-        
+
         let permissions = UnveilPermissions {
             read: true,
             write: false,
@@ -1350,15 +1437,18 @@ mod tests {
     fn test_mobile_optimizations() {
         let mut mobile = MobileOptimizations::new();
         mobile.enable_mobile_mode();
-        
-        assert!(mobile.power_management.battery_saver_mode.load(Ordering::SeqCst));
+
+        assert!(mobile
+            .power_management
+            .battery_saver_mode
+            .load(Ordering::SeqCst));
     }
 
     #[test]
     fn test_innovative_features() {
         let mut features = InnovativeOSFeatures::new();
         features.initialize_all();
-        
+
         let status = features.get_status_report();
         assert!(status.contains("SigmaOS Innovative Features Status"));
     }
@@ -1369,18 +1459,32 @@ mod tests {
         features.initialize_all();
 
         // 1. Compliance Dashboard
-        assert_eq!(features.compliance_dashboard.audit_overall_compliance_score(), 100);
+        assert_eq!(
+            features
+                .compliance_dashboard
+                .audit_overall_compliance_score(),
+            100
+        );
 
         // 2. AI Debugger
-        let patch = features.ai_debugger.analyze_log_line("Kernel SEGFAULT at 0x0").unwrap();
+        let patch = features
+            .ai_debugger
+            .analyze_log_line("Kernel SEGFAULT at 0x0")
+            .unwrap();
         assert!(patch.contains("Auto-resolved crash event"));
 
         // 3. Self-Healing OS
-        let heal = features.self_healing.trigger_repair_and_rollback("OOM-Kill-01").unwrap();
+        let heal = features
+            .self_healing
+            .trigger_repair_and_rollback("OOM-Kill-01")
+            .unwrap();
         assert!(heal.contains("Restored CoW snapshot"));
 
         // 4. Privacy-First Guard
-        assert!(features.privacy_guard.strict_privacy_active.load(Ordering::SeqCst));
+        assert!(features
+            .privacy_guard
+            .strict_privacy_active
+            .load(Ordering::SeqCst));
 
         // 5. Cross-Device Continuity
         let synced = features.continuity.sync_clipboard("New Token");
@@ -1395,7 +1499,9 @@ mod tests {
         assert_eq!(output, "doc.pdf");
 
         // 8. Accessibility Matrix
-        let score = features.accessibility_matrix.calculate_overall_inclusivity_rating();
+        let score = features
+            .accessibility_matrix
+            .calculate_overall_inclusivity_rating();
         assert!(score >= 90);
     }
 
@@ -1407,7 +1513,9 @@ mod tests {
         personalities.register_process(102, KernelPersonality::FreeBsd);
 
         let res_posix = personalities.dispatch_syscall(100, "fork").unwrap();
-        let res_nt = personalities.dispatch_syscall(101, "CreateProcess").unwrap();
+        let res_nt = personalities
+            .dispatch_syscall(101, "CreateProcess")
+            .unwrap();
         let res_bsd = personalities.dispatch_syscall(102, "kqueue").unwrap();
 
         assert!(res_posix.contains("[POSIX-SYSCALL]"));

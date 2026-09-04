@@ -1,11 +1,10 @@
-
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561
 /// Implements secure boot chain with signature verification
 use std::boxed::Box;
 use std::vec::Vec;
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStageID = usize;
 

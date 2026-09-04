@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: EXT4 Filesystem Implementation
 /// Provides native ext4 filesystem support with journal recovery
-
 use super::vfs::{DirEntry, FileSystem, FileType, Inode, VfsError};
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -161,11 +160,11 @@ impl Default for Ext4FileSystem {
 impl FileSystem for Ext4FileSystem {
     fn init(&mut self) -> Result<(), VfsError> {
         self.init_block_groups()?;
-        
+
         // Create root inode (inode 2 on ext4)
         let root = Inode::new(2, FileType::Directory, 0o755);
         self.inode_cache.push(root);
-        
+
         self.mounted = true;
         Ok(())
     }
@@ -179,7 +178,11 @@ impl FileSystem for Ext4FileSystem {
     }
 
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError> {
-        if let Some(cached) = self.inode_cache.iter_mut().find(|i| i.inode_number == inode.inode_number) {
+        if let Some(cached) = self
+            .inode_cache
+            .iter_mut()
+            .find(|i| i.inode_number == inode.inode_number)
+        {
             *cached = inode.clone();
             // Mark as dirty for eventual writeback
             Ok(())
@@ -189,7 +192,12 @@ impl FileSystem for Ext4FileSystem {
         }
     }
 
-    fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError> {
+    fn read_data(
+        &self,
+        inode_number: u64,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<usize, VfsError> {
         let inode = self.read_inode(inode_number)?;
 
         if offset >= inode.size {
@@ -201,14 +209,20 @@ impl FileSystem for Ext4FileSystem {
         Ok(readable)
     }
 
-    fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError> {
+    fn write_data(
+        &mut self,
+        inode_number: u64,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<usize, VfsError> {
         let mut inode = self.read_inode(inode_number)?;
 
         let written = data.len();
         let new_size = (offset + written as u64).max(inode.size);
 
         // Allocate blocks if needed
-        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize) {
+        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize)
+        {
             let block = self.allocate_block();
             match block {
                 Ok(b) => inode.data_blocks.push(b),

@@ -3,10 +3,10 @@ use std::format;
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. CPU FREQUENCY GOVERNORS

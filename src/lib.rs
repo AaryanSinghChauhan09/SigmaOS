@@ -9,12 +9,12 @@ pub mod auth;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
+pub mod crypto;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
-pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
@@ -162,8 +162,8 @@ pub mod toolchain {
     pub mod capsule;
     pub mod codex;
 }
-pub mod scheduler;
 pub mod logging;
+pub mod scheduler;
 pub mod system;
 pub mod update {
     pub mod distro_update_parity;
@@ -182,7 +182,6 @@ pub use innovation::{
     BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
     FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
     KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
-    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
-    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
-    UserlandOverlayLayer, VfsObjectRecord,
+    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine, RetroSandboxSession,
+    RetrocompatibilitySandboxEngine, SchedulingPolicyRule, UserlandOverlayLayer, VfsObjectRecord,
 };

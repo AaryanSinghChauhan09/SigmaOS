@@ -1,12 +1,12 @@
 // SigmaOS Built-in Virtualization Support
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
 
+use core::default::Default;
+use core::result::Result::{self, Err, Ok};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::default::Default;
-use core::result::Result::{self, Err, Ok};
 
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;

@@ -9,8 +9,8 @@ use sigmaos::ai::{
     KMeansClustering, LocalLlmWrapper, LocalQuantizationType, PrincipalComponentAnalysis,
 };
 use sigmaos::distro::OpenBSDUnveil;
-use sigmaos::security::selinux::SelinuxEngine;
 use sigmaos::distro::OpenBSDUnveil;
+use sigmaos::security::selinux::SelinuxEngine;
 use sigmaos::virtualization::kvm_vcpu::{KvmExitCode, KvmVcpu, RAX_HLT_SIGNAL};
 
 #[test]

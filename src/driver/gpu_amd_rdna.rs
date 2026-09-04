@@ -2,10 +2,10 @@
 // SigmaOS AMD RDNA/AMDGPU Driver
 // Supports modern AMD discrete and integrated GPUs (RDNA, RDNA2, RDNA3, Vega)
 
-use std::boxed::Box;
-use std::vec::Vec;
-use std::string::String;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -16,17 +16,17 @@ use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 pub const AMD_VENDOR_ID: u16 = 0x1002;
 
 // RDNA Series Device IDs
-pub const RDNA_RX5700: u16 = 0x7340;   // Radeon RX 5700 XT
-pub const RDNA_RX5600: u16 = 0x7344;   // Radeon RX 5600 XT
-pub const RDNA2_RX6800: u16 = 0x73A0;  // Radeon RX 6800 XT
-pub const RDNA2_RX6700: u16 = 0x73DF;  // Radeon RX 6700 XT
+pub const RDNA_RX5700: u16 = 0x7340; // Radeon RX 5700 XT
+pub const RDNA_RX5600: u16 = 0x7344; // Radeon RX 5600 XT
+pub const RDNA2_RX6800: u16 = 0x73A0; // Radeon RX 6800 XT
+pub const RDNA2_RX6700: u16 = 0x73DF; // Radeon RX 6700 XT
 pub const RDNA3_RX7900XTX: u16 = 0x7480; // Radeon RX 7900 XTX
-pub const RDNA3_RX7900XT: u16 = 0x7481;  // Radeon RX 7900 XT
-pub const RDNA3_RX7800XT: u16 = 0x7487;  // Radeon RX 7800 XT
+pub const RDNA3_RX7900XT: u16 = 0x7481; // Radeon RX 7900 XT
+pub const RDNA3_RX7800XT: u16 = 0x7487; // Radeon RX 7800 XT
 
 // Vega Series Device IDs
-pub const VEGA_RX_VEGA56: u16 = 0x687F;  // Radeon RX Vega 56
-pub const VEGA_RX_VEGA64: u16 = 0x6867;  // Radeon RX Vega 64
+pub const VEGA_RX_VEGA56: u16 = 0x687F; // Radeon RX Vega 56
+pub const VEGA_RX_VEGA64: u16 = 0x6867; // Radeon RX Vega 64
 
 // MMIO Register Base
 pub const MMIO_GRAPHICS_VRAM_SIZE: u32 = 512 * 1024 * 1024; // 512 MB minimum
@@ -111,7 +111,8 @@ impl AmdGpuMemoryManager {
         let gpu_addr = self.vram_offset;
         self.vram_offset += size;
 
-        self.regions.push(GpuMemoryRegion::new(gpu_addr, gpu_addr, size, true));
+        self.regions
+            .push(GpuMemoryRegion::new(gpu_addr, gpu_addr, size, true));
 
         Some(gpu_addr)
     }
@@ -119,7 +120,8 @@ impl AmdGpuMemoryManager {
     pub fn allocate_system_memory(&mut self, size: u64) -> Option<u64> {
         // Allocate from system memory (GTT - Graphics Translation Table)
         let addr = 0xFFFFFFFF00000000 + self.vram_offset; // High address range for system memory
-        self.regions.push(GpuMemoryRegion::new(addr, 0, size, false));
+        self.regions
+            .push(GpuMemoryRegion::new(addr, 0, size, false));
 
         Some(addr)
     }
@@ -159,9 +161,7 @@ impl GpxPacketHeader {
     }
 
     pub fn to_u32(&self) -> u32 {
-        ((self.packet_type as u32) << 30)
-            | ((self.count as u32) << 16)
-            | (self.opcode as u32)
+        ((self.packet_type as u32) << 30) | ((self.count as u32) << 16) | (self.opcode as u32)
     }
 }
 
@@ -443,7 +443,10 @@ impl PciDriver for AmdGpuPciDriver {
         }
 
         // Device is supported, initialize driver
-        let mut gpu = Box::new(AmdGpuDriver::new(device.device_id, &device.address.sysfs_format()));
+        let mut gpu = Box::new(AmdGpuDriver::new(
+            device.device_id,
+            &device.address.sysfs_format(),
+        ));
 
         // Extract MMIO BAR (typically BAR0 for AMD GPU)
         if let Some(ref bar) = device.bars[0] {

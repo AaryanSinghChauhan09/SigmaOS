@@ -2,10 +2,10 @@
 // SigmaOS High-Definition Audio (HDA) Codec Driver
 // Supports Intel HDA, Realtek ALC, and Conexant audio codecs
 
-use std::boxed::Box;
-use std::vec::Vec;
-use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -29,18 +29,18 @@ pub const REALTEK_ALC1220: u32 = 0x1220;
 pub const REALTEK_ALC3226: u32 = 0x3226;
 
 // HDA Register Offsets
-pub const HDA_GCAP: u32 = 0x00;      // Global Capabilities
-pub const HDA_VMIN: u32 = 0x02;      // Minor Version
-pub const HDA_VMAJ: u32 = 0x03;      // Major Version
-pub const HDA_OUTPAY: u32 = 0x04;    // Output Payload Capability
-pub const HDA_INPAY: u32 = 0x06;     // Input Payload Capability
-pub const HDA_GCTL: u32 = 0x08;      // Global Control
-pub const HDA_WAKEEN: u32 = 0x0C;    // Wake Enable
-pub const HDA_STATESTS: u32 = 0x0E;  // State Change Status
-pub const HDA_GSTS: u32 = 0x10;      // Global Status
-pub const HDA_INTCTL: u32 = 0x20;    // Interrupt Control
-pub const HDA_INTSTS: u32 = 0x24;    // Interrupt Status
-pub const HDA_WALCLK: u32 = 0x30;    // Wall Clock Counter
+pub const HDA_GCAP: u32 = 0x00; // Global Capabilities
+pub const HDA_VMIN: u32 = 0x02; // Minor Version
+pub const HDA_VMAJ: u32 = 0x03; // Major Version
+pub const HDA_OUTPAY: u32 = 0x04; // Output Payload Capability
+pub const HDA_INPAY: u32 = 0x06; // Input Payload Capability
+pub const HDA_GCTL: u32 = 0x08; // Global Control
+pub const HDA_WAKEEN: u32 = 0x0C; // Wake Enable
+pub const HDA_STATESTS: u32 = 0x0E; // State Change Status
+pub const HDA_GSTS: u32 = 0x10; // Global Status
+pub const HDA_INTCTL: u32 = 0x20; // Interrupt Control
+pub const HDA_INTSTS: u32 = 0x24; // Interrupt Status
+pub const HDA_WALCLK: u32 = 0x30; // Wall Clock Counter
 
 // DMA Position and Descriptors (per stream)
 pub const HDA_DPLBASE: u32 = 0x70;
@@ -64,8 +64,8 @@ pub const HDA_GCTL_FCNTRL: u32 = 0x00000002;
 // Stream Control Bits
 pub const HDA_SD_CTL_STREAM_RESET: u32 = 0x00000001;
 pub const HDA_SD_CTL_RUN: u32 = 0x00000002;
-pub const HDA_SD_CTL_IOCE: u32 = 0x00000004;  // Interrupt on Completion Enable
-pub const HDA_SD_CTL_FEIE: u32 = 0x00000008;  // FIFO Error Interrupt Enable
+pub const HDA_SD_CTL_IOCE: u32 = 0x00000004; // Interrupt on Completion Enable
+pub const HDA_SD_CTL_FEIE: u32 = 0x00000008; // FIFO Error Interrupt Enable
 
 // ============================================================================
 // Audio Format Definitions
@@ -139,9 +139,7 @@ impl AudioStream {
     }
 
     pub fn bytes_per_second(&self) -> u32 {
-        (self.sample_rate as u32)
-            * (self.bit_depth as u32 / 8)
-            * (self.channels as u32)
+        (self.sample_rate as u32) * (self.bit_depth as u32 / 8) * (self.channels as u32)
     }
 
     pub fn frame_size(&self) -> u32 {
@@ -436,11 +434,13 @@ impl HdaPciDriver {
 
 impl PciDriver for HdaPciDriver {
     fn probe(&mut self, device: &PciDeviceInfo) -> Result<bool, &'static str> {
-        let supported = (device.vendor_id == INTEL_VENDOR_ID &&
-            matches!(
+        let supported = (device.vendor_id == INTEL_VENDOR_ID
+            && matches!(
                 device.device_id,
                 PANTHER_POINT_HDA | LYNX_POINT_HDA | WILDCAT_POINT_HDA | SUNRISE_POINT_HDA
-            )) || (device.vendor_id == REALTEK_VENDOR_ID) || (device.vendor_id == CONEXANT_VENDOR_ID);
+            ))
+            || (device.vendor_id == REALTEK_VENDOR_ID)
+            || (device.vendor_id == CONEXANT_VENDOR_ID);
 
         if !supported {
             return Ok(false);
@@ -555,7 +555,13 @@ mod tests {
         controller.init_codec(0).unwrap();
 
         assert!(controller
-            .setup_output_stream(0, 0, SampleRate::Hz48000, BitDepth::Bits16, Channels::Stereo)
+            .setup_output_stream(
+                0,
+                0,
+                SampleRate::Hz48000,
+                BitDepth::Bits16,
+                Channels::Stereo
+            )
             .is_ok());
     }
 

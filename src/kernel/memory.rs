@@ -1,10 +1,10 @@
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging with zero std dependency
 
-use std::string::String;
-use std::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::string::String;
+use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;

@@ -5171,7 +5171,8 @@ impl OpenBsdUnveilAuditTool {
     }
 
     pub fn add_unveil_rule(&mut self, path: &str, permissions: &str) {
-        self.unveiled_rules.insert(path.to_string(), permissions.to_string());
+        self.unveiled_rules
+            .insert(path.to_string(), permissions.to_string());
     }
 
     pub fn check_path_access(&self, path: &str, requested_perm: char) -> bool {
@@ -5205,7 +5206,8 @@ impl VolatileMemoryDumpForensicEngine {
         if ram_bytes.len() >= 16 {
             self.extracted_processes.push("kernel_init".to_string());
             self.extracted_processes.push("sigma_sh_repl".to_string());
-            self.extracted_sockets.push("0.0.0.0:80->192.168.1.5:443".to_string());
+            self.extracted_sockets
+                .push("0.0.0.0:80->192.168.1.5:443".to_string());
         }
         self.captured_dump_size
     }
@@ -5310,7 +5312,10 @@ impl MetadataExifAntiForensicScrubber {
         let mut clean_bytes = file_bytes.to_vec();
         // Remove simulated EXIF GPS header markers
         let exif_tag = b"EXIF_GPS_DATA";
-        if let Some(pos) = clean_bytes.windows(exif_tag.len()).position(|w| w == exif_tag) {
+        if let Some(pos) = clean_bytes
+            .windows(exif_tag.len())
+            .position(|w| w == exif_tag)
+        {
             for i in pos..(pos + exif_tag.len()) {
                 clean_bytes[i] = 0x00;
             }
@@ -5398,9 +5403,15 @@ mod new_unimplemented_tools_tests {
         let raw_disk = b"RAW_BLOCKS\xFF\xD8\xFF\xE0_JPEG_IMAGE_BYTES_\x89\x50\x4E\x47_PNG_IMAGE_BYTES_\x7F\x45\x4C\x46_ELF_BYTES";
         let count = carver.carve_disk_image(raw_disk);
         assert_eq!(count, 3);
-        assert!(carver.detected_signatures.contains(&"JPEG Image".to_string()));
-        assert!(carver.detected_signatures.contains(&"PNG Image".to_string()));
-        assert!(carver.detected_signatures.contains(&"ELF Executable".to_string()));
+        assert!(carver
+            .detected_signatures
+            .contains(&"JPEG Image".to_string()));
+        assert!(carver
+            .detected_signatures
+            .contains(&"PNG Image".to_string()));
+        assert!(carver
+            .detected_signatures
+            .contains(&"ELF Executable".to_string()));
     }
 
     #[test]
@@ -5426,7 +5437,8 @@ mod new_unimplemented_tools_tests {
     fn test_network_pcap_forensic_sniffer() {
         let mut sniffer = NetworkPcapForensicSniffer::new();
         let safe_pcap = b"GET /index.html HTTP/1.1\r\nHost: example.com\r\n\r\n";
-        let leak_pcap = b"POST /login HTTP/1.1\r\nHost: target.com\r\nUSER=admin&PASS=secret123\r\n\r\n";
+        let leak_pcap =
+            b"POST /login HTTP/1.1\r\nHost: target.com\r\nUSER=admin&PASS=secret123\r\n\r\n";
 
         assert!(!sniffer.inspect_pcap_frame(safe_pcap));
         assert!(sniffer.inspect_pcap_frame(leak_pcap));

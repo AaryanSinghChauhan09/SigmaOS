@@ -1,8 +1,8 @@
 // SigmaOS Distro Compatibility Layer
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 /// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
 /// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==========================================
 // 1. Zen Interactivity Governor

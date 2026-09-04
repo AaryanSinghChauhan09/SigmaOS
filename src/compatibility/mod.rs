@@ -70,8 +70,8 @@ pub use linux_distro_parity::{
     FstabEntry, LinuxCoreDumpFilterEngine, LinuxFstabEngine, LinuxLdSoLoader,
     LinuxModulesLoadEngine, LinuxPamAuthenticationEngine, LinuxRunlevel, LinuxRunlevelGovernor,
     LinuxSwapfileManagerEngine, LinuxSysctlGovernor, LinuxSystemdTmpfilesEngine,
-    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice,
-    SwapKind, TmpfileItemType, TmpfileRule, UdevRule,
+    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice, SwapKind,
+    TmpfileItemType, TmpfileRule, UdevRule,
 };
 pub mod linux_init;
 pub mod linux_network;
@@ -169,9 +169,7 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
-pub use mate_betsy::{
-    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
-};
+pub use mate_betsy::{MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine};
 pub use mint_linux::{
     Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
     MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert, MintReportSystem,

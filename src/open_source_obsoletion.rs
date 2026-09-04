@@ -1543,7 +1543,9 @@ pub struct SovereignApacheSparkDataEngine {
 
 impl SovereignApacheSparkDataEngine {
     pub fn new() -> Self {
-        Self { dataset: Vec::new() }
+        Self {
+            dataset: Vec::new(),
+        }
     }
 
     pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
@@ -1551,7 +1553,11 @@ impl SovereignApacheSparkDataEngine {
     }
 
     pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
-        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
+        self.dataset
+            .iter()
+            .filter(|r| r.value >= min_val)
+            .cloned()
+            .collect()
     }
 
     pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
@@ -1639,7 +1645,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             redis_cluster: SovereignRedisClusterEngine::new(),
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
-            supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
+            supremacy_suite:
+                crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
             total_obsoleted_projects_count: 42,
         }
     }
@@ -3723,9 +3730,21 @@ mod tests {
     fn test_sovereign_apache_spark_data_engine() {
         let mut spark = SovereignApacheSparkDataEngine::new();
         let records = vec![
-            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
-            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
-            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
+            SparkDataRecord {
+                id: 1,
+                key: "CPU".to_string(),
+                value: 40,
+            },
+            SparkDataRecord {
+                id: 2,
+                key: "RAM".to_string(),
+                value: 80,
+            },
+            SparkDataRecord {
+                id: 3,
+                key: "CPU".to_string(),
+                value: 60,
+            },
         ];
         spark.load_dataset(records);
 

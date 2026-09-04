@@ -30,21 +30,36 @@ pub struct CpuContext {
     pub rip: u64,
     pub rflags: u64,
     // Linux/BSD MSRs & PCID page table attributes
-    pub fs_base: u64,  // TLS (Thread Local Storage) MSR
-    pub gs_base: u64,  // Per-CPU data block MSR
-    pub cr3: u64,      // PML4 Page directory base
-    pub pcid: u16,     // FreeBSD/Linux PCID (Process Context ID for TLB retention)
-    pub stack_canary: u64, // OpenBSD-style stack canary protector
-    pub xsave_dirty: bool, // Lazy FP/AVX XSAVE restoration flag
+    pub fs_base: u64,          // TLS (Thread Local Storage) MSR
+    pub gs_base: u64,          // Per-CPU data block MSR
+    pub cr3: u64,              // PML4 Page directory base
+    pub pcid: u16,             // FreeBSD/Linux PCID (Process Context ID for TLB retention)
+    pub stack_canary: u64,     // OpenBSD-style stack canary protector
+    pub xsave_dirty: bool,     // Lazy FP/AVX XSAVE restoration flag
     pub xsave_area: [u64; 64], // 512-byte FXSAVE/XSAVE vector state area
 }
 
 impl Default for CpuContext {
     fn default() -> Self {
         Self {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
-            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
-            rip: 0, rflags: 0x202,
+            rax: 0,
+            rbx: 0,
+            rcx: 0,
+            rdx: 0,
+            rsi: 0,
+            rdi: 0,
+            rbp: 0,
+            rsp: 0,
+            r8: 0,
+            r9: 0,
+            r10: 0,
+            r11: 0,
+            r12: 0,
+            r13: 0,
+            r14: 0,
+            r15: 0,
+            rip: 0,
+            rflags: 0x202,
             fs_base: 0,
             gs_base: 0,
             cr3: 0x1000,

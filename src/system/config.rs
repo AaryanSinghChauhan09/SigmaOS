@@ -60,7 +60,7 @@ impl SystemConfigManager {
     /// Load configuration from file
     pub fn load_config(&mut self, filename: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.config_dir, filename);
-        
+
         if file_path.is_empty() {
             self.create_default_config(filename)?;
             return Ok(());

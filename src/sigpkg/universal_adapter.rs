@@ -1,9 +1,9 @@
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::collections::HashMap;
 
+use std::boxed::Box;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
-use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -600,26 +600,42 @@ impl UniversalPackageAdapter {
             }
             if line.starts_with("name") {
                 if let Some(pos) = line.find(' ') {
-                    name = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    name = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("version") {
                 if let Some(pos) = line.find(' ') {
-                    version = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    version = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("summary") {
                 if let Some(pos) = line.find(' ') {
-                    summary = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    summary = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
             } else if line.starts_with("architecture") {
                 if let Some(pos) = line.find(' ') {
-                    architecture = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == '\'' || c == ';').to_string();
+                    architecture = line[pos + 1..]
+                        .trim()
+                        .trim_matches(|c| c == '"' || c == '\'' || c == ';')
+                        .to_string();
                 }
-            } else if line.starts_with("requires {") || line == "requires {" || line.starts_with("requires") {
+            } else if line.starts_with("requires {")
+                || line == "requires {"
+                || line.starts_with("requires")
+            {
                 in_requires_block = true;
             } else if line.starts_with('}') {
                 in_requires_block = false;
             } else if in_requires_block {
-                let clean_req = line.trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ';');
+                let clean_req =
+                    line.trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ';');
                 if !clean_req.is_empty() {
                     requires.push(clean_req.to_string());
                 }
@@ -689,7 +705,10 @@ impl UniversalPackageAdapter {
     }
 
     /// Parses FreeBSD UCL (+MANIFEST) pkg manifest
-    pub fn parse_freebsd_ucl_manifest(&self, text: &str) -> Result<FreeBsdUclManifest, &'static str> {
+    pub fn parse_freebsd_ucl_manifest(
+        &self,
+        text: &str,
+    ) -> Result<FreeBsdUclManifest, &'static str> {
         let mut name = String::new();
         let mut version = String::new();
         let mut comment = String::new();
@@ -719,7 +738,8 @@ impl UniversalPackageAdapter {
                 }
             } else if let Some(pos) = line.find(':') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ' ');
+                let val =
+                    line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == ',' || c == ' ');
                 match key {
                     "name" => name = val.to_string(),
                     "version" => version = val.to_string(),
@@ -742,7 +762,10 @@ impl UniversalPackageAdapter {
     }
 
     /// Parses OpenBSD +CONTENTS pkg manifest
-    pub fn parse_openbsd_contents(&self, text: &str) -> Result<OpenBsdContentsManifest, &'static str> {
+    pub fn parse_openbsd_contents(
+        &self,
+        text: &str,
+    ) -> Result<OpenBsdContentsManifest, &'static str> {
         let mut pkgname = String::new();
         let mut version = String::new();
         let mut comment = String::new();
@@ -900,7 +923,8 @@ impl UniversalPackageAdapter {
             }
             if let Some(pos) = line.find('=') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
+                let val =
+                    line[pos + 1..].trim_matches(|c| c == '"' || c == '\'' || c == '(' || c == ')');
                 match key {
                     "PRGNAM" | "NAME" => name = val.to_string(),
                     "VERSION" | "VER" => version = val.to_string(),
@@ -958,7 +982,6 @@ impl UniversalPackageAdapter {
         }
         permissions
     }
-
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
@@ -1760,7 +1783,9 @@ impl UniversalDependencyMapper {
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python3" | "python" | "python3-dev" | "lang/python3" | "dev-lang/python" => "python".to_string(),
+            "python3" | "python" | "python3-dev" | "lang/python3" | "dev-lang/python" => {
+                "python".to_string()
+            }
             "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
             "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
@@ -1828,10 +1853,16 @@ impl UniversalScriptletConverter {
                 _ => None,
             },
             PackageFormat::Pkg | PackageFormat::Ports => match script_name {
-                "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => Some(SigmaPkgHookType::PostInstall),
+                "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => {
+                    Some(SigmaPkgHookType::PostInstall)
+                }
                 "+PRE_INSTALL" | "pre-install" => Some(SigmaPkgHookType::PreInstall),
-                "+POST_DEINSTALL" | "+DEINSTALL" | "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
-                "+PRE_DEINSTALL" | "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
+                "+POST_DEINSTALL" | "+DEINSTALL" | "post-deinstall" | "post-remove" => {
+                    Some(SigmaPkgHookType::PostRemove)
+                }
+                "+PRE_DEINSTALL" | "pre-deinstall" | "pre-remove" => {
+                    Some(SigmaPkgHookType::PreRemove)
+                }
                 _ => None,
             },
             PackageFormat::Pacman => match script_name {
@@ -1906,7 +1937,12 @@ impl UniversalSandboxCapabilityMatrix {
             } else if c == "x11" || c == "wayland" || c == "--socket=x11" || c == "--socket=wayland"
             {
                 perms.push(Permission::DisplayAccess);
-            } else if c == "system-observe" || c == "proc" || c == "sysctl" || c == "exec" || c == "execpromises" {
+            } else if c == "system-observe"
+                || c == "proc"
+                || c == "sysctl"
+                || c == "exec"
+                || c == "execpromises"
+            {
                 perms.push(Permission::ProcessControl);
                 perms.push(Permission::Execute);
             }
@@ -3047,7 +3083,9 @@ requires {
         assert_eq!(manifest.requires, vec!["haiku_core", "libssl"]);
 
         let mut engine = SigPkgUniversalBridgeEngine::new();
-        let pkg = engine.absorb_and_register("app.hpkg", hpkg_text.as_bytes()).unwrap();
+        let pkg = engine
+            .absorb_and_register("app.hpkg", hpkg_text.as_bytes())
+            .unwrap();
         assert_eq!(pkg.name, "haiku_dep");
         assert!(engine.is_package_registered("haiku_dep"));
     }

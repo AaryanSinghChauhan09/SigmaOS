@@ -1,11 +1,11 @@
 use crate::driver::device::DdeDeviceWrapper;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {

@@ -14,8 +14,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::vec;
 
-use std::vec::Vec;
 use core::ptr;
+use std::vec::Vec;
 
 /// Secure Data Erasure (BleachBit Parity)
 /// Multi-pass secure sector overwriting and cache purging to prevent forensic recovery.

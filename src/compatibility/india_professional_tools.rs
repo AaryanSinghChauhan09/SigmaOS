@@ -342,7 +342,10 @@ impl CaGstTaxAuditEngine {
     pub fn reconcile_itc(&self, gstr3b_itc: u64, gstr2b_itc: u64) -> (i64, &'static str) {
         let delta = gstr3b_itc as i64 - gstr2b_itc as i64;
         if delta == 0 {
-            (0, "ITC Reconciliation Perfect: 100% Match between GSTR-3B and GSTR-2B")
+            (
+                0,
+                "ITC Reconciliation Perfect: 100% Match between GSTR-3B and GSTR-2B",
+            )
         } else if delta > 0 {
             (delta, "ITC Warning: Excess ITC claimed in GSTR-3B relative to GSTR-2B auto-populated statement")
         } else {
@@ -396,7 +399,8 @@ impl CharteredEngineersBoqEstimator {
     ) -> Result<(BoqItemEstimate, BoqItemEstimate, f64), &'static str> {
         let concrete_volume_cum = length_m * breadth_m * depth_m;
         let steel_density_kg_cum = 7850.0;
-        let steel_weight_mt = (concrete_volume_cum * (steel_percentage / 100.0) * steel_density_kg_cum) / 1000.0;
+        let steel_weight_mt =
+            (concrete_volume_cum * (steel_percentage / 100.0) * steel_density_kg_cum) / 1000.0;
 
         let conc_rate = *self.dsr_rates.get("CPWD-CONC-M25").unwrap_or(&6000.0);
         let steel_rate = *self.dsr_rates.get("CPWD-STEEL-FE500").unwrap_or(&65000.0);
@@ -604,7 +608,12 @@ impl UpiQrCodeMerchantEngine {
     }
 
     pub fn validate_vpa(&self, vpa: &str) -> bool {
-        vpa.contains('@') && (vpa.ends_with("@upi") || vpa.ends_with("@okaxis") || vpa.ends_with("@ybl") || vpa.ends_with("@icici") || vpa.ends_with("@paytm"))
+        vpa.contains('@')
+            && (vpa.ends_with("@upi")
+                || vpa.ends_with("@okaxis")
+                || vpa.ends_with("@ybl")
+                || vpa.ends_with("@icici")
+                || vpa.ends_with("@paytm"))
     }
 
     pub fn generate_merchant_upi_string(
@@ -653,7 +662,10 @@ pub struct MedicalCouncilDoctorPrescriptionGenerator {
 impl MedicalCouncilDoctorPrescriptionGenerator {
     pub fn new() -> Self {
         let mut registered_doctors = HashMap::new();
-        registered_doctors.insert("NMC-REG-2026-991".to_string(), "Dr. Aaryan Singh".to_string());
+        registered_doctors.insert(
+            "NMC-REG-2026-991".to_string(),
+            "Dr. Aaryan Singh".to_string(),
+        );
         Self { registered_doctors }
     }
 

@@ -40,7 +40,11 @@ pub mod sigpkg {
 
     impl Version {
         pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
+            Self {
+                major,
+                minor,
+                patch,
+            }
         }
 
         pub fn parse(version_str: &str) -> Result<Self, &'static str> {
@@ -55,9 +59,21 @@ pub mod sigpkg {
             let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
             let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
 
-            let major = if major_clean.is_empty() { 0 } else { major_clean.parse::<u64>().unwrap_or(0) };
-            let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().unwrap_or(0) };
-            let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().unwrap_or(0) };
+            let major = if major_clean.is_empty() {
+                0
+            } else {
+                major_clean.parse::<u64>().unwrap_or(0)
+            };
+            let minor = if minor_clean.is_empty() {
+                0
+            } else {
+                minor_clean.parse::<u64>().unwrap_or(0)
+            };
+            let patch = if patch_clean.is_empty() {
+                0
+            } else {
+                patch_clean.parse::<u64>().unwrap_or(0)
+            };
 
             Ok(Version::new(major, minor, patch))
         }
@@ -109,13 +125,12 @@ pub mod sigpkg {
 
 #[test]
 fn test_universal_adapter_all_formats() {
-    use universal_adapter::{
-        UniversalPackageAdapter, SigPkgUniversalBridgeEngine,
-        UniversalPmCommandDispatcher, UniversalPmOperation,
-        FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
-        ZypperSpecManifest, SlackwarePkgManifest,
-    };
     use sigpkg::Version;
+    use universal_adapter::{
+        FreeBsdUclManifest, NetBsdPkgsrcManifest, OpenBsdContentsManifest,
+        SigPkgUniversalBridgeEngine, SlackwarePkgManifest, UniversalPackageAdapter,
+        UniversalPmCommandDispatcher, UniversalPmOperation, ZypperSpecManifest,
+    };
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -126,7 +141,8 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(ucl.version, "7.0.11");
 
     // 2. OpenBSD +CONTENTS
-    let openbsd_data = "@name tmux-3.3a\n@comment Terminal multiplexer\n@depend libevent:libevent-2.1.12\n";
+    let openbsd_data =
+        "@name tmux-3.3a\n@comment Terminal multiplexer\n@depend libevent:libevent-2.1.12\n";
     let obsd: OpenBsdContentsManifest = adapter.parse_openbsd_contents(openbsd_data).unwrap();
     assert_eq!(obsd.pkgname, "tmux");
     assert_eq!(obsd.version, "3.3a");
@@ -148,12 +164,16 @@ fn test_universal_adapter_all_formats() {
 
     // 6. Universal Bridge Engine Absorption
     let mut bridge = SigPkgUniversalBridgeEngine::new();
-    let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
+    let pkg_bsd = bridge
+        .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
+        .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
     assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
-    let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
+    let pkg_obsd = bridge
+        .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
+        .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
     assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));

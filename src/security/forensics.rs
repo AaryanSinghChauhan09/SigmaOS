@@ -562,11 +562,15 @@ impl EvtxAuditJournalAnalyzer {
     }
 
     pub fn detect_privilege_escalation(&self, events: &[SecurityAuditEvent]) -> bool {
-        events.iter().any(|e| e.event_id == 4672 || e.message.contains("privilege"))
+        events
+            .iter()
+            .any(|e| e.event_id == 4672 || e.message.contains("privilege"))
     }
 
     pub fn detect_log_clearing(&self, events: &[SecurityAuditEvent]) -> bool {
-        events.iter().any(|e| e.event_id == 1102 || e.message.contains("cleared"))
+        events
+            .iter()
+            .any(|e| e.event_id == 1102 || e.message.contains("cleared"))
     }
 }
 

@@ -1,10 +1,10 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543
 /// Implements decentralized identity, Fedora FAS OIDC, and Flask-OIDC SSO middleware support
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type IdentityID = usize;
 

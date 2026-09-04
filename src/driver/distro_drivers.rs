@@ -2,9 +2,9 @@ use std::vec;
 // SigmaOS Distro-Inspired Clean-Room Drivers
 // Replicates key drivers, device nodes, and audio/crypto subsystems from Linux & BSD distributions
 
+use core::sync::atomic::{AtomicU32, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================
 // 1. Linux Devtmpfs & Standard Device Nodes Simulator
@@ -436,7 +436,6 @@ impl LinuxDmaScatterGatherEngine {
 // ============================================================================
 
 #[cfg(test)]
-
 // ============================================================================
 // 7. Linux Virtio-Net Virtual Network Device Driver
 // ============================================================================
@@ -515,7 +514,11 @@ pub struct FreeBsdVtConsoleDriver {
 
 impl FreeBsdVtConsoleDriver {
     pub fn new(width: usize, height: usize) -> Self {
-        let blank_cell = VtCell { ch: ' ', fg_color: 7, bg_color: 0 };
+        let blank_cell = VtCell {
+            ch: ' ',
+            fg_color: 7,
+            bg_color: 0,
+        };
         let mut framebuffers = Vec::new();
         for _ in 0..8 {
             framebuffers.push(vec![blank_cell; width * height]);
@@ -536,12 +539,23 @@ impl FreeBsdVtConsoleDriver {
         Ok(())
     }
 
-    pub fn write_char(&mut self, x: usize, y: usize, ch: char, fg: u8, bg: u8) -> Result<(), &'static str> {
+    pub fn write_char(
+        &mut self,
+        x: usize,
+        y: usize,
+        ch: char,
+        fg: u8,
+        bg: u8,
+    ) -> Result<(), &'static str> {
         if x >= self.width || y >= self.height {
             return Err("Coordinates out of bounds");
         }
         let idx = y * self.width + x;
-        self.framebuffers[self.active_vt][idx] = VtCell { ch, fg_color: fg, bg_color: bg };
+        self.framebuffers[self.active_vt][idx] = VtCell {
+            ch,
+            fg_color: fg,
+            bg_color: bg,
+        };
         Ok(())
     }
 
@@ -588,7 +602,6 @@ impl NetBsdRumpDriverKernelWrapper {
         Ok(f())
     }
 }
-
 
 // ============================================================================
 // 10. NVMe (Non-Volatile Memory Express) Bare-Metal Controller & Queue Driver
@@ -648,7 +661,7 @@ impl NvmePCIeHostController {
             io_cq: Vec::with_capacity(256),
             controller_ready: false,
             total_lba_count: 2_000_000_000, // ~1TB NVMe drive
-            block_size_bytes: 4096,          // 4K sector NVMe
+            block_size_bytes: 4096,         // 4K sector NVMe
         }
     }
 
@@ -772,15 +785,40 @@ impl IntelE1000eNicDriver {
         Self {
             mmio_base,
             mac_addr: mac,
-            rx_ring: vec![E1000RxDescriptor { buffer_addr: 0, length: 0, checksum: 0, status: 0, errors: 0, special: 0 }; 64],
-            tx_ring: vec![E1000TxDescriptor { buffer_addr: 0, length: 0, cso: 0, cmd: 0, status: 0, css: 0, special: 0 }; 64],
+            rx_ring: vec![
+                E1000RxDescriptor {
+                    buffer_addr: 0,
+                    length: 0,
+                    checksum: 0,
+                    status: 0,
+                    errors: 0,
+                    special: 0
+                };
+                64
+            ],
+            tx_ring: vec![
+                E1000TxDescriptor {
+                    buffer_addr: 0,
+                    length: 0,
+                    cso: 0,
+                    cmd: 0,
+                    status: 0,
+                    css: 0,
+                    special: 0
+                };
+                64
+            ],
             rx_head: 0,
             tx_head: 0,
             link_speed_mbps: 1000, // 1Gbps full-duplex
         }
     }
 
-    pub fn transmit_raw_ethernet(&mut self, pkt_addr: u64, len: u16) -> Result<usize, &'static str> {
+    pub fn transmit_raw_ethernet(
+        &mut self,
+        pkt_addr: u64,
+        len: u16,
+    ) -> Result<usize, &'static str> {
         let idx = self.tx_head;
         self.tx_ring[idx] = E1000TxDescriptor {
             buffer_addr: pkt_addr,
@@ -895,7 +933,11 @@ impl XhciHostControllerDriver {
     }
 
     pub fn post_command_trb(&mut self, param: u64, status: u32, ctrl: u32) {
-        let trb = XhciTrb { parameter: param, status, control: ctrl };
+        let trb = XhciTrb {
+            parameter: param,
+            status,
+            control: ctrl,
+        };
         self.command_ring.push(trb);
     }
 
@@ -1097,8 +1139,12 @@ mod tests {
         assert_eq!(nvme.io_sq.len(), 1);
         assert_eq!(nvme.io_cq.len(), 1);
 
-        let mut e1000 = IntelE1000eNicDriver::new(0xFD00_0000, [0x00, 0x1B, 0x21, 0x34, 0x56, 0x78]);
-        assert_eq!(e1000.transmit_raw_ethernet(0x2000_0000, 1514).unwrap(), 1514);
+        let mut e1000 =
+            IntelE1000eNicDriver::new(0xFD00_0000, [0x00, 0x1B, 0x21, 0x34, 0x56, 0x78]);
+        assert_eq!(
+            e1000.transmit_raw_ethernet(0x2000_0000, 1514).unwrap(),
+            1514
+        );
         assert_eq!(e1000.tx_head, 1);
     }
 

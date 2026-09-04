@@ -1,8 +1,8 @@
+use core::ops::{Deref, DerefMut};
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::ops::{Deref, DerefMut};
 
 use core::mem;
 /// OOP-based Boot Performance Optimization for SigmaOS

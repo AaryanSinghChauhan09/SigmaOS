@@ -10,10 +10,10 @@
 
 use std::boxed::Box;
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
 use std::vec;
+use std::vec::Vec;
 
 /// Supported Omarchy Curated Themes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -340,7 +340,6 @@ impl Default for OmarchyModernDesktopEngine {
     }
 }
 
-
 /// Sovereign Agent Definition (inspired by omacom/omarchy: ori-agent, hermes-agent, openclaw-agent, add-default-agent)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SovereignAgentKind {
@@ -419,9 +418,15 @@ impl FactoryResetGuardian {
 
     pub fn plan_rollback_instructions(&self) -> Vec<String> {
         vec![
-            format!("btrfs subvolume snapshot -r {} {}", self.btrfs_subvolume_root, "/@pre-reset-backup"),
+            format!(
+                "btrfs subvolume snapshot -r {} {}",
+                self.btrfs_subvolume_root, "/@pre-reset-backup"
+            ),
             format!("btrfs subvolume delete {}", self.btrfs_subvolume_root),
-            format!("btrfs subvolume snapshot {} {}", self.btrfs_subvolume_factory, self.btrfs_subvolume_root),
+            format!(
+                "btrfs subvolume snapshot {} {}",
+                self.btrfs_subvolume_factory, self.btrfs_subvolume_root
+            ),
             "systemctl reboot".to_string(),
         ]
     }
@@ -453,7 +458,9 @@ impl HardwareQuirkAdapter {
 
     /// Framework 16 & ASUS ROG Keyboard RGB / Backlight Quirk
     pub fn probe_rgb_keyboard(device_name: &str) -> Option<Self> {
-        if device_name.to_lowercase().contains("framework16") || device_name.to_lowercase().contains("asus-rog") {
+        if device_name.to_lowercase().contains("framework16")
+            || device_name.to_lowercase().contains("asus-rog")
+        {
             Some(Self {
                 pci_id: "usb:input-rgb".to_string(),
                 device_name: device_name.to_string(),
@@ -515,7 +522,11 @@ mod tests {
     #[test]
     fn test_omarchy_web2app_registration() {
         let mut engine = OmarchyModernDesktopEngine::new();
-        engine.register_webapp("Slack", "https://app.slack.com/", "https://example.com/slack.png");
+        engine.register_webapp(
+            "Slack",
+            "https://app.slack.com/",
+            "https://example.com/slack.png",
+        );
         let desktop = engine.generate_desktop_entry("Slack").unwrap();
         assert!(desktop.contains("Name=Slack"));
         assert!(desktop.contains("--ozone-platform=wayland"));

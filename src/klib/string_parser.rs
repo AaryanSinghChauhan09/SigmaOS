@@ -1,7 +1,7 @@
+use core::str::Chars;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::str::Chars;
 // SigmaOS Custom String Parser
 // Reduces dependency on std string parsing functions
 

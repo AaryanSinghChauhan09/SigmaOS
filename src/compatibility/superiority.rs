@@ -29,10 +29,10 @@ use std::vec;
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
 
+use core::sync::atomic::{AtomicU64, Ordering};
 use std::collections::{BTreeMap, VecDeque};
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 // ==========================================
 // 1. SovereignRegistry

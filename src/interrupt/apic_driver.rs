@@ -13,38 +13,38 @@ pub const APIC_BASE: u64 = 0xfee0_0000; // Local APIC Base Address (default)
 pub const IO_APIC_BASE: u64 = 0xfec0_0000; // I/O APIC Base Address (default)
 
 // Local APIC Register Offsets (from APIC_BASE)
-pub const APIC_ID: u32 = 0x20;          // Local APIC ID
-pub const APIC_VERSION: u32 = 0x30;     // Local APIC Version
-pub const APIC_TPR: u32 = 0x80;         // Task Priority Register
-pub const APIC_PPR: u32 = 0xa0;         // Processor Priority Register
-pub const APIC_EOI: u32 = 0xb0;         // End of Interrupt
+pub const APIC_ID: u32 = 0x20; // Local APIC ID
+pub const APIC_VERSION: u32 = 0x30; // Local APIC Version
+pub const APIC_TPR: u32 = 0x80; // Task Priority Register
+pub const APIC_PPR: u32 = 0xa0; // Processor Priority Register
+pub const APIC_EOI: u32 = 0xb0; // End of Interrupt
 pub const APIC_REMOTE_READ: u32 = 0xc0; // Remote Read
 pub const APIC_LOGICAL_DEST: u32 = 0xd0; // Logical Destination
 pub const APIC_DEST_FORMAT: u32 = 0xe0; // Destination Format
 pub const APIC_SPURIOUS_INT: u32 = 0xf0; // Spurious Interrupt Vector
-pub const APIC_ISR_BASE: u32 = 0x100;   // In-Service Register (32 bytes)
-pub const APIC_TMR_BASE: u32 = 0x180;   // Trigger Mode Register (32 bytes)
-pub const APIC_IRR_BASE: u32 = 0x200;   // Interrupt Request Register (32 bytes)
+pub const APIC_ISR_BASE: u32 = 0x100; // In-Service Register (32 bytes)
+pub const APIC_TMR_BASE: u32 = 0x180; // Trigger Mode Register (32 bytes)
+pub const APIC_IRR_BASE: u32 = 0x200; // Interrupt Request Register (32 bytes)
 pub const APIC_ERROR_STATUS: u32 = 0x280; // Error Status Register
-pub const APIC_CMCI: u32 = 0x2f0;       // Corrected Machine Check Interrupt
-pub const APIC_ICR_LOW: u32 = 0x300;    // Interrupt Command Register (low 32-bit)
-pub const APIC_ICR_HIGH: u32 = 0x310;   // Interrupt Command Register (high 32-bit)
-pub const APIC_LVT_TIMER: u32 = 0x320;  // LVT Timer
+pub const APIC_CMCI: u32 = 0x2f0; // Corrected Machine Check Interrupt
+pub const APIC_ICR_LOW: u32 = 0x300; // Interrupt Command Register (low 32-bit)
+pub const APIC_ICR_HIGH: u32 = 0x310; // Interrupt Command Register (high 32-bit)
+pub const APIC_LVT_TIMER: u32 = 0x320; // LVT Timer
 pub const APIC_LVT_THERMAL: u32 = 0x330; // LVT Thermal
 pub const APIC_LVT_PERFORMANCE: u32 = 0x340; // LVT Performance Counter
-pub const APIC_LVT_LINT0: u32 = 0x350;  // LVT LINT0 (Local Interrupt 0)
-pub const APIC_LVT_LINT1: u32 = 0x360;  // LVT LINT1 (Local Interrupt 1)
-pub const APIC_LVT_ERROR: u32 = 0x370;  // LVT Error
+pub const APIC_LVT_LINT0: u32 = 0x350; // LVT LINT0 (Local Interrupt 0)
+pub const APIC_LVT_LINT1: u32 = 0x360; // LVT LINT1 (Local Interrupt 1)
+pub const APIC_LVT_ERROR: u32 = 0x370; // LVT Error
 pub const APIC_TIMER_INITIAL: u32 = 0x380; // Timer Initial Count
 pub const APIC_TIMER_CURRENT: u32 = 0x390; // Timer Current Count
 pub const APIC_TIMER_DIVIDE: u32 = 0x3e0; // Timer Divide Configuration
 
 // I/O APIC Register Offsets
-pub const IO_APIC_INDEX: u32 = 0x00;    // Register Select Index
-pub const IO_APIC_DATA: u32 = 0x10;     // Register Data
-pub const IO_APIC_ID: u32 = 0x00;       // I/O APIC ID
-pub const IO_APIC_VERSION: u32 = 0x01;  // I/O APIC Version
-pub const IO_APIC_ARB_ID: u32 = 0x02;   // I/O APIC Arbitration ID
+pub const IO_APIC_INDEX: u32 = 0x00; // Register Select Index
+pub const IO_APIC_DATA: u32 = 0x10; // Register Data
+pub const IO_APIC_ID: u32 = 0x00; // I/O APIC ID
+pub const IO_APIC_VERSION: u32 = 0x01; // I/O APIC Version
+pub const IO_APIC_ARB_ID: u32 = 0x02; // I/O APIC Arbitration ID
 pub const IO_APIC_REDIR_BASE: u32 = 0x10; // Redirection Table Entries start at 0x10
 
 // Delivery Modes (bits 8-10 of ICR low or Redirection Entry low)
@@ -168,7 +168,12 @@ impl LocalApic {
         Ok(())
     }
 
-    pub fn send_ipi(&self, target_apic_id: u8, vector: u8, delivery_mode: u32) -> Result<(), &'static str> {
+    pub fn send_ipi(
+        &self,
+        target_apic_id: u8,
+        vector: u8,
+        delivery_mode: u32,
+    ) -> Result<(), &'static str> {
         unsafe {
             // Write ICR high (destination)
             self.write_register(APIC_ICR_HIGH, (target_apic_id as u32) << 24);
@@ -194,7 +199,12 @@ impl LocalApic {
         Ok(())
     }
 
-    pub fn setup_timer(&self, vector: u8, mode: ApicTimerMode, initial_count: u32) -> Result<(), &'static str> {
+    pub fn setup_timer(
+        &self,
+        vector: u8,
+        mode: ApicTimerMode,
+        initial_count: u32,
+    ) -> Result<(), &'static str> {
         unsafe {
             let mode_bits = match mode {
                 ApicTimerMode::OneShot => 0,
@@ -360,7 +370,12 @@ impl IoApic {
         Ok(())
     }
 
-    pub fn set_irq_routing(&self, irq: u8, vector: u8, dest_apic_id: u8) -> Result<(), &'static str> {
+    pub fn set_irq_routing(
+        &self,
+        irq: u8,
+        vector: u8,
+        dest_apic_id: u8,
+    ) -> Result<(), &'static str> {
         if irq as u32 >= self.max_redir_entries as u32 {
             return Err("IRQ out of range");
         }
@@ -435,7 +450,11 @@ impl InterruptDispatchTable {
         InterruptDispatchTable { handlers }
     }
 
-    pub fn register_handler(&mut self, vector: u8, handler: InterruptHandler) -> Result<(), &'static str> {
+    pub fn register_handler(
+        &mut self,
+        vector: u8,
+        handler: InterruptHandler,
+    ) -> Result<(), &'static str> {
         if (vector as usize) >= self.handlers.len() {
             return Err("Vector out of range");
         }
@@ -482,7 +501,11 @@ impl ApicManager {
         Ok(())
     }
 
-    pub fn register_interrupt_handler(&mut self, vector: u8, handler: InterruptHandler) -> Result<(), &'static str> {
+    pub fn register_interrupt_handler(
+        &mut self,
+        vector: u8,
+        handler: InterruptHandler,
+    ) -> Result<(), &'static str> {
         self.dispatch_table.register_handler(vector, handler)
     }
 

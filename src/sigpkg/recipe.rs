@@ -6,11 +6,11 @@ use std::vec;
 
 use crate::klib::collections::HashMap;
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
-use std::string::{String, ToString};
-use std::vec::Vec;
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

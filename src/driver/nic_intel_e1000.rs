@@ -2,13 +2,13 @@
 // SigmaOS Intel e1000/i210 Ethernet Driver
 // Supports Intel 1GB/10GB Ethernet controllers (82540, 82541, 82545, i210, i350, etc.)
 
-use std::boxed::Box;
-use std::vec::Vec;
-use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
-use crate::net::tcp_ip_implementation::{MacAddress, IPv4Address};
+use crate::net::tcp_ip_implementation::{IPv4Address, MacAddress};
 
 // ============================================================================
 // Intel NIC Constants
@@ -18,39 +18,39 @@ pub const INTEL_VENDOR_ID: u16 = 0x8086;
 
 // e1000 Device IDs
 pub const E1000_82540EM: u16 = 0x100E; // 82540EM
-pub const E1000_82545: u16 = 0x100F;   // 82545EM
-pub const E1000_82546: u16 = 0x1010;   // 82546EB
-pub const E1000_I210: u16 = 0x1533;    // i210
-pub const E1000_I350: u16 = 0x1521;    // i350
+pub const E1000_82545: u16 = 0x100F; // 82545EM
+pub const E1000_82546: u16 = 0x1010; // 82546EB
+pub const E1000_I210: u16 = 0x1533; // i210
+pub const E1000_I350: u16 = 0x1521; // i350
 
 // Register Offsets
-pub const REG_CTRL: u32 = 0x00000;     // Device Control
-pub const REG_STATUS: u32 = 0x00008;   // Device Status
-pub const REG_EECD: u32 = 0x00010;     // EEPROM/Flash Control & Data
+pub const REG_CTRL: u32 = 0x00000; // Device Control
+pub const REG_STATUS: u32 = 0x00008; // Device Status
+pub const REG_EECD: u32 = 0x00010; // EEPROM/Flash Control & Data
 pub const REG_CTRL_EXT: u32 = 0x00018; // Extended Device Control
-pub const REG_MDIC: u32 = 0x00020;     // MDI Control
-pub const REG_FCAH: u32 = 0x00020;     // Flow Control Address High
-pub const REG_FCT: u32 = 0x00030;      // Flow Control Type
-pub const REG_VET: u32 = 0x00038;      // VLAN Ether Type
+pub const REG_MDIC: u32 = 0x00020; // MDI Control
+pub const REG_FCAH: u32 = 0x00020; // Flow Control Address High
+pub const REG_FCT: u32 = 0x00030; // Flow Control Type
+pub const REG_VET: u32 = 0x00038; // VLAN Ether Type
 
 // Receive Descriptors
-pub const REG_RDBAL: u32 = 0x02800;    // RX Descriptor Base Address Low
-pub const REG_RDBAH: u32 = 0x02804;    // RX Descriptor Base Address High
-pub const REG_RDLEN: u32 = 0x02808;    // RX Descriptor Length
-pub const REG_RDH: u32 = 0x02810;      // RX Descriptor Head
-pub const REG_RDT: u32 = 0x02818;      // RX Descriptor Tail
-pub const REG_RDTR: u32 = 0x02820;     // RX Delay Timer
+pub const REG_RDBAL: u32 = 0x02800; // RX Descriptor Base Address Low
+pub const REG_RDBAH: u32 = 0x02804; // RX Descriptor Base Address High
+pub const REG_RDLEN: u32 = 0x02808; // RX Descriptor Length
+pub const REG_RDH: u32 = 0x02810; // RX Descriptor Head
+pub const REG_RDT: u32 = 0x02818; // RX Descriptor Tail
+pub const REG_RDTR: u32 = 0x02820; // RX Delay Timer
 
 // Transmit Descriptors
-pub const REG_TDBAL: u32 = 0x03800;    // TX Descriptor Base Address Low
-pub const REG_TDBAH: u32 = 0x03804;    // TX Descriptor Base Address High
-pub const REG_TDLEN: u32 = 0x03808;    // TX Descriptor Length
-pub const REG_TDH: u32 = 0x03810;      // TX Descriptor Head
-pub const REG_TDT: u32 = 0x03818;      // TX Descriptor Tail
-pub const REG_TIDV: u32 = 0x03820;     // TX Interrupt Delay Value
+pub const REG_TDBAL: u32 = 0x03800; // TX Descriptor Base Address Low
+pub const REG_TDBAH: u32 = 0x03804; // TX Descriptor Base Address High
+pub const REG_TDLEN: u32 = 0x03808; // TX Descriptor Length
+pub const REG_TDH: u32 = 0x03810; // TX Descriptor Head
+pub const REG_TDT: u32 = 0x03818; // TX Descriptor Tail
+pub const REG_TIDV: u32 = 0x03820; // TX Interrupt Delay Value
 
 // Receive Control
-pub const REG_RCTL: u32 = 0x00100;     // RX Control
+pub const REG_RCTL: u32 = 0x00100; // RX Control
 pub const REG_RCTL_EN: u32 = 0x00000002;
 pub const REG_RCTL_SBP: u32 = 0x00000004;
 pub const REG_RCTL_UPE: u32 = 0x00000008;
@@ -58,19 +58,19 @@ pub const REG_RCTL_MPE: u32 = 0x00000010;
 pub const REG_RCTL_BAM: u32 = 0x00008000;
 
 // Transmit Control
-pub const REG_TCTL: u32 = 0x00400;     // TX Control
+pub const REG_TCTL: u32 = 0x00400; // TX Control
 pub const REG_TCTL_EN: u32 = 0x00000002;
 pub const REG_TCTL_PSP: u32 = 0x00000008;
 
 // MAC Address
-pub const REG_RAL: u32 = 0x05400;      // Receive Address Low
-pub const REG_RAH: u32 = 0x05404;      // Receive Address High
+pub const REG_RAL: u32 = 0x05400; // Receive Address Low
+pub const REG_RAH: u32 = 0x05404; // Receive Address High
 
 // Interrupt Registers
-pub const REG_ICR: u32 = 0x000C0;      // Interrupt Cause Read
-pub const REG_ITR: u32 = 0x000C4;      // Interrupt Throttling Rate
-pub const REG_IMS: u32 = 0x000D0;      // Interrupt Mask Set
-pub const REG_IMC: u32 = 0x000D8;      // Interrupt Mask Clear
+pub const REG_ICR: u32 = 0x000C0; // Interrupt Cause Read
+pub const REG_ITR: u32 = 0x000C4; // Interrupt Throttling Rate
+pub const REG_IMS: u32 = 0x000D0; // Interrupt Mask Set
+pub const REG_IMC: u32 = 0x000D8; // Interrupt Mask Clear
 
 // ============================================================================
 // TX/RX Descriptor Structures
@@ -357,7 +357,10 @@ impl PciDriver for IntelNicPciDriver {
         }
 
         // Device is supported, initialize driver
-        let mut nic = Box::new(IntelNicDriver::new(device.device_id, &device.address.sysfs_format()));
+        let mut nic = Box::new(IntelNicDriver::new(
+            device.device_id,
+            &device.address.sysfs_format(),
+        ));
 
         // Extract MMIO BAR (typically BAR0)
         if let Some(ref bar) = device.bars[0] {

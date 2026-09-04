@@ -6,7 +6,6 @@
 //   • ebuilds metadata model
 //   • World set and dependency graph
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;

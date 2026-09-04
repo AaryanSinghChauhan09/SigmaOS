@@ -4,10 +4,10 @@
 #[cfg(test)]
 extern crate std;
 
+use core::sync::atomic::{AtomicBool, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::klib::HashMap;
 
