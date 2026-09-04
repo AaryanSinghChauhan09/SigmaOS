@@ -100,7 +100,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux
             | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -216,7 +218,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
