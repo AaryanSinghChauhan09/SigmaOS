@@ -18,8 +18,6 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # stable
-        with:
-          toolchain: stable
 
       - name: Run Fedora Security Policies Test
         run: |

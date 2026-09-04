@@ -44,9 +44,7 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-
 
       - name: cargo check
-        run: |
-          chmod +x ./run_sigma_tests.sh
-          ./run_sigma_tests.sh
+        run: cargo +nightly check --all 2>&1
 
   # ── Build ──────────────────────────────────────────────────────────────────
   build:
@@ -68,11 +66,9 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
       - name: Build (debug)
-        run: |
-          chmod +x ./run_sigma_tests.sh
-          ./run_sigma_tests.sh
+        run: cargo +nightly build --all
       - name: Build (release)
-        run: echo "Build complete"
+        run: cargo +nightly build --all --release
 
   # ── Tests ──────────────────────────────────────────────────────────────────
   test:
@@ -93,9 +89,7 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
       - name: Run Rust tests
-        run: |
-          chmod +x ./run_sigma_tests.sh
-          ./run_sigma_tests.sh
+        run: cargo +nightly test --all
       - name: Install Python test dependencies
         run: pip3 install pytest
       - name: Run Python tests

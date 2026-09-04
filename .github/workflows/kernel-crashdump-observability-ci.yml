@@ -19,8 +19,6 @@ jobs:
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # stable
-        with:
-          toolchain: stable
 
       - name: Test Kdump & Watchdog Engine
         run: |
