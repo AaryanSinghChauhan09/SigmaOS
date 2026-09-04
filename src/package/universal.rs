@@ -13,8 +13,6 @@ use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
-pub mod node_distribution_dummy {
-    use super::*;
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
@@ -2302,6 +2300,11 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
     }
 
+    #[test]
+    fn test_sovereign_rollback_engine() {
+        let mut engine = SovereignRollbackEngine::new(RollbackBackendMechanism::OpenSuseSnapper);
+        let pkgs = vec!["curl".to_string(), "nginx".to_string()];
+        let snap_id = engine.create_distro_snapshot(pkgs.clone(), "Pre-update checkpoint");
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
