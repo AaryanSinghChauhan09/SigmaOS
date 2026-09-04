@@ -19,9 +19,15 @@ pub mod hash;
 pub mod kdf;
 pub mod keys;
 pub mod libsodium;
+pub mod post_quantum;
 pub mod postquantum;
 pub mod pqc_dilithium;
 pub mod primitives;
 pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
+
+pub use post_quantum::{
+    PostQuantumCryptoManager, DilithiumSecretKey, DilithiumPublicKey, DilithiumSignature,
+    KyberSecretKey, KyberPublicKey, KyberCiphertext, KyberSharedSecret, HybridCryptoMode,
+};
