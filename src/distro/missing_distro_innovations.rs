@@ -1386,6 +1386,232 @@ impl Default for GentooPortageSlotOperatorEngine {
 }
 
 // =========================================================================
+// STEAMOS-INSPIRED ATOMIC A/B PARTITION IMAGE UPDATE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionSlot {
+    SlotA,
+    SlotB,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImageSlotStatus {
+    Healthy,
+    PendingValidation,
+    Corrupted,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSlotState {
+    pub slot: PartitionSlot,
+    pub version: String,
+    pub sha256_checksum: String,
+    pub boot_count: u32,
+    pub status: ImageSlotStatus,
+}
+
+pub struct SteamOsAtomicAbImageUpdateEngine {
+    pub active_slot: PartitionSlot,
+    pub slot_a: ImageSlotState,
+    pub slot_b: ImageSlotState,
+}
+
+impl SteamOsAtomicAbImageUpdateEngine {
+    pub fn new(initial_version: &str, initial_checksum: &str) -> Self {
+        Self {
+            active_slot: PartitionSlot::SlotA,
+            slot_a: ImageSlotState {
+                slot: PartitionSlot::SlotA,
+                version: initial_version.to_string(),
+                sha256_checksum: initial_checksum.to_string(),
+                boot_count: 0,
+                status: ImageSlotStatus::Healthy,
+            },
+            slot_b: ImageSlotState {
+                slot: PartitionSlot::SlotB,
+                version: "empty".to_string(),
+                sha256_checksum: "none".to_string(),
+                boot_count: 0,
+                status: ImageSlotStatus::Corrupted,
+            },
+        }
+    }
+
+    pub fn inactive_slot(&self) -> PartitionSlot {
+        match self.active_slot {
+            PartitionSlot::SlotA => PartitionSlot::SlotB,
+            PartitionSlot::SlotB => PartitionSlot::SlotA,
+        }
+    }
+
+    pub fn apply_update_to_inactive_slot(
+        &mut self,
+        new_version: &str,
+        expected_checksum: &str,
+        payload_data: &[u8],
+    ) -> Result<PartitionSlot, &'static str> {
+        // Calculate hash
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in payload_data {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        let calculated_checksum = format!("{:016x}", hash);
+
+        if calculated_checksum != expected_checksum {
+            return Err("SteamOS A/B Update: Image payload checksum mismatch");
+        }
+
+        let target_slot = self.inactive_slot();
+        let target_state = match target_slot {
+            PartitionSlot::SlotA => &mut self.slot_a,
+            PartitionSlot::SlotB => &mut self.slot_b,
+        };
+
+        target_state.version = new_version.to_string();
+        target_state.sha256_checksum = calculated_checksum;
+        target_state.boot_count = 0;
+        target_state.status = ImageSlotStatus::PendingValidation;
+
+        self.active_slot = target_slot;
+        Ok(target_slot)
+    }
+
+    pub fn mark_boot_successful(&mut self) -> Result<(), &'static str> {
+        let active = match self.active_slot {
+            PartitionSlot::SlotA => &mut self.slot_a,
+            PartitionSlot::SlotB => &mut self.slot_b,
+        };
+        active.boot_count += 1;
+        active.status = ImageSlotStatus::Healthy;
+        Ok(())
+    }
+
+    pub fn report_boot_failure_and_rollback(&mut self) -> PartitionSlot {
+        let active = match self.active_slot {
+            PartitionSlot::SlotA => &mut self.slot_a,
+            PartitionSlot::SlotB => &mut self.slot_b,
+        };
+        active.status = ImageSlotStatus::Corrupted;
+
+        let fallback_slot = self.inactive_slot();
+        self.active_slot = fallback_slot;
+        fallback_slot
+    }
+}
+
+impl Default for SteamOsAtomicAbImageUpdateEngine {
+    fn default() -> Self {
+        Self::new("1.0.0", "cbf29ce484222325")
+    }
+}
+
+// =========================================================================
+// APPARMOR-INSPIRED PATH-BASED MAC RULE EVALUATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorRuleMode {
+    Enforce,
+    Complain,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorPathRule {
+    pub path_pattern: String,
+    pub allow_read: bool,
+    pub allow_write: bool,
+    pub allow_exec: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorProfile {
+    pub profile_name: String,
+    pub mode: AppArmorRuleMode,
+    pub rules: Vec<AppArmorPathRule>,
+}
+
+pub struct AppArmorPathRuleEngine {
+    pub profiles: BTreeMap<String, AppArmorProfile>,
+    pub audit_log: Vec<String>,
+}
+
+impl AppArmorPathRuleEngine {
+    pub fn new() -> Self {
+        Self {
+            profiles: BTreeMap::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn add_profile(&mut self, profile: AppArmorProfile) {
+        self.profiles.insert(profile.profile_name.clone(), profile);
+    }
+
+    pub fn evaluate_access(
+        &mut self,
+        profile_name: &str,
+        path: &str,
+        need_read: bool,
+        need_write: bool,
+        need_exec: bool,
+    ) -> bool {
+        let profile = match self.profiles.get(profile_name) {
+            Some(p) => p,
+            None => return true, // Unprofiled application
+        };
+
+        if profile.mode == AppArmorRuleMode::Disabled {
+            return true;
+        }
+
+        let mut matched_rule: Option<&AppArmorPathRule> = None;
+        for rule in &profile.rules {
+            if path == rule.path_pattern
+                || (rule.path_pattern.ends_with("/*")
+                    && path.starts_with(rule.path_pattern.trim_end_matches("/*")))
+                || (rule.path_pattern.ends_with('*')
+                    && path.starts_with(rule.path_pattern.trim_end_matches('*')))
+            {
+                matched_rule = Some(rule);
+                break;
+            }
+        }
+
+        let allowed = if let Some(rule) = matched_rule {
+            (!need_read || rule.allow_read)
+                && (!need_write || rule.allow_write)
+                && (!need_exec || rule.allow_exec)
+        } else {
+            false
+        };
+
+        if !allowed {
+            let log = format!(
+                "AppArmor audit [{:?}]: profile='{}' path='{}' (r:{}, w:{}, x:{})",
+                profile.mode, profile_name, path, need_read, need_write, need_exec
+            );
+            self.audit_log.push(log);
+
+            if profile.mode == AppArmorRuleMode::Complain {
+                return true; // Allow in complain mode, but audit logged
+            }
+            return false;
+        }
+
+        true
+    }
+}
+
+impl Default for AppArmorPathRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 16. FEDORA / RHEL SELINUX MLS / MCS GOVERNOR ENGINE
 // =========================================================================
 
@@ -1637,5 +1863,74 @@ mod tests {
         let engine = MissingDistroComponentsEngine::new();
         assert_eq!(engine.records.len(), 13);
         assert!(engine.is_all_components_implemented());
+    }
+
+    #[test]
+    fn test_steamos_atomic_ab_image_update_engine() {
+        let mut ab_engine = SteamOsAtomicAbImageUpdateEngine::new("3.4.0", "cbf29ce484222325");
+        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
+        assert_eq!(ab_engine.inactive_slot(), PartitionSlot::SlotB);
+
+        // Calculate expected hash for update payload
+        let payload = b"STEAM_OS_SYSTEM_UPDATE_IMAGE_PAYLOAD";
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in payload {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        let expected_hash = format!("{:016x}", hash);
+
+        // Apply update to Slot B
+        let updated_slot = ab_engine
+            .apply_update_to_inactive_slot("3.5.0", &expected_hash, payload)
+            .unwrap();
+        assert_eq!(updated_slot, PartitionSlot::SlotB);
+        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotB);
+
+        // Confirm boot success on Slot B
+        assert!(ab_engine.mark_boot_successful().is_ok());
+        assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Healthy);
+
+        // Simulate boot failure and verify rollback to Slot A
+        let fallback = ab_engine.report_boot_failure_and_rollback();
+        assert_eq!(fallback, PartitionSlot::SlotA);
+        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
+        assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Corrupted);
+    }
+
+    #[test]
+    fn test_apparmor_path_rule_engine() {
+        let mut apparmor = AppArmorPathRuleEngine::new();
+
+        let profile = AppArmorProfile {
+            profile_name: "usr.bin.firefox".to_string(),
+            mode: AppArmorRuleMode::Enforce,
+            rules: vec![
+                AppArmorPathRule {
+                    path_pattern: "/home/user/*".to_string(),
+                    allow_read: true,
+                    allow_write: true,
+                    allow_exec: false,
+                },
+                AppArmorPathRule {
+                    path_pattern: "/usr/lib/firefox/firefox".to_string(),
+                    allow_read: true,
+                    allow_write: false,
+                    allow_exec: true,
+                },
+            ],
+        };
+
+        apparmor.add_profile(profile);
+
+        // Allowed accesses
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/home/user/download.pdf", true, true, false));
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, false, true));
+
+        // Denied accesses (e.g. write to executable or exec home file)
+        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, true, true));
+        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
+
+        assert!(apparmor.audit_log.len() >= 2);
     }
 }
