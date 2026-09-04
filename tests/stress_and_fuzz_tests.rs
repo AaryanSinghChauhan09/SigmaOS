@@ -56,6 +56,15 @@ fn test_matrix_syscall_fuzzing() {
     unveil.unveil("/var", "r").unwrap();
     assert!(unveil.validate_path("/etc/shadow", UnveilPermission::Read).is_err());
     assert!(unveil.validate_path("\0\0\0/invalid_fuzz", UnveilPermission::Write).is_err());
+
+    // Syzkaller-style random pseudo-syscall fuzzing iterations
+    let seeds: [u64; 4] = [0xDEADBEEF, 0xCAFEBABE, 0x13371337, 0x88888888];
+    for seed in seeds {
+        let bad_fd = (seed % 10000) as usize + 1000;
+        let mut buf = [0u8; 32];
+        assert!(vfs.read_file(bad_fd, &mut buf).is_err());
+        assert!(vfs.write_file(bad_fd, &seed.to_le_bytes()).is_err());
+    }
 }
 
 #[test]
