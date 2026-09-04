@@ -966,6 +966,109 @@ mod repl_tests {
 }
 
 // =========================================================================
+// REPL LINE EDITOR, AUTO-SUGGEST & SOVEREIGN SIGMA SH REPL
+// =========================================================================
+
+pub struct ReplLineEditor;
+
+impl ReplLineEditor {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn highlight_line(&self, line: &str) -> String {
+        let parts: StdVec<&str> = line.split_whitespace().collect();
+        if parts.is_empty() {
+            return line.to_string();
+        }
+        let first = parts[0];
+        let rest = if line.len() > first.len() {
+            &line[first.len()..]
+        } else {
+            ""
+        };
+        format!("\x1B[32m{}\x1B[0m{}", first, rest)
+    }
+}
+
+impl Default for ReplLineEditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct AutoSuggestTabPopup {
+    pub candidates: StdVec<String>,
+}
+
+impl AutoSuggestTabPopup {
+    pub fn new() -> Self {
+        Self {
+            candidates: StdVec::new(),
+        }
+    }
+}
+
+impl Default for AutoSuggestTabPopup {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignSigmaShRepl {
+    pub line_editor: ReplLineEditor,
+    pub completer: ContextualCompleter,
+    pub env: SimpleShellEnvironment,
+}
+
+impl SovereignSigmaShRepl {
+    pub fn new() -> Self {
+        let mut env = SimpleShellEnvironment::new();
+        env.set(b"USER", b"sovereign");
+        env.set(b"HOSTNAME", b"sigmaos");
+        Self {
+            line_editor: ReplLineEditor::new(),
+            completer: ContextualCompleter::new(),
+            env,
+        }
+    }
+
+    pub fn render_prompt(&self) -> String {
+        let user = String::from_utf8_lossy(self.env.get(b"USER").unwrap_or(b"sovereign"));
+        let host = String::from_utf8_lossy(self.env.get(b"HOSTNAME").unwrap_or(b"sigmaos"));
+        format!("{}@{}> ", user, host)
+    }
+
+    pub fn suggest_completion(&self, input: &str) -> Option<String> {
+        let matches = self.completer.complete(input);
+        matches.first().map(|(sub, _)| sub.clone())
+    }
+
+    pub fn execute_repl_command(&mut self, line: &str) -> Result<(), ShellError> {
+        let trimmed = line.trim();
+        if trimmed.starts_with("export ") {
+            let kv = &trimmed[7..];
+            if let Some(pos) = kv.find('=') {
+                let key = kv[..pos].trim();
+                let val = kv[pos + 1..].trim();
+                self.env.set(key.as_bytes(), val.as_bytes());
+            }
+        }
+        Ok(())
+    }
+
+    pub fn jobs_cmd(&self) -> String {
+        "No active background jobs".to_string()
+    }
+}
+
+impl Default for SovereignSigmaShRepl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // ADVANCED ZSH, BASH, TCSH & KSH SHELL INNOVATIONS
 // =========================================================================
 
