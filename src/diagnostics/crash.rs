@@ -665,9 +665,9 @@ extern "C" {
 
 #[cfg(test)]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::std::{alloc as std_alloc, Layout};
+    use std::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align_unchecked(size, 8);
-    std_alloc(layout)
+    std_alloc::alloc(layout)
 }
 
 #[cfg(test)]

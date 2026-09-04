@@ -585,8 +585,8 @@ pub struct SQrexecChannel {
 
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
-        let layout = core::std::Layout::from_size_align(size.max(1), 8).unwrap();
-        let buffer = unsafe { std::std::alloc(layout) };
+        let layout = core::core::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
+        let buffer = unsafe { std::alloc(layout) };
         Self {
             buffer,
             size,
@@ -628,8 +628,8 @@ impl SQrexecChannel {
     pub fn destroy(&self) {
         unsafe {
             core::ptr::write_bytes(self.buffer, 0, self.size);
-            let layout = core::std::Layout::from_size_align(self.size.max(1), 8).unwrap();
-            std::std::dealloc(self.buffer, layout);
+            let layout = core::core::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
+            std::dealloc(self.buffer, layout);
         }
     }
 }

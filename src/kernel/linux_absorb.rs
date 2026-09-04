@@ -386,7 +386,7 @@ impl LinuxAbsorptionEngine {
         let mut r = Vec::new();
         r.push(ConversionRule {
             linux_pattern: String::from("kmalloc"),
-            sigma_pattern: String::from("std::std::alloc"),
+            sigma_pattern: String::from("std::alloc"),
             rule_type: ConversionRuleType::MemorySafety,
             priority: 10,
         });
