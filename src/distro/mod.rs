@@ -25,11 +25,11 @@ pub mod garuda_nomad_innovations;
 
 pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
-    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
-    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
-    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack, SovereignDnsTlsResolverEngine,
-    SovereignDynamicDevfsEngine, SovereignStatefulNatEngine, SovereignJournaldBinaryStorageEngine,
-    DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, NatType, ConntrackTableEntry, JournaldLogRecord,
+    DeviceNodeType, DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel,
+    NatRule, NatRuleKind, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine,
+    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine,
+    SovereignStatefulNatEngine, SystemdInitManager, SystemdUnitService, TcpSocket, TcpState,
+    UsbHidKeyboardDriver, UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
 };
 
 pub use garuda_nomad_innovations::{
@@ -150,7 +150,6 @@ pub use missing_distro_innovations::{
     SmartOsZoneEngine, ComponentParityStatus, MissingDistroComponentsEngine,
     DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
     GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
-    BpfTypeFormatEngine, ErofsReadOnlyOverlayEngine, LoongArch64ArchitectureEngine,
 };
 
 pub use linux_bsd_inspirations::{
@@ -190,4 +189,13 @@ pub use nextgen_innovations::{
     SigmaLayer, OSLayer, SigmaLink, NetworkMediaKind, SigmaEdgeNet, SigmaSecureNet, SigmaCollab,
     CollabWorkspacePeer, SigmaAssist, TroubleshootingDiagnostic, SigmaRollback, SystemSnapshot,
     SigmaDoc, DocumentationTopic, SigmaRescue,
+};
+
+pub mod sovereign_nextgen_distro_leap;
+pub use sovereign_nextgen_distro_leap::{
+    SovereignSchedExtEngine, ScxSchedulerKind, ScxTaskState, SchedExtTask,
+    SovereignLandlockV5Guard, LandlockAccessType, LandlockV5Rule,
+    SovereignHermeticCasStoreEngine, HermeticClosureRecord, SystemGenerationRecord,
+    SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
+    SovereignDistroLeapSuite,
 };

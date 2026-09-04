@@ -509,36 +509,37 @@ mod tests {
     }
 
     #[test]
-    fn test_git_repo_splitter_gbp_and_overlay_sync() {
+    fn test_pkgctl_split_migration_engine() {
         let mut migrator = SovereignSvnToGitMigrator::new();
         migrator.add_svn_log(SvnRevisionLog {
-            revision: 100,
-            author: "dev".to_string(),
-            message: "add ripgrep".to_string(),
-            path: "packages/ripgrep".to_string(),
-            branch_type: SvnBranchType::Branch,
+            revision: 500,
+            author: "maintainer".to_string(),
+            message: "upgpkg: ripgrep 14.0.0-1".to_string(),
+            path: "trunk/ripgrep".to_string(),
+            branch_type: SvnBranchType::Trunk,
         });
-        let commits = migrator.migrate_svn_to_git("sigmaos.org");
 
-        let mut splitter = GitPackagingRepositorySplitter::new();
-        let split = splitter.split_monolithic_repo(&commits, "https://gitlab.sigmaos.org/pkg");
-        assert_eq!(split.len(), 1);
-        assert_eq!(split[0].package_name, "ripgrep");
+        let commits = migrator.migrate_svn_to_git("archlinux.org");
 
-        let mut gbp = DebianGitBuildpackageEngine::new();
-        gbp.add_pristine_tar(PristineTarDelta {
-            package_name: "ripgrep".to_string(),
-            version: "13.0.0".to_string(),
-            delta_checksum: "abc".to_string(),
-            tarball_filename: "ripgrep_13.0.0.orig.tar.gz".to_string(),
-        });
-        assert_eq!(
-            gbp.reconstruct_upstream_tarball("ripgrep", "13.0.0").unwrap(),
-            "ripgrep_13.0.0.orig.tar.gz"
-        );
+        let mut splitter = PkgctlSplitMigrationEngine::new();
+        splitter.register_pkgbase("ripgrep", "https://gitlab.archlinux.org/archlinux/packaging/packages/ripgrep.git", true);
 
-        let mut overlay = SovereignGitOverlaySyncEngine::new();
-        assert!(overlay.sync_overlay("gentoo-guru", "https://github.com/gentoo/guru.git", "commit-sha-123", true).is_ok());
-        assert!(overlay.sync_overlay("untrusted-repo", "https://example.com/repo.git", "commit-sha-456", false).is_err());
+        let split_commits = splitter.execute_split("ripgrep", &commits).unwrap();
+        assert_eq!(split_commits.len(), 1);
+        assert_eq!(split_commits[0].git_branch, "pkgbases/ripgrep");
+    }
+
+    #[test]
+    fn test_bsd_ports_cvs_svn_to_git_mapper() {
+        let mut mapper = BsdPortsCvsSvnToGitMapper::new();
+        let header = "# $FreeBSD: head/ports/sysutils/ripgrep/Makefile 550000 2020-10-01 12:00:00Z bsddev $";
+        let tag = mapper.parse_rcs_header(header).unwrap();
+
+        assert_eq!(tag.rcs_keyword, "$FreeBSD$");
+        assert_eq!(tag.rcs_revision, "550000");
+        assert_eq!(tag.author, "bsddev");
+
+        let git_tag = mapper.convert_rcs_to_git_tag(&tag);
+        assert_eq!(git_tag, "ports/bsddev/v550000");
     }
 }
