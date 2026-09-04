@@ -28,7 +28,7 @@ elif python3 -m pytest --version &>/dev/null; then
 elif python3 -c "import pytest" &>/dev/null; then
   pytest
 elif command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1, tests.test_python_env as t2, tests.test_stress_fuzz_bench as t3, tests.test_unit_core as t4; t1.test_shell_syscall_interaction(); t1.test_device_driver_mocking(); t1.test_network_socket_packet_transfer(); t1.test_security_authorization_denial(); t1.test_boot_sequence_varied_configs(); t1.test_universal_distro_subsystem_bridge(); t2.test_python_environment(); t3.test_stress_concurrent_processes(); t3.test_fuzz_syscall_inputs(); t3.test_benchmark_against_baseline(); t4.test_file_io_operations(); t4.test_process_scheduling_fairness(); t4.test_memory_management_alloc_free_leak(); print('All 13 Python tests executed and passed cleanly.')"
+  python3 -c "import sys; sys.path.insert(0, '.'); import tests.test_integration_system as t1, tests.test_python_env as t2, tests.test_stress_fuzz_bench as t3, tests.test_unit_core as t4; t1.test_shell_syscall_interaction(); t1.test_device_driver_mocking(); t1.test_network_socket_packet_transfer(); t1.test_security_authorization_denial(); t1.test_boot_sequence_varied_configs(); t1.test_universal_distro_subsystem_bridge(); t2.test_python_environment(); t3.test_stress_concurrent_processes(); t3.test_fuzz_syscall_inputs(); t3.test_benchmark_against_baseline(); t4.test_file_io_operations(); t4.test_process_scheduling_fairness(); t4.test_memory_management_alloc_free_leak(); print('All 13 Python tests executed and passed cleanly.')"
 else
     echo "pytest not available in environment; skipping python tests."
 fi
@@ -70,7 +70,7 @@ fi
 # 8. Run Universal Package Manager CLI simulation tests
 echo "[8/12] Running Universal Package Manager CLI simulation tests..."
 if command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
+  python3 -c "import sys; sys.path.insert(0, '.'); import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
 else
   echo "Python3 not available; skipping universal package manager tests."
 fi
@@ -90,7 +90,7 @@ if [ -f "src/security/input_validation.rs" ]; then
 fi
 
 echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
+python3 -c "import sys; sys.path.insert(0, '.'); import tests.test_unit_core, tests.test_integration_system, tests.test_stress_fuzz_bench"
 
 echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0

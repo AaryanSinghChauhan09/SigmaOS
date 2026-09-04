@@ -447,12 +447,20 @@ impl PacmanContribEngine {
         lines.join("\n")
     }
 
-    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
+    pub fn checkupdates(
+        &self,
+        local_db: &PacmanDatabase,
+        remote_db: &PacmanDatabase,
+    ) -> Vec<(String, String, String)> {
         let mut updates = Vec::new();
         for local in &local_db.local_packages {
             if let Some(remote) = remote_db.packages.iter().find(|p| p.name == local.name) {
                 if remote.version != local.version {
-                    updates.push((local.name.clone(), local.version.clone(), remote.version.clone()));
+                    updates.push((
+                        local.name.clone(),
+                        local.version.clone(),
+                        remote.version.clone(),
+                    ));
                 }
             }
         }
@@ -605,65 +613,6 @@ impl SovereignDbscriptsEngine {
 }
 
 impl Default for SovereignDbscriptsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Pacman contrib utility engine
-pub struct PacmanContribEngine;
-
-impl PacmanContribEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn paccache_clean(&self, cache: &[String], keep: usize) -> Vec<String> {
-        if cache.len() <= keep {
-            Vec::new()
-        } else {
-            cache[..cache.len() - keep].to_vec()
-        }
-    }
-
-    pub fn rankmirrors(&self, mirrors: &[(String, u32)], limit: usize) -> Vec<(String, u32)> {
-        let mut sorted = mirrors.to_vec();
-        sorted.sort_by_key(|m| m.1);
-        sorted.truncate(limit);
-        sorted
-    }
-
-    pub fn updpkgsums(&self, pkgbuild: &str, new_hash: &str) -> String {
-        if pkgbuild.contains("sha256sums=") {
-            format!("pkgname=foo\nsha256sums=('{}')", new_hash)
-        } else {
-            format!("{}\nsha256sums=('{}')", pkgbuild, new_hash)
-        }
-    }
-
-    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
-        let mut updates = Vec::new();
-        for local_pkg in &local_db.local_packages {
-            if let Some(remote_pkg) = remote_db.packages.iter().find(|p| p.name == local_pkg.name) {
-                if remote_pkg.version != local_pkg.version {
-                    updates.push((local_pkg.name.clone(), local_pkg.version.clone(), remote_pkg.version.clone()));
-                }
-            }
-        }
-        updates
-    }
-
-    pub fn finddeps(&self, local_db: &PacmanDatabase, dep_name: &str) -> Vec<String> {
-        local_db
-            .local_packages
-            .iter()
-            .filter(|p| p.depends.iter().any(|d| d == dep_name))
-            .map(|p| p.name.clone())
-            .collect()
-    }
-}
-
-impl Default for PacmanContribEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -883,5 +832,4 @@ depends=('glibc')
         assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
         assert_eq!(cleaner.cached_files.len(), 2);
     }
-
 }
