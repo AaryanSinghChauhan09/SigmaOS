@@ -101,14 +101,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
             | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxTails => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid
+            | DistroSubsystemMode::BedrockLinux => {
                 ServiceSupervisorType::Runit
             }
 
@@ -116,7 +120,6 @@ impl SovereignUniversalDistroBridge {
                 ServiceSupervisorType::Shepherd
             }
 
-            DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
@@ -216,7 +219,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
