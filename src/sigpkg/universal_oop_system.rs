@@ -24,7 +24,7 @@ use alloc::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(not(test))]
@@ -35,7 +35,7 @@ use std::collections::HashMap;
 
 use alloc::sync::Arc;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -43,14 +43,14 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -68,41 +68,21 @@ impl Version {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Package {
-    pub name: String,
-    pub version: Version,
-    pub description: String,
-    pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-}
-
-#[cfg(any(feature = "standalone_test", test))]
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
+#[cfg(feature = "standalone_test")]
+pub struct Package;
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
@@ -135,15 +115,12 @@ pub trait IPackage: Send + Sync {
 pub enum PackageFormat {
     // Debian-based
     Deb,
-    Apt,
     // RPM-based
     Rpm,
-    Yum,
     // Arch-based
     Pacman,
     // Gentoo-based
     Ebuild,
-    Portage,
     // Alpine-based
     Apk,
     // Nix-based
@@ -166,7 +143,6 @@ pub enum PackageFormat {
     Guix,
     // SigmaOS Native
     Sigma,
-    Sovereign,
     // Adobe AIR
     Air,
     // Homebrew Bottle
@@ -2913,7 +2889,7 @@ impl PortagePackage {
     }
 
     fn update_resolved_dependencies(&mut self) {
-        let mut deps: Vec<Dependency> = self.base_package.dependencies.clone();
+        let mut deps = self.base_package.dependencies.clone();
         for (flag, dep) in &self.conditional_deps {
             if self.use_flags.iter().any(|f| f.name == *flag && f.enabled) {
                 deps.push(dep.clone());
