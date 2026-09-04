@@ -135,8 +135,8 @@ impl SigmaAUR {
         }
 
         // Simulate build process
-        println!("Building package: {}", pkg_name_str);
-        println!("Version: {}", pkg_ver_str);
+        println!("Building package: {}", pkg_name);
+        println!("Version: {}", pkg.version);
         println!("Dependencies: {:?}", dependencies);
 
         // Mark as installed
