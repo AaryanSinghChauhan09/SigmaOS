@@ -75,11 +75,21 @@ pub enum DriverLoadStatus {
     Failed,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeclarativeHardwarePolicy {
+    PreferOpenDrivers,
+    RequireFirmwareFree,
+    SandboxUntrustedUsb,
+    AllowVendorBlobs,
+}
+
 pub struct HardwareManager {
     devices: HashMap<String, DeviceInfo>,
     drivers: HashMap<String, DriverInfo>,
     device_tree: DeviceTree,
     hotplug_enabled: bool,
+    active_policies: Vec<DeclarativeHardwarePolicy>,
+    sandboxed_devices: HashMap<String, bool>,
 }
 
 #[derive(Debug, Clone)]
@@ -107,7 +117,45 @@ impl HardwareManager {
                 },
             },
             hotplug_enabled: true,
+            active_policies: vec![DeclarativeHardwarePolicy::PreferOpenDrivers],
+            sandboxed_devices: HashMap::new(),
         }
+    }
+
+    pub fn set_hardware_policy(&mut self, policy: DeclarativeHardwarePolicy) {
+        if !self.active_policies.contains(&policy) {
+            self.active_policies.push(policy);
+        }
+    }
+
+    pub fn auto_synthesize_driver_descriptor(&mut self, device_name: &str) -> Option<String> {
+        let device = self.devices.get(device_name)?;
+        let synthesized_name = format!("synth_driver_{:04x}_{:04x}", device.vendor_id, device.device_id);
+
+        let driver_info = DriverInfo {
+            name: synthesized_name.clone(),
+            version: "0.1.0-synthesized".to_string(),
+            supported_devices: vec![(device.vendor_id, device.device_id)],
+            supported_classes: vec![(device.class_id, device.subclass_id)],
+            priority: 50,
+            load_status: DriverLoadStatus::NotLoaded,
+        };
+
+        self.register_driver(driver_info);
+        Some(synthesized_name)
+    }
+
+    pub fn sandbox_peripheral_device(&mut self, device_name: &str) -> bool {
+        if self.devices.contains_key(device_name) {
+            self.sandboxed_devices.insert(device_name.to_string(), true);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_device_sandboxed(&self, device_name: &str) -> bool {
+        self.sandboxed_devices.get(device_name).copied().unwrap_or(false)
     }
 
     pub fn scan_hardware(&mut self) -> Result<(), String> {
@@ -506,5 +554,65 @@ mod tests {
         
         manager.register_driver(driver);
         assert_eq!(manager.drivers.len(), 1);
+    }
+
+    #[test]
+    fn test_driver_synthesis_and_hardware_policy() {
+        let mut manager = HardwareManager::new();
+        manager.set_hardware_policy(DeclarativeHardwarePolicy::RequireFirmwareFree);
+
+        let device = DeviceInfo {
+            device_type: DeviceType::PCI,
+            vendor_id: 0x8086,
+            device_id: 0x272b,
+            class_id: 0x02,
+            subclass_id: 0x80,
+            prog_if: 0x00,
+            name: "intel_wifi7".to_string(),
+            description: "Intel Wi-Fi 7 BE200".to_string(),
+            driver: None,
+            status: DeviceStatus::Connected,
+            resources: DeviceResources {
+                io_ports: vec![],
+                memory_ranges: vec![],
+                irq: Some(11),
+                dma_channel: None,
+            },
+        };
+
+        manager.add_device(device);
+        let synth_driver = manager.auto_synthesize_driver_descriptor("intel_wifi7");
+        assert_eq!(synth_driver, Some("synth_driver_8086_272b".to_string()));
+        assert!(manager.drivers.contains_key("synth_driver_8086_272b"));
+    }
+
+    #[test]
+    fn test_peripheral_sandboxing_policy() {
+        let mut manager = HardwareManager::new();
+        manager.set_hardware_policy(DeclarativeHardwarePolicy::SandboxUntrustedUsb);
+
+        let usb_dev = DeviceInfo {
+            device_type: DeviceType::USB,
+            vendor_id: 0x0930,
+            device_id: 0x6545,
+            class_id: 0x08,
+            subclass_id: 0x06,
+            prog_if: 0x50,
+            name: "toshiba_usb_drive".to_string(),
+            description: "USB Mass Storage".to_string(),
+            driver: None,
+            status: DeviceStatus::Connected,
+            resources: DeviceResources {
+                io_ports: vec![],
+                memory_ranges: vec![],
+                irq: None,
+                dma_channel: None,
+            },
+        };
+
+        manager.add_device(usb_dev);
+        assert!(manager.sandbox_peripheral_device("toshiba_usb_drive"));
+        assert!(manager.is_device_sandboxed("toshiba_usb_drive"));
+        assert!(!manager.is_device_sandboxed("non_existent"));
     }
 }
