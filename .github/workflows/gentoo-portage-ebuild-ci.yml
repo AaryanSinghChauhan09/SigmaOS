@@ -24,4 +24,4 @@ jobs:
 
       - name: Test Gentoo Package Format Transpilation
         run: |
-          cargo test --lib -- package::universal
+          ./run_sigma_tests.sh
