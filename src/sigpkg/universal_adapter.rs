@@ -1,5 +1,3 @@
-extern crate alloc;
-use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -21,10 +19,7 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use crate::sigpkg::universal_engine::PackageFormat;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::Permission;
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -126,6 +121,48 @@ pub struct FlatpakManifest {
     pub app_id: String,
     pub command: String,
     pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdUclManifest {
+    pub name: String,
+    pub version: String,
+    pub comment: String,
+    pub deps: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdContentsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+    pub exec_commands: Vec<String>,
+    pub unexec_commands: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetBsdPkgsrcManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SlackwarePkgManifest {
+    pub name: String,
+    pub version: String,
+    pub description: String,
+    pub slack_required: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ZypperSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub requires: Vec<String>,
 }
 
 pub struct UniversalPackageAdapter;
@@ -274,7 +311,6 @@ impl UniversalPackageAdapter {
     /// Parses Gentoo .ebuild specification text
     pub fn parse_gentoo_ebuild(&self, filename: &str, text: &str) -> Result<GentooEbuildMetadata, &'static str> {
         let mut category = String::from("app-misc");
-        let mut package_name = String::new();
         let mut version = String::from("1.0.0");
         let mut rdepend = Vec::new();
         let mut depend = Vec::new();
@@ -283,22 +319,22 @@ impl UniversalPackageAdapter {
 
         // Infer name and version from filename (e.g. `sys-apps/portage-3.0.30.ebuild` or `nginx-1.25.1.ebuild`)
         let clean_filename = filename.trim_end_matches(".ebuild");
-        if clean_filename.contains('/') {
+        let mut package_name = if clean_filename.contains('/') {
             let mut parts = clean_filename.split('/');
             category = parts.next().unwrap_or("app-misc").to_string();
             let name_ver = parts.next().unwrap_or(clean_filename);
             if let Some(pos) = name_ver.rfind('-') {
-                package_name = name_ver[..pos].to_string();
                 version = name_ver[pos + 1..].to_string();
+                name_ver[..pos].to_string()
             } else {
-                package_name = name_ver.to_string();
+                name_ver.to_string()
             }
         } else if let Some(pos) = clean_filename.rfind('-') {
-            package_name = clean_filename[..pos].to_string();
             version = clean_filename[pos + 1..].to_string();
+            clean_filename[..pos].to_string()
         } else {
-            package_name = clean_filename.to_string();
-        }
+            clean_filename.to_string()
+        };
 
         for line in text.lines() {
             let line = line.trim();
@@ -1049,8 +1085,8 @@ impl SigPkgUniversalBridgeEngine {
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
     pub fn absorb_and_register(&mut self, filename: &str, raw_data: &[u8]) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = super::universal_oop_system::StandardPackage {
-            metadata: super::universal_oop_system::PackageMetadata {
+        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
+            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version,
                 description: native_pkg.description.clone(),
@@ -1066,7 +1102,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+            format: crate::sigpkg::universal_engine::PackageFormat::Sovereign,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
@@ -1130,6 +1166,209 @@ impl UniversalPackageAdapter {
             requires,
         })
     }
+
+    /// Parses FreeBSD UCL (+MANIFEST) package text
+    pub fn parse_freebsd_ucl_manifest(&self, text: &str) -> Result<FreeBsdUclManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut comment = String::new();
+        let mut deps = Vec::new();
+        let mut in_deps = false;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if line.starts_with("deps") && line.contains('{') {
+                in_deps = true;
+                continue;
+            }
+            if in_deps && line.contains('}') && !line.contains(':') {
+                in_deps = false;
+                continue;
+            }
+
+            if in_deps {
+                if let Some(pos) = line.find(':') {
+                    let dep_key = line[..pos].trim().trim_matches('"').trim_matches('{').trim();
+                    if !dep_key.is_empty() && dep_key != "origin" && dep_key != "version" {
+                        deps.push(dep_key.to_string());
+                    }
+                }
+            } else if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim().trim_matches('"');
+                let val = line[pos + 1..].trim().trim_matches(|c| c == '"' || c == ',' || c == ' ');
+                match key {
+                    "name" => name = val.to_string(),
+                    "version" => version = val.to_string(),
+                    "comment" => comment = val.to_string(),
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid FreeBSD UCL manifest: missing name or version");
+        }
+
+        Ok(FreeBsdUclManifest { name, version, comment, deps })
+    }
+
+    /// Parses OpenBSD +CONTENTS binary package text
+    pub fn parse_openbsd_contents(&self, text: &str) -> Result<OpenBsdContentsManifest, &'static str> {
+        let mut full_pkgname = String::new();
+        let mut comment = String::new();
+        let mut depends = Vec::new();
+        let mut exec_commands = Vec::new();
+        let mut unexec_commands = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if line.starts_with("@name ") {
+                full_pkgname = line["@name ".len()..].trim().to_string();
+            } else if line.starts_with("@comment ") {
+                comment = line["@comment ".len()..].trim().to_string();
+            } else if line.starts_with("@depend ") || line.starts_with("@pkgdep ") {
+                let dep_spec = line.split_whitespace().nth(1).unwrap_or("");
+                if let Some(pos) = dep_spec.rfind(':') {
+                    depends.push(dep_spec[pos + 1..].to_string());
+                } else if !dep_spec.is_empty() {
+                    depends.push(dep_spec.to_string());
+                }
+            } else if line.starts_with("@exec ") {
+                exec_commands.push(line["@exec ".len()..].trim().to_string());
+            } else if line.starts_with("@unexec ") {
+                unexec_commands.push(line["@unexec ".len()..].trim().to_string());
+            }
+        }
+
+        if full_pkgname.is_empty() {
+            return Err("Invalid OpenBSD +CONTENTS manifest: missing @name");
+        }
+
+        let (pkgname, version) = if let Some(pos) = full_pkgname.rfind('-') {
+            (full_pkgname[..pos].to_string(), full_pkgname[pos + 1..].to_string())
+        } else {
+            (full_pkgname.clone(), "1.0.0".to_string())
+        };
+
+        Ok(OpenBsdContentsManifest {
+            pkgname,
+            version,
+            comment,
+            depends,
+            exec_commands,
+            unexec_commands,
+        })
+    }
+
+    /// Parses NetBSD pkgsrc package manifest text
+    pub fn parse_netbsd_pkgsrc(&self, text: &str) -> Result<NetBsdPkgsrcManifest, &'static str> {
+        let mut full_pkgname = String::new();
+        let mut comment = String::new();
+        let mut depends = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim().trim_matches('"');
+                match key {
+                    "PKGNAME" => full_pkgname = val.to_string(),
+                    "COMMENT" => comment = val.to_string(),
+                    "DEPENDS" | "REQUIRES" => depends.push(val.to_string()),
+                    _ => {}
+                }
+            }
+        }
+
+        if full_pkgname.is_empty() {
+            return Err("Invalid NetBSD pkgsrc manifest: missing PKGNAME");
+        }
+
+        let (pkgname, version) = if let Some(pos) = full_pkgname.rfind('-') {
+            (full_pkgname[..pos].to_string(), full_pkgname[pos + 1..].to_string())
+        } else {
+            (full_pkgname.clone(), "1.0.0".to_string())
+        };
+
+        Ok(NetBsdPkgsrcManifest {
+            pkgname,
+            version,
+            comment,
+            depends,
+        })
+    }
+
+    /// Parses Slackware SlackBuild or txz package text
+    pub fn parse_slackware_pkg(&self, text: &str) -> Result<SlackwarePkgManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut description = String::new();
+        let mut slack_required = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim().trim_matches('"');
+                match key {
+                    "PRGNAM" | "PACKAGE_NAME" => name = val.to_string(),
+                    "VERSION" => version = val.to_string(),
+                    "SHORT_DESCRIPTION" => description = val.to_string(),
+                    "SLACK_REQUIRED" | "REQUIRES" => {
+                        for req in val.split(',') {
+                            let clean = req.trim();
+                            if !clean.is_empty() {
+                                slack_required.push(clean.to_string());
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            } else if line.contains(':') && description.is_empty() {
+                let val = line.split(':').nth(1).unwrap_or("").trim();
+                if !val.is_empty() {
+                    description = val.to_string();
+                }
+            }
+        }
+
+        if name.is_empty() {
+            name = "slack-pkg".to_string();
+        }
+        if version.is_empty() {
+            version = "1.0.0".to_string();
+        }
+
+        Ok(SlackwarePkgManifest {
+            name,
+            version,
+            description,
+            slack_required,
+        })
+    }
+
+    /// Parses openSUSE Zypper spec file text
+    pub fn parse_zypper_spec(&self, text: &str) -> Result<ZypperSpecManifest, &'static str> {
+        let spec = self.parse_rpm_spec(text)?;
+        Ok(ZypperSpecManifest {
+            name: spec.name,
+            version: spec.version,
+            summary: spec.summary,
+            requires: spec.requires,
+        })
+    }
 }
 
 // =========================================================================
@@ -1163,11 +1402,11 @@ impl UniversalDependencyMapper {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl" | "dev-libs/openssl" => {
                 "openssl".to_string()
             }
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python3" | "python" | "lang/python3" | "dev-lang/python" => "python".to_string(),
+            "python3" | "python3-dev" | "python" | "lang/python3" | "dev-lang/python" => "python".to_string(),
             "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
             "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
@@ -1224,7 +1463,7 @@ impl UniversalScriptletConverter {
             },
             PackageFormat::Yum => match script_name {
                 "%pre" => Some(SigmaPkgHookType::PreInstall),
-                "%post" => Some(SigmaPkgHookType::PostInstall),
+                "%post" | "%posttrans" => Some(SigmaPkgHookType::PostInstall),
                 "%preun" => Some(SigmaPkgHookType::PreRemove),
                 "%postun" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
@@ -1236,11 +1475,11 @@ impl UniversalScriptletConverter {
                 "post_remove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Apk | PackageFormat::Xbps => match script_name {
-                "pre-install" => Some(SigmaPkgHookType::PreInstall),
-                "post-install" => Some(SigmaPkgHookType::PostInstall),
-                "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
-                "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
+            PackageFormat::Apk | PackageFormat::Xbps | PackageFormat::Pkg | PackageFormat::Ports => match script_name {
+                "pre-install" | "+PRE_INSTALL" | "preinst" => Some(SigmaPkgHookType::PreInstall),
+                "post-install" | "+POST_INSTALL" | "postinst" => Some(SigmaPkgHookType::PostInstall),
+                "pre-deinstall" | "pre-remove" | "+PRE_DEINSTALL" | "prerm" => Some(SigmaPkgHookType::PreRemove),
+                "post-deinstall" | "post-remove" | "+POST_DEINSTALL" | "postrm" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
             _ => None,

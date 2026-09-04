@@ -13,9 +13,6 @@ use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
-pub mod node_distribution_dummy {
-    use super::*;
-
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 #[cfg(not(feature = "standalone_test"))]
@@ -805,6 +802,51 @@ impl Default for PackageTriggerRegistry {
 
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
+
+#[derive(Debug, Clone)]
+pub struct ForeignDistroManifest {
+    pub name: String,
+    pub version: String,
+    pub format: PackageFormat,
+    pub dependencies: Vec<String>,
+    pub raw_data: Vec<u8>,
+}
+
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        UnifiedPackage {
+            name: manifest.name.clone(),
+            version: manifest.version.clone(),
+            formats: vec![manifest.format],
+            dependencies: manifest.dependencies.clone(),
+            conflicts: Vec::new(),
+            provides: Vec::new(),
+            source: PackageSource::Repository { url: String::new() },
+            installed: false,
+            state: PackageState::Uninstalled,
+            properties: HashMap::new(),
+        }
+    }
+}
+
+pub struct DistroRepoSyncEngine {
+    pub synced_repos: Vec<String>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            synced_repos: Vec::new(),
+        }
+    }
+
+    pub fn sync_repository(&mut self, repo_url: &str) -> Result<usize, PackageError> {
+        self.synced_repos.push(repo_url.to_string());
+        Ok(1)
+    }
+}
 
 impl UniversalDistroAdapterPipeline {
     /// Ingests a foreign distro package file (.deb, .rpm, .apk, .pkg.tar.zst, .xbps),
@@ -2302,6 +2344,11 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
     }
 
+    #[test]
+    fn test_snapshot_rollback() {
+        let mut engine = UniversalSnapshotRollbackEngine::new();
+        let pkgs = vec!["htop".to_string(), "curl".to_string()];
+        let snap_id = engine.create_snapshot("pre-install", &pkgs);
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);

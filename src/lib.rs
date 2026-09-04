@@ -2,8 +2,6 @@ extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
-
 // Core working modules
 pub mod ai;
 pub mod app;
@@ -74,12 +72,10 @@ pub use package::bsd_linux_package_innovations::{
 };
 pub use unimplemented_features::{
     Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine, AndroidApexModule,
-    DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub, FrappeFrameworkDocTypeEngine,
-    HwbustersPowerSupplyMonitor, MacOsSequoiaWindowManager, ManjaroHardwareDetectionEngine,
+    DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub, ManjaroHardwareDetectionEngine,
     PhoronixAutomatedBenchmarkEngine, PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator,
     SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, VoidXbpsContainerEngine,
-    WindowsCopilotRecallAuditor,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
