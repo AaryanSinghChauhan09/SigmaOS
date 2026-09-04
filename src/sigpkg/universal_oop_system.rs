@@ -3895,6 +3895,101 @@ impl Default for NixStoreGcEngine {
     }
 }
 
+// ============================================================================
+// Universal Distro Package Unifier Engine & User-Defined Function Manager
+// ============================================================================
+
+pub struct UniversalDistroPackageUnifierEngine {
+    pub translator: SigmaPackageTranslator,
+    pub macro_evaluator: RpmMacroEvaluator,
+    pub conffile_merger: ConffileMergeEngine,
+}
+
+impl UniversalDistroPackageUnifierEngine {
+    pub fn new() -> Self {
+        Self {
+            translator: SigmaPackageTranslator::new(),
+            macro_evaluator: RpmMacroEvaluator::new(),
+            conffile_merger: ConffileMergeEngine::new(),
+        }
+    }
+
+    /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
+    /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
+    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+        let meta = foreign_package.metadata();
+
+        // 1. Expand macros in description/paths if applicable
+        let expanded_desc = self.macro_evaluator.expand(&meta.description);
+
+        // 2. Map dependencies to unified sovereign system dependencies
+        let mut unified_deps = Vec::new();
+        for dep in foreign_package.dependencies() {
+            let mapped_name = match dep.name.as_str() {
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
+                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
+                _ => &dep.name,
+            };
+            unified_deps.push(Dependency {
+                name: mapped_name.to_string(),
+                version_constraint: dep.version_constraint,
+            });
+        }
+
+        let mut unified_meta = meta.clone();
+        unified_meta.description = expanded_desc;
+
+        let base_sigma = StandardPackage {
+            metadata: unified_meta,
+            dependencies: unified_deps,
+            format: PackageFormat::Sigma,
+        };
+
+        // Wrap with AuditedPackageDecorator for OOP security compliance
+        Ok(Box::new(AuditedPackageDecorator::new(Box::new(base_sigma))))
+    }
+}
+
+impl Default for UniversalDistroPackageUnifierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UserDefinedFunctionManager {
+    pub pipeline: UserDefinedFunctionPipeline,
+    pub custom_hooks: Vec<Arc<dyn UserDefinedHook>>,
+}
+
+impl UserDefinedFunctionManager {
+    pub fn new() -> Self {
+        Self {
+            pipeline: UserDefinedFunctionPipeline::new(),
+            custom_hooks: Vec::new(),
+        }
+    }
+
+    pub fn register_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+        self.custom_hooks.push(hook);
+    }
+
+    pub fn run_hooks_on(&self, package: &mut dyn IPackage) -> Result<usize, HookError> {
+        let mut ran = 0;
+        for hook in &self.custom_hooks {
+            hook.execute(package)?;
+            ran += 1;
+        }
+        Ok(ran)
+    }
+}
+
+impl Default for UserDefinedFunctionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3967,7 +4062,7 @@ Description: Test
 Depends: simple";
 
         let package = manager.parse_package(deb_data).unwrap();
-        let name = package.name().to_string();
+        let _name = package.name().to_string();
 
         // Install without dependencies should fail
         assert!(manager.install_package(package).is_err());
@@ -4776,5 +4871,86 @@ Description: Hook test";
         let mut pipeline = UserDefinedFunctionPipeline::new();
         pipeline.set_env_var("BUILD_JOBS", "8");
         assert_eq!(pipeline.get_env_var("BUILD_JOBS"), Some("8"));
+    }
+
+    #[test]
+    fn test_universal_distro_package_unifier_engine_and_udf_manager() {
+        let unifier = UniversalDistroPackageUnifierEngine::new();
+
+        // Foreign RPM package with macro in description and foreign dependencies
+        let rpm_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "nginx".to_string(),
+                version: Version::new(1, 24, 0),
+                description: "Web server binary located in %_bindir/nginx".to_string(),
+                license: "BSD-2-Clause".to_string(),
+                maintainer: "nginx-team".to_string(),
+                homepage: "nginx.org".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256checksum".to_string(),
+                size: 2048000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: vec![
+                Dependency {
+                    name: "openssl-devel".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+                Dependency {
+                    name: "glibc".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+            ],
+            format: PackageFormat::Rpm,
+        });
+
+        let unified = unifier.unify_package(rpm_pkg.as_ref()).unwrap();
+        assert_eq!(unified.name(), "nginx");
+
+        // Macro expansion check
+        assert!(unified.metadata().description.contains("/usr/bin/nginx"));
+
+        // Normalized dependency mapping check
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+
+        // UserDefinedFunctionManager check
+        let mut udf_mgr = UserDefinedFunctionManager::new();
+        struct CustomSuffixHook;
+        impl UserDefinedHook for CustomSuffixHook {
+            fn name(&self) -> &str { "suffix-hook" }
+            fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+                pkg.metadata_mut().maintainer = "sovereign-built".to_string();
+                Ok(())
+            }
+        }
+
+        udf_mgr.register_hook(Arc::new(CustomSuffixHook));
+        let mut test_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-test".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "unknown".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let ran = udf_mgr.run_hooks_on(test_pkg.as_mut()).unwrap();
+        assert_eq!(ran, 1);
+        assert_eq!(test_pkg.metadata().maintainer, "sovereign-built");
     }
 }
