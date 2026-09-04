@@ -825,28 +825,26 @@ impl FedoraAnityaReleaseMonitoringEngine {
     ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
-            if is_new {
-                self.messaging_bus.publish_version_update(
-                    record.project_id,
-                    &record.name,
-                    "Fedora",
-                    &record.current_version,
-                    latest_version,
-                    vec![
-                        AnityaPackageMapping {
-                            distro: "Fedora".to_string(),
-                            package_name: record.name.clone(),
-                        },
-                        AnityaPackageMapping {
-                            distro: "SigmaOS".to_string(),
-                            package_name: record.name.clone(),
-                        },
-                    ],
-                    1000000,
-                );
-            }
+            let old_ver = record.current_version.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
+            if is_new {
+                let project_id = record.project_id;
+                let name = record.name.clone();
+                let pkgs = vec![
+                    AnityaPackageMapping { distro: "Fedora".to_string(), package_name: name.clone() },
+                    AnityaPackageMapping { distro: "SigmaOS".to_string(), package_name: name.clone() },
+                ];
+                self.messaging_bus.publish_version_update(
+                    project_id,
+                    &name,
+                    "pypi/crates/rpm",
+                    &old_ver,
+                    latest_version,
+                    pkgs,
+                    1700000000,
+                );
+            }
             Some(is_new)
         } else {
             None
