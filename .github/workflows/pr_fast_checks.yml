@@ -23,6 +23,8 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@v1 # stable
         with:
+          with:
+            toolchain: stable
           components: rustfmt, clippy
 
       - name: Code Formatting Check
