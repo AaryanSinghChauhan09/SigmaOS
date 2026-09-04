@@ -2593,7 +2593,29 @@ mod tests {
         assert_eq!(vol.capacity_gb, 100);
         assert!(vol.encrypted);
 
+        // 9. Extended Open Source Supremacy Features
+        assert!(suite.supervise_systemd_free_init("openrc-service"));
+        assert!(suite.throttle_racct_resource(1234, 80));
+        assert!(suite.process_xdp_zero_copy_packet(1500));
+        assert!(suite.scrub_tiered_storage_extent(101));
+
         assert!(suite.evaluate_open_source_project_supremacy());
+    }
+
+    #[test]
+    fn test_open_source_project_supremacy_suite_extended() {
+        let mut suite = OpenSourceProjectSupremacySuite::new();
+
+        assert!(suite.supervise_systemd_free_init("runit-syslog"));
+        assert!(suite.throttle_racct_resource(5678, 50));
+        assert!(!suite.throttle_racct_resource(0, 50));
+        assert!(!suite.throttle_racct_resource(5678, 101));
+
+        assert!(suite.process_xdp_zero_copy_packet(1024));
+        assert!(!suite.process_xdp_zero_copy_packet(10)); // Under 64 bytes MTU min
+        assert!(!suite.process_xdp_zero_copy_packet(10000)); // Over 9000 bytes Jumbo frame
+
+        assert!(suite.scrub_tiered_storage_extent(202));
     }
 }
 
