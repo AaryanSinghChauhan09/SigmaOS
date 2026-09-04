@@ -21,6 +21,7 @@ pub mod storage;
 pub mod touch_jingos;
 pub mod printing;
 pub mod usb_hid;
+pub mod sovereign_driver_lifecycle;
 pub mod vesa;
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
@@ -43,6 +44,13 @@ pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use linux_bsd_drivers::*;
+pub use sovereign_driver_lifecycle::{
+    ClusterAwarePeripheralManager, CommunityDriverRegistry, CrossOsDriverShim,
+    DeclarativeDriverProfile, DeclarativeHardwareResolver, DriverShard, DriverShardManager,
+    FirmwareType, IoBusType, ProgrammableIoStack, SandboxedHardwareModule,
+    SignedDriverPackage, SovereignDriverLifecycleState, SovereignDriverManager,
+    SovereignModularDeviceSupportEngine, TargetOsOrigin, UniversalFirmwareBridge,
+};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
