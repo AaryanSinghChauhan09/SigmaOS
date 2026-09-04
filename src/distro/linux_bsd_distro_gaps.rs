@@ -498,6 +498,23 @@ impl SystemdInitManager {
             false
         }
     }
+
+    pub fn is_service_running(&self, name: &str) -> bool {
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+    }
+
+    pub fn check_dependencies_met(&self, name: &str) -> bool {
+        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
+            for &req in &srv.requires {
+                if !self.is_service_running(req) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl Default for SystemdInitManager {
