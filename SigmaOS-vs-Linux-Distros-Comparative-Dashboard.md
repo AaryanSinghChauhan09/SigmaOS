@@ -53,7 +53,7 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **Phase 2 (Important, 12‑24m)** | Fault Tolerance, Enterprise, Docs | Fault Tolerance, Enterprise Integration, Documentation | Robust orchestration, AD/LDAP, strong docs | Reliability, ZFS, FreeBSD Handbook | Leapfrog with AI‑driven orchestration + compliance dashboards |
 | **Phase 3 (Optional, 24‑36m)** | Scaling, Community, UI | Proc Scaling, Community Ecosystem, UI/UX | Large scaling, global communities, polished UX | Strong niche communities, stable UI | Leapfrog with adaptive UI + collaborative OS layer |
 
-***
+---
 
 ## 🖥️ SigmaOS vs Linux Distros Comparative Matrix
 
@@ -73,27 +73,29 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **Virtualization** | KVM, QEMU, Docker, Podman, LXC, FreeBSD Jails | Qubes OS RPC policy engine, `FreeBsdJailSandboxEngine`, & Kata Containers microVM manager | Integrate Firecracker/KVM hypervisor bindings and OCI container image execution. |
 | **Update Mechanism** | Rolling (Arch) / Stable (Debian/Fedora) releases | Rawhide rolling channel selector (`SigmaNextChannel`) & livepatching | Build automated transactional updates, delta packages (`debdelta`), and reproducible ISO pipelines. |
 
-***
+---
 
 ## 📐 Dependency Flowchart & Systems Map
 
-    [Kernel Hybrid]
-          ↓
-    [Transactional Filesystem]
-          ↓
-    [Adaptive Scheduler]
-          ↓
-    [Visual Sandbox GUI]
-          ↓
-    [Unified Firewall Dashboard]
-          ↓
-    [Native Containers + VM Orchestration]
-          ↓
-    [Zenith Desktop Overlays]
-          ↓
-    [Compliance Handbook + Community Modules]
+```
+[Kernel Hybrid]
+      ↓
+[Transactional Filesystem]
+      ↓
+[Adaptive Scheduler]
+      ↓
+[Visual Sandbox GUI]
+      ↓
+[Unified Firewall Dashboard]
+      ↓
+[Native Containers + VM Orchestration]
+      ↓
+[Zenith Desktop Overlays]
+      ↓
+[Compliance Handbook + Community Modules]
+```
 
-***
+---
 
 ## 🚨 Ranked Gap Analysis Matrix
 
@@ -103,7 +105,7 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **Important** | Fault Tolerance, Enterprise, Docs | Robust orchestration, AD/LDAP, handbooks | Task resilience, AD/LDAP hooks, compliance handbook |
 | **Optional** | Proc Scaling, Community, UI | Large scaling, strong communities, polished UX | Workload scaling, contributor verification, Zenith overlays |
 
-***
+---
 
 ## 📊 Quarterly Compliance Scorecard (Q1–Q6)
 
@@ -116,7 +118,7 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **Q5** | Differentiation Start | Native container orchestration, Zenith overlays prototype, distributed FS overlay alpha | Container launch < 2s, Desktop uptime ≥ 90% |
 | **Q6** | Differentiation Complete | Optimized container runtime, Zenith overlays refinement, distributed FS overlay beta | Container launch < 1.5s, Sync accuracy ≥ 99.9% |
 
-***
+---
 
 ## 📜 Future Development Protocol & Community Charter
 
@@ -133,47 +135,40 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 ## 🚀 Future Development Roadmap for SigmaOS
 
 ### Phase 1 — Stabilization (Months 0–3)
-
-*   **Kernel Hygiene**: Refine process scheduler (BORE + MLFQ), NUMA buddy memory allocator, and interrupt handlers.
-*   **Basic Filesystem**: Finalize `SigmaFS` ext2/ext4 read-write compatibility, hard link reference counts, and POSIX ACLs.
-*   **Minimal Shell**: Expand `sigma-sh` with POSIX coreutils, Bash alias substitution, and tab auto-completion.
+- **Kernel Hygiene**: Refine process scheduler (BORE + MLFQ), NUMA buddy memory allocator, and interrupt handlers.
+- **Basic Filesystem**: Finalize `SigmaFS` ext2/ext4 read-write compatibility, hard link reference counts, and POSIX ACLs.
+- **Minimal Shell**: Expand `sigma-sh` with POSIX coreutils, Bash alias substitution, and tab auto-completion.
 
 ### Phase 2 — Core Expansion (Months 3–6)
-
-*   **Networking Stack**: Implement full IPv4/IPv6 dual-stack, BSD socket options, and seed-reproducible TCP state machines.
-*   **Device Driver Framework**: Expand Sovereign Driver Framework (SDF), Intel e1000 Gigabit NIC, VirtIO, and xHCI USB 3.x drivers.
-*   **Bootloader Integration**: Enhance UEFI bootloader with Secure Boot keyring verification and `mkinitcpio` initramfs generation.
+- **Networking Stack**: Implement full IPv4/IPv6 dual-stack, BSD socket options, and seed-reproducible TCP state machines.
+- **Device Driver Framework**: Expand Sovereign Driver Framework (SDF), Intel e1000 Gigabit NIC, VirtIO, and xHCI USB 3.x drivers.
+- **Bootloader Integration**: Enhance UEFI bootloader with Secure Boot keyring verification and `mkinitcpio` initramfs generation.
 
 ### Phase 3 — Userland & UX (Months 6–9)
-
-*   **CLI Utilities**: Add `df` disk usage reporting, `ps aux` process table queries, and system troubleshooting logs.
-*   **Package Manager**: Deploy `sigpkg` with AUR compilation, local APT cache simulation, and atomic rollback stores.
-*   **Zenith Desktop Prototype**: Finalize Zenith Desktop GUI with Zorin OS multi-layout persona switching and Wayland compositor.
+- **CLI Utilities**: Add `df` disk usage reporting, `ps aux` process table queries, and system troubleshooting logs.
+- **Package Manager**: Deploy `sigpkg` with AUR compilation, local APT cache simulation, and atomic rollback stores.
+- **Zenith Desktop Prototype**: Finalize Zenith Desktop GUI with Zorin OS multi-layout persona switching and Wayland compositor.
 
 ### Phase 4 — Security & Reliability (Months 9–12)
-
-*   **User Authentication & Permissions**: Integrate Discretionary (DAC), Mandatory (Bell-LaPadula MLS MAC), and Role-Based (RBAC) access control.
-*   **Sandbox Framework**: Enforce PQC Kyber/Dilithium capability tokens, OpenBSD `pledge`/`unveil`, and Qubes/Kata microVM isolation.
-*   **Snapshot Rollback System**: Add content-addressed storage snapshots (`sigpkg rollback`) and transactional state recovery.
+- **User Authentication & Permissions**: Integrate Discretionary (DAC), Mandatory (Bell-LaPadula MLS MAC), and Role-Based (RBAC) access control.
+- **Sandbox Framework**: Enforce PQC Kyber/Dilithium capability tokens, OpenBSD `pledge`/`unveil`, and Qubes/Kata microVM isolation.
+- **Snapshot Rollback System**: Add content-addressed storage snapshots (`sigpkg rollback`) and transactional state recovery.
 
 ### Phase 5 — Ecosystem & Community (Months 12–18)
-
-*   **Documentation Hub**: Launch public `SigmaWiki` (Arch Wiki style) with installation, configuration, and API reference manuals.
-*   **Contributor Onboarding Tools**: Establish GitHub issue templates, Special Interest Groups (SIG), and developer handbooks.
-*   **Knowledge Base**: Build automated troubleshooting tools, diagnostic reporters, and error prevention engines.
+- **Documentation Hub**: Launch public `SigmaWiki` (Arch Wiki style) with installation, configuration, and API reference manuals.
+- **Contributor Onboarding Tools**: Establish GitHub issue templates, Special Interest Groups (SIG), and developer handbooks.
+- **Knowledge Base**: Build automated troubleshooting tools, diagnostic reporters, and error prevention engines.
 
 ### Phase 6 — Professional Applications (Months 18–24)
-
-*   **SigmaOffice Suite**: Native word processing, spreadsheet calculations, and presentation engines (`SovereignPresentationEngine`).
-*   **Developer IDE Plugins**: Debugging tools with GDB/WinDbg pseudo-registers, Build ID symbol resolvers, and cross-compilers.
-*   **Creative Suite**: Native non-linear video editor (`SovereignVideoEditor`), vector graphics engine, and VLC/MPV video player.
+- **SigmaOffice Suite**: Native word processing, spreadsheet calculations, and presentation engines (`SovereignPresentationEngine`).
+- **Developer IDE Plugins**: Debugging tools with GDB/WinDbg pseudo-registers, Build ID symbol resolvers, and cross-compilers.
+- **Creative Suite**: Native non-linear video editor (`SovereignVideoEditor`), vector graphics engine, and VLC/MPV video player.
 
 ### Phase 7 — Automation & Personalization (Months 24+)
+- **Workflow Automation**: IFTTT-style system automation rules and event triggers.
+- **Adaptive Resource Scheduler**: AI-driven predictive resource allocator (`SigmaKernelAutotuner`) adjusting CPU/memory parameters.
+- **Personal Dashboards**: Real-time performance metrics, Cognitive OS telemetry, and synesthetic notifications.
 
-*   **Workflow Automation**: IFTTT-style system automation rules and event triggers.
-*   **Adaptive Resource Scheduler**: AI-driven predictive resource allocator (`SigmaKernelAutotuner`) adjusting CPU/memory parameters.
-*   **Personal Dashboards**: Real-time performance metrics, Cognitive OS telemetry, and synesthetic notifications.
-
-***
+---
 
 This roadmap guarantees that SigmaOS systematically evolves from a conceptual microkernel skeleton into a daily-driver sovereign operating system and global developer ecosystem hub.
