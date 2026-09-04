@@ -325,6 +325,48 @@ impl IndiaStackClient {
         }
         Ok(true)
     }
+
+    /// Query Indian professional domain modular toolkits
+    pub fn get_professional_toolkit_tools(&self, domain: &str) -> Vec<String> {
+        match domain {
+            "Legal" => vec![
+                String::from("SigmaLaw (Case search & citations)"),
+                String::from("SigmaNotary (Digital signature & e-stamp)"),
+                String::from("SigmaCourt (Court filing & cause lists)"),
+            ],
+            "Healthcare" => vec![
+                String::from("SigmaMed (Patient record & ABDM compliance)"),
+                String::from("SigmaPharma (Drug inventory & prescription)"),
+                String::from("SigmaTeleHealth (Encrypted video consultations)"),
+            ],
+            "Education" => vec![
+                String::from("SigmaEdu (Learning management system)"),
+                String::from("SigmaExam (Exam creation & proctoring)"),
+                String::from("SigmaResearch (Citation & research notebooks)"),
+            ],
+            "Corporate" => vec![
+                String::from("SigmaBiz (ERP finance & compliance)"),
+                String::from("SigmaPayroll (Automated EPF/ESI payroll)"),
+                String::from("SigmaAudit (Governance & risk monitoring)"),
+            ],
+            "EngineeringIt" | "IT" => vec![
+                String::from("SigmaDev (Developer cross-language IDE)"),
+                String::from("SigmaInfra (Container/VM cluster orchestration)"),
+                String::from("SigmaCyber (IDS & security patch automation)"),
+            ],
+            "Agriculture" => vec![
+                String::from("SigmaAgri (Crop monitoring & soil analytics)"),
+                String::from("SigmaMarket (Market price & e-Mandi)"),
+                String::from("SigmaSupply (Logistics & cold-chain)"),
+            ],
+            "Creative" | "CreativeMedia" => vec![
+                String::from("SigmaStudio (Audio/video editing suite)"),
+                String::from("SigmaPublish (Publishing workflows)"),
+                String::from("SigmaDesign (Graphic design & AR/VR)"),
+            ],
+            _ => vec![String::from("SigmaOS General Professional Utility")],
+        }
+    }
 }
 
 impl Default for IndiaStackClient {
@@ -411,6 +453,17 @@ mod tests {
         };
         let token = client.create_erupi_voucher(voucher).unwrap();
         assert!(token.starts_with("ERUPI-VCHR-"));
+    }
+
+    #[test]
+    fn test_professional_toolkit_helpers() {
+        let client = IndiaStackClient::new(String::from("https://api"), String::from("key"));
+        let legal_tools = client.get_professional_toolkit_tools("Legal");
+        assert!(legal_tools.iter().any(|t| t.contains("SigmaLaw")));
+        assert!(legal_tools.iter().any(|t| t.contains("SigmaNotary")));
+
+        let agri_tools = client.get_professional_toolkit_tools("Agriculture");
+        assert!(agri_tools.iter().any(|t| t.contains("SigmaMarket")));
     }
 
     #[test]

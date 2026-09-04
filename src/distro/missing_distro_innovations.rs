@@ -1760,7 +1760,7 @@ pub enum AppArmorMode {
 }
 
 #[derive(Debug, Clone)]
-pub struct AppArmorProfile {
+pub struct UbuntuAppArmorProfile {
     pub profile_name: String,
     pub mode: AppArmorMode,
     pub allowed_read_paths: Vec<String>,
@@ -1770,7 +1770,7 @@ pub struct AppArmorProfile {
 
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
+    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
 }
 
 impl UbuntuAppArmorEngine {
@@ -1778,7 +1778,7 @@ impl UbuntuAppArmorEngine {
         Self::default()
     }
 
-    pub fn load_profile(&mut self, profile: AppArmorProfile) {
+    pub fn load_profile(&mut self, profile: UbuntuAppArmorProfile) {
         self.profiles.insert(profile.profile_name.clone(), profile);
     }
 
@@ -2100,6 +2100,164 @@ mod tests {
         assert_eq!(erofs.total_blocks_checksummed, 1);
     }
 
+    /// GNU Guix Functional Package Transactional Scheme AST Engine
+    pub struct GuixGnuSchemeFunctionalPackageEngine {
+        pub derivations: Vec<String>,
+        pub gc_roots: Vec<String>,
+        pub active_profiles: usize,
+    }
+
+    impl GuixGnuSchemeFunctionalPackageEngine {
+        pub fn new() -> Self {
+            Self {
+                derivations: Vec::new(),
+                gc_roots: Vec::new(),
+                active_profiles: 1,
+            }
+        }
+
+        pub fn register_scheme_derivation(&mut self, name: &str, scheme_expr: &str) -> String {
+            let drv_path = format!("/gnu/store/{}-{}", name, scheme_expr.len());
+            self.derivations.push(drv_path.clone());
+            drv_path
+        }
+
+        pub fn add_gc_root(&mut self, path: &str) {
+            self.gc_roots.push(String::from(path));
+        }
+
+        pub fn is_path_garbage_collected(&self, path: &str) -> bool {
+            !self.gc_roots.contains(&String::from(path))
+        }
+    }
+
+    /// Slackware pkgtool tar.xz Package Manager Engine
+    pub struct SlackwarePkgtoolEngine {
+        pub installed_packages: Vec<String>,
+        pub scriptlet_executions: usize,
+    }
+
+    impl SlackwarePkgtoolEngine {
+        pub fn new() -> Self {
+            Self {
+                installed_packages: Vec::new(),
+                scriptlet_executions: 0,
+            }
+        }
+
+        pub fn installpkg(&mut self, pkg_name: &str, has_doinst_sh: bool) -> bool {
+            if pkg_name.is_empty() {
+                return false;
+            }
+            self.installed_packages.push(String::from(pkg_name));
+            if has_doinst_sh {
+                self.scriptlet_executions += 1;
+            }
+            true
+        }
+
+        pub fn removepkg(&mut self, pkg_name: &str) -> bool {
+            if let Some(idx) = self.installed_packages.iter().position(|p| p == pkg_name) {
+                self.installed_packages.remove(idx);
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    /// CachyOS BPF sched_ext Kernel Scheduler Engine
+    pub struct CachyOsSchedExtBpfEngine {
+        pub active_scheduler: String,
+        pub avx512_optimization_enabled: bool,
+        pub scheduled_tasks: usize,
+    }
+
+    impl CachyOsSchedExtBpfEngine {
+        pub fn new() -> Self {
+            Self {
+                active_scheduler: String::from("scx_bpfland"),
+                avx512_optimization_enabled: true,
+                scheduled_tasks: 0,
+            }
+        }
+
+        pub fn switch_sched_ext_policy(&mut self, policy_name: &str) {
+            self.active_scheduler = String::from(policy_name);
+        }
+
+        pub fn dispatch_task(&mut self, task_id: u32) -> bool {
+            if task_id == 0 {
+                return false;
+            }
+            self.scheduled_tasks += 1;
+            true
+        }
+    }
+
+    /// Clear Linux Swupd Content-Addressed Stateless Bundle Engine
+    pub struct SwupdStatelessBundleEngine {
+        pub installed_bundles: Vec<String>,
+        pub content_hash_manifest: Vec<String>,
+    }
+
+    impl SwupdStatelessBundleEngine {
+        pub fn new() -> Self {
+            Self {
+                installed_bundles: Vec::new(),
+                content_hash_manifest: Vec::new(),
+            }
+        }
+
+        pub fn bundle_add(&mut self, bundle_name: &str, hash: &str) -> bool {
+            if bundle_name.is_empty() || hash.is_empty() {
+                return false;
+            }
+            self.installed_bundles.push(String::from(bundle_name));
+            self.content_hash_manifest.push(String::from(hash));
+            true
+        }
+
+        pub fn is_stateless_clean(&self) -> bool {
+            !self.installed_bundles.is_empty()
+        }
+    }
+
+    /// StarlingX Edge Cloud OTA Deploy & Recovery Engine
+    pub struct StarlingOsOtadeployEngine {
+        pub active_version: String,
+        pub rollback_version: Option<String>,
+        pub health_check_passed: bool,
+    }
+
+    impl StarlingOsOtadeployEngine {
+        pub fn new() -> Self {
+            Self {
+                active_version: String::from("24.01-edge"),
+                rollback_version: Some(String::from("23.09-edge")),
+                health_check_passed: true,
+            }
+        }
+
+        pub fn deploy_ota_update(&mut self, target_version: &str) -> bool {
+            if target_version.is_empty() {
+                return false;
+            }
+            self.rollback_version = Some(self.active_version.clone());
+            self.active_version = String::from(target_version);
+            true
+        }
+
+        pub fn rollback(&mut self) -> bool {
+            if let Some(prev) = self.rollback_version.take() {
+                self.active_version = prev;
+                true
+            } else {
+                false
+            }
+        }
+    }
+
     #[test]
     fn test_loongarch64_architecture_engine() {
         let mut la64 = LoongArch64ArchitectureEngine::new();
@@ -2107,5 +2265,34 @@ mod tests {
         assert_eq!(la64.active_cores, 4);
         assert!(la64.execute_instruction(0x02800000));
         assert_eq!(la64.executed_instructions, 1);
+    }
+
+    #[test]
+    fn test_guix_slackware_cachy_swupd_starling_engines() {
+        let mut guix = GuixGnuSchemeFunctionalPackageEngine::new();
+        let drv = guix.register_scheme_derivation("hello", "(package (name \"hello\"))");
+        assert!(drv.contains("/gnu/store/hello-"));
+        guix.add_gc_root(&drv);
+        assert!(!guix.is_path_garbage_collected(&drv));
+
+        let mut slack = SlackwarePkgtoolEngine::new();
+        assert!(slack.installpkg("neofetch-7.1.0-x86_64-1.txz", true));
+        assert_eq!(slack.scriptlet_executions, 1);
+        assert!(slack.removepkg("neofetch-7.1.0-x86_64-1.txz"));
+
+        let mut cachy = CachyOsSchedExtBpfEngine::new();
+        cachy.switch_sched_ext_policy("scx_rustland");
+        assert_eq!(cachy.active_scheduler, "scx_rustland");
+        assert!(cachy.dispatch_task(101));
+
+        let mut swupd = SwupdStatelessBundleEngine::new();
+        assert!(swupd.bundle_add("os-core", "a1b2c3d4e5f6"));
+        assert!(swupd.is_stateless_clean());
+
+        let mut starling = StarlingOsOtadeployEngine::new();
+        assert!(starling.deploy_ota_update("24.07-edge"));
+        assert_eq!(starling.active_version, "24.07-edge");
+        assert!(starling.rollback());
+        assert_eq!(starling.active_version, "24.01-edge");
     }
 }
