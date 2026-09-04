@@ -1628,6 +1628,15 @@ impl SigPkgUniversalBridgeEngine {
                     &net.depends,
                 )
             }
+            PackageFormat::Hpkg => {
+                let haiku = self.adapter.parse_haiku_hpkg(&manifest_text)?;
+                self.adapter.translate_to_native_package(
+                    &haiku.name,
+                    &haiku.version,
+                    &haiku.summary,
+                    &haiku.requires,
+                )
+            }
             _ => self
                 .adapter
                 .parse_and_translate_manifest(filename, &manifest_text),
