@@ -24,7 +24,7 @@ use alloc::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(not(test))]
@@ -35,7 +35,7 @@ use std::collections::HashMap;
 
 use alloc::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -43,14 +43,14 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -68,21 +68,41 @@ impl Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(feature = "standalone_test")]
-pub struct Package;
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: String,
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
@@ -115,12 +135,15 @@ pub trait IPackage: Send + Sync {
 pub enum PackageFormat {
     // Debian-based
     Deb,
+    Apt,
     // RPM-based
     Rpm,
+    Yum,
     // Arch-based
     Pacman,
     // Gentoo-based
     Ebuild,
+    Portage,
     // Alpine-based
     Apk,
     // Nix-based
@@ -143,6 +166,7 @@ pub enum PackageFormat {
     Guix,
     // SigmaOS Native
     Sigma,
+    Sovereign,
     // Adobe AIR
     Air,
     // Homebrew Bottle
@@ -205,6 +229,108 @@ pub enum PackageFormat {
     Drpm,
     // Bedrock Linux Stratum (.stratum)
     Stratum,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        if name.ends_with(".deb") || name.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") || name.ends_with(".drpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".pkg.tar.zst")
+            || name.ends_with(".pkg.tar.xz")
+            || name.ends_with(".pkg.tar.gz")
+            || name.contains("pacman")
+        {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") || name.contains(".tar .gz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else {
+            None
+        }
+    }
 }
 
 /// Package metadata structure
