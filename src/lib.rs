@@ -116,6 +116,8 @@ pub use security::{
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
     SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+    AutopsyTimelineEngine, ChainOfCustodyLedger, EvtxAuditJournalAnalyzer, VolatilityMemoryAnalyzer,
+    YaraSignatureCarvingEngine,
 };
 pub use driver::{
     DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
@@ -171,3 +173,15 @@ pub mod ml;
 pub mod iot;
 
 pub mod distro;
+pub mod innovation;
+pub use innovation::{
+    BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
+    FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
+    KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
+    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
+    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
+    UserlandOverlayLayer, VfsObjectRecord,
+};
+pub use crypto::aegis_vault::{
+    AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
+};
