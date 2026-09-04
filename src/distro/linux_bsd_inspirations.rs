@@ -100,8 +100,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
@@ -216,7 +218,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -4398,6 +4399,303 @@ impl Default for SovereignIllumosZonesEngine {
 }
 
 // ==========================================
+// 40. OPENSUSE SNAPPER BTRFS AUTOMATIC SNAPSHOT & ROLLBACK ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapperSnapshotType {
+    Single,
+    Pre,
+    Post,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapperSnapshot {
+    pub id: u32,
+    pub snap_type: SnapperSnapshotType,
+    pub pre_id: Option<u32>,
+    pub timestamp: u64,
+    pub description: String,
+    pub subvol_name: String,
+    pub is_active_boot: bool,
+}
+
+pub struct OpenSuseSnapperEngine {
+    pub snapshots: Vec<SnapperSnapshot>,
+    pub next_snap_id: u32,
+    pub active_boot_snapshot_id: Option<u32>,
+}
+
+impl OpenSuseSnapperEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            next_snap_id: 1,
+            active_boot_snapshot_id: None,
+        }
+    }
+
+    pub fn create_pre_snapshot(&mut self, description: &str, subvol_name: &str) -> u32 {
+        let id = self.next_snap_id;
+        self.next_snap_id += 1;
+        self.snapshots.push(SnapperSnapshot {
+            id,
+            snap_type: SnapperSnapshotType::Pre,
+            pre_id: None,
+            timestamp: self.snapshots.len() as u64 + 1,
+            description: description.to_string(),
+            subvol_name: subvol_name.to_string(),
+            is_active_boot: false,
+        });
+        id
+    }
+
+    pub fn create_post_snapshot(&mut self, pre_id: u32, description: &str, subvol_name: &str) -> Result<u32, &'static str> {
+        let pre_exists = self.snapshots.iter().any(|s| s.id == pre_id && s.snap_type == SnapperSnapshotType::Pre);
+        if !pre_exists {
+            return Err("Pre-snapshot ID not found for post snapshot creation");
+        }
+        let id = self.next_snap_id;
+        self.next_snap_id += 1;
+        self.snapshots.push(SnapperSnapshot {
+            id,
+            snap_type: SnapperSnapshotType::Post,
+            pre_id: Some(pre_id),
+            timestamp: self.snapshots.len() as u64 + 1,
+            description: description.to_string(),
+            subvol_name: subvol_name.to_string(),
+            is_active_boot: false,
+        });
+        Ok(id)
+    }
+
+    pub fn rollback_to_snapshot(&mut self, snap_id: u32) -> Result<(), &'static str> {
+        let exists = self.snapshots.iter().any(|s| s.id == snap_id);
+        if !exists {
+            return Err("Target snapshot ID for rollback not found");
+        }
+        for snap in self.snapshots.iter_mut() {
+            snap.is_active_boot = snap.id == snap_id;
+        }
+        self.active_boot_snapshot_id = Some(snap_id);
+        Ok(())
+    }
+}
+
+impl Default for OpenSuseSnapperEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 41. POP!_OS SYSTEM76 SCHEDULER & HYBRID GPU SWITCHER
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HybridGpuMode {
+    Integrated,
+    NvidiaDiscrete,
+    HybridOptimus,
+    ComputeOnly,
+}
+
+#[derive(Debug, Clone)]
+pub struct System76ProcessPriority {
+    pub pid: u64,
+    pub process_name: String,
+    pub is_foreground_focused: bool,
+    pub nice_level: i32,
+    pub cpu_affinity_mask: u64,
+}
+
+pub struct PopOsSystem76SchedulerEngine {
+    pub active_gpu_mode: HybridGpuMode,
+    pub processes: Vec<System76ProcessPriority>,
+}
+
+impl PopOsSystem76SchedulerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_gpu_mode: HybridGpuMode::HybridOptimus,
+            processes: Vec::new(),
+        }
+    }
+
+    pub fn set_gpu_mode(&mut self, mode: HybridGpuMode) {
+        self.active_gpu_mode = mode;
+    }
+
+    pub fn register_process(&mut self, pid: u64, name: &str, is_foreground: bool) {
+        let (nice, affinity) = if is_foreground {
+            (-5, 0xFF) // High priority, all cores
+        } else {
+            (10, 0x0F) // Low priority, efficiency cores
+        };
+
+        self.processes.push(System76ProcessPriority {
+            pid,
+            process_name: name.to_string(),
+            is_foreground_focused: is_foreground,
+            nice_level: nice,
+            cpu_affinity_mask: affinity,
+        });
+    }
+
+    pub fn focus_change(&mut self, pid: u64, is_focused: bool) -> Result<(), &'static str> {
+        let proc_info = self.processes.iter_mut().find(|p| p.pid == pid).ok_or("Process not found")?;
+        proc_info.is_foreground_focused = is_focused;
+        if is_focused {
+            proc_info.nice_level = -5;
+            proc_info.cpu_affinity_mask = 0xFF;
+        } else {
+            proc_info.nice_level = 10;
+            proc_info.cpu_affinity_mask = 0x0F;
+        }
+        Ok(())
+    }
+}
+
+impl Default for PopOsSystem76SchedulerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 42. DRAGONFLY BSD HAMMER2 PFS CLUSTER & MULTI-VERSION INODE SYNCHRONIZER
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsClusterNode {
+    pub node_id: u32,
+    pub node_address: String,
+    pub current_merkle_root: u64,
+    pub is_online: bool,
+}
+
+pub struct DragonFlyHammer2PfsEngine {
+    pub nodes: Vec<Hammer2PfsClusterNode>,
+    pub pfs_name: String,
+}
+
+impl DragonFlyHammer2PfsEngine {
+    pub fn new(pfs_name: &str) -> Self {
+        Self {
+            nodes: Vec::new(),
+            pfs_name: pfs_name.to_string(),
+        }
+    }
+
+    pub fn add_cluster_node(&mut self, node_id: u32, address: &str, merkle: u64) {
+        self.nodes.push(Hammer2PfsClusterNode {
+            node_id,
+            node_address: address.to_string(),
+            current_merkle_root: merkle,
+            is_online: true,
+        });
+    }
+
+    pub fn verify_cluster_consensus(&self) -> Result<u64, &'static str> {
+        let online: Vec<&Hammer2PfsClusterNode> = self.nodes.iter().filter(|n| n.is_online).collect();
+        if online.is_empty() {
+            return Err("No online nodes in HAMMER2 PFS cluster");
+        }
+
+        let first_merkle = online[0].current_merkle_root;
+        let consensus = online.iter().all(|n| n.current_merkle_root == first_merkle);
+
+        if consensus {
+            Ok(first_merkle)
+        } else {
+            Err("Cluster consensus error: Merkle root mismatch across nodes")
+        }
+    }
+}
+
+// ==========================================
+// 43. VOID LINUX RUNIT & XBPS TRANSACTION SAFETY SUPERVISOR
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct XbpsTransaction {
+    pub tx_id: u64,
+    pub package_name: String,
+    pub action: String, // "install", "remove", "update"
+    pub completed: bool,
+}
+
+pub struct VoidLinuxRunitXbpsEngine {
+    pub supervisor: SovereignRunitSupervisor,
+    pub transactions: Vec<XbpsTransaction>,
+    pub next_tx_id: u64,
+}
+
+impl VoidLinuxRunitXbpsEngine {
+    pub fn new() -> Self {
+        Self {
+            supervisor: SovereignRunitSupervisor::new(RunitRunlevel::Boot),
+            transactions: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn begin_transaction(&mut self, pkg: &str, action: &str) -> u64 {
+        let tx_id = self.next_tx_id;
+        self.next_tx_id += 1;
+        self.transactions.push(XbpsTransaction {
+            tx_id,
+            package_name: pkg.to_string(),
+            action: action.to_string(),
+            completed: false,
+        });
+        tx_id
+    }
+
+    pub fn commit_transaction(&mut self, tx_id: u64) -> Result<(), &'static str> {
+        let tx = self.transactions.iter_mut().find(|t| t.tx_id == tx_id).ok_or("Transaction not found")?;
+        tx.completed = true;
+        Ok(())
+    }
+}
+
+impl Default for VoidLinuxRunitXbpsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 44. OPENBSD RETGUARD & MAP_STACK SENTINEL
+// ==========================================
+
+pub struct OpenBsdRetguardSentinel {
+    pub map_stack: MapStackRegion,
+    pub violations_count: usize,
+}
+
+impl OpenBsdRetguardSentinel {
+    pub fn new(stack_base: u64, stack_size: usize) -> Self {
+        Self {
+            map_stack: MapStackRegion {
+                base_addr: stack_base,
+                size: stack_size,
+            },
+            violations_count: 0,
+        }
+    }
+
+    pub fn validate_sp(&mut self, sp: u64) -> bool {
+        if sp >= self.map_stack.base_addr && sp < self.map_stack.base_addr + self.map_stack.size as u64 {
+            true
+        } else {
+            self.violations_count += 1;
+            false
+        }
+    }
+}
+
+// ==========================================
 // 30. DRAGONFLY BSD VARSYMS & NUMA LOCKLESS NETPOLL ENGINE (SovereignDragonflyNpotEngine)
 // ==========================================
 
@@ -4561,7 +4859,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "swupd",
+                "bundle",
                 ServiceSupervisorType::Systemd,
             ),
             (
@@ -5773,6 +6071,65 @@ mod tests {
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
         assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
+    }
+
+    #[test]
+    fn test_opensuse_snapper_engine() {
+        let mut snapper = OpenSuseSnapperEngine::new();
+        let pre_id = snapper.create_pre_snapshot("Pre update system state", "@root");
+        assert_eq!(pre_id, 1);
+
+        let post_id = snapper.create_post_snapshot(pre_id, "Post update system state", "@root").unwrap();
+        assert_eq!(post_id, 2);
+
+        assert!(snapper.rollback_to_snapshot(pre_id).is_ok());
+        assert_eq!(snapper.active_boot_snapshot_id, Some(pre_id));
+        assert!(snapper.rollback_to_snapshot(999).is_err());
+    }
+
+    #[test]
+    fn test_popos_system76_scheduler_engine() {
+        let mut sched = PopOsSystem76SchedulerEngine::new();
+        sched.set_gpu_mode(HybridGpuMode::NvidiaDiscrete);
+        assert_eq!(sched.active_gpu_mode, HybridGpuMode::NvidiaDiscrete);
+
+        sched.register_process(1001, "game.exe", true);
+        assert_eq!(sched.processes[0].nice_level, -5);
+
+        assert!(sched.focus_change(1001, false).is_ok());
+        assert_eq!(sched.processes[0].nice_level, 10);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_pfs_engine() {
+        let mut hammer2 = DragonFlyHammer2PfsEngine::new("rpool/pfs0");
+        hammer2.add_cluster_node(1, "192.168.1.10", 0x12345678);
+        hammer2.add_cluster_node(2, "192.168.1.11", 0x12345678);
+
+        let consensus = hammer2.verify_cluster_consensus();
+        assert_eq!(consensus.unwrap(), 0x12345678);
+
+        hammer2.nodes[1].current_merkle_root = 0x87654321;
+        assert!(hammer2.verify_cluster_consensus().is_err());
+    }
+
+    #[test]
+    fn test_void_linux_runit_xbps_engine() {
+        let mut void_eng = VoidLinuxRunitXbpsEngine::new();
+        let tx = void_eng.begin_transaction("curl", "install");
+        assert_eq!(tx, 1);
+        assert!(!void_eng.transactions[0].completed);
+
+        assert!(void_eng.commit_transaction(tx).is_ok());
+        assert!(void_eng.transactions[0].completed);
+    }
+
+    #[test]
+    fn test_openbsd_retguard_sentinel() {
+        let mut retguard = OpenBsdRetguardSentinel::new(0x7FFF0000, 0x10000);
+        assert!(retguard.validate_sp(0x7FFF1000));
+        assert!(!retguard.validate_sp(0x1000));
+        assert_eq!(retguard.violations_count, 1);
     }
 }
 

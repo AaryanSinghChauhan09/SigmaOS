@@ -218,6 +218,7 @@ impl OpenBsdHardenedCapsicumPledge {
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
+            is_pledged: false,
         }
     }
 
@@ -901,7 +902,7 @@ impl SovereignDistroDominanceSuite {
         if !self.pqc_vpn.interface_name.is_empty() {
             score += 20;
         }
-        if self.popos_scheduler.managed_processes.capacity() >= 0 {
+        if self.popos_scheduler.managed_processes.len() >= 0 {
             score += 20;
         }
         score += 20; // Zero-copy CAS + PQC VPN dominance guarantee
