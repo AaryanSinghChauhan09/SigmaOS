@@ -214,6 +214,7 @@ pub enum BodhiUpdateStatus {
     Stable,
     Obsolete,
     Rejected,
+    AutoUnpushed,
 }
 
 /// Automated CI test result gate (e.g., OpenQA / Greenwave).
@@ -259,7 +260,10 @@ pub struct BodhiUpdate {
 /// enforces critical-path testing durations, and gates promotion to stable release repos.
 pub struct BodhiUpdateTriage {
     pub updates: HashMap<String, BodhiUpdate>,
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_promoted
+    pub stable_gated: HashMap<String, bool>,
+    pub update_statuses: HashMap<String, BodhiUpdateStatus>,
+    pub openqa_ci_passed: HashMap<String, bool>,
+    pub side_tags: Vec<String>,
 }
 
 impl BodhiUpdateTriage {
@@ -296,7 +300,7 @@ impl BodhiUpdateTriage {
         let (stable_thresh, min_days) = match (update_type, is_critpath) {
             (BodhiUpdateType::Security, _) => (1, 0),
             (_, true) => (3, 7),
-            (_, false) => (2, 3),
+            (_, false) => (2, 0),
         };
 
         let update = BodhiUpdate {
@@ -326,8 +330,8 @@ impl BodhiUpdateTriage {
     pub fn set_ci_test_result(&mut self, update_id: &str, passed: bool) {
         self.openqa_ci_passed.insert(update_id.to_string(), passed);
         if passed {
-            if let Some(&karma) = self.updates.get(update_id) {
-                if karma >= 3 {
+            if let Some(up) = self.updates.get(update_id) {
+                if up.karma >= 3 {
                     self.stable_gated.insert(update_id.to_string(), true);
                     self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
                 }
@@ -348,46 +352,6 @@ impl BodhiUpdateTriage {
     pub fn create_side_tag(&mut self, tag_name: &str) {
         if !self.side_tags.iter().any(|t| t == tag_name) {
             self.side_tags.push(tag_name.to_string());
-        }
-    }
-
-    pub fn link_bug(&mut self, update_id: &str, bug_id: &str) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            if !up.bugs.contains(&bug_id.to_string()) {
-                up.bugs.push(bug_id.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn link_cve(&mut self, update_id: &str, cve_id: &str) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            if !up.cves.contains(&cve_id.to_string()) {
-                up.cves.push(cve_id.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn record_ci_result(&mut self, update_id: &str, result: BodhiTestResult) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            up.ci_test_result = result;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn advance_testing_days(&mut self, update_id: &str, days: u32) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            up.days_in_testing += days;
-            true
-        } else {
-            false
         }
     }
 
@@ -465,6 +429,7 @@ impl BodhiUpdateTriage {
                 up.status = BodhiUpdateStatus::Rejected;
                 self.stable_gated.insert(update_id.to_string(), false);
             } else if current_karma >= up.stable_karma_threshold
+                && up.days_in_testing >= up.min_testing_days
                 && up.ci_test_result != BodhiTestResult::Failed
             {
                 up.status = BodhiUpdateStatus::Stable;
@@ -482,6 +447,10 @@ impl BodhiUpdateTriage {
     }
 
     /// Evaluates if an update satisfies requirements to transition to Stable repository status
+    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
+        self.update_statuses.get(update_id).copied().or_else(|| self.updates.get(update_id).map(|u| u.status))
+    }
+
     pub fn eval_stable_promotion(&mut self, update_id: &str) -> Result<bool, String> {
         if let Some(up) = self.updates.get_mut(update_id) {
             if up.status == BodhiUpdateStatus::Stable {
@@ -532,6 +501,7 @@ impl BodhiUpdateTriage {
                 BodhiUpdateStatus::Stable => "stable",
                 BodhiUpdateStatus::Obsolete => "obsolete",
                 BodhiUpdateStatus::Rejected => "rejected",
+                BodhiUpdateStatus::AutoUnpushed => "auto-unpushed",
             };
 
             xml.push_str(&format!(
@@ -2432,7 +2402,6 @@ impl FedoraNautilusFileBrowserEngine {
     }
 }
 
-/// Folder Color Palette Enum
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FolderColor {
     Blue,
@@ -2444,16 +2413,14 @@ pub enum FolderColor {
     Custom(String),
 }
 
-/// Fedora Workstation Folder Color & Emblem Customization Engine
-/// Manages folder icon color tinting, custom emblem overlays, and Nautilus icon badges.
 pub struct FedoraFolderColorSwitcherEngine {
-    pub folder_colors: HashMap<String, FolderColor>, // path -> color
-    pub folder_emblems: HashMap<String, Vec<String>>, // path -> emblem badges
+    pub folder_colors: HashMap<String, FolderColor>,
+    pub folder_emblems: HashMap<String, Vec<String>>,
 }
 
 impl FedoraFolderColorSwitcherEngine {
     pub fn new() -> Self {
-        FedoraFolderColorSwitcherEngine {
+        Self {
             folder_colors: HashMap::new(),
             folder_emblems: HashMap::new(),
         }
@@ -2464,25 +2431,23 @@ impl FedoraFolderColorSwitcherEngine {
     }
 
     pub fn add_folder_emblem(&mut self, path: &str, emblem: &str) {
-        let emblems = self
-            .folder_emblems
-            .entry(path.to_string())
-            .or_insert_with(Vec::new);
+        let emblems = self.folder_emblems.entry(path.to_string()).or_insert_with(Vec::new);
         if !emblems.contains(&emblem.to_string()) {
             emblems.push(emblem.to_string());
         }
     }
 
-    pub fn get_folder_color(&self, path: &str) -> FolderColor {
-        self.folder_colors
-            .get(path)
-            .cloned()
-            .unwrap_or(FolderColor::Blue)
+    pub fn get_folder_color(&self, path: &str) -> Option<FolderColor> {
+        self.folder_colors.get(path).cloned()
     }
 }
 
-/// DNF History Transaction Record
-#[derive(Debug, Clone, PartialEq, Eq)]
+impl Default for FedoraFolderColorSwitcherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct FedoraDnfTransaction {
     pub transaction_id: u32,
     pub action: String, // "install", "remove", "upgrade"
@@ -3501,7 +3466,7 @@ impl FedoraToolbxContainerEngine {
     }
 
     pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
-        let mut default_mounts = vec![
+        let default_mounts = vec![
             "/home".to_string(),
             "/var/srv".to_string(),
             "/dev".to_string(),
@@ -3545,98 +3510,6 @@ impl FedoraToolbxContainerEngine {
 }
 
 impl Default for FedoraToolbxContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionFile {
-    pub path: String,
-    pub mode: u32,
-    pub content: String,
-    pub overwrite: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionUser {
-    pub name: String,
-    pub ssh_authorized_keys: Vec<String>,
-    pub groups: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionSystemdUnit {
-    pub name: String,
-    pub enabled: bool,
-    pub contents: String,
-}
-
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-pub struct FedoraIgnitionEngine {
-    pub files: Vec<IgnitionFile>,
-    pub users: Vec<IgnitionUser>,
-    pub systemd_units: Vec<IgnitionSystemdUnit>,
-    pub provisioned: bool,
-}
-
-impl FedoraIgnitionEngine {
-    pub fn new() -> Self {
-        Self {
-            files: Vec::new(),
-            users: Vec::new(),
-            systemd_units: Vec::new(),
-            provisioned: false,
-        }
-    }
-
-    pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
-        self.files.push(IgnitionFile {
-            path: path.to_string(),
-            mode,
-            content: content.to_string(),
-            overwrite: true,
-        });
-    }
-
-    pub fn add_user(&mut self, name: &str, ssh_keys: &[&str], groups: &[&str]) {
-        self.users.push(IgnitionUser {
-            name: name.to_string(),
-            ssh_authorized_keys: ssh_keys.iter().map(|s| s.to_string()).collect(),
-            groups: groups.iter().map(|s| s.to_string()).collect(),
-        });
-    }
-
-    pub fn add_systemd_unit(&mut self, name: &str, enabled: bool, contents: &str) {
-        self.systemd_units.push(IgnitionSystemdUnit {
-            name: name.to_string(),
-            enabled,
-            contents: contents.to_string(),
-        });
-    }
-
-    pub fn execute_provisioning(&mut self) -> Result<String, &'static str> {
-        if self.provisioned {
-            return Err("Ignition provisioning already executed; runs once on first boot");
-        }
-
-        self.provisioned = true;
-        Ok(format!(
-            "Ignition: Provisioned {} files, {} users, and {} systemd units successfully",
-            self.files.len(),
-            self.users.len(),
-            self.systemd_units.len()
-        ))
-    }
-}
-
-impl Default for FedoraIgnitionEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -3682,572 +3555,6 @@ pub struct ClientLocationContext {
 }
 
 /// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
-pub struct FedoraMirrorManager2Engine {
-    pub mirrors: Vec<FedoraMirrorHost>,
-    pub max_allowed_lag_secs: u64,
-}
-
-impl FedoraMirrorManager2Engine {
-    pub fn new(max_lag_secs: u64) -> Self {
-        Self {
-            mirrors: Vec::new(),
-            max_allowed_lag_secs: max_lag_secs,
-        }
-    }
-
-    pub fn register_mirror(&mut self, mirror: FedoraMirrorHost) {
-        self.mirrors.retain(|m| m.host_id != mirror.host_id);
-        self.mirrors.push(mirror);
-    }
-
-    pub fn update_mirror_status(
-        &mut self,
-        host_id: &str,
-        status: MirrorSyncStatus,
-        lag_secs: u64,
-    ) -> bool {
-        if let Some(m) = self.mirrors.iter_mut().find(|m| m.host_id == host_id) {
-            m.sync_status = status;
-            m.lag_seconds = lag_secs;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn select_optimal_mirrors(&self, client: &ClientLocationContext) -> Vec<FedoraMirrorHost> {
-        let mut candidates: Vec<FedoraMirrorHost> = self
-            .mirrors
-            .iter()
-            .filter(|m| {
-                m.sync_status == MirrorSyncStatus::UpToDate
-                    && m.lag_seconds <= self.max_allowed_lag_secs
-                    && m.protocols.contains(&client.preferred_protocol)
-            })
-            .cloned()
-            .collect();
-
-        candidates.sort_by(|a, b| {
-            let a_asn = a.asn == client.asn;
-            let b_asn = b.asn == client.asn;
-            if a_asn != b_asn {
-                return b_asn.cmp(&a_asn);
-            }
-
-            let a_country = a.country_code == client.country_code;
-            let b_country = b.country_code == client.country_code;
-            if a_country != b_country {
-                return b_country.cmp(&a_country);
-            }
-
-            b.bandwidth_mbps.cmp(&a.bandwidth_mbps)
-        });
-
-        candidates
-    }
-}
-
-// =========================================================================
-// Fedora Shared System Infrastructure & Runtime Manager
-// =========================================================================
-
-/// Fedora Shared Library Dependency & Soname Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraSharedLibraryEntry {
-    pub soname: String,
-    pub real_path: String,
-    pub abi_version: String,
-    pub exported_symbols: Vec<String>,
-}
-
-/// Fedora Shared DNF Repository Cache Transaction Lock
-#[derive(Debug, Clone)]
-pub struct FedoraDnfSharedCacheLock {
-    pub lock_file_path: String,
-    pub is_locked: bool,
-    pub lock_owner_pid: u32,
-}
-
-/// Fedora System-wide Shared Runtime Environment (/run/user/UID & /dev/shm)
-#[derive(Debug, Clone)]
-pub struct FedoraSharedRuntimeEnvironment {
-    pub runtime_dir: String,
-    pub shm_dir: String,
-    pub allocated_shm_blocks: HashMap<String, usize>,
-}
-
-/// Fedora-inspired Shared System Manager for SigmaOS
-pub struct FedoraSharedSystemManager {
-    pub shared_libraries: HashMap<String, FedoraSharedLibraryEntry>,
-    pub cache_lock: FedoraDnfSharedCacheLock,
-    pub runtime_env: FedoraSharedRuntimeEnvironment,
-}
-
-impl FedoraSharedSystemManager {
-    pub fn new(uid: u32) -> Self {
-        Self {
-            shared_libraries: HashMap::new(),
-            cache_lock: FedoraDnfSharedCacheLock {
-                lock_file_path: "/var/cache/dnf/metadata_lock.pid".to_string(),
-                is_locked: false,
-                lock_owner_pid: 0,
-            },
-            runtime_env: FedoraSharedRuntimeEnvironment {
-                runtime_dir: format!("/run/user/{}", uid),
-                shm_dir: "/dev/shm".to_string(),
-                allocated_shm_blocks: HashMap::new(),
-            },
-        }
-    }
-
-    pub fn register_shared_library(
-        &mut self,
-        soname: &str,
-        path: &str,
-        abi_ver: &str,
-        symbols: &[&str],
-    ) {
-        let sym_vec = symbols.iter().map(|s| s.to_string()).collect();
-        self.shared_libraries.insert(
-            soname.to_string(),
-            FedoraSharedLibraryEntry {
-                soname: soname.to_string(),
-                real_path: path.to_string(),
-                abi_version: abi_ver.to_string(),
-                exported_symbols: sym_vec,
-            },
-        );
-    }
-
-    pub fn acquire_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
-        if self.cache_lock.is_locked {
-            if self.cache_lock.lock_owner_pid == pid {
-                return Ok(());
-            }
-            return Err("FedoraDnfSharedCache: Lock currently held by another process");
-        }
-        self.cache_lock.is_locked = true;
-        self.cache_lock.lock_owner_pid = pid;
-        Ok(())
-    }
-
-    pub fn release_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
-        if !self.cache_lock.is_locked {
-            return Ok(());
-        }
-        if self.cache_lock.lock_owner_pid != pid {
-            return Err("FedoraDnfSharedCache: Cannot release lock owned by another process");
-        }
-        self.cache_lock.is_locked = false;
-        self.cache_lock.lock_owner_pid = 0;
-        Ok(())
-    }
-
-    pub fn allocate_shared_memory_block(&mut self, key: &str, size_bytes: usize) -> String {
-        self.runtime_env
-            .allocated_shm_blocks
-            .insert(key.to_string(), size_bytes);
-        format!("{}/{}", self.runtime_env.shm_dir, key)
-    }
-
-    pub fn resolve_shared_library_symbol(&self, soname: &str, symbol: &str) -> bool {
-        if let Some(lib) = self.shared_libraries.get(soname) {
-            lib.exported_symbols.contains(&symbol.to_string())
-        } else {
-            false
-        }
-    }
-}
-
-// =========================================================================
-// Fedora Badges (badges.fedoraproject.org) Community Achievement Engine
-// =========================================================================
-
-/// Fedora Community Contribution Badge Alignment
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraBadge {
-    pub badge_id: String,
-    pub name: String,
-    pub description: String,
-    pub category: String, // "development", "qa", "community", "governance"
-    pub points: u32,
-}
-
-/// Fedora Badges & OpenBadges Community Achievement Engine
-pub struct FedoraBadgesEngine {
-    pub badges: HashMap<String, FedoraBadge>,
-    pub user_awarded_badges: HashMap<String, Vec<String>>, // fas_username -> badge_ids
-}
-
-impl FedoraBadgesEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            badges: HashMap::new(),
-            user_awarded_badges: HashMap::new(),
-        };
-        engine.register_default_badges();
-        engine
-    }
-
-    fn register_default_badges(&mut self) {
-        self.badges.insert(
-            "pkg-first-build".to_string(),
-            FedoraBadge {
-                badge_id: "pkg-first-build".to_string(),
-                name: "First Package Build".to_string(),
-                description: "Built first official RPM package in Koji/Copr".to_string(),
-                category: "development".to_string(),
-                points: 10,
-            },
-        );
-        self.badges.insert(
-            "qa-test-day".to_string(),
-            FedoraBadge {
-                badge_id: "qa-test-day".to_string(),
-                name: "QA Test Day Hero".to_string(),
-                description: "Participated in official Fedora QA test day".to_string(),
-                category: "qa".to_string(),
-                points: 15,
-            },
-        );
-    }
-
-    pub fn award_badge(&mut self, fas_username: &str, badge_id: &str) -> Result<u32, &'static str> {
-        if !self.badges.contains_key(badge_id) {
-            return Err("FedoraBadges: Invalid badge ID");
-        }
-        let user_badges = self
-            .user_awarded_badges
-            .entry(fas_username.to_string())
-            .or_insert_with(Vec::new);
-
-        if !user_badges.contains(&badge_id.to_string()) {
-            user_badges.push(badge_id.to_string());
-        }
-
-        let total_points = user_badges
-            .iter()
-            .filter_map(|id| self.badges.get(id))
-            .map(|b| b.points)
-            .sum();
-
-        Ok(total_points)
-    }
-}
-
-impl Default for FedoraBadgesEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora System Roles (linux-system-roles) Declarative Engine
-// =========================================================================
-
-/// Fedora System Role Category
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SystemRoleKind {
-    Timesync,
-    Network,
-    Firewall,
-    Selinux,
-    Storage,
-}
-
-/// Fedora System Roles (linux-system-roles) Declarative Automation Engine
-pub struct FedoraSystemRolesEngine {
-    pub applied_roles: Vec<SystemRoleKind>,
-    pub chrony_ntp_servers: Vec<String>,
-    pub configured_firewall_ports: Vec<u16>,
-}
-
-impl FedoraSystemRolesEngine {
-    pub fn new() -> Self {
-        Self {
-            applied_roles: Vec::new(),
-            chrony_ntp_servers: Vec::new(),
-            configured_firewall_ports: Vec::new(),
-        }
-    }
-
-    pub fn apply_timesync_role(&mut self, ntp_servers: &[&str]) {
-        self.chrony_ntp_servers = ntp_servers.iter().map(|s| s.to_string()).collect();
-        if !self.applied_roles.contains(&SystemRoleKind::Timesync) {
-            self.applied_roles.push(SystemRoleKind::Timesync);
-        }
-    }
-
-    pub fn apply_firewall_role(&mut self, open_ports: &[u16]) {
-        for &p in open_ports {
-            if !self.configured_firewall_ports.contains(&p) {
-                self.configured_firewall_ports.push(p);
-            }
-        }
-        if !self.applied_roles.contains(&SystemRoleKind::Firewall) {
-            self.applied_roles.push(SystemRoleKind::Firewall);
-        }
-    }
-}
-
-impl Default for FedoraSystemRolesEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DracutModule {
-    pub name: String,
-    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
-    pub drivers: Vec<String>,
-}
-
-/// Fedora Dracut Modular Initramfs Generation & Hook Engine
-/// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
-pub struct FedoraDracutInitramfsEngine {
-    pub modules: Vec<DracutModule>,
-    pub kernel_version: String,
-    pub compression_format: String, // "zstd", "xz", "gzip"
-}
-
-impl FedoraDracutInitramfsEngine {
-    pub fn new(kernel_version: &str) -> Self {
-        let mut engine = Self {
-            modules: Vec::new(),
-            kernel_version: kernel_version.to_string(),
-            compression_format: "zstd".to_string(),
-        };
-        engine.load_default_dracut_modules();
-        engine
-    }
-
-    fn load_default_dracut_modules(&mut self) {
-        self.modules.push(DracutModule {
-            name: "90crypt".to_string(),
-            hook_stage: "cmdline".to_string(),
-            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
-        });
-        self.modules.push(DracutModule {
-            name: "95rootfs".to_string(),
-            hook_stage: "pre-pivot".to_string(),
-            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
-        });
-    }
-
-    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
-        self.modules.push(DracutModule {
-            name: name.to_string(),
-            hook_stage: stage.to_string(),
-            drivers: drivers.iter().map(|d| d.to_string()).collect(),
-        });
-    }
-
-    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
-        if self.modules.is_empty() {
-            Err("Dracut: No modules included in initramfs build")
-        } else {
-            Ok(format!(
-                "/boot/initramfs-{}.img ({} modules, compressed with {})",
-                self.kernel_version,
-                self.modules.len(),
-                self.compression_format
-            ))
-        }
-    }
-}
-
-// =========================================================================
-// Fedora ABRT (Automatic Bug Reporting Tool) Engine
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AbrtCrashReport {
-    pub crash_id: String,
-    pub executable_path: String,
-    pub signal_name: String,
-    pub stack_trace: String,
-    pub kernel_release: String,
-    pub timestamp_secs: u64,
-    pub count: u32,
-    pub reported_to_bugzilla: bool,
-}
-
-/// Fedora ABRT (Automatic Bug Reporting Tool) Crash Daemon
-/// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
-/// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
-pub struct FedoraAbrtCrashDaemon {
-    pub captured_crashes: HashMap<String, AbrtCrashReport>, // crash_id -> report
-    pub messaging_engine: FedoraMessagingEngine,
-    pub total_crashes_handled: u64,
-}
-
-impl FedoraAbrtCrashDaemon {
-    pub fn new() -> Self {
-        Self {
-            captured_crashes: HashMap::new(),
-            messaging_engine: FedoraMessagingEngine::new(),
-            total_crashes_handled: 0,
-        }
-    }
-
-    pub fn capture_crash(
-        &mut self,
-        exe_path: &str,
-        signal: &str,
-        backtrace: &str,
-        kernel_ver: &str,
-        timestamp_secs: u64,
-    ) -> AbrtCrashReport {
-        self.total_crashes_handled += 1;
-        let signature = format!("{}:{}:{}", exe_path, signal, backtrace);
-        let crash_id = format!("abrt-{:08x}", self.total_crashes_handled);
-
-        if let Some(existing) = self.captured_crashes.get_mut(&signature) {
-            existing.count += 1;
-            return existing.clone();
-        }
-
-        let report = AbrtCrashReport {
-            crash_id: crash_id.clone(),
-            executable_path: exe_path.to_string(),
-            signal_name: signal.to_string(),
-            stack_trace: backtrace.to_string(),
-            kernel_release: kernel_ver.to_string(),
-            timestamp_secs,
-            count: 1,
-            reported_to_bugzilla: false,
-        };
-
-        let topic = format!("org.fedoraproject.prod.abrt.crash.{}", signal.to_lowercase());
-        let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
-        self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
-
-        self.captured_crashes.insert(signature, report.clone());
-        report
-    }
-
-    pub fn mark_reported(&mut self, crash_id: &str) -> bool {
-        for report in self.captured_crashes.values_mut() {
-            if report.crash_id == crash_id {
-                report.reported_to_bugzilla = true;
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for FedoraAbrtCrashDaemon {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora Toolbx OCI Development Container Engine
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ToolbxContainer {
-    pub name: String,
-    pub image: String,
-    pub host_mounts: Vec<String>,
-    pub environment_vars: HashMap<String, String>,
-    pub running: bool,
-}
-
-/// Fedora Toolbx Interactive OCI Development Environment Manager
-/// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
-pub struct FedoraToolbxContainerEngine {
-    pub active_containers: HashMap<String, ToolbxContainer>,
-}
-
-impl FedoraToolbxContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            active_containers: HashMap::new(),
-        }
-    }
-
-    pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
-        let mut default_mounts = vec![
-            "/home".to_string(),
-            "/var/srv".to_string(),
-            "/dev".to_string(),
-            "/run/host".to_string(),
-        ];
-        let mut env = HashMap::new();
-        env.insert("TOOLBX_NAME".to_string(), name.to_string());
-        env.insert("SHELL".to_string(), "/bin/bash".to_string());
-
-        let container = ToolbxContainer {
-            name: name.to_string(),
-            image: image.to_string(),
-            host_mounts: default_mounts,
-            environment_vars: env,
-            running: false,
-        };
-
-        self.active_containers.insert(name.to_string(), container.clone());
-        container
-    }
-
-    pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = true;
-            Ok(format!("Toolbx container '{}' started using image '{}'", c.name, c.image))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.host_mounts.contains(&host_path.to_string()) {
-                c.host_mounts.push(host_path.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraToolbxContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-// =========================================================================
-
 pub struct FedoraOfflineUpdateEngine {
     pub staged_packages: Vec<String>,
     pub is_offline_update_pending: bool,
@@ -4295,46 +3602,6 @@ impl Default for FedoraOfflineUpdateEngine {
     }
 }
 
-// =========================================================================
-// Fedora MirrorManager 2 (mirrormanager2) System Engine
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum MirrorProtocol {
-    Https,
-    Http,
-    Rsync,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MirrorSyncStatus {
-    UpToDate,
-    Syncing,
-    Outdated,
-    Unreachable,
-}
-
-#[derive(Debug, Clone)]
-pub struct FedoraMirrorHost {
-    pub host_id: String,
-    pub base_url: String,
-    pub country_code: String,
-    pub asn: u32,
-    pub bandwidth_mbps: u32,
-    pub protocols: Vec<MirrorProtocol>,
-    pub sync_status: MirrorSyncStatus,
-    pub lag_seconds: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct ClientLocationContext {
-    pub client_ip: String,
-    pub country_code: String,
-    pub asn: u32,
-    pub preferred_protocol: MirrorProtocol,
-}
-
-/// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
 pub struct FedoraMirrorManager2Engine {
     pub mirrors: Vec<FedoraMirrorHost>,
     pub max_allowed_lag_secs: u64,
@@ -4648,7 +3915,6 @@ impl Default for FedoraSystemRolesEngine {
         Self::new()
     }
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -4722,61 +3988,6 @@ mod tests {
         bodhi.submit_update("FEDORA-2023-SEC1");
         assert!(bodhi.apply_security_karma_waiver("FEDORA-2023-SEC1").is_ok());
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
-    }
-
-    #[test]
-    fn test_bodhi_advanced_lifecycle() {
-        let mut bodhi = BodhiUpdateTriage::new();
-
-        // 1. Create a Critical Path update
-        bodhi.create_update(
-            "SIGMA-2026-CRIT01",
-            vec!["systemd-255-1.fc39.x86_64".to_string()],
-            BodhiUpdateType::Enhancement,
-            "SigmaOS-39",
-            true, // is_critpath
-        );
-
-        bodhi.link_bug("SIGMA-2026-CRIT01", "RHBZ-200101");
-        bodhi.link_cve("SIGMA-2026-CRIT01", "CVE-2026-0001");
-
-        // Karma +2, but min_testing_days is 7 -> promo fails initially
-        bodhi.submit_feedback("SIGMA-2026-CRIT01", 3).unwrap(); // Karma 3 meets threshold
-        assert!(!bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
-
-        // Advance days in testing to 7
-        bodhi.advance_testing_days("SIGMA-2026-CRIT01", 7);
-        assert!(bodhi.eval_stable_promotion("SIGMA-2026-CRIT01").unwrap());
-
-        // 2. Greenwave CI test failure gate
-        bodhi.create_update(
-            "SIGMA-2026-FAIL01",
-            vec!["badpkg-1.0.rpm".to_string()],
-            BodhiUpdateType::Bugfix,
-            "SigmaOS-39",
-            false,
-        );
-        bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
-        bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
-        assert!(bodhi.eval_stable_promotion("SIGMA-2026-FAIL01").is_err()); // Greenwave failure blocks
-
-        // 3. Security Fast-Track
-        bodhi.create_update(
-            "SIGMA-2026-SEC01",
-            vec!["openssl-3.1.0.rpm".to_string()],
-            BodhiUpdateType::Security,
-            "SigmaOS-39",
-            false,
-        );
-        bodhi.link_cve("SIGMA-2026-SEC01", "CVE-2026-9999");
-        assert!(bodhi.eval_stable_promotion("SIGMA-2026-SEC01").unwrap()); // Security fast track
-
-        // 4. Updateinfo XML generation
-        let xml = bodhi.generate_updateinfo_xml();
-        assert!(xml.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
-        assert!(xml.contains("CVE-2026-9999"));
-        assert!(xml.contains("RHBZ-200101"));
-        assert!(xml.contains("<update id=\"SIGMA-2026-CRIT01\""));
     }
 
     #[test]
@@ -5327,15 +4538,16 @@ mod tests {
     #[test]
     fn test_fedora_folder_color_switcher_engine() {
         let mut switcher = FedoraFolderColorSwitcherEngine::new();
+        switcher.set_folder_color("/home/user/Documents", FolderColor::Blue);
         assert_eq!(
             switcher.get_folder_color("/home/user/Documents"),
-            FolderColor::Blue
+            Some(FolderColor::Blue)
         );
 
         switcher.set_folder_color("/home/user/Documents", FolderColor::Green);
         assert_eq!(
             switcher.get_folder_color("/home/user/Documents"),
-            FolderColor::Green
+            Some(FolderColor::Green)
         );
 
         switcher.add_folder_emblem("/home/user/Documents", "emblem-important");
