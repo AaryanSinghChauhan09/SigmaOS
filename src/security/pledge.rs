@@ -135,15 +135,45 @@ impl PledgeManager {
         Ok(())
     }
 
-    /// Validate path access against unveil permissions
+    /// Validate path access against unveil permissions.
+    ///
+    /// Security hardening applied:
+    /// - Rejects null bytes (CVE-class: null-byte injection)
+    /// - Rejects `..` segments (directory traversal)
+    /// - Rejects paths with encoded traversal sequences (`%2e%2e`, `%2F`)
+    /// - Longest-prefix match with strict boundary check
     pub fn validate_unveil_access(&self, path: &str, requested_perm: char) -> bool {
         if self.unveiled_paths.is_empty() {
-            return true; // If no paths are unveiled, allow all accesses
+            return true; // No unveil restrictions — allow all.
         }
 
-        // Mitigate directory traversal: reject paths containing parent directory segments
+        // Reject null bytes — they can truncate paths in C-ABI syscall interop.
+        if path.as_bytes().contains(&0u8) {
+            return false;
+        }
+
+        // Reject URL-encoded traversal patterns (common in HTTP-facing code paths).
+        let lower = {
+            let mut buf = [0u8; 512];
+            let bytes = path.as_bytes();
+            let copy_len = bytes.len().min(buf.len());
+            buf[..copy_len].copy_from_slice(&bytes[..copy_len]);
+            // Lowercase the copy without alloc
+            for b in &mut buf[..copy_len] {
+                if *b >= b'A' && *b <= b'Z' {
+                    *b += 32;
+                }
+            }
+            buf
+        };
+        let lower_path = core::str::from_utf8(&lower[..path.len().min(512)]).unwrap_or("");
+        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c") {
+            return false;
+        }
+
+        // Reject `..` segments — directory traversal mitigation.
         for segment in path.split(|c| c == '/' || c == '\\') {
-            if segment == ".." {
+            if segment == ".." || segment == "." {
                 return false;
             }
         }
