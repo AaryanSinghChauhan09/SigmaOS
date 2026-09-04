@@ -1,8 +1,6 @@
 //! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
-use alloc::vec;
 extern crate alloc;
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::time::Duration;
@@ -94,38 +92,6 @@ impl Process {
         // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
-    }
-}
-
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            virtual_runtime: 0,
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
-        }
-    }
-
-    pub fn get_weight(&self) -> u64 {
-        match self.priority {
-            Priority::Idle => 1,
-            Priority::Low => 2,
-            Priority::Normal => 4,
-            Priority::High => 8,
-            Priority::Realtime => 16,
-        }
-    }
-
-    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
-        let weight = self.get_weight();
-        // deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
-        let q = 10;
-        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
     }
 }
 
@@ -270,7 +236,8 @@ impl Scheduler {
             let weight = p.get_weight();
             let delta = (ticks_executed / weight).max(1);
             p.virtual_runtime = p.virtual_runtime.saturating_add(delta);
-            p.update_virtual_deadline(self.system_vtime);
+            let sys_vtime = self.system_vtime;
+            p.update_virtual_deadline(sys_vtime);
             p.runtime += Duration::from_millis(ticks_executed * 10);
         }
     }
@@ -302,6 +269,16 @@ impl Scheduler {
             }
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, Copy)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
 }
 
 /// CFS Scheduler implementation
@@ -339,6 +316,20 @@ impl CfsScheduler {
         } else {
             None
         }
+    }
+
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+        if self.task_count > 0 {
+            if let Some(ref mut task) = self.tasks[0] {
+                task.vruntime += 1;
+            }
+            self.sort_tasks();
+        }
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
     }
 
     fn sort_tasks(&mut self) {
