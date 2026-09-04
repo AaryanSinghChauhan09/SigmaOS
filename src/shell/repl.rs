@@ -7,23 +7,6 @@ use std::format;
 use crate::klib::HashMap;
 use crate::klib::hashset::HashSet;
 
-/// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
-/// Provides a placeholder so the shell REPL compiles while orchestrator is being built
-pub struct AgentAutomationEngine {
-    pub active: bool,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine { active: true }
-    }
-}
-
-impl Default for AgentAutomationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 use crate::accessibility::{
     AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
@@ -84,17 +67,6 @@ pub enum ShellCommand {
     Apt {
         subcommand: String,
         package: Option<String>,
-    },
-    Uname,
-    Clear,
-    Touch {
-        filename: String,
-    },
-    Mkdir {
-        dirname: String,
-    },
-    Rm {
-        filename: String,
     },
     Theme {
         theme_name: String,
@@ -308,6 +280,19 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub command_history: Vec<String>,
+    pub customization: CustomizationEngine,
+    pub accessibility: AccessibilityFramework,
+    pub package_manager: UniversalPackageManager,
+    pub virt_orchestrator: VirtualizationOrchestrator,
+    pub compatibility: CompatibilityManager,
+    pub self_healing: SelfHealingModule,
+    pub prompt_builder: PowerlinePromptBuilder,
+    pub fuzzy_completer: FuzzyCompletionEngine,
+    pub highlighter: ZshSyntaxHighlighter,
+    pub dir_stack: BsdDirectoryStack,
+    pub job_control: ShellJobControl,
+    pub job_manager: JobControlManager,
 }
 
 impl ShellRepl {
@@ -359,20 +344,8 @@ impl ShellRepl {
         shell
     }
 
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt,
-            agent_engine: AgentAutomationEngine::new(),
-            current_dir: "/home/user".to_string(),
-            current_user: "user".to_string(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
-        }
+    pub fn get_rendered_prompt(&self) -> String {
+        self.prompt_builder.render_prompt()
     }
 
     pub fn run(&mut self) {
@@ -589,24 +562,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
                         filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "touch" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Touch {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "mkdir" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Mkdir {
-                        dirname: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
