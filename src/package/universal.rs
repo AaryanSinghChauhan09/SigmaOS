@@ -1,19 +1,14 @@
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
-use alloc::collections::BTreeMap;
+use alloc::vec;
+use std::collections::HashMap;
+use std::sync::Arc;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
-};
 pub mod node_distribution_dummy {
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
@@ -23,11 +18,14 @@ pub mod node_distribution_dummy {
     pub enum NodeReleaseStream {
         Lts,
         Current,
+    }
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,
+    }
     pub struct NodeBinaryPackage {
         pub version: String,
+    }
     impl NodeBinaryPackage {
         pub fn new(
             version: &str,
@@ -43,10 +41,12 @@ pub mod node_distribution_dummy {
                 version: version.to_string(),
             }
         }
+    }
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
         pub fn new() -> Self {
             Self
+        }
         pub fn install_to_store(
             &self,
             pkg: &NodeBinaryPackage,
@@ -54,13 +54,12 @@ pub mod node_distribution_dummy {
             _npm: &str,
         ) -> Result<String, &'static str> {
             Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
+        }
+    }
 }
 use node_distribution_dummy::*;
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, HashSet, Arc};
-use std::{collections::{HashMap, HashSet}, sync::Arc};
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackagePriority {
@@ -114,6 +113,11 @@ pub enum PackageFormat {
     Dmg,        // macOS Disk Image (.dmg)
     Cports,     // Chimera Linux (.cports)
     Cachy,      // CachyOS Package (.cachy)
+    Nix,        // Nix expression / package (.nix)
+    Txz,        // Slackware/FreeBSD txz package (.txz)
+    CachyOS,    // CachyOS (.cachyos)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling format (.starling)
     Dports,     // DragonFly BSD DPorts (.dports)
     SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
     Crux,       // CRUX Linux (.crux / .pkgfile)
@@ -762,6 +766,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -785,6 +790,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -834,6 +840,118 @@ impl PackageTriggerRegistry {
 }
 
 impl Default for PackageTriggerRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Foreign Distro Package Manifest & Repository Synchronization
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-{}", manifest.original_name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.original_name.clone());
+
+        for dep in &manifest.raw_dependencies {
+            let mapped_dep = if dep.contains("ssl") {
+                "sovereign-openssl".to_string()
+            } else if dep.contains("c6") || dep.contains("libc") {
+                "sovereign-libc".to_string()
+            } else {
+                dep.clone()
+            };
+            pkg = pkg.with_dependency(mapped_dep);
+        }
+
+        for prov in &manifest.raw_provides {
+            pkg = pkg.with_provides(prov.clone());
+        }
+
+        for conf in &manifest.raw_conflicts {
+            pkg = pkg.with_conflict(conf.clone());
+        }
+
+        pkg
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RegisteredRepoInfo {
+    pub distro_name: String,
+    pub mirror_url: String,
+}
+
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<RegisteredRepoInfo>,
+    pub foreign_index: HashMap<String, ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_repos: vec![
+                RegisteredRepoInfo {
+                    distro_name: "Debian".to_string(),
+                    mirror_url: "https://deb.debian.org/debian".to_string(),
+                },
+                RegisteredRepoInfo {
+                    distro_name: "ArchLinux".to_string(),
+                    mirror_url: "https://archlinux.org/packages".to_string(),
+                },
+                RegisteredRepoInfo {
+                    distro_name: "Fedora".to_string(),
+                    mirror_url: "https://mirrors.fedoraproject.org".to_string(),
+                },
+                RegisteredRepoInfo {
+                    distro_name: "Alpine".to_string(),
+                    mirror_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
+                },
+                RegisteredRepoInfo {
+                    distro_name: "VoidLinux".to_string(),
+                    mirror_url: "https://repo-default.voidlinux.org/current".to_string(),
+                },
+            ],
+            foreign_index: HashMap::new(),
+        }
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.foreign_index
+            .insert(manifest.original_name.clone(), manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.foreign_index.len()
+    }
+
+    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
+        self.foreign_index
+            .get(pkg_name)
+            .map(|manifest| UniversalPackageTranslator::translate_to_sigma_pkg(manifest))
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1374,6 +1492,7 @@ pub struct UniversalPackageManager {
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
     pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    pub triggers: PackageTriggerRegistry,
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
 }
@@ -1388,6 +1507,7 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
+            triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };
