@@ -3,6 +3,7 @@
 pub mod syscall_dispatcher;
 pub mod network_syscalls;
 pub mod signal_syscalls;
+pub mod integration;
 
 pub use syscall_dispatcher::*;
 pub use network_syscalls::{
@@ -14,3 +15,4 @@ pub use signal_syscalls::{
     SignalSyscalls, SigAction, SigInfo, SigaltStack,
     signals, sa_flags, SIG_DFL, SIG_IGN, SIG_HOLD,
 };
+pub use integration::{SyscallContext, SignalHandlerTable, SignalHandler};
