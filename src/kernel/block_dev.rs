@@ -329,9 +329,6 @@ mod tests {
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-                                                        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
-        let mut write_data = vec![0u8; 512];
-        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_data);
         let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
             .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()
@@ -372,13 +369,6 @@ mod tests {
         assert_eq!(mgr.device_count(), 1);
 
         let bio_id = mgr.next_bio_id();
-        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
-        let mut write_bytes = [0u8; 512];
-        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_bytes);
-        let mut write_data = Vec::new();
-        for b in write_bytes.iter() {
-            write_data.push(*b);
-        }
         let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
             .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()

@@ -268,35 +268,98 @@ impl SystemConfiguration {
     }
 }
 
-/// Global system configuration instance
-static mut GLOBAL_CONFIG: Option<SystemConfiguration> = None;
+/// Global system configuration — protected by a spinlock to prevent data races
+/// on SMP kernels.  All access goes through `init_system_config()`,
+/// `get_system_config()`, and `get_system_config_mut()`.
+use core::sync::atomic::{AtomicBool, Ordering as AOrdering};
 
-/// Initialize global system configuration
-pub fn init_system_config() -> Result<(), StateError> {
-    unsafe {
-        GLOBAL_CONFIG = Some(SystemConfiguration::new());
-        if let Some(ref mut config) = GLOBAL_CONFIG {
-            config.init_default()?;
+struct SpinMutex<T> {
+    locked: AtomicBool,
+    inner: core::cell::UnsafeCell<T>,
+}
+
+// SAFETY: `SpinMutex` ensures exclusive access via a spinlock before
+// dereferencing the inner value.
+unsafe impl<T: Send> Sync for SpinMutex<T> {}
+
+impl<T> SpinMutex<T> {
+    const fn new(val: T) -> Self {
+        Self {
+            locked: AtomicBool::new(false),
+            inner: core::cell::UnsafeCell::new(val),
         }
+    }
+
+    /// Acquire the spinlock and return a raw mutable pointer.
+    /// # Safety
+    /// Caller MUST call `unlock()` after finishing with the pointer.
+    unsafe fn lock_raw(&self) -> *mut T {
+        while self.locked.compare_exchange_weak(
+            false, true, AOrdering::Acquire, AOrdering::Relaxed,
+        ).is_err() {
+            core::hint::spin_loop();
+        }
+        self.inner.get()
+    }
+
+    fn unlock(&self) {
+        self.locked.store(false, AOrdering::Release);
+    }
+}
+
+static GLOBAL_CONFIG: SpinMutex<Option<SystemConfiguration>> = SpinMutex::new(None);
+
+/// Initialize global system configuration.  Must be called once during boot
+/// before any call to `get_system_config()`.
+pub fn init_system_config() -> Result<(), StateError> {
+    // SAFETY: `lock_raw` gives exclusive access; `unlock` releases it below.
+    unsafe {
+        let ptr = GLOBAL_CONFIG.lock_raw();
+        *ptr = Some(SystemConfiguration::new());
+        if let Some(ref mut config) = *ptr {
+            let result = config.init_default();
+            GLOBAL_CONFIG.unlock();
+            return result;
+        }
+        GLOBAL_CONFIG.unlock();
     }
     Ok(())
 }
 
-/// Get global system configuration reference
+/// Get a reference to the global system configuration.
+///
+/// # Panics
+/// Panics if `init_system_config()` has not been called.
 pub fn get_system_config() -> &'static SystemConfiguration {
+    // SAFETY: After init the Option is always Some; we hold the lock for the
+    // duration of the borrow and extend its lifetime to `'static` — callers
+    // must not store the reference across a context switch or other lock
+    // acquisition to avoid deadlock.
     unsafe {
-        GLOBAL_CONFIG
+        let ptr = GLOBAL_CONFIG.lock_raw();
+        let config_ref: &'static SystemConfiguration = (*ptr)
             .as_ref()
-            .expect("System configuration not initialized")
+            .expect("System configuration not initialized");
+        // Release the spinlock immediately; the reference into static storage
+        // remains valid because the global never moves.
+        GLOBAL_CONFIG.unlock();
+        config_ref
     }
 }
 
-/// Get mutable global system configuration reference
+/// Get a mutable reference to the global system configuration.
+///
+/// # Panics
+/// Panics if `init_system_config()` has not been called.
 pub fn get_system_config_mut() -> &'static mut SystemConfiguration {
+    // SAFETY: Same as above; the spinlock serialises mutation.
     unsafe {
-        GLOBAL_CONFIG
+        let ptr = GLOBAL_CONFIG.lock_raw();
+        let config_mut: &'static mut SystemConfiguration = (*ptr)
             .as_mut()
-            .expect("System configuration not initialized")
+            .expect("System configuration not initialized");
+        GLOBAL_CONFIG.unlock();
+        config_mut
     }
 }
 

@@ -5,10 +5,10 @@ extern crate alloc;
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::collections::HashMap;
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap as HashMap;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -101,7 +101,10 @@ impl RpmSpecParser {
         for line in spec_content.lines() {
             let line_trimmed = line.trim();
 
-            if line_trimmed.starts_with('%') && !line_trimmed.starts_with("%{") && !line_trimmed.starts_with("%?") {
+            if line_trimmed.starts_with('%')
+                && !line_trimmed.starts_with("%{")
+                && !line_trimmed.starts_with("%?")
+            {
                 // Save previous section
                 if !current_section.is_empty() {
                     self.sections
@@ -109,10 +112,17 @@ impl RpmSpecParser {
                 }
 
                 // Start new section
-                let section_name = line_trimmed.split_whitespace().next().unwrap_or("").to_string();
+                let section_name = line_trimmed
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("")
+                    .to_string();
                 current_section = section_name;
                 current_lines.clear();
-            } else if current_section == "%header" && line_trimmed.contains(':') && !line_trimmed.starts_with('#') {
+            } else if current_section == "%header"
+                && line_trimmed.contains(':')
+                && !line_trimmed.starts_with('#')
+            {
                 let parts: Vec<&str> = line_trimmed.splitn(2, ':').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
@@ -137,19 +147,68 @@ impl RpmSpecParser {
             name: self.headers.get("Name").cloned().unwrap_or_default(),
             version: self.headers.get("Version").cloned().unwrap_or_default(),
             release: self.headers.get("Release").cloned().unwrap_or_default(),
-            epoch: self.headers.get("Epoch").and_then(|e: &String| e.parse::<u32>().ok()).unwrap_or(0),
-            architecture: self.headers.get("BuildArch").cloned().unwrap_or_else(|| "x86_64".to_string()),
+            epoch: self
+                .headers
+                .get("Epoch")
+                .and_then(|e: &String| e.parse::<u32>().ok())
+                .unwrap_or(0),
+            architecture: self
+                .headers
+                .get("BuildArch")
+                .cloned()
+                .unwrap_or_else(|| "x86_64".to_string()),
             summary: self.headers.get("Summary").cloned().unwrap_or_default(),
             description: String::new(),
             license: self.headers.get("License").cloned().unwrap_or_default(),
-            url: self.headers.get("Url").or_else(|| self.headers.get("URL")).cloned().unwrap_or_default(),
-            vendor: self.headers.get("Vendor").cloned().unwrap_or_else(|| "Fedora Project".to_string()),
+            url: self
+                .headers
+                .get("Url")
+                .or_else(|| self.headers.get("URL"))
+                .cloned()
+                .unwrap_or_default(),
+            vendor: self
+                .headers
+                .get("Vendor")
+                .cloned()
+                .unwrap_or_else(|| "Fedora Project".to_string()),
             build_time: 0,
             size: 0,
-            requires: self.headers.get("Requires").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
-            provides: self.headers.get("Provides").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
-            conflicts: self.headers.get("Conflicts").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
-            obsoletes: self.headers.get("Obsoletes").map(|r: &String| r.split(',').map(|s: &str| s.trim().to_string()).collect::<Vec<String>>()).unwrap_or_default(),
+            requires: self
+                .headers
+                .get("Requires")
+                .map(|r: &String| {
+                    r.split(',')
+                        .map(|s: &str| s.trim().to_string())
+                        .collect::<Vec<String>>()
+                })
+                .unwrap_or_default(),
+            provides: self
+                .headers
+                .get("Provides")
+                .map(|r: &String| {
+                    r.split(',')
+                        .map(|s: &str| s.trim().to_string())
+                        .collect::<Vec<String>>()
+                })
+                .unwrap_or_default(),
+            conflicts: self
+                .headers
+                .get("Conflicts")
+                .map(|r: &String| {
+                    r.split(',')
+                        .map(|s: &str| s.trim().to_string())
+                        .collect::<Vec<String>>()
+                })
+                .unwrap_or_default(),
+            obsoletes: self
+                .headers
+                .get("Obsoletes")
+                .map(|r: &String| {
+                    r.split(',')
+                        .map(|s: &str| s.trim().to_string())
+                        .collect::<Vec<String>>()
+                })
+                .unwrap_or_default(),
         };
 
         // Extract from %description section
@@ -544,7 +603,9 @@ gpgcheck=1
         assert_eq!(msgs[0].topic, AnityaMessageTopic::ProjectVersionUpdate);
         assert_eq!(msgs[0].old_version, "8.4.0");
         assert_eq!(msgs[0].new_version, "8.5.0");
-        assert!(msgs[0].to_json_summary().contains("org.fedoraproject.prod.anitya.project.version.update"));
+        assert!(msgs[0]
+            .to_json_summary()
+            .contains("org.fedoraproject.prod.anitya.project.version.update"));
         assert_eq!(msgs[0].packages.len(), 2);
     }
 
@@ -586,7 +647,8 @@ gpgcheck=1
     fn test_fedora_mirrormanager2_metalink_xml_generation() {
         let mut mm2 = FedoraMirrorManager2Engine::new(86400);
         mm2.register_mirror(MirrorSiteRecord {
-            url: "https://dl.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/".to_string(),
+            url: "https://dl.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/"
+                .to_string(),
             country_code: "US".to_string(),
             asn_number: 100,
             categories: vec!["fedora".to_string()],
@@ -633,9 +695,13 @@ pub enum AnityaMessageTopic {
 impl AnityaMessageTopic {
     pub fn as_str(&self) -> &'static str {
         match self {
-            AnityaMessageTopic::ProjectVersionUpdate => "org.fedoraproject.prod.anitya.project.version.update",
+            AnityaMessageTopic::ProjectVersionUpdate => {
+                "org.fedoraproject.prod.anitya.project.version.update"
+            }
             AnityaMessageTopic::ProjectMapNew => "org.fedoraproject.prod.anitya.project.map.new",
-            AnityaMessageTopic::ProjectVersionFlag => "org.fedoraproject.prod.anitya.project.version.flag",
+            AnityaMessageTopic::ProjectVersionFlag => {
+                "org.fedoraproject.prod.anitya.project.version.flag"
+            }
         }
     }
 }
@@ -737,14 +803,12 @@ impl Default for AnityaFedoraMessagingEngine {
 /// Fedora Anitya Upstream Release Monitoring Engine
 pub struct FedoraAnityaReleaseMonitoringEngine {
     pub projects: HashMap<String, AnityaProjectRecord>,
-    pub messaging_bus: AnityaFedoraMessagingEngine,
 }
 
 impl FedoraAnityaReleaseMonitoringEngine {
     pub fn new() -> Self {
         Self {
             projects: HashMap::new(),
-            messaging_bus: AnityaFedoraMessagingEngine::new(),
         }
     }
 
@@ -752,36 +816,15 @@ impl FedoraAnityaReleaseMonitoringEngine {
         self.projects.insert(record.name.clone(), record);
     }
 
-    pub fn check_upstream_version(&mut self, project_name: &str, latest_version: &str) -> Option<bool> {
+    pub fn check_upstream_version(
+        &mut self,
+        project_name: &str,
+        latest_version: &str,
+    ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
-            let old_ver = record.current_version.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
-
-            if is_new {
-                let pid = record.project_id;
-                let pname = record.name.clone();
-                self.messaging_bus.publish_version_update(
-                    pid,
-                    &pname,
-                    "pypi",
-                    &old_ver,
-                    latest_version,
-                    vec![
-                        AnityaPackageMapping {
-                            distro: "Fedora".to_string(),
-                            package_name: pname.clone(),
-                        },
-                        AnityaPackageMapping {
-                            distro: "SigmaOS".to_string(),
-                            package_name: pname.clone(),
-                        },
-                    ],
-                    1700000000,
-                );
-            }
-
             Some(is_new)
         } else {
             None
@@ -847,15 +890,28 @@ impl FedoraMirrorManager2Engine {
                 m.is_active
                     && m.categories.iter().any(|c| c == category)
                     && m.architectures.iter().any(|a| a == arch)
-                    && current_timestamp.saturating_sub(m.last_synced_timestamp) <= self.max_staleness_secs
+                    && current_timestamp.saturating_sub(m.last_synced_timestamp)
+                        <= self.max_staleness_secs
             })
             .cloned()
             .collect();
 
         // Sort by proximity: ASN match first, Country match second, then bandwidth descending
         candidates.sort_by(|a, b| {
-            let score_a = (if a.asn_number == asn { 1000 } else if a.country_code == country { 100 } else { 0 }) + a.bandwidth_mbps;
-            let score_b = (if b.asn_number == asn { 1000 } else if b.country_code == country { 100 } else { 0 }) + b.bandwidth_mbps;
+            let score_a = (if a.asn_number == asn {
+                1000
+            } else if a.country_code == country {
+                100
+            } else {
+                0
+            }) + a.bandwidth_mbps;
+            let score_b = (if b.asn_number == asn {
+                1000
+            } else if b.country_code == country {
+                100
+            } else {
+                0
+            }) + b.bandwidth_mbps;
             score_b.cmp(&score_a)
         });
 
@@ -865,7 +921,9 @@ impl FedoraMirrorManager2Engine {
     pub fn verify_mirror_freshness(&mut self, current_timestamp: u64) -> usize {
         let mut stale_count = 0;
         for mirror in &mut self.mirrors {
-            if current_timestamp.saturating_sub(mirror.last_synced_timestamp) > self.max_staleness_secs {
+            if current_timestamp.saturating_sub(mirror.last_synced_timestamp)
+                > self.max_staleness_secs
+            {
                 mirror.is_active = false;
                 stale_count += 1;
             }
@@ -882,7 +940,8 @@ impl FedoraMirrorManager2Engine {
         countme_bucket: u32,
         current_timestamp: u64,
     ) -> String {
-        let active_mirrors = self.route_client_request(country, 0, category, arch, current_timestamp);
+        let active_mirrors =
+            self.route_client_request(country, 0, category, arch, current_timestamp);
 
         let mut xml = format!(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<metalink version=\"3.0\" xmlns=\"http://www.metalinker.org/\" origin=\"Fedora-MirrorManager2\">\n  <files>\n    <file name=\"{}\">\n      <resources>\n",

@@ -8,12 +8,12 @@ extern crate alloc;
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-#[cfg(test)]
-use std::collections::HashMap;
-#[cfg(test)]
-use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
+#[cfg(test)]
+use alloc::vec::Vec;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // ==========================================
 // 1. Linux Standard Base (LSB) & /etc/os-release
@@ -273,7 +273,8 @@ impl LinuxPamAuthenticationEngine {
 
         // Simulate pam_unix.so credential check
         let is_valid = password == "sigma_pass" || password == "root_pass";
-        self.authenticated_sessions.insert(username.to_string(), is_valid);
+        self.authenticated_sessions
+            .insert(username.to_string(), is_valid);
         Ok(is_valid)
     }
 
@@ -296,7 +297,9 @@ impl LinuxSysctlGovernor {
         params.insert("vm.swappiness".to_string(), "60".to_string());
         params.insert("net.ipv4.ip_forward".to_string(), "0".to_string());
         params.insert("fs.file-max".to_string(), "2097152".to_string());
-        Self { sysctl_params: params }
+        Self {
+            sysctl_params: params,
+        }
     }
 
     pub fn parse_sysctl_conf(&mut self, content: &str) {
@@ -365,7 +368,10 @@ impl LinuxUdevRulesEngine {
         let mut mode = None;
 
         for token in trimmed.split(',') {
-            let parts: Vec<&str> = token.split('=').map(|s| s.trim().trim_matches('"')).collect();
+            let parts: Vec<&str> = token
+                .split('=')
+                .map(|s| s.trim().trim_matches('"'))
+                .collect();
             if parts.len() == 2 {
                 let key = parts[0].trim_end_matches(':').trim_end_matches('+');
                 let val = parts[1];
@@ -444,7 +450,173 @@ impl Default for LinuxModulesLoadEngine {
 }
 
 // ==========================================
-// 9. Integration Tests
+// 9. Linux Systemd Tmpfiles Engine (/etc/tmpfiles.d/)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TmpfileItemType {
+    CreateDirectory, // 'd'
+    CreateFile,      // 'f'
+    CreateSymlink,   // 'L'
+    CleanupDirectory,// 'e'
+}
+
+#[derive(Debug, Clone)]
+pub struct TmpfileRule {
+    pub item_type: TmpfileItemType,
+    pub path: String,
+    pub mode: u16,
+    pub uid: String,
+    pub gid: String,
+    pub age: Option<String>,
+}
+
+pub struct LinuxSystemdTmpfilesEngine {
+    pub rules: Vec<TmpfileRule>,
+}
+
+impl LinuxSystemdTmpfilesEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn parse_tmpfile_line(&mut self, line: &str) {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') || trimmed.is_empty() {
+            return;
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() >= 2 {
+            let item_type = match parts[0] {
+                "d" | "D" => TmpfileItemType::CreateDirectory,
+                "f" | "F" => TmpfileItemType::CreateFile,
+                "L" => TmpfileItemType::CreateSymlink,
+                "e" => TmpfileItemType::CleanupDirectory,
+                _ => TmpfileItemType::CreateDirectory,
+            };
+
+            let path = parts[1].to_string();
+            let mode = parts.get(2).and_then(|m| u16::from_str_radix(m, 8).ok()).unwrap_or(0o755);
+            let uid = parts.get(3).unwrap_or(&"root").to_string();
+            let gid = parts.get(4).unwrap_or(&"root").to_string();
+            let age = parts.get(5).map(|s| s.to_string());
+
+            self.rules.push(TmpfileRule {
+                item_type,
+                path,
+                mode,
+                uid,
+                gid,
+                age,
+            });
+        }
+    }
+}
+
+impl Default for LinuxSystemdTmpfilesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 10. Linux Swap & Zram Manager Engine (swapon/swapoff Parity)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SwapKind {
+    Partition,
+    Swapfile,
+    ZramCompressor,
+}
+
+#[derive(Debug, Clone)]
+pub struct SwapDevice {
+    pub path: String,
+    pub kind: SwapKind,
+    pub priority: i32,
+    pub size_mb: u64,
+    pub active: bool,
+}
+
+pub struct LinuxSwapfileManagerEngine {
+    pub devices: Vec<SwapDevice>,
+}
+
+impl LinuxSwapfileManagerEngine {
+    pub fn new() -> Self {
+        Self { devices: Vec::new() }
+    }
+
+    pub fn swapon(&mut self, path: &str, kind: SwapKind, priority: i32, size_mb: u64) {
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.path == path) {
+            dev.active = true;
+            dev.priority = priority;
+        } else {
+            self.devices.push(SwapDevice {
+                path: path.to_string(),
+                kind,
+                priority,
+                size_mb,
+                active: true,
+            });
+        }
+    }
+
+    pub fn swapoff(&mut self, path: &str) -> bool {
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.path == path) {
+            dev.active = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_total_active_swap_mb(&self) -> u64 {
+        self.devices.iter().filter(|d| d.active).map(|d| d.size_mb).sum()
+    }
+}
+
+impl Default for LinuxSwapfileManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 11. Linux Core Dump Filter Engine (/proc/sys/kernel/core_pattern Parity)
+// ==========================================
+
+pub struct LinuxCoreDumpFilterEngine {
+    pub core_pattern: String,
+    pub max_core_size_bytes: u64,
+}
+
+impl LinuxCoreDumpFilterEngine {
+    pub fn new() -> Self {
+        Self {
+            core_pattern: String::from("/var/lib/systemd/coredump/core.%e.%p.%t"),
+            max_core_size_bytes: 1024 * 1024 * 512, // 512 MB
+        }
+    }
+
+    pub fn format_core_filename(&self, executable: &str, pid: u32, timestamp: u64) -> String {
+        self.core_pattern
+            .replace("%e", executable)
+            .replace("%p", &pid.to_string())
+            .replace("%t", &timestamp.to_string())
+    }
+}
+
+impl Default for LinuxCoreDumpFilterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 12. Integration Tests
 // ==========================================
 
 #[cfg(test)]
@@ -511,7 +683,10 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
 
         let ok = pam.authenticate("sovereign_user", "sigma_pass").unwrap();
         assert!(ok);
-        assert_eq!(pam.authenticated_sessions.get("sovereign_user"), Some(&true));
+        assert_eq!(
+            pam.authenticated_sessions.get("sovereign_user"),
+            Some(&true)
+        );
 
         pam.close_session("sovereign_user");
         assert!(pam.authenticated_sessions.get("sovereign_user").is_none());
@@ -570,6 +745,37 @@ wireguard
 kvm
 "#;
         modules.parse_modules_load_conf(conf);
-        assert_eq!(modules.modules_to_load, vec!["wireguard".to_string(), "kvm".to_string()]);
+        assert_eq!(
+            modules.modules_to_load,
+            vec!["wireguard".to_string(), "kvm".to_string()]
+        );
+    }
+
+    #[test]
+    fn test_linux_systemd_tmpfiles_engine() {
+        let mut tmpfiles = LinuxSystemdTmpfilesEngine::new();
+        tmpfiles.parse_tmpfile_line("d /tmp 1777 root root 10d");
+        assert_eq!(tmpfiles.rules.len(), 1);
+        assert_eq!(tmpfiles.rules[0].item_type, TmpfileItemType::CreateDirectory);
+        assert_eq!(tmpfiles.rules[0].path, "/tmp");
+        assert_eq!(tmpfiles.rules[0].mode, 0o1777);
+    }
+
+    #[test]
+    fn test_linux_swapfile_manager_engine() {
+        let mut swap = LinuxSwapfileManagerEngine::new();
+        swap.swapon("/dev/zram0", SwapKind::ZramCompressor, 100, 4096);
+        swap.swapon("/swapfile", SwapKind::Swapfile, 10, 2048);
+
+        assert_eq!(swap.get_total_active_swap_mb(), 6144);
+        assert!(swap.swapoff("/swapfile"));
+        assert_eq!(swap.get_total_active_swap_mb(), 4096);
+    }
+
+    #[test]
+    fn test_linux_core_dump_filter_engine() {
+        let filter = LinuxCoreDumpFilterEngine::new();
+        let formatted = filter.format_core_filename("sigma-app", 1337, 1700000000);
+        assert_eq!(formatted, "/var/lib/systemd/coredump/core.sigma-app.1337.1700000000");
     }
 }

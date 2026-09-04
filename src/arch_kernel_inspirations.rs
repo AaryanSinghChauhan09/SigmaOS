@@ -1009,51 +1009,6 @@ impl ReproducibleBuildVerdict {
         self.records.iter().filter(|r| r.status == status).collect()
     }
 
-    /// Compare two binary build artifacts byte-by-byte and record diffoscope-style diagnostic audit
-    pub fn compare_build_artifacts(
-        &mut self,
-        package: &str,
-        bin_a: &[u8],
-        bin_b: &[u8],
-    ) -> ReproducibleStatus {
-        let mut discrepancies = Vec::new();
-
-        // Calculate simple checksum parity
-        let mut hash_a = [0u8; 32];
-        let mut hash_b = [0u8; 32];
-
-        for (i, &b) in bin_a.iter().enumerate() {
-            hash_a[i % 32] ^= b;
-        }
-
-        for (i, &b) in bin_b.iter().enumerate() {
-            hash_b[i % 32] ^= b;
-        }
-
-        let status = if bin_a == bin_b {
-            ReproducibleStatus::Reproducible
-        } else {
-            if bin_a.len() != bin_b.len() {
-                discrepancies.push(DiscrepancyKind::SizeMismatch);
-            } else {
-                discrepancies.push(DiscrepancyKind::BinaryDiffBitMismatch);
-            }
-            ReproducibleStatus::Unreproducible
-        };
-
-        self.record(package, status);
-        self.audit_reports.push(ReproducibleAuditReport {
-            package: package.to_string(),
-            status,
-            build_a_hash: hash_a,
-            build_b_hash: hash_b,
-            discrepancies,
-            source_date_epoch: self.source_date_epoch,
-        });
-
-        status
-    }
-
     pub fn reproducible_count(&self) -> usize {
         self.filter_by_status(ReproducibleStatus::Reproducible).len()
     }

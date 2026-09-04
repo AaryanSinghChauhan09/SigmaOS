@@ -26,12 +26,10 @@ pub mod system;
 pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
-pub mod wiki;
 
 pub use local_llm::{
     LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
 };
-pub use sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,

@@ -1,9 +1,4 @@
 extern crate alloc;
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
-
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::HashMap;
 
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
@@ -125,12 +120,7 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!(
-                "Executed '{} {}' from stratum '{}'",
-                cmd,
-                args.join(" "),
-                stratum_name
-            ))
+            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -236,19 +226,13 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }
@@ -700,6 +684,159 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
+// =========================================================================
+// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevuanInitBackend {
+    SysVInit,
+    Runit,
+    S6,
+    OpenRc,
+}
+
+#[derive(Debug, Clone)]
+pub struct DevuanInitService {
+    pub name: String,
+    pub backend: DevuanInitBackend,
+    pub script_path: String,
+    pub is_enabled: bool,
+}
+
+pub struct DevuanInitDiversityEngine {
+    pub default_backend: DevuanInitBackend,
+    pub services: BTreeMap<String, DevuanInitService>,
+}
+
+impl DevuanInitDiversityEngine {
+    pub fn new(default_backend: DevuanInitBackend) -> Self {
+        Self {
+            default_backend,
+            services: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_service(&mut self, name: &str, backend: DevuanInitBackend, script_path: &str) {
+        let service = DevuanInitService {
+            name: name.to_string(),
+            backend,
+            script_path: script_path.to_string(),
+            is_enabled: true,
+        };
+        self.services.insert(name.to_string(), service);
+    }
+
+    pub fn is_systemd_free(&self) -> bool {
+        true
+    }
+}
+
+impl Default for DevuanInitDiversityEngine {
+    fn default() -> Self {
+        Self::new(DevuanInitBackend::SysVInit)
+    }
+}
+
+// =========================================================================
+// ARTIX LINUX INIT MATRIX (ARTIX LINUX SYSTEMD-FREE SCRIPTLET TRANSLATOR)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ArtixInitScriptlet {
+    pub service_name: String,
+    pub openrc_run_script: String,
+    pub runit_run_script: String,
+    pub dinit_service_file: String,
+}
+
+pub struct ArtixLinuxInitMatrix {
+    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
+}
+
+impl ArtixLinuxInitMatrix {
+    pub fn new() -> Self {
+        Self {
+            scriptlets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scriptlet(&mut self, service_name: &str, exec_path: &str) {
+        let scriptlet = ArtixInitScriptlet {
+            service_name: service_name.to_string(),
+            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"\n", exec_path),
+            runit_run_script: format!("#!/bin/sh\nexec {}\n", exec_path),
+            dinit_service_file: format!("type = process\ncommand = {}\n", exec_path),
+        };
+        self.scriptlets.insert(service_name.to_string(), scriptlet);
+    }
+
+    pub fn get_scriptlet(&self, service_name: &str) -> Option<&ArtixInitScriptlet> {
+        self.scriptlets.get(service_name)
+    }
+}
+
+impl Default for ArtixLinuxInitMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// KAOS PACKAGE STATE GOVERNOR (KAOS LINUX QT/KDE-FIRST REPOSITORY GOVERNOR)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KaOsRepoGroup {
+    Core,
+    Main,
+    Apps,
+}
+
+#[derive(Debug, Clone)]
+pub struct KaOsPackageRecord {
+    pub name: String,
+    pub version: String,
+    pub repo_group: KaOsRepoGroup,
+    pub is_qt_kde_toolkit: bool,
+}
+
+pub struct KaOSPackageStateGovernor {
+    pub packages: BTreeMap<String, KaOsPackageRecord>,
+}
+
+impl KaOSPackageStateGovernor {
+    pub fn new() -> Self {
+        Self {
+            packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
+        let record = KaOsPackageRecord {
+            name: name.to_string(),
+            version: version.to_string(),
+            repo_group: group,
+            is_qt_kde_toolkit: is_qt_kde,
+        };
+        self.packages.insert(name.to_string(), record);
+    }
+
+    pub fn qt_kde_toolkit_ratio(&self) -> f32 {
+        if self.packages.is_empty() {
+            return 1.0;
+        }
+        let qt_count = self.packages.values().filter(|p| p.is_qt_kde_toolkit).count();
+        qt_count as f32 / self.packages.len() as f32
+    }
+}
+
+impl Default for KaOSPackageStateGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 12. Missing Linux & BSD Distro Component Parity Inspector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -725,12 +862,36 @@ impl MissingDistroComponentsEngine {
             records: BTreeMap::new(),
         };
 
-        engine.register_component("Portage USE Flags", "Gentoo", ComponentParityStatus::Implemented);
-        engine.register_component("APK Trigger Hooks", "Alpine", ComponentParityStatus::Implemented);
-        engine.register_component("AUR Recipe Helper", "Arch Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
-        engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
-        engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
+        engine.register_component(
+            "Portage USE Flags",
+            "Gentoo",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "APK Trigger Hooks",
+            "Alpine",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "AUR Recipe Helper",
+            "Arch Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Pledge & Unveil",
+            "OpenBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Jails & ZFS BootEnv",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "RPM-OSTree Atomic Trees",
+            "Fedora Silverblue",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -745,7 +906,9 @@ impl MissingDistroComponentsEngine {
     }
 
     pub fn is_all_components_implemented(&self) -> bool {
-        self.records.values().all(|r| r.status == ComponentParityStatus::Implemented)
+        self.records
+            .values()
+            .all(|r| r.status == ComponentParityStatus::Implemented)
     }
 }
 
@@ -845,9 +1008,16 @@ impl IllumosDTraceProbeEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, function: &str, payload: &str) {
-        if let Some(p) = self.probes.iter().find(|p| p.provider == provider && p.function == function) {
+        if let Some(p) = self
+            .probes
+            .iter()
+            .find(|p| p.provider == provider && p.function == function)
+        {
             if p.is_enabled {
-                let entry = format!("dtrace:{}:{}:{}:{}: [{}]", p.provider, p.module, p.function, p.name, payload);
+                let entry = format!(
+                    "dtrace:{}:{}:{}:{}: [{}]",
+                    p.provider, p.module, p.function, p.name, payload
+                );
                 self.trace_buffer.push(entry);
             }
         }
@@ -855,6 +1025,109 @@ impl IllumosDTraceProbeEngine {
 }
 
 impl Default for IllumosDTraceProbeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// DRAGONFLY BSD HAMMER2 ZERO-COST SNAPSHOT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsSnapshot {
+    pub pfs_name: String,
+    pub snapshot_id: u64,
+    pub timestamp: u64,
+    pub is_mounted: bool,
+}
+
+pub struct DragonFlyBsdHammerSnapshotEngine {
+    pub snapshots: Vec<Hammer2PfsSnapshot>,
+    pub next_id: u64,
+}
+
+impl DragonFlyBsdHammerSnapshotEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            next_id: 100,
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, pfs_name: &str) -> u64 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.snapshots.push(Hammer2PfsSnapshot {
+            pfs_name: pfs_name.to_string(),
+            snapshot_id: id,
+            timestamp: 1672531199 + id,
+            is_mounted: false,
+        });
+        id
+    }
+
+    pub fn mount_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
+        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
+            snap.is_mounted = true;
+            Ok(format!("/media/hammer2/@snap_{}", snapshot_id))
+        } else {
+            Err("HAMMER2: Snapshot not found")
+        }
+    }
+}
+
+impl Default for DragonFlyBsdHammerSnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// VANILLA OS APX CONTAINERIZED SUBSYSTEM ENGINE (APX / ABROOT PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApxSubsystemContainer {
+    pub name: String,
+    pub base_distro: String, // e.g. "ubuntu", "arch", "fedora"
+    pub installed_apps: Vec<String>,
+    pub is_active: bool,
+}
+
+pub struct VanillaOsApxSubsystemEngine {
+    pub containers: Vec<ApxSubsystemContainer>,
+}
+
+impl VanillaOsApxSubsystemEngine {
+    pub fn new() -> Self {
+        Self { containers: Vec::new() }
+    }
+
+    pub fn create_apx_container(&mut self, name: &str, base_distro: &str) -> Result<(), &'static str> {
+        if self.containers.iter().any(|c| c.name == name) {
+            return Err("APX: Container name already exists");
+        }
+        self.containers.push(ApxSubsystemContainer {
+            name: name.to_string(),
+            base_distro: base_distro.to_string(),
+            installed_apps: Vec::new(),
+            is_active: true,
+        });
+        Ok(())
+    }
+
+    pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == container_name) {
+            c.installed_apps.push(app.to_string());
+            Ok(())
+        } else {
+            Err("APX: Container not found")
+        }
+    }
+}
+
+impl Default for VanillaOsApxSubsystemEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -893,8 +1166,17 @@ impl SuseYaSTConfigurationRegistry {
         self.modules.push(module);
     }
 
-    pub fn set_value(&mut self, module_name: &str, key: &str, val: &str) -> Result<(), &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
+    pub fn set_value(
+        &mut self,
+        module_name: &str,
+        key: &str,
+        val: &str,
+    ) -> Result<(), &'static str> {
+        if let Some(m) = self
+            .modules
+            .iter_mut()
+            .find(|m| m.module_name == module_name)
+        {
             m.config_data.push((key.to_string(), val.to_string()));
             Ok(())
         } else {
@@ -903,7 +1185,11 @@ impl SuseYaSTConfigurationRegistry {
     }
 
     pub fn apply_configuration(&mut self, module_name: &str) -> Result<bool, &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
+        if let Some(m) = self
+            .modules
+            .iter_mut()
+            .find(|m| m.module_name == module_name)
+        {
             m.is_applied = true;
             Ok(true)
         } else {
@@ -949,10 +1235,13 @@ impl DragonFlyHammer2EmergencyCowEngine {
 
     pub fn write_data_block(&mut self, offset: u64, data: &[u8]) -> Result<u64, &'static str> {
         if self.is_emergency_read_only {
-            return Err("HAMMER2: Storage capacity critical! Filesystem forced to emergency read-only");
+            return Err(
+                "HAMMER2: Storage capacity critical! Filesystem forced to emergency read-only",
+            );
         }
 
-        if self.free_space_bytes < 1024 * 1024 { // Less than 1MB free
+        if self.free_space_bytes < 1024 * 1024 {
+            // Less than 1MB free
             self.is_emergency_read_only = true;
             return Err("HAMMER2: Free space depleted! Emergency CoW snapshot activated");
         }
@@ -1051,7 +1340,9 @@ pub struct GentooPortageSlotOperatorEngine {
 
 impl GentooPortageSlotOperatorEngine {
     pub fn new() -> Self {
-        Self { slots: BTreeMap::new() }
+        Self {
+            slots: BTreeMap::new(),
+        }
     }
 
     pub fn register_package_slot(&mut self, pkg: &str, slot: &str, subslot: &str) {
@@ -1064,7 +1355,11 @@ impl GentooPortageSlotOperatorEngine {
         self.slots.insert(pkg.to_string(), dep);
     }
 
-    pub fn update_subslot_and_trigger_rebuilds(&mut self, pkg: &str, new_subslot: &str) -> Vec<String> {
+    pub fn update_subslot_and_trigger_rebuilds(
+        &mut self,
+        pkg: &str,
+        new_subslot: &str,
+    ) -> Vec<String> {
         let mut rebuilds = Vec::new();
         if let Some(dep) = self.slots.get_mut(pkg) {
             if dep.subslot != new_subslot {
@@ -1102,10 +1397,20 @@ pub struct FedoraSelinuxMlsMcsGovernor {
 
 impl FedoraSelinuxMlsMcsGovernor {
     pub fn new() -> Self {
-        Self { active_contexts: BTreeMap::new() }
+        Self {
+            active_contexts: BTreeMap::new(),
+        }
     }
 
-    pub fn assign_context(&mut self, pid: usize, user: &str, role: &str, domain: &str, level: u8, cats: &[u16]) {
+    pub fn assign_context(
+        &mut self,
+        pid: usize,
+        user: &str,
+        role: &str,
+        domain: &str,
+        level: u8,
+        cats: &[u16],
+    ) {
         let ctx = SelinuxMlsMcsContext {
             user: user.to_string(),
             role: role.to_string(),
@@ -1116,7 +1421,12 @@ impl FedoraSelinuxMlsMcsGovernor {
         self.active_contexts.insert(pid, ctx);
     }
 
-    pub fn authorize_mls_mcs_access(&self, subj_pid: usize, obj_level: u8, obj_cats: &[u16]) -> bool {
+    pub fn authorize_mls_mcs_access(
+        &self,
+        subj_pid: usize,
+        obj_level: u8,
+        obj_cats: &[u16],
+    ) -> bool {
         if let Some(subj) = self.active_contexts.get(&subj_pid) {
             if subj.sensitivity_level < obj_level {
                 return false; // Sensitivity level dominated
@@ -1204,7 +1514,9 @@ mod tests {
     fn test_dragonfly_hammer2_emergency_cow() {
         let mut hammer = DragonFlyHammer2EmergencyCowEngine::new(5 * 1024 * 1024);
         let h1 = hammer.write_data_block(0, b"DATA_PAYLOAD_BLOCK").unwrap();
-        let h2 = hammer.write_data_block(4096, b"DATA_PAYLOAD_BLOCK").unwrap();
+        let h2 = hammer
+            .write_data_block(4096, b"DATA_PAYLOAD_BLOCK")
+            .unwrap();
         assert_eq!(h1, h2);
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
@@ -1248,6 +1560,19 @@ mod tests {
     }
 
     #[test]
+    fn test_dragonfly_hammer_and_vanilla_apx() {
+        let mut hammer = DragonFlyBsdHammerSnapshotEngine::new();
+        let sid = hammer.create_pfs_snapshot("root_pfs");
+        let path = hammer.mount_snapshot(sid).unwrap();
+        assert!(path.contains("snap_100"));
+
+        let mut apx = VanillaOsApxSubsystemEngine::new();
+        assert!(apx.create_apx_container("arch-subsystem", "arch").is_ok());
+        assert!(apx.install_apx_app("arch-subsystem", "neofetch").is_ok());
+        assert_eq!(apx.containers[0].installed_apps.len(), 1);
+    }
+
+    #[test]
     fn test_illumos_dtrace_probe_engine() {
         let mut dtrace = IllumosDTraceProbeEngine::new();
         dtrace.register_probe("syscall", "sys", "read", "entry");
@@ -1276,9 +1601,34 @@ mod tests {
     }
 
     #[test]
+    fn test_devuan_init_diversity() {
+        let mut devuan = DevuanInitDiversityEngine::new(DevuanInitBackend::OpenRc);
+        devuan.register_service("networking", DevuanInitBackend::OpenRc, "/etc/init.d/networking");
+        assert!(devuan.is_systemd_free());
+        assert_eq!(devuan.services.len(), 1);
+    }
+
+    #[test]
+    fn test_artix_init_matrix() {
+        let mut artix = ArtixLinuxInitMatrix::new();
+        artix.register_scriptlet("sshd", "/usr/bin/sshd");
+        let scriptlet = artix.get_scriptlet("sshd").unwrap();
+        assert!(scriptlet.openrc_run_script.contains("/usr/bin/sshd"));
+        assert!(scriptlet.runit_run_script.contains("exec /usr/bin/sshd"));
+    }
+
+    #[test]
+    fn test_kaos_package_governor() {
+        let mut kaos = KaOSPackageStateGovernor::new();
+        kaos.register_package("plasma-desktop", "5.27", KaOsRepoGroup::Core, true);
+        kaos.register_package("kwrite", "23.08", KaOsRepoGroup::Apps, true);
+        assert_eq!(kaos.qt_kde_toolkit_ratio(), 1.0);
+    }
+
+    #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
+        assert_eq!(engine.records.len(), 13);
         assert!(engine.is_all_components_implemented());
     }
 }

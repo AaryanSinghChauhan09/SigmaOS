@@ -591,12 +591,6 @@ impl MirrorSyncEngine {
             mirror.active = false;
         }
     }
-
-    pub fn mark_failure(&mut self, url: &str) {
-        if let Some(mirror) = self.mirrors.iter_mut().find(|m| m.url == url) {
-            mirror.active = false;
-        }
-    }
 }
 
 impl Default for MirrorSyncEngine {
@@ -763,12 +757,18 @@ mod tests {
         sync_engine.add_mirror("https://mirror1.sigmaos.org", "US", 20);
 
         sync_engine.rank_mirrors();
-        assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror1.sigmaos.org");
+        assert_eq!(
+            sync_engine.get_fastest_mirror().unwrap(),
+            "https://mirror1.sigmaos.org"
+        );
 
         // Fail mirror 1 to trigger failover
         sync_engine.mark_failure("https://mirror1.sigmaos.org");
 
-        assert_eq!(sync_engine.get_fastest_mirror().unwrap(), "https://mirror2.sigmaos.org");
+        assert_eq!(
+            sync_engine.get_fastest_mirror().unwrap(),
+            "https://mirror2.sigmaos.org"
+        );
     }
 
     #[test]

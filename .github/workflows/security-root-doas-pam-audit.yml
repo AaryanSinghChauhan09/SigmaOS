@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   doas-pam-security-audit:
     name: Root Improvement, Doas & PAM Audit

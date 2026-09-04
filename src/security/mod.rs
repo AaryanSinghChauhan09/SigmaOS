@@ -49,10 +49,10 @@ pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
-    PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
-    UnveilManager as BsdUnveilManager, UnveilPermission as BsdUnveilPermission, UnveilEntry as BsdUnveilEntry,
-    WxEnforcer, MemoryPermission, PaxMprotect, AslrEngine, CapsicumManager,
-    CapsicumCapability, BsdHardeningSuite,
+    AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
+    PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
+    UnveilEntry as BsdUnveilEntry, UnveilManager as BsdUnveilManager,
+    UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
 pub use capability::{
     CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
@@ -72,7 +72,7 @@ pub use defensive_audit::{
 };
 pub use forensics::*;
 pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
@@ -100,7 +100,10 @@ pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pledge::{promises, PledgeError, PledgeManager as OriginalPledgeManager, PledgePromise as OriginalPledgePromise};
+pub use pledge::{
+    promises, PledgeError, PledgeManager as OriginalPledgeManager,
+    PledgePromise as OriginalPledgePromise,
+};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 pub use rules::{
@@ -109,11 +112,12 @@ pub use rules::{
     SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
     SysctlParameterRule, UnveilRule,
 };
-pub use selinux::{PolicyRule, SELinuxPolicy, SigmaSELinux, SecurityContext};
-pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel};
+pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
+pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
-    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions, UnveilState,
+    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
+    UnveilState,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,

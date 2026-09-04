@@ -5,6 +5,7 @@ pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
 pub mod ext4_ntfs_security;
+pub mod ext4_mount;
 pub mod manager;
 pub mod smart_symlink;
 pub mod support;
@@ -31,3 +32,6 @@ pub use manager::{
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use ext4_mount::{
+    Ext4FilesystemManager, Ext4Inode, Ext4Superblock, Ext4Mount, Ext4DirEntry,
+};

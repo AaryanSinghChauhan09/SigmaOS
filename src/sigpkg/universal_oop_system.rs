@@ -24,21 +24,18 @@ use alloc::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(all(not(feature = "standalone_test"), test))]
+#[cfg(test)]
 use std::collections::HashMap;
-
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
 
 use alloc::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u64,
@@ -46,14 +43,14 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -71,21 +68,41 @@ impl Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(feature = "standalone_test")]
-pub struct Package;
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: String,
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
@@ -118,12 +135,15 @@ pub trait IPackage: Send + Sync {
 pub enum PackageFormat {
     // Debian-based
     Deb,
+    Apt,
     // RPM-based
     Rpm,
+    Yum,
     // Arch-based
     Pacman,
     // Gentoo-based
     Ebuild,
+    Portage,
     // Alpine-based
     Apk,
     // Nix-based
@@ -146,6 +166,7 @@ pub enum PackageFormat {
     Guix,
     // SigmaOS Native
     Sigma,
+    Sovereign,
     // Adobe AIR
     Air,
     // Homebrew Bottle
@@ -208,6 +229,108 @@ pub enum PackageFormat {
     Drpm,
     // Bedrock Linux Stratum (.stratum)
     Stratum,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        if name.ends_with(".deb") || name.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if name.ends_with(".rpm") || name.ends_with(".drpm") {
+            Some(PackageFormat::Rpm)
+        } else if name.ends_with(".pkg.tar.zst")
+            || name.ends_with(".pkg.tar.xz")
+            || name.ends_with(".pkg.tar.gz")
+            || name.contains("pacman")
+        {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Ebuild)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") || name.contains(".tar .gz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else {
+            None
+        }
+    }
 }
 
 /// Package metadata structure
@@ -3095,7 +3218,8 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> = matched_paths.iter().map(|s: &String| s.as_str()).collect();
+                let paths_ref: Vec<&str> =
+                    matched_paths.iter().map(|s: &String| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3468,7 +3592,7 @@ pub struct AlternativeChoice {
 
 pub struct SovereignAlternativesEngine {
     pub alternatives: HashMap<String, Vec<AlternativeChoice>>, // Name -> Choices
-    pub active_selections: HashMap<String, String>,             // Name -> Selected Path
+    pub active_selections: HashMap<String, String>,            // Name -> Selected Path
 }
 
 impl SovereignAlternativesEngine {
@@ -3559,7 +3683,10 @@ impl PortageSlotResolver {
     }
 
     pub fn register_package_slot(&mut self, pkg_name: &str, slot: &str, subslot: Option<&str>) {
-        let entry = self.installed_slots.entry(pkg_name.to_string()).or_default();
+        let entry = self
+            .installed_slots
+            .entry(pkg_name.to_string())
+            .or_default();
         let slot_info = PortageSlotInfo {
             slot: slot.to_string(),
             subslot: subslot.map(|s| s.to_string()),
@@ -3768,6 +3895,101 @@ impl Default for NixStoreGcEngine {
     }
 }
 
+// ============================================================================
+// Universal Distro Package Unifier Engine & User-Defined Function Manager
+// ============================================================================
+
+pub struct UniversalDistroPackageUnifierEngine {
+    pub translator: SigmaPackageTranslator,
+    pub macro_evaluator: RpmMacroEvaluator,
+    pub conffile_merger: ConffileMergeEngine,
+}
+
+impl UniversalDistroPackageUnifierEngine {
+    pub fn new() -> Self {
+        Self {
+            translator: SigmaPackageTranslator::new(),
+            macro_evaluator: RpmMacroEvaluator::new(),
+            conffile_merger: ConffileMergeEngine::new(),
+        }
+    }
+
+    /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
+    /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
+    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+        let meta = foreign_package.metadata();
+
+        // 1. Expand macros in description/paths if applicable
+        let expanded_desc = self.macro_evaluator.expand(&meta.description);
+
+        // 2. Map dependencies to unified sovereign system dependencies
+        let mut unified_deps = Vec::new();
+        for dep in foreign_package.dependencies() {
+            let mapped_name = match dep.name.as_str() {
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
+                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
+                _ => &dep.name,
+            };
+            unified_deps.push(Dependency {
+                name: mapped_name.to_string(),
+                version_constraint: dep.version_constraint,
+            });
+        }
+
+        let mut unified_meta = meta.clone();
+        unified_meta.description = expanded_desc;
+
+        let base_sigma = StandardPackage {
+            metadata: unified_meta,
+            dependencies: unified_deps,
+            format: PackageFormat::Sigma,
+        };
+
+        // Wrap with AuditedPackageDecorator for OOP security compliance
+        Ok(Box::new(AuditedPackageDecorator::new(Box::new(base_sigma))))
+    }
+}
+
+impl Default for UniversalDistroPackageUnifierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UserDefinedFunctionManager {
+    pub pipeline: UserDefinedFunctionPipeline,
+    pub custom_hooks: Vec<Arc<dyn UserDefinedHook>>,
+}
+
+impl UserDefinedFunctionManager {
+    pub fn new() -> Self {
+        Self {
+            pipeline: UserDefinedFunctionPipeline::new(),
+            custom_hooks: Vec::new(),
+        }
+    }
+
+    pub fn register_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+        self.custom_hooks.push(hook);
+    }
+
+    pub fn run_hooks_on(&self, package: &mut dyn IPackage) -> Result<usize, HookError> {
+        let mut ran = 0;
+        for hook in &self.custom_hooks {
+            hook.execute(package)?;
+            ran += 1;
+        }
+        Ok(ran)
+    }
+}
+
+impl Default for UserDefinedFunctionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3840,7 +4062,7 @@ Description: Test
 Depends: simple";
 
         let package = manager.parse_package(deb_data).unwrap();
-        let name = package.name().to_string();
+        let _name = package.name().to_string();
 
         // Install without dependencies should fail
         assert!(manager.install_package(package).is_err());
@@ -4576,10 +4798,7 @@ Description: Hook test";
         let mut macro_eval = RpmMacroEvaluator::new();
         macro_eval.define("prefix", "/opt/sigma");
 
-        assert_eq!(
-            macro_eval.expand("%{prefix}/bin/app"),
-            "/opt/sigma/bin/app"
-        );
+        assert_eq!(macro_eval.expand("%{prefix}/bin/app"), "/opt/sigma/bin/app");
         assert_eq!(macro_eval.expand("%_bindir/app"), "/usr/bin/app");
 
         let merger = ConffileMergeEngine::new();
@@ -4603,7 +4822,10 @@ Description: Hook test";
 
         gc.register_path(
             "/nix/store/system-profile",
-            vec!["/nix/store/bash".to_string(), "/nix/store/glibc".to_string()],
+            vec![
+                "/nix/store/bash".to_string(),
+                "/nix/store/glibc".to_string(),
+            ],
         );
 
         gc.add_gc_root("/nix/store/system-profile");
@@ -4649,5 +4871,86 @@ Description: Hook test";
         let mut pipeline = UserDefinedFunctionPipeline::new();
         pipeline.set_env_var("BUILD_JOBS", "8");
         assert_eq!(pipeline.get_env_var("BUILD_JOBS"), Some("8"));
+    }
+
+    #[test]
+    fn test_universal_distro_package_unifier_engine_and_udf_manager() {
+        let unifier = UniversalDistroPackageUnifierEngine::new();
+
+        // Foreign RPM package with macro in description and foreign dependencies
+        let rpm_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "nginx".to_string(),
+                version: Version::new(1, 24, 0),
+                description: "Web server binary located in %_bindir/nginx".to_string(),
+                license: "BSD-2-Clause".to_string(),
+                maintainer: "nginx-team".to_string(),
+                homepage: "nginx.org".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "sha256checksum".to_string(),
+                size: 2048000,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: vec![
+                Dependency {
+                    name: "openssl-devel".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+                Dependency {
+                    name: "glibc".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+            ],
+            format: PackageFormat::Rpm,
+        });
+
+        let unified = unifier.unify_package(rpm_pkg.as_ref()).unwrap();
+        assert_eq!(unified.name(), "nginx");
+
+        // Macro expansion check
+        assert!(unified.metadata().description.contains("/usr/bin/nginx"));
+
+        // Normalized dependency mapping check
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+
+        // UserDefinedFunctionManager check
+        let mut udf_mgr = UserDefinedFunctionManager::new();
+        struct CustomSuffixHook;
+        impl UserDefinedHook for CustomSuffixHook {
+            fn name(&self) -> &str { "suffix-hook" }
+            fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+                pkg.metadata_mut().maintainer = "sovereign-built".to_string();
+                Ok(())
+            }
+        }
+
+        udf_mgr.register_hook(Arc::new(CustomSuffixHook));
+        let mut test_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-test".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "unknown".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let ran = udf_mgr.run_hooks_on(test_pkg.as_mut()).unwrap();
+        assert_eq!(ran, 1);
+        assert_eq!(test_pkg.metadata().maintainer, "sovereign-built");
     }
 }

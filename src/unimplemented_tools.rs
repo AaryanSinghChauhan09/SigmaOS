@@ -5050,7 +5050,8 @@ mod tests {
 
     #[test]
     fn test_freebsd_jail_sandbox_engine() {
-        let mut jail = FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
+        let mut jail =
+            FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
         assert!(!jail.is_running);
         assert!(jail.start_jail().is_ok());
         assert!(jail.is_running);
@@ -5131,6 +5132,57 @@ impl PhoronixSuiteAutomatedBenchmarkRunnerTool {
     }
 }
 
+#[derive(Debug, Default, Clone)]
+pub struct NixGuixStoreGarbageCollectorTool {
+    pub registered_roots: Vec<String>,
+    pub dead_paths: Vec<String>,
+}
+
+impl NixGuixStoreGarbageCollectorTool {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_gc_root(&mut self, store_path: &str) {
+        self.registered_roots.push(store_path.to_string());
+    }
+
+    pub fn register_dead_path(&mut self, store_path: &str) {
+        if !self.registered_roots.contains(&store_path.to_string()) {
+            self.dead_paths.push(store_path.to_string());
+        }
+    }
+
+    pub fn collect_garbage(&mut self) -> usize {
+        let count = self.dead_paths.len();
+        self.dead_paths.clear();
+        count
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct OpenBsdUnveilAuditTool {
+    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+}
+
+impl OpenBsdUnveilAuditTool {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_unveil_rule(&mut self, path: &str, permissions: &str) {
+        self.unveiled_rules.insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn check_path_access(&self, path: &str, requested_perm: char) -> bool {
+        if let Some(perms) = self.unveiled_rules.get(path) {
+            perms.contains(requested_perm)
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod new_unimplemented_tools_tests {
     use super::*;
@@ -5146,8 +5198,28 @@ mod new_unimplemented_tools_tests {
     #[test]
     fn test_phoronix_suite_automated_benchmark_runner_tool() {
         let mut runner = PhoronixSuiteAutomatedBenchmarkRunnerTool::new("Kernel IPC Suite");
-        let score = runner.run_automated_suite(&["pipe-latency", "socket-throughput"], &[12.5, 87.5]);
+        let score =
+            runner.run_automated_suite(&["pipe-latency", "socket-throughput"], &[12.5, 87.5]);
         assert_eq!(score, 50.0);
         assert_eq!(runner.executed_tests.len(), 2);
+    }
+
+    #[test]
+    fn test_nix_guix_store_garbage_collector_tool() {
+        let mut gc = NixGuixStoreGarbageCollectorTool::new();
+        gc.add_gc_root("/sigma/store/root-bash");
+        gc.register_dead_path("/sigma/store/dead-tmp");
+        gc.register_dead_path("/sigma/store/root-bash"); // Should skip root
+        assert_eq!(gc.dead_paths.len(), 1);
+        assert_eq!(gc.collect_garbage(), 1);
+        assert_eq!(gc.dead_paths.len(), 0);
+    }
+
+    #[test]
+    fn test_openbsd_unveil_audit_tool() {
+        let mut unveil = OpenBsdUnveilAuditTool::new();
+        unveil.add_unveil_rule("/etc", "r");
+        assert!(unveil.check_path_access("/etc", 'r'));
+        assert!(!unveil.check_path_access("/etc", 'w'));
     }
 }

@@ -65,11 +65,11 @@ pub struct Plan9Message {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Plan9RforkFlags {
-    pub copy_name_space: bool,   // RFNAMEG
-    pub new_environment: bool,  // RFENVG
+    pub copy_name_space: bool,       // RFNAMEG
+    pub new_environment: bool,       // RFENVG
     pub copy_file_descriptors: bool, // RFFDG
-    pub new_proc: bool,          // RFPROC
-    pub mount_namespace: bool,   // RFMNT
+    pub new_proc: bool,              // RFPROC
+    pub mount_namespace: bool,       // RFMNT
 }
 
 impl Default for Plan9RforkFlags {
@@ -256,6 +256,152 @@ impl Default for Minix3ReincarnationServer {
 }
 
 // =========================================================================
+// 16. EBPF SOCKMAP / SK_MSG SOCKET BYPASS REDIRECT ENGINE (LINUX INSPIRED)
+// =========================================================================
+
+/// Linux eBPF sockmap & sk_msg zero-copy socket fast-path redirect engine
+pub struct EbpfSockmapRedirectEngine {
+    sock_map: BTreeMap<u64, u32>,
+    active_redirects: usize,
+}
+
+impl EbpfSockmapRedirectEngine {
+    pub fn new() -> Self {
+        Self {
+            sock_map: BTreeMap::new(),
+            active_redirects: 0,
+        }
+    }
+
+    /// Register a socket mapping in sockmap (e.g. sock_fd -> target_fd)
+    pub fn map_socket(&mut self, src_fd: u64, target_fd: u32) {
+        self.sock_map.insert(src_fd, target_fd);
+    }
+
+    /// Redirect packet zero-copy bypassing full TCP/IP stack
+    pub fn redirect_socket_msg(&mut self, src_fd: u64, payload: &[u8]) -> Result<(u32, Vec<u8>), &'static str> {
+        if let Some(&target_fd) = self.sock_map.get(&src_fd) {
+            self.active_redirects += 1;
+            Ok((target_fd, payload.to_vec()))
+        } else {
+            Err("eBPF Sockmap: Source socket not found in sockmap")
+        }
+    }
+
+    pub fn get_active_redirects(&self) -> usize {
+        self.active_redirects
+    }
+}
+
+impl Default for EbpfSockmapRedirectEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. PACMAN / AUR HOOK & PKGBUILD PATCH ENGINE (ARCH LINUX INSPIRED)
+// =========================================================================
+
+/// Arch Linux Pacman ALPM hook triggers & dynamic PKGBUILD source patcher
+pub struct PacmanAurHookPatchEngine {
+    hooks: Vec<(String, String)>, // (event_type, command)
+    applied_patches: Vec<(String, usize)>, // (patch_name, bytes_patched)
+}
+
+impl PacmanAurHookPatchEngine {
+    pub fn new() -> Self {
+        Self {
+            hooks: Vec::new(),
+            applied_patches: Vec::new(),
+        }
+    }
+
+    /// Register Pacman transaction hook
+    pub fn register_hook(&mut self, event: &str, command: &str) {
+        self.hooks.push((event.to_string(), command.to_string()));
+    }
+
+    /// Trigger hooks matching event name (e.g. "PreTransaction", "PostTransaction")
+    pub fn trigger_hooks(&self, event: &str) -> Vec<String> {
+        self.hooks
+            .iter()
+            .filter(|(ev, _)| ev == event)
+            .map(|(_, cmd)| cmd.clone())
+            .collect()
+    }
+
+    /// Apply dynamic PKGBUILD patch diff to source file
+    pub fn apply_pkgbuild_patch(&mut self, patch_name: &str, patch_diff: &str) -> Result<usize, &'static str> {
+        if patch_name.is_empty() || patch_diff.is_empty() {
+            return Err("Pacman/AUR: Invalid patch name or content");
+        }
+        let bytes_patched = patch_diff.len();
+        self.applied_patches.push((patch_name.to_string(), bytes_patched));
+        Ok(bytes_patched)
+    }
+
+    pub fn get_applied_patches_count(&self) -> usize {
+        self.applied_patches.len()
+    }
+}
+
+impl Default for PacmanAurHookPatchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 18. VHOST-USER-GPU ZERO-COPY VIRTIO DISPLAY ENGINE (QEMU/KVM INSPIRED)
+// =========================================================================
+
+/// QEMU/KVM Vhost-User GPU zero-copy shared memory render engine
+pub struct VhostUserGpuEngine {
+    resources: BTreeMap<u32, (u32, u32)>, // res_id -> (width, height)
+    render_queue: Vec<(u32, Vec<u8>)>,
+}
+
+impl VhostUserGpuEngine {
+    pub fn new() -> Self {
+        Self {
+            resources: BTreeMap::new(),
+            render_queue: Vec::new(),
+        }
+    }
+
+    /// Allocate virtio-gpu 2D/3D resource buffer
+    pub fn create_gpu_resource(&mut self, res_id: u32, width: u32, height: u32) -> Result<usize, &'static str> {
+        if width == 0 || height == 0 {
+            return Err("Vhost-User-GPU: Invalid dimensions");
+        }
+        let buffer_bytes = (width as usize) * (height as usize) * 4; // RGBA 32-bit
+        self.resources.insert(res_id, (width, height));
+        Ok(buffer_bytes)
+    }
+
+    /// Submit zero-copy 3D render command payload for virtio GPU dispatch
+    pub fn submit_3d_render_cmd(&mut self, res_id: u32, cmd_bytes: &[u8]) -> Result<usize, &'static str> {
+        if !self.resources.contains_key(&res_id) {
+            return Err("Vhost-User-GPU: Resource ID not allocated");
+        }
+        let len = cmd_bytes.len();
+        self.render_queue.push((res_id, cmd_bytes.to_vec()));
+        Ok(len)
+    }
+
+    pub fn get_pending_render_commands(&self) -> usize {
+        self.render_queue.len()
+    }
+}
+
+impl Default for VhostUserGpuEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 3. NETBSD (Userland Rump Kernel Driver Isolation & Autoconf Engine)
 // =========================================================================
 
@@ -342,7 +488,13 @@ impl HaikuBfsAttributeEngine {
         Self { files: Vec::new() }
     }
 
-    pub fn add_file_attribute(&mut self, path: &str, key: &str, val_str: &str, val_int: Option<i64>) {
+    pub fn add_file_attribute(
+        &mut self,
+        path: &str,
+        key: &str,
+        val_str: &str,
+        val_int: Option<i64>,
+    ) {
         let attr = BfsAttribute {
             key: key.to_string(),
             value_string: val_str.to_string(),
@@ -363,7 +515,11 @@ impl HaikuBfsAttributeEngine {
     pub fn query_by_attribute(&self, key: &str, val_str: &str) -> Vec<String> {
         self.files
             .iter()
-            .filter(|f| f.attributes.iter().any(|a| a.key == key && a.value_string == val_str))
+            .filter(|f| {
+                f.attributes
+                    .iter()
+                    .any(|a| a.key == key && a.value_string == val_str)
+            })
             .map(|f| f.file_path.clone())
             .collect()
     }
@@ -461,8 +617,17 @@ impl AndroidApexContainerModuleEngine {
         }
     }
 
-    pub fn register_apex_module(&mut self, pkg_name: &str, version: u64, mount_point: &str) -> bool {
-        if self.modules.iter().any(|m| m.package_name == pkg_name && m.version_code == version) {
+    pub fn register_apex_module(
+        &mut self,
+        pkg_name: &str,
+        version: u64,
+        mount_point: &str,
+    ) -> bool {
+        if self
+            .modules
+            .iter()
+            .any(|m| m.package_name == pkg_name && m.version_code == version)
+        {
             return false;
         }
         self.modules.push(AndroidApexModule {
@@ -563,7 +728,11 @@ impl RosettaDynamicBinaryTranslator {
     }
 
     pub fn translate_instruction_block(&mut self, src_addr: u64, src_code: &[u8]) -> Vec<u8> {
-        if let Some(block) = self.translation_cache.iter_mut().find(|b| b.source_addr == src_addr) {
+        if let Some(block) = self
+            .translation_cache
+            .iter_mut()
+            .find(|b| b.source_addr == src_addr)
+        {
             block.hit_count += 1;
             return block.translated_instructions.clone();
         }
@@ -658,7 +827,11 @@ impl DistroWatchParityMetricsHub {
         if self.distros.is_empty() {
             return 0.0;
         }
-        let sum: u64 = self.distros.iter().map(|d| d.parity_percentage as u64).sum();
+        let sum: u64 = self
+            .distros
+            .iter()
+            .map(|d| d.parity_percentage as u64)
+            .sum();
         (sum as f64) / (self.distros.len() as f64)
     }
 }
@@ -809,7 +982,8 @@ impl Hammer2StorageEngine {
 
     pub fn write_block(&mut self, pfs_name: &str, block_id: u64, payload: &[u8]) {
         let checksum = Self::compute_checksum(payload);
-        self.blocks.retain(|b| !(b.pfs_name == pfs_name && b.block_id == block_id));
+        self.blocks
+            .retain(|b| !(b.pfs_name == pfs_name && b.block_id == block_id));
         self.blocks.push(Hammer2Block {
             block_id,
             pfs_name: pfs_name.to_string(),
@@ -824,7 +998,9 @@ impl Hammer2StorageEngine {
         let snap_id = (self.snapshots.len() + 1) as u32;
         let mut merkle_sum: u64 = 0;
         for b in self.blocks.iter().filter(|b| b.pfs_name == pfs_name) {
-            merkle_sum = merkle_sum.wrapping_add(b.crc32_checksum as u64).wrapping_mul(6364136223846793005);
+            merkle_sum = merkle_sum
+                .wrapping_add(b.crc32_checksum as u64)
+                .wrapping_mul(6364136223846793005);
         }
 
         self.snapshots.push(Hammer2PfsSnapshot {
@@ -1217,17 +1393,26 @@ impl TempleOsHolyCCompilerEngine {
         }
     }
 
-    pub fn compile_holyc_jit(&mut self, symbol_name: &str, code_str: &str) -> Result<usize, &'static str> {
+    pub fn compile_holyc_jit(
+        &mut self,
+        symbol_name: &str,
+        code_str: &str,
+    ) -> Result<usize, &'static str> {
         if code_str.is_empty() {
             return Err("TempleOS HolyC: Empty source code");
         }
         let bytecode = format!("HolyC_JIT_NATIVE[{}]", code_str).into_bytes();
         let len = bytecode.len();
-        self.compiled_symbols.insert(symbol_name.to_string(), bytecode);
+        self.compiled_symbols
+            .insert(symbol_name.to_string(), bytecode);
         Ok(len)
     }
 
-    pub fn spawn_cooperative_task(&mut self, name: &str, symbol_name: &str) -> Result<u32, &'static str> {
+    pub fn spawn_cooperative_task(
+        &mut self,
+        name: &str,
+        symbol_name: &str,
+    ) -> Result<u32, &'static str> {
         if !self.compiled_symbols.contains_key(symbol_name) {
             return Err("TempleOS HolyC: Uncompiled function symbol");
         }
@@ -1301,9 +1486,15 @@ impl DTraceAggregation {
         match self.op {
             DTraceAggregationOp::Count => self.values.len() as f64,
             DTraceAggregationOp::Sum => self.values.iter().sum(),
-            DTraceAggregationOp::Avg => self.values.iter().sum::<f64>() / (self.values.len() as f64),
+            DTraceAggregationOp::Avg => {
+                self.values.iter().sum::<f64>() / (self.values.len() as f64)
+            }
             DTraceAggregationOp::Min => self.values.iter().cloned().fold(f64::INFINITY, f64::min),
-            DTraceAggregationOp::Max => self.values.iter().cloned().fold(f64::NEG_INFINITY, f64::max),
+            DTraceAggregationOp::Max => self
+                .values
+                .iter()
+                .cloned()
+                .fold(f64::NEG_INFINITY, f64::max),
         }
     }
 }
@@ -1333,7 +1524,11 @@ impl DTraceDynamicTracingEngine {
     }
 
     pub fn enable_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(probe) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
+        if let Some(probe) = self
+            .probes
+            .iter_mut()
+            .find(|p| p.provider == provider && p.name == name)
+        {
             probe.state = DTraceProbeState::Enabled;
             true
         } else {
@@ -1342,7 +1537,9 @@ impl DTraceDynamicTracingEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, name: &str, arg_value: Option<f64>) -> bool {
-        if let Some(probe) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name && p.state == DTraceProbeState::Enabled) {
+        if let Some(probe) = self.probes.iter_mut().find(|p| {
+            p.provider == provider && p.name == name && p.state == DTraceProbeState::Enabled
+        }) {
             probe.hit_count += 1;
             if let Some(val) = arg_value {
                 let agg_name = format!("{}:{}", provider, name);
@@ -1438,14 +1635,19 @@ impl NixStoreGarbageCollectorEngine {
     pub fn collect_garbage(&mut self) -> usize {
         let mut reachable = Vec::new();
 
-        if let Some(active_gen) = self.profiles.iter().find(|p| p.generation_number == self.active_profile_generation) {
+        if let Some(active_gen) = self
+            .profiles
+            .iter()
+            .find(|p| p.generation_number == self.active_profile_generation)
+        {
             for root in &active_gen.active_root_paths {
                 self.mark_closure(root, &mut reachable);
             }
         }
 
         let original_len = self.store_paths.len();
-        self.store_paths.retain(|p| reachable.contains(&p.store_path));
+        self.store_paths
+            .retain(|p| reachable.contains(&p.store_path));
         original_len - self.store_paths.len()
     }
 
@@ -1782,7 +1984,10 @@ impl GenodeCapabilityRouterEngine {
     pub fn request_session(&mut self, cap_id: u64) -> Result<String, &'static str> {
         if let Some(cap) = self.capabilities.iter().find(|c| c.cap_id == cap_id) {
             self.active_sessions_count += 1;
-            Ok(format!("GenodeSession[{}:{}]", cap.service_name, cap.local_name))
+            Ok(format!(
+                "GenodeSession[{}:{}]",
+                cap.service_name, cap.local_name
+            ))
         } else {
             Err("Genode Router: Invalid capability delegation")
         }
@@ -1830,7 +2035,13 @@ impl FuchsiaZirconChannelEngine {
         self.handles.push(ZirconHandle { handle_val, rights });
     }
 
-    pub fn channel_write(&mut self, txid: u32, ordinal: u64, bytes: &[u8], handles: Vec<ZirconHandle>) {
+    pub fn channel_write(
+        &mut self,
+        txid: u32,
+        ordinal: u64,
+        bytes: &[u8],
+        handles: Vec<ZirconHandle>,
+    ) {
         self.channel_messages.push(ZirconChannelMessage {
             txid,
             ordinal,
@@ -1879,7 +2090,11 @@ impl VoidXbpsTriggerEngine {
     }
 
     pub fn register_trigger(&mut self, name: &str, dir: &str) {
-        if !self.registered_triggers.iter().any(|t| t.trigger_name == name) {
+        if !self
+            .registered_triggers
+            .iter()
+            .any(|t| t.trigger_name == name)
+        {
             self.registered_triggers.push(XbpsTriggerHook {
                 trigger_name: name.to_string(),
                 target_directory: dir.to_string(),
@@ -1937,7 +2152,10 @@ impl AlpineApk3SignatureEngine {
     }
 
     pub fn verify_apk3_package(&mut self, pkg: &Apk3PackageManifest) -> bool {
-        if self.trusted_keys.is_empty() || pkg.sha256_checksum.is_empty() || pkg.ed25519_signature.is_empty() {
+        if self.trusted_keys.is_empty()
+            || pkg.sha256_checksum.is_empty()
+            || pkg.ed25519_signature.is_empty()
+        {
             return false;
         }
         // Verification succeeds if signature payload matches trusted key domain
@@ -2110,7 +2328,11 @@ impl FreeBsdGeomTopologyEngine {
         });
     }
 
-    pub fn dispatch_bio(&self, provider_name: &str, req: GeomBioRequest) -> Result<usize, &'static str> {
+    pub fn dispatch_bio(
+        &self,
+        provider_name: &str,
+        req: GeomBioRequest,
+    ) -> Result<usize, &'static str> {
         let provider = self
             .providers
             .iter()
@@ -2186,7 +2408,10 @@ mod tests {
 
         let walk_res = engine.process_message(walk_req).unwrap();
         assert_eq!(walk_res.msg_type, Plan9MessageType::Rwalk);
-        assert_eq!(engine.active_fids.get(&11), Some(&"/n/local/bin".to_string()));
+        assert_eq!(
+            engine.active_fids.get(&11),
+            Some(&"/n/local/bin".to_string())
+        );
     }
 
     #[test]
@@ -2229,7 +2454,9 @@ mod tests {
     fn test_smartos_crossbow_vnic_engine() {
         let mut crossbow = SmartOsCrossbowVnicEngine::new();
         crossbow.create_etherstub("stub0");
-        assert!(crossbow.create_vnic("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000).is_ok());
+        assert!(crossbow
+            .create_vnic("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000)
+            .is_ok());
 
         let vnic = crossbow.lookup_vnic("vnic0").unwrap();
         assert_eq!(vnic.parent_interface, "stub0");
@@ -2239,10 +2466,20 @@ mod tests {
     #[test]
     fn test_android_apex_container_module_engine() {
         let mut engine = AndroidApexContainerModuleEngine::new();
-        assert!(engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
-        assert!(!engine.register_apex_module("com.android.runtime", 330000000, "/apex/com.android.runtime"));
+        assert!(engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
+        assert!(!engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
 
-        assert!(engine.activate_module("com.android.runtime", 330000000).is_ok());
+        assert!(engine
+            .activate_module("com.android.runtime", 330000000)
+            .is_ok());
         assert_eq!(engine.active_mounts, 1);
 
         let version = engine.rollback_module("com.android.runtime").unwrap();
@@ -2320,7 +2557,10 @@ mod tests {
         vnet.add_interface(1, "epair0a", "192.168.1.10");
         vnet.add_route(1, "0.0.0.0/0", "192.168.1.1");
 
-        assert_eq!(vnet.route_lookup(1, "8.8.8.8"), Some("192.168.1.1".to_string()));
+        assert_eq!(
+            vnet.route_lookup(1, "8.8.8.8"),
+            Some("192.168.1.1".to_string())
+        );
     }
 
     #[test]
@@ -2358,18 +2598,28 @@ mod tests {
         assert_eq!(handle, 1);
         assert_eq!(nt.objects.len(), 1);
 
-        nt.reg_set_value("HKLM\\SYSTEM\\CurrentControlSet", "Start", &[0x02, 0x00, 0x00, 0x00]);
-        let val = nt.reg_query_value("HKLM\\SYSTEM\\CurrentControlSet", "Start").unwrap();
+        nt.reg_set_value(
+            "HKLM\\SYSTEM\\CurrentControlSet",
+            "Start",
+            &[0x02, 0x00, 0x00, 0x00],
+        );
+        let val = nt
+            .reg_query_value("HKLM\\SYSTEM\\CurrentControlSet", "Start")
+            .unwrap();
         assert_eq!(val, vec![0x02, 0x00, 0x00, 0x00]);
     }
 
     #[test]
     fn test_templeos_holyc_compiler_and_cooperative_tasking() {
         let mut holyc = TempleOsHolyCCompilerEngine::new();
-        let len = holyc.compile_holyc_jit("DrawMatrix", "U0 Main() { Print(\"TempleOS\"); }").unwrap();
+        let len = holyc
+            .compile_holyc_jit("DrawMatrix", "U0 Main() { Print(\"TempleOS\"); }")
+            .unwrap();
         assert!(len > 0);
 
-        let task_id = holyc.spawn_cooperative_task("RenderTask", "DrawMatrix").unwrap();
+        let task_id = holyc
+            .spawn_cooperative_task("RenderTask", "DrawMatrix")
+            .unwrap();
         assert_eq!(task_id, 1);
         assert!(holyc.yield_cooperative_task(task_id));
         assert!(holyc.tasks[0].is_completed);
@@ -2475,7 +2725,10 @@ mod tests {
         let mut zircon = FuchsiaZirconChannelEngine::new();
         zircon.create_handle(0x01, 0x03);
 
-        let handles = vec![ZirconHandle { handle_val: 0x01, rights: 0x03 }];
+        let handles = vec![ZirconHandle {
+            handle_val: 0x01,
+            rights: 0x03,
+        }];
         zircon.channel_write(101, 0x00FF_1122, b"fidl_req", handles);
 
         let msg = zircon.channel_read().unwrap();
@@ -2505,7 +2758,8 @@ mod tests {
         let pkg = Apk3PackageManifest {
             pkg_name: "curl".to_string(),
             version: "8.5.0-r0".to_string(),
-            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .to_string(),
             ed25519_signature: vec![0xAB, 0xCD, 0xEF],
         };
 
@@ -2540,7 +2794,13 @@ mod tests {
     #[test]
     fn test_freebsd_geom_topology_engine() {
         let mut geom = FreeBsdGeomTopologyEngine::new();
-        geom.register_provider("mirror0", GeomClassType::Mirror, 512, 2097152, &["ada0", "ada1"]);
+        geom.register_provider(
+            "mirror0",
+            GeomClassType::Mirror,
+            512,
+            2097152,
+            &["ada0", "ada1"],
+        );
 
         let req = GeomBioRequest {
             cmd: GeomBioCmd::Read,
@@ -2582,7 +2842,9 @@ mod tests {
         assert_ne!(split_dir, "Unknown");
 
         // 6. FreeBSD / OpenBSD Security
-        assert!(suite.apply_pledge_and_unveil(&["stdio", "rpath"], "/etc", "r").is_ok());
+        assert!(suite
+            .apply_pledge_and_unveil(&["stdio", "rpath"], "/etc", "r")
+            .is_ok());
 
         // 7. DragonFly BSD HAMMER2
         suite.write_hammer2_block("@pfs_root", 1, b"hammer2_data");
@@ -2593,7 +2855,61 @@ mod tests {
         assert_eq!(vol.capacity_gb, 100);
         assert!(vol.encrypted);
 
+        // 9. Extended Open Source Supremacy Features
+        assert!(suite.supervise_systemd_free_init("openrc-service"));
+        assert!(suite.throttle_racct_resource(1234, 80));
+        assert!(suite.process_xdp_zero_copy_packet(1500));
+        assert!(suite.scrub_tiered_storage_extent(101));
+
         assert!(suite.evaluate_open_source_project_supremacy());
+    }
+
+    #[test]
+    fn test_ebpf_sockmap_redirect_engine() {
+        let mut engine = EbpfSockmapRedirectEngine::new();
+        engine.map_socket(1001, 2002);
+
+        let payload = b"GET /fast-path HTTP/1.1\r\n";
+        let res = engine.redirect_socket_msg(1001, payload);
+        assert!(res.is_ok());
+        let (target_fd, data) = res.unwrap();
+        assert_eq!(target_fd, 2002);
+        assert_eq!(data, payload);
+        assert_eq!(engine.get_active_redirects(), 1);
+
+        assert!(engine.redirect_socket_msg(9999, payload).is_err());
+    }
+
+    #[test]
+    fn test_pacman_aur_hook_patch_engine() {
+        let mut engine = PacmanAurHookPatchEngine::new();
+        engine.register_hook("PreTransaction", "systemctl stop service");
+        engine.register_hook("PostTransaction", "systemctl daemon-reload");
+
+        let pre_hooks = engine.trigger_hooks("PreTransaction");
+        assert_eq!(pre_hooks.len(), 1);
+        assert_eq!(pre_hooks[0], "systemctl stop service");
+
+        let patch_diff = "--- src/main.c\n+++ src/main.c\n@@ -1 +1 @@\n-old\n+new";
+        let res = engine.apply_pkgbuild_patch("fix-arch.patch", patch_diff);
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), patch_diff.len());
+        assert_eq!(engine.get_applied_patches_count(), 1);
+    }
+
+    #[test]
+    fn test_vhost_user_gpu_engine() {
+        let mut engine = VhostUserGpuEngine::new();
+        let bytes = engine.create_gpu_resource(1, 1920, 1080).unwrap();
+        assert_eq!(bytes, 1920 * 1080 * 4);
+
+        let cmd = b"\x01\x02\x03\x043D_RENDER_DRAW_INDEXED";
+        let res = engine.submit_3d_render_cmd(1, cmd);
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), cmd.len());
+        assert_eq!(engine.get_pending_render_commands(), 1);
+
+        assert!(engine.submit_3d_render_cmd(99, cmd).is_err());
     }
 }
 
@@ -2680,7 +2996,11 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Void Linux: Start Runit supervised service process
-    pub fn start_runit_service(&mut self, service_name: &str, pid: u32) -> Result<(), &'static str> {
+    pub fn start_runit_service(
+        &mut self,
+        service_name: &str,
+        pid: u32,
+    ) -> Result<(), &'static str> {
         if let Some(p) = self.runit_services.get_mut(service_name) {
             *p = pid;
             Ok(())
@@ -2711,14 +3031,17 @@ impl OpenSourceProjectSupremacySuite {
                 self.pledge_promises.push(p.to_string());
             }
         }
-        self.unveiled_paths.push((path.to_string(), perms.to_string()));
+        self.unveiled_paths
+            .push((path.to_string(), perms.to_string()));
         Ok(())
     }
 
     /// DragonFly BSD: Write HAMMER2 PFS CoW block
     pub fn write_hammer2_block(&mut self, pfs: &str, block_id: u64, payload: &[u8]) {
-        self.hammer2_blocks.retain(|(p, id, _)| !(p == pfs && *id == block_id));
-        self.hammer2_blocks.push((pfs.to_string(), block_id, payload.to_vec()));
+        self.hammer2_blocks
+            .retain(|(p, id, _)| !(p == pfs && *id == block_id));
+        self.hammer2_blocks
+            .push((pfs.to_string(), block_id, payload.to_vec()));
     }
 
     /// DragonFly BSD: Verify HAMMER2 PFS integrity
@@ -2742,15 +3065,14 @@ impl OpenSourceProjectSupremacySuite {
             encrypted,
             attached_instance_id: None,
         };
-        self.cinder_volumes.insert(volume_id.to_string(), record.clone());
+        self.cinder_volumes
+            .insert(volume_id.to_string(), record.clone());
         Ok(record)
     }
 
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {
-        self.amnesic_active
-            && !self.stateless_factory_path.is_empty()
-            && self.runit_stage == 2
+        self.amnesic_active && !self.stateless_factory_path.is_empty() && self.runit_stage == 2
     }
 }
 

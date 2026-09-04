@@ -12,12 +12,6 @@ pub use sigma_sh::{
     SovereignSigmaShRepl, ZshPromptFormatter,
 };
 
-pub use sigma_sh::{
-    AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
-    ParameterExpansionEngine, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
-    SovereignSigmaShRepl, ZshPromptFormatter,
-};
-
 // pub use repl::{ShellCommand, ShellRepl};
 pub use alias_system::{AliasManager, AliasType, SigmaAlias};
 pub use command::{

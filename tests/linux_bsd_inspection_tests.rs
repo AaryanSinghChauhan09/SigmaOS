@@ -20,6 +20,20 @@ mod sysctl;
 mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+#[path = "../src/distro/ready_to_use.rs"]
+mod ready_to_use;
+#[path = "../src/compatibility/garuda_zen.rs"]
+mod garuda_zen;
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+#[path = "../src/compatibility/zorin.rs"]
+mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
@@ -62,36 +76,6 @@ mod sigma_boot;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd_compat;
-#[path = "../src/distro/wiki_ideas_implementation.rs"]
-mod wiki_ideas_implementation;
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-#[path = "../src/compatibility/zorin.rs"]
-mod zorin;
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
-#[path = "../src/package/hardening.rs"]
-mod hardening;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
-#[path = "../src/open_source_os_gap_closure.rs"]
-mod open_source_os_gap_closure;
-
-#[path = "../src/security/capability.rs"]
-mod capability;
-
-pub mod security {
-    pub use super::capability::Permission;
-}
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
 use wiki_ideas_implementation as wiki_ideas;

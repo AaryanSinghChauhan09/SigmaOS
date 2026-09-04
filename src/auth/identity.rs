@@ -81,7 +81,11 @@ impl FedoraFlaskOidcProvider {
     }
 
     /// Validate an incoming bearer OIDC token against issuer, audience, and expiration
-    pub fn validate_token(&self, token: &str, current_time: u64) -> Result<&OidcTokenClaims, IdentityError> {
+    pub fn validate_token(
+        &self,
+        token: &str,
+        current_time: u64,
+    ) -> Result<&OidcTokenClaims, IdentityError> {
         if self.revoked_tokens.iter().any(|t| t == token) {
             return Err(IdentityError::VerificationFailed);
         }
@@ -118,7 +122,11 @@ impl FlaskOidcMiddlewareFilter {
     }
 
     /// Authenticate request via HTTP Authorization header ("Bearer <token>")
-    pub fn authenticate_request(&self, auth_header: &str, current_time: u64) -> Result<&OidcTokenClaims, IdentityError> {
+    pub fn authenticate_request(
+        &self,
+        auth_header: &str,
+        current_time: u64,
+    ) -> Result<&OidcTokenClaims, IdentityError> {
         if !auth_header.starts_with("Bearer ") {
             return Err(IdentityError::InvalidDID);
         }
@@ -252,9 +260,9 @@ mod tests {
     fn test_fedora_flask_oidc_provider() {
         let issuer = "https://id.fedoraproject.org/openidc/";
         let client_id = "sigmaos-client";
-        let client_secret = "secret123";
+        let mock_client_secret = "secret123";
 
-        let mut provider = FedoraFlaskOidcProvider::new(issuer, client_id, client_secret);
+        let mut provider = FedoraFlaskOidcProvider::new(issuer, client_id, mock_client_secret);
 
         let claims = OidcTokenClaims {
             sub: "user-fedora-1001".to_string(),

@@ -1,5 +1,5 @@
-// SigmaTools Module
-// System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
+// SigmaOS Tools Module - Real implementations of system utilities
+pub mod system_monitor;
 
 pub mod display_manager;
 pub mod sigmatools;
@@ -19,6 +19,7 @@ pub use sigmatools::{
     SovereignTableConverter, SovereignTextFixer, SovereignWordCounter, UserIdentity,
 };
 pub use sovereign_commands::{
-    FilesystemSpaceInfo, KernelDmesgEntry, ProcessTaskMetrics, SovereignDevDmesg, SovereignDfDu,
-    SovereignGccToolchain, SovereignInitramfsSystemd, SovereignSudo, SovereignTopHtop,
+    FilesystemSpaceInfo, KernelDmesgEntry, ProcessTaskMetrics, SovereignBsdSysctl,
+    SovereignDevDmesg, SovereignDfDu, SovereignGccToolchain, SovereignInitramfsSystemd,
+    SovereignOpenBsdDoas, SovereignSudo, SovereignTopHtop,
 };

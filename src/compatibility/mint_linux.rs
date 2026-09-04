@@ -355,21 +355,8 @@ impl CinnamonThemeEngine {
         let default_name = b"Mint-Y-Dark";
         let default_icons = b"Mint-Y";
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                default_name.as_ptr(),
-                theme.as_mut_ptr(),
-                default_name.len(),
-            );
-            core::ptr::copy_nonoverlapping(
-                default_name.as_ptr(),
-                theme.as_mut_ptr(),
-                default_name.len(),
-            );
-            core::ptr::copy_nonoverlapping(
-                default_icons.as_ptr(),
-                icon_theme.as_mut_ptr(),
-                default_icons.len(),
-            );
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(default_icons.as_ptr(), icon_theme.as_mut_ptr(), default_icons.len());
         }
         Self {
             active_gtk_theme: theme,

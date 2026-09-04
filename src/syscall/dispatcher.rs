@@ -423,6 +423,186 @@ impl SovereignPledgeManager {
     }
 }
 
+// =========================================================================
+// LINUX IO_URING ASYNCHRONOUS SYSCALL RING BUFFER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct IoUringSqe {
+    pub opcode: u8,
+    pub fd: i32,
+    pub addr: usize,
+    pub len: u32,
+    pub user_data: u64,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct IoUringCqe {
+    pub user_data: u64,
+    pub res: i32,
+    pub flags: u32,
+}
+
+pub struct LinuxIoUringSyscallRing {
+    pub sq_entries: Vec<IoUringSqe>,
+    pub cq_entries: Vec<IoUringCqe>,
+}
+
+impl LinuxIoUringSyscallRing {
+    pub fn new() -> Self {
+        Self {
+            sq_entries: Vec::new(),
+            cq_entries: Vec::new(),
+        }
+    }
+
+    pub fn submit_entry(&mut self, sqe: IoUringSqe) {
+        self.sq_entries.push(sqe);
+    }
+
+    pub fn process_submissions(&mut self) -> usize {
+        let count = self.sq_entries.len();
+        for sqe in self.sq_entries.drain(..) {
+            let res = match sqe.opcode {
+                0 => sqe.len as i32,  // READ
+                1 => sqe.len as i32,  // WRITE
+                2 => 0,               // NOP
+                _ => -38,             // ENOSYS
+            };
+            self.cq_entries.push(IoUringCqe {
+                user_data: sqe.user_data,
+                res,
+                flags: 0,
+            });
+        }
+        count
+    }
+
+    pub fn pop_completion(&mut self) -> Option<IoUringCqe> {
+        if !self.cq_entries.is_empty() {
+            Some(self.cq_entries.remove(0))
+        } else {
+            None
+        }
+    }
+}
+
+// =========================================================================
+// FREEBSD CAPSICUM CAPABILITY RIGHTS GOVERNOR
+// =========================================================================
+
+pub const CAP_READ: u64 = 0x0000000000000001;
+pub const CAP_WRITE: u64 = 0x0000000000000002;
+pub const CAP_FSTAT: u64 = 0x0000000000000004;
+pub const CAP_SEEK: u64 = 0x0000000000000008;
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdCapsicumRightsGovernor {
+    pub fd_rights: Vec<(i32, u64)>, // (FD, Bitmask of allowed CapRights)
+}
+
+impl FreeBsdCapsicumRightsGovernor {
+    pub fn new() -> Self {
+        Self { fd_rights: Vec::new() }
+    }
+
+    pub fn set_rights(&mut self, fd: i32, rights_mask: u64) {
+        if let Some(entry) = self.fd_rights.iter_mut().find(|(f, _)| *f == fd) {
+            entry.1 = rights_mask;
+        } else {
+            self.fd_rights.push((fd, rights_mask));
+        }
+    }
+
+    pub fn check_right(&self, fd: i32, required_right: u64) -> bool {
+        for (f, mask) in &self.fd_rights {
+            if *f == fd {
+                return (mask & required_right) == required_right;
+            }
+        }
+        false
+    }
+}
+
+// =========================================================================
+// OPENBSD UNVEIL PATH FILESYSTEM SANDBOX
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdUnveilPathSandbox {
+    pub permissions: Vec<(String, String)>, // (Path, "r", "w", "x", "c" permissions)
+}
+
+impl OpenBsdUnveilPathSandbox {
+    pub fn new() -> Self {
+        Self { permissions: Vec::new() }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
+        if path.is_empty() {
+            return Err("Unveil: Empty path");
+        }
+        self.permissions.push((path.to_string(), permissions.to_string()));
+        Ok(())
+    }
+
+    pub fn is_path_access_permitted(&self, target_path: &str, req_perm: char) -> bool {
+        for (unveiled_path, perms) in &self.permissions {
+            if target_path.starts_with(unveiled_path) {
+                if perms.contains(req_perm) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+// =========================================================================
+// LINUX SECCOMP-BPF SYSCALL FILTER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    Trap,
+    Kill,
+    Errno(u16),
+}
+
+#[derive(Debug, Clone)]
+pub struct SeccompRule {
+    pub syscall_num: usize,
+    pub action: SeccompAction,
+}
+
+pub struct LinuxSeccompBpfSyscallFilter {
+    pub default_action: SeccompAction,
+    pub rules: Vec<SeccompRule>,
+}
+
+impl LinuxSeccompBpfSyscallFilter {
+    pub fn new(default_action: SeccompAction) -> Self {
+        Self {
+            default_action,
+            rules: Vec::new(),
+        }
+    }
+
+    pub fn add_rule(&mut self, syscall_num: usize, action: SeccompAction) {
+        self.rules.push(SeccompRule { syscall_num, action });
+    }
+
+    pub fn evaluate_syscall(&self, syscall_num: usize) -> SeccompAction {
+        for rule in &self.rules {
+            if rule.syscall_num == syscall_num {
+                return rule.action;
+            }
+        }
+        self.default_action
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -482,5 +662,71 @@ mod tests {
         assert!(pledge.is_syscall_permitted(SyscallNumber::Write));
         assert!(pledge.is_syscall_permitted(SyscallNumber::Open));
         assert!(!pledge.is_syscall_permitted(SyscallNumber::Socket));
+    }
+
+    #[test]
+    fn test_linux_io_uring_syscall_ring() {
+        let mut ring = LinuxIoUringSyscallRing::new();
+        ring.submit_entry(IoUringSqe {
+            opcode: 0, // READ
+            fd: 3,
+            addr: 0x1000,
+            len: 128,
+            user_data: 0x11223344,
+        });
+        ring.submit_entry(IoUringSqe {
+            opcode: 1, // WRITE
+            fd: 4,
+            addr: 0x2000,
+            len: 256,
+            user_data: 0x55667788,
+        });
+
+        let processed = ring.process_submissions();
+        assert_eq!(processed, 2);
+
+        let cqe1 = ring.pop_completion().unwrap();
+        assert_eq!(cqe1.user_data, 0x11223344);
+        assert_eq!(cqe1.res, 128);
+
+        let cqe2 = ring.pop_completion().unwrap();
+        assert_eq!(cqe2.user_data, 0x55667788);
+        assert_eq!(cqe2.res, 256);
+    }
+
+    #[test]
+    fn test_freebsd_capsicum_rights_governor() {
+        let mut gov = FreeBsdCapsicumRightsGovernor::new();
+        gov.set_rights(3, CAP_READ | CAP_SEEK);
+
+        assert!(gov.check_right(3, CAP_READ));
+        assert!(gov.check_right(3, CAP_SEEK));
+        assert!(!gov.check_right(3, CAP_WRITE));
+        assert!(!gov.check_right(4, CAP_READ));
+    }
+
+    #[test]
+    fn test_openbsd_unveil_path_sandbox() {
+        let mut sandbox = OpenBsdUnveilPathSandbox::new();
+        assert!(sandbox.unveil("/userland/home", "rw").is_ok());
+        assert!(sandbox.unveil("/usr/bin", "rx").is_ok());
+
+        assert!(sandbox.is_path_access_permitted("/userland/home/file.txt", 'r'));
+        assert!(sandbox.is_path_access_permitted("/userland/home/file.txt", 'w'));
+        assert!(!sandbox.is_path_access_permitted("/userland/home/file.txt", 'x'));
+        assert!(!sandbox.is_path_access_permitted("/etc/shadow", 'r'));
+    }
+
+    #[test]
+    fn test_linux_seccomp_bpf_filter() {
+        let mut filter = LinuxSeccompBpfSyscallFilter::new(SeccompAction::Kill);
+        filter.add_rule(0, SeccompAction::Allow); // Read
+        filter.add_rule(1, SeccompAction::Allow); // Write
+        filter.add_rule(19, SeccompAction::Errno(13)); // Socket -> EACCES
+
+        assert_eq!(filter.evaluate_syscall(0), SeccompAction::Allow);
+        assert_eq!(filter.evaluate_syscall(1), SeccompAction::Allow);
+        assert_eq!(filter.evaluate_syscall(19), SeccompAction::Errno(13));
+        assert_eq!(filter.evaluate_syscall(99), SeccompAction::Kill);
     }
 }

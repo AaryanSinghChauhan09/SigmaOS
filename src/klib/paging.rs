@@ -63,22 +63,6 @@ pub enum PrivilegeLevel {
     User = 3,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageSize {
-    Standard4KB,
-    Huge2MB,
-    Giant1GB,
-}
-
-impl PageSize {
-    pub fn byte_size(&self) -> usize {
-        match self {
-            PageSize::Standard4KB => 4 * 1024,
-            PageSize::Huge2MB => 2 * 1024 * 1024,
-            PageSize::Giant1GB => 1024 * 1024 * 1024,
-        }
-    }
-}
 
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
@@ -286,7 +270,7 @@ impl SimpleVMM {
 
     pub fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
-        let _pdpt_idx = self.get_pdpt_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
@@ -296,7 +280,11 @@ impl SimpleVMM {
 
         let pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx;
 
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pt_table_idx).and_then(|opt| opt.as_mut()) {
+        if let Some(ref mut pt) = self
+            .pt_tables
+            .get_mut(pt_table_idx)
+            .and_then(|opt| opt.as_mut())
+        {
             let pt_entry = pt.get_entry(pt_idx);
             pt_entry.set_cow(true);
             pt_entry.set_writable(false);
@@ -306,12 +294,24 @@ impl SimpleVMM {
     }
 
     /// FreeBSD Superpages inspired 2MB contiguous physical frame allocation
-    pub fn allocate_superpage_2mb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
+    pub fn allocate_superpage_2mb(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Huge2MB, user, writable)
     }
 
     /// FreeBSD Superpages inspired 1GB contiguous physical frame allocation
-    pub fn allocate_superpage_1gb(&mut self, virt: VirtualAddress, phys: PhysicalAddress, user: bool, writable: bool) -> Result<(), PageFaultError> {
+    pub fn allocate_superpage_1gb(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError> {
         self.map_large_page(virt, phys, PageSize::Giant1GB, user, writable)
     }
 
@@ -521,7 +521,11 @@ impl VirtualMemoryManager for SimpleVMM {
 
         let pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx;
 
-        if let Some(ref mut pt) = self.pt_tables.get_mut(pt_table_idx).and_then(|opt| opt.as_mut()) {
+        if let Some(ref mut pt) = self
+            .pt_tables
+            .get_mut(pt_table_idx)
+            .and_then(|opt| opt.as_mut())
+        {
             let pt_entry = pt.get_entry(pt_idx);
             pt_entry.set_present(false);
             return Ok(());
@@ -552,7 +556,11 @@ impl VirtualMemoryManager for SimpleVMM {
             }
 
             let pd_table_idx = pml4_idx * 512 + pdpt_idx;
-            if let Some(ref pd) = self.pd_tables.get(pd_table_idx).and_then(|opt| opt.as_ref()) {
+            if let Some(ref pd) = self
+                .pd_tables
+                .get(pd_table_idx)
+                .and_then(|opt| opt.as_ref())
+            {
                 let pd_entry = pd.get_entry_ref(pd_idx);
                 if !pd_entry.is_present() {
                     return None;
@@ -564,7 +572,11 @@ impl VirtualMemoryManager for SimpleVMM {
                 }
 
                 let pt_table_idx = pd_table_idx * 512 + pd_idx;
-                if let Some(ref pt) = self.pt_tables.get(pt_table_idx).and_then(|opt| opt.as_ref()) {
+                if let Some(ref pt) = self
+                    .pt_tables
+                    .get(pt_table_idx)
+                    .and_then(|opt| opt.as_ref())
+                {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;

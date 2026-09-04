@@ -6,14 +6,10 @@ use alloc::vec::Vec;
 use core::mem;
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+/// OOP-based User Authentication for SigmaOS
+/// Based on Roadmap Item 13: User authentication
 
 pub type UserID = usize;
 
@@ -104,7 +100,7 @@ pub trait AuthService {
 }
 
 pub struct SimpleAuthService {
-    users: SovereignVec<Option<Box<dyn User>>>,
+    users: Vec<Option<Box<dyn User>>>,
     next_id: AtomicUsize,
 }
 
@@ -307,7 +303,11 @@ impl FedoraNogginUserPortal {
         Ok(())
     }
 
-    pub fn request_group_membership(&mut self, username: &str, group: &str) -> Result<(), &'static str> {
+    pub fn request_group_membership(
+        &mut self,
+        username: &str,
+        group: &str,
+    ) -> Result<(), &'static str> {
         let acc = self
             .accounts
             .iter_mut()
@@ -322,7 +322,11 @@ impl FedoraNogginUserPortal {
         Ok(())
     }
 
-    pub fn approve_group_membership(&mut self, username: &str, group: &str) -> Result<(), &'static str> {
+    pub fn approve_group_membership(
+        &mut self,
+        username: &str,
+        group: &str,
+    ) -> Result<(), &'static str> {
         let acc = self
             .accounts
             .iter_mut()
@@ -344,7 +348,10 @@ impl FedoraNogginUserPortal {
             .find(|a| a.username == username)
             .ok_or("User account not found")?;
         acc.totp_secret_configured = true;
-        Ok(format!("otpauth://totp/SigmaOS:{}?secret=JBSWY3DPEHPK3PXP&issuer=SigmaOS", username))
+        Ok(format!(
+            "otpauth://totp/SigmaOS:{}?secret=JBSWY3DPEHPK3PXP&issuer=SigmaOS",
+            username
+        ))
     }
 }
 
@@ -430,15 +437,23 @@ mod tests {
         portal.register_account(account);
 
         // SSH key registration
-        assert!(portal.add_ssh_public_key("aaryan", "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...").is_ok());
+        assert!(portal
+            .add_ssh_public_key("aaryan", "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...")
+            .is_ok());
         assert!(portal.add_ssh_public_key("aaryan", "invalid-key").is_err());
 
         // GPG key fingerprint registration
-        assert!(portal.add_gpg_fingerprint("aaryan", "4B62A0D0F5E12345678901234567890123456789").is_ok());
+        assert!(portal
+            .add_gpg_fingerprint("aaryan", "4B62A0D0F5E12345678901234567890123456789")
+            .is_ok());
 
         // Group request and approval
-        assert!(portal.request_group_membership("aaryan", "packagers").is_ok());
-        assert!(portal.approve_group_membership("aaryan", "packagers").is_ok());
+        assert!(portal
+            .request_group_membership("aaryan", "packagers")
+            .is_ok());
+        assert!(portal
+            .approve_group_membership("aaryan", "packagers")
+            .is_ok());
         assert_eq!(portal.accounts[0].approved_groups[0], "packagers");
 
         // 2FA TOTP configuration

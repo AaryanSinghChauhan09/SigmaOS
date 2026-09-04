@@ -1,0 +1,29 @@
+name: Void Runit & Alpine Musl Container Hardened CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  void-alpine-container-verification:
+    name: Void Runit Supervisor & Alpine APK3 Container Isolation Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@39cd7d8a6567312886107b533db551532454b8a0 # v5.5.0
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: pip install pytest
+
+      - name: Run Container & Init Supervisor Integration Tests
+        run: PYTHONDONTWRITEBYTECODE=1 pytest tests/test_unit_core.py tests/test_integration_system.py

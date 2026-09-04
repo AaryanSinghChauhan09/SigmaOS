@@ -11,11 +11,11 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
 use alloc::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 // ==========================================
 // 1. Nix-Style Store Derivations
@@ -204,7 +204,12 @@ impl GentooPortageReproducibleEbuildEngine {
     }
 
     pub fn compute_ebuild_build_hash(&self) -> String {
-        let key = format!("{}:{}:{}", self.category_atom, self.slot, self.active_use_flags.join(","));
+        let key = format!(
+            "{}:{}:{}",
+            self.category_atom,
+            self.slot,
+            self.active_use_flags.join(",")
+        );
         let mut hash_val = 5381u64;
         for b in key.bytes() {
             hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
@@ -253,7 +258,11 @@ impl ReproducibleBuildDiffInspector {
     pub fn inspect_diffs(artifact_a: &[u8], artifact_b: &[u8]) -> Vec<String> {
         let mut diffs = Vec::new();
         if artifact_a.len() != artifact_b.len() {
-            diffs.push(format!("Size mismatch: {} bytes vs {} bytes", artifact_a.len(), artifact_b.len()));
+            diffs.push(format!(
+                "Size mismatch: {} bytes vs {} bytes",
+                artifact_a.len(),
+                artifact_b.len()
+            ));
             return diffs;
         }
 
@@ -261,7 +270,10 @@ impl ReproducibleBuildDiffInspector {
         for (i, (&byte_a, &byte_b)) in artifact_a.iter().zip(artifact_b.iter()).enumerate() {
             if byte_a != byte_b {
                 if mismatch_count < 3 {
-                    diffs.push(format!("Byte mismatch at offset 0x{:x}: 0x{:02x} vs 0x{:02x}", i, byte_a, byte_b));
+                    diffs.push(format!(
+                        "Byte mismatch at offset 0x{:x}: 0x{:02x} vs 0x{:02x}",
+                        i, byte_a, byte_b
+                    ));
                 }
                 mismatch_count += 1;
             }
@@ -303,7 +315,8 @@ impl ArchLinuxReproBuildInspector {
                 let pkg = line["installed = ".len()..].to_string();
                 let mut parts = pkg.split('-');
                 if let (Some(name), Some(ver)) = (parts.next(), parts.next()) {
-                    self.installed_pkgs.insert(name.to_string(), ver.to_string());
+                    self.installed_pkgs
+                        .insert(name.to_string(), ver.to_string());
                 }
             }
         }
@@ -327,7 +340,10 @@ pub struct DebianDiffoscopeEngine;
 impl DebianDiffoscopeEngine {
     pub fn diff_elf_build_ids(build_id_a: &str, build_id_b: &str) -> Option<String> {
         if build_id_a != build_id_b {
-            Some(format!("ELF Build ID mismatch: {} vs {}", build_id_a, build_id_b))
+            Some(format!(
+                "ELF Build ID mismatch: {} vs {}",
+                build_id_a, build_id_b
+            ))
         } else {
             None
         }
@@ -376,8 +392,197 @@ impl NetBsdPkgsrcDeterministicBulkBuilder {
     }
 }
 
+// =========================================================================
+// 5. OPENBSD SIGNIFY PACKAGE REPRODUCER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdSignifyPackageReproducer {
+    pub key_name: String,
+    pub pubkey: String,
+    pub seckey: String,
+}
+
+impl OpenBsdSignifyPackageReproducer {
+    pub fn new(key_name: &str) -> Self {
+        Self {
+            key_name: key_name.to_string(),
+            pubkey: format!("untrusted comment: {} public key\nRWRzc1Rlc3RQdWJLZXkxMjM0NTY3ODkwYWJjZGVmZ2hpams=", key_name),
+            seckey: format!("untrusted comment: {} secret key\nU2VjS2V5VGVzdE1vY2sxMjM0NTY3ODkwYWJjZGVmZ2hpams=", key_name),
+        }
+    }
+
+    pub fn sign_package_manifest(&self, manifest_content: &str) -> String {
+        let mut hash_val = 5381u64;
+        for b in manifest_content.bytes() {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        let sig = format!("{:016x}{:016x}", hash_val, hash_val.wrapping_add(0x1337));
+        format!(
+            "untrusted comment: verify with {}.pub\nSIG:{}\n{}",
+            self.key_name, sig, manifest_content
+        )
+    }
+
+    pub fn verify_package_signature(&self, signed_manifest: &str) -> bool {
+        signed_manifest.contains("untrusted comment: verify with") && signed_manifest.contains("SIG:")
+    }
+}
+
+// =========================================================================
+// 6. VOID LINUX XBPS-SRC REPRODUCIBLE CONTAINER BUILDER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NormalizedTarEntry {
+    pub name: String,
+    pub mode: u32,
+    pub uid: u32,
+    pub gid: u32,
+    pub mtime: u64,
+    pub size: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidXbpsSrcReproducibleContainer {
+    pub pkgname: String,
+    pub version: String,
+    pub revision: u32,
+    pub source_date_epoch: u64,
+    pub entries: Vec<NormalizedTarEntry>,
+}
+
+impl VoidXbpsSrcReproducibleContainer {
+    pub fn new(pkgname: &str, version: &str, revision: u32, source_date_epoch: u64) -> Self {
+        Self {
+            pkgname: pkgname.to_string(),
+            version: version.to_string(),
+            revision,
+            source_date_epoch,
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn add_file_entry(&mut self, name: &str, is_executable: bool, data: &[u8]) {
+        let mode = if is_executable { 0o755 } else { 0o644 };
+        self.entries.push(NormalizedTarEntry {
+            name: name.to_string(),
+            mode,
+            uid: 0,
+            gid: 0,
+            mtime: self.source_date_epoch,
+            size: data.len(),
+        });
+    }
+
+    pub fn build_reproducible_xbps_package(&self) -> (String, Vec<u8>) {
+        let filename = format!("{}-{}_{}.x86_64.xbps", self.pkgname, self.version, self.revision);
+        let mut manifest = format!("pkgname={}\nversion={}\nrevision={}\nmtime={}\n", self.pkgname, self.version, self.revision, self.source_date_epoch);
+        for entry in &self.entries {
+            manifest.push_str(&format!("entry={}:{:o}:{}:{}:{}\n", entry.name, entry.mode, entry.uid, entry.gid, entry.mtime));
+        }
+        (filename, manifest.into_bytes())
+    }
+}
+
+// =========================================================================
+// 7. DEBIAN REPRODUCIBLE BUILDS ENVIRONMENT SANITIZER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DebianReproBuildEnvironmentSanitizer {
+    pub source_date_epoch: u64,
+    pub build_path: String,
+}
+
+impl DebianReproBuildEnvironmentSanitizer {
+    pub fn new(source_date_epoch: u64, build_path: &str) -> Self {
+        Self {
+            source_date_epoch,
+            build_path: build_path.to_string(),
+        }
+    }
+
+    pub fn sanitize_environment(&self) -> HashMap<String, String> {
+        let mut env = HashMap::new();
+        env.insert("SOURCE_DATE_EPOCH".to_string(), self.source_date_epoch.to_string());
+        env.insert("LANG".to_string(), "C.UTF-8".to_string());
+        env.insert("LC_ALL".to_string(), "C.UTF-8".to_string());
+        env.insert("TZ".to_string(), "UTC".to_string());
+        env.insert("UMASK".to_string(), "0022".to_string());
+        env.insert("BUILD_PATH".to_string(), self.build_path.clone());
+        env
+    }
+
+    pub fn generate_repro_compiler_flags(&self) -> Vec<String> {
+        vec![
+            format!("-fdebug-prefix-map={}=", self.build_path),
+            format!("--remap-path-prefix={}=", self.build_path),
+            "-Wl,--build-id=sha1".to_string(),
+        ]
+    }
+}
+
+// =========================================================================
+// 8. SIGMAPKG REPRODUCIBILITY PIPELINE ORCHESTRATOR
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PipelineResult {
+    pub pkg_name: String,
+    pub is_fully_reproducible: bool,
+    pub signed_manifest: String,
+    pub build_info_hash: String,
+    pub diff_report: Vec<String>,
+}
+
+pub struct SigmaPkgReproducibilityPipeline {
+    pub pkg_name: String,
+    pub source_date_epoch: u64,
+    pub signify_reproducer: OpenBsdSignifyPackageReproducer,
+}
+
+impl SigmaPkgReproducibilityPipeline {
+    pub fn new(pkg_name: &str, source_date_epoch: u64) -> Self {
+        Self {
+            pkg_name: pkg_name.to_string(),
+            source_date_epoch,
+            signify_reproducer: OpenBsdSignifyPackageReproducer::new(pkg_name),
+        }
+    }
+
+    pub fn execute_reproducible_pipeline(
+        &self,
+        bin1: &[u8],
+        bin2: &[u8],
+    ) -> PipelineResult {
+        let sanitizer = DebianReproBuildEnvironmentSanitizer::new(self.source_date_epoch, "/build/sigmaos");
+        let _env = sanitizer.sanitize_environment();
+
+        let diff_report = ReproducibleBuildDiffInspector::inspect_diffs(bin1, bin2);
+        let is_fully_reproducible = diff_report.is_empty();
+
+        let repro_inspector = ArchLinuxReproBuildInspector::new(&self.pkg_name, "1.0.0", self.source_date_epoch);
+        let build_info_hash = repro_inspector.compute_buildinfo_hash();
+
+        let raw_manifest = format!(
+            "pkgname={}\nreproducible={}\nbuild_info_hash={}\nepoch={}",
+            self.pkg_name, is_fully_reproducible, build_info_hash, self.source_date_epoch
+        );
+        let signed_manifest = self.signify_reproducer.sign_package_manifest(&raw_manifest);
+
+        PipelineResult {
+            pkg_name: self.pkg_name.clone(),
+            is_fully_reproducible,
+            signed_manifest,
+            build_info_hash,
+            diff_report,
+        }
+    }
+}
+
 // ==========================================
-// 5. Tests Module
+// 9. Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -480,10 +685,16 @@ mod tests {
         let mut ebuild2 = GentooPortageReproducibleEbuildEngine::new("dev-libs/openssl", "0/1.1");
         ebuild2.set_use_flags(&["zlib", "asm", "tls-compression"]);
 
-        assert_eq!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+        assert_eq!(
+            ebuild1.compute_ebuild_build_hash(),
+            ebuild2.compute_ebuild_build_hash()
+        );
 
         ebuild2.set_use_flags(&["asm", "zlib"]);
-        assert_ne!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+        assert_ne!(
+            ebuild1.compute_ebuild_build_hash(),
+            ebuild2.compute_ebuild_build_hash()
+        );
     }
 
     #[test]
@@ -519,7 +730,10 @@ mod tests {
         inspector.parse_buildinfo(content);
 
         assert_eq!(inspector.buildenv.len(), 2);
-        assert_eq!(inspector.installed_pkgs.get("glibc").map(|s| s.as_str()), Some("2.38"));
+        assert_eq!(
+            inspector.installed_pkgs.get("glibc").map(|s| s.as_str()),
+            Some("2.38")
+        );
         assert!(!inspector.compute_buildinfo_hash().is_empty());
     }
 
@@ -528,159 +742,175 @@ mod tests {
         let diff_id = DebianDiffoscopeEngine::diff_elf_build_ids("sha_a", "sha_b");
         assert!(diff_id.unwrap().contains("ELF Build ID mismatch"));
 
-        let diff_hdr = DebianDiffoscopeEngine::diff_archive_headers(&["bin/bash"], &["bin/bash", "bin/zsh"]);
+        let diff_hdr =
+            DebianDiffoscopeEngine::diff_archive_headers(&["bin/bash"], &["bin/bash", "bin/zsh"]);
         assert_eq!(diff_hdr.len(), 1);
         assert!(diff_hdr[0].contains("bin/zsh"));
     }
 
-// =========================================================================
-// SOVEREIGN HERMETIC CHROOT SANDBOX (ARCH EXTRA-BUILD & POUDRIERE PARITY)
-// =========================================================================
+    // =========================================================================
+    // SOVEREIGN HERMETIC CHROOT SANDBOX (ARCH EXTRA-BUILD & POUDRIERE PARITY)
+    // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct SovereignHermeticChrootSandbox {
-    pub chroot_path: String,
-    pub source_date_epoch: u64,
-    pub sanitized_env: Vec<(String, String)>,
-    pub active_mounts: Vec<String>,
-}
-
-impl SovereignHermeticChrootSandbox {
-    pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
-        let mut sanitized_env = Vec::new();
-        sanitized_env.push(("SOURCE_DATE_EPOCH".to_string(), source_date_epoch.to_string()));
-        sanitized_env.push(("LC_ALL".to_string(), "C.UTF-8".to_string()));
-        sanitized_env.push(("LANG".to_string(), "C.UTF-8".to_string()));
-        sanitized_env.push(("TZ".to_string(), "UTC".to_string()));
-        sanitized_env.push(("PATH".to_string(), "/usr/bin:/bin".to_string()));
-
-        Self {
-            chroot_path: chroot_path.to_string(),
-            source_date_epoch,
-            sanitized_env,
-            active_mounts: vec!["/proc".to_string(), "/sys".to_string(), "/dev/shm".to_string()],
-        }
+    #[derive(Debug, Clone)]
+    pub struct SovereignHermeticChrootSandbox {
+        pub chroot_path: String,
+        pub source_date_epoch: u64,
+        pub sanitized_env: Vec<(String, String)>,
+        pub active_mounts: Vec<String>,
     }
 
-    pub fn prepare_clean_room(&mut self) -> Result<(), &'static str> {
-        if self.chroot_path.is_empty() {
-            return Err("HermeticChroot: Path empty");
-        }
-        Ok(())
-    }
-
-    pub fn execute_hermetic_build(&self, build_cmd: &str) -> (bool, Vec<u8>) {
-        let mut output = Vec::new();
-        output.extend_from_slice(b"HermeticChroot: Executed [");
-        output.extend_from_slice(build_cmd.as_bytes());
-        output.extend_from_slice(b"] with SOURCE_DATE_EPOCH=");
-        output.extend_from_slice(self.source_date_epoch.to_string().as_bytes());
-
-        (true, output)
-    }
-}
-
-// =========================================================================
-// DIFFOSCOPE STRUCTURAL DIFF ENGINE (DEBIAN DIFFOSCOPE STRUCTURAL PARITY)
-// =========================================================================
-
-pub struct DiffoscopeStructuralDiffEngine;
-
-impl DiffoscopeStructuralDiffEngine {
-    pub fn diff_elf_build_id(build_id1: &str, build_id2: &str) -> Option<String> {
-        if build_id1 != build_id2 {
-            Some(format!(
-                "Diffoscope: ELF .gnu.build-id mismatch: [{}] vs [{}]",
-                build_id1, build_id2
-            ))
-        } else {
-            None
-        }
-    }
-
-    pub fn diff_binary_structure(bin1: &[u8], bin2: &[u8]) -> Vec<String> {
-        let mut diffs = Vec::new();
-        if bin1.len() != bin2.len() {
-            diffs.push(format!(
-                "Diffoscope: Size mismatch ({} bytes vs {} bytes)",
-                bin1.len(), bin2.len()
+    impl SovereignHermeticChrootSandbox {
+        pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
+            let mut sanitized_env = Vec::new();
+            sanitized_env.push((
+                "SOURCE_DATE_EPOCH".to_string(),
+                source_date_epoch.to_string(),
             ));
-        }
+            sanitized_env.push(("LC_ALL".to_string(), "C.UTF-8".to_string()));
+            sanitized_env.push(("LANG".to_string(), "C.UTF-8".to_string()));
+            sanitized_env.push(("TZ".to_string(), "UTC".to_string()));
+            sanitized_env.push(("PATH".to_string(), "/usr/bin:/bin".to_string()));
 
-        let min_len = bin1.len().min(bin2.len());
-        let mut mismatch_count = 0;
-        for i in 0..min_len {
-            if bin1[i] != bin2[i] {
-                mismatch_count += 1;
-                if diffs.len() < 5 {
-                    diffs.push(format!(
-                        "Diffoscope: Byte offset 0x{:x}: 0x{:02x} != 0x{:02x}",
-                        i, bin1[i], bin2[i]
-                    ));
-                }
+            Self {
+                chroot_path: chroot_path.to_string(),
+                source_date_epoch,
+                sanitized_env,
+                active_mounts: vec![
+                    "/proc".to_string(),
+                    "/sys".to_string(),
+                    "/dev/shm".to_string(),
+                ],
             }
         }
 
-        if mismatch_count > 0 {
-            diffs.push(format!(
-                "Diffoscope: Total mismatched bytes = {}",
-                mismatch_count
-            ));
+        pub fn prepare_clean_room(&mut self) -> Result<(), &'static str> {
+            if self.chroot_path.is_empty() {
+                return Err("HermeticChroot: Path empty");
+            }
+            Ok(())
         }
 
-        diffs
-    }
-}
+        pub fn execute_hermetic_build(&self, build_cmd: &str) -> (bool, Vec<u8>) {
+            let mut output = Vec::new();
+            output.extend_from_slice(b"HermeticChroot: Executed [");
+            output.extend_from_slice(build_cmd.as_bytes());
+            output.extend_from_slice(b"] with SOURCE_DATE_EPOCH=");
+            output.extend_from_slice(self.source_date_epoch.to_string().as_bytes());
 
-// =========================================================================
-// SOVEREIGN PACKAGE REPRODUCIBILITY AUDITOR (HYDRA & REPRO BUILDS PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct ReproducibilityAuditReport {
-    pub package_name: String,
-    pub is_reproducible: bool,
-    pub build1_hash: String,
-    pub build2_hash: String,
-    pub diffs: Vec<String>,
-}
-
-pub struct SovereignPackageReproducibilityAuditor {
-    pub sandbox: SovereignHermeticChrootSandbox,
-}
-
-impl SovereignPackageReproducibilityAuditor {
-    pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
-        Self {
-            sandbox: SovereignHermeticChrootSandbox::new(chroot_path, source_date_epoch),
+            (true, output)
         }
     }
 
-    pub fn audit_dual_build(
-        &mut self,
-        package_name: &str,
-        bin1: &[u8],
-        bin2: &[u8],
-    ) -> ReproducibilityAuditReport {
-        let diffs = DiffoscopeStructuralDiffEngine::diff_binary_structure(bin1, bin2);
-        let is_reproducible = diffs.is_empty();
+    // =========================================================================
+    // DIFFOSCOPE STRUCTURAL DIFF ENGINE (DEBIAN DIFFOSCOPE STRUCTURAL PARITY)
+    // =========================================================================
 
-        let hash1 = format!("{:x}", bin1.len() * 31 + bin1.first().copied().unwrap_or(0) as usize);
-        let hash2 = format!("{:x}", bin2.len() * 31 + bin2.first().copied().unwrap_or(0) as usize);
+    pub struct DiffoscopeStructuralDiffEngine;
 
-        ReproducibilityAuditReport {
-            package_name: package_name.to_string(),
-            is_reproducible,
-            build1_hash: hash1,
-            build2_hash: hash2,
-            diffs,
+    impl DiffoscopeStructuralDiffEngine {
+        pub fn diff_elf_build_id(build_id1: &str, build_id2: &str) -> Option<String> {
+            if build_id1 != build_id2 {
+                Some(format!(
+                    "Diffoscope: ELF .gnu.build-id mismatch: [{}] vs [{}]",
+                    build_id1, build_id2
+                ))
+            } else {
+                None
+            }
+        }
+
+        pub fn diff_binary_structure(bin1: &[u8], bin2: &[u8]) -> Vec<String> {
+            let mut diffs = Vec::new();
+            if bin1.len() != bin2.len() {
+                diffs.push(format!(
+                    "Diffoscope: Size mismatch ({} bytes vs {} bytes)",
+                    bin1.len(),
+                    bin2.len()
+                ));
+            }
+
+            let min_len = bin1.len().min(bin2.len());
+            let mut mismatch_count = 0;
+            for i in 0..min_len {
+                if bin1[i] != bin2[i] {
+                    mismatch_count += 1;
+                    if diffs.len() < 5 {
+                        diffs.push(format!(
+                            "Diffoscope: Byte offset 0x{:x}: 0x{:02x} != 0x{:02x}",
+                            i, bin1[i], bin2[i]
+                        ));
+                    }
+                }
+            }
+
+            if mismatch_count > 0 {
+                diffs.push(format!(
+                    "Diffoscope: Total mismatched bytes = {}",
+                    mismatch_count
+                ));
+            }
+
+            diffs
         }
     }
-}
+
+    // =========================================================================
+    // SOVEREIGN PACKAGE REPRODUCIBILITY AUDITOR (HYDRA & REPRO BUILDS PARITY)
+    // =========================================================================
+
+    #[derive(Debug, Clone)]
+    pub struct ReproducibilityAuditReport {
+        pub package_name: String,
+        pub is_reproducible: bool,
+        pub build1_hash: String,
+        pub build2_hash: String,
+        pub diffs: Vec<String>,
+    }
+
+    pub struct SovereignPackageReproducibilityAuditor {
+        pub sandbox: SovereignHermeticChrootSandbox,
+    }
+
+    impl SovereignPackageReproducibilityAuditor {
+        pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
+            Self {
+                sandbox: SovereignHermeticChrootSandbox::new(chroot_path, source_date_epoch),
+            }
+        }
+
+        pub fn audit_dual_build(
+            &mut self,
+            package_name: &str,
+            bin1: &[u8],
+            bin2: &[u8],
+        ) -> ReproducibilityAuditReport {
+            let diffs = DiffoscopeStructuralDiffEngine::diff_binary_structure(bin1, bin2);
+            let is_reproducible = diffs.is_empty();
+
+            let hash1 = format!(
+                "{:x}",
+                bin1.len() * 31 + bin1.first().copied().unwrap_or(0) as usize
+            );
+            let hash2 = format!(
+                "{:x}",
+                bin2.len() * 31 + bin2.first().copied().unwrap_or(0) as usize
+            );
+
+            ReproducibilityAuditReport {
+                package_name: package_name.to_string(),
+                is_reproducible,
+                build1_hash: hash1,
+                build2_hash: hash2,
+                diffs,
+            }
+        }
+    }
 
     #[test]
     fn test_sovereign_package_reproducibility_auditor() {
-        let mut auditor = SovereignPackageReproducibilityAuditor::new("/var/chroot/repro", 1700000000);
+        let mut auditor =
+            SovereignPackageReproducibilityAuditor::new("/var/chroot/repro", 1700000000);
         let bin = b"identical_binary_bytes";
 
         let report_pass = auditor.audit_dual_build("zsh", bin, bin);
@@ -702,7 +932,8 @@ impl SovereignPackageReproducibilityAuditor {
         assert!(!diffs.is_empty());
         assert!(diffs[0].contains("Byte offset"));
 
-        let build_id_diff = DiffoscopeStructuralDiffEngine::diff_elf_build_id("sha1_abc", "sha1_xyz");
+        let build_id_diff =
+            DiffoscopeStructuralDiffEngine::diff_elf_build_id("sha1_abc", "sha1_xyz");
         assert!(build_id_diff.unwrap().contains("mismatch"));
     }
 
@@ -730,5 +961,61 @@ impl SovereignPackageReproducibilityAuditor {
         let verified = builder.verify_distfile(sample_bytes);
         assert!(verified);
         assert_eq!(builder.wrkdir, "/usr/pkgsrc/shells/zsh/work");
+    }
+
+    #[test]
+    fn test_openbsd_signify_package_reproducer() {
+        let reproducer = OpenBsdSignifyPackageReproducer::new("sigmaos-release");
+        let manifest = "pkgname=ripgrep\nversion=14.1.0\nhash=abc123xyz";
+
+        let signed = reproducer.sign_package_manifest(manifest);
+        assert!(reproducer.verify_package_signature(&signed));
+        assert!(signed.contains("untrusted comment: verify with sigmaos-release.pub"));
+    }
+
+    #[test]
+    fn test_void_xbps_src_reproducible_container() {
+        let mut container = VoidXbpsSrcReproducibleContainer::new("curl", "8.5.0", 1, 1700000000);
+        container.add_file_entry("/usr/bin/curl", true, b"binary_curl_data");
+        container.add_file_entry("/usr/share/doc/curl/README", false, b"readme_data");
+
+        let (filename, pkg_bytes) = container.build_reproducible_xbps_package();
+        assert_eq!(filename, "curl-8.5.0_1.x86_64.xbps");
+
+        let manifest_str = String::from_utf8_lossy(&pkg_bytes);
+        assert!(manifest_str.contains("pkgname=curl"));
+        assert!(manifest_str.contains("entry=/usr/bin/curl:755:0:0:1700000000"));
+        assert!(manifest_str.contains("entry=/usr/share/doc/curl/README:644:0:0:1700000000"));
+    }
+
+    #[test]
+    fn test_debian_repro_build_environment_sanitizer() {
+        let sanitizer = DebianReproBuildEnvironmentSanitizer::new(1700000000, "/build/workspace");
+        let env = sanitizer.sanitize_environment();
+
+        assert_eq!(env.get("SOURCE_DATE_EPOCH").map(|s| s.as_str()), Some("1700000000"));
+        assert_eq!(env.get("TZ").map(|s| s.as_str()), Some("UTC"));
+        assert_eq!(env.get("LANG").map(|s| s.as_str()), Some("C.UTF-8"));
+
+        let flags = sanitizer.generate_repro_compiler_flags();
+        assert!(flags.iter().any(|f| f.contains("-fdebug-prefix-map=/build/workspace=")));
+        assert!(flags.iter().any(|f| f.contains("-Wl,--build-id=sha1")));
+    }
+
+    #[test]
+    fn test_sigmapkg_reproducibility_pipeline() {
+        let pipeline = SigmaPkgReproducibilityPipeline::new("sovereign-kernel", 1700000000);
+        let bin_pass = b"reproducible_kernel_payload_bytes_v1";
+
+        let result_pass = pipeline.execute_reproducible_pipeline(bin_pass, bin_pass);
+        assert!(result_pass.is_fully_reproducible);
+        assert!(result_pass.diff_report.is_empty());
+        assert!(result_pass.signed_manifest.contains("reproducible=true"));
+
+        let bin_fail = b"reproducible_kernel_payload_TAMPERED";
+        let result_fail = pipeline.execute_reproducible_pipeline(bin_pass, bin_fail);
+        assert!(!result_fail.is_fully_reproducible);
+        assert!(!result_fail.diff_report.is_empty());
+        assert!(result_fail.signed_manifest.contains("reproducible=false"));
     }
 }

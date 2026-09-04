@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   network-discovery-security-audit:
     name: mDNS/SSDP/LLMNR/NDP Discovery Audit

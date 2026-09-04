@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   linux-sched-cgroups-verify:
     name: Verify Linux cgroups v2 & EEVDF/BORE Scheduler

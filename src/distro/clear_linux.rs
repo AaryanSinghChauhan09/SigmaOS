@@ -2,16 +2,16 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Configuration file location
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigLocation {
-    Defaults,  // /usr/share/defaults
-    System,    // /etc
-    Runtime,   // /run
+    Defaults, // /usr/share/defaults
+    System,   // /etc
+    Runtime,  // /run
 }
 
 /// Configuration state
@@ -92,7 +92,9 @@ impl ClearLinuxStatelessEngine {
 
     /// Get state status
     pub fn get_status(&self) -> String {
-        let overridden = self.configs.values()
+        let overridden = self
+            .configs
+            .values()
             .filter(|s| s.location == ConfigLocation::System)
             .count();
 
@@ -141,9 +143,7 @@ impl SwupdUpdateManager {
 
     /// Install bundle
     pub fn install_bundle(&mut self, bundle_name: &str) -> Result<(), String> {
-        if let Some(bundle) = self.bundles.get(bundle_name) {
-            let deps = bundle.dependencies.clone();
-            let version = bundle.version.clone();
+        if let Some(bundle) = self.bundles.get(bundle_name).cloned() {
             // Install dependencies first
             for dep in &deps {
                 if !self.installed_bundles.contains(dep) {
@@ -178,7 +178,8 @@ impl SwupdUpdateManager {
     /// Search bundles
     pub fn search_bundles(&self, query: &str) -> Vec<&SwupdBundle> {
         let query_lower = query.to_lowercase();
-        self.bundles.values()
+        self.bundles
+            .values()
             .filter(|b| b.name.to_lowercase().contains(&query_lower))
             .collect()
     }

@@ -1,32 +1,47 @@
 ---
 name: Bug Report
-about: Create a report to help us fix a bug or kernel regression in SigmaOS
+about: Report a bug in SigmaOS
 title: '[BUG] '
-labels: 'bug, triage'
+labels: 'bug, needs-triage'
 assignees: ''
 ---
 
-## 🐛 Bug Description
-A clear and concise description of what the bug or regression is.
+## Bug Description
 
-## 💻 Subsystem Affected
-- [ ] Kernel Core / Microkernel (`kernel/`)
-- [ ] Memory Allocation / Page Tables (`src/kernel/memory.rs`, `perf_mm`)
-- [ ] Capability Token Security (`src/security/capability.rs`)
-- [ ] Driver Framework / Hardware (`drivers/`)
-- [ ] Package Manager / Universal (`src/package/universal.rs`)
-- [ ] Zenith Desktop Environment (`src/desktop/`)
-- [ ] Bootloader / ISO Image (`src/boot/`)
+<!-- A clear and concise description of what the bug is. -->
 
-## 🔄 Steps to Reproduce
-1. Execute command/script: `...`
-2. Run in QEMU: `...`
-3. See error: `...`
+## Steps to Reproduce
 
-## 📊 Expected Behavior
-A clear description of what you expected to happen.
+1. Go to '...'
+2. Run '...'
+3. See error
 
-## 🖥️ Environment / Hardware Details
-- Architecture: [e.g. x86_64, aarch64, riscv64]
-- QEMU command or Bare-Metal Hardware specs:
-- Toolchain version (`rustc --version`):
+## Expected Behavior
+
+<!-- What you expected to happen. -->
+
+## Actual Behavior
+
+<!-- What actually happened. Include error messages, stack traces, panics. -->
+
+## Environment
+
+- **SigmaOS Version:** <!-- e.g. v1.0.0 -->
+- **Architecture:** <!-- e.g. x86_64, aarch64 -->
+- **Kernel Version:** <!-- output of `sigma-sysinfo kernel` -->
+- **Rust Version:** <!-- output of `rustc --version` -->
+- **Host OS (if cross-compiling):** <!-- e.g. Ubuntu 22.04 -->
+
+## Logs / Stack Trace
+
+```
+Paste relevant logs here
+```
+
+## Additional Context
+
+<!-- Any other context about the problem. Screenshots if applicable. -->
+
+## Possible Fix
+
+<!-- If you have a hypothesis about what might be causing this, share it here. -->

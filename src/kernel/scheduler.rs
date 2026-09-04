@@ -2,9 +2,9 @@
 use alloc::vec;
 extern crate alloc;
 
-use alloc::string::{String, ToString};
+extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
-use core::cmp::Ordering;
 use core::time::Duration;
 
 /// Process priority level
@@ -15,24 +15,6 @@ pub enum Priority {
     Normal = 2,
     High = 3,
     Realtime = 4,
-}
-
-/// Task Identifier
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u32);
-
-/// Task structure for CFS compatibility
-#[derive(Debug, Clone, Copy)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
-impl PartialEq for Task {
-    fn eq(&self, other: &Self) -> bool {
-        self.vruntime == other.vruntime
-    }
 }
 
 /// Process state
@@ -115,6 +97,38 @@ impl Process {
     }
 }
 
+impl Process {
+    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
+        Self {
+            pid,
+            name,
+            priority,
+            state: ProcessState::Ready,
+            runtime: Duration::from_secs(0),
+            virtual_runtime: 0,
+            virtual_deadline: 0,
+            time_slice: Duration::from_millis(10),
+        }
+    }
+
+    pub fn get_weight(&self) -> u64 {
+        match self.priority {
+            Priority::Idle => 1,
+            Priority::Low => 2,
+            Priority::Normal => 4,
+            Priority::High => 8,
+            Priority::Realtime => 16,
+        }
+    }
+
+    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
+        let weight = self.get_weight();
+        // deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
+        let q = 10;
+        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct NumaNode {
     pub node_id: u32,
@@ -154,20 +168,7 @@ impl WorkStealingQueue {
     }
 }
 
-impl Eq for Task {}
-
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.vruntime.cmp(&other.vruntime)
-    }
-}
-
+/// EEVDF Scheduler Engine
 pub struct Scheduler {
     pub processes: Vec<Process>,
     pub current_time: u64,
@@ -178,7 +179,7 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new() -> Self {
-        Self {
+        Scheduler {
             processes: Vec::new(),
             current_time: 0,
             system_vtime: 0,
@@ -188,12 +189,14 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, mut process: Process) {
+        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
         process.virtual_runtime = self.system_vtime;
         process.update_virtual_deadline(self.system_vtime);
         self.processes.push(process);
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
+        // 1. Filter ready processes
         let mut ready_indices = Vec::new();
         for (idx, p) in self.processes.iter().enumerate() {
             if p.state == ProcessState::Ready {
@@ -381,7 +384,11 @@ mod tests {
         };
         scheduler.add_task(task);
 
-        let scheduled = scheduler.pick_next_task();
+        for _ in 0..5 {
+            scheduler.tick();
+        }
+
+        let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());
     }
 
