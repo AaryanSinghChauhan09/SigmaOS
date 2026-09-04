@@ -153,11 +153,14 @@ pub use wiki_ideas_implementation::{
 };
 
 pub use missing_distro_innovations::{
+    AppArmorPathRule, AppArmorPathRuleEngine, AppArmorProfile, AppArmorRuleMode,
     BedrockLinuxStrataEngine, BedrockStratum, ChimeraDinitSupervisor, ComponentParityStatus,
     DinitService, DinitServiceState, DragonFlyHammer2EmergencyCowEngine,
-    FedoraSelinuxMlsMcsGovernor, GentooPortageSlotOperatorEngine, MageiaUrpmiEngine,
-    MissingDistroComponentsEngine, SmartOsImage, SmartOsVmBrand, SmartOsVmConfig, SmartOsVmState,
-    SmartOsZoneEngine, SolusEopkgManager, SovereignFastInitramfsGenerator, TailsAmnesicEngine,
+    FedoraSelinuxMlsMcsGovernor, GentooPortageSlotOperatorEngine, ImageSlotState,
+    ImageSlotStatus, MageiaUrpmiEngine, MissingDistroComponentsEngine, PartitionSlot,
+    SmartOsImage, SmartOsVmBrand, SmartOsVmConfig, SmartOsVmState, SmartOsZoneEngine,
+    SolusEopkgManager, SovereignFastInitramfsGenerator, SteamOsAtomicAbImageUpdateEngine,
+    TailsAmnesicEngine,
 };
 
 pub use linux_bsd_inspirations::{

@@ -803,12 +803,14 @@ impl Default for AnityaFedoraMessagingEngine {
 /// Fedora Anitya Upstream Release Monitoring Engine
 pub struct FedoraAnityaReleaseMonitoringEngine {
     pub projects: HashMap<String, AnityaProjectRecord>,
+    pub messaging_bus: AnityaFedoraMessagingEngine,
 }
 
 impl FedoraAnityaReleaseMonitoringEngine {
     pub fn new() -> Self {
         Self {
             projects: HashMap::new(),
+            messaging_bus: AnityaFedoraMessagingEngine::new(),
         }
     }
 
@@ -823,8 +825,26 @@ impl FedoraAnityaReleaseMonitoringEngine {
     ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
+            let old_ver = record.current_version.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
+            if is_new {
+                let project_id = record.project_id;
+                let name = record.name.clone();
+                let pkgs = vec![
+                    AnityaPackageMapping { distro: "Fedora".to_string(), package_name: name.clone() },
+                    AnityaPackageMapping { distro: "SigmaOS".to_string(), package_name: name.clone() },
+                ];
+                self.messaging_bus.publish_version_update(
+                    project_id,
+                    &name,
+                    "pypi/crates/rpm",
+                    &old_ver,
+                    latest_version,
+                    pkgs,
+                    1700000000,
+                );
+            }
             Some(is_new)
         } else {
             None
