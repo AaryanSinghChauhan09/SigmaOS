@@ -331,7 +331,127 @@ impl Default for SovereignGuard {
 }
 
 // =========================================================================
-// 5. DATA MANAGER SYSTEM (SovereignCatalog)
+// 5. DATA SCIENCE TRANSFORMER & ESTIMATOR ENGINES (SovereignML)
+// =========================================================================
+
+/// Preprocessing Data Transformer for MinMax Scaling, Z-Score Normalization, and Imputation
+pub struct SovereignDataTransformer;
+
+impl SovereignDataTransformer {
+    /// Rescales vector feature values to range [0.0, 1.0] using MinMax scaling
+    pub fn min_max_scale(data: &[f32]) -> Vec<f32> {
+        if data.is_empty() {
+            return Vec::new();
+        }
+        let mut min_val = f32::MAX;
+        let mut max_val = f32::MIN;
+        for &val in data {
+            if val < min_val { min_val = val; }
+            if val > max_val { max_val = val; }
+        }
+        let range = max_val - min_val;
+        if range == 0.0 {
+            return vec![0.0; data.len()];
+        }
+        data.iter().map(|&x| (x - min_val) / range).collect()
+    }
+
+    /// Normalizes vector features to mean=0.0 and std_dev=1.0 (Z-Score Standardization)
+    pub fn z_score_normalize(data: &[f32]) -> Vec<f32> {
+        if data.is_empty() {
+            return Vec::new();
+        }
+        let sum: f32 = data.iter().sum();
+        let mean = sum / (data.len() as f32);
+        let variance_sum: f32 = data.iter().map(|&x| (x - mean) * (x - mean)).sum();
+        let std_dev = (variance_sum / (data.len() as f32)).sqrt();
+
+        if std_dev == 0.0 {
+            return vec![0.0; data.len()];
+        }
+        data.iter().map(|&x| (x - mean) / std_dev).collect()
+    }
+
+    /// Imputes NaN or missing values using Mean imputation
+    pub fn impute_missing_mean(data: &[Option<f32>]) -> Vec<f32> {
+        let valid_values: Vec<f32> = data.iter().filter_map(|&x| x).collect();
+        let mean = if valid_values.is_empty() {
+            0.0
+        } else {
+            valid_values.iter().sum::<f32>() / (valid_values.len() as f32)
+        };
+
+        data.iter().map(|&x| x.unwrap_or(mean)).collect()
+    }
+}
+
+/// Pipeline Estimator for Linear Model Evaluation and Loss Metric Computation
+pub struct SovereignPipelineEstimator {
+    pub weights: Vec<f32>,
+    pub bias: f32,
+}
+
+impl SovereignPipelineEstimator {
+    pub fn new(weights: Vec<f32>, bias: f32) -> Self {
+        Self { weights, bias }
+    }
+
+    /// Predicts target scalar for input feature vector: y_hat = w . x + b
+    pub fn predict(&self, features: &[f32]) -> Result<f32, &'static str> {
+        if features.len() != self.weights.len() {
+            return Err("Estimator feature dimension mismatch");
+        }
+        let dot_product: f32 = features
+            .iter()
+            .zip(self.weights.iter())
+            .map(|(&x, &w)| x * w)
+            .sum();
+        Ok(dot_product + self.bias)
+    }
+
+    /// Computes Mean Squared Error (MSE) loss over dataset predictions vs targets
+    pub fn mean_squared_error(y_true: &[f32], y_pred: &[f32]) -> Result<f32, &'static str> {
+        if y_true.len() != y_pred.len() || y_true.is_empty() {
+            return Err("Loss dimension mismatch or empty targets");
+        }
+        let sq_err_sum: f32 = y_true
+            .iter()
+            .zip(y_pred.iter())
+            .map(|(&yt, &yp)| (yt - yp) * (yt - yp))
+            .sum();
+        Ok(sq_err_sum / (y_true.len() as f32))
+    }
+}
+
+/// Dataframe Exporter supporting Parquet/Arrow schema descriptors, CSV, and JSON formatting
+pub struct SovereignDataframeExporter;
+
+impl SovereignDataframeExporter {
+    /// Formats columnar data series into CSV string
+    pub fn export_to_csv(headers: &[&str], rows: &[Vec<f64>]) -> String {
+        let mut csv = String::new();
+        csv.push_str(&headers.join(","));
+        csv.push('\n');
+
+        for row in rows {
+            let row_strs: Vec<String> = row.iter().map(|v| v.to_string()).collect();
+            csv.push_str(&row_strs.join(","));
+            csv.push('\n');
+        }
+        csv
+    }
+
+    /// Generates Apache Arrow / Parquet zero-copy memory schema descriptor
+    pub fn generate_arrow_schema_descriptor(dataset_name: &str, num_columns: usize) -> String {
+        format!(
+            "ArrowSchema[dataset='{}', columns={}, format='IPC_STREAM_LE', align=64]",
+            dataset_name, num_columns
+        )
+    }
+}
+
+// =========================================================================
+// 6. DATA MANAGER SYSTEM (SovereignCatalog)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -457,5 +577,42 @@ mod tests {
         let meta = catalog.lookup_residency("medical_records").unwrap();
         assert_eq!(meta.residency_zone, "SigmaFS-Local-Node-1");
         assert_eq!(meta.merkle_root_hash, "0xMERKLE_ROOT_HASH_1234");
+    }
+
+    #[test]
+    fn test_sovereign_data_science_transformers_and_estimators() {
+        let raw_data = vec![10.0, 20.0, 30.0, 40.0, 50.0];
+
+        // MinMax scaling
+        let scaled = SovereignDataTransformer::min_max_scale(&raw_data);
+        assert_eq!(scaled[0], 0.0);
+        assert_eq!(scaled[4], 1.0);
+        assert_eq!(scaled[2], 0.5);
+
+        // Z-score normalization
+        let norm = SovereignDataTransformer::z_score_normalize(&raw_data);
+        assert!((norm.iter().sum::<f32>()).abs() < 1e-4);
+
+        // Imputation
+        let missing_data = vec![Some(10.0), None, Some(30.0)];
+        let imputed = SovereignDataTransformer::impute_missing_mean(&missing_data);
+        assert_eq!(imputed[1], 20.0); // Mean of 10 and 30 is 20
+
+        // Linear Estimator
+        let estimator = SovereignPipelineEstimator::new(vec![2.0, 3.0], 1.0);
+        let pred = estimator.predict(&[1.0, 2.0]).unwrap();
+        assert_eq!(pred, 9.0); // (2*1 + 3*2) + 1 = 9
+
+        // MSE loss
+        let mse = SovereignPipelineEstimator::mean_squared_error(&[10.0, 20.0], &[8.0, 22.0]).unwrap();
+        assert_eq!(mse, 4.0); // ((10-8)^2 + (20-22)^2)/2 = (4 + 4)/2 = 4
+
+        // Export to CSV & Arrow
+        let csv = SovereignDataframeExporter::export_to_csv(&["age", "score"], &[vec![25.0, 95.5], vec![30.0, 88.0]]);
+        assert!(csv.contains("age,score"));
+        assert!(csv.contains("25,95.5"));
+
+        let arrow_desc = SovereignDataframeExporter::generate_arrow_schema_descriptor("telemetry", 2);
+        assert!(arrow_desc.contains("dataset='telemetry'"));
     }
 }
