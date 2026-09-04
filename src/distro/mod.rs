@@ -200,3 +200,13 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHighAvailabilityMeshEngine, ClusterNodeRole, HaStateEntry,
     SovereignDistroLeapSuite,
 };
+
+pub mod sovereign_omni_distro_dominance;
+pub use sovereign_omni_distro_dominance::{
+    SigmaZeroLockStoreGcEngine, StoreGcSlice,
+    SigmaAdaptiveMicroarchJitEngine, MicroarchLevel, SchedulerPolicyKind,
+    SigmaUnifiedBsdSecuritySentinel, CapabilityRights,
+    SigmaDeltaStateSnapshotEngine, DeltaSnapshot,
+    SigmaRunitSupervisedDagEngine, DagService,
+    SigmaOmniDistroDominanceSuite,
+};
