@@ -18,6 +18,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
+pub mod crypto;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
