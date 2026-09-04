@@ -1,7 +1,6 @@
 // Modern high-performance NVMe PCIe block storage & AHCI SATA Controller Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
 
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,14 +83,14 @@ impl Default for SmartTelemetry {
 
 /// Simulated AHCI SATA Command Header structure (HBA memory layout)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeader {
+pub struct AhciPortCommandHeader {
     pub opts: u16,
     pub prdtl: u16,
     pub prdbc: u32,
     pub ctba: u64,
 }
 
-impl AhciCommandHeader {
+impl AhciPortCommandHeader {
     pub const fn new() -> Self {
         Self { opts: 0, prdtl: 0, prdbc: 0, ctba: 0 }
     }
@@ -100,14 +99,14 @@ impl AhciCommandHeader {
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
     pub cmd_issue: u32,
-    pub cmd_headers: [AhciCommandHeader; 32], // 32 command slots
+    pub cmd_headers: [AhciPortCommandHeader; 32], // 32 command slots
 }
 
 impl AhciPort {
     pub const fn new() -> Self {
         Self {
             cmd_issue: 0,
-            cmd_headers: [AhciCommandHeader::new(); 32],
+            cmd_headers: [AhciPortCommandHeader::new(); 32],
         }
     }
 
@@ -128,31 +127,6 @@ impl AhciPort {
             self.cmd_issue &= !(1 << slot);
         }
     }
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration {
-    Legacy,
-    Modern,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState {
-    Off,
-    On,
-}
-
-#[cfg(test)]
-pub trait PeripheralDevice {
-    fn name(&self) -> &'static str;
-    fn generation(&self) -> DeviceGeneration;
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str>;
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
-    fn shutdown(&mut self) -> Result<(), &'static str>;
 }
 
 /// AHCI SATA Physical Region Descriptor Table (PRDT) Entry
@@ -379,5 +353,21 @@ mod tests {
         let bytes = ahci.read(&mut buf).unwrap();
         assert_eq!(bytes, 512);
         assert_eq!(ahci.name(), "AHCI Serial ATA Storage Driver");
+    }
+
+    #[test]
+    fn test_nvme_queues_and_telemetry() {
+        let mut sq = NvmeSubmissionQueue::new(4);
+        let cmd = NvmeCmd { opcode: 0x02, nsid: 1, prp1: 0x1000, prp2: 0 };
+        assert_eq!(sq.submit_command(cmd).unwrap(), 0);
+        assert_eq!(sq.submit_command(cmd).unwrap(), 1);
+
+        let mut cq = NvmeCompletionQueue::new(4);
+        let (head, phase) = cq.reap_completion();
+        assert_eq!(head, 0);
+        assert!(phase);
+
+        let telemetry = SmartTelemetry::new();
+        assert_eq!(telemetry.temperature_c, 38);
     }
 }

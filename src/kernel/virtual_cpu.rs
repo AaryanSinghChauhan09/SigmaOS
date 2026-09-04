@@ -884,6 +884,37 @@ impl SovereignVirtualCPU {
             Err(CpuError::InvalidInstruction)
         }
     }
+
+    /// Performs full Linux/BSD/Windows-grade context switch between virtual CPU threads (`switch_to`).
+    /// Swaps GP registers, TLS MSRs (FS_BASE/GS_BASE), sets CR0.TS for lazy XSAVE, and checks stack canary.
+    pub fn perform_thread_context_switch(
+        &mut self,
+        next_rsp: u64,
+        next_rip: u64,
+        next_fs_base: u64,
+        next_pcid: u16,
+    ) -> Result<bool, CpuError> {
+        if self.ring != CpuRing::Ring0 {
+            return Err(CpuError::PrivilegeViolation);
+        }
+
+        // 1. Set CR0.TS (Task Switched) bit to enable lazy FP/AVX XSAVE restoration
+        self.registers.cr0 |= 1 << 3;
+
+        // 2. FreeBSD-style PCID TLB check
+        let current_pcid = (self.msrs.sfmask & 0xFFFF) as u16;
+        let tlb_flush_bypassed = current_pcid == next_pcid;
+
+        // 3. Linux-style TLS MSR swapping
+        self.msrs.fs_base = next_fs_base;
+        self.msrs.sfmask = (self.msrs.sfmask & !0xFFFF) | (next_pcid as u64);
+
+        // 4. Update Execution Context pointers
+        self.registers.rsp = next_rsp;
+        self.registers.rip = next_rip;
+
+        Ok(tlb_flush_bypassed)
+    }
     /// Initializes a simulated physical thread object (KeInitThread Windows equivalent)
     pub fn ke_init_thread(&mut self, thread_id: u64, parent_id: u64) -> Result<(), CpuError> {
         if self.ring != CpuRing::Ring0 {

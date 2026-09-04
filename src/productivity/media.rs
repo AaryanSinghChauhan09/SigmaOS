@@ -19,6 +19,7 @@ pub enum MediaFormat {
     Mp3,
     Wav,
     Flac,
+    Pcm,
 }
 
 pub struct AudioChannel {
@@ -70,7 +71,7 @@ impl SigmaMediaEngine {
         Ok(())
     }
 
-    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
+    pub fn load_track(&mut self, _name: alloc::string::String, _format: MediaFormat, _duration: u32) {
         self.has_track = true;
         self.state = PlaybackState::Stopped;
     }
@@ -85,14 +86,12 @@ impl SigmaMediaEngine {
         self.state = PlaybackState::Stopped;
     }
 
-    /// Plays a raw chiptune sound buffer over an active audio channel
     pub fn play_chiptune_buffer(
         &self,
         channel_id: usize,
         buffer: &[u16],
     ) -> Result<(), &'static str> {
         if self.master_mute.load(Ordering::SeqCst) {
-            println!("MediaEngine: Master mute is active. Buffer playback bypassed.");
             return Ok(());
         }
 
@@ -104,24 +103,15 @@ impl SigmaMediaEngine {
         channel.active.store(true, Ordering::SeqCst);
         let vol = channel.volume.load(Ordering::SeqCst);
 
-        println!(
-            "MediaEngine: Playing chiptune audio sample ({} samples) on Channel {} at volume level {}%.",
-            buffer.len(),
-            channel_id,
-            vol
-        );
-
-        // Simulate PCM mixing on active hardware VESA/sound register
-        let mut mixed_amplitude: u32 = 0;
+        let mut _mixed_amplitude: u32 = 0;
         for &sample in buffer {
-            mixed_amplitude = mixed_amplitude.wrapping_add((sample as u32 * vol as u32) / 100);
+            _mixed_amplitude = _mixed_amplitude.wrapping_add((sample as u32 * vol as u32) / 100);
         }
 
         channel.active.store(false, Ordering::SeqCst);
         Ok(())
     }
 
-    /// Configures global output level limits
     pub fn adjust_channel_volume(
         &self,
         channel_id: usize,
@@ -135,85 +125,11 @@ impl SigmaMediaEngine {
         self.channels[channel_id]
             .volume
             .store(target_vol, Ordering::SeqCst);
-        println!(
-            "MediaEngine: Volume updated for Channel {} -> {}%.",
-            channel_id, target_vol
-        );
         Ok(())
     }
 }
 
 pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
-// SigmaOS Polish-Parity Out-of-the-Box Codecs & Multimedia Engine (SigmaMedia)
-// Designed for chiptune synthesizers, audio playing, and decoders with zero dependencies
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MediaFormat {
-    Mp3,
-    Wav,
-    Pcm,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PlaybackState {
-    Stopped,
-    Playing,
-    Paused,
-}
-
-pub struct AudioTrack {
-    pub name: String,
-    pub format: MediaFormat,
-    pub duration_secs: u32,
-    pub volume: f32, // 0.0 to 1.0
-}
-
-pub struct SigmaMediaEngine {
-    pub current_track: Option<AudioTrack>,
-    pub state: PlaybackState,
-}
-
-impl SigmaMediaEngine {
-    pub fn new() -> Self {
-        SigmaMediaEngine {
-            current_track: None,
-            state: PlaybackState::Stopped,
-        }
-    }
-
-    pub fn load_track(&mut self, name: String, format: MediaFormat, duration: u32) {
-        let track = AudioTrack {
-            name,
-            format,
-            duration_secs: duration,
-            volume: 0.8,
-        };
-        self.current_track = Some(track);
-        self.state = PlaybackState::Stopped;
-    }
-
-    pub fn play(&mut self) -> Result<(), ()> {
-        if self.current_track.is_some() {
-            self.state = PlaybackState::Playing;
-            Ok(())
-        } else {
-            Err(())
-        }
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
-    }
-}
-
-// =========================================================================
-// 1. SigmaSupportSubtitleSync (Aegisub ASS Advanced Styling & Karaoke Parity)
 
 pub struct AegisubKaraokeSyllable {
     pub text: String,
@@ -237,7 +153,6 @@ impl SigmaSupportSubtitleSync {
         }
     }
 
-    /// Parses Aegisub-style ASS tags (e.g. {\fnArial\fs24\c&HFF0000&}Sovereign)
     pub fn parse_ass_styling_tags(&mut self, tag_str: &str) -> String {
         if !tag_str.starts_with("{\\") || !tag_str.contains('}') {
             return tag_str.to_string();
@@ -268,8 +183,6 @@ impl SigmaSupportSubtitleSync {
         });
     }
 }
-
-// 2. SigmaSupportSubtitleEdit (Subtitle Edit Timing Synchronization Parity)
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SubtitleFormat {
@@ -305,7 +218,6 @@ impl SigmaSupportSubtitleEdit {
         });
     }
 
-    /// Subtitle Edit parity: applies frame-rate scale conversion and millisecond synchronization shifts
     pub fn shift_all_timings_ms(&mut self, offset_ms: i32) {
         for entry in &mut self.entries {
             let s = entry.start_ms as i64 + offset_ms as i64;
@@ -344,15 +256,12 @@ mod tests {
         let mut edit = SigmaSupportSubtitleEdit::new(SubtitleFormat::Srt);
         edit.insert_subtitle_entry(1000, 3000, "Hello World");
 
-        // Shift forward 500ms
         edit.shift_all_timings_ms(500);
         assert_eq!(edit.entries[0].start_ms, 1500);
         assert_eq!(edit.entries[0].end_ms, 3500);
 
-        // Shift backward 1000ms
         edit.shift_all_timings_ms(-1000);
         assert_eq!(edit.entries[0].start_ms, 500);
         assert_eq!(edit.entries[0].end_ms, 2500);
     }
 }
-pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();

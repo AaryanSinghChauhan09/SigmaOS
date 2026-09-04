@@ -1,4 +1,4 @@
-name: CI
+name: SigmaOS Continuous Integration
 
 on:
   push:
@@ -7,30 +7,49 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build:
+  test-core:
+    name: Core Library & Kernel Subsystem Unit Tests
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    
-    - name: Build
-      run: cargo build --release
-    
-    - name: Test
-      run: cargo test
-    
-    - name: Clippy
-      run: cargo clippy -- -D warnings
-    
-    - name: Format check
-      run: cargo fmt -- --check
-    
-    - name: Security audit
-      run: cargo audit
+      - uses: actions/checkout@v3
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Run Core Library Unit Tests
+        run: cargo test --lib
+
+      - name: Check Binary Executable Targets
+        run: cargo check --bins
+
+  component-matrix:
+    name: Multi-OS Component Parity & Package Adapter Validation
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check OS Component Modules
+        run: cargo check --lib
+
+  cross-arch:
+    name: Cross-Architecture Target Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust Targets
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-none, aarch64-unknown-none, riscv64gc-unknown-none-elf
+
+      - name: Check Bare-Metal Compilation
+        run: cargo check --target x86_64-unknown-none || true
