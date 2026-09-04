@@ -58,7 +58,14 @@ pub mod lattice;
 pub mod lattice_grid;
 pub mod legacy_adapters;
 pub mod linux_adapter;
+pub mod linux_bsd_ecosystem_bridge;
 pub mod linux_compat;
+
+pub use linux_bsd_ecosystem_bridge::{
+    EcosystemAbi, LinuxBsdEcosystemBridge, MultiFormatPackageBridge, NativeSigmaPackageManifest,
+    PackageSourceFormat, PosixSharedMemoryIpcBridge, SyscallTranslationResult,
+    UniversalSyscallAbiShim,
+};
 pub mod linux_distro_parity;
 pub use linux_distro_parity::{
     FstabEntry, LinuxCoreDumpFilterEngine, LinuxFstabEngine, LinuxLdSoLoader,

@@ -154,6 +154,42 @@ pub fn dec_to_base(mut n: u64, base: u8) -> String {
     result.chars().rev().collect()
 }
 
+/// Zero-allocation, stack-based u64 integer string parser
+pub fn parse_u64_str(s: &str) -> Result<u64, ()> {
+    if s.is_empty() {
+        return Err(());
+    }
+    let mut val: u64 = 0;
+    for &b in s.as_bytes() {
+        if !b.is_ascii_digit() {
+            return Err(());
+        }
+        let digit = (b - b'0') as u64;
+        val = val.checked_mul(10).ok_or(())?.checked_add(digit).ok_or(())?;
+    }
+    Ok(val)
+}
+
+/// Zero-allocation, stack-based u64 to hex string formatter
+pub fn u64_to_hex_str_stack(mut n: u64, buf: &mut [u8; 16]) -> usize {
+    if n == 0 {
+        buf[0] = b'0';
+        return 1;
+    }
+    const HEX_DIGITS: &[u8; 16] = b"0123456789abcdef";
+    let mut tmp = [0u8; 16];
+    let mut len = 0;
+    while n > 0 {
+        tmp[len] = HEX_DIGITS[(n & 0xF) as usize];
+        n >>= 4;
+        len += 1;
+    }
+    for i in 0..len {
+        buf[i] = tmp[len - 1 - i];
+    }
+    len
+}
+
 /// Custom any base to decimal conversion
 pub fn base_to_dec(s: &str, base: u8) -> Result<u64, ()> {
     if base < 2 || base > 36 {
@@ -219,6 +255,23 @@ mod tests {
         let bytes = b"Hi";
         let binary = bytes_to_binary(bytes);
         assert_eq!(binary.len(), 16);
+    }
+
+    #[test]
+    fn test_parse_u64_str() {
+        assert_eq!(parse_u64_str("123456").unwrap(), 123456);
+        assert!(parse_u64_str("").is_err());
+        assert!(parse_u64_str("123a").is_err());
+    }
+
+    #[test]
+    fn test_u64_to_hex_str_stack() {
+        let mut buf = [0u8; 16];
+        let len = u64_to_hex_str_stack(255, &mut buf);
+        assert_eq!(&buf[..len], b"ff");
+
+        let len_zero = u64_to_hex_str_stack(0, &mut buf);
+        assert_eq!(&buf[..len_zero], b"0");
     }
 
     #[test]
