@@ -726,10 +726,10 @@ depends=('glibc')
             is_explicit: true,
         };
 
-        // Note: In a real implementation, we'd add this to aur_packages
+        aur.register_aur_package(test_pkg);
         let results = aur.search_aur("test");
-        // Since aur_packages is empty, this should return empty
-        assert!(results.is_empty());
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].name, "aur-test");
     }
 
     #[test]
