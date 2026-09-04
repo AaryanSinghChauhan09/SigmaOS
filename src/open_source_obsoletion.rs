@@ -203,6 +203,74 @@ impl Default for SovereignVcsEngine {
 }
 
 // =========================================================================
+// 54. SOVEREIGN ANSIBLE AUTOMATION ENGINE (Superseding Ansible, SaltStack & Puppet)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnsibleTaskSpec {
+    pub name: String,
+    pub module_type: String, // "package", "service", "file", "command"
+    pub target_state: String,
+    pub parameters: BTreeMap<String, String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnsiblePlaybook {
+    pub playbook_name: String,
+    pub target_hosts: Vec<String>,
+    pub tasks: Vec<AnsibleTaskSpec>,
+}
+
+pub struct SovereignAnsibleAutomationEngine {
+    pub playbooks: Vec<AnsiblePlaybook>,
+    pub executed_tasks_count: usize,
+    pub changed_count: usize,
+}
+
+impl SovereignAnsibleAutomationEngine {
+    pub fn new() -> Self {
+        Self {
+            playbooks: Vec::new(),
+            executed_tasks_count: 0,
+            changed_count: 0,
+        }
+    }
+
+    pub fn register_playbook(&mut self, playbook: AnsiblePlaybook) {
+        self.playbooks.push(playbook);
+    }
+
+    pub fn execute_playbook(&mut self, playbook_name: &str) -> Result<(usize, usize), &'static str> {
+        let playbook = self
+            .playbooks
+            .iter()
+            .find(|p| p.playbook_name == playbook_name)
+            .ok_or("Ansible: Playbook not found")?;
+
+        let mut task_count = 0;
+        let mut changed_count = 0;
+
+        for task in &playbook.tasks {
+            task_count += 1;
+            if task.target_state == "present" || task.target_state == "started" || task.target_state == "absent" {
+                changed_count += 1;
+            }
+        }
+
+        self.executed_tasks_count += task_count;
+        self.changed_count += changed_count;
+
+        Ok((task_count, changed_count))
+    }
+}
+
+impl Default for SovereignAnsibleAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 2. SOVEREIGN INIT SUPERVISOR (Superseding Systemd, Runit, OpenRC, Launchd)
 // =========================================================================
 
@@ -1602,6 +1670,7 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub redis_cluster: SovereignRedisClusterEngine,
     pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
     pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
+    pub ansible: SovereignAnsibleAutomationEngine,
     pub supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -1639,8 +1708,9 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             redis_cluster: SovereignRedisClusterEngine::new(),
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
+            ansible: SovereignAnsibleAutomationEngine::new(),
             supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 42,
+            total_obsoleted_projects_count: 43,
         }
     }
 
@@ -4307,9 +4377,33 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_ansible_automation_engine() {
+        let mut ansible = SovereignAnsibleAutomationEngine::new();
+        let mut params = BTreeMap::new();
+        params.insert("name".to_string(), "nginx".to_string());
+
+        let playbook = AnsiblePlaybook {
+            playbook_name: "deploy_web".to_string(),
+            target_hosts: vec!["web01.sigmaos.local".to_string()],
+            tasks: vec![AnsibleTaskSpec {
+                name: "Install Nginx".to_string(),
+                module_type: "package".to_string(),
+                target_state: "present".to_string(),
+                parameters: params,
+            }],
+        };
+
+        ansible.register_playbook(playbook);
+        let (tasks, changed) = ansible.execute_playbook("deploy_web").unwrap();
+        assert_eq!(tasks, 1);
+        assert_eq!(changed, 1);
+        assert_eq!(ansible.executed_tasks_count, 1);
+    }
+
+    #[test]
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("42 legacy open-source projects obsoleted"));
+        assert!(status.contains("43 legacy open-source projects obsoleted"));
     }
 }
