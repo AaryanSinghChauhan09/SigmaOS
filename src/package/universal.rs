@@ -26,17 +26,18 @@ use crate::runtime::node_distribution::{
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
     use super::*;
+
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
         Glibc,
     }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone)]
     pub enum NodeReleaseStream {
         Lts,
         Current,
     }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone)]
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,

@@ -92,7 +92,6 @@ impl ZeroDependencyPrimitiveHub {
         }
         hash
     }
-
     /// Formats an unsigned integer into a fixed static stack buffer without heap allocation
     pub fn format_u64_stack(mut value: u64, buf: &mut [u8; 32]) -> &str {
         if value == 0 {
@@ -123,7 +122,6 @@ mod tests {
     fn test_zero_dependency_architecture() {
         assert!(is_zero_dependency_build());
     }
-
     #[test]
     fn test_zero_dependency_primitive_hub() {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");
@@ -142,3 +140,6 @@ mod tests {
         assert_eq!(formatted, "2026");
     }
 }
+
+pub use hashset::HashSet;
+pub use arc::Arc;
