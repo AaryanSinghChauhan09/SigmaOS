@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 # SigmaOS Native Test Runner
-set -e
+# set -e replaced with per-test error handling for robust test suite
+
+TEST_FAILURES=0
+
+run_test() {
+    local name="$1"
+    shift
+    echo "--- Running: $name ---"
+    if "$@"; then
+        echo "✅ PASS: $name"
+    else
+        echo "❌ FAIL: $name (exit code: $?)"
+        TEST_FAILURES=$((TEST_FAILURES + 1))
+    fi
+}
+
 
 echo "=== SigmaOS Native Test Runner ==="
 

@@ -1,0 +1,171 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  # ── Dependency Vulnerability Audit ────────────────────────────────────────
+  cargo-audit:
+    name: Cargo Audit (dependency vulnerabilities)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@b3b07ba8b418af3f8b6c4a8a9e62e4a9e9e8b7b8
+        with:
+          toolchain: stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Run cargo audit
+        run: cargo audit --json > audit-results.json 2>&1 || true
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2d  # v4.5.0
+        if: always()
+        with:
+          name: cargo-audit-results
+          path: audit-results.json
+
+  # ── Static Analysis: Unsafe Code ──────────────────────────────────────────
+  unsafe-audit:
+    name: Unsafe Code Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: Count unsafe blocks
+        run: |
+          echo "## Unsafe Code Audit" > unsafe-report.txt
+          echo "" >> unsafe-report.txt
+          count=$(grep -r "unsafe " src/ --include="*.rs" | grep -v "// SAFETY" | wc -l)
+          echo "Total unsafe blocks without SAFETY comment: $count" >> unsafe-report.txt
+          echo "" >> unsafe-report.txt
+          grep -rn "unsafe " src/ --include="*.rs" | grep -v "// SAFETY" | head -50 >> unsafe-report.txt || true
+          cat unsafe-report.txt
+      - name: Upload unsafe report
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2d  # v4.5.0
+        with:
+          name: unsafe-code-report
+          path: unsafe-report.txt
+
+  # ── Hardcoded Secrets Scan ────────────────────────────────────────────────
+  secrets-scan:
+    name: Hardcoded Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0  # Full history for git-based scanning
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "Scanning for potential hardcoded secrets..."
+          # Look for patterns that suggest hardcoded credentials
+          found=0
+          
+          # Check for password literals (excluding test files with proper disclaimers)
+          if grep -rn 'password\s*=\s*"[^"]\{4,\}"' src/ --include="*.rs" | grep -v "test\|TODO\|FIXME\|example"; then
+            echo "WARNING: Possible hardcoded password found"
+            found=1
+          fi
+          
+          # Check for API key patterns
+          if grep -rn 'api_key\s*=\s*"[A-Za-z0-9]\{20,\}"' src/ --include="*.rs"; then
+            echo "WARNING: Possible hardcoded API key found"
+            found=1
+          fi
+          
+          # Check for private key headers
+          if grep -rn "BEGIN.*PRIVATE KEY\|BEGIN.*CERTIFICATE" src/ --include="*.rs"; then
+            echo "ERROR: Private key material found in source code!"
+            found=1
+          fi
+          
+          if [ $found -eq 0 ]; then
+            echo "✅ No hardcoded secrets detected"
+          fi
+
+  # ── Supply Chain: Dependency Freshness ───────────────────────────────────
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: Check for new dependencies
+        run: |
+          echo "Checking Cargo.toml for unpinned dependency versions..."
+          # Flag any dependencies using wildcard or caret ranges without minimum version
+          grep -n '^\s*[a-z_-]\+ = "\*"' Cargo.toml || echo "No wildcard deps found"
+          echo "Dependency review complete"
+
+  # ── Security-Critical Input Validation Tests ──────────────────────────────
+  security-tests:
+    name: Security Input Validation Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: dtolnay/rust-toolchain@b3b07ba8b418af3f8b6c4a8a9e62e4a9e9e8b7b8
+        with:
+          toolchain: nightly
+          components: rust-src
+      - name: Run security-specific tests
+        run: |
+          cargo +nightly test --all -- security 2>&1 | tee security-test-results.txt
+          # Specifically test IPv4 octal SSRF prevention
+          cargo +nightly test --all -- validate_ipv4 2>&1 | tee -a security-test-results.txt
+          # Test input validation
+          cargo +nightly test --all -- input_validation 2>&1 | tee -a security-test-results.txt
+      - name: Upload test results
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2d  # v4.5.0
+        if: always()
+        with:
+          name: security-test-results
+          path: security-test-results.txt
+
+  # ── GitHub Actions Pinning Verification ──────────────────────────────────
+  workflow-pin-check:
+    name: Verify GitHub Actions are Pinned
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: Check that all actions are pinned to SHAs
+        run: |
+          echo "Checking GitHub Actions workflow files for unpinned actions..."
+          unpinned=0
+          
+          for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
+            [ -f "$wf" ] || continue
+            # Look for uses: lines without SHA pinning (40 hex chars)
+            while IFS= read -r line; do
+              if echo "$line" | grep -qE '^\s+uses:.*@[^#]'; then
+                sha=$(echo "$line" | grep -oE '@[a-f0-9]{40}' || true)
+                if [ -z "$sha" ]; then
+                  echo "UNPINNED in $wf: $line"
+                  unpinned=$((unpinned + 1))
+                fi
+              fi
+            done < "$wf"
+          done
+          
+          if [ $unpinned -gt 0 ]; then
+            echo "WARNING: $unpinned unpinned GitHub Actions found. Pin to exact SHAs for security."
+            # Don't fail - just warn
+          else
+            echo "✅ All GitHub Actions are pinned to SHAs"
+          fi

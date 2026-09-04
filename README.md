@@ -1,9 +1,9 @@
 # 🇸🇴 SigmaOS Sovereign Operating System
 
-[![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
+[![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigmaos-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
-[![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/SigmaOS-Org/SigmaOS/releases)
+[![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
 
 SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency `#![no_std]` architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
 
