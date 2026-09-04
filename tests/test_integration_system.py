@@ -218,7 +218,7 @@ def test_sovereign_wiki_master_engine_integration():
         "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc/apt/sources.list"},
         "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": "/etc/apk/repositories"},
         "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc/xbps.d"},
-        "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos/configuration.nix"},
+        "LinuxGuix": {"pkg_ext": ".scm", "supervisor": "Shepherd", "vfs_etc": "/etc/config.scm"},
         "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "Rcd", "vfs_etc": "/etc/rc.conf"},
     }
 
