@@ -128,16 +128,35 @@ impl SovereignUniversalDistroBridge {
     pub fn translate_vfs_path(&self, generic_path: &str) -> String {
         match (self.mode, generic_path) {
             (DistroSubsystemMode::LinuxNix, "/etc") => "/etc/nixos".to_string(),
-            (DistroSubsystemMode::LinuxNix, "/var/lib/pkg") => "/nix/store".to_string(),
-            (DistroSubsystemMode::FreeBsd, "/etc") => "/usr/local/etc".to_string(),
-            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
+            (DistroSubsystemMode::LinuxGuix, "/etc") => "/etc/config.scm".to_string(),
+            (DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix, "/var/lib/pkg") => {
+                "/nix/store".to_string()
+            }
+            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
             (
-                DistroSubsystemMode::OpenBsd
+                DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxTails,
+                "/var/lib/pkg",
+            ) => "/var/lib/dpkg".to_string(),
+            (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
+            (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd,
+                "/var/lib/pkg",
+            ) => "/var/db/pkg".to_string(),
+            (
+                DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
-                | DistroSubsystemMode::SolarisIllumos,
+                | DistroSubsystemMode::SmartOs,
                 "/etc",
-            ) => "/etc".to_string(),
+            ) => "/usr/local/etc".to_string(),
+            (DistroSubsystemMode::LinuxClear, "/etc") => "/usr/etc".to_string(),
             (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
@@ -215,7 +234,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
