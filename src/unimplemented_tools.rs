@@ -1,12 +1,15 @@
-use std::boxed::Box;
 // Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 // Re-exported in src/lib.rs for full SigmaOS distribution parity.
 
-use std::format;
-use std::string::String;
-use std::string::ToString;
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. MULTIMEDIA TOOLS
@@ -5161,7 +5164,7 @@ impl NixGuixStoreGarbageCollectorTool {
 
 #[derive(Debug, Default, Clone)]
 pub struct OpenBsdUnveilAuditTool {
-    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+    pub unveiled_rules: BTreeMap<String, String>,
 }
 
 impl OpenBsdUnveilAuditTool {

@@ -1,14 +1,17 @@
-use std::format;
-use std::vec;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
-use std::boxed::Box;
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
 
