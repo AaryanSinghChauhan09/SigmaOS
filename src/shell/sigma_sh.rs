@@ -1684,11 +1684,6 @@ impl HistoryExpansionEngine {
 }
 
 /// Rich Line Editor for Sovereign Shell REPL
-pub struct ReplLineEditor {
-    pub prompt: String,
-    pub history: StdVec<String>,
-}
-
 impl ReplLineEditor {
     pub fn new() -> Self {
         Self {
@@ -1707,13 +1702,6 @@ impl ReplLineEditor {
 }
 
 /// Sovereign REPL combining Zsh prompt, Fish auto-suggestions, and Ksh job control
-pub struct SovereignSigmaShRepl {
-    pub line_editor: ReplLineEditor,
-    pub completer: ContextualCompleter,
-    pub job_manager: JobControlManager,
-    pub history: StdVec<String>,
-}
-
 impl SovereignSigmaShRepl {
     pub fn new() -> Self {
         Self {

@@ -163,10 +163,6 @@ pub mod toolchain {
     pub mod codex;
 }
 pub mod scheduler;
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
-
 pub mod logging;
 pub mod system;
 pub mod update {
