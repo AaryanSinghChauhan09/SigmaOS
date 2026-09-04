@@ -96,7 +96,7 @@ pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, Reg
 pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
     GuixFunctionalStore, NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, OstreeDeployment,
-    OstreeDeploymentEngine, RumpKernelServer, ShepherdService, ShepherdServiceState,
+    OstreeDeploymentEngine, RumpKernelServer, ShepherdServiceState,
     SlackBuildCompiler, SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot,
     SnapperType, SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };

@@ -233,7 +233,7 @@ pub fn initialize_kernel_console(backend: ConsoleBackend) -> Result<(), &'static
         if (*(&raw const GLOBAL_CONSOLE)).is_none() {
             let mut console = KernelConsole::new();
             console.initialize(backend)?;
-            *console_ptr = Some(console);
+            GLOBAL_CONSOLE = Some(console);
         }
         Ok(())
     }

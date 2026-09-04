@@ -5066,3 +5066,158 @@ mod tests {
         assert!(node.is_hook_connected("lower"));
     }
 }
+
+// =========================================================================
+// DISTRO & BENCHMARK TREND ANALYZER UTILITIES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DistroWatchTrendEntry {
+    pub distro_name: String,
+    pub page_hits_per_day: u32,
+    pub rank: u32,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct DistroWatchTrendAnalyzerTool {
+    pub rankings: Vec<DistroWatchTrendEntry>,
+}
+
+impl DistroWatchTrendAnalyzerTool {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn record_distro_hits(&mut self, distro_name: &str, hits: u32) {
+        self.rankings.push(DistroWatchTrendEntry {
+            distro_name: distro_name.to_string(),
+            page_hits_per_day: hits,
+            rank: (self.rankings.len() as u32) + 1,
+        });
+    }
+
+    pub fn get_top_distro(&self) -> Option<String> {
+        self.rankings
+            .iter()
+            .max_by_key(|r| r.page_hits_per_day)
+            .map(|r| r.distro_name.clone())
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct PhoronixSuiteAutomatedBenchmarkRunnerTool {
+    pub suite_name: String,
+    pub executed_tests: Vec<String>,
+    pub composite_score: f64,
+}
+
+impl PhoronixSuiteAutomatedBenchmarkRunnerTool {
+    pub fn new(suite_name: &str) -> Self {
+        Self {
+            suite_name: suite_name.to_string(),
+            executed_tests: Vec::new(),
+            composite_score: 0.0,
+        }
+    }
+
+    pub fn run_automated_suite(&mut self, test_names: &[&str], scores: &[f64]) -> f64 {
+        for &t in test_names {
+            self.executed_tests.push(t.to_string());
+        }
+        if !scores.is_empty() {
+            self.composite_score = scores.iter().sum::<f64>() / scores.len() as f64;
+        }
+        self.composite_score
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct NixGuixStoreGarbageCollectorTool {
+    pub registered_roots: Vec<String>,
+    pub dead_paths: Vec<String>,
+}
+
+impl NixGuixStoreGarbageCollectorTool {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_gc_root(&mut self, store_path: &str) {
+        self.registered_roots.push(store_path.to_string());
+    }
+
+    pub fn register_dead_path(&mut self, store_path: &str) {
+        if !self.registered_roots.contains(&store_path.to_string()) {
+            self.dead_paths.push(store_path.to_string());
+        }
+    }
+
+    pub fn collect_garbage(&mut self) -> usize {
+        let count = self.dead_paths.len();
+        self.dead_paths.clear();
+        count
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct OpenBsdUnveilAuditTool {
+    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+}
+
+impl OpenBsdUnveilAuditTool {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_unveil_rule(&mut self, path: &str, permissions: &str) {
+        self.unveiled_rules.insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn check_path_access(&self, path: &str, requested_perm: char) -> bool {
+        if let Some(perms) = self.unveiled_rules.get(path) {
+            perms.contains(requested_perm)
+        } else {
+            false
+        }
+    }
+}
+
+#[cfg(test)]
+mod new_unimplemented_tools_tests {
+    use super::*;
+
+    #[test]
+    fn test_distrowatch_trend_analyzer_tool() {
+        let mut analyzer = DistroWatchTrendAnalyzerTool::new();
+        analyzer.record_distro_hits("MX Linux", 2500);
+        analyzer.record_distro_hits("Mint", 2100);
+        assert_eq!(analyzer.get_top_distro().unwrap(), "MX Linux");
+    }
+
+    #[test]
+    fn test_phoronix_suite_automated_benchmark_runner_tool() {
+        let mut runner = PhoronixSuiteAutomatedBenchmarkRunnerTool::new("Kernel IPC Suite");
+        let score = runner.run_automated_suite(&["pipe-latency", "socket-throughput"], &[12.5, 87.5]);
+        assert_eq!(score, 50.0);
+        assert_eq!(runner.executed_tests.len(), 2);
+    }
+
+    #[test]
+    fn test_nix_guix_store_garbage_collector_tool() {
+        let mut gc = NixGuixStoreGarbageCollectorTool::new();
+        gc.add_gc_root("/sigma/store/root-bash");
+        gc.register_dead_path("/sigma/store/dead-tmp");
+        gc.register_dead_path("/sigma/store/root-bash"); // Should skip root
+        assert_eq!(gc.dead_paths.len(), 1);
+        assert_eq!(gc.collect_garbage(), 1);
+        assert_eq!(gc.dead_paths.len(), 0);
+    }
+
+    #[test]
+    fn test_openbsd_unveil_audit_tool() {
+        let mut unveil = OpenBsdUnveilAuditTool::new();
+        unveil.add_unveil_rule("/etc", "r");
+        assert!(unveil.check_path_access("/etc", 'r'));
+        assert!(!unveil.check_path_access("/etc", 'w'));
+    }
+}

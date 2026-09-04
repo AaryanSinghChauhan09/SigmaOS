@@ -14,6 +14,11 @@ pub enum TensorDtype {
     Bf16,
     Int8,
     Int4,
+    FP32,
+    FP16,
+    BF16,
+    INT8,
+    INT4,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,6 +26,7 @@ pub enum TensorDtype {
 pub enum ComputeDeviceTarget {
     CPU,
     CpuSimd,
+    CPU_SIMD,
     GPU,
     DiscreteGpu,
     IntegratedGpu,
@@ -62,7 +68,7 @@ impl QuantizedMatrix {
         let mut zero_points = Vec::new();
 
         match target_dtype {
-            TensorDtype::INT8 => {
+            TensorDtype::INT8 | TensorDtype::Int8 => {
                 // Per-row symmetric INT8 quantization
                 for r in 0..rows {
                     let row_slice = &weights[r * cols..(r + 1) * cols];
@@ -77,7 +83,7 @@ impl QuantizedMatrix {
                     }
                 }
             }
-            TensorDtype::INT4 => {
+            TensorDtype::INT4 | TensorDtype::Int4 => {
                 // Pack two 4-bit elements per byte
                 for r in 0..rows {
                     let row_slice = &weights[r * cols..(r + 1) * cols];
@@ -98,7 +104,7 @@ impl QuantizedMatrix {
                     }
                 }
             }
-            TensorDtype::FP16 | TensorDtype::BF16 => {
+            TensorDtype::FP16 | TensorDtype::Fp16 | TensorDtype::BF16 | TensorDtype::Bf16 => {
                 // Simulated FP16 conversion (2 bytes per weight)
                 for &w in weights {
                     let bytes = (w as f32).to_le_bytes();
@@ -108,7 +114,7 @@ impl QuantizedMatrix {
                 scales.push(1.0);
                 zero_points.push(0);
             }
-            TensorDtype::FP32 => {
+            TensorDtype::FP32 | TensorDtype::Fp32 => {
                 for &w in weights {
                     quantized_data.extend_from_slice(&w.to_le_bytes());
                 }
