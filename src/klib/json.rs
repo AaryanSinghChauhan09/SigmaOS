@@ -111,18 +111,19 @@ impl SovereignJsonValue {
 }
 
 /// Standalone `#![no_std]` Zero-Dependency Recursive Descent JSON Parser
+// Optimization: Operates directly on string slice `&'a str` with byte offsets, eliminating
+// pre-allocation of `Vec<char>` (4 * N bytes heap overhead) and eliminating intermediate
+// temporary string allocations during token matching and number slicing.
 pub struct SovereignJsonParser<'a> {
-    chars: Vec<char>,
+    input: &'a str,
     pos: usize,
-    _phantom: core::marker::PhantomData<&'a str>,
 }
 
 impl<'a> SovereignJsonParser<'a> {
     pub fn new(input: &'a str) -> Self {
         Self {
-            chars: input.chars().collect(),
+            input,
             pos: 0,
-            _phantom: core::marker::PhantomData,
         }
     }
 
@@ -131,24 +132,24 @@ impl<'a> SovereignJsonParser<'a> {
         parser.skip_whitespace();
         let val = parser.parse_value()?;
         parser.skip_whitespace();
-        if parser.pos < parser.chars.len() {
+        if parser.pos < parser.input.len() {
             return Err("JSON Parser: Trailing characters after root value");
         }
         Ok(val)
     }
 
     fn peek(&self) -> Option<char> {
-        if self.pos < self.chars.len() {
-            Some(self.chars[self.pos])
+        if self.pos < self.input.len() {
+            self.input[self.pos..].chars().next()
         } else {
             None
         }
     }
 
     fn next_char(&mut self) -> Option<char> {
-        if self.pos < self.chars.len() {
-            let c = self.chars[self.pos];
-            self.pos += 1;
+        if self.pos < self.input.len() {
+            let c = self.input[self.pos..].chars().next()?;
+            self.pos += c.len_utf8();
             Some(c)
         } else {
             None
@@ -156,21 +157,13 @@ impl<'a> SovereignJsonParser<'a> {
     }
 
     fn starts_with_chars(&self, expected: &str) -> bool {
-        let expected_chars: Vec<char> = expected.chars().collect();
-        if self.pos + expected_chars.len() > self.chars.len() {
-            return false;
-        }
-        for (i, &ec) in expected_chars.iter().enumerate() {
-            if self.chars[self.pos + i] != ec {
-                return false;
-            }
-        }
-        true
+        self.input[self.pos..].starts_with(expected)
     }
 
     fn skip_whitespace(&mut self) {
-        while let Some(c) = self.peek() {
-            if c == ' ' || c == '\t' || c == '\n' || c == '\r' {
+        while self.pos < self.input.len() {
+            let b = self.input.as_bytes()[self.pos];
+            if b == b' ' || b == b'\t' || b == b'\n' || b == b'\r' {
                 self.pos += 1;
             } else {
                 break;
@@ -270,8 +263,8 @@ impl<'a> SovereignJsonParser<'a> {
             }
         }
 
-        let num_str: String = self.chars[start..self.pos].iter().collect();
-        let num: f64 = parse_f64_simple(&num_str)?;
+        let num_str = &self.input[start..self.pos];
+        let num: f64 = parse_f64_simple(num_str)?;
         Ok(SovereignJsonValue::Number(num))
     }
 
