@@ -3996,6 +3996,10 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DracutModule {
     pub name: String,

@@ -5,7 +5,3 @@
 ## 2026-09-02 - Bulk `copy_from_slice` in Package Cache Buffer Allocation
 **Learning:** In package registry proxy caching, copying payload buffers byte-by-byte in `for i in 0..data_len` loops forces per-index bounds checking and prevents the compiler from emitting vectorized `memcpy` intrinsics. Replacing manual byte-level array assignment with `cached.data[..data_len].copy_from_slice(&data[..data_len])` leverages optimized bulk CPU/SIMD memory transfer routines.
 **Action:** When populating static or dynamic byte arrays in caching layers, always use `copy_from_slice` over manual element loops.
-
-## 2026-09-02 - Zero-Copy Slice Offsets for Recursive Descent JSON Parsers
-**Learning:** Collecting input string slices into a `Vec<char>` up front in recursive descent parsers incurs a 4x size heap allocation overhead (4 bytes per UTF-32 char) and degrades cache locality. Storing input as `&'a str` and tracking byte offset `pos: usize` eliminates all parser state heap allocations while `str::starts_with` and slice subslices (`&input[start..pos]`) replace temporary string allocations during token matching and number parsing.
-**Action:** In `#![no_std]` parser components, always parse directly against string slices using byte offset positions rather than collecting characters into heap vectors.

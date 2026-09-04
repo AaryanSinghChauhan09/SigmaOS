@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: PR Size Labeler
-        uses: pascalgn/size-label-action@v0.5.0
+        uses: pascalgn/size-label-action@b700fbe937b4f5358055bf1ee5593c72d65016c5
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
