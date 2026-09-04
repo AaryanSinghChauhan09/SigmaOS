@@ -3875,3 +3875,57 @@ To maintain continuous repository evolution, AI development agents adopt a compo
 |            Sovereign Policy Engine & Automated CI Verification Gates              |
 +-----------------------------------------------------------------------------------+
 ```
+
+---
+
+## 65. SOVEREIGN MODULAR DEVICE SUPPORT, DRIVER SHARDS & CLUSTER-NATIVE PERIPHERALS SPECIFICATION
+
+To outmatch the hardware support breadth and flexibility of Linux, Windows, and macOS, SigmaOS establishes an architecturally resilient, zero-dependency, modular device integration framework grounded in `src/drivers/sovereign_driver_lifecycle.rs` (`SovereignModularDeviceSupportEngine`).
+
+### 65.1 Modular Hardware Support Architecture
+
+```
++-----------------------------------------------------------------------------------+
+|                   SOVEREIGN MODULAR DEVICE SUPPORT ENGINE                         |
+|      (Zero-Dependency, Resilient & Cluster-Native Hardware Integration)           |
++-----------------------------------------------------------------------------------+
+|  [1. Driver Shards]       [2. Universal Firmware]   [3. Declarative Profiles]     |
+|   Hot-Swappable Units      UEFI / ACPI / GPU Blobs   Auto-Resolve at Boot          |
++-----------------------------------------------------------------------------------+
+|  [4. Cross-OS Compatibility] [5. Sandboxed Hardware] [6. Community Registry]     |
+|   Linux / BSD Shim Layer   Isolated Quota Modules   Dilithium-5 Signed Packages   |
++-----------------------------------------------------------------------------------+
+|  [7. Programmable I/O Stack]                       [8. Cluster-Aware Peripherals] |
+|   Scripted USB/PCIe/GPIO Bytecode                   Seamless Distributed Devices  |
++-----------------------------------------------------------------------------------+
+```
+
+### 65.2 Eight Modular Hardware Strategies
+
+1. **Driver Shards (`DriverShardManager`)**:
+   - Isolates hardware drivers into self-contained "shards" loaded and hot-swapped without kernel reboots or system downtime.
+   - Tracks shard revisions, hot-swap capabilities, and active runtime status.
+
+2. **Universal Firmware Bridge (`UniversalFirmwareBridge`)**:
+   - Translates vendor firmware blobs (UEFI runtime services, ACPI tables, proprietary GPU firmware) into SigmaOS-native HAL method calls.
+   - Eliminates reliance on vendor-specific kernel shims.
+
+3. **Declarative Driver Profiles (`DeclarativeHardwareResolver`)**:
+   - Hardware configurations declared via structured profiles (`DeclarativeDriverProfile`) matching detected PCI Vendor/Device IDs.
+   - Auto-resolves and loads required driver shards seamlessly during boot.
+
+4. **Cross-OS Driver Compatibility Shims (`CrossOsDriverShim`)**:
+   - Provides ABI translation layers to reuse stable Linux kernel (`TargetOsOrigin::LinuxKernel`) and BSD (`TargetOsOrigin::FreeBsdKernel`) drivers directly without code duplication.
+
+5. **Sandboxed Hardware Modules (`SandboxedHardwareModule`)**:
+   - Executes untrusted or experimental drivers inside isolated memory-quota containers.
+   - Enforces strict I/O byte quotas and logs boundary violations to prevent kernel panics.
+
+6. **Community Driver Registry (`CommunityDriverRegistry`)**:
+   - Cryptographically signed decentralized repository where contributors publish driver packages (`SignedDriverPackage`) verified via Dilithium-5 PQC signatures.
+
+7. **Programmable I/O Stack (`ProgrammableIoStack`)**:
+   - Allows scripting hardware interactions across USB, PCIe, and GPIO buses using sandboxed bytecode execution directly at the OS level for rapid prototyping.
+
+8. **Cluster-Aware Peripherals (`ClusterAwarePeripheralManager`)**:
+   - Shares connected peripheral devices (GPUs, NVMe arrays, sensors) across distributed SigmaOS cluster nodes seamlessly.
