@@ -171,3 +171,15 @@ pub mod ml;
 pub mod iot;
 
 pub mod distro;
+pub mod innovation;
+pub use innovation::{
+    BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
+    FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
+    KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
+    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
+    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
+    UserlandOverlayLayer, VfsObjectRecord,
+};
+pub use crypto::aegis_vault::{
+    AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
+};
