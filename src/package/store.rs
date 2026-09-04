@@ -68,7 +68,6 @@ impl SigmaSoftwareStore {
     /// Automatically scans and triggers update routines for registered packages
     pub fn trigger_auto_updates(&self) -> usize {
         if !self.auto_updates_enabled.load(Ordering::SeqCst) {
-            println!("SoftwareStore: Auto-updates deactivated by user configuration.");
             return 0;
         }
 
@@ -77,16 +76,11 @@ impl SigmaSoftwareStore {
         for entry_slot in registry.iter_mut() {
             if let Some(ref mut entry) = entry_slot {
                 if entry.update_available {
-                    println!("SoftwareStore: Auto-updating package: '{}'...", entry.name);
                     entry.update_available = false;
                     count += 1;
                 }
             }
         }
-        println!(
-            "SoftwareStore: Update complete. Updated {} packages dynamically.",
-            count
-        );
         count
     }
 }
