@@ -224,3 +224,10 @@ To ensure SigmaOS successfully bridges the gap between ambitious architecture an
 8.  **Phase 8: Repository Infrastructure Geo-Routing & Signed Caches**: Enable DNS SRV auto-discovery and Ed25519 binary cache verification in `src/sigpkg/repository_manager.rs`.
 9.  **Phase 9: Multi-OS Package Translators**: Enable seamless conversion between `.pkg.tar.zst`, `.deb`, `.rpm`, `.apk`, `.xbps`, and FreeBSD `.pkg` formats.
 10. **Phase 10: Multi-Seat Desktop & Driver Management**: Integrate PAM/BSD-auth multi-seat controls and NVIDIA PRIME hybrid graphics profile switching.
+
+## 10. Linux & BSD Device Driver Architecture Guidelines
+
+*   **Virtio Drivers**: Implement virtqueue ring buffers for hardware-virtualized devices in `src/driver/`.
+*   **Virtual Terminals**: Use FreeBSD vt(4) multi-slot cell buffering for console display.
+*   **RUMP Kernel Drivers**: Wrap legacy drivers in NetBSD RUMP memory-isolated barriers.
+*   **Bare-Metal Drivers Target**: Prioritize direct physical hardware drivers (NVMe, Intel e1000e, UEFI GOP, USB xHCI) over userspace simulation to ensure real bare-metal boot capability.
