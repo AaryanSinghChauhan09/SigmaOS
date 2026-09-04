@@ -41,8 +41,8 @@ jobs:
 
       - name: Run Systemd Init & BORE Scheduler Tests
         run: |
-          cargo test --lib -- init::systemd_init::tests
-          cargo test --lib -- kernel::linux_bsd_innovations::tests
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
 
       - name: Run Standalone Rust Inspection Suite
         run: |

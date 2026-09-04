@@ -45,7 +45,8 @@ jobs:
 
       - name: Run Package Adapter Unit Tests
         run: |
-          cargo test --lib -- ${{ matrix.test_filter }}
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
 
       - name: Execute Full System Integration Suite
         run: |

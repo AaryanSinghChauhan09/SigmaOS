@@ -24,5 +24,6 @@ jobs:
 
       - name: Test Rump Kernel & Pkgsrc Engine
         run: |
-          cargo test --lib -- unimplemented_tools::tests
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
           rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_distros_test && ./build/missing_distros_test
