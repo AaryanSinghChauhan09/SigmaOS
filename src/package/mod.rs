@@ -54,19 +54,23 @@ pub use nix_guix::{NixPackageManager, StorePath, SystemGeneration, Derivation, E
 pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
 pub use pactree::{PactreeEngine, DependencyNode};
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptPinRule,
-    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
-    DebianDpkgTriggersAptListbugsGuardEngine, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
+    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
+    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
+    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
     DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
-    FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
-    MicroarchRepoRoute, MicroarchitectureLevel, NetBsdPkgsrcOptionsFrameworkEngine,
+    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
     NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
-    OpenSuseZypperVendorStickinessEngine, PkgsrcOptionSpec, PortageEapiLevel, PpaRepository,
-    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator,
-    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
+    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
+    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
+    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
+    ZypperRepository,
 };
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,

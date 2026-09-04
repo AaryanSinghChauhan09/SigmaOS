@@ -64,19 +64,23 @@ pub mod zero_alloc_resolver;
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptPinRule,
-    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianDebconfStatoverrideEngine,
-    DebianDpkgTriggersAptListbugsGuardEngine, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
+    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
+    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
+    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
     DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
-    FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
-    MicroarchRepoRoute, MicroarchitectureLevel, NetBsdPkgsrcOptionsFrameworkEngine,
+    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
     NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
-    OpenSuseZypperVendorStickinessEngine, PkgsrcOptionSpec, PortageEapiLevel, PpaRepository,
-    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator,
-    UbuntuPpaAptPinningEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer, ZypperRepository,
+    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
+    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
+    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
+    ZypperRepository,
 };
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
@@ -136,6 +140,8 @@ pub use package_snapshot_rollback::{
 pub use sovereign_package_innovations::{
     GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
     ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
+    SlackBuildScript, SlackwareBuildPackageEngine, ZypperPackageSpec,
+    ZypperSatDependencyResolver, MossStatelessPackage, SolusMossStatelessTransactionEngine,
 };
 pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
 pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
