@@ -2,12 +2,17 @@
 pub mod device;
 pub mod distro_drivers;
 pub mod dkms_autoloader;
+pub mod driver_test_framework;
 pub mod framework;
 pub mod gpu_framework;
+pub mod gpu_intel_i915;
+pub mod gpu_amd_rdna;
 pub mod grid;
 pub mod irp_system;
 pub mod mapper;
 pub mod network_framework;
+pub mod nic_intel_e1000;
+pub mod nvme_storage;
 pub mod pci_bus;
 pub mod pci_enumeration;
 pub mod pods;
@@ -16,10 +21,30 @@ pub mod shims;
 pub mod ubuntu_common_drivers;
 pub mod universal_support;
 pub mod vault;
+pub mod wifi_broadcom_bcm4318;
 pub mod windows_compat;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
+pub use driver_test_framework::{
+    DriverTestRunner, TestResult, TestStatus, TestSummary, GpuTestSuite, NicTestSuite,
+    StorageTestSuite, WifiTestSuite, MockPciDevice, MockMmioSpace, QemuSimulator, GuestOs,
+};
+pub use gpu_intel_i915::{
+    IntelGpuDriver, IntelGpuPciDriver, GpuMemoryManager, DisplayMode, GpuCommandBuilder,
+};
+pub use gpu_amd_rdna::{
+    AmdGpuDriver, AmdGpuPciDriver, AmdGpuMemoryManager, DisplayConfiguration, GpxCommandQueue,
+};
 pub use mapper::{DriverMapper, MapperCategory};
+pub use nic_intel_e1000::{
+    IntelNicDriver, IntelNicPciDriver, DmaRing, RxDescriptor, TxDescriptor,
+};
+pub use nvme_storage::{
+    NvmeController, NvmePciDriver, NvmeNamespace, QueuePair, NvmeCompletionEntry,
+};
+pub use wifi_broadcom_bcm4318::{
+    BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard, Band, AssociationState,
+};
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
