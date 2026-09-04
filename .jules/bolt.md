@@ -5,3 +5,7 @@
 ## 2026-09-02 - Bulk `copy_from_slice` in Package Cache Buffer Allocation
 **Learning:** In package registry proxy caching, copying payload buffers byte-by-byte in `for i in 0..data_len` loops forces per-index bounds checking and prevents the compiler from emitting vectorized `memcpy` intrinsics. Replacing manual byte-level array assignment with `cached.data[..data_len].copy_from_slice(&data[..data_len])` leverages optimized bulk CPU/SIMD memory transfer routines.
 **Action:** When populating static or dynamic byte arrays in caching layers, always use `copy_from_slice` over manual element loops.
+
+## 2026-09-03 - Hoisting Outer Map Lookups in Pairwise Audits
+**Learning:** In pairwise collection scans (e.g. `detect_conflicts` in `DependencyResolver`), evaluating the outer item's map lookup `self.packages.get(pkg1_name)` inside the inner `(pkg1, pkg2)` loop re-queries the hash/B-tree map $N-1-i$ redundant times per outer item. Hoisting the outer lookup out of the inner loop reduces total map lookups from $N(N-1)$ to $\frac{N(N+1)}{2}$ (~50% reduction in map queries) while maintaining strict borrow checker lifetimes.
+**Action:** Always hoist outer element lookups out of nested pair-scan loops when auditing or comparing elements against a map/registry.
