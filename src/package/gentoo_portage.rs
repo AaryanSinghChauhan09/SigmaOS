@@ -291,7 +291,7 @@ impl SigmaPortage {
         }
 
         // Simulate build process
-        println!("Emerging {} ({})", package, ebuild_clone.version);
+        println!("Emerging {} ({})", package, ebuild.version);
         println!("USE flags: {:?}", use_flags);
         println!("Dependencies: {:?}", dependencies);
 

@@ -295,3 +295,81 @@ fn test_pillar20_migration_tooling() {
     assert!(fedora_sigpkg.contains("name = \"curl\""));
     assert!(fedora_sigpkg.contains("converted_from = \"fedora\""));
 }
+
+#[test]
+fn test_pillar21_bsd_and_linux_universal_package_dispatch() {
+    let dispatcher = UniversalPmCommandDispatcher::new();
+
+    let apt_act = dispatcher.dispatch_command("apt install nginx curl -y").unwrap();
+    assert_eq!(apt_act.source_pm, "apt");
+    assert_eq!(apt_act.operation, UniversalPmOperation::Install);
+    assert_eq!(apt_act.target_packages, vec!["nginx", "curl"]);
+
+    let dnf_act = dispatcher.dispatch_command("dnf remove httpd").unwrap();
+    assert_eq!(dnf_act.source_pm, "dnf");
+    assert_eq!(dnf_act.operation, UniversalPmOperation::Remove);
+
+    let pac_act = dispatcher.dispatch_command("pacman -Syu --print").unwrap();
+    assert_eq!(pac_act.source_pm, "pacman");
+    assert_eq!(pac_act.operation, UniversalPmOperation::Upgrade);
+    assert!(pac_act.dry_run);
+
+    let apk_act = dispatcher.dispatch_command("apk add musl-dev").unwrap();
+    assert_eq!(apk_act.source_pm, "apk");
+    assert_eq!(apk_act.operation, UniversalPmOperation::Install);
+
+    let bsd_act = dispatcher.dispatch_command("pkg install -n postgresql15").unwrap();
+    assert_eq!(bsd_act.source_pm, "pkg");
+    assert_eq!(bsd_act.operation, UniversalPmOperation::Install);
+    assert!(bsd_act.dry_run);
+}
+
+#[test]
+fn test_pillar22_bsd_and_linux_manifest_conversion() {
+    let adapter = UniversalPackageAdapter::new();
+
+    // FreeBSD UCL
+    let freebsd_ucl = "name: \"nginx\"\nversion: \"1.24.0\"\ncomment: \"HTTP server\"\ndeps {\n  \"openssl\": { origin: \"security/openssl\", version: \"3.0.8\" }\n}\n";
+    let ucl_parsed = adapter.parse_freebsd_ucl_manifest(freebsd_ucl).unwrap();
+    assert_eq!(ucl_parsed.name, "nginx");
+    assert_eq!(ucl_parsed.version, "1.24.0");
+
+    // OpenBSD +CONTENTS
+    let openbsd_contents = "@name rsync-3.2.7p0\n@comment Remote copy\n@depend net/rsync:rsync-3.2.7\n";
+    let obs_parsed = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
+    assert_eq!(obs_parsed.pkgname, "rsync");
+    assert_eq!(obs_parsed.version, "3.2.7p0");
+
+    // NetBSD pkgsrc
+    let netbsd_pkgsrc = "PKGNAME=git-2.41.0\nCOMMENT=Git SCM\nDEPENDS=security/openssl\n";
+    let net_parsed = adapter.parse_netbsd_pkgsrc(netbsd_pkgsrc).unwrap();
+    assert_eq!(net_parsed.pkgname, "git");
+
+    // Slackware
+    let slack_pkg = "PRGNAM=htop\nVERSION=3.2.2\nSHORT_DESCRIPTION=Process viewer\nSLACK_REQUIRED=ncurses\n";
+    let slack_parsed = adapter.parse_slackware_pkg(slack_pkg).unwrap();
+    assert_eq!(slack_parsed.name, "htop");
+}
+
+#[test]
+fn test_pillar23_universal_scriptlet_and_capability_mapping() {
+    let dep_mapper = UniversalDependencyMapper::new();
+    assert_eq!(dep_mapper.to_canonical_name("libssl-dev"), "openssl");
+    assert_eq!(dep_mapper.to_canonical_name("openssl-devel"), "openssl");
+    assert_eq!(dep_mapper.to_canonical_name("libc6"), "libc");
+
+    let scriptlet_conv = UniversalScriptletConverter::new();
+    let hook = scriptlet_conv.convert_scriptlet(PackageFormat::Apt, "postinst", "echo post").unwrap();
+    assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
+
+    let simulator = UniversalDryRunSimulator::new();
+    let result = simulator
+        .simulate_install(
+            PackageFormat::Apt,
+            b"Package: curl\nVersion: 8.2.1\nDepends: libssl-dev, libc6\n",
+        )
+        .unwrap();
+    assert!(result.is_valid);
+    assert_eq!(result.package_name, "curl");
+    assert_eq!(result.resolved_dependencies.len(), 2);
+}
