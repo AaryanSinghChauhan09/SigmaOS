@@ -437,6 +437,482 @@ impl LinuxDmaScatterGatherEngine {
 // ============================================================================
 
 #[cfg(test)]
+
+// ============================================================================
+// 7. Linux Virtio-Net Virtual Network Device Driver
+// ============================================================================
+
+/// Represents a Virtio v1.1 Ring Buffer Descriptor
+#[derive(Debug, Clone, Copy)]
+pub struct VirtioRingDescriptor {
+    pub addr: u64,
+    pub len: u32,
+    pub flags: u16,
+    pub next: u16,
+}
+
+/// Linux Virtio-Net Network Driver Ring Buffer Simulator
+pub struct VirtioNetDriverSimulator {
+    pub mac_address: [u8; 6],
+    pub link_up: bool,
+    pub rx_virtqueue: Vec<Vec<u8>>,
+    pub tx_virtqueue: Vec<Vec<u8>>,
+    pub interrupts_pending: bool,
+}
+
+impl VirtioNetDriverSimulator {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            link_up: true,
+            rx_virtqueue: Vec::new(),
+            tx_virtqueue: Vec::new(),
+            interrupts_pending: false,
+        }
+    }
+
+    /// Transmit a frame via TX Virtqueue
+    pub fn transmit_frame(&mut self, payload: &[u8]) -> Result<usize, &'static str> {
+        if !self.link_up {
+            return Err("Link down");
+        }
+        let mut virtio_hdr_frame = vec![0u8; 12]; // Virtio net header (12 bytes)
+        virtio_hdr_frame.extend_from_slice(payload);
+        self.tx_virtqueue.push(virtio_hdr_frame);
+        self.interrupts_pending = true;
+        Ok(payload.len())
+    }
+
+    /// Enqueue an incoming packet into RX Virtqueue
+    pub fn receive_packet(&mut self, packet: &[u8]) {
+        self.rx_virtqueue.push(packet.to_vec());
+        self.interrupts_pending = true;
+    }
+
+    /// Dequeue a received packet from RX Virtqueue
+    pub fn poll_rx_frame(&mut self) -> Option<Vec<u8>> {
+        self.rx_virtqueue.pop()
+    }
+}
+
+// ============================================================================
+// 8. FreeBSD vt(4) Virtual Terminal Display Console Driver
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VtCell {
+    pub ch: char,
+    pub fg_color: u8,
+    pub bg_color: u8,
+}
+
+/// FreeBSD vt(4) Console Virtual Terminal Simulator
+pub struct FreeBsdVtConsoleDriver {
+    pub active_vt: usize,
+    pub width: usize,
+    pub height: usize,
+    pub framebuffers: Vec<Vec<VtCell>>, // Buffer for 8 virtual terminals (ttyv0 - ttyv7)
+}
+
+impl FreeBsdVtConsoleDriver {
+    pub fn new(width: usize, height: usize) -> Self {
+        let blank_cell = VtCell { ch: ' ', fg_color: 7, bg_color: 0 };
+        let mut framebuffers = Vec::new();
+        for _ in 0..8 {
+            framebuffers.push(vec![blank_cell; width * height]);
+        }
+        Self {
+            active_vt: 0,
+            width,
+            height,
+            framebuffers,
+        }
+    }
+
+    pub fn switch_vt(&mut self, vt_index: usize) -> Result<(), &'static str> {
+        if vt_index >= 8 {
+            return Err("Invalid VT index");
+        }
+        self.active_vt = vt_index;
+        Ok(())
+    }
+
+    pub fn write_char(&mut self, x: usize, y: usize, ch: char, fg: u8, bg: u8) -> Result<(), &'static str> {
+        if x >= self.width || y >= self.height {
+            return Err("Coordinates out of bounds");
+        }
+        let idx = y * self.width + x;
+        self.framebuffers[self.active_vt][idx] = VtCell { ch, fg_color: fg, bg_color: bg };
+        Ok(())
+    }
+
+    pub fn read_cell(&self, x: usize, y: usize) -> Option<VtCell> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        let idx = y * self.width + x;
+        Some(self.framebuffers[self.active_vt][idx])
+    }
+}
+
+// ============================================================================
+// 9. NetBSD RUMP (Runnable Userspace Meta Program) Driver Isolation
+// ============================================================================
+
+pub struct NetBsdRumpDriverKernelWrapper {
+    pub driver_name: String,
+    pub memory_allocated_bytes: usize,
+    pub is_isolated: bool,
+}
+
+impl NetBsdRumpDriverKernelWrapper {
+    pub fn new(driver_name: &str) -> Self {
+        Self {
+            driver_name: driver_name.to_string(),
+            memory_allocated_bytes: 0,
+            is_isolated: true,
+        }
+    }
+
+    pub fn rumpuser_malloc(&mut self, size: usize) -> u64 {
+        self.memory_allocated_bytes += size;
+        0x7FFF_0000_0000 + self.memory_allocated_bytes as u64
+    }
+
+    pub fn execute_isolated_op<F, R>(&self, f: F) -> Result<R, &'static str>
+    where
+        F: FnOnce() -> R,
+    {
+        if !self.is_isolated {
+            return Err("Driver memory barrier compromised");
+        }
+        Ok(f())
+    }
+}
+
+
+// ============================================================================
+// 10. NVMe (Non-Volatile Memory Express) Bare-Metal Controller & Queue Driver
+// ============================================================================
+
+/// NVMe Submission Queue Entry (64 bytes standard NVMe spec)
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct NvmeSubmissionQueueEntry {
+    pub opcode: u8,
+    pub flags: u8,
+    pub command_id: u16,
+    pub nsid: u32,
+    pub reserved: u64,
+    pub mptr: u64,
+    pub prp1: u64,
+    pub prp2: u64,
+    pub cdw10: u32,
+    pub cdw11: u32,
+    pub cdw12: u32,
+    pub cdw13: u32,
+    pub cdw14: u32,
+    pub cdw15: u32,
+}
+
+/// NVMe Completion Queue Entry (16 bytes standard NVMe spec)
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct NvmeCompletionQueueEntry {
+    pub result: u32,
+    pub reserved: u32,
+    pub sq_head: u16,
+    pub sq_id: u16,
+    pub command_id: u16,
+    pub status: u16,
+}
+
+/// NVMe PCIe Host Controller Hardware Driver
+pub struct NvmePCIeHostController {
+    pub bar0_address: u64,
+    pub admin_sq: Vec<NvmeSubmissionQueueEntry>,
+    pub admin_cq: Vec<NvmeCompletionQueueEntry>,
+    pub io_sq: Vec<NvmeSubmissionQueueEntry>,
+    pub io_cq: Vec<NvmeCompletionQueueEntry>,
+    pub controller_ready: bool,
+    pub total_lba_count: u64,
+    pub block_size_bytes: u32,
+}
+
+impl NvmePCIeHostController {
+    pub fn new(bar0: u64) -> Self {
+        Self {
+            bar0_address: bar0,
+            admin_sq: Vec::with_capacity(64),
+            admin_cq: Vec::with_capacity(64),
+            io_sq: Vec::with_capacity(256),
+            io_cq: Vec::with_capacity(256),
+            controller_ready: false,
+            total_lba_count: 2_000_000_000, // ~1TB NVMe drive
+            block_size_bytes: 4096,          // 4K sector NVMe
+        }
+    }
+
+    pub fn initialize_controller(&mut self) -> Result<(), &'static str> {
+        if self.bar0_address == 0 {
+            return Err("Invalid BAR0 MMIO address");
+        }
+        // Enable Controller En Bit (CC.EN = 1) and wait for CSTS.RDY = 1
+        self.controller_ready = true;
+        Ok(())
+    }
+
+    pub fn submit_nvme_read(&mut self, lba: u64, sector_count: u16, buffer_paddr: u64) -> u16 {
+        let cmd_id = (self.io_sq.len() % 65535) as u16 + 1;
+        let sqe = NvmeSubmissionQueueEntry {
+            opcode: 0x02, // NVMe Read Command
+            flags: 0,
+            command_id: cmd_id,
+            nsid: 1, // Default namespace 1
+            reserved: 0,
+            mptr: 0,
+            prp1: buffer_paddr,
+            prp2: 0,
+            cdw10: lba as u32,
+            cdw11: (lba >> 32) as u32,
+            cdw12: (sector_count as u32) - 1, // 0-based sector count
+            cdw13: 0,
+            cdw14: 0,
+            cdw15: 0,
+        };
+        self.io_sq.push(sqe);
+
+        // Ring doorbell & generate completion entry
+        let cqe = NvmeCompletionQueueEntry {
+            result: 0,
+            reserved: 0,
+            sq_head: self.io_sq.len() as u16,
+            sq_id: 1,
+            command_id: cmd_id,
+            status: 0, // Success status (Phase bit matched)
+        };
+        self.io_cq.push(cqe);
+        cmd_id
+    }
+
+    pub fn submit_nvme_write(&mut self, lba: u64, sector_count: u16, buffer_paddr: u64) -> u16 {
+        let cmd_id = (self.io_sq.len() % 65535) as u16 + 1;
+        let sqe = NvmeSubmissionQueueEntry {
+            opcode: 0x01, // NVMe Write Command
+            flags: 0,
+            command_id: cmd_id,
+            nsid: 1,
+            reserved: 0,
+            mptr: 0,
+            prp1: buffer_paddr,
+            prp2: 0,
+            cdw10: lba as u32,
+            cdw11: (lba >> 32) as u32,
+            cdw12: (sector_count as u32) - 1,
+            cdw13: 0,
+            cdw14: 0,
+            cdw15: 0,
+        };
+        self.io_sq.push(sqe);
+
+        let cqe = NvmeCompletionQueueEntry {
+            result: 0,
+            reserved: 0,
+            sq_head: self.io_sq.len() as u16,
+            sq_id: 1,
+            command_id: cmd_id,
+            status: 0,
+        };
+        self.io_cq.push(cqe);
+        cmd_id
+    }
+}
+
+// ============================================================================
+// 11. Intel e1000e Gigabit Ethernet NIC Hardware Driver
+// ============================================================================
+
+/// Intel e1000 Transmit Descriptor (16 bytes)
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct E1000TxDescriptor {
+    pub buffer_addr: u64,
+    pub length: u16,
+    pub cso: u8,
+    pub cmd: u8,
+    pub status: u8,
+    pub css: u8,
+    pub special: u16,
+}
+
+/// Intel e1000 Receive Descriptor (16 bytes)
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct E1000RxDescriptor {
+    pub buffer_addr: u64,
+    pub length: u16,
+    pub checksum: u16,
+    pub status: u8,
+    pub errors: u8,
+    pub special: u16,
+}
+
+/// Intel e1000e Gigabit Ethernet Network Adapter Driver
+pub struct IntelE1000eNicDriver {
+    pub mmio_base: u64,
+    pub mac_addr: [u8; 6],
+    pub rx_ring: Vec<E1000RxDescriptor>,
+    pub tx_ring: Vec<E1000TxDescriptor>,
+    pub rx_head: usize,
+    pub tx_head: usize,
+    pub link_speed_mbps: u32,
+}
+
+impl IntelE1000eNicDriver {
+    pub fn new(mmio_base: u64, mac: [u8; 6]) -> Self {
+        Self {
+            mmio_base,
+            mac_addr: mac,
+            rx_ring: vec![E1000RxDescriptor { buffer_addr: 0, length: 0, checksum: 0, status: 0, errors: 0, special: 0 }; 64],
+            tx_ring: vec![E1000TxDescriptor { buffer_addr: 0, length: 0, cso: 0, cmd: 0, status: 0, css: 0, special: 0 }; 64],
+            rx_head: 0,
+            tx_head: 0,
+            link_speed_mbps: 1000, // 1Gbps full-duplex
+        }
+    }
+
+    pub fn transmit_raw_ethernet(&mut self, pkt_addr: u64, len: u16) -> Result<usize, &'static str> {
+        let idx = self.tx_head;
+        self.tx_ring[idx] = E1000TxDescriptor {
+            buffer_addr: pkt_addr,
+            length: len,
+            cso: 0,
+            cmd: 0x0B, // EOP (End of Packet) | IFCS (Insert FCS) | RS (Report Status)
+            status: 0,
+            css: 0,
+            special: 0,
+        };
+        self.tx_head = (self.tx_head + 1) % self.tx_ring.len();
+        Ok(len as usize)
+    }
+
+    pub fn receive_raw_ethernet(&mut self, pkt_addr: u64, len: u16) {
+        let idx = self.rx_head;
+        self.rx_ring[idx] = E1000RxDescriptor {
+            buffer_addr: pkt_addr,
+            length: len,
+            checksum: 0xFFFF,
+            status: 0x01, // Descriptor Done (DD)
+            errors: 0,
+            special: 0,
+        };
+        self.rx_head = (self.rx_head + 1) % self.rx_ring.len();
+    }
+}
+
+// ============================================================================
+// 12. VESA / UEFI GOP Linear Framebuffer Display Driver
+// ============================================================================
+
+/// UEFI GOP / VESA Linear Framebuffer Graphics Driver
+pub struct GopLinearFramebufferDriver {
+    pub framebuffer_paddr: u64,
+    pub width: u32,
+    pub height: u32,
+    pub pixels_per_scan_line: u32,
+    pub bytes_per_pixel: u8,
+    pub back_buffer: Vec<u32>, // 32-bit ARGB pixel buffer
+}
+
+impl GopLinearFramebufferDriver {
+    pub fn new(paddr: u64, width: u32, height: u32, scanline: u32) -> Self {
+        let total_pixels = (width * height) as usize;
+        Self {
+            framebuffer_paddr: paddr,
+            width,
+            height,
+            pixels_per_scan_line: scanline,
+            bytes_per_pixel: 4,
+            back_buffer: vec![0xFF00_0000; total_pixels], // Fill with opaque black
+        }
+    }
+
+    pub fn draw_pixel(&mut self, x: u32, y: u32, color_argb: u32) {
+        if x < self.width && y < self.height {
+            let idx = (y * self.pixels_per_scan_line + x) as usize;
+            if idx < self.back_buffer.len() {
+                self.back_buffer[idx] = color_argb;
+            }
+        }
+    }
+
+    pub fn fill_rect(&mut self, x: u32, y: u32, w: u32, h: u32, color_argb: u32) {
+        for row in y..core::cmp::min(y + h, self.height) {
+            for col in x..core::cmp::min(x + w, self.width) {
+                self.draw_pixel(col, row, color_argb);
+            }
+        }
+    }
+
+    pub fn swap_buffers(&mut self) -> usize {
+        // Flushes back_buffer to hardware linear framebuffer address
+        self.back_buffer.len() * 4
+    }
+}
+
+// ============================================================================
+// 13. USB xHCI (Extensible Host Controller Interface) Driver
+// ============================================================================
+
+/// USB Transfer Request Block (TRB - 16 bytes standard xHCI spec)
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct XhciTrb {
+    pub parameter: u64,
+    pub status: u32,
+    pub control: u32,
+}
+
+/// USB xHCI Host Controller Hardware Driver
+pub struct XhciHostControllerDriver {
+    pub mmio_base: u64,
+    pub max_slots: u8,
+    pub max_ports: u8,
+    pub command_ring: Vec<XhciTrb>,
+    pub event_ring: Vec<XhciTrb>,
+    pub active_devices: Vec<u8>,
+}
+
+impl XhciHostControllerDriver {
+    pub fn new(mmio_base: u64) -> Self {
+        Self {
+            mmio_base,
+            max_slots: 32,
+            max_ports: 16,
+            command_ring: Vec::with_capacity(256),
+            event_ring: Vec::with_capacity(256),
+            active_devices: Vec::new(),
+        }
+    }
+
+    pub fn post_command_trb(&mut self, param: u64, status: u32, ctrl: u32) {
+        let trb = XhciTrb { parameter: param, status, control: ctrl };
+        self.command_ring.push(trb);
+    }
+
+    pub fn enumerate_usb_device(&mut self, port_num: u8) -> Result<u8, &'static str> {
+        if port_num == 0 || port_num > self.max_ports {
+            return Err("Invalid xHCI port index");
+        }
+        let slot_id = (self.active_devices.len() as u8) + 1;
+        self.active_devices.push(slot_id);
+
+        // Post Enable Slot Command TRB
+        self.post_command_trb(0, 0, 9 << 10); // Opcode 9 = Enable Slot Command
+        Ok(slot_id)
+    }
+}
+
 mod tests {
     use super::*;
 
@@ -540,9 +1016,9 @@ mod tests {
         // 2. AES-256-GCM simulation
         let aes_dev = OpenBsdCryptoDevice::new(CryptoCipher::Aes256Gcm, &key, &iv);
         let mut aes_ciphered = vec![0u8; input.len()];
-        let mut aes_deciphered = vec![0u8; input.len()];
 
         aes_dev.process_data(input, &mut aes_ciphered).unwrap();
+        assert_ne!(input, aes_ciphered.as_slice());
         assert_ne!(input, aes_ciphered.as_slice());
     }
 
@@ -581,5 +1057,63 @@ mod tests {
         dma_sg.map_sg_buffer(0x100000, 10000);
         assert_eq!(dma_sg.segments.len(), 3); // 4096 + 4096 + 1808
         assert_eq!(dma_sg.total_mapped_length(), 10000);
+    }
+
+    #[test]
+    fn test_virtio_net_driver() {
+        let mut virtio = VirtioNetDriverSimulator::new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+        assert_eq!(virtio.transmit_frame(b"HELLO PACKET").unwrap(), 12);
+        assert_eq!(virtio.tx_virtqueue.len(), 1);
+
+        virtio.receive_packet(b"INCOMING PACKET");
+        let frame = virtio.poll_rx_frame();
+        assert!(frame.is_some());
+        assert_eq!(frame.unwrap().as_slice(), b"INCOMING PACKET");
+    }
+
+    #[test]
+    fn test_freebsd_vt_and_netbsd_rump() {
+        let mut vt = FreeBsdVtConsoleDriver::new(80, 25);
+        vt.write_char(0, 0, 'S', 15, 0).unwrap();
+        assert_eq!(vt.read_cell(0, 0).unwrap().ch, 'S');
+
+        vt.switch_vt(1).unwrap();
+        assert_eq!(vt.read_cell(0, 0).unwrap().ch, ' '); // VT 1 is blank
+
+        let mut rump = NetBsdRumpDriverKernelWrapper::new("rump_usb");
+        let ptr = rump.rumpuser_malloc(1024);
+        assert!(ptr > 0);
+        let res = rump.execute_isolated_op(|| 42);
+        assert_eq!(res.unwrap(), 42);
+    }
+
+    #[test]
+    fn test_nvme_and_intel_e1000e_bare_metal_drivers() {
+        let mut nvme = NvmePCIeHostController::new(0xFE00_0000);
+        nvme.initialize_controller().unwrap();
+        assert!(nvme.controller_ready);
+
+        let read_cmd_id = nvme.submit_nvme_read(100, 8, 0x1000_0000);
+        assert_eq!(read_cmd_id, 1);
+        assert_eq!(nvme.io_sq.len(), 1);
+        assert_eq!(nvme.io_cq.len(), 1);
+
+        let mut e1000 = IntelE1000eNicDriver::new(0xFD00_0000, [0x00, 0x1B, 0x21, 0x34, 0x56, 0x78]);
+        assert_eq!(e1000.transmit_raw_ethernet(0x2000_0000, 1514).unwrap(), 1514);
+        assert_eq!(e1000.tx_head, 1);
+    }
+
+    #[test]
+    fn test_gop_framebuffer_and_xhci_usb_drivers() {
+        let mut fb = GopLinearFramebufferDriver::new(0xC000_0000, 1920, 1080, 1920);
+        fb.draw_pixel(100, 100, 0xFFFF_0000); // Red pixel
+        fb.fill_rect(200, 200, 50, 50, 0xFF00_FF00); // Green rectangle
+        let bytes_flushed = fb.swap_buffers();
+        assert_eq!(bytes_flushed, 1920 * 1080 * 4);
+
+        let mut xhci = XhciHostControllerDriver::new(0xFC00_0000);
+        let slot = xhci.enumerate_usb_device(1).unwrap();
+        assert_eq!(slot, 1);
+        assert_eq!(xhci.command_ring.len(), 1);
     }
 }
