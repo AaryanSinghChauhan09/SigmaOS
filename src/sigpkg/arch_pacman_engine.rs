@@ -261,7 +261,6 @@ impl AURHelper {
     }
 }
 
-
 impl Default for PacmanDatabase {
     fn default() -> Self {
         Self::new()
@@ -275,7 +274,9 @@ pub struct PacmanCacheCleaner {
 
 impl PacmanCacheCleaner {
     pub fn new(files: Vec<String>) -> Self {
-        PacmanCacheCleaner { cached_files: files }
+        PacmanCacheCleaner {
+            cached_files: files,
+        }
     }
 
     /// Prunes cache to keep specified number of candidates per package
@@ -296,15 +297,22 @@ pub struct PacnewDiffManager {
 
 impl PacnewDiffManager {
     pub fn new() -> Self {
-        PacnewDiffManager { pending_diffs: Vec::new() }
+        PacnewDiffManager {
+            pending_diffs: Vec::new(),
+        }
     }
 
     pub fn register_pacnew(&mut self, original: &str, pacnew: &str) {
-        self.pending_diffs.push((original.to_string(), pacnew.to_string()));
+        self.pending_diffs
+            .push((original.to_string(), pacnew.to_string()));
     }
 
     pub fn resolve_diff(&mut self, original: &str) -> Option<String> {
-        if let Some(pos) = self.pending_diffs.iter().position(|(orig, _)| orig == original) {
+        if let Some(pos) = self
+            .pending_diffs
+            .iter()
+            .position(|(orig, _)| orig == original)
+        {
             let item = self.pending_diffs.remove(pos);
             Some(format!("Merged {} into {}", item.1, item.0))
         } else {
@@ -326,7 +334,12 @@ impl DependencyTreeVisualizer {
     pub fn render_tree(pkg_name: &str, db: &PacmanDatabase, reverse: bool) -> String {
         let mut result = format!("{}\n", pkg_name);
         if !reverse {
-            if let Some(pkg) = db.packages.iter().chain(db.local_packages.iter()).find(|p| p.name == pkg_name) {
+            if let Some(pkg) = db
+                .packages
+                .iter()
+                .chain(db.local_packages.iter())
+                .find(|p| p.name == pkg_name)
+            {
                 for dep in &pkg.depends {
                     result.push_str(&format!("├── {}\n", dep));
                 }
@@ -351,7 +364,11 @@ impl SafeUpdateChecker {
         for local in &db.local_packages {
             if let Some(repo_pkg) = db.packages.iter().find(|p| p.name == local.name) {
                 if repo_pkg.version != local.version {
-                    updates.push((local.name.clone(), local.version.clone(), repo_pkg.version.clone()));
+                    updates.push((
+                        local.name.clone(),
+                        local.version.clone(),
+                        repo_pkg.version.clone(),
+                    ));
                 }
             }
         }
@@ -368,7 +385,11 @@ impl PkgbuildChecksumUpdater {
         for &b in source_payload {
             hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
         }
-        let hash_str = format!("{:016x}{:016x}", hash_val, hash_val.wrapping_add(0x12345678));
+        let hash_str = format!(
+            "{:016x}{:016x}",
+            hash_val,
+            hash_val.wrapping_add(0x12345678)
+        );
 
         let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
         let mut found = false;
@@ -383,6 +404,82 @@ impl PkgbuildChecksumUpdater {
             lines.push(format!("sha256sums=('{}')", hash_str));
         }
         lines.join("\n")
+    }
+}
+
+/// Pacman contrib engine for Arch Linux pacman-contrib scripts parity (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        PacmanContribEngine
+    }
+
+    pub fn paccache_clean(&self, cache: &[String], keep_count: usize) -> Vec<String> {
+        if cache.len() <= keep_count {
+            Vec::new()
+        } else {
+            cache[..cache.len() - keep_count].to_vec()
+        }
+    }
+
+    pub fn rankmirrors(&self, mirrors: &[(String, u32)], top_n: usize) -> Vec<(String, u32)> {
+        let mut sorted = mirrors.to_vec();
+        sorted.sort_by_key(|(_, ping)| *ping);
+        sorted.truncate(top_n);
+        sorted
+    }
+
+    pub fn updpkgsums(&self, pkgbuild_text: &str, new_sum: &str) -> String {
+        let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
+        let mut replaced = false;
+        for line in &mut lines {
+            if line.starts_with("sha256sums=") {
+                *line = format!("sha256sums=('{}')", new_sum);
+                replaced = true;
+                break;
+            }
+        }
+        if !replaced {
+            lines.push(format!("sha256sums=('{}')", new_sum));
+        }
+        lines.join("\n")
+    }
+
+    pub fn checkupdates(
+        &self,
+        local_db: &PacmanDatabase,
+        remote_db: &PacmanDatabase,
+    ) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local in &local_db.local_packages {
+            if let Some(remote) = remote_db.packages.iter().find(|p| p.name == local.name) {
+                if remote.version != local.version {
+                    updates.push((
+                        local.name.clone(),
+                        local.version.clone(),
+                        remote.version.clone(),
+                    ));
+                }
+            }
+        }
+        updates
+    }
+
+    pub fn finddeps(&self, local_db: &PacmanDatabase, dep_name: &str) -> Vec<String> {
+        let mut dependents = Vec::new();
+        for pkg in &local_db.local_packages {
+            if pkg.depends.iter().any(|d| d == dep_name) {
+                dependents.push(pkg.name.clone());
+            }
+        }
+        dependents
+    }
+}
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -435,7 +532,11 @@ impl SovereignDbscriptsEngine {
     }
 
     /// repo-add parity: Adds or updates package entry in target repository database index
-    pub fn repo_add(&mut self, stage: RepoStageTier, entry: RepoDbPackageEntry) -> Result<(), &'static str> {
+    pub fn repo_add(
+        &mut self,
+        stage: RepoStageTier,
+        entry: RepoDbPackageEntry,
+    ) -> Result<(), &'static str> {
         if entry.sha256_hash.is_empty() || entry.pgp_dilithium5_signature.is_empty() {
             return Err("dbscripts: Refusing repo_add for unsigned or missing checksum package");
         }
@@ -462,7 +563,11 @@ impl SovereignDbscriptsEngine {
     }
 
     /// repo-remove parity: Removes package entry from target repository database index
-    pub fn repo_remove(&mut self, stage: RepoStageTier, pkg_name: &str) -> Result<RepoDbPackageEntry, &'static str> {
+    pub fn repo_remove(
+        &mut self,
+        stage: RepoStageTier,
+        pkg_name: &str,
+    ) -> Result<RepoDbPackageEntry, &'static str> {
         let db = self
             .repo_databases
             .iter_mut()
@@ -483,7 +588,12 @@ impl SovereignDbscriptsEngine {
     }
 
     /// db-move parity: Moves package between repository stages (e.g. testing -> core)
-    pub fn db_move(&mut self, from_stage: RepoStageTier, to_stage: RepoStageTier, pkg_name: &str) -> Result<(), &'static str> {
+    pub fn db_move(
+        &mut self,
+        from_stage: RepoStageTier,
+        to_stage: RepoStageTier,
+        pkg_name: &str,
+    ) -> Result<(), &'static str> {
         let mut entry = self.repo_remove(from_stage, pkg_name)?;
         entry.stage = to_stage;
         self.repo_add(to_stage, entry)?;
@@ -721,12 +831,20 @@ depends=('glibc')
         let contrib = PacmanContribEngine::new();
 
         // Test paccache
-        let cache = vec!["pkg-1.0.pkg.tar.zst".to_string(), "pkg-1.1.pkg.tar.zst".to_string(), "pkg-1.2.pkg.tar.zst".to_string()];
+        let cache = vec![
+            "pkg-1.0.pkg.tar.zst".to_string(),
+            "pkg-1.1.pkg.tar.zst".to_string(),
+            "pkg-1.2.pkg.tar.zst".to_string(),
+        ];
         let to_remove = contrib.paccache_clean(&cache, 2);
         assert_eq!(to_remove, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
 
         // Test rankmirrors
-        let mirrors = vec![("mirror1".to_string(), 120), ("mirror2".to_string(), 45), ("mirror3".to_string(), 80)];
+        let mirrors = vec![
+            ("mirror1".to_string(), 120),
+            ("mirror2".to_string(), 45),
+            ("mirror3".to_string(), 80),
+        ];
         let ranked = contrib.rankmirrors(&mirrors, 2);
         assert_eq!(ranked.len(), 2);
         assert_eq!(ranked[0].0, "mirror2");

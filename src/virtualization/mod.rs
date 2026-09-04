@@ -5,8 +5,8 @@ pub mod orchestration;
 pub mod rancher;
 
 pub use kvm_vcpu::{
-    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs,
-    VirtioDeviceBackend, VirtioDeviceType,
+    KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,
+    VirtioDeviceType,
 };
 
 pub use orchestration::{
@@ -17,7 +17,6 @@ pub use orchestration::{
 
 pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};
 pub use rancher::{
-    DaemonlessContainer, K3osOrchestrator, RancherError,
-    RancherHarvesterVirtualMachineGovernor, RancherK3sEmbeddedClusterController,
-    RancherSystemDockerEngine,
+    DaemonlessContainer, K3osOrchestrator, RancherError, RancherHarvesterVirtualMachineGovernor,
+    RancherK3sEmbeddedClusterController, RancherSystemDockerEngine,
 };
