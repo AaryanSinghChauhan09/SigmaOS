@@ -548,6 +548,13 @@ impl Default for SovereignDbscriptsEngine {
     }
 }
 
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

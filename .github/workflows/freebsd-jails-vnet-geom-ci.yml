@@ -19,6 +19,8 @@ jobs:
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # stable
+        with:
+          toolchain: stable
 
       - name: Test FreeBSD Jails Submodule
         run: |

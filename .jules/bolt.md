@@ -9,7 +9,3 @@
 ## 2026-09-03 - Hoisting Outer Map Lookups in Pairwise Audits
 **Learning:** In pairwise collection scans (e.g. `detect_conflicts` in `DependencyResolver`), evaluating the outer item's map lookup `self.packages.get(pkg1_name)` inside the inner `(pkg1, pkg2)` loop re-queries the hash/B-tree map $N-1-i$ redundant times per outer item. Hoisting the outer lookup out of the inner loop reduces total map lookups from $N(N-1)$ to $\frac{N(N+1)}{2}$ (~50% reduction in map queries) while maintaining strict borrow checker lifetimes.
 **Action:** Always hoist outer element lookups out of nested pair-scan loops when auditing or comparing elements against a map/registry.
-
-## 2026-09-04 - Set Lookups & Drop Order Borrow Lifetimes in Transaction Audits
-**Learning:** Replacing `Vec` linear scans with `BTreeSet` transforms $O(N)$ lookups into $O(\log N)$ set operations and allows `insert` to return duplicate status in a single pass. When borrowing slice references (`&str`) into a set (e.g., `BTreeSet<&str>`), the underlying vector containing the owned data (`Vec<AlpmPackage>`) must be declared before the set so that local variable drop order (reverse declaration) ensures the owned data outlives borrowed set references.
-**Action:** When creating borrowed reference sets (`BTreeSet<&str>`) in local functions, always declare the owned container first.
