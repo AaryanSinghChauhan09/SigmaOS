@@ -3535,6 +3535,26 @@ impl FedoraToolbxContainerEngine {
         }
     }
 
+    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            c.running = false;
+            Ok(format!("Toolbx container '{}' stopped", c.name))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
+    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
+        if let Some(c) = self.active_containers.get_mut(name) {
+            if !c.running {
+                c.running = true;
+            }
+            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+        } else {
+            Err("Toolbx container not found")
+        }
+    }
+
     pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
         if let Some(c) = self.active_containers.get_mut(name) {
             if !c.host_mounts.contains(&host_path.to_string()) {

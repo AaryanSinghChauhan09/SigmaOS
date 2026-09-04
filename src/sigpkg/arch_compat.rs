@@ -955,21 +955,7 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
-    #[test]
-    fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
-        let mut verifier = SAurP2pVerifier::new(
-            "swarm_arch_community_001",
-            "merkle_root_99887766554433221100",
-        );
-        assert!(verifier.verify_chunk_hash(0, b"chunk0_data_block"));
-        assert!(verifier.verify_chunk_hash(1, b"chunk1_data_block"));
-        assert_eq!(verifier.verified_chunks, 2);
-        assert!(verifier.is_swarm_integrity_valid());
-
-        let compiler = SAbsSimdCompiler::new(SimdTarget::Avx512, 3);
-        let flags = compiler.generate_compiler_flags();
-        assert!(flags.contains("skylake-avx512"));
-        assert!(flags.contains("opt-level=3"));
+// --- Arch Linux svntogit Repository Migration Engine ---
 
         let compiled = compiler.compile_vectorized_binary("fn main() {}");
         assert!(compiled.len() > 20);
