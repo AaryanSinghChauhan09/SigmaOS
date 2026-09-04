@@ -47,6 +47,11 @@ pub enum DistroSubsystemMode {
     NetBsd,
     DragonFlyBsd,
     SolarisIllumos,
+    SmartOs,
+    BedrockLinux,
+    LinuxPopOs,
+    LinuxTails,
+    LinuxGuix,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +62,9 @@ pub enum ServiceSupervisorType {
     Shepherd,
     Dinit,
     SysVInit,
+    Sysvinit,
     Smf,
+    Rcd,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -112,6 +119,7 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
     }
@@ -169,47 +177,39 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        let modes = [
-            DistroSubsystemMode::LinuxArch,
-            DistroSubsystemMode::LinuxDebian,
-            DistroSubsystemMode::LinuxAlpine,
-            DistroSubsystemMode::LinuxNix,
-            DistroSubsystemMode::LinuxGentoo,
-            DistroSubsystemMode::LinuxFedora,
-            DistroSubsystemMode::FreeBsd,
-            DistroSubsystemMode::OpenBsd,
-            DistroSubsystemMode::NetBsd,
-            DistroSubsystemMode::DragonFlyBsd,
-        ];
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
 
-        !pkg_spec.is_empty()
-            && !vfs_etc.is_empty()
-            && match self.mode {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora
-                | DistroSubsystemMode::LinuxOpenSuse
-                | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxClear
-                | DistroSubsystemMode::LinuxTails
-                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
+        let supervisor_valid = match self.mode {
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-                DistroSubsystemMode::LinuxAlpine
-                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
 
-                DistroSubsystemMode::LinuxNix
-                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
+            DistroSubsystemMode::LinuxNix
+            | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
 
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+        };
+
+        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -231,17 +231,11 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            }
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
+                format!("{}.tgz", input_pkg)
+            }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
-            DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
-            DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
-            DistroSubsystemMode::FreeBsd
-            | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
@@ -386,36 +380,6 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
-    pub fn verify_all_subsystems_compatibility(&self) -> bool {
-        let supervisor = self.get_supervisor_type();
-        let pkg_spec = self.translate_package_specifier("coreutils");
-        let vfs_etc = self.translate_vfs_path("/etc");
-
-        let supervisor_valid = match self.mode {
-            DistroSubsystemMode::LinuxArch
-            | DistroSubsystemMode::LinuxDebian
-            | DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => supervisor == ServiceSupervisorType::Systemd,
-
-            DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::FreeBsd
-            | DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
-
-            DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
-            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
-        };
-
-        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
-    }
 }
 
 // ==========================================

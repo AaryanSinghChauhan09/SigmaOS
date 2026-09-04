@@ -10,15 +10,19 @@ pub enum TargetArchitecture {
     X86_64,
     AArch64,
     Riscv64,
+    LoongArch64,
+    Ppc64Le,
 }
 
-/// System Interrupt Controller Abstraction (x86 APIC/IOAPIC, ARM GICv2/v3, RISC-V PLIC/CLINT)
+/// System Interrupt Controller Abstraction (x86 APIC/IOAPIC, ARM GICv2/v3, RISC-V PLIC/CLINT, LoongArch ExtIOI, PowerPC XIVE)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptControllerKind {
     X86ApicIoApic,
     ArmGicV2,
     ArmGicV3,
     RiscvPlicClint,
+    LoongArchExtIoi,
+    PpcXive,
 }
 
 /// Architecture-specific register context snapshot
@@ -49,6 +53,18 @@ pub enum CpuRegisterContext {
         sstatus: u64,
         satp: u64,
     },
+    LoongArch64 {
+        r: [u64; 32],
+        era: u64,
+        prmd: u64,
+        pgdl: u64,
+    },
+    Ppc64Le {
+        gpr: [u64; 32],
+        nip: u64,
+        msr: u64,
+        lr: u64,
+    },
 }
 
 /// MMIO Page Fault Information
@@ -74,6 +90,8 @@ impl MultiArchHalManager {
             TargetArchitecture::X86_64 => InterruptControllerKind::X86ApicIoApic,
             TargetArchitecture::AArch64 => InterruptControllerKind::ArmGicV3,
             TargetArchitecture::Riscv64 => InterruptControllerKind::RiscvPlicClint,
+            TargetArchitecture::LoongArch64 => InterruptControllerKind::LoongArchExtIoi,
+            TargetArchitecture::Ppc64Le => InterruptControllerKind::PpcXive,
         };
 
         Self {
@@ -131,6 +149,18 @@ impl MultiArchHalManager {
                 sstatus: 0x00000020,
                 satp: 0x8000000000003000,
             },
+            TargetArchitecture::LoongArch64 => CpuRegisterContext::LoongArch64 {
+                r: [0u64; 32],
+                era: 0x9000000000000000,
+                prmd: 0x4,
+                pgdl: 0x1000,
+            },
+            TargetArchitecture::Ppc64Le => CpuRegisterContext::Ppc64Le {
+                gpr: [0u64; 32],
+                nip: 0x0000000000000100,
+                msr: 0x8000000000009033,
+                lr: 0,
+            },
         }
     }
 }
@@ -177,6 +207,22 @@ mod tests {
             assert_eq!(pc, 0x80000000);
         } else {
             panic!("Expected Riscv64 register context");
+        }
+
+        let hal_loongarch = MultiArchHalManager::new(TargetArchitecture::LoongArch64);
+        assert_eq!(hal_loongarch.irq_controller, InterruptControllerKind::LoongArchExtIoi);
+        if let CpuRegisterContext::LoongArch64 { era, .. } = hal_loongarch.create_default_context() {
+            assert_eq!(era, 0x9000000000000000);
+        } else {
+            panic!("Expected LoongArch64 register context");
+        }
+
+        let hal_ppc = MultiArchHalManager::new(TargetArchitecture::Ppc64Le);
+        assert_eq!(hal_ppc.irq_controller, InterruptControllerKind::PpcXive);
+        if let CpuRegisterContext::Ppc64Le { nip, .. } = hal_ppc.create_default_context() {
+            assert_eq!(nip, 0x0000000000000100);
+        } else {
+            panic!("Expected Ppc64Le register context");
         }
     }
 }
