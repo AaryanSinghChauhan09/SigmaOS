@@ -461,7 +461,7 @@ impl Default for SigmaInit {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_service_creation() {

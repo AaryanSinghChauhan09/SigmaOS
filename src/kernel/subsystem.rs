@@ -725,7 +725,7 @@ pub enum RegistryError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     // Mock driver for testing
     struct MockDriver {

@@ -3,13 +3,11 @@
 // Inspired by DuckDB, Apache Arrow, Polars, and Pandas
 // Provides fast tabular queries, columnar dataset inspection, ETL pipelines, and statistical summaries.
 
-#![no_std]
 
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-extern crate alloc;
 
 /// Data DataType for Tabular Data Fields
 #[derive(Debug, Clone, PartialEq, Eq)]

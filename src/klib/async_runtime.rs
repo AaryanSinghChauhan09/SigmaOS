@@ -86,7 +86,7 @@ const DUMMY_VTABLE: RawWakerVTable = RawWakerVTable::new(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::rc::Rc;
+    use std::rc::Rc;
     use core::cell::RefCell;
 
     struct SimpleFuture {

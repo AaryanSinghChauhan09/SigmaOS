@@ -711,7 +711,7 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use alloc::string::String;
+    use std::string::String;
 
     pub type Result<T> = core::result::Result<T, &'static str>;
 

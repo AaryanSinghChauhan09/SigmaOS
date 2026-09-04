@@ -725,7 +725,7 @@ impl Default for SovereignXcr0State {
 mod tests {
     use super::*;
     extern crate alloc;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {

@@ -1,4 +1,3 @@
-#![no_std]
 //! # 🐧 SigmaOS Extended Distro & Unix Subsystem Matrix
 //!
 //! Provides native Safe-Rust execution, parsing, and policy abstractions for 15+ Unix/Linux/BSD paradigms:
@@ -12,7 +11,6 @@
 //! - **DragonFly BSD**: HAMMER2 filesystem snapshot transaction log model
 use std::vec;
 
-extern crate alloc;
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};

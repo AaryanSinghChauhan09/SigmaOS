@@ -237,7 +237,7 @@ impl SubtitleEditEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::collections::BTreeMap;
+    use std::collections::BTreeMap;
 
     #[test]
     fn test_subtitle_entry_timing_shift() {

@@ -53,8 +53,8 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-pub use alloc::collections::BTreeMap;
-pub use alloc::string::{String, ToString};
+pub use std::collections::BTreeMap;
+pub use std::string::{String, ToString};
 pub use arc::Arc;
 pub use collections::VecDeque;
 pub use hashmap::HashMap;

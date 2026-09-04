@@ -728,7 +728,7 @@ impl Default for HardwareBroker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_device_id() {

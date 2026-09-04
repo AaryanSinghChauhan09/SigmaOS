@@ -240,7 +240,7 @@ impl Default for SovereignCompilerOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {

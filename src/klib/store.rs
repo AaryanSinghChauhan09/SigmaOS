@@ -55,7 +55,7 @@ impl<S: Clone, A> Store<S, A> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::rc::Rc;
+    use std::rc::Rc;
 
     #[derive(Clone, Debug, PartialEq, Eq)]
     struct AppState {

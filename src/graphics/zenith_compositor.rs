@@ -493,7 +493,7 @@ impl Default for DamageTracker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::format;
+    use std::format;
 
     #[test]
     fn test_window_creation() {

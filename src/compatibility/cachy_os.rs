@@ -369,7 +369,7 @@ impl CachyMicroarchCompilerTuner {
 
     pub fn inject_optimal_compilation_flags(&self) -> Vec<String> {
         let mut flags = Vec::new();
-        use alloc::string::ToString;
+        use std::string::ToString;
         flags.push("-O3".to_string());
         flags.push("-flto=thin".to_string());
         flags.push("-fno-plt".to_string());
@@ -491,7 +491,7 @@ impl Default for CachyosKernelFeatureMatrix {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
+    use std::string::ToString;
 
     #[test]
     fn test_bore_scheduler_ticks() {

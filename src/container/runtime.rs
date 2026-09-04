@@ -738,7 +738,7 @@ impl SimpleContainerRuntime {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     unsafe { std_alloc(layout) }
 }
@@ -832,8 +832,8 @@ pub mod oci {
     extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use alloc::string::{String, ToString};
-    use alloc::vec::Vec;
+    use std::string::{String, ToString};
+    use std::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -997,8 +997,8 @@ pub mod oci {
 mod tests {
     extern crate alloc;
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
+    use std::string::ToString;
+    use std::vec;
 
     #[test]
     fn test_container_creation() {

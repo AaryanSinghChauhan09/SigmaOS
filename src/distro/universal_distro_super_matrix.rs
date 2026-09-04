@@ -6,8 +6,6 @@
 // absorption of advanced capabilities across General-Purpose, Lightweight, Security,
 // Enterprise, Privacy, Specialized, Container, and Rolling Linux Distributions.
 
-#![no_std]
-extern crate alloc;
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};

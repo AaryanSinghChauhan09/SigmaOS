@@ -299,8 +299,8 @@ pub fn parse_dpkg_status(text: &str) -> Vec<DpkgStatusEntry> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::format;
-    use alloc::vec;
+    use std::format;
+    use std::vec;
 
     #[test]
     fn test_debian_control_parsing() {

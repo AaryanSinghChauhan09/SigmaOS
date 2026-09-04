@@ -20,8 +20,8 @@
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 976
 /// Implements IoT device management
 
-pub use alloc::string::String;
-pub use alloc::boxed::Box;
+pub use std::string::String;
+pub use std::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

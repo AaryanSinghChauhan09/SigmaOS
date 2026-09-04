@@ -218,7 +218,7 @@ impl LogRotator for SimpleLogRotator {
                 if log_file.id() == id {
                     log_file.reset_size();
                     // Use standard alloc::string::ToString
-                    use alloc::string::ToString;
+                    use std::string::ToString;
                     let path_str = alloc::string::String::from_utf8(log_file.path().to_vec())
                         .unwrap_or_else(|_| alloc::string::String::from("log"));
                     path_to_shift = Some(path_str);

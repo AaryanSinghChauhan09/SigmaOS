@@ -263,7 +263,7 @@ impl Default for TlsEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
+    use std::string::ToString;
 
     #[test]
     fn test_create_session() {

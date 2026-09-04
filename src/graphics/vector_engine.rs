@@ -335,7 +335,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_game_engine_physics() {
-        use alloc::string::ToString;
+        use std::string::ToString;
         let mut engine = SovereignGameEngine::new();
         engine.gravity = 10.0; // Simplify math: g = 10 m/s^2
 

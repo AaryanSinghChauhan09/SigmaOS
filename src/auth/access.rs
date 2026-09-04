@@ -182,7 +182,7 @@ impl AccessControl for SimpleAccessControl {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::boxed::Box;
+    use std::boxed::Box;
 
     #[test]
     fn test_simple_permission_resource_len() {
