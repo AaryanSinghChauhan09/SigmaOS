@@ -1,4 +1,3 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::format;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
@@ -6,6 +5,7 @@ use std::format;
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintError {
@@ -354,16 +354,8 @@ impl CinnamonThemeEngine {
         let default_name = b"Mint-Y-Dark";
         let default_icons = b"Mint-Y";
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                default_name.as_ptr(),
-                theme.as_mut_ptr(),
-                default_name.len(),
-            );
-            core::ptr::copy_nonoverlapping(
-                default_icons.as_ptr(),
-                icon_theme.as_mut_ptr(),
-                default_icons.len(),
-            );
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+            core::ptr::copy_nonoverlapping(default_icons.as_ptr(), icon_theme.as_mut_ptr(), default_icons.len());
         }
         Self {
             active_gtk_theme: theme,

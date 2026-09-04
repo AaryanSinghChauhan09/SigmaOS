@@ -2,8 +2,8 @@ use std::format;
 // Simple UUID implementation for SigmaOS
 // Reduces dependency on external uuid crate
 
-use core::fmt;
 use std::string::String;
+use core::fmt;
 
 /// Simple UUID v4 implementation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

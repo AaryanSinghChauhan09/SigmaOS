@@ -2,10 +2,10 @@ use std::vec;
 // SigmaOS CachyOS-inspired Performance and System Optimization Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::collections::BTreeSet;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 // ==========================================
 // 1. BORE SCHEDULER (BURST LATENCY MINIMIZER)

@@ -345,12 +345,8 @@ impl SovereignDataTransformer {
         let mut min_val = f32::MAX;
         let mut max_val = f32::MIN;
         for &val in data {
-            if val < min_val {
-                min_val = val;
-            }
-            if val > max_val {
-                max_val = val;
-            }
+            if val < min_val { min_val = val; }
+            if val > max_val { max_val = val; }
         }
         let range = max_val - min_val;
         if range == 0.0 {
@@ -607,20 +603,15 @@ mod tests {
         assert_eq!(pred, 9.0); // (2*1 + 3*2) + 1 = 9
 
         // MSE loss
-        let mse =
-            SovereignPipelineEstimator::mean_squared_error(&[10.0, 20.0], &[8.0, 22.0]).unwrap();
+        let mse = SovereignPipelineEstimator::mean_squared_error(&[10.0, 20.0], &[8.0, 22.0]).unwrap();
         assert_eq!(mse, 4.0); // ((10-8)^2 + (20-22)^2)/2 = (4 + 4)/2 = 4
 
         // Export to CSV & Arrow
-        let csv = SovereignDataframeExporter::export_to_csv(
-            &["age", "score"],
-            &[vec![25.0, 95.5], vec![30.0, 88.0]],
-        );
+        let csv = SovereignDataframeExporter::export_to_csv(&["age", "score"], &[vec![25.0, 95.5], vec![30.0, 88.0]]);
         assert!(csv.contains("age,score"));
         assert!(csv.contains("25,95.5"));
 
-        let arrow_desc =
-            SovereignDataframeExporter::generate_arrow_schema_descriptor("telemetry", 2);
+        let arrow_desc = SovereignDataframeExporter::generate_arrow_schema_descriptor("telemetry", 2);
         assert!(arrow_desc.contains("dataset='telemetry'"));
     }
 }

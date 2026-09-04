@@ -1,11 +1,11 @@
-/// SOLID Principles-Driven and Composable Kernel Architecture for SigmaOS
-/// Implements Dependency Inversion, Liskov Substitution, User-Defined Schedulers,
-/// and SigmaFS++ Composable filesystems with Blockchain Audit Trails.
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+/// SOLID Principles-Driven and Composable Kernel Architecture for SigmaOS
+/// Implements Dependency Inversion, Liskov Substitution, User-Defined Schedulers,
+/// and SigmaFS++ Composable filesystems with Blockchain Audit Trails.
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. Dependency Inversion & Interchangeable Subsystems

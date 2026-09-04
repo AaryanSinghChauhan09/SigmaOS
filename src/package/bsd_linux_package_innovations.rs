@@ -4,6 +4,7 @@
 // Arch ALPM hooks, Fedora DNF5 DeltaRPM, Gentoo Portage subslots, Haiku PackageFS,
 // Debian apt-mark, Void xbps-src, Fedora DNF history, and NetBSD pkgin.
 
+
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -1766,10 +1767,7 @@ impl FedoraDnfHistoryRollbackJournalEngine {
         tx_id
     }
 
-    pub fn compute_rollback_actions(
-        &self,
-        target_tx_id: u64,
-    ) -> Result<Vec<DnfActionRecord>, &'static str> {
+    pub fn compute_rollback_actions(&self, target_tx_id: u64) -> Result<Vec<DnfActionRecord>, &'static str> {
         let mut undo_actions = Vec::new();
         let target_idx = self
             .history
@@ -2320,10 +2318,7 @@ MAINTAINER="SigmaOS"
         assert_eq!(gov.find_autoremove_candidates().len(), 0);
 
         gov.mark_package("libzstd", AptMarkState::Auto);
-        assert_eq!(
-            gov.find_autoremove_candidates(),
-            vec!["libzstd".to_string()]
-        );
+        assert_eq!(gov.find_autoremove_candidates(), vec!["libzstd".to_string()]);
     }
 
     #[test]

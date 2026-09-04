@@ -3,10 +3,10 @@ use std::vec;
 // OOP-based Unified Logging System and Diverse Targets for SigmaOS
 // Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Syslog Facility enum inspired by BSD syslog and Linux syslog.h
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

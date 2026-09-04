@@ -7,10 +7,10 @@ use std::vec;
 use crate::klib::collections::HashMap;
 use std::boxed::Box;
 use std::collections::BTreeMap;
-#[cfg(test)]
-use std::collections::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================

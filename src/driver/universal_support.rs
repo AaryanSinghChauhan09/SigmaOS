@@ -5,10 +5,10 @@ use std::vec;
 use crate::driver::device::{
     CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, PortAddress,
 };
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {

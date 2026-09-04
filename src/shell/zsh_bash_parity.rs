@@ -1335,10 +1335,7 @@ impl UniversalScriptTranspiler {
                 return format!("export {}={}", var, val);
             }
         } else if l.starts_with("set -e ") || l.starts_with("set -e") {
-            let var = l
-                .trim_start_matches("set -e ")
-                .trim_start_matches("set -e")
-                .trim();
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
             return format!("unset {}", var);
         } else if l.starts_with("set -g ") || l.starts_with("set ") {
             let rest = l.trim_start_matches("set -g ").trim_start_matches("set ");

@@ -8,9 +8,9 @@ use crate::klib::collections::HashMap;
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;
 
-use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::string::{String as AllocString, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Security classification levels inspired by AT&T System V MLS / Bell-LaPadula
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

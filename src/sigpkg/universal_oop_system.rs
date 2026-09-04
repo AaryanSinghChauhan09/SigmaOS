@@ -59,16 +59,7 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s
-            .chars()
-            .map(|c| {
-                if c.is_ascii_digit() || c == '.' {
-                    c
-                } else {
-                    ' '
-                }
-            })
-            .collect();
+        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
         let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
         let parts: Vec<&str> = first_num.split('.').collect();
         let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
@@ -103,13 +94,7 @@ pub struct Package {
 
 #[cfg(any(feature = "standalone_test", test))]
 impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Self {
             name,
             version,
@@ -295,10 +280,7 @@ impl PackageFormat {
             Some(PackageFormat::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz")
-            || normalized.ends_with(".tar.xz")
-            || normalized.ends_with(".xz")
-        {
+        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -328,10 +310,7 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild")
-            || normalized.ends_with(".tlz")
-            || normalized.ends_with(".tbz")
-        {
+        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -3940,10 +3919,7 @@ impl UniversalDistroPackageUnifierEngine {
 
     /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
     /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
-    pub fn unify_package(
-        &self,
-        foreign_package: &dyn IPackage,
-    ) -> Result<Box<dyn IPackage>, ParseError> {
+    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
         // 1. Expand macros in description/paths if applicable
@@ -3953,9 +3929,7 @@ impl UniversalDistroPackageUnifierEngine {
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
             let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => {
-                    "sovereign-openssl"
-                }
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
                 "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
                 "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
                 _ => &dep.name,
@@ -4943,22 +4917,14 @@ Description: Hook test";
         assert!(unified.metadata().description.contains("/usr/bin/nginx"));
 
         // Normalized dependency mapping check
-        assert!(unified
-            .dependencies()
-            .iter()
-            .any(|d| d.name == "sovereign-openssl"));
-        assert!(unified
-            .dependencies()
-            .iter()
-            .any(|d| d.name == "sovereign-libc"));
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
+        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
 
         // UserDefinedFunctionManager check
         let mut udf_mgr = UserDefinedFunctionManager::new();
         struct CustomSuffixHook;
         impl UserDefinedHook for CustomSuffixHook {
-            fn name(&self) -> &str {
-                "suffix-hook"
-            }
+            fn name(&self) -> &str { "suffix-hook" }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().maintainer = "sovereign-built".to_string();
                 Ok(())

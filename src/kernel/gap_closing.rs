@@ -18,13 +18,13 @@
 
 // (no_std only applicable at crate root - removed)
 
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 

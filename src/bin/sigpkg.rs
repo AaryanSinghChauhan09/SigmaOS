@@ -249,11 +249,7 @@ fn cmd_install(args: &[String]) {
             let canonical_name = dep_mapper.to_canonical_name(clean_name);
             let fmt_desc = forced_format
                 .map(|f| format!("{:?}", f))
-                .or_else(|| {
-                    adapter
-                        .detect_format_by_extension(target)
-                        .map(|f| format!("{:?}", f))
-                })
+                .or_else(|| adapter.detect_format_by_extension(target).map(|f| format!("{:?}", f)))
                 .unwrap_or_else(|| "Sovereign".to_string());
             let pkg = Package::new(
                 canonical_name.clone(),

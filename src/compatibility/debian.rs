@@ -3,10 +3,10 @@
 //! Implements APT repositories, SysVinit runlevels, debian alternatives, and debootstrap logic.
 //! Zero external dependencies.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==============================================================================
 // 1. APT Repository Synchronization & GPG Keyring verification

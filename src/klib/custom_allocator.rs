@@ -17,10 +17,10 @@
 // A bump allocator with a simple recycle list, replacing std::std::System.
 // Designed to minimize dependency on predefined library allocators.
 
-use core::cell::UnsafeCell;
-use core::ptr;
 #[allow(dead_code)]
 use core::std::{GlobalAlloc, Layout};
+use core::cell::UnsafeCell;
+use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ============================================================================

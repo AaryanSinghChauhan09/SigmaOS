@@ -4,11 +4,11 @@ use std::vec;
 // OOP-based VM management with hypervisor integration
 
 use std::collections::BTreeMap as HashMap;
-use std::collections::BTreeMap as HashMap;
-use std::format;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::collections::BTreeMap as HashMap;
+use std::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]

@@ -831,14 +831,8 @@ impl FedoraAnityaReleaseMonitoringEngine {
                 let project_id = record.project_id;
                 let name = record.name.clone();
                 let pkgs = vec![
-                    AnityaPackageMapping {
-                        distro: "Fedora".to_string(),
-                        package_name: name.clone(),
-                    },
-                    AnityaPackageMapping {
-                        distro: "SigmaOS".to_string(),
-                        package_name: name.clone(),
-                    },
+                    AnityaPackageMapping { distro: "Fedora".to_string(), package_name: name.clone() },
+                    AnityaPackageMapping { distro: "SigmaOS".to_string(), package_name: name.clone() },
                 ];
                 self.messaging_bus.publish_version_update(
                     project_id,

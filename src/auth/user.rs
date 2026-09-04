@@ -1,11 +1,11 @@
-use core::mem;
-/// OOP-based User Authentication for SigmaOS
-/// Based on Roadmap Item 13: User authentication
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::mem;
+/// OOP-based User Authentication for SigmaOS
+/// Based on Roadmap Item 13: User authentication
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication

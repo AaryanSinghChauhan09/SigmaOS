@@ -113,7 +113,9 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     assert_eq!(zyp_act.operation, UniversalPmOperation::Install);
 
     // XBPS
-    let xbps_act = dispatcher.dispatch_command("xbps-install -S bash").unwrap();
+    let xbps_act = dispatcher
+        .dispatch_command("xbps-install -S bash")
+        .unwrap();
     assert_eq!(xbps_act.source_pm, "xbps-install");
     assert_eq!(xbps_act.operation, UniversalPmOperation::Install);
 }

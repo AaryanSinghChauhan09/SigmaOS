@@ -406,6 +406,7 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
+
 // ============================================================================
 // ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
 // ============================================================================
@@ -760,4 +761,5 @@ depends=('glibc')
         assert_eq!(removed, vec!["pkg-1.0.pkg.tar.zst".to_string()]);
         assert_eq!(cleaner.cached_files.len(), 2);
     }
+
 }

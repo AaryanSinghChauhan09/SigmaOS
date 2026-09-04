@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-use core::fmt;
 /// SigmaOS: ZenithNet - Bare-Metal Networking Stack
 /// Implements TCP/IP, UDP, ARP, ICMP with zero-copy packet handling
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::fmt;
 
 /// Packet types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -139,8 +140,16 @@ impl EthernetFrame {
             return None;
         }
 
-        let dst_mac = MacAddr([data[0], data[1], data[2], data[3], data[4], data[5]]);
-        let src_mac = MacAddr([data[6], data[7], data[8], data[9], data[10], data[11]]);
+        let dst_mac = MacAddr(
+            [
+                data[0], data[1], data[2], data[3], data[4], data[5],
+            ],
+        );
+        let src_mac = MacAddr(
+            [
+                data[6], data[7], data[8], data[9], data[10], data[11],
+            ],
+        );
         let ether_type = u16::from_be_bytes([data[12], data[13]]);
         let payload = data[14..].to_vec();
 
@@ -417,12 +426,7 @@ impl ZenithNet {
     /// Get interface statistics
     pub fn get_interface_stats(&self, name: &str) -> Result<(u64, u64, u64, u64), NetworkError> {
         if let Some(iface) = self.interfaces.get(name) {
-            Ok((
-                iface.rx_packets,
-                iface.tx_packets,
-                iface.rx_bytes,
-                iface.tx_bytes,
-            ))
+            Ok((iface.rx_packets, iface.tx_packets, iface.rx_bytes, iface.tx_bytes))
         } else {
             Err(NetworkError::InterfaceNotFound)
         }

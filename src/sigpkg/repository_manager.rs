@@ -2,12 +2,12 @@
 /// Manages package repositories, mirrors, and metadata
 use crate::klib::BTreeMap;
 use crate::sigpkg::{Package, Version, VersionConstraint};
-use core::default::Default;
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::default::Default;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 
 /// Ubuntu PPA (Personal Package Archive) representation
 #[derive(Debug, Clone)]
@@ -118,6 +118,7 @@ pub enum OfficialArchiveSource {
     Multiverse,
     Backports,
 }
+
 
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]

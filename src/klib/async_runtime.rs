@@ -1,11 +1,11 @@
 // 'sigma-async' Cooperative Runtime for SigmaOS
 // A lightweight, `#![no_std]` cooperative task executor using raw Future polling.
 
+use std::boxed::Box;
+use std::vec::Vec;
 use core::future::Future;
 use core::pin::Pin;
 use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
-use std::boxed::Box;
-use std::vec::Vec;
 
 /// A spawnable cooperative asynchronous task
 pub struct Task {
@@ -86,8 +86,8 @@ const DUMMY_VTABLE: RawWakerVTable = RawWakerVTable::new(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::cell::RefCell;
     use std::rc::Rc;
+    use core::cell::RefCell;
 
     struct SimpleFuture {
         polls_remaining: u32,

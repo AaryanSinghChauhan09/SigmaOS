@@ -10,8 +10,9 @@
 //   present in the `alloc` crate (which SigmaOS already uses)
 // • Panic-free — every operation returns a Result or Option
 
-use core::fmt::Write;
+
 use std::vec::Vec;
+use core::fmt::Write;
 
 // ── Type aliases ──────────────────────────────────────────────────────────────
 

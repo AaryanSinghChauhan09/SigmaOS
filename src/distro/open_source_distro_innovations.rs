@@ -9,6 +9,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+
 // =========================================================================
 // 1. APACHE NUTTX INSPIRED POSIX RT REAL-TIME TASK GOVERNOR
 // =========================================================================
@@ -52,9 +53,7 @@ impl NuttxRealtimeTaskGovernor {
     }
 
     pub fn schedule_next(&self) -> Option<u32> {
-        let active_highest = self
-            .tasks
-            .iter()
+        let active_highest = self.tasks.iter()
             .filter(|t| t.is_ready)
             .max_by_key(|t| t.current_priority)?;
 
@@ -138,10 +137,7 @@ impl OpenBsdVmmBhyveHypervisorBridge {
     }
 
     pub fn start_guest(&mut self, vm_id: u32) -> Result<(), &'static str> {
-        let guest = self
-            .guests
-            .iter_mut()
-            .find(|g| g.vm_id == vm_id)
+        let guest = self.guests.iter_mut().find(|g| g.vm_id == vm_id)
             .ok_or("MicroVM guest not found")?;
         if guest.state == VmState::Running {
             return Err("Guest is already running");
@@ -150,15 +146,8 @@ impl OpenBsdVmmBhyveHypervisorBridge {
         Ok(())
     }
 
-    pub fn passthrough_pci_device(
-        &mut self,
-        vm_id: u32,
-        pci_bdf: &str,
-    ) -> Result<(), &'static str> {
-        let guest = self
-            .guests
-            .iter_mut()
-            .find(|g| g.vm_id == vm_id)
+    pub fn passthrough_pci_device(&mut self, vm_id: u32, pci_bdf: &str) -> Result<(), &'static str> {
+        let guest = self.guests.iter_mut().find(|g| g.vm_id == vm_id)
             .ok_or("MicroVM guest not found")?;
         if guest.state == VmState::Running {
             return Err("Cannot attach PPT PCI device while guest is running");
@@ -168,10 +157,7 @@ impl OpenBsdVmmBhyveHypervisorBridge {
     }
 
     pub fn stop_guest(&mut self, vm_id: u32) -> Result<(), &'static str> {
-        let guest = self
-            .guests
-            .iter_mut()
-            .find(|g| g.vm_id == vm_id)
+        let guest = self.guests.iter_mut().find(|g| g.vm_id == vm_id)
             .ok_or("MicroVM guest not found")?;
         guest.state = VmState::Stopped;
         Ok(())
@@ -205,7 +191,9 @@ pub struct IllumosDTraceProbeProvider {
 
 impl IllumosDTraceProbeProvider {
     pub fn new() -> Self {
-        Self { probes: Vec::new() }
+        Self {
+            probes: Vec::new(),
+        }
     }
 
     pub fn register_probe(&mut self, provider: &str, module: &str, function: &str, name: &str) {
@@ -231,11 +219,7 @@ impl IllumosDTraceProbeProvider {
     }
 
     pub fn disable_probe(&mut self, provider: &str, name: &str) -> bool {
-        if let Some(probe) = self
-            .probes
-            .iter_mut()
-            .find(|p| p.provider == provider && p.name == name)
-        {
+        if let Some(probe) = self.probes.iter_mut().find(|p| p.provider == provider && p.name == name) {
             probe.is_enabled = false;
             true
         } else {
@@ -281,16 +265,9 @@ impl GentooPortageEapi8SlotResolver {
         });
     }
 
-    pub fn evaluate_subslot_rebuild_trigger(
-        &self,
-        pkg_name: &str,
-        old_subslot: &str,
-        new_subslot: &str,
-    ) -> bool {
+    pub fn evaluate_subslot_rebuild_trigger(&self, pkg_name: &str, old_subslot: &str, new_subslot: &str) -> bool {
         if old_subslot != new_subslot {
-            self.installed_records
-                .iter()
-                .any(|r| r.category_pkg.contains(pkg_name))
+            self.installed_records.iter().any(|r| r.category_pkg.contains(pkg_name))
         } else {
             false
         }
@@ -337,9 +314,7 @@ mod tests {
         assert_eq!(bridge.guests[0].state, VmState::Running);
 
         // Cannot attach PCI device while running
-        assert!(bridge
-            .passthrough_pci_device(vm_id, "0000:02:00.0")
-            .is_err());
+        assert!(bridge.passthrough_pci_device(vm_id, "0000:02:00.0").is_err());
         assert!(bridge.stop_guest(vm_id).is_ok());
         assert_eq!(bridge.guests[0].state, VmState::Stopped);
     }

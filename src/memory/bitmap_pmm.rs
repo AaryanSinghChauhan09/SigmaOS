@@ -2,9 +2,9 @@
 //! Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Fast x86_64 Assembly Syscall Dispatcher.
 //! Implements bottom-up kernel primitives as described in Step 1, Step 2, and Step 3 specifications.
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE_4096: usize = 4096;
 pub const HIGHER_HALF_OFFSET: u64 = 0xFFFFFFFF80000000;

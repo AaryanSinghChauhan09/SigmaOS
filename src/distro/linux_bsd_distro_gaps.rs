@@ -2,6 +2,7 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
+
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -447,9 +448,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -466,9 +465,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -485,9 +482,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -504,9 +499,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -523,9 +516,7 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -647,11 +638,7 @@ impl SovereignDnsTlsResolverEngine {
         ttl: u32,
         dnssec_validated: bool,
     ) {
-        if let Some(existing) = self
-            .local_cache
-            .iter_mut()
-            .find(|r| r.domain_name == domain)
-        {
+        if let Some(existing) = self.local_cache.iter_mut().find(|r| r.domain_name == domain) {
             existing.ip_address = ip;
             existing.ttl_seconds = ttl;
             existing.dnssec_validated = dnssec_validated;
@@ -836,9 +823,7 @@ impl SovereignStatefulNatEngine {
         translated_dst_port: u16,
     ) -> Option<([u8; 4], u16)> {
         for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip
-                && entry.translated_port == translated_dst_port
-            {
+            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
                 entry.packets_counter += 1;
                 return Some((entry.original_src, entry.src_port));
             }
@@ -890,10 +875,7 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs
-            .iter()
-            .filter(|l| l.priority <= min_priority)
-            .collect()
+        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
     }
 }
 
@@ -996,103 +978,103 @@ mod tests {
         );
         assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
 
-        #[test]
-        fn test_sovereign_dynamic_devfs() {
-            let mut devfs = SovereignDynamicDevfsEngine::new();
-            assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
+    #[test]
+    fn test_sovereign_dynamic_devfs() {
+        let mut devfs = SovereignDynamicDevfsEngine::new();
+        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
 
-            resolver.faillock_guard.reset();
-            assert!(!resolver.faillock_guard.is_locked);
+        resolver.faillock_guard.reset();
+        assert!(!resolver.faillock_guard.is_locked);
+    }
+}
+
+// ============================================================================
+// 7. Universal Linux & BSD Distro Gap Resolver
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PamFaillockGuard {
+    pub failed_attempts: u32,
+    pub max_failures: u32,
+    pub is_locked: bool,
+}
+
+impl PamFaillockGuard {
+    pub fn new(max_failures: u32) -> Self {
+        Self {
+            failed_attempts: 0,
+            max_failures,
+            is_locked: false,
         }
     }
 
-    // ============================================================================
-    // 7. Universal Linux & BSD Distro Gap Resolver
-    // ============================================================================
-
-    #[derive(Debug, Clone)]
-    pub struct PamFaillockGuard {
-        pub failed_attempts: u32,
-        pub max_failures: u32,
-        pub is_locked: bool,
+    pub fn record_failure(&mut self) -> bool {
+        self.failed_attempts += 1;
+        if self.failed_attempts >= self.max_failures {
+            self.is_locked = true;
+        }
+        self.is_locked
     }
 
-    impl PamFaillockGuard {
-        pub fn new(max_failures: u32) -> Self {
-            Self {
-                failed_attempts: 0,
-                max_failures,
-                is_locked: false,
+    pub fn reset(&mut self) {
+        self.failed_attempts = 0;
+        self.is_locked = false;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignUniversalDistroGapResolver {
+    pub dracut_modules_loaded: Vec<&'static str>,
+    pub faillock_guard: PamFaillockGuard,
+    pub bsd_geom_layers: Vec<&'static str>,
+    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
+}
+
+impl SovereignUniversalDistroGapResolver {
+    pub fn new() -> Self {
+        #[cfg(not(target_os = "none"))]
+        use std::vec;
+
+        let mut auto_modprobe_aliases = Vec::new();
+        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
+        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
+        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
+
+        Self {
+            dracut_modules_loaded: vec![
+                "bash",
+                "systemd",
+                "kernel-modules",
+                "rootfs-generator",
+                "network",
+            ],
+            faillock_guard: PamFaillockGuard::new(3),
+            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
+            auto_modprobe_aliases,
+        }
+    }
+
+    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
+        self.dracut_modules_loaded.len()
+    }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        for &(a, mod_name) in &self.auto_modprobe_aliases {
+            if a == alias {
+                return Some(mod_name);
             }
         }
-
-        pub fn record_failure(&mut self) -> bool {
-            self.failed_attempts += 1;
-            if self.failed_attempts >= self.max_failures {
-                self.is_locked = true;
-            }
-            self.is_locked
-        }
-
-        pub fn reset(&mut self) {
-            self.failed_attempts = 0;
-            self.is_locked = false;
-        }
+        None
     }
 
-    #[derive(Debug, Clone)]
-    pub struct SovereignUniversalDistroGapResolver {
-        pub dracut_modules_loaded: Vec<&'static str>,
-        pub faillock_guard: PamFaillockGuard,
-        pub bsd_geom_layers: Vec<&'static str>,
-        pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
+    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
+        !self.bsd_geom_layers.is_empty()
     }
+}
 
-    impl SovereignUniversalDistroGapResolver {
-        pub fn new() -> Self {
-            #[cfg(not(target_os = "none"))]
-            use std::vec;
-
-            let mut auto_modprobe_aliases = Vec::new();
-            auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
-            auto_modprobe_aliases.push(("char-major-10-200", "tun"));
-            auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
-
-            Self {
-                dracut_modules_loaded: vec![
-                    "bash",
-                    "systemd",
-                    "kernel-modules",
-                    "rootfs-generator",
-                    "network",
-                ],
-                faillock_guard: PamFaillockGuard::new(3),
-                bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
-                auto_modprobe_aliases,
-            }
-        }
-
-        pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
-            self.dracut_modules_loaded.len()
-        }
-
-        pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-            for &(a, mod_name) in &self.auto_modprobe_aliases {
-                if a == alias {
-                    return Some(mod_name);
-                }
-            }
-            None
-        }
-
-        pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
-            !self.bsd_geom_layers.is_empty()
-        }
+impl Default for SovereignUniversalDistroGapResolver {
+    fn default() -> Self {
+        Self::new()
     }
-
-    impl Default for SovereignUniversalDistroGapResolver {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
+}
 } // end mod tests

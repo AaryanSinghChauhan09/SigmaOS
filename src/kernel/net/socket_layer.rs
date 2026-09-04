@@ -1,11 +1,11 @@
+use std::vec;
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
 use crate::klib::collections::HashMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 

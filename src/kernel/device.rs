@@ -1,8 +1,8 @@
 use std::boxed::Box;
 
-use core::any::Any;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::any::Any;
 
 use crate::kernel::object::{KRef, KernelObject};
 use crate::security::capability::CapabilityToken;

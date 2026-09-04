@@ -2,10 +2,10 @@
 // SigmaOS NVMe Storage Driver
 // Supports NVMe 1.0+ SSDs with queue pair and completion queue management
 
-use core::sync::atomic::{AtomicU16, AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, AtomicU16, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -188,7 +188,12 @@ pub struct QueuePair {
 }
 
 impl QueuePair {
-    pub fn new(id: u16, sq_base: u64, cq_base: u64, depth: u32) -> Self {
+    pub fn new(
+        id: u16,
+        sq_base: u64,
+        cq_base: u64,
+        depth: u32,
+    ) -> Self {
         QueuePair {
             queue_id: id,
             submission_queue: SubmissionQueue::new(sq_base, depth),
@@ -265,12 +270,7 @@ pub struct NvmeController {
 impl NvmeController {
     pub fn new(device_id: u16, pci_addr: &str) -> Self {
         // Create admin queue pair
-        let admin_queue = QueuePair::new(
-            0,
-            NVME_SQ_BASE as u64,
-            NVME_CQ_BASE as u64,
-            ADMIN_QUEUE_DEPTH,
-        );
+        let admin_queue = QueuePair::new(0, NVME_SQ_BASE as u64, NVME_CQ_BASE as u64, ADMIN_QUEUE_DEPTH);
 
         NvmeController {
             device_id,
@@ -460,10 +460,8 @@ impl PciDriver for NvmePciDriver {
         }
 
         // Device is NVMe, initialize driver
-        let mut controller = Box::new(NvmeController::new(
-            device.device_id,
-            &device.address.sysfs_format(),
-        ));
+        let mut controller =
+            Box::new(NvmeController::new(device.device_id, &device.address.sysfs_format()));
 
         // Extract MMIO BAR (typically BAR0)
         if let Some(ref bar) = device.bars[0] {

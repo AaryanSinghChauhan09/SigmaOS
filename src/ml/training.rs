@@ -4,6 +4,7 @@ use core::mem;
 // Based on Ideas-999-Structured: AI & Machine Learning Item 936
 // Implements model training and optimization
 
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type TrainingID = usize;

@@ -28,6 +28,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::vec;
 
+
 use sigma_types::{CapabilityToken, Result};
 
 use std::collections::BTreeSet as HashSet;

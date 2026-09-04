@@ -450,8 +450,7 @@ impl SovereignDistroGapClosureEngine {
         // Open Source OS Distro Innovations Parity
         self.features.push(DistroGapFeatureRecord {
             distro_name: "Apache NuttX RTOS",
-            gap_feature_name:
-                "POSIX RT preemption-threshold task scheduler with priority inheritance",
+            gap_feature_name: "POSIX RT preemption-threshold task scheduler with priority inheritance",
             sigma_counterpart: "NuttxRealtimeTaskGovernor",
             verification_passed: true,
         });
@@ -481,11 +480,7 @@ impl SovereignDistroGapClosureEngine {
 
     pub fn get_gap_closure_metrics(&self) -> (usize, usize) {
         let total = self.features.len();
-        let verified = self
-            .features
-            .iter()
-            .filter(|f| f.verification_passed)
-            .count();
+        let verified = self.features.iter().filter(|f| f.verification_passed).count();
         (total, verified)
     }
 }

@@ -1,10 +1,10 @@
 // SigmaOS Advanced GUI-Style Installer, Live ISO and Automated Preseed Deployment Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use core::cell::RefCell;
-use core::sync::atomic::{AtomicBool, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::cell::RefCell;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================
 // 1. LIVE ISO CONFIGURATION (RAMDISK OVERLAYS)

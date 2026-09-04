@@ -2,10 +2,10 @@
 // SigmaOS USB xHCI Host Controller Driver
 // Supports USB 2.0/3.0/3.1 via xHCI specification
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -17,10 +17,10 @@ pub const INTEL_VENDOR_ID: u16 = 0x8086;
 
 // Common xHCI Device IDs
 pub const PANTHER_POINT_XHCI: u16 = 0x1E31; // Panther Point (Series 6)
-pub const LYNX_POINT_XHCI: u16 = 0x8C31; // Lynx Point (Series 7)
+pub const LYNX_POINT_XHCI: u16 = 0x8C31;    // Lynx Point (Series 7)
 pub const WILDCAT_POINT_XHCI: u16 = 0x9C31; // Wildcat Point (Series 8)
 pub const SUNRISE_POINT_XHCI: u16 = 0xA12F; // Sunrise Point (Series 100)
-pub const KABY_LAKE_XHCI: u16 = 0x5AA0; // Kaby Lake
+pub const KABY_LAKE_XHCI: u16 = 0x5AA0;     // Kaby Lake
 
 // xHCI Register Offsets
 pub const XHCI_CAP_LENGTH: u32 = 0x00;
@@ -29,12 +29,12 @@ pub const XHCI_HCS_PARAMS1: u32 = 0x04;
 pub const XHCI_HCS_PARAMS2: u32 = 0x08;
 pub const XHCI_HCS_PARAMS3: u32 = 0x0C;
 
-pub const XHCI_USBCMD: u32 = 0x00; // USB Command (operational regs)
-pub const XHCI_USBSTS: u32 = 0x04; // USB Status
+pub const XHCI_USBCMD: u32 = 0x00;  // USB Command (operational regs)
+pub const XHCI_USBSTS: u32 = 0x04;  // USB Status
 pub const XHCI_PAGESIZE: u32 = 0x08;
-pub const XHCI_CRCR: u32 = 0x18; // Command Ring Control
-pub const XHCI_DCBAAP: u32 = 0x30; // Device Context Base Address Array Pointer
-pub const XHCI_CONFIG: u32 = 0x38; // Configure
+pub const XHCI_CRCR: u32 = 0x18;    // Command Ring Control
+pub const XHCI_DCBAAP: u32 = 0x30;  // Device Context Base Address Array Pointer
+pub const XHCI_CONFIG: u32 = 0x38;  // Configure
 
 // Port Registers (per port)
 pub const XHCI_PORTSC: u32 = 0x400; // Port Status and Control (base)
@@ -47,7 +47,7 @@ pub const XHCI_STS_HALTED: u32 = 0x0001;
 pub const XHCI_STS_RUNNING: u32 = 0x0000;
 pub const XHCI_CMD_RUN: u32 = 0x0001;
 pub const XHCI_CMD_RESET: u32 = 0x0002;
-pub const XHCI_CMD_IE: u32 = 0x0004; // Interrupter Enable
+pub const XHCI_CMD_IE: u32 = 0x0004;  // Interrupter Enable
 
 // ============================================================================
 // USB Device & Endpoint Structures
@@ -55,9 +55,9 @@ pub const XHCI_CMD_IE: u32 = 0x0004; // Interrupter Enable
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UsbSpeed {
-    FullSpeed,      // 12 Mbps
-    HighSpeed,      // 480 Mbps
-    SuperSpeed,     // 5 Gbps
+    FullSpeed,    // 12 Mbps
+    HighSpeed,    // 480 Mbps
+    SuperSpeed,   // 5 Gbps
     SuperSpeedPlus, // 10 Gbps
 }
 
@@ -115,9 +115,9 @@ impl UsbDevice {
 #[derive(Debug, Clone)]
 pub struct UsbEndpoint {
     pub endpoint_address: u8,
-    pub endpoint_type: u8, // Control=0, Isoch=1, Bulk=2, Intr=3
+    pub endpoint_type: u8,  // Control=0, Isoch=1, Bulk=2, Intr=3
     pub max_packet_size: u16,
-    pub direction: bool, // false=OUT, true=IN
+    pub direction: bool,    // false=OUT, true=IN
 }
 
 impl UsbEndpoint {
@@ -246,8 +246,7 @@ impl UsbXhciHostDriver {
             // Check bit 0 (CCS - Current Connect Status)
             // For simulation, assume alternating ports have devices
             if port % 2 == 0 {
-                let device =
-                    UsbDevice::new(port, UsbSpeed::SuperSpeed, UsbDeviceClass::MassStorage);
+                let device = UsbDevice::new(port, UsbSpeed::SuperSpeed, UsbDeviceClass::MassStorage);
                 self.devices.push(device);
                 connected_count += 1;
             }
@@ -271,7 +270,7 @@ impl UsbXhciHostDriver {
 
         let mut device = UsbDevice::new(port, UsbSpeed::SuperSpeed, UsbDeviceClass::MassStorage);
         device.address = (port + 1) as u8;
-        device.vendor_id = 0x0951; // Kingston vendor ID (example)
+        device.vendor_id = 0x0951;  // Kingston vendor ID (example)
         device.product_id = 0x1234;
         device.manufacturer = "Kingston".to_string();
         device.product_name = "DataTraveler".to_string();

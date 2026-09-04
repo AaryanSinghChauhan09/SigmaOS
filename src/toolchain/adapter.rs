@@ -5,6 +5,7 @@ use std::vec::Vec;
 // Wraps legacy compilation profiles (GCC 2.x, early LLVM, and assembly) natively without source patching
 // Enhanced with Gentoo / Clear Linux optimization matrices and Fedora / NixOS-style compiler hardening injections.
 
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainProfile {
     LegacyC,

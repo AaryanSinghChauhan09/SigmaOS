@@ -51,11 +51,15 @@ pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
+pub use bus::*;
+pub use linux_bsd_innovations::*;
+pub use policy_mechanism::*;
+#[allow(ambiguous_glob_reexports)]
+pub use structures::*;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
-pub use bus::*;
 pub use bus::*;
 pub use gap_closing::{
     AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
@@ -64,7 +68,6 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use linux_bsd_innovations::*;
 pub use linux_bsd_innovations::*;
 pub use linux_bsd_innovations::{
     AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
@@ -105,13 +108,10 @@ pub use meta::{
 pub use nextgen_breakthroughs::*;
 pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
 pub use policy_mechanism::*;
-pub use policy_mechanism::*;
 pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-#[allow(ambiguous_glob_reexports)]
-pub use structures::*;
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;

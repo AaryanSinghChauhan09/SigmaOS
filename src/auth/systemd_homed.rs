@@ -11,11 +11,11 @@ use std::vec::Vec;
 /// Storage mechanism for user home directory
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HomeStorageBackend {
-    LuksLoop,       // Encrypted LUKS2 loopback file image
-    Fscrypt,        // Native filesystem-level encryption
-    Directory,      // Standard unencrypted directory
-    Cifs,           // Network SMB/CIFS home mount
-    BtrfsSubvolume, // CoW subvolume home
+    LuksLoop,        // Encrypted LUKS2 loopback file image
+    Fscrypt,         // Native filesystem-level encryption
+    Directory,       // Standard unencrypted directory
+    Cifs,            // Network SMB/CIFS home mount
+    BtrfsSubvolume,  // CoW subvolume home
 }
 
 /// State of the user home directory
@@ -36,7 +36,7 @@ pub struct HomedUserRecord {
     pub real_name: String,
     pub home_path: String,
     pub storage_backend: HomeStorageBackend,
-    pub image_path: String, // e.g. "/home/alice.home"
+    pub image_path: String,          // e.g. "/home/alice.home"
     pub disk_quota_bytes: u64,
     pub auto_lock_on_suspend: bool,
     pub is_luks_encrypted: bool,
@@ -55,10 +55,7 @@ impl HomedUserRecord {
             image_path: format!("/home/{}.home", username),
             disk_quota_bytes: 53687091200, // 50 GB default quota
             auto_lock_on_suspend: true,
-            is_luks_encrypted: matches!(
-                backend,
-                HomeStorageBackend::LuksLoop | HomeStorageBackend::Fscrypt
-            ),
+            is_luks_encrypted: matches!(backend, HomeStorageBackend::LuksLoop | HomeStorageBackend::Fscrypt),
             state: HomeState::Unmounted,
         }
     }
@@ -96,11 +93,7 @@ impl SovereignSystemdHomedEngine {
     }
 
     /// Activate and mount encrypted user home area on login (`homectl activate` / PAM)
-    pub fn mount_home_area(
-        &mut self,
-        username: &str,
-        passphrase: &str,
-    ) -> Result<String, &'static str> {
+    pub fn mount_home_area(&mut self, username: &str, passphrase: &str) -> Result<String, &'static str> {
         let user = self
             .users
             .get_mut(username)
@@ -149,11 +142,7 @@ impl SovereignSystemdHomedEngine {
     }
 
     /// Resize user home LUKS2 loopback image / quota (`homectl resize`)
-    pub fn resize_home_area(
-        &mut self,
-        username: &str,
-        new_size_bytes: u64,
-    ) -> Result<(), &'static str> {
+    pub fn resize_home_area(&mut self, username: &str, new_size_bytes: u64) -> Result<(), &'static str> {
         let user = self
             .users
             .get_mut(username)
@@ -196,10 +185,7 @@ mod tests {
         assert_eq!(homed.users.get("alice").unwrap().state, HomeState::Locked);
 
         assert!(homed.unmount_home_area("alice").is_ok());
-        assert_eq!(
-            homed.users.get("alice").unwrap().state,
-            HomeState::Unmounted
-        );
+        assert_eq!(homed.users.get("alice").unwrap().state, HomeState::Unmounted);
     }
 
     #[test]

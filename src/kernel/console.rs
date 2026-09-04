@@ -4,9 +4,9 @@ use std::vec;
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
+use std::string::String;
 use core::fmt::Write;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::string::String;
 
 /// Console output backend type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

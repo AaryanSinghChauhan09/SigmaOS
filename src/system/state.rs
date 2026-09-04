@@ -293,11 +293,9 @@ impl<T> SpinMutex<T> {
     /// # Safety
     /// Caller MUST call `unlock()` after finishing with the pointer.
     unsafe fn lock_raw(&self) -> *mut T {
-        while self
-            .locked
-            .compare_exchange_weak(false, true, AOrdering::Acquire, AOrdering::Relaxed)
-            .is_err()
-        {
+        while self.locked.compare_exchange_weak(
+            false, true, AOrdering::Acquire, AOrdering::Relaxed,
+        ).is_err() {
             core::hint::spin_loop();
         }
         self.inner.get()

@@ -205,13 +205,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
 
-            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
-                supervisor == ServiceSupervisorType::Shepherd
-            }
+            DistroSubsystemMode::LinuxNix
+            | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
@@ -233,17 +231,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
-                format!("{}.rpm", input_pkg)
-            }
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::SmartOs => {
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
@@ -444,6 +439,7 @@ impl SovereignUniversalDistroBridge {
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
     }
+
 }
 
 // ==========================================
@@ -4658,27 +4654,13 @@ mod tests {
             assert!(bridge.verify_all_subsystems_compatibility());
 
             // Check cross-subsystem operations
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("init", "restart")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("package", "install")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("vfs", "/etc")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("security", "/app")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("network", "eth0")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("graphics", "set_mode")
-                .is_ok());
-            assert!(bridge
-                .dispatch_cross_subsystem_operation("power", "performance")
-                .is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("init", "restart").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("package", "install").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("security", "/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
         }
     }
 
@@ -5862,10 +5844,7 @@ mod tests {
         // 5th crash triggers SegvGuard brute force mitigation
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
-        assert_eq!(
-            pax.violations[1].violation,
-            PaxViolationType::SegvGuardThresholdExceeded
-        );
+        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
     }
 }
 

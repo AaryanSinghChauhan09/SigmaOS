@@ -10,10 +10,10 @@ use std::vec;
 use crate::driver::device::{
     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- Standard Windows Types & NTSTATUS Codes ---
 pub type NTSTATUS = i32;

@@ -1,10 +1,11 @@
 //! OOP-based Hardware Compatibility Matrix for SigmaOS
 //! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
@@ -57,11 +58,7 @@ impl Default for SimpleAcpiManager {
 
 /// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
 pub trait AcpiLoadBalancer {
-    fn balance_irq_routing(
-        &mut self,
-        interrupt_line: u8,
-        cpu_id: usize,
-    ) -> Result<(), &'static str>;
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
     fn set_device_power_state(
         &mut self,
         device_id: DeviceID,
@@ -71,14 +68,9 @@ pub trait AcpiLoadBalancer {
 }
 
 impl AcpiLoadBalancer for SimpleAcpiManager {
-    fn balance_irq_routing(
-        &mut self,
-        interrupt_line: u8,
-        cpu_id: usize,
-    ) -> Result<(), &'static str> {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
         // Map u32 irq to u8 interrupt_line by modulo
-        self.irq_routing
-            .insert(interrupt_line as u32, cpu_id as u32);
+        self.irq_routing.insert(interrupt_line as u32, cpu_id as u32);
         Ok(())
     }
 

@@ -15,9 +15,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-use core::cmp::PartialEq;
 use std::string::String;
 use std::vec::Vec;
+use core::cmp::PartialEq;
 
 /// YARA-Style Signature Engine for SigmaOS
 /// Multi-threaded binary signature matching.

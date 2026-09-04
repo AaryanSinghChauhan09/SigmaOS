@@ -4,11 +4,11 @@ use std::vec;
 // Implements block-oriented devices, block operations, multi-type block classification,
 // record blocking (fixed, variable, permanent, spanned), and system block diagram topologies.
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
 pub type BlockNumber = u64;

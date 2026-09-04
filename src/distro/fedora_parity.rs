@@ -2,8 +2,8 @@
 // Implements DNF package management, SELinux integration, and RPM support
 
 use crate::klib::Vec;
-use core::cell::Cell;
 use std::string::String;
+use core::cell::Cell;
 
 pub use crate::compatibility::fedora::FedoraOfflineUpdateEngine;
 

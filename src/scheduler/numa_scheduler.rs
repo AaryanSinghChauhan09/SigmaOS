@@ -4,9 +4,9 @@ use std::vec::Vec;
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use core::sync::atomic::{AtomicPtr, Ordering};
 use std::boxed::Box;
 use std::vec;
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 pub struct NumaNode {
     pub node_id: u32,

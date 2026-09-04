@@ -2,10 +2,10 @@
 // SigmaOS Post-Quantum Cryptography Module
 // Implements NIST PQC standards: Dilithium-5 (signing), Kyber-1024 (encryption)
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================
 // NIST PQC Constants
@@ -27,12 +27,8 @@ pub const KYBER_SS_BYTES: usize = 32;
 pub const KYBER_MODE: u8 = 1024;
 
 // OID for post-quantum algorithms
-pub const OID_DILITHIUM5: &[u8] = &[
-    0x06, 0x0B, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x04, 0x03,
-];
-pub const OID_KYBER1024: &[u8] = &[
-    0x06, 0x0C, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x05, 0x03,
-];
+pub const OID_DILITHIUM5: &[u8] = &[0x06, 0x0B, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x04, 0x03];
+pub const OID_KYBER1024: &[u8] = &[0x06, 0x0C, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x05, 0x03];
 
 // ============================================================================
 // Cryptographic Constants
@@ -266,8 +262,7 @@ impl PostQuantumCryptoManager {
 
         let public_key = DilithiumPublicKey::new(&pk_data)?;
 
-        self.dilithium_keys
-            .push((public_key.clone(), secret_key.clone()));
+        self.dilithium_keys.push((public_key.clone(), secret_key.clone()));
         self.key_count.fetch_add(1, Ordering::SeqCst);
 
         Ok((public_key, secret_key))
@@ -293,8 +288,7 @@ impl PostQuantumCryptoManager {
 
         let public_key = KyberPublicKey::new(&pk_data)?;
 
-        self.kyber_keys
-            .push((public_key.clone(), secret_key.clone()));
+        self.kyber_keys.push((public_key.clone(), secret_key.clone()));
         self.key_count.fetch_add(1, Ordering::SeqCst);
 
         Ok((public_key, secret_key))

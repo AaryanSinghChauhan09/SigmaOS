@@ -6,6 +6,7 @@ use std::vec::Vec;
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
+
 /// Win32 processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Win32Error {

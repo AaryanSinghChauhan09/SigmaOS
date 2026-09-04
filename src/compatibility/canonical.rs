@@ -1,6 +1,7 @@
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 // SigmaOS Canonical Ecosystem, Snapshots, Security Jails, App Store, Continuity, Desktop Switcher, and AI Scheduler
 // Conforms to zero-dependency, #![no_std] compliant OOP structures
+
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 use std::boxed::Box;

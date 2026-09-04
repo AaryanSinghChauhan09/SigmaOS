@@ -1,10 +1,10 @@
 // eBPF-based Scheduling System for SigmaOS
 // Inspired by Ubuntu 25.04 sched_ext integration
 
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Scheduling policy types
 #[derive(Debug, Clone, PartialEq, Eq)]

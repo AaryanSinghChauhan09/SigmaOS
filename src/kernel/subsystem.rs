@@ -3,10 +3,10 @@ use std::format;
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-use core::any::Any;
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::any::Any;
 
 #[cfg(not(test))]
 use crate::security::CapabilityToken;

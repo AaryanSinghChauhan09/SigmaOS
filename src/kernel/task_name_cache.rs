@@ -97,9 +97,7 @@ impl TaskNameCache {
 
                 core::sync::atomic::fence(Ordering::SeqCst);
                 // End seqlock write: increment to even version.
-                self.entries[slot]
-                    .version
-                    .store(old_ver + 2, Ordering::Release);
+                self.entries[slot].version.store(old_ver + 2, Ordering::Release);
 
                 if existing == 0 {
                     self.count.fetch_add(1, Ordering::Relaxed);
@@ -194,9 +192,7 @@ mod tests {
     fn test_set_and_get() {
         let cache = TaskNameCache::new();
         let name = b"sigma_init\0\0\0\0\0\0";
-        unsafe {
-            assert!(cache.set(1, b"sigma_init"));
-        }
+        unsafe { assert!(cache.set(1, b"sigma_init")); }
         let got = cache.get(1).unwrap();
         assert_eq!(&got[..10], b"sigma_init");
         assert_eq!(got[10], 0);

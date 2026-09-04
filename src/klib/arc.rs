@@ -1,11 +1,11 @@
 // SigmaOS Custom Arc (Atomic Reference Counting)
 // Reduces dependency on std::sync::Arc
 
+use std::boxed::Box;
 use core::convert::AsRef;
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
 
 /// ArcInner - Internal structure for Arc
 #[repr(C)]

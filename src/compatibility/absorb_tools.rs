@@ -1,10 +1,10 @@
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 // ==========================================
 // 1. Process Privilege Reduction (Pledge & Unveil)

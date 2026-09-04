@@ -2,12 +2,12 @@
 // This module provides zero-dependency, no-std compliant implementations of subtitle editors,
 // style processors, and audio-timing synchronizers inspired by Aegisub & Subtitle Edit.
 
-use core::time::Duration;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+use core::time::Duration;
 
 /// Supported subtitle formats.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

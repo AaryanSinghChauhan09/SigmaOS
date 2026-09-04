@@ -1,8 +1,8 @@
 //! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
 
-use core::time::Duration;
 use std::string::String;
 use std::vec::Vec;
+use core::time::Duration;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

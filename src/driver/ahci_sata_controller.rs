@@ -2,10 +2,10 @@
 // SigmaOS AHCI SATA Controller Driver
 // Supports SATA I/II/III via AHCI specification
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -35,28 +35,28 @@ pub const AHCI_EM_CTL: u32 = 0x20;
 pub const AHCI_CAP2: u32 = 0x24;
 
 // Port registers (per port, offset 0x100 + port*0x80)
-pub const AHCI_PORT_CLB: u32 = 0x00; // Command List Base Address
-pub const AHCI_PORT_CLBU: u32 = 0x04; // Command List Base Address Upper
-pub const AHCI_PORT_FB: u32 = 0x08; // FIS Base Address
-pub const AHCI_PORT_FBU: u32 = 0x0C; // FIS Base Address Upper
-pub const AHCI_PORT_IS: u32 = 0x10; // Interrupt Status
-pub const AHCI_PORT_IE: u32 = 0x14; // Interrupt Enable
-pub const AHCI_PORT_CMD: u32 = 0x18; // Command and Status
-pub const AHCI_PORT_TFD: u32 = 0x20; // Task File Data
-pub const AHCI_PORT_SIG: u32 = 0x24; // Signature
-pub const AHCI_PORT_SSTS: u32 = 0x28; // Serial ATA Status
-pub const AHCI_PORT_SCTL: u32 = 0x2C; // Serial ATA Control
-pub const AHCI_PORT_SERR: u32 = 0x30; // Serial ATA Error
-pub const AHCI_PORT_SACT: u32 = 0x34; // Serial ATA Active
-pub const AHCI_PORT_CI: u32 = 0x38; // Command Issue
+pub const AHCI_PORT_CLB: u32 = 0x00;      // Command List Base Address
+pub const AHCI_PORT_CLBU: u32 = 0x04;     // Command List Base Address Upper
+pub const AHCI_PORT_FB: u32 = 0x08;       // FIS Base Address
+pub const AHCI_PORT_FBU: u32 = 0x0C;      // FIS Base Address Upper
+pub const AHCI_PORT_IS: u32 = 0x10;       // Interrupt Status
+pub const AHCI_PORT_IE: u32 = 0x14;       // Interrupt Enable
+pub const AHCI_PORT_CMD: u32 = 0x18;      // Command and Status
+pub const AHCI_PORT_TFD: u32 = 0x20;      // Task File Data
+pub const AHCI_PORT_SIG: u32 = 0x24;      // Signature
+pub const AHCI_PORT_SSTS: u32 = 0x28;     // Serial ATA Status
+pub const AHCI_PORT_SCTL: u32 = 0x2C;     // Serial ATA Control
+pub const AHCI_PORT_SERR: u32 = 0x30;     // Serial ATA Error
+pub const AHCI_PORT_SACT: u32 = 0x34;     // Serial ATA Active
+pub const AHCI_PORT_CI: u32 = 0x38;       // Command Issue
 
 // Global Control Register Bits
-pub const AHCI_GHC_HR: u32 = 0x00000001; // HBA Reset
-pub const AHCI_GHC_IE: u32 = 0x00000002; // Interrupt Enable
-pub const AHCI_GHC_AE: u32 = 0x80000000; // AHCI Enable
+pub const AHCI_GHC_HR: u32 = 0x00000001;  // HBA Reset
+pub const AHCI_GHC_IE: u32 = 0x00000002;  // Interrupt Enable
+pub const AHCI_GHC_AE: u32 = 0x80000000;  // AHCI Enable
 
 // Port Command Register Bits
-pub const AHCI_PORT_CMD_ST: u32 = 0x00000001; // Start
+pub const AHCI_PORT_CMD_ST: u32 = 0x00000001;  // Start
 pub const AHCI_PORT_CMD_FRE: u32 = 0x00000010; // FIS Receive Enable
 pub const AHCI_PORT_CMD_FR: u32 = 0x00004000; // FIS Receive Running
 pub const AHCI_PORT_CMD_CR: u32 = 0x00008000; // Command List Running
@@ -124,14 +124,14 @@ impl SataDevice {
 // ============================================================================
 
 pub struct CommandListEntry {
-    pub prdtl: u16, // Physical Region Descriptor Table Length
-    pub pmp: u8,    // Port Multiplier Port
-    pub cfl: u8,    // Command FIS Length
-    pub w: bool,    // Write
-    pub a: bool,    // ATAPI
-    pub r: bool,    // Reset
-    pub b: bool,    // BIST
-    pub c: bool,    // Clear Busy
+    pub prdtl: u16,      // Physical Region Descriptor Table Length
+    pub pmp: u8,         // Port Multiplier Port
+    pub cfl: u8,         // Command FIS Length
+    pub w: bool,         // Write
+    pub a: bool,         // ATAPI
+    pub r: bool,         // Reset
+    pub b: bool,         // BIST
+    pub c: bool,         // Clear Busy
     pub cmd_table_addr: u64,
 }
 
@@ -228,7 +228,8 @@ impl AhciSataController {
 
             // Simulate alternating ports with devices
             if port % 2 == 0 {
-                let device = SataDevice::new(port).detect_from_signature(SATA_SIG_ATA);
+                let device = SataDevice::new(port)
+                    .detect_from_signature(SATA_SIG_ATA);
                 self.devices.push(device);
                 device_count += 1;
             }
@@ -271,7 +272,11 @@ impl AhciSataController {
             return Err("Invalid port");
         }
 
-        if !self.devices.iter().any(|d| d.port == port && d.is_attached) {
+        if !self
+            .devices
+            .iter()
+            .any(|d| d.port == port && d.is_attached)
+        {
             return Err("Device not attached");
         }
 
@@ -302,7 +307,11 @@ impl AhciSataController {
             return Err("Invalid port");
         }
 
-        if !self.devices.iter().any(|d| d.port == port && d.is_attached) {
+        if !self
+            .devices
+            .iter()
+            .any(|d| d.port == port && d.is_attached)
+        {
             return Err("Device not attached");
         }
 
@@ -334,7 +343,8 @@ impl AhciSataController {
         }
 
         if attached {
-            let device = SataDevice::new(port).detect_from_signature(SATA_SIG_ATA);
+            let device = SataDevice::new(port)
+                .detect_from_signature(SATA_SIG_ATA);
             self.devices.push(device);
             self.device_count.fetch_add(1, Ordering::SeqCst);
         } else {
@@ -378,12 +388,11 @@ impl AhciPciDriver {
 
 impl PciDriver for AhciPciDriver {
     fn probe(&mut self, device: &PciDeviceInfo) -> Result<bool, &'static str> {
-        let supported = (device.vendor_id == INTEL_VENDOR_ID
-            && matches!(
+        let supported = (device.vendor_id == INTEL_VENDOR_ID &&
+            matches!(
                 device.device_id,
                 PANTHER_POINT_AHCI | LYNX_POINT_AHCI | WILDCAT_POINT_AHCI | SUNRISE_POINT_AHCI
-            ))
-            || (device.vendor_id == AMD_VENDOR_ID);
+            )) || (device.vendor_id == AMD_VENDOR_ID);
 
         if !supported {
             return Ok(false);

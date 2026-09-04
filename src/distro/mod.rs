@@ -20,10 +20,10 @@ pub mod gentoo_inspirations;
 pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_distro_gaps;
+pub mod linux_distro_innovations;
 pub mod linux_bsd_inspirations;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
-pub mod linux_distro_innovations;
 
 pub use linux_bsd_distro_gaps::{
     BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
@@ -157,10 +157,11 @@ pub use missing_distro_innovations::{
     AppArmorPathRule, AppArmorPathRuleEngine, AppArmorProfile, AppArmorRuleMode,
     BedrockLinuxStrataEngine, BedrockStratum, ChimeraDinitSupervisor, ComponentParityStatus,
     DinitService, DinitServiceState, DragonFlyHammer2EmergencyCowEngine,
-    FedoraSelinuxMlsMcsGovernor, GentooPortageSlotOperatorEngine, ImageSlotState, ImageSlotStatus,
-    MageiaUrpmiEngine, MissingDistroComponentsEngine, PartitionSlot, SmartOsImage, SmartOsVmBrand,
-    SmartOsVmConfig, SmartOsVmState, SmartOsZoneEngine, SolusEopkgManager,
-    SovereignFastInitramfsGenerator, SteamOsAtomicAbImageUpdateEngine, TailsAmnesicEngine,
+    FedoraSelinuxMlsMcsGovernor, GentooPortageSlotOperatorEngine, ImageSlotState,
+    ImageSlotStatus, MageiaUrpmiEngine, MissingDistroComponentsEngine, PartitionSlot,
+    SmartOsImage, SmartOsVmBrand, SmartOsVmConfig, SmartOsVmState, SmartOsZoneEngine,
+    SolusEopkgManager, SovereignFastInitramfsGenerator, SteamOsAtomicAbImageUpdateEngine,
+    TailsAmnesicEngine,
 };
 
 pub use linux_bsd_inspirations::{
@@ -214,25 +215,23 @@ pub use sovereign_nextgen_distro_leap::{
 
 pub mod open_source_distro_innovations;
 pub use open_source_distro_innovations::{
-    DTraceProbe, EbuildPackageRecord, GentooPortageEapi8SlotResolver, IllumosDTraceProbeProvider,
-    MicroVmGuest, NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, VmState,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
 pub use open_source_distro_innovations::{
-    DTraceProbe, EbuildPackageRecord, GentooPortageEapi8SlotResolver, IllumosDTraceProbeProvider,
-    MicroVmGuest, NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, VmState,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
 pub use open_source_distro_innovations::{
-    DTraceProbe, EbuildPackageRecord, GentooPortageEapi8SlotResolver, IllumosDTraceProbeProvider,
-    MicroVmGuest, NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, VmState,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
 pub use open_source_distro_innovations::{
-    DTraceProbe, EbuildPackageRecord, GentooPortageEapi8SlotResolver, IllumosDTraceProbeProvider,
-    MicroVmGuest, NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, VmState,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
-pub use omarchy::{
-    GpuDriverConfig, KeybindingDefinition, OmarchyModernDesktopEngine, OmarchyTheme, WebAppSpec,
-};
+pub use omarchy::{OmarchyModernDesktopEngine, OmarchyTheme, KeybindingDefinition, WebAppSpec, GpuDriverConfig};

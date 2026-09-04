@@ -1,3 +1,4 @@
+
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)
@@ -118,12 +119,7 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!(
-                "Executed '{} {}' from stratum '{}'",
-                cmd,
-                args.join(" "),
-                stratum_name
-            ))
+            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -229,19 +225,13 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self
-            .vms
-            .get_mut(uuid)
-            .ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }
@@ -821,13 +811,7 @@ impl KaOSPackageStateGovernor {
         }
     }
 
-    pub fn register_package(
-        &mut self,
-        name: &str,
-        version: &str,
-        group: KaOsRepoGroup,
-        is_qt_kde: bool,
-    ) {
+    pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
         let record = KaOsPackageRecord {
             name: name.to_string(),
             version: version.to_string(),
@@ -841,11 +825,7 @@ impl KaOSPackageStateGovernor {
         if self.packages.is_empty() {
             return 1.0;
         }
-        let qt_count = self
-            .packages
-            .values()
-            .filter(|p| p.is_qt_kde_toolkit)
-            .count();
+        let qt_count = self.packages.values().filter(|p| p.is_qt_kde_toolkit).count();
         qt_count as f32 / self.packages.len() as f32
     }
 }
@@ -911,41 +891,13 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
-        engine.register_component(
-            "Devuan Init Diversity",
-            "Devuan Linux",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "Artix Init Scriptlet Matrix",
-            "Artix Linux",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "KaOS Qt/KDE Repo Governor",
-            "KaOS Linux",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "Universal Multi-Format Package Matrix",
-            "SigmaOS Universal Packaging",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "DTrace Dynamic Tracing Provider",
-            "Illumos / Solaris",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "HAMMER2 Multi-Version Pfs Engine",
-            "DragonFly BSD",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "GEOM Storage Transformation Topology",
-            "FreeBSD",
-            ComponentParityStatus::Implemented,
-        );
+        engine.register_component("Devuan Init Diversity", "Devuan Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Artix Init Scriptlet Matrix", "Artix Linux", ComponentParityStatus::Implemented);
+        engine.register_component("KaOS Qt/KDE Repo Governor", "KaOS Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Universal Multi-Format Package Matrix", "SigmaOS Universal Packaging", ComponentParityStatus::Implemented);
+        engine.register_component("DTrace Dynamic Tracing Provider", "Illumos / Solaris", ComponentParityStatus::Implemented);
+        engine.register_component("HAMMER2 Multi-Version Pfs Engine", "DragonFly BSD", ComponentParityStatus::Implemented);
+        engine.register_component("GEOM Storage Transformation Topology", "FreeBSD", ComponentParityStatus::Implemented);
 
         engine
     }
@@ -1122,11 +1074,7 @@ impl DragonFlyBsdHammerSnapshotEngine {
     }
 
     pub fn mount_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
-        if let Some(snap) = self
-            .snapshots
-            .iter_mut()
-            .find(|s| s.snapshot_id == snapshot_id)
-        {
+        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
             snap.is_mounted = true;
             Ok(format!("/media/hammer2/@snap_{}", snapshot_id))
         } else {
@@ -1159,16 +1107,10 @@ pub struct VanillaOsApxSubsystemEngine {
 
 impl VanillaOsApxSubsystemEngine {
     pub fn new() -> Self {
-        Self {
-            containers: Vec::new(),
-        }
+        Self { containers: Vec::new() }
     }
 
-    pub fn create_apx_container(
-        &mut self,
-        name: &str,
-        base_distro: &str,
-    ) -> Result<(), &'static str> {
+    pub fn create_apx_container(&mut self, name: &str, base_distro: &str) -> Result<(), &'static str> {
         if self.containers.iter().any(|c| c.name == name) {
             return Err("APX: Container name already exists");
         }
@@ -1182,11 +1124,7 @@ impl VanillaOsApxSubsystemEngine {
     }
 
     pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
-        if let Some(c) = self
-            .containers
-            .iter_mut()
-            .find(|c| c.name == container_name)
-        {
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == container_name) {
             c.installed_apps.push(app.to_string());
             Ok(())
         } else {
@@ -1755,8 +1693,7 @@ impl BpfTypeFormatEngine {
     }
 
     pub fn register_type(&mut self, type_id: u32, name: &str, kind: &str) {
-        self.type_table
-            .insert(type_id, (name.to_string(), kind.to_string()));
+        self.type_table.insert(type_id, (name.to_string(), kind.to_string()));
     }
 
     pub fn lookup_type(&self, type_id: u32) -> Option<&(String, String)> {
@@ -1781,8 +1718,7 @@ impl ErofsReadOnlyOverlayEngine {
     }
 
     pub fn mount_erofs_super(&mut self, image_name: &str, compression: &str) {
-        self.mounted_images
-            .insert(image_name.to_string(), compression.to_string());
+        self.mounted_images.insert(image_name.to_string(), compression.to_string());
     }
 
     pub fn verify_block_checksum(&mut self, _block_id: u64) -> bool {
@@ -1857,18 +1793,9 @@ impl UbuntuAppArmorEngine {
         }
 
         let allowed = match access_type {
-            "read" => profile
-                .allowed_read_paths
-                .iter()
-                .any(|p| target_path.starts_with(p)),
-            "write" => profile
-                .allowed_write_paths
-                .iter()
-                .any(|p| target_path.starts_with(p)),
-            "exec" => profile
-                .allowed_exec_paths
-                .iter()
-                .any(|p| target_path.starts_with(p)),
+            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
+            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
+            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
             _ => false,
         };
 
@@ -1891,8 +1818,7 @@ impl NixOsFlakesEngine {
     }
 
     pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs
-            .insert(name.to_string(), (url.to_string(), hash.to_string()));
+        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
     }
 
     pub fn compute_system_derivation_hash(&self) -> String {
@@ -2054,11 +1980,7 @@ mod tests {
     #[test]
     fn test_devuan_init_diversity() {
         let mut devuan = DevuanInitDiversityEngine::new(DevuanInitBackend::OpenRc);
-        devuan.register_service(
-            "networking",
-            DevuanInitBackend::OpenRc,
-            "/etc/init.d/networking",
-        );
+        devuan.register_service("networking", DevuanInitBackend::OpenRc, "/etc/init.d/networking");
         assert!(devuan.is_systemd_free());
         assert_eq!(devuan.services.len(), 1);
     }
@@ -2146,31 +2068,14 @@ mod tests {
         apparmor.add_profile(profile);
 
         // Allowed accesses
-        assert!(apparmor.evaluate_access(
-            "usr.bin.firefox",
-            "/home/user/download.pdf",
-            true,
-            true,
-            false
-        ));
-        assert!(apparmor.evaluate_access(
-            "usr.bin.firefox",
-            "/usr/lib/firefox/firefox",
-            true,
-            false,
-            true
-        ));
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/home/user/download.pdf", true, true, false));
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, false, true));
 
         // Denied accesses (e.g. write to executable or exec home file)
-        assert!(!apparmor.evaluate_access(
-            "usr.bin.firefox",
-            "/usr/lib/firefox/firefox",
-            true,
-            true,
-            true
-        ));
+        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, true, true));
         assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
 
         assert!(apparmor.audit_log.len() >= 2);
     }
+
 }

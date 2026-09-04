@@ -2,10 +2,10 @@
 // SigmaOS Intel i915/i965 Integrated GPU Driver
 // Supports Gen 3-11 Intel integrated graphics (Skylake, Kaby Lake, Coffee Lake, etc.)
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 use crate::interrupt::ApicManager;
@@ -97,19 +97,17 @@ impl GpuMemoryManager {
         self.vram_offset += size;
 
         self.regions.push(GpuMemoryRegion::new(
-            offset, offset, // For simplicity, map 1:1
-            size, true,
+            offset,
+            offset, // For simplicity, map 1:1
+            size,
+            true,
         ));
 
         Some(offset)
     }
 
     pub fn free_vram(&mut self, address: u64) -> bool {
-        if let Some(pos) = self
-            .regions
-            .iter()
-            .position(|r| r.physical_address == address)
-        {
+        if let Some(pos) = self.regions.iter().position(|r| r.physical_address == address) {
             self.regions.remove(pos);
             true
         } else {
@@ -251,8 +249,7 @@ impl IntelGpuDriver {
         // 4. Wait for completion
 
         let next_offset = offset + cmd_size as u32;
-        self.command_buffer_offset
-            .store(next_offset, Ordering::SeqCst);
+        self.command_buffer_offset.store(next_offset, Ordering::SeqCst);
 
         Ok(cmd_addr as u32)
     }
@@ -345,10 +342,7 @@ impl PciDriver for IntelGpuPciDriver {
         }
 
         // Device is supported, initialize driver
-        let mut gpu = Box::new(IntelGpuDriver::new(
-            device.device_id,
-            &device.address.sysfs_format(),
-        ));
+        let mut gpu = Box::new(IntelGpuDriver::new(device.device_id, &device.address.sysfs_format()));
 
         // Extract MMIO BAR (typically BAR0 for Intel GPU)
         if let Some(ref bar) = device.bars[0] {

@@ -2,10 +2,10 @@
 // SigmaOS HID Input Device Driver
 // Supports USB HID devices: keyboards, mice, touchpads
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -84,10 +84,10 @@ impl HidKeyboardReport {
 
 #[derive(Debug, Clone, Copy)]
 pub struct HidMouseReport {
-    pub buttons: u8, // Buttons bitmap: bit 0=left, bit 1=right, bit 2=middle
-    pub x: i8,       // X movement (-127 to +127)
-    pub y: i8,       // Y movement (-127 to +127)
-    pub wheel: i8,   // Wheel (-127 to +127)
+    pub buttons: u8,      // Buttons bitmap: bit 0=left, bit 1=right, bit 2=middle
+    pub x: i8,            // X movement (-127 to +127)
+    pub y: i8,            // Y movement (-127 to +127)
+    pub wheel: i8,        // Wheel (-127 to +127)
 }
 
 impl HidMouseReport {
@@ -243,10 +243,7 @@ impl HidInputDeviceDriver {
         self.register_device(device)
     }
 
-    pub fn submit_keyboard_report(
-        &mut self,
-        report: HidKeyboardReport,
-    ) -> Result<(), &'static str> {
+    pub fn submit_keyboard_report(&mut self, report: HidKeyboardReport) -> Result<(), &'static str> {
         if self.keyboard_buffer.len() >= 16 {
             return Err("Keyboard buffer full");
         }
@@ -344,7 +341,7 @@ impl HidInputDeviceDriver {
                 0x15, 0x00, // Logical Minimum (0)
                 0x25, 0x01, // Logical Maximum (1)
                 0x81, 0x02, // Input (Data, Variable, Absolute)
-                0xC0, // End Collection
+                0xC0,       // End Collection
             ],
             HidDeviceType::Mouse => vec![
                 0x05, 0x01, // Usage Page (Generic Desktop)
@@ -360,8 +357,8 @@ impl HidInputDeviceDriver {
                 0x75, 0x01, // Report Size (1)
                 0x95, 0x03, // Report Count (3)
                 0x81, 0x02, // Input (Data, Variable, Absolute)
-                0xC0, // End Collection
-                0xC0, // End Collection
+                0xC0,       // End Collection
+                0xC0,       // End Collection
             ],
             _ => return Err("Device type not supported"),
         };
@@ -377,7 +374,9 @@ impl HidInputDeviceDriver {
         Ok(HidKeyboardReport {
             modifier: data[0],
             reserved: data[1],
-            keycodes: [data[2], data[3], data[4], data[5], data[6], data[7]],
+            keycodes: [
+                data[2], data[3], data[4], data[5], data[6], data[7],
+            ],
         })
     }
 
@@ -560,9 +559,7 @@ mod tests {
     #[test]
     fn test_report_descriptor_generation() {
         let mut driver = HidInputDeviceDriver::new();
-        let dev_id = driver
-            .register_device(HidDevice::new(0x046D, 0xC31C, HidDeviceType::Keyboard))
-            .unwrap();
+        let dev_id = driver.register_device(HidDevice::new(0x046D, 0xC31C, HidDeviceType::Keyboard)).unwrap();
         let descriptor = driver.get_report_descriptor(dev_id).unwrap();
         assert!(!descriptor.is_empty());
     }

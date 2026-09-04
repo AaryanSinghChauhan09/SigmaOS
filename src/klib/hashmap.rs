@@ -3,9 +3,9 @@
 use std::string::{String, ToString};
 
 use crate::klib::hash::SimpleHasher;
+use std::vec::Vec;
 use core::borrow::Borrow;
 use core::hash::{Hash, Hasher};
-use std::vec::Vec;
 
 pub type HashMap<K, V> = BTreeMap<K, V>;
 

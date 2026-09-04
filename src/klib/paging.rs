@@ -63,6 +63,7 @@ pub enum PrivilegeLevel {
     User = 3,
 }
 
+
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
     fn is_writable(&self) -> bool;

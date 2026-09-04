@@ -1,10 +1,11 @@
+
 #[cfg(test)]
 extern crate std;
 
+use std::vec::Vec;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
 /// Provides PKGBUILD parsing, source compilation simulation, and rolling release dependency installations.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
