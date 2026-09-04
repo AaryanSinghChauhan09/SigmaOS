@@ -6,6 +6,7 @@ extern crate alloc;
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -1511,6 +1512,57 @@ impl SovereignApacheKafkaStreamEngine {
 // =========================================================================
 // 15. SOVEREIGN OPEN SOURCE OBSOLETION ORCHESTRATOR
 // =========================================================================
+
+// =========================================================================
+// 50. SOVEREIGN APACHE SPARK DATA ENGINE (Superseding Apache Spark, Trino & Flink)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SparkDataRecord {
+    pub id: u64,
+    pub key: String,
+    pub value: u64,
+}
+
+pub struct SovereignApacheSparkDataEngine {
+    pub dataset: Vec<SparkDataRecord>,
+}
+
+impl SovereignApacheSparkDataEngine {
+    pub fn new() -> Self {
+        Self { dataset: Vec::new() }
+    }
+
+    pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
+        self.dataset = records;
+    }
+
+    pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
+        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
+    }
+
+    pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
+    where
+        F: Fn(&SparkDataRecord) -> SparkDataRecord,
+    {
+        self.dataset.iter().map(transform).collect()
+    }
+
+    pub fn aggregate_sum_by_key(&self) -> BTreeMap<String, u64> {
+        let mut agg = BTreeMap::new();
+        for record in &self.dataset {
+            let entry = agg.entry(record.key.clone()).or_insert(0);
+            *entry += record.value;
+        }
+        agg
+    }
+}
+
+impl Default for SovereignApacheSparkDataEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub vcs: SovereignVcsEngine,
@@ -3620,6 +3672,24 @@ mod tests {
 
         runtime.enforce_cgroups("app1", 50);
         assert_eq!(runtime.containers[0].cpu_usage_pct, 50);
+    }
+
+    #[test]
+    fn test_sovereign_apache_spark_data_engine() {
+        let mut spark = SovereignApacheSparkDataEngine::new();
+        let records = vec![
+            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
+            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
+            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
+        ];
+        spark.load_dataset(records);
+
+        let filtered = spark.filter_by_min_value(50);
+        assert_eq!(filtered.len(), 2);
+
+        let agg = spark.aggregate_sum_by_key();
+        assert_eq!(agg.get("CPU"), Some(&100));
+        assert_eq!(agg.get("RAM"), Some(&80));
     }
 
     #[test]

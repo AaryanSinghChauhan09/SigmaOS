@@ -39,17 +39,6 @@ impl PpaRepository {
 
 
 
-
-/// Linux Mint Sources Mirror Benchmark Engine
-#[derive(Debug, Clone)]
-pub struct MirrorBenchmark {
-    pub url: String,
-    pub latency_ms: u32,
-    pub download_speed_kbps: u32,
-}
-
-pub struct MirrorBenchmarkEngine;
-
 impl MirrorBenchmarkEngine {
     pub fn benchmark_mirrors(mirrors: &[String]) -> Vec<MirrorBenchmark> {
         let mut results = Vec::new();
@@ -94,6 +83,7 @@ pub enum OfficialArchiveSource {
     Multiverse,
     Backports,
 }
+
 
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]

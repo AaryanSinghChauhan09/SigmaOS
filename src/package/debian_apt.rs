@@ -5,7 +5,8 @@ use alloc::collections::BTreeSet;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::collections::BTreeMap;
+use crate::klib::collections::HashSet;
 
 /// APT error types
 #[derive(Debug, Clone)]

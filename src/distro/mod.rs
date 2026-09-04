@@ -25,11 +25,11 @@ pub mod garuda_nomad_innovations;
 
 pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
-    DeviceNodeType, DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel,
-    NatRule, NatRuleKind, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine,
-    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine,
-    SovereignStatefulNatEngine, SystemdInitManager, SystemdUnitService, TcpSocket, TcpState,
-    UsbHidKeyboardDriver, UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
+    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
+    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack, SovereignDnsTlsResolverEngine,
+    SovereignDynamicDevfsEngine, SovereignStatefulNatEngine, SovereignJournaldBinaryStorageEngine,
+    DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, NatType, ConntrackTableEntry, JournaldLogRecord,
 };
 
 pub use garuda_nomad_innovations::{
