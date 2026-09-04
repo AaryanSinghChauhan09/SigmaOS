@@ -51,6 +51,7 @@ pub enum DistroSubsystemMode {
     DragonFlyBsd,
     SmartOs,
     BedrockLinux,
+    SolarisIllumos,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,6 +63,7 @@ pub enum ServiceSupervisorType {
     Dinit,
     S6,
     Sysvinit,
+    Smf,
     Rcd,
     Launchd,
 }
@@ -119,6 +121,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
         }
     }
 
@@ -207,6 +210,7 @@ impl SovereignUniversalDistroBridge {
                 }
                 DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
                 DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+                _ => true,
             };
 
             if !valid_supervisor {
@@ -230,7 +234,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
@@ -240,6 +243,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
         }
     }
 
@@ -347,8 +351,9 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxNix => supervisor == ServiceSupervisorType::Shepherd,
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::SysVInit,
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+            _ => true,
         };
 
         !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid

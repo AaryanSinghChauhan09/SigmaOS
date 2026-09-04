@@ -659,6 +659,152 @@ impl Default for DebianPolicyEnforcer {
 }
 
 // =========================================================================
+// 8. SIGMAOS 5-10 YEAR COMPARATIVE TIMELINE ROADMAP ENGINE (2026-2035)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RoadmapMilestoneRecord {
+    pub year_range: String,
+    pub sigmaos_milestone: String,
+    pub linux_milestone: String,
+    pub windows_milestone: String,
+    pub macos_milestone: String,
+}
+
+#[derive(Debug, Default)]
+pub struct SigmaOsComparativeTimelineRoadmapEngine {
+    pub milestones: Vec<RoadmapMilestoneRecord>,
+}
+
+impl SigmaOsComparativeTimelineRoadmapEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { milestones: Vec::new() };
+        engine.init_roadmap_timeline();
+        engine
+    }
+
+    fn init_roadmap_timeline(&mut self) {
+        self.milestones.push(RoadmapMilestoneRecord {
+            year_range: "2026-2027".to_string(),
+            sigmaos_milestone: "Driver shards, declarative configs, Zenith desktop".to_string(),
+            linux_milestone: "Wayland adoption, container dominance".to_string(),
+            windows_milestone: "AI Copilot expansion, ARM optimization".to_string(),
+            macos_milestone: "Apple Silicon refinements, tighter ecosystem".to_string(),
+        });
+
+        self.milestones.push(RoadmapMilestoneRecord {
+            year_range: "2028-2029".to_string(),
+            sigmaos_milestone: "Sandboxed drivers, firmware bridge, temporal filesystem".to_string(),
+            linux_milestone: "Cloud-native Linux, stronger SELinux/AppArmor".to_string(),
+            windows_milestone: "AI-native Windows, Snapdragon X2 ecosystem".to_string(),
+            macos_milestone: "AR/VR integration, Vision Pro OS layering".to_string(),
+        });
+
+        self.milestones.push(RoadmapMilestoneRecord {
+            year_range: "2030-2031".to_string(),
+            sigmaos_milestone: "Clustered peripherals, programmable scheduler, immutable userland".to_string(),
+            linux_milestone: "Cross-architecture portability (ARM, RISC-V)".to_string(),
+            windows_milestone: "Enterprise AI orchestration, deeper cloud tie-ins".to_string(),
+            macos_milestone: "Expanded AR/VR ecosystem, tighter iOS/macOS convergence".to_string(),
+        });
+
+        self.milestones.push(RoadmapMilestoneRecord {
+            year_range: "2032-2035".to_string(),
+            sigmaos_milestone: "Cryptographic boot chain, network-native OS state, hardware sovereignty".to_string(),
+            linux_milestone: "Decentralized Linux distributions, sovereign computing".to_string(),
+            windows_milestone: "AI-first OS, subscription-driven ecosystem".to_string(),
+            macos_milestone: "Full Apple ecosystem lock-in, AR-native macOS".to_string(),
+        });
+    }
+
+    pub fn evaluate_roadmap_milestone(&self, year: u32) -> Option<&RoadmapMilestoneRecord> {
+        match year {
+            2026..=2027 => self.milestones.get(0),
+            2028..=2029 => self.milestones.get(1),
+            2030..=2031 => self.milestones.get(2),
+            2032..=2035 => self.milestones.get(3),
+            _ => None,
+        }
+    }
+}
+
+// =========================================================================
+// 9. MULTI-PHASE HARDWARE SOVEREIGNTY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereigntyPhase {
+    Phase1CompatibilityFoundation, // Years 1-2
+    Phase2SovereigntyAndSecurity,   // Years 3-5
+    Phase3SovereignExpansion,       // Years 5+
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HardwareSovereigntyFeature {
+    pub feature_name: String,
+    pub phase: SovereigntyPhase,
+    pub is_enabled: bool,
+}
+
+pub struct MultiPhaseHardwareSovereigntyEngine {
+    pub features: BTreeMap<String, HardwareSovereigntyFeature>,
+}
+
+impl MultiPhaseHardwareSovereigntyEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { features: BTreeMap::new() };
+        engine.init_sovereignty_features();
+        engine
+    }
+
+    fn init_sovereignty_features(&mut self) {
+        // Phase 1: Compatibility Foundation
+        self.register_feature("driver_shards", SovereigntyPhase::Phase1CompatibilityFoundation);
+        self.register_feature("cross_os_driver_compat", SovereigntyPhase::Phase1CompatibilityFoundation);
+        self.register_feature("declarative_driver_configs", SovereigntyPhase::Phase1CompatibilityFoundation);
+        self.register_feature("hotplug_orchestration", SovereigntyPhase::Phase1CompatibilityFoundation);
+
+        // Phase 2: Sovereignty & Security
+        self.register_feature("sandboxed_hardware_modules", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+        self.register_feature("universal_firmware_bridge", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+        self.register_feature("firmware_free_drivers", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+        self.register_feature("secure_peripheral_isolation", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+        self.register_feature("driver_layering_system", SovereigntyPhase::Phase2SovereigntyAndSecurity);
+
+        // Phase 3: Sovereign Expansion
+        self.register_feature("clustered_device_pooling", SovereigntyPhase::Phase3SovereignExpansion);
+        self.register_feature("programmable_io_stack", SovereigntyPhase::Phase3SovereignExpansion);
+        self.register_feature("cross_architecture_portability", SovereigntyPhase::Phase3SovereignExpansion);
+        self.register_feature("declarative_hardware_policies", SovereigntyPhase::Phase3SovereignExpansion);
+        self.register_feature("cryptographic_boot_chain", SovereigntyPhase::Phase3SovereignExpansion);
+    }
+
+    fn register_feature(&mut self, name: &str, phase: SovereigntyPhase) {
+        self.features.insert(
+            name.to_string(),
+            HardwareSovereigntyFeature {
+                feature_name: name.to_string(),
+                phase,
+                is_enabled: true,
+            },
+        );
+    }
+
+    pub fn evaluate_phase_readiness(&self, phase: SovereigntyPhase) -> bool {
+        self.features
+            .values()
+            .filter(|f| f.phase == phase)
+            .all(|f| f.is_enabled)
+    }
+}
+
+impl Default for MultiPhaseHardwareSovereigntyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -956,5 +1102,29 @@ mod tests {
 
         // 3. FHS Non-compliant path (/opt/mycustomapp) -> Non-compliant
         assert!(enforcer.evaluate_package_compliance("custom-app", "MIT", &["/opt/custom/app"]).is_err());
+    }
+
+    #[test]
+    fn test_comparative_timeline_roadmap_engine() {
+        let timeline = SigmaOsComparativeTimelineRoadmapEngine::new();
+        assert_eq!(timeline.milestones.len(), 4);
+
+        let m_2026 = timeline.evaluate_roadmap_milestone(2027).unwrap();
+        assert_eq!(m_2026.year_range, "2026-2027");
+        assert!(m_2026.sigmaos_milestone.contains("Driver shards"));
+
+        let m_2035 = timeline.evaluate_roadmap_milestone(2034).unwrap();
+        assert_eq!(m_2035.year_range, "2032-2035");
+        assert!(m_2035.sigmaos_milestone.contains("Cryptographic boot chain"));
+    }
+
+    #[test]
+    fn test_multi_phase_hardware_sovereignty_engine() {
+        let engine = MultiPhaseHardwareSovereigntyEngine::new();
+        assert_eq!(engine.features.len(), 14);
+
+        assert!(engine.evaluate_phase_readiness(SovereigntyPhase::Phase1CompatibilityFoundation));
+        assert!(engine.evaluate_phase_readiness(SovereigntyPhase::Phase2SovereigntyAndSecurity));
+        assert!(engine.evaluate_phase_readiness(SovereigntyPhase::Phase3SovereignExpansion));
     }
 }

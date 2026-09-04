@@ -2301,9 +2301,5 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
     }
-
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
-    }
+}
 }

@@ -150,6 +150,7 @@ pub use missing_distro_innovations::{
     SmartOsZoneEngine, ComponentParityStatus, MissingDistroComponentsEngine,
     DragonFlyHammer2EmergencyCowEngine, SovereignFastInitramfsGenerator,
     GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
+    BpfTypeFormatEngine, ErofsReadOnlyOverlayEngine, LoongArch64ArchitectureEngine,
 };
 
 pub use linux_bsd_inspirations::{
