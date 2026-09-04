@@ -241,6 +241,8 @@ pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
 // ── Network address ────────────────────────────────────────────────────────
 
 /// Validate a textual IPv4 address (digits and dots, ≤ 15 bytes).
+/// Rejects leading zeros in multi-digit octets (e.g., `010.0.0.1`) to prevent
+/// octal parser differential and SSRF security bypass vulnerabilities.
 pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -251,15 +253,20 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     let mut octet_count = 0u8;
     let mut octet_val: u32 = 0;
     let mut octet_len = 0u8;
+    let mut octet_has_leading_zero = false;
     for &b in addr {
         if b == b'.' {
-            if octet_val > 255 || octet_len == 0 {
+            if octet_val > 255 || octet_len == 0 || (octet_len > 1 && octet_has_leading_zero) {
                 return Err(ValidationError::OutOfRange);
             }
             octet_count += 1;
             octet_val = 0;
             octet_len = 0;
+            octet_has_leading_zero = false;
         } else if b.is_ascii_digit() {
+            if octet_len == 0 && b == b'0' {
+                octet_has_leading_zero = true;
+            }
             octet_val = octet_val.saturating_mul(10).saturating_add((b - b'0') as u32);
             octet_len += 1;
             if octet_len > 3 {
@@ -270,7 +277,7 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
         }
     }
     // Validate last octet and total count.
-    if octet_val > 255 || octet_len == 0 || octet_count != 3 {
+    if octet_val > 255 || octet_len == 0 || octet_count != 3 || (octet_len > 1 && octet_has_leading_zero) {
         return Err(ValidationError::OutOfRange);
     }
     Ok(())
@@ -429,11 +436,17 @@ mod tests {
     fn test_ipv4_validation() {
         assert!(validate_ipv4(b"192.168.1.1").is_ok());
         assert!(validate_ipv4(b"0.0.0.0").is_ok());
+        assert!(validate_ipv4(b"192.168.0.1").is_ok());
         assert!(validate_ipv4(b"255.255.255.255").is_ok());
         assert!(validate_ipv4(b"256.0.0.1").is_err());
         assert!(validate_ipv4(b"65536.0.0.1").is_err());
         assert!(validate_ipv4(b"99999.0.0.1").is_err());
         assert!(validate_ipv4(b"192.168.1").is_err());
+
+        // Reject multi-digit octets with leading zeros (prevents octal SSRF bypass)
+        assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"001.1.1.1"), Err(ValidationError::OutOfRange));
     }
 
     #[test]
