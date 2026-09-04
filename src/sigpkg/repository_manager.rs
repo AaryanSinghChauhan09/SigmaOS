@@ -38,7 +38,10 @@ impl PpaRepository {
 }
 
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+
+
+/// Linux Mint Sources Mirror Benchmark Engine
+#[derive(Debug, Clone)]
 pub struct MirrorBenchmark {
     pub url: String,
     pub latency_ms: u32,

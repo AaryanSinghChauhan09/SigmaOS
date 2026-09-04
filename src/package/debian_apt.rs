@@ -5,8 +5,7 @@ use alloc::collections::BTreeSet;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use crate::klib::collections::HashSet;
+use alloc::collections::{BTreeMap, BTreeSet};
 
 /// APT error types
 #[derive(Debug, Clone)]
@@ -156,8 +155,7 @@ impl SigmaAPT {
 
             // Get package information
             let pkg_info = self.database.available.get(&package)
-                .ok_or(AptError::PackageNotFound)?
-                .clone();
+                .ok_or(AptError::PackageNotFound)?.clone();
 
             // Resolve dependencies
             let dependencies = self.resolve_dependencies(&pkg_info)?;

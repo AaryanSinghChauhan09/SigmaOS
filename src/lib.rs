@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 // Core working modules
 pub mod ai;
 pub mod app;
@@ -80,7 +82,8 @@ pub use unimplemented_features::{
     HwbustersPowerSupplyMonitor, MacOsSequoiaWindowManager, ManjaroHardwareDetectionEngine,
     PhoronixAutomatedBenchmarkEngine, PhoronixTestSuiteRunner, PuppyLinuxOverlayRamdiskEngine,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator,
-    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, VoidXbpsContainerEngine,
+    S6ServiceInitSupervisor, SteamOsGamescopeCompositorEngine, TargetArch,
+    TinyCoreModularTczLoader, UutilsCoreutilsZeroCopyBuffer, VoidXbpsContainerEngine,
     WindowsCopilotRecallAuditor,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,

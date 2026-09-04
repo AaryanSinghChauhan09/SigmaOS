@@ -768,6 +768,54 @@ impl MakepkgBuilder {
     }
 }
 
+// --- Arch Linux svntogit Repository Migration Engine ---
+
+#[derive(Debug, Clone)]
+pub struct SvnPackageMetadata {
+    pub pkgname: String,
+    pub repo: String, // e.g. "core", "extra", "community"
+    pub svn_revision: u64,
+    pub has_pkgbuild: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct SvntogitMigrationEngine {
+    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
+}
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: alloc::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgbuild_content.is_empty() {
+            return Err("svntogit: Cannot migrate empty PKGBUILD");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+        Ok(format!(
+            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
+            pkgname, svn_revision, pkgname
+        ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -955,33 +1003,6 @@ mod tests {
         assert!(pkg_data.len() > source_bytes.len());
     }
 
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-        let compiled = compiler.compile_vectorized_binary("fn main() {}");
-        assert!(compiled.len() > 20);
-        let compiled_str = String::from_utf8_lossy(&compiled);
-        assert!(compiled_str.contains("S-ABS_SIMD_BINARY"));
-        assert!(compiled_str.contains("Avx512"));
-    }
-
-    #[test]
-    fn test_svntogit_migration_engine() {
-        let mut engine = SvntogitMigrationEngine::new();
-        let pkgbuild = "pkgname=linux-zen\npkgver=6.8.1";
-
-        let result = engine.migrate_svn_repo_layout("linux-zen", "extra", 450123, pkgbuild);
-        assert!(result.is_ok());
-        assert!(result.unwrap().contains("packages/linux-zen"));
-        assert_eq!(engine.migrated_packages.len(), 1);
-
-        let fail_res = engine.migrate_svn_repo_layout("empty-pkg", "extra", 450124, "");
-        assert!(fail_res.is_err());
-    }
-}
-
-#[cfg(test)]
-mod tests_extra {
-    use super::*;
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {

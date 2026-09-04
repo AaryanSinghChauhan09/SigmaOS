@@ -121,8 +121,7 @@ impl SigmaAUR {
     /// Install package
     pub fn install_package(&mut self, pkg_name: &str) -> Result<(), BuildError> {
         let pkg = self.package_db.get(pkg_name)
-            .ok_or(BuildError::PackageNotFound)?
-            .clone();
+            .ok_or(BuildError::PackageNotFound)?.clone();
 
         // Resolve dependencies
         let dependencies = self.resolve_dependencies(&pkg)?;
