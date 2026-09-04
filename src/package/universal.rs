@@ -12,9 +12,6 @@ use alloc::sync::Arc;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
-pub mod node_distribution_dummy {
-    use super::*;
-}
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
@@ -813,7 +810,7 @@ impl Default for PackageTriggerRegistry {
 // Foreign Distro Manifest & Multi-Distro Package Adapter Pipeline
 // =========================================================================
 
-/// Manifest metadata for foreign distribution packages (.deb, .rpm, .apk, .pkg, etc.)
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
@@ -826,103 +823,69 @@ pub struct ForeignDistroManifest {
     pub maintainer: String,
 }
 
-/// Translator converting foreign distro package manifests into native SigmaPkg models
 pub struct UniversalPackageTranslator;
 
 impl UniversalPackageTranslator {
     pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
-
+                let name = format!("sigpkg-{}", manifest.original_name);
+        let mut deps = Vec::new();
         for dep in &manifest.raw_dependencies {
-            let mapped_dep = if dep == "libssl-dev" || dep == "openssl-devel" {
-                "sovereign-openssl".to_string()
+            if dep == "libssl-dev" || dep == "openssl-devel" {
+                deps.push("sovereign-openssl".to_string());
             } else if dep == "libc6" {
-                "sovereign-libc".to_string()
+                deps.push("sovereign-libc".to_string());
             } else {
-                dep.clone()
-            };
-            pkg = pkg.with_dependency(mapped_dep);
+                deps.push(dep.clone());
+            }
         }
-
-        for provide in &manifest.raw_provides {
-            pkg = pkg.with_provides(provide.clone());
+        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides(manifest.original_name.clone());
+        for p in &manifest.raw_provides {
+            pkg = pkg.with_provides(p.clone());
         }
-
-        for conflict in &manifest.raw_conflicts {
-            pkg = pkg.with_conflict(conflict.clone());
+        for d in deps {
+            pkg = pkg.with_dependency(d);
         }
-
         pkg
     }
 }
 
-/// Distro Repo Sync Engine for cross-distro repository synchronization
-#[derive(Debug, Clone)]
-pub struct ForeignDistroRepo {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DistroRepoMirror {
     pub distro_name: String,
-    pub repo_url: String,
+    pub mirror_url: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct DistroRepoSyncEngine {
-    pub registered_repos: Vec<ForeignDistroRepo>,
-    pub indexed_manifests: HashMap<String, ForeignDistroManifest>,
+    pub registered_repos: Vec<DistroRepoMirror>,
+    pub indexed_manifests: Vec<ForeignDistroManifest>,
 }
 
 impl DistroRepoSyncEngine {
     pub fn new() -> Self {
-        let mut registered_repos = Vec::new();
-        registered_repos.push(ForeignDistroRepo {
+        let mut repos = Vec::new();
+        repos.push(DistroRepoMirror {
             distro_name: "Debian".to_string(),
-            repo_url: "https://deb.debian.org/debian".to_string(),
+            mirror_url: "https://deb.debian.org/debian".to_string(),
         });
-        registered_repos.push(ForeignDistroRepo {
+        repos.push(DistroRepoMirror {
             distro_name: "ArchLinux".to_string(),
-            repo_url: "https://archlinux.org/packages".to_string(),
+            mirror_url: "https://archlinux.org/packages".to_string(),
         });
-        registered_repos.push(ForeignDistroRepo {
-            distro_name: "Fedora".to_string(),
-            repo_url: "https://mirrors.fedoraproject.org".to_string(),
-        });
-        registered_repos.push(ForeignDistroRepo {
-            distro_name: "Alpine".to_string(),
-            repo_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
-        });
-        registered_repos.push(ForeignDistroRepo {
-            distro_name: "FreeBSD".to_string(),
-            repo_url: "https://pkg.freebsd.org".to_string(),
-        });
-
         Self {
-            registered_repos,
-            indexed_manifests: HashMap::new(),
+            registered_repos: repos,
+            indexed_manifests: Vec::new(),
         }
     }
 
     pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests
-            .insert(manifest.original_name.clone(), manifest);
+        self.indexed_manifests.push(manifest);
     }
 
     pub fn total_indexed_packages(&self) -> usize {
         self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .get(name)
-            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
-    }
-}
-
-impl Default for DistroRepoSyncEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

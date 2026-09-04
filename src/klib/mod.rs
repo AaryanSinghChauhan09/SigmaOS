@@ -141,4 +141,3 @@ mod tests {
         assert_eq!(formatted, "2026");
     }
 }
-

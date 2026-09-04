@@ -38,6 +38,13 @@ impl PpaRepository {
 }
 
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MirrorBenchmark {
+    pub url: String,
+    pub latency_ms: u32,
+    pub download_speed_kbps: u32,
+}
+
 pub struct MirrorBenchmarkEngine;
 
 impl MirrorBenchmarkEngine {

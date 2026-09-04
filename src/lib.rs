@@ -1,7 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-
 // Core working modules
 pub mod ai;
 pub mod app;
