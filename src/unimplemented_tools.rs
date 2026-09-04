@@ -3,6 +3,7 @@ use std::boxed::Box;
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 // Re-exported in src/lib.rs for full SigmaOS distribution parity.
 
+use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 use std::string::ToString;
@@ -5161,7 +5162,7 @@ impl NixGuixStoreGarbageCollectorTool {
 
 #[derive(Debug, Default, Clone)]
 pub struct OpenBsdUnveilAuditTool {
-    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+    pub unveiled_rules: BTreeMap<String, String>,
 }
 
 impl OpenBsdUnveilAuditTool {
