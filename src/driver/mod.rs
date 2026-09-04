@@ -16,6 +16,15 @@ pub mod ubuntu_common_drivers;
 pub mod universal_support;
 pub mod vault;
 pub mod windows_compat;
+pub mod device_roadmap;
+
+pub use device_roadmap::{
+    DriverShard, DriverShardManager, HardwareProfileSpec, DeclarativeDriverConfigEngine,
+    CrossOsDriverBridge, SandboxedDriverContainer, SandboxedHardwareModuleManager,
+    FirmwareBlobRecord, UniversalFirmwareBridge, SignedDriverPackage, CommunityDriverRegistry,
+    ClusterPeripheralResource, ClusterAwarePeripheralRouter, IoScriptFilter, ProgrammableIoStack,
+    BootChainStage, CryptographicBootChain, SigmaDeviceIntegrationRoadmapEngine,
+};
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};

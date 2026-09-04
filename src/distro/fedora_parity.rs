@@ -6,6 +6,8 @@ use crate::klib::Vec;
 use alloc::string::String;
 use core::cell::Cell;
 
+pub use crate::compatibility::fedora::FedoraOfflineUpdateEngine;
+
 /// Fedora DNF package manager parity
 pub struct DnfPackageManager {
     pub repositories: Vec<String>,
