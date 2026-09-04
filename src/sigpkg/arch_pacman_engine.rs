@@ -386,6 +386,69 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
+/// Pacman Contrib Suite Engine (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
+#[derive(Debug, Clone, Default)]
+pub struct PacmanContribEngine;
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        PacmanContribEngine
+    }
+
+    pub fn paccache_clean(&self, cache: &[String], keep_count: usize) -> Vec<String> {
+        if cache.len() <= keep_count {
+            Vec::new()
+        } else {
+            cache[..cache.len() - keep_count].to_vec()
+        }
+    }
+
+    pub fn rankmirrors(&self, mirrors: &[(String, u32)], limit: usize) -> Vec<(String, u32)> {
+        let mut sorted = mirrors.to_vec();
+        sorted.sort_by_key(|m| m.1);
+        sorted.truncate(limit);
+        sorted
+    }
+
+    pub fn updpkgsums(&self, pkgbuild: &str, new_sum: &str) -> String {
+        let mut lines: Vec<String> = pkgbuild.lines().map(|l| l.to_string()).collect();
+        let mut found = false;
+        for line in &mut lines {
+            if line.starts_with("sha256sums=") {
+                *line = format!("sha256sums=('{}')", new_sum);
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            lines.push(format!("sha256sums=('{}')", new_sum));
+        }
+        lines.join("\n")
+    }
+
+    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
+        let mut updates = Vec::new();
+        for local in &local_db.local_packages {
+            if let Some(remote) = remote_db.packages.iter().find(|p| p.name == local.name) {
+                if remote.version != local.version {
+                    updates.push((local.name.clone(), local.version.clone(), remote.version.clone()));
+                }
+            }
+        }
+        updates
+    }
+
+    pub fn finddeps(&self, local_db: &PacmanDatabase, dep_name: &str) -> Vec<String> {
+        let mut dependents = Vec::new();
+        for pkg in &local_db.local_packages {
+            if pkg.depends.iter().any(|d| d == dep_name) {
+                dependents.push(pkg.name.clone());
+            }
+        }
+        dependents
+    }
+}
+
 // ============================================================================
 // ARCH LINUX DBSCRIPTS & REPOSITORY DATABASE MANAGEMENT ENGINE
 // ============================================================================

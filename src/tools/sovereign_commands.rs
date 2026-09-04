@@ -294,6 +294,70 @@ impl Default for SovereignInitramfsSystemd {
     }
 }
 
+/// 7. Sovereign FreeBSD Sysctl MIB Inspector & Variable Tuner
+pub struct SovereignBsdSysctl {
+    pub mib_tree: BTreeMap<String, String>,
+}
+
+impl SovereignBsdSysctl {
+    pub fn new() -> Self {
+        let mut tree = BTreeMap::new();
+        tree.insert(String::from("kern.ostype"), String::from("SigmaOS"));
+        tree.insert(String::from("kern.osrelease"), String::from("1.0.0-SOVEREIGN"));
+        tree.insert(String::from("hw.ncpu"), String::from("16"));
+        tree.insert(String::from("hw.physmem"), String::from("34359738368"));
+        tree.insert(String::from("security.bsd.unprivileged_proc_debug"), String::from("0"));
+        tree.insert(String::from("net.inet.tcp.sack.enable"), String::from("1"));
+        Self { mib_tree: tree }
+    }
+
+    pub fn get_mib(&self, mib_name: &str) -> Option<&String> {
+        self.mib_tree.get(mib_name)
+    }
+
+    pub fn set_mib(&mut self, mib_name: &str, value: &str) -> Result<String, String> {
+        self.mib_tree.insert(mib_name.to_string(), value.to_string());
+        Ok(format!("{} -> {}", mib_name, value))
+    }
+}
+
+impl Default for SovereignBsdSysctl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 8. Sovereign OpenBSD Doas Privilege Delegation Engine
+pub struct SovereignOpenBsdDoas {
+    pub permitted_rules: Vec<String>, // user -> command rule
+}
+
+impl SovereignOpenBsdDoas {
+    pub fn new() -> Self {
+        Self {
+            permitted_rules: vec![
+                String::from("permit keepenv :wheel"),
+                String::from("permit nopass sovereign as root cmd /bin/sigma-pkg"),
+            ],
+        }
+    }
+
+    pub fn execute_doas(&self, user: &str, command: &str) -> Result<String, String> {
+        let is_allowed = user == "sovereign" || user == "root" || self.permitted_rules.iter().any(|r| r.contains(user));
+        if is_allowed {
+            Ok(format!("[doas] Executing '{}' as root for user '{}'", command, user))
+        } else {
+            Err(format!("[doas] Access denied for user '{}' on command '{}'", user, command))
+        }
+    }
+}
+
+impl Default for SovereignOpenBsdDoas {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -360,5 +424,20 @@ mod tests {
 
         initramfs.register_post_install_hook("nginx");
         assert_eq!(initramfs.package_post_install_hooks.len(), 1);
+    }
+
+    #[test]
+    fn test_bsd_sysctl_and_openbsd_doas() {
+        let mut sysctl = SovereignBsdSysctl::new();
+        assert_eq!(sysctl.get_mib("kern.ostype").unwrap(), "SigmaOS");
+        let res = sysctl.set_mib("net.inet.tcp.sack.enable", "0").unwrap();
+        assert!(res.contains("net.inet.tcp.sack.enable -> 0"));
+
+        let doas = SovereignOpenBsdDoas::new();
+        let allowed = doas.execute_doas("sovereign", "sigma-pkg update").unwrap();
+        assert!(allowed.contains("Executing 'sigma-pkg update' as root"));
+
+        let denied = doas.execute_doas("guest", "rm -rf /");
+        assert!(denied.is_err());
     }
 }
