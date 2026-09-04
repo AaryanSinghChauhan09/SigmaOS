@@ -2,7 +2,7 @@
 
 This document presents a comparative dashboard, gap closure matrix, and strategic development roadmap tracing SigmaOS's evolution from conceptual microkernel skeleton into a daily-driver sovereign operating system ecosystem.
 
----
+***
 
 ## 🗺️ SigmaOS Catch‑Up vs Leapfrog Strategy Map
 
@@ -20,11 +20,12 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **Future Modules** | Limited AI/quantum | Conservative design | Quantum, AI, compliance dashboards | **Leapfrog** → futuristic kernel modules |
 
 > **Strategic Takeaway**:
-> - **Catch‑Up Layer**: Paging, hotplugging, interrupts, app ecosystem, enterprise hooks, docs.
-> - **Leapfrog Layer**: Adaptive UI, ultra‑fast startup, AI orchestration, quantum kernel, compliance dashboards.
-> - **Balanced Roadmap**: SigmaOS must first close critical gaps to gain credibility, then skip ahead with moonshot features to differentiate.
+>
+> *   **Catch‑Up Layer**: Paging, hotplugging, interrupts, app ecosystem, enterprise hooks, docs.
+> *   **Leapfrog Layer**: Adaptive UI, ultra‑fast startup, AI orchestration, quantum kernel, compliance dashboards.
+> *   **Balanced Roadmap**: SigmaOS must first close critical gaps to gain credibility, then skip ahead with moonshot features to differentiate.
 
----
+***
 
 ## 📊 SigmaOS vs Linux vs BSD — Gap & Advantage Matrix
 
@@ -42,7 +43,7 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 | **UI/UX** | Polished desktop/server | Stable UI paradigms | Adaptive UI vision | **Ahead (Potential)** |
 | **Future Modules** | Limited AI/quantum | Conservative design | Quantum, AI, compliance dashboards | **Ahead (Moonshot)** |
 
----
+***
 
 ## 📈 Gap Closure Benchmark Timeline
 
@@ -119,15 +120,15 @@ This document presents a comparative dashboard, gap closure matrix, and strategi
 
 ## 📜 Future Development Protocol & Community Charter
 
-1. **Governance Model**: Core maintainer team, Special Interest Groups (SIGs), and transparent RFC decision-making.
-2. **Roadmap Planning**: Rolling 2-year roadmap categorized into short-term usability, mid-term sovereignty, and long-term resilience.
-3. **Development Workflow**: Mandatory RFCs for major changes, feature branches, code reviews, and automated CI/CD checks.
-4. **Application Ecosystem**: Compatibility layers for Linux/BSD apps, Shards marketplace, and clear SDKs/APIs.
-5. **Collaboration & Community**: Contributor Guidelines, monthly community sync calls, quarterly sprints, and academic research partnerships.
-6. **Security & Sovereignty**: Firmware-minimized drivers, cryptographic post-quantum boot chains, and regular security audits.
-7. **Documentation & Transparency**: Living developer wiki, architecture diagrams, and public design decision rationale.
+1.  **Governance Model**: Core maintainer team, Special Interest Groups (SIGs), and transparent RFC decision-making.
+2.  **Roadmap Planning**: Rolling 2-year roadmap categorized into short-term usability, mid-term sovereignty, and long-term resilience.
+3.  **Development Workflow**: Mandatory RFCs for major changes, feature branches, code reviews, and automated CI/CD checks.
+4.  **Application Ecosystem**: Compatibility layers for Linux/BSD apps, Shards marketplace, and clear SDKs/APIs.
+5.  **Collaboration & Community**: Contributor Guidelines, monthly community sync calls, quarterly sprints, and academic research partnerships.
+6.  **Security & Sovereignty**: Firmware-minimized drivers, cryptographic post-quantum boot chains, and regular security audits.
+7.  **Documentation & Transparency**: Living developer wiki, architecture diagrams, and public design decision rationale.
 
----
+***
 
 ## 🚀 Future Development Roadmap for SigmaOS
 
