@@ -85,6 +85,18 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
+};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
+    ZypperSpecManifest, SlackwarePkgManifest,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
+};
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
     AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,

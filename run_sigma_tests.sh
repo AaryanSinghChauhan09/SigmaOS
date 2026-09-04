@@ -16,11 +16,10 @@ run_test() {
     fi
 }
 
-
 echo "=== SigmaOS Native Test Runner ==="
 
 # 1. Run Python integration test suite if pytest module is available
-echo "[1/12] Checking Python integration test suite..."
+echo "[1/13] Checking Python integration test suite..."
 if command -v pytest &>/dev/null; then
   pytest tests/
 elif python3 -m pytest --version &>/dev/null; then
@@ -33,50 +32,71 @@ else
     echo "pytest not available in environment; skipping python tests."
 fi
 
-# 2. Run Open Source OS Gap Closure standalone tests
-echo "[2/12] Running Open Source OS Gap Closure standalone tests..."
+# 2. Run Package Caching Engine tests
+echo "[2/13] Testing Package Caching Engine..."
+mkdir -p build
+rustc --test --edition 2021 src/package/cache.rs -o build/test_cache
+./build/test_cache
+
+# 3. Run Universal Package Adapter Engine tests
+echo "[3/13] Testing Universal Package Adapter Engine..."
+rustc --test --edition 2021 tests/test_universal_adapter.rs -o build/test_universal_adapter
+./build/test_universal_adapter
+
+# 4. Run Unimplemented Features Suite tests
+echo "[4/13] Testing Unimplemented Features Suite..."
+rustc --test --edition 2021 src/unimplemented_features.rs -o build/test_unimplemented_features
+./build/test_unimplemented_features
+
+# 5. Run Unimplemented Tools Suite tests
+echo "[5/13] Testing Unimplemented Tools Suite..."
+rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools
+./build/test_unimplemented_tools
+
+# 6. Run Open Source OS Gap Closure standalone tests
+echo "[6/13] Running Open Source OS Gap Closure standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o /tmp/test_gap
 /tmp/test_gap
 
-# 3. Run Expanded Wiki Innovations standalone tests
-echo "[3/12] Running Expanded Wiki Innovations standalone tests..."
+# 7. Run Expanded Wiki Innovations standalone tests
+echo "[7/13] Running Expanded Wiki Innovations standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o /tmp/test_wiki
 /tmp/test_wiki
 
-# 4. Run Arch Pacman & Boot standalone tests
-echo "[4/12] Running Arch Pacman & Boot standalone tests..."
+# 8. Run Arch Pacman & Boot standalone tests
+echo "[8/13] Running Arch Pacman & Boot standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o /tmp/test_arch
 /tmp/test_arch
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o /tmp/test_boot
 /tmp/test_boot
 
-# 5. Run Fedora RPM & MirrorManager2 standalone tests
-echo "[5/12] Running Fedora RPM & MirrorManager2 standalone tests..."
+# 9. Run Fedora RPM & MirrorManager2 standalone tests
+echo "[9/13] Running Fedora RPM & MirrorManager2 standalone tests..."
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_rpm_engine.rs -o /tmp/test_fedora
 /tmp/test_fedora
 
-# 6. Run changed files standalone tests runner
-echo "[6/12] Running changed files standalone rustc test runner..."
+# 10. Run changed files standalone tests runner
+echo "[10/13] Running changed files standalone rustc test runner..."
 ./scripts/changed_files_rustc_tests.sh || true
 
-# 7. Run UI/UX accessibility tests
-echo "[7/12] Running UI/UX accessibility tests..."
+# 11. Run UI/UX accessibility tests
+echo "[11/13] Running UI/UX accessibility tests..."
 if [ -f "./scripts/uiux_accessibility_test.sh" ]; then
     ./scripts/uiux_accessibility_test.sh
 else
   echo "UI/UX accessibility test script not found; skipping."
 fi
 
-# 8. Run Universal Package Manager CLI simulation tests
-echo "[8/12] Running Universal Package Manager CLI simulation tests..."
+# 12. Run Universal Package Manager CLI simulation tests
+echo "[12/13] Running Universal Package Manager CLI simulation tests..."
 if command -v python3 &>/dev/null; then
   python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
 else
   echo "Python3 not available; skipping universal package manager tests."
 fi
 
-# 9. Run SigmaOS Sovereign Parity & Component Inspection Tests (Performance Optimization)
-echo "[9/12] Running SigmaOS Sovereign Parity & Component Inspection Tests..."
+# 13. Run SigmaOS Sovereign Parity & Component Inspection Tests (Performance Optimization)
+echo "[13/13] Running SigmaOS Sovereign Parity & Component Inspection Tests..."
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
     echo "Running core algorithm & component inspection test binary..."
     ./algorithm_and_components_inspection_tests
