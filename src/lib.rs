@@ -104,12 +104,6 @@ pub use distro::{
     GentooPortageSlotOperatorEngine, FedoraSelinuxMlsMcsGovernor,
     SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignStatefulNatEngine,
     SovereignJournaldBinaryStorageEngine,
-    SigmaZeroLockStoreGcEngine, StoreGcSlice,
-    SigmaAdaptiveMicroarchJitEngine, MicroarchLevel, SchedulerPolicyKind,
-    SigmaUnifiedBsdSecuritySentinel, CapabilityRights,
-    SigmaDeltaStateSnapshotEngine, DeltaSnapshot,
-    SigmaRunitSupervisedDagEngine, DagService,
-    SigmaOmniDistroDominanceSuite,
 };
 pub use security::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError,
