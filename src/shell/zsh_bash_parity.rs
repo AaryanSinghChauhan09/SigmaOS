@@ -1292,7 +1292,35 @@ impl UniversalScriptTranspiler {
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
-        // 1. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
+        // 1. Fish math evaluation: math "1 + 2" -> $(( 1 + 2 ))
+        if l.starts_with("math ") || l.contains(" math ") {
+            if let Some(idx) = l.find("math ") {
+                let expr = l[idx + 5..].trim().trim_matches('"').trim_matches('\'');
+                l = format!("{} echo $(( {} ))", &l[..idx], expr);
+            }
+        }
+
+        // 2. Fish string replace / match: string replace "a" "b" "str" -> sed 's/a/b/g'
+        if l.starts_with("string replace ") {
+            let rest = l.trim_start_matches("string replace ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 3 {
+                let pat = parts[0].trim_matches('"').trim_matches('\'');
+                let rep = parts[1].trim_matches('"').trim_matches('\'');
+                let target = parts[2..].join(" ");
+                return format!("echo {} | sed 's/{}/{}/g'", target, pat, rep);
+            }
+        } else if l.starts_with("string match ") {
+            let rest = l.trim_start_matches("string match ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let pat = parts[0].trim_matches('"').trim_matches('\'');
+                let target = parts[1..].join(" ");
+                return format!("echo {} | grep -E {}", target, pat);
+            }
+        }
+
+        // 3. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
         if l.starts_with("set -x ") || l.starts_with("set -gx ") {
             let rest = l.trim_start_matches("set -x ").trim_start_matches("set -gx ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1300,6 +1328,9 @@ impl UniversalScriptTranspiler {
                 let val = &rest[space_idx + 1..];
                 return format!("export {}={}", var, val);
             }
+        } else if l.starts_with("set -e ") || l.starts_with("set -e") {
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
+            return format!("unset {}", var);
         } else if l.starts_with("set -g ") || l.starts_with("set ") {
             let rest = l.trim_start_matches("set -g ").trim_start_matches("set ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1309,21 +1340,21 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Fish 'and' / 'or' -> '&&' / '||'
+        // 4. Fish 'and' / 'or' -> '&&' / '||'
         if l.starts_with("and ") {
             l = format!("&& {}", &l[4..]);
         } else if l.starts_with("or ") {
             l = format!("|| {}", &l[3..]);
         }
 
-        // 3. Fish 'function foo' -> 'foo() {'
+        // 5. Fish 'function foo' -> 'foo() {'
         if l.starts_with("function ") {
             let func_name = l.trim_start_matches("function ").trim();
             *in_function = true;
             return format!("{}() {{", func_name);
         }
 
-        // 4. Fish 'end' -> '}' if in function
+        // 6. Fish 'end' -> '}' if in function
         if l == "end" && *in_function {
             *in_function = false;
             return "}".to_string();
@@ -1346,7 +1377,18 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Tcsh 'alias foo bar' -> 'alias foo="bar"'
+        // 2. Tcsh 'unsetenv VAR' -> 'unset VAR'
+        if l.starts_with("unsetenv ") {
+            let var = l.trim_start_matches("unsetenv ").trim();
+            return format!("unset {}", var);
+        }
+
+        // 3. Tcsh 'rehash' -> hash -r
+        if l == "rehash" {
+            return "hash -r".to_string();
+        }
+
+        // 4. Tcsh 'alias foo bar' -> 'alias foo="bar"'
         if l.starts_with("alias ") {
             let rest = l.trim_start_matches("alias ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1362,12 +1404,28 @@ impl UniversalScriptTranspiler {
     fn transpile_bash_zsh_line(line: &str) -> String {
         let mut l = line.to_string();
 
-        // 1. [[ expr ]] -> [ expr ]
+        // 1. Process substitution: <(cmd) -> subshell evaluation bridge
+        while let Some(start) = l.find("<(") {
+            if let Some(end) = l[start..].find(')') {
+                let absolute_end = start + end;
+                let subcmd = &l[start + 2..absolute_end];
+                l = format!("{} $( {} ){}", &l[..start], subcmd, &l[absolute_end + 1..]);
+            } else {
+                break;
+            }
+        }
+
+        // 2. Zsh zero-based array index fix: $var[0] -> ${var[1]}
+        if l.contains("$") && l.contains("[0]") {
+            l = l.replace("[0]", "[1]");
+        }
+
+        // 3. [[ expr ]] -> [ expr ]
         if l.contains("[[") && l.contains("]]") {
             l = l.replace("[[", "[").replace("]]", "]");
         }
 
-        // 2. <<< "here string" -> echo "here string" |
+        // 4. <<< "here string" -> echo "here string" |
         if l.contains("<<<") {
             if let Some(pos) = l.find("<<<") {
                 let cmd = &l[..pos].trim();
@@ -1376,7 +1434,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 3. function foo() -> foo()
+        // 5. function foo() -> foo()
         if l.starts_with("function ") {
             let rest = l.trim_start_matches("function ").trim();
             if !rest.contains("()") {
