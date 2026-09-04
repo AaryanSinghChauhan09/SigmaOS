@@ -59,7 +59,6 @@ pub use arc::Arc;
 pub use collections::VecDeque;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
-pub use arc::Arc;
 pub use path::PathBuf;
 pub use string::SigmaString;
 pub use vec::Vec;
@@ -142,6 +141,3 @@ mod tests {
         assert_eq!(formatted, "2026");
     }
 }
-
-pub use hashset::HashSet;
-pub use arc::Arc;

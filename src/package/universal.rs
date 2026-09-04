@@ -7,19 +7,15 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
-pub mod node_distribution_dummy {
-    use super::*;
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, HashSet, Arc};
+#[cfg(feature = "standalone_test")]
 use std::{collections::{HashMap, HashSet}, sync::Arc};
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -802,6 +798,85 @@ impl Default for PackageTriggerRegistry {
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
+
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+                let name = format!("sigpkg-{}", manifest.original_name);
+        let mut deps = Vec::new();
+        for dep in &manifest.raw_dependencies {
+            if dep == "libssl-dev" || dep == "openssl-devel" {
+                deps.push("sovereign-openssl".to_string());
+            } else if dep == "libc6" {
+                deps.push("sovereign-libc".to_string());
+            } else {
+                deps.push(dep.clone());
+            }
+        }
+        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides(manifest.original_name.clone());
+        for p in &manifest.raw_provides {
+            pkg = pkg.with_provides(p.clone());
+        }
+        for d in deps {
+            pkg = pkg.with_dependency(d);
+        }
+        pkg
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DistroRepoMirror {
+    pub distro_name: String,
+    pub mirror_url: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<DistroRepoMirror>,
+    pub indexed_manifests: Vec<ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut repos = Vec::new();
+        repos.push(DistroRepoMirror {
+            distro_name: "Debian".to_string(),
+            mirror_url: "https://deb.debian.org/debian".to_string(),
+        });
+        repos.push(DistroRepoMirror {
+            distro_name: "ArchLinux".to_string(),
+            mirror_url: "https://archlinux.org/packages".to_string(),
+        });
+        Self {
+            registered_repos: repos,
+            indexed_manifests: Vec::new(),
+        }
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests.push(manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+}
 
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
@@ -2300,10 +2375,5 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-    }
-
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
     }
 }

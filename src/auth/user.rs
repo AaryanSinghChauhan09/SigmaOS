@@ -4,16 +4,10 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UserID = usize;
 
@@ -104,7 +98,7 @@ pub trait AuthService {
 }
 
 pub struct SimpleAuthService {
-    users: SovereignVec<Option<Box<dyn User>>>,
+    users: Vec<Option<Box<dyn User>>>,
     next_id: AtomicUsize,
 }
 

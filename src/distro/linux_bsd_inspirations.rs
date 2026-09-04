@@ -207,6 +207,7 @@ impl SovereignUniversalDistroBridge {
                 }
                 DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
                 DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+                _ => true,
             };
 
             if !valid_supervisor {
@@ -230,7 +231,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
