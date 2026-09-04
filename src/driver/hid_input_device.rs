@@ -559,7 +559,7 @@ mod tests {
 
     #[test]
     fn test_report_descriptor_generation() {
-        let driver = HidInputDeviceDriver::new();
+        let mut driver = HidInputDeviceDriver::new();
         let dev_id = driver.register_device(HidDevice::new(0x046D, 0xC31C, HidDeviceType::Keyboard)).unwrap();
         let descriptor = driver.get_report_descriptor(dev_id).unwrap();
         assert!(!descriptor.is_empty());

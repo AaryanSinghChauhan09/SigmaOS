@@ -2,13 +2,11 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-#[cfg(not(target_os = "none"))]
-use std::vec::Vec;
-
-#[cfg(target_os = "none")]
 extern crate alloc;
 
-#[cfg(target_os = "none")]
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 // ============================================================================
