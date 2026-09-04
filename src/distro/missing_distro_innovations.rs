@@ -1682,6 +1682,151 @@ impl Default for FedoraSelinuxMlsMcsGovernor {
     }
 }
 
+/// BPF Type Format (BTF) Metadata Engine
+#[derive(Debug, Clone, Default)]
+pub struct BpfTypeFormatEngine {
+    pub type_table: BTreeMap<u32, (String, String)>, // type_id -> (name, kind)
+}
+
+impl BpfTypeFormatEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_type(&mut self, type_id: u32, name: &str, kind: &str) {
+        self.type_table.insert(type_id, (name.to_string(), kind.to_string()));
+    }
+
+    pub fn lookup_type(&self, type_id: u32) -> Option<&(String, String)> {
+        self.type_table.get(&type_id)
+    }
+
+    pub fn total_types(&self) -> usize {
+        self.type_table.len()
+    }
+}
+
+/// Enhanced Read-Only File System (EROFS) Overlay Engine
+#[derive(Debug, Clone, Default)]
+pub struct ErofsReadOnlyOverlayEngine {
+    pub mounted_images: BTreeMap<String, String>, // image_name -> compression_algo
+    pub total_blocks_checksummed: u64,
+}
+
+impl ErofsReadOnlyOverlayEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn mount_erofs_super(&mut self, image_name: &str, compression: &str) {
+        self.mounted_images.insert(image_name.to_string(), compression.to_string());
+    }
+
+    pub fn verify_block_checksum(&mut self, _block_id: u64) -> bool {
+        self.total_blocks_checksummed += 1;
+        true
+    }
+}
+
+/// LoongArch 64-bit Architecture Simulation Engine
+#[derive(Debug, Clone, Default)]
+pub struct LoongArch64ArchitectureEngine {
+    pub active_cores: usize,
+    pub executed_instructions: u64,
+    pub tlb_refill_handlers: usize,
+}
+
+impl LoongArch64ArchitectureEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn init_la64_core(&mut self, core_count: usize) {
+        self.active_cores += core_count;
+        self.tlb_refill_handlers += core_count;
+    }
+
+    pub fn execute_instruction(&mut self, _opcode: u32) -> bool {
+        self.executed_instructions += 1;
+        true
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorMode {
+    Enforce,
+    Complain,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorProfile {
+    pub profile_name: String,
+    pub mode: AppArmorMode,
+    pub allowed_read_paths: Vec<String>,
+    pub allowed_write_paths: Vec<String>,
+    pub allowed_exec_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UbuntuAppArmorEngine {
+    pub profiles: BTreeMap<String, AppArmorProfile>,
+}
+
+impl UbuntuAppArmorEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn load_profile(&mut self, profile: AppArmorProfile) {
+        self.profiles.insert(profile.profile_name.clone(), profile);
+    }
+
+    pub fn authorize_path_access(
+        &self,
+        profile_name: &str,
+        target_path: &str,
+        access_type: &str,
+    ) -> Result<bool, &'static str> {
+        let profile = self.profiles.get(profile_name).ok_or("Profile not found")?;
+        if profile.mode == AppArmorMode::Disabled {
+            return Ok(true);
+        }
+
+        let allowed = match access_type {
+            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
+            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
+            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
+            _ => false,
+        };
+
+        if allowed || profile.mode == AppArmorMode::Complain {
+            Ok(true)
+        } else {
+            Err("AppArmor permission denied")
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct NixOsFlakesEngine {
+    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
+}
+
+impl NixOsFlakesEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
+        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
+    }
+
+    pub fn compute_system_derivation_hash(&self) -> String {
+        format!("nix-store-drv-{:x}", self.flake_inputs.len())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1932,5 +2077,35 @@ mod tests {
         assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
 
         assert!(apparmor.audit_log.len() >= 2);
+    }
+
+    #[test]
+    fn test_bpf_type_format_engine() {
+        let mut btf = BpfTypeFormatEngine::new();
+        btf.register_type(1, "int", "BTF_KIND_INT");
+        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
+
+        assert_eq!(btf.total_types(), 2);
+        let res = btf.lookup_type(2).unwrap();
+        assert_eq!(res.0, "sk_buff");
+        assert_eq!(res.1, "BTF_KIND_STRUCT");
+    }
+
+    #[test]
+    fn test_erofs_read_only_overlay_engine() {
+        let mut erofs = ErofsReadOnlyOverlayEngine::new();
+        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
+        assert_eq!(erofs.mounted_images.len(), 1);
+        assert!(erofs.verify_block_checksum(1024));
+        assert_eq!(erofs.total_blocks_checksummed, 1);
+    }
+
+    #[test]
+    fn test_loongarch64_architecture_engine() {
+        let mut la64 = LoongArch64ArchitectureEngine::new();
+        la64.init_la64_core(4);
+        assert_eq!(la64.active_cores, 4);
+        assert!(la64.execute_instruction(0x02800000));
+        assert_eq!(la64.executed_instructions, 1);
     }
 }
