@@ -207,6 +207,7 @@ impl SovereignUniversalDistroBridge {
                 }
                 DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
                 DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+                _ => true,
             };
 
             if !valid_supervisor {

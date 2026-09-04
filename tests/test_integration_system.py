@@ -214,11 +214,12 @@ def test_sovereign_wiki_master_engine_integration():
     }
 
     distro_matrix = {
-        "ArchLinux": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": ["pacman.conf"]},
-        "Ubuntu": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": ["apt/sources.list"]},
-        "Fedora": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": ["dnf/dnf.conf"]},
-        "Alpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": ["apk/repositories"]},
-        "FreeBSD": {"pkg_ext": ".pkg", "supervisor": "Rcd", "vfs_etc": ["pkg.conf"]},
+        "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc/pacman.conf"},
+        "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc/apt/sources.list"},
+        "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": "/etc/apk/repositories"},
+        "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc/xbps.d"},
+        "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos/configuration.nix"},
+        "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "Rcd", "vfs_etc": "/etc/rc.conf"},
     }
 
     for mode, spec in distro_matrix.items():

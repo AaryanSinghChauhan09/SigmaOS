@@ -5817,3 +5817,4 @@ mod tests {
         assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
 }
+}
