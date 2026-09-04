@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   ebpf-xdp-verify:
     name: Verify eBPF XDP Fast Data-Plane Hooks

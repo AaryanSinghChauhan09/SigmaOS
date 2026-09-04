@@ -2192,7 +2192,9 @@ impl FedoraSsdEnterpriseDirectoryClient {
         username: &str,
         secret: &str,
     ) -> Result<String, &'static str> {
-        if secret == "fedora_ad_pass" || secret == "corp_pass" {
+        let fedora_pass = core::option_env!("SIGMA_FEDORA_AD_PASS").unwrap_or("fedora_ad_pass");
+        let corp_pass = core::option_env!("SIGMA_CORP_PASS").unwrap_or("corp_pass");
+        if secret == fedora_pass || secret == corp_pass {
             let ticket = format!("tgt_{}_fedora_{}", username, self.kerberos_realm);
             self.authenticated_users
                 .insert(username.to_string(), ticket.clone());
