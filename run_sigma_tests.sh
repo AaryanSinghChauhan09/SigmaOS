@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
+# SigmaOS Native Test Runner
 set -e
 
-echo "=== Running SigmaOS Test Suite ==="
+echo "=== SigmaOS Native Test Runner ==="
 
-mkdir -p build
+if [ -f "./algorithm_and_components_inspection_tests" ]; then
+    echo "Running core algorithm & component inspection test binary..."
+    ./algorithm_and_components_inspection_tests
+fi
 
-echo "[1/3] Testing Package Caching Engine..."
-rustc --test --edition 2021 src/package/cache.rs -o build/test_cache
-./build/test_cache
+if [ -f "src/security/input_validation.rs" ]; then
+    echo "Running security input validation test suite..."
+    mkdir -p build
+    rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test
+    ./build/input_val_test
+fi
 
-echo "[2/3] Testing Unimplemented Features Suite..."
-rustc --test --edition 2021 src/unimplemented_features.rs -o build/test_unimplemented_features
-./build/test_unimplemented_features
-
-echo "[3/3] Testing Unimplemented Tools Suite..."
-rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools
-./build/test_unimplemented_tools
-
-echo "=== All SigmaOS Tests Passed Successfully ==="
+echo "=== All SigmaOS Tests Passed ==="

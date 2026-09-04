@@ -1,61 +1,26 @@
-.TH SIGMA-SH 1 "2026-03-31" "SigmaOS 1.0" "SigmaOS User Commands"
+.\" SPDX-License-Identifier: MIT
+.TH SIGMA-SH 1 "March 2026" "SigmaOS 1.0" "SigmaOS User Commands"
 .SH NAME
-sigma-sh \- Sovereign zero-dependency interactive shell and PQC command interpreter
+sigma-sh \- Sovereign Zero-Trust Command Shell for SigmaOS
 .SH SYNOPSIS
 .B sigma-sh
-[\ \fIOPTIONS\fR\ ]
-[\ \fISCRIPT_FILE\fR\ ]
+[\fIOPTIONS\fR] [\fISCRIPT\fR]
 .SH DESCRIPTION
 .B sigma-sh
-is the native interactive command shell and script interpreter for SigmaOS. Built with zero-dependency bare-metal Rust principles, it provides OpenBSD Pledge/Unveil sandboxing, Landlock filesystem isolation, Post-Quantum Cryptographic (PQC) binary execution verification, and POSIX-compliant scripting capabilities.
+is the native command-line shell for SigmaOS. It provides POSIX-compatible shell execution, eBPF-integrated privilege sandboxing, OpenBSD pledge/unveil integration, and Post-Quantum Cryptographic (PQC) binary execution verification.
 .SH OPTIONS
 .TP
 .BR \-c \ \fICOMMAND\fR
-Read and execute commands from the provided \fICOMMAND\fR string argument.
+Execute
+.I COMMAND
+and exit immediately.
 .TP
 .BR \-i
-Force interactive shell session with history, tab completion, and syntax highlighting.
+Run shell in interactive mode.
 .TP
-.BR \-\-pqc\-enforce
-Enforce Post-Quantum Cryptographic (Dilithium-5 / Kyber-1024) signature validation on all executed ELF binaries.
-.TP
-.BR \-\-pledge\ \fIPROMISES\fR
-Restrict system calls for the shell session matching OpenBSD pledge promises (e.g., "stdio rpath wpath cpath exec").
-.TP
-.BR \-\-unveil\ \fIPATH:PERM\fR
-Restrict filesystem visibility matching OpenBSD unveil rules (e.g., "/usr/bin:rx").
-.TP
-.BR \-v ",\ " \-\-version
-Display \fBsigma-sh\fR version and PQC security engine status.
-.TP
-.BR \-h ",\ " \-\-help
-Print usage summary and exit.
-.SH BUILTIN COMMANDS
-.TP
-.B cd \fI[DIR]\fR
-Change the current working directory to \fIDIR\fR (defaults to $HOME).
-.TP
-.B exit \fI[STATUS]\fR
-Exit the shell with optional integer status code.
-.TP
-.B pledge \fI[PROMISES]\fR
-Apply OpenBSD-style syscall promise restrictions to the active shell process.
-.TP
-.B unveil \fI[PATH]\ \fI[PERMISSIONS]\fR
-Restrict path visibility for subsequent child processes.
-.TP
-.B Pqc-status
-Report TPM 2.0 PCR attestation and Dilithium-5 cryptographic signature status.
-.SH ENVIRONMENT
-.TP
-.B SIGMA_PQC_STRICT
-When set to "1", non-PQC signed executables are rejected with \fBEACCES\fR.
-.TP
-.B PATH
-Colon-separated list of directories searched when resolving commands.
+.BR \-\-version
+Print version information and exit.
 .SH SEE ALSO
-.BR sigma-pkg (8),
-.BR landlock (7),
-.BR pledge (2)
+.BR sigma-pkg (8)
 .SH AUTHORS
-SigmaOS Core Kernel & Userland Maintainers.
+SigmaOS Core Maintainers <maintainers@sigmaos.org>
