@@ -49,7 +49,9 @@ pub trait Package {
 pub struct SimplePackage {
     pub id: PackageID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub version: [u8; 32],
+    pub version_len: u8,
     pub state: AtomicUsize,
     pub deps: Vec<PackageID>,
 }
@@ -67,7 +69,9 @@ impl SimplePackage {
         SimplePackage {
             id,
             name: name_array,
+            name_len: name_len as u8,
             version: version_array,
+            version_len: version_len as u8,
             state: AtomicUsize::new(PackageState::NotInstalled as usize),
             deps: Vec::new(),
         }
@@ -77,12 +81,13 @@ impl SimplePackage {
 impl Package for SimplePackage {
     fn id(&self) -> PackageID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name and version lengths on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every package query,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
+        &self.version[..self.version_len as usize]
     }
     fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn dependencies(&self) -> Vec<PackageID> { self.deps.clone() }
