@@ -340,6 +340,157 @@ impl Default for OmarchyModernDesktopEngine {
     }
 }
 
+
+/// Sovereign Agent Definition (inspired by omacom/omarchy: ori-agent, hermes-agent, openclaw-agent, add-default-agent)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SovereignAgentKind {
+    Ori,
+    Hermes,
+    OpenClaw,
+    Claude,
+    Codex,
+    Grok,
+    Agy,
+    Copilot,
+    Custom(String),
+}
+
+impl SovereignAgentKind {
+    pub fn from_str(name: &str) -> Self {
+        match name.to_lowercase().as_str() {
+            "ori" => Self::Ori,
+            "hermes" => Self::Hermes,
+            "openclaw" => Self::OpenClaw,
+            "claude" => Self::Claude,
+            "codex" => Self::Codex,
+            "grok" => Self::Grok,
+            "agy" => Self::Agy,
+            "copilot" => Self::Copilot,
+            other => Self::Custom(other.to_string()),
+        }
+    }
+
+    pub fn binary_name(&self) -> String {
+        match self {
+            Self::Ori => "ori".to_string(),
+            Self::Hermes => "hermes".to_string(),
+            Self::OpenClaw => "openclaw".to_string(),
+            Self::Claude => "claude".to_string(),
+            Self::Codex => "codex".to_string(),
+            Self::Grok => "grok".to_string(),
+            Self::Agy => "agy".to_string(),
+            Self::Copilot => "copilot".to_string(),
+            Self::Custom(s) => s.clone(),
+        }
+    }
+
+    pub fn interactive_flag(&self) -> &'static str {
+        match self {
+            Self::Ori | Self::Agy | Self::OpenClaw => "--interactive",
+            Self::Copilot => "--interactive",
+            Self::Hermes => "--agent-prompt",
+            _ => "--prompt-interactive",
+        }
+    }
+}
+
+/// Factory Reset & Snapshot Guardian (inspired by omacom/omarchy: factory-reset-requires-snapshot)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FactoryResetGuardian {
+    pub factory_snapshot_label: String,
+    pub snapshot_present: bool,
+    pub btrfs_subvolume_root: String,
+    pub btrfs_subvolume_factory: String,
+}
+
+impl FactoryResetGuardian {
+    pub fn new() -> Self {
+        Self {
+            factory_snapshot_label: "@factory-clean".to_string(),
+            snapshot_present: true,
+            btrfs_subvolume_root: "/@".to_string(),
+            btrfs_subvolume_factory: "/@factory-clean".to_string(),
+        }
+    }
+
+    pub fn can_perform_factory_reset(&self) -> bool {
+        self.snapshot_present && !self.btrfs_subvolume_factory.is_empty()
+    }
+
+    pub fn plan_rollback_instructions(&self) -> Vec<String> {
+        vec![
+            format!("btrfs subvolume snapshot -r {} {}", self.btrfs_subvolume_root, "/@pre-reset-backup"),
+            format!("btrfs subvolume delete {}", self.btrfs_subvolume_root),
+            format!("btrfs subvolume snapshot {} {}", self.btrfs_subvolume_factory, self.btrfs_subvolume_root),
+            "systemctl reboot".to_string(),
+        ]
+    }
+}
+
+/// Hardware Quirk & Device Adaptation Engine (inspired by omacom/omarchy: be211-wifi7-quattro, asus-rog, framework16, dell-xps-oled)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HardwareQuirkAdapter {
+    pub pci_id: String,
+    pub device_name: String,
+    pub workaround_modprobe: Option<String>,
+    pub recommended_kernel_params: Vec<String>,
+}
+
+impl HardwareQuirkAdapter {
+    /// Detect Intel BE200 / BE211 WiFi 7 chipsets and resolve kernel firmware assert bugs (Linux Bug 221675)
+    pub fn probe_intel_be211_wifi7(pci_id: &str) -> Option<Self> {
+        if pci_id.contains("8086:272b") || pci_id.contains("8086:2723") {
+            Some(Self {
+                pci_id: pci_id.to_string(),
+                device_name: "Intel BE200/BE211 Wi-Fi 7 Controller".to_string(),
+                workaround_modprobe: Some("options iwlwifi disable_eht=1".to_string()),
+                recommended_kernel_params: vec!["iwlwifi.disable_eht=1".to_string()],
+            })
+        } else {
+            None
+        }
+    }
+
+    /// Framework 16 & ASUS ROG Keyboard RGB / Backlight Quirk
+    pub fn probe_rgb_keyboard(device_name: &str) -> Option<Self> {
+        if device_name.to_lowercase().contains("framework16") || device_name.to_lowercase().contains("asus-rog") {
+            Some(Self {
+                pci_id: "usb:input-rgb".to_string(),
+                device_name: device_name.to_string(),
+                workaround_modprobe: Some("options asus_wmi fnlock_default=1".to_string()),
+                recommended_kernel_params: vec!["asus_wmi.fnlock_default=1".to_string()],
+            })
+        } else {
+            None
+        }
+    }
+}
+
+/// Fail-Closed Passwordless Sudo Expiry Guard (inspired by omacom/omarchy: security/nopasswd-expiry-fail-closed)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PasswordlessSudoExpiryGuard {
+    pub expiry_seconds: u64,
+    pub armed: bool,
+    pub fail_closed: bool,
+}
+
+impl PasswordlessSudoExpiryGuard {
+    pub fn new(duration_secs: u64) -> Self {
+        Self {
+            expiry_seconds: duration_secs,
+            armed: true,
+            fail_closed: true,
+        }
+    }
+
+    pub fn verify_access(&self, elapsed_secs: u64) -> bool {
+        if !self.armed && self.fail_closed {
+            return false;
+        }
+        elapsed_secs < self.expiry_seconds
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
