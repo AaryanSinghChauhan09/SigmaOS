@@ -1,8 +1,7 @@
-extern crate alloc;
 /// Custom Moonshot AI Kimi-Code Code Generation Subsystems for SigmaOS
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // ==========================================

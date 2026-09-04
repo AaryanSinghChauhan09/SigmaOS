@@ -1,14 +1,13 @@
 #![allow(dead_code)]
-use alloc::format;
+use std::format;
 // Kernel-level Illumos/Solaris DTrace D-Language bytecode interpreter and probe engine for SigmaOS
 // Enables dynamic tracing, DIF (DTrace Intermediate Format) execution, and aggregation buffers
 
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DTraceProbeKind {

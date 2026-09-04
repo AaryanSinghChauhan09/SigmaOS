@@ -1,9 +1,8 @@
-extern crate alloc;
 // Sovereign Code Hardening (Obfuscation), Cryptography, and Malware/Threat Detection Subsystem
 // Implements compiler-level program transformations, safe data encoding, and signature-based threat/malware scanning.
 
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================

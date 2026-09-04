@@ -1,14 +1,13 @@
 #![allow(dead_code)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 // Purely functional Nix DSL parser and derivation evaluator for SigmaOS
 // Enables content-addressed store derivations, deterministic hashes, and Nix expressions
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Represents a Nix AST expression node
 #[derive(Debug, Clone, PartialEq, Eq)]

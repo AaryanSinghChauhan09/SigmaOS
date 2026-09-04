@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 pub struct SysFs {
     nodes: Vec<String>,

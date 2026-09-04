@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS Pop!_OS COSMIC Dynamic Auto-Tiling & Task Scheduler Parity
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Pop!_OS COSMIC features
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Node in Binary Space Partitioning (BSP) window layout tree
 #[derive(Debug, Clone, PartialEq, Eq)]

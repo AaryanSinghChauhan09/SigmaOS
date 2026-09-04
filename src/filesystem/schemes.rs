@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Redox OS-inspired URL Scheme subsystem for SigmaOS.
 // Replaces standard Unix pathnames with URL-based resources (e.g., "shm://buffer", "log://kernel", "rand://stream")
 // where "everything is a URL resource".

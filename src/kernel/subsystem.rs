@@ -1,12 +1,11 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::any::Any;
 
 #[cfg(not(test))]

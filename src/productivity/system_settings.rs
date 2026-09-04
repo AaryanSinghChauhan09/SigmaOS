@@ -1,11 +1,10 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-extern crate alloc;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Unified System Settings and Preferences Manager (S-CONTROL)
 // Inspired by GNOME/KDE Control Centers, Windows Control Panel, and BSD rc.conf settings.
 // Manages accounts, network, bluetooth, backup, drivers, visual effects, firewall, font, input methods, and touch preferences.
 
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserAccount {

@@ -1,13 +1,12 @@
-use alloc::vec;
-use alloc::boxed::Box;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::boxed::Box;
+use std::format;
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use crate::klib::collections::HashMap;
 
 /// FreeBSD VNET virtual network interface pair configuration (FreeBSD VNET/jails parity)

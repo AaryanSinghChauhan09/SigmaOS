@@ -20,8 +20,7 @@
 /// Implements application launcher, search, and iconic Elementary OS / Pantheon desktop subsystems.
 /// Inspired by Plank, Slingshot, Wingpanel, Gala, and Pantheon-Files.
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

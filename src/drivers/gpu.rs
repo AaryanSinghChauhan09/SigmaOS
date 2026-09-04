@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::security::capability::CapabilityToken;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct DrmModeInfo {

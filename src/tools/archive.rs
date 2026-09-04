@@ -2,11 +2,10 @@
 //! Archive Tools (tar/zip Inspiration)
 //! Archive manager, compression tools, and archive operations
 
-extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 
 

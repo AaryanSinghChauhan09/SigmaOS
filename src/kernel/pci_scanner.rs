@@ -1,9 +1,8 @@
-extern crate alloc;
 // S-BOOT FIRMWARE (PCI & PCIe Express Bus Scanner)
 // BIOS, UEFI & PCIe ECAM (Enhanced Configuration Access Mechanism) Specification compliance
 
 #[cfg(not(feature = "standalone_test"))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 #[cfg(feature = "standalone_test")]

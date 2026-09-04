@@ -5,10 +5,9 @@
 
 
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use crate::klib::HashMap;
 

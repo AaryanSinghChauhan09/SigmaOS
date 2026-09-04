@@ -1,13 +1,12 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
 
-extern crate alloc;
 /// OOP-based Network Stack for SigmaOS
 /// Implements networking using OOP principles with traits and structs
 /// No dependency on external network frameworks
 /// Based on Roadmap Item 6: Network stack
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

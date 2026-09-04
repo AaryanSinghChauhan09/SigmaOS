@@ -4,10 +4,9 @@
 // arrays of strings). Implementing it in-kernel removes the project's reliance
 // on external TOML/serde crates and keeps the sovereign toolchain dependency-free.
 
-extern crate alloc;
 use crate::klib::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// A parsed TOML document: top-level keys plus nested tables.
 pub struct TomlDocument {

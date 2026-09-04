@@ -2,9 +2,8 @@
 // Scans PCIe MMIO ECAM config space, registers vendor/device IDs,
 // allocates BAR memory addresses, and configures MSI-X interrupts.
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 #[derive(Debug, Clone)]
 pub struct PcieDeviceInfo {

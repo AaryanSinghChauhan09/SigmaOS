@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS Comprehensive OS Scheduling Suite
 // Implements 3 Levels of Schedulers (Long-Term, Medium-Term, Short-Term CPU),
 // 6 CPU Scheduling Algorithms (FCFS, SJF, RR, Priority with Aging, Multilevel Queue, MLFQ),
 // and Advanced Disk/I/O Schedulers (Anticipatory I/O, CFQ, BFQ, Deadline).
 // Inspired by Linux (CFQ/BFQ/eBPF) & BSD (CAM/ULE/Kqueue) architectures under #![no_std]
 
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessLifecycleState {

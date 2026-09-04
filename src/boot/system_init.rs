@@ -1,15 +1,14 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::vec;
+use std::vec;
 // SigmaOS System Initialization
 // Linux distro-inspired boot process and system initialization
 // Handles boot sequence, service startup, and system readiness
 
 
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Boot stages for SigmaOS initialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

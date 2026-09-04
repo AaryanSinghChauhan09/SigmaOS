@@ -11,10 +11,9 @@
 //! proven networking capabilities while maintaining custom extensions.
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
 
 /// smoltcp interface identifier
 pub type InterfaceId = usize;

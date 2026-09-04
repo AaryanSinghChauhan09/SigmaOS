@@ -1,15 +1,14 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Feature Flags Subsystem
 // Inspired by Gentoo Portage USE flags, OpenBSD pledge/unveil, and FreeBSD Capsicum rights
 // Fine-grained control over package compilation, system configuration, and kernel sandboxing
 
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Feature flag definition for raw memory serialization
 #[repr(C)]

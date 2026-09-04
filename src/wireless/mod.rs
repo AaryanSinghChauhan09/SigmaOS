@@ -1,11 +1,10 @@
 //! Bluetooth/Wireless Management (BlueZ/NetworkManager Inspiration)
 //! Bluetooth stack, WiFi management, and wireless profiles
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Bluetooth adapter state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

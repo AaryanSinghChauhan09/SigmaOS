@@ -2,7 +2,7 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Memory protection flags

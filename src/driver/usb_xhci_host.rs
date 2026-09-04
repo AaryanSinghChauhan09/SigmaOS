@@ -2,10 +2,9 @@
 // SigmaOS USB xHCI Host Controller Driver
 // Supports USB 2.0/3.0/3.1 via xHCI specification
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Artix Linux Parity Subsystem
 // Independent, zero-dependency implementations of Artix Linux core tooling
 // Implements OpenRC, Runit, and S6 init systems (systemd-free Arch Linux fork)
 
 use crate::klib::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. PACMAN PACKAGE MANAGER (Arch-compatible)

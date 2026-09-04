@@ -1,11 +1,10 @@
-extern crate alloc;
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.
 
 use crate::klib::HashMap;
 use crate::klib::Vec;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceClass {

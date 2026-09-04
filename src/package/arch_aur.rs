@@ -2,9 +2,9 @@
 // Implements AUR-like package system for SigmaOS
 // Inspired by Arch Linux's AUR for community-driven packages
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// AUR package metadata
 #[derive(Debug, Clone)]

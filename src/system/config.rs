@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS System Configuration Manager
 // Linux distro-inspired system configuration management
 // Handles system-wide configuration files, service configs, and runtime settings

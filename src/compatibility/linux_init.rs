@@ -17,13 +17,12 @@
 //! Process supervision
 //! System state management
 
-extern crate alloc;
-use alloc::vec;
+use std::vec;
 // SigmaOS Linux Init System Concepts
 // Implements init system concepts inspired by systemd and SysVinit
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Runlevel definitions (SysVinit-style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

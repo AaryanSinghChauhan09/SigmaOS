@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // BSD-style sysctl interface for dynamic kernel parameters.
 // Supports safe querying and mutation of kernel variables under hierarchical MIB nodes.
 

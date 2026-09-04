@@ -1,14 +1,13 @@
-use alloc::vec;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::format;
 // SigmaOS Bootable ISO Builder
 // Finalizes the bootable ISO implementation with advanced features
 // Integrates with existing installer components
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 /// ISO Boot Configuration
 #[derive(Debug, Clone)]

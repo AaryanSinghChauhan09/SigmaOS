@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // 1. LINUX FILE TYPE AND METADATA COMPATIBILITY LAYER
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

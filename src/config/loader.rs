@@ -1,6 +1,5 @@
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
-extern crate alloc;
+use std::string::{String, ToString};
+use std::boxed::Box;
 
 /// OOP-based Configuration Loader for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 201

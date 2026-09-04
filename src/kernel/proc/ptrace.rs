@@ -1,9 +1,8 @@
 //! Linux & BSD-inspired Debugger, Process, and Thread Control Engine (ptrace)
 //! Implements trace event queues, exception monitors, singlestep traps, and exception continue-state routing.
-extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 use crate::klib::HashMap;
 
 /// ptrace system call requests

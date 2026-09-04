@@ -17,12 +17,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
+use std::format;
 
-extern crate alloc;
-use alloc::collections::VecDeque;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

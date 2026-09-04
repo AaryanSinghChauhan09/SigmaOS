@@ -2,10 +2,9 @@
 // SigmaOS EXT4 Filesystem Mount System
 // Supports mounting and managing ext4 filesystems
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================

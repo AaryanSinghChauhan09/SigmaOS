@@ -1,11 +1,10 @@
-extern crate alloc;
 
 /// Custom Compression Algorithms for SigmaOS
 /// Implements compression without relying on external compression libraries
 /// Includes DEFLATE, LZ77, and Huffman coding
 
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 /// LZ77 match
 #[repr(C)]

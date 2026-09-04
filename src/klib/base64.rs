@@ -2,9 +2,8 @@
 // Zero-dependency base64 encoding and decoding
 // Reduces reliance on external base64 crates
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 const BASE64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 

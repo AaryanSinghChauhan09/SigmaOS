@@ -3,14 +3,13 @@
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
 //! Replicates Debian-style debug symbols packages (.dbgsym) and Build ID lookup systems.
-extern crate alloc;
 
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::vec;
+use std::format;
 
 pub mod breakpoint;
 

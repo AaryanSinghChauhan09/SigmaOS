@@ -1,11 +1,10 @@
 //! Comprehensive System Recovery & Backup inspired by Timeshift and Borg
 //! Incremental backups, deduplicated chunks, point-in-time recovery, and instant snapshot rollbacks.
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct BackupChunk {

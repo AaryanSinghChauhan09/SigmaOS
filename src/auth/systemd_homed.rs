@@ -1,13 +1,12 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS systemd-homed Parity Engine (Sovereign Hometd)
 // Provides portable, encrypted user home directory management using LUKS2 loopbacks,
 // fscrypt, JSON user identity records, auto-mounting on login, and auto-lock on suspend.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Storage mechanism for user home directory
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

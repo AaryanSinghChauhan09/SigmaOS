@@ -18,8 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::String;
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GstRate {

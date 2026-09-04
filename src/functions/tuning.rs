@@ -1,11 +1,10 @@
 //! Performance Tuning Functions (tuned Inspiration)
 //! Performance tuner, I/O tuner, and network tuner
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Tuning profile
 #[derive(Debug, Clone)]

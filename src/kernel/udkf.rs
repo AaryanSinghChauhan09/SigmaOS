@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS User-Defined Kernel Functions (UDKF) Scripting Engine
 // Allows safe, in-kernel customization of allocators, scheduling algorithms, and filesystems without recompilation
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UdkfHook {

@@ -1,13 +1,12 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::vec;
-use alloc::boxed::Box;
+use std::vec;
+use std::boxed::Box;
 // SigmaOS Sovereign Ecosystem Technology Integration
 // Zero external library dependency, no_std compatible
 
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. KIMI CODE: AI-Native Contextual Code Completion with Semantic Weights

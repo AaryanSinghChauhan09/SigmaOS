@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Sovereign Automated Fixer and Self-Healing Daemon
 // Inspired by Linux watchdogs, systemd service recovery, and Solaris Fault Management Architecture (FMA).
 

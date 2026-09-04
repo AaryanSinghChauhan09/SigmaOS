@@ -1,10 +1,9 @@
-extern crate alloc;
 // India Stack - Professional Utility Engines for Indian Krishi, Vyapaar, and Kanoon
 // Core calculators for Indian farmers, CAs/retailers, medical practitioners, structural engineers, and legal advocates
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Lightweight Newton-Raphson square root estimation for bare-metal `#![no_std]` environments
 fn sovereign_sqrt(x: f64) -> f64 {

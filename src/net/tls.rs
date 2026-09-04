@@ -19,10 +19,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TlsVersion {

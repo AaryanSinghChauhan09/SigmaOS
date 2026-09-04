@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS CachyOS Compatibility & Performance Suite (CachyOS Parity)
 // Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
 
@@ -7,10 +6,10 @@ extern crate alloc;
 extern crate std;
 
 
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 

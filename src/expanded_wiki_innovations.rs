@@ -1,4 +1,3 @@
-extern crate alloc;
 /// Expanded Wiki & Distro Unimplemented Innovations Engine
 /// Implements planned wiki concepts inspired by Linux & BSD distributions:
 /// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
@@ -13,11 +12,11 @@ extern crate alloc;
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

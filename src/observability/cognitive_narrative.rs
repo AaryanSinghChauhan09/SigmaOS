@@ -1,11 +1,10 @@
 //! Sovereign Cognitive OS Narratives and Future-Ready Innovation Engine
 //! Implements a comprehensive, seven-vector system of cutting-edge OS innovations.
-extern crate alloc;
 
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. Cognitive OS Narratives (Human-Readable System Stories)

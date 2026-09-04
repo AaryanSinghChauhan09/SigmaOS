@@ -19,9 +19,9 @@
 //! Routing and firewall concepts
 //! Network namespace isolation
 //! Advanced networking features
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Network interface types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

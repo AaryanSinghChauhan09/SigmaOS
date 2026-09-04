@@ -13,12 +13,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 /// SigmaOS Power Management Subsystem
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── CPUfreq ───────────────────────────────────────────────────────────────
 

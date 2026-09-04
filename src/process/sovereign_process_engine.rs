@@ -1,13 +1,12 @@
-extern crate alloc;
 // SigmaOS Sovereign Process Management & Advanced IPC Engine
 // High-performance process execution, non-blocking stream I/O,
 // background process management, timeout waiting, process cancellation/termination,
 // and zero-copy IPC channels inspired by Linux and BSD distributions.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignProcessState {

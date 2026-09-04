@@ -4,9 +4,8 @@
 
 #![cfg_attr(not(test), no_std)]
 
-extern crate alloc;
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Magic marker for valid SigmaOS kdump headers

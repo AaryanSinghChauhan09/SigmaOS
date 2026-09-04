@@ -18,9 +18,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {

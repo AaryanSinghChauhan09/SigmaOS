@@ -1,13 +1,12 @@
-extern crate alloc;
 // Sovereign Package Management Innovations for SigmaOS
 // Features Gentoo Ebuild USE flag solver, FreeBSD pkg DB, Arch ALPM hooks, Nix Flakes cache,
 // Slackware SlackBuild compiler, Zypper Boolean SAT resolver, and Solus Moss stateless transaction engine.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Gentoo Portage USE Flag Solver Engine
 pub struct GentooEbuildUseFlagSolver {

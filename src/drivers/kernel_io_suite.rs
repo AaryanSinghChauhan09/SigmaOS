@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::vec;
+use std::format;
 
 // SigmaOS Kernel I/O Suite
 // Comprehensive // #![no_std]  // crate-root only-compatible driver suite implementing Linux kernel heritage patterns
@@ -22,10 +22,9 @@ use alloc::format;
 // (no_std only applicable at crate root - removed)
 
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::mem::MaybeUninit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

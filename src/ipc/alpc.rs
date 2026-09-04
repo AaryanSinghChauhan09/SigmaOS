@@ -5,13 +5,12 @@
 //! Provides zero-copy section memory mapping for large payload procedure calls,
 //! facility-based message routing (Kernel, VFS, Net, Auth, Distro),
 //! synchronous Request-Reply RPC execution, and sandboxed port security checks.
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Facility categories for system procedure routing

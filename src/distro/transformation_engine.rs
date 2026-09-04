@@ -1,13 +1,12 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Sovereign Future-Ready Operating System Transformation Engine
 // Implements accessibility overlays, automation routines, forensic audit trails,
 // global legal compliance dashboards, cross-language developer tools, and IoT mesh orchestration.
 
 use crate::klib::HashMap;
-use alloc::collections::BTreeSet as HashSet;
+use std::collections::BTreeSet as HashSet;
 
 /// 1. Accessibility Overlay Manager
 pub struct AccessibilityOverlayManager {

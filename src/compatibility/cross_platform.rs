@@ -1,11 +1,10 @@
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
-extern crate alloc;
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
 use crate::klib::{BTreeMap, HashMap};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {

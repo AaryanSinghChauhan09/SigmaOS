@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Image processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

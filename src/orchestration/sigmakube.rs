@@ -1,9 +1,8 @@
 //! Cloud-Native Features (Kubernetes/OpenShift Inspiration)
 //! Container orchestration, service mesh, and cloud integration
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Cluster state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

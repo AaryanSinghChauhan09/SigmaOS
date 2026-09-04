@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 // Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
@@ -351,46 +350,6 @@ impl BodhiUpdateTriage {
     pub fn create_side_tag(&mut self, tag_name: &str) {
         if !self.side_tags.iter().any(|t| t == tag_name) {
             self.side_tags.push(tag_name.to_string());
-        }
-    }
-
-    pub fn link_bug(&mut self, update_id: &str, bug_id: &str) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            if !up.bugs.contains(&bug_id.to_string()) {
-                up.bugs.push(bug_id.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn link_cve(&mut self, update_id: &str, cve_id: &str) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            if !up.cves.contains(&cve_id.to_string()) {
-                up.cves.push(cve_id.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn record_ci_result(&mut self, update_id: &str, result: BodhiTestResult) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            up.ci_test_result = result;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn advance_testing_days(&mut self, update_id: &str, days: u32) -> bool {
-        if let Some(up) = self.updates.get_mut(update_id) {
-            up.days_in_testing += days;
-            true
-        } else {
-            false
         }
     }
 
@@ -3811,55 +3770,6 @@ pub struct IgnitionSystemdUnit {
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.
 
-impl FedoraIgnitionEngine {
-    pub fn new() -> Self {
-        Self {
-            files: Vec::new(),
-            users: Vec::new(),
-            systemd_units: Vec::new(),
-            provisioned: false,
-        }
-    }
-
-    pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
-        self.files.push(IgnitionFile {
-            path: path.to_string(),
-            mode,
-            content: content.to_string(),
-            overwrite: true,
-        });
-    }
-
-    pub fn add_user(&mut self, name: &str, ssh_keys: &[&str], groups: &[&str]) {
-        self.users.push(IgnitionUser {
-            name: name.to_string(),
-            ssh_authorized_keys: ssh_keys.iter().map(|s| s.to_string()).collect(),
-            groups: groups.iter().map(|s| s.to_string()).collect(),
-        });
-    }
-
-    pub fn add_systemd_unit(&mut self, name: &str, enabled: bool, contents: &str) {
-        self.systemd_units.push(IgnitionSystemdUnit {
-            name: name.to_string(),
-            enabled,
-            contents: contents.to_string(),
-        });
-    }
-
-    pub fn execute_provisioning(&mut self) -> Result<String, &'static str> {
-        if self.provisioned {
-            return Err("Ignition provisioning already executed; runs once on first boot");
-        }
-
-        self.provisioned = true;
-        Ok(format!(
-            "Ignition: Provisioned {} files, {} users, and {} systemd units successfully",
-            self.files.len(),
-            self.users.len(),
-            self.systemd_units.len()
-        ))
-    }
-}
 
 impl Default for FedoraIgnitionEngine {
     fn default() -> Self {
@@ -4226,52 +4136,6 @@ impl Default for FedoraSystemRolesEngine {
 /// Fedora Dracut Modular Initramfs Generation & Hook Engine
 /// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
 
-impl FedoraDracutInitramfsEngine {
-    pub fn new(kernel_version: &str) -> Self {
-        let mut engine = Self {
-            modules: Vec::new(),
-            kernel_version: kernel_version.to_string(),
-            compression_format: "zstd".to_string(),
-        };
-        engine.load_default_dracut_modules();
-        engine
-    }
-
-    fn load_default_dracut_modules(&mut self) {
-        self.modules.push(DracutModule {
-            name: "90crypt".to_string(),
-            hook_stage: "cmdline".to_string(),
-            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
-        });
-        self.modules.push(DracutModule {
-            name: "95rootfs".to_string(),
-            hook_stage: "pre-pivot".to_string(),
-            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
-        });
-    }
-
-    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
-        self.modules.push(DracutModule {
-            name: name.to_string(),
-            hook_stage: stage.to_string(),
-            drivers: drivers.iter().map(|d| d.to_string()).collect(),
-        });
-    }
-
-    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
-        if self.modules.is_empty() {
-            Err("Dracut: No modules included in initramfs build")
-        } else {
-            Ok(format!(
-                "/boot/initramfs-{}.img ({} modules, compressed with {})",
-                self.kernel_version,
-                self.modules.len(),
-                self.compression_format
-            ))
-        }
-    }
-}
-
 // =========================================================================
 // Fedora ABRT (Automatic Bug Reporting Tool) Engine
 // =========================================================================
@@ -4282,65 +4146,6 @@ impl FedoraDracutInitramfsEngine {
 /// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
 /// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
 
-impl FedoraAbrtCrashDaemon {
-    pub fn new() -> Self {
-        Self {
-            captured_crashes: HashMap::new(),
-            messaging_engine: FedoraMessagingEngine::new(),
-            total_crashes_handled: 0,
-        }
-    }
-
-    pub fn capture_crash(
-        &mut self,
-        exe_path: &str,
-        signal: &str,
-        backtrace: &str,
-        kernel_ver: &str,
-        timestamp_secs: u64,
-    ) -> AbrtCrashReport {
-        self.total_crashes_handled += 1;
-        let signature = format!("{}:{}:{}", exe_path, signal, backtrace);
-        let crash_id = format!("abrt-{:08x}", self.total_crashes_handled);
-
-        if let Some(existing) = self.captured_crashes.get_mut(&signature) {
-            existing.count += 1;
-            return existing.clone();
-        }
-
-        let report = AbrtCrashReport {
-            crash_id: crash_id.clone(),
-            executable_path: exe_path.to_string(),
-            signal_name: signal.to_string(),
-            stack_trace: backtrace.to_string(),
-            kernel_release: kernel_ver.to_string(),
-            timestamp_secs,
-            count: 1,
-            reported_to_bugzilla: false,
-        };
-
-        let topic = format!(
-            "org.fedoraproject.prod.abrt.crash.{}",
-            signal.to_lowercase()
-        );
-        let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
-        self.messaging_engine
-            .publish_message(&topic, &body, timestamp_secs);
-
-        self.captured_crashes.insert(signature, report.clone());
-        report
-    }
-
-    pub fn mark_reported(&mut self, crash_id: &str) -> bool {
-        for report in self.captured_crashes.values_mut() {
-            if report.crash_id == crash_id {
-                report.reported_to_bugzilla = true;
-                return true;
-            }
-        }
-        false
-    }
-}
 
 impl Default for FedoraAbrtCrashDaemon {
     fn default() -> Self {
@@ -4356,81 +4161,6 @@ impl Default for FedoraAbrtCrashDaemon {
 
 /// Fedora Toolbx Interactive OCI Development Environment Manager
 /// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
-
-impl FedoraToolbxContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            active_containers: HashMap::new(),
-        }
-    }
-
-    pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
-        let mut default_mounts = vec![
-            "/home".to_string(),
-            "/var/srv".to_string(),
-            "/dev".to_string(),
-            "/run/host".to_string(),
-        ];
-        let mut env = HashMap::new();
-        env.insert("TOOLBX_NAME".to_string(), name.to_string());
-        env.insert("SHELL".to_string(), "/bin/bash".to_string());
-
-        let container = ToolbxContainer {
-            name: name.to_string(),
-            image: image.to_string(),
-            host_mounts: default_mounts,
-            environment_vars: env,
-            running: false,
-        };
-
-        self.active_containers
-            .insert(name.to_string(), container.clone());
-        container
-    }
-
-    pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = true;
-            Ok(format!(
-                "Toolbx container '{}' started using image '{}'",
-                c.name, c.image
-            ))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.host_mounts.contains(&host_path.to_string()) {
-                c.host_mounts.push(host_path.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-}
 
 impl Default for FedoraToolbxContainerEngine {
     fn default() -> Self {

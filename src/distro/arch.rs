@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Arch Linux Compatibility & Tooling Suite (Arch Parity)
 // Implements Arch Build System (ABS), Pacman database synchronizations, AUR package compilation helper, and Mirror ranker.
 
@@ -7,10 +6,10 @@ extern crate alloc;
 extern crate std;
 
 
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 

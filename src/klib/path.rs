@@ -1,8 +1,7 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Minimal Path and PathBuf for no_std klib
 
-use alloc::string::String;
+use std::string::String;
 use core::ops::Deref;
 
 pub type Path = PathBuf;

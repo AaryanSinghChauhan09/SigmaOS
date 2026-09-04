@@ -3,7 +3,7 @@
 // x86_64 Advanced Programmable Interrupt Controller (APIC) & I/O APIC hardware abstraction
 
 use core::sync::atomic::{AtomicU32, Ordering};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // APIC Memory-Mapped I/O Registers (x86_64)

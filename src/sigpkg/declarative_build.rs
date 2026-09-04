@@ -1,19 +1,18 @@
 //! Pure Declarative Build System (Nix & Bazel Inspired) with Curated Ratings/Reviews Subsystem
 //! Implements deterministic build derivations, hermetic dependency graphs, and package reputation validation.
-use alloc::format;
-extern crate alloc;
+use std::format;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 

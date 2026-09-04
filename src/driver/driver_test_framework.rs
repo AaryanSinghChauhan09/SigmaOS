@@ -2,10 +2,9 @@
 // SigmaOS Driver Testing Framework
 // Unified test harness for Phase 2 hardware drivers with QEMU simulation support
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================

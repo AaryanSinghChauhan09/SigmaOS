@@ -1,12 +1,11 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
+use std::vec;
 // OOP-based Unified Logging System and Diverse Targets for SigmaOS
 // Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Syslog Facility enum inspired by BSD syslog and Linux syslog.h

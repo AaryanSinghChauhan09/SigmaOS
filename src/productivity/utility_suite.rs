@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.

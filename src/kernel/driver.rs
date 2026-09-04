@@ -1,8 +1,7 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::any::Any;
 use core::fmt;
 

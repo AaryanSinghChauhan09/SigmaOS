@@ -1,8 +1,7 @@
-extern crate alloc;
 // Musl C Library Compatibility Layer for SigmaOS
 // Location: src/userland/libc/sigma_musl_compat.rs
 
-use alloc::string::String;
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LibcVariant {

@@ -7,10 +7,9 @@
 //! 2. `SmepSmapEnforcer`: Control register (CR4) hardware protection management, AC flag STAC/CLAC primitives, and boundary-checked safe user space copies (`copy_from_user`, `copy_to_user`).
 //! 3. `HardenedSyscallDispatcher`: Multi-layered syscall security filtering (pledge/unveil, Capsicum rights, seccomp rules), argument pointer sanity checks, rate-limiting, and anomaly detection.
 //! 4. `RetpolineKptiMitigationEngine`: Spectre Variant 2 retpoline indirect branch thunk mitigations, Meltdown Kernel Page Table Isolation (KPTI) page table shadow page table switches, and stack canary integrity validation.
-extern crate alloc;
 
 use crate::klib::{HashMap, Vec};
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

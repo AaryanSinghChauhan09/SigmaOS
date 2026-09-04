@@ -3,8 +3,8 @@
 /// Provides native ext4 filesystem support with journal recovery
 
 use super::vfs::{DirEntry, FileSystem, FileType, Inode, VfsError};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// EXT4 Superblock
 #[derive(Debug, Clone)]

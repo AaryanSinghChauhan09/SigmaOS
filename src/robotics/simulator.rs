@@ -15,8 +15,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// 3D Physical Simulator (Gazebo/CoppeliaSim Parity)
 /// Renders collision geometries and solves multi-body rigid dynamics.

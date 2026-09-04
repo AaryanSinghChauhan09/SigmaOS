@@ -17,13 +17,12 @@
 // OOP-based declarative theming with light/dark/auto modes
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Color palette
 #[derive(Debug, Clone)]

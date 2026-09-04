@@ -1,11 +1,10 @@
 //! System Update Functions (apt/dnf Inspiration)
 //! Package manager, update manager, and repository manager
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Package
 #[derive(Debug, Clone)]

@@ -1,12 +1,11 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS CPU Frequency Scaling & Advanced Power Governors (Linux Inspired)
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================

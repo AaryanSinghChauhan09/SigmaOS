@@ -1,5 +1,5 @@
 #![allow(clippy::all, warnings)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Distro Device Expansion Subsystem
 // Linux & BSD inspired drivers for broad hardware support:
 // - Broadcom LSI SAS/SATA Controller (Linux mpt3sas / FreeBSD mpr(4))
@@ -17,7 +17,6 @@ use alloc::vec;
 
 
 
-extern crate alloc;
 #[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
@@ -27,9 +26,9 @@ pub mod peripheral;
 
 #[cfg(all(test, not(feature = "sigmaos_lib")))]
 use peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. Storage / SAS Controller: Broadcom LSI MPT3SAS Controller

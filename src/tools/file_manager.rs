@@ -1,12 +1,11 @@
 //! File Manager (Nautilus/Thunar Inspiration)
 //! File navigation, operations, and file properties
-extern crate alloc;
 
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::vec;
 
 const MAX_CLIPBOARD_ITEMS: usize = 16;
 

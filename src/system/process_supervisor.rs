@@ -1,13 +1,12 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Process Supervisor
 // Linux/BSD distro-inspired process management
 // Handles process supervision, monitoring, and lifecycle management
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

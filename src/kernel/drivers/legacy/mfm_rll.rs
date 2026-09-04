@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -22,7 +21,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux 0.01 hard disk driver — the very first block device Linux ever supported
 /// Supports ST-412 / ST-506 controllers, MFM and RLL encoding, CHS geometry
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Maximum CHS (Cylinder-Head-Sector) values for ancient controllers
 pub const MFM_MAX_CYLINDERS: u16 = 1024;

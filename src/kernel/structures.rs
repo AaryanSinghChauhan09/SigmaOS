@@ -1,11 +1,10 @@
-extern crate alloc;
 use core::cell::{Cell, RefCell};
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // 1. SINGLY LINKED LIST
 

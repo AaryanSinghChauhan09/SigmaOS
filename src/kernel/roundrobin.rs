@@ -1,10 +1,9 @@
 // SigmaOS Round-Robin Scheduler
 // Enhanced priority-aware round-robin with process yielding and context tracking
 
-extern crate alloc;
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// CPU register context saved during a context switch
 /// Enhanced with Linux-style TLS MSRs, FreeBSD-style PCID TLB tags,

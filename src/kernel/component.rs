@@ -17,10 +17,9 @@
 //! inspired by Genode OS framework. Provides hierarchical security isolation and
 //! fine-grained privilege scoping through capability-based security.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

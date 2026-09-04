@@ -1,11 +1,10 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // OOP-based PKI System for SigmaOS
 // Based on Ideas-999-Structured: Security & Sovereignty Item 552
 // Implements certificate management and PKI operations
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CertificateID = usize;

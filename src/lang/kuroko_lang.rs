@@ -23,14 +23,13 @@
 //! - FFI (Foreign Function Interface) for calling SigmaOS syscalls
 //! - REPL (Read-Eval-Print Loop) for interactive use
 //! - Async/await support for OS operations
-use alloc::format;
+use std::format;
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use core::ptr::NonNull;

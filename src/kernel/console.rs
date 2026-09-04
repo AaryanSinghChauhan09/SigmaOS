@@ -1,11 +1,10 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Kernel Console Output Infrastructure
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-extern crate alloc;
-use alloc::string::String;
+use std::string::String;
 use core::fmt::Write;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 

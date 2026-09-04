@@ -12,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
 /// Inspired by Linux (coredump(5), ABRT, Apport) and FreeBSD (coredump(5))
 /// Based on Roadmap Item 14: Crash reporting pipeline
 
-extern crate alloc;
 #[cfg(not(test))]
 use core::ptr::{self, NonNull};
 #[cfg(not(test))]

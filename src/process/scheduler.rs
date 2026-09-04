@@ -3,8 +3,8 @@
 /// Implements fair, preemptible scheduling with time-slice management
 
 use super::manager::{Priority, ProcessInfo, ProcessState};
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::vec::Vec;
 use core::fmt;
 
 /// Scheduling Statistics

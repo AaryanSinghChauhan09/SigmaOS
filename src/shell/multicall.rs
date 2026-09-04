@@ -1,9 +1,8 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // BusyBox-Style: Multi-Call `sigma-sh` Command Parser
 // Combining utilities into a single executable reduces binary overhead by up to 90%
 
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SysCommandType {

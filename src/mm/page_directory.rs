@@ -16,8 +16,7 @@
 // S-MM Page Directory Controller
 // Sovereign AI-Native zero-dependency implementation
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const MAX_PHYSICAL_FRAMES: usize = 128;

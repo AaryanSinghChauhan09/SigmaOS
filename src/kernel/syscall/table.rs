@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux & BSD syscall interface: POSIX-complete table with 300+ syscalls
@@ -7,8 +6,8 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
 /// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use crate::klib::HashMap;
 
 // ── Syscall numbers (Linux-compatible subset + BSD + SigmaOS extensions) ──

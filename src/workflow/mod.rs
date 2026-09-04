@@ -1,14 +1,13 @@
 #![allow(dead_code)]
-use alloc::format;
+use std::format;
 // SigmaOS Workflow Module
 // Workflow automation engine
 // Zero-dependency implementation - no external libraries required
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 /// Error type for the Workflow module

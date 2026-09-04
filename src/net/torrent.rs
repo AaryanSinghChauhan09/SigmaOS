@@ -12,21 +12,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 // =========================================================================
 // 1. BENCODE PARSER & ENCODER (BEP-0003)
 // =========================================================================
 
-use alloc::collections::BTreeMap;
-use alloc::format;
+use std::collections::BTreeMap;
+use std::format;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BencodeValue {

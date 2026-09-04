@@ -1,8 +1,7 @@
 // SigmaOS Multi-Arch Hardware Abstraction Layer (HAL)
 // Hardware abstraction layer supporting x86_64, AArch64 (ARM64), and RISC-V (RV64GC).
 
-extern crate alloc;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArch {

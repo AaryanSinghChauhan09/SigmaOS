@@ -1,4 +1,3 @@
-extern crate alloc;
 /// Memory Descriptor Lists (MDL), physical-to-virtual memory descriptor tracking,
 /// locked-in-memory states, and ancient/historical hardware driver DMA buffer compatibility.
 ///
@@ -6,9 +5,9 @@ extern crate alloc;
 /// where direct I/O address space, direct-memory access (DMA), page protection, and
 /// ISA 16MB memory boundaries required precise, contiguous/non-contiguous mapping trackers.
 
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryProtection {

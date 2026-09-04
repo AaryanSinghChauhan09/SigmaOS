@@ -8,13 +8,12 @@
 // SigmaOS nix-shell equivalent - Isolated development environments
 // Provides NixOS-style isolated development environments for SigmaOS
 
-extern crate alloc;
 #[allow(unused_variables)]
 #[allow(unused_mut)]
 #[allow(unused_imports)]
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Development environment configuration
 #[derive(Debug, Clone, PartialEq, Eq)]

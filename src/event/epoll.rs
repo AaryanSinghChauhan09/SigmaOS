@@ -1,8 +1,7 @@
-extern crate alloc;
 // POSIX Epoll I/O Multiplexing Event Loop Subsystem for SigmaOS
 // Zero-dependency, #![no_std] compliant I/O event notification mechanism (Linux epoll(7) parity)
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Epoll Event Notification Flags
 pub const EPOLLIN: u32 = 0x001;

@@ -8,12 +8,12 @@
 //! - GPU & NVIDIA Early-KMS Hardware Acceleration Configuration
 //! - Fast Terminal & Development Environment Provisioner
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
-use alloc::vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
+use std::vec;
 
 /// Supported Omarchy Curated Themes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

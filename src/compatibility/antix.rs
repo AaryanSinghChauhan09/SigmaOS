@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware

@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // Custom string implementation for SigmaOS
 // This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 

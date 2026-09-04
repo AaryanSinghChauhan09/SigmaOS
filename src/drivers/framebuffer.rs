@@ -1,6 +1,5 @@
-use alloc::vec;
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec;
+use std::vec::Vec;
 use core::ptr;
 
 pub struct Framebuffer {

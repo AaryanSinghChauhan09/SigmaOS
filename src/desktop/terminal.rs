@@ -1,10 +1,9 @@
-extern crate alloc;
 
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.
 /// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

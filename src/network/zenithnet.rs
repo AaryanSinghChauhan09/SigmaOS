@@ -2,9 +2,9 @@
 /// SigmaOS: ZenithNet - Bare-Metal Networking Stack
 /// Implements TCP/IP, UDP, ARP, ICMP with zero-copy packet handling
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// Packet types

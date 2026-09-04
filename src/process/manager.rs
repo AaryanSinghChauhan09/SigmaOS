@@ -2,9 +2,9 @@
 /// SigmaOS: Process Manager
 /// Manages process creation, termination, scheduling, and inter-process communication
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// Process State

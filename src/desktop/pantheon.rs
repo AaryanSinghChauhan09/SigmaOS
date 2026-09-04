@@ -1,13 +1,12 @@
-extern crate alloc;
 // SigmaOS Pantheon Desktop Environment (elementary OS Parity)
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
 #[cfg(test)]
 extern crate std;
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::klib::HashMap;

@@ -1,9 +1,8 @@
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Target ABI ecosystem family
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

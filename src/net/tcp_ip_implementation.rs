@@ -2,10 +2,9 @@
 // SigmaOS Functional TCP/IP Network Stack Implementation
 // Full-featured IPv4/TCP/UDP protocol suite with modern congestion control
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU16, Ordering};
 use core::time::Duration;
 

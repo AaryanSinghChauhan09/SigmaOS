@@ -6,11 +6,10 @@
 //! - Canonical Livepatch kernel driver hot-patching
 //! - Hardware PCI ID auto-matching for NVIDIA/AMD GPUs, Broadcom Wi-Fi, Realtek NICs
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 

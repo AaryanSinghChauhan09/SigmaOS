@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
 /// OOP-Based Cluster Orchestration for SigmaOS (Rancher, k3s, and Harvester Parity)
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),

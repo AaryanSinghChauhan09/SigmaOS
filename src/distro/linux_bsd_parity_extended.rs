@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Extended Linux & BSD Distro Parity Subsystem
 // Clean-room implementations of Slackware PkgTools / SlackBuilds, GNU Guix & Shepherd,
 // Fedora Silverblue OSTree, Illumos/Solaris Crossbow & NetBSD RUMP, Netplan & Cloud-Init, and openSUSE YaST2 & Snapper.
 
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Slackware & LFS: PkgTools & SlackBuild Compiler (SlackwarePkgTools / SlackBuildCompiler)

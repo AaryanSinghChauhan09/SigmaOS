@@ -1,13 +1,12 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Universal Hardware Compatibility, Footprint Optimization & Distro Parity Engine
 // Supports ancient (16-bit/32-bit ISA, IDE, AC97, CGA/VGA) and modern (PCIe 5.0, NVMe 2.0, USB4, Wi-Fi 7, CXL) devices.
 
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Device Generation Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,8 +1,7 @@
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::String;
+use std::format;
+use std::string::String;
 
 /// Display Power Management Signaling (DPMS) state inspired by X11 / Wayland / BSD xset
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

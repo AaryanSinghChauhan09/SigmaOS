@@ -1,11 +1,10 @@
 //! Audio/Media System (PipeWire/Jack2 Inspiration)
 //! Professional audio graph with low-latency processing and device management
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Audio node type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

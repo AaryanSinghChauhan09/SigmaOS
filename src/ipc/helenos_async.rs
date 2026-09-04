@@ -24,11 +24,10 @@
 //! - Capability-based security for IPC operations
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, AtomicBool, Ordering};
 use core::mem;
 use core::ptr::NonNull;

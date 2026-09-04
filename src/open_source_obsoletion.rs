@@ -1,15 +1,14 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Open Source Obsoletion Subsystem (`src/open_source_obsoletion.rs`)
 // Comprehensive, zero-dependency, AI-native `#![no_std]` implementations designed
 // to surpass and make legacy open-source projects (Git, Systemd, WireGuard,
 // Prometheus/Grafana, Postman, Obsidian, GParted) completely obsolete.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)

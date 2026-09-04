@@ -1,14 +1,13 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
+use std::vec;
 // Debian Crusher Core for SigmaOS Package Management
 // Absorbs Debian .deb package control manifests, enforces zero-hook declarative
 // state updates (eliminating fragile dpkg maintainer scripts), and resolves
 // APT dependency trees via SAT constraint solving.
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DebControlManifest {

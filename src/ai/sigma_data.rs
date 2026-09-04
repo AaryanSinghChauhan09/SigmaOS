@@ -1,9 +1,8 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Zero-Allocation Data Science Algorithms (Scikit-Learn & mlpack Parity)
 // Rewritten in safe, zero-allocation Rust for native availability to all Sovereign applications.
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// K-Means Clustering Algorithm
 pub struct KMeansClustering {

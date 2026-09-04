@@ -1,9 +1,8 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
 #[cfg(not(target_os = "none"))]
 #[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 use core::mem;
 use core::sync::atomic::AtomicUsize;

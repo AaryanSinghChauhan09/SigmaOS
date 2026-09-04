@@ -3,12 +3,11 @@
 // Inspired by Fedora Infrastructure Messaging (`fedora-messaging` / fedmsg), AMQP 0-9-1,
 // Bodhi, Koji, Pagure, Copr, and real-time schema-validated HTTP webhook dispatchers.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. FEDORA MESSAGING TOPIC & SCHEMA VALIDATION ENGINE

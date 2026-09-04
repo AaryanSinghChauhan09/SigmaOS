@@ -1,7 +1,6 @@
-extern crate alloc;
 /// Advanced High-Fidelity Heterogeneous Interrupt Controller (APIC, GIC, PLIC) for SigmaOS
 /// Models x86_64 APIC Inter-Processor Interrupts (IPI), ARM GIC Fast Interrupts (FIQ), and RISC-V PLIC Supervisor targets.
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type IRQNumber = usize;

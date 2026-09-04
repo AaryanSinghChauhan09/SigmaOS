@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -21,7 +21,6 @@ use alloc::string::{String, ToString};
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
 /// Implements CSPRNG with entropy collection
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -348,10 +347,10 @@ impl ProductionCryptoEnclave {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+impl<T> VecImpl<T> {
+    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }

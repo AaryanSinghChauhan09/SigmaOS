@@ -16,9 +16,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 /// Tor Parity: Onion Routing Tunnel Management
 /// Manages encrypted circuits through multi-hop relays.

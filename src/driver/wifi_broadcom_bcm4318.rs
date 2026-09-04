@@ -2,10 +2,9 @@
 // SigmaOS Broadcom WiFi Driver
 // Supports modern Broadcom/Cypress WiFi chipsets (802.11ac/ax)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

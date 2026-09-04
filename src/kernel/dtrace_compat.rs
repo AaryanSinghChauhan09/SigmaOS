@@ -1,7 +1,6 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS — DTrace/eBPF-Inspired Kernel Tracing Engine
 //
 // Provides static probe points (like DTrace's USDT/SDT probes) and a

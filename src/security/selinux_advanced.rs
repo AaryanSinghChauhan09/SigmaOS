@@ -2,9 +2,9 @@
 // Enhanced SELinux-inspired security with policy management and MLS support
 // Inspired by Fedora's advanced SELinux features
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// MLS (Multi-Level Security) level
 #[derive(Debug, Clone, PartialEq, Eq)]

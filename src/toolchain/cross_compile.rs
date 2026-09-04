@@ -3,11 +3,10 @@
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
 /// Implements reproducible cross builds for multiple architectures
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::String;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

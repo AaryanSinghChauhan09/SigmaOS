@@ -2,11 +2,10 @@
 // OpenBSD KARL (Kernel Address Randomized Link) engine for SigmaOS
 // Randomizes kernel section order, function alignments, and symbol offsets on boot
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KernelSectionKind {

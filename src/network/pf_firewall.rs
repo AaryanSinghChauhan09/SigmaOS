@@ -1,11 +1,10 @@
-extern crate alloc;
 // OpenBSD pf-Inspired Firewall with Stateful Packet Filtering
 // Provides comprehensive packet filtering, NAT, traffic shaping, and state tracking
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// pf-inspired action for rules
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

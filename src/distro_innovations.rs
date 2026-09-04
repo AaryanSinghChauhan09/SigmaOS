@@ -13,14 +13,14 @@
 //! 8. **Void Linux**: XBPS Transaction Graph & Circular Dependency Resolver
 //! 9. **openSUSE / Fedora**: Snapper-style Btrfs/ZFS Snapshot Timeline Manager & RPM Spec Macro Expander
 //! 10. **Clear Linux**: Stateless OS Root Verification & Bundle Telemetry Analyzer
-use alloc::format;
+use std::format;
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// 1. Arch Linux: AUR PKGBUILD parser and dependency resolution model
 #[derive(Debug, Clone, PartialEq, Eq)]

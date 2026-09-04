@@ -12,10 +12,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // QwenPaw Personal Agent Workstation Integration Module
 //
@@ -189,7 +188,7 @@ impl Default for PawAgentCommunicationProtocol {
 // ============================================================================
 
 use crate::klib::HashMap;
-use alloc::sync::Arc;
+use std::sync::Arc;
 
 pub struct SemanticSkillFunction {
     pub name: String,

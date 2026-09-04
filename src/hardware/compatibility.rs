@@ -1,10 +1,10 @@
 //! OOP-based Hardware Compatibility Matrix for SigmaOS
 //! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
@@ -53,6 +53,38 @@ impl SimpleAcpiManager {
 impl Default for SimpleAcpiManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
+pub trait AcpiLoadBalancer {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
+    fn set_device_power_state(
+        &mut self,
+        device_id: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str>;
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState>;
+}
+
+impl AcpiLoadBalancer for SimpleAcpiManager {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
+        // Map u32 irq to u8 interrupt_line by modulo
+        self.irq_routing.insert(interrupt_line as u32, cpu_id as u32);
+        Ok(())
+    }
+
+    fn set_device_power_state(
+        &mut self,
+        device_id: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str> {
+        self.power_states.insert(device_id, state);
+        Ok(())
+    }
+
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState> {
+        self.power_states.get(&device_id).copied()
     }
 }
 
@@ -436,151 +468,6 @@ pub enum CompatibilityResult {
 
 pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
-}
-
-pub trait DriverManager {
-    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
-    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
-    fn get_driver_status(&self, device_id: DeviceID) -> bool;
-}
-
-pub struct SimpleDriverManager {
-    pub loaded_drivers: Vec<DeviceID>,
-}
-
-impl SimpleDriverManager {
-    pub fn new() -> Self {
-        SimpleDriverManager {
-            loaded_drivers: Vec::new(),
-        }
-    }
-}
-
-impl Default for SimpleDriverManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl DriverManager for SimpleDriverManager {
-    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
-        if self.loaded_drivers.contains(&device_id) {
-            return Err(());
-        }
-        self.loaded_drivers.push(device_id);
-        Ok(())
-    }
-
-    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
-        if let Some(pos) = self.loaded_drivers.iter().position(|&x| x == device_id) {
-            self.loaded_drivers.remove(pos);
-            Ok(())
-        } else {
-            Err(())
-        }
-    }
-
-    fn get_driver_status(&self, device_id: DeviceID) -> bool {
-        self.loaded_drivers.contains(&device_id)
-    }
-}
-
-pub trait CompatibilityCheck {
-    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult;
-    fn run_full_scan(&self) -> CompatibilityReport;
-}
-
-pub struct SimpleDiagnostics {
-    pub matrix: SimpleCompatibilityMatrix,
-}
-
-impl SimpleDiagnostics {
-    pub fn new(matrix: SimpleCompatibilityMatrix) -> Self {
-        SimpleDiagnostics { matrix }
-    }
-}
-
-impl CompatibilityCheck for SimpleDiagnostics {
-    fn check_device(&self, device_id: DeviceID) -> CompatibilityResult {
-        if let Some(device) = self.matrix.get_device(device_id) {
-            match device.support_status() {
-                SupportStatus::Supported => CompatibilityResult::Healthy,
-                SupportStatus::Partial => CompatibilityResult::Warning,
-                SupportStatus::Unsupported => CompatibilityResult::Error,
-                SupportStatus::Unknown => CompatibilityResult::Unknown,
-            }
-        } else {
-            CompatibilityResult::Unknown
-        }
-    }
-
-    fn run_full_scan(&self) -> CompatibilityReport {
-        let mut results = Vec::new();
-        for device in &self.matrix.devices {
-            let result = self.check_device(device.id());
-            results.push((device.id(), result));
-        }
-        CompatibilityReport { results }
-    }
-}
-
-/// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AcpiPowerState {
-    D0 = 0, // Fully functional
-    D1 = 1,
-    D2 = 2,
-    D3 = 3, // Power off
-}
-
-pub trait AcpiLoadBalancer {
-    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
-    fn set_device_power_state(
-        &mut self,
-        device_id: DeviceID,
-        state: AcpiPowerState,
-    ) -> Result<(), &'static str>;
-    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState>;
-}
-
-pub struct SimpleAcpiManager {
-    pub irq_routing: std::collections::HashMap<u8, usize>, // maps IRQ to CPU ID
-    pub device_states: std::collections::HashMap<DeviceID, AcpiPowerState>,
-}
-
-impl SimpleAcpiManager {
-    pub fn new() -> Self {
-        SimpleAcpiManager {
-            irq_routing: std::collections::HashMap::new(),
-            device_states: std::collections::HashMap::new(),
-        }
-    }
-}
-
-impl Default for SimpleAcpiManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl AcpiLoadBalancer for SimpleAcpiManager {
-    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
-        self.irq_routing.insert(interrupt_line, cpu_id);
-        Ok(())
-    }
-
-    fn set_device_power_state(
-        &mut self,
-        device_id: DeviceID,
-        state: AcpiPowerState,
-    ) -> Result<(), &'static str> {
-        self.device_states.insert(device_id, state);
-        Ok(())
-    }
-
-    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState> {
-        self.device_states.get(&device_id).copied()
-    }
 }
 
 #[cfg(test)]

@@ -1,15 +1,14 @@
-use alloc::boxed::Box;
-use alloc::vec;
-extern crate alloc;
+use std::boxed::Box;
+use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use alloc::collections::BTreeMap as HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap as HashMap;
-use alloc::format;
+use std::collections::BTreeMap as HashMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap as HashMap;
+use std::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]

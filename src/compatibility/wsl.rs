@@ -1,16 +1,15 @@
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::collections::HashMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 
 /// WSL Execution Architecture Mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Timeshift-Parity Recovery & Snapshot Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Permitting instant system-wide rollbacks of the root file system hierarchy if user updates damage any system file.
@@ -87,7 +87,7 @@ pub static GLOBAL_TIMESHIFT: SigmaTimeshift = SigmaTimeshift::new();
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 // SystemTime not in no_std; using u64 timestamps
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

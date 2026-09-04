@@ -1,13 +1,12 @@
-extern crate alloc;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::collections::HashMap;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),

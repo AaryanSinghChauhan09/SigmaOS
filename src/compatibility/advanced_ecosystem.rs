@@ -8,13 +8,12 @@
 //! 6. XNU macOS Kernel (Mach ports IPC, VM map memory virtualization, and Out-of-Line memory descriptors).
 //! 7. FreeType (rasterization hinting, font face cache maps, TrueType glyph kerning, and file parsing).
 //! 8. Norigin Spatial Navigation (Euclidean-distance directional focus routing, nested container isolation, and navigation locks).
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================

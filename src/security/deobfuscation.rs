@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 /// SigmaOS Binary Analysis, Deobfuscation, and Semantic Inversion Engine
 /// Implements advanced abstract interpretation, transformation inversion,
 /// opaque predicate resolution, and a continuum of static/dynamic disassembler callbacks.

@@ -13,11 +13,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 /// SigmaOS vmalloc interface for virtual contiguous memory allocation
 /// Maps non-contiguous physical pages into contiguous virtual space
 use crate::klib::BTreeMap;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub struct VmallocRegion {
     pub start_addr: usize,

@@ -3,8 +3,8 @@
 /// BSD-compatible socket API for TCP/UDP/ICMP
 
 use super::zenithnet::{Ipv4Addr, NetworkError, TcpState};
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 use core::fmt;
 
 /// Socket Address Family

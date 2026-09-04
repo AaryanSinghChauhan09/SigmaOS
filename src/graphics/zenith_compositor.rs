@@ -1,12 +1,11 @@
-extern crate alloc;
 // Zenith Desktop Compositor
 // Wayland-inspired compositor with OOP design
 // Inspired by Mutter, KWin, Sway, and wlroots from popular Linux distributions.
 
 
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
 
 pub const SCREEN_WIDTH: u32 = 1920;
 pub const SCREEN_HEIGHT: u32 = 1080;

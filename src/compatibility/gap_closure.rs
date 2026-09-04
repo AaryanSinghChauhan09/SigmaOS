@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // SigmaOS Absolute Parity & Gap-Closure Subsystem (SigmaGapClosure)
 //
@@ -29,7 +29,6 @@ use alloc::vec;
 // 10. High-impact HID keyboard/mouse and VESA Framebuffer graphics drivers
 // 11. Local AI task orchestration scheduler (S-AI)
 
-extern crate alloc;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopMode {
     ClassicDE,
@@ -37,10 +36,10 @@ pub enum DesktopMode {
     TouchTabletMode,
 }
 
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, BTreeSet};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Kernel Module Management

@@ -12,13 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // Universal OOP Package System for SigmaOS
 // Supports all Linux distro package formats with user-defined functions
@@ -33,7 +32,7 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
-use alloc::sync::Arc;
+use std::sync::Arc;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

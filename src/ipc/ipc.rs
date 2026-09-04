@@ -20,11 +20,10 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::vec::Vec;
+use std::vec;
+use std::string::String;
+use std::string::ToString;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
 use core::mem;

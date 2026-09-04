@@ -1,13 +1,12 @@
-extern crate alloc;
 // Slab Allocator - Linux-style efficient small object allocation
 // Reduces fragmentation by caching freed objects of similar sizes
 // Enhanced with Linux-inspired size-bucketed kmalloc/kfree and sub-16MB legacy DMA pools for ancient devices.
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SlabState {

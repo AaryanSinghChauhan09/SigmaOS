@@ -1,5 +1,4 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Virtual Memory & Paging Implementation
 // 4-level paging architecture (PML4 → PDPT → PD → PT)
 // Enhanced with Huge Pages (2MB/1GB), advanced page protection attributes,
@@ -10,9 +9,9 @@ extern crate alloc;
 // 2. Copy-on-Write (CoW) Fault Handling: Generates a writable clone of a shared/KSM page upon write intents.
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 512;

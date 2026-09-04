@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas

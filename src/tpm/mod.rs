@@ -5,10 +5,9 @@
 
 pub mod tpm2_implementation;
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 pub use tpm2_implementation::{

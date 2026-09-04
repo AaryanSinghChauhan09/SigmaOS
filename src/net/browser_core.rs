@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::vec;
+use std::format;
 // SigmaOS Network Protocol Layer
 
 // Browser Core - High-performance, memory-safe browser implementation
@@ -21,9 +21,8 @@ use alloc::format;
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BrowserTabState {

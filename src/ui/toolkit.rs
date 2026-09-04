@@ -1,11 +1,10 @@
-extern crate alloc;
 // OOP-based Native UI Toolkit for SigmaOS
 // Implements GTK3/GTK4 inspired UI toolkit using OOP principles with traits, structs, and GLib-style signals.
 
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Widget ID

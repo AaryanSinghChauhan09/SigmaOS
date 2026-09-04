@@ -1,7 +1,6 @@
 //! BSD Pledge inspired security mechanism
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum PledgePromise {

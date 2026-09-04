@@ -5,15 +5,14 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 // SigmaOS AUR Helper - Arch User Repository integration
 // Provides high-speed CLI helpers for AUR metadata parsing and package management
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]

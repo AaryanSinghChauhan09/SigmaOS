@@ -26,12 +26,11 @@
 //! - Capsicum capability rights on FDs
 //! - GEOM-style I/O transform chains
 //! - SMR (safe memory reclamation epochs)
-extern crate alloc;
-use alloc::vec;
+use std::vec;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 use core::cmp::Ordering as CmpOrdering;
 use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, AtomicU64, AtomicUsize, Ordering};

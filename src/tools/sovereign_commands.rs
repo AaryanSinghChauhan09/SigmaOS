@@ -7,12 +7,11 @@
 // - gcc / clang: Compiler toolchain wrapper with optimization flags (-O3, -march=native, AVX-512)
 // - systemd & initramfs: Modular initramfs generator & systemd unit manager package hooks
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// 1. Sovereign Sudo & Privilege Elevation Engine
 pub struct SovereignSudo {

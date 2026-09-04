@@ -2,10 +2,9 @@
 // SigmaOS TPM 2.0 Functional Implementation
 // Complete TPM 2.0 command/response handling, PCR management, key operations
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::String;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::tpm::{TpmError, TpmResult};

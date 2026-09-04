@@ -7,20 +7,19 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(target_os = "none"))]
 use std::collections::BTreeMap;
 
 #[cfg(target_os = "none")]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(target_os = "none"))]
 use std::string::{String, ToString};
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Garuda Linux Zen Kernel Performance Governor & zRAM Optimizer

@@ -12,9 +12,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 /// SigmaOS IRQ Domain mapper
 /// Maps physical hardware interrupts (hwirq) to virtual interrupt numbers (virq)

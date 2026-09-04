@@ -6,10 +6,9 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. rpm-ostree / ChromeOS A/B Atomic Partition Updater

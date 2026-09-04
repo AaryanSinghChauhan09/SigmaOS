@@ -1,17 +1,16 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 
-extern crate alloc;
 
 /// Contributor onboarding stages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

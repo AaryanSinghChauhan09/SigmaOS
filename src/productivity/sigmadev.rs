@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaDev IDE: Zero-dependency, lightweight code editor optimized for
 // Rust, Zig, and Nim with sandboxed AI code completion assistants for SigmaOS.
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupportedLanguage {

@@ -1,14 +1,13 @@
-extern crate alloc;
 
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 14
 /// Implements automated coredump collection and anonymized bug reports
 
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::String;
+use std::vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

@@ -9,9 +9,9 @@
 #![no_std]
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Category of Linux/BSD Distribution Architecture
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

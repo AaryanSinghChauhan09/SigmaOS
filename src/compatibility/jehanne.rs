@@ -1,4 +1,3 @@
-extern crate alloc;
 use core::mem;
 /// JehanneOS & Plan 9-inspired 9P Distributed Filesystem and Namespace Suite for SigmaOS
 /// Provides 9P protocol serialization transactions, custom namespace binds,

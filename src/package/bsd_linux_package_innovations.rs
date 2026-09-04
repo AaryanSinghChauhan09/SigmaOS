@@ -4,12 +4,11 @@
 // Arch ALPM hooks, Fedora DNF5 DeltaRPM, Gentoo Portage subslots, Haiku PackageFS,
 // Debian apt-mark, Void xbps-src, Fedora DNF history, and NetBSD pkgin.
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. FreeBSD Ports Flavours & VuXML Package Vulnerability Auditor

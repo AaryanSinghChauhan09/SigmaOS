@@ -5,11 +5,10 @@
 //! PPA & APT repository management, MATE Software Store catalog searching,
 //! and offline Betsy `.betsy` package bundle export with Merkle tree verification.
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ─── 1. MATE Desktop Panel Layout & Applet Dock ───────────────────────────────
 

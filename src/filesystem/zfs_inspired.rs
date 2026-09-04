@@ -1,11 +1,10 @@
-extern crate alloc;
 // ZFS-Inspired Advanced Filesystem Features
 // Combines ZFS innovations: snapshots, compression, deduplication, data integrity
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::time::Duration;
 
 /// ZFS-inspired compression algorithms

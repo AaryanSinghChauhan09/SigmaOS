@@ -4,12 +4,11 @@
 //! - LWKT (Light Weight Kernel Threads) lockless message-passing scheduler
 //! - VKERNEL (Virtual Kernel) userland kernel execution virtualization
 //! - Concurrent Slate Lock NUMA synchronization primitives
-extern crate alloc;
 
 use crate::klib::HashMap;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 // ==========================================

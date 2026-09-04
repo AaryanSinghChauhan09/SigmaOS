@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Physical + Virtual Memory Manager
 // Buddy allocator + Slab allocator + Paging
 // Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc

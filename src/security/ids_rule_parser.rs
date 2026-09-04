@@ -5,10 +5,9 @@
 
 
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 /// Rule action types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

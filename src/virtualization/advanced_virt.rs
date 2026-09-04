@@ -1,11 +1,10 @@
 //! Virtualization Enhancements inspired by KVM, QEMU, and Libvirt
 //! KVM hardware acceleration, live VM migration, GPU passthrough,
 //! and Libvirt-compatible management APIs.
-extern crate alloc;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VmState {

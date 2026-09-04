@@ -2,9 +2,9 @@
 // Implements BSD-style security hardening features for SigmaOS
 // Inspired by OpenBSD, FreeBSD, DragonFly BSD, and HardenedBSD
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// OpenBSD pledge-style syscall restriction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

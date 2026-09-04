@@ -1,5 +1,4 @@
-use alloc::string::{String, ToString};
-extern crate alloc;
+use std::string::{String, ToString};
 // SigmaOS Glary Utilities & Advanced SystemCare Parity Resource Optimizer
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.

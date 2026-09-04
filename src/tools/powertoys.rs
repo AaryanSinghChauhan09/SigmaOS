@@ -7,8 +7,8 @@
 //! - HostsEditor (IP lookup hosts custom DNS routing rule editor)
 
 use crate::klib::{BTreeMap, Vec};
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::format;
+use std::string::{String, ToString};
 
 pub struct ColorPicker;
 

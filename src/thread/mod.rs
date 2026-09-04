@@ -3,10 +3,9 @@
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// Error type for the Thread module

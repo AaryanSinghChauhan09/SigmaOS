@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
+use std::vec;
 // SigmaOS Distro Compatibility Layer
 // EndeavourOS Parity Engines for SigmaOS
 // This module implements user-centric distro utilities inspired by EndeavourOS,
@@ -11,10 +10,10 @@ extern crate alloc;
 
 use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Represents a package mirror in the SigmaOS network.

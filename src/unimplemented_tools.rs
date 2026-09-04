@@ -1,13 +1,12 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 // Re-exported in src/lib.rs for full SigmaOS distribution parity.
 
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. MULTIMEDIA TOOLS

@@ -6,9 +6,8 @@
 // - FreeBSD Capsicum fine-grained per-descriptor capability delegation (CAP_READ, CAP_WRITE, etc.)
 // - Close-on-exec (O_CLOEXEC) descriptor sweeping upon process execve
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 pub mod flags {
     pub const O_RDONLY: u32   = 0x0000;

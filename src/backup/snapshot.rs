@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -21,7 +21,6 @@ use alloc::boxed::Box;
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 161
 /// Implements system snapshots and backup management
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

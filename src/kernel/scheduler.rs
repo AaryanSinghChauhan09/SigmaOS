@@ -1,8 +1,7 @@
 //! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::time::Duration;
 
 /// Process priority level

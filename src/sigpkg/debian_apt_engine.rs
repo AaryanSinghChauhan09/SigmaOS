@@ -1,11 +1,10 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Debian/Ubuntu APT Compatibility Engine
 // Implements APT package management, DEB package parsing, and dpkg compatibility
 
 use crate::klib::collections::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// DEB package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]

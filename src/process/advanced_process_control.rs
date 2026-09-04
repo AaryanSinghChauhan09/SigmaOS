@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Advanced Process Control Subsystem
 // Inspired by Linux and BSD distribution process management paradigms:
 // - Cross-process memory inspection (Linux process_vm_readv / process_vm_writev)
@@ -7,10 +6,10 @@ extern crate alloc;
 // - Cancellation tokens (pthread_cancel) & Zombie process reaping/reparenting
 // - Advanced IPC Hub (POSIX Message Queue, eventfd counters, sigqueue rich signal dispatch)
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProcessControlError {

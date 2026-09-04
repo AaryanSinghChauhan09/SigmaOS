@@ -1,10 +1,9 @@
 //! Wireless & Bluetooth Management inspired by BlueZ and NetworkManager
 //! WPA3 Wi-Fi connection profiles, DNS resolution, Bluetooth LE GATT services,
 //! and AP hotspot configuration.
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiSecurity {

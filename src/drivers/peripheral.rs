@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Unified Peripheral Device Architecture
 // Implements OOP principles for robust, low footprint device management
 // Improved with Windows Driver Model (WDM), WDF/KMDF/UMDF concepts,
 // Filter/Minifilter drivers, I/O Request Packets (IRPs), and Plug-and-Play (PnP) states.
 
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Defines the generation of a peripheral device

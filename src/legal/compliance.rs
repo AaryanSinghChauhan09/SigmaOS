@@ -1,6 +1,6 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Unified Statutory Compliance & Labour Integration Engine
 // Natively tracks global standards (GDPR, ISO-27001, SOC-2) and automates national statutory calculations (EPF, ESI, Payroll Auditing)
 

@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Breakthrough Operating System Tools & Engines
 // Implements the seven advanced developer-friendly and sovereign OS engines:
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,

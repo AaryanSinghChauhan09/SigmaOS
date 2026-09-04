@@ -1,13 +1,12 @@
 //! System Health Check Functions (systemd-analyze Inspiration)
 //! Health checker, diagnostics tool, and recovery tool
-use alloc::vec;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::format;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Health check
 #[derive(Debug, Clone)]

@@ -1,10 +1,9 @@
 //! Key Innovations Absorbed from Open Source OS Repositories:
 //! Haiku OS (app_server UI responsiveness), Redox OS (Microkernel Scheme IPC Grants),
 //! illumos/ZFS (Adaptive Replacement Cache - ARC), and Plan 9 (9P2000.u GPU device sharing).
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// 1. Haiku OS app_server Window Damage & UI Priority Booster
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,9 +1,8 @@
-extern crate alloc;
 // Secure Boot Chain-of-Trust Verification Engine for SigmaOS
 // Location: src/boot/secure_boot.rs
 
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecureBootState {

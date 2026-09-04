@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS

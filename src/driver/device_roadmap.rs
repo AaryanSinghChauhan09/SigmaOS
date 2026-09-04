@@ -2,13 +2,12 @@
 // SigmaOS Device Integration Roadmap Subsystem
 // Native zero-dependency Rust implementation of Short-, Mid-, and Long-Term device support architecture
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SHORT-TERM PHASE (1-2 Years)

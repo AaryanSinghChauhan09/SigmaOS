@@ -16,15 +16,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Voice recognition model type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

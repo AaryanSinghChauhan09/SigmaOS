@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS NetBSD NPF & Linux Netfilter/PF Parity Subsystem - NPF Firewall Engine
 // Stateful Connection Tracking (Conntrack), NAPT/NAT64 Engine, BPF Rule Inspection, & IP Sets
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::format;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NpfDirection {

@@ -18,8 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const MAX_RECIPE_DEPENDENCIES: usize = 8;
 pub const MAX_REGISTRY_SIZE: usize = 16;

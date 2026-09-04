@@ -9,12 +9,11 @@
 //! This module provides a compatibility layer for libsodium cryptographic primitives,
 //! enabling integration with existing libsodium-based applications and providing
 //! industry-standard cryptographic operations.
-extern crate alloc;
-use alloc::vec;
+use std::vec;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 use core::ffi::CStr;
 use core::ffi::{c_char, c_int, c_void};

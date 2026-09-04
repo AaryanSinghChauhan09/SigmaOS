@@ -16,8 +16,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Signal Parity: Secure Messaging Core
 /// Implementation of a basic Double Ratchet cryptographic state machine.

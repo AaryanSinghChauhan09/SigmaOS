@@ -1,11 +1,10 @@
 //! Process Management Functions (systemd/ps Inspiration)
 //! Service manager, process manager, and system control
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

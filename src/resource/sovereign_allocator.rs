@@ -1,12 +1,11 @@
-extern crate alloc;
 // Sovereign Multi-Resource Allocator Engine (Linux & BSD Inspired)
 // Combines Linux cgroups v2 resource weight allocation with OpenBSD racct/rctl limits
 // and FreeBSD GEOM storage provider resource budgeting.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AllocatorResourceType {

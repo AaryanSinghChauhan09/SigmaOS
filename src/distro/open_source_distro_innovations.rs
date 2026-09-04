@@ -6,10 +6,9 @@
 // capabilities from open-source OS ecosystems: Apache NuttX POSIX RTOS,
 // OpenBSD vmm/vmd & FreeBSD bhyve, Illumos/Solaris DTrace, and Gentoo Portage EAPI 8.
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
-extern crate alloc;
 
 // =========================================================================
 // 1. APACHE NUTTX INSPIRED POSIX RT REAL-TIME TASK GOVERNOR

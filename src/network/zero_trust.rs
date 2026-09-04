@@ -1,13 +1,12 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
 
-extern crate alloc;
 /// OOP-based Network Zero-Trust for SigmaOS
 /// Implements zero-trust networking using OOP principles with traits and structs
 /// No dependency on external networking frameworks
 /// Based on Roadmap Item 64: Network zero-trust defaults
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};

@@ -2,8 +2,7 @@
 // Deterministic append-only Merkle tree for firmware measurements
 // and content addressing without external cryptographic dependencies
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Fixed-size hash for Merkle nodes (32 bytes)
 pub type MerkleHash = [u8; 32];

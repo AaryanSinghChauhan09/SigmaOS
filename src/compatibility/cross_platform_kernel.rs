@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Sovereign Cross-Platform Kernel Internals Layer
 // Parity bridge representing low-level kernel mechanisms from Linux, Windows, and BSD
 
-use alloc::collections::{BTreeMap as HashMap, VecDeque};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::{BTreeMap as HashMap, VecDeque};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 
 // =========================================================================

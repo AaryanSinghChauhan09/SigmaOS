@@ -2,8 +2,8 @@
 // Implements pledge(), unveil(), and other security-hardening syscalls
 // Inspired by OpenBSD security mechanisms
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Pledge promise categories - OpenBSD-inspired syscall restriction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS QEMU & KVM Hypervisor Parity Engine
 // Provides low-level vCPU execution loops, register synchronization, memory mapping, and virtio backends.
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// x86_64 General Purpose & Control Register State
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]

@@ -1,11 +1,10 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Sovereign Mathematical Function Plotter & Visualizer (gnuplot/plotutils Defeater)
 // Implements zero-dependency, high-performance mathematical function plotting on terminal-friendly ascii grids.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Supported mathematical function types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

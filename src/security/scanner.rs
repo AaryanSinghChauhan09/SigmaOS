@@ -15,9 +15,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::cmp::PartialEq;
 
 /// YARA-Style Signature Engine for SigmaOS

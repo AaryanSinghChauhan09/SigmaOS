@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::boxed::Box;
+use std::vec;
+use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // ZenithNet - Zero-copy networking stack
@@ -21,9 +21,8 @@ use alloc::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {

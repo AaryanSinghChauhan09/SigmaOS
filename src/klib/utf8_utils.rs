@@ -2,9 +2,8 @@
 // Zero-dependency string inspection and tokenization
 // Replaces reliance on std string methods in kernel contexts
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Validate that a byte slice is well-formed UTF-8
 pub fn is_valid_utf8(data: &[u8]) -> bool {

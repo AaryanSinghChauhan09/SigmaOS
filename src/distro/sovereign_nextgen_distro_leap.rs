@@ -1,4 +1,3 @@
-extern crate alloc;
 
 // SPDX-License-Identifier: MIT
 // SigmaOS NextGen Distro Leap Subsystem
@@ -9,11 +8,11 @@ extern crate alloc;
 // 4. SovereignHighAvailabilityMeshEngine: OpenBSD CARP virtual IP failover, PFSYNC state table replication, FreeBSD VNET networking, and block delta streaming.
 // 5. SovereignDistroLeapSuite: Master coordinator ensuring absolute system dominance over all Linux & BSD distros.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SovereignSchedExtEngine: sched_ext BPF Extensible Scheduler Framework

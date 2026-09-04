@@ -12,11 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
-extern crate alloc;
 use crate::klib::{BTreeMap, Vec, VecDeque};
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer

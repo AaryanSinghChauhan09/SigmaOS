@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Intent/Message structures for Multi-Agent AutoGen Simulation
 #[repr(C)]

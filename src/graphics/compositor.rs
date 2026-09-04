@@ -1,8 +1,8 @@
 //! Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
 //! Implements screen composition, double buffering, and screen capturing
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Position

@@ -1,13 +1,12 @@
-extern crate alloc;
 // SigmaOS Open-Source Dominance & Distro Inspiration Subsystem
 // Zero-dependency, #![no_std] compliant engine synthesizing architectural paradigms
 // from Linux (Debian, Arch, Gentoo, Fedora, Alpine, Void, CachyOS, NixOS),
 // FreeBSD (GEOM, Capsicum, Jail), OpenBSD (pledge, unveil, pf), DragonFly BSD (HAMMER2),
 // Haiku (BeOS Translators), SerenityOS, and ReactOS/Wine Win32 translation layers.
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum OpenSourceInspirationTier {

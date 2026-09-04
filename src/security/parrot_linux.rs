@@ -1,13 +1,12 @@
-extern crate alloc;
 // SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
 // Fully absorbs and implements all security, forensics, and anonymity systems of Parrot Linux:
 // Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,
 // Password Auditor, Secure Wiper (7-pass shredder), and Sigma IDS (Intrusion Detection).
 
-use alloc::collections::VecDeque;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct SniffedPacket {

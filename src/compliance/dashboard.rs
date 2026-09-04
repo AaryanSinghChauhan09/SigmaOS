@@ -1,13 +1,12 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Compliance Dashboard Implementation
 // Implements comprehensive compliance dashboard as described in COMPLIANCE_DASHBOARD_MAPPING.md
 // Maps technical features to Indian legal compliance requirements
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::fmt;
 
 /// Compliance status enumeration

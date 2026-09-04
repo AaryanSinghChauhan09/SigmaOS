@@ -2,10 +2,9 @@
 // SigmaOS Kernel Library Collections
 // Eliminates dependency on std::collections
 
-extern crate alloc;
-use alloc::collections::BTreeMap as AllocBTreeMap;
-use alloc::collections::BTreeSet as AllocBTreeSet;
-use alloc::collections::VecDeque as AllocVecDeque;
+use std::collections::BTreeMap as AllocBTreeMap;
+use std::collections::BTreeSet as AllocBTreeSet;
+use std::collections::VecDeque as AllocVecDeque;
 use core::cell::Cell;
 
 pub use super::hashmap::{Entry, HashMap};

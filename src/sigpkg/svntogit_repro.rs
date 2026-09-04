@@ -2,12 +2,11 @@
 // SigmaOS SVN-to-Git Migration & Reproducible Package Builder Subsystem
 // Native Rust implementation of Arch Linux svntogit and Reproducible Builds parity
 
-extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SovereignSvnToGitMigrator (svntogit parity)

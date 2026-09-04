@@ -1,9 +1,8 @@
-extern crate alloc;
 // OCI-Compliant Container Runtime & Telemetry-Driven AI Orchestrator
 // for zero-trust microservice isolation in SigmaOS.
 
-use alloc::string::String;
-use alloc::string::ToString;
+use std::string::String;
+use std::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct OciContainerSpec {

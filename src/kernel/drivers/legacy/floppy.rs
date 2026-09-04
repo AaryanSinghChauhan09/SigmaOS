@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -22,7 +21,7 @@ use crate::kernel::subsystems::registry::{
 /// Supports: 5.25" 360K/1.2M, 3.5" 720K/1.44M/2.88M, LS-120
 /// Absorbs Linux drivers/block/floppy.c — the original block device
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const FDC_BASE_IO: u16 = 0x03F0;
 pub const FDC_IRQ: u8 = 6;

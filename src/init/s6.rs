@@ -1,9 +1,8 @@
-extern crate alloc;
 // S6 Supervision Engine for SigmaOS
 // Location: src/init/s6.rs
 
-use alloc::string::String;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::collections::BTreeMap;
 use super::init_abstraction::{InitSystem, InitSystemType, ServiceStatus, InitError};
 
 pub struct S6Service {

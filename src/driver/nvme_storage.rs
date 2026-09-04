@@ -2,10 +2,9 @@
 // SigmaOS NVMe Storage Driver
 // Supports NVMe 1.0+ SSDs with queue pair and completion queue management
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, AtomicU16, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

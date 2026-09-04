@@ -1,4 +1,3 @@
-extern crate alloc;
 /// Sovereign Process & System Accounting Subsystem (SigmaAccounting)
 /// Inspired by Linux Process Accounting (`acct_v3` / `/var/log/pacct`),
 /// BSD Resource Accounting (`getrusage` / `sa(8)` / `lastcomm`),
@@ -6,13 +5,13 @@ extern crate alloc;
 /// and Linux Netlink Taskstats & Delay Accounting.
 
 
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 
 pub type Pid = usize;
 pub type UserID = u32;

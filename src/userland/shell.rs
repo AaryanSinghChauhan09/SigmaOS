@@ -1,11 +1,10 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Comprehensive redirection specifications inspired by Linux (Bash/Zsh/Fish) and BSD (Ksh/Sh)
 #[derive(Debug, Clone, PartialEq, Eq)]

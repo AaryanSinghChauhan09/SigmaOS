@@ -1,11 +1,10 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Ancient Compiler & Toolchain Support Adapter
 // Wraps legacy compilation profiles (GCC 2.x, early LLVM, and assembly) natively without source patching
 // Enhanced with Gentoo / Clear Linux optimization matrices and Fedora / NixOS-style compiler hardening injections.
 
-extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainProfile {

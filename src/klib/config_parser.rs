@@ -2,10 +2,9 @@
 // Zero-dependency configuration store replacing external parser libraries
 // Supports [sections] and key = value pairs
 
-extern crate alloc;
 use crate::klib::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// INI-style configuration store
 pub struct ConfigStore {

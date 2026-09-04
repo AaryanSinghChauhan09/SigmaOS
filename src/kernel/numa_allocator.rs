@@ -12,16 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // NUMA (Non-Uniform Memory Access) Allocator
 // Linux-style NUMA-aware memory allocation for multi-socket systems
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NodeState {

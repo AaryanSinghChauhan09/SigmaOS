@@ -3,12 +3,11 @@
 // Implements Article I-V Judicial Chambers, Audit Inspection,
 // Rollback Safety Verification, Sandbox Policy Enforcement, and Remedy Dispatch.
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Article II — Supreme Court Judicial Chambers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

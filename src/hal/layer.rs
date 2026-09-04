@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -20,7 +20,6 @@ use alloc::boxed::Box;
 /// OOP-based Hardware Abstraction Layer for SigmaOS
 /// Based on Roadmap Item 2: Hardware abstraction layer
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

@@ -1,9 +1,8 @@
-extern crate alloc;
 /// Special Virtual and Loopback Device Drivers for SigmaOS
 /// Inspired by Linux and BSD distribution drivers (/dev/null, /dev/zero, /dev/urandom, /dev/loop).
 
 use crate::drivers::peripheral::{PeripheralDevice, DeviceGeneration, PowerState};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Standard /dev/null device discarding all writes and returning EOF (0 bytes) on read.
 pub struct NullDevice {

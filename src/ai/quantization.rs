@@ -1,10 +1,9 @@
-use alloc::vec;
+use std::vec;
 // Dynamic Matrix Quantization & Multi-Device Execution Fallback for SigmaOS
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]

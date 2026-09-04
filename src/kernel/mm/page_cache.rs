@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
@@ -22,9 +21,9 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;
 

@@ -1,10 +1,9 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
 use crate::klib::{BTreeMap, Vec};
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 /// Cron job specification
 #[derive(Debug, Clone, PartialEq, Eq)]

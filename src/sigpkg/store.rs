@@ -12,16 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // Content-Addressed Store for SigmaPkg
 // Stores packages by SHA3-256 hash for reproducibility
 
-extern crate alloc;
 use crate::sigpkg::Package;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
 /// PathBuf-like alias using String for no_std compatibility
 type PathBuf = alloc::string::String;
 

@@ -1,10 +1,9 @@
-extern crate alloc;
 // Linux-style Control Groups (cgroups) for SigmaOS
 // Implements hierarchical grouping of processes and resource limitation, prioritization, accounting, and control.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use crate::klib::BTreeMap;
 
 #[repr(C)]

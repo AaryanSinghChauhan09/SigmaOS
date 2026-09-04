@@ -1,11 +1,10 @@
-use alloc::vec::Vec;
-extern crate alloc;
+use std::vec::Vec;
 // SigmaOS BSD Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of BSD (FreeBSD/OpenBSD) core tooling
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
 
 /// Jailed Execution Environment in FreeBSD virtualization.
 #[derive(Debug, Clone, PartialEq, Eq)]

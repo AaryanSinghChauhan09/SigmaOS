@@ -20,7 +20,6 @@
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 976
 /// Implements IoT device management
 
-extern crate alloc;
 pub use alloc::string::String;
 pub use alloc::boxed::Box;
 

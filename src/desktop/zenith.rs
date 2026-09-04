@@ -2,12 +2,11 @@
 //! Implements desktop environment using OOP principles with traits and structs
 //! No dependency on external desktop frameworks
 //! Based on Roadmap Item 41: Zenith Desktop core
-extern crate alloc;
 
 
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Window ID

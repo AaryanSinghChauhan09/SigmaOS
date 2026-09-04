@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS Advanced Driver & Hardware Shims Subsystem
 // Independent, zero-dependency implementations of Intel e1000, Intel HDA, and VirtIO hardware drivers
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. INTEL E1000 ETHERNET DRIVER SHIM

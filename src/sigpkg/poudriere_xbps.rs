@@ -2,12 +2,11 @@
 // SigmaOS Poudriere Bulk Builder, Void xbps-src Chroot Builder, and Slackpkg Patch Engine Subsystem
 // Native Rust implementation of FreeBSD poudriere, Void Linux xbps-src, and Slackware slackpkg parity
 
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::vec;
+use std::format;
 
 // ============================================================================
 // 1. PoudriereBulkBuildQueue (FreeBSD poudriere parity)

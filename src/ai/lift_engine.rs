@@ -1,13 +1,12 @@
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS AI-Native Structured Document Extraction Engine (SigmaLift)
 // Fully absorbs and implements all design philosophies of datalab-to/lift:
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
 // near-miss distraction filtering, citations/verification tracking, and high-performance single-pass execution.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 /// Simple schema types supported by the extractor
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

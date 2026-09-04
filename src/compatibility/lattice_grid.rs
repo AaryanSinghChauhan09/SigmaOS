@@ -17,10 +17,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. KERNEL PERSONALITY LATTICE

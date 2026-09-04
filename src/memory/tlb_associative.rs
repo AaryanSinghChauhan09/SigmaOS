@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Hardware-Inspired Associative Page Table Lookup & TLB Caching Subsystem for SigmaOS
 // Implements Fully Associative, 4-Way Set Associative, and Direct Mapped Translation Lookaside Buffer (TLB) translation.
 

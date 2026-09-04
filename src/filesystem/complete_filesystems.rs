@@ -12,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // SigmaOS Complete Filesystems Suite
 // High-fidelity implementation of FAT (12, 16, 32), NTFS, exFAT, Btrfs, HFS+, and ext (2, 3, 4) filesystems
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 use crate::access::control::{
     Ext4AccessCheckEngine, Ext4InodeMode, Ext4Xattr, NtfsSecurityDescriptor, PosixAclTable,

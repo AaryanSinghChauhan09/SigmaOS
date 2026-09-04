@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::String;
-use alloc::rc::Rc;
+use std::vec::Vec;
+use std::collections::{BTreeMap, VecDeque};
+use std::string::String;
+use std::rc::Rc;
 use core::cell::RefCell;
 use core::cmp;
 

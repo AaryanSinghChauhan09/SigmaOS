@@ -16,8 +16,7 @@
 // Kali-Style: Isolated Dynamic System Tracing Sandbox Hook
 // Hooks trace handlers directly inside the kernel transaction bus using isolated spans
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 
 

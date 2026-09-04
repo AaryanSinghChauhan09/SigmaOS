@@ -1,8 +1,7 @@
-extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::string::String;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NamespaceType {

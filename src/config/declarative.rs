@@ -1,11 +1,10 @@
 //! Declarative System Configuration Management inspired by NixOS and Guix
 //! Atomic upgrades, system generation tracking, configuration modules, and instant rollbacks.
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigState {

@@ -5,11 +5,10 @@
 //! - Pacman-style package engine with dependency checking and database locking
 //! - Init targets, firewalls, LSM, PAM, and Tmux terminal multiplexers
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
-extern crate alloc;
 
-use alloc::collections::BTreeMap as HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap as HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Virtual Filesystem Parity (/proc & /dev)

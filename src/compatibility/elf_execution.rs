@@ -1,8 +1,7 @@
-extern crate alloc;
 /// Custom Linux-Style Secure ELF Executable Subsystems for SigmaOS
 /// Implements ASLR (Address Space Layout Randomization) base loader, DEP/NX (No-Execute) page enforcement,
 /// dynamic shared library (.so) symbol resolver, and IMA (Integrity Measurement Architecture) cryptographic signature verifier.
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==========================================

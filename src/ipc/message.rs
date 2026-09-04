@@ -18,9 +18,8 @@
 // Indirect Addressing (Mailboxes/Ports with 1-to-1, 1-to-N, N-to-N relationships),
 // Structured Message Headers with payload validation, sequence numbers, and delivery modes.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

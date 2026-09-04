@@ -1,11 +1,10 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // Sovereign Podcast Recording & RSS Publishing Engine
 // Inspired by GarageBand and Anchor, providing multi-track recording, mastering filters, and iTunes XML feed generation.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// A recorded audio clip segment

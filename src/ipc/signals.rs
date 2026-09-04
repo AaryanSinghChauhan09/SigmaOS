@@ -6,9 +6,8 @@
 
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 use crate::ipc::ipc::{IPCError, IPCCapability};
 
 /// Unix/BSD standard and custom signal numbers

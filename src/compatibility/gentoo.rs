@@ -1,11 +1,10 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Distro Compatibility Layer
 /// Gentoo Linux & SysVinit runlevels Architecture Absorption for SigmaOS
 /// Implements Portage-grade ebuild compilation recipes, global & local compile-time USE Flags,
 /// and OpenRC runlevel dependency-resolved parallel process/daemon supervision.
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. USE FLAGS (Gentoo-grade Compile-Time Feature Optimization)

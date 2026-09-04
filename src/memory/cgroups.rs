@@ -1,11 +1,10 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Linux-inspired Memory Control Groups (memcg) and OOM Killer Subsystem
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OomPolicy {

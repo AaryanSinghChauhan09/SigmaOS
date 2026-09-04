@@ -3,9 +3,9 @@
 /// Implements packet routing, forwarding, and network lookup
 
 use super::zenithnet::{Ipv4Addr, NetworkError};
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Routing Table Entry
 #[derive(Debug, Clone)]

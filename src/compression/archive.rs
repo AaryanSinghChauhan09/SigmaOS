@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Archive Subsystem for SigmaOS
 // Inspired by BSD libarchive, Linux GNU tar, zip/unzip, cpio, and ISO-9660 image tools.
 

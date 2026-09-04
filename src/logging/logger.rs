@@ -20,8 +20,7 @@
 /// Implements dmesg logs by taking inspiration from Linux distributions.
 /// No dependency on external logging frameworks.
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};

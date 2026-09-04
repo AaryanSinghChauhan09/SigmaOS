@@ -1,5 +1,4 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Legacy Linux Kernel & System Compatibility Adapter
 // Enables ancient and modern software compiled for Linux 2.x, 3.x, 4.x, 5.x, and 6.x to run securely
 // Supports System V IPC, ProcFS emulation, GLIBC environment shims, and ELF binary Aux Vectors loading.
@@ -7,10 +6,10 @@ extern crate alloc;
 #[cfg(test)]
 extern crate std;
 
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 

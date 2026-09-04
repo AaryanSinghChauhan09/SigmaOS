@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Linux & BSD Inspired Advanced Drivers Subsystem
 // Zero-dependency, #![no_std] compliant, providing Linux evdev, FreeBSD DRM/KMS,
 // AMDGPU DCN, Intel Xe/i915 GuC, Intel iwlwifi / Realtek rtw89 Wi-Fi, USB4/Thunderbolt security,
@@ -6,11 +5,11 @@ extern crate alloc;
 // Apple Silicon DART IOMMU, Raspberry Pi BCM2711/2712 SoC, and OpenBSD/NetBSD driver sandboxing.
 
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
+use std::boxed::Box;
 
 // =========================================================================
 // 1. Linux Evdev Subsystem (Multi-Touch, Force Feedback, Event Streaming)

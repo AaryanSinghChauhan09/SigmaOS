@@ -1,13 +1,12 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // Vector Graphics Engine (SigmaDraw)
 // Defines 2D paths, Bézier curves, layers, groups, masks, SVG import/export, and real-time path manipulation.
 // Inspiration: Inkscape, Blender's grease pencil.
 
 
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::format;
+use std::vec::Vec;
+use std::string::String;
+use std::format;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point2D {

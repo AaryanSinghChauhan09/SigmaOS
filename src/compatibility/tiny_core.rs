@@ -1,7 +1,7 @@
 use crate::filesystem::FileType;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS
 /// Implements frugal booting, RAM-only execution isolation, .tcz read-only extension loop mounting,
 /// boot code parsing (base, norestore, etc.), and filetool-style (mydata.tgz) user backup/restore.

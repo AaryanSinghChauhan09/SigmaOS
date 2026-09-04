@@ -12,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec::Vec;
+use std::format;
+use std::vec::Vec;
 
-extern crate alloc;
 use crate::klib::BTreeMap;
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 /// Apache Ossie (Incubating) Semantic Model & Metric Specification Engine for SigmaOS
 /// Formerly Open Semantic Interchange (OSI) standard
 /// Establishes an on-device, vendor-neutral semantic layer and metric language interpreter.

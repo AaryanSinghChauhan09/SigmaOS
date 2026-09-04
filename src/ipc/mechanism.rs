@@ -18,8 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

@@ -1,11 +1,10 @@
 //! Network Diagnostic Functions (iproute2/ethtool Inspiration)
 //! Network configuration, diagnostics, and interface management
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Network interface state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

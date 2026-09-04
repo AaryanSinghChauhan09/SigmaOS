@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Breakthrough Operating System Tools & Engines (Pillar 2 - Wave 2)
 // Implements the next eight revolutionary, unexplored OS breakthrough engines:
 // 1. Neuro-Symbolic OS Intelligence
@@ -11,9 +10,9 @@ extern crate alloc;
 // 7. Cross-Mode Terminal Multiplexing
 // 8. AI-Driven Daemon Ecosystem
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================

@@ -4,10 +4,9 @@
 //! - FreeBSD GEOM Storage Partitioning & Disk Labeling (`FreeBsdGeomDiskEngine`)
 //! - OpenBSD DRM/KMS Mode-setting & Framebuffer Controller (`OpenBsdDrmKmsController`)
 //! - Universal USB xHCI Transfer Ring Buffer Manager (`UniversalXhciRingEngine`)
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::string::ToString;
+use std::string::String;
+use std::string::ToString;
 use crate::klib::{Vec, HashMap};
 
 // ==========================================

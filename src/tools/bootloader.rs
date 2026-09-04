@@ -1,12 +1,11 @@
 //! Bootloader & Dual-Boot Manager (GRUB2 / systemd-boot / Calamares Inspiration)
 //! Boot menu, multi-OS detection, chainloading, and UEFI support
-extern crate alloc;
 
 
 
 use crate::klib::{Vec, String, ToString};
-use alloc::string::String;
-use alloc::format;
+use std::string::String;
+use std::format;
 
 /// Target Operating System Type for Dual-Boot Chainloading
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

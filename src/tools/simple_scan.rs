@@ -1,10 +1,10 @@
 //! Sovereign Simple Scan (SANE & eSCL / AirScan Document Scanner) Engine
 //! Inspired by Linux GNOME Simple Scan (`simple-scan`), SANE (Scanner Access Now Easy), and eSCL driverless AirScan
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Scanner document input feed sources
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

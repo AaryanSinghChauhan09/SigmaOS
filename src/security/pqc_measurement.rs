@@ -2,7 +2,6 @@
 // Combines Kyber-1024 KEM with a firmware measurement hash chain
 // for secure-boot / measured-boot narrative
 
-extern crate alloc;
 #[cfg(not(test))]
 use crate::klib::merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(not(test))]
@@ -17,7 +16,7 @@ use merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(test)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(test)]
 use pqc_enclave::KyberKem;
 

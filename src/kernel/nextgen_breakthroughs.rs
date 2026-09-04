@@ -3,9 +3,8 @@
 //! Implements SigmaQuantum, SigmaMesh, SigmaSentinel, SigmaPolyglot, SigmaNano,
 //! SigmaContinuum, SigmaVeritas, SigmaNeuro, SigmaCross, and SigmaEternity.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// 1. SigmaQuantum: Quantum-ready simulator & classical/quantum hybrid scheduler
 #[derive(Debug, Clone)]

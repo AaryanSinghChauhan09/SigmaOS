@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::filesystem::FsError;

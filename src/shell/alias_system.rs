@@ -4,12 +4,11 @@
 //! 1. **User-named aliases** (custom commands registered and manipulated by users)
 //! 2. **Fixed-named aliases** (standards-based package manager and utility mappings from Linux & BSD)
 //! 3. **Automatic aliases** (typo auto-correction and zsh-style suffix-based file extensions)
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Represents the classification/origin of a SigmaOS alias.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -12,19 +12,18 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 // Moksha Desktop and EFL Engine for SigmaOS
 // Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
 
-extern crate alloc;
 #[cfg(test)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Moksha Window Type / Class
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

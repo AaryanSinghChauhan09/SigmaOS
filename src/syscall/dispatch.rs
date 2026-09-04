@@ -12,8 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only

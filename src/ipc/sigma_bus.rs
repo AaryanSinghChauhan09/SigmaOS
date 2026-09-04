@@ -5,11 +5,10 @@
 // Inspired by D-Bus, HeLin IPC (HeliOS), and Mach ports (macOS/GNU Mach)
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::format;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::string::String;
+use std::format;
+use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
 
 /// Maximum message payload size (inspired by D-Bus's 134MB, but kernel-safe at 4KB)

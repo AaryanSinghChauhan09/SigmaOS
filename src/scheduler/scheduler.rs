@@ -1,11 +1,10 @@
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-extern crate alloc;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using Linux & BSD inspired task states and workload classifications.
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Schedulable trait (OOP interface)

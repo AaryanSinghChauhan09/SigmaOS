@@ -20,9 +20,8 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 776
 /// Implements desktop settings and preferences
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SettingID = usize;

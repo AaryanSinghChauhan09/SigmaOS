@@ -1,6 +1,6 @@
 #![allow(dead_code)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 // SigmaOS Access Module
 // Access control management, LDAP, Wireless Access, Remote File & Tool Access, Process Migration
 // Inspired by Linux (credentials/cgroups/sec) & BSD (ucred/capsicum)
@@ -9,12 +9,11 @@ use alloc::vec;
 pub mod append_rights;
 pub mod control;
 
-extern crate alloc;
 pub use crate::filesystem::ext4_ntfs_security::*;
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// Error type for the Access module

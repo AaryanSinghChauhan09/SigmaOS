@@ -17,8 +17,7 @@
 /// Fully absorbs and merges all functions, ideas, features, and principles from emilkowalski/skills.
 /// Eliminates any challenge or capability gap, establishing superior taste & design intelligence.
 
-extern crate alloc;
-use alloc::string::String;
+use std::string::String;
 
 /// Custom square root helper for `// #![no_std]  // crate-root only` compatibility
 fn float_sqrt(x: f32) -> f32 {

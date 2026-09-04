@@ -1,4 +1,3 @@
-extern crate alloc;
 // Sovereign BSD Securelevels and Granular Linux Capabilities Subsystem
 // Integrates core security paradigms from BSD securelevels and Linux capabilities into a unified microkernel privilege manager.
 
@@ -17,7 +16,7 @@ pub enum SecurityError {
 pub enum SigmaError {
     Security(SecurityError),
 }
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU8, Ordering};
 
 /// Granular system capabilities inspired by Linux capability sets

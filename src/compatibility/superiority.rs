@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 // SigmaOS Absolute Superiority Subsystem (SigmaSuperiority)
 //
 // Formally implements and unifies all remaining planned/unimplemented USPs of SigmaOS:
@@ -29,10 +29,9 @@ use alloc::vec;
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
 
-extern crate alloc;
-use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, VecDeque};
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 // ==========================================

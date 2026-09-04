@@ -1,9 +1,8 @@
-extern crate alloc;
 
 use crate::klib::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 

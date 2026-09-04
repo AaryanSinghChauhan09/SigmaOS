@@ -13,7 +13,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 // ============================================================================
 // SigmaOS — Phase L: Plan Implementation Suite
 // Implements all remaining plan-document specifications in // #![no_std]  // crate-root only Rust.
@@ -2491,4 +2491,3 @@ pub mod s_cosmos {
     }
 }
 
-extern crate alloc;

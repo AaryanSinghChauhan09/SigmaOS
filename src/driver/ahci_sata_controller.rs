@@ -2,10 +2,9 @@
 // SigmaOS AHCI SATA Controller Driver
 // Supports SATA I/II/III via AHCI specification
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

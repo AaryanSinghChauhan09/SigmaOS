@@ -1,8 +1,7 @@
-extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

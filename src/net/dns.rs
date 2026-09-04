@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
@@ -31,9 +31,8 @@ use alloc::vec;
 /// 6. Redundant parallel querying with stagger delay.
 /// 7. Secure DoH / DoT transport channel fallbacks.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RecordID = usize;

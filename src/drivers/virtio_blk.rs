@@ -1,6 +1,5 @@
-extern crate alloc;
 // use crate::drivers::virtio::VirtioTransport;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub struct VirtioBlk {
     // transport: VirtioTransport,

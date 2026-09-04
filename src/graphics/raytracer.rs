@@ -15,8 +15,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::f64;
 
 /// 3D Raytracing Engine (Blender Parity)

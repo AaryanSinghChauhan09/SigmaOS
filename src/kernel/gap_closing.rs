@@ -18,11 +18,10 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec;
+use std::vec::Vec;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};

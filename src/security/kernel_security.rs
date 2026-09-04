@@ -1,12 +1,11 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Kernel Security Framework
 // Inspired by SELinux, AppArmor, OpenBSD pledge/unveil, and PaX
 // Provides comprehensive kernel-level security policies and enforcement
 
 use crate::klib::{HashMap, Vec};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityPolicy {

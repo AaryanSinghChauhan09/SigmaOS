@@ -1,4 +1,3 @@
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
@@ -10,10 +9,10 @@ use std_alloc::boxed::Box;
 /// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
 
 
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::string::ToString;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type RuleID = usize;

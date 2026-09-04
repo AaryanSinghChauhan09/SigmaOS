@@ -1,6 +1,6 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 //! Text Editor (gedit/nano Inspiration)
 //! Document management, syntax highlighting, and editor features
 

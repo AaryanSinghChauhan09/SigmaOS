@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Kernel Library
 
 pub mod adt;

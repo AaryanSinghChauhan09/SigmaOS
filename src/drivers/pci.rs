@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const CONFIG_ADDRESS: u16 = 0xCF8;
 pub const CONFIG_DATA: u16 = 0xCFC;

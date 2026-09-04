@@ -1,12 +1,11 @@
-extern crate alloc;
 // Sovereign Printing Subsystem for SigmaOS
 // Implements Linux CUPS IPP 2.0, BSD LPD (RFC 1179), and PPD driver matching
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrintJobState {

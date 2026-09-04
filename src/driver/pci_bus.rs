@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS PCI / PCIe Bus Driver & Bus Manager Implementation
 // Clean-room implementation taking inspiration from Linux (pci-sysfs, ECAM, BAR allocation, MSI/MSI-X, PCIe AER, PCIe ASPM)
 // and BSD distributions (FreeBSD devctl/pci ioctls, OpenBSD autoconf PCI matching).
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicU32, Ordering};
 

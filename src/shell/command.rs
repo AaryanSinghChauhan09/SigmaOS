@@ -1,5 +1,4 @@
-use alloc::vec::Vec;
-extern crate alloc;
+use std::vec::Vec;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -584,7 +583,7 @@ pub trait CommandRegistry {
     fn list(&self) -> ShellVec<&[u8]>;
 }
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 #[repr(C)]
 pub struct SimpleCommandRegistry {

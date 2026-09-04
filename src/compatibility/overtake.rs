@@ -12,17 +12,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
+use std::format;
 
 // SigmaOS Distro Clean-Room Overtake & Absorption Engines
 // Absorbing top-tier innovations from Starling, Pop!_OS, Ubuntu Budgie, Rhino Linux,
 // Bodhi Linux, elementaryOS, Ubuntu, Ubuntu Server, ZorinOS, Mandrake Linux, Caldera OpenLinux.
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 // ==========================================
 // 1. Starling Build (Starling Desktop) Features

@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // Sovereign Standard Streams Controller
 // Linux & BSD inspired standard input, output, and error stream management.
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Standard File Descriptors
 pub const STDIN_FILENO: i32 = 0;

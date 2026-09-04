@@ -1,12 +1,11 @@
-extern crate alloc;
 // Linux/BSD Distro Inspirations Implementation
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;

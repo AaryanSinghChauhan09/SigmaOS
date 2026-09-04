@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS Fedora/RHEL Parity Implementation
 // Implements DNF package management, SELinux integration, and RPM support
 
 use crate::klib::Vec;
-use alloc::string::String;
+use std::string::String;
 use core::cell::Cell;
 
 pub use crate::compatibility::fedora::FedoraOfflineUpdateEngine;

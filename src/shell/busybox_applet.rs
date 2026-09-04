@@ -1,14 +1,13 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // SigmaOS Alpine Linux BusyBox-Inspired Multi-Call Applet Command Dispatcher
 // Zero-dependency, safe, robust command multiplexing for sovereign userland shell
 // Inspired by Alpine Linux BusyBox multicall binary architecture
 
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 pub type AppletHandler = fn(args: &[&str]) -> Result<String, &'static str>;
 

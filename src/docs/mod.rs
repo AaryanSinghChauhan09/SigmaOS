@@ -2,15 +2,14 @@
 //!
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
-extern crate alloc;
 
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::string::ToString;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::string::ToString;
 
 /// Safely escapes HTML special characters to prevent DOM text reinterpretation / XSS
 pub fn escape_html(input: &str) -> String {

@@ -6,12 +6,11 @@
 //!
 //! This module forms the hybrid architectural spine of SigmaOS, facilitating dynamic
 //! virtualization, asynchronous I/O packet routing, and multi-privilege isolation.
-extern crate alloc;
 
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================

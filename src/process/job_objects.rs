@@ -1,15 +1,14 @@
-use alloc::vec;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Job Objects Subsystem (src/process/job_objects.rs)
 // Integrates Windows Job Objects with Linux cgroups v2 resource controllers, FreeBSD rctl limits,
 // and OpenBSD pledge/unveil sandboxing for process group governance.
 
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

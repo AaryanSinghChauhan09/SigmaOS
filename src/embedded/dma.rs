@@ -1,4 +1,3 @@
-extern crate alloc;
 
 
 /// OOP-based DMA for SigmaOS
@@ -7,8 +6,8 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 pub type ChannelID = usize;
 

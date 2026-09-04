@@ -2,10 +2,9 @@
 // SigmaOS Intel e1000/i210 Ethernet Driver
 // Supports Intel 1GB/10GB Ethernet controllers (82540, 82541, 82545, i210, i350, etc.)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

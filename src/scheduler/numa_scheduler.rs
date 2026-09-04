@@ -1,11 +1,11 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use alloc::boxed::Box;
-use alloc::vec;
+use std::boxed::Box;
+use std::vec;
 use core::sync::atomic::{AtomicPtr, Ordering};
 
 pub struct NumaNode {

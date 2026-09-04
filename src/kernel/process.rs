@@ -5,10 +5,9 @@
 // and advanced blocked process states (BlockedWaiting, BlockedSuspended, WaitChannels).
 
 
-extern crate alloc;
-use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, VecDeque};
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;

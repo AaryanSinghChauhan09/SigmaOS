@@ -18,8 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const PCI_MAX_BUS: u16 = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;

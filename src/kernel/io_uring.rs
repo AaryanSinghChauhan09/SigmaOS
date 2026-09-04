@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,9 +1,8 @@
-extern crate alloc;
 // NixOS-Style: Atomic Inode Pointer-Swap Generation Manager
 // Implements sub-millisecond, zero-copy system rollbacks via content-addressed nodes
 
-use alloc::vec;
-use alloc::vec::Vec;
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Generation {

@@ -4,28 +4,27 @@
 // inspired by NixOS's functional package management approach.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
+use std::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::boxed::Box;
+use std::boxed::Box;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 
 #[cfg(any(feature = "standalone_test", test))]
-extern crate alloc;
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::vec;
+use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::boxed::Box;
+use std::boxed::Box;
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::format;
+use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]

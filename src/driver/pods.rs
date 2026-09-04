@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Peripheral Evolution Pods (PeripheralPod)
 // Encapsulates simulation of obsolete devices (Floppy drives, Tape drives, CRT graphics, Dot-matrix printers)
 

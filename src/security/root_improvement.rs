@@ -25,12 +25,11 @@
 // 8. Linux Subordinate UID/GID Mapper (subuid/subgid container parity)
 // 9. Rootless Privileged Port Binding Manager (sysctl ip_unprivileged_port_start parity)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU64, Ordering};
 
 // ==========================================

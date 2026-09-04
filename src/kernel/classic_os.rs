@@ -1,5 +1,4 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SPDX-License-Identifier: Apache-2.0
 // Classic Operating System Algorithms & Subsystems
 //
@@ -13,7 +12,7 @@ extern crate alloc;
 // - Ticket Spinlock with Exponential Backoff
 // - Simple & Multiprogrammed Batch Queue Processor
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Memory Ballooning Manager (VirtIO / Hypervisor Ballooning)
 pub struct VirtioBalloonManager {

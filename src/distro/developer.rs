@@ -12,16 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 /// Represents a compiled target architecture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

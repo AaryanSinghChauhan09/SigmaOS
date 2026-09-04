@@ -1,12 +1,11 @@
 //! FreeBSD-style & Linux Container (OCI/cgroups) Hybrid Jails Isolation System for SigmaOS
 //! Implements advanced OS-level virtualization by isolating directory subtrees, hostnames,
 //! VNET network stacks, User/Mount namespaces, and resource quotas (FreeBSD rctl / cgroups v2).
-use alloc::format;
-extern crate alloc;
+use std::format;
 
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 /// Administrative capabilities inside a jail

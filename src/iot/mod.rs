@@ -1,9 +1,8 @@
 //! IoT Platform (IoT Device Management Inspiration)
 //! Large-scale device management, protocol support, and digital twin integration
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

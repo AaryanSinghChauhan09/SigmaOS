@@ -2,10 +2,9 @@
 // SigmaOS Intel i915/i965 Integrated GPU Driver
 // Supports Gen 3-11 Intel integrated graphics (Skylake, Kaby Lake, Coffee Lake, etc.)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};

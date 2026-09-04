@@ -2,8 +2,8 @@
 /// SigmaOS: ELF Binary Loader
 /// Loads and parses ELF (Executable and Linkable Format) binaries for execution
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 use core::mem;
 

@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Cutting-Edge Terminal Multiplexer (SigmaTmux Engine)
 // Implements robust OOP principles with custom split, zoom, broadcast, copy registers,
 // control mode (-C) protocol parsing, copy-mode scrollback search, pane synchronization,

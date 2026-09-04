@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::format;
+use std::string::{String, ToString};
 // Custom BTreeMap implementation for SigmaOS
 // Reduces dependency on alloc::collections::BTreeMap
 // Simple implementation using sorted Vec for now

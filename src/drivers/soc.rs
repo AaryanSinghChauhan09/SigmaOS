@@ -19,9 +19,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PinDirection {

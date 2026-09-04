@@ -1,10 +1,9 @@
 //! Advanced Boot Manager inspired by GRUB2, systemd-boot, and rEFInd
 //! Multi-boot entry management, measured boot TPM PCR registers, custom themes,
 //! and fallback boot recovery environments.
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct BootEntry {

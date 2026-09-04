@@ -1,14 +1,13 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // SigmaOS Sovereign Replacement System Utilities Suite (sigma-core-utils)
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.
 // Aligns perfectly with the core Sovereign replacement table.
 
 
-use alloc::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::{BTreeMap as HashMap, BTreeSet as HashSet};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Log Level for sigma-log
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

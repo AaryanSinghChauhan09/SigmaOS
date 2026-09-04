@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -22,7 +21,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux ALSA snd-opl3 + snd-sb* driver families
 /// AdLib OPL2 (YM3812), OPL3 (YMF262), SB 1.0/2.0/Pro/16/AWE32
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// OPL register space
 pub const OPL_BASE_ADDR: u16 = 0x388;

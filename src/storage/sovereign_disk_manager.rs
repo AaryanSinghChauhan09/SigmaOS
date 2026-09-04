@@ -5,11 +5,10 @@
 // - Physical Volume (PV), Volume Group (VG), and Logical Volume (LV) creation, extension, and thin provisioning
 // - CoW Logical Volume snapshots (lvcreate --snapshot)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitionTableScheme {

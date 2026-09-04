@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS Debian/Ubuntu Parity Implementation
 // Implements Debian packaging system, APT, and Ubuntu-specific features
 
 use crate::klib::Vec;
-use alloc::string::String;
+use std::string::String;
 use core::cell::Cell;
 
 /// Debian package management with APT parity

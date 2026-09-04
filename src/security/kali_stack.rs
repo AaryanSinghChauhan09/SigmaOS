@@ -1,4 +1,3 @@
-extern crate alloc;
 
 use crate::klib::Vec;
 use core::mem;

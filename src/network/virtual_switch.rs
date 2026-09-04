@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Linux Open vSwitch & BSD if_bridge Virtual Ethernet Switch Engine
 // MAC Forwarding Database (FDB), 802.1Q VLAN Tagging/Trunking, STP Spanning Tree, SPAN Mirroring, & LACP
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::format;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SwitchPortMode {

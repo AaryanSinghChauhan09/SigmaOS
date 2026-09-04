@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Advanced Process Control & Lifecycle Management
 // Absorbs Linux fork/exec/exit/waitpid, copy-on-write namespaces, BSD rlimits, Windows Priority Classes, and Orphan Re-parenting.
 
@@ -7,10 +6,10 @@ extern crate alloc;
 extern crate std;
 
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::format;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::time::Duration;
 

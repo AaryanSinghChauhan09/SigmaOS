@@ -1,13 +1,12 @@
-extern crate alloc;
 // SigmaOS EndeavourOS Parity Module
 // Implements terminal-centric EndeavourOS features: Calamares installer engine,
 // EOS Welcome app tasks, EOS Log Tool pastebin diagnostics, Reflector mirror ranking,
 // Yay/Paru AUR helper, and AKM Kernel Manager.
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Supported Desktop Environments for Calamares
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

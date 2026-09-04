@@ -1,10 +1,9 @@
 //! Network Driver Framework (Linux mac80211 & FreeBSD net80211 Inspiration)
 //! Supports wireless (Intel iwlwifi, Broadcom brcmfmac, Realtek rtw88, Atheros ath10k), ethernet, and Bluetooth
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Network device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

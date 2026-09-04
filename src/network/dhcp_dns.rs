@@ -2,10 +2,9 @@
 // Implements DHCP state machine (DISCOVER/OFFER/REQUEST/ACK), DNS A/AAAA query resolution,
 // and background cloud synchronization.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DhcpState {

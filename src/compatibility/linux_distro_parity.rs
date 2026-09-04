@@ -4,14 +4,13 @@
 //! - SysVinit runlevels and systemd target management (`LinuxRunlevelGovernor`)
 //! - `/etc/fstab` filesystem mount table entry parsing (`LinuxFstabEngine`)
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
-extern crate alloc;
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use alloc::string::String;
-use alloc::string::ToString;
+use std::string::String;
+use std::string::ToString;
 #[cfg(test)]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
 

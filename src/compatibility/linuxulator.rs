@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Sovereign Linuxulator - Native Linux ELF Binary Loader and Syscall Translation Engine for SigmaOS
 // Inspired by the FreeBSD linuxulator, allowing unmodified Linux x86_64 binaries to run natively under microkernel isolation.
 
 use crate::driver::device::DeviceError;
 use crate::interrupt::handler::RegisterSet;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -15,10 +15,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// NoSQL Database Engine (Cassandra & CouchDB Parity)
 /// Wide-column store and document store supporting masterless replication.

@@ -2,8 +2,8 @@
 // Package signing, verification, and security
 // Inspired by Arch pacman and FreeBSD pkg security
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Package signature types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

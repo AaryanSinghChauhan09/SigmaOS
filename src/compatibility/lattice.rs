@@ -2,9 +2,8 @@
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum LatticeFeature {

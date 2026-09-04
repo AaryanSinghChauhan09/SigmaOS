@@ -1,12 +1,11 @@
 //! Advanced Hardware Abstraction Layer & udev Integration
 //! Automatic device discovery, rich device properties, udev rule matching,
 //! hotplug events, and device tree enumeration.
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceCategory {

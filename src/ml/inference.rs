@@ -1,10 +1,9 @@
-extern crate alloc;
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};

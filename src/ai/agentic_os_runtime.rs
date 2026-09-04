@@ -1,13 +1,12 @@
-extern crate alloc;
 /// Agentic OS & Hybrid Container Runtime Subsystem for SigmaOS
 ///
 /// Step 1: Hybrid Linux Runtime Foundation (Container-First Architecture, eBPF Monitoring, POSIX Base Bridge)
 /// Step 2: Agentic OS Architecture (Context MMU, Local LLM System Daemons, OmniAutomator Studio APIs)
 /// Step 3: Zero-Trust & Sovereign Auditing (TPM 2.0 Key Vault, Ephemeral Agent Sandboxing, Tamper-Proof Action Audit Logs)
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================================
 // STEP 1: HYBRID LINUX RUNTIME FOUNDATION

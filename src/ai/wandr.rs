@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 /// WANDR (Wide And Deep Research) Agent & Benchmark Engine for SigmaOS
 /// Replicates the design, features, metrics, and core principles of Perplexity AI's WANDR research benchmark
 /// Solves structured, high-volume information work requiring broad discovery (wide), systematic extraction, disambiguation, and auditable synthesis (deep).

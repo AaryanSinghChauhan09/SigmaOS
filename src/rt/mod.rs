@@ -1,11 +1,10 @@
 //! Real-Time Capabilities (PREEMPT_RT Inspiration)
 //! Real-time kernel, scheduling policies, and industrial support
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Scheduling policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

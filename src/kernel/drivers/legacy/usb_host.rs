@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -22,8 +21,8 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux USB stack (linux/drivers/usb/): OHCI, UHCI, EHCI, xHCI
 /// USB HID (keyboards, mice, gamepads), USB Mass Storage (BBB protocol)
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// USB speed
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

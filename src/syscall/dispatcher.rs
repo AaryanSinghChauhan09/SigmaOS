@@ -4,10 +4,9 @@
 /// Uses capability-based access control
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};

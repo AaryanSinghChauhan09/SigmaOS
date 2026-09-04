@@ -1,18 +1,17 @@
 #![allow(clippy::all, warnings)]
-use alloc::vec;
+use std::vec;
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 distinct drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
 
 
-extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use core::result::Result::{self, Ok, Err};
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 // -------------------------------------------------------------------------
 // ANCIENT / LEGACY DEVICES

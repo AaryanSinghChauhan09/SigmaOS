@@ -1,12 +1,11 @@
 //! Service Management System (systemd + OpenRC + BSD rc Inspiration)
 //! Implements service management, logging, and network configuration
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Service unit types (systemd inspiration)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

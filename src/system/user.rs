@@ -1,7 +1,6 @@
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec;
+use std::vec::Vec;
 // SigmaOS User Management System
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod

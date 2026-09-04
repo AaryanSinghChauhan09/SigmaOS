@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // Linux, BSD & OpenStack Cinder Inspired Block Device & Storage Extensions for SigmaOS
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};

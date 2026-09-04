@@ -2,10 +2,9 @@
 //! Zero-dependency #![no_std] implementation of AI orchestration, ML experiment tracking,
 //! safety policy engine, signed model marketplace, multi-device model scheduling,
 //! privacy prompt redaction, default-deny network policy, and OpenShell sandboxing.
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. MULTI-DEVICE MODEL SCHEDULING (LocalLlmOrchestrator)

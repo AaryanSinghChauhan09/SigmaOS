@@ -1,12 +1,11 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 #![allow(clippy::all, unused)]
-use alloc::string::String;
+use std::string::String;
 
 // SigmaOS Kernel Main Entry Point
 
-extern crate alloc;
-use alloc::string::ToString;
+use std::string::ToString;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

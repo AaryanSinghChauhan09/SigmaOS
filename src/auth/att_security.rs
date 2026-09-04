@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // AT&T System V, Linux & BSD Inspired Identification, Verification, ADT & Security Subsystem
 // Implements 5-step User Identification, Verification, Authenticity of Information,
 // Attributes Definition Table (ADT), and Automatic Allocation & Management Engine.
@@ -9,8 +8,8 @@ use crate::klib::collections::HashMap;
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;
 
-use alloc::string::{String as AllocString, ToString};
-use alloc::vec::Vec;
+use std::string::{String as AllocString, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Security classification levels inspired by AT&T System V MLS / Bell-LaPadula

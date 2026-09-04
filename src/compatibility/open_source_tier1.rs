@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Open Source Tier 1 Projects Integration Layer
 // Implements clean-room, high-fidelity integration wrappers for Wasmer, smoltcp, libsodium, and SQLite
 

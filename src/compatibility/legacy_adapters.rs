@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Legacy Compatibility Adapters
 // Provides implementations for legacy personality adaptations, syscall translations,
 // and bridge structures as expected by the integration tests.

@@ -1,14 +1,13 @@
-use alloc::vec;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::format;
 // nftables-Inspired Modern Firewall Framework
 // Linux nftables provides a modern, flexible packet filtering framework with tables, chains, and rules
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::{format, vec};
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::{format, vec};
 
 /// nftables-inspired table families
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

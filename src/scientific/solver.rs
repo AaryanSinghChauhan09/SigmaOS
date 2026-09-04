@@ -15,9 +15,8 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::vec;
+use std::vec::Vec;
+use std::vec;
 
 /// A high-performance `// #![no_std]  // crate-root only` Linear Algebra and Numeric Solver Engine
 /// Designed to replace GNU Octave, MATLAB, and GROMACS dependencies.

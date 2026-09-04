@@ -3,17 +3,16 @@
 #![allow(static_mut_refs)]
 #![allow(dead_code)]
 
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Windows Driver Compatibility, Emulation, and PE Loading Framework for SigmaOS
 // Implements WDM, WDF (KMDF/UMDF), NDIS, Storport, WDDM, and PE-grade .sys loading.
 
 use crate::driver::device::{
     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- Standard Windows Types & NTSTATUS Codes ---

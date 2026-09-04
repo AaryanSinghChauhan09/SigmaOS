@@ -1,9 +1,8 @@
-extern crate alloc;
 // Debian Linux Distro Compatibility Subsystem
 // Formats, parsers, and registry models matching Debian systems (dpkg, apt, .deb)
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DebControl {

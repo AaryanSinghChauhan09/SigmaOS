@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -22,8 +21,8 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux 0.01–2.6 ISA bus support: I/O port space, DMA, IRQs
 /// Supports ISA, EISA, and LPC bridge legacy devices
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Classic ISA I/O port ranges (from PC architecture spec)
 pub const ISA_IO_BASE: u16 = 0x0000;

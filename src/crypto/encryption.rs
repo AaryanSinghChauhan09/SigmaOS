@@ -1,7 +1,6 @@
-use alloc::vec::Vec;
-extern crate alloc;
+use std::vec::Vec;
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service

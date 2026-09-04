@@ -8,13 +8,12 @@
 //! 
 //! This module provides SQLite database functionality for SigmaOS,
 //! enabling efficient local data storage and SQL query capabilities.
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 
 use crate::klib::HashMap;
-use alloc::sync::Arc;
+use std::sync::Arc;
 use core::cell::RefCell;
 
 /// SQLite database connection

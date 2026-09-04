@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Unveil & Landlock - Filesystem Visibility & Sandboxing Subsystem
 // Inspired by OpenBSD unveil and Linux Landlock, providing fine-grained path restrictions.
 
@@ -13,8 +12,8 @@ pub enum SecurityError {
 pub enum SigmaError {
     Security(SecurityError),
 }
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Filesystem access permissions for unveiled paths
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

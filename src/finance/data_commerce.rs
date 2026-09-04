@@ -3,10 +3,9 @@
 // Inspired by Red Hat Subscription Manager (RHSM), Red Hat Marketplace,
 // Flathub Commercial Apps, Telemetry Metering, and Data Loss Prevention (DLP) Data Security.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
 
 // =========================================================================
 // 1. RED HAT SUBSCRIPTION MANAGER (RHSM) ENTITLEMENT & LICENSING ENGINE

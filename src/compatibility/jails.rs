@@ -1,12 +1,11 @@
 // Sovereign Jail and Syscall Sandboxing Isolation Subsystem
 // Inspired by FreeBSD Jails, Linux Namespaces, and Linux seccomp-BPF filters.
 
-extern crate alloc;
 
-use alloc::collections::BTreeSet;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeSet;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum NamespaceType {

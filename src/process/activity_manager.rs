@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // System Activity Manager for SigmaOS
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,
 // Garuda Zen interactivity governor, FreeBSD process activity accounting, and macOS Activity Monitor.

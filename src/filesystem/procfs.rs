@@ -1,7 +1,6 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::collections::BTreeMap;
 use crate::filesystem::vfs::{Inode, FileType, FilePermissions};
 
 pub struct ProcNode {

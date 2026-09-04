@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS OpenBSD-grade Packet Filter (PF) Stateful Firewall Subsystem
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-overhead routing.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::string::ToString;
+use std::string::String;
+use std::vec::Vec;
+use std::string::ToString;
 use core::cell::RefCell;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

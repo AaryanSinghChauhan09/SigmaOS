@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,
 /// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, Cachy-Initramfs module loader,
 /// Cachy-THP & Memory Compaction, KSM Samepage Merging, P-State Governor, and SIMD compiler tuning.
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 

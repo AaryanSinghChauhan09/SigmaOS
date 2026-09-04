@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Virtual Memory Management Completion Module
 // Finalizes the remaining components for Phase G completion
 // This module completes the VMM implementation with advanced features
 
 
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
 
 /// Page Reclamation Watermarks (Linux kswapd-style)
 #[derive(Debug, Clone, Copy)]

@@ -12,17 +12,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::vec;
+use std::format;
 
 // SigmaFS CAS + PQC Engine
 // Content-Addressed Storage & Post-Quantum Cryptography
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 pub const SHA256_HASH_SIZE: usize = 32;
 pub const DILITHIUM5_SIGNATURE_SIZE: usize = 64;

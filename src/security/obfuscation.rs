@@ -1,9 +1,8 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Advanced Code Obfuscation, Anti-Analysis, and White-Box Cryptography Engine
 // Designed to thwart static analysis, linear sweep disassemblers, and runtime memory dumping.
 

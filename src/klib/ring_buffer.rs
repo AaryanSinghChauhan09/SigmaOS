@@ -1,4 +1,3 @@
-extern crate alloc;
 
 // SigmaOS klib: Lock-free Ring Buffer (Circular Queue)
 // Inspired by Linux kernel's kfifo and FreeBSD's ring buffer implementations

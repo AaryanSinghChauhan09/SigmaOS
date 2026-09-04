@@ -4,10 +4,9 @@
 // and producing reproducible binary packages. This rounds out the Void Linux
 // inspiration beyond the init system already modelled in compatibility/void_linux.rs.
 
-extern crate alloc;
 use crate::klib::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum XbpsTemplatePhase {

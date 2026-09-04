@@ -1,12 +1,11 @@
-extern crate alloc;
 // Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
 // Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
 // Enhanced with advanced GDB/WinDbg-inspired Predefined and User-Defined Pseudo Registers
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 pub type InterruptNumber = u32;

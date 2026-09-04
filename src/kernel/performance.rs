@@ -1,9 +1,8 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Kernel Performance - Zero-Copy IPC & UDF Scheduler VM
 // High-speed zero-copy IPC and autonomic UDF CPU scheduling engine
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

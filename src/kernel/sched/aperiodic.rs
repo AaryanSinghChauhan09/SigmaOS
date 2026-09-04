@@ -1,10 +1,9 @@
 //! SigmaOS Aperiodic & Sporadic Task Scheduling Subsystem
 //! Inspired by Linux PREEMPT_RT / SCHED_DEADLINE Constant Bandwidth Server (CBS),
 //! Rate-Monotonic Deferrable Server (DS), Sporadic Server (SS), and FreeBSD Taskqueues.
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AperiodicPriority {

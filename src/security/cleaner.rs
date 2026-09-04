@@ -12,10 +12,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::ptr;
 
 /// Secure Data Erasure (BleachBit Parity)

@@ -1,9 +1,8 @@
-extern crate alloc;
 // GDT, IDT, and VGA Text Buffer architectures for SigmaOS
 // Integrates core bare-metal concepts from phil-opp/blog_os under `#![no_std]`.
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU16, AtomicUsize, Ordering};
 
 // ==========================================

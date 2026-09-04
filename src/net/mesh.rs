@@ -1,8 +1,7 @@
-extern crate alloc;
 // SigmaNet Mesh: Stateless, zero-configuration peer-to-peer mesh networking
 // for collaborative secure file sharing in SigmaOS.
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MeshPeerNode {

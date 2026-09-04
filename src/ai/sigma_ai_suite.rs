@@ -1,14 +1,13 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS AI & Automation Suite - SigmaAI Agent Roadmap Implementation
 // Phases 1-5: Natural Language Translator, Workflow Automation, Adaptive CLI Suggestions,
 // Error Explanation Layer, and SigmaAI Assistant (Indic Languages & Voice Support).
 
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Supported Indic and international languages for SigmaAI.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

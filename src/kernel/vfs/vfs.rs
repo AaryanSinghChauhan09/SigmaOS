@@ -15,11 +15,10 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

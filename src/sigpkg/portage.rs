@@ -1,12 +1,11 @@
-extern crate alloc;
 // Gentoo Portage-Inspired Advanced Dependency Resolution
 // Sophisticated dependency solver with USE flags, slot conflicts, and optimization
 
-use alloc::boxed::Box;
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::{BTreeMap, BTreeSet};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Portage-inspired USE flag (compile-time feature selection)
 #[derive(Debug, Clone, PartialEq, Eq)]

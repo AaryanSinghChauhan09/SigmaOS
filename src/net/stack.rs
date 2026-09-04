@@ -12,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::string::{String, ToString};
+use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 use crate::filesystem::FsError;
 

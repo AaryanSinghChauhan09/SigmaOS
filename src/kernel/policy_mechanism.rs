@@ -2,9 +2,8 @@
 // Implements core principles of OS design: Separation of Policy and Mechanism,
 // Protection & Isolation, Optimization for the Common Case, Privilege Levels, and Interrupt Handling.
 
-extern crate alloc;
 use crate::security::CapabilityToken;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

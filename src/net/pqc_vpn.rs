@@ -1,10 +1,9 @@
-extern crate alloc;
 /// Post-Quantum Cryptography WireGuard VPN protocol and secure tunnel.
 /// Employs Kyber-1024 KEM and Dilithium-5 digital signatures for military-grade protection.
 
 
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

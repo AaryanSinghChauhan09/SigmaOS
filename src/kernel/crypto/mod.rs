@@ -13,13 +13,12 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS Crypto Subsystem
 /// Absorbs Linux crypto/ API: symmetric ciphers, hash functions, AEAD, RNG
 /// Pure-Rust implementations: ChaCha20, AES-128/256, SHA-256/512, BLAKE3,
 /// HMAC, PBKDF2, ChaCha20-Poly1305 AEAD, CSPRNG
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ── CSPRNG (ChaCha20-based) ───────────────────────────────────────────────
 

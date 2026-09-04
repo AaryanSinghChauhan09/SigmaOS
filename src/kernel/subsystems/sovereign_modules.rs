@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Sovereign Core Modules & Subsystems
 // Implements missing enterprise, gaming, accessibility, mobile, localization,
 // and sovereign sector integrations (Healthcare, Education, Agriculture, Finance)

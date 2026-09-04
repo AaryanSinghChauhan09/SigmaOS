@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Linux Driver Absorption Framework
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::any::Any;
 
 pub mod subsystem {

@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Distro-Hopper Laboratory (Pillar 6 - Wave 3)
 // Implements experience, philosophy, and community parity features for Linux hoppers:
 // 1. Customizability Layer (KDE/GNOME/WM themes & Selectable service managers)
@@ -9,9 +8,9 @@ extern crate alloc;
 // 5. Hopping Philosophy Guides & Migration Tutorials (Arch, Ubuntu, Fedora)
 // 6. WASM Runtime & Unikernel Execution Scheduler
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================

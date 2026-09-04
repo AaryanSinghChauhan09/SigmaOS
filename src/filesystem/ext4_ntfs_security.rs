@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS Dual Filesystem Access Rights Layer: Linux Ext4 vs Windows NTFS
 // Implements Ext4 Inode i_mode + xattr POSIX ACLs, and NTFS Security Descriptors + SIDs + DACL/SACLs.
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =================================================================────────────
 // 1. LINUX EXT4 FILESYSTEM ACCESS MODEL (i_mode + Extended Attributes POSIX ACLs)

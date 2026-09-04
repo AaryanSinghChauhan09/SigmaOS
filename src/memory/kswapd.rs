@@ -1,8 +1,7 @@
-extern crate alloc;
 // SigmaOS Linux-inspired kswapd & Active/Inactive LRU Page Reclamation Subsystem
 
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageState {

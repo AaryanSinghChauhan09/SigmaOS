@@ -3,10 +3,9 @@
 // Multiboot2 header parsing, Device Tree (DTB) blob parsing, initrd/initramfs RAM disk,
 // kernel cmdline parsing, kernel ELF loading, page table initialization, and automated installer wizard.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootType {

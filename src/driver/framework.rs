@@ -1,11 +1,10 @@
-use alloc::string::{String, ToString};
-extern crate alloc;
+use std::string::{String, ToString};
 // ==========================================
 // Basic Driver Framework Implementation
 // ==========================================
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;

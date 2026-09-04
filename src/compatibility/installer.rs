@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS Advanced GUI-Style Installer, Live ISO and Automated Preseed Deployment Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 

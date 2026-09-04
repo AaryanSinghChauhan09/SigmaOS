@@ -19,7 +19,6 @@
 /// OOP-based Syscall Interface for SigmaOS
 /// Based on Roadmap Item 11: Syscall interface
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 

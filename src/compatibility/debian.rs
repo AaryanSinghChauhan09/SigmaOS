@@ -3,10 +3,9 @@
 //! Implements APT repositories, SysVinit runlevels, debian alternatives, and debootstrap logic.
 //! Zero external dependencies.
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==============================================================================

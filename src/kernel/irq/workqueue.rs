@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 /// SigmaOS Workqueue async deferred execution engine
 /// Runs deferred kernel tasks in thread context (Linux kernel workqueue.c & BSD taskqueue parity)
 #[cfg(test)]
@@ -22,8 +21,8 @@ use crate::klib::VecDeque;
 #[cfg(not(test))]
 use crate::klib::VecDeque;
 
-use alloc::string::String;
-use alloc::string::ToString;
+use std::string::String;
+use std::string::ToString;
 
 #[derive(Clone)]
 pub struct Work {

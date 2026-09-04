@@ -3,8 +3,8 @@
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// File types

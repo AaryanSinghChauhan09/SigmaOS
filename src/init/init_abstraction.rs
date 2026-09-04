@@ -1,10 +1,9 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Init System Abstraction Layer for SigmaOS
 // Location: src/init/init_abstraction.rs
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceStatus {

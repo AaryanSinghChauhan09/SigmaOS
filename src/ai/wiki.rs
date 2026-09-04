@@ -1,9 +1,8 @@
-extern crate alloc;
 // Sovereign AI-Native Knowledge Base & Wiki Engine (OpenWiki Defeater)
 // Implements automated, semantic, zero-dependency collaborative wiki generation inside the microkernel space.
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// A parsed, structured wiki article stored inside the sovereign system
 #[derive(Debug, Clone)]

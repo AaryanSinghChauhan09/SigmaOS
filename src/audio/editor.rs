@@ -1,10 +1,9 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 pub trait AudioEffect {
     fn apply(&self, samples: &mut [f32]);

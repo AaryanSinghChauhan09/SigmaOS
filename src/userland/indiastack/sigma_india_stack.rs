@@ -12,16 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // SigmaOS India Stack Integration
 // ABDM FHIR client, UPI payments, GST/IRN generation, e-RUPI voucher
 
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::String;
+use std::vec::Vec;
+use std::format;
 use core::fmt;
 
 /// India Stack service types

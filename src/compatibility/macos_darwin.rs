@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS macOS & Darwin Parity Subsystem Layer
 // Replicates key macOS / Darwin subsystem capabilities:
 // 1. Mach-O 64-bit and Universal Fat Binary executable loader (MachOLoader)
@@ -7,11 +6,11 @@ extern crate alloc;
 // 4. CoreAudio HAL stream routing graph & dynamic callback matrix (CoreAudioHalRouter)
 // 5. APFS volume snapshot manager & copy-on-write dynamic file clones (ApfsSnapshotManager)
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 /// Mach-O Magic Numbers
 pub const MH_MAGIC_64: u32 = 0xfeedfacf;

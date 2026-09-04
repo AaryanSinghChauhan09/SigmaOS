@@ -1,9 +1,8 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, #![no_std] compliant x86_64 paging implementation.
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::ptr::NonNull;
 
 pub const PAGE_SIZE: usize = 4096;

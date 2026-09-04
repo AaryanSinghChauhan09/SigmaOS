@@ -1,4 +1,3 @@
-extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
 extern crate std;

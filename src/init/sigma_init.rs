@@ -1,4 +1,3 @@
-extern crate alloc;
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
@@ -6,8 +5,8 @@ extern crate alloc;
 
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 pub type ServiceID = usize;
 

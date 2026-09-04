@@ -2,8 +2,8 @@
 // Implements regulatory compliance frameworks (HIPAA, SOC2, ISO 27001, PCI-DSS)
 // Inspired by enterprise Linux distributions and security-focused BSD systems
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Compliance framework types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

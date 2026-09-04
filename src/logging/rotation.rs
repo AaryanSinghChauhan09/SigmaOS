@@ -1,14 +1,13 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
+use std::vec;
 // OOP-based Log Rotation for SigmaOS
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 pub type LogFileID = usize;
 

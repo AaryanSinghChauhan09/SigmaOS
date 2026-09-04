@@ -12,13 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-extern crate alloc;
+use std::format;
 
 /// SigmaOS sysfs-like device tree implementation
 /// Exposes devices, drivers, and attributes in a structured tree
 use crate::klib::BTreeMap;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 pub struct SysfsAttribute {
     pub name: String,

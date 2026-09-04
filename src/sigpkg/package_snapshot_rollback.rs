@@ -5,11 +5,10 @@
 // - Snapshot diffing (added, removed, upgraded, or downgraded packages)
 // - Automated generation pruning with retention policies
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstalledPackageRecord {

@@ -1,4 +1,3 @@
-extern crate alloc;
 
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
@@ -19,11 +18,11 @@ extern crate alloc;
 // - Gentoo Portage EAPI 8 Slot Operator Engine
 // - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// 1. Clear Linux Stateless Architecture Engine
 pub struct ClearLinuxStatelessEngine {

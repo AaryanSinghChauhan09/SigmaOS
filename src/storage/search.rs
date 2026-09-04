@@ -15,10 +15,9 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Search & Information Retrieval Engine (Lucene Parity)
 /// Full-text indexing, tokenization, stemming, and TF-IDF ranking.

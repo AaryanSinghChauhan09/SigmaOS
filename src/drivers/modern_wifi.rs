@@ -1,13 +1,12 @@
-extern crate alloc;
 // Modern Wireless Network Interface Driver
 // Demonstrates how advanced modern wireless drivers implement the unified OOP architecture.
 // Enhanced with Linux/BSD-inspired wireless properties, security, scanning, and monitor mode support.
 
 
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};

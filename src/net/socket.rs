@@ -1,4 +1,3 @@
-extern crate alloc;
 
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
@@ -6,9 +5,9 @@ extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
 #[cfg(not(target_os = "none"))]
-use alloc::boxed::Box;
+use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};

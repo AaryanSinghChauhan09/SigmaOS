@@ -12,21 +12,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-extern crate alloc;
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 use core::time::Duration;
 // Instant not in no_std

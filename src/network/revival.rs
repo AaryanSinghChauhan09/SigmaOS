@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Legacy Networking Protocols Revival (NetRevival)
 // Revives obsolete LAN network stacks (Novell IPX/SPX, IBM NetBEUI) decorated behind a secure zero-trust envelope
 

@@ -1,9 +1,8 @@
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::mem;
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10

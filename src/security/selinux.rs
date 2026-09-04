@@ -2,9 +2,9 @@
 // Implements Fedora-style mandatory access control adapted for capability-based security
 // Inspired by Fedora's SELinux for enhanced security architecture
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Security context
 #[derive(Debug, Clone, PartialEq, Eq)]

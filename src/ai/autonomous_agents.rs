@@ -1,13 +1,12 @@
-extern crate alloc;
 // Autonomous Agents: The Intelligence Layer
 // Implements the Sovereign Agent System as described in AGENTS.md
 // Replaces traditional background daemons and systemd services with Autonomous Agents
 
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Agent types in the hierarchy

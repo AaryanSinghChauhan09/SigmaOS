@@ -2,14 +2,13 @@
 //! Unified driver interface abstraction and platform-specific shims (x86_64, AArch64/ARM64, RISC-V).
 //! Inspired by Linux (sysfs, eBPF/IRQ domains, device tree FDT, PCI ECAM, DMA pools)
 //! and BSD (FreeBSD newbus/bus_dma/nexus, OpenBSD pledge/unveil security, NetBSD rump hypercall driver model).
-extern crate alloc;
 
 
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==============================================================================

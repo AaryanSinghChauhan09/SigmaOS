@@ -1,4 +1,3 @@
-extern crate alloc;
 use core::mem;
 /// NetBSD & OpenBSD-inspired UVM (Universal Virtual Memory) Subsystem for SigmaOS
 /// Provides machine-independent Anonymous Maps (amap), decoupled Physical Maps (pmap),

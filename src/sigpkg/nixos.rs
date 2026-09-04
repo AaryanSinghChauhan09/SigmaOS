@@ -1,11 +1,10 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // NixOS Declarative Profile Generations & Content-Addressed Store Manager
 // Inspired by NixOS /nix/store generations, profiles, atomic rollbacks, and hash verification.
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Content-addressed Nix store package entry
 #[derive(Debug, Clone, PartialEq, Eq)]

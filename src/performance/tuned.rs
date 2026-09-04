@@ -1,9 +1,8 @@
 //! System Performance Tuning inspired by tuned and systemd-analyze
 //! Adaptive ML tuning profiles, boot time performance analysis, and automated I/O/network optimization.
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TuningProfileKind {

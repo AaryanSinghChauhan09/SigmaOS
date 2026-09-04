@@ -20,8 +20,7 @@
 /// Implements NDIS (Network Device Interface Specification) model ethernet and Wi-Fi drivers.
 /// Inspired by Linux sk_buff, BSD mbuf, and standard NDIS OID state queries.
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;

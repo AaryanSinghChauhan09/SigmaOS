@@ -2,9 +2,9 @@
 // Implements Gentoo-style source-based package management for SigmaOS
 // Inspired by Gentoo's Portage for performance optimization and customization
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Portage error types
 #[derive(Debug, Clone)]

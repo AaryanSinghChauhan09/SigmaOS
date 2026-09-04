@@ -14,9 +14,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 // SPDX-License-Identifier: MIT
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 use crate::filesystem::FsError;

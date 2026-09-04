@@ -1,4 +1,3 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
@@ -7,9 +6,9 @@ extern crate alloc;
 use crate::klib;
 use crate::klib::Vec;
 use crate::klib::{HashMap, SigmaString, Vec as KVec};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec as AllocVec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec as AllocVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

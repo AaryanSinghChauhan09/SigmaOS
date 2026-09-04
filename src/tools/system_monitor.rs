@@ -2,11 +2,10 @@
 // SigmaOS Advanced System Monitor
 // Real implementation of system monitoring tools (btop, fastfetch, power diagnostics)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::format;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::format;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================

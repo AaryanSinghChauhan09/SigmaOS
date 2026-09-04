@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS Linux / ELF Binary Protection Parity Subsystem
 // Stack Canaries (SSP), ASLR, NX/DEP, Full/Partial RELRO, PIE, and CFI Validation
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
+use std::format;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RelroMode {

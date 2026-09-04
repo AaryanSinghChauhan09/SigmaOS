@@ -1,10 +1,9 @@
 //! Graphics Acceleration Support inspired by Mesa, Vulkan, and DRI
 //! Vulkan 1.3 / OpenGL 4.6 APIs, PRIME GPU offloading, compute shaders, and ray tracing pipelines.
-extern crate alloc;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::productivity::mint_competitor::{NvidiaPrimeProfile, SovereignNvidiaPrimeEngine};
 

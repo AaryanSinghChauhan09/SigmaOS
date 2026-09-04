@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // Cryptographic Verifier for SigmaPkg
 // Dilithium-5 + SHA3-256 signature verification
 // Includes Debian APT-style release signature keyring verification engine

@@ -1,6 +1,5 @@
-use alloc::vec;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::format;
 // SigmaOS Advanced Debugger Subsystem
 //
 // Models and implements advanced debugger user interfaces, mathematical and bitwise expression
@@ -9,10 +8,10 @@ extern crate alloc;
 // and production kernels (Linux ptrace, Windows Dbgsrv/WinDbg).
 
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(feature = "standalone_test")]

@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaCut: Native Video Editor for SigmaOS
 // Features GPU-accelerated raster timelines, multi-track mixing, and subtitle overlay rendering.
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TrackType {

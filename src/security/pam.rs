@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.
 
@@ -10,8 +9,8 @@ use crate::klib::HashMap;
 use crate::klib::HashMap;
 
 use crate::security::crypto_utils::{constant_time_eq, hash_password_placeholder, SecureRandom};
-use alloc::string::{String as AllocString, ToString};
-use alloc::vec::Vec;
+use std::string::{String as AllocString, ToString};
+use std::vec::Vec;
 
 /// Errors returned by the PAM subsystem
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

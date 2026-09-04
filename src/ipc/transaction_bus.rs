@@ -16,8 +16,7 @@
 // S-IPC Transaction Bus (Microkernel Inter-Process Communication)
 // Sovereign AI-Native zero-dependency implementation
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
 pub const IPC_QUEUE_CAPACITY: usize = 8;

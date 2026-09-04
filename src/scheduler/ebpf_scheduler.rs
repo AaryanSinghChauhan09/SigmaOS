@@ -1,10 +1,9 @@
-extern crate alloc;
 // eBPF-based Scheduling System for SigmaOS
 // Inspired by Ubuntu 25.04 sched_ext integration
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Scheduling policy types

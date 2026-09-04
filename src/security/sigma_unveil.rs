@@ -12,9 +12,9 @@
 //! sigma_unveil!(nullptr, nullptr); // Lock the veil
 //! ```
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 use sigma_types::Result;

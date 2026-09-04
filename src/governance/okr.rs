@@ -1,11 +1,10 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 /// Strategic OKR Engine & Milestone Evaluation Subsystem for SigmaOS
 
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Strategic evaluation error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

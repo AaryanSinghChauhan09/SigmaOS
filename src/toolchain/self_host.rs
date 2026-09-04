@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS Native Self-Hosting Compilation & Assembly Suite (SigmaSelfHost)
 // Enables on-kernel compiler and toolchain bootstrapping to build/link
 // native development tooling, making the operating system fully self-hosting.
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 #[cfg(not(target_os = "none"))]
 use std::path::{Path, PathBuf};
 

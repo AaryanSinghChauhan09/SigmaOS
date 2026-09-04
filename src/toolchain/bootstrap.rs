@@ -1,10 +1,9 @@
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
-extern crate alloc;
 use crate::klib::collections::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {

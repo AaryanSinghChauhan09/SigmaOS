@@ -12,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
+use std::boxed::Box;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
 /// OOP-based Package Management for SigmaOS
 /// Based on Roadmap Item: Package Management + Reproducible Builds
-extern crate alloc;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

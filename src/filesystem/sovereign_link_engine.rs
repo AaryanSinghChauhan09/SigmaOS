@@ -2,12 +2,11 @@
 // Inspired by Linux (link/unlink/linkat/symlinkat, atomic symlink swaps, ELOOP cycle protection)
 // and DragonFly BSD / OpenBSD (Variant Symlinks - varsyms: $SYS, $ARCH, $USER, $ZONE expansion).
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
-use alloc::collections::{BTreeMap, BTreeSet};
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::vec;
+use std::format;
+use std::collections::{BTreeMap, BTreeSet};
 
 pub const AT_FDCWD: i32 = -100;
 pub const MAX_SYMLINK_DEPTH: usize = 12;

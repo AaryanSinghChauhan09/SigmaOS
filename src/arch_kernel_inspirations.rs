@@ -16,12 +16,11 @@
 //   - arch-signoff                    -> `PackageSignoff`
 //   - arch-repro-status (reproducible)-> `ReproducibleBuildVerdict`
 
-extern crate alloc;
 
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, BTreeSet};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. KUNIT -> KUnitEngine

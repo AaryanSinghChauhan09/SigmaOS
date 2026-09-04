@@ -1,15 +1,14 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::format;
+use std::format;
 // SigmaOS MAC-VFS Integration
 // Integrates Mandatory Access Control with VFS layer
 // Solves BUG-014: MAC enforcement not wired into VFS call sites
 
 
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::String;
 
 use crate::security::mac::{
     SecurityContext, SecurityLevel, SecurityDomain, ContextCapability,

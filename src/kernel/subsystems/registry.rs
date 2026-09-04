@@ -12,18 +12,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::format;
+use std::boxed::Box;
+use std::format;
 
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Kernel Subsystem Registry
 /// Inspired by Linux initcall mechanism — provides ordered, dependency-aware subsystem boot
 /// OOP-based: every kernel module implements the KernelSubsystem trait
 use crate::klib::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Initialization priority — mirrors Linux initcall levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

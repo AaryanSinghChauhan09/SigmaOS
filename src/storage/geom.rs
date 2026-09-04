@@ -1,14 +1,13 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS FreeBSD-Inspired GEOM Storage Architecture
 // Provides a modular, layered storage transformation framework:
 // Partitioning (g_part), Mirroring (g_mirror), Striping (g_stripe),
 // GELI Encryption (g_eli), and Linear Concatenation (g_concat).
 
-use alloc::borrow::ToOwned;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::borrow::ToOwned;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BioCmd {

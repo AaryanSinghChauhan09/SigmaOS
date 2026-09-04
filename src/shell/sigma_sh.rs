@@ -1,15 +1,14 @@
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
 #[cfg(target_os = "none")]
-use alloc::boxed::Box;
+use std::boxed::Box;
 use std_alloc::boxed::Box;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec as StdVec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec as StdVec;
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities

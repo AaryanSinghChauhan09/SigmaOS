@@ -4,10 +4,9 @@
 // Zero external library dependency, no_std compatible.
 
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. IRQL (Interrupt Request Level) & CPU Context

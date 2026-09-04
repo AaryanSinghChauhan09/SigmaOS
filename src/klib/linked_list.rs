@@ -1,12 +1,11 @@
 #![allow(dead_code)]
-use alloc::vec::Vec;
+use std::vec::Vec;
 // SigmaOS klib: Intrusive Linked List
 // Inspired by Linux kernel's intrusive list implementation (include/linux/list.h)
 // and BSD's TAILQ/LIST macros from sys/queue.h
 // No external dependencies - fully custom implementation.
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr::NonNull;
 

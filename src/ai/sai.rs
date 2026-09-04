@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // S-AI - Local AI engine and multi-agent automation
 // SovereignML tensor core, agent orchestrator, and local inference
 // Fully implements the 6-Phase AI & Automation Roadmap to differentiate SigmaOS from traditional distros.
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AiError {

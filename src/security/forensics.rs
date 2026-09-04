@@ -12,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Digital Forensics Engine (Sleuth Kit Parity)
 /// Raw disk image analysis engine for forensic recovery.

@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Sovereign Shell Parity Engine (Bash & Zsh Parity)
 // Advanced shell capabilities inspired by GNU Bash and Zsh on Linux and BSD distros:
 // - Variable expansion ($VAR, ${VAR:-default})
@@ -9,11 +8,11 @@ extern crate alloc;
 // - Custom prompt formatting (PS1 expansion: \u, \h, \w, \$)
 // - Background job control parsing (&)
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RedirectionType {

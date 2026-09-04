@@ -1,5 +1,5 @@
-use alloc::string::{String, ToString};
-use alloc::format;
+use std::string::{String, ToString};
+use std::format;
 // SigmaOS — ZFS-Compatible Filesystem Features
 //
 // Inspired by Sun/OpenZFS: copy-on-write semantics, per-block checksumming,

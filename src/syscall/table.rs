@@ -20,7 +20,6 @@
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 111
 /// Implements syscall registration and dispatch table
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -231,8 +230,8 @@ impl SyscallAuditor for SimpleSyscallAuditor {
     }
 }
 
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 #[cfg(test)]
 mod tests {

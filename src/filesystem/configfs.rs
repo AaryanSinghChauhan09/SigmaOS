@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // Sovereign ConfigFS - "Everything is a File" and "Principle of Least Astonishment" (POLA) Implementation
 // Inspired by Linux sysfs/configfs and BSD sysctl, exposing kernel state, scheduler, and security configurations as virtual files.
 
@@ -7,9 +6,9 @@ extern crate alloc;
 use crate::filesystem::vfs::FsError;
 use crate::kernel::bore::BoreScheduler;
 use crate::security::securelevels::{Securelevel, SovereignSecurelevelManager};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

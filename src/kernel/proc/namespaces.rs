@@ -12,11 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
 
 /// SigmaOS Linux-style Namespaces for process isolation
 /// Supports: PID, Net, Mount, UTS, IPC, User, Cgroup namespaces
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NamespaceType {

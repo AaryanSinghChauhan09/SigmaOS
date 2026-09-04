@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // NUMA-Aware Scheduler with Lock-free Synchronization Primitives
 // Optimizes multi-core scalability, limits cache line bouncing, and prevents socket bus saturation.
 

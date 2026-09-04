@@ -17,10 +17,9 @@
 // Implements OOP-based lightweight legacy drivers executing sandboxed UDFs
 
 
-extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// A generic OOP representation of an ancient legacy device.
 /// Behavior is completely customizable via tiny User-Defined Function (UDF) bytecode.

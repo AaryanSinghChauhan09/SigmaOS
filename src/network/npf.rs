@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS NetBSD NPF-Inspired Stateful Packet Filter Engine
 // Zero-dependency, safe, robust stateful packet filtering and NAT framework
 // Inspired by NetBSD's NPF (N-Packet Filter) architecture
 
 
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NpfFilterAction {

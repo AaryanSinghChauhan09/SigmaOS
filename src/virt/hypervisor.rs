@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 use core::mem;
 /// OOP-based Hypervisor for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 181

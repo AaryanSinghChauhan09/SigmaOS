@@ -1,14 +1,13 @@
-extern crate alloc;
 // SigmaOS: Mint Competitor Suite
 // Fully-featured, zero-dependency, safe Rust implementation of standard-defeating
 // desktop features matching and crushing Linux Mint (Cinnamon, Software/Update/Driver Managers)
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. CINNAMON APPLETS & SYSTEM TRAY ENGINE

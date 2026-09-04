@@ -2,8 +2,8 @@
 // Implements firewall, TLS, and network security features
 // Inspired by pf (OpenBSD), iptables (Linux), and Windows Firewall
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Network protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

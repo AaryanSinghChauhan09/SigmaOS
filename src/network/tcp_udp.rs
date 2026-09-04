@@ -1,9 +1,8 @@
 //! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 //! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;

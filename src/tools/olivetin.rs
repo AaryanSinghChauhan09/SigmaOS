@@ -2,11 +2,10 @@
 //! Provides a safe, incredibly clean, lightweight web control panel
 //! allowing administrators to expose pre-defined shell commands with parameter variables
 //! in a sandboxed, ease-of-use environment under #![no_std].
-use alloc::string::String;
-use alloc::format;
-extern crate alloc;
+use std::string::String;
+use std::format;
 
-use alloc::string::ToString;
+use std::string::ToString;
 use crate::klib::{Vec, BTreeMap};
 
 #[derive(Debug, Clone)]

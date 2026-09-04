@@ -16,8 +16,7 @@
 // S-Signal Dispatcher (Capability-Gated Async Signals)
 // Sovereign AI-Native zero-dependency implementation
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignSignal {

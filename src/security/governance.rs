@@ -1,11 +1,10 @@
 //! Security, Privacy & Governance Framework (Items 61-80)
 //! Comprehensive Security, Privacy, and Open-Source Governance Suite for SigmaOS
-extern crate alloc;
 
 
 
 use crate::klib::{String, Vec, ToString};
-use alloc::string::String;
+use std::string::String;
 
 // ============================================================================
 // 61. Default Secure Posture

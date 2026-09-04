@@ -2,13 +2,12 @@
 //!
 //! This module provides optimized local large language model inference,
 //! including quantization, batching, and hardware acceleration.
-use alloc::format;
-extern crate alloc;
+use std::format;
 
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 /// Quantization type for model compression
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

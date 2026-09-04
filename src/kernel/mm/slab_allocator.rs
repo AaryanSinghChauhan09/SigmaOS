@@ -13,13 +13,12 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 /// SigmaOS SLAB/SLUB memory allocator
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
 use crate::klib::BTreeMap;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::vec;
+use std::vec::Vec;
 
 pub struct Slab {
     pub object_size: usize,

@@ -2,9 +2,9 @@
 // Implements dependency resolution and conflict detection
 // Inspired by NixOS declarative package management
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Package version
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

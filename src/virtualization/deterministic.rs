@@ -1,4 +1,3 @@
-extern crate alloc;
 
 use core::mem;
 /// Orange Slice-inspired Deterministic Micro-Virtualization Suite for SigmaOS

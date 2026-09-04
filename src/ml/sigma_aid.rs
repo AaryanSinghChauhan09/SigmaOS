@@ -12,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// Sigma-Aid Daemon: AI-Native LLM Orchestrator
 /// Provides an OOP interface for GGUF model execution and local inference
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ModelStatus {

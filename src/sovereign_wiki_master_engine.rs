@@ -1,14 +1,13 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// ---------------------------------------------------------------------------
 /// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)

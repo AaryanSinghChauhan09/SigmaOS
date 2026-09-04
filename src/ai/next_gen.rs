@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.

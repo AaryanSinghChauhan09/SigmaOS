@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // OpenRC-Inspired Service Management System
 // Dependency-based init system with runlevels, service supervision, and parallel startup
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// OpenRC-inspired service states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

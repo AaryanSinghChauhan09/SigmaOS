@@ -1,13 +1,12 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Sovereign Remote Sharing & Protocol Enhancements for SigmaOS
 // Inspired by Linux & BSD distributions: OpenSSH, dropbear, NFSv4, Samba (smbd/ksmbd), SCP, and rsync.
 
 use crate::klib::HashMap;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 // =========================================================================
 // 1. SSH ENHANCEMENTS: OpenSSH / Dropbear / OpenBSD PrivSep & ControlMaster

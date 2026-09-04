@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS VirtIO Paravirtualization Drivers Subsystem
 // Natively implementing VirtIO Block, Net, and Entropy (RNG) interfaces in a #![no_std] environment
 
 
 
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VirtioDeviceType {

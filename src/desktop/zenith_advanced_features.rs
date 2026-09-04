@@ -1,15 +1,14 @@
 #![cfg_attr(not(test), no_std)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Zenith Advanced Desktop Features
 // Advanced window management, multi-monitor support, gesture control, AI suggestions
 // Implements missing desktop features from 100-Improvement-Ideas.md
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 /// Advanced window layout modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

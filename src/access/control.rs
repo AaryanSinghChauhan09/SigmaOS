@@ -1,9 +1,8 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::format;
+use std::string::{String, ToString};
 /// Access Control Matrix (ACM), Extended POSIX ACLs, Capability Bounding Sets,
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub type RoleID = usize;
 pub type PermissionID = usize;

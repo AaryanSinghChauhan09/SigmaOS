@@ -1,8 +1,7 @@
-extern crate alloc;
 // Dynamic ELF Relocation Primitives for SigmaOS
 // Zero-dependency, #![no_std] compliant ELF dynamic symbol relocation resolution (x86_64 ABI parity)
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Standard x86_64 ELF Relocation Types
 pub const R_X86_64_NONE: u32 = 0;

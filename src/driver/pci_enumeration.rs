@@ -2,10 +2,9 @@
 // SigmaOS PCI Device Enumeration & Device Binding
 // Complete PCI bus enumeration, BAR allocation, and device driver binding
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
+use std::vec::Vec;
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_bus::PciAddress;

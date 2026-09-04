@@ -2,8 +2,8 @@
 // Implements Arch Linux pacman-contrib's paccache functionality
 // Retains keep_count uninstalled package tarballs while purging stale cache files
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Package cache entry
 #[derive(Debug, Clone)]
