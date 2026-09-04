@@ -199,10 +199,11 @@ fn rebuild_order_detects_cycles() {
 fn signoff_needs_community_quorum() {
     let mut s = PackageSignoff::new(2);
     s.register("linux", "6.10");
+    s.set_verification_flags("linux", true, true, true);
     assert!(!s.ready("linux"));
-    s.sign("linux", false).unwrap();
+    s.sign("linux", false);
     assert!(!s.ready("linux"));
-    s.sign("linux", false).unwrap();
+    s.sign("linux", false);
     assert!(s.ready("linux"));
 }
 
