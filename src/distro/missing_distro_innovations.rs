@@ -1751,22 +1751,6 @@ impl LoongArch64ArchitectureEngine {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppArmorMode {
-    Enforce,
-    Complain,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorProfile {
-    pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
     pub profiles: BTreeMap<String, AppArmorProfile>,
@@ -1788,18 +1772,35 @@ impl UbuntuAppArmorEngine {
         access_type: &str,
     ) -> Result<bool, &'static str> {
         let profile = self.profiles.get(profile_name).ok_or("Profile not found")?;
-        if profile.mode == AppArmorMode::Disabled {
+        if profile.mode == AppArmorRuleMode::Disabled {
             return Ok(true);
         }
 
-        let allowed = match access_type {
-            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
-            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
-            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
-            _ => false,
+        let mut matched_rule: Option<&AppArmorPathRule> = None;
+        for rule in &profile.rules {
+            if target_path == rule.path_pattern
+                || (rule.path_pattern.ends_with("/*")
+                    && target_path.starts_with(rule.path_pattern.trim_end_matches("/*")))
+                || (rule.path_pattern.ends_with('*')
+                    && target_path.starts_with(rule.path_pattern.trim_end_matches('*')))
+            {
+                matched_rule = Some(rule);
+                break;
+            }
+        }
+
+        let allowed = if let Some(rule) = matched_rule {
+            match access_type {
+                "read" => rule.allow_read,
+                "write" => rule.allow_write,
+                "exec" => rule.allow_exec,
+                _ => false,
+            }
+        } else {
+            false
         };
 
-        if allowed || profile.mode == AppArmorMode::Complain {
+        if allowed || profile.mode == AppArmorRuleMode::Complain {
             Ok(true)
         } else {
             Err("AppArmor permission denied")
@@ -2108,63 +2109,4 @@ mod tests {
         assert_eq!(la64.executed_instructions, 1);
     }
 
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
-
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
 }
