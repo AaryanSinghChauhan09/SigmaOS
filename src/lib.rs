@@ -93,6 +93,8 @@ pub use unimplemented_features::{
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
     NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ZfsPoolState, ZramCompressionAlgorithm,
