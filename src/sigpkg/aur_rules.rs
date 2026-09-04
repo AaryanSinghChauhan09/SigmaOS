@@ -206,6 +206,221 @@ impl Default for MakepkgReproduciblePipeline {
 }
 
 // ============================================================================
+// 3. AurDependencySolverEngine (yay/paru & FreeBSD portmaster parity)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AurDependencyNode {
+    pub package_name: String,
+    pub dependencies: Vec<String>,
+    pub make_dependencies: Vec<String>,
+    pub is_installed: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct AurDependencySolverEngine {
+    pub package_db: alloc::collections::BTreeMap<String, AurDependencyNode>,
+}
+
+impl AurDependencySolverEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_package(&mut self, node: AurDependencyNode) {
+        self.package_db.insert(node.package_name.clone(), node);
+    }
+
+    /// Resolves optimal build order via topological sort and detects circular dependencies
+    pub fn resolve_build_order(&self, root_package: &str) -> Result<Vec<String>, &'static str> {
+        let mut visited = Vec::new();
+        let mut visiting = Vec::new();
+        let mut build_order = Vec::new();
+
+        self.topological_sort(root_package, &mut visited, &mut visiting, &mut build_order)?;
+        Ok(build_order)
+    }
+
+    fn topological_sort(
+        &self,
+        pkg: &str,
+        visited: &mut Vec<String>,
+        visiting: &mut Vec<String>,
+        order: &mut Vec<String>,
+    ) -> Result<(), &'static str> {
+        if visiting.contains(&pkg.to_string()) {
+            return Err("AUR Solver: Dependency cycle detected");
+        }
+
+        if !visited.contains(&pkg.to_string()) {
+            visiting.push(pkg.to_string());
+
+            if let Some(node) = self.package_db.get(pkg) {
+                let mut all_deps = node.dependencies.clone();
+                all_deps.extend(node.make_dependencies.clone());
+
+                for dep in all_deps {
+                    self.topological_sort(&dep, visited, visiting, order)?;
+                }
+            }
+
+            visiting.retain(|p| p != pkg);
+            visited.push(pkg.to_string());
+            order.push(pkg.to_string());
+        }
+
+        Ok(())
+    }
+}
+
+// ============================================================================
+// 4. AurTrustedUserAdoptionEngine (Arch TU & Gentoo proxy-maintainer parity)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AurPackageAdoptionRecord {
+    pub pkgbase: String,
+    pub maintainer: Option<String>,
+    pub co_maintainers: Vec<String>,
+    pub is_out_of_date: bool,
+    pub vote_count: u32,
+    pub is_promoted_to_official: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct AurTrustedUserAdoptionEngine {
+    pub records: alloc::collections::BTreeMap<String, AurPackageAdoptionRecord>,
+}
+
+impl AurTrustedUserAdoptionEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_pkgbase(&mut self, pkgbase: &str, maintainer: Option<&str>) {
+        self.records.insert(
+            pkgbase.to_string(),
+            AurPackageAdoptionRecord {
+                pkgbase: pkgbase.to_string(),
+                maintainer: maintainer.map(|m| m.to_string()),
+                co_maintainers: Vec::new(),
+                is_out_of_date: false,
+                vote_count: 0,
+                is_promoted_to_official: false,
+            },
+        );
+    }
+
+    pub fn flag_out_of_date(&mut self, pkgbase: &str) -> bool {
+        if let Some(rec) = self.records.get_mut(pkgbase) {
+            rec.is_out_of_date = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn adopt_orphaned_pkgbase(&mut self, pkgbase: &str, new_maintainer: &str) -> Result<(), &'static str> {
+        if let Some(rec) = self.records.get_mut(pkgbase) {
+            if rec.maintainer.is_none() {
+                rec.maintainer = Some(new_maintainer.to_string());
+                rec.is_out_of_date = false;
+                Ok(())
+            } else {
+                Err("AurTU: Package is not orphaned")
+            }
+        } else {
+            Err("AurTU: Package base not found")
+        }
+    }
+
+    pub fn promote_by_tu_vote(&mut self, pkgbase: &str, tu_user: &str, vote_threshold: u32) -> Result<bool, &'static str> {
+        if !tu_user.starts_with("tu_") {
+            return Err("AurTU: Only Trusted Users may initiate package promotion");
+        }
+
+        if let Some(rec) = self.records.get_mut(pkgbase) {
+            rec.vote_count += 5; // TU votes carry weight 5
+            if rec.vote_count >= vote_threshold {
+                rec.is_promoted_to_official = true;
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        } else {
+            Err("AurTU: Package base not found")
+        }
+    }
+}
+
+// ============================================================================
+// 5. AurNamcapPortclippyLinter (namcap, portclippy, and xlint parity)
+// ============================================================================
+
+#[derive(Debug, Default)]
+pub struct AurNamcapPortclippyLinter;
+
+impl AurNamcapPortclippyLinter {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn lint_srcinfo(&self, srcinfo_content: &str) -> Vec<AurLintFinding> {
+        let mut findings = Vec::new();
+
+        let mut has_pkgbase = false;
+        let mut has_license = false;
+
+        for (idx, line) in srcinfo_content.lines().enumerate() {
+            let line_no = idx + 1;
+            let trimmed = line.trim();
+
+            if trimmed.starts_with("pkgbase =") {
+                has_pkgbase = true;
+            }
+            if trimmed.starts_with("license =") {
+                has_license = true;
+                if trimmed.contains("custom") || trimmed.contains("unknown") {
+                    findings.push(AurLintFinding {
+                        rule_id: "PORTCLIPPY-LIC-001".to_string(),
+                        severity: LintSeverity::Warning,
+                        message: "Non-standard license taxonomy string detected in .SRCINFO".to_string(),
+                        line_number: Some(line_no),
+                    });
+                }
+            }
+            if trimmed.starts_with("source = http://") {
+                findings.push(AurLintFinding {
+                    rule_id: "NAMCAP-SEC-002".to_string(),
+                    severity: LintSeverity::Warning,
+                    message: "Insecure unencrypted http:// source URL in .SRCINFO (prefer https://)".to_string(),
+                    line_number: Some(line_no),
+                });
+            }
+        }
+
+        if !has_pkgbase {
+            findings.push(AurLintFinding {
+                rule_id: "NAMCAP-SRC-001".to_string(),
+                severity: LintSeverity::Error,
+                message: "Missing 'pkgbase' entry in .SRCINFO metadata file".to_string(),
+                line_number: None,
+            });
+        }
+        if !has_license {
+            findings.push(AurLintFinding {
+                rule_id: "PORTCLIPPY-LIC-002".to_string(),
+                severity: LintSeverity::Error,
+                message: "Missing 'license' declaration in .SRCINFO metadata file".to_string(),
+                line_number: None,
+            });
+        }
+
+        findings
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -236,5 +451,69 @@ mod tests {
         assert_eq!(result.status, MakepkgBuildStatus::Success);
         assert_eq!(result.package_filename, "valid-app-1.0.0-x86_64.pkg.tar.zst");
         assert!(result.sig_filename.unwrap().contains("key-0x9E5A"));
+    }
+
+    #[test]
+    fn test_aur_dependency_solver_order_and_cycle() {
+        let mut solver = AurDependencySolverEngine::new();
+        solver.register_package(AurDependencyNode {
+            package_name: "libfoo".to_string(),
+            dependencies: Vec::new(),
+            make_dependencies: Vec::new(),
+            is_installed: false,
+        });
+        solver.register_package(AurDependencyNode {
+            package_name: "foo-app".to_string(),
+            dependencies: vec!["libfoo".to_string()],
+            make_dependencies: Vec::new(),
+            is_installed: false,
+        });
+
+        let order = solver.resolve_build_order("foo-app").unwrap();
+        assert_eq!(order, vec!["libfoo", "foo-app"]);
+
+        // Test cycle detection
+        let mut cycle_solver = AurDependencySolverEngine::new();
+        cycle_solver.register_package(AurDependencyNode {
+            package_name: "pkg-a".to_string(),
+            dependencies: vec!["pkg-b".to_string()],
+            make_dependencies: Vec::new(),
+            is_installed: false,
+        });
+        cycle_solver.register_package(AurDependencyNode {
+            package_name: "pkg-b".to_string(),
+            dependencies: vec!["pkg-a".to_string()],
+            make_dependencies: Vec::new(),
+            is_installed: false,
+        });
+        assert!(cycle_solver.resolve_build_order("pkg-a").is_err());
+    }
+
+    #[test]
+    fn test_aur_trusted_user_adoption_and_promotion() {
+        let mut tu_engine = AurTrustedUserAdoptionEngine::new();
+        tu_engine.register_pkgbase("neovim-git", None);
+
+        assert!(tu_engine.flag_out_of_date("neovim-git"));
+        assert!(tu_engine.adopt_orphaned_pkgbase("neovim-git", "archdev").is_ok());
+
+        // Test promotion voting
+        assert!(!tu_engine.promote_by_tu_vote("neovim-git", "tu_alice", 10).unwrap());
+        let is_promoted = tu_engine.promote_by_tu_vote("neovim-git", "tu_bob", 10).unwrap();
+        assert!(is_promoted);
+    }
+
+    #[test]
+    fn test_aur_namcap_portclippy_linter() {
+        let linter = AurNamcapPortclippyLinter::new();
+        let srcinfo = "pkgbase = myapp\nlicense = GPL-3.0-or-later\nsource = http://example.com/myapp.tar.gz\n";
+
+        let findings = linter.lint_srcinfo(srcinfo);
+        assert!(findings.iter().any(|f| f.rule_id == "NAMCAP-SEC-002"));
+
+        let bad_srcinfo = "source = https://example.com/myapp.tar.gz\n";
+        let bad_findings = linter.lint_srcinfo(bad_srcinfo);
+        assert!(bad_findings.iter().any(|f| f.rule_id == "NAMCAP-SRC-001"));
+        assert!(bad_findings.iter().any(|f| f.rule_id == "PORTCLIPPY-LIC-002"));
     }
 }

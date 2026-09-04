@@ -97,20 +97,16 @@ pub use arch_compat::{
 pub use arch_pacman_engine::{
     AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer,
     PacmanCacheCleaner, PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater,
-    SafeUpdateChecker,
-};
-pub use arch_pacman_engine::{
-    AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase,
-    RepoDbPackageEntry, RepoStageTier, SovereignDbscriptsEngine,
+    SafeUpdateChecker, PacmanContribEngine, RepoDbPackageEntry, RepoStageTier,
+    SovereignDbscriptsEngine,
 };
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
 pub use fedora_rpm_engine::{
-    AnityaFedoraMessagingEngine, AnityaMessageTopic, AnityaPackageMapping,
-    AnityaVersionUpdateMessage, DnfRepository, FedoraAnityaReleaseMonitoringEngine,
-    FedoraMirrorManager2Engine, MirrorSiteRecord, RpmPackage,
+    DnfRepository, FedoraAnityaReleaseMonitoringEngine, RpmPackage,
+    AnityaProjectRecord, RpmDatabase, RpmDependencyResolver,
 };
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
@@ -161,11 +157,15 @@ pub use svntogit_repro::{
     SvnActionType, SvnXattrProperties, PkgctlSplitMigrationEngine, SplitPackageRepoConfig,
     BsdPortsCvsSvnToGitMapper, BsdPortsRcsTag,
     ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
-    ReproducibilityAttestationReport,
+    ReproducibilityAttestationReport, FedoraDistGitNamespaceEngine,
+    GentooEbuildGitManifestEngine, AlpineAportsCommitSigner,
 };
 pub use aur_rules::{
     AurRuleEngine, AurLintFinding, LintSeverity, AurSandboxPolicy,
     MakepkgReproduciblePipeline, MakepkgBuildStatus, MakepkgBuildResult,
+    AurDependencySolverEngine, AurDependencyNode,
+    AurTrustedUserAdoptionEngine, AurPackageAdoptionRecord,
+    AurNamcapPortclippyLinter,
 };
 
 /// Package version using SemVer

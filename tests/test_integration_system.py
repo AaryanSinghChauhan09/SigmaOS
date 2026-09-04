@@ -213,6 +213,15 @@ def test_sovereign_wiki_master_engine_integration():
         "S-SHARD 12": "SovereignVMM Virtualization",
     }
 
+    distro_matrix = {
+        "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc/pacman.conf"},
+        "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc/apt/sources.list"},
+        "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": "/etc/apk/repositories"},
+        "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc/xbps.d"},
+        "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos/configuration.nix"},
+        "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "Rcd", "vfs_etc": "/etc/rc.conf"},
+    }
+
     for mode, spec in distro_matrix.items():
         pkg_name = f"coreutils{spec['pkg_ext']}"
         assert pkg_name.endswith(spec["pkg_ext"])
