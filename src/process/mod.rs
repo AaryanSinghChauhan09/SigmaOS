@@ -31,6 +31,7 @@ pub use sovereign_process_engine::{
 };
 pub use spawn::{
     Process, ProcessError, ProcessID, ProcessSpawner, ProcessState, ProcessWaiter, SimpleProcess,
+    SimpleProcessSpawner, SimpleProcessWaiter,
 };
 pub use manager::{
     ProcessManager, ProcessInfo, ProcessState as ProcessStateInfo, Priority, ExitStatus,
@@ -42,6 +43,4 @@ pub use elf_loader::{
 };
 pub use scheduler::{
     Scheduler, SchedulingStats, VirtualRuntime, QueueEntry,
-};
-    SimpleProcessSpawner, SimpleProcessWaiter,
 };

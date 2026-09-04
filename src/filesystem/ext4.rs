@@ -208,7 +208,7 @@ impl FileSystem for Ext4FileSystem {
         let new_size = (offset + written as u64).max(inode.size);
 
         // Allocate blocks if needed
-        while inode.data_blocks.len() * self.superblock.block_size as usize < new_size as usize {
+        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize) {
             let block = self.allocate_block();
             match block {
                 Ok(b) => inode.data_blocks.push(b),

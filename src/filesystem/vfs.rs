@@ -220,7 +220,7 @@ impl VirtualFileSystem {
     /// Register a filesystem type
     pub fn register_filesystem(&mut self, fs_type: String, block_device_id: u64) -> Result<(), VfsError> {
         // Check if already registered
-        for (ft, _) = &self.filesystems {
+        for (ft, _) in &self.filesystems {
             if ft == &fs_type {
                 return Err(VfsError::FileExists);
             }
