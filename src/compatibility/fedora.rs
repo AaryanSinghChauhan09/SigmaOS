@@ -4321,9 +4321,13 @@ impl FedoraAbrtCrashDaemon {
             reported_to_bugzilla: false,
         };
 
-        let topic = format!("org.fedoraproject.prod.abrt.crash.{}", signal.to_lowercase());
+        let topic = format!(
+            "org.fedoraproject.prod.abrt.crash.{}",
+            signal.to_lowercase()
+        );
         let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
-        self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+        self.messaging_engine
+            .publish_message(&topic, &body, timestamp_secs);
 
         self.captured_crashes.insert(signature, report.clone());
         report
@@ -4391,14 +4395,18 @@ impl FedoraToolbxContainerEngine {
             running: false,
         };
 
-        self.active_containers.insert(name.to_string(), container.clone());
+        self.active_containers
+            .insert(name.to_string(), container.clone());
         container
     }
 
     pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
         if let Some(c) = self.active_containers.get_mut(name) {
             c.running = true;
-            Ok(format!("Toolbx container '{}' started using image '{}'", c.name, c.image))
+            Ok(format!(
+                "Toolbx container '{}' started using image '{}'",
+                c.name, c.image
+            ))
         } else {
             Err("Toolbx container not found")
         }
