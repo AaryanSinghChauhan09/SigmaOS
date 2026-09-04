@@ -26,7 +26,11 @@ pub mod primitives;
 pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
+pub mod aegis_vault;
 
+pub use aegis_vault::{
+    AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
+};
 pub use post_quantum::{
     PostQuantumCryptoManager, DilithiumSecretKey, DilithiumPublicKey, DilithiumSignature,
     KyberSecretKey, KyberPublicKey, KyberCiphertext, KyberSharedSecret, HybridCryptoMode,
