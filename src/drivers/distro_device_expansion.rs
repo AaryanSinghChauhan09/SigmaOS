@@ -18,7 +18,15 @@ use alloc::vec;
 
 
 extern crate alloc;
+#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+
+#[cfg(all(test, not(feature = "sigmaos_lib")))]
+#[path = "peripheral.rs"]
+pub mod peripheral;
+
+#[cfg(all(test, not(feature = "sigmaos_lib")))]
+use peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -1805,7 +1813,11 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
+
+    #[cfg(all(test, not(feature = "sigmaos_lib")))]
+    use super::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
 
     #[test]
     fn test_mpt3sas_controller_driver() {

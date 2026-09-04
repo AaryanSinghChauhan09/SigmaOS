@@ -60,6 +60,7 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
+
 use crate::security::Permission;
 use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
@@ -1642,9 +1643,10 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
+            "python3-dev" => "python".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }

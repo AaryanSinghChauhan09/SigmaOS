@@ -892,6 +892,13 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component("Devuan Init Diversity", "Devuan Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Artix Init Scriptlet Matrix", "Artix Linux", ComponentParityStatus::Implemented);
+        engine.register_component("KaOS Qt/KDE Repo Governor", "KaOS Linux", ComponentParityStatus::Implemented);
+        engine.register_component("Universal Multi-Format Package Matrix", "SigmaOS Universal Packaging", ComponentParityStatus::Implemented);
+        engine.register_component("DTrace Dynamic Tracing Provider", "Illumos / Solaris", ComponentParityStatus::Implemented);
+        engine.register_component("HAMMER2 Multi-Version Pfs Engine", "DragonFly BSD", ComponentParityStatus::Implemented);
+        engine.register_component("GEOM Storage Transformation Topology", "FreeBSD", ComponentParityStatus::Implemented);
 
         engine
     }

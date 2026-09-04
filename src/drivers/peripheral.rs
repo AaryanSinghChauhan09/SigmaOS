@@ -13,6 +13,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Defines the generation of a peripheral device
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
+    /// Ancient legacy devices (e.g., Sound Blaster 16, Floppy Controller)
+    Ancient,
     /// Older generation devices (e.g., PS/2, Serial, legacy ISA)
     Legacy,
     /// Modern generation devices (e.g., USB 3.0, PCIe)

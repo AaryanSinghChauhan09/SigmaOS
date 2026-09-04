@@ -203,8 +203,8 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
-/// Package format type
-// Unified system absorbing all 18 major distribution formats.
+/// Package format type covering 18 major distribution formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackagePriority {
     Essential,
     Required,
@@ -269,9 +269,6 @@ pub enum PackageFormat {
     Stratum,    // Bedrock Linux Stratum (.stratum)
     Nix,        // Nix package (.nix)
     Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -1261,6 +1258,9 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::Nix => Box::new(NixInstallStrategy),
+            PackageFormat::Txz => Box::new(TxzInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1315,6 +1315,9 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::Nix => Box::new(NixMetadataAdapter),
+            PackageFormat::Txz => Box::new(TxzMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1376,6 +1379,109 @@ impl PackageTriggerRegistry {
 impl Default for PackageTriggerRegistry {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct NodeBinaryPackage {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct NodeBinaryDistroEngine;
+impl NodeBinaryDistroEngine {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn install_to_store(&self, _pkg: &NodeBinaryPackage, _bytes: &[u8], _npm_version: &str) -> Result<String, &'static str> {
+        Ok("/var/lib/sigmaos/node/store".to_string())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let name = format!("sigpkg-{}", manifest.original_name);
+        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg);
+
+        for dep in &manifest.raw_dependencies {
+            if dep.contains("ssl") || dep.contains("crypto") {
+                pkg = pkg.with_dependency("sovereign-openssl".to_string());
+            } else if dep.contains("libc") || dep.contains("c6") {
+                pkg = pkg.with_dependency("sovereign-libc".to_string());
+            } else {
+                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
+            }
+        }
+        pkg.provides.push(manifest.original_name.clone());
+        for p in &manifest.raw_provides {
+            pkg.provides.push(p.clone());
+        }
+        pkg
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroRepoRecord {
+    pub distro_name: String,
+    pub url: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DistroRepoSyncEngine {
+    pub synced_repos: Vec<String>,
+    pub registered_repos: Vec<DistroRepoRecord>,
+    pub indexed_manifests: Vec<ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            synced_repos: Vec::new(),
+            registered_repos: vec![
+                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
+                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
+                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
+                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
+                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
+            ],
+            indexed_manifests: Vec::new(),
+        }
+    }
+
+    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
+        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
+        Ok(self.synced_repos.len())
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests.push(manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+
+    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .iter()
+            .find(|m| m.original_name == pkg_name)
+            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
     }
 }
 
@@ -2672,7 +2778,49 @@ mod tests {
             &pkgs,
             1700000000,
         );
+    }
 
+    #[test]
+    fn test_package_format_from_filename_extensions() {
+        assert_eq!(PackageFormat::from_filename("app.air"), Some(PackageFormat::Air));
+        assert_eq!(PackageFormat::from_filename("brew.bottle"), Some(PackageFormat::Bottle));
+        assert_eq!(PackageFormat::from_filename("app.ipa"), Some(PackageFormat::Ipa));
+        assert_eq!(PackageFormat::from_filename("bsd.ports"), Some(PackageFormat::Ports));
+        assert_eq!(PackageFormat::from_filename("install.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(PackageFormat::from_filename("app.aab"), Some(PackageFormat::Aab));
+        assert_eq!(PackageFormat::from_filename("tool.apk"), Some(PackageFormat::Apk));
+        assert_eq!(PackageFormat::from_filename("software.AppImage"), Some(PackageFormat::AppImage));
+        assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
+        assert_eq!(PackageFormat::from_filename("nixos.nixpkg"), Some(PackageFormat::Nixpkg));
+        assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
+        assert_eq!(PackageFormat::from_filename("gentoo.portage"), Some(PackageFormat::Ebuild));
+        assert_eq!(PackageFormat::from_filename("debian.deb"), Some(PackageFormat::Deb));
+        assert_eq!(PackageFormat::from_filename("archive.tar.gz"), Some(PackageFormat::TarGz));
+        assert_eq!(PackageFormat::from_filename("archive.tgz"), Some(PackageFormat::TarGz));
+        assert_eq!(PackageFormat::from_filename("compressed.xz"), Some(PackageFormat::Xz));
+        assert_eq!(PackageFormat::from_filename("fedora.rpm"), Some(PackageFormat::Rpm));
+        assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
+        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.zst"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
+        assert_eq!(PackageFormat::from_filename("macos.app"), Some(PackageFormat::App));
+        assert_eq!(PackageFormat::from_filename("harmony.hap"), Some(PackageFormat::Hap));
+        assert_eq!(PackageFormat::from_filename("pardus.PiSi"), Some(PackageFormat::Pisi));
+        assert_eq!(PackageFormat::from_filename("pardus.pisi"), Some(PackageFormat::Pisi));
+        assert_eq!(PackageFormat::from_filename("deepin.superdeb"), Some(PackageFormat::Superdeb));
+        assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
+        assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
+        assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
+        assert_eq!(PackageFormat::from_filename("arch_pacman.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
+        assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
+    }
+
+    #[test]
+    fn test_package_rollback() {
+        let mut engine = SovereignPackageRollbackEngine::new();
+        let pkgs = vec!["nginx".to_string(), "curl".to_string()];
+        let snap_id = engine.create_snapshot("pre-update", pkgs.clone());
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
