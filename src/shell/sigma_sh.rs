@@ -1,8 +1,4 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(target_os = "none")]
 use std::boxed::Box;
-use std_std::boxed::Box;
 
 use std::format;
 use std::string::{String, ToString};
@@ -1682,66 +1678,6 @@ impl HistoryExpansionEngine {
     }
 }
 
-/// Rich Line Editor for Sovereign Shell REPL
-impl ReplLineEditor {
-    pub fn new() -> Self {
-        Self {
-            prompt: "sovereign@sigmaos:~$ ".to_string(),
-            history: StdVec::new(),
-        }
-    }
-
-    pub fn highlight_line(&self, line: &str) -> String {
-        let mut highlighted = line.to_string();
-        if highlighted.starts_with("git") {
-            highlighted = highlighted.replacen("git", "\x1B[32mgit\x1B[0m", 1);
-        }
-        highlighted
-    }
-}
-
-/// Sovereign REPL combining Zsh prompt, Fish auto-suggestions, and Ksh job control
-impl SovereignSigmaShRepl {
-    pub fn new() -> Self {
-        Self {
-            line_editor: ReplLineEditor::new(),
-            completer: ContextualCompleter::new(),
-            job_manager: JobControlManager::new(),
-            history: StdVec::new(),
-        }
-    }
-
-    pub fn render_prompt(&self) -> String {
-        ZshPromptFormatter::format_prompt(
-            "%F{green}%n@%m%f:%F{blue}%~%f %# ",
-            "sovereign",
-            "sigmaos",
-            "/home/sovereign",
-            "/home/sovereign",
-            0,
-            "12:00",
-        )
-    }
-
-    pub fn suggest_completion(&self, input: &str) -> Option<String> {
-        let completions = self.completer.complete(input);
-        completions.first().map(|(sub, _)| sub.clone())
-    }
-
-    pub fn execute_repl_command(&mut self, cmd: &str) -> Result<(), String> {
-        self.history.push(cmd.to_string());
-        Ok(())
-    }
-
-    pub fn jobs_cmd(&self) -> String {
-        let jobs = self.job_manager.list_jobs();
-        if jobs.is_empty() {
-            "No active background jobs".to_string()
-        } else {
-            jobs.join("\n")
-        }
-    }
-}
 
 #[cfg(test)]
 mod advanced_shell_tests {
