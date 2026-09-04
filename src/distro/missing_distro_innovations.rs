@@ -1533,6 +1533,7 @@ pub struct AppArmorProfile {
     pub rules: Vec<AppArmorPathRule>,
 }
 
+#[derive(Debug, Clone)]
 pub struct AppArmorPathRuleEngine {
     pub profiles: BTreeMap<String, AppArmorProfile>,
     pub audit_log: Vec<String>,
@@ -1752,25 +1753,9 @@ impl LoongArch64ArchitectureEngine {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppArmorMode {
-    Enforce,
-    Complain,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorProfile {
-    pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
+    pub path_engine: AppArmorPathRuleEngine,
 }
 
 impl UbuntuAppArmorEngine {
@@ -1779,28 +1764,24 @@ impl UbuntuAppArmorEngine {
     }
 
     pub fn load_profile(&mut self, profile: AppArmorProfile) {
-        self.profiles.insert(profile.profile_name.clone(), profile);
+        self.path_engine.add_profile(profile);
     }
 
     pub fn authorize_path_access(
-        &self,
+        &mut self,
         profile_name: &str,
         target_path: &str,
         access_type: &str,
     ) -> Result<bool, &'static str> {
-        let profile = self.profiles.get(profile_name).ok_or("Profile not found")?;
-        if profile.mode == AppArmorMode::Disabled {
-            return Ok(true);
-        }
-
-        let allowed = match access_type {
-            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
-            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
-            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
-            _ => false,
+        let (need_read, need_write, need_exec) = match access_type {
+            "read" => (true, false, false),
+            "write" => (false, true, false),
+            "exec" => (false, false, true),
+            _ => (false, false, false),
         };
 
-        if allowed || profile.mode == AppArmorMode::Complain {
+        let allowed = self.path_engine.evaluate_access(profile_name, target_path, need_read, need_write, need_exec);
+        if allowed {
             Ok(true)
         } else {
             Err("AppArmor permission denied")
@@ -2079,65 +2060,6 @@ mod tests {
         assert!(apparmor.audit_log.len() >= 2);
     }
 
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
-
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
 
     #[test]
     fn test_bpf_type_format_engine() {
