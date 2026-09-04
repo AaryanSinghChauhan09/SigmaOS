@@ -1,0 +1,28 @@
+name: Security - ZeroConf & Network Discovery Audit
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  network-discovery-security-audit:
+    name: mDNS/SSDP/LLMNR/NDP Discovery Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4 # v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable # stable
+
+      - name: Run Network Discovery Security Tests
+        run: |
+          mkdir -p build
+          rustc --edition=2021 --test src/network/discovery.rs -o build/disc_test
+          ./build/disc_test
+          rm -f build/disc_test

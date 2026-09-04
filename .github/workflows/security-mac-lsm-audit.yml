@@ -1,0 +1,28 @@
+name: Security - Mandatory Access Control (MAC) LSM Audit
+
+on:
+  push:
+    branches: [ main, master, "jules-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  mac-lsm-security-audit:
+    name: MAC LSM Inode/Ptrace/Socket Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4 # v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable # stable
+
+      - name: Run MAC LSM Security Unit Tests
+        run: |
+          mkdir -p build
+          rustc --edition=2021 --test src/security/mandatory_access_control.rs -o build/mac_test
+          ./build/mac_test
+          rm -f build/mac_test

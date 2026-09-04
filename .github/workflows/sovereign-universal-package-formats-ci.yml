@@ -1,0 +1,26 @@
+name: Universal Package Manager Multi-Format CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  package-formats-verify:
+    name: Verify Universal Package Manifest Parsing & Adapters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4 # v4.2.2
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable # stable
+
+      - name: Test Universal Package Manager Submodule
+        run: |
+          rustc --test src/package/universal.rs --edition=2021 -o build/package_test
+          ./build/package_test

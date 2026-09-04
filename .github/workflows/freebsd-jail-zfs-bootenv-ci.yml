@@ -1,0 +1,24 @@
+name: FreeBSD Jail Isolation & ZFS BootEnv CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  bsd-jail-zfs-test:
+    permissions:
+      contents: read
+    name: FreeBSD Parity Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable # stable
+
+      - name: Verify FreeBSD Boot Environment & Storage
+        run: |
+          ./run_sigma_tests.sh
