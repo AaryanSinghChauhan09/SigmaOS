@@ -150,6 +150,73 @@ impl SovereignUniversalDistroBridge {
         }
     }
 
+    pub fn verify_all_subsystems_compatibility(&self) -> bool {
+        let modes = [
+            DistroSubsystemMode::LinuxArch,
+            DistroSubsystemMode::LinuxDebian,
+            DistroSubsystemMode::LinuxAlpine,
+            DistroSubsystemMode::LinuxNix,
+            DistroSubsystemMode::LinuxGentoo,
+            DistroSubsystemMode::LinuxFedora,
+            DistroSubsystemMode::FreeBsd,
+            DistroSubsystemMode::OpenBsd,
+            DistroSubsystemMode::NetBsd,
+            DistroSubsystemMode::DragonFlyBsd,
+        ];
+
+        for m in modes {
+            let temp_bridge = SovereignUniversalDistroBridge::new(m);
+            let pkg_spec = temp_bridge.translate_package_specifier("coreutils");
+            let vfs_etc = temp_bridge.translate_vfs_path("/etc");
+            let vfs_pkg = temp_bridge.translate_vfs_path("/var/lib/pkg");
+
+            if pkg_spec.is_empty() || vfs_etc.is_empty() || vfs_pkg.is_empty() {
+                return false;
+            }
+
+            let valid_supervisor = match m {
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora
+                | DistroSubsystemMode::LinuxOpenSuse
+                | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxClear
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::BedrockLinux => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
+                }
+                DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
+                }
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit
+                }
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd
+                }
+                DistroSubsystemMode::LinuxSolus => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Dinit
+                }
+                DistroSubsystemMode::LinuxSlackware => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Rcd
+                }
+            };
+
+            if !valid_supervisor {
+                return false;
+            }
+        }
+
+        true
+    }
+
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
@@ -161,9 +228,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
-                format!("{}.rpm", input_pkg)
-            }
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
