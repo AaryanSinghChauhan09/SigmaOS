@@ -367,6 +367,13 @@ pub struct SecurityAdvisory {
     pub description: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VulnerabilityState {
+    Vulnerable,
+    Fixed,
+    Unaffected,
+}
+
 pub struct SecurityAdvisoryTracker {
     pub advisories: Vec<SecurityAdvisory>,
 }
@@ -406,11 +413,25 @@ impl SecurityAdvisoryTracker {
         upgrades
     }
 
+    /// Evaluate vulnerability classification state for a given package version
+    pub fn evaluate_state(&self, package: &str, installed_version: &str) -> VulnerabilityState {
+        let affected_list = self.affected(package, installed_version);
+        if !affected_list.is_empty() {
+            VulnerabilityState::Vulnerable
+        } else if self.advisories.iter().any(|a| a.package == package && a.fixed_version.as_deref() == Some(installed_version)) {
+            VulnerabilityState::Fixed
+        } else {
+            VulnerabilityState::Unaffected
+        }
+    }
+
+    /// Query advisories matching target severity
+    pub fn by_severity(&self, severity: AdvisorySeverity) -> Vec<&SecurityAdvisory> {
+        self.advisories.iter().filter(|a| a.severity == severity).collect()
+    }
+
     pub fn critical_count(&self) -> usize {
-        self.advisories
-            .iter()
-            .filter(|a| a.severity == AdvisorySeverity::Critical)
-            .count()
+        self.by_severity(AdvisorySeverity::Critical).len()
     }
 }
 
@@ -709,6 +730,9 @@ pub struct SignoffEntry {
     pub package: String,
     pub version: String,
     pub signoffs: SignoffCount,
+    pub qa_tested: bool,
+    pub build_reproducible: bool,
+    pub security_audited: bool,
 }
 
 pub struct PackageSignoff {
@@ -732,7 +756,27 @@ impl PackageSignoff {
                 maintainer: false,
                 community: 0,
             },
+            qa_tested: false,
+            build_reproducible: false,
+            security_audited: false,
         });
+    }
+
+    pub fn set_verification_flags(
+        &mut self,
+        package: &str,
+        qa_tested: bool,
+        build_reproducible: bool,
+        security_audited: bool,
+    ) -> bool {
+        if let Some(e) = self.entries.iter_mut().find(|e| e.package == package) {
+            e.qa_tested = qa_tested;
+            e.build_reproducible = build_reproducible;
+            e.security_audited = security_audited;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn sign(&mut self, package: &str, by_maintainer: bool) -> Option<bool> {
@@ -742,14 +786,15 @@ impl PackageSignoff {
         } else {
             e.signoffs.community += 1;
         }
-        Some(by_maintainer || e.signoffs.community >= self.required_signoffs)
+        Some(self.ready(package))
     }
 
     pub fn ready(&self, package: &str) -> bool {
-        self.entries
-            .iter()
-            .find(|e| e.package == package)
-            .map_or(false, |e| e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs)
+        self.entries.iter().find(|e| e.package == package).map_or(false, |e| {
+            let quorum_met = e.signoffs.maintainer || e.signoffs.community >= self.required_signoffs;
+            let verifications_met = e.qa_tested && e.build_reproducible && e.security_audited;
+            quorum_met && verifications_met
+        })
     }
 }
 
@@ -772,31 +817,68 @@ pub enum ReproducibleStatus {
     NotBuilt,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReproducibleBuildRecord {
+    pub package: String,
+    pub status: ReproducibleStatus,
+    pub source_date_epoch: u64,
+    pub toolchain_version: String,
+    pub diff_hash: Option<String>,
+}
+
 pub struct ReproducibleBuildVerdict {
-    pub verdicts: Vec<(String, ReproducibleStatus)>,
+    pub records: Vec<ReproducibleBuildRecord>,
 }
 
 impl ReproducibleBuildVerdict {
     pub fn new() -> Self {
-        Self { verdicts: Vec::new() }
+        Self { records: Vec::new() }
     }
 
     pub fn record(&mut self, package: &str, status: ReproducibleStatus) {
-        self.verdicts.push((package.to_string(), status));
+        self.records.push(ReproducibleBuildRecord {
+            package: package.to_string(),
+            status,
+            source_date_epoch: 1700000000,
+            toolchain_version: "rustc-1.98.0".to_string(),
+            diff_hash: if status == ReproducibleStatus::Unreproducible {
+                Some("diffoscope-sha256-mismatch".to_string())
+            } else {
+                None
+            },
+        });
+    }
+
+    pub fn record_detailed(
+        &mut self,
+        package: &str,
+        status: ReproducibleStatus,
+        source_date_epoch: u64,
+        toolchain: &str,
+        diff_hash: Option<&str>,
+    ) {
+        self.records.push(ReproducibleBuildRecord {
+            package: package.to_string(),
+            status,
+            source_date_epoch,
+            toolchain_version: toolchain.to_string(),
+            diff_hash: diff_hash.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn filter_by_status(&self, status: ReproducibleStatus) -> Vec<&ReproducibleBuildRecord> {
+        self.records.iter().filter(|r| r.status == status).collect()
     }
 
     pub fn reproducible_count(&self) -> usize {
-        self.verdicts
-            .iter()
-            .filter(|(_, s)| *s == ReproducibleStatus::Reproducible)
-            .count()
+        self.filter_by_status(ReproducibleStatus::Reproducible).len()
     }
 
     pub fn ratio(&self) -> f32 {
-        if self.verdicts.is_empty() {
+        if self.records.is_empty() {
             return 0.0;
         }
-        self.reproducible_count() as f32 / self.verdicts.len() as f32
+        self.reproducible_count() as f32 / self.records.len() as f32
     }
 }
 

@@ -714,6 +714,95 @@ impl SnapperIntegration {
 }
 
 // ============================================================================
+// VOID LINUX — Runit Supervision & XBPS
+// ============================================================================
+
+/// Service supervisor inspired by Void Linux runit.
+pub struct VoidRunitSupervisor {
+    pub services: alloc::vec::Vec<RunitService>,
+}
+
+pub struct RunitService {
+    pub name: alloc::string::String,
+    pub is_running: bool,
+    pub pid: u32,
+}
+
+impl VoidRunitSupervisor {
+    pub fn new() -> Self {
+        Self {
+            services: alloc::vec::Vec::new(),
+        }
+    }
+
+    pub fn register_service(&mut self, name: &str) {
+        self.services.push(RunitService {
+            name: alloc::string::String::from(name),
+            is_running: false,
+            pid: 0,
+        });
+    }
+
+    pub fn start_service(&mut self, name: &str, pid: u32) -> bool {
+        if let Some(svc) = self.services.iter_mut().find(|s| s.name == name) {
+            svc.is_running = true;
+            svc.pid = pid;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ============================================================================
+// GENTOO LINUX — Portage USE-Flag Solver
+// ============================================================================
+
+/// Gentoo-inspired USE-flag constraint solver.
+pub struct GentooPortageUseSolver {
+    pub enabled_flags: alloc::vec::Vec<alloc::string::String>,
+}
+
+impl GentooPortageUseSolver {
+    pub fn new() -> Self {
+        Self {
+            enabled_flags: alloc::vec::Vec::new(),
+        }
+    }
+
+    pub fn enable_flag(&mut self, flag: &str) {
+        if !self.enabled_flags.iter().any(|f| f == flag) {
+            self.enabled_flags.push(alloc::string::String::from(flag));
+        }
+    }
+
+    pub fn is_flag_enabled(&self, flag: &str) -> bool {
+        self.enabled_flags.iter().any(|f| f == flag)
+    }
+}
+
+// ============================================================================
+// OPENSUSE — YaST2 Control Center Module
+// ============================================================================
+
+/// YaST2-inspired modular control center setting plug.
+pub struct Yast2ModulePlug {
+    pub module_id: alloc::string::String,
+    pub title: alloc::string::String,
+    pub active: bool,
+}
+
+impl Yast2ModulePlug {
+    pub fn new(id: &str, title: &str) -> Self {
+        Self {
+            module_id: alloc::string::String::from(id),
+            title: alloc::string::String::from(title),
+            active: true,
+        }
+    }
+}
+
+// ============================================================================
 // COMMON ERROR TYPE
 // ============================================================================
 
@@ -899,6 +988,23 @@ mod tests {
         let next_after_update = scheduler.pick_next().unwrap();
         // vruntime + burst_score of cargo is now 80 + 50 = 130 vs 110 of firefox
         assert_eq!(next_after_update.pid, 101);
+    }
+
+    #[test]
+    fn test_void_runit_gentoo_yast_improvements() {
+        let mut void_runit = VoidRunitSupervisor::new();
+        void_runit.register_service("dbus");
+        assert!(void_runit.start_service("dbus", 101));
+        assert!(void_runit.services[0].is_running);
+
+        let mut gentoo = GentooPortageUseSolver::new();
+        gentoo.enable_flag("wayland");
+        assert!(gentoo.is_flag_enabled("wayland"));
+        assert!(!gentoo.is_flag_enabled("x11"));
+
+        let yast = Yast2ModulePlug::new("network", "Network Settings");
+        assert_eq!(yast.module_id, "network");
+        assert!(yast.active);
     }
 
     #[test]
