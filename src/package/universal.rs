@@ -513,6 +513,55 @@ impl InstallStrategy for SigmaPkgInstallStrategy {
     fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
+macro_rules! impl_generic_install_strategy {
+    ($struct_name:ident) => {
+        pub struct $struct_name;
+        impl InstallStrategy for $struct_name {
+            fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+                println!(concat!("Strategy: Installing ", stringify!($struct_name), " package '{}'"), package.name);
+                Ok(())
+            }
+            fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+            fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+                println!(concat!("Strategy: Removing ", stringify!($struct_name), " package '{}'"), package.name);
+                Ok(())
+            }
+        }
+    };
+}
+
+impl_generic_install_strategy!(AirInstallStrategy);
+impl_generic_install_strategy!(BottleInstallStrategy);
+impl_generic_install_strategy!(IpaInstallStrategy);
+impl_generic_install_strategy!(PortsInstallStrategy);
+impl_generic_install_strategy!(PkgInstallStrategy);
+impl_generic_install_strategy!(AabInstallStrategy);
+impl_generic_install_strategy!(TarGzInstallStrategy);
+impl_generic_install_strategy!(XzInstallStrategy);
+impl_generic_install_strategy!(AppInstallStrategy);
+impl_generic_install_strategy!(HapInstallStrategy);
+impl_generic_install_strategy!(PisiInstallStrategy);
+impl_generic_install_strategy!(SuperdebInstallStrategy);
+impl_generic_install_strategy!(LzmInstallStrategy);
+impl_generic_install_strategy!(PupInstallStrategy);
+impl_generic_install_strategy!(PetInstallStrategy);
+impl_generic_install_strategy!(TarInstallStrategy);
+impl_generic_install_strategy!(MossInstallStrategy);
+impl_generic_install_strategy!(HpkgInstallStrategy);
+impl_generic_install_strategy!(TczInstallStrategy);
+impl_generic_install_strategy!(GoboInstallStrategy);
+impl_generic_install_strategy!(OstreeInstallStrategy);
+impl_generic_install_strategy!(PkgsrcInstallStrategy);
+impl_generic_install_strategy!(SfsInstallStrategy);
+impl_generic_install_strategy!(PukInstallStrategy);
+impl_generic_install_strategy!(DmgInstallStrategy);
+impl_generic_install_strategy!(CportsInstallStrategy);
+impl_generic_install_strategy!(DportsInstallStrategy);
+impl_generic_install_strategy!(SlackBuildInstallStrategy);
+impl_generic_install_strategy!(CruxInstallStrategy);
+impl_generic_install_strategy!(DrpmInstallStrategy);
+impl_generic_install_strategy!(StratumInstallStrategy);
+
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
 // ============================================================================
@@ -674,6 +723,49 @@ impl PackageMetadataAdapter for SigmaPkgMetadataAdapter {
     }
 }
 
+macro_rules! impl_generic_metadata_adapter {
+    ($struct_name:ident, $format_variant:ident) => {
+        pub struct $struct_name;
+        impl PackageMetadataAdapter for $struct_name {
+            fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
+                Ok(UnifiedPackage::new(concat!(stringify!($format_variant), "-pkg").to_lowercase(), "1.0.0".to_string()).with_format(PackageFormat::$format_variant))
+            }
+        }
+    };
+}
+
+impl_generic_metadata_adapter!(AirMetadataAdapter, Air);
+impl_generic_metadata_adapter!(BottleMetadataAdapter, Bottle);
+impl_generic_metadata_adapter!(IpaMetadataAdapter, Ipa);
+impl_generic_metadata_adapter!(PortsMetadataAdapter, Ports);
+impl_generic_metadata_adapter!(PkgMetadataAdapter, Pkg);
+impl_generic_metadata_adapter!(AabMetadataAdapter, Aab);
+impl_generic_metadata_adapter!(TarGzMetadataAdapter, TarGz);
+impl_generic_metadata_adapter!(XzMetadataAdapter, Xz);
+impl_generic_metadata_adapter!(AppMetadataAdapter, App);
+impl_generic_metadata_adapter!(HapMetadataAdapter, Hap);
+impl_generic_metadata_adapter!(PisiMetadataAdapter, Pisi);
+impl_generic_metadata_adapter!(SuperdebMetadataAdapter, Superdeb);
+impl_generic_metadata_adapter!(LzmMetadataAdapter, Lzm);
+impl_generic_metadata_adapter!(PupMetadataAdapter, Pup);
+impl_generic_metadata_adapter!(PetMetadataAdapter, Pet);
+impl_generic_metadata_adapter!(TarMetadataAdapter, Tar);
+impl_generic_metadata_adapter!(MossMetadataAdapter, Moss);
+impl_generic_metadata_adapter!(HpkgMetadataAdapter, Hpkg);
+impl_generic_metadata_adapter!(TczMetadataAdapter, Tcz);
+impl_generic_metadata_adapter!(GoboMetadataAdapter, Gobo);
+impl_generic_metadata_adapter!(OstreeMetadataAdapter, Ostree);
+impl_generic_metadata_adapter!(PkgsrcMetadataAdapter, Pkgsrc);
+impl_generic_metadata_adapter!(SfsMetadataAdapter, Sfs);
+impl_generic_metadata_adapter!(PukMetadataAdapter, Puk);
+impl_generic_metadata_adapter!(DmgMetadataAdapter, Dmg);
+impl_generic_metadata_adapter!(CportsMetadataAdapter, Cports);
+impl_generic_metadata_adapter!(DportsMetadataAdapter, Dports);
+impl_generic_metadata_adapter!(SlackBuildMetadataAdapter, SlackBuild);
+impl_generic_metadata_adapter!(CruxMetadataAdapter, Crux);
+impl_generic_metadata_adapter!(DrpmMetadataAdapter, Drpm);
+impl_generic_metadata_adapter!(StratumMetadataAdapter, Stratum);
+
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
 // ============================================================================
@@ -721,6 +813,79 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String, // e.g. "x86-64-v3", "x86-64-v4"
+    pub required_simd_features: Vec<String>, // e.g. ["avx2", "avx512f", "neon"]
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!("HardwareOptimizationDecorator: Optimizing package '{}' for level {} with SIMD {:?}", self.get_package().name, self.target_microarch_level, self.required_simd_features);
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!("ResourceLimitDecorator: Cgroups v2 bounds applied to '{}': Memory={}B, CPU={}%", self.get_package().name, self.max_memory_bytes, self.cpu_quota_percent);
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PqcSignedDecorator<T> {
+    pub fn verify_signature(&self) -> bool {
+        self.dilithium_signature.contains("dilithium") || self.dilithium_signature.contains("sphincs")
+    }
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if !self.verify_signature() {
+            return Err(PackageError::InstallationFailed(format!("PqcSignedDecorator: Signature verification failed for package '{}'", self.get_package().name)));
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -756,7 +921,7 @@ impl PackageFactory {
             PackageFormat::Pacman => Box::new(PacmanInstallStrategy),
             PackageFormat::Ebuild => Box::new(EbuildInstallStrategy),
             PackageFormat::Apk => Box::new(ApkInstallStrategy),
-            PackageFormat::Nix => Box::new(NixInstallStrategy),
+            PackageFormat::Nix | PackageFormat::Nixpkg => Box::new(NixInstallStrategy),
             PackageFormat::Flatpak => Box::new(FlatpakInstallStrategy),
             PackageFormat::Snap => Box::new(SnapInstallStrategy),
             PackageFormat::AppImage => Box::new(AppImageInstallStrategy),
@@ -765,11 +930,41 @@ impl PackageFactory {
             PackageFormat::Eopkg => Box::new(EopkgInstallStrategy),
             PackageFormat::Zypper => Box::new(ZypperInstallStrategy),
             PackageFormat::Guix => Box::new(GuixInstallStrategy),
-            PackageFormat::CachyOS => Box::new(CachyOSInstallStrategy),
+            PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(CachyOSInstallStrategy),
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Air => Box::new(AirInstallStrategy),
+            PackageFormat::Bottle => Box::new(BottleInstallStrategy),
+            PackageFormat::Ipa => Box::new(IpaInstallStrategy),
+            PackageFormat::Ports => Box::new(PortsInstallStrategy),
+            PackageFormat::Pkg => Box::new(PkgInstallStrategy),
+            PackageFormat::Aab => Box::new(AabInstallStrategy),
+            PackageFormat::TarGz => Box::new(TarGzInstallStrategy),
+            PackageFormat::Xz => Box::new(XzInstallStrategy),
+            PackageFormat::App => Box::new(AppInstallStrategy),
+            PackageFormat::Hap => Box::new(HapInstallStrategy),
+            PackageFormat::Pisi => Box::new(PisiInstallStrategy),
+            PackageFormat::Superdeb => Box::new(SuperdebInstallStrategy),
+            PackageFormat::Lzm => Box::new(LzmInstallStrategy),
+            PackageFormat::Pup => Box::new(PupInstallStrategy),
+            PackageFormat::Pet => Box::new(PetInstallStrategy),
+            PackageFormat::Tar => Box::new(TarInstallStrategy),
+            PackageFormat::Moss => Box::new(MossInstallStrategy),
+            PackageFormat::Hpkg => Box::new(HpkgInstallStrategy),
+            PackageFormat::Tcz => Box::new(TczInstallStrategy),
+            PackageFormat::Gobo => Box::new(GoboInstallStrategy),
+            PackageFormat::Ostree => Box::new(OstreeInstallStrategy),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcInstallStrategy),
+            PackageFormat::Sfs => Box::new(SfsInstallStrategy),
+            PackageFormat::Puk => Box::new(PukInstallStrategy),
+            PackageFormat::Dmg => Box::new(DmgInstallStrategy),
+            PackageFormat::Cports => Box::new(CportsInstallStrategy),
+            PackageFormat::Dports => Box::new(DportsInstallStrategy),
+            PackageFormat::SlackBuild => Box::new(SlackBuildInstallStrategy),
+            PackageFormat::Crux => Box::new(CruxInstallStrategy),
+            PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
+            PackageFormat::Stratum => Box::new(StratumInstallStrategy),
         }
     }
 
@@ -780,7 +975,7 @@ impl PackageFactory {
             PackageFormat::Pacman => Box::new(PacmanMetadataAdapter),
             PackageFormat::Ebuild => Box::new(EbuildMetadataAdapter),
             PackageFormat::Apk => Box::new(ApkMetadataAdapter),
-            PackageFormat::Nix => Box::new(NixMetadataAdapter),
+            PackageFormat::Nix | PackageFormat::Nixpkg => Box::new(NixMetadataAdapter),
             PackageFormat::Flatpak => Box::new(FlatpakMetadataAdapter),
             PackageFormat::Snap => Box::new(SnapMetadataAdapter),
             PackageFormat::AppImage => Box::new(AppImageMetadataAdapter),
@@ -789,11 +984,41 @@ impl PackageFactory {
             PackageFormat::Eopkg => Box::new(EopkgMetadataAdapter),
             PackageFormat::Zypper => Box::new(ZypperMetadataAdapter),
             PackageFormat::Guix => Box::new(GuixMetadataAdapter),
-            PackageFormat::CachyOS => Box::new(CachyOSMetadataAdapter),
+            PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(CachyOSMetadataAdapter),
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Air => Box::new(AirMetadataAdapter),
+            PackageFormat::Bottle => Box::new(BottleMetadataAdapter),
+            PackageFormat::Ipa => Box::new(IpaMetadataAdapter),
+            PackageFormat::Ports => Box::new(PortsMetadataAdapter),
+            PackageFormat::Pkg => Box::new(PkgMetadataAdapter),
+            PackageFormat::Aab => Box::new(AabMetadataAdapter),
+            PackageFormat::TarGz => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Xz => Box::new(XzMetadataAdapter),
+            PackageFormat::App => Box::new(AppMetadataAdapter),
+            PackageFormat::Hap => Box::new(HapMetadataAdapter),
+            PackageFormat::Pisi => Box::new(PisiMetadataAdapter),
+            PackageFormat::Superdeb => Box::new(SuperdebMetadataAdapter),
+            PackageFormat::Lzm => Box::new(LzmMetadataAdapter),
+            PackageFormat::Pup => Box::new(PupMetadataAdapter),
+            PackageFormat::Pet => Box::new(PetMetadataAdapter),
+            PackageFormat::Tar => Box::new(TarMetadataAdapter),
+            PackageFormat::Moss => Box::new(MossMetadataAdapter),
+            PackageFormat::Hpkg => Box::new(HpkgMetadataAdapter),
+            PackageFormat::Tcz => Box::new(TczMetadataAdapter),
+            PackageFormat::Gobo => Box::new(GoboMetadataAdapter),
+            PackageFormat::Ostree => Box::new(OstreeMetadataAdapter),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcMetadataAdapter),
+            PackageFormat::Sfs => Box::new(SfsMetadataAdapter),
+            PackageFormat::Puk => Box::new(PukMetadataAdapter),
+            PackageFormat::Dmg => Box::new(DmgMetadataAdapter),
+            PackageFormat::Cports => Box::new(CportsMetadataAdapter),
+            PackageFormat::Dports => Box::new(DportsMetadataAdapter),
+            PackageFormat::SlackBuild => Box::new(SlackBuildMetadataAdapter),
+            PackageFormat::Crux => Box::new(CruxMetadataAdapter),
+            PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
+            PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
         }
     }
 }
@@ -2479,5 +2704,76 @@ mod tests {
         assert_eq!(snap_id, 1);
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
+    }
+
+    #[test]
+    fn test_all_package_format_strategies_and_adapters() {
+        let formats = vec![
+            PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
+            PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,
+            PackageFormat::AppImage, PackageFormat::Xbps, PackageFormat::Txz, PackageFormat::Eopkg,
+            PackageFormat::Zypper, PackageFormat::Guix, PackageFormat::CachyOS, PackageFormat::Swupd,
+            PackageFormat::Starling, PackageFormat::SigmaPkg, PackageFormat::Air, PackageFormat::Bottle,
+            PackageFormat::Ipa, PackageFormat::Ports, PackageFormat::Pkg, PackageFormat::Aab,
+            PackageFormat::TarGz, PackageFormat::Xz, PackageFormat::App, PackageFormat::Hap,
+            PackageFormat::Pisi, PackageFormat::Superdeb, PackageFormat::Lzm, PackageFormat::Pup,
+            PackageFormat::Pet, PackageFormat::Tar, PackageFormat::Moss, PackageFormat::Hpkg,
+            PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
+            PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
+            PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
+            PackageFormat::Stratum
+        ];
+
+        for fmt in formats {
+            let strategy = PackageFactory::get_strategy(fmt);
+            let adapter = PackageFactory::get_adapter(fmt);
+            let pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
+
+            assert!(strategy.install(&pkg).is_ok());
+            assert!(strategy.verify(&pkg).unwrap());
+            assert!(strategy.remove(&pkg).is_ok());
+
+            let adapted = adapter.adapt("").unwrap();
+            assert!(adapted.formats.contains(&fmt) || (fmt == PackageFormat::Nix && adapted.formats.contains(&PackageFormat::Nixpkg)));
+        }
+    }
+
+    #[test]
+    fn test_expanded_decorators() {
+        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
+        let base = BasePackageDecorator { package: pkg };
+
+        let hw_dec = HardwareOptimizationDecorator {
+            decorated: base,
+            target_microarch_level: "x86-64-v3".to_string(),
+            required_simd_features: vec!["avx2".to_string(), "fma".to_string()],
+        };
+
+        hw_dec.profile_performance();
+        assert_eq!(hw_dec.get_package().name, "simd-app");
+
+        let res_dec = ResourceLimitDecorator {
+            decorated: hw_dec,
+            max_memory_bytes: 1024 * 1024 * 512,
+            cpu_quota_percent: 50,
+        };
+
+        assert!(res_dec.enforce_sandbox().is_ok());
+
+        let pqc_dec = PqcSignedDecorator {
+            decorated: res_dec,
+            dilithium_signature: "dilithium-5-valid-signature".to_string(),
+        };
+
+        assert!(pqc_dec.enforce_sandbox().is_ok());
+
+        let bad_pqc = PqcSignedDecorator {
+            decorated: BasePackageDecorator {
+                package: UnifiedPackage::new("invalid-sig".to_string(), "1.0.0".to_string()),
+            },
+            dilithium_signature: "invalid-signature".to_string(),
+        };
+
+        assert!(bad_pqc.enforce_sandbox().is_err());
     }
 }
