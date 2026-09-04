@@ -3713,7 +3713,7 @@ SigmaOS guarantees native bare-metal execution across 30+ years of hardware evol
     *   **Polymorphism**: Dynamic dispatch supporting uniform interrupt handling, page queue transitions, and package installation across targets.
     *   **OS Design Patterns**: Singleton pattern (VMM/APIC managers), Factory pattern (driver hotplugging), and Observer pattern (interrupt & hotplug event notifications).
 
----
+***
 
 ## 63. SOVEREIGN UNIFIED OS COMPLIANCE, GITHUB REPOSITORY MANAGEMENT & UNIVERSAL HARDWARE ADAPTATION SPECIFICATION
 
@@ -3742,30 +3742,29 @@ SigmaOS provides a unified hardware abstraction layer capable of running on lega
 
 ### 63.3 Multi-Domain Regulatory & Industry Compliance Stack
 
-1. **GDPR & Privacy Compliance**: Immutable PII data masking, zero-knowledge storage vault (`ZeroKnowledgePasswordVault`), and `SovereignAmnesicEngine` RAM scrubbing.
-2. **HIPAA & Healthcare Security**: Encrypted audit trail (`HardenedAuditTrail`), strict default-deny access control, and TLS 1.3 / Kyber-1024 post-quantum VPN tunnels.
-3. **WCAG 2.1 AA Accessibility**: Built-in screen reader (`TtsSynthesizer`), high-contrast vector icons (`FedoraAdwaitaIconThemeEngine`), and Braille matrix support.
-4. **ISO 27001 & SOC 2 Security**: Continuous vulnerability auditing (`KaliDefensiveSecurityAuditSuite`), automated compliance reports, and Signed-off-by patch validation.
-5. **CIS Benchmarks**: Pre-configured systemd-preset security rules (`SystemdPresetConfigurator`), crypto-policies enforcement (`FedoraCryptoPoliciesEngine`), and SELinux enforcing policies.
+1.  **GDPR & Privacy Compliance**: Immutable PII data masking, zero-knowledge storage vault (`ZeroKnowledgePasswordVault`), and `SovereignAmnesicEngine` RAM scrubbing.
+2.  **HIPAA & Healthcare Security**: Encrypted audit trail (`HardenedAuditTrail`), strict default-deny access control, and TLS 1.3 / Kyber-1024 post-quantum VPN tunnels.
+3.  **WCAG 2.1 AA Accessibility**: Built-in screen reader (`TtsSynthesizer`), high-contrast vector icons (`FedoraAdwaitaIconThemeEngine`), and Braille matrix support.
+4.  **ISO 27001 & SOC 2 Security**: Continuous vulnerability auditing (`KaliDefensiveSecurityAuditSuite`), automated compliance reports, and Signed-off-by patch validation.
+5.  **CIS Benchmarks**: Pre-configured systemd-preset security rules (`SystemdPresetConfigurator`), crypto-policies enforcement (`FedoraCryptoPoliciesEngine`), and SELinux enforcing policies.
 
 ### 63.4 GitHub Repository Management & Automation Workflows
 
-1. **Maintainer Tree Governance**: Hierarchical subsystem maintainers (`docs/MAINTAINERS.md`) managing `kernel/`, `drivers/`, `security/`, `package/`, and `desktop/`.
-2. **Automated Triage & Labeling**: `pr-size-labeler.yml` for PR sizing, `auto-assign.yml` for issue triage, and `branch-name-validator.yml` enforcing conventional prefixes.
-3. **Automated Weekly Metrics**: `automated-weekly-metrics.yml` generating repository health telemetry and test coverage reports.
-4. **Daily Jules AI Feature Discovery**: Continuous discovery of open-source OS innovations, translating external features into zero-dependency bare-metal OOP modules.
+1.  **Maintainer Tree Governance**: Hierarchical subsystem maintainers (`docs/MAINTAINERS.md`) managing `kernel/`, `drivers/`, `security/`, `package/`, and `desktop/`.
+2.  **Automated Triage & Labeling**: `pr-size-labeler.yml` for PR sizing, `auto-assign.yml` for issue triage, and `branch-name-validator.yml` enforcing conventional prefixes.
+3.  **Automated Weekly Metrics**: `automated-weekly-metrics.yml` generating repository health telemetry and test coverage reports.
+4.  **Daily Jules AI Feature Discovery**: Continuous discovery of open-source OS innovations, translating external features into zero-dependency bare-metal OOP modules.
 
 ### 63.5 Bare-Metal Zero-Dependency OOP Architecture Standards
 
-- **Zero Dynamic C Library Dependencies**: Written strictly in Rust, Zig, and Nim under `#![no_std]` without `glibc`, `musl`, or external C runtimes.
-- **Bare-Metal Object-Oriented Principles**:
-  * **Encapsulation**: Device registers, page table entries, and security tokens encapsulated in isolated zero-cost structs.
-  * **Inheritance & Hierarchy**: `DeviceDriver` base interfaces inherited by `NvmeDriver`, `E1000Driver`, and `AhciDriver`.
-  * **Polymorphism**: Dynamic trait dispatch for unified packet filtering (`EbpfXdpFastPacketEngine`), file system access, and package translation.
-  * **OS Design Patterns**: Singleton pattern for memory allocators, Factory pattern for hotplug driver instantiation, and Observer pattern for IPC notifications.
+*   **Zero Dynamic C Library Dependencies**: Written strictly in Rust, Zig, and Nim under `#![no_std]` without `glibc`, `musl`, or external C runtimes.
+*   **Bare-Metal Object-Oriented Principles**:
+    *   **Encapsulation**: Device registers, page table entries, and security tokens encapsulated in isolated zero-cost structs.
+    *   **Inheritance & Hierarchy**: `DeviceDriver` base interfaces inherited by `NvmeDriver`, `E1000Driver`, and `AhciDriver`.
+    *   **Polymorphism**: Dynamic trait dispatch for unified packet filtering (`EbpfXdpFastPacketEngine`), file system access, and package translation.
+    *   **OS Design Patterns**: Singleton pattern for memory allocators, Factory pattern for hotplug driver instantiation, and Observer pattern for IPC notifications.
 
-
----
+***
 
 ## 64. SOVEREIGN AUTONOMOUS AI ENGINEERING SPECIFICATION, UNIVERSAL HARDWARE ADAPTATION & DISTRO-CRUSHING MASTER ROADMAP
 
@@ -3799,79 +3798,77 @@ SigmaOS systematically absorbs and surpasses every major operating system and Li
 
 The Zenith Compositor provides a direct bare-metal graphics engine with zero dependencies on X11 or Wayland display protocols:
 
-```
-+-----------------------------------------------------------------------------------+
-|                            ZENITH UNIFIED COMPOSITOR                              |
-|     (Direct Bare-Metal Framebuffer / Zero X11/Wayland Dependencies)               |
-+-----------------------------------------------------------------------------------+
-|  [GNOME Design Elements]    [KDE Customization]    [COSMIC Performance]  [macOS/Win] |
-|   Minimalism & A11y         Granular Control       Safe Tiling Engine    Fluidity     |
-+-----------------------------------------------------------------------------------+
-|                 Unified Declarative Settings Overlay (JSON/YAML)                  |
-+-----------------------------------------------------------------------------------+
-```
+    +-----------------------------------------------------------------------------------+
+    |                            ZENITH UNIFIED COMPOSITOR                              |
+    |     (Direct Bare-Metal Framebuffer / Zero X11/Wayland Dependencies)               |
+    +-----------------------------------------------------------------------------------+
+    |  [GNOME Design Elements]    [KDE Customization]    [COSMIC Performance]  [macOS/Win] |
+    |   Minimalism & A11y         Granular Control       Safe Tiling Engine    Fluidity     |
+    +-----------------------------------------------------------------------------------+
+    |                 Unified Declarative Settings Overlay (JSON/YAML)                  |
+    +-----------------------------------------------------------------------------------+
 
-- **GNOME Absorption**: Distraction-free workflows, cohesive accessibility overlays (WCAG 2.1 AA), and clean typography.
-- **KDE Plasma Absorption**: Granular widget separation, flexible desktop layout panels, and customizable window behavior.
-- **COSMIC Absorption**: Multi-threaded memory-safe tiling algorithms written in pure `#![no_std]` Rust.
-- **macOS & Windows Absorption**: Smooth animation curves, multi-display window staging, and spotlight-style application search.
+*   **GNOME Absorption**: Distraction-free workflows, cohesive accessibility overlays (WCAG 2.1 AA), and clean typography.
+*   **KDE Plasma Absorption**: Granular widget separation, flexible desktop layout panels, and customizable window behavior.
+*   **COSMIC Absorption**: Multi-threaded memory-safe tiling algorithms written in pure `#![no_std]` Rust.
+*   **macOS & Windows Absorption**: Smooth animation curves, multi-display window staging, and spotlight-style application search.
 
 ### 64.4 Low-Level Language Purity & Bare-Metal OOP Design Patterns
 
 All kernel, driver, and system components adhere strictly to these software engineering rules:
 
-1. **Modern Systems Languages**: Written exclusively in Rust, Zig, or Nim targeting `#![no_std]` bare-metal execution.
-2. **Absolute Zero-Dependency Constraint**: Zero usage of `std::`, external C runtimes (`glibc`, `musl`), or third-party crates. Every register interface, memory allocator, and protocol packet is constructed from raw hardware memory addresses (`0x...`).
-3. **Bare-Metal Object-Oriented Principles (OOP)**:
-   - **Encapsulation**: Hardware MMIO register sets, page table entries, and cryptographic keys are encapsulated inside thread-safe object structs.
-   - **Inheritance & Device Hierarchies**: Base abstract device traits (`DeviceDriver`) extended by family-specific controller classes (`NvmeStorageDriver`, `E1000NetworkDriver`).
-   - **Polymorphism**: Dynamic trait dispatch for unified packet processing, storage block access, and package translation.
-   - **OS Design Patterns**:
-     - *Singleton Pattern*: Central management of system VMM, interrupt controllers, and driver registries.
-     - *Factory Pattern*: Dynamic driver allocation and instantiation based on PCI/xHCI vendor/device identifiers.
-     - *Observer Pattern*: Thread-safe asynchronous event notification for IRQ lines, hotplug events, and packet arrivals.
-     - *Adapter Pattern*: Compatibility shims translating legacy Linux/BSD syscalls and package manifests into native SigmaOS calls.
+1.  **Modern Systems Languages**: Written exclusively in Rust, Zig, or Nim targeting `#![no_std]` bare-metal execution.
+2.  **Absolute Zero-Dependency Constraint**: Zero usage of `std::`, external C runtimes (`glibc`, `musl`), or third-party crates. Every register interface, memory allocator, and protocol packet is constructed from raw hardware memory addresses (`0x...`).
+3.  **Bare-Metal Object-Oriented Principles (OOP)**:
+    *   **Encapsulation**: Hardware MMIO register sets, page table entries, and cryptographic keys are encapsulated inside thread-safe object structs.
+    *   **Inheritance & Device Hierarchies**: Base abstract device traits (`DeviceDriver`) extended by family-specific controller classes (`NvmeStorageDriver`, `E1000NetworkDriver`).
+    *   **Polymorphism**: Dynamic trait dispatch for unified packet processing, storage block access, and package translation.
+    *   **OS Design Patterns**:
+        *   *Singleton Pattern*: Central management of system VMM, interrupt controllers, and driver registries.
+        *   *Factory Pattern*: Dynamic driver allocation and instantiation based on PCI/xHCI vendor/device identifiers.
+        *   *Observer Pattern*: Thread-safe asynchronous event notification for IRQ lines, hotplug events, and packet arrivals.
+        *   *Adapter Pattern*: Compatibility shims translating legacy Linux/BSD syscalls and package manifests into native SigmaOS calls.
 
 ### 64.5 Composite AI Agent Workflow & Repository Intelligence Framework
 
 To maintain continuous repository evolution, AI development agents adopt a composite persona matrix:
 
-1. **Bolt ⚡ (Performance Specialist)**:
-   - Identifies and eliminates micro-bottlenecks in memory copy loops, page allocation, and ring-buffer processing.
-   - Replaces O(N^2) algorithm patterns with O(N) or O(1) lookup structures.
-   - Maintains performance journal in `.jules/bolt.md`.
-2. **Palette 🎨 (UX & Accessibility Specialist)**:
-   - Enforces WCAG 2.1 AA accessibility standards, focus states, screen reader hooks, and intuitive keyboard navigation in Zenith UI.
-   - Maintains UX journal in `.jules/palette.md`.
-3. **Sentinel 🛡️ (Security Specialist)**:
-   - Threat-models kernel syscall gates, VFS paths, and crypto implementations.
-   - Scans for hardcoded credentials, buffer overruns, race conditions, and privilege escalation vectors.
-   - Maintains security journal in `.jules/sentinel.md`.
-4. **Daily Knowledge Extraction Workflow**:
-   - Scans global open-source ecosystem updates (Linux kernel, systemd, FreeBSD, NixOS, OpenBSD, GNOME, KDE, Kubernetes).
-   - Extracts useful algorithms, drivers, and security models, re-implementing them in zero-dependency `#![no_std]` Rust/Zig/Nim.
+1.  **Bolt ⚡ (Performance Specialist)**:
+    *   Identifies and eliminates micro-bottlenecks in memory copy loops, page allocation, and ring-buffer processing.
+    *   Replaces O(N^2) algorithm patterns with O(N) or O(1) lookup structures.
+    *   Maintains performance journal in `.jules/bolt.md`.
+2.  **Palette 🎨 (UX & Accessibility Specialist)**:
+    *   Enforces WCAG 2.1 AA accessibility standards, focus states, screen reader hooks, and intuitive keyboard navigation in Zenith UI.
+    *   Maintains UX journal in `.jules/palette.md`.
+3.  **Sentinel 🛡️ (Security Specialist)**:
+    *   Threat-models kernel syscall gates, VFS paths, and crypto implementations.
+    *   Scans for hardcoded credentials, buffer overruns, race conditions, and privilege escalation vectors.
+    *   Maintains security journal in `.jules/sentinel.md`.
+4.  **Daily Knowledge Extraction Workflow**:
+    *   Scans global open-source ecosystem updates (Linux kernel, systemd, FreeBSD, NixOS, OpenBSD, GNOME, KDE, Kubernetes).
+    *   Extracts useful algorithms, drivers, and security models, re-implementing them in zero-dependency `#![no_std]` Rust/Zig/Nim.
 
 ### 64.6 Extended GitHub Repository Management & Multi-Domain Compliance
 
-- **GitHub Role Hierarchy**:
-  - *Contributor*: Submits PRs, opens issues, reports bugs.
-  - *Collaborator (Write)*: Pushes branches, reviews PRs.
-  - *Triage Specialist*: Categorizes issues, assigns labels, manages metadata.
-  - *Maintainer*: Oversees subsystem boundaries (`kernel/`, `drivers/`, `fs/`, `net/`, `crypto/`, `desktop/`), manages CI workflows, merges PRs.
-  - *Admin / Owner*: Strategic governance, team management, security policy enforcement.
-- **Multi-Domain Compliance Stack**:
-  - *Data Privacy*: GDPR, CCPA, HIPAA alignment with zero-knowledge data masking and amnesic RAM scrubbing.
-  - *Security Standards*: CIS Benchmarks, ISO 27001, SOC 2 Type II audit readiness with immutable append-only audit logging.
-  - *Accessibility*: WCAG 2.1 AA and Section 508 compliance.
-  - *Repo Governance*: DCO (Developer Certificate of Origin) signoff, Conventional Commits, and automated CI quality gates.
+*   **GitHub Role Hierarchy**:
+    *   *Contributor*: Submits PRs, opens issues, reports bugs.
+    *   *Collaborator (Write)*: Pushes branches, reviews PRs.
+    *   *Triage Specialist*: Categorizes issues, assigns labels, manages metadata.
+    *   *Maintainer*: Oversees subsystem boundaries (`kernel/`, `drivers/`, `fs/`, `net/`, `crypto/`, `desktop/`), manages CI workflows, merges PRs.
+    *   *Admin / Owner*: Strategic governance, team management, security policy enforcement.
+*   **Multi-Domain Compliance Stack**:
+    *   *Data Privacy*: GDPR, CCPA, HIPAA alignment with zero-knowledge data masking and amnesic RAM scrubbing.
+    *   *Security Standards*: CIS Benchmarks, ISO 27001, SOC 2 Type II audit readiness with immutable append-only audit logging.
+    *   *Accessibility*: WCAG 2.1 AA and Section 508 compliance.
+    *   *Repo Governance*: DCO (Developer Certificate of Origin) signoff, Conventional Commits, and automated CI quality gates.
 
-```
-+-----------------------------------------------------------------------------------+
-|                       SIGMAOS UNIFIED COMPLIANCE STACK                            |
-+-----------------------------------------------------------------------------------+
-|  [Legal & Licensing]   [Security & Privacy]   [Accessibility]   [Governance]  |
-|   GPL/MIT/Apache/BSD   GDPR / HIPAA / CIS      WCAG 2.1 AA       DCO / CLA     |
-+-----------------------------------------------------------------------------------+
-|            Sovereign Policy Engine & Automated CI Verification Gates              |
-+-----------------------------------------------------------------------------------+
-```
+<!---->
+
+    +-----------------------------------------------------------------------------------+
+    |                       SIGMAOS UNIFIED COMPLIANCE STACK                            |
+    +-----------------------------------------------------------------------------------+
+    |  [Legal & Licensing]   [Security & Privacy]   [Accessibility]   [Governance]  |
+    |   GPL/MIT/Apache/BSD   GDPR / HIPAA / CIS      WCAG 2.1 AA       DCO / CLA     |
+    +-----------------------------------------------------------------------------------+
+    |            Sovereign Policy Engine & Automated CI Verification Gates              |
+    +-----------------------------------------------------------------------------------+
