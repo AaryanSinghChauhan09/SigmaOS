@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Linux & BSD Inspired Package Management Innovations
 // Inspired by FreeBSD Ports & VuXML, Void XBPS, Alpine APK v3, Nix/Guix CAS,
-// Arch ALPM hooks, Fedora DNF5 DeltaRPM, Gentoo Portage subslots, and Haiku PackageFS.
+// Arch ALPM hooks, Fedora DNF5 DeltaRPM, Gentoo Portage subslots, Haiku PackageFS,
+// Debian apt-mark, Void xbps-src, Fedora DNF history, and NetBSD pkgin.
 
 extern crate alloc;
 
@@ -1517,6 +1518,342 @@ impl Default for DebianDpkgTriggersAptListbugsGuardEngine {
     }
 }
 
+// =========================================================================
+// 21. Void Linux xbps-src Restricted Non-Free Licensing Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RestrictedPackageSpec {
+    pub name: String,
+    pub version: String,
+    pub license: String,
+    pub is_restricted: bool,
+    pub download_url: String,
+    pub accepted_terms_prompt: String,
+}
+
+pub struct XbpsRestrictedNonFreeLicenseEngine {
+    pub restricted_packages: BTreeMap<String, RestrictedPackageSpec>,
+    pub accepted_licenses: Vec<String>,
+    pub allow_restricted_builds: bool,
+}
+
+impl XbpsRestrictedNonFreeLicenseEngine {
+    pub fn new() -> Self {
+        Self {
+            restricted_packages: BTreeMap::new(),
+            accepted_licenses: Vec::new(),
+            allow_restricted_builds: false,
+        }
+    }
+
+    pub fn register_restricted_package(&mut self, spec: RestrictedPackageSpec) {
+        self.restricted_packages.insert(spec.name.clone(), spec);
+    }
+
+    pub fn accept_license(&mut self, license_name: &str) {
+        if !self.accepted_licenses.contains(&license_name.to_string()) {
+            self.accepted_licenses.push(license_name.to_string());
+        }
+    }
+
+    pub fn can_fetch_and_build(&self, pkg_name: &str) -> Result<bool, &'static str> {
+        let pkg = self
+            .restricted_packages
+            .get(pkg_name)
+            .ok_or("Package spec not found")?;
+
+        if pkg.is_restricted && !self.allow_restricted_builds {
+            return Ok(false);
+        }
+
+        if !self.accepted_licenses.contains(&pkg.license) {
+            return Ok(false);
+        }
+
+        Ok(true)
+    }
+}
+
+impl Default for XbpsRestrictedNonFreeLicenseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 22. Debian apt-mark Package Hold & Manual/Auto State Governor
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AptMarkState {
+    Auto,
+    Manual,
+    Hold,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptMarkRecord {
+    pub package_name: String,
+    pub state: AptMarkState,
+    pub required_by: Vec<String>,
+}
+
+pub struct DebianAptMarkPackageStateGovernor {
+    pub mark_db: BTreeMap<String, AptMarkRecord>,
+}
+
+impl DebianAptMarkPackageStateGovernor {
+    pub fn new() -> Self {
+        Self {
+            mark_db: BTreeMap::new(),
+        }
+    }
+
+    pub fn mark_package(&mut self, pkg_name: &str, state: AptMarkState) {
+        self.mark_db
+            .entry(pkg_name.to_string())
+            .and_modify(|r| r.state = state)
+            .or_insert_with(|| AptMarkRecord {
+                package_name: pkg_name.to_string(),
+                state,
+                required_by: Vec::new(),
+            });
+    }
+
+    pub fn register_dep_relation(&mut self, dependent: &str, provider: &str) {
+        self.mark_db
+            .entry(provider.to_string())
+            .or_insert_with(|| AptMarkRecord {
+                package_name: provider.to_string(),
+                state: AptMarkState::Auto,
+                required_by: Vec::new(),
+            });
+        if let Some(record) = self.mark_db.get_mut(provider) {
+            if !record.required_by.contains(&dependent.to_string()) {
+                record.required_by.push(dependent.to_string());
+            }
+        }
+    }
+
+    pub fn show_auto(&self) -> Vec<String> {
+        self.mark_db
+            .values()
+            .filter(|r| r.state == AptMarkState::Auto)
+            .map(|r| r.package_name.clone())
+            .collect()
+    }
+
+    pub fn show_manual(&self) -> Vec<String> {
+        self.mark_db
+            .values()
+            .filter(|r| r.state == AptMarkState::Manual)
+            .map(|r| r.package_name.clone())
+            .collect()
+    }
+
+    pub fn show_hold(&self) -> Vec<String> {
+        self.mark_db
+            .values()
+            .filter(|r| r.state == AptMarkState::Hold)
+            .map(|r| r.package_name.clone())
+            .collect()
+    }
+
+    pub fn find_autoremove_candidates(&self) -> Vec<String> {
+        let mut candidates = Vec::new();
+        for record in self.mark_db.values() {
+            if record.state == AptMarkState::Auto && record.required_by.is_empty() {
+                candidates.push(record.package_name.clone());
+            }
+        }
+        candidates
+    }
+}
+
+impl Default for DebianAptMarkPackageStateGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23. Fedora DNF Transaction History & Rollback Journal Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DnfActionKind {
+    Install,
+    Upgrade,
+    Downgrade,
+    Remove,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DnfActionRecord {
+    pub package_name: String,
+    pub version: String,
+    pub kind: DnfActionKind,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DnfTransactionItem {
+    pub transaction_id: u64,
+    pub timestamp_sec: u64,
+    pub user_cmd: String,
+    pub actions: Vec<DnfActionRecord>,
+}
+
+pub struct FedoraDnfHistoryRollbackJournalEngine {
+    pub history: Vec<DnfTransactionItem>,
+    pub next_tx_id: u64,
+}
+
+impl FedoraDnfHistoryRollbackJournalEngine {
+    pub fn new() -> Self {
+        Self {
+            history: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn record_transaction(
+        &mut self,
+        user_cmd: &str,
+        actions: Vec<DnfActionRecord>,
+        now_sec: u64,
+    ) -> u64 {
+        let tx_id = self.next_tx_id;
+        self.next_tx_id += 1;
+
+        let tx = DnfTransactionItem {
+            transaction_id: tx_id,
+            timestamp_sec: now_sec,
+            user_cmd: user_cmd.to_string(),
+            actions,
+        };
+        self.history.push(tx);
+        tx_id
+    }
+
+    pub fn compute_rollback_actions(&self, target_tx_id: u64) -> Result<Vec<DnfActionRecord>, &'static str> {
+        let mut undo_actions = Vec::new();
+        let target_idx = self
+            .history
+            .iter()
+            .position(|t| t.transaction_id == target_tx_id)
+            .ok_or("Transaction ID not found")?;
+
+        for tx in self.history[target_idx..].iter().rev() {
+            for action in tx.actions.iter().rev() {
+                let undo = match action.kind {
+                    DnfActionKind::Install => DnfActionRecord {
+                        package_name: action.package_name.clone(),
+                        version: action.version.clone(),
+                        kind: DnfActionKind::Remove,
+                    },
+                    DnfActionKind::Remove => DnfActionRecord {
+                        package_name: action.package_name.clone(),
+                        version: action.version.clone(),
+                        kind: DnfActionKind::Install,
+                    },
+                    DnfActionKind::Upgrade => DnfActionRecord {
+                        package_name: action.package_name.clone(),
+                        version: action.version.clone(),
+                        kind: DnfActionKind::Downgrade,
+                    },
+                    DnfActionKind::Downgrade => DnfActionRecord {
+                        package_name: action.package_name.clone(),
+                        version: action.version.clone(),
+                        kind: DnfActionKind::Upgrade,
+                    },
+                };
+                undo_actions.push(undo);
+            }
+        }
+        Ok(undo_actions)
+    }
+}
+
+impl Default for FedoraDnfHistoryRollbackJournalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 24. NetBSD pkgin Binary Package Database & Vacuum Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PkgSummaryRecord {
+    pub pkgname: String,
+    pub pkgpath: String,
+    pub size_bytes: u64,
+    pub comment: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub filename: String,
+    pub size_bytes: u64,
+    pub is_installed: bool,
+}
+
+pub struct NetBsdPkginBinaryDatabaseEngine {
+    pub db: BTreeMap<String, PkgSummaryRecord>,
+    pub cache: Vec<CachedPackageFile>,
+}
+
+impl NetBsdPkginBinaryDatabaseEngine {
+    pub fn new() -> Self {
+        Self {
+            db: BTreeMap::new(),
+            cache: Vec::new(),
+        }
+    }
+
+    pub fn register_pkg_summary(&mut self, record: PkgSummaryRecord) {
+        self.db.insert(record.pkgname.clone(), record);
+    }
+
+    pub fn register_cache_file(&mut self, file: CachedPackageFile) {
+        self.cache.push(file);
+    }
+
+    pub fn query_pkg(&self, name_prefix: &str) -> Vec<PkgSummaryRecord> {
+        self.db
+            .values()
+            .filter(|p| p.pkgname.starts_with(name_prefix))
+            .cloned()
+            .collect()
+    }
+
+    pub fn vacuum_stale_cache(&mut self) -> (usize, u64) {
+        let mut freed_bytes = 0u64;
+        let mut freed_count = 0usize;
+
+        self.cache.retain(|f| {
+            if !f.is_installed {
+                freed_bytes += f.size_bytes;
+                freed_count += 1;
+                false
+            } else {
+                true
+            }
+        });
+
+        (freed_count, freed_bytes)
+    }
+}
+
+impl Default for NetBsdPkginBinaryDatabaseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1908,5 +2245,93 @@ MAINTAINER="SigmaOS"
         });
 
         assert_eq!(engine.process_deferred_triggers(), 1);
+    }
+
+    #[test]
+    fn test_xbps_restricted_nonfree_license() {
+        let mut engine = XbpsRestrictedNonFreeLicenseEngine::new();
+        engine.register_restricted_package(RestrictedPackageSpec {
+            name: "nvidia-driver".to_string(),
+            version: "550.54.14".to_string(),
+            license: "Nvidia License".to_string(),
+            is_restricted: true,
+            download_url: "https://nvidia.com/driver.run".to_string(),
+            accepted_terms_prompt: "Accept Nvidia EULA".to_string(),
+        });
+
+        assert!(!engine.can_fetch_and_build("nvidia-driver").unwrap());
+
+        engine.allow_restricted_builds = true;
+        assert!(!engine.can_fetch_and_build("nvidia-driver").unwrap()); // license not accepted yet
+
+        engine.accept_license("Nvidia License");
+        assert!(engine.can_fetch_and_build("nvidia-driver").unwrap());
+    }
+
+    #[test]
+    fn test_debian_apt_mark_state_governor() {
+        let mut gov = DebianAptMarkPackageStateGovernor::new();
+        gov.mark_package("curl", AptMarkState::Manual);
+        gov.mark_package("libcurl4", AptMarkState::Auto);
+        gov.mark_package("linux-image-generic", AptMarkState::Hold);
+        gov.register_dep_relation("curl", "libcurl4");
+
+        assert_eq!(gov.show_manual(), vec!["curl".to_string()]);
+        assert_eq!(gov.show_hold(), vec!["linux-image-generic".to_string()]);
+        assert_eq!(gov.find_autoremove_candidates().len(), 0);
+
+        gov.mark_package("libzstd", AptMarkState::Auto);
+        assert_eq!(gov.find_autoremove_candidates(), vec!["libzstd".to_string()]);
+    }
+
+    #[test]
+    fn test_fedora_dnf_history_rollback() {
+        let mut journal = FedoraDnfHistoryRollbackJournalEngine::new();
+        let tx1 = journal.record_transaction(
+            "dnf install htop",
+            vec![DnfActionRecord {
+                package_name: "htop".to_string(),
+                version: "3.3.0".to_string(),
+                kind: DnfActionKind::Install,
+            }],
+            1700000000,
+        );
+        assert_eq!(tx1, 1);
+
+        let undo = journal.compute_rollback_actions(1).unwrap();
+        assert_eq!(undo.len(), 1);
+        assert_eq!(undo[0].kind, DnfActionKind::Remove);
+        assert_eq!(undo[0].package_name, "htop");
+    }
+
+    #[test]
+    fn test_netbsd_pkgin_binary_database() {
+        let mut pkgin = NetBsdPkginBinaryDatabaseEngine::new();
+        pkgin.register_pkg_summary(PkgSummaryRecord {
+            pkgname: "bash-5.2".to_string(),
+            pkgpath: "shells/bash".to_string(),
+            size_bytes: 2048000,
+            comment: "The GNU Bourne Again Shell".to_string(),
+            depends: vec![],
+        });
+
+        pkgin.register_cache_file(CachedPackageFile {
+            filename: "bash-5.2.tgz".to_string(),
+            size_bytes: 2048000,
+            is_installed: true,
+        });
+
+        pkgin.register_cache_file(CachedPackageFile {
+            filename: "old-zsh-5.8.tgz".to_string(),
+            size_bytes: 1500000,
+            is_installed: false,
+        });
+
+        assert_eq!(pkgin.query_pkg("bash").len(), 1);
+
+        let (freed_count, freed_bytes) = pkgin.vacuum_stale_cache();
+        assert_eq!(freed_count, 1);
+        assert_eq!(freed_bytes, 1500000);
+        assert_eq!(pkgin.cache.len(), 1);
     }
 }
