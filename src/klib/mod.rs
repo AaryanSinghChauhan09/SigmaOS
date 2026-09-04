@@ -12,7 +12,6 @@ pub mod collections;
 pub mod config_parser;
 #[macro_use]
 pub mod console;
-pub mod config_parser;
 pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;

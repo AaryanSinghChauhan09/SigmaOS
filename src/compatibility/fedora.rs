@@ -3797,19 +3797,8 @@ impl Default for FedoraToolbxContainerEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionFile {
-    pub path: String,
-    pub mode: u32,
-    pub content: String,
-    pub overwrite: bool,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionUser {
-    pub name: String,
-    pub ssh_authorized_keys: Vec<String>,
-    pub groups: Vec<String>,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IgnitionSystemdUnit {
@@ -3821,12 +3810,6 @@ pub struct IgnitionSystemdUnit {
 /// Fedora Ignition First-Boot Declarative Provisioning Engine
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.
-pub struct FedoraIgnitionEngine {
-    pub files: Vec<IgnitionFile>,
-    pub users: Vec<IgnitionUser>,
-    pub systemd_units: Vec<IgnitionSystemdUnit>,
-    pub provisioned: bool,
-}
 
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
@@ -4239,19 +4222,9 @@ impl Default for FedoraSystemRolesEngine {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DracutModule {
-    pub name: String,
-    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
-    pub drivers: Vec<String>,
-}
 
 /// Fedora Dracut Modular Initramfs Generation & Hook Engine
 /// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
-pub struct FedoraDracutInitramfsEngine {
-    pub modules: Vec<DracutModule>,
-    pub kernel_version: String,
-    pub compression_format: String, // "zstd", "xz", "gzip"
-}
 
 impl FedoraDracutInitramfsEngine {
     pub fn new(kernel_version: &str) -> Self {
@@ -4304,25 +4277,10 @@ impl FedoraDracutInitramfsEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AbrtCrashReport {
-    pub crash_id: String,
-    pub executable_path: String,
-    pub signal_name: String,
-    pub stack_trace: String,
-    pub kernel_release: String,
-    pub timestamp_secs: u64,
-    pub count: u32,
-    pub reported_to_bugzilla: bool,
-}
 
 /// Fedora ABRT (Automatic Bug Reporting Tool) Crash Daemon
 /// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
 /// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
-pub struct FedoraAbrtCrashDaemon {
-    pub captured_crashes: HashMap<String, AbrtCrashReport>, // crash_id -> report
-    pub messaging_engine: FedoraMessagingEngine,
-    pub total_crashes_handled: u64,
-}
 
 impl FedoraAbrtCrashDaemon {
     pub fn new() -> Self {
@@ -4395,19 +4353,9 @@ impl Default for FedoraAbrtCrashDaemon {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ToolbxContainer {
-    pub name: String,
-    pub image: String,
-    pub host_mounts: Vec<String>,
-    pub environment_vars: HashMap<String, String>,
-    pub running: bool,
-}
 
 /// Fedora Toolbx Interactive OCI Development Environment Manager
 /// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
-pub struct FedoraToolbxContainerEngine {
-    pub active_containers: HashMap<String, ToolbxContainer>,
-}
 
 impl FedoraToolbxContainerEngine {
     pub fn new() -> Self {
@@ -4514,30 +4462,10 @@ pub enum MirrorSyncStatus {
 }
 
 #[derive(Debug, Clone)]
-pub struct FedoraMirrorHost {
-    pub host_id: String,
-    pub base_url: String,
-    pub country_code: String,
-    pub asn: u32,
-    pub bandwidth_mbps: u32,
-    pub protocols: Vec<MirrorProtocol>,
-    pub sync_status: MirrorSyncStatus,
-    pub lag_seconds: u64,
-}
 
 #[derive(Debug, Clone)]
-pub struct ClientLocationContext {
-    pub client_ip: String,
-    pub country_code: String,
-    pub asn: u32,
-    pub preferred_protocol: MirrorProtocol,
-}
 
 /// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
-pub struct FedoraMirrorManager2Engine {
-    pub mirrors: Vec<FedoraMirrorHost>,
-    pub max_allowed_lag_secs: u64,
-}
 
 impl FedoraMirrorManager2Engine {
     pub fn new(max_lag_secs: u64) -> Self {
@@ -4605,35 +4533,14 @@ impl FedoraMirrorManager2Engine {
 
 /// Fedora Shared Library Dependency & Soname Entry
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraSharedLibraryEntry {
-    pub soname: String,
-    pub real_path: String,
-    pub abi_version: String,
-    pub exported_symbols: Vec<String>,
-}
 
 /// Fedora Shared DNF Repository Cache Transaction Lock
 #[derive(Debug, Clone)]
-pub struct FedoraDnfSharedCacheLock {
-    pub lock_file_path: String,
-    pub is_locked: bool,
-    pub lock_owner_pid: u32,
-}
 
 /// Fedora System-wide Shared Runtime Environment (/run/user/UID & /dev/shm)
 #[derive(Debug, Clone)]
-pub struct FedoraSharedRuntimeEnvironment {
-    pub runtime_dir: String,
-    pub shm_dir: String,
-    pub allocated_shm_blocks: HashMap<String, usize>,
-}
 
 /// Fedora-inspired Shared System Manager for SigmaOS
-pub struct FedoraSharedSystemManager {
-    pub shared_libraries: HashMap<String, FedoraSharedLibraryEntry>,
-    pub cache_lock: FedoraDnfSharedCacheLock,
-    pub runtime_env: FedoraSharedRuntimeEnvironment,
-}
 
 impl FedoraSharedSystemManager {
     pub fn new(uid: u32) -> Self {
@@ -4717,19 +4624,8 @@ impl FedoraSharedSystemManager {
 
 /// Fedora Community Contribution Badge Alignment
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraBadge {
-    pub badge_id: String,
-    pub name: String,
-    pub description: String,
-    pub category: String, // "development", "qa", "community", "governance"
-    pub points: u32,
-}
 
 /// Fedora Badges & OpenBadges Community Achievement Engine
-pub struct FedoraBadgesEngine {
-    pub badges: HashMap<String, FedoraBadge>,
-    pub user_awarded_badges: HashMap<String, Vec<String>>, // fas_username -> badge_ids
-}
 
 impl FedoraBadgesEngine {
     pub fn new() -> Self {
@@ -4808,11 +4704,6 @@ pub enum SystemRoleKind {
 }
 
 /// Fedora System Roles (linux-system-roles) Declarative Automation Engine
-pub struct FedoraSystemRolesEngine {
-    pub applied_roles: Vec<SystemRoleKind>,
-    pub chrony_ntp_servers: Vec<String>,
-    pub configured_firewall_ports: Vec<u16>,
-}
 
 impl FedoraSystemRolesEngine {
     pub fn new() -> Self {

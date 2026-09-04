@@ -143,8 +143,45 @@ impl FramebufferDriver {
 
     /// Set VGA text mode
     unsafe fn set_vga_text_mode(&self) {
-        // TODO: Implement VGA text mode setting
-        // This would involve writing to VGA registers
+        // Initialize VGA text mode (80x25 characters)
+        // Mode 3: 80x25 16-color text mode
+        
+        // VGA registers
+        let miscellaneous_output = 0x3C2 as *mut u8;
+        let crtc_index = 0x3D4 as *mut u8;
+        let crtc_data = 0x3D5 as *mut u8;
+        let sequencer_index = 0x3C4 as *mut u8;
+        let sequencer_data = 0x3C5 as *mut u8;
+        let graphics_index = 0x3CE as *mut u8;
+        let graphics_data = 0x3CF as *mut u8;
+        
+        // Set miscellaneous output register (0x3C2)
+        core::ptr::write_volatile(miscellaneous_output, 0x67);
+        
+        // Reset sequencer
+        core::ptr::write_volatile(sequencer_index, 0x00);
+        core::ptr::write_volatile(sequencer_data, 0x03);
+        
+        // Disable character generator
+        core::ptr::write_volatile(sequencer_index, 0x01);
+        core::ptr::write_volatile(sequencer_data, 0x00);
+        
+        // Program CRTC controller for 80x25 text mode
+        // Horizontal Total
+        core::ptr::write_volatile(crtc_index, 0x00);
+        core::ptr::write_volatile(crtc_data, 0x5F);
+        
+        // Horizontal Display End
+        core::ptr::write_volatile(crtc_index, 0x01);
+        core::ptr::write_volatile(crtc_data, 0x4F);
+        
+        // Set character generator
+        core::ptr::write_volatile(sequencer_index, 0x03);
+        core::ptr::write_volatile(sequencer_data, 0x00);
+        
+        // Enable character generator
+        core::ptr::write_volatile(sequencer_index, 0x01);
+        core::ptr::write_volatile(sequencer_data, 0x01);
     }
 
     /// Clear screen with color

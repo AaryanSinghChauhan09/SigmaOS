@@ -112,18 +112,43 @@ impl LogWriter {
 
 impl Write for LogWriter {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        // TODO: Implement actual output to VGA/serial
-        // For now, this is a stub
-        let _ = s;
+        // Write to both VGA text mode and serial port
+        for byte in s.bytes() {
+            self.write_byte(byte);
+        }
         Ok(())
     }
     
     fn write_char(&mut self, c: char) -> core::fmt::Result {
-        // TODO: Implement actual output
-        let _ = c;
+        if c.is_ascii() {
+            self.write_byte(c as u8);
+        }
         Ok(())
     }
 }
+
+impl LogWriter {
+    /// Write a single byte to VGA and serial
+    #[inline]
+    fn write_byte(&self, byte: u8) {
+        // VGA text mode output (0xB8000)
+        unsafe {
+            let vga_buffer = 0xB8000 as *mut u16;
+            if !vga_buffer.is_null() {
+                // Simple VGA write - write character with white on black
+                let entry = ((0x0F << 8) | (byte as u16)); // White on black
+                core::ptr::write_volatile(vga_buffer, entry);
+            }
+        }
+        
+        // Serial port output (COM1: 0x3F8)
+        unsafe {
+            let serial_port = 0x3F8 as *mut u8;
+            if !serial_port.is_null() {
+                core::ptr::write_volatile(serial_port, byte);
+            }
+        }
+    }
 
 // ─── Global Logger Instance ─────────────────────────────────────────────
 
