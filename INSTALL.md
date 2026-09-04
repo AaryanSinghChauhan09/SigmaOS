@@ -2,19 +2,19 @@
 
 This guide covers building SigmaOS from source and running it in a virtual machine.
 
----
+***
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Building from Source](#building-from-source)
-3. [Running in QEMU](#running-in-qemu)
-4. [Cross-Compilation](#cross-compilation)
-5. [Building a Bootable ISO](#building-a-bootable-iso)
-6. [Installing on Real Hardware](#installing-on-real-hardware)
-7. [Troubleshooting](#troubleshooting)
+1.  [Prerequisites](#prerequisites)
+2.  [Building from Source](#building-from-source)
+3.  [Running in QEMU](#running-in-qemu)
+4.  [Cross-Compilation](#cross-compilation)
+5.  [Building a Bootable ISO](#building-a-bootable-iso)
+6.  [Installing on Real Hardware](#installing-on-real-hardware)
+7.  [Troubleshooting](#troubleshooting)
 
----
+***
 
 ## Prerequisites
 
@@ -76,7 +76,7 @@ rustup target add x86_64-unknown-none
 rustup component add rust-src llvm-tools-preview
 ```
 
----
+***
 
 ## Building from Source
 
@@ -122,11 +122,11 @@ cargo test --test sovereign_inspection_suite
 cargo test --test stress_and_fuzz_tests
 ```
 
----
+***
 
 ## Running in QEMU
 
-### Quick Start (x86_64)
+### Quick Start (x86\_64)
 
 ```bash
 # Build and run the QEMU smoke test
@@ -164,7 +164,7 @@ qemu-system-x86_64 \
     -nographic
 ```
 
----
+***
 
 ## Cross-Compilation
 
@@ -198,7 +198,7 @@ cmake --build build-riscv64
 cargo build --target riscv64gc-unknown-none-elf --release
 ```
 
----
+***
 
 ## Building a Bootable ISO
 
@@ -220,18 +220,17 @@ qemu-system-x86_64 \
 ### ISO Contents
 
 The ISO follows standard Linux ISO structure:
-```
-iso_root/
-├── boot/
-│   ├── sigma_kernel      # Kernel binary
-│   └── grub/             # GRUB2 bootloader
-├── installer/
-│   └── install.sh        # Automated installer
-└── sigma/
-    └── store/            # Base system packages
-```
 
----
+    iso_root/
+    ├── boot/
+    │   ├── sigma_kernel      # Kernel binary
+    │   └── grub/             # GRUB2 bootloader
+    ├── installer/
+    │   └── install.sh        # Automated installer
+    └── sigma/
+        └── store/            # Base system packages
+
+***
 
 ## Installing on Real Hardware
 
@@ -241,10 +240,10 @@ iso_root/
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| CPU | x86_64, 1 GHz | x86_64 4+ cores, 2+ GHz |
+| CPU | x86\_64, 1 GHz | x86\_64 4+ cores, 2+ GHz |
 | RAM | 256 MB | 2 GB+ |
 | Storage | 4 GB | 20 GB+ SSD |
-| Architecture | x86_64 | x86_64 or aarch64 |
+| Architecture | x86\_64 | x86\_64 or aarch64 |
 
 ### Installation Steps
 
@@ -275,7 +274,7 @@ bash install.sh \
     --locale en_US.UTF-8
 ```
 
----
+***
 
 ## Troubleshooting
 
@@ -324,7 +323,7 @@ cargo check 2>&1 | grep -i warning | head -20
 CARGO_BUILD_JOBS=2 cargo build --release
 ```
 
----
+***
 
 ## Development Workflow
 
@@ -340,11 +339,11 @@ cargo clippy -- -D warnings   # Fail on any warning
 cargo test           # Full test suite
 ```
 
----
+***
 
 ## Getting Help
 
-- **GitHub Issues**: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
-- **GitHub Discussions**: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
-- **Wiki**: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
-- **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
+*   **GitHub Issues**: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
+*   **GitHub Discussions**: https://github.com/AaryanSinghChauhan09/SigmaOS/discussions
+*   **Wiki**: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+*   **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING)

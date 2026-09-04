@@ -1,18 +1,20 @@
-# WHAT_IS_WORKING_AND_NOT_WORKING.md
+# WHAT\_IS\_WORKING\_AND\_NOT\_WORKING.md
+
 ## Master AI Agent Algorithm Diagnostics & Fix Guide for SigmaOS
 
----
+***
 
 ## 1. Executive Overview & System Architecture
 
 SigmaOS is an ultra-autonomous, zero-dependency, safe Rust operating system designed for self-sufficiency, cross-distribution parity (Linux & BSD), and agentic intelligence.
 
 This document serves as the **Master AI Agent Algorithm Diagnostics & Fix Guide**. Any AI agent operating on this codebase can consult this guide to understand:
-1. **What is working**: Operating OS subsystems, fully tested algorithms, and functional feature matrices.
-2. **What is not working & Why**: Detailed root-cause analysis of active and historical compiler error codes (`E0004` to `E0659`, unclosed delimiters, type ambiguities).
-3. **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol.
 
----
+1.  **What is working**: Operating OS subsystems, fully tested algorithms, and functional feature matrices.
+2.  **What is not working & Why**: Detailed root-cause analysis of active and historical compiler error codes (`E0004` to `E0659`, unclosed delimiters, type ambiguities).
+3.  **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol.
+
+***
 
 ## 2. Operating Subsystems Matrix (What's Working)
 
@@ -33,7 +35,7 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 | **S-SHARD 11** | Telemetry & Diagnostics | **WORKING (100%)** | ABRT Crash Daemon (`FedoraAbrtCrashDaemon`), status.fpo infrastructure health monitor, Phoronix Test Suite runner, Devlink Health, Perf Events PMU. |
 | **S-SHARD 12** | Media, Office & Codecs | **WORKING (100%)** | PipeWire SPA audio session engine (`FedoraPipewireAudioSessionEngine`), LDAC/aptX Bluetooth negotiation, Adwaita vector icon theme, WebApp PWA containers. |
 
----
+***
 
 ## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
 
@@ -67,7 +69,7 @@ When modifying or expanding algorithms, AI agents may encounter Rust compiler er
 | **`E0659`** | Import Ambiguity | **Ambiguous import resolution**: Happens when two wildcard imports (`use foo::*; use bar::*;`) expose identical type names. |
 | **Delimiters** | Parser / Syntax | **Unclosed delimiter**: Caused by missing closing braces `}` or accidental insertion of `mod tests {` or module wrappers around whole files during merge operations. |
 
----
+***
 
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
 
@@ -319,34 +321,33 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 ```
 
----
+***
 
 ## 5. AI Agent 4-Step Diagnostic & Verification Protocol
 
 When working on any task in SigmaOS, AI agents **MUST** follow this 4-step workflow:
 
-```
-[ Step 1: Isolation ] ----> [ Step 2: Root-Cause Analysis ]
-                                    |
-                                    v
-[ Step 4: Verification ] <---- [ Step 3: Blueprint Fix ]
-```
+    [ Step 1: Isolation ] ----> [ Step 2: Root-Cause Analysis ]
+                                        |
+                                        v
+    [ Step 4: Verification ] <---- [ Step 3: Blueprint Fix ]
 
-1. **Step 1: Isolation**:
-   - Run `cargo check --all-targets` to capture exact compiler output.
-   - Locate file path, line number, and error code (e.g. `E0004`, `E0428`).
+1.  **Step 1: Isolation**:
+    *   Run `cargo check --all-targets` to capture exact compiler output.
+    *   Locate file path, line number, and error code (e.g. `E0004`, `E0428`).
 
-2. **Step 2: Root-Cause Tracing**:
-   - Look up error code in Section 3 of this guide.
-   - Determine if the issue is a duplicate struct/enum (`E0428`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), or duplicate import (`E0252`).
+2.  **Step 2: Root-Cause Tracing**:
+    *   Look up error code in Section 3 of this guide.
+    *   Determine if the issue is a duplicate struct/enum (`E0428`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), or duplicate import (`E0252`).
 
-3. **Step 3: Blueprint Fix Application**:
-   - Apply the corresponding safe Rust blueprint from Section 4.
-   - Modify the source file using `replace_with_git_merge_diff` or `write_file`.
+3.  **Step 3: Blueprint Fix Application**:
+    *   Apply the corresponding safe Rust blueprint from Section 4.
+    *   Modify the source file using `replace_with_git_merge_diff` or `write_file`.
 
-4. **Step 4: Regression Verification**:
-   - Run `cargo check --all-targets` to verify clean compilation.
-   - Execute `./run_sigma_tests.sh` to confirm 100% test suite pass rate.
+4.  **Step 4: Regression Verification**:
+    *   Run `cargo check --all-targets` to verify clean compilation.
+    *   Execute `./run_sigma_tests.sh` to confirm 100% test suite pass rate.
 
----
+***
+
 *Guide synchronized and verified across root directory, `wiki/`, and `wiki_repo/`.*
