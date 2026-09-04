@@ -119,17 +119,10 @@ pub use unimplemented_features::{
     NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine,
     PhoronixTestSuiteRunner, PowerState, PuppyLinuxOverlayRamdiskEngine, RavenWidgetState,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, RumpComponent,
-    RumpComponentType, S6ServiceInitSupervisor, SatSolverEngine, SerenityIpcEvent,
-    SerenityOsAsyncIpcLoop, SlackwarePackage, SlackwarePkgtoolEngine, SolusEopkgDeltaPackage,
-    SolusEopkgRavenGovernor, SovereignIpcBus, SteamOsGamescopeCompositorEngine, TargetArch,
-    TinyCoreModularTczLoader, UdfVm, UutilsCoreutilsZeroCopyBuffer, VoidXbpsContainerEngine,
-    WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
-};
-pub use unimplemented_tools::{
-    ChainedAuditTrailLedger, DiskImageSignatureCarver, DistroWatchTrendAnalyzerTool,
-    MetadataExifAntiForensicScrubber, NetworkPcapForensicSniffer, NixGuixStoreGarbageCollectorTool,
-    OpenBsdUnveilAuditTool, PhoronixSuiteAutomatedBenchmarkRunnerTool,
-    VolatileMemoryDumpForensicEngine,
+    RumpComponentType, SatSolverEngine, SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage,
+    SlackwarePkgtoolEngine, SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
+    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, UdfVm,
+    VoidXbpsContainerEngine, WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{

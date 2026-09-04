@@ -14,7 +14,7 @@
 
 Use **one** of these private channels:
 - **GitHub Security Advisories** (preferred): https://github.com/AaryanSinghChauhan09/SigmaOS/security/advisories/new
-- **Email**: aaryansinghchauhan090305@gmail.com — subject line: `[SECURITY] SigmaOS CVE Report`
+- **Email**: **aaryansinghchauhan090305@gmail.com** — subject line: `[SECURITY] SigmaOS CVE Report`
 
 ### Response Timeline
 | Severity | Acknowledgement | Fix Target |

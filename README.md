@@ -1,6 +1,5 @@
 # 🇸🇴 SigmaOS Sovereign Operating System
 
-[![Build Status](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/actions/workflows/sigmaos-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
