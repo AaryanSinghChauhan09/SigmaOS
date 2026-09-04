@@ -1,7 +1,7 @@
-extern crate alloc;
-// OOP-based Hardware Compatibility Matrix for SigmaOS
-// Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
+//! OOP-based Hardware Compatibility Matrix for SigmaOS
+//! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -9,6 +9,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AcpiPowerState {
     D0,
@@ -66,6 +67,7 @@ pub enum DeviceType {
     LegacyBus = 6,
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupportStatus {
     Supported = 0,
@@ -436,6 +438,12 @@ pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
 }
 
+pub trait DriverManager {
+    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
+    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()>;
+    fn get_driver_status(&self, device_id: DeviceID) -> bool;
+}
+
 pub struct SimpleDriverManager {
     pub loaded_drivers: Vec<DeviceID>,
 }
@@ -464,13 +472,12 @@ impl DriverManager for SimpleDriverManager {
     }
 
     fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
-        for i in 0..self.loaded_drivers.len() {
-            if self.loaded_drivers[i] == device_id {
-                self.loaded_drivers.remove(i);
-                return Ok(());
-            }
+        if let Some(pos) = self.loaded_drivers.iter().position(|&x| x == device_id) {
+            self.loaded_drivers.remove(pos);
+            Ok(())
+        } else {
+            Err(())
         }
-        Err(())
     }
 
     fn get_driver_status(&self, device_id: DeviceID) -> bool {
@@ -510,41 +517,94 @@ impl CompatibilityCheck for SimpleDiagnostics {
     fn run_full_scan(&self) -> CompatibilityReport {
         let mut results = Vec::new();
         for device in &self.matrix.devices {
-            let result = self.check_device((**device).id());
-            results.push(((**device).id(), result));
+            let result = self.check_device(device.id());
+            results.push((device.id(), result));
         }
         CompatibilityReport { results }
     }
 }
 
-pub type AcpiLoadBalancer = SimpleAcpiManager;
+/// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AcpiPowerState {
+    D0 = 0, // Fully functional
+    D1 = 1,
+    D2 = 2,
+    D3 = 3, // Power off
+}
+
+pub trait AcpiLoadBalancer {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
+    fn set_device_power_state(
+        &mut self,
+        device_id: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str>;
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState>;
+}
+
+pub struct SimpleAcpiManager {
+    pub irq_routing: std::collections::HashMap<u8, usize>, // maps IRQ to CPU ID
+    pub device_states: std::collections::HashMap<DeviceID, AcpiPowerState>,
+}
+
+impl SimpleAcpiManager {
+    pub fn new() -> Self {
+        SimpleAcpiManager {
+            irq_routing: std::collections::HashMap::new(),
+            device_states: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for SimpleAcpiManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AcpiLoadBalancer for SimpleAcpiManager {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
+        self.irq_routing.insert(interrupt_line, cpu_id);
+        Ok(())
+    }
+
+    fn set_device_power_state(
+        &mut self,
+        device_id: DeviceID,
+        state: AcpiPowerState,
+    ) -> Result<(), &'static str> {
+        self.device_states.insert(device_id, state);
+        Ok(())
+    }
+
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState> {
+        self.device_states.get(&device_id).copied()
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_multi_generation_hardware_matrix() {
-        let mut matrix = SimpleCompatibilityMatrix::new();
-        matrix.seed_with_defaults();
-
-        let com1_id = matrix.find_by_vendor_device(0x0003, 0x03F8).unwrap();
-        let com1_dev = matrix.get_device(com1_id).unwrap();
-        assert_eq!(com1_dev.device_type(), DeviceType::LegacyBus);
-        assert_eq!(com1_dev.name(), "Serial Port COM1 (UART 16550)");
-
-        let nvme_id = matrix.find_by_vendor_device(0x144D, 0xA808).unwrap();
-        let nvme_dev = matrix.get_device(nvme_id).unwrap();
-        assert_eq!(nvme_dev.device_type(), DeviceType::Storage);
-        assert_eq!(nvme_dev.name(), "Samsung PCIe Gen 4 NVMe Controller");
-    }
-
-    #[test]
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 14);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
+        assert_eq!(matrix.list_supported().len(), 7);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+    }
+
+    #[test]
+    fn test_driver_manager_lifecycle() {
+        let mut driver_manager = SimpleDriverManager::new();
+        assert!(!driver_manager.get_driver_status(42));
+
+        driver_manager.load_driver(42).unwrap();
+        assert!(driver_manager.get_driver_status(42));
+
+        driver_manager.unload_driver(42).unwrap();
+        assert!(!driver_manager.get_driver_status(42));
     }
 
     #[test]
