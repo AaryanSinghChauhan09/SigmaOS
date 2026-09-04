@@ -211,6 +211,9 @@ The following innovations are planned but not yet fully implemented:
 
 ### Recently Transferred to Completed Features:
 
+*   **BPF Type Format (BTF)**: Fully implemented in `src/distro/missing_distro_innovations.rs` (`BpfTypeFormatEngine`).
+*   **EROFS Read-Only Overlay FS**: Fully implemented in `src/distro/missing_distro_innovations.rs` (`ErofsReadOnlyOverlayEngine`).
+*   **LoongArch 64-bit Architecture**: Fully implemented in `src/distro/missing_distro_innovations.rs` (`LoongArch64ArchitectureEngine`).
 *   **io\_uring Async I/O**: Fully implemented in `src/kernel/linux_parity.rs`, `src/kernel/io_uring.rs`, and `src/distro/missing_distro_innovations.rs`.
 *   **Landlock LSM**: Fully implemented in `src/distro/linux_bsd_inspirations.rs` (`SovereignLandlockLsm`), `src/container/distro_sandbox.rs`, and `src/kernel/linux_bsd_innovations.rs`.
 *   **zRAM Compressed Swap**: Fully implemented in `src/memory/paging.rs`, `src/memory/kswapd.rs`, `src/compatibility/garuda_zen.rs`, and `src/performance/cachy_opt.rs`.
