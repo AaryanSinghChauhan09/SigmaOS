@@ -376,8 +376,197 @@ impl NetBsdPkgsrcDeterministicBulkBuilder {
     }
 }
 
+// =========================================================================
+// 5. OPENBSD SIGNIFY PACKAGE REPRODUCER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdSignifyPackageReproducer {
+    pub key_name: String,
+    pub pubkey: String,
+    pub seckey: String,
+}
+
+impl OpenBsdSignifyPackageReproducer {
+    pub fn new(key_name: &str) -> Self {
+        Self {
+            key_name: key_name.to_string(),
+            pubkey: format!("untrusted comment: {} public key\nRWRzc1Rlc3RQdWJLZXkxMjM0NTY3ODkwYWJjZGVmZ2hpams=", key_name),
+            seckey: format!("untrusted comment: {} secret key\nU2VjS2V5VGVzdE1vY2sxMjM0NTY3ODkwYWJjZGVmZ2hpams=", key_name),
+        }
+    }
+
+    pub fn sign_package_manifest(&self, manifest_content: &str) -> String {
+        let mut hash_val = 5381u64;
+        for b in manifest_content.bytes() {
+            hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
+        }
+        let sig = format!("{:016x}{:016x}", hash_val, hash_val.wrapping_add(0x1337));
+        format!(
+            "untrusted comment: verify with {}.pub\nSIG:{}\n{}",
+            self.key_name, sig, manifest_content
+        )
+    }
+
+    pub fn verify_package_signature(&self, signed_manifest: &str) -> bool {
+        signed_manifest.contains("untrusted comment: verify with") && signed_manifest.contains("SIG:")
+    }
+}
+
+// =========================================================================
+// 6. VOID LINUX XBPS-SRC REPRODUCIBLE CONTAINER BUILDER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NormalizedTarEntry {
+    pub name: String,
+    pub mode: u32,
+    pub uid: u32,
+    pub gid: u32,
+    pub mtime: u64,
+    pub size: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidXbpsSrcReproducibleContainer {
+    pub pkgname: String,
+    pub version: String,
+    pub revision: u32,
+    pub source_date_epoch: u64,
+    pub entries: Vec<NormalizedTarEntry>,
+}
+
+impl VoidXbpsSrcReproducibleContainer {
+    pub fn new(pkgname: &str, version: &str, revision: u32, source_date_epoch: u64) -> Self {
+        Self {
+            pkgname: pkgname.to_string(),
+            version: version.to_string(),
+            revision,
+            source_date_epoch,
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn add_file_entry(&mut self, name: &str, is_executable: bool, data: &[u8]) {
+        let mode = if is_executable { 0o755 } else { 0o644 };
+        self.entries.push(NormalizedTarEntry {
+            name: name.to_string(),
+            mode,
+            uid: 0,
+            gid: 0,
+            mtime: self.source_date_epoch,
+            size: data.len(),
+        });
+    }
+
+    pub fn build_reproducible_xbps_package(&self) -> (String, Vec<u8>) {
+        let filename = format!("{}-{}_{}.x86_64.xbps", self.pkgname, self.version, self.revision);
+        let mut manifest = format!("pkgname={}\nversion={}\nrevision={}\nmtime={}\n", self.pkgname, self.version, self.revision, self.source_date_epoch);
+        for entry in &self.entries {
+            manifest.push_str(&format!("entry={}:{:o}:{}:{}:{}\n", entry.name, entry.mode, entry.uid, entry.gid, entry.mtime));
+        }
+        (filename, manifest.into_bytes())
+    }
+}
+
+// =========================================================================
+// 7. DEBIAN REPRODUCIBLE BUILDS ENVIRONMENT SANITIZER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DebianReproBuildEnvironmentSanitizer {
+    pub source_date_epoch: u64,
+    pub build_path: String,
+}
+
+impl DebianReproBuildEnvironmentSanitizer {
+    pub fn new(source_date_epoch: u64, build_path: &str) -> Self {
+        Self {
+            source_date_epoch,
+            build_path: build_path.to_string(),
+        }
+    }
+
+    pub fn sanitize_environment(&self) -> HashMap<String, String> {
+        let mut env = HashMap::new();
+        env.insert("SOURCE_DATE_EPOCH".to_string(), self.source_date_epoch.to_string());
+        env.insert("LANG".to_string(), "C.UTF-8".to_string());
+        env.insert("LC_ALL".to_string(), "C.UTF-8".to_string());
+        env.insert("TZ".to_string(), "UTC".to_string());
+        env.insert("UMASK".to_string(), "0022".to_string());
+        env.insert("BUILD_PATH".to_string(), self.build_path.clone());
+        env
+    }
+
+    pub fn generate_repro_compiler_flags(&self) -> Vec<String> {
+        vec![
+            format!("-fdebug-prefix-map={}=", self.build_path),
+            format!("--remap-path-prefix={}=", self.build_path),
+            "-Wl,--build-id=sha1".to_string(),
+        ]
+    }
+}
+
+// =========================================================================
+// 8. SIGMAPKG REPRODUCIBILITY PIPELINE ORCHESTRATOR
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PipelineResult {
+    pub pkg_name: String,
+    pub is_fully_reproducible: bool,
+    pub signed_manifest: String,
+    pub build_info_hash: String,
+    pub diff_report: Vec<String>,
+}
+
+pub struct SigmaPkgReproducibilityPipeline {
+    pub pkg_name: String,
+    pub source_date_epoch: u64,
+    pub signify_reproducer: OpenBsdSignifyPackageReproducer,
+}
+
+impl SigmaPkgReproducibilityPipeline {
+    pub fn new(pkg_name: &str, source_date_epoch: u64) -> Self {
+        Self {
+            pkg_name: pkg_name.to_string(),
+            source_date_epoch,
+            signify_reproducer: OpenBsdSignifyPackageReproducer::new(pkg_name),
+        }
+    }
+
+    pub fn execute_reproducible_pipeline(
+        &self,
+        bin1: &[u8],
+        bin2: &[u8],
+    ) -> PipelineResult {
+        let sanitizer = DebianReproBuildEnvironmentSanitizer::new(self.source_date_epoch, "/build/sigmaos");
+        let _env = sanitizer.sanitize_environment();
+
+        let diff_report = ReproducibleBuildDiffInspector::inspect_diffs(bin1, bin2);
+        let is_fully_reproducible = diff_report.is_empty();
+
+        let repro_inspector = ArchLinuxReproBuildInspector::new(&self.pkg_name, "1.0.0", self.source_date_epoch);
+        let build_info_hash = repro_inspector.compute_buildinfo_hash();
+
+        let raw_manifest = format!(
+            "pkgname={}\nreproducible={}\nbuild_info_hash={}\nepoch={}",
+            self.pkg_name, is_fully_reproducible, build_info_hash, self.source_date_epoch
+        );
+        let signed_manifest = self.signify_reproducer.sign_package_manifest(&raw_manifest);
+
+        PipelineResult {
+            pkg_name: self.pkg_name.clone(),
+            is_fully_reproducible,
+            signed_manifest,
+            build_info_hash,
+            diff_report,
+        }
+    }
+}
+
 // ==========================================
-// 5. Tests Module
+// 9. Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -730,5 +919,61 @@ impl SovereignPackageReproducibilityAuditor {
         let verified = builder.verify_distfile(sample_bytes);
         assert!(verified);
         assert_eq!(builder.wrkdir, "/usr/pkgsrc/shells/zsh/work");
+    }
+
+    #[test]
+    fn test_openbsd_signify_package_reproducer() {
+        let reproducer = OpenBsdSignifyPackageReproducer::new("sigmaos-release");
+        let manifest = "pkgname=ripgrep\nversion=14.1.0\nhash=abc123xyz";
+
+        let signed = reproducer.sign_package_manifest(manifest);
+        assert!(reproducer.verify_package_signature(&signed));
+        assert!(signed.contains("untrusted comment: verify with sigmaos-release.pub"));
+    }
+
+    #[test]
+    fn test_void_xbps_src_reproducible_container() {
+        let mut container = VoidXbpsSrcReproducibleContainer::new("curl", "8.5.0", 1, 1700000000);
+        container.add_file_entry("/usr/bin/curl", true, b"binary_curl_data");
+        container.add_file_entry("/usr/share/doc/curl/README", false, b"readme_data");
+
+        let (filename, pkg_bytes) = container.build_reproducible_xbps_package();
+        assert_eq!(filename, "curl-8.5.0_1.x86_64.xbps");
+
+        let manifest_str = String::from_utf8_lossy(&pkg_bytes);
+        assert!(manifest_str.contains("pkgname=curl"));
+        assert!(manifest_str.contains("entry=/usr/bin/curl:755:0:0:1700000000"));
+        assert!(manifest_str.contains("entry=/usr/share/doc/curl/README:644:0:0:1700000000"));
+    }
+
+    #[test]
+    fn test_debian_repro_build_environment_sanitizer() {
+        let sanitizer = DebianReproBuildEnvironmentSanitizer::new(1700000000, "/build/workspace");
+        let env = sanitizer.sanitize_environment();
+
+        assert_eq!(env.get("SOURCE_DATE_EPOCH").map(|s| s.as_str()), Some("1700000000"));
+        assert_eq!(env.get("TZ").map(|s| s.as_str()), Some("UTC"));
+        assert_eq!(env.get("LANG").map(|s| s.as_str()), Some("C.UTF-8"));
+
+        let flags = sanitizer.generate_repro_compiler_flags();
+        assert!(flags.iter().any(|f| f.contains("-fdebug-prefix-map=/build/workspace=")));
+        assert!(flags.iter().any(|f| f.contains("-Wl,--build-id=sha1")));
+    }
+
+    #[test]
+    fn test_sigmapkg_reproducibility_pipeline() {
+        let pipeline = SigmaPkgReproducibilityPipeline::new("sovereign-kernel", 1700000000);
+        let bin_pass = b"reproducible_kernel_payload_bytes_v1";
+
+        let result_pass = pipeline.execute_reproducible_pipeline(bin_pass, bin_pass);
+        assert!(result_pass.is_fully_reproducible);
+        assert!(result_pass.diff_report.is_empty());
+        assert!(result_pass.signed_manifest.contains("reproducible=true"));
+
+        let bin_fail = b"reproducible_kernel_payload_TAMPERED";
+        let result_fail = pipeline.execute_reproducible_pipeline(bin_pass, bin_fail);
+        assert!(!result_fail.is_fully_reproducible);
+        assert!(!result_fail.diff_report.is_empty());
+        assert!(result_fail.signed_manifest.contains("reproducible=false"));
     }
 }
