@@ -463,7 +463,8 @@ impl Wsl2LxssBridgeEngine {
     }
 
     pub fn register_distro(&mut self, config: Wsl2DistroConfig) {
-        self.active_distros.insert(config.distro_name.clone(), config);
+        self.active_distros
+            .insert(config.distro_name.clone(), config);
     }
 
     pub fn translate_drvfs_path(&self, windows_path: &str) -> String {
