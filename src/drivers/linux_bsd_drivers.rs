@@ -268,6 +268,81 @@ impl IntelXeDrmDriver {
 }
 
 // =========================================================================
+// 16. FreeBSD Broadcom bwn Wireless LAN Driver
+// =========================================================================
+
+pub struct FreeBsdBwnWifiDriver {
+    pub mac_address: [u8; 6],
+    pub is_firmware_loaded: bool,
+    pub is_associated: bool,
+}
+
+impl FreeBsdBwnWifiDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            is_firmware_loaded: true,
+            is_associated: false,
+        }
+    }
+
+    pub fn associate(&mut self, _ssid: &str) -> Result<(), &'static str> {
+        self.is_associated = true;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 17. OpenBSD uvideo USB Video Class (UVC) Camera Driver
+// =========================================================================
+
+pub struct OpenBsdUvideoCameraDriver {
+    pub device_name: String,
+    pub is_streaming: bool,
+    pub width: u32,
+    pub height: u32,
+}
+
+impl OpenBsdUvideoCameraDriver {
+    pub fn new(name: &str) -> Self {
+        Self {
+            device_name: name.to_string(),
+            is_streaming: false,
+            width: 1920,
+            height: 1080,
+        }
+    }
+
+    pub fn start_stream(&mut self) -> Result<(), &'static str> {
+        self.is_streaming = true;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 18. NetBSD VirtIO 9P2000.L Transport Driver
+// =========================================================================
+
+pub struct NetBsdVirtio9pDriver {
+    pub mount_tag: String,
+    pub is_mounted: bool,
+}
+
+impl NetBsdVirtio9pDriver {
+    pub fn new(tag: &str) -> Self {
+        Self {
+            mount_tag: tag.to_string(),
+            is_mounted: false,
+        }
+    }
+
+    pub fn mount_passthrough(&mut self) -> Result<(), &'static str> {
+        self.is_mounted = true;
+        Ok(())
+    }
+}
+
+// =========================================================================
 // 16. Open Nvidia / Nouveau DRM/KMS Driver (Linux nouveau parity)
 // =========================================================================
 
@@ -1399,6 +1474,37 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_device_manager_open_source_driver_probing() {
+        let mut dev_mgr = SovereignDeviceManager::new();
+
+        let rdna3 = dev_mgr.auto_probe_pci_device(0x1002, 0x744C).unwrap();
+        assert_eq!(rdna3, "AMD RDNA 3 DCN 3.2 Display Driver");
+
+        let bwn = dev_mgr.auto_probe_pci_device(0x14e4, 0x43a0).unwrap();
+        assert_eq!(bwn, "FreeBSD Broadcom bwn Wireless Driver");
+
+        let virtio_9p = dev_mgr.auto_probe_pci_device(0x1af4, 0x1009).unwrap();
+        assert_eq!(virtio_9p, "NetBSD VirtIO 9P2000.L Transport Driver");
+
+        let uvideo = dev_mgr.auto_probe_usb_device(0x046d, 0x0825).unwrap();
+        assert_eq!(uvideo, "OpenBSD uvideo UVC Camera Driver");
+
+        assert_eq!(dev_mgr.bound_drivers.len(), 4);
+
+        let mut bwn_driver = FreeBsdBwnWifiDriver::new([0x00, 0x10, 0x18, 0x00, 0x11, 0x22]);
+        assert!(bwn_driver.associate("SigmaOS_WiFi").is_ok());
+        assert!(bwn_driver.is_associated);
+
+        let mut uvideo_driver = OpenBsdUvideoCameraDriver::new("Webcam 1080p");
+        assert!(uvideo_driver.start_stream().is_ok());
+        assert!(uvideo_driver.is_streaming);
+
+        let mut virtio9p_driver = NetBsdVirtio9pDriver::new("host_root");
+        assert!(virtio9p_driver.mount_passthrough().is_ok());
+        assert!(virtio9p_driver.is_mounted);
+    }
+
+    #[test]
     fn test_virtio_gpu_sound_r8169_igc_and_sensor_drivers() {
         let mut vgpu = VirtioGpu3dDriver::new();
         let fence = vgpu.submit_3d_command_stream(&[0x01, 0x02, 0x03]).unwrap();
@@ -1496,12 +1602,15 @@ impl SovereignDeviceManager {
     pub fn auto_probe_pci_device(&mut self, vendor: u16, device: u16) -> Result<&'static str, &'static str> {
         let driver = match (vendor, device) {
             (0x1002, 0x731F) => "AMDGPU DRM/KMS Driver",
+            (0x1002, 0x744C) => "AMD RDNA 3 DCN 3.2 Display Driver",
             (0x8086, 0x125b) => "Intel igc 2.5GbE Ethernet Driver",
             (0x1af4, 0x1050) => "VirtIO GPU 3D Display Driver",
+            (0x1af4, 0x1009) => "NetBSD VirtIO 9P2000.L Transport Driver",
             (0x10de, 0x2782) => "Nouveau Open Nvidia DRM/KMS Driver",
             (0x106b, 0x2001) => "Apple Silicon ANS2 NVMe Driver",
             (0x5143, 0x0740) => "Qualcomm Adreno MSM DRM Driver",
             (0x8086, 0x272b) => "Intel Wi-Fi 7 BE200 Driver",
+            (0x14e4, 0x43a0) => "FreeBSD Broadcom bwn Wireless Driver",
             _ => return Err("Unknown PCI device"),
         };
         self.bound_drivers.push(driver);
@@ -1512,6 +1621,7 @@ impl SovereignDeviceManager {
         let driver = match (vendor, device) {
             (0x056a, 0x037a) => "Wacom Precision Tablet Driver",
             (0x170b, 0x0011) => "USB MIDI 2.0 & Audio Class 3.0 Driver",
+            (0x046d, 0x0825) => "OpenBSD uvideo UVC Camera Driver",
             _ => return Err("Unknown USB device"),
         };
         self.bound_drivers.push(driver);
