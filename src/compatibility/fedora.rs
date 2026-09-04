@@ -319,7 +319,8 @@ impl BodhiUpdateTriage {
 
         self.updates.insert(update_id.to_string(), update);
         self.stable_gated.insert(update_id.to_string(), false);
-        self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Testing);
+        self.update_statuses
+            .insert(update_id.to_string(), BodhiUpdateStatus::Testing);
         self.openqa_ci_passed.insert(update_id.to_string(), false);
     }
 
@@ -329,7 +330,8 @@ impl BodhiUpdateTriage {
             if let Some(&karma) = self.updates.get(update_id) {
                 if karma >= 3 {
                     self.stable_gated.insert(update_id.to_string(), true);
-                    self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+                    self.update_statuses
+                        .insert(update_id.to_string(), BodhiUpdateStatus::Stable);
                 }
             }
         }
@@ -338,7 +340,8 @@ impl BodhiUpdateTriage {
     pub fn apply_security_karma_waiver(&mut self, update_id: &str) -> Result<(), String> {
         if self.updates.contains_key(update_id) {
             self.stable_gated.insert(update_id.to_string(), true);
-            self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+            self.update_statuses
+                .insert(update_id.to_string(), BodhiUpdateStatus::Stable);
             Ok(())
         } else {
             Err("Update package not found".to_string())
@@ -469,10 +472,12 @@ impl BodhiUpdateTriage {
             {
                 up.status = BodhiUpdateStatus::Stable;
                 self.stable_gated.insert(update_id.to_string(), true);
-                self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::Stable);
+                self.update_statuses
+                    .insert(update_id.to_string(), BodhiUpdateStatus::Stable);
             } else if current_karma <= -3 {
                 self.stable_gated.insert(update_id.to_string(), false);
-                self.update_statuses.insert(update_id.to_string(), BodhiUpdateStatus::AutoUnpushed);
+                self.update_statuses
+                    .insert(update_id.to_string(), BodhiUpdateStatus::AutoUnpushed);
             }
 
             Ok(current_karma)
@@ -489,11 +494,15 @@ impl BodhiUpdateTriage {
             }
 
             if up.ci_test_result == BodhiTestResult::Failed {
-                return Err("Cannot promote to stable: Automated Greenwave CI tests failed".to_string());
+                return Err(
+                    "Cannot promote to stable: Automated Greenwave CI tests failed".to_string(),
+                );
             }
 
             // Security fast-track
-            if up.update_type == BodhiUpdateType::Security && (up.karma >= 1 || up.ci_test_result == BodhiTestResult::Passed) {
+            if up.update_type == BodhiUpdateType::Security
+                && (up.karma >= 1 || up.ci_test_result == BodhiTestResult::Passed)
+            {
                 up.status = BodhiUpdateStatus::Stable;
                 self.stable_gated.insert(update_id.to_string(), true);
                 return Ok(true);
@@ -3004,7 +3013,8 @@ impl FedoraTheNewHotnessEngine {
         fedora_pkg_name: &str,
         current_version: &str,
     ) {
-        self.mappings.retain(|m| m.anitya_project_id != anitya_project_id);
+        self.mappings
+            .retain(|m| m.anitya_project_id != anitya_project_id);
         self.mappings.push(AnityaPackageMapping {
             anitya_project_id,
             upstream_name: upstream_name.to_string(),
@@ -3047,7 +3057,8 @@ impl FedoraTheNewHotnessEngine {
                 anitya_project_id, fedora_pkg, old_ver, latest_upstream_version, release_url
             );
 
-            self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+            self.messaging_engine
+                .publish_message(&topic, &body, timestamp_secs);
             self.release_events.push(event.clone());
 
             Ok(Some(event))
@@ -3107,7 +3118,8 @@ impl FedoraPlanetAggregationEngine {
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
-        self.registered_feeds.retain(|f| f.fas_account != fas_account);
+        self.registered_feeds
+            .retain(|f| f.fas_account != fas_account);
         self.registered_feeds.push(PlanetUserFeed {
             fas_account: fas_account.to_string(),
             feed_url: feed_url.to_string(),
@@ -3234,10 +3246,11 @@ impl FedoraTahrirEngine {
         let hashtags = Self::extract_hashtags(content);
 
         let topic = format!("org.fedoraproject.prod.tahrir.post.{}", author);
-        let fedmsg = self
-            .messaging_gateway
-            .messaging_engine
-            .publish_message(&topic, content, timestamp_secs);
+        let fedmsg = self.messaging_gateway.messaging_engine.publish_message(
+            &topic,
+            content,
+            timestamp_secs,
+        );
 
         let post = TahrirMessagePost {
             post_id,
@@ -3630,9 +3643,13 @@ impl FedoraAbrtCrashDaemon {
             reported_to_bugzilla: false,
         };
 
-        let topic = format!("org.fedoraproject.prod.abrt.crash.{}", signal.to_lowercase());
+        let topic = format!(
+            "org.fedoraproject.prod.abrt.crash.{}",
+            signal.to_lowercase()
+        );
         let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
-        self.messaging_engine.publish_message(&topic, &body, timestamp_secs);
+        self.messaging_engine
+            .publish_message(&topic, &body, timestamp_secs);
 
         self.captured_crashes.insert(signature, report.clone());
         report
@@ -3700,14 +3717,18 @@ impl FedoraToolbxContainerEngine {
             running: false,
         };
 
-        self.active_containers.insert(name.to_string(), container.clone());
+        self.active_containers
+            .insert(name.to_string(), container.clone());
         container
     }
 
     pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
         if let Some(c) = self.active_containers.get_mut(name) {
             c.running = true;
-            Ok(format!("Toolbx container '{}' started using image '{}'", c.name, c.image))
+            Ok(format!(
+                "Toolbx container '{}' started using image '{}'",
+                c.name, c.image
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -4832,7 +4853,10 @@ mod tests {
         let mut bodhi = BodhiUpdateTriage::new();
         bodhi.submit_update("FEDORA-2023-A8F8");
 
-        assert_eq!(bodhi.get_update_status("FEDORA-2023-A8F8"), Some(BodhiUpdateStatus::Testing));
+        assert_eq!(
+            bodhi.get_update_status("FEDORA-2023-A8F8"),
+            Some(BodhiUpdateStatus::Testing)
+        );
         assert!(!bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
 
         // Increase karma
@@ -4843,14 +4867,19 @@ mod tests {
         // Direct promotion
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
-        assert_eq!(bodhi.get_update_status("FEDORA-2023-A8F8"), Some(BodhiUpdateStatus::Stable));
+        assert_eq!(
+            bodhi.get_update_status("FEDORA-2023-A8F8"),
+            Some(BodhiUpdateStatus::Stable)
+        );
 
         // Side-tag and security waiver testing
         bodhi.create_side_tag("f39-build-sidetag");
         assert_eq!(bodhi.side_tags.len(), 1);
 
         bodhi.submit_update("FEDORA-2023-SEC1");
-        assert!(bodhi.apply_security_karma_waiver("FEDORA-2023-SEC1").is_ok());
+        assert!(bodhi
+            .apply_security_karma_waiver("FEDORA-2023-SEC1")
+            .is_ok());
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
     }
 
@@ -5618,15 +5647,24 @@ mod tests {
     #[test]
     fn test_fedora_status_fpo_engine() {
         let mut status = FedoraStatusFpoEngine::new();
-        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
+        assert_eq!(
+            status.service_states.get("Koji"),
+            Some(&StatusFpoServiceHealth::Good)
+        );
         assert_eq!(status.calculate_uptime_sla_percentage(), 100.0);
 
         status.report_incident(101, "Koji", "Database connectivity degradation");
-        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::MajorOutage));
+        assert_eq!(
+            status.service_states.get("Koji"),
+            Some(&StatusFpoServiceHealth::MajorOutage)
+        );
         assert_eq!(status.incidents.len(), 1);
 
         assert!(status.resolve_incident(101));
-        assert_eq!(status.service_states.get("Koji"), Some(&StatusFpoServiceHealth::Good));
+        assert_eq!(
+            status.service_states.get("Koji"),
+            Some(&StatusFpoServiceHealth::Good)
+        );
 
         let summary = status.generate_status_summary();
         assert!(summary.contains("status.fpo"));
@@ -5695,7 +5733,8 @@ mod tests {
         let payload = FedoraWebhookPayload {
             source_service: "github".to_string(),
             event_type: "push".to_string(),
-            raw_json_body: "{\"ref\": \"refs/heads/main\", \"repository\": \"sigmaos\"}".to_string(),
+            raw_json_body: "{\"ref\": \"refs/heads/main\", \"repository\": \"sigmaos\"}"
+                .to_string(),
             hmac_signature: "sha256=abcdef123456".to_string(),
         };
 
@@ -5703,15 +5742,9 @@ mod tests {
             .process_and_dispatch_webhook(&payload, "webhook_secret", 1700000000)
             .unwrap();
 
-        assert_eq!(
-            msg.topic,
-            "org.fedoraproject.prod.webhook.github.push"
-        );
+        assert_eq!(msg.topic, "org.fedoraproject.prod.webhook.github.push");
         assert_eq!(gateway.processed_webhooks_count, 1);
-        assert_eq!(
-            gateway.messaging_engine.published_messages.len(),
-            1
-        );
+        assert_eq!(gateway.messaging_engine.published_messages.len(), 1);
 
         let fetched = gateway
             .messaging_engine
@@ -5744,7 +5777,10 @@ mod tests {
 
         assert_eq!(post.post_id, 1);
         assert!(post.fedmsg_dispatched);
-        assert_eq!(post.hashtags, vec!["SigmaOS".to_string(), "PQC".to_string()]);
+        assert_eq!(
+            post.hashtags,
+            vec!["SigmaOS".to_string(), "PQC".to_string()]
+        );
 
         let user_timeline = tahrir.fetch_user_timeline("jules_dev");
         assert_eq!(user_timeline.len(), 1);
@@ -5763,8 +5799,16 @@ mod tests {
         let mut ignition = FedoraIgnitionEngine::new();
 
         ignition.add_file("/etc/hostname", "sigmaos-node-1", 0o644);
-        ignition.add_user("admin", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "docker"]);
-        ignition.add_systemd_unit("node-exporter.service", true, "[Unit]\nDescription=Node Exporter\n");
+        ignition.add_user(
+            "admin",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+            &["wheel", "docker"],
+        );
+        ignition.add_systemd_unit(
+            "node-exporter.service",
+            true,
+            "[Unit]\nDescription=Node Exporter\n",
+        );
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
@@ -5829,17 +5873,31 @@ mod tests {
     fn test_fedora_toolbx_container_engine() {
         let mut engine = FedoraToolbxContainerEngine::new();
 
-        let container = engine.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39");
+        let container = engine.create_toolbx(
+            "fedora-toolbox-39",
+            "registry.fedoraproject.org/fedora-toolbox:39",
+        );
         assert_eq!(container.name, "fedora-toolbox-39");
         assert!(container.host_mounts.contains(&"/home".to_string()));
         assert!(!container.running);
 
         assert!(engine.add_host_mount("fedora-toolbox-39", "/mnt/data"));
-        assert!(engine.active_containers.get("fedora-toolbox-39").unwrap().host_mounts.contains(&"/mnt/data".to_string()));
+        assert!(engine
+            .active_containers
+            .get("fedora-toolbox-39")
+            .unwrap()
+            .host_mounts
+            .contains(&"/mnt/data".to_string()));
 
         let start_res = engine.start_toolbx("fedora-toolbox-39").unwrap();
         assert!(start_res.contains("started using image"));
-        assert!(engine.active_containers.get("fedora-toolbox-39").unwrap().running);
+        assert!(
+            engine
+                .active_containers
+                .get("fedora-toolbox-39")
+                .unwrap()
+                .running
+        );
     }
 
     #[test]
@@ -6003,5 +6061,40 @@ mod tests {
         roles.apply_firewall_role(&[80, 443, 8080]);
         assert_eq!(roles.applied_roles.len(), 2);
         assert_eq!(roles.configured_firewall_ports.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_the_new_hotness_engine() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.0");
+
+        assert_eq!(hotness.mappings.len(), 1);
+        assert_eq!(hotness.mappings[0].current_stable_version, "8.2.0");
+
+        // Same version check -> no event
+        let no_event = hotness
+            .process_upstream_release_check(1234, "8.2.0", "https://curl.se/release", 1700000000)
+            .unwrap();
+        assert!(no_event.is_none());
+
+        // New version release check -> event generated & fedmsg published
+        let event = hotness
+            .process_upstream_release_check(
+                1234,
+                "8.3.0",
+                "https://curl.se/release-8.3.0",
+                1700000100,
+            )
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(event.old_version, "8.2.0");
+        assert_eq!(event.new_version, "8.3.0");
+        assert_eq!(event.fedora_package_name, "curl");
+        assert_eq!(hotness.release_events.len(), 1);
+        assert_eq!(hotness.messaging_engine.published_messages.len(), 1);
+        assert!(hotness.messaging_engine.published_messages[0]
+            .topic
+            .contains("org.fedoraproject.prod.hotness.update.curl"));
     }
 }

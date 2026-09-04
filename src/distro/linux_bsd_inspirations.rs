@@ -100,12 +100,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
+
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 ServiceSupervisorType::Runit
             }
-            DistroSubsystemMode::LinuxNix => ServiceSupervisorType::Shepherd,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::SysVInit,
-            DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
+
+            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                ServiceSupervisorType::Shepherd
+            }
+
+            DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -209,8 +215,19 @@ impl SovereignUniversalDistroBridge {
                 }
             };
 
-            if !valid_supervisor {
-                return false;
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    supervisor == ServiceSupervisorType::Runit
+                }
+
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    supervisor == ServiceSupervisorType::Shepherd
+                }
+
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => {
+                    supervisor == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             }
         }
 
@@ -237,8 +254,13 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::SmartOs => {
+                format!("{}.tgz", input_pkg)
+            }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
+            DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
 
@@ -248,7 +270,9 @@ impl SovereignUniversalDistroBridge {
         root_path: &str,
     ) -> Result<(), &'static str> {
         match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd | DistroSubsystemMode::SmartOs => {
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::SmartOs => {
                 let jail = FreeBSDJail::new(pid, root_path.to_string(), "sigma-jail".to_string());
                 self.active_jail = Some(jail);
                 Ok(())
@@ -261,7 +285,12 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => {
                 let mut zone_engine = SovereignIllumosZonesEngine::new();
-                let zone_id = zone_engine.create_zone("zone-isolate", ZoneBrand::Native, 50, 1024 * 1024 * 512)?;
+                let zone_id = zone_engine.create_zone(
+                    "zone-isolate",
+                    ZoneBrand::Native,
+                    50,
+                    1024 * 1024 * 512,
+                )?;
                 zone_engine.boot_zone(zone_id)?;
                 Ok(())
             }
@@ -309,7 +338,8 @@ impl SovereignUniversalDistroBridge {
                 ))
             }
             "storage" => {
-                let healed = self.verify_and_self_heal_cow_file("@root", action, b"default")
+                let healed = self
+                    .verify_and_self_heal_cow_file("@root", action, b"default")
                     .map_err(|_| "CoW storage operation failed")?;
                 Ok(format!(
                     "Dispatched storage CoW self-heal check for '{}' (healed: {}) under distro mode '{:?}'",
@@ -317,7 +347,8 @@ impl SovereignUniversalDistroBridge {
                 ))
             }
             "kernel" => {
-                let pid = self.schedule_distro_task(101, action, 50)
+                let pid = self
+                    .schedule_distro_task(101, action, 50)
                     .ok_or("Scheduler task registration failed")?;
                 Ok(format!(
                     "Dispatched kernel/scheduler task '{}' for PID {} under distro mode '{:?}'",
@@ -4564,21 +4595,64 @@ mod tests {
 
         // Test all additional distro subsystem modes
         let modes = [
-            (DistroSubsystemMode::LinuxVoid, "xbps", ServiceSupervisorType::Runit),
-            (DistroSubsystemMode::LinuxSlackware, "txz", ServiceSupervisorType::Sysvinit),
-            (DistroSubsystemMode::LinuxOpenSuse, "rpm", ServiceSupervisorType::Systemd),
-            (DistroSubsystemMode::LinuxPopOs, "deb", ServiceSupervisorType::Systemd),
-            (DistroSubsystemMode::LinuxSolus, "eopkg", ServiceSupervisorType::Dinit),
-            (DistroSubsystemMode::LinuxGuix, "scm", ServiceSupervisorType::Shepherd),
-            (DistroSubsystemMode::LinuxClear, "swupd", ServiceSupervisorType::Systemd),
-            (DistroSubsystemMode::LinuxTails, "deb", ServiceSupervisorType::Systemd),
-            (DistroSubsystemMode::SmartOs, "tgz", ServiceSupervisorType::Rcd),
-            (DistroSubsystemMode::BedrockLinux, "stratum", ServiceSupervisorType::Systemd),
+            (
+                DistroSubsystemMode::LinuxVoid,
+                "xbps",
+                ServiceSupervisorType::Runit,
+            ),
+            (
+                DistroSubsystemMode::LinuxSlackware,
+                "txz",
+                ServiceSupervisorType::Sysvinit,
+            ),
+            (
+                DistroSubsystemMode::LinuxOpenSuse,
+                "rpm",
+                ServiceSupervisorType::Systemd,
+            ),
+            (
+                DistroSubsystemMode::LinuxPopOs,
+                "deb",
+                ServiceSupervisorType::Systemd,
+            ),
+            (
+                DistroSubsystemMode::LinuxSolus,
+                "eopkg",
+                ServiceSupervisorType::Dinit,
+            ),
+            (
+                DistroSubsystemMode::LinuxGuix,
+                "scm",
+                ServiceSupervisorType::Shepherd,
+            ),
+            (
+                DistroSubsystemMode::LinuxClear,
+                "swupd",
+                ServiceSupervisorType::Systemd,
+            ),
+            (
+                DistroSubsystemMode::LinuxTails,
+                "deb",
+                ServiceSupervisorType::Systemd,
+            ),
+            (
+                DistroSubsystemMode::SmartOs,
+                "tgz",
+                ServiceSupervisorType::Rcd,
+            ),
+            (
+                DistroSubsystemMode::BedrockLinux,
+                "stratum",
+                ServiceSupervisorType::Systemd,
+            ),
         ];
 
         for (mode, ext, expected_supervisor) in modes {
             bridge.set_subsystem_mode(mode);
-            assert_eq!(bridge.translate_package_specifier("testpkg"), format!("testpkg.{}", ext));
+            assert_eq!(
+                bridge.translate_package_specifier("testpkg"),
+                format!("testpkg.{}", ext)
+            );
             assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
             assert!(bridge.verify_all_subsystems_compatibility());
         }

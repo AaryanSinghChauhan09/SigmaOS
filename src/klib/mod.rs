@@ -9,6 +9,7 @@ pub mod bitmap;
 pub mod btreemap;
 pub mod buddy_allocator;
 pub mod collections;
+pub mod config_parser;
 #[macro_use]
 pub mod console;
 pub mod config_parser;
@@ -54,19 +55,17 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-// Re-exports — single source of truth for common types
+pub use alloc::collections::BTreeMap;
+pub use alloc::string::{String, ToString};
 pub use arc::Arc;
 pub use collections::VecDeque;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
+pub use json::{SovereignJsonParser, SovereignJsonValue};
 pub use path::PathBuf;
 pub use string::SigmaString;
-pub use vec::Vec;
-
-// Compatibility re-exports from alloc (where no custom implementation exists)
-pub use alloc::collections::BTreeMap;
-pub use alloc::string::{String, ToString};
 pub use time::{Duration, Instant, Time};
+pub use vec::Vec;
 
 pub const fn is_zero_dependency_build() -> bool {
     true
@@ -93,6 +92,7 @@ impl ZeroDependencyPrimitiveHub {
         }
         hash
     }
+
     /// Formats an unsigned integer into a fixed static stack buffer without heap allocation
     pub fn format_u64_stack(mut value: u64, buf: &mut [u8; 32]) -> &str {
         if value == 0 {
@@ -123,6 +123,7 @@ mod tests {
     fn test_zero_dependency_architecture() {
         assert!(is_zero_dependency_build());
     }
+
     #[test]
     fn test_zero_dependency_primitive_hub() {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");
@@ -141,6 +142,3 @@ mod tests {
         assert_eq!(formatted, "2026");
     }
 }
-
-pub use hashset::HashSet;
-pub use arc::Arc;

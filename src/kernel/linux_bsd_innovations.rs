@@ -1,8 +1,9 @@
 extern crate alloc;
 
+use alloc::collections::BTreeMap;
+use alloc::string::String;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
@@ -4426,7 +4427,11 @@ impl LinuxLandlockLsmRuleEngine {
         }
     }
 
-    pub fn add_path_benefit(&mut self, path: &str, allowed_access: u32) -> Result<(), &'static str> {
+    pub fn add_path_benefit(
+        &mut self,
+        path: &str,
+        allowed_access: u32,
+    ) -> Result<(), &'static str> {
         if self.is_enforced {
             return Err("Landlock LSM rules locked; cannot add path rule post-enforcement");
         }
@@ -4477,7 +4482,11 @@ impl FreeBsdCapsicumEngine {
         self.in_capability_mode = true;
     }
 
-    pub fn limit_descriptor_rights(&mut self, fd: u32, rights_mask: u64) -> Result<(), &'static str> {
+    pub fn limit_descriptor_rights(
+        &mut self,
+        fd: u32,
+        rights_mask: u64,
+    ) -> Result<(), &'static str> {
         if let Some(&existing) = self.descriptor_rights.get(&fd) {
             if (existing & rights_mask) != rights_mask {
                 return Err("Capsicum: Cannot escalate descriptor rights in capability mode");
@@ -4533,11 +4542,14 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn register_service(&mut self, name: &str, pid: u32) {
-        self.services.insert(name.to_string(), VoidRunitService {
-            name: name.to_string(),
-            pid,
-            is_active: true,
-        });
+        self.services.insert(
+            name.to_string(),
+            VoidRunitService {
+                name: name.to_string(),
+                pid,
+                is_active: true,
+            },
+        );
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {
@@ -4550,7 +4562,10 @@ impl VoidLinuxRunitSupervisor {
     }
 
     pub fn is_service_active(&self, name: &str) -> bool {
-        self.services.get(name).map(|s| s.is_active).unwrap_or(false)
+        self.services
+            .get(name)
+            .map(|s| s.is_active)
+            .unwrap_or(false)
     }
 }
 
@@ -4591,11 +4606,13 @@ impl IntelClearLinuxStatelessEngine {
     }
 
     pub fn register_default_config(&mut self, path: &str, content: &str) {
-        self.usr_share_defaults.insert(path.to_string(), content.to_string());
+        self.usr_share_defaults
+            .insert(path.to_string(), content.to_string());
     }
 
     pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.etc_user_overrides.insert(path.to_string(), content.to_string());
+        self.etc_user_overrides
+            .insert(path.to_string(), content.to_string());
     }
 
     pub fn resolve_config(&self, path: &str) -> Option<String> {
@@ -4655,7 +4672,11 @@ impl OpenSuseSnapperEngine {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: u64) -> Result<u64, &'static str> {
-        let snap = self.snapshots.iter().find(|s| s.id == id).ok_or("Snapper: Target snapshot not found")?;
+        let snap = self
+            .snapshots
+            .iter()
+            .find(|s| s.id == id)
+            .ok_or("Snapper: Target snapshot not found")?;
         self.active_snapshot_id = id;
         Ok(snap.root_block_hash)
     }
@@ -4679,7 +4700,9 @@ mod linux_bsd_extra_tests {
     #[test]
     fn test_freebsd_capsicum_engine() {
         let mut capsicum = FreeBsdCapsicumEngine::new();
-        capsicum.limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG).unwrap();
+        capsicum
+            .limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG)
+            .unwrap();
         capsicum.enter_capability_mode();
 
         assert!(capsicum.check_descriptor_right(3, CAP_READ_FLAG));
@@ -4700,13 +4723,22 @@ mod linux_bsd_extra_tests {
     fn test_intel_clear_linux_stateless() {
         let mut stateless = IntelClearLinuxStatelessEngine::new();
         stateless.register_default_config("/etc/hostname", "sigma-default");
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
 
         stateless.set_user_override("/etc/hostname", "sigma-custom");
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-custom");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-custom"
+        );
 
         stateless.reset_etc_to_stateless();
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
     }
 
     #[test]

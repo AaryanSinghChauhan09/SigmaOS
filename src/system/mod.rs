@@ -41,9 +41,7 @@ pub use cleanup::{
 pub use config::{
     ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
 };
-pub use cron::{
-    CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon,
-};
+pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
     FragmentationReport, SigmaFsDefragStrategy,

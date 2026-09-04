@@ -1,17 +1,17 @@
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod alpine_apk_engine;
 pub mod arch_compat;
 pub mod arch_pacman_engine;
-pub mod client;
-pub mod daemon;
 pub mod aur;
 pub mod aur_helper;
 pub mod aurweb;
+pub mod client;
+pub mod daemon;
 
 pub use aurweb::{
     AurComment, AurCommentThread, AurGitRepoManager, AurGitRepository, AurPackageRecord,
@@ -23,33 +23,36 @@ pub mod debian_defeater;
 pub mod declarative_build;
 pub use declarative_build::{
     ArchLinuxReproBuildInspector, BazelBuildEngine, BazelRuleType, BazelTarget,
-    DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer,
-    GentooPortageReproducibleEbuildEngine, NetBsdPkgsrcDeterministicBulkBuilder,
-    NixDerivation, PackageReview, PackageRatingsRegistry,
+    DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer, GentooPortageReproducibleEbuildEngine,
+    NetBsdPkgsrcDeterministicBulkBuilder, NixDerivation, PackageRatingsRegistry, PackageReview,
     ReproducibleBuildDiffInspector,
 };
+pub mod aur_rules;
 pub mod fedora_rpm_engine;
+pub mod gentoo_use_flags;
 pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
 pub mod multi_distro;
 pub mod nix_dsl;
-pub mod gentoo_use_flags;
-pub mod package_snapshot_rollback;
-pub mod sovereign_package_innovations;
 pub mod nix_shell;
 pub mod nixos;
-pub mod aur_rules;
+pub mod package_snapshot_rollback;
 pub mod pacman;
 pub mod pacman_contrib;
 pub mod portage;
-pub mod svntogit_repro;
 pub mod recipe;
 pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
 pub mod sovereign_sigpkg;
+pub mod svntogit_repro;
+
+pub use sovereign_package_innovations::{
+    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+};
 pub mod spec;
 pub mod store;
 pub mod transaction;
@@ -82,90 +85,86 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
-pub use zero_alloc_resolver::{
-    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
-};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
-    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
-    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
-    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
-};
 pub use sovereign_sigpkg::*;
+pub use universal_adapter::{
+    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
+    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
+pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
     AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager, SvntogitMigrationEngine, SvnPackageMetadata,
+    PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
-    AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer,
-    PacmanCacheCleaner, PacmanContribEngine, PacmanDatabase, PacnewDiffManager,
-    PkgbuildChecksumUpdater, RepoDbPackageEntry, RepoStageTier, SafeUpdateChecker,
-    SovereignDbscriptsEngine,
+    AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer, PacmanCacheCleaner,
+    PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater, SafeUpdateChecker,
 };
+pub use aur_rules::{
+    AurLintFinding, AurRuleEngine, AurSandboxPolicy, LintSeverity, MakepkgBuildResult,
+    MakepkgBuildStatus, MakepkgReproduciblePipeline,
+};
+pub use client::{
+    parse_manifest, verify_signed_metadata, Manifest, SignedMetadata, SigpkgClient, TufRole,
+};
+pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{
     SovereignDeltaGenerator, SovereignMaintainerSandbox, SovereignMirrorSelector,
 };
-pub use fedora_rpm_engine::{DnfRepository, FedoraAnityaReleaseMonitoringEngine, RpmPackage};
+pub use fedora_rpm_engine::{
+    AnityaFedoraMessagingEngine, AnityaMessageTopic, AnityaPackageMapping,
+    AnityaVersionUpdateMessage, DnfRepository, FedoraAnityaReleaseMonitoringEngine,
+    FedoraMirrorManager2Engine, MirrorSiteRecord, RpmPackage,
+};
+pub use gentoo_use_flags::{ConditionalDependency, UseFlagManager, UseProfile};
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
 pub use multi_distro::{
-    AptPinPriority, BsdPkgDb, BsdPkgDirective, BsdPkgManifest, DnfDeltaEngine,
-    EbuildManifestEntry, EbuildManifestEntryType, GentooEbuildManifestEngine,
-    NixFlakeInput, NixFlakeLockVerifier, NixFlakeLockfile, PacmanAlpmHookRegistry,
-    ParallelMirrorDownloader, PortageSlotResolver, SovereignMultiDistroPackageManager,
-    StagedTransaction, TransactionRollbackHandler, XbpsCasExtractor,
+    AptPinPriority, BsdPkgDb, BsdPkgDirective, BsdPkgManifest, DnfDeltaEngine, EbuildManifestEntry,
+    EbuildManifestEntryType, GentooEbuildManifestEngine, NixFlakeInput, NixFlakeLockVerifier,
+    NixFlakeLockfile, PacmanAlpmHookRegistry, ParallelMirrorDownloader, PortageSlotResolver,
+    SovereignMultiDistroPackageManager, StagedTransaction, TransactionRollbackHandler,
+    XbpsCasExtractor,
+};
+pub use nix_dsl::{NixDerivationSpec, NixDslEvaluator, NixExpr};
+pub use package_snapshot_rollback::{
+    InstalledPackageRecord, PackageSnapshotDiff, PackageSnapshotState,
+    SovereignPackageSnapshotRollbackEngine,
+};
+pub use pacman_contrib::{
+    CheckUpdatesEngine, InstalledPackage, PacCacheResult, PacCacheTrimmer, PacDiffAction,
+    PacDiffCandidate, PacDiffConfigResolver, PacListRepoFilter, PacLogAction, PacLogAuditor,
+    PacLogEntry, PackageCacheEntry, PendingUpdate, SyncPackage, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
-pub use nix_dsl::{NixDerivationSpec, NixDslEvaluator, NixExpr};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
-pub use transaction::Transaction;
+pub use sovereign_package_innovations::{
+    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
+    NixFlakeHermeticCacheStore,
+};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use verifier::CryptoVerifier;
-pub use package_snapshot_rollback::{
-    SovereignPackageSnapshotRollbackEngine, PackageSnapshotState, PackageSnapshotDiff,
-    InstalledPackageRecord,
-};
-pub use sovereign_package_innovations::{
-    GentooEbuildUseFlagSolver, BsdPkgRecord, BsdPkgDbStorageEngine,
-    ArchAlpmHookTransactionEngine, NixFlakeHermeticCacheStore,
-    SlackBuildScript, SlackwareBuildPackageEngine, ZypperPackageSpec,
-    ZypperSatDependencyResolver, MossStatelessPackage, SolusMossStatelessTransactionEngine,
-};
-pub use alpine_apk_engine::{ApkPackage, ApkIndexParser, AlpineCommunityRepo};
-pub use gentoo_use_flags::{UseFlagManager, UseProfile, ConditionalDependency};
-pub use client::{
-    SigpkgClient, Manifest, SignedMetadata, TufRole, parse_manifest, verify_signed_metadata,
-};
-pub use daemon::{SigpkgDaemon, SyncStatus, UpdateAvailable};
-pub use pacman_contrib::{
-    PacCacheTrimmer, PackageCacheEntry, PacCacheResult,
-    PacDiffConfigResolver, PacDiffAction, PacDiffCandidate,
-    CheckUpdatesEngine, InstalledPackage, SyncPackage, PendingUpdate,
-    PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor, PacLogAction, PacLogEntry,
+pub use store::{
+    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
 pub use svntogit_repro::{
-    SovereignSvnToGitMigrator, SvnRevisionLog, ConvertedGitCommit, SvnBranchType,
-    SvnActionType, SvnXattrProperties, PkgctlSplitMigrationEngine, SplitPackageRepoConfig,
-    BsdPortsCvsSvnToGitMapper, BsdPortsRcsTag,
-    ReproduciblePackageBuilder, ReproducibleBuildEnvironment, BuildArtifact,
-    ReproducibilityAttestationReport,
+    BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
+    ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
+    SvnBranchType, SvnRevisionLog,
 };
-pub use aur_rules::{
-    AurRuleEngine, AurLintFinding, LintSeverity, AurSandboxPolicy,
-    MakepkgReproduciblePipeline, MakepkgBuildStatus, MakepkgBuildResult,
-};
+pub use transaction::Transaction;
+pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -209,9 +208,23 @@ impl Version {
             return Err(ParseError::InvalidNumber);
         }
 
-        let major = major_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)?;
-        let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)? };
-        let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().map_err(|_| ParseError::InvalidNumber)? };
+        let major = major_clean
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = if minor_clean.is_empty() {
+            0
+        } else {
+            minor_clean
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        };
+        let patch = if patch_clean.is_empty() {
+            0
+        } else {
+            patch_clean
+                .parse::<u64>()
+                .map_err(|_| ParseError::InvalidNumber)?
+        };
 
         Ok(Version::new(major, minor, patch))
     }

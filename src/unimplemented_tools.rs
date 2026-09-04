@@ -5050,7 +5050,8 @@ mod tests {
 
     #[test]
     fn test_freebsd_jail_sandbox_engine() {
-        let mut jail = FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
+        let mut jail =
+            FreeBsdJailSandboxEngine::new(1, "web_jail", "/usr/jails/web", "web.sigma.os", true);
         assert!(!jail.is_running);
         assert!(jail.start_jail().is_ok());
         assert!(jail.is_running);
@@ -5197,7 +5198,8 @@ mod new_unimplemented_tools_tests {
     #[test]
     fn test_phoronix_suite_automated_benchmark_runner_tool() {
         let mut runner = PhoronixSuiteAutomatedBenchmarkRunnerTool::new("Kernel IPC Suite");
-        let score = runner.run_automated_suite(&["pipe-latency", "socket-throughput"], &[12.5, 87.5]);
+        let score =
+            runner.run_automated_suite(&["pipe-latency", "socket-throughput"], &[12.5, 87.5]);
         assert_eq!(score, 50.0);
         assert_eq!(runner.executed_tests.len(), 2);
     }

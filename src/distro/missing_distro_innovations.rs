@@ -862,19 +862,36 @@ impl MissingDistroComponentsEngine {
             records: BTreeMap::new(),
         };
 
-        engine.register_component("Portage USE Flags", "Gentoo", ComponentParityStatus::Implemented);
-        engine.register_component("APK Trigger Hooks", "Alpine", ComponentParityStatus::Implemented);
-        engine.register_component("AUR Recipe Helper", "Arch Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
-        engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
-        engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
-        engine.register_component("Devuan Init Diversity", "Devuan Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Artix Init Scriptlet Matrix", "Artix Linux", ComponentParityStatus::Implemented);
-        engine.register_component("KaOS Qt/KDE Repo Governor", "KaOS Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Universal Multi-Format Package Matrix", "SigmaOS Universal Packaging", ComponentParityStatus::Implemented);
-        engine.register_component("DTrace Dynamic Tracing Provider", "Illumos / Solaris", ComponentParityStatus::Implemented);
-        engine.register_component("HAMMER2 Multi-Version Pfs Engine", "DragonFly BSD", ComponentParityStatus::Implemented);
-        engine.register_component("GEOM Storage Transformation Topology", "FreeBSD", ComponentParityStatus::Implemented);
+        engine.register_component(
+            "Portage USE Flags",
+            "Gentoo",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "APK Trigger Hooks",
+            "Alpine",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "AUR Recipe Helper",
+            "Arch Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Pledge & Unveil",
+            "OpenBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Jails & ZFS BootEnv",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "RPM-OSTree Atomic Trees",
+            "Fedora Silverblue",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -889,7 +906,9 @@ impl MissingDistroComponentsEngine {
     }
 
     pub fn is_all_components_implemented(&self) -> bool {
-        self.records.values().all(|r| r.status == ComponentParityStatus::Implemented)
+        self.records
+            .values()
+            .all(|r| r.status == ComponentParityStatus::Implemented)
     }
 }
 
@@ -989,9 +1008,16 @@ impl IllumosDTraceProbeEngine {
     }
 
     pub fn fire_probe(&mut self, provider: &str, function: &str, payload: &str) {
-        if let Some(p) = self.probes.iter().find(|p| p.provider == provider && p.function == function) {
+        if let Some(p) = self
+            .probes
+            .iter()
+            .find(|p| p.provider == provider && p.function == function)
+        {
             if p.is_enabled {
-                let entry = format!("dtrace:{}:{}:{}:{}: [{}]", p.provider, p.module, p.function, p.name, payload);
+                let entry = format!(
+                    "dtrace:{}:{}:{}:{}: [{}]",
+                    p.provider, p.module, p.function, p.name, payload
+                );
                 self.trace_buffer.push(entry);
             }
         }
@@ -1140,8 +1166,17 @@ impl SuseYaSTConfigurationRegistry {
         self.modules.push(module);
     }
 
-    pub fn set_value(&mut self, module_name: &str, key: &str, val: &str) -> Result<(), &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
+    pub fn set_value(
+        &mut self,
+        module_name: &str,
+        key: &str,
+        val: &str,
+    ) -> Result<(), &'static str> {
+        if let Some(m) = self
+            .modules
+            .iter_mut()
+            .find(|m| m.module_name == module_name)
+        {
             m.config_data.push((key.to_string(), val.to_string()));
             Ok(())
         } else {
@@ -1150,7 +1185,11 @@ impl SuseYaSTConfigurationRegistry {
     }
 
     pub fn apply_configuration(&mut self, module_name: &str) -> Result<bool, &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
+        if let Some(m) = self
+            .modules
+            .iter_mut()
+            .find(|m| m.module_name == module_name)
+        {
             m.is_applied = true;
             Ok(true)
         } else {
@@ -1196,10 +1235,13 @@ impl DragonFlyHammer2EmergencyCowEngine {
 
     pub fn write_data_block(&mut self, offset: u64, data: &[u8]) -> Result<u64, &'static str> {
         if self.is_emergency_read_only {
-            return Err("HAMMER2: Storage capacity critical! Filesystem forced to emergency read-only");
+            return Err(
+                "HAMMER2: Storage capacity critical! Filesystem forced to emergency read-only",
+            );
         }
 
-        if self.free_space_bytes < 1024 * 1024 { // Less than 1MB free
+        if self.free_space_bytes < 1024 * 1024 {
+            // Less than 1MB free
             self.is_emergency_read_only = true;
             return Err("HAMMER2: Free space depleted! Emergency CoW snapshot activated");
         }
@@ -1298,7 +1340,9 @@ pub struct GentooPortageSlotOperatorEngine {
 
 impl GentooPortageSlotOperatorEngine {
     pub fn new() -> Self {
-        Self { slots: BTreeMap::new() }
+        Self {
+            slots: BTreeMap::new(),
+        }
     }
 
     pub fn register_package_slot(&mut self, pkg: &str, slot: &str, subslot: &str) {
@@ -1311,7 +1355,11 @@ impl GentooPortageSlotOperatorEngine {
         self.slots.insert(pkg.to_string(), dep);
     }
 
-    pub fn update_subslot_and_trigger_rebuilds(&mut self, pkg: &str, new_subslot: &str) -> Vec<String> {
+    pub fn update_subslot_and_trigger_rebuilds(
+        &mut self,
+        pkg: &str,
+        new_subslot: &str,
+    ) -> Vec<String> {
         let mut rebuilds = Vec::new();
         if let Some(dep) = self.slots.get_mut(pkg) {
             if dep.subslot != new_subslot {
@@ -1349,10 +1397,20 @@ pub struct FedoraSelinuxMlsMcsGovernor {
 
 impl FedoraSelinuxMlsMcsGovernor {
     pub fn new() -> Self {
-        Self { active_contexts: BTreeMap::new() }
+        Self {
+            active_contexts: BTreeMap::new(),
+        }
     }
 
-    pub fn assign_context(&mut self, pid: usize, user: &str, role: &str, domain: &str, level: u8, cats: &[u16]) {
+    pub fn assign_context(
+        &mut self,
+        pid: usize,
+        user: &str,
+        role: &str,
+        domain: &str,
+        level: u8,
+        cats: &[u16],
+    ) {
         let ctx = SelinuxMlsMcsContext {
             user: user.to_string(),
             role: role.to_string(),
@@ -1363,7 +1421,12 @@ impl FedoraSelinuxMlsMcsGovernor {
         self.active_contexts.insert(pid, ctx);
     }
 
-    pub fn authorize_mls_mcs_access(&self, subj_pid: usize, obj_level: u8, obj_cats: &[u16]) -> bool {
+    pub fn authorize_mls_mcs_access(
+        &self,
+        subj_pid: usize,
+        obj_level: u8,
+        obj_cats: &[u16],
+    ) -> bool {
         if let Some(subj) = self.active_contexts.get(&subj_pid) {
             if subj.sensitivity_level < obj_level {
                 return false; // Sensitivity level dominated
@@ -1451,7 +1514,9 @@ mod tests {
     fn test_dragonfly_hammer2_emergency_cow() {
         let mut hammer = DragonFlyHammer2EmergencyCowEngine::new(5 * 1024 * 1024);
         let h1 = hammer.write_data_block(0, b"DATA_PAYLOAD_BLOCK").unwrap();
-        let h2 = hammer.write_data_block(4096, b"DATA_PAYLOAD_BLOCK").unwrap();
+        let h2 = hammer
+            .write_data_block(4096, b"DATA_PAYLOAD_BLOCK")
+            .unwrap();
         assert_eq!(h1, h2);
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }

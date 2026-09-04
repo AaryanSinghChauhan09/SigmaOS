@@ -65,7 +65,9 @@ impl SimpleSigningKey {
 }
 
 impl SigningKey for SimpleSigningKey {
-    fn id(&self) -> KeyID { self.id }
+    fn id(&self) -> KeyID {
+        self.id
+    }
     fn algorithm(&self) -> SignatureAlgorithm {
         match self.algorithm.load(Ordering::SeqCst) {
             0 => SignatureAlgorithm::ED25519,
@@ -73,7 +75,9 @@ impl SigningKey for SimpleSigningKey {
             _ => SignatureAlgorithm::Dilithium5,
         }
     }
-    fn public_key(&self) -> &[u8] { &self.public_key }
+    fn public_key(&self) -> &[u8] {
+        &self.public_key
+    }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, SigningError> {
         let mut signature = Vec::new();

@@ -45,14 +45,8 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 
-pub use alpine_apk::{ApkPackageManager, ApkPackage, ApkRepository, ApkWorld};
-pub use arch_aur::{SigmaAUR, AURPackage, PKGBUILD, BuildError};
-pub use debian_apt::{SigmaAPT, AptPackage, SourcesEntry, AptDatabase, AptError};
-pub use fedora_dnf::{SigmaDNF, DnfPackage, Transaction, TransactionOperation, Repository, DnfError};
-pub use gentoo_portage::{SigmaPortage, Ebuild, UseFlag, UseFlagType, UseFlagManager, PortageTree, PackageDatabase, ProfileManager, PortageError};
-pub use nix_guix::{NixPackageManager, StorePath, SystemGeneration, Derivation, EnvironmentScrubber};
-pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
-pub use pactree::{PactreeEngine, DependencyNode};
+pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
+pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
@@ -72,14 +66,23 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
+pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
 };
+pub use debian_apt::{AptDatabase, AptError, AptPackage, SigmaAPT, SourcesEntry};
 pub use dependency_graph::{
     DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
+pub use fedora_dnf::{
+    DnfError, DnfPackage, Repository, SigmaDNF, Transaction, TransactionOperation,
+};
+pub use gentoo_portage::{
+    Ebuild, PackageDatabase, PortageError, PortageTree, ProfileManager, SigmaPortage, UseFlag,
+    UseFlagManager, UseFlagType,
+};
 pub use hardening::{
-    PackageSignature, PackageSignatureType, PackageSigningEngine, PackageSecurityMetadata,
+    PackageSecurityMetadata, PackageSignature, PackageSignatureType, PackageSigningEngine,
     PackageVerificationResult,
 };
 pub use linux_translation::{
@@ -87,7 +90,11 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-pub use paccache::{PaccacheEngine, PaccacheConfig, PackageCacheEntry};
+pub use nix_guix::{
+    Derivation, EnvironmentScrubber, NixPackageManager, StorePath, SystemGeneration,
+};
+pub use paccache::{PaccacheConfig, PaccacheEngine, PackageCacheEntry};
+pub use pactree::{DependencyNode, PactreeEngine};
 pub use repository::{
     MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule, PackageRepository,
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,

@@ -356,7 +356,10 @@ impl FedoraAtomicTinyStageEngine {
         }
         self.current_stage = 2;
         self.atomic_pivot_successful = true;
-        Ok(format!("Atomic pivot to OSTree sysroot [{}] complete", self.ostree_deployment_ref))
+        Ok(format!(
+            "Atomic pivot to OSTree sysroot [{}] complete",
+            self.ostree_deployment_ref
+        ))
     }
 
     /// Triggers Stage 3 Emergency Rescue Sandbox when Stage 2 fails

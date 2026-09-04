@@ -77,8 +77,8 @@ pub mod lubuntu;
 pub mod macos_darwin;
 pub mod mate_betsy;
 pub mod mesh_hub;
-pub mod mint_linux;
 pub mod mint_ecosystem;
+pub mod mint_linux;
 
 pub use mint_ecosystem::{
     CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,
@@ -168,9 +168,9 @@ pub use mate_betsy::{
 };
 pub use mint_linux::{
     Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
-    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
-    MintReportSystem, MintSoftwareManager, MintTimeshiftEngine,
-    MintUpdateManager, MintUpdatePackage, TimeshiftSnapshot,
+    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert, MintReportSystem,
+    MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, MintUpdatePackage,
+    TimeshiftSnapshot,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};
