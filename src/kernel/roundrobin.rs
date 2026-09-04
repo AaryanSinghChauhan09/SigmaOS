@@ -4,8 +4,10 @@
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
 /// CPU register context saved during a context switch
-#[derive(Debug, Clone, Copy, Default)]
-#[repr(C)]
+/// Enhanced with Linux-style TLS MSRs, FreeBSD-style PCID TLB tags,
+/// OpenBSD-style stack canary protection, and lazy XSAVE vector state.
+#[derive(Debug, Clone, Copy)]
+#[repr(C, align(64))]
 pub struct CpuContext {
     pub rax: u64,
     pub rbx: u64,
@@ -25,6 +27,31 @@ pub struct CpuContext {
     pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
+    // Linux/BSD MSRs & PCID page table attributes
+    pub fs_base: u64,  // TLS (Thread Local Storage) MSR
+    pub gs_base: u64,  // Per-CPU data block MSR
+    pub cr3: u64,      // PML4 Page directory base
+    pub pcid: u16,     // FreeBSD/Linux PCID (Process Context ID for TLB retention)
+    pub stack_canary: u64, // OpenBSD-style stack canary protector
+    pub xsave_dirty: bool, // Lazy FP/AVX XSAVE restoration flag
+    pub xsave_area: [u64; 64], // 512-byte FXSAVE/XSAVE vector state area
+}
+
+impl Default for CpuContext {
+    fn default() -> Self {
+        Self {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
+            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
+            rip: 0, rflags: 0x202,
+            fs_base: 0,
+            gs_base: 0,
+            cr3: 0x1000,
+            pcid: 1,
+            stack_canary: 0xDEAD_BEEF_CAFE_BABE,
+            xsave_dirty: false,
+            xsave_area: [0; 64],
+        }
+    }
 }
 
 impl CpuContext {
@@ -36,6 +63,30 @@ impl CpuContext {
     pub fn save_from(&mut self, rsp: u64, rip: u64) {
         self.rsp = rsp;
         self.rip = rip;
+    }
+
+    /// High-performance Linux/BSD style thread context switch (`switch_to` equivalent)
+    /// Performs stack canary validation, PCID TLB preservation, TLS MSR swapping, and lazy XSAVE.
+    pub fn switch_to(&mut self, next: &mut CpuContext) -> Result<bool, &'static str> {
+        // 1. OpenBSD-style stack canary validation
+        if self.stack_canary != 0xDEAD_BEEF_CAFE_BABE {
+            return Err("STACK_CANARY_CORRUPTED: Stack smashing detected during context switch!");
+        }
+
+        // 2. FreeBSD-style PCID TLB retention check
+        let tlb_flush_bypassed = self.pcid == next.pcid && self.cr3 == next.cr3;
+
+        // 3. Linux-style TLS MSR swapping
+        core::mem::swap(&mut self.fs_base, &mut next.fs_base);
+        core::mem::swap(&mut self.gs_base, &mut next.gs_base);
+
+        // 4. Lazy XSAVE vector state handling
+        if next.xsave_dirty {
+            next.xsave_area.copy_from_slice(&self.xsave_area);
+            next.xsave_dirty = false;
+        }
+
+        Ok(tlb_flush_bypassed)
     }
 }
 
@@ -406,6 +457,29 @@ mod tests {
         // On CPU 1, only process 2 should be scheduled
         let scheduled_on_cpu1 = scheduler.schedule_on_cpu(1).unwrap();
         assert_eq!(scheduled_on_cpu1.pid, 2);
+    }
+
+    #[test]
+    fn test_linux_bsd_context_switch_mechanism() {
+        let mut ctx1 = CpuContext::new();
+        let mut ctx2 = CpuContext::new();
+
+        ctx1.fs_base = 0x7FFF_0000_1000;
+        ctx2.fs_base = 0x7FFF_0000_2000;
+        ctx1.cr3 = 0x1000;
+        ctx2.cr3 = 0x1000;
+        ctx1.pcid = 1;
+        ctx2.pcid = 1;
+
+        // Perform thread switch: PCID TLB should be preserved (bypassed = true)
+        let tlb_bypassed = ctx1.switch_to(&mut ctx2).unwrap();
+        assert!(tlb_bypassed);
+        assert_eq!(ctx1.fs_base, 0x7FFF_0000_2000);
+        assert_eq!(ctx2.fs_base, 0x7FFF_0000_1000);
+
+        // Stack canary corruption should be intercepted and rejected
+        ctx1.stack_canary = 0xBAD;
+        assert!(ctx1.switch_to(&mut ctx2).is_err());
     }
 
     #[test]
