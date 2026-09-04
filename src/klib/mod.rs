@@ -91,31 +91,45 @@ impl ZeroDependencyPrimitiveHub {
             i += 1;
         }
         hash
+    }
     /// Formats an unsigned integer into a fixed static stack buffer without heap allocation
     pub fn format_u64_stack(mut value: u64, buf: &mut [u8; 32]) -> &str {
         if value == 0 {
             buf[0] = b'0';
             return core::str::from_utf8(&buf[0..1]).unwrap_or("0");
+        }
         let mut len = 0;
         let mut tmp = [0u8; 32];
         while value > 0 {
             tmp[len] = b'0' + (value % 10) as u8;
             value /= 10;
             len += 1;
+        }
+        let mut i = 0;
         while i < len {
             buf[i] = tmp[len - 1 - i];
+            i += 1;
+        }
         core::str::from_utf8(&buf[0..len]).unwrap_or("0")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn test_zero_dependency_architecture() {
         assert!(is_zero_dependency_build());
+    }
+    #[test]
     fn test_zero_dependency_primitive_hub() {
         let hash = ZeroDependencyPrimitiveHub::fnv1a_hash_64(b"sigmaos");
         assert_ne!(hash, 0);
         let mut buf = [0u8; 32];
         let formatted = ZeroDependencyPrimitiveHub::format_u64_stack(2026, &mut buf);
         assert_eq!(formatted, "2026");
+    }
+}
+
 pub use hashset::HashSet;
 pub use arc::Arc;
