@@ -63,8 +63,8 @@ impl NixOSFlakeEngine {
         }
         hash_accum = hash_accum.wrapping_add(self.generation_count as u64);
 
-        let closure_hash = alloc::format!("{:016x}", hash_accum);
-        let store_path = alloc::format!("/sigma/store/{}-system-closure", closure_hash);
+        let closure_hash = std::format!("{:016x}", hash_accum);
+        let store_path = std::format!("/sigma/store/{}-system-closure", closure_hash);
 
         let closure = SystemClosure {
             hash: closure_hash,
@@ -320,8 +320,8 @@ impl GentooPortageUseFlagsEngine {
         if let Some(pkg) = self.packages.iter_mut().find(|p| p.name == package_name) {
             let mut resolved = Vec::new();
             for flag in &pkg.available_use_flags {
-                let pos_flag = alloc::format!("+{}", flag);
-                let neg_flag = alloc::format!("-{}", flag);
+                let pos_flag = std::format!("+{}", flag);
+                let neg_flag = std::format!("-{}", flag);
 
                 let is_globally_disabled = global_flags.contains(&neg_flag);
                 let is_globally_enabled =

@@ -1,5 +1,5 @@
 // SigmaOS Custom Arc (Atomic Reference Counting)
-// Reduces dependency on alloc::sync::Arc
+// Reduces dependency on std::sync::Arc
 
 use std::boxed::Box;
 use core::convert::AsRef;

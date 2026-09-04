@@ -1,5 +1,5 @@
 //! Custom BTreeMap implementation for SigmaOS
-//! Reduces dependency on alloc::collections::BTreeMap
+//! Reduces dependency on std::collections::BTreeMap
 use std::string::{String, ToString};
 
 use crate::klib::hash::SimpleHasher;

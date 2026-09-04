@@ -116,14 +116,14 @@ impl LinuxKswapd {
 
 /// Linux ZRAM/ZSWAP compressed in-memory swap page pool
 pub struct ZramPagePool {
-    pub compressed_pages: alloc::collections::BTreeMap<usize, Vec<u8>>,
+    pub compressed_pages: std::collections::BTreeMap<usize, Vec<u8>>,
     pub compression_ratio_x100: u32, // e.g. 250 = 2.5x compression ratio
 }
 
 impl ZramPagePool {
     pub fn new() -> Self {
         Self {
-            compressed_pages: alloc::collections::BTreeMap::new(),
+            compressed_pages: std::collections::BTreeMap::new(),
             compression_ratio_x100: 250,
         }
     }

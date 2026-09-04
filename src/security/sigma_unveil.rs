@@ -18,8 +18,8 @@ use std::vec::Vec;
 
 use crate::klib::HashMap;
 use sigma_types::Result;
-// Path/PathBuf not in no_std; using alloc::string::String as path
-pub type PathBuf = alloc::string::String;
+// Path/PathBuf not in no_std; using std::string::String as path
+pub type PathBuf = std::string::String;
 pub type Path = str;
 
 /// Access permissions for unveiled paths
@@ -265,7 +265,7 @@ impl Default for UnveilManager {
 #[macro_export]
 macro_rules! sigma_unveil {
     ($path:expr, $perms:expr) => {{
-        let path = alloc::string::String::from($path);
+        let path = std::string::String::from($path);
         // In real implementation, this would call the global unveil manager
         // For now, we'll just create the state
         let mut state = $crate::security::sigma_unveil::UnveilState::new();
@@ -299,10 +299,10 @@ mod tests {
         let mut state = UnveilState::new();
 
         state
-            .unveil(alloc::string::String::from("/etc"), "r")
+            .unveil(std::string::String::from("/etc"), "r")
             .unwrap();
         state
-            .unveil(alloc::string::String::from("/tmp"), "rw")
+            .unveil(std::string::String::from("/tmp"), "rw")
             .unwrap();
 
         assert!(!state.is_locked());
@@ -318,10 +318,10 @@ mod tests {
         let mut state = UnveilState::new();
 
         state
-            .unveil(alloc::string::String::from("/etc"), "r")
+            .unveil(std::string::String::from("/etc"), "r")
             .unwrap();
         state
-            .unveil(alloc::string::String::from("/tmp"), "rw")
+            .unveil(std::string::String::from("/tmp"), "rw")
             .unwrap();
 
         // Read access to /etc should be allowed
@@ -360,7 +360,7 @@ mod tests {
         let mut manager = UnveilManager::new();
 
         manager
-            .unveil(1, alloc::string::String::from("/home"), "rw")
+            .unveil(1, std::string::String::from("/home"), "rw")
             .unwrap();
         manager.lock(1).unwrap();
 

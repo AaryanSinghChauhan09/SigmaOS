@@ -62,7 +62,7 @@ impl XfsRealtimeSubsystem {
             extent_size_blocks,
             total_extents,
             free_extents: total_extents,
-            bitmap: alloc::vec![true; total_extents as usize],
+            bitmap: std::vec![true; total_extents as usize],
         }
     }
 
@@ -215,7 +215,7 @@ impl XfsFilesystem {
                 inode.blocks += rt.extent_size_blocks as u64;
                 inode.is_realtime = true;
             }
-            let vec = alloc::vec![extent];
+            let vec = std::vec![extent];
             self.extents.insert(inode_id, vec.clone());
             self.state = XfsState::Dirty;
             return Ok(vec);

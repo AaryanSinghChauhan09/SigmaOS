@@ -116,11 +116,11 @@ mod tests {
         let mut mgr = SigmaDeviceManager::new();
 
         mgr.register_rule(UdevRule {
-            conditions: alloc::vec![
+            conditions: std::vec![
                 UdevCondition::Subsystem("block".to_string()),
                 UdevCondition::KernelPattern("sd".to_string()),
             ],
-            actions: alloc::vec![UdevAction::SetNodePermission(0o660)],
+            actions: std::vec![UdevAction::SetNodePermission(0o660)],
         });
 
         let dev = HardwareDevice {

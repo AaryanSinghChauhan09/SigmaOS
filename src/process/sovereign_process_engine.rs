@@ -91,7 +91,7 @@ impl SovereignProcessManager {
         let pg = ProcessGroup {
             pgid: pid,
             leader_pid: pid,
-            pids: alloc::vec![pid],
+            pids: std::vec![pid],
             is_foreground: true,
         };
 

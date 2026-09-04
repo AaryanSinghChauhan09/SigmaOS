@@ -40,7 +40,7 @@ impl SyscallType {
 }
 
 /// Minimal Vec implementation for no-std syscall interface.
-/// Uses a raw allocator (extern "C" alloc/free) since alloc::vec::Vec
+/// Uses a raw allocator (extern "C" alloc/free) since std::vec::Vec
 /// requires a global allocator which may not be available in early boot.
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 

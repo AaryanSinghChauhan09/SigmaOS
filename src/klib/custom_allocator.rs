@@ -14,11 +14,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Custom Memory Allocator
-// A bump allocator with a simple recycle list, replacing std::alloc::System.
+// A bump allocator with a simple recycle list, replacing std::std::System.
 // Designed to minimize dependency on predefined library allocators.
 
 #[allow(dead_code)]
-use core::alloc::{GlobalAlloc, Layout};
+use core::std::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;
 use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -394,7 +394,7 @@ fn sigma_oom(layout: Layout) -> ! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::alloc::Layout;
+    use core::std::Layout;
 
     #[test]
     fn test_basic_alloc_dealloc() {

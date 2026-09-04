@@ -266,7 +266,7 @@ impl MemoryDescriptorList {
             virtual_address,
             byte_count,
             byte_offset,
-            physical_pages: alloc::vec![0; page_count],
+            physical_pages: std::vec![0; page_count],
             is_probed: false,
             is_locked: false,
             is_mapped: false,

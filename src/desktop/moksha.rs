@@ -211,7 +211,7 @@ impl BodhiAppCenterInstaller {
     pub fn new(sandbox_dir: &str) -> Self {
         BodhiAppCenterInstaller {
             local_sandbox_dir: sandbox_dir.to_string(),
-            allowed_apturl_protocols: alloc::vec!["apt".to_string(), "apturl".to_string()],
+            allowed_apturl_protocols: std::vec!["apt".to_string(), "apturl".to_string()],
         }
     }
 

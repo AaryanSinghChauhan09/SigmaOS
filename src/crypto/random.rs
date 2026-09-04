@@ -314,7 +314,7 @@ pub struct ProductionCryptoEnclave {
 
 #[derive(Debug, Clone)]
 pub struct SecurityAuditReport {
-    pub verified_algorithms: alloc::vec::Vec<alloc::string::String>,
+    pub verified_algorithms: std::vec::Vec<std::string::String>,
     pub hardware_rng_active: bool,
     pub signatures_intact: bool,
 }
@@ -334,10 +334,10 @@ impl ProductionCryptoEnclave {
     /// Performs a pre-deployment security audit and validates cryptographic signatures
     pub fn perform_security_audit(&mut self, hrng: &HardwareRng) -> SecurityAuditReport {
         self.audit_passed = true;
-        let mut algs = alloc::vec::Vec::new();
-        algs.push(alloc::string::String::from("AES-256-GCM (RustCrypto)"));
-        algs.push(alloc::string::String::from("Dilithium-5 (Post-Quantum)"));
-        algs.push(alloc::string::String::from("Kyber-1024"));
+        let mut algs = std::vec::Vec::new();
+        algs.push(std::string::String::from("AES-256-GCM (RustCrypto)"));
+        algs.push(std::string::String::from("Dilithium-5 (Post-Quantum)"));
+        algs.push(std::string::String::from("Kyber-1024"));
 
         SecurityAuditReport {
             verified_algorithms: algs,

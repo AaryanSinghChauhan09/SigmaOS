@@ -514,8 +514,8 @@ mod tests {
 
         let list = [task1, task2];
         assert!(!rcu.grace_period_elapsed(&list, 0));
-        assert_eq!(rcu.stalled_readers(&list, 0), alloc::vec![102]);
-        assert_eq!(rcu.synchronize_rcu_checked(&list), Err(alloc::vec![102]));
+        assert_eq!(rcu.stalled_readers(&list, 0), std::vec![102]);
+        assert_eq!(rcu.synchronize_rcu_checked(&list), Err(std::vec![102]));
     }
 
     #[test]

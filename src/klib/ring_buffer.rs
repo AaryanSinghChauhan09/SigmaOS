@@ -140,9 +140,9 @@ impl<T> HeapRingBuffer<T> {
     /// Create a new heap-allocated ring buffer with given capacity (rounded up to power of two).
     pub fn new(capacity: usize) -> Self {
         let cap = capacity.next_power_of_two();
-        let layout = core::alloc::Layout::array::<core::mem::MaybeUninit<T>>(cap).unwrap();
+        let layout = core::std::Layout::array::<core::mem::MaybeUninit<T>>(cap).unwrap();
         // SAFETY: we use the global allocator
-        let data = unsafe { alloc::alloc::alloc(layout) as *mut core::mem::MaybeUninit<T> };
+        let data = unsafe { std::std::alloc(layout) as *mut core::mem::MaybeUninit<T> };
         if data.is_null() {
             panic!("HeapRingBuffer: allocation failed");
         }
@@ -197,9 +197,9 @@ impl<T> HeapRingBuffer<T> {
 impl<T> Drop for HeapRingBuffer<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
-        let layout = core::alloc::Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
+        let layout = core::std::Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
         unsafe {
-            alloc::alloc::dealloc(self.data as *mut u8, layout);
+            std::std::dealloc(self.data as *mut u8, layout);
         }
     }
 }

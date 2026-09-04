@@ -256,14 +256,14 @@ impl SeccompProfileV2 {
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
+    pub lower_dirs: std::vec::Vec<String>,
     pub upper_dir: String,
     pub work_dir: String,
     pub mounted: bool,
 }
 
 impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+    pub fn new(lower_dirs: std::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
         Self {
             lower_dirs,
             upper_dir,
@@ -738,7 +738,7 @@ impl SimpleContainerRuntime {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
+    use std::std::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     unsafe { std_alloc(layout) }
 }
@@ -752,32 +752,32 @@ pub enum AppBundleFormat {
 
 #[derive(Debug, Clone)]
 pub struct AppBundleContainer {
-    pub app_id: alloc::string::String,
+    pub app_id: std::string::String,
     pub format: AppBundleFormat,
-    pub runtime_version: alloc::string::String,
-    pub sandbox_permissions: alloc::vec::Vec<alloc::string::String>,
+    pub runtime_version: std::string::String,
+    pub sandbox_permissions: std::vec::Vec<std::string::String>,
     pub is_active: bool,
 }
 
 pub struct FlatpakSnapCompatLayer {
-    pub installed_bundles: alloc::vec::Vec<AppBundleContainer>,
+    pub installed_bundles: std::vec::Vec<AppBundleContainer>,
 }
 
 impl FlatpakSnapCompatLayer {
     pub fn new() -> Self {
         FlatpakSnapCompatLayer {
-            installed_bundles: alloc::vec::Vec::new(),
+            installed_bundles: std::vec::Vec::new(),
         }
     }
 
     pub fn install_flatpak_ref(&mut self, app_id: &str, runtime_ver: &str, permissions: &[&str]) {
         let bundle = AppBundleContainer {
-            app_id: alloc::string::String::from(app_id),
+            app_id: std::string::String::from(app_id),
             format: AppBundleFormat::Flatpak,
-            runtime_version: alloc::string::String::from(runtime_ver),
+            runtime_version: std::string::String::from(runtime_ver),
             sandbox_permissions: permissions
                 .iter()
-                .map(|&s| alloc::string::String::from(s))
+                .map(|&s| std::string::String::from(s))
                 .collect(),
             is_active: false,
         };
@@ -786,12 +786,12 @@ impl FlatpakSnapCompatLayer {
 
     pub fn install_snap_ref(&mut self, snap_name: &str, revision: &str, permissions: &[&str]) {
         let bundle = AppBundleContainer {
-            app_id: alloc::string::String::from(snap_name),
+            app_id: std::string::String::from(snap_name),
             format: AppBundleFormat::Snap,
-            runtime_version: alloc::string::String::from(revision),
+            runtime_version: std::string::String::from(revision),
             sandbox_permissions: permissions
                 .iter()
-                .map(|&s| alloc::string::String::from(s))
+                .map(|&s| std::string::String::from(s))
                 .collect(),
             is_active: false,
         };

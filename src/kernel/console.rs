@@ -45,7 +45,7 @@ pub struct KernelConsole {
 impl KernelConsole {
     pub fn new() -> Self {
         #[cfg(not(target_os = "none"))]
-        let vga_ptr = alloc::vec![0u8; 80 * 25 * 2].leak().as_mut_ptr();
+        let vga_ptr = std::vec![0u8; 80 * 25 * 2].leak().as_mut_ptr();
         #[cfg(target_os = "none")]
         let vga_ptr = 0xB8000 as *mut u8;
 

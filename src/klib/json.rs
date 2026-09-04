@@ -1,7 +1,7 @@
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-// Use our custom sovereign HashMap instead of alloc::collections::BTreeMap
+// Use our custom sovereign HashMap instead of std::collections::BTreeMap
 // to reduce dependency on pre-defined library data structures.
 use crate::klib::hashmap::BTreeMap;
 

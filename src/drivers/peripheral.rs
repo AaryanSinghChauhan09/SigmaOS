@@ -325,7 +325,7 @@ mod tests {
         let dev_id = io_mgr.create_device("SovereignDiskDriver");
         assert_eq!(dev_id, 1);
 
-        let mut irp = Irp::new(MajorFunction::IrpMjWrite, alloc::vec![0x11, 0x22]);
+        let mut irp = Irp::new(MajorFunction::IrpMjWrite, std::vec![0x11, 0x22]);
         let status = io_mgr.call_driver(dev_id, &mut irp);
 
         assert_eq!(status, 0);
@@ -356,7 +356,7 @@ mod tests {
             .attach_device_to_device_stack(filter_dev_id, disk_dev_id)
             .unwrap();
 
-        let mut irp = Irp::new(MajorFunction::IrpMjWrite, alloc::vec![0x00, 0x55]);
+        let mut irp = Irp::new(MajorFunction::IrpMjWrite, std::vec![0x00, 0x55]);
 
         // Dispatch IRP down target disk stack. Should automatically divert to Attached Minifilter!
         let status = io_mgr.call_driver(disk_dev_id, &mut irp);

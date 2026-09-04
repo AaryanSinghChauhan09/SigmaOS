@@ -465,7 +465,7 @@ mod tests {
     fn test_vault_metadata() {
         let metadata = VaultMetadata {
             name: "test".to_string(),
-            path: alloc::string::String::from("/vault"),
+            path: std::string::String::from("/vault"),
             algorithm: EncryptionAlgorithm::Aes256Gcm,
             created_at: 1234567890,
             file_count: 0,

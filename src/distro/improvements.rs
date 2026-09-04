@@ -27,15 +27,15 @@ use std::vec::Vec;
 /// Represents a rolling release channel with continuous updates.
 pub struct RollingReleaseChannel {
     pub name: &'static str,
-    pub packages: alloc::vec::Vec<RollingPackage>,
+    pub packages: std::vec::Vec<RollingPackage>,
     pub last_sync: u64,
 }
 
 /// A package in the rolling release pipeline.
 pub struct RollingPackage {
-    pub name: alloc::string::String,
-    pub version: alloc::string::String,
-    pub upstream_version: alloc::string::String,
+    pub name: std::string::String,
+    pub version: std::string::String,
+    pub upstream_version: std::string::String,
     pub is_outdated: bool,
 }
 
@@ -43,13 +43,13 @@ pub struct RollingPackage {
 pub trait RollingReleaseManager {
     fn sync_mirrors(&mut self) -> Result<(), ReleaseError>;
     fn upgrade_system(&mut self) -> Result<usize, ReleaseError>;
-    fn get_outdated_packages(&self) -> alloc::vec::Vec<&RollingPackage>;
+    fn get_outdated_packages(&self) -> std::vec::Vec<&RollingPackage>;
     fn is_minimal_base(&self) -> bool;
 }
 
 /// Minimal base installer inspired by Arch's base meta-package.
 pub struct MinimalBaseInstaller {
-    pub installed_packages: alloc::vec::Vec<alloc::string::String>,
+    pub installed_packages: std::vec::Vec<std::string::String>,
     pub total_size_kb: u64,
 }
 
@@ -57,7 +57,7 @@ impl MinimalBaseInstaller {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MinimalBaseInstaller {
-            installed_packages: alloc::vec::Vec::new(),
+            installed_packages: std::vec::Vec::new(),
             total_size_kb: 0,
         }
     }
@@ -71,7 +71,7 @@ impl MinimalBaseInstaller {
         ];
         for pkg in &base {
             self.installed_packages
-                .push(alloc::string::String::from(*pkg));
+                .push(std::string::String::from(*pkg));
         }
         self.total_size_kb = 512 * 1024; // ~512 MB
     }
@@ -79,9 +79,9 @@ impl MinimalBaseInstaller {
 
 /// AUR-style user repository concept for SigmaOS.
 pub struct UserPackageRepository {
-    pub repo_url: alloc::string::String,
+    pub repo_url: std::string::String,
     pub trusted: bool,
-    pub packages: alloc::vec::Vec<RollingPackage>,
+    pub packages: std::vec::Vec<RollingPackage>,
 }
 
 /// Dynamic implementation of the Arch-inspired RollingReleaseManager.
@@ -96,7 +96,7 @@ impl SigmaRollingReleaseManager {
         Self {
             channel: RollingReleaseChannel {
                 name,
-                packages: alloc::vec::Vec::new(),
+                packages: std::vec::Vec::new(),
                 last_sync: 0,
             },
             is_minimal: true,
@@ -126,8 +126,8 @@ impl RollingReleaseManager for SigmaRollingReleaseManager {
         Ok(upgraded)
     }
 
-    fn get_outdated_packages(&self) -> alloc::vec::Vec<&RollingPackage> {
-        let mut outdated = alloc::vec::Vec::new();
+    fn get_outdated_packages(&self) -> std::vec::Vec<&RollingPackage> {
+        let mut outdated = std::vec::Vec::new();
         for pkg in &self.channel.packages {
             if pkg.is_outdated {
                 outdated.push(pkg);
@@ -147,14 +147,14 @@ impl RollingReleaseManager for SigmaRollingReleaseManager {
 
 /// Btrfs volume manager inspired by Fedora's default Btrfs layout.
 pub struct BtrfsVolumeManager {
-    pub device_path: alloc::string::String,
-    pub subvolumes: alloc::vec::Vec<BtrfsSubvolume>,
+    pub device_path: std::string::String,
+    pub subvolumes: std::vec::Vec<BtrfsSubvolume>,
     pub compression: BtrfsCompression,
 }
 
 pub struct BtrfsSubvolume {
-    pub name: alloc::string::String,
-    pub mount_point: alloc::string::String,
+    pub name: std::string::String,
+    pub mount_point: std::string::String,
     pub quota_enabled: bool,
     pub snapshot_policy: SnapshotPolicy,
 }
@@ -177,7 +177,7 @@ pub enum SnapshotPolicy {
 }
 
 pub struct SystemSnapshotManager {
-    pub snapshots: alloc::vec::Vec<SystemSnapshot>,
+    pub snapshots: std::vec::Vec<SystemSnapshot>,
     pub auto_snapshot_on_upgrade: bool,
     pub max_snapshots: usize,
 }
@@ -185,15 +185,15 @@ pub struct SystemSnapshotManager {
 pub struct SystemSnapshot {
     pub id: u64,
     pub timestamp: u64,
-    pub description: alloc::string::String,
-    pub subvolume: alloc::string::String,
+    pub description: std::string::String,
+    pub subvolume: std::string::String,
     pub pre_upgrade: bool,
 }
 
 impl SystemSnapshotManager {
     pub fn new(max_snapshots: usize) -> Self {
         SystemSnapshotManager {
-            snapshots: alloc::vec::Vec::new(),
+            snapshots: std::vec::Vec::new(),
             auto_snapshot_on_upgrade: true,
             max_snapshots,
         }
@@ -204,8 +204,8 @@ impl SystemSnapshotManager {
         self.snapshots.push(SystemSnapshot {
             id,
             timestamp: 0, // Would use real clock
-            description: alloc::string::String::from(desc),
-            subvolume: alloc::string::String::from("@"),
+            description: std::string::String::from(desc),
+            subvolume: std::string::String::from("@"),
             pre_upgrade,
         });
         // Prune old snapshots if at limit
@@ -230,45 +230,45 @@ impl SystemSnapshotManager {
 
 /// Declarative system configuration inspired by NixOS's configuration.nix.
 pub struct DeclarativeSystemConfig {
-    pub hostname: alloc::string::String,
-    pub packages: alloc::vec::Vec<alloc::string::String>,
-    pub services: alloc::vec::Vec<ServiceConfig>,
-    pub users: alloc::vec::Vec<UserConfig>,
+    pub hostname: std::string::String,
+    pub packages: std::vec::Vec<std::string::String>,
+    pub services: std::vec::Vec<ServiceConfig>,
+    pub users: std::vec::Vec<UserConfig>,
     pub boot: BootConfig,
     pub generation: u64,
 }
 
 pub struct ServiceConfig {
-    pub name: alloc::string::String,
+    pub name: std::string::String,
     pub enabled: bool,
-    pub extra_config: alloc::vec::Vec<(alloc::string::String, alloc::string::String)>,
+    pub extra_config: std::vec::Vec<(std::string::String, std::string::String)>,
 }
 
 pub struct UserConfig {
-    pub username: alloc::string::String,
-    pub groups: alloc::vec::Vec<alloc::string::String>,
-    pub shell: alloc::string::String,
-    pub home: alloc::string::String,
+    pub username: std::string::String,
+    pub groups: std::vec::Vec<std::string::String>,
+    pub shell: std::string::String,
+    pub home: std::string::String,
 }
 
 pub struct BootConfig {
-    pub loader: alloc::string::String,
-    pub kernel_params: alloc::vec::Vec<alloc::string::String>,
+    pub loader: std::string::String,
+    pub kernel_params: std::vec::Vec<std::string::String>,
     pub max_generations: u32,
 }
 
 /// Nix-style store path for immutable packages.
 pub struct NixStyleStorePath {
     pub hash: [u8; 32],
-    pub name: alloc::string::String,
-    pub version: alloc::string::String,
-    pub path: alloc::string::String,
+    pub name: std::string::String,
+    pub version: std::string::String,
+    pub path: std::string::String,
 }
 
 impl NixStyleStorePath {
-    pub fn derive_path(name: &str, hash: [u8; 32]) -> alloc::string::String {
+    pub fn derive_path(name: &str, hash: [u8; 32]) -> std::string::String {
         // Produce /sigma/store/<hash>-<name>
-        let mut path = alloc::string::String::from("/sigma/store/");
+        let mut path = std::string::String::from("/sigma/store/");
         for byte in &hash[..16] {
             let hi = (byte >> 4) & 0xf;
             let lo = byte & 0xf;
@@ -325,7 +325,7 @@ pub struct EphemeralSessionManager {
 }
 
 pub struct EncryptedPersistentStorage {
-    pub device: alloc::string::String,
+    pub device: std::string::String,
     pub luks_header_offset: u64,
     pub unlocked: bool,
 }
@@ -360,7 +360,7 @@ impl EphemeralSessionManager {
     /// Enable persistent encrypted storage for specific data.
     pub fn enable_persistent(&mut self, device: &str) {
         self.persistent_storage = Some(EncryptedPersistentStorage {
-            device: alloc::string::String::from(device),
+            device: std::string::String::from(device),
             luks_header_offset: 0,
             unlocked: false,
         });
@@ -375,7 +375,7 @@ pub trait Amnesic {
 
 pub struct RamDisk {
     pub size_bytes: usize,
-    pub data: alloc::vec::Vec<u8>,
+    pub data: std::vec::Vec<u8>,
     pub wiped: bool,
 }
 
@@ -399,14 +399,14 @@ impl Amnesic for RamDisk {
 
 /// Penetration testing tool registry, inspired by Kali Linux's tool suite.
 pub struct PenTestToolRegistry {
-    pub tools: alloc::vec::Vec<PenTestTool>,
+    pub tools: std::vec::Vec<PenTestTool>,
 }
 
 pub struct PenTestTool {
-    pub name: alloc::string::String,
+    pub name: std::string::String,
     pub category: PenTestCategory,
     pub installed: bool,
-    pub version: alloc::string::String,
+    pub version: std::string::String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -427,7 +427,7 @@ impl PenTestToolRegistry {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut registry = PenTestToolRegistry {
-            tools: alloc::vec::Vec::new(),
+            tools: std::vec::Vec::new(),
         };
         registry.register_default_tools();
         registry
@@ -446,31 +446,31 @@ impl PenTestToolRegistry {
         ];
         for (name, cat) in defaults {
             self.tools.push(PenTestTool {
-                name: alloc::string::String::from(name),
+                name: std::string::String::from(name),
                 category: cat,
                 installed: false,
-                version: alloc::string::String::from("0.1.0"),
+                version: std::string::String::from("0.1.0"),
             });
         }
     }
 
-    pub fn tools_in_category(&self, cat: &PenTestCategory) -> alloc::vec::Vec<&PenTestTool> {
+    pub fn tools_in_category(&self, cat: &PenTestCategory) -> std::vec::Vec<&PenTestTool> {
         self.tools.iter().filter(|t| &t.category == cat).collect()
     }
 }
 
 /// Live forensics session — captures state without modifying target.
 pub struct LiveForensicsSession {
-    pub target_device: alloc::string::String,
-    pub evidence_dir: alloc::string::String,
-    pub chain_of_custody: alloc::vec::Vec<CustodyEntry>,
+    pub target_device: std::string::String,
+    pub evidence_dir: std::string::String,
+    pub chain_of_custody: std::vec::Vec<CustodyEntry>,
     pub read_only: bool,
 }
 
 pub struct CustodyEntry {
     pub timestamp: u64,
-    pub action: alloc::string::String,
-    pub operator: alloc::string::String,
+    pub action: std::string::String,
+    pub operator: std::string::String,
 }
 
 // ============================================================================
@@ -511,7 +511,7 @@ impl MinimalRuntime {
 /// Init system inspired by Alpine's OpenRC.
 pub struct OpenRcStyleInit {
     pub runlevel: Runlevel,
-    pub services: alloc::vec::Vec<InitService>,
+    pub services: std::vec::Vec<InitService>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -525,10 +525,10 @@ pub enum Runlevel {
 }
 
 pub struct InitService {
-    pub name: alloc::string::String,
+    pub name: std::string::String,
     pub runlevel: Runlevel,
     pub started: bool,
-    pub dependencies: alloc::vec::Vec<alloc::string::String>,
+    pub dependencies: std::vec::Vec<std::string::String>,
 }
 
 // ============================================================================
@@ -570,7 +570,7 @@ impl BoreSchedulerConfig {
 
 pub struct Task {
     pub pid: u32,
-    pub name: alloc::string::String,
+    pub name: std::string::String,
     pub burst_score: u64,
     pub vruntime: u64,
     pub priority: i32,
@@ -579,14 +579,14 @@ pub struct Task {
 /// BORE-style scheduler implementing burst fairness.
 pub struct BoreScheduler {
     pub config: BoreSchedulerConfig,
-    pub run_queue: alloc::vec::Vec<Task>,
+    pub run_queue: std::vec::Vec<Task>,
 }
 
 impl BoreScheduler {
     pub fn new(config: BoreSchedulerConfig) -> Self {
         BoreScheduler {
             config,
-            run_queue: alloc::vec::Vec::new(),
+            run_queue: std::vec::Vec::new(),
         }
     }
 
@@ -610,8 +610,8 @@ impl BoreScheduler {
 
 /// Kernel compilation profile — optimized for host CPU (CachyOS-style).
 pub struct OptimizedKernelProfile {
-    pub cpu_arch: alloc::string::String,
-    pub march_flags: alloc::vec::Vec<alloc::string::String>,
+    pub cpu_arch: std::string::String,
+    pub march_flags: std::vec::Vec<std::string::String>,
     pub lto_enabled: bool,
     pub pgo_enabled: bool,
     pub hugepages: bool,
@@ -620,8 +620,8 @@ pub struct OptimizedKernelProfile {
 impl OptimizedKernelProfile {
     pub fn for_zen4() -> Self {
         OptimizedKernelProfile {
-            cpu_arch: alloc::string::String::from("znver4"),
-            march_flags: alloc::vec!["avx512f".into(), "bmi2".into(), "znver4".into()],
+            cpu_arch: std::string::String::from("znver4"),
+            march_flags: std::vec!["avx512f".into(), "bmi2".into(), "znver4".into()],
             lto_enabled: true,
             pgo_enabled: true,
             hugepages: true,
@@ -635,9 +635,9 @@ impl OptimizedKernelProfile {
 
 /// Garuda-inspired Btrfs layout with zstd compression everywhere.
 pub struct GarudaBtrfsLayout {
-    pub root_subvol: alloc::string::String,
-    pub home_subvol: alloc::string::String,
-    pub snapshots_subvol: alloc::string::String,
+    pub root_subvol: std::string::String,
+    pub home_subvol: std::string::String,
+    pub snapshots_subvol: std::string::String,
     pub compression: BtrfsCompression,
     pub nodatacow_enabled: bool,
     pub discard_async: bool,
@@ -648,9 +648,9 @@ impl GarudaBtrfsLayout {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         GarudaBtrfsLayout {
-            root_subvol: alloc::string::String::from("@"),
-            home_subvol: alloc::string::String::from("@home"),
-            snapshots_subvol: alloc::string::String::from("@snapshots"),
+            root_subvol: std::string::String::from("@"),
+            home_subvol: std::string::String::from("@home"),
+            snapshots_subvol: std::string::String::from("@snapshots"),
             compression: BtrfsCompression::Zstd { level: 3 },
             nodatacow_enabled: false,
             discard_async: true,
@@ -658,20 +658,20 @@ impl GarudaBtrfsLayout {
     }
 
     /// Mount options string for fstab/systemd.
-    pub fn mount_options(&self) -> alloc::string::String {
+    pub fn mount_options(&self) -> std::string::String {
         let comp = match self.compression {
-            BtrfsCompression::Zstd { level } => alloc::format!("compress=zstd:{}", level),
-            BtrfsCompression::Zlib => alloc::string::String::from("compress=zlib"),
-            BtrfsCompression::Lzo => alloc::string::String::from("compress=lzo"),
-            BtrfsCompression::None => alloc::string::String::from("nocompress"),
+            BtrfsCompression::Zstd { level } => std::format!("compress=zstd:{}", level),
+            BtrfsCompression::Zlib => std::string::String::from("compress=zlib"),
+            BtrfsCompression::Lzo => std::string::String::from("compress=lzo"),
+            BtrfsCompression::None => std::string::String::from("nocompress"),
         };
-        let mut opts = alloc::vec![
+        let mut opts = std::vec![
             comp,
-            alloc::string::String::from("noatime"),
-            alloc::string::String::from("space_cache=v2"),
+            std::string::String::from("noatime"),
+            std::string::String::from("space_cache=v2"),
         ];
         if self.discard_async {
-            opts.push(alloc::string::String::from("discard=async"));
+            opts.push(std::string::String::from("discard=async"));
         }
         opts.join(",")
     }
@@ -679,12 +679,12 @@ impl GarudaBtrfsLayout {
 
 /// Snapper-style automatic snapshot integration (as used in Garuda).
 pub struct SnapperIntegration {
-    pub configs: alloc::vec::Vec<SnapperConfig>,
+    pub configs: std::vec::Vec<SnapperConfig>,
 }
 
 pub struct SnapperConfig {
-    pub name: alloc::string::String,
-    pub subvolume: alloc::string::String,
+    pub name: std::string::String,
+    pub subvolume: std::string::String,
     pub timeline_enabled: bool,
     pub timeline_min_age: u64,
     pub timeline_limit_hourly: u32,
@@ -697,8 +697,8 @@ pub struct SnapperConfig {
 impl SnapperIntegration {
     pub fn default_root_config() -> SnapperConfig {
         SnapperConfig {
-            name: alloc::string::String::from("root"),
-            subvolume: alloc::string::String::from("/"),
+            name: std::string::String::from("root"),
+            subvolume: std::string::String::from("/"),
             timeline_enabled: true,
             timeline_min_age: 1800,
             timeline_limit_hourly: 5,
@@ -716,11 +716,11 @@ impl SnapperIntegration {
 
 /// Service supervisor inspired by Void Linux runit.
 pub struct VoidRunitSupervisor {
-    pub services: alloc::vec::Vec<RunitService>,
+    pub services: std::vec::Vec<RunitService>,
 }
 
 pub struct RunitService {
-    pub name: alloc::string::String,
+    pub name: std::string::String,
     pub is_running: bool,
     pub pid: u32,
 }
@@ -728,13 +728,13 @@ pub struct RunitService {
 impl VoidRunitSupervisor {
     pub fn new() -> Self {
         Self {
-            services: alloc::vec::Vec::new(),
+            services: std::vec::Vec::new(),
         }
     }
 
     pub fn register_service(&mut self, name: &str) {
         self.services.push(RunitService {
-            name: alloc::string::String::from(name),
+            name: std::string::String::from(name),
             is_running: false,
             pid: 0,
         });
@@ -757,19 +757,19 @@ impl VoidRunitSupervisor {
 
 /// Gentoo-inspired USE-flag constraint solver.
 pub struct GentooPortageUseSolver {
-    pub enabled_flags: alloc::vec::Vec<alloc::string::String>,
+    pub enabled_flags: std::vec::Vec<std::string::String>,
 }
 
 impl GentooPortageUseSolver {
     pub fn new() -> Self {
         Self {
-            enabled_flags: alloc::vec::Vec::new(),
+            enabled_flags: std::vec::Vec::new(),
         }
     }
 
     pub fn enable_flag(&mut self, flag: &str) {
         if !self.enabled_flags.iter().any(|f| f == flag) {
-            self.enabled_flags.push(alloc::string::String::from(flag));
+            self.enabled_flags.push(std::string::String::from(flag));
         }
     }
 
@@ -784,16 +784,16 @@ impl GentooPortageUseSolver {
 
 /// YaST2-inspired modular control center setting plug.
 pub struct Yast2ModulePlug {
-    pub module_id: alloc::string::String,
-    pub title: alloc::string::String,
+    pub module_id: std::string::String,
+    pub title: std::string::String,
     pub active: bool,
 }
 
 impl Yast2ModulePlug {
     pub fn new(id: &str, title: &str) -> Self {
         Self {
-            module_id: alloc::string::String::from(id),
-            title: alloc::string::String::from(title),
+            module_id: std::string::String::from(id),
+            title: std::string::String::from(title),
             active: true,
         }
     }
@@ -839,7 +839,7 @@ impl SigmaDistroEngine {
         SigmaDistroEngine {
             rolling_channel: RollingReleaseChannel {
                 name: "sigma-rolling",
-                packages: alloc::vec::Vec::new(),
+                packages: std::vec::Vec::new(),
                 last_sync: 0,
             },
             snapshot_manager: SystemSnapshotManager::new(10),
@@ -853,7 +853,7 @@ impl SigmaDistroEngine {
             bore_scheduler: BoreScheduler::new(BoreSchedulerConfig::default_desktop()),
             btrfs_layout: GarudaBtrfsLayout::new(),
             snapper: SnapperIntegration {
-                configs: alloc::vec![SnapperIntegration::default_root_config()],
+                configs: std::vec![SnapperIntegration::default_root_config()],
             },
         }
     }
@@ -922,12 +922,12 @@ mod tests {
 
         let config = DeclarativeSystemConfig {
             hostname: "sigma-nix".to_string(),
-            packages: alloc::vec!["tmux".into(), "git".into()],
-            services: alloc::vec![],
-            users: alloc::vec![],
+            packages: std::vec!["tmux".into(), "git".into()],
+            services: std::vec![],
+            users: std::vec![],
             boot: BootConfig {
                 loader: "systemd-boot".to_string(),
-                kernel_params: alloc::vec![],
+                kernel_params: std::vec![],
                 max_generations: 5,
             },
             generation: 2,

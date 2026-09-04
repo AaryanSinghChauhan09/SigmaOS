@@ -1,7 +1,7 @@
 use std::format;
 use std::string::{String, ToString};
 // Custom BTreeMap implementation for SigmaOS
-// Reduces dependency on alloc::collections::BTreeMap
+// Reduces dependency on std::collections::BTreeMap
 // Simple implementation using sorted Vec for now
 
 use super::Vec;

@@ -291,7 +291,7 @@ mod tests {
             Duration::from_millis(3000),
             "Frame-rate test",
         );
-        edit.load_entries(alloc::vec![entry]);
+        edit.load_entries(std::vec![entry]);
 
         // Convert 24 fps to 12 fps -> times should scale up (multiply by 2)
         edit.convert_framerate(24.0, 12.0);
@@ -312,7 +312,7 @@ mod tests {
             Duration::from_secs(2),
             "Hello World",
         );
-        edit.load_entries(alloc::vec![entry]);
+        edit.load_entries(std::vec![entry]);
 
         let mut dict = BTreeMap::new();
         dict.insert("hello".to_string(), "bonjour".to_string());

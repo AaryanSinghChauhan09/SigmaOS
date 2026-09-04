@@ -160,7 +160,7 @@ impl DebianPackageTranslator {
         }
 
         pkg.source = PackageSource::Local {
-            path: alloc::format!(
+            path: std::format!(
                 "/tmp/deb_absorb/{}_{}.deb",
                 deb_meta.package_name,
                 deb_meta.version

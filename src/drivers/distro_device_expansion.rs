@@ -244,7 +244,7 @@ impl PeripheralDevice for RealtekRtl8169Driver {
         self.power_state = PowerState::On;
         self.rx_ring = Vec::new();
         // Pre-populate simulated RX buffer frame
-        self.rx_ring.push(alloc::vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00]);
+        self.rx_ring.push(std::vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00]);
         Ok(())
     }
 
@@ -985,7 +985,7 @@ impl PeripheralDevice for CanBusSocketDriver {
         self.power_state = PowerState::On;
         self.rx_queue = Vec::new();
         // Enqueue sample CAN frame
-        self.rx_queue.push((0x123, alloc::vec![0xDE, 0xAD, 0xBE, 0xEF]));
+        self.rx_queue.push((0x123, std::vec![0xDE, 0xAD, 0xBE, 0xEF]));
         Ok(())
     }
 
@@ -1766,7 +1766,7 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
         self.power_state = PowerState::On;
-        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        self.rx_buffer = std::vec![b'O', b'K', b'\r', b'\n'];
         Ok(())
     }
 

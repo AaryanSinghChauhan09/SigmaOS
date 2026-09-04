@@ -409,7 +409,7 @@ impl OpenRCManager {
     /// Dependency resolution for service startup order
     pub fn resolve_startup_order(&self, service_names: &[String]) -> Result<Vec<String>, &'static str> {
         let mut order = Vec::new();
-        let mut visited = alloc::collections::BTreeSet::new();
+        let mut visited = std::collections::BTreeSet::new();
 
         for name in service_names {
             self.visit_dependency(name, &mut order, &mut visited)?;
@@ -422,7 +422,7 @@ impl OpenRCManager {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut alloc::collections::BTreeSet<String>,
+        visited: &mut std::collections::BTreeSet<String>,
     ) -> Result<(), &'static str> {
         let actual_name = self.resolve_virtual_service(name).unwrap_or(name);
 

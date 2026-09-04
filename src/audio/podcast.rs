@@ -117,49 +117,49 @@ impl PodcastFeed {
             "<rss version=\"2.0\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">\n",
         );
         xml.push_str("  <channel>\n");
-        xml.push_str(&alloc::format!("    <title>{}</title>\n", self.title));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!("    <title>{}</title>\n", self.title));
+        xml.push_str(&std::format!(
             "    <description>{}</description>\n",
             self.description
         ));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!(
             "    <itunes:author>{}</itunes:author>\n",
             self.author
         ));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!(
             "    <language>{}</language>\n",
             self.language
         ));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!(
             "    <itunes:image href=\"{}\"/>\n",
             self.cover_art_url
         ));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!(
             "    <itunes:category text=\"{}\"/>\n",
             self.category
         ));
-        xml.push_str(&alloc::format!(
+        xml.push_str(&std::format!(
             "    <itunes:explicit>{}</itunes:explicit>\n",
             if self.explicit { "yes" } else { "no" }
         ));
 
         for ep in &self.episodes {
             xml.push_str("    <item>\n");
-            xml.push_str(&alloc::format!("      <guid>{}</guid>\n", ep.id));
-            xml.push_str(&alloc::format!("      <title>{}</title>\n", ep.title));
-            xml.push_str(&alloc::format!(
+            xml.push_str(&std::format!("      <guid>{}</guid>\n", ep.id));
+            xml.push_str(&std::format!("      <title>{}</title>\n", ep.title));
+            xml.push_str(&std::format!(
                 "      <description>{}</description>\n",
                 ep.description
             ));
-            xml.push_str(&alloc::format!(
+            xml.push_str(&std::format!(
                 "      <enclosure url=\"{}\" length=\"0\" type=\"audio/mpeg\"/>\n",
                 ep.audio_url
             ));
-            xml.push_str(&alloc::format!(
+            xml.push_str(&std::format!(
                 "      <itunes:duration>{}</itunes:duration>\n",
                 ep.duration_seconds
             ));
-            xml.push_str(&alloc::format!(
+            xml.push_str(&std::format!(
                 "      <itunes:explicit>{}</itunes:explicit>\n",
                 if ep.explicit { "yes" } else { "no" }
             ));

@@ -689,7 +689,7 @@ impl DriverRegistry {
         for driver in &mut self.drivers {
             driver
                 .init()
-                .map_err(|e| RegistryError::InitializationFailed(alloc::format!("{:?}", e)))?;
+                .map_err(|e| RegistryError::InitializationFailed(std::format!("{:?}", e)))?;
         }
         Ok(())
     }
@@ -949,7 +949,7 @@ impl VesaFrameBufferSimulator {
         Self {
             width,
             height,
-            video_memory: alloc::vec![0u32; size],
+            video_memory: std::vec![0u32; size],
         }
     }
 

@@ -16,7 +16,7 @@ impl Framebuffer {
         let size = (pitch * height) as usize;
         Self {
             addr, width, height, pitch, bpp,
-            back_buffer: alloc::vec![0; size],
+            back_buffer: std::vec![0; size],
         }
     }
     

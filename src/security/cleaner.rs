@@ -75,23 +75,23 @@ mod tests {
     #[test]
     fn test_secure_wipe() {
         let cleaner = SecureCleaner::new();
-        let mut sensitive_data = alloc::vec![0xCA, 0xFE, 0xBA, 0xBE];
+        let mut sensitive_data = std::vec![0xCA, 0xFE, 0xBA, 0xBE];
 
         cleaner.secure_wipe(&mut sensitive_data);
 
-        assert_eq!(sensitive_data, alloc::vec![0x00, 0x00, 0x00, 0x00]);
+        assert_eq!(sensitive_data, std::vec![0x00, 0x00, 0x00, 0x00]);
     }
 
     #[test]
     fn test_wipe_unallocated_space() {
         let cleaner = SecureCleaner::new();
-        let mut partition = alloc::vec![0xFF; 1024];
+        let mut partition = std::vec![0xFF; 1024];
         let bitmap = [true, false];
 
         cleaner.wipe_unallocated_space(&mut partition, &bitmap);
 
-        assert_eq!(partition[0..512], alloc::vec![0xFF; 512]);
-        assert_eq!(partition[512..1024], alloc::vec![0x00; 512]);
+        assert_eq!(partition[0..512], std::vec![0xFF; 512]);
+        assert_eq!(partition[512..1024], std::vec![0x00; 512]);
     }
 }
 
@@ -221,16 +221,16 @@ mod tails_parity_tests {
     #[test]
     fn test_amnesic_ram_shredder() {
         let amnesia = AmnesiaManager::new();
-        let mut sensitive_ram = alloc::vec![0xAA; 512];
+        let mut sensitive_ram = std::vec![0xAA; 512];
 
         amnesia.shred_ram_segment(&mut sensitive_ram);
-        assert_eq!(sensitive_ram, alloc::vec![0x00; 512]);
+        assert_eq!(sensitive_ram, std::vec![0x00; 512]);
     }
 
     #[test]
     fn test_metadata_scrubbing() {
         let scrubber = MetadataScrubber::new();
-        let mut document = alloc::vec![0x41, 0x42, 0x43, 0x00];
+        let mut document = std::vec![0x41, 0x42, 0x43, 0x00];
         document.extend_from_slice(b"Exif\0\0CameraID_12345_GPSLocation_9999");
         document.extend_from_slice(b"SomeSuffixData");
 

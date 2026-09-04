@@ -707,7 +707,7 @@ impl AppArmorProfile {
         }
 
         if !allowed {
-            let log_msg = alloc::format!(
+            let log_msg = std::format!(
                 "AppArmor [{:?}] profile='{}' path='{}' perm={}",
                 self.mode,
                 self.name,

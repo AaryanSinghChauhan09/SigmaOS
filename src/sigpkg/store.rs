@@ -22,7 +22,7 @@ use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 /// PathBuf-like alias using String for no_std compatibility
-type PathBuf = alloc::string::String;
+type PathBuf = std::string::String;
 
 /// Content-addressed store
 pub struct ContentAddressedStore {
@@ -50,7 +50,7 @@ impl ContentAddressedStore {
     /// Add package to store
     pub fn add(&mut self, package: Package, data: &[u8]) -> Result<String, StoreError> {
         let hash = self.compute_hash(data);
-        let package_path = alloc::format!("{}/{}-{}", self.base_path, hash, package.name);
+        let package_path = std::format!("{}/{}-{}", self.base_path, hash, package.name);
 
         let stored = StoredPackage {
             package: package.clone(),
@@ -98,7 +98,7 @@ impl ContentAddressedStore {
             hash_val ^= byte as u64;
             hash_val = hash_val.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", hash_val)
+        std::format!("{:x}", hash_val)
     }
 
     /// Get package path
@@ -204,7 +204,7 @@ impl BsdPkgRepositoryMirror {
                 hash_val ^= byte as u64;
                 hash_val = hash_val.wrapping_mul(0x100000001b3);
             }
-            self.index_hash = alloc::format!("{:x}", hash_val);
+            self.index_hash = std::format!("{:x}", hash_val);
             self.is_trusted = true;
             self.packages_count = index_bytes.len() / 32;
             true
@@ -276,10 +276,10 @@ impl NixOsHermeticCasStore {
             hash_val ^= byte as u64;
             hash_val = hash_val.wrapping_mul(0x100000001b3);
         }
-        let hash_str = alloc::format!("{:016x}", hash_val);
+        let hash_str = std::format!("{:016x}", hash_val);
 
-        let folder_name = alloc::format!("{}-{}-{}", hash_str, pkg_name, version);
-        let store_path = alloc::format!("{}/{}", self.store_dir, folder_name);
+        let folder_name = std::format!("{}-{}-{}", hash_str, pkg_name, version);
+        let store_path = std::format!("{}/{}", self.store_dir, folder_name);
         self.store_paths
             .insert(pkg_name.to_string(), store_path.clone());
         store_path

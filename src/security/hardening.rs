@@ -218,13 +218,13 @@ pub enum IntrusionSeverity {
 #[derive(Debug, Clone)]
 pub struct AuditLogEntry {
     pub timestamp_ms: u64,
-    pub event: alloc::string::String,
+    pub event: std::string::String,
     pub severity: IntrusionSeverity,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct HardenedAuditTrail {
-    pub logs: alloc::vec::Vec<AuditLogEntry>,
+    pub logs: std::vec::Vec<AuditLogEntry>,
 }
 
 impl HardenedAuditTrail {

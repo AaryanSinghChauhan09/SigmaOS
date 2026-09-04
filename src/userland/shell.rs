@@ -268,13 +268,13 @@ impl Environment {
                 let options: Vec<&str> = body.split(',').collect();
                 let mut results = Vec::new();
                 for opt in options {
-                    let combined = alloc::format!("{}{}{}", prefix, opt.trim(), suffix);
+                    let combined = std::format!("{}{}{}", prefix, opt.trim(), suffix);
                     results.extend(Self::expand_braces(&combined));
                 }
                 return results;
             }
         }
-        alloc::vec![input.to_string()]
+        std::vec![input.to_string()]
     }
 }
 

@@ -206,7 +206,7 @@ impl FuzzyCompletionEngine {
         let m = b1.len();
         let n = b2.len();
 
-        let mut dp = alloc::vec![vec![0usize; n + 1]; m + 1];
+        let mut dp = std::vec![vec![0usize; n + 1]; m + 1];
 
         for i in 0..=m {
             dp[i][0] = i;
@@ -572,7 +572,7 @@ impl WildcardGlobMatcher {
         let p_len = p_bytes.len();
         let t_len = t_bytes.len();
 
-        let mut dp = alloc::vec![vec![false; t_len + 1]; p_len + 1];
+        let mut dp = std::vec![vec![false; t_len + 1]; p_len + 1];
         dp[0][0] = true;
 
         for i in 1..=p_len {

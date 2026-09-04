@@ -158,7 +158,7 @@ mod tests {
             "test-package".to_string(),
             Version::new(1, 0, 0),
             "Test package".to_string(),
-            alloc::vec::Vec::new(),
+            std::vec::Vec::new(),
             "checksum".to_string(),
         );
         log.add_install(&package);

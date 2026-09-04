@@ -69,9 +69,9 @@ impl SsdBlockDevice {
             id,
             block_size,
             total_blocks,
-            erase_cycles: alloc::vec![0u32; total_blocks as usize],
+            erase_cycles: std::vec![0u32; total_blocks as usize],
             write_blocked: false,
-            data: alloc::vec![0u8; total_bytes],
+            data: std::vec![0u8; total_bytes],
         }
     }
 }
@@ -142,7 +142,7 @@ impl NvmeBlockDevice {
             submission_queues: num_queues,
             completion_queues: num_queues,
             write_blocked: false,
-            storage: alloc::vec![0u8; total_bytes],
+            storage: std::vec![0u8; total_bytes],
         }
     }
 }
@@ -230,7 +230,7 @@ impl BlockOperationEngine {
             BlockOpCode::Read | BlockOpCode::DirectIoRead => {
                 let mut read_bytes = 0;
                 for i in 0..req.count {
-                    let mut b = alloc::vec![0u8; dev.block_size()];
+                    let mut b = std::vec![0u8; dev.block_size()];
                     dev.read_block(req.block_num + i as u64, &mut b)?;
                     req.buffer.extend_from_slice(&b);
                     read_bytes += dev.block_size();
@@ -263,7 +263,7 @@ impl BlockOperationEngine {
                 if dev.is_write_blocked() {
                     return Err(BlockError::WriteBlocked);
                 }
-                let zero_buf = alloc::vec![0u8; dev.block_size()];
+                let zero_buf = std::vec![0u8; dev.block_size()];
                 for i in 0..req.count {
                     dev.write_block(req.block_num + i as u64, &zero_buf)?;
                 }
@@ -518,7 +518,7 @@ mod tests {
     #[test]
     fn test_ssd_ftl_wear_leveling() {
         let mut ssd = SsdBlockDevice::new(1, 4096, 16);
-        let data = alloc::vec![0xAAu8; 4096];
+        let data = std::vec![0xAAu8; 4096];
         assert!(ssd.write_block(0, &data).is_ok());
         assert_eq!(ssd.erase_cycles[0], 1);
 

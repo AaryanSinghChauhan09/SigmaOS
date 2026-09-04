@@ -266,7 +266,7 @@ impl PaccacheEngine {
 
     pub fn purge_unneeded_cache(&mut self) -> usize {
         let mut purged = 0;
-        let mut counts = alloc::collections::BTreeMap::new();
+        let mut counts = std::collections::BTreeMap::new();
         let mut remaining = Vec::new();
 
         self.cache_files.sort_by(|a, b| b.1.cmp(&a.1)); // Sort highest pkgrel first

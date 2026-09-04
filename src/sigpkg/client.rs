@@ -286,7 +286,7 @@ impl SigpkgClient {
             hash ^= byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", hash) == declared
+        std::format!("{:x}", hash) == declared
     }
 
     /// List packages currently in the store.
@@ -374,7 +374,7 @@ files: /usr/bin/zenith, /etc/zenith.conf
             h ^= b as u64;
             h = h.wrapping_mul(0x100000001b3);
         }
-        check_manifest.checksum = alloc::format!("{:x}", h);
+        check_manifest.checksum = std::format!("{:x}", h);
 
         let hash = client
             .install_from_manifest(&check_manifest, payload, &installed)

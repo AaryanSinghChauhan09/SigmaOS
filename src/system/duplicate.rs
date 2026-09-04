@@ -44,7 +44,7 @@ impl HashAlgorithm for Sha256Algorithm {
             hash_val ^= byte as u64;
             hash_val = hash_val.wrapping_mul(0x100000001b3);
         }
-        Ok(alloc::format!("{:x}", hash_val))
+        Ok(std::format!("{:x}", hash_val))
     }
 
     fn name(&self) -> &str {

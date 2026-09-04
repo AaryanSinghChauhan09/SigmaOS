@@ -22,7 +22,7 @@ use std::vec::Vec;
 // OOP-based VPN with WireGuard, OpenVPN, and Private Internet Access (PIA) support
 
 // IpAddr not in no_std; using u32 for addresses
-pub type PathBuf = alloc::string::String;
+pub type PathBuf = std::string::String;
 pub type IpAddr = u32;
 #[allow(non_snake_case)]
 pub fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 {

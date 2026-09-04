@@ -1,5 +1,5 @@
 //! Custom VecDeque implementation for SigmaOS
-//! Reduces dependency on alloc::collections::VecDeque
+//! Reduces dependency on std::collections::VecDeque
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -205,7 +205,7 @@ mod tests {
         deque.push_back(2);
         deque.push_front(0);
 
-        let items: alloc::vec::Vec<i32> = deque.iter().cloned().collect();
-        assert_eq!(items, alloc::vec![0, 1, 2]);
+        let items: std::vec::Vec<i32> = deque.iter().cloned().collect();
+        assert_eq!(items, std::vec![0, 1, 2]);
     }
 }

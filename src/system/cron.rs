@@ -102,7 +102,7 @@ impl CronSchedule {
             }
         }
 
-        let parts: alloc::vec::Vec<&str> = trimmed.split_whitespace().collect();
+        let parts: std::vec::Vec<&str> = trimmed.split_whitespace().collect();
         if parts.len() != 5 {
             return Err(CronError::InvalidFormat);
         }
@@ -141,7 +141,7 @@ impl CronField {
         }
 
         if field.contains('/') {
-            let parts: alloc::vec::Vec<&str> = field.split('/').collect();
+            let parts: std::vec::Vec<&str> = field.split('/').collect();
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
@@ -159,7 +159,7 @@ impl CronField {
         }
 
         if field.contains('-') {
-            let parts: alloc::vec::Vec<&str> = field.split('-').collect();
+            let parts: std::vec::Vec<&str> = field.split('-').collect();
             if parts.len() != 2 {
                 return Err(CronError::InvalidField);
             }
@@ -173,7 +173,7 @@ impl CronField {
         }
 
         if field.contains(',') {
-            let parts: alloc::vec::Vec<&str> = field.split(',').collect();
+            let parts: std::vec::Vec<&str> = field.split(',').collect();
             if parts.len() > 8 {
                 return Err(CronError::InvalidField);
             }

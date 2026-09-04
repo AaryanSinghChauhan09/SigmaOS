@@ -527,7 +527,7 @@ mod tests {
         let fuzzer = Fuzzer {
             name: String::from("test_fuzzer"),
             target: |input| !input.is_empty(),
-            input_generator: || alloc::vec![1, 2, 3],
+            input_generator: || std::vec![1, 2, 3],
             max_iterations: 10,
         };
         framework.add_fuzzer(fuzzer);
@@ -556,7 +556,7 @@ mod tests {
                 true
             },
             input_generator: || {
-                let mut buf = alloc::vec![0u8; 8];
+                let mut buf = std::vec![0u8; 8];
                 buf[0] = 0x00;
                 buf[1] = 0x61;
                 buf[2] = 0x73;
@@ -581,7 +581,7 @@ mod tests {
                 true
             },
             input_generator: || {
-                let mut buf = alloc::vec![0u8; 32];
+                let mut buf = std::vec![0u8; 32];
                 buf[12] = 0x50; // Data offset = 5 (20 bytes)
                 buf
             },

@@ -147,8 +147,8 @@ pub enum StorageClass {
 
 #[derive(Clone)]
 pub struct S3Object {
-    pub bucket: alloc::string::String,
-    pub key: alloc::string::String,
+    pub bucket: std::string::String,
+    pub key: std::string::String,
     pub size_bytes: u64,
     pub storage_class: StorageClass,
     pub last_modified_timestamp: u64,
@@ -157,22 +157,22 @@ pub struct S3Object {
 #[derive(Clone)]
 pub struct MultipartUploadSession {
     pub upload_id: u32,
-    pub bucket: alloc::string::String,
-    pub key: alloc::string::String,
+    pub bucket: std::string::String,
+    pub key: std::string::String,
     pub total_parts_expected: usize,
     pub uploaded_parts_count: usize,
 }
 
 pub struct PresignedUrl {
-    pub url: alloc::string::String,
+    pub url: std::string::String,
     pub expiration_timestamp: u64,
     pub signature_token: u32,
 }
 
 pub struct SovereignS3Bucket {
-    pub bucket_name: alloc::string::String,
-    pub objects: alloc::vec::Vec<S3Object>,
-    pub active_multipart_uploads: alloc::vec::Vec<MultipartUploadSession>,
+    pub bucket_name: std::string::String,
+    pub objects: std::vec::Vec<S3Object>,
+    pub active_multipart_uploads: std::vec::Vec<MultipartUploadSession>,
     pub lifecycle_transition_days_ia: u32,
     pub lifecycle_transition_days_glacier: u32,
 }
@@ -181,8 +181,8 @@ impl SovereignS3Bucket {
     pub fn new(name: &str) -> Self {
         Self {
             bucket_name: name.to_string(),
-            objects: alloc::vec::Vec::new(),
-            active_multipart_uploads: alloc::vec::Vec::new(),
+            objects: std::vec::Vec::new(),
+            active_multipart_uploads: std::vec::Vec::new(),
             lifecycle_transition_days_ia: 30,
             lifecycle_transition_days_glacier: 90,
         }

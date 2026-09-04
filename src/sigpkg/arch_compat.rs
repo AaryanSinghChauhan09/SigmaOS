@@ -57,7 +57,7 @@ pub struct Package {
     pub name: SigmaString,
     pub version: Version,
     pub description: SigmaString,
-    pub dependencies: alloc::vec::Vec<Dependency>,
+    pub dependencies: std::vec::Vec<Dependency>,
     pub checksum: SigmaString,
 }
 
@@ -66,7 +66,7 @@ impl Package {
         name: SigmaString,
         version: Version,
         description: SigmaString,
-        dependencies: alloc::vec::Vec<Dependency>,
+        dependencies: std::vec::Vec<Dependency>,
         checksum: SigmaString,
     ) -> Self {
         Self {
@@ -96,7 +96,7 @@ impl AurRecipeCompiler {
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
-        let mut depends = alloc::vec::Vec::new();
+        let mut depends = std::vec::Vec::new();
 
         for line in pkgbuild_content.lines() {
             let line = line.trim();
@@ -147,7 +147,7 @@ impl Default for AurRecipeCompiler {
 pub struct DebianSbuildPackage {
     pub name: SigmaString,
     pub version: Version,
-    pub build_depends: alloc::vec::Vec<SigmaString>,
+    pub build_depends: std::vec::Vec<SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
@@ -249,7 +249,7 @@ impl PacmanDbAdapter {
             crate::klib::string::SigmaString::from(name),
             parsed_ver,
             crate::klib::string::SigmaString::from(desc),
-            alloc::vec::Vec::<Dependency>::new(),
+            std::vec::Vec::<Dependency>::new(),
             crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -323,8 +323,8 @@ impl AlpmHookManager {
         &self,
         when: HookWhen,
         changed_file: &str,
-    ) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
-        let mut triggered_cmds = alloc::vec::Vec::new();
+    ) -> std::vec::Vec<crate::klib::string::SigmaString> {
+        let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
                 let pattern = hook.target_pattern.trim_end_matches('*');
@@ -540,13 +540,13 @@ impl AlpmConflictSolver {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: alloc::vec::Vec<SigmaString>,
+    pub hooks: std::vec::Vec<SigmaString>,
     pub compression: SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = alloc::vec::Vec::new();
+        let mut hooks = std::vec::Vec::new();
         hooks.push(crate::klib::string::SigmaString::from("base"));
         hooks.push(crate::klib::string::SigmaString::from("udev"));
         hooks.push(crate::klib::string::SigmaString::from("autodetect"));
@@ -691,13 +691,13 @@ pub struct SvnPackageMetadata {
 
 #[derive(Debug, Default)]
 pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
 }
 
 impl SvntogitMigrationEngine {
     pub fn new() -> Self {
         Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
+            migrated_packages: std::collections::BTreeMap::new(),
         }
     }
 
@@ -791,13 +791,13 @@ pub struct SvnPackageMetadata {
 
 #[derive(Debug, Default)]
 pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
 }
 
 impl SvntogitMigrationEngine {
     pub fn new() -> Self {
         Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
+            migrated_packages: std::collections::BTreeMap::new(),
         }
     }
 
@@ -844,7 +844,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
+            build_depends: std::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make")
             ],
@@ -860,7 +860,7 @@ mod tests {
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
+            build_depends: std::vec![
                 crate::klib::string::SigmaString::from("gcc"),
                 crate::klib::string::SigmaString::from("make"),
                 crate::klib::string::SigmaString::from("libc-dev"),

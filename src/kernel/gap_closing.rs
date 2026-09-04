@@ -568,8 +568,8 @@ pub enum DeviceType {
 pub struct DeviceObjectX86 {
     pub device_type: DeviceType,
     pub driver_name: &'static str,
-    pub next_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
-    pub attached_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
+    pub next_device: Option<std::boxed::Box<DeviceObjectX86>>,
+    pub attached_device: Option<std::boxed::Box<DeviceObjectX86>>,
 }
 
 pub struct DriverObjectX86 {
@@ -802,7 +802,7 @@ pub enum PledgePromise {
 
 pub struct OpenBsdPledgeUnveil {
     pub pledged_promises: Vec<PledgePromise>,
-    pub unveiled_paths: Vec<(alloc::string::String, alloc::string::String)>, // (Path, Permissions e.g. "r", "rw")
+    pub unveiled_paths: Vec<(std::string::String, std::string::String)>, // (Path, Permissions e.g. "r", "rw")
     pub is_pledged: bool,
 }
 

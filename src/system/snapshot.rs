@@ -378,7 +378,7 @@ impl MerkleSnapshotStorage {
             hash_val ^= byte as u64;
             hash_val = hash_val.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", hash_val)
+        std::format!("{:x}", hash_val)
     }
 
     fn find_oldest_snapshot(&self) -> Option<String> {

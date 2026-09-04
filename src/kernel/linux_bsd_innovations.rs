@@ -268,7 +268,7 @@ impl FreeBsdVfsNullfs {
                     return Err("Nullfs: EROFS - Read-only file system layer");
                 }
                 let relative_suffix = &overlay_path[mp.len()..];
-                let resolved = alloc::format!("{}{}", node.target_lower_path, relative_suffix);
+                let resolved = std::format!("{}{}", node.target_lower_path, relative_suffix);
                 return Ok((resolved, node.override_permissions));
             }
         }
@@ -1557,7 +1557,7 @@ impl MicrokernelTranslatorRegistry {
         if !trans.is_active {
             return Err("Mach/Hurd: Translator is passive. Activate before dispatching I/O!");
         }
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Dispatched operational request '{}' to Mach Server on Port {}",
             op,
             trans.server_port
@@ -1946,7 +1946,7 @@ impl GcdDispatchQueue {
             for _ in 0..limit {
                 if !self.pending_tasks.is_empty() {
                     let task = self.pending_tasks.remove(0);
-                    executed.push(alloc::format!("Serial executing: {}", task.name));
+                    executed.push(std::format!("Serial executing: {}", task.name));
                 }
             }
         } else {
@@ -1954,7 +1954,7 @@ impl GcdDispatchQueue {
             for _ in 0..limit {
                 if !self.pending_tasks.is_empty() {
                     let task = self.pending_tasks.remove(0);
-                    executed.push(alloc::format!(
+                    executed.push(std::format!(
                         "Concurrent executing priority {:?}: {}",
                         task.priority,
                         task.name
@@ -2370,7 +2370,7 @@ impl HybridKernelManager {
         self.executive.active_handles += 1;
         self.microkernel.active_threads += 1;
         self.microkernel.active_interrupts += 1;
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Dispatched Handle {} through NT-Executive to Microkernel",
             handle_id
         ))
@@ -2455,12 +2455,12 @@ impl NetBsdRumpKernel {
     pub fn bootstrap_component(&self, name: &str) -> Result<String, &'static str> {
         let comp = self.components.get(name).ok_or("Component not found")?;
         if comp.run_in_userspace {
-            Ok(alloc::format!(
+            Ok(std::format!(
                 "Bootstrap Anykernel component: {} running as Userspace Micro-thread",
                 name
             ))
         } else {
-            Ok(alloc::format!(
+            Ok(std::format!(
                 "Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space",
                 name
             ))
@@ -2485,7 +2485,7 @@ impl NetBsdRumpKernel {
 
     pub fn isolate_rump_vfs(&mut self, fs_name: &str) -> Result<String, &'static str> {
         self.register_component(fs_name, true);
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Isolated Rump VFS driver '{}' in userspace microthread",
             fs_name
         ))
@@ -2493,7 +2493,7 @@ impl NetBsdRumpKernel {
 
     pub fn virtualize_rump_network(&mut self, net_dev: &str) -> Result<String, &'static str> {
         self.register_component(net_dev, true);
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Virtualised Rumpnet network stack driver '{}' in userspace microthread",
             net_dev
         ))

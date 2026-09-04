@@ -218,7 +218,7 @@ impl AutomaticResourceManager {
             allocated_home_dir: if uid == 0 {
                 "/root".to_string()
             } else {
-                alloc::format!("/home/{}", username)
+                std::format!("/home/{}", username)
             },
             authenticity_token,
             is_active: true,

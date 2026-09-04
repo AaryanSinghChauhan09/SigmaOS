@@ -19,7 +19,7 @@ pub enum NixExpr {
     AttrSet(BTreeMap<String, NixExpr>),
     Function {
         arg_name: String,
-        body: alloc::boxed::Box<NixExpr>,
+        body: std::boxed::Box<NixExpr>,
     },
     Var(String),
     DerivationCall(NixDerivationSpec),

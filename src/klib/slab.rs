@@ -5,7 +5,7 @@ use std::vec::Vec;
 // No external dependencies - fully sovereign implementation
 
 #[allow(dead_code)]
-use core::alloc::Layout;
+use core::std::Layout;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -56,7 +56,7 @@ impl SlabCache {
         let total_bytes = obj_size * capacity;
 
         let layout = Layout::from_size_align(total_bytes, align).ok()?;
-        let pool = alloc::alloc::alloc(layout);
+        let pool = std::std::alloc(layout);
         if pool.is_null() {
             return None;
         }
@@ -174,7 +174,7 @@ impl Drop for SlabCache {
         let total_bytes = self.object_size * self.total;
         let layout = unsafe { Layout::from_size_align_unchecked(total_bytes, self.align) };
         unsafe {
-            alloc::alloc::dealloc(self.pool, layout);
+            std::std::dealloc(self.pool, layout);
         }
     }
 }
@@ -258,7 +258,7 @@ mod tests {
     #[test]
     fn test_slab_cache_exhaustion() {
         let cache = TypedSlabCache::<u32>::new(4, "tiny_cache").unwrap();
-        let ptrs: alloc::vec::Vec<_> = (0..4).filter_map(|i| cache.alloc_with(i as u32)).collect();
+        let ptrs: std::vec::Vec<_> = (0..4).filter_map(|i| cache.alloc_with(i as u32)).collect();
         assert_eq!(ptrs.len(), 4);
         // Should be full now
         assert!(cache.alloc_with(99u32).is_none());

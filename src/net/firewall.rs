@@ -1,7 +1,7 @@
 #[cfg(not(target_os = "none"))]
 extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
+use std_std::boxed::Box;
 
 
 /// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS

@@ -71,7 +71,7 @@ impl DecoyHoneyPot {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            decoy_ports: alloc::vec![21, 22, 23, 80],
+            decoy_ports: std::vec![21, 22, 23, 80],
             trip_wires_triggered: 0,
         }
     }
@@ -103,7 +103,7 @@ impl SigmaPortScanner {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            target_ports: alloc::vec![80, 443, 8080],
+            target_ports: std::vec![80, 443, 8080],
         }
     }
 
@@ -134,7 +134,7 @@ impl PassComplexityAuditor {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            common_dictionary: alloc::vec![
+            common_dictionary: std::vec![
                 String::from("123456"),
                 String::from("password"),
                 String::from("admin"),
@@ -199,7 +199,7 @@ impl ForensicAnalyzer {
                 // In a real implementation, we would parse chunks. Here we just grab a fixed size for the test.
                 let end = (offset + 1024).min(raw_disk.len());
                 files.push(RecoveredFile {
-                    filename: alloc::format!("recovered_image_{}.png", offset),
+                    filename: std::format!("recovered_image_{}.png", offset),
                     data: raw_disk[offset..end].to_vec(),
                 });
                 offset = end;
@@ -227,7 +227,7 @@ impl ForensicAnalyzer {
             });
             metadata.push(ExtractedMetadata {
                 key: String::from("Offset"),
-                value: alloc::format!("{}", pos),
+                value: std::format!("{}", pos),
             });
         }
 
@@ -680,7 +680,7 @@ impl ChainOfCustodyLedger {
             hash ^= byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
-        let hash_str = alloc::format!("{:016x}", hash);
+        let hash_str = std::format!("{:016x}", hash);
         self.evidence_hash = hash_str.clone();
         hash_str
     }
@@ -700,7 +700,7 @@ impl ChainOfCustodyLedger {
             hash ^= byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:016x}", hash) == self.evidence_hash
+        std::format!("{:016x}", hash) == self.evidence_hash
     }
 }
 
@@ -743,7 +743,7 @@ mod tests {
     #[test]
     fn test_orphan_recovery() {
         let analyzer = ForensicAnalyzer::new();
-        let mut disk = alloc::vec![0u8; 2048];
+        let mut disk = std::vec![0u8; 2048];
         // Inject a fake PNG signature
         let magic = b"\x89PNG\r\n\x1A\n";
         disk[500..500 + magic.len()].copy_from_slice(magic);
@@ -756,7 +756,7 @@ mod tests {
     #[test]
     fn test_metadata_extraction() {
         let analyzer = ForensicAnalyzer::new();
-        let mut mem = alloc::vec![0u8; 100];
+        let mut mem = std::vec![0u8; 100];
         let magic = b"Exif\0\0";
         mem[20..20 + magic.len()].copy_from_slice(magic);
 

@@ -91,7 +91,7 @@ mod tests {
         ctx.demux_packet(MediaPacket {
             stream_index: vid_idx,
             timestamp_pts: 100,
-            payload: alloc::vec![1, 2, 3],
+            payload: std::vec![1, 2, 3],
         });
 
         assert_eq!(ctx.packets.len(), 1);
@@ -100,6 +100,6 @@ mod tests {
             hardware_accel_enabled: true,
         };
         let out = tx.transcode_packet(&ctx.packets[0]);
-        assert_ne!(out.payload, alloc::vec![1, 2, 3]); // Verify simulated transcode applied
+        assert_ne!(out.payload, std::vec![1, 2, 3]); // Verify simulated transcode applied
     }
 }

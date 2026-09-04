@@ -174,7 +174,7 @@ mod tests {
             h ^= b as u64;
             h = h.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", h)
+        std::format!("{:x}", h)
     }
 
     fn make_manifest(name: &str, version: Version, payload: &[u8]) -> Manifest {

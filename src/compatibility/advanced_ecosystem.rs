@@ -645,7 +645,7 @@ mod tests {
         ctrl.register_property("Background", "Blue");
         ctrl.register_property("BorderWidth", "1");
 
-        let notified = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
+        let notified = std::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
         let notified_clone = notified.clone();
         ctrl.add_listener(move |prop, val| {
             if prop == "Background" && val == "Red" {

@@ -547,7 +547,7 @@ impl DhcpClient {
 // ============================================================================
 
 pub struct DnsResolver {
-    cache: BTreeMap<alloc::string::String, IPv4Address>,
+    cache: BTreeMap<std::string::String, IPv4Address>,
 }
 
 impl DnsResolver {
@@ -571,7 +571,7 @@ impl DnsResolver {
         }
     }
 
-    pub fn cache_entry(&mut self, hostname: alloc::string::String, ip: IPv4Address) {
+    pub fn cache_entry(&mut self, hostname: std::string::String, ip: IPv4Address) {
         self.cache.insert(hostname, ip);
     }
 }
@@ -707,7 +707,7 @@ impl TcpIpStack {
         self.dns_resolver.resolve(hostname)
     }
 
-    pub fn cache_hostname(&mut self, hostname: alloc::string::String, ip: IPv4Address) {
+    pub fn cache_hostname(&mut self, hostname: std::string::String, ip: IPv4Address) {
         let mut resolver = DnsResolver::new();
         resolver.cache_entry(hostname, ip);
     }

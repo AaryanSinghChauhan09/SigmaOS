@@ -69,7 +69,7 @@ impl ImageComposition {
 
     /// Basic blend mode simulation (flatten image)
     pub fn flatten(&self) -> Vec<Pixel> {
-        let mut result = alloc::vec![Pixel { r: 0, g: 0, b: 0, a: 255 }; self.width * self.height];
+        let mut result = std::vec![Pixel { r: 0, g: 0, b: 0, a: 255 }; self.width * self.height];
 
         for layer in &self.layers {
             for (i, p) in layer.pixels.iter().enumerate() {
@@ -93,7 +93,7 @@ mod tests {
         let mut comp = ImageComposition::new(2, 2);
         let layer1 = Layer {
             name: "Background",
-            pixels: alloc::vec![Pixel { r: 255, g: 0, b: 0, a: 255 }; 4],
+            pixels: std::vec![Pixel { r: 255, g: 0, b: 0, a: 255 }; 4],
             width: 2,
             height: 2,
             blend_mode: BlendMode::Normal,
@@ -101,7 +101,7 @@ mod tests {
         };
         let layer2 = Layer {
             name: "Foreground",
-            pixels: alloc::vec![
+            pixels: std::vec![
                 Pixel {
                     r: 0,
                     g: 255,

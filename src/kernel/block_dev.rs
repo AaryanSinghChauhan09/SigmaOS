@@ -263,7 +263,7 @@ impl BlockDevice for RamDisk {
 // ── Block device manager ──────────────────────────────────────────────────
 
 pub struct BlockDeviceManager {
-    devices: alloc::collections::BTreeMap<String, Box<dyn BlockDevice>>,
+    devices: std::collections::BTreeMap<String, Box<dyn BlockDevice>>,
     scheduler: DeadlineScheduler,
     bio_counter: AtomicU64,
 }
@@ -272,7 +272,7 @@ impl BlockDeviceManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BlockDeviceManager {
-            devices: alloc::collections::BTreeMap::new(),
+            devices: std::collections::BTreeMap::new(),
             scheduler: DeadlineScheduler::new(),
             bio_counter: AtomicU64::new(0),
         }

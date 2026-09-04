@@ -1662,7 +1662,7 @@ pub struct LinuxIioImuSensorDriver {
 
 impl LinuxIioImuSensorDriver {
     pub fn new(name: &str) -> Self {
-        let boxed: alloc::boxed::Box<str> = name.into();
+        let boxed: std::boxed::Box<str> = name.into();
         Self { name: Box::leak(boxed) }
     }
 

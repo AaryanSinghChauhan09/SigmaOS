@@ -262,7 +262,7 @@ impl OpenBsdSandboxGuard {
     }
 
     pub fn pledge(&mut self, promises_str: &str) -> Result<(), &'static str> {
-        let promised_list: alloc::vec::Vec<&str> = promises_str.split_whitespace().collect();
+        let promised_list: std::vec::Vec<&str> = promises_str.split_whitespace().collect();
         for (promise, enabled) in self.promises.iter_mut() {
             if !promised_list.contains(&promise.as_str()) {
                 *enabled = false;

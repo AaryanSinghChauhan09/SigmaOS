@@ -215,7 +215,7 @@ impl SigmaLayerMask {
         SigmaLayerMask {
             width,
             height,
-            mask_bytes: alloc::vec![initial_value; size],
+            mask_bytes: std::vec![initial_value; size],
             enabled: true,
             inverted: false,
         }
@@ -432,7 +432,7 @@ impl SigmaSelectionEngine {
         SigmaSelectionEngine {
             width,
             height,
-            selection_bytes: alloc::vec![0; size],
+            selection_bytes: std::vec![0; size],
             active_mode: SelectionMode::Replace,
         }
     }
@@ -661,9 +661,9 @@ impl SigmaImageExporter {
             return Err(PhotoError::InvalidDimensions);
         }
 
-        let mut ppm = alloc::format!("P3\n{} {}\n255\n", width, height);
+        let mut ppm = std::format!("P3\n{} {}\n255\n", width, height);
         for pixel in pixels {
-            ppm.push_str(&alloc::format!("{} {} {} ", pixel.r, pixel.g, pixel.b));
+            ppm.push_str(&std::format!("{} {} {} ", pixel.r, pixel.g, pixel.b));
         }
         ppm.push('\n');
         Ok(ppm)
@@ -733,7 +733,7 @@ mod tests {
         mask.set_value(0, 0, 128); // 50% opacity
         mask_engine.attach_mask(mask);
 
-        let mut pixels = alloc::vec![ColorRgba::new(255, 0, 0, 200); 4];
+        let mut pixels = std::vec![ColorRgba::new(255, 0, 0, 200); 4];
         mask_engine.apply_mask_to_layer(2, 2, &mut pixels);
 
         // Pixel (0,0) alpha scaled down by ~50%
@@ -770,7 +770,7 @@ mod tests {
         let mid = SovereignBrushEngine::interpolate_catmull_rom(p0, p1, p2, p3, 0.5);
         assert!(mid.x > 10.0 && mid.x < 20.0);
 
-        let mut pixels = alloc::vec![ColorRgba::new(0, 0, 0, 0); 400]; // 20x20 canvas
+        let mut pixels = std::vec![ColorRgba::new(0, 0, 0, 0); 400]; // 20x20 canvas
         brush.paint_dab(p1, 20, 20, &mut pixels);
 
         let center_idx = (10 * 20 + 10) as usize;
@@ -810,7 +810,7 @@ mod tests {
             handle_out_y: 8.0,
         });
 
-        let mut pixels = alloc::vec![ColorRgba::new(255, 255, 255, 0); 100]; // 10x10 canvas
+        let mut pixels = std::vec![ColorRgba::new(255, 255, 255, 0); 100]; // 10x10 canvas
         path.stroke_path_onto_canvas(10, 10, &mut pixels);
 
         // Ensure rasterization hit pixels along path
@@ -835,7 +835,7 @@ mod tests {
 
     #[test]
     fn test_image_exporter() {
-        let pixels = alloc::vec![ColorRgba::new(255, 0, 0, 255); 4]; // 2x2 red canvas
+        let pixels = std::vec![ColorRgba::new(255, 0, 0, 255); 4]; // 2x2 red canvas
         let ppm = SigmaImageExporter::export_ppm(2, 2, &pixels).unwrap();
         assert!(ppm.starts_with("P3\n2 2\n255\n"));
 

@@ -1,7 +1,7 @@
 use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
 #[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
+use std_std::boxed::Box;
 
 
 /// OOP-based Advanced Metrics, Telemetry & Diagnostics Collection for SigmaOS

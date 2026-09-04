@@ -963,7 +963,7 @@ impl ContentUri {
     }
 
     pub fn to_string_uri(&self) -> String {
-        alloc::format!("content://{}/{}", self.authority, self.path)
+        std::format!("content://{}/{}", self.authority, self.path)
     }
 }
 

@@ -98,7 +98,7 @@ mod tests {
         assert_eq!(hash1, hash2);
         assert!(rec.total_saved_bytes_dedup > 0);
 
-        let snap_id = rec.create_snapshot("Pre-Upgrade Snapshot", 1718900000, alloc::vec![hash1]);
+        let snap_id = rec.create_snapshot("Pre-Upgrade Snapshot", 1718900000, std::vec![hash1]);
         assert_eq!(snap_id, 1);
 
         let restored_chunks_count = rec.rollback_to_snapshot(1).unwrap();

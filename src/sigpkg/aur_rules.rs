@@ -229,7 +229,7 @@ pub struct AurDependencyNode {
 
 #[derive(Debug, Default)]
 pub struct AurDependencySolverEngine {
-    pub package_db: alloc::collections::BTreeMap<String, AurDependencyNode>,
+    pub package_db: std::collections::BTreeMap<String, AurDependencyNode>,
 }
 
 impl AurDependencySolverEngine {
@@ -299,7 +299,7 @@ pub struct AurPackageAdoptionRecord {
 
 #[derive(Debug, Default)]
 pub struct AurTrustedUserAdoptionEngine {
-    pub records: alloc::collections::BTreeMap<String, AurPackageAdoptionRecord>,
+    pub records: std::collections::BTreeMap<String, AurPackageAdoptionRecord>,
 }
 
 impl AurTrustedUserAdoptionEngine {

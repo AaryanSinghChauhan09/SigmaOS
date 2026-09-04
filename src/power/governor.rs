@@ -209,7 +209,7 @@ impl SigmaGovernor {
             self.adjust_core_frequency(cpu_id);
             Ok(())
         } else {
-            Err(alloc::format!("CPU core {} not found", cpu_id))
+            Err(std::format!("CPU core {} not found", cpu_id))
         }
     }
 

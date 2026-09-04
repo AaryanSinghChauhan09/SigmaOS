@@ -46,7 +46,7 @@ impl ConfigManager {
         };
 
         Self {
-            generations: alloc::vec![initial_gen],
+            generations: std::vec![initial_gen],
             active_generation_id: 1,
             system_profile_name: profile_name.to_string(),
         }
@@ -120,7 +120,7 @@ mod tests {
         let mut cfg = ConfigManager::new("default-workstation");
         cfg.add_module_to_active(ConfigModule {
             module_name: "services.pipewire".to_string(),
-            options: alloc::vec![("enable".to_string(), "true".to_string())],
+            options: std::vec![("enable".to_string(), "true".to_string())],
             is_enabled: true,
         });
 

@@ -301,7 +301,7 @@ impl GitPackagingRepositorySplitter {
         converted_commits: &[ConvertedGitCommit],
         base_org_url: &str,
     ) -> Vec<SplitPackageRepo> {
-        let mut package_commit_counts = alloc::collections::BTreeMap::new();
+        let mut package_commit_counts = std::collections::BTreeMap::new();
 
         for commit in converted_commits {
             let pkg_name = if commit.git_branch.starts_with("packages/") {
@@ -435,7 +435,7 @@ pub struct FedoraDistGitNamespace {
 #[derive(Debug, Default)]
 pub struct FedoraDistGitNamespaceEngine {
     pub namespaces: Vec<FedoraDistGitNamespace>,
-    pub lookaside_hashes: alloc::collections::BTreeMap<String, String>, // tarball -> sha512
+    pub lookaside_hashes: std::collections::BTreeMap<String, String>, // tarball -> sha512
 }
 
 impl FedoraDistGitNamespaceEngine {

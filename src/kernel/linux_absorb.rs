@@ -386,7 +386,7 @@ impl LinuxAbsorptionEngine {
         let mut r = Vec::new();
         r.push(ConversionRule {
             linux_pattern: String::from("kmalloc"),
-            sigma_pattern: String::from("alloc::alloc::alloc"),
+            sigma_pattern: String::from("std::std::alloc"),
             rule_type: ConversionRuleType::MemorySafety,
             priority: 10,
         });
@@ -624,7 +624,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError> {
         match operation {
             IoOperation::Read { offset: _, size } => {
-                let data = alloc::vec![0u8; size];
+                let data = std::vec![0u8; size];
                 Ok(IoResult::ReadComplete { data })
             }
             IoOperation::Write { offset: _, data } => Ok(IoResult::WriteComplete {

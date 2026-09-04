@@ -51,7 +51,7 @@ impl SysVIPCEngine {
         if self.shared_memory_keys.contains_key(&key) {
             true
         } else {
-            self.shared_memory_keys.insert(key, alloc::vec![0u8; size]);
+            self.shared_memory_keys.insert(key, std::vec![0u8; size]);
             true
         }
     }

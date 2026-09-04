@@ -920,7 +920,7 @@ impl UserDefinedFunction {
 
             // Substitute positional arguments $1, $2, etc. (up to 9 for safety)
             for (idx, arg) in args.iter().enumerate() {
-                let placeholder = alloc::format!("${}", idx + 1);
+                let placeholder = std::format!("${}", idx + 1);
                 newline = newline.replace(&placeholder, arg);
             }
 
@@ -1155,7 +1155,7 @@ impl TerminalMultiplexerV2 {
             is_focused: true,
         };
         Self {
-            panes: alloc::vec![first_pane],
+            panes: std::vec![first_pane],
             active_pane_id: 1,
             next_pane_id: 2,
         }
@@ -1343,7 +1343,7 @@ impl TerminalSession {
                 } else {
                     ""
                 };
-                current = alloc::format!("{}{}", alias_val, rest);
+                current = std::format!("{}{}", alias_val, rest);
                 depth += 1;
             } else {
                 break;
@@ -1380,7 +1380,7 @@ impl TerminalSession {
             plan.push("rm -f /tmp/*.tmp".to_string());
             plan.push("clear".to_string());
         } else {
-            plan.push(alloc::format!(
+            plan.push(std::format!(
                 "echo 'AI Plan: {} - Completed successfully.'",
                 goal
             ));
@@ -1399,7 +1399,7 @@ impl TerminalSession {
             }
         }
         if error_log.contains("Permission denied") {
-            return alloc::format!("su root -c \"{}\"", failed_command);
+            return std::format!("su root -c \"{}\"", failed_command);
         }
         failed_command.to_string()
     }
@@ -1410,7 +1410,7 @@ impl TerminalSession {
             return Err("Invalid package name");
         }
         // Simulated AI healing logic
-        let report = alloc::format!(
+        let report = std::format!(
             "HEALING REPORT FOR '{}':\n\
              - Detected missing linkage: libssl.so.3 (OpenSSL compatibility)\n\
              - Invoking sigpkg to resolve libssl...\n\
@@ -1994,7 +1994,7 @@ mod tests {
         assert!(prompt.contains("sigma-sh"));
 
         // 6. Scrollback search
-        let scrollback = alloc::vec![
+        let scrollback = std::vec![
             "Error: file not found".to_string(),
             "Compilation completed successfully".to_string(),
             "Error: permission denied".to_string(),

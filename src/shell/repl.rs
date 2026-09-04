@@ -437,7 +437,7 @@ impl ShellRepl {
         }
 
         // 3. Parameter Expansion & Arithmetic Evaluation (${VAR:-default}, $(( expr )))
-        let mut env_map = alloc::collections::BTreeMap::new();
+        let mut env_map = std::collections::BTreeMap::new();
         for (k, v) in &self.variables {
             env_map.insert(k.clone(), v.clone());
         }

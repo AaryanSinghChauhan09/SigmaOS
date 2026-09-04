@@ -672,7 +672,7 @@ impl IptablesToNftablesTranslator {
         NftRule {
             handle: rule_handle,
             expressions,
-            comment: alloc::format!(
+            comment: std::format!(
                 "Translated from iptables -A {} -p {} --dport {} -j {}",
                 legacy_rule.chain, legacy_rule.protocol, legacy_rule.dport, legacy_rule.action
             ),

@@ -337,7 +337,7 @@ mod tests {
     use super::*;
     #[cfg(not(feature = "standalone_test"))]
     use crate::klib::custom_string::SigmaString;
-    type PathBuf = alloc::string::String;
+    type PathBuf = std::string::String;
 
     #[test]
     fn test_transaction_creation() {

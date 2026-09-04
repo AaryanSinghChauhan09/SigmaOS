@@ -292,7 +292,7 @@ mod tests {
         assert!(!engine.is_fully_committed());
         let sequence = engine.commit_flush_sequence();
 
-        assert_eq!(sequence, alloc::vec![0, 1, 2]);
+        assert_eq!(sequence, std::vec![0, 1, 2]);
         assert!(engine.is_fully_committed());
     }
 

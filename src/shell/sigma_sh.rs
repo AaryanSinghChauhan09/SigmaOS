@@ -2,7 +2,7 @@
 extern crate alloc as std_alloc;
 #[cfg(target_os = "none")]
 use std::boxed::Box;
-use std_alloc::boxed::Box;
+use std_std::boxed::Box;
 
 use std::format;
 use std::string::{String, ToString};
@@ -259,8 +259,8 @@ impl SimpleShell {
     }
 
     /// Zsh/Bash/Fish-inspired prompt string token expansion (%n, %m, %~, %?, %F{color}, %f)
-    pub fn expand_prompt_string(&self, template: &[u8]) -> alloc::vec::Vec<u8> {
-        let mut result = alloc::vec::Vec::new();
+    pub fn expand_prompt_string(&self, template: &[u8]) -> std::vec::Vec<u8> {
+        let mut result = std::vec::Vec::new();
         let mut i = 0;
         while i < template.len() {
             if template[i] == b'%' && i + 1 < template.len() {

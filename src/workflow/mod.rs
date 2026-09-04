@@ -85,7 +85,7 @@ impl Workflow {
 /// Manager for Workflow resources
 #[derive(Debug)]
 pub struct WorkflowStep {
-    resources: alloc::vec::Vec<Workflow>,
+    resources: std::vec::Vec<Workflow>,
     initialized: bool,
 }
 
@@ -93,7 +93,7 @@ impl WorkflowStep {
     /// Create a new WorkflowStep
     pub fn new() -> Self {
         Self {
-            resources: alloc::vec::Vec::new(),
+            resources: std::vec::Vec::new(),
             initialized: false,
         }
     }
@@ -139,7 +139,7 @@ impl WorkflowStep {
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> WorkflowResult<()> {
         self.initialized = false;
-        let res: &mut alloc::vec::Vec<Workflow> = &mut self.resources;
+        let res: &mut std::vec::Vec<Workflow> = &mut self.resources;
         res.clear();
         Ok(())
     }
@@ -204,7 +204,7 @@ impl SystemWorkflow {
 
     pub fn fail(&mut self, reason: &str) -> WorkflowResult<()> {
         self.active = false;
-        self.status = alloc::format!("Failed: {}", reason);
+        self.status = std::format!("Failed: {}", reason);
         Ok(())
     }
 }
@@ -212,13 +212,13 @@ impl SystemWorkflow {
 /// Unified Registry managing all category-specific system workflows
 #[derive(Debug, Default)]
 pub struct SystemWorkflowRegistry {
-    pub workflows: alloc::vec::Vec<SystemWorkflow>,
+    pub workflows: std::vec::Vec<SystemWorkflow>,
 }
 
 impl SystemWorkflowRegistry {
     pub fn new() -> Self {
         Self {
-            workflows: alloc::vec::Vec::new(),
+            workflows: std::vec::Vec::new(),
         }
     }
 
@@ -228,8 +228,8 @@ impl SystemWorkflowRegistry {
         id
     }
 
-    pub fn get_by_category(&self, category: WorkflowCategory) -> alloc::vec::Vec<&SystemWorkflow> {
-        let mut list: alloc::vec::Vec<&SystemWorkflow> = alloc::vec::Vec::new();
+    pub fn get_by_category(&self, category: WorkflowCategory) -> std::vec::Vec<&SystemWorkflow> {
+        let mut list: std::vec::Vec<&SystemWorkflow> = std::vec::Vec::new();
         for w in &self.workflows {
             if w.category == category {
                 list.push(w);

@@ -260,7 +260,7 @@ mod tests {
         fn remove_child(
             &mut self,
             child_name: &str,
-        ) -> Option<alloc::boxed::Box<dyn KernelObject>> {
+        ) -> Option<std::boxed::Box<dyn KernelObject>> {
             self.base.remove_child(child_name)
         }
         fn kref(&self) -> &KRef {

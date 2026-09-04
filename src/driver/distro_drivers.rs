@@ -99,7 +99,7 @@ impl BsdAudioMixer {
 
         // Find the longest registered stream to define our mixed buffer size
         let max_len = self.channels.iter().map(|ch| ch.len()).max().unwrap_or(0);
-        let mut mixed = alloc::vec![PcmFrame { left: 0, right: 0 }; max_len];
+        let mut mixed = std::vec![PcmFrame { left: 0, right: 0 }; max_len];
 
         for (ch_idx, channel) in self.channels.iter().enumerate() {
             let pan = self.channel_pan[ch_idx] as f32; // -128 to 127
@@ -940,7 +940,7 @@ mod tests {
     fn test_bsd_audio_mixer() {
         let mut mixer = BsdAudioMixer::new();
 
-        let stream1 = alloc::vec![
+        let stream1 = std::vec![
             PcmFrame {
                 left: 1000,
                 right: 2000
@@ -950,7 +950,7 @@ mod tests {
                 right: -1000
             },
         ];
-        let stream2 = alloc::vec![
+        let stream2 = std::vec![
             PcmFrame {
                 left: 3000,
                 right: 1000

@@ -84,7 +84,7 @@ impl MultiTrackSession {
             .map(|t| t.samples.len())
             .max()
             .unwrap_or(0);
-        let mut mixed = alloc::vec![0.0f32; max_len];
+        let mut mixed = std::vec![0.0f32; max_len];
 
         for track in &self.tracks {
             if track.is_muted {

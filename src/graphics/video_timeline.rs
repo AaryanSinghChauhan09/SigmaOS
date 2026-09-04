@@ -73,7 +73,7 @@ mod tests {
     fn test_video_timeline_duration() {
         let mut timeline = VideoTimeline::new(60);
         let track = VideoTrack {
-            clips: alloc::vec![
+            clips: std::vec![
                 VideoClip {
                     id: 1,
                     start_time_ms: 0,

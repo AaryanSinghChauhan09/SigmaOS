@@ -81,15 +81,15 @@ impl SovereignConfigFS {
         match node.file_type {
             ConfigFileType::SchedulerBorePenalty => {
                 let val = self.bore_penalty.load(Ordering::SeqCst);
-                Ok(alloc::format!("{}\n", val))
+                Ok(std::format!("{}\n", val))
             }
             ConfigFileType::SecuritySecurelevel => {
                 let lvl = self.securelevel_manager.securelevel();
-                Ok(alloc::format!("{:?}\n", lvl))
+                Ok(std::format!("{:?}\n", lvl))
             }
             ConfigFileType::SystemUptime => {
                 let upt = self.system_uptime_secs.load(Ordering::SeqCst);
-                Ok(alloc::format!("{}s\n", upt))
+                Ok(std::format!("{}s\n", upt))
             }
         }
     }

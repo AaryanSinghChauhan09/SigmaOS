@@ -307,13 +307,13 @@ impl LdapAccessClient {
             return Err(AccessManagerError::NotFound);
         }
 
-        let dn = alloc::format!("uid={},ou=users,{}", uid, self.base_dn);
+        let dn = std::format!("uid={},ou=users,{}", uid, self.base_dn);
         Ok(LdapUserEntry {
             dn,
             uid: uid.to_string(),
-            cn: alloc::format!("User {}", uid),
-            mail: alloc::format!("{}@sigmaos.org", uid),
-            member_of: alloc::vec!["cn=developers,ou=groups".to_string()],
+            cn: std::format!("User {}", uid),
+            mail: std::format!("{}@sigmaos.org", uid),
+            member_of: std::vec!["cn=developers,ou=groups".to_string()],
         })
     }
 }
@@ -506,7 +506,7 @@ impl AnonymousAccessPolicy {
     pub fn new() -> Self {
         Self {
             allow_guest_login: true,
-            restricted_paths: alloc::vec![
+            restricted_paths: std::vec![
                 "/etc/shadow".to_string(),
                 "/root".to_string(),
                 "/sys/kernel/security".to_string()

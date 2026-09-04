@@ -16,7 +16,7 @@ use core::fmt::Write;
 
 // ── Type aliases ──────────────────────────────────────────────────────────────
 
-/// A heap-allocated UTF-8 string backed by `alloc::vec::Vec<u8>`.
+/// A heap-allocated UTF-8 string backed by `std::vec::Vec<u8>`.
 /// Prefer using the kernel's `SigmaString` from `klib::string` when richer
 /// behaviour is needed; this type is intentionally thin.
 pub type SigmaByteBuf = Vec<u8>;
@@ -562,7 +562,7 @@ impl SigmaHash for &str {
         fnv1a_64(self.as_bytes())
     }
 }
-impl SigmaHash for alloc::string::String {
+impl SigmaHash for std::string::String {
     fn sigma_hash(&self) -> u64 {
         fnv1a_64(self.as_bytes())
     }

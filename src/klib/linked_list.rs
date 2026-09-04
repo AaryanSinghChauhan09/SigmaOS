@@ -305,7 +305,7 @@ mod tests {
         list.push_front(3);
         list.push_front(2);
         list.push_front(1);
-        let collected: alloc::vec::Vec<&u32> = list.iter().collect();
+        let collected: std::vec::Vec<&u32> = list.iter().collect();
         assert_eq!(collected, [&1, &2, &3]);
     }
 
@@ -318,7 +318,7 @@ mod tests {
         let removed = list.remove_first(|&x| x == 20);
         assert_eq!(removed, Some(20));
         assert_eq!(list.len(), 2);
-        let collected: alloc::vec::Vec<&i32> = list.iter().collect();
+        let collected: std::vec::Vec<&i32> = list.iter().collect();
         assert_eq!(collected, [&10, &30]);
     }
 

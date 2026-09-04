@@ -509,7 +509,7 @@ impl BtrfsFilesystem {
         if extent.data_hash_corrupted {
             return Err("Input/output error (checksum verification failed)");
         }
-        Ok(alloc::vec![0u8; extent.length as usize])
+        Ok(std::vec![0u8; extent.length as usize])
     }
 
     /// Scrub the filesystem, verifying checksums and repairing corrupt copies (Self-Healing)
@@ -865,7 +865,7 @@ impl BtrfsFilesystem {
             if extent.subvol_id == subvol_id {
                 let data = self
                     .read_data(extent.offset)
-                    .unwrap_or_else(|_| alloc::vec![0u8; extent.length as usize]);
+                    .unwrap_or_else(|_| std::vec![0u8; extent.length as usize]);
                 ops.push(BtrfsSendOperation::WriteExtent {
                     subvol_id,
                     offset: extent.offset,

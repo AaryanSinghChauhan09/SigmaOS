@@ -149,7 +149,7 @@ impl VideoTimeline {
     /// Renders and composites a single frame at the specified index, applying all track-level effects sequentially
     pub fn render_frame(&self, frame_index: usize, background_rgb: [u8; 3]) -> Vec<[u8; 3]> {
         let pixel_count = self.width * self.height;
-        let mut framebuffer = alloc::vec![background_rgb; pixel_count];
+        let mut framebuffer = std::vec![background_rgb; pixel_count];
 
         // Composite from bottom track to top track
         for track in &self.tracks {

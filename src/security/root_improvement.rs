@@ -793,7 +793,7 @@ impl PamModule for PamMfaPluggableModule {
 /// A single rule in a PAM configuration chain
 pub struct PamRule {
     pub control_flag: PamControlFlag,
-    pub module: alloc::sync::Arc<dyn PamModule>,
+    pub module: std::sync::Arc<dyn PamModule>,
 }
 
 /// Central Pluggable Authentication Modules manager
@@ -1212,10 +1212,10 @@ mod tests {
 
         let unix_db: Vec<(String, String)> =
             vec![("alice".to_string(), "alice_pwd_hash".to_string())];
-        let pam_unix = alloc::sync::Arc::new(PamUnixModule::new(unix_db));
-        let pam_faillock = alloc::sync::Arc::new(PamFaillockModule);
-        let pam_time = alloc::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
-        let pam_mfa = alloc::sync::Arc::new(PamMfaPluggableModule);
+        let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
+        let pam_faillock = std::sync::Arc::new(PamFaillockModule);
+        let pam_time = std::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
+        let pam_mfa = std::sync::Arc::new(PamMfaPluggableModule);
 
         // Scenario 1: Configure stack: Required pam_faillock + Required pam_unix + Optional pam_mfa
         engine.add_rule(
