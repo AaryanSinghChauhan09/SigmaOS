@@ -39,12 +39,9 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.target }}
 
-      - name: Run Systemd Init & BORE Scheduler Tests
-        run: |
-          cargo test --lib -- init::systemd_init::tests
-          cargo test --lib -- kernel::linux_bsd_innovations::tests
-
       - name: Run Standalone Rust Inspection Suite
         run: |
+          chmod +x ./run_sigma_tests.sh
+          ./run_sigma_tests.sh
           chmod +x ./scripts/changed_files_rustc_tests.sh
           ./scripts/changed_files_rustc_tests.sh
