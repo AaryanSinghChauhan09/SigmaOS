@@ -59,7 +59,6 @@ pub use arc::Arc;
 pub use collections::VecDeque;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
-pub use arc::Arc;
 pub use path::PathBuf;
 pub use string::SigmaString;
 pub use vec::Vec;
@@ -143,5 +142,3 @@ mod tests {
     }
 }
 
-pub use hashset::HashSet;
-pub use arc::Arc;

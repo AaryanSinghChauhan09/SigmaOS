@@ -198,7 +198,7 @@ impl SovereignUniversalDistroBridge {
                 return false;
             }
 
-            let valid_supervisor = match m {
+            let valid_supervisor = temp_bridge.get_supervisor_type() == match m {
                 DistroSubsystemMode::LinuxArch
                 | DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxFedora
@@ -206,31 +206,23 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxPopOs
                 | DistroSubsystemMode::LinuxClear
                 | DistroSubsystemMode::LinuxTails
-                | DistroSubsystemMode::BedrockLinux => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
-                }
+                | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
                 DistroSubsystemMode::LinuxGentoo
                 | DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
-                }
-                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit
-                }
-                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd
-                }
-                DistroSubsystemMode::LinuxSolus => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Dinit
-                }
-                DistroSubsystemMode::LinuxSlackware => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Sysvinit
-                }
-                DistroSubsystemMode::SmartOs => {
-                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Rcd
-                }
+                | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
+
+                DistroSubsystemMode::LinuxAlpine
+                | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
+
+                DistroSubsystemMode::LinuxNix
+                | DistroSubsystemMode::LinuxGuix => ServiceSupervisorType::Shepherd,
+
+                DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+                DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
             };
 
             if !valid_supervisor {

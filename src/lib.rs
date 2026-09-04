@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 

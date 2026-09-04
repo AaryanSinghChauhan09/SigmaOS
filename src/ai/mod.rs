@@ -27,9 +27,6 @@ pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
 
-pub use sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
-pub use local_llm::{LocalLlmWrapper, WhisperSpeechToText, QuantizationType as LocalQuantizationType};
-
 pub use local_llm::{
     LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
 };
