@@ -96,12 +96,9 @@ pub use arch_compat::{
 };
 pub use arch_pacman_engine::{
     AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer,
-    PacmanCacheCleaner, PacmanDatabase, PacnewDiffManager, PkgbuildChecksumUpdater,
-    SafeUpdateChecker,
-};
-pub use arch_pacman_engine::{
-    AURHelper, ArchBuildSystem, ArchPacmanPackage, PacmanContribEngine, PacmanDatabase,
-    RepoDbPackageEntry, RepoStageTier, SovereignDbscriptsEngine,
+    PacmanCacheCleaner, PacmanContribEngine, PacmanDatabase, PacnewDiffManager,
+    PkgbuildChecksumUpdater, RepoDbPackageEntry, RepoStageTier, SafeUpdateChecker,
+    SovereignDbscriptsEngine,
 };
 pub use debian_apt_engine::{AptRepository, DebPackage};
 pub use debian_defeater::{

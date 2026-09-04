@@ -6,13 +6,6 @@ use alloc::vec::Vec;
 use core::mem;
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UserID = usize;

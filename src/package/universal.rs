@@ -7,19 +7,18 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
     use super::*;
+}
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, HashSet, Arc};
+#[cfg(feature = "standalone_test")]
 use std::{collections::{HashMap, HashSet}, sync::Arc};
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -2301,10 +2300,5 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-    }
-
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
     }
 }
