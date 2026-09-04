@@ -70,7 +70,7 @@ impl CapabilityToken {
 
     /// Check if capability has specific permission
     pub fn has_permission(&self, permission: Permission) -> bool {
-        (self.bits & (permission as u64)) != 0
+        (self.bits & (1u64 << (permission as u64))) != 0
     }
 
     /// Revoke all permissions

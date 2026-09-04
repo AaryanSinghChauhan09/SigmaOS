@@ -1586,14 +1586,15 @@ impl DependencyResolver {
         let mut resolved: Vec<String> = Vec::new();
         let mut to_visit: Vec<String> = Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited: Vec<String> = Vec::new();
+        // Bolt ⚡ Optimization: Use HashSet for O(1) visited checks instead of O(N) linear scans on Vec
+        let mut visited: HashSet<String> = HashSet::new();
 
         while let Some(current) = to_visit.pop() {
             if visited.contains(&current) {
                 continue;
             }
 
-            visited.push(current.clone());
+            visited.insert(current.clone());
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
@@ -1617,11 +1618,11 @@ impl DependencyResolver {
         // N-1 redundant lookups per outer loop iteration, reducing total map lookups
         // from N(N-1) to N(N+1)/2 (~50% lookup reduction).
         for (i, pkg1_name) in packages.iter().enumerate() {
+            let pkg1 = match self.packages.get(pkg1_name) {
+                Some(p) => p,
+                None => continue,
+            };
             for pkg2_name in packages.iter().skip(i + 1) {
-                let pkg1 = match self.packages.get(pkg1_name) {
-                    Some(p) => p,
-                    None => continue,
-                };
                 let pkg2 = match self.packages.get(pkg2_name) {
                     Some(p) => p,
                     None => continue,

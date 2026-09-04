@@ -13,3 +13,7 @@
 ## 2026-09-04 - Set Lookups & Drop Order Borrow Lifetimes in Transaction Audits
 **Learning:** Replacing `Vec` linear scans with `BTreeSet` transforms $O(N)$ lookups into $O(\log N)$ set operations and allows `insert` to return duplicate status in a single pass. When borrowing slice references (`&str`) into a set (e.g., `BTreeSet<&str>`), the underlying vector containing the owned data (`Vec<AlpmPackage>`) must be declared before the set so that local variable drop order (reverse declaration) ensures the owned data outlives borrowed set references.
 **Action:** When creating borrowed reference sets (`BTreeSet<&str>`) in local functions, always declare the owned container first.
+
+## 2026-09-05 - `HashSet` Visited Tracking & Hoisted Map Lookups in Package Resolution
+**Learning:** In dependency resolution graphs, tracking visited nodes in a `Vec<String>` results in $O(N)$ linear scans per dependency edge ($O(V \cdot E)$ overall). Replacing `Vec` with `HashSet<String>` reduces visited checks to $O(1)$ ($O(V + E)$ overall). Additionally, hoisting the outer item lookup `self.packages.get(pkg1_name)` outside the inner pair scan loop in conflict detection reduces map queries by 50%.
+**Action:** In graph traversal routines, always use `HashSet` or `BTreeSet` for visited node tracking, and hoist outer item lookups outside nested pair comparison loops.

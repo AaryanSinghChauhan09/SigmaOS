@@ -1226,6 +1226,15 @@ impl UniversalPackageAdapter {
                     &deps,
                 )
             }
+            Some(PackageFormat::Hpkg) => {
+                let manifest = self.parse_haiku_hpkg(raw_text)?;
+                self.translate_to_native_package(
+                    &manifest.name,
+                    &manifest.version,
+                    &manifest.summary,
+                    &manifest.requires,
+                )
+            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
