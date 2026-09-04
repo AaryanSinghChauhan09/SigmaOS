@@ -1537,6 +1537,7 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub redis_cluster: SovereignRedisClusterEngine,
     pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
     pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
+    pub supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -1573,7 +1574,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             redis_cluster: SovereignRedisClusterEngine::new(),
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
-            total_obsoleted_projects_count: 33,
+            supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
+            total_obsoleted_projects_count: 42,
         }
     }
 
@@ -4173,6 +4175,6 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("33 legacy open-source projects obsoleted"));
+        assert!(status.contains("42 legacy open-source projects obsoleted"));
     }
 }
