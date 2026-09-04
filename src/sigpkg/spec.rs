@@ -577,69 +577,72 @@ pub enum UniversalPackageType {
 impl UniversalPackageType {
     pub fn detect_type_from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".udeb") {
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(UniversalPackageType::Apt)
-        } else if name.ends_with(".rpm") || name.ends_with(".drpm") {
+        } else if normalized.ends_with(".superdeb") {
+            Some(UniversalPackageType::SuperDeb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
             Some(UniversalPackageType::Rpm)
-        } else if name.ends_with(".pkg.tar.zst")
-            || name.ends_with(".pkg.tar.xz")
-            || name.ends_with(".pkg.tar.gz")
-            || name.contains("pacman")
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.contains("pacman")
         {
             Some(UniversalPackageType::Pacman)
-        } else if name.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") {
             Some(UniversalPackageType::Snap)
-        } else if name.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") {
             Some(UniversalPackageType::Flatpak)
-        } else if name.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") {
             Some(UniversalPackageType::AppImage)
-        } else if name.ends_with(".air") {
+        } else if normalized.ends_with(".air") {
             Some(UniversalPackageType::Air)
-        } else if name.ends_with(".bottle") {
+        } else if normalized.ends_with(".bottle") {
             Some(UniversalPackageType::Bottle)
-        } else if name.ends_with(".ipa") {
+        } else if normalized.ends_with(".ipa") {
             Some(UniversalPackageType::Ipa)
-        } else if name.ends_with(".ports") {
+        } else if normalized.ends_with(".ports") {
             Some(UniversalPackageType::Ports)
-        } else if name.ends_with(".pkg") {
+        } else if normalized.ends_with(".pkg") {
             Some(UniversalPackageType::Pkg)
-        } else if name.ends_with(".aab") {
+        } else if normalized.ends_with(".aab") {
             Some(UniversalPackageType::Aab)
-        } else if name.ends_with(".apk") {
+        } else if normalized.ends_with(".apk") {
             Some(UniversalPackageType::Apk)
-        } else if name.ends_with(".eopkg") {
+        } else if normalized.ends_with(".eopkg") {
             Some(UniversalPackageType::Eopkg)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(UniversalPackageType::NixPkg)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(UniversalPackageType::Ebuild)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if name.ends_with(".txz") || name.ends_with(".tar.xz") || name.ends_with(".xz") {
+        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
             Some(UniversalPackageType::Txz)
-        } else if name.ends_with(".xbps") {
+        } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)
-        } else if name.ends_with(".zypper") {
+        } else if normalized.ends_with(".zypper") {
             Some(UniversalPackageType::Zypper)
-        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
             Some(UniversalPackageType::Guix)
-        } else if name.ends_with(".app") {
+        } else if normalized.ends_with(".app") {
             Some(UniversalPackageType::App)
-        } else if name.ends_with(".hap") {
+        } else if normalized.ends_with(".hap") {
             Some(UniversalPackageType::Hap)
-        } else if name.ends_with(".pisi") {
+        } else if normalized.ends_with(".pisi") {
             Some(UniversalPackageType::Pisi)
-        } else if name.ends_with(".superdeb") {
-            Some(UniversalPackageType::SuperDeb)
-        } else if name.ends_with(".lzm") {
+        } else if normalized.ends_with(".lzm") {
             Some(UniversalPackageType::Lzm)
-        } else if name.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") {
             Some(UniversalPackageType::Pup)
-        } else if name.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") {
             Some(UniversalPackageType::Pet)
-        } else if name.ends_with(".sigpkg") || name.ends_with(".sigma") {
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(UniversalPackageType::Sigma)
-        } else if name.ends_with(".tar") {
+        } else if normalized.ends_with(".tar") {
             Some(UniversalPackageType::TarArchive)
         } else {
             None
