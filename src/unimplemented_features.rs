@@ -3244,6 +3244,247 @@ mod extra_unimplemented_tests {
     }
 }
 // =========================================================================
+// DISTRO ECOSYSTEM ENCOUNTER ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub major_version: u32,
+    pub errata_patches_applied: usize,
+    pub security_advisories: Vec<String>,
+}
+
+impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub fn new(major_version: u32) -> Self {
+        Self {
+            major_version,
+            errata_patches_applied: 0,
+            security_advisories: Vec::new(),
+        }
+    }
+
+    pub fn verify_abi_compatibility(&self, target_major: u32) -> bool {
+        self.major_version == target_major || target_major == 8 || target_major == 9
+    }
+
+    pub fn apply_errata_patch(&mut self, errata_id: &str) {
+        self.security_advisories.push(errata_id.to_string());
+        self.errata_patches_applied += 1;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidXbpsContainerEngine {
+    pub registered_packages: Vec<String>,
+    pub runit_services_active: Vec<String>,
+}
+
+impl VoidXbpsContainerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_packages: Vec::new(),
+            runit_services_active: Vec::new(),
+        }
+    }
+
+    pub fn install_xbps_package(&mut self, pkg: &str) {
+        if !self.registered_packages.iter().any(|p| p == pkg) {
+            self.registered_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn start_runit_service(&mut self, service: &str) {
+        if !self.runit_services_active.iter().any(|s| s == service) {
+            self.runit_services_active.push(service.to_string());
+        }
+    }
+}
+
+impl Default for VoidXbpsContainerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PuppyLinuxOverlayRamdiskEngine {
+    pub ram_capacity_mb: usize,
+    pub loaded_sfs_modules: Vec<String>,
+    pub persistence_save_file: Option<String>,
+}
+
+impl PuppyLinuxOverlayRamdiskEngine {
+    pub fn new(ram_capacity_mb: usize) -> Self {
+        Self {
+            ram_capacity_mb,
+            loaded_sfs_modules: Vec::new(),
+            persistence_save_file: None,
+        }
+    }
+
+    pub fn load_sfs_module(&mut self, module_path: &str) {
+        self.loaded_sfs_modules.push(module_path.to_string());
+    }
+
+    pub fn mount_persistence(&mut self, save_file: &str) {
+        self.persistence_save_file = Some(save_file.to_string());
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TinyCoreModularTczLoader {
+    pub mounted_extensions: Vec<String>,
+    pub total_ram_used_kb: usize,
+}
+
+impl TinyCoreModularTczLoader {
+    pub fn new() -> Self {
+        Self {
+            mounted_extensions: Vec::new(),
+            total_ram_used_kb: 0,
+        }
+    }
+
+    pub fn mount_tcz(&mut self, extension: &str, size_kb: usize) {
+        self.mounted_extensions.push(extension.to_string());
+        self.total_ram_used_kb += size_kb;
+    }
+}
+
+impl Default for TinyCoreModularTczLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeepinDdeControlCenterEngine {
+    pub theme_mode: String,
+    pub dock_position: String,
+}
+
+impl DeepinDdeControlCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            theme_mode: "Dark".to_string(),
+            dock_position: "Bottom".to_string(),
+        }
+    }
+
+    pub fn set_theme_mode(&mut self, mode: &str) {
+        self.theme_mode = mode.to_string();
+    }
+
+    pub fn set_dock_position(&mut self, pos: &str) {
+        self.dock_position = pos.to_string();
+    }
+}
+
+impl Default for DeepinDdeControlCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ManjaroHardwareDetectionEngine {
+    pub detected_pci_ids: Vec<(u16, u16)>,
+    pub recommended_drivers: Vec<String>,
+}
+
+impl ManjaroHardwareDetectionEngine {
+    pub fn new() -> Self {
+        Self {
+            detected_pci_ids: Vec::new(),
+            recommended_drivers: Vec::new(),
+        }
+    }
+
+    pub fn scan_pci_bus(&mut self, vendor_id: u16, device_id: u16) {
+        self.detected_pci_ids.push((vendor_id, device_id));
+        if vendor_id == 0x10DE {
+            self.recommended_drivers.push("video-nvidia".to_string());
+        } else {
+            self.recommended_drivers.push("video-linux".to_string());
+        }
+    }
+
+    pub fn auto_install_recommended_drivers(&self) -> usize {
+        self.recommended_drivers.len()
+    }
+}
+
+impl Default for ManjaroHardwareDetectionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SteamOsGamescopeCompositorEngine {
+    pub target_fps_limit: u32,
+    pub fsr_enabled: bool,
+    pub drm_lease_count: usize,
+}
+
+impl SteamOsGamescopeCompositorEngine {
+    pub fn new() -> Self {
+        Self {
+            target_fps_limit: 60,
+            fsr_enabled: false,
+            drm_lease_count: 0,
+        }
+    }
+
+    pub fn enable_fsr(&mut self, enable: bool) {
+        self.fsr_enabled = enable;
+    }
+
+    pub fn set_fps_limit(&mut self, fps: u32) {
+        self.target_fps_limit = fps;
+    }
+
+    pub fn lease_drm_surface(&mut self) -> usize {
+        self.drm_lease_count += 1;
+        self.drm_lease_count
+    }
+}
+
+impl Default for SteamOsGamescopeCompositorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PhoronixTestSuiteRunner {
+    pub suite_title: String,
+    pub benchmark_results: Vec<(String, f64)>,
+}
+
+impl PhoronixTestSuiteRunner {
+    pub fn new(suite_title: &str) -> Self {
+        Self {
+            suite_title: suite_title.to_string(),
+            benchmark_results: Vec::new(),
+        }
+    }
+
+    pub fn execute_benchmark(&mut self, name: &str, score: f64) {
+        self.benchmark_results.push((name.to_string(), score));
+    }
+
+    pub fn calculate_composite_score(&self) -> f64 {
+        if self.benchmark_results.is_empty() {
+            0.0
+        } else {
+            let sum: f64 = self.benchmark_results.iter().map(|(_, s)| *s).sum();
+            sum / self.benchmark_results.len() as f64
+        }
+    }
+}
+
+// =========================================================================
 // TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
 // =========================================================================
 
@@ -3454,237 +3695,6 @@ impl WindowsCopilotRecallAuditor {
 impl Default for WindowsCopilotRecallAuditor {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-// =========================================================================
-// DISTRO ECOSYSTEM ENCOUNTER ENFORCE ENGINES
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub major_version: u32,
-    pub errata_patches_applied: usize,
-    pub security_advisories: Vec<String>,
-}
-
-impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub fn new(major_version: u32) -> Self {
-        Self {
-            major_version,
-            errata_patches_applied: 0,
-            security_advisories: Vec::new(),
-        }
-    }
-
-    pub fn verify_abi_compatibility(&self, target_ver: u32) -> bool {
-        target_ver <= self.major_version
-    }
-
-    pub fn apply_errata_patch(&mut self, patch_id: &str) {
-        self.errata_patches_applied += 1;
-        self.security_advisories.push(patch_id.to_string());
-    }
-}
-
-pub struct VoidXbpsContainerEngine {
-    pub registered_packages: Vec<String>,
-    pub runit_services_active: Vec<String>,
-}
-
-impl VoidXbpsContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_packages: Vec::new(),
-            runit_services_active: Vec::new(),
-        }
-    }
-
-    pub fn install_xbps_package(&mut self, name: &str) {
-        if !self.registered_packages.contains(&name.to_string()) {
-            self.registered_packages.push(name.to_string());
-        }
-    }
-
-    pub fn start_runit_service(&mut self, name: &str) {
-        if !self.runit_services_active.contains(&name.to_string()) {
-            self.runit_services_active.push(name.to_string());
-        }
-    }
-}
-
-impl Default for VoidXbpsContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct PuppyLinuxOverlayRamdiskEngine {
-    pub ram_limit_mb: u32,
-    pub loaded_sfs_modules: Vec<String>,
-    pub persistence_save_file: Option<String>,
-}
-
-impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ram_limit_mb: u32) -> Self {
-        Self {
-            ram_limit_mb,
-            loaded_sfs_modules: Vec::new(),
-            persistence_save_file: None,
-        }
-    }
-
-    pub fn load_sfs_module(&mut self, path: &str) {
-        self.loaded_sfs_modules.push(path.to_string());
-    }
-
-    pub fn mount_persistence(&mut self, path: &str) {
-        self.persistence_save_file = Some(path.to_string());
-    }
-}
-
-pub struct TinyCoreModularTczLoader {
-    pub mounted_extensions: Vec<(String, usize)>,
-    pub total_ram_used_kb: usize,
-}
-
-impl TinyCoreModularTczLoader {
-    pub fn new() -> Self {
-        Self {
-            mounted_extensions: Vec::new(),
-            total_ram_used_kb: 0,
-        }
-    }
-
-    pub fn mount_tcz(&mut self, name: &str, ram_kb: usize) {
-        self.mounted_extensions.push((name.to_string(), ram_kb));
-        self.total_ram_used_kb += ram_kb;
-    }
-}
-
-impl Default for TinyCoreModularTczLoader {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct DeepinDdeControlCenterEngine {
-    pub theme_mode: String,
-    pub dock_position: String,
-}
-
-impl DeepinDdeControlCenterEngine {
-    pub fn new() -> Self {
-        Self {
-            theme_mode: "Dark".to_string(),
-            dock_position: "Bottom".to_string(),
-        }
-    }
-
-    pub fn set_theme_mode(&mut self, theme: &str) {
-        self.theme_mode = theme.to_string();
-    }
-
-    pub fn set_dock_position(&mut self, pos: &str) {
-        self.dock_position = pos.to_string();
-    }
-}
-
-impl Default for DeepinDdeControlCenterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct ManjaroHardwareDetectionEngine {
-    pub scanned_devices: Vec<(u16, u16)>,
-    pub recommended_drivers: Vec<String>,
-}
-
-impl ManjaroHardwareDetectionEngine {
-    pub fn new() -> Self {
-        Self {
-            scanned_devices: Vec::new(),
-            recommended_drivers: Vec::new(),
-        }
-    }
-
-    pub fn scan_pci_bus(&mut self, vendor: u16, device: u16) {
-        self.scanned_devices.push((vendor, device));
-        if vendor == 0x10DE {
-            self.recommended_drivers.push("video-nvidia".to_string());
-        }
-    }
-
-    pub fn auto_install_recommended_drivers(&mut self) -> usize {
-        self.recommended_drivers.len()
-    }
-}
-
-impl Default for ManjaroHardwareDetectionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SteamOsGamescopeCompositorEngine {
-    pub fsr_enabled: bool,
-    pub target_fps_limit: u32,
-    pub surface_lease_count: u32,
-}
-
-impl SteamOsGamescopeCompositorEngine {
-    pub fn new() -> Self {
-        Self {
-            fsr_enabled: false,
-            target_fps_limit: 60,
-            surface_lease_count: 0,
-        }
-    }
-
-    pub fn enable_fsr(&mut self, enable: bool) {
-        self.fsr_enabled = enable;
-    }
-
-    pub fn set_fps_limit(&mut self, limit: u32) {
-        self.target_fps_limit = limit;
-    }
-
-    pub fn lease_drm_surface(&mut self) -> u32 {
-        self.surface_lease_count += 1;
-        self.surface_lease_count
-    }
-}
-
-impl Default for SteamOsGamescopeCompositorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct PhoronixTestSuiteRunner {
-    pub suite_name: String,
-    pub test_scores: Vec<(String, f64)>,
-}
-
-impl PhoronixTestSuiteRunner {
-    pub fn new(suite_name: &str) -> Self {
-        Self {
-            suite_name: suite_name.to_string(),
-            test_scores: Vec::new(),
-        }
-    }
-
-    pub fn execute_benchmark(&mut self, test_name: &str, score: f64) {
-        self.test_scores.push((test_name.to_string(), score));
-    }
-
-    pub fn calculate_composite_score(&self) -> f64 {
-        if self.test_scores.is_empty() {
-            return 0.0;
-        }
-        let total: f64 = self.test_scores.iter().map(|(_, s)| *s).sum();
-        total / (self.test_scores.len() as f64)
     }
 }
 
