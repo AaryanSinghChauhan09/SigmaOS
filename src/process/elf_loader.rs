@@ -59,7 +59,7 @@ pub enum ElfMachine {
 pub enum ProgramHeaderType {
     Null = 0,
     Load = 1,
-    Dynamic = 3,
+    Dynamic = 2,
     Interp = 3,
     Note = 4,
     Shlib = 5,

@@ -14,7 +14,7 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 # Test dependencies
 
 [features]
-default = []
+default = ["core-build"]
 standalone_test = []
 desktop = []
 drivers = []
@@ -27,6 +27,9 @@ cloud = ["cloud-init"]
 cloud-init = []
 wasm = []
 browser = ["wasm"]
+# Build features
+core-build = []  # Core kernel components (VFS, Process, Network)
+full-build = ["core-build"]  # Full build with all modules
 # Opt-in feature consumed by src/klib/custom_allocator.rs via cfg(feature = "...").
 custom_alloc_error_handler = []
 
