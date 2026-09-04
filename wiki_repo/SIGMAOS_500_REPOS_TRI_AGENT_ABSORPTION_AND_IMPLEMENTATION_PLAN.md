@@ -644,7 +644,32 @@ pub struct PledgeSet {
 
 ---
 
-### 3. Multi-Phase Execution Roadmap (5-Year Plan)
+### 3. Indian Professional Toolkit Map (Domain-Aware Modular Subsystems)
+
+SigmaOS incorporates specialized, profession-aware toolkits tailored for Indian professional domains, inspired by modular Linux/BSD utilities and integrated directly with India Stack APIs:
+
+- ⚖️ **Legal & Judicial**: `SigmaLaw` (Case law search, citation management, compliance), `SigmaNotary` (Digital signatures + e-stamp integration), `SigmaCourt` (Court filing automation with cause-list tracking).
+- 🏥 **Healthcare**: `SigmaMed` (Patient record management with HIPAA/ABDM compliance), `SigmaPharma` (Drug inventory & prescription validation), `SigmaTeleHealth` (Encrypted video consultations).
+- 📚 **Education & Academia**: `SigmaEdu` (Modular LMS), `SigmaExam` (Exam creation, proctoring, grading), `SigmaResearch` (Citation, plagiarism detection, collaborative notebooks).
+- 💼 **Corporate & Business**: `SigmaBiz` (ERP finance, HR, compliance), `SigmaPayroll` (EPF/ESI automated payroll), `SigmaAudit` (Governance, risk, compliance).
+- 🛠️ **Engineering & IT**: `SigmaDev` (Cross-language developer IDE), `SigmaInfra` (Container/VM/Cluster orchestration), `SigmaCyber` (Security toolkit with IDS & patch automation).
+- 🌾 **Agriculture**: `SigmaAgri` (Crop monitoring, soil analytics, weather), `SigmaMarket` (Price tracking & e-Mandi integration), `SigmaSupply` (Logistics & cold-chain management).
+- 🎨 **Creative & Media**: `SigmaStudio` (Audio/video editing suite), `SigmaPublish` (Book/blog publishing workflows), `SigmaDesign` (Graphic design & AR/VR prototyping).
+
+#### Domain Comparison Summary Matrix
+| Profession | Linux/BSD Inspiration | SigmaOS Subsystem Tool | Unique Value Proposition (USP) |
+|------------|-----------------------|-------------------------|--------------------------------|
+| Legal | LibreOffice, OpenSSL | SigmaLaw, SigmaNotary, SigmaCourt | Compliance + e-signatures & cause-list tracking |
+| Healthcare | GNU Health | SigmaMed, SigmaTeleHealth, SigmaPharma | Secure ABDM FHIR patient workflows |
+| Education | Moodle, LaTeX | SigmaEdu, SigmaExam, SigmaResearch | LMS + proctored exam automation |
+| Corporate | ERPNext | SigmaBiz, SigmaPayroll, SigmaAudit | Compliance-ready EPF/ESI ERP |
+| IT / Eng | Kubernetes, GCC | SigmaDev, SigmaInfra, SigmaCyber | Dev + container/cluster orchestration |
+| Agriculture | AgriOS | SigmaAgri, SigmaMarket, SigmaSupply | Crop analytics & e-Mandi integration |
+| Creative | GIMP, Blender | SigmaStudio, SigmaDesign, SigmaPublish | Media editing & AR/VR prototyping |
+
+---
+
+### 4. Multi-Phase Execution Roadmap (5-Year Plan)
 
 ```
 ========================================================================================
