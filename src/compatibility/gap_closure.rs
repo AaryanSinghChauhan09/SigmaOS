@@ -951,10 +951,18 @@ pub enum TargetDistroFamily {
     AntiXLightweight,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GapClosurePhase {
+    Phase1Critical,  // 0-12m: Demand Paging, Hotplugging, Interrupts, App Ecosystem
+    Phase2Important, // 12-24m: Fault Tolerance, Enterprise Integration, Docs
+    Phase3Optional,  // 24-36m: Proc Scaling, Community Ecosystem, UI/UX
+}
+
 pub struct SovereignDistroAbsorptionEngine {
     pub active_distro_target: TargetDistroFamily,
     pub total_absorbed_distros_count: u32,
     pub is_clean_room_active: bool,
+    pub current_phase: GapClosurePhase,
 }
 
 impl SovereignDistroAbsorptionEngine {
@@ -963,11 +971,37 @@ impl SovereignDistroAbsorptionEngine {
             active_distro_target: TargetDistroFamily::ArchLinux,
             total_absorbed_distros_count: 13,
             is_clean_room_active: true,
+            current_phase: GapClosurePhase::Phase1Critical,
         }
     }
 
     pub fn set_active_target(&mut self, distro: TargetDistroFamily) {
         self.active_distro_target = distro;
+    }
+
+    pub fn evaluate_gap_roadmap_phase(&self, phase: GapClosurePhase) -> &'static str {
+        match phase {
+            GapClosurePhase::Phase1Critical => {
+                "Phase 1 (0-12m): Catching up with Demand Paging, Hotplugging, Multicore Balancing -> Leapfrog with Predictive VM + Hot-Swap Kernel Modules"
+            }
+            GapClosurePhase::Phase2Important => {
+                "Phase 2 (12-24m): Parity on Fault Tolerance, Enterprise Integration, Docs -> Leapfrog with AI-Driven Orchestration + Compliance Dashboards"
+            }
+            GapClosurePhase::Phase3Optional => {
+                "Phase 3 (24-36m): Scaling Proc & Community Ecosystem -> Leapfrog with Adaptive UI + Collaborative OS Layer"
+            }
+        }
+    }
+
+    pub fn query_leapfrog_innovations(&self) -> Vec<&'static str> {
+        vec![
+            "Predictive VM",
+            "Hot-swap kernel modules",
+            "AI-driven orchestration",
+            "Compliance dashboards",
+            "Adaptive UI",
+            "Collaborative OS layer",
+        ]
     }
 
     pub fn execute_distro_absorption(&self, package_spec: &str) -> String {
@@ -1168,5 +1202,27 @@ mod tests {
         let (obsoleted, msg) = competitor_orch.run_sovereign_benchmark();
         assert_eq!(obsoleted, 35);
         assert!(msg.contains("outperforms standard Linux & BSD titans"));
+    }
+
+    #[test]
+    fn test_gap_closure_roadmap_phase_evaluation() {
+        let engine = SovereignDistroAbsorptionEngine::new();
+        assert_eq!(engine.current_phase, GapClosurePhase::Phase1Critical);
+
+        let p1_summary = engine.evaluate_gap_roadmap_phase(GapClosurePhase::Phase1Critical);
+        assert!(p1_summary.contains("Phase 1 (0-12m)"));
+        assert!(p1_summary.contains("Predictive VM"));
+
+        let p2_summary = engine.evaluate_gap_roadmap_phase(GapClosurePhase::Phase2Important);
+        assert!(p2_summary.contains("Phase 2 (12-24m)"));
+        assert!(p2_summary.contains("AI-Driven Orchestration"));
+
+        let p3_summary = engine.evaluate_gap_roadmap_phase(GapClosurePhase::Phase3Optional);
+        assert!(p3_summary.contains("Phase 3 (24-36m)"));
+        assert!(p3_summary.contains("Adaptive UI"));
+
+        let leapfrogs = engine.query_leapfrog_innovations();
+        assert_eq!(leapfrogs.len(), 6);
+        assert!(leapfrogs.contains(&"Predictive VM"));
     }
 }
