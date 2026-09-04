@@ -7,7 +7,10 @@ use alloc::vec::Vec;
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -360,7 +363,8 @@ impl SigmaPkg {
             }
 
             for (name, package) in &repo.packages {
-                if name.to_lowercase().contains(&query_lower)
+                let name_str: &String = name;
+                if name_str.to_lowercase().contains(&query_lower)
                     || package.description.to_lowercase().contains(&query_lower)
                 {
                     results.push(package);
@@ -435,7 +439,8 @@ impl SigmaPkg {
         for repo in &self.repositories {
             if repo.enabled {
                 if let Some(pkg) = repo.packages.get(name) {
-                    return Ok(pkg.clone());
+                    let pkg_val: &Package = pkg;
+                    return Ok(pkg_val.clone());
                 }
             }
         }
@@ -584,7 +589,8 @@ impl SigmaPkg {
 
         for (name, package) in &self.local_packages {
             if package.dependencies.contains(&package_name.to_string()) {
-                dependents.push(name.clone());
+                let name_str: &String = name;
+                dependents.push(name_str.clone());
             }
         }
 
@@ -648,7 +654,7 @@ impl SigmaPkg {
         Ok(())
     }
 
-    fn upgrade_package(&mut self, old: &Package, new: &Package) -> Result<(), String> {
+    fn upgrade_package(&mut self, _old: &Package, new: &Package) -> Result<(), String> {
         // Run pre-upgrade hooks
         self.run_hooks("pre_upgrade", new)?;
 
