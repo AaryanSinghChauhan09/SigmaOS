@@ -89,14 +89,10 @@ fi
 
 # 12. Run Universal Package Manager CLI simulation tests
 echo "[12/13] Running Universal Package Manager CLI simulation tests..."
-if command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
-# 8. Run Universal Package Manager CLI simulation tests
-echo "[8/12] Running Universal Package Manager CLI simulation tests..."
 if command -v pytest &>/dev/null; then
   pytest tests/test_integration_system.py -k test_universal_package_manager_cli_simulation
 elif command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_package_manager_cli_simulation(); print('Universal package manager CLI simulation test passed.')"
+  python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
 else
   echo "Python3 not available; skipping universal package manager tests."
 fi
@@ -115,24 +111,12 @@ if [ -f "src/security/input_validation.rs" ]; then
     ./build/input_val_test
 fi
 
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
+echo ":: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)..."
 if command -v pytest &>/dev/null; then
   pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
 elif python3 -m pytest --version &>/dev/null; then
   python3 -m pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
 fi
 
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
+echo "[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]"
 exit 0
