@@ -1,10 +1,17 @@
 // SigmaTools Module
 // System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
 
+pub mod data_tools;
 pub mod display_manager;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
+
+pub use data_tools::{
+    ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
+    DataPipelineEtlEngine, DataQueryEngine, DataValue, ParquetArrowDataEngine,
+    DataVisualizationEngine,
+};
 
 pub use simple_scan::{
     SaneScanOptions, SaneScannerDevice, ScanColorMode, ScanExportFormat, ScanSource, ScannedPage,
