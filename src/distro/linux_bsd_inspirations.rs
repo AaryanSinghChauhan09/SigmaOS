@@ -199,14 +199,38 @@ impl SovereignUniversalDistroBridge {
             }
 
             let valid_supervisor = match m {
-                DistroSubsystemMode::LinuxArch | DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxFedora => {
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxDebian
+                | DistroSubsystemMode::LinuxFedora
+                | DistroSubsystemMode::LinuxOpenSuse
+                | DistroSubsystemMode::LinuxPopOs
+                | DistroSubsystemMode::LinuxClear
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::BedrockLinux => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::Systemd
                 }
-                DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                DistroSubsystemMode::LinuxGentoo
+                | DistroSubsystemMode::FreeBsd
+                | DistroSubsystemMode::OpenBsd
+                | DistroSubsystemMode::NetBsd
+                | DistroSubsystemMode::DragonFlyBsd => {
                     temp_bridge.get_supervisor_type() == ServiceSupervisorType::OpenRC
                 }
-                DistroSubsystemMode::LinuxAlpine => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit,
-                DistroSubsystemMode::LinuxNix => temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd,
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Runit
+                }
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Shepherd
+                }
+                DistroSubsystemMode::LinuxSolus => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Dinit
+                }
+                DistroSubsystemMode::LinuxSlackware => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => {
+                    temp_bridge.get_supervisor_type() == ServiceSupervisorType::Rcd
+                }
             };
 
             if !valid_supervisor {
@@ -230,7 +254,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
