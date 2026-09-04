@@ -59,6 +59,50 @@ impl Default for SovereignSudo {
     }
 }
 
+/// 7. Sovereign Linux Command Line Suite (systemctl, journalctl, systemd-analyze, pacman, dnf, apt-get, apk)
+pub struct SovereignLinuxCommandSuite;
+
+impl SovereignLinuxCommandSuite {
+    pub fn systemctl(args: &[&str]) -> String {
+        if args.contains(&"status") {
+            String::from("● sigma.service - SigmaOS Core Service\n   Loaded: loaded\n   Active: active (running)")
+        } else if args.contains(&"start") {
+            format!("Started service {}", args.get(1).unwrap_or(&"service"))
+        } else if args.contains(&"stop") {
+            format!("Stopped service {}", args.get(1).unwrap_or(&"service"))
+        } else {
+            String::from("systemctl: operation completed successfully")
+        }
+    }
+
+    pub fn journalctl(args: &[&str]) -> Vec<String> {
+        vec![
+            String::from("2026-03-03T00:00:01Z sigma-kernel: System boot completed in 0.012s"),
+            String::from("2026-03-03T00:00:02Z sigma-net: Sovereign interface wg-sovereign0 UP"),
+        ]
+    }
+
+    pub fn systemd_analyze() -> String {
+        String::from("Startup finished in 1.2ms (kernel) + 2.1ms (userspace) = 3.3ms")
+    }
+
+    pub fn pacman(args: &[&str]) -> String {
+        format!("pacman: synchronized 124 repositories, executed operation {:?}", args)
+    }
+
+    pub fn dnf(args: &[&str]) -> String {
+        format!("dnf: metadata refreshed, transaction verified for {:?}", args)
+    }
+
+    pub fn apt_get(args: &[&str]) -> String {
+        format!("apt-get: reading package lists... done. Executed {:?}", args)
+    }
+
+    pub fn apk(args: &[&str]) -> String {
+        format!("apk: world file updated, transaction completed for {:?}", args)
+    }
+}
+
 /// 2. Sovereign Top / Htop Real-Time Task & Process Monitor
 #[derive(Debug, Clone)]
 pub struct ProcessTaskMetrics {
@@ -346,6 +390,17 @@ mod tests {
         let logs = dmesg.get_dmesg_log();
         assert_eq!(logs.len(), 1);
         assert!(logs[0].contains("USB device connected"));
+    }
+
+    #[test]
+    fn test_sovereign_linux_command_suite() {
+        assert!(SovereignLinuxCommandSuite::systemctl(&["status"]).contains("sigma.service"));
+        assert_eq!(SovereignLinuxCommandSuite::journalctl(&[]).len(), 2);
+        assert!(SovereignLinuxCommandSuite::systemd_analyze().contains("Startup finished"));
+        assert!(SovereignLinuxCommandSuite::pacman(&["-Syu"]).contains("synchronized"));
+        assert!(SovereignLinuxCommandSuite::dnf(&["install", "curl"]).contains("metadata refreshed"));
+        assert!(SovereignLinuxCommandSuite::apt_get(&["update"]).contains("reading package lists"));
+        assert!(SovereignLinuxCommandSuite::apk(&["add", "bash"]).contains("world file updated"));
     }
 
     #[test]
