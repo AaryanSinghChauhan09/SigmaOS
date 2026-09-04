@@ -437,6 +437,159 @@ impl LinuxDmaScatterGatherEngine {
 // ============================================================================
 
 #[cfg(test)]
+
+// ============================================================================
+// 7. Linux Virtio-Net Virtual Network Device Driver
+// ============================================================================
+
+/// Represents a Virtio v1.1 Ring Buffer Descriptor
+#[derive(Debug, Clone, Copy)]
+pub struct VirtioRingDescriptor {
+    pub addr: u64,
+    pub len: u32,
+    pub flags: u16,
+    pub next: u16,
+}
+
+/// Linux Virtio-Net Network Driver Ring Buffer Simulator
+pub struct VirtioNetDriverSimulator {
+    pub mac_address: [u8; 6],
+    pub link_up: bool,
+    pub rx_virtqueue: Vec<Vec<u8>>,
+    pub tx_virtqueue: Vec<Vec<u8>>,
+    pub interrupts_pending: bool,
+}
+
+impl VirtioNetDriverSimulator {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            link_up: true,
+            rx_virtqueue: Vec::new(),
+            tx_virtqueue: Vec::new(),
+            interrupts_pending: false,
+        }
+    }
+
+    /// Transmit a frame via TX Virtqueue
+    pub fn transmit_frame(&mut self, payload: &[u8]) -> Result<usize, &'static str> {
+        if !self.link_up {
+            return Err("Link down");
+        }
+        let mut virtio_hdr_frame = vec![0u8; 12]; // Virtio net header (12 bytes)
+        virtio_hdr_frame.extend_from_slice(payload);
+        self.tx_virtqueue.push(virtio_hdr_frame);
+        self.interrupts_pending = true;
+        Ok(payload.len())
+    }
+
+    /// Enqueue an incoming packet into RX Virtqueue
+    pub fn receive_packet(&mut self, packet: &[u8]) {
+        self.rx_virtqueue.push(packet.to_vec());
+        self.interrupts_pending = true;
+    }
+
+    /// Dequeue a received packet from RX Virtqueue
+    pub fn poll_rx_frame(&mut self) -> Option<Vec<u8>> {
+        self.rx_virtqueue.pop()
+    }
+}
+
+// ============================================================================
+// 8. FreeBSD vt(4) Virtual Terminal Display Console Driver
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VtCell {
+    pub ch: char,
+    pub fg_color: u8,
+    pub bg_color: u8,
+}
+
+/// FreeBSD vt(4) Console Virtual Terminal Simulator
+pub struct FreeBsdVtConsoleDriver {
+    pub active_vt: usize,
+    pub width: usize,
+    pub height: usize,
+    pub framebuffers: Vec<Vec<VtCell>>, // Buffer for 8 virtual terminals (ttyv0 - ttyv7)
+}
+
+impl FreeBsdVtConsoleDriver {
+    pub fn new(width: usize, height: usize) -> Self {
+        let blank_cell = VtCell { ch: ' ', fg_color: 7, bg_color: 0 };
+        let mut framebuffers = Vec::new();
+        for _ in 0..8 {
+            framebuffers.push(vec![blank_cell; width * height]);
+        }
+        Self {
+            active_vt: 0,
+            width,
+            height,
+            framebuffers,
+        }
+    }
+
+    pub fn switch_vt(&mut self, vt_index: usize) -> Result<(), &'static str> {
+        if vt_index >= 8 {
+            return Err("Invalid VT index");
+        }
+        self.active_vt = vt_index;
+        Ok(())
+    }
+
+    pub fn write_char(&mut self, x: usize, y: usize, ch: char, fg: u8, bg: u8) -> Result<(), &'static str> {
+        if x >= self.width || y >= self.height {
+            return Err("Coordinates out of bounds");
+        }
+        let idx = y * self.width + x;
+        self.framebuffers[self.active_vt][idx] = VtCell { ch, fg_color: fg, bg_color: bg };
+        Ok(())
+    }
+
+    pub fn read_cell(&self, x: usize, y: usize) -> Option<VtCell> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        let idx = y * self.width + x;
+        Some(self.framebuffers[self.active_vt][idx])
+    }
+}
+
+// ============================================================================
+// 9. NetBSD RUMP (Runnable Userspace Meta Program) Driver Isolation
+// ============================================================================
+
+pub struct NetBsdRumpDriverKernelWrapper {
+    pub driver_name: String,
+    pub memory_allocated_bytes: usize,
+    pub is_isolated: bool,
+}
+
+impl NetBsdRumpDriverKernelWrapper {
+    pub fn new(driver_name: &str) -> Self {
+        Self {
+            driver_name: driver_name.to_string(),
+            memory_allocated_bytes: 0,
+            is_isolated: true,
+        }
+    }
+
+    pub fn rumpuser_malloc(&mut self, size: usize) -> u64 {
+        self.memory_allocated_bytes += size;
+        0x7FFF_0000_0000 + self.memory_allocated_bytes as u64
+    }
+
+    pub fn execute_isolated_op<F, R>(&self, f: F) -> Result<R, &'static str>
+    where
+        F: FnOnce() -> R,
+    {
+        if !self.is_isolated {
+            return Err("Driver memory barrier compromised");
+        }
+        Ok(f())
+    }
+}
+
 mod tests {
     use super::*;
 
@@ -540,9 +693,9 @@ mod tests {
         // 2. AES-256-GCM simulation
         let aes_dev = OpenBsdCryptoDevice::new(CryptoCipher::Aes256Gcm, &key, &iv);
         let mut aes_ciphered = vec![0u8; input.len()];
-        let mut aes_deciphered = vec![0u8; input.len()];
 
         aes_dev.process_data(input, &mut aes_ciphered).unwrap();
+        assert_ne!(input, aes_ciphered.as_slice());
         assert_ne!(input, aes_ciphered.as_slice());
     }
 
@@ -581,5 +734,33 @@ mod tests {
         dma_sg.map_sg_buffer(0x100000, 10000);
         assert_eq!(dma_sg.segments.len(), 3); // 4096 + 4096 + 1808
         assert_eq!(dma_sg.total_mapped_length(), 10000);
+    }
+
+    #[test]
+    fn test_virtio_net_driver() {
+        let mut virtio = VirtioNetDriverSimulator::new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+        assert_eq!(virtio.transmit_frame(b"HELLO PACKET").unwrap(), 12);
+        assert_eq!(virtio.tx_virtqueue.len(), 1);
+
+        virtio.receive_packet(b"INCOMING PACKET");
+        let frame = virtio.poll_rx_frame();
+        assert!(frame.is_some());
+        assert_eq!(frame.unwrap().as_slice(), b"INCOMING PACKET");
+    }
+
+    #[test]
+    fn test_freebsd_vt_and_netbsd_rump() {
+        let mut vt = FreeBsdVtConsoleDriver::new(80, 25);
+        vt.write_char(0, 0, 'S', 15, 0).unwrap();
+        assert_eq!(vt.read_cell(0, 0).unwrap().ch, 'S');
+
+        vt.switch_vt(1).unwrap();
+        assert_eq!(vt.read_cell(0, 0).unwrap().ch, ' '); // VT 1 is blank
+
+        let mut rump = NetBsdRumpDriverKernelWrapper::new("rump_usb");
+        let ptr = rump.rumpuser_malloc(1024);
+        assert!(ptr > 0);
+        let res = rump.execute_isolated_op(|| 42);
+        assert_eq!(res.unwrap(), 42);
     }
 }
