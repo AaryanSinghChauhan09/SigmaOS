@@ -1,3 +1,4 @@
+use alloc::collections::BTreeSet;
 // SigmaOS APT (Advanced Package Tool) Implementation
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations

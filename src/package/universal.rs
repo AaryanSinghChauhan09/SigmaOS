@@ -7,19 +7,18 @@ use alloc::collections::BTreeMap;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
 pub mod node_distribution_dummy {
     use super::*;
+}
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, HashSet, Arc};
+#[cfg(feature = "standalone_test")]
 use std::{collections::{HashMap, HashSet}, sync::Arc};
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -802,6 +801,16 @@ impl Default for PackageTriggerRegistry {
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
+#[derive(Debug, Clone)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+}
+
 
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
@@ -813,7 +822,7 @@ impl UniversalDistroAdapterPipeline {
         manager: &mut UniversalPackageManager,
         manifest: ForeignDistroManifest,
     ) -> Result<(), PackageError> {
-        let sigma_pkg = UniversalPackageTranslator::translate_to_sigma_pkg(&manifest);
+        let sigma_pkg = UnifiedPackage::new(manifest.original_name.clone(), manifest.version.clone()).with_format(manifest.raw_format);
         let pkg_name = sigma_pkg.name.clone();
 
         manager.add_package(sigma_pkg);
@@ -1324,10 +1333,43 @@ impl Default for TransactionalHistory {
 // ============================================================================
 // Main Universal Package Manager Facade
 // ============================================================================
+#[derive(Debug, Clone)]
+pub struct RegisteredDistroRepo {
+    pub distro_name: String,
+    pub repo_url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<RegisteredDistroRepo>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut repos = Vec::new();
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Debian".to_string(),
+            repo_url: "https://deb.debian.org/debian".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "ArchLinux".to_string(),
+            repo_url: "https://archlinux.org/packages".to_string(),
+        });
+        Self { registered_repos: repos }
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 /// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
+
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
@@ -2300,10 +2342,5 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
         assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-    }
-
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
     }
 }

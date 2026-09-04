@@ -17,7 +17,6 @@ extern crate alloc;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
