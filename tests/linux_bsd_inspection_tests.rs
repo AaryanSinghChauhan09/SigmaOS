@@ -1127,6 +1127,12 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
         (DistroSubsystemMode::OpenBsd, "zsh.tgz", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
         (DistroSubsystemMode::NetBsd, "zsh.tgz", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
         (DistroSubsystemMode::DragonFlyBsd, "zsh.pkg", ServiceSupervisorType::OpenRC, "/var/db/pkg"),
+        (DistroSubsystemMode::SolarisIllumos, "zsh.p5p", ServiceSupervisorType::Smf, "/var/lib/pkg"),
+        (DistroSubsystemMode::SmartOs, "zsh.tgz", ServiceSupervisorType::Rcd, "/var/lib/pkg"),
+        (DistroSubsystemMode::BedrockLinux, "zsh.stratum", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
+        (DistroSubsystemMode::LinuxPopOs, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
+        (DistroSubsystemMode::LinuxTails, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
+        (DistroSubsystemMode::LinuxGuix, "zsh.scm", ServiceSupervisorType::Shepherd, "/var/lib/pkg"),
     ];
 
     for (mode, expected_pkg, expected_supervisor, expected_pkg_db) in modes {
@@ -1135,6 +1141,14 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
         assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
         assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), expected_pkg_db);
         assert!(bridge.enforce_security_isolation(1001, "/sandbox/root").is_ok());
+
+        assert!(bridge.dispatch_cross_subsystem_operation("init", "start").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("package", "zsh").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("security", "/sandbox").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
+        assert!(bridge.dispatch_cross_subsystem_operation("power", "saver").is_ok());
     }
 
     let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);

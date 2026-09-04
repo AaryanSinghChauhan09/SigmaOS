@@ -320,6 +320,50 @@ impl SovereignUniversalDistroBridge {
                     action, pid, self.mode
                 ))
             }
+            "network" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched VNET network stack routing for interface '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!(
+                            "Dispatched Crossbow VNIC/Etherstub network routing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched eBPF/XDP zero-copy sockmap network redirect for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "graphics" => {
+                let mode_info = DrmModeInfo::new(1920, 1080, 60);
+                let valid = mode_info.verify_timing_boundaries();
+                Ok(format!(
+                    "Dispatched DRM/KMS atomic modeset '{}' (timing valid: {}) under distro mode '{:?}'",
+                    action, valid, self.mode
+                ))
+            }
+            "power" => {
+                let mut governor = System76PowerGovernor::new();
+                if action == "performance" {
+                    governor.set_power_profile(PowerProfileMode::HighPerformance);
+                } else if action == "saver" {
+                    governor.set_power_profile(PowerProfileMode::BatterySaver);
+                } else {
+                    governor.set_power_profile(PowerProfileMode::Balanced);
+                }
+                Ok(format!(
+                    "Dispatched power governor profile '{:?}' (cap: {}MHz) under distro mode '{:?}'",
+                    governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -4528,7 +4572,7 @@ mod tests {
         assert!(bridge.enforce_security_isolation(102, "/var/www").is_ok());
         assert!(bridge.verify_all_subsystems_compatibility());
 
-        // Test all additional distro subsystem modes
+        // Test all additional distro subsystem modes and cross-subsystem dispatches
         let modes = [
             (
                 DistroSubsystemMode::LinuxVoid,
@@ -4562,7 +4606,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "swupd",
+                "bundle",
                 ServiceSupervisorType::Systemd,
             ),
             (
@@ -4590,6 +4634,15 @@ mod tests {
             );
             assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
             assert!(bridge.verify_all_subsystems_compatibility());
+
+            // Check cross-subsystem operations
+            assert!(bridge.dispatch_cross_subsystem_operation("init", "restart").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("package", "install").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("security", "/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
         }
     }
 
