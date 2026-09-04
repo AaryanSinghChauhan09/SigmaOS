@@ -174,3 +174,8 @@ pub mod ml;
 pub mod performance;
 
 pub mod distro;
+
+pub use unimplemented_tools::{
+    ChainedAuditTrailLedger, DiskImageSignatureCarver, MetadataExifAntiForensicScrubber,
+    NetworkPcapForensicSniffer, VolatileMemoryDumpForensicEngine,
+};

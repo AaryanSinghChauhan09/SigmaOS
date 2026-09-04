@@ -54,7 +54,7 @@ This document outlines 100 comprehensive improvement ideas organized into catego
 36. **AI anomaly detection firewall** [CrowdStrike Falcon, Snort] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
 37. **Encrypted file vault** [VeraCrypt, BitLocker] ✅ **IMPLEMENTED** - `src/security/vault.rs`
 38. **Password manager with biometric unlock** [1Password, LastPass] ✅ **IMPLEMENTED** - `src/security/password_manager.rs` & `src/unimplemented_tools.rs`
-39. **Secure container for apps (Qubes-style)** [Docker, Kata Containers] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
+39. **Secure container for apps (Qubes-style / FreeBSD Jails)** [Docker, Kata Containers, FreeBSD Jails] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs` (`FreeBsdJailSandboxEngine`)
 40. **Privacy dashboard (telemetry control)** [O&O ShutUp10, Privacy Badger] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
 41. **Secure clipboard manager** [Ditto, ClipClip] ✅ **IMPLEMENTED** - `src/productivity/clipboard_manager.rs`
 42. **Intrusion detection system** [OSSEC, Suricata] ✅ **IMPLEMENTED** - `src/security/intrusion_detection.rs`
@@ -94,7 +94,7 @@ This document outlines 100 comprehensive improvement ideas organized into catego
 64. **Cloud sync for files/settings** [Dropbox, Google Drive] ✅ **IMPLEMENTED** - `src/network/sync.rs`
 65. **Built-in torrent client** [qBittorrent, Transmission] ✅ **IMPLEMENTED** - `src/network/torrent.rs`
 66. **Remote desktop client/server** [TeamViewer, AnyDesk] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
-67. **Mesh networking support** [Babel, cjdns] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
+67. **Mesh networking & Netgraph support** [Babel, cjdns, FreeBSD Netgraph] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs` (`FreeBsdNetgraphNodeEngine`)
 68. **IoT device manager** [Home Assistant, OpenHAB] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs` & `src/iot/hub.rs`
 69. **Cloud backup utility** [Backblaze, Acronis] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
 70. **Secure file sharing tool** [Syncthing, Resilio Sync] ✅ **IMPLEMENTED** - `src/unimplemented_tools.rs`
