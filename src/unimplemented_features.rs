@@ -3243,6 +3243,7 @@ mod extra_unimplemented_tests {
         assert_eq!(hub.average_ecosystem_parity(), 95.0);
     }
 }
+
 // =========================================================================
 // TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
 // =========================================================================
