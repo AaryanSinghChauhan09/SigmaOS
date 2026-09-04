@@ -524,7 +524,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * ::core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 ::core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
