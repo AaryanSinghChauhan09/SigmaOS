@@ -42,10 +42,15 @@ pub enum DistroSubsystemMode {
     LinuxSolus,
     LinuxClear,
     LinuxSlackware,
+    LinuxPopOs,
+    LinuxTails,
+    LinuxGuix,
+    BedrockLinux,
     FreeBsd,
     OpenBsd,
     NetBsd,
     DragonFlyBsd,
+    SmartOs,
     SolarisIllumos,
 }
 
@@ -176,40 +181,28 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix,
             DistroSubsystemMode::LinuxGentoo,
             DistroSubsystemMode::LinuxFedora,
+            DistroSubsystemMode::LinuxPopOs,
+            DistroSubsystemMode::LinuxTails,
+            DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::BedrockLinux,
             DistroSubsystemMode::FreeBsd,
             DistroSubsystemMode::OpenBsd,
             DistroSubsystemMode::NetBsd,
             DistroSubsystemMode::DragonFlyBsd,
+            DistroSubsystemMode::SmartOs,
+            DistroSubsystemMode::SolarisIllumos,
         ];
 
-        !pkg_spec.is_empty()
-            && !vfs_etc.is_empty()
-            && match self.mode {
-                DistroSubsystemMode::LinuxArch
-                | DistroSubsystemMode::LinuxDebian
-                | DistroSubsystemMode::LinuxFedora
-                | DistroSubsystemMode::LinuxOpenSuse
-                | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxClear
-                | DistroSubsystemMode::LinuxTails
-                | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
-
-                DistroSubsystemMode::LinuxGentoo
-                | DistroSubsystemMode::FreeBsd
-                | DistroSubsystemMode::OpenBsd
-                | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
-
-                DistroSubsystemMode::LinuxAlpine
-                | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
-
-                DistroSubsystemMode::LinuxNix
-                | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
-
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+        for m in modes {
+            let bridge = SovereignUniversalDistroBridge::new(m);
+            let pkg = bridge.translate_package_specifier("kernel");
+            let vfs = bridge.translate_vfs_path("/etc");
+            let sup = bridge.get_supervisor_type();
+            if pkg.is_empty() || vfs.is_empty() || sup == ServiceSupervisorType::SysVInit && m == DistroSubsystemMode::LinuxArch {
+                return false;
             }
+        }
+        true
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -229,19 +222,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
-                format!("{}.pkg", input_pkg)
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
-            DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
-            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
-            DistroSubsystemMode::LinuxClear => format!("{}.swupd", input_pkg),
-            DistroSubsystemMode::FreeBsd
-            | DistroSubsystemMode::DragonFlyBsd => format!("{}.pkg", input_pkg),
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::SmartOs => format!("{}.tgz", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
     }
