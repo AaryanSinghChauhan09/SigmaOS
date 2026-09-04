@@ -10,6 +10,7 @@ pub mod manager;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
+pub mod ext4;
 pub use bsd_linux_innovations::{
     BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
     MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
@@ -35,3 +36,8 @@ pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, Virtual
 pub use ext4_mount::{
     Ext4FilesystemManager, Ext4Inode, Ext4Superblock, Ext4Mount, Ext4DirEntry,
 };
+pub use vfs::{
+    DirEntry, FileHandle, FileMode, VirtualFileSystem, VfsError, FileSystem as VfsFileSystem,
+    MountPoint,
+};
+pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
