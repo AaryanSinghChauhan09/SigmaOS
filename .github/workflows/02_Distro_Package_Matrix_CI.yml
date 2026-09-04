@@ -43,7 +43,10 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Run Package Adapter Unit Tests
+        run: |
+          cargo test --lib -- ${{ matrix.test_filter }}
+
       - name: Execute Full System Integration Suite
         run: |
-          chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh
