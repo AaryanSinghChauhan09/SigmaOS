@@ -37,12 +37,10 @@ pub mod node_distribution_dummy {
         Lts,
         Current,
     }
-    #[derive(Debug, Clone)]
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,
     }
-    #[derive(Debug, Clone)]
     pub struct NodeBinaryPackage {
         pub version: String,
     }
@@ -62,7 +60,6 @@ pub mod node_distribution_dummy {
             }
         }
     }
-    #[derive(Debug, Clone)]
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
         pub fn new() -> Self {

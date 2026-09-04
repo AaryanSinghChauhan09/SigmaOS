@@ -408,7 +408,8 @@ impl PkgbuildChecksumUpdater {
     }
 }
 
-/// Pacman contrib engine for Arch Linux pacman-contrib scripts parity (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
+/// Pacman Contrib Suite Engine (paccache, rankmirrors, updpkgsums, checkupdates, finddeps)
+#[derive(Debug, Clone, Default)]
 pub struct PacmanContribEngine;
 
 impl PacmanContribEngine {
@@ -424,43 +425,35 @@ impl PacmanContribEngine {
         }
     }
 
-    pub fn rankmirrors(&self, mirrors: &[(String, u32)], top_n: usize) -> Vec<(String, u32)> {
+    pub fn rankmirrors(&self, mirrors: &[(String, u32)], limit: usize) -> Vec<(String, u32)> {
         let mut sorted = mirrors.to_vec();
-        sorted.sort_by_key(|(_, ping)| *ping);
-        sorted.truncate(top_n);
+        sorted.sort_by_key(|m| m.1);
+        sorted.truncate(limit);
         sorted
     }
 
-    pub fn updpkgsums(&self, pkgbuild_text: &str, new_sum: &str) -> String {
-        let mut lines: Vec<String> = pkgbuild_text.lines().map(|l| l.to_string()).collect();
-        let mut replaced = false;
+    pub fn updpkgsums(&self, pkgbuild: &str, new_sum: &str) -> String {
+        let mut lines: Vec<String> = pkgbuild.lines().map(|l| l.to_string()).collect();
+        let mut found = false;
         for line in &mut lines {
             if line.starts_with("sha256sums=") {
                 *line = format!("sha256sums=('{}')", new_sum);
-                replaced = true;
+                found = true;
                 break;
             }
         }
-        if !replaced {
+        if !found {
             lines.push(format!("sha256sums=('{}')", new_sum));
         }
         lines.join("\n")
     }
 
-    pub fn checkupdates(
-        &self,
-        local_db: &PacmanDatabase,
-        remote_db: &PacmanDatabase,
-    ) -> Vec<(String, String, String)> {
+    pub fn checkupdates(&self, local_db: &PacmanDatabase, remote_db: &PacmanDatabase) -> Vec<(String, String, String)> {
         let mut updates = Vec::new();
         for local in &local_db.local_packages {
             if let Some(remote) = remote_db.packages.iter().find(|p| p.name == local.name) {
                 if remote.version != local.version {
-                    updates.push((
-                        local.name.clone(),
-                        local.version.clone(),
-                        remote.version.clone(),
-                    ));
+                    updates.push((local.name.clone(), local.version.clone(), remote.version.clone()));
                 }
             }
         }
@@ -475,12 +468,6 @@ impl PacmanContribEngine {
             }
         }
         dependents
-    }
-}
-
-impl Default for PacmanContribEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
