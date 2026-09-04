@@ -203,6 +203,16 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
+/// Package state representation
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
 pub enum PackagePriority {
@@ -267,11 +277,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -758,12 +763,28 @@ macro_rules! impl_generic_install_strategy {
         pub struct $struct_name;
         impl InstallStrategy for $struct_name {
             fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-                println!(concat!("Strategy: Installing ", stringify!($struct_name), " package '{}'"), package.name);
+                println!(
+                    concat!(
+                        "Strategy: Installing ",
+                        stringify!($struct_name),
+                        " package '{}'"
+                    ),
+                    package.name
+                );
                 Ok(())
             }
-            fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+            fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+                Ok(true)
+            }
             fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-                println!(concat!("Strategy: Removing ", stringify!($struct_name), " package '{}'"), package.name);
+                println!(
+                    concat!(
+                        "Strategy: Removing ",
+                        stringify!($struct_name),
+                        " package '{}'"
+                    ),
+                    package.name
+                );
                 Ok(())
             }
         }
@@ -1013,7 +1034,11 @@ macro_rules! impl_generic_metadata_adapter {
         pub struct $struct_name;
         impl PackageMetadataAdapter for $struct_name {
             fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-                Ok(UnifiedPackage::new(concat!(stringify!($format_variant), "-pkg").to_lowercase(), "1.0.0".to_string()).with_format(PackageFormat::$format_variant))
+                Ok(UnifiedPackage::new(
+                    concat!(stringify!($format_variant), "-pkg").to_lowercase(),
+                    "1.0.0".to_string(),
+                )
+                .with_format(PackageFormat::$format_variant))
             }
         }
     };
@@ -1122,7 +1147,12 @@ impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T
         self.decorated.restrict_network()
     }
     fn profile_performance(&self) {
-        println!("HardwareOptimizationDecorator: Optimizing package '{}' for level {} with SIMD {:?}", self.get_package().name, self.target_microarch_level, self.required_simd_features);
+        println!(
+            "HardwareOptimizationDecorator: Optimizing package '{}' for level {} with SIMD {:?}",
+            self.get_package().name,
+            self.target_microarch_level,
+            self.required_simd_features
+        );
         self.decorated.profile_performance();
     }
 }
@@ -1138,7 +1168,12 @@ impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
         self.decorated.get_package()
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        println!("ResourceLimitDecorator: Cgroups v2 bounds applied to '{}': Memory={}B, CPU={}%", self.get_package().name, self.max_memory_bytes, self.cpu_quota_percent);
+        println!(
+            "ResourceLimitDecorator: Cgroups v2 bounds applied to '{}': Memory={}B, CPU={}%",
+            self.get_package().name,
+            self.max_memory_bytes,
+            self.cpu_quota_percent
+        );
         self.decorated.enforce_sandbox()
     }
     fn restrict_network(&self) -> Result<(), PackageError> {
@@ -1156,7 +1191,8 @@ pub struct PqcSignedDecorator<T: PackageCapability> {
 
 impl<T: PackageCapability> PqcSignedDecorator<T> {
     pub fn verify_signature(&self) -> bool {
-        self.dilithium_signature.contains("dilithium") || self.dilithium_signature.contains("sphincs")
+        self.dilithium_signature.contains("dilithium")
+            || self.dilithium_signature.contains("sphincs")
     }
 }
 
@@ -1166,7 +1202,10 @@ impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
         if !self.verify_signature() {
-            return Err(PackageError::InstallationFailed(format!("PqcSignedDecorator: Signature verification failed for package '{}'", self.get_package().name)));
+            return Err(PackageError::InstallationFailed(format!(
+                "PqcSignedDecorator: Signature verification failed for package '{}'",
+                self.get_package().name
+            )));
         }
         self.decorated.enforce_sandbox()
     }
@@ -1380,118 +1419,6 @@ impl Default for PackageTriggerRegistry {
 }
 
 // =========================================================================
-// Foreign Distro Package Manifest & Repository Synchronization
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
-
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
-
-        for dep in &manifest.raw_dependencies {
-            let mapped_dep = if dep.contains("ssl") {
-                "sovereign-openssl".to_string()
-            } else if dep.contains("c6") || dep.contains("libc") {
-                "sovereign-libc".to_string()
-            } else {
-                dep.clone()
-            };
-            pkg = pkg.with_dependency(mapped_dep);
-        }
-
-        for prov in &manifest.raw_provides {
-            pkg = pkg.with_provides(prov.clone());
-        }
-
-        for conf in &manifest.raw_conflicts {
-            pkg = pkg.with_conflict(conf.clone());
-        }
-
-        pkg
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RegisteredRepoInfo {
-    pub distro_name: String,
-    pub mirror_url: String,
-}
-
-pub struct DistroRepoSyncEngine {
-    pub registered_repos: Vec<RegisteredRepoInfo>,
-    pub foreign_index: HashMap<String, ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_repos: vec![
-                RegisteredRepoInfo {
-                    distro_name: "Debian".to_string(),
-                    mirror_url: "https://deb.debian.org/debian".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "ArchLinux".to_string(),
-                    mirror_url: "https://archlinux.org/packages".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "Fedora".to_string(),
-                    mirror_url: "https://mirrors.fedoraproject.org".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "Alpine".to_string(),
-                    mirror_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "VoidLinux".to_string(),
-                    mirror_url: "https://repo-default.voidlinux.org/current".to_string(),
-                },
-            ],
-            foreign_index: HashMap::new(),
-        }
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.foreign_index
-            .insert(manifest.original_name.clone(), manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.foreign_index.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.foreign_index
-            .get(pkg_name)
-            .map(|manifest| UniversalPackageTranslator::translate_to_sigma_pkg(manifest))
-    }
-}
-
-impl Default for DistroRepoSyncEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
 
@@ -1618,10 +1545,7 @@ impl PackageAdapter {
     }
 
     pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Purging package {}",
-            self.adapter_name, package.name
-        );
+        println!("[{}] Purging package {}", self.adapter_name, package.name);
         Ok(())
     }
 
@@ -1631,6 +1555,48 @@ impl PackageAdapter {
             self.adapter_name, package.name
         );
         Ok(())
+    }
+
+    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
+        let mut pledges = Vec::new();
+        for arg in &manifest.finish_args {
+            if arg.contains("network") {
+                pledges.push("network".to_string());
+            } else if arg.contains("ipc") {
+                pledges.push("ipc".to_string());
+            } else if arg.contains("filesystem") {
+                pledges.push("unveil_all".to_string());
+            }
+        }
+        pledges
+    }
+
+    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
+        match manifest.confinement.as_str() {
+            "strict" => "strict_pledge_sandbox".to_string(),
+            "classic" => "classic_unrestricted".to_string(),
+            _ => "devmode_permissive".to_string(),
+        }
+    }
+
+    pub fn mount_appimage_squashfs(
+        &self,
+        runtime: &AppImageRuntime,
+    ) -> Result<String, PackageError> {
+        if runtime.squashfs_offset == 0 {
+            return Err(PackageError::InstallationFailed(
+                "Invalid SquashFS offset".to_string(),
+            ));
+        }
+        Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
+    }
+
+    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
+        !config.sourcelist_url.is_empty() && !config.suite.is_empty()
+    }
+
+    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
+        config.enabled && !config.baseurl.is_empty()
     }
 }
 
@@ -1870,7 +1836,6 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -1957,17 +1922,18 @@ impl UniversalPackageManager {
             (PackageFormat::Snap, "snap"),
             (PackageFormat::Flatpak, "flatpak"),
             (PackageFormat::SigmaPkg, "sigpkg"),
-            (PackageFormat::Portage, "portage_ebuild"),
-            (PackageFormat::FreeBsdPkg, "freebsd_pkg"),
-            (PackageFormat::ArchPkgBuild, "arch_pkgbuild"),
-            (PackageFormat::NixStore, "nix_store"),
+            (PackageFormat::Ebuild, "portage_ebuild"),
+            (PackageFormat::Pkg, "freebsd_pkg"),
+            (PackageFormat::Nixpkg, "arch_pkgbuild"),
+            (PackageFormat::Nix, "nix_store"),
             (PackageFormat::AppImage, "appimage"),
-            (PackageFormat::Homebrew, "homebrew_formula"),
+            (PackageFormat::Bottle, "homebrew_formula"),
             (PackageFormat::Apk, "apk"),
         ];
 
         for (fmt, name) in formats {
-            self.adapters.insert(fmt, PackageAdapter::new(fmt, name.to_string()));
+            self.adapters
+                .insert(fmt, PackageAdapter::new(fmt, name.to_string()));
         }
     }
 
@@ -2325,7 +2291,12 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn create_snapshot(&mut self, label: &str, installed_packages: Vec<String>) -> usize {
-        self.create_distro_snapshot(DistroRollbackType::OpenSuseSnapper, label, &installed_packages, 0)
+        self.create_distro_snapshot(
+            DistroRollbackType::OpenSuseSnapper,
+            label,
+            &installed_packages,
+            0,
+        )
     }
 
     pub fn create_distro_snapshot(
@@ -2681,32 +2652,73 @@ mod tests {
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
-            PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
-            PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,
-            PackageFormat::AppImage, PackageFormat::Xbps, PackageFormat::Txz, PackageFormat::Eopkg,
-            PackageFormat::Zypper, PackageFormat::Guix, PackageFormat::CachyOS, PackageFormat::Swupd,
-            PackageFormat::Starling, PackageFormat::SigmaPkg, PackageFormat::Air, PackageFormat::Bottle,
-            PackageFormat::Ipa, PackageFormat::Ports, PackageFormat::Pkg, PackageFormat::Aab,
-            PackageFormat::TarGz, PackageFormat::Xz, PackageFormat::App, PackageFormat::Hap,
-            PackageFormat::Pisi, PackageFormat::Superdeb, PackageFormat::Lzm, PackageFormat::Pup,
-            PackageFormat::Pet, PackageFormat::Tar, PackageFormat::Moss, PackageFormat::Hpkg,
-            PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
-            PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
-            PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
-            PackageFormat::Stratum
+            PackageFormat::Deb,
+            PackageFormat::Rpm,
+            PackageFormat::Pacman,
+            PackageFormat::Ebuild,
+            PackageFormat::Apk,
+            PackageFormat::Nix,
+            PackageFormat::Flatpak,
+            PackageFormat::Snap,
+            PackageFormat::AppImage,
+            PackageFormat::Xbps,
+            PackageFormat::Txz,
+            PackageFormat::Eopkg,
+            PackageFormat::Zypper,
+            PackageFormat::Guix,
+            PackageFormat::CachyOS,
+            PackageFormat::Swupd,
+            PackageFormat::Starling,
+            PackageFormat::SigmaPkg,
+            PackageFormat::Air,
+            PackageFormat::Bottle,
+            PackageFormat::Ipa,
+            PackageFormat::Ports,
+            PackageFormat::Pkg,
+            PackageFormat::Aab,
+            PackageFormat::TarGz,
+            PackageFormat::Xz,
+            PackageFormat::App,
+            PackageFormat::Hap,
+            PackageFormat::Pisi,
+            PackageFormat::Superdeb,
+            PackageFormat::Lzm,
+            PackageFormat::Pup,
+            PackageFormat::Pet,
+            PackageFormat::Tar,
+            PackageFormat::Moss,
+            PackageFormat::Hpkg,
+            PackageFormat::Tcz,
+            PackageFormat::Gobo,
+            PackageFormat::Ostree,
+            PackageFormat::Pkgsrc,
+            PackageFormat::Sfs,
+            PackageFormat::Puk,
+            PackageFormat::Dmg,
+            PackageFormat::Cports,
+            PackageFormat::Dports,
+            PackageFormat::SlackBuild,
+            PackageFormat::Crux,
+            PackageFormat::Drpm,
+            PackageFormat::Stratum,
         ];
 
         for fmt in formats {
             let strategy = PackageFactory::get_strategy(fmt);
             let adapter = PackageFactory::get_adapter(fmt);
-            let pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
+            let pkg =
+                UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
 
             assert!(strategy.install(&pkg).is_ok());
             assert!(strategy.verify(&pkg).unwrap());
             assert!(strategy.remove(&pkg).is_ok());
 
             let adapted = adapter.adapt("").unwrap();
-            assert!(adapted.formats.contains(&fmt) || (fmt == PackageFormat::Nix && adapted.formats.contains(&PackageFormat::Nixpkg)));
+            assert!(
+                adapted.formats.contains(&fmt)
+                    || (fmt == PackageFormat::Nix
+                        && adapted.formats.contains(&PackageFormat::Nixpkg))
+            );
         }
     }
 
