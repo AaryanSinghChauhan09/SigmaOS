@@ -26,8 +26,10 @@ jobs:
 
 
       - uses: dtolnay/rust-toolchain@v1
-      with:
-        toolchain: stable
+        with:
+          toolchain: stable
+        with:
+          toolchain: stable
 
 
       - name: Install cargo-audit
