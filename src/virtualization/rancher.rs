@@ -4,9 +4,9 @@ extern crate alloc;
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
 // by executing daemonless OCI containers directly on microkernel capabilities.
 
-use alloc::collections::BTreeMap;
 #[cfg(not(test))]
 use crate::security::capability::CapabilityToken;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
@@ -74,11 +74,16 @@ impl K3osOrchestrator {
         let mut instance = container;
         instance.state = ContainerState::Running;
         self.allocated_memory_mb += memory_demand_mb;
-        self.active_containers.insert(instance.container_id.clone(), instance);
+        self.active_containers
+            .insert(instance.container_id.clone(), instance);
         Ok(())
     }
 
-    pub fn terminate_container(&mut self, id: &str, memory_demand_mb: usize) -> Result<(), RancherError> {
+    pub fn terminate_container(
+        &mut self,
+        id: &str,
+        memory_demand_mb: usize,
+    ) -> Result<(), RancherError> {
         if let Some(mut container) = self.active_containers.remove(id) {
             container.state = ContainerState::Stopped;
             self.allocated_memory_mb = self.allocated_memory_mb.saturating_sub(memory_demand_mb);
@@ -89,9 +94,17 @@ impl K3osOrchestrator {
     }
 
     /// Enforces Bottlerocket-style dm-verity write-blocking on container filesystem root paths
-    pub fn validate_container_write_access(&self, id: &str, path: &str) -> Result<bool, RancherError> {
+    pub fn validate_container_write_access(
+        &self,
+        id: &str,
+        path: &str,
+    ) -> Result<bool, RancherError> {
         if let Some(container) = self.active_containers.get(id) {
-            if container.immutable_rootfs && (path.starts_with("/bin") || path.starts_with("/usr") || path.starts_with("/lib")) {
+            if container.immutable_rootfs
+                && (path.starts_with("/bin")
+                    || path.starts_with("/usr")
+                    || path.starts_with("/lib"))
+            {
                 return Err(RancherError::ReadOnlyViolation);
             }
             Ok(true)
@@ -216,25 +229,35 @@ mod tests {
 
         assert_eq!(orchestrator.allocated_memory_mb, 512);
 
-        let running_container = orchestrator.active_containers.get("web-server-node-01").unwrap();
+        let running_container = orchestrator
+            .active_containers
+            .get("web-server-node-01")
+            .unwrap();
         assert_eq!(running_container.state, ContainerState::Running);
 
         // Verify write access check: writing to system root /usr is blocked by Bottlerocket immutability
-        let write_res = orchestrator.validate_container_write_access("web-server-node-01", "/usr/bin/malicious-binary");
+        let write_res = orchestrator
+            .validate_container_write_access("web-server-node-01", "/usr/bin/malicious-binary");
         assert_eq!(write_res.unwrap_err(), RancherError::ReadOnlyViolation);
 
         // Writing to /tmp is permitted
-        let write_tmp = orchestrator.validate_container_write_access("web-server-node-01", "/tmp/session.log");
+        let write_tmp =
+            orchestrator.validate_container_write_access("web-server-node-01", "/tmp/session.log");
         assert!(write_tmp.unwrap());
 
         // Terminate and verify clean resources deallocation
-        orchestrator.terminate_container("web-server-node-01", 512).unwrap();
+        orchestrator
+            .terminate_container("web-server-node-01", 512)
+            .unwrap();
         assert_eq!(orchestrator.allocated_memory_mb, 0);
     }
 
     #[test]
     fn test_rancher_k3s_cluster_controller() {
-        let mut k3s = RancherK3sEmbeddedClusterController::new("k3s_secret_token", "sqlite:///var/lib/rancher/k3s/db/state.db");
+        let mut k3s = RancherK3sEmbeddedClusterController::new(
+            "k3s_secret_token",
+            "sqlite:///var/lib/rancher/k3s/db/state.db",
+        );
         assert!(k3s.join_node("node-alpha"));
         assert!(!k3s.join_node("node-alpha")); // Duplicate check
         assert_eq!(k3s.registered_nodes.len(), 1);

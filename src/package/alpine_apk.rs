@@ -2,9 +2,9 @@
 // Implements Alpine Linux's APK package manager
 // Inspired by Alpine's lightweight, security-focused package management
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// APK package
 #[derive(Debug, Clone)]
@@ -70,7 +70,9 @@ impl ApkPackageManager {
 
     /// Install package
     pub fn install(&mut self, package_name: &str) -> Result<(), String> {
-        let package = self.available.get(package_name)
+        let package = self
+            .available
+            .get(package_name)
             .ok_or_else(|| format!("Package {} not found", package_name))?
             .clone();
 
@@ -105,7 +107,10 @@ impl ApkPackageManager {
         // Check for reverse dependencies
         let reverse_deps = self.find_reverse_dependencies(package_name);
         if !reverse_deps.is_empty() {
-            return Err(format!("Package {} is required by: {:?}", package_name, reverse_deps));
+            return Err(format!(
+                "Package {} is required by: {:?}",
+                package_name, reverse_deps
+            ));
         }
 
         println!("Removing {}", package_name);
@@ -120,7 +125,10 @@ impl ApkPackageManager {
         if let Some(current) = self.installed.get(package_name) {
             if let Some(available) = self.available.get(package_name) {
                 if available.version != current.version {
-                    println!("Updating {} from {} to {}", package_name, current.version, available.version);
+                    println!(
+                        "Updating {} from {} to {}",
+                        package_name, current.version, available.version
+                    );
                     self.remove(package_name)?;
                     self.install(package_name)?;
                 }
@@ -184,7 +192,8 @@ impl ApkPackageManager {
 
     /// Find reverse dependencies
     fn find_reverse_dependencies(&self, package_name: &str) -> Vec<String> {
-        self.installed.values()
+        self.installed
+            .values()
             .filter(|pkg| pkg.dependencies.contains(&package_name.to_string()))
             .map(|pkg| pkg.name.clone())
             .collect()
@@ -193,10 +202,11 @@ impl ApkPackageManager {
     /// Search packages
     pub fn search(&self, query: &str) -> Vec<&ApkPackage> {
         let query_lower = query.to_lowercase();
-        self.available.values()
+        self.available
+            .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower) ||
-                pkg.description.to_lowercase().contains(&query_lower)
+                pkg.name.to_lowercase().contains(&query_lower)
+                    || pkg.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }

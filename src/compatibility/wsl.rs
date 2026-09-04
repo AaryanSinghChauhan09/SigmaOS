@@ -58,8 +58,12 @@ impl DrvFsMountManager {
         };
 
         // Pre-register standard drive mounts (/mnt/c, /mnt/d)
-        manager.mount_drive("C:", "/mnt/c", WslMountType::DrvFsHostDrive, true, true).ok();
-        manager.mount_drive("D:", "/mnt/d", WslMountType::DrvFsHostDrive, false, false).ok();
+        manager
+            .mount_drive("C:", "/mnt/c", WslMountType::DrvFsHostDrive, true, true)
+            .ok();
+        manager
+            .mount_drive("D:", "/mnt/d", WslMountType::DrvFsHostDrive, false, false)
+            .ok();
 
         manager
     }
@@ -186,8 +190,12 @@ impl WslInteropBridge {
             wslenv_rules: HashMap::new(),
         };
 
-        bridge.wslenv_rules.insert(String::from("PATH"), String::from("l:p"));
-        bridge.wslenv_rules.insert(String::from("TMPDIR"), String::from("p"));
+        bridge
+            .wslenv_rules
+            .insert(String::from("PATH"), String::from("l:p"));
+        bridge
+            .wslenv_rules
+            .insert(String::from("TMPDIR"), String::from("p"));
 
         bridge
     }
@@ -197,7 +205,10 @@ impl WslInteropBridge {
             return Err("Interop: Command name cannot be empty");
         }
         let full_args = args.join(" ");
-        Ok(format!("Host Command Output (via Interop): {} {}", cmd, full_args))
+        Ok(format!(
+            "Host Command Output (via Interop): {} {}",
+            cmd, full_args
+        ))
     }
 
     pub fn translate_env_var(&self, var_name: &str, val: &str) -> String {
@@ -253,41 +264,49 @@ impl DistroRegistryManager {
         };
 
         // Register default distro targets inspired by popular Linux & BSD distros
-        manager.register_distro(
-            "Ubuntu",
-            2,
-            WslArchitectureMode::Wsl2MicroVmContainer,
-            "ubuntu",
-            "5.15.90.1-sigmaos",
-            true,
-        ).ok();
+        manager
+            .register_distro(
+                "Ubuntu",
+                2,
+                WslArchitectureMode::Wsl2MicroVmContainer,
+                "ubuntu",
+                "5.15.90.1-sigmaos",
+                true,
+            )
+            .ok();
 
-        manager.register_distro(
-            "Arch",
-            2,
-            WslArchitectureMode::Wsl2MicroVmContainer,
-            "arch",
-            "6.5.6-sigmaos",
-            false,
-        ).ok();
+        manager
+            .register_distro(
+                "Arch",
+                2,
+                WslArchitectureMode::Wsl2MicroVmContainer,
+                "arch",
+                "6.5.6-sigmaos",
+                false,
+            )
+            .ok();
 
-        manager.register_distro(
-            "Alpine",
-            1,
-            WslArchitectureMode::Wsl1PicoTranslation,
-            "root",
-            "5.10.0-sigmaos",
-            false,
-        ).ok();
+        manager
+            .register_distro(
+                "Alpine",
+                1,
+                WslArchitectureMode::Wsl1PicoTranslation,
+                "root",
+                "5.10.0-sigmaos",
+                false,
+            )
+            .ok();
 
-        manager.register_distro(
-            "FreeBSD-Hybrid",
-            1,
-            WslArchitectureMode::BsdLinuxulatorHybrid,
-            "freebsd",
-            "14.0-RELEASE-sigmaos",
-            false,
-        ).ok();
+        manager
+            .register_distro(
+                "FreeBSD-Hybrid",
+                1,
+                WslArchitectureMode::BsdLinuxulatorHybrid,
+                "freebsd",
+                "14.0-RELEASE-sigmaos",
+                false,
+            )
+            .ok();
 
         manager
     }
@@ -400,7 +419,9 @@ mod tests {
     #[test]
     fn test_wsl_interop_bridge() {
         let bridge = WslInteropBridge::new();
-        let res = bridge.execute_host_command("cmd.exe", &["/c", "dir"]).unwrap();
+        let res = bridge
+            .execute_host_command("cmd.exe", &["/c", "dir"])
+            .unwrap();
         assert!(res.contains("cmd.exe /c dir"));
 
         let translated = bridge.translate_env_var("PATH", r"C:\Windows\System32");
