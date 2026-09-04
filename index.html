@@ -212,20 +212,20 @@
                 </div>
             </div>
             <div class="window-body auto-style-30">
-                <div class="auto-style-31" style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <button type="button" class="fm-btn active" onclick="switchMarketTab('core-shards')">Core Shards</button>
-                    <button type="button" class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
-                    <button type="button" class="fm-btn" onclick="switchMarketTab('archweb-hub')">ArchWeb Package DB</button>
+                <div class="auto-style-31" style="display: flex; gap: 10px; margin-bottom: 12px;" role="tablist" aria-label="Marketplace Navigation Tabs">
+                    <button type="button" role="tab" id="tab-market-core" aria-selected="true" aria-controls="market-core-shards" class="fm-btn active" onclick="switchMarketTab('core-shards')">Core Shards</button>
+                    <button type="button" role="tab" id="tab-market-foss" aria-selected="false" aria-controls="market-foss-apps" class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
+                    <button type="button" role="tab" id="tab-market-archweb" aria-selected="false" aria-controls="market-archweb-hub" class="fm-btn" onclick="switchMarketTab('archweb-hub')">ArchWeb Package DB</button>
                 </div>
                 
-                <div id="market-core-shards">
+                <div id="market-core-shards" role="tabpanel" aria-labelledby="tab-market-core">
                     <h3 class="auto-style-32">Attested Core Shards</h3>
                     <div class="shard-grid auto-style-33" id="shardContainer">
                         <!-- Dynamically populated from kernel_loader.js -->
                     </div>
                 </div>
 
-                <div id="market-foss-apps" class="auto-style-34">
+                <div id="market-foss-apps" class="auto-style-34" role="tabpanel" aria-labelledby="tab-market-foss" style="display: none;">
                     <h3 class="auto-style-35">FOSS Lattice Packages</h3>
                     <p class="auto-style-36">Inject verified open-source environments directly into your running shard.</p>
                     
@@ -237,12 +237,12 @@
                                 <div class="auto-style-40">
                                     <strong>DeepSeek / Gemma / Qwen</strong><br>
                                     <span class="auto-style-41">LLM Inference Engines</span><br>
-                                    <button class="fm-btn auto-style-42" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
+                                    <button type="button" class="fm-btn auto-style-42" aria-label="Inject DeepSeek LLM Inference Engine" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
                                 </div>
                                 <div class="auto-style-43">
                                     <strong>eSpeak & eSpeak NG</strong><br>
                                     <span class="auto-style-44">Speech Synthesis & Speech Recognition</span><br>
-                                    <button class="fm-btn auto-style-45" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
+                                    <button type="button" class="fm-btn auto-style-45" aria-label="Inject eSpeak Speech Synthesis Shard" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -254,12 +254,12 @@
                                 <div class="auto-style-48">
                                     <strong>KiCad & Fritzing</strong><br>
                                     <span class="auto-style-49">EDA Electronic Design Simulation</span><br>
-                                    <button class="fm-btn auto-style-50" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
+                                    <button type="button" class="fm-btn auto-style-50" aria-label="Inject KiCad EDA Workspace" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
                                 </div>
                                 <div class="auto-style-51">
                                     <strong>FreeCAD & OpenSCAD</strong><br>
                                     <span class="auto-style-52">3D Mechanical Design Models</span><br>
-                                    <button class="fm-btn auto-style-53" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
+                                    <button type="button" class="fm-btn auto-style-53" aria-label="Inject FreeCAD 3D Design Workspace" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
                                 </div>
                             </div>
                         </div>
@@ -271,12 +271,12 @@
                                 <div class="auto-style-56">
                                     <strong>Kali Arsenal (Nmap / Ghidra / Volatility)</strong><br>
                                     <span class="auto-style-57">Security Audit Core Vitals</span><br>
-                                    <button class="fm-btn auto-style-58" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
+                                    <button type="button" class="fm-btn auto-style-58" aria-label="Inject Kali Arsenal Security Tools" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
                                 </div>
                                 <div class="auto-style-59">
                                     <strong>RescueZilla Recovery Hub</strong><br>
                                     <span class="auto-style-60">Declarative Snapshot Rollbacks</span><br>
-                                    <button class="fm-btn auto-style-61" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
+                                    <button type="button" class="fm-btn auto-style-61" aria-label="Inject RescueZilla Recovery Shard" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -288,12 +288,12 @@
                                 <div class="auto-style-64">
                                     <strong>SageMath / Octave / GeoGebra</strong><br>
                                     <span class="auto-style-65">Numerical Science & Calculus Libraries</span><br>
-                                    <button class="fm-btn auto-style-66" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
+                                    <button type="button" class="fm-btn auto-style-66" aria-label="Inject SageMath Calculus Toolkit" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
                                 </div>
                                 <div class="auto-style-67">
                                     <strong>QGIS & OpenStreetMap</strong><br>
                                     <span class="auto-style-68">Geographical Information Systems</span><br>
-                                    <button class="fm-btn auto-style-69" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
+                                    <button type="button" class="fm-btn auto-style-69" aria-label="Inject QGIS Geographical System Shard" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +302,7 @@
                 </div>
 
                 <!-- ArchWeb / BSD Ports Universal Package Hub -->
-                <div id="market-archweb-hub" class="auto-style-34" style="display: none;">
+                <div id="market-archweb-hub" class="auto-style-34" role="tabpanel" aria-labelledby="tab-market-archweb" style="display: none;">
                     <h3 class="auto-style-35">ArchWeb & BSD Ports Universal Package Database</h3>
                     <p class="auto-style-36">Search official binary packages, AUR PKGBUILDs, and FreeBSD ports with Kyber-1024 mirror attestation.</p>
                     <div class="settings-group" style="margin-top: 10px;">
@@ -568,6 +568,13 @@ function switchMarketTab(tabId) {
     document.getElementById('market-core-shards').style.display = (tabId === 'core-shards') ? 'block' : 'none';
     document.getElementById('market-foss-apps').style.display = (tabId === 'foss-apps') ? 'block' : 'none';
     document.getElementById('market-archweb-hub').style.display = (tabId === 'archweb-hub') ? 'block' : 'none';
+
+    const tabs = document.querySelectorAll('#sigma-market-win [role="tab"]');
+    tabs.forEach(tab => {
+        const isSelected = tab.getAttribute('aria-controls') === `market-${tabId}`;
+        tab.classList.toggle('active', isSelected);
+        tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
 }
 </script>
 </body>
