@@ -200,3 +200,4 @@ To ensure SigmaOS successfully bridges the gap between ambitious architecture an
 - **Virtio Drivers**: Implement virtqueue ring buffers for hardware-virtualized devices in `src/driver/`.
 - **Virtual Terminals**: Use FreeBSD vt(4) multi-slot cell buffering for console display.
 - **RUMP Kernel Drivers**: Wrap legacy drivers in NetBSD RUMP memory-isolated barriers.
+- **Bare-Metal Drivers Target**: Prioritize direct physical hardware drivers (NVMe, Intel e1000e, UEFI GOP, USB xHCI) over userspace simulation to ensure real bare-metal boot capability.

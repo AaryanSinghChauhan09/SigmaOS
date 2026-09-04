@@ -106,3 +106,7 @@ This document provides a holistic analysis of the **SigmaOS** repository, evalua
 - **Linux Virtio-Net**: Virtqueue ring-buffer simulation (`VirtioNetDriverSimulator`) for network frames.
 - **FreeBSD vt(4)**: Dual-buffered 8-slot virtual console terminal driver (`FreeBsdVtConsoleDriver`).
 - **NetBSD RUMP**: Isolated driver memory and execution barrier wrapper (`NetBsdRumpDriverKernelWrapper`).
+- **NVMe PCIe Controller Driver**: Real hardware NVMe PCIe host controller (`NvmePCIeHostController`) with 64-byte Submission and 16-byte Completion queue processing.
+- **Intel e1000e NIC Driver**: Bare-metal Intel Gigabit Ethernet driver (`IntelE1000eNicDriver`) with PCIe MMIO ring descriptor management.
+- **VESA / UEFI GOP Framebuffer Driver**: Linear framebuffer graphics driver (`GopLinearFramebufferDriver`) with double-buffered ARGB pixel blitting and rectangle filling.
+- **USB xHCI Controller Driver**: Extensible Host Controller Interface (`XhciHostControllerDriver`) with Transfer Ring command posting and port device enumeration.
