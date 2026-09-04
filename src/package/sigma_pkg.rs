@@ -7,6 +7,10 @@ use alloc::vec::Vec;
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
