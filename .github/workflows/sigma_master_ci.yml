@@ -24,7 +24,9 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable # stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable # stable
 
       - name: Prepare Build Environment
         run: mkdir -p build
