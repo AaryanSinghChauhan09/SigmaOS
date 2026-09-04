@@ -27,12 +27,14 @@ pub use linux_bsd_distro_gaps::{
     BootMenuEntry, BootloaderType, BluetoothDevice, CronJobEntry, CronJobScheduler,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SystemdInitManager,
     SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
-    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack, SovereignDnsTlsResolverEngine,
+    SovereignDynamicDevfsEngine, SovereignStatefulNatEngine, SovereignJournaldBinaryStorageEngine,
+    DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, NatType, ConntrackTableEntry, JournaldLogRecord,
 };
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
-    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService,
+    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset,
     ZfsPoolState, ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;

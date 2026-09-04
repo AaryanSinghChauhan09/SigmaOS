@@ -64,6 +64,7 @@
 | FreeBSD Jails | FreeBSD | `src/security/mac.rs`, `src/container/` | ✅ Done | Full namespace isolation |
 | Capability-based security | FreeBSD Capsicum | `src/security/capability.rs` | ✅ Done | Fine-grained resource tokens |
 | Mandatory Access Control (MAC) | SELinux (NSA) | `src/security/mac.rs` | ✅ Done | Security contexts/labels |
+| Landlock LSM | Linux 5.13+ | `src/distro/linux_bsd_inspirations.rs` | ✅ Done | Unprivileged path-based sandboxing |
 | PF (Packet Filter) firewall | OpenBSD | `src/net/firewall.rs` | ✅ Done | Stateful packet filtering |
 | Stack canaries | GCC/LLVM SSP | Compiler flag | ✅ Done | `-Z stack-protector-all` |
 | CFI (Control Flow Integrity) | Clang, Linux | Compiler flag | 🔄 In Progress | LLVM CFI passes |
@@ -202,15 +203,18 @@ The following innovations are planned but not yet fully implemented:
 
 | Innovation | Source OS | Target Module | Priority |
 |-----------|-----------|--------------|----------|
-| io\_uring async I/O | Linux 5.1 | `src/kernel/` | 🔴 High |
 | BPF Type Format (BTF) | Linux | `src/observability/` | 🟡 Medium |
-| Landlock LSM | Linux 5.13 | `src/security/` | 🔴 High |
 | EROFS read-only overlay FS | Linux | `src/filesystem/` | 🟡 Medium |
-| zRAM compressed swap | Linux | `src/memory/` | 🟡 Medium |
-| systemd-homed | systemd | `src/auth/` | 🟢 Low |
 | Wayland display protocol | Linux | `src/desktop/` | 🟡 Medium |
 | RISC-V port | Linux | `src/arch/` | 🟡 Medium |
 | LoongArch port | Linux | `src/arch/` | 🟢 Low |
+
+### Recently Transferred to Completed Features:
+
+- **io_uring Async I/O**: Fully implemented in `src/kernel/linux_parity.rs`, `src/kernel/io_uring.rs`, and `src/distro/missing_distro_innovations.rs`.
+- **Landlock LSM**: Fully implemented in `src/distro/linux_bsd_inspirations.rs` (`SovereignLandlockLsm`), `src/container/distro_sandbox.rs`, and `src/kernel/linux_bsd_innovations.rs`.
+- **zRAM Compressed Swap**: Fully implemented in `src/memory/paging.rs`, `src/memory/kswapd.rs`, `src/compatibility/garuda_zen.rs`, and `src/performance/cachy_opt.rs`.
+- **systemd-homed**: Fully implemented in `src/auth/systemd_homed.rs` (`SovereignSystemdHomedEngine`).
 
 ***
 
