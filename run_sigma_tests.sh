@@ -125,5 +125,8 @@ fi
 echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
 pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
 
+echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
+pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
+
 echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
 exit 0
