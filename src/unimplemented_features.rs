@@ -2209,9 +2209,9 @@ impl SovereignStatelessArchitectureEngine {
         user_overrides_exist: bool,
     ) -> String {
         if user_overrides_exist {
-            alloc::format!("{}/{}", self.user_override_path, config_key)
+            format!("{}/{}", self.user_override_path, config_key)
         } else {
-            alloc::format!("{}/{}", self.factory_default_path, config_key)
+            format!("{}/{}", self.factory_default_path, config_key)
         }
     }
 }
@@ -4078,5 +4078,245 @@ mod new_unimplemented_tests {
         let backoff = s6.handle_service_exit();
         assert_eq!(backoff, 200);
         assert!(!s6.is_ready);
+    }
+}
+
+// ==================================================================
+// 54. SIGMAOS FOUNDATION & COMMUNITY GOVERNANCE ENGINE
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct SecurityBounty {
+    pub bounty_id: u32,
+    pub title: String,
+    pub reward_amount_usd: u32,
+    pub is_claimed: bool,
+}
+
+pub struct SigmaOsFoundationGovernanceEngine {
+    pub foundation_charter: String,
+    pub active_bounties: Vec<SecurityBounty>,
+    pub hackathons_count: usize,
+    pub doc_sprints_count: usize,
+}
+
+impl SigmaOsFoundationGovernanceEngine {
+    pub fn new(charter: &str) -> Self {
+        Self {
+            foundation_charter: charter.to_string(),
+            active_bounties: Vec::new(),
+            hackathons_count: 0,
+            doc_sprints_count: 0,
+        }
+    }
+
+    pub fn post_bounty(&mut self, id: u32, title: &str, reward: u32) {
+        self.active_bounties.push(SecurityBounty {
+            bounty_id: id,
+            title: title.to_string(),
+            reward_amount_usd: reward,
+            is_claimed: false,
+        });
+    }
+
+    pub fn claim_bounty(&mut self, id: u32) -> Result<u32, &'static str> {
+        if let Some(bounty) = self.active_bounties.iter_mut().find(|b| b.bounty_id == id) {
+            if bounty.is_claimed {
+                return Err("Bounty already claimed");
+            }
+            bounty.is_claimed = true;
+            Ok(bounty.reward_amount_usd)
+        } else {
+            Err("Bounty ID not found")
+        }
+    }
+
+    pub fn organize_hackathon(&mut self) -> usize {
+        self.hackathons_count += 1;
+        self.hackathons_count
+    }
+
+    pub fn organize_doc_sprint(&mut self) -> usize {
+        self.doc_sprints_count += 1;
+        self.doc_sprints_count
+    }
+}
+
+impl Default for SigmaOsFoundationGovernanceEngine {
+    fn default() -> Self {
+        Self::new("SigmaOS Open Source Software Foundation Bylaws & Governance Charter")
+    }
+}
+
+// ==================================================================
+// 55. SIGMAOS MOBILE VARIANT & CELLULAR MODEM ENGINE
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CellularNetworkType {
+    None,
+    Lte4G,
+    FiveGSub6,
+    FiveGmmWave,
+}
+
+pub struct SigmaOsMobileVariantEngine {
+    pub battery_level_pct: u8,
+    pub network_type: CellularNetworkType,
+    pub touch_gestures_enabled: bool,
+    pub portrait_mode: bool,
+}
+
+impl SigmaOsMobileVariantEngine {
+    pub fn new() -> Self {
+        Self {
+            battery_level_pct: 100,
+            network_type: CellularNetworkType::Lte4G,
+            touch_gestures_enabled: true,
+            portrait_mode: true,
+        }
+    }
+
+    pub fn set_cellular_network(&mut self, net_type: CellularNetworkType) {
+        self.network_type = net_type;
+    }
+
+    pub fn rotate_screen(&mut self) -> bool {
+        self.portrait_mode = !self.portrait_mode;
+        self.portrait_mode
+    }
+}
+
+impl Default for SigmaOsMobileVariantEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==================================================================
+// 56. SIGMAOS CLOUD ORCHESTRATION & CLUSTER ENGINE
+// ==================================================================
+#[derive(Debug, Clone)]
+pub struct ClusterNode {
+    pub node_id: String,
+    pub ip_address: String,
+    pub cpu_cores: u32,
+    pub memory_gb: u32,
+    pub is_healthy: bool,
+}
+
+pub struct SigmaOsCloudOrchestrationEngine {
+    pub cluster_name: String,
+    pub nodes: Vec<ClusterNode>,
+    pub scheduled_workloads: usize,
+}
+
+impl SigmaOsCloudOrchestrationEngine {
+    pub fn new(cluster_name: &str) -> Self {
+        Self {
+            cluster_name: cluster_name.to_string(),
+            nodes: Vec::new(),
+            scheduled_workloads: 0,
+        }
+    }
+
+    pub fn register_node(&mut self, node_id: &str, ip: &str, cpu: u32, mem_gb: u32) {
+        self.nodes.push(ClusterNode {
+            node_id: node_id.to_string(),
+            ip_address: ip.to_string(),
+            cpu_cores: cpu,
+            memory_gb: mem_gb,
+            is_healthy: true,
+        });
+    }
+
+    pub fn schedule_container_workload(&mut self, required_mem_gb: u32) -> Result<String, &'static str> {
+        let available_node = self.nodes.iter().find(|n| n.is_healthy && n.memory_gb >= required_mem_gb);
+        if let Some(node) = available_node {
+            self.scheduled_workloads += 1;
+            Ok(node.node_id.clone())
+        } else {
+            Err("No cluster node with sufficient capacity available")
+        }
+    }
+}
+
+// ==================================================================
+// 57. SIGMAOS GAMING VULKAN & DIRECTX COMPATIBILITY LAYER
+// ==================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GraphicsApiBackend {
+    Vulkan1_3,
+    DirectX12,
+    Metal3,
+}
+
+pub struct SigmaOsGamingVulkanDirectXLayer {
+    pub active_backend: GraphicsApiBackend,
+    pub compiled_shaders_count: usize,
+    pub target_fps: u32,
+}
+
+impl SigmaOsGamingVulkanDirectXLayer {
+    pub fn new(backend: GraphicsApiBackend) -> Self {
+        Self {
+            active_backend: backend,
+            compiled_shaders_count: 0,
+            target_fps: 144,
+        }
+    }
+
+    pub fn compile_shader(&mut self, hlsl_or_spirv: &[u8]) -> usize {
+        if !hlsl_or_spirv.is_empty() {
+            self.compiled_shaders_count += 1;
+        }
+        self.compiled_shaders_count
+    }
+
+    pub fn set_frame_rate_target(&mut self, fps: u32) {
+        self.target_fps = fps;
+    }
+}
+
+#[cfg(test)]
+mod governance_and_cross_platform_tests {
+    use super::*;
+
+    #[test]
+    fn test_sigmaos_foundation_governance_engine() {
+        let mut gov = SigmaOsFoundationGovernanceEngine::default();
+        gov.post_bounty(1, "Kernel Race Condition Bug", 5000);
+        assert_eq!(gov.active_bounties.len(), 1);
+
+        let reward = gov.claim_bounty(1).unwrap();
+        assert_eq!(reward, 5000);
+        assert!(gov.claim_bounty(1).is_err());
+
+        assert_eq!(gov.organize_hackathon(), 1);
+        assert_eq!(gov.organize_doc_sprint(), 1);
+    }
+
+    #[test]
+    fn test_sigmaos_mobile_variant_engine() {
+        let mut mobile = SigmaOsMobileVariantEngine::new();
+        mobile.set_cellular_network(CellularNetworkType::FiveGSub6);
+        assert_eq!(mobile.network_type, CellularNetworkType::FiveGSub6);
+        assert!(mobile.rotate_screen() == false);
+    }
+
+    #[test]
+    fn test_sigmaos_cloud_orchestration_engine() {
+        let mut cloud = SigmaOsCloudOrchestrationEngine::new("sigma-k8s-cluster");
+        cloud.register_node("node-01", "10.0.0.1", 16, 64);
+        let scheduled = cloud.schedule_container_workload(32).unwrap();
+        assert_eq!(scheduled, "node-01");
+        assert!(cloud.schedule_container_workload(128).is_err());
+    }
+
+    #[test]
+    fn test_sigmaos_gaming_vulkan_directx_layer() {
+        let mut gaming = SigmaOsGamingVulkanDirectXLayer::new(GraphicsApiBackend::Vulkan1_3);
+        let compiled = gaming.compile_shader(b"SPIRV_SHADER_BYTECODE");
+        assert_eq!(compiled, 1);
+        gaming.set_frame_rate_target(240);
+        assert_eq!(gaming.target_fps, 240);
     }
 }
