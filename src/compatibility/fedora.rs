@@ -2725,6 +2725,184 @@ impl FedoraBtrfsSnapperSnapshotEngine {
     }
 }
 
+/// Fedora FMN (Fedora Messaging Notifications) Notification Transport Channels
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FmnNotificationTransport {
+    Email,
+    Matrix,
+    Irc,
+    DesktopDbus,
+    Webhook,
+}
+
+/// Fedora FMN Event Severity Level
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum FmnEventSeverity {
+    Low = 1,
+    Medium = 2,
+    High = 3,
+    Critical = 4,
+}
+
+/// Fedora FMN Message Bus Event (Koji build, Bodhi update, Pagure PR, Anitya release)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FmnMessageEvent {
+    pub event_id: String,
+    pub topic: String, // e.g., "org.fedoraproject.prod.buildsys.task.state.change"
+    pub package_name: String,
+    pub severity: FmnEventSeverity,
+    pub summary: String,
+    pub timestamp_epoch: u64,
+}
+
+/// Fedora FMN User Filtering & Delivery Preferences Rule
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FmnFilterRule {
+    pub rule_id: String,
+    pub user_id: String,
+    pub package_pattern: String, // Wildcard "*" or package name
+    pub topic_pattern: String,   // Wildcard "*" or topic substring
+    pub min_severity: FmnEventSeverity,
+    pub preferred_transport: FmnNotificationTransport,
+}
+
+/// Fedora Tahrir OpenBadges Assertion Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirBadgeAssertion {
+    pub badge_id: String,
+    pub recipient_email_hash: String,
+    pub issuer_id: String,
+    pub issued_on_epoch: u64,
+    pub evidence_url: String,
+    pub assertion_digest: String,
+}
+
+/// Fedora Tahrir User Avatar Record (Libravatar/Gravatar Compatible)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirUserAvatar {
+    pub user_id: String,
+    pub email_sha256: String,
+    pub avatar_data: Vec<u8>,
+    pub mime_type: String,
+}
+
+/// Fedora Tahrir User Identity, Avatar & OpenBadges API Engine
+/// Serves Libravatar-compatible avatar resolution and Fedora Badges OpenBadges v2/v3 assertions.
+pub struct FedoraTahrirIdentityApiEngine {
+    pub user_avatars: Vec<TahrirUserAvatar>,
+    pub issued_badges: Vec<TahrirBadgeAssertion>,
+}
+
+impl FedoraTahrirIdentityApiEngine {
+    pub fn new() -> Self {
+        FedoraTahrirIdentityApiEngine {
+            user_avatars: Vec::new(),
+            issued_badges: Vec::new(),
+        }
+    }
+
+    /// FNV-1a hash algorithm simulation for Libravatar email hash generation
+    pub fn calculate_email_hash(email: &str) -> String {
+        let mut hash: u64 = 14695981039346656037;
+        for byte in email.trim().to_lowercase().bytes() {
+            hash ^= byte as u64;
+            hash = hash.wrapping_mul(1099511628211);
+        }
+        format!("{:016x}", hash)
+    }
+
+    pub fn register_user_avatar(&mut self, user_id: &str, email: &str, avatar_data: &[u8], mime: &str) -> String {
+        let email_hash = Self::calculate_email_hash(email);
+        self.user_avatars.retain(|a| a.user_id != user_id);
+        self.user_avatars.push(TahrirUserAvatar {
+            user_id: user_id.to_string(),
+            email_sha256: email_hash.clone(),
+            avatar_data: avatar_data.to_vec(),
+            mime_type: mime.to_string(),
+        });
+        email_hash
+    }
+
+    pub fn resolve_avatar_by_hash(&self, email_hash: &str) -> Option<&TahrirUserAvatar> {
+        self.user_avatars.iter().find(|a| a.email_sha256 == email_hash)
+    }
+
+    pub fn issue_badge_assertion(&mut self, badge_id: &str, recipient_email: &str, issuer: &str, timestamp: u64) -> TahrirBadgeAssertion {
+        let recipient_hash = Self::calculate_email_hash(recipient_email);
+        let digest = format!("{}:{}:{}:{}", badge_id, recipient_hash, issuer, timestamp);
+        let assertion = TahrirBadgeAssertion {
+            badge_id: badge_id.to_string(),
+            recipient_email_hash: recipient_hash,
+            issuer_id: issuer.to_string(),
+            issued_on_epoch: timestamp,
+            evidence_url: format!("https://badges.fedoraproject.org/badge/{}", badge_id),
+            assertion_digest: digest,
+        };
+        self.issued_badges.push(assertion.clone());
+        assertion
+    }
+
+    pub fn verify_badge_assertion(&self, assertion: &TahrirBadgeAssertion) -> bool {
+        self.issued_badges.iter().any(|b| b.assertion_digest == assertion.assertion_digest)
+    }
+}
+
+impl Default for FedoraTahrirIdentityApiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora FMN (Fedora Messaging Notifications) Event-Driven Notification Engine
+/// Listens to Fedora AMQP bus events, evaluates rule matches, and dispatches multi-channel alerts.
+pub struct FedoraFmnMessagingEngine {
+    pub filter_rules: Vec<FmnFilterRule>,
+    pub published_event_count: u64,
+    pub dispatched_notifications_log: Vec<(String, FmnNotificationTransport, String)>, // (user_id, transport, event_summary)
+}
+
+impl FedoraFmnMessagingEngine {
+    pub fn new() -> Self {
+        FedoraFmnMessagingEngine {
+            filter_rules: Vec::new(),
+            published_event_count: 0,
+            dispatched_notifications_log: Vec::new(),
+        }
+    }
+
+    pub fn register_filter_rule(&mut self, rule: FmnFilterRule) {
+        self.filter_rules.push(rule);
+    }
+
+    pub fn publish_event(&mut self, event: FmnMessageEvent) -> usize {
+        self.published_event_count += 1;
+        let mut dispatched_count = 0;
+
+        for rule in &self.filter_rules {
+            let pkg_match = rule.package_pattern == "*" || rule.package_pattern == event.package_name;
+            let topic_match = rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
+            let severity_match = event.severity >= rule.min_severity;
+
+            if pkg_match && topic_match && severity_match {
+                self.dispatched_notifications_log.push((
+                    rule.user_id.clone(),
+                    rule.preferred_transport,
+                    format!("[{}] {}", event.package_name, event.summary),
+                ));
+                dispatched_count += 1;
+            }
+        }
+
+        dispatched_count
+    }
+}
+
+impl Default for FedoraFmnMessagingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Fedora / RPM Fusion NVIDIA PRIME Power Profiles
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FedoraGpuPowerMode {
@@ -4629,6 +4807,112 @@ mod tests {
         assert!(setup.complete_initial_setup().is_ok());
         assert!(!setup.is_first_boot);
         assert_eq!(setup.current_step, "Complete");
+    }
+
+    #[test]
+    fn test_fedora_tahrir_identity_api_engine() {
+        let mut tahrir = FedoraTahrirIdentityApiEngine::new();
+
+        // 1. Register avatar
+        let email_hash = tahrir.register_user_avatar(
+            "alice_developer",
+            "alice@fedoraproject.org",
+            b"<svg>ALICE_AVATAR</svg>",
+            "image/svg+xml",
+        );
+        assert!(!email_hash.is_empty());
+
+        // 2. Resolve avatar by Libravatar email hash
+        let resolved = tahrir.resolve_avatar_by_hash(&email_hash).unwrap();
+        assert_eq!(resolved.user_id, "alice_developer");
+        assert_eq!(resolved.mime_type, "image/svg+xml");
+        assert_eq!(resolved.avatar_data, b"<svg>ALICE_AVATAR</svg>");
+
+        // 3. Issue OpenBadges assertion
+        let assertion = tahrir.issue_badge_assertion(
+            "package_artisan_2024",
+            "alice@fedoraproject.org",
+            "fedora_badges_bot",
+            1700000000,
+        );
+        assert_eq!(assertion.badge_id, "package_artisan_2024");
+        assert_eq!(assertion.recipient_email_hash, email_hash);
+        assert!(assertion.evidence_url.contains("package_artisan_2024"));
+
+        // 4. Verify OpenBadges assertion
+        assert!(tahrir.verify_badge_assertion(&assertion));
+
+        let fake_assertion = TahrirBadgeAssertion {
+            badge_id: "fake_badge".to_string(),
+            recipient_email_hash: "0000000000000000".to_string(),
+            issuer_id: "fake_issuer".to_string(),
+            issued_on_epoch: 0,
+            evidence_url: "".to_string(),
+            assertion_digest: "invalid_digest".to_string(),
+        };
+        assert!(!tahrir.verify_badge_assertion(&fake_assertion));
+    }
+
+    #[test]
+    fn test_fedora_fmn_messaging_engine() {
+        let mut fmn = FedoraFmnMessagingEngine::new();
+
+        // Register rule for user alice: interested in kernel builds via Matrix
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-01".to_string(),
+            user_id: "alice@fedora".to_string(),
+            package_pattern: "kernel".to_string(),
+            topic_pattern: "buildsys".to_string(),
+            min_severity: FmnEventSeverity::Medium,
+            preferred_transport: FmnNotificationTransport::Matrix,
+        });
+
+        // Register rule for user bob: interested in critical alerts across all packages via Email
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-02".to_string(),
+            user_id: "bob@fedora".to_string(),
+            package_pattern: "*".to_string(),
+            topic_pattern: "*".to_string(),
+            min_severity: FmnEventSeverity::Critical,
+            preferred_transport: FmnNotificationTransport::Email,
+        });
+
+        // Event 1: Low severity kernel build event -> Alice (min Medium) ignored, Bob (min Critical) ignored
+        let count1 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-01".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::Low,
+            summary: "Kernel scratch build started".to_string(),
+            timestamp_epoch: 1700000000,
+        });
+        assert_eq!(count1, 0);
+
+        // Event 2: High severity kernel build completed -> Alice matches!
+        let count2 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-02".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::High,
+            summary: "Kernel 6.8.0-1.fc40 build completed successfully".to_string(),
+            timestamp_epoch: 1700000100,
+        });
+        assert_eq!(count2, 1);
+        assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+
+        // Event 3: Critical security update for openssl -> Bob matches!
+        let count3 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-03".to_string(),
+            topic: "org.fedoraproject.prod.bodhi.update.critical".to_string(),
+            package_name: "openssl".to_string(),
+            severity: FmnEventSeverity::Critical,
+            summary: "Critical security advisory FEDORA-2024-SEC01".to_string(),
+            timestamp_epoch: 1700000200,
+        });
+        assert_eq!(count3, 1);
+        assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
     }
 
     #[test]

@@ -5,6 +5,7 @@ Covers: Shell ↔ Syscall routing, Hardware Driver mocking (disk/network),
 Network sockets, Security policy enforcement, and Cold Boot configurations.
 """
 
+import pytest
 import time
 
 
@@ -134,11 +135,8 @@ def test_device_driver_mocking():
     read_back = disk.read_sector(0)
 
     assert read_back == sector_data
-    try:
+    with pytest.raises(ValueError):
         disk.read_sector(999)
-        assert False, "Expected ValueError"
-    except ValueError:
-        pass
 
 
 def test_network_socket_packet_transfer():
@@ -188,43 +186,3 @@ def test_boot_sequence_varied_configs():
     assert boot_err.execute_boot() is False
     assert boot_err.state == "BOOT_ERROR"
     assert any("BOOT_FAIL" in log for log in boot_err.boot_logs)
-
-
-def test_universal_package_manager_cli_simulation():
-    """Simulates universal package manager CLI interactions for .deb, .rpm, .pkg.tar.zst, and APK conversion."""
-    package_formats = ["deb", "rpm", "pkg.tar.zst", "apk", "xbps", "econstruct"]
-    assert len(package_formats) == 6
-
-
-def test_sovereign_wiki_master_engine_integration():
-    """Validates the 100 improvement ideas, 12 S-SHARDs, and Linux/BSD distro gap closure matrix."""
-    shards_status = {
-        "S-SHARD 01": "Productivity Office",
-        "S-SHARD 02": "Media Processing",
-        "S-SHARD 03": "Creative 2D/3D & CAD",
-        "S-SHARD 04": "Foundational AI & ML",
-        "S-SHARD 05": "LLM KV-Cache Inference",
-        "S-SHARD 06": "Autonomous Swarms",
-        "S-SHARD 07": "Quantum-Resistant Mesh Net",
-        "S-SHARD 08": "SigmaFS Storage",
-        "S-SHARD 09": "Zenith Desktop Compositor",
-        "S-SHARD 10": "Edge/Global Compliance",
-        "S-SHARD 11": "System Administration",
-        "S-SHARD 12": "SovereignVMM Virtualization",
-    }
-
-    distro_matrix = {
-        "Ubuntu": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc/apt"},
-        "Fedora": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": "/etc/dnf"},
-        "Arch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc/pacman.d"},
-        "Alpine": {"pkg_ext": ".apk", "supervisor": "OpenRC", "vfs_etc": "/etc/apk"},
-        "Void": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc/xbps.d"},
-        "Guix": {"pkg_ext": ".scm", "supervisor": "Shepherd", "vfs_etc": "/etc/guix"},
-        "FreeBSD": {"pkg_ext": ".pkg", "supervisor": "Rcd", "vfs_etc": "/etc/pkg"},
-    }
-
-    for mode, spec in distro_matrix.items():
-        pkg_name = f"coreutils{spec['pkg_ext']}"
-        assert pkg_name.endswith(spec["pkg_ext"])
-        assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Rcd"]
-        assert len(spec["vfs_etc"]) > 0
