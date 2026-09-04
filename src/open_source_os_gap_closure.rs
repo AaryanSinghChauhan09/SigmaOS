@@ -2911,6 +2911,22 @@ mod tests {
 
         assert!(engine.submit_3d_render_cmd(99, cmd).is_err());
     }
+
+    #[test]
+    fn test_open_source_project_supremacy_suite_extended() {
+        let mut suite = OpenSourceProjectSupremacySuite::new();
+
+        assert!(suite.supervise_systemd_free_init("runit-syslog"));
+        assert!(suite.throttle_racct_resource(5678, 50));
+        assert!(!suite.throttle_racct_resource(0, 50));
+        assert!(!suite.throttle_racct_resource(5678, 101));
+
+        assert!(suite.process_xdp_zero_copy_packet(1024));
+        assert!(!suite.process_xdp_zero_copy_packet(10)); // Under 64 bytes MTU min
+        assert!(!suite.process_xdp_zero_copy_packet(10000)); // Over 9000 bytes Jumbo frame
+
+        assert!(suite.scrub_tiered_storage_extent(202));
+    }
 }
 
 // =========================================================================
