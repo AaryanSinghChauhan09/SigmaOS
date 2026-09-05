@@ -19,8 +19,8 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # v1
-        with:
-          toolchain: stable
+          with:
+            toolchain: stable
 
       - name: Verify Debian Package Parity & Reproducibility Context
         run: |

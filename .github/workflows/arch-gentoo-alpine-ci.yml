@@ -18,9 +18,9 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # stable
-        with:
-          toolchain: stable
-          components: clippy, rustfmt
+          with:
+            toolchain: stable
+            components: clippy, rustfmt
 
       - name: Verify PCI/PCIe Bus Scanner Subsystem
         run: mkdir -p build && rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/kernel/pci_scanner.rs -o /tmp/test_pci && /tmp/test_pci
