@@ -1,9 +1,11 @@
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-// Use our custom sovereign HashMap instead of std::collections::BTreeMap
-// to reduce dependency on pre-defined library data structures.
+// Use std::collections::BTreeMap during standalone test compilation or custom BTreeMap otherwise
+#[cfg(not(test))]
 use crate::klib::hashmap::BTreeMap;
+#[cfg(test)]
+use std::collections::BTreeMap;
 
 /// Zero-dependency Sovereign JSON Data Model
 #[derive(Debug, Clone, PartialEq)]
@@ -97,12 +99,13 @@ impl SovereignJsonValue {
             SovereignJsonValue::Object(obj) => {
                 out.push('{');
                 for (i, (key, val)) in obj.iter().enumerate() {
+                    let val_node: &SovereignJsonValue = val;
                     if i > 0 {
                         out.push_str(", ");
                     }
                     append_escaped_json_string(key, out);
                     out.push_str(": ");
-                    val.append_json_string(out);
+                    val_node.append_json_string(out);
                 }
                 out.push('}');
             }
