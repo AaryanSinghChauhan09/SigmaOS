@@ -19,6 +19,8 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable # stable
+          with:
+            toolchain: stable
 
       - name: Run Network Discovery Security Tests
         run: |

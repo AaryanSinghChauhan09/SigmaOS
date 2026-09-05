@@ -35,9 +35,9 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          targets: ${{ matrix.target }}
+          with:
+            toolchain: stable
+            targets: ${{ matrix.target }}
 
       - name: Run Systemd Init & BORE Scheduler Tests
         run: |

@@ -35,8 +35,8 @@ jobs:
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
+          with:
+            toolchain: stable
 
       - name: Build Sovereign System Images
         run: |
