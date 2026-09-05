@@ -192,7 +192,7 @@ impl PackageFormat {
             Some(PackageFormat::Ipa)
         } else if normalized.ends_with(".ports") {
             Some(PackageFormat::Ports)
-        } else if normalized.ends_with(".pkg") {
+        } else if normalized.ends_with(".pkg") && !normalized.contains("pacman") && !normalized.contains("arch") {
             Some(PackageFormat::Pkg)
         } else if normalized.ends_with(".aab") {
             Some(PackageFormat::Aab)
@@ -2271,7 +2271,7 @@ impl UniversalPackageFormatBridge {
         }
 
         if !raw_data.is_empty() {
-            pkg.checksum = format!("{:x}", raw_data.len() * 31);
+            pkg.properties.insert("checksum".to_string(), format!("{:x}", raw_data.len() * 31));
         }
 
         Ok(pkg)
@@ -2664,7 +2664,7 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
         assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
         assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("arch_pacman.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(PackageFormat::from_filename("bsd_pkg.pkg"), Some(PackageFormat::Pkg));
         assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
         assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
     }
@@ -2753,16 +2753,16 @@ mod tests {
     #[test]
     fn test_universal_package_format_bridge() {
         let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert_eq!(deb_pkg.format, PackageFormat::Deb);
+        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
         assert_eq!(deb_pkg.name, "nginx");
         assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
 
         let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert_eq!(rpm_pkg.format, PackageFormat::Rpm);
+        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
         assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
 
         let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert_eq!(apk_pkg.format, PackageFormat::Apk);
+        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }
