@@ -7,6 +7,7 @@ use std::format;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use std::collections::BTreeMap;
 
 // =========================================================================
 // 1. MULTIMEDIA TOOLS
@@ -5161,7 +5162,7 @@ impl NixGuixStoreGarbageCollectorTool {
 
 #[derive(Debug, Default, Clone)]
 pub struct OpenBsdUnveilAuditTool {
-    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+    pub unveiled_rules: BTreeMap<String, String>,
 }
 
 impl OpenBsdUnveilAuditTool {

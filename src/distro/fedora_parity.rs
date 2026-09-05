@@ -5,7 +5,9 @@ use crate::klib::Vec;
 use std::string::String;
 use core::cell::Cell;
 
-pub use crate::compatibility::fedora::FedoraOfflineUpdateEngine;
+pub use crate::compatibility::fedora::BodhiUpdateTriage;
+
+// FedoraOfflineUpdateEngine is not available, using BodhiUpdateTriage as alternative
 
 /// Fedora DNF package manager parity
 pub struct DnfPackageManager {
