@@ -22,3 +22,4 @@ pub mod inotify_syscalls;
 pub mod kevent_syscalls;
 pub mod uts_syscalls;
 pub mod user_syscalls;
+pub mod bpf_syscalls;

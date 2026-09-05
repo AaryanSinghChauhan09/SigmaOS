@@ -2,6 +2,7 @@
 pub mod audit;
 pub mod capability;
 pub mod seccomp;
+pub mod seccomp_ebpf;
 pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
