@@ -2,6 +2,7 @@
 // SigmaOS Kernel Module
 pub mod architecture;
 pub mod atomic_extended;
+pub mod cgroup_v2;
 pub mod block_dev;
 pub mod bore;
 pub mod breakthrough;
@@ -116,3 +117,7 @@ pub use namespaces::{
 };
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+pub use cgroup_v2::{
+    Cgroup, CgroupHierarchy, CgroupId, CgroupState, ControllerType, CpuController,
+    MemoryController, PidsController, Controller,
+};
