@@ -7,6 +7,7 @@ use std::format;
 
 use std::string::ToString;
 use crate::klib::{Vec, BTreeMap};
+use crate::ui::gtk::GtkDashboardCard;
 
 #[derive(Debug, Clone)]
 pub struct OliveTinAction {
@@ -131,6 +132,21 @@ impl SovereignOliveTinEngine {
 
         html.push_str("</div></body></html>");
         html
+    }
+
+    /// Renders native GTK cards for non-HTML UI environments
+    pub fn render_dashboard_native(&self) -> Vec<GtkDashboardCard> {
+        let mut cards = Vec::new();
+        for act in &self.actions {
+            cards.push(GtkDashboardCard::new(
+                act.id,
+                &act.title,
+                &act.description,
+                &act.command_template,
+                "Run Action",
+            ));
+        }
+        cards
     }
 }
 

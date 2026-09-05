@@ -34,6 +34,7 @@ pub enum DocFormat {
     Html,
     Pdf,
     AsciiDoc,
+    PlainText,
 }
 
 /// Documentation section type
@@ -98,7 +99,32 @@ impl DocGenerator {
             DocFormat::Html => self.generate_html(),
             DocFormat::Pdf => self.generate_pdf(),
             DocFormat::AsciiDoc => self.generate_asciidoc(),
+            DocFormat::PlainText => self.generate_plain_text(),
         }
+    }
+
+    /// Generate plain text documentation (non-HTML text layout)
+    fn generate_plain_text(&self) -> Result<String, String> {
+        let mut output = String::new();
+
+        if !self.metadata.is_empty() {
+            output.push_str("=== METADATA ===\n");
+            for (key, value) in &self.metadata {
+                output.push_str(&format!("{}: {}\n", key, value));
+            }
+            output.push_str("================\n\n");
+        }
+
+        let mut sorted_entries = self.entries.clone();
+        sorted_entries.sort_by_key(|e| e.order);
+
+        for entry in &sorted_entries {
+            output.push_str(&format!("[{}]\n", entry.title.to_uppercase()));
+            output.push_str(&entry.content);
+            output.push_str("\n\n");
+        }
+
+        Ok(output)
     }
 
     /// Generate PDF documentation (Simulated PDF document layout structure)

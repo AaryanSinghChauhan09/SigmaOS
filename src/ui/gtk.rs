@@ -113,6 +113,32 @@ impl GtkCssProvider {
     }
 }
 
+/// Native GTK Dashboard Card Representation (replaces web HTML cards)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GtkDashboardCard {
+    pub id: usize,
+    pub title: String,
+    pub description: String,
+    pub command: String,
+    pub button_label: String,
+}
+
+impl GtkDashboardCard {
+    pub fn new(id: usize, title: &str, description: &str, command: &str, button_label: &str) -> Self {
+        Self {
+            id,
+            title: title.to_string(),
+            description: description.to_string(),
+            command: command.to_string(),
+            button_label: button_label.to_string(),
+        }
+    }
+
+    pub fn render_summary(&self) -> String {
+        format!("Card #{}: [{}] - {} | Command: `{}`", self.id, self.title, self.description, self.command)
+    }
+}
+
 /// Window Control Buttons for HeaderBar
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowControlLayout {
