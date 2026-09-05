@@ -99,7 +99,7 @@ jobs:
           chmod +x ./run_sigma_tests.sh
           ./run_sigma_tests.sh
       - name: Install Python test dependencies
-        run: pip3 install pytest
+        run: pip3 install pytest pytest-timeout
       - name: Run Python tests
         run: python3 -m pytest tests/ -v --timeout=60
 

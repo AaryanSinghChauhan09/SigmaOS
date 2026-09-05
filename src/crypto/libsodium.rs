@@ -550,6 +550,7 @@ mod tests {
 
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
         let message: &[u8] = TEST_BOX_PLAINTEXT;
+        // lgtm[rust/hard-coded-cryptographic-value]
         let mut nonce = [0u8; constants::CRYPTO_BOX_NONCEBYTES];
         random_bytes(&mut nonce);
 
@@ -568,6 +569,7 @@ mod tests {
 
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
         let message: &[u8] = TEST_SECRETBOX_PLAINTEXT;
+        // lgtm[rust/hard-coded-cryptographic-value]
         let mut nonce = [0u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
         random_bytes(&mut nonce);
 
