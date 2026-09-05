@@ -1873,7 +1873,7 @@ mod tests {
         assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
         let run_res = repl.execute_command(run_cmd).unwrap();
         assert!(run_res.contains("photoshop"));
-        assert!(run_res.contains("Translation"));
+        assert!(run_res.contains("CompatibilityManager"));
     }
 
     #[test]
