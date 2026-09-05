@@ -1275,7 +1275,7 @@ pub struct NodeBinaryPackage {
     pub version: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct NodeBinaryDistroEngine;
 impl NodeBinaryDistroEngine {
     pub fn new() -> Self {
