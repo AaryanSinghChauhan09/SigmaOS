@@ -235,7 +235,6 @@ mod tests {
         base: KObject,
         owner: Option<String>,
         debug_level: String,
-        base: KObject,
     }
 
     impl KernelObject for MockDriver {

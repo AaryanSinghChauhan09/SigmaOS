@@ -653,6 +653,173 @@ pub trait NetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
 
+#[repr(C)]
+pub struct CubicCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub w_max: AtomicUsize,
+}
+
+impl CubicCongestionControl {
+    pub fn new() -> Self {
+        Self {
+            cwnd: AtomicUsize::new(10),
+            w_max: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Default for CubicCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CongestionControl for CubicCongestionControl {
+    fn update_cwnd(&mut self, acked: usize) {
+        self.cwnd.fetch_add(acked, Ordering::SeqCst);
+    }
+
+    fn on_loss(&mut self) {
+        let cur = self.cwnd.load(Ordering::SeqCst);
+        self.w_max.store(cur, Ordering::SeqCst);
+        self.cwnd.store((cur * 7) / 10, Ordering::SeqCst);
+    }
+
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SackBlock {
+    pub start: u32,
+    pub end: u32,
+}
+
+pub struct NewRenoSackCongestionControl {
+    pub cwnd: AtomicUsize,
+    pub sack_blocks: Vec<SackBlock>,
+    pub in_fast_recovery: bool,
+}
+
+impl NewRenoSackCongestionControl {
+    pub fn new() -> Self {
+        Self {
+            cwnd: AtomicUsize::new(10),
+            sack_blocks: Vec::new(),
+            in_fast_recovery: false,
+        }
+    }
+
+    pub fn process_sack(&mut self, start: u32, end: u32) {
+        self.sack_blocks.push(SackBlock { start, end });
+    }
+
+    pub fn enter_fast_recovery(&mut self) {
+        self.in_fast_recovery = true;
+    }
+
+    pub fn exit_fast_recovery(&mut self) {
+        self.in_fast_recovery = false;
+        self.sack_blocks.clear();
+    }
+
+    pub fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
+}
+
+impl Default for NewRenoSackCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TcpOption {
+    Mss(u16),
+    WindowScale(u8),
+    SackPermitted,
+}
+
+pub struct TcpOptionParser;
+
+impl TcpOptionParser {
+    pub fn parse(raw: &[u8]) -> Vec<TcpOption> {
+        let mut opts = Vec::new();
+        let mut idx = 0;
+        while idx < raw.len() {
+            let kind = raw[idx];
+            if kind == 0 {
+                break;
+            }
+            if kind == 1 {
+                idx += 1;
+                continue;
+            }
+            if idx + 1 >= raw.len() {
+                break;
+            }
+            let len = raw[idx + 1] as usize;
+            if len < 2 || idx + len > raw.len() {
+                break;
+            }
+            match kind {
+                2 if len == 4 => {
+                    let mss = ((raw[idx + 2] as u16) << 8) | (raw[idx + 3] as u16);
+                    opts.push(TcpOption::Mss(mss));
+                }
+                3 if len == 3 => {
+                    opts.push(TcpOption::WindowScale(raw[idx + 2]));
+                }
+                4 if len == 2 => {
+                    opts.push(TcpOption::SackPermitted);
+                }
+                _ => {}
+            }
+            idx += len;
+        }
+        opts
+    }
+}
+
+pub struct UdpChecksumEngine;
+
+impl UdpChecksumEngine {
+    pub fn compute_checksum(src: [u8; 4], dst: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8]) -> u16 {
+        let mut sum: u32 = 0;
+        sum += ((src[0] as u32) << 8) | (src[1] as u32);
+        sum += ((src[2] as u32) << 8) | (src[3] as u32);
+        sum += ((dst[0] as u32) << 8) | (dst[1] as u32);
+        sum += ((dst[2] as u32) << 8) | (dst[3] as u32);
+        sum += 17; // UDP Protocol
+        sum += (8 + payload.len()) as u32;
+        sum += src_port as u32;
+        sum += dst_port as u32;
+        sum += (8 + payload.len()) as u32;
+
+        for chunk in payload.chunks(2) {
+            if chunk.len() == 2 {
+                sum += ((chunk[0] as u32) << 8) | (chunk[1] as u32);
+            } else {
+                sum += (chunk[0] as u32) << 8;
+            }
+        }
+
+        while (sum >> 16) != 0 {
+            sum = (sum & 0xFFFF) + (sum >> 16);
+        }
+
+        let csum = !(sum as u16);
+        if csum == 0 { 0xFFFF } else { csum }
+    }
+
+    pub fn verify_checksum(src: [u8; 4], dst: [u8; 4], src_port: u16, dst_port: u16, payload: &[u8], expected: u16) -> bool {
+        let actual = Self::compute_checksum(src, dst, src_port, dst_port, payload);
+        actual == expected
+    }
+}
+
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<Box<dyn Socket>>>,
     pub next_id: AtomicUsize,

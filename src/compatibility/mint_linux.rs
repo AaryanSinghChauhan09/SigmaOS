@@ -657,6 +657,7 @@ pub enum LoopbackDiskFormat {
 pub enum WindowsBootloaderType {
     Ntldr,        // Windows XP / Server 2003
     BcdBootmgr,   // Windows Vista / 7 / 8 / 10 / 11
+    BcdUefi,      // Windows UEFI BCD Bootloader
     Grub4Dos,     // Legacy MBR chainloader
     UefiEfiEntry, // UEFI NVRAM Boot Entry
 }
@@ -685,6 +686,102 @@ impl Mint4WinInstallationConfig {
             default_username: username.to_string(),
             host_os_version: "Windows 11".to_string(),
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NtfsFastStartupState {
+    Clean,
+    DirtyHibernated,
+}
+
+#[derive(Debug, Clone)]
+pub struct Mint4WinConfig {
+    pub target_drive_letter: char,
+    pub install_folder: String,
+    pub root_disk_size_mb: u64,
+    pub swap_disk_size_mb: u64,
+    pub username: String,
+    pub language: String,
+    pub bootloader_type: WindowsBootloaderType,
+}
+
+#[derive(Debug, Clone)]
+pub struct VirtualDiskImage {
+    pub windows_path: String,
+    pub size_mb: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowsUninstallerEntry {
+    pub key_path: String,
+    pub uninstall_string: String,
+}
+
+pub struct Mint4WinInstaller {
+    pub config: Mint4WinConfig,
+    pub fast_startup_state: NtfsFastStartupState,
+    pub root_disk: Option<VirtualDiskImage>,
+    pub bcd_entry_guid: Option<String>,
+}
+
+impl Mint4WinInstaller {
+    pub fn new(config: Mint4WinConfig) -> Self {
+        Self {
+            config,
+            fast_startup_state: NtfsFastStartupState::Clean,
+            root_disk: None,
+            bcd_entry_guid: None,
+        }
+    }
+
+    pub fn detect_ntfs_fast_startup(&mut self, is_hibernated: bool, _is_dirty: bool) -> NtfsFastStartupState {
+        if is_hibernated {
+            self.fast_startup_state = NtfsFastStartupState::DirtyHibernated;
+        } else {
+            self.fast_startup_state = NtfsFastStartupState::Clean;
+        }
+        self.fast_startup_state
+    }
+
+    pub fn create_loopback_disks(&mut self) -> Result<(), &'static str> {
+        if self.fast_startup_state == NtfsFastStartupState::DirtyHibernated {
+            return Err("Cannot install on hibernated NTFS partition");
+        }
+        self.root_disk = Some(VirtualDiskImage {
+            windows_path: format!("C:\\{}\\disks\\root.disk", self.config.install_folder),
+            size_mb: self.config.root_disk_size_mb,
+        });
+        Ok(())
+    }
+
+    pub fn register_windows_boot_entry(&mut self) -> String {
+        self.bcd_entry_guid = Some("{a1b2c3d4-e5f6-7890-abcd-1234567890ab}".to_string());
+        "bcdedit /create {guid} /d \"SigmaOS Linux Mint\"".to_string()
+    }
+
+    pub fn register_windows_uninstaller(&self) -> WindowsUninstallerEntry {
+        WindowsUninstallerEntry {
+            key_path: "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SigmaOS_mint4win".to_string(),
+            uninstall_string: format!("C:\\{}\\uninstall.exe", self.config.install_folder),
+        }
+    }
+
+    pub fn expand_root_disk(&mut self, additional_mb: u64) -> Result<u64, &'static str> {
+        if let Some(ref mut disk) = self.root_disk {
+            disk.size_mb += additional_mb;
+            Ok(disk.size_mb)
+        } else {
+            Err("Root disk not created")
+        }
+    }
+
+    pub fn execute_uninstallation(&mut self) -> Result<u64, &'static str> {
+        let root_size = self.root_disk.as_ref().map(|d| d.size_mb).unwrap_or(0);
+        let reclaimed = root_size + self.config.swap_disk_size_mb;
+        self.root_disk = None;
+        self.bcd_entry_guid = None;
+        Ok(reclaimed)
     }
 }
 

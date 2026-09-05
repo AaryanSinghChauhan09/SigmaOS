@@ -6,7 +6,11 @@ use std::vec::Vec;
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -647,7 +651,7 @@ impl SigmaPkg {
         Ok(())
     }
 
-    fn upgrade_package(&mut self, old: &Package, new: &Package) -> Result<(), String> {
+    fn upgrade_package(&mut self, _old: &Package, new: &Package) -> Result<(), String> {
         // Run pre-upgrade hooks
         self.run_hooks("pre_upgrade", new)?;
 

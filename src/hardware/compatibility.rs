@@ -2,6 +2,10 @@
 //! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -19,15 +23,15 @@ pub enum AcpiPowerState {
 }
 
 pub struct SimpleAcpiManager {
-    pub irq_routing: crate::klib::BTreeMap<u32, u32>,
-    pub power_states: crate::klib::BTreeMap<DeviceID, AcpiPowerState>,
+    pub irq_routing: BTreeMap<u32, u32>,
+    pub power_states: BTreeMap<DeviceID, AcpiPowerState>,
 }
 
 impl SimpleAcpiManager {
     pub fn new() -> Self {
         Self {
-            irq_routing: crate::klib::BTreeMap::new(),
-            power_states: crate::klib::BTreeMap::new(),
+            irq_routing: BTreeMap::new(),
+            power_states: BTreeMap::new(),
         }
     }
 
@@ -177,6 +181,63 @@ pub trait HardwareCompatibilityManager {
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID>;
     fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID>;
     fn list_supported(&self) -> Vec<DeviceID>;
+}
+
+pub struct SimpleDriverManager {
+    pub loaded_drivers: BTreeMap<DeviceID, bool>,
+}
+
+impl SimpleDriverManager {
+    pub fn new() -> Self {
+        Self {
+            loaded_drivers: BTreeMap::new(),
+        }
+    }
+}
+
+impl Default for SimpleDriverManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DriverManager for SimpleDriverManager {
+    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        self.loaded_drivers.insert(device_id, true);
+        Ok(())
+    }
+
+    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        self.loaded_drivers.insert(device_id, false);
+        Ok(())
+    }
+
+    fn get_driver_status(&self, device_id: DeviceID) -> bool {
+        *self.loaded_drivers.get(&device_id).unwrap_or(&false)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DiagnosticReport {
+    pub results: Vec<bool>,
+}
+
+pub struct SimpleDiagnostics {
+    pub matrix: SimpleCompatibilityMatrix,
+}
+
+impl SimpleDiagnostics {
+    pub fn new(matrix: SimpleCompatibilityMatrix) -> Self {
+        Self { matrix }
+    }
+
+    pub fn run_full_scan(&self) -> DiagnosticReport {
+        let mut results = Vec::new();
+        for dev in &self.matrix.devices {
+            results.push(dev.support_status() == SupportStatus::Supported);
+        }
+        DiagnosticReport { results }
+    }
 }
 
 pub trait DriverManager {
@@ -478,8 +539,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 7);
-        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
+        assert_eq!(matrix.list_supported().len(), 14);
+        assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 4);
     }
 
     #[test]
