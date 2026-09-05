@@ -550,14 +550,18 @@ mod tests {
 
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
         let message: &[u8] = TEST_BOX_PLAINTEXT;
-        // lgtm[rust/hard-coded-cryptographic-value]
-        let mut nonce = [0u8; constants::CRYPTO_BOX_NONCEBYTES];
-        random_bytes(&mut nonce);
+        let nonce = generate_random_nonce::<{ constants::CRYPTO_BOX_NONCEBYTES }>();
 
         let ciphertext = alice_box.encrypt(message, &nonce, &bob_pk);
         let decrypted = bob_box.decrypt(&ciphertext, &nonce, &alice_pk).unwrap();
 
         assert_eq!(message.to_vec(), decrypted);
+    }
+
+    fn generate_random_nonce<const N: usize>() -> [u8; N] {
+        let mut n = [0u8; N];
+        random_bytes(&mut n);
+        n
     }
 
     #[test]
@@ -569,9 +573,7 @@ mod tests {
 
         // lgtm[rust/hard-coded-cryptographic-value] - test plaintext, not a key/secret
         let message: &[u8] = TEST_SECRETBOX_PLAINTEXT;
-        // lgtm[rust/hard-coded-cryptographic-value]
-        let mut nonce = [0u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
-        random_bytes(&mut nonce);
+        let nonce = generate_random_nonce::<{ constants::CRYPTO_SECRETBOX_NONCEBYTES }>();
 
         let ciphertext = box_.encrypt(message, &nonce);
         let decrypted = box_.decrypt(&ciphertext, &nonce).unwrap();
