@@ -173,7 +173,10 @@ impl PackageFormat {
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
             || normalized.ends_with(".pkg.tar.gz")
-            || normalized.contains("pacman")
+            || normalized.ends_with(".pkg.tar")
+            || normalized.ends_with(".pkgbuild")
+            || normalized.ends_with(".pacman")
+            || (normalized.contains("pacman") && !normalized.ends_with(".pkg"))
         {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".snap") {
@@ -1146,8 +1149,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            PackageFormat::Nix => Box::new(NixInstallStrategy),
-            PackageFormat::Txz => Box::new(TxzInstallStrategy),
             _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
@@ -1203,8 +1204,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            PackageFormat::Nix => Box::new(NixMetadataAdapter),
-            PackageFormat::Txz => Box::new(TxzMetadataAdapter),
             _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
@@ -2271,7 +2270,7 @@ impl UniversalPackageFormatBridge {
         }
 
         if !raw_data.is_empty() {
-            pkg.checksum = format!("{:x}", raw_data.len() * 31);
+            pkg.properties.insert("checksum".to_string(), format!("{:x}", raw_data.len() * 31));
         }
 
         Ok(pkg)
@@ -2753,16 +2752,16 @@ mod tests {
     #[test]
     fn test_universal_package_format_bridge() {
         let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert_eq!(deb_pkg.format, PackageFormat::Deb);
+        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
         assert_eq!(deb_pkg.name, "nginx");
         assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
 
         let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert_eq!(rpm_pkg.format, PackageFormat::Rpm);
+        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
         assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
 
         let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert_eq!(apk_pkg.format, PackageFormat::Apk);
+        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }
