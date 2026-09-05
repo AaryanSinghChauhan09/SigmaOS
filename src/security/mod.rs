@@ -6,6 +6,7 @@ pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
+pub mod user_namespace;
 
 pub mod bridge;
 pub mod bsd_hardening;

@@ -20,3 +20,5 @@ pub mod table;
 pub mod namespace_syscalls;
 pub mod inotify_syscalls;
 pub mod kevent_syscalls;
+pub mod uts_syscalls;
+pub mod user_syscalls;
