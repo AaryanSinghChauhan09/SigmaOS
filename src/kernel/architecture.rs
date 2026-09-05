@@ -27,8 +27,10 @@ pub enum ThreadState {
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitectureClass {
+    X86_32,
     X86_64,
     AArch64,
+    RiscV32,
     RiscV64,
 }
 
@@ -128,7 +130,38 @@ impl LookasideList {
     }
 }
 
-// 7. Multi-Architecture HAL Abstractions (x86_64, AArch64, RISC-V 64)
+// 7. Multi-Architecture HAL Abstractions (x86_32, x86_64, AArch64, RISC-V 32, RISC-V 64)
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct X86_32Hal {
+    pub pic_master_base: u16,
+    pub pic_slave_base: u16,
+    pub cr0: u32,
+    pub cr3: u32,
+}
+
+impl X86_32Hal {
+    pub fn new() -> Self {
+        Self {
+            pic_master_base: 0x20,
+            pic_slave_base: 0xA0,
+            cr0: 0x8000_0001, // PE & PG enabled
+            cr3: 0x0010_0000, // Page directory base
+        }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "x86_32 (IA-32)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "2-Level Paging (10-10-12) / PAE"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "Ring 0 (Kernel) / Ring 3 (User)"
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct X86_64Hal {
@@ -148,6 +181,18 @@ impl X86_64Hal {
             cr4: 0x0000_06B0,  // PAE, PGE, OSFXSR, OSXMMEXCPT
             efer: 0x0000_0D01, // LME, LMA, NXE
         }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "x86_64 (AMD64)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "4-Level PML4 / 5-Level PML5"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "Ring 0 (Kernel) / Ring 3 (User)"
     }
 }
 
@@ -170,6 +215,49 @@ impl AArch64Hal {
             sctlr_el1: 0x30D0_0800, // MMU, Caches enabled
         }
     }
+
+    pub fn arch_name(&self) -> &'static str {
+        "AArch64 (ARM64)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "48-bit Virtual Addressing (TTBR0/TTBR1)"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "EL0 (User) / EL1 (Kernel) / EL2 (Hypervisor) / EL3 (Monitor)"
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RiscV32Hal {
+    pub plic_base: u32,
+    pub clint_base: u32,
+    pub satp: u32,
+    pub sstatus: u32,
+}
+
+impl RiscV32Hal {
+    pub fn new() -> Self {
+        Self {
+            plic_base: 0x0C00_0000,
+            clint_base: 0x0200_0000,
+            satp: (1u32 << 31) | 0x0000_1000, // Sv32 mode (MODE = 1)
+            sstatus: 0x0000_0020,
+        }
+    }
+
+    pub fn arch_name(&self) -> &'static str {
+        "RiscV32 (RV32I)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "Sv32 2-Level Paging"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "U-Mode (User) / S-Mode (Supervisor) / M-Mode (Machine)"
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -189,6 +277,18 @@ impl RiscV64Hal {
             sstatus: 0x0000_0020,             // SIE (Supervisor Interrupt Enable)
         }
     }
+
+    pub fn arch_name(&self) -> &'static str {
+        "RiscV64 (RV64I)"
+    }
+
+    pub fn paging_mode(&self) -> &'static str {
+        "Sv39 / Sv48 Page Translation"
+    }
+
+    pub fn privilege_levels(&self) -> &'static str {
+        "U-Mode (User) / S-Mode (Supervisor) / M-Mode (Machine)"
+    }
 }
 
 #[cfg(test)]
@@ -197,15 +297,37 @@ mod tests {
 
     #[test]
     fn test_multi_arch_hal_initialization() {
-        let x86 = X86_64Hal::new();
-        assert_eq!(x86.lapic_base, 0xFEE0_0000);
-        assert_ne!(x86.cr0 & (1 << 31), 0); // Paging enabled bit
+        let x86_32 = X86_32Hal::new();
+        assert_eq!(x86_32.pic_master_base, 0x20);
+        assert_eq!(x86_32.arch_name(), "x86_32 (IA-32)");
+
+        let x86_64 = X86_64Hal::new();
+        assert_eq!(x86_64.lapic_base, 0xFEE0_0000);
+        assert_ne!(x86_64.cr0 & (1 << 31), 0); // Paging enabled bit
+        assert_eq!(x86_64.arch_name(), "x86_64 (AMD64)");
 
         let arm = AArch64Hal::new();
         assert_eq!(arm.gicd_base, 0x0800_0000);
+        assert_eq!(arm.arch_name(), "AArch64 (ARM64)");
 
-        let riscv = RiscV64Hal::new();
-        assert_eq!(riscv.satp >> 60, 8); // Sv39 mode bit
+        let riscv32 = RiscV32Hal::new();
+        assert_eq!(riscv32.plic_base, 0x0C00_0000);
+        assert_eq!(riscv32.arch_name(), "RiscV32 (RV32I)");
+
+        let riscv64 = RiscV64Hal::new();
+        assert_eq!(riscv64.satp >> 60, 8); // Sv39 mode bit
+        assert_eq!(riscv64.arch_name(), "RiscV64 (RV64I)");
+
+        let engine_arm = ArchitectureEngine::with_architecture(CpuArchitectureClass::AArch64);
+        let (name, paging, privs) = engine_arm.get_arch_info();
+        assert_eq!(name, "AArch64 (ARM64)");
+        assert!(paging.contains("Virtual Addressing"));
+        assert!(privs.contains("EL0"));
+
+        let engine_riscv32 = ArchitectureEngine::with_architecture(CpuArchitectureClass::RiscV32);
+        let (r32_name, r32_paging, _) = engine_riscv32.get_arch_info();
+        assert_eq!(r32_name, "RiscV32 (RV32I)");
+        assert_eq!(r32_paging, "Sv32 2-Level Paging");
     }
 
     #[test]
@@ -344,6 +466,7 @@ impl SystemServiceDescriptorTable {
 // 6. Unified Architecture Engine
 
 pub struct ArchitectureEngine {
+    pub architecture_class: CpuArchitectureClass,
     pub init_state: ProcessorInitState,
     pub current_irql: Irql,
     pub ssdt: SystemServiceDescriptorTable,
@@ -355,12 +478,51 @@ pub struct ArchitectureEngine {
 impl ArchitectureEngine {
     pub fn new() -> Self {
         Self {
+            architecture_class: CpuArchitectureClass::X86_64,
             init_state: ProcessorInitState::Offline,
             current_irql: Irql::PassiveLevel,
             ssdt: SystemServiceDescriptorTable::new(),
             lookaside_nonpaged: LookasideList::new(PoolType::NonPagedPool, 1024),
             lookaside_paged: LookasideList::new(PoolType::PagedPool, 1024),
             running_pcb: None,
+        }
+    }
+
+    pub fn with_architecture(architecture_class: CpuArchitectureClass) -> Self {
+        Self {
+            architecture_class,
+            init_state: ProcessorInitState::Offline,
+            current_irql: Irql::PassiveLevel,
+            ssdt: SystemServiceDescriptorTable::new(),
+            lookaside_nonpaged: LookasideList::new(PoolType::NonPagedPool, 1024),
+            lookaside_paged: LookasideList::new(PoolType::PagedPool, 1024),
+            running_pcb: None,
+        }
+    }
+
+    /// Returns architecture name, paging mode, and privilege level hierarchy for the active architecture
+    pub fn get_arch_info(&self) -> (&'static str, &'static str, &'static str) {
+        match self.architecture_class {
+            CpuArchitectureClass::X86_32 => {
+                let hal = X86_32Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::X86_64 => {
+                let hal = X86_64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::AArch64 => {
+                let hal = AArch64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::RiscV32 => {
+                let hal = RiscV32Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
+            CpuArchitectureClass::RiscV64 => {
+                let hal = RiscV64Hal::new();
+                (hal.arch_name(), hal.paging_mode(), hal.privilege_levels())
+            }
         }
     }
 
