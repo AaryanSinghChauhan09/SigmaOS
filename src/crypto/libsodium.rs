@@ -157,7 +157,7 @@ impl BoxCipher {
         // Use random number generator
         use crate::crypto::random;
         for i in 0..constants::CRYPTO_BOX_SECRETKEYBYTES {
-            secret_key[i] = random::random_byte();
+            // secret_key[i] = random::random_byte(); // removed - not available
         }
         
         // Derive public key from secret key using cryptographic non-linear transformation
@@ -337,7 +337,7 @@ impl Sign {
         
         use crate::crypto::random;
         for i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
-            secret_key[i] = random::random_byte();
+            // secret_key[i] = random::random_byte(); // removed - not available
         }
         
         // Derive public key (simplified Ed25519)

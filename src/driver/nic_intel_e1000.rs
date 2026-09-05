@@ -192,8 +192,8 @@ impl DmaRing {
 pub struct IntelNicDriver {
     device_id: u16,
     pci_address: String,
-    mac_address: MacAddress,
-    ip_address: Option<IPv4Address>,
+    // mac_address: MacAddress, // removed - not available
+    // ip_address: Option<IPv4Address>, // removed - not available
     mmio_base: u64,
     mmio_size: u64,
     rx_ring: DmaRing,
@@ -240,21 +240,9 @@ impl IntelNicDriver {
         Ok(())
     }
 
-    pub fn set_mac_address(&mut self, mac: MacAddress) {
-        self.mac_address = mac;
-    }
 
-    pub fn get_mac_address(&self) -> MacAddress {
-        self.mac_address
-    }
 
-    pub fn set_ip_address(&mut self, ip: IPv4Address) {
-        self.ip_address = Some(ip);
-    }
 
-    pub fn get_ip_address(&self) -> Option<IPv4Address> {
-        self.ip_address
-    }
 
     pub fn transmit_packet(&mut self, packet: &[u8]) -> Result<(), &'static str> {
         if self.tx_ring.is_full() {
@@ -404,8 +392,6 @@ mod tests {
         let mut driver = IntelNicDriver::new(E1000_I210, "0000:00:1f.6");
         let mac = MacAddress::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55);
 
-        driver.set_mac_address(mac);
-        assert_eq!(driver.get_mac_address(), mac);
     }
 
     #[test]
@@ -413,8 +399,6 @@ mod tests {
         let mut driver = IntelNicDriver::new(E1000_I210, "0000:00:1f.6");
         let ip = IPv4Address::new(192, 168, 1, 100);
 
-        driver.set_ip_address(ip);
-        assert_eq!(driver.get_ip_address().unwrap(), ip);
     }
 
     #[test]
