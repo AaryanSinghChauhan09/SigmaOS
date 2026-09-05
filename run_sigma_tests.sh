@@ -2,6 +2,10 @@
 # SigmaOS Native Test Runner
 # set -e replaced with per-test error handling for robust test suite
 
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+RESET='\033[0m'
+
 TEST_FAILURES=0
 
 run_test() {
