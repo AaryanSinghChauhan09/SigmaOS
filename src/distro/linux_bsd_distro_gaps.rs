@@ -600,6 +600,8 @@ impl Default for CronJobScheduler {
 // ============================================================================
 
 #[derive(Debug, Clone)]
+pub type DnsRecord = DnsRecordEntry;
+
 pub struct DnsRecordEntry {
     pub domain_name: &'static str,
     pub ip_address: [u8; 4],
@@ -678,6 +680,8 @@ pub enum DeviceNodeType {
 }
 
 #[derive(Debug, Clone)]
+pub type DynamicDeviceNode = DeviceNodeEntry;
+
 pub struct DeviceNodeEntry {
     pub name: &'static str,
     pub node_type: DeviceNodeType,
@@ -739,10 +743,10 @@ impl SovereignDynamicDevfsEngine {
         }
     }
 
-    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
-        self.nodes
+    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
+        self.devices
             .iter()
-            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+            .find(|d| d.name == path || d.symlink_paths.iter().any(|&s| s == path))
     }
 }
 
@@ -762,7 +766,16 @@ pub enum NatType {
     Dnat,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatRuleKind {
+    Snat,
+    Dnat,
+    Masquerade,
+}
+
+pub type ConnectionTrackEntry = ConntrackTableEntry;
+pub type NatRule = ConntrackTableEntry;
+
 pub struct ConntrackTableEntry {
     pub original_src: [u8; 4],
     pub original_dst: [u8; 4],
@@ -836,7 +849,20 @@ impl SovereignStatefulNatEngine {
 // 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
 // ============================================================================
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JournalLogLevel {
+    Emerg = 0,
+    Alert = 1,
+    Crit = 2,
+    Err = 3,
+    Warning = 4,
+    Notice = 5,
+    Info = 6,
+    Debug = 7,
+}
+
+pub type JournalBinaryRecord = JournaldLogRecord;
+
 pub struct JournaldLogRecord {
     pub timestamp_unix_epoch: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
