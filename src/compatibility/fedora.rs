@@ -3409,6 +3409,13 @@ pub struct IgnitionUser {
     pub groups: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionSystemdUnit {
+    pub name: String,
+    pub enabled: bool,
+    pub contents: String,
+}
+
 /// Fedora Ignition First-Boot Declarative Provisioning Engine
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.

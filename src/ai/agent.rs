@@ -466,13 +466,14 @@ impl Default for ManagerCapability {
 /// Simple AI agent manager
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
+    pub stats_data: AIStats,
 }
 
 impl SimpleAIAgentManager {
     pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
-            stats: AIStats::new(),
+            stats_data: AIStats::new(),
         }
     }
 }
@@ -487,7 +488,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
         let id = self.agents.len();
         self.agents.push(agent);
-        self.stats.total_agents += 1;
+        self.stats_data.total_agents += 1;
         Ok(id)
     }
 
@@ -496,22 +497,26 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError> {
-        self.stats.total_requests += 1;
+        self.stats_data.total_requests += 1;
         if let Some(agent) = self.agents.get_mut(id) {
             let intent = agent.parse(input)?;
             match agent.execute(&intent) {
                 Ok(res) => {
-                    self.stats.successful_requests += 1;
+                    self.stats_data.successful_requests += 1;
                     Ok(res)
                 }
                 Err(e) => {
-                    self.stats.failed_requests += 1;
+                    self.stats_data.failed_requests += 1;
                     Err(e)
                 }
             }
         } else {
             Err(AIError::InvalidInput)
         }
+    }
+
+    fn stats(&self) -> AIStats {
+        self.stats_data
     }
 }
 
