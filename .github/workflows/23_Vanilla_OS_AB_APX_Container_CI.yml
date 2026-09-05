@@ -1,0 +1,21 @@
+name: Vanilla OS A/B Atomic Image & APX Container CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  vanilla-apx-audit:
+    name: Vanilla OS A/B Atomic System Update & APX Container Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Vanilla OS A/B & APX Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/vanilla_test && /tmp/vanilla_test

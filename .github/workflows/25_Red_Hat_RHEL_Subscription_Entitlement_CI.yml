@@ -1,0 +1,21 @@
+name: Red Hat RHEL RHSM Subscription & FIPS CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  rhel-rhsm-audit:
+    name: Red Hat RHEL RHSM Entitlement & FIPS Cryptography Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify RHEL RHSM Entitlement Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/rhel_test && /tmp/rhel_test

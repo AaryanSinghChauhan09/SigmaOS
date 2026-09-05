@@ -1,0 +1,21 @@
+name: DragonFly BSD HAMMER2 PFS Zero-Cost Snapshot CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  hammer2-pfs-audit:
+    name: DragonFly BSD HAMMER2 PFS Zero-Cost Snapshot Engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify HAMMER2 Snapshot Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/hammer_test && /tmp/hammer_test

@@ -1,0 +1,21 @@
+name: Qubes OS Xen Qrexec Domain Isolation CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  qubes-xen-audit:
+    name: Qubes OS Xen Hypervisor Isolation & Qrexec RPC Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Security & Isolation Rules
+        run: |
+          rustc --test src/security/rules.rs --edition=2021 -o /tmp/qubes_sec_test && /tmp/qubes_sec_test

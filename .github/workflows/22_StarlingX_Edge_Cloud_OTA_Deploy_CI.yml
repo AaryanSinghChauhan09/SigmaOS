@@ -1,0 +1,21 @@
+name: StarlingX Edge Cloud OTA Deployment & HA CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  starlingx-ota-audit:
+    name: StarlingX Edge Cloud OTA Deployment & Dual-Controller HA Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify StarlingX Edge OTA Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/starling_test && /tmp/starling_test

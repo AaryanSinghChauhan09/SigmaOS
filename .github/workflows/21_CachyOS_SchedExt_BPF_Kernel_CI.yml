@@ -1,0 +1,21 @@
+name: CachyOS BPF sched_ext Kernel Scheduler CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  cachyos-schedext-audit:
+    name: CachyOS BPF sched_ext Kernel Scheduler & AVX-512 Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify CachyOS BPF Sched_ext Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/cachy_test && /tmp/cachy_test

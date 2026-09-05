@@ -1,0 +1,21 @@
+name: Arch Linux Pacman SIMD Vectorized Build CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  arch-pacman-simd-audit:
+    name: Arch Linux makepkg SIMD Vectorization & ALPM Hook Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Arch Pacman & AUR Web Engine
+        run: |
+          rustc --test src/sigpkg/aurweb.rs --edition=2021 -o /tmp/aurweb_test && /tmp/aurweb_test

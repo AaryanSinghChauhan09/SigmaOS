@@ -1,0 +1,21 @@
+name: GNU Guix Scheme Functional AST Derivation CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  guix-ast-audit:
+    name: GNU Guix Scheme AST Functional Package Derivations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify GNU Guix Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/guix_test && /tmp/guix_test
