@@ -42,6 +42,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
+    ProcessExec,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2202,7 +2203,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_add" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2214,6 +2215,55 @@ impl UniversalPmCommandDispatcher {
                         "ug" | "full-upgrade" => operation = UniversalPmOperation::Upgrade,
                         "se" | "search" => operation = UniversalPmOperation::Search,
                         "-n" | "-s" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "flatpak" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "snap" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "remove" => operation = UniversalPmOperation::Remove,
+                        "refresh" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "find" | "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "yay" | "paru" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
+                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
+                        "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
+                        "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
+                        "--print" | "--dryrun" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }

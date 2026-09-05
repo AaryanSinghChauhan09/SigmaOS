@@ -158,10 +158,77 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
-    // 7. Command Dispatcher
+    // 7. Command Dispatcher Multi-Distro Suite
     let dispatcher = UniversalPmCommandDispatcher::new();
+
+    // APT
     let action = dispatcher.dispatch_command("apt install curl -y").unwrap();
     assert_eq!(action.source_pm, "apt");
     assert_eq!(action.operation, UniversalPmOperation::Install);
     assert_eq!(action.target_packages, vec!["curl"]);
+
+    // Pacman
+    let action_pacman = dispatcher.dispatch_command("pacman -S --noconfirm firefox").unwrap();
+    assert_eq!(action_pacman.source_pm, "pacman");
+    assert_eq!(action_pacman.operation, UniversalPmOperation::Install);
+    assert_eq!(action_pacman.target_packages, vec!["firefox"]);
+
+    // DNF / YUM
+    let action_dnf = dispatcher.dispatch_command("dnf install htop").unwrap();
+    assert_eq!(action_dnf.source_pm, "dnf");
+    assert_eq!(action_dnf.operation, UniversalPmOperation::Install);
+    assert_eq!(action_dnf.target_packages, vec!["htop"]);
+
+    // Zypper
+    let action_zypper = dispatcher.dispatch_command("zypper in --no-confirm vlc").unwrap();
+    assert_eq!(action_zypper.source_pm, "zypper");
+    assert_eq!(action_zypper.operation, UniversalPmOperation::Install);
+    assert_eq!(action_zypper.target_packages, vec!["vlc"]);
+
+    // APK (Alpine)
+    let action_apk = dispatcher.dispatch_command("apk add musl-dev").unwrap();
+    assert_eq!(action_apk.source_pm, "apk");
+    assert_eq!(action_apk.operation, UniversalPmOperation::Install);
+    assert_eq!(action_apk.target_packages, vec!["musl-dev"]);
+
+    // XBPS (Void)
+    let action_xbps = dispatcher.dispatch_command("xbps-install -S bash").unwrap();
+    assert_eq!(action_xbps.source_pm, "xbps-install");
+    assert_eq!(action_xbps.operation, UniversalPmOperation::Install);
+    assert_eq!(action_xbps.target_packages, vec!["bash"]);
+
+    // FreeBSD / OpenBSD pkg
+    let action_pkg = dispatcher.dispatch_command("pkg install nginx").unwrap();
+    assert_eq!(action_pkg.source_pm, "pkg");
+    assert_eq!(action_pkg.operation, UniversalPmOperation::Install);
+    assert_eq!(action_pkg.target_packages, vec!["nginx"]);
+
+    // Gentoo emerge
+    let action_emerge = dispatcher.dispatch_command("emerge -a sys-apps/portage").unwrap();
+    assert_eq!(action_emerge.source_pm, "emerge");
+    assert_eq!(action_emerge.target_packages, vec!["sys-apps/portage"]);
+    assert!(action_emerge.dry_run);
+
+    // Nix / Guix
+    let action_nix = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
+    assert_eq!(action_nix.source_pm, "nix-env");
+    assert_eq!(action_nix.operation, UniversalPmOperation::Install);
+    assert_eq!(action_nix.target_packages, vec!["nixpkgs.git"]);
+
+    // Flatpak & Snap
+    let action_flatpak = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+    assert_eq!(action_flatpak.source_pm, "flatpak");
+    assert_eq!(action_flatpak.operation, UniversalPmOperation::Install);
+    assert_eq!(action_flatpak.target_packages, vec!["org.gimp.GIMP"]);
+
+    let action_snap = dispatcher.dispatch_command("snap install code --classic").unwrap();
+    assert_eq!(action_snap.source_pm, "snap");
+    assert_eq!(action_snap.operation, UniversalPmOperation::Install);
+    assert_eq!(action_snap.target_packages, vec!["code"]);
+
+    // Arch AUR helper (yay)
+    let action_yay = dispatcher.dispatch_command("yay -S visual-studio-code-bin").unwrap();
+    assert_eq!(action_yay.source_pm, "yay");
+    assert_eq!(action_yay.operation, UniversalPmOperation::Install);
+    assert_eq!(action_yay.target_packages, vec!["visual-studio-code-bin"]);
 }

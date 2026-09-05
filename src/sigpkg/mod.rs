@@ -96,6 +96,8 @@ pub use universal_adapter::{
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,
     SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
     UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
+    UniversalPmCommandDispatcher, DispatchedPmAction, UniversalPmOperation,
+    SigPkgUniversalBridgeEngine,
 };
 pub use sovereign_sigpkg::*;
 

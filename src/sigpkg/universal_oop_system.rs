@@ -26,10 +26,10 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(not(test))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
 use std::sync::Arc;
