@@ -1,5 +1,7 @@
 // SigmaOS Filesystem Module
 pub mod archive;
+pub mod file_monitor;
+pub mod watch;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
 pub mod defragmenter;
@@ -36,3 +38,7 @@ pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, Symlink
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSystem, VirtualFileSystem as VirtualFilesystem, VfsError, VfsError as FsError, FileSystem as VfsFileSystem, Inode, FileType, MountPoint};
 pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
+pub use file_monitor::{
+    EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
+};
+pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};

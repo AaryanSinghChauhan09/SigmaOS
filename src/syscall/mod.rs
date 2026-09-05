@@ -18,3 +18,4 @@ pub mod dispatcher;
 pub mod interface;
 pub mod table;
 pub mod namespace_syscalls;
+pub mod inotify_syscalls;
