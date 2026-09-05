@@ -156,6 +156,11 @@ pub enum PackageFormat {
     ArchPkgBuild,// Arch PKGBUILD
     NixStore,   // Nix store
     Homebrew,   // Homebrew formula
+    Ipk,        // OpenWrt / opkg / Entware (.ipk)
+    Opkg,       // Yocto / OpenEmbedded (.opkg)
+    OpenBsdPkg, // OpenBSD pkg_add (.openbsd.tgz / .tgz)
+    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
+    GuixNar,    // GNU Guix / Nix Archive (.nar)
 }
 
 impl PackageFormat {
@@ -258,6 +263,16 @@ impl PackageFormat {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
+        } else if normalized.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if normalized.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if normalized.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else {
             None
         }
@@ -2651,6 +2666,11 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("arch_pacman.pkg"), Some(PackageFormat::Pkg));
         assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
         assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
+        assert_eq!(PackageFormat::from_filename("router.ipk"), Some(PackageFormat::Ipk));
+        assert_eq!(PackageFormat::from_filename("embedded.opkg"), Some(PackageFormat::Opkg));
+        assert_eq!(PackageFormat::from_filename("solaris.p5p"), Some(PackageFormat::SolarisIps));
+        assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
+        assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
     }
 
     #[test]
