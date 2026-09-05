@@ -7,6 +7,7 @@ pub mod disk_usage;
 pub mod ext4_ntfs_security;
 pub mod ext4_mount;
 pub mod manager;
+pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
@@ -30,6 +31,7 @@ pub use manager::{
     ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
+pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSystem, VirtualFileSystem as VirtualFilesystem, VfsError, VfsError as FsError, FileSystem as VfsFileSystem, Inode, FileType, MountPoint};

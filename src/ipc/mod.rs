@@ -20,6 +20,7 @@ pub mod unix_socket;
 pub mod signals;
 pub mod async_io;
 pub mod std_streams;
+pub mod ipc_namespace;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
@@ -42,4 +43,10 @@ pub use async_io::{
 pub use std_streams::{
     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
+};
+
+pub use ipc_namespace::{
+    IpcNamespace, IpcObjectRegistry, IpcObjectType, MessageQueueObject, SemaphoreObject,
+    SharedMemoryObject, IpcNamespaceStats, MessageQueueId, SemaphoreId, SharedMemoryId,
+    IpcObjectId,
 };

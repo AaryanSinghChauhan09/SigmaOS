@@ -14,7 +14,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 pub mod process;
+pub mod pid_namespace;
+
 pub use process::{
     Process, ProcessCapability, ProcessManager, ProcessPriority, ProcessSignal, ProcessState,
     SupervisedServiceTarget,
 };
+pub use pid_namespace::{PidNamespace, PidNamespaceStats, ProcessId};

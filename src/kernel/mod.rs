@@ -30,6 +30,7 @@ pub mod linux_parity;
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
+pub mod namespaces;
 pub mod net;
 pub mod nextgen_breakthroughs;
 pub mod numa_allocator;
@@ -109,5 +110,9 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use namespaces::{
+    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceConfig, NamespaceError,
+    NamespaceIdGenerator, next_namespace_id, MAX_NAMESPACES, MAX_PIDS_PER_NAMESPACE,
+};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
