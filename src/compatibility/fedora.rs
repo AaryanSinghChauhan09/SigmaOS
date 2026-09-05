@@ -4090,6 +4090,13 @@ pub enum SystemRoleKind {
 
 
 
+#[derive(Debug, Clone)]
+pub struct FedoraSystemRolesEngine {
+    pub applied_roles: Vec<SystemRoleKind>,
+    pub chrony_ntp_servers: Vec<String>,
+    pub configured_firewall_ports: Vec<u16>,
+}
+
 impl FedoraSystemRolesEngine {
     pub fn new() -> Self {
         Self {

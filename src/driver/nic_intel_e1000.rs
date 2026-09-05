@@ -8,7 +8,8 @@ use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
-use crate::network::tcp_ip_implementation::{MacAddress, IPv4Address};
+// use crate::network::tcp_ip_implementation::{MacAddress, IPv4Address}; // Module not found
+
 
 // ============================================================================
 // Intel NIC Constants

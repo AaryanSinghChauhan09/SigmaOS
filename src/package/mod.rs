@@ -101,7 +101,8 @@ pub use repository::{
     TransactionJournalEntry,
 };
 pub use store::{
-    SigmaSoftwareStore, SoftwareRegistryEntry, StoreApp, StoreError, GLOBAL_SOFTWARE_STORE,
+    SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
+     GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,

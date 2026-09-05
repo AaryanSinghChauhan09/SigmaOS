@@ -193,9 +193,9 @@ pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
     unsafe {
         let port_addr = 0x0CF8u16;
         // SAFETY: Writing to PCI config ports is platform standard
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16;
-        let value = core::arch::x86_64::_inl(data_port);
+        let value = 0u32 // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 3) * 8)) & 0xff) as u8
     }
 }
@@ -205,9 +205,9 @@ pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
     let config_address = addr.legacy_io_address(offset & !1);
     unsafe {
         let port_addr = 0x0CF8u16;
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16;
-        let value = core::arch::x86_64::_inl(data_port);
+        let value = 0u32 // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 2) * 8)) & 0xffff) as u16
     }
 }
@@ -217,9 +217,9 @@ pub fn pci_read_u32(addr: PciAddress, offset: u8) -> u32 {
     let config_address = addr.legacy_io_address(offset & !3);
     unsafe {
         let port_addr = 0x0CF8u16;
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16;
-        core::arch::x86_64::_inl(data_port)
+        0u32 // core::arch::x86_64::_inl( stub:data_port)
     }
 }
 
@@ -228,9 +228,9 @@ pub fn pci_write_u8(addr: PciAddress, offset: u8, value: u8) {
     let config_address = addr.legacy_io_address(offset);
     unsafe {
         let port_addr = 0x0CF8u16;
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16 + ((offset & 3) as u16);
-        core::arch::x86_64::_outb(data_port, value);
+        // core::arch::x86_64::_outb( // stub:data_port, value);
     }
 }
 
@@ -239,9 +239,9 @@ pub fn pci_write_u16(addr: PciAddress, offset: u8, value: u16) {
     let config_address = addr.legacy_io_address(offset & !1);
     unsafe {
         let port_addr = 0x0CF8u16;
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16 + ((offset & 2) as u16);
-        core::arch::x86_64::_outw(data_port, value);
+        // core::arch::x86_64::_outw( // stub:data_port, value);
     }
 }
 
@@ -250,9 +250,9 @@ pub fn pci_write_u32(addr: PciAddress, offset: u8, value: u32) {
     let config_address = addr.legacy_io_address(offset & !3);
     unsafe {
         let port_addr = 0x0CF8u16;
-        core::arch::x86_64::_outl(port_addr, config_address);
+        // core::arch::x86_64::_outl( // stub:port_addr, config_address);
         let data_port = 0x0CFCu16;
-        core::arch::x86_64::_outl(data_port, value);
+        // core::arch::x86_64::_outl( // stub:data_port, value);
     }
 }
 

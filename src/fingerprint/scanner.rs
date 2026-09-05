@@ -171,13 +171,13 @@ impl<T> Vec<T> {
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_layout = core::std::Layout::array::<T>(new_capacity).unwrap();
-        let new_data = std::alloc(new_layout) as *mut T;
+        let new_layout = core::std::alloc::Layout::array::<T>(new_capacity).unwrap();
+        let new_data = std::alloc::alloc(new_layout) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
             if self.capacity > 0 {
-                let old_layout = core::std::Layout::array::<T>(self.capacity).unwrap();
-                std::dealloc(self.data as *mut u8, old_layout);
+                let old_layout = core::std::alloc::Layout::array::<T>(self.capacity).unwrap();
+                std::alloc::dealloc(self.data as *mut u8, old_layout);
             }
             self.data = new_data;
             self.capacity = new_capacity;

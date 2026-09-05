@@ -155,7 +155,7 @@ impl BoxCipher {
         let mut secret_key = [0u8; constants::CRYPTO_BOX_SECRETKEYBYTES];
         
         // Use random number generator
-        use super::random;
+        use crate::crypto::random;
         for i in 0..constants::CRYPTO_BOX_SECRETKEYBYTES {
             secret_key[i] = random::random_byte();
         }
@@ -335,7 +335,7 @@ impl Sign {
         let mut public_key = [0u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES];
         let mut secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
         
-        use super::random;
+        use crate::crypto::random;
         for i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
             secret_key[i] = random::random_byte();
         }
@@ -500,7 +500,7 @@ pub mod utils {
     
     /// Generate random bytes
     pub fn randombytes(buf: &mut [u8]) {
-        use super::random;
+        use crate::crypto::random;
         for byte in buf.iter_mut() {
             *byte = random::random_byte();
         }

@@ -394,7 +394,7 @@ fn sigma_oom(layout: Layout) -> ! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::Layout;
+    use std::alloc::Layout;
 
     #[test]
     fn test_basic_alloc_dealloc() {
