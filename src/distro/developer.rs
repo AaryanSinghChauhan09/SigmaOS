@@ -25,9 +25,15 @@ use std::collections::BTreeMap;
 /// Represents a compiled target architecture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum TargetArch {
+    X86_32,
     X86_64,
+    Arm32,
     Arm64,
+    Riscv32,
     Riscv64,
+    Wasm32,
+    LoongArch64,
+    Ppc64le,
 }
 
 /// Represents a developer compiler or builder tool.

@@ -699,9 +699,14 @@ impl Default for AndroidApexContainerModuleEngine {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArch {
+    X86_32,
     X86_64,
+    AArch32,
     AArch64,
+    RiscV32,
     RiscV64,
+    LoongArch64,
+    Ppc64Le,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

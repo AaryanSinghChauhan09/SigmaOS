@@ -6,16 +6,20 @@ use std::vec::Vec;
 /// Target CPU Architectures supported by SigmaOS Multi-Arch HAL
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArchitecture {
+    X86_32,
     X86_64,
+    Armv7,
     AArch64,
+    Riscv32,
     Riscv64,
     LoongArch64,
     Ppc64Le,
 }
 
-/// System Interrupt Controller Abstraction (x86 APIC/IOAPIC, ARM GICv2/v3, RISC-V PLIC/CLINT, LoongArch ExtIOI, PowerPC XIVE)
+/// System Interrupt Controller Abstraction (x86 PIC/APIC/IOAPIC, ARM GICv2/v3, RISC-V PLIC/CLINT, LoongArch ExtIOI, PowerPC XIVE)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptControllerKind {
+    X86Pic8259,
     X86ApicIoApic,
     ArmGicV2,
     ArmGicV3,
@@ -27,6 +31,18 @@ pub enum InterruptControllerKind {
 /// Architecture-specific register context snapshot
 #[derive(Debug, Clone)]
 pub enum CpuRegisterContext {
+    X86_32 {
+        eax: u32,
+        ebx: u32,
+        ecx: u32,
+        edx: u32,
+        esi: u32,
+        edi: u32,
+        esp: u32,
+        eip: u32,
+        eflags: u32,
+        cr3: u32,
+    },
     X86_64 {
         rax: u64,
         rbx: u64,
@@ -39,12 +55,26 @@ pub enum CpuRegisterContext {
         rflags: u64,
         cr3: u64,
     },
+    Armv7 {
+        r: [u32; 13],
+        sp: u32,
+        lr: u32,
+        pc: u32,
+        cpsr: u32,
+        ttbr0: u32,
+    },
     AArch64 {
         x: [u64; 31],
         sp: u64,
         pc: u64,
         pstate: u64,
         ttbr0_el1: u64,
+    },
+    Riscv32 {
+        x: [u32; 32],
+        pc: u32,
+        sstatus: u32,
+        satp: u32,
     },
     Riscv64 {
         x: [u64; 32],
@@ -86,9 +116,11 @@ pub struct MultiArchHalManager {
 impl MultiArchHalManager {
     pub fn new(arch: TargetArchitecture) -> Self {
         let irq_controller = match arch {
+            TargetArchitecture::X86_32 => InterruptControllerKind::X86Pic8259,
             TargetArchitecture::X86_64 => InterruptControllerKind::X86ApicIoApic,
+            TargetArchitecture::Armv7 => InterruptControllerKind::ArmGicV2,
             TargetArchitecture::AArch64 => InterruptControllerKind::ArmGicV3,
-            TargetArchitecture::Riscv64 => InterruptControllerKind::RiscvPlicClint,
+            TargetArchitecture::Riscv32 | TargetArchitecture::Riscv64 => InterruptControllerKind::RiscvPlicClint,
             TargetArchitecture::LoongArch64 => InterruptControllerKind::LoongArchExtIoi,
             TargetArchitecture::Ppc64Le => InterruptControllerKind::PpcXive,
         };
@@ -123,6 +155,18 @@ impl MultiArchHalManager {
 
     pub fn create_default_context(&self) -> CpuRegisterContext {
         match self.current_arch {
+            TargetArchitecture::X86_32 => CpuRegisterContext::X86_32 {
+                eax: 0,
+                ebx: 0,
+                ecx: 0,
+                edx: 0,
+                esi: 0,
+                edi: 0,
+                esp: 0x00C00000,
+                eip: 0x00010000,
+                eflags: 0x202,
+                cr3: 0x1000,
+            },
             TargetArchitecture::X86_64 => CpuRegisterContext::X86_64 {
                 rax: 0,
                 rbx: 0,
@@ -135,12 +179,26 @@ impl MultiArchHalManager {
                 rflags: 0x202,
                 cr3: 0x1000,
             },
+            TargetArchitecture::Armv7 => CpuRegisterContext::Armv7 {
+                r: [0u32; 13],
+                sp: 0x20000000,
+                lr: 0,
+                pc: 0x00010000,
+                cpsr: 0x10,
+                ttbr0: 0x1000,
+            },
             TargetArchitecture::AArch64 => CpuRegisterContext::AArch64 {
                 x: [0u64; 31],
                 sp: 0x40000000,
                 pc: 0x00400000,
                 pstate: 0x3C5,
                 ttbr0_el1: 0x2000,
+            },
+            TargetArchitecture::Riscv32 => CpuRegisterContext::Riscv32 {
+                x: [0u32; 32],
+                pc: 0x80000000,
+                sstatus: 0x00000020,
+                satp: 0x80001000,
             },
             TargetArchitecture::Riscv64 => CpuRegisterContext::Riscv64 {
                 x: [0u64; 32],
@@ -223,5 +281,14 @@ mod tests {
         } else {
             panic!("Expected Ppc64Le register context");
         }
+
+        let hal_x86_32 = MultiArchHalManager::new(TargetArchitecture::X86_32);
+        assert_eq!(hal_x86_32.irq_controller, InterruptControllerKind::X86Pic8259);
+
+        let hal_armv7 = MultiArchHalManager::new(TargetArchitecture::Armv7);
+        assert_eq!(hal_armv7.irq_controller, InterruptControllerKind::ArmGicV2);
+
+        let hal_rv32 = MultiArchHalManager::new(TargetArchitecture::Riscv32);
+        assert_eq!(hal_rv32.irq_controller, InterruptControllerKind::RiscvPlicClint);
     }
 }

@@ -548,10 +548,15 @@ impl BuildSandboxEngine {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArchitecture {
+    X86_32,
     X86_64,
+    AArch32,
     AArch64,
+    RiscV32,
     RiscV64,
     Wasm32,
+    LoongArch64,
+    Ppc64Le,
 }
 
 pub struct CrossCompileToolchain {
@@ -571,10 +576,15 @@ impl CrossCompileToolchain {
 
     pub fn get_target_triple(&self) -> &'static str {
         match self.target_arch {
+            TargetArchitecture::X86_32 => "i686-sigmaos-linux-gnu",
             TargetArchitecture::X86_64 => "x86_64-sigmaos-linux-gnu",
+            TargetArchitecture::AArch32 => "armv7-sigmaos-linux-gnueabihf",
             TargetArchitecture::AArch64 => "aarch64-sigmaos-linux-gnu",
+            TargetArchitecture::RiscV32 => "riscv32-sigmaos-linux-gnu",
             TargetArchitecture::RiscV64 => "riscv64-sigmaos-linux-gnu",
             TargetArchitecture::Wasm32 => "wasm32-unknown-emscripten",
+            TargetArchitecture::LoongArch64 => "loongarch64-sigmaos-linux-gnu",
+            TargetArchitecture::Ppc64Le => "powerpc64le-sigmaos-linux-gnu",
         }
     }
 }
