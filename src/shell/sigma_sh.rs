@@ -1,7 +1,5 @@
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
-#[cfg(target_os = "none")]
-use std::boxed::Box;
 use std::boxed::Box;
 
 use std::format;
@@ -12,7 +10,7 @@ use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CommandID = usize;
 
@@ -964,108 +962,6 @@ mod repl_tests {
     }
 }
 
-// =========================================================================
-// REPL LINE EDITOR, AUTO-SUGGEST & SOVEREIGN SIGMA SH REPL
-// =========================================================================
-
-pub struct ReplLineEditor;
-
-impl ReplLineEditor {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn highlight_line(&self, line: &str) -> String {
-        let parts: StdVec<&str> = line.split_whitespace().collect();
-        if parts.is_empty() {
-            return line.to_string();
-        }
-        let first = parts[0];
-        let rest = if line.len() > first.len() {
-            &line[first.len()..]
-        } else {
-            ""
-        };
-        format!("\x1B[32m{}\x1B[0m{}", first, rest)
-    }
-}
-
-impl Default for ReplLineEditor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct AutoSuggestTabPopup {
-    pub candidates: StdVec<String>,
-}
-
-impl AutoSuggestTabPopup {
-    pub fn new() -> Self {
-        Self {
-            candidates: StdVec::new(),
-        }
-    }
-}
-
-impl Default for AutoSuggestTabPopup {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignSigmaShRepl {
-    pub line_editor: ReplLineEditor,
-    pub completer: ContextualCompleter,
-    pub env: SimpleShellEnvironment,
-}
-
-impl SovereignSigmaShRepl {
-    pub fn new() -> Self {
-        let mut env = SimpleShellEnvironment::new();
-        env.set(b"USER", b"sovereign");
-        env.set(b"HOSTNAME", b"sigmaos");
-        Self {
-            line_editor: ReplLineEditor::new(),
-            completer: ContextualCompleter::new(),
-            env,
-        }
-    }
-
-    pub fn render_prompt(&self) -> String {
-        let user = String::from_utf8_lossy(self.env.get(b"USER").unwrap_or(b"sovereign"));
-        let host = String::from_utf8_lossy(self.env.get(b"HOSTNAME").unwrap_or(b"sigmaos"));
-        format!("{}@{}> ", user, host)
-    }
-
-    pub fn suggest_completion(&self, input: &str) -> Option<String> {
-        let matches = self.completer.complete(input);
-        matches.first().map(|(sub, _)| sub.clone())
-    }
-
-    pub fn execute_repl_command(&mut self, line: &str) -> Result<(), ShellError> {
-        let trimmed = line.trim();
-        if trimmed.starts_with("export ") {
-            let kv = &trimmed[7..];
-            if let Some(pos) = kv.find('=') {
-                let key = kv[..pos].trim();
-                let val = kv[pos + 1..].trim();
-                self.env.set(key.as_bytes(), val.as_bytes());
-            }
-        }
-        Ok(())
-    }
-
-    pub fn jobs_cmd(&self) -> String {
-        "No active background jobs".to_string()
-    }
-}
-
-impl Default for SovereignSigmaShRepl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // ADVANCED ZSH, BASH, TCSH & KSH SHELL INNOVATIONS
@@ -1683,6 +1579,11 @@ impl HistoryExpansionEngine {
 }
 
 /// Rich Line Editor for Sovereign Shell REPL
+pub struct ReplLineEditor {
+    pub prompt: String,
+    pub history: StdVec<String>,
+}
+
 impl ReplLineEditor {
     pub fn new() -> Self {
         Self {
@@ -1700,14 +1601,26 @@ impl ReplLineEditor {
     }
 }
 
+pub struct SovereignSigmaShRepl {
+    pub line_editor: ReplLineEditor,
+    pub completer: ContextualCompleter,
+    pub job_manager: JobControlManager,
+    pub history: StdVec<String>,
+    pub env: SimpleShellEnvironment,
+}
+
 /// Sovereign REPL combining Zsh prompt, Fish auto-suggestions, and Ksh job control
 impl SovereignSigmaShRepl {
     pub fn new() -> Self {
+        let mut env = SimpleShellEnvironment::new();
+        env.set(b"USER", b"sovereign");
+        env.set(b"HOSTNAME", b"sigmaos");
         Self {
             line_editor: ReplLineEditor::new(),
             completer: ContextualCompleter::new(),
             job_manager: JobControlManager::new(),
             history: StdVec::new(),
+            env,
         }
     }
 
@@ -1725,7 +1638,7 @@ impl SovereignSigmaShRepl {
 
     pub fn suggest_completion(&self, input: &str) -> Option<String> {
         let completions = self.completer.complete(input);
-        completions.first().map(|(sub, _)| sub.clone())
+        completions.first().map(|(sub, _): &(String, String)| sub.clone())
     }
 
     pub fn execute_repl_command(&mut self, cmd: &str) -> Result<(), String> {
