@@ -647,7 +647,7 @@ impl SigmaPkg {
         Ok(())
     }
 
-    fn upgrade_package(&mut self, old: &Package, new: &Package) -> Result<(), String> {
+    fn upgrade_package(&mut self, _old: &Package, new: &Package) -> Result<(), String> {
         // Run pre-upgrade hooks
         self.run_hooks("pre_upgrade", new)?;
 

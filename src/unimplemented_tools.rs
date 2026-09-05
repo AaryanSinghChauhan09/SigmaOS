@@ -5176,7 +5176,7 @@ impl OpenBsdUnveilAuditTool {
 
     pub fn check_path_access(&self, path: &str, requested_perm: char) -> bool {
         if let Some(perms) = self.unveiled_rules.get(path) {
-            perms.contains(requested_perm)
+            perms.chars().any(|c| c == requested_perm)
         } else {
             false
         }
