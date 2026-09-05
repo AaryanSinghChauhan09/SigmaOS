@@ -447,90 +447,6 @@ impl SystemdInitManager {
         }
     }
 
-    pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
-    }
-
-    pub fn check_dependencies_met(&self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
-            for &req in &srv.requires {
-                if !self.is_service_running(req) {
-                    return false;
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
-    }
-
-    pub fn check_dependencies_met(&self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
-            for &req in &srv.requires {
-                if !self.is_service_running(req) {
-                    return false;
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
-    }
-
-    pub fn check_dependencies_met(&self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
-            for &req in &srv.requires {
-                if !self.is_service_running(req) {
-                    return false;
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
-    }
-
-    pub fn check_dependencies_met(&self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
-            for &req in &srv.requires {
-                if !self.is_service_running(req) {
-                    return false;
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
-    }
-
-    pub fn check_dependencies_met(&self, name: &str) -> bool {
-        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
-            for &req in &srv.requires {
-                if !self.is_service_running(req) {
-                    return false;
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
 }
 
 impl Default for SystemdInitManager {
@@ -739,10 +655,10 @@ impl SovereignDynamicDevfsEngine {
         }
     }
 
-    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
-        self.nodes
+    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
+        self.devices
             .iter()
-            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+            .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
     }
 }
 
@@ -794,23 +710,25 @@ impl SovereignStatefulNatEngine {
         dst_ip: [u8; 4],
         src_port: u16,
         dst_port: u16,
-        protocol: u8,
+        _protocol: u8,
     ) -> ([u8; 4], u16) {
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.src_ip == src_ip
+            c.original_src == internal_src
                 && c.src_port == src_port
-                && c.dst_ip == dst_ip
+                && c.original_dst == dst_ip
                 && c.dst_port == dst_port
         }) {
             conn.packets_counter += 1;
         } else {
-            self.conntrack_table.push(ConnectionTrackEntry {
-                src_ip,
+            self.conntrack_table.push(ConntrackTableEntry {
+                original_src: internal_src,
+                original_dst: dst_ip,
                 src_port,
-                dst_ip,
                 dst_port,
-                protocol,
+                translated_ip: self.public_ip,
+                translated_port: src_port,
+                nat_type: NatType::Snat,
                 packets_counter: 1,
             });
         }

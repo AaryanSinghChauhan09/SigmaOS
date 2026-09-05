@@ -12,10 +12,10 @@ use crate::klib::HashMap;
 #[cfg(not(test))]
 mod fs {
     use super::*;
-    pub fn read_to_string(_path: &PathBuf) -> Result<String, std::io::Error> {
+    pub fn read_to_string<P: AsRef<str>>(_path: P) -> Result<String, std::io::Error> {
         Ok(String::new())
     }
-    pub fn write(_path: &PathBuf, _content: String) -> Result<(), std::io::Error> {
+    pub fn write<P: AsRef<str>>(_path: P, _content: String) -> Result<(), std::io::Error> {
         Ok(())
     }
     pub fn create_dir_all<P: AsRef<str>>(_path: P) -> Result<(), std::io::Error> {
@@ -111,7 +111,7 @@ impl SystemConfigManager {
 
         // Ensure directory exists
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         let entries = self
@@ -310,7 +310,7 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         let content =
-            fs::read_to_string(&file_path).map_err(|e| ConfigError::ReadError(file_path, e))?;
+            fs::read_to_string(&file_path).map_err(|e| ConfigError::ReadError(file_path, e.to_string()))?;
 
         let service = self.parse_service_unit(&content, name);
         self.services.insert(name.to_string(), service);
@@ -387,11 +387,11 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         fs::write(&file_path, service.to_unit_file())
-            .map_err(|e| ConfigError::WriteError(file_path, e))?;
+            .map_err(|e| ConfigError::WriteError(file_path, e.to_string()))?;
 
         Ok(())
     }

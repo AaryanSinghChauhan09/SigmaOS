@@ -4,8 +4,7 @@ use std::format;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use crate::klib::HashMap;
-use crate::klib::hashset::HashSet;
+use std::collections::{HashMap, HashSet};
 
 
 use crate::accessibility::{
@@ -304,15 +303,15 @@ impl ShellRepl {
         prompt_builder.home_dir = "/home/ubuntu".to_string();
 
         let dir_stack = BsdDirectoryStack::new(&current_dir);
-        let mut services = crate::klib::HashMap::new();
+        let mut services = HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
-            variables: crate::klib::HashMap::new(),
-            aliases: crate::klib::HashMap::new(),
+            variables: HashMap::new(),
+            aliases: HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
@@ -321,7 +320,7 @@ impl ShellRepl {
             installed_packages: HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: crate::klib::HashMap::new(),
+            a11y_features: HashMap::new(),
             command_history: Vec::new(),
             customization: CustomizationEngine::new(),
             accessibility: AccessibilityFramework::new(),

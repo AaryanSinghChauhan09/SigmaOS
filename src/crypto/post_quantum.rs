@@ -24,7 +24,7 @@ pub const KYBER_SK_BYTES: usize = 3168;
 pub const KYBER_PK_BYTES: usize = 1568;
 pub const KYBER_CT_BYTES: usize = 1568;
 pub const KYBER_SS_BYTES: usize = 32;
-pub const KYBER_MODE: u8 = 1024;
+pub const KYBER_MODE: u16 = 1024;
 
 // OID for post-quantum algorithms
 pub const OID_DILITHIUM5: &[u8] = &[0x06, 0x0B, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x04, 0x03];

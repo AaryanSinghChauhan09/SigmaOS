@@ -213,6 +213,7 @@ pub enum BodhiUpdateStatus {
     Stable,
     Obsolete,
     Rejected,
+    AutoUnpushed,
 }
 
 /// Automated CI test result gate (e.g., OpenQA / Greenwave).
@@ -259,6 +260,9 @@ pub struct BodhiUpdate {
 pub struct BodhiUpdateTriage {
     pub updates: HashMap<String, BodhiUpdate>,
     pub stable_gated: HashMap<String, bool>, // update_id -> is_promoted
+    pub update_statuses: HashMap<String, BodhiUpdateStatus>,
+    pub openqa_ci_passed: HashMap<String, bool>,
+    pub side_tags: Vec<String>,
 }
 
 impl BodhiUpdateTriage {
@@ -326,8 +330,8 @@ impl BodhiUpdateTriage {
     pub fn set_ci_test_result(&mut self, update_id: &str, passed: bool) {
         self.openqa_ci_passed.insert(update_id.to_string(), passed);
         if passed {
-            if let Some(&karma) = self.updates.get(update_id) {
-                if karma >= 3 {
+            if let Some(up) = self.updates.get(update_id) {
+                if up.karma >= 3 {
                     self.stable_gated.insert(update_id.to_string(), true);
                     self.update_statuses
                         .insert(update_id.to_string(), BodhiUpdateStatus::Stable);
@@ -500,6 +504,7 @@ impl BodhiUpdateTriage {
                 BodhiUpdateStatus::Stable => "stable",
                 BodhiUpdateStatus::Obsolete => "obsolete",
                 BodhiUpdateStatus::Rejected => "rejected",
+                BodhiUpdateStatus::AutoUnpushed => "unpushed",
             };
 
             xml.push_str(&format!(
@@ -3720,26 +3725,6 @@ impl FedoraToolbxContainerEngine {
         }
     }
 
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
     pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
         if let Some(c) = self.active_containers.get_mut(name) {
             if !c.host_mounts.contains(&host_path.to_string()) {
@@ -3761,26 +3746,6 @@ impl Default for FedoraToolbxContainerEngine {
 // =========================================================================
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
-
-
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionSystemdUnit {
-    pub name: String,
-    pub enabled: bool,
-    pub contents: String,
-}
-
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-
-
-impl Default for FedoraIgnitionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

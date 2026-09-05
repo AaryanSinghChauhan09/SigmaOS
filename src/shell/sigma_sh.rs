@@ -1449,6 +1449,21 @@ pub struct PipelinePlan {
     pub run_if_failure: bool,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoSuggestTabPopup {
+    pub suggestions: StdVec<String>,
+    pub selected_index: usize,
+}
+
+impl AutoSuggestTabPopup {
+    pub fn new(suggestions: StdVec<String>) -> Self {
+        Self {
+            suggestions,
+            selected_index: 0,
+        }
+    }
+}
+
 pub struct PipelineExecutor;
 
 impl PipelineExecutor {

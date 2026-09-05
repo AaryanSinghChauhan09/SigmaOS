@@ -13,11 +13,11 @@ use core::mem;
 pub type KDFID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KDFError { Success = 0, InvalidKey = 1, InvalidLength = 2 }
 
 pub trait KeyDerivation {

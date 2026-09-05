@@ -633,6 +633,7 @@ impl Compositor for SimpleCompositor {
             for &window_id in &self.window_order {
                 if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
                     let window_rect = window.rect();
+                    let opacity = window.get_opacity();
 
                     if let Some(surface) = window.surface() {
                         let window_stride = surface.info().stride as usize / 4;

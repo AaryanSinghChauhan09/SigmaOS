@@ -68,44 +68,38 @@ impl SimpleEncryptionService {
 
 impl EncryptionService for SimpleEncryptionService {
     fn encrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut encrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        if key_bytes.is_empty() {
-                            return Err(CryptoError::InvalidKey);
-                        }
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = key_bytes[idx % key_bytes.len()];
-                            encrypted.push(*byte ^ mask);
-                        }
-                        return Ok(encrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = key_option {
+                if key.id() == key_id {
+                    let mut encrypted = Vec::new();
+                    let key_bytes = key.key_data();
+                    if key_bytes.is_empty() {
+                        return Err(CryptoError::InvalidKey);
                     }
+                    for (idx, byte) in data.iter().enumerate() {
+                        let mask = key_bytes[idx % key_bytes.len()];
+                        encrypted.push(*byte ^ mask);
+                    }
+                    return Ok(encrypted);
                 }
             }
         }
         Err(CryptoError::KeyNotFound)
     }
     fn decrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut decrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        if key_bytes.is_empty() {
-                            return Err(CryptoError::InvalidKey);
-                        }
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = key_bytes[idx % key_bytes.len()];
-                            decrypted.push(*byte ^ mask);
-                        }
-                        return Ok(decrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = key_option {
+                if key.id() == key_id {
+                    let mut decrypted = Vec::new();
+                    let key_bytes = key.key_data();
+                    if key_bytes.is_empty() {
+                        return Err(CryptoError::InvalidKey);
                     }
+                    for (idx, byte) in data.iter().enumerate() {
+                        let mask = key_bytes[idx % key_bytes.len()];
+                        decrypted.push(*byte ^ mask);
+                    }
+                    return Ok(decrypted);
                 }
             }
         }

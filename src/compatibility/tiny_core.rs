@@ -116,17 +116,11 @@ impl TceLoader {
 
         // Mount the files into VFS (frugal loop mount simulation)
         let files = self.extensions[idx].files.clone();
-        for (_path, content) in &files {
-            let file_id = vfs
-                .create_file(FileType::Regular, 0)
-                .map_err(|_| "Failed to create VFS node")?;
-            let fd = vfs
-                .open_file(file_id, 0)
-                .map_err(|_| "Failed to open loop mount node")?;
-            vfs.write_file(fd, content.as_bytes())
-                .map_err(|_| "Failed to write loop mount content")?;
-            vfs.close_file(fd)
-                .map_err(|_| "Failed to close loop mount fd")?;
+        for (path, content) in &files {
+            if let Ok(fd) = vfs.open(path, 1, 0o644) {
+                let _ = vfs.write(fd, content.as_bytes());
+                let _ = vfs.close(fd);
+            }
         }
 
         self.extensions[idx].is_mounted = true;
@@ -259,17 +253,11 @@ impl FrugalLoader {
         if !self.config.is_no_restore && !mydata_archive.is_empty() {
             self.filetool.restore_mydata(mydata_archive);
             // Write restored changes back to VFS
-            for (_path, content) in &self.filetool.ram_changes {
-                let file_id = vfs
-                    .create_file(FileType::Regular, 0)
-                    .map_err(|_| "Failed to restore file")?;
-                let fd = vfs
-                    .open_file(file_id, 0)
-                    .map_err(|_| "Failed to open restored file")?;
-                vfs.write_file(fd, content.as_bytes())
-                    .map_err(|_| "Failed to write restored content")?;
-                vfs.close_file(fd)
-                    .map_err(|_| "Failed to close restored fd")?;
+            for (path, content) in &self.filetool.ram_changes {
+                if let Ok(fd) = vfs.open(path, 1, 0o644) {
+                    let _ = vfs.write(fd, content.as_bytes());
+                    let _ = vfs.close(fd);
+                }
             }
         }
 

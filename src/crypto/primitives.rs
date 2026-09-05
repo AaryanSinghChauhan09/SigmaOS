@@ -384,17 +384,17 @@ pub fn random_bytes(buf: &mut [u8]) {
             // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
             #[cfg(target_arch = "x86_64")]
             {
-                seed = seed.wrapping_xor(core::arch::x86_64::_rdtsc() as u64);
+                seed ^= core::arch::x86_64::_rdtsc() as u64;
             }
 
             // 2. Dynamic pointer-derived ASLR context mixing
             let aslr_ptr = &RNG as *const _ as usize as u64;
-            seed = seed.wrapping_xor(aslr_ptr);
+            seed ^= aslr_ptr;
 
             // 3. Stack address entropy
             let stack_var = 0u64;
             let stack_ptr = &stack_var as *const _ as usize as u64;
-            seed = seed.wrapping_xor(stack_ptr);
+            seed ^= stack_ptr;
 
             // 4. Additional chaotic mixing with prime constants
             seed = seed.wrapping_mul(0x5851f42d4c957f2d)

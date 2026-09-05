@@ -585,7 +585,7 @@ pub struct SQrexecChannel {
 
 impl SQrexecChannel {
     pub fn new(size: usize) -> Self {
-        let layout = core::std::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
+        let layout = std::alloc::Layout::from_size_align(size.max(1), 8).unwrap();
         let buffer = unsafe { std::alloc::alloc(layout) };
         Self {
             buffer,
@@ -628,7 +628,7 @@ impl SQrexecChannel {
     pub fn destroy(&self) {
         unsafe {
             core::ptr::write_bytes(self.buffer, 0, self.size);
-            let layout = core::std::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
+            let layout = std::alloc::Layout::from_size_align(self.size.max(1), 8).unwrap();
             std::alloc::dealloc(self.buffer, layout);
         }
     }
@@ -648,7 +648,7 @@ impl QubesZeroTrustParitySuite {
             isolation_manager: SovereignIsolationManager::new(),
             policy_engine: QrexecPolicyEngine::new(),
             gui_blitter: QubesGuiBlitter::new(1920, 1080),
-            template_manager: TemplateVmManager::new(),
+            template_manager: TemplateVmManager::new(1),
         }
     }
 

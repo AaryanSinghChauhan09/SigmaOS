@@ -9,8 +9,9 @@ use std::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+use std::sync::Arc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
@@ -98,7 +99,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
@@ -106,6 +107,7 @@ pub enum PackageFormat {
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
@@ -333,8 +335,8 @@ impl PackageHook for CustomPackageHook {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSource {
     Repository { url: String },
-    _Local { path: String },
-    _Remote { url: String },
+    Local { path: String },
+    Remote { url: String },
 }
 
 /// Dependency conflict resolution strategy
@@ -1286,8 +1288,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
     pub original_name: String,

@@ -455,7 +455,7 @@ impl NvmePciDriver {
 impl PciDriver for NvmePciDriver {
     fn probe(&mut self, device: &PciDeviceInfo) -> Result<bool, &'static str> {
         // Check if this is an NVMe device (class 0x01, subclass 0x08)
-        if device.class != NVME_CLASS_MASS_STORAGE || device.subclass != NVME_SUBCLASS_NVM {
+        if device.class_code != NVME_CLASS_MASS_STORAGE || device.subclass_code != NVME_SUBCLASS_NVM {
             return Ok(false);
         }
 

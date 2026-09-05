@@ -46,10 +46,11 @@ pub mod repository_manager;
 pub mod resolver;
 pub mod rolling_release;
 pub mod rpm_compat;
+pub mod sovereign_package_innovations;
 pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
-pub use sovereign_sigpkg::{
+pub use sovereign_package_innovations::{
     AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
     GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
@@ -101,7 +102,7 @@ pub use sovereign_sigpkg::*;
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    AlpmHook as ArchCompatAlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
@@ -150,10 +151,6 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_sigpkg::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
-};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,

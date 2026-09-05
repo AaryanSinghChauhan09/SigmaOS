@@ -9,7 +9,7 @@ pub mod zsh_bash_parity;
 
 pub use sigma_sh::{
     AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
-    ParameterExpansionEngine, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
+    ParameterExpansionEngine, PipelineExecutor, PipelinePlan, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
     SovereignSigmaShRepl, ZshPromptFormatter,
 };
 

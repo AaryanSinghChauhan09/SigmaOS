@@ -152,7 +152,7 @@ pub enum PciBarType {
     Memory64Bit { prefetchable: bool },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PciBar {
     pub bar_type: PciBarType,
     pub address: u64,

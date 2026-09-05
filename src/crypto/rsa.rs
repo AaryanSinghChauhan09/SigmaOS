@@ -258,8 +258,11 @@ impl<'a, T> IntoIterator for &'a VecImpl<T> {
     type IntoIter = core::slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+        if self.data.is_null() || self.len == 0 {
+            [].iter()
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+        }
     }
 }
 

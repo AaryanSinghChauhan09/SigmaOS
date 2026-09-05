@@ -32,5 +32,5 @@ pub use manager::{
 };
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
-pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSystem, VfsError, FileSystem as VfsFileSystem, Inode, FileType, MountPoint};
+pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSystem, VirtualFileSystem as VirtualFilesystem, VfsError, VfsError as FsError, FileSystem as VfsFileSystem, Inode, FileType, MountPoint};
 pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};

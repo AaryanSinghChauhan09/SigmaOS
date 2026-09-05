@@ -147,9 +147,11 @@ impl SimpleAIAgent {
             name_str.push(byte as char);
         }
         SimpleAIAgent {
-            name: name.to_string(),
+            name: name_str,
             version,
             execution_count: AtomicUsize::new(0),
+            capability,
+            patterns: Vec::new(),
             mcp_tools: Vec::new(),
             prompt_optim_weight: 0.5,
         }

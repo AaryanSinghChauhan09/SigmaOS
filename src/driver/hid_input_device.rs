@@ -432,7 +432,7 @@ impl PciDriver for HidPciDriver {
         }
 
         // Determine device type from subclass/protocol
-        let device_type = match device.sub_class_code {
+        let device_type = match device.subclass_code {
             HID_PROTOCOL_KEYBOARD => HidDeviceType::Keyboard,
             HID_PROTOCOL_MOUSE => HidDeviceType::Mouse,
             _ => HidDeviceType::Unknown,

@@ -208,14 +208,9 @@ pub struct IntelNicDriver {
 
 impl IntelNicDriver {
     pub fn new(device_id: u16, pci_addr: &str) -> Self {
-        // Generate a fake MAC address
-        let mac = MacAddress::new(0x52, 0x54, 0x00, 0x12, 0x34, 0x56);
-
         IntelNicDriver {
             device_id,
             pci_address: pci_addr.to_string(),
-            mac_address: mac,
-            ip_address: None,
             mmio_base: 0,
             mmio_size: 0,
             rx_ring: DmaRing::new(0, 0, 256),
@@ -234,8 +229,8 @@ impl IntelNicDriver {
         self.mmio_size = size;
 
         // Initialize RX/TX rings (simplified - in real implementation, allocate DMA memory)
-        self.rx_ring = DmaRing::new(bar + 0x1000, size, 256);
-        self.tx_ring = DmaRing::new(bar + 0x2000, size, 256);
+        self.rx_ring = DmaRing::new(bar + 0x1000, size as usize, 256);
+        self.tx_ring = DmaRing::new(bar + 0x2000, size as usize, 256);
 
         Ok(())
     }

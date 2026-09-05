@@ -1986,8 +1986,7 @@ impl UniversalSandboxCapabilityMatrix {
             {
                 perms.push(Permission::DisplayAccess);
             } else if c == "system-observe" || c == "proc" || c == "sysctl" || c == "exec" || c == "execpromises" {
-                perms.push(Permission::ProcessControl);
-                perms.push(Permission::Execute);
+                perms.push(Permission::ProcessExec);
             }
         }
         if perms.is_empty() {
