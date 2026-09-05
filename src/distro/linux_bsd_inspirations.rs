@@ -141,10 +141,15 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
             (
+                DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse,
+                "/var/lib/pkg",
+            ) => "/var/lib/rpm".to_string(),
+            (
                 DistroSubsystemMode::FreeBsd
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::NetBsd
-                | DistroSubsystemMode::DragonFlyBsd,
+                | DistroSubsystemMode::DragonFlyBsd
+                | DistroSubsystemMode::LinuxGentoo,
                 "/var/lib/pkg",
             ) => "/var/db/pkg".to_string(),
             (

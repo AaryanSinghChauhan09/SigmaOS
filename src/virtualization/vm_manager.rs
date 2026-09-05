@@ -1,14 +1,12 @@
-use std::boxed::Box;
-use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
+use std::boxed::Box;
 use std::collections::BTreeMap as HashMap;
 use std::format;
 use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
-use std::collections::BTreeMap as HashMap;
-use std::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]

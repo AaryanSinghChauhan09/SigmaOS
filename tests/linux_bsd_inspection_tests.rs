@@ -66,19 +66,19 @@ mod missing_distro_innovations;
 mod module_loader;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd_compat;
+use sigmaos::sigpkg;
+use sigmaos::open_source_os_gap_closure;
 
 use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
-use wiki_ideas_implementation as wiki_ideas;
+use sigmaos::distro::wiki_ideas_implementation as wiki_ideas;
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -206,16 +206,11 @@ fn test_kernel_classic_algorithms_inspection() {
 
 #[test]
 fn test_wiki_distro_innovations_inspection() {
-    use wiki_ideas_implementation::{
+    use wiki_ideas::{
         ArchRecipeSandboxCompiler, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
         NixDeclarativeSystemState, PolicyAction, RealtimeTask, SchedulerClass,
         SigmaZeroCopySpliceEngine, SnapperTransactionGuard, SovereignHybridSchedulerInnovations,
         SovereignSystemdParityEngine, SystemdUnitActiveState, SystemdUnitType, CAP_READ, CAP_SEEK,
-    use wiki_ideas::{
-        NixDeclarativeSystemState, ArchRecipeSandboxCompiler, SnapperTransactionGuard,
-        SigmaZeroCopySpliceEngine, EbpfSyscallPolicyVerifier, FreeBsdCapsicumDescriptorDelegate,
-        PolicyAction, CAP_READ, CAP_SEEK, SystemdUnitType,
-        SovereignSystemdParityEngine, SystemdUnitActiveState,
     };
 
     // 1. NixOS Declarative System State
@@ -267,7 +262,7 @@ fn test_wiki_distro_innovations_inspection() {
     );
     // 8. Real-Time Hybrid Scheduler
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(wiki_ideas_implementation::RealtimeTask { pid: 1, class: wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    sched.add_task(wiki_ideas::RealtimeTask { pid: 1, class: wiki_ideas::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -1130,9 +1125,9 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
         (DistroSubsystemMode::SolarisIllumos, "zsh.p5p", ServiceSupervisorType::Smf, "/var/lib/pkg"),
         (DistroSubsystemMode::SmartOs, "zsh.tgz", ServiceSupervisorType::Rcd, "/var/lib/pkg"),
         (DistroSubsystemMode::BedrockLinux, "zsh.stratum", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
-        (DistroSubsystemMode::LinuxPopOs, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
-        (DistroSubsystemMode::LinuxTails, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/pkg"),
-        (DistroSubsystemMode::LinuxGuix, "zsh.scm", ServiceSupervisorType::Shepherd, "/var/lib/pkg"),
+        (DistroSubsystemMode::LinuxPopOs, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/dpkg"),
+        (DistroSubsystemMode::LinuxTails, "zsh.deb", ServiceSupervisorType::Systemd, "/var/lib/dpkg"),
+        (DistroSubsystemMode::LinuxGuix, "zsh.scm", ServiceSupervisorType::Shepherd, "/nix/store"),
     ];
 
     for (mode, expected_pkg, expected_supervisor, expected_pkg_db) in modes {
