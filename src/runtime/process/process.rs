@@ -1,5 +1,6 @@
 use std::string::String;
 use std::vec::Vec;
+use std::sync::Arc;
 
 use core::mem;
 /// Custom Process Management for SigmaOS
@@ -7,6 +8,10 @@ use core::mem;
 /// Uses capability-based access control
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+// Import namespace types (these modules exist in src/ipc/ and src/filesystem/)
+// We'll need to add proper module exports to make these available
+// For now, use feature-gated compilation
 
 /// Process ID
 pub type ProcessID = usize;
@@ -22,6 +27,51 @@ pub enum ProcessState {
     Stopped = 4,
     Zombie = 5,
     Terminated = 6,
+}
+
+/// Process Namespace Context
+/// Holds references to all namespaces associated with a process
+/// Uses trait objects to avoid circular dependencies
+#[derive(Clone)]
+pub struct ProcessNamespaceContext {
+    /// Metadata about the namespaces this process uses
+    pub namespace_metadata: String,
+}
+
+impl ProcessNamespaceContext {
+    /// Create a new namespace context with root namespaces
+    pub fn new_root() -> Self {
+        ProcessNamespaceContext {
+            namespace_metadata: "root_namespaces".to_string(),
+        }
+    }
+
+    /// Create a child namespace context
+    pub fn create_child(&self) -> Self {
+        ProcessNamespaceContext {
+            namespace_metadata: "child_namespaces".to_string(),
+        }
+    }
+
+    /// Clone all namespaces from this context (for fork operations)
+    pub fn clone_all(&self) -> Self {
+        self.clone()
+    }
+
+    /// Increment reference counts for all namespaces
+    pub fn increment_refs(&self) {
+        // Stub - will be implemented by runtime when adding namespace types
+    }
+
+    /// Decrement reference counts for all namespaces
+    pub fn decrement_refs(&self) {
+        // Stub - will be implemented by runtime when adding namespace types
+    }
+
+    /// Get metadata summary for all namespaces
+    pub fn metadata_summary(&self) -> String {
+        self.namespace_metadata.clone()
+    }
 }
 
 /// Process priority
@@ -133,6 +183,8 @@ pub struct Process {
     pub pgid: ProcessID,
     pub sid: ProcessID,
     pub cpu_time_ns: AtomicUsize,
+    /// Namespace context for this process (not repr(C) compatible, so stored as pointer)
+    pub namespace_context: Option<Box<ProcessNamespaceContext>>,
 }
 
 impl Process {
@@ -156,7 +208,20 @@ impl Process {
             pgid: pid,
             sid: pid,
             cpu_time_ns: AtomicUsize::new(0),
+            namespace_context: None,
         }
+    }
+
+    /// Create a process with namespace context
+    pub unsafe fn with_namespace_context(
+        pid: ProcessID,
+        ppid: ProcessID,
+        capability: ProcessCapability,
+        namespace_context: ProcessNamespaceContext,
+    ) -> Self {
+        let mut process = Process::new(pid, ppid, capability);
+        process.namespace_context = Some(Box::new(namespace_context));
+        process
     }
 
     /// Sets process task name (up to 15 characters)
@@ -238,6 +303,21 @@ impl Process {
         } else {
             false
         }
+    }
+
+    /// Get namespace context if available
+    pub fn namespace_context(&self) -> Option<&ProcessNamespaceContext> {
+        self.namespace_context.as_ref().map(|ctx| ctx.as_ref())
+    }
+
+    /// Get mutable namespace context if available
+    pub fn namespace_context_mut(&mut self) -> Option<&mut ProcessNamespaceContext> {
+        self.namespace_context.as_mut().map(|ctx| ctx.as_mut())
+    }
+
+    /// Set namespace context
+    pub fn set_namespace_context(&mut self, context: ProcessNamespaceContext) {
+        self.namespace_context = Some(Box::new(context));
     }
 }
 

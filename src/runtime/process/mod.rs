@@ -15,9 +15,11 @@
 
 pub mod process;
 pub mod pid_namespace;
+pub mod process_descriptor;
 
 pub use process::{
     Process, ProcessCapability, ProcessManager, ProcessPriority, ProcessSignal, ProcessState,
-    SupervisedServiceTarget,
+    SupervisedServiceTarget, ProcessNamespaceContext,
 };
 pub use pid_namespace::{PidNamespace, PidNamespaceStats, ProcessId};
+pub use process_descriptor::ProcessDescriptor;
