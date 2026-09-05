@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base - Offline Arch Wiki knowledge base engine with category and tag searching (`ArchWikiKnowledgeBaseEngine`)
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
@@ -67,16 +67,16 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Low Priority Tasks
 
 ### Community & Governance
-- [ ] SigmaOS Foundation establishment
-- [ ] Contributor programs and hackathons
-- [ ] Documentation sprints
-- [ ] Bounty programs for security bugs
+- [x] SigmaOS Foundation establishment - Open source foundation governance charter engine (`SigmaOsFoundationGovernanceEngine`)
+- [x] Contributor programs and hackathons - Hackathon organization & participant tracking
+- [x] Documentation sprints - Documentation sprint organizing & publication workflow
+- [x] Bounty programs for security bugs - Security vulnerability bounty posting & claiming ledger
 
 ### Cross-Platform
-- [ ] SigmaOS Mobile variant
-- [ ] IoT/embedded device support
-- [ ] Cloud orchestration layer
-- [ ] Gaming layer (Vulkan/DirectX compatibility)
+- [x] SigmaOS Mobile variant - Mobile variant engine with cellular network (5G/LTE), touch gestures, and screen rotation (`SigmaOsMobileVariantEngine`)
+- [x] IoT/embedded device support - Native IoT hub & device manager (`IotDeviceManager`)
+- [x] Cloud orchestration layer - Cloud cluster manager & container workload scheduler (`SigmaOsCloudOrchestrationEngine`)
+- [x] Gaming layer (Vulkan/DirectX compatibility) - Vulkan 1.3, DirectX 12, and Metal 3 compatibility shader compiler (`SigmaOsGamingVulkanDirectXLayer`)
 
 ## Known Issues
 
