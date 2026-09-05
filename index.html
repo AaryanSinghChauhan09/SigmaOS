@@ -133,36 +133,46 @@
             </div>
             <div class="window-body">
                 <div class="settings-layout">
-                    <div class="settings-tabs">
-                        <div class="settings-tab active">Appearance</div>
-                        <div class="settings-tab">Core Profiles</div>
-                        <div class="settings-tab">Obs Sync</div>
+                    <div class="settings-tabs" role="tablist" aria-label="Lattice Settings Navigation Tabs">
+                        <button type="button" role="tab" id="tab-settings-appearance" aria-selected="true" aria-controls="settings-panel-appearance" class="settings-tab active" onclick="switchSettingsTab('appearance', this)">Appearance</button>
+                        <button type="button" role="tab" id="tab-settings-profiles" aria-selected="false" aria-controls="settings-panel-profiles" class="settings-tab" onclick="switchSettingsTab('profiles', this)">Core Profiles</button>
+                        <button type="button" role="tab" id="tab-settings-obs" aria-selected="false" aria-controls="settings-panel-obs" class="settings-tab" onclick="switchSettingsTab('obs', this)">Obs Sync</button>
                     </div>
                     <div class="settings-content">
-                        <div class="settings-group">
-                            <h4>Dynamic Theme Engine</h4>
-                            <div class="theme-selector-grid" role="group" aria-label="Color Theme Selection">
-                                <button type="button" class="theme-button theme-cyan" onclick="setTheme('cyan')" aria-label="Switch to Cyan theme" title="Switch to Cyan theme">Cyan</button>
-                                <button type="button" class="theme-button theme-gold" onclick="setTheme('gold')" aria-label="Switch to Gold theme" title="Switch to Gold theme">Gold</button>
-                                <button type="button" class="theme-button theme-solar" onclick="setTheme('solar')" aria-label="Switch to Solar theme" title="Switch to Solar theme">Solar</button>
-                                <button type="button" class="theme-button theme-crimson" onclick="setTheme('crimson')" aria-label="Switch to Crimson theme" title="Switch to Crimson theme">Crimson</button>
+                        <div id="settings-panel-appearance" role="tabpanel" aria-labelledby="tab-settings-appearance">
+                            <div class="settings-group">
+                                <h4>Dynamic Theme Engine</h4>
+                                <div class="theme-selector-grid" role="group" aria-label="Color Theme Selection">
+                                    <button type="button" class="theme-button theme-cyan" onclick="setTheme('cyan')" aria-label="Switch to Cyan theme" title="Switch to Cyan theme">Cyan</button>
+                                    <button type="button" class="theme-button theme-gold" onclick="setTheme('gold')" aria-label="Switch to Gold theme" title="Switch to Gold theme">Gold</button>
+                                    <button type="button" class="theme-button theme-solar" onclick="setTheme('solar')" aria-label="Switch to Solar theme" title="Switch to Solar theme">Solar</button>
+                                    <button type="button" class="theme-button theme-crimson" onclick="setTheme('crimson')" aria-label="Switch to Crimson theme" title="Switch to Crimson theme">Crimson</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="settings-group">
-                            <h4>Workflow Profiles</h4>
-                            <div class="form-switch">
-                                <span>Enable Neural Layout Engine</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
-                                    <span class="slider"></span>
-                                </label>
+                        <div id="settings-panel-profiles" role="tabpanel" aria-labelledby="tab-settings-profiles" style="display: none;">
+                            <div class="settings-group">
+                                <h4>Workflow Profiles</h4>
+                                <div class="form-switch">
+                                    <span>Enable Neural Layout Engine</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-switch">
+                                    <span>Ambient VSync Overdrive</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-switch">
-                                <span>Ambient VSync Overdrive</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
-                                    <span class="slider"></span>
-                                </label>
+                        </div>
+                        <div id="settings-panel-obs" role="tabpanel" aria-labelledby="tab-settings-obs" style="display: none;">
+                            <div class="settings-group">
+                                <h4>Observability Stream Sync</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Synchronize real-time Ring-0 kernel telemetry and ring buffer logs with connected lattice nodes.</p>
                             </div>
                         </div>
                     </div>
@@ -331,7 +341,11 @@
                 </div>
             </div>
             <div class="window-body auto-style-71">
-                <iframe src="installer.html" title="Zenith System Installer" class="auto-style-72"></iframe>        <!-- App: Developer Portal -->
+                <iframe src="installer.html" title="Zenith System Installer" class="auto-style-72"></iframe>
+            </div>
+        </div>
+
+        <!-- App: Developer Portal -->
         <div class="window" id="dev-portal-win" style="display: none;">
             <div class="window-header">
                 <div class="window-title">📖 <span>Interactive Developer Portal</span></div>
@@ -343,14 +357,14 @@
             </div>
             <div class="window-body">
                 <div class="settings-layout">
-                    <div class="settings-tabs">
-                        <div class="settings-tab active" onclick="switchDevPortalTab('syscall-docs', this)">Syscall Docs</div>
-                        <div class="settings-tab" onclick="switchDevPortalTab('setup-wizard', this)">Setup Wizard</div>
-                        <div class="settings-tab" onclick="switchDevPortalTab('cicd-status', this)">CI/CD Pipeline</div>
+                    <div class="settings-tabs" role="tablist" aria-label="Developer Portal Navigation Tabs">
+                        <button type="button" role="tab" id="tab-dev-syscall" aria-selected="true" aria-controls="dev-syscall-docs" class="settings-tab active" onclick="switchDevPortalTab('syscall-docs', this)">Syscall Docs</button>
+                        <button type="button" role="tab" id="tab-dev-wizard" aria-selected="false" aria-controls="dev-setup-wizard" class="settings-tab" onclick="switchDevPortalTab('setup-wizard', this)">Setup Wizard</button>
+                        <button type="button" role="tab" id="tab-dev-cicd" aria-selected="false" aria-controls="dev-cicd-status" class="settings-tab" onclick="switchDevPortalTab('cicd-status', this)">CI/CD Pipeline</button>
                     </div>
                     <div class="settings-content">
                         <!-- Syscall Docs -->
-                        <div id="dev-syscall-docs" class="dev-portal-tab-content active">
+                        <div id="dev-syscall-docs" role="tabpanel" aria-labelledby="tab-dev-syscall" class="dev-portal-tab-content active">
                             <h3>Syscall & API Reference</h3>
                             <input type="text" class="cmd-input" id="syscall-search" placeholder="Search syscalls (e.g., sys_write, sys_exit)..." oninput="searchSyscalls()" aria-label="Search syscall documentation">
                             <div class="syscall-list-container" id="syscall-list-container">
@@ -358,29 +372,29 @@
                             </div>
                         </div>
                         <!-- Setup Wizard -->
-                        <div id="dev-setup-wizard" class="dev-portal-tab-content">
+                        <div id="dev-setup-wizard" role="tabpanel" aria-labelledby="tab-dev-wizard" class="dev-portal-tab-content">
                             <h3>Build Environment Setup</h3>
                             <p>Verify and configure your bare-metal toolchain for SigmaOS development.</p>
                             <div class="wizard-steps-form">
                                 <div class="wizard-step-card">
                                     <strong>Step 1: Install LLVM & clang</strong>
                                     <p>SigmaOS requires LLVM 15+ and clang compiler for target cross-compilation.</p>
-                                    <button class="wizard-btn" onclick="verifyStep(1, this)">VERIFY INSTALLATION</button>
+                                    <button type="button" class="wizard-btn" onclick="verifyStep(1, this)" aria-label="Verify LLVM and clang installation">VERIFY INSTALLATION</button>
                                 </div>
                                 <div class="wizard-step-card">
                                     <strong>Step 2: Install Rust Toolchain</strong>
                                     <p>Rust compiler (nightly channel) with <code>rust-src</code> component for <code>#![no_std]</code> kernel compilation.</p>
-                                    <button class="wizard-btn" onclick="verifyStep(2, this)">VERIFY RUSTC</button>
+                                    <button type="button" class="wizard-btn" onclick="verifyStep(2, this)" aria-label="Verify Rust compiler installation">VERIFY RUSTC</button>
                                 </div>
                                 <div class="wizard-step-card">
                                     <strong>Step 3: Setup Zig & Nim Compilers</strong>
                                     <p>Zig 0.11+ for HAL elements and Nim 1.6+ for declarative packaging system configuration.</p>
-                                    <button class="wizard-btn" onclick="verifyStep(3, this)">VERIFY COMPILERS</button>
+                                    <button type="button" class="wizard-btn" onclick="verifyStep(3, this)" aria-label="Verify Zig and Nim compilers">VERIFY COMPILERS</button>
                                 </div>
                             </div>
                         </div>
                         <!-- CI/CD Status -->
-                        <div id="dev-cicd-status" class="dev-portal-tab-content">
+                        <div id="dev-cicd-status" role="tabpanel" aria-labelledby="tab-dev-cicd" class="dev-portal-tab-content">
                             <h3>Live Mainline Builds</h3>
                             <p>Real-time compilation tracking across attested target architectures.</p>
                             <div class="cicd-status-grid">
@@ -398,7 +412,7 @@
                                 </div>
                             </div>
                             <div class="ci-trigger-section">
-                                <button class="wizard-btn" onclick="triggerCIBuild()">TRIGGER INTEGRATION BUILD</button>
+                                <button type="button" class="wizard-btn" onclick="triggerCIBuild()" aria-label="Trigger integration build">TRIGGER INTEGRATION BUILD</button>
                                 <pre id="cicd-log-output" class="cicd-log-box">Ready to build...</pre>
                             </div>
                         </div>
@@ -506,14 +520,11 @@
                                 <input type="checkbox" class="test-suite-check" checked value="Rust IPC Shard">
                                 <span>Rust IPC Shard</span>
                             </label>
-                            <button class="wizard-btn run-suites-btn" onclick="runSelectedTests()">RUN SELECTED SUITES</button>
+                            <button type="button" class="wizard-btn run-suites-btn" onclick="runSelectedTests()" aria-label="Run selected test suites">RUN SELECTED SUITES</button>
                             <div id="test-run-result" class="test-result-console">Ready.</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-           </div>
             </div>
         </div>
 
@@ -572,6 +583,47 @@ function switchMarketTab(tabId) {
     const tabs = document.querySelectorAll('#sigma-market-win [role="tab"]');
     tabs.forEach(tab => {
         const isSelected = tab.getAttribute('aria-controls') === `market-${tabId}`;
+        tab.classList.toggle('active', isSelected);
+        tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+}
+
+function switchSettingsTab(tabId, tabEl) {
+    const panels = {
+        'appearance': 'settings-panel-appearance',
+        'profiles': 'settings-panel-profiles',
+        'obs': 'settings-panel-obs'
+    };
+    for (const [key, panelId] of Object.entries(panels)) {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            panel.style.display = (key === tabId) ? 'block' : 'none';
+        }
+    }
+    const tabs = document.querySelectorAll('#lattice-settings-win [role="tab"]');
+    tabs.forEach(tab => {
+        const isSelected = tab === tabEl || tab.getAttribute('aria-controls') === panels[tabId];
+        tab.classList.toggle('active', isSelected);
+        tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+}
+
+function switchDevPortalTab(tabId, tabEl) {
+    const panels = {
+        'syscall-docs': 'dev-syscall-docs',
+        'setup-wizard': 'dev-setup-wizard',
+        'cicd-status': 'dev-cicd-status'
+    };
+    for (const [key, panelId] of Object.entries(panels)) {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            panel.classList.toggle('active', key === tabId);
+            panel.style.display = (key === tabId) ? 'block' : 'none';
+        }
+    }
+    const tabs = document.querySelectorAll('#dev-portal-win [role="tab"]');
+    tabs.forEach(tab => {
+        const isSelected = tab === tabEl || tab.getAttribute('aria-controls') === panels[tabId];
         tab.classList.toggle('active', isSelected);
         tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
     });
