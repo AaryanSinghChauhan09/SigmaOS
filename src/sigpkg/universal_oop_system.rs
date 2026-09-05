@@ -230,6 +230,16 @@ pub enum PackageFormat {
     Drpm,
     // Bedrock Linux Stratum (.stratum)
     Stratum,
+    // OpenWrt / opkg / Entware (.ipk)
+    Ipk,
+    // Yocto / OpenEmbedded (.opkg)
+    Opkg,
+    // OpenBSD pkg_add (.openbsd.tgz / .tgz)
+    OpenBsdPkg,
+    // Solaris / Illumos IPS (.p5p / .ips)
+    SolarisIps,
+    // GNU Guix / Nix Archive (.nar)
+    GuixNar,
 }
 
 impl PackageFormat {
@@ -330,6 +340,16 @@ impl PackageFormat {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
+        } else if normalized.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if normalized.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if normalized.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else {
             None
         }

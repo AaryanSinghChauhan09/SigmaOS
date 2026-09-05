@@ -1051,6 +1051,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Yum)
         } else if f.ends_with(".stratum") {
             Some(PackageFormat::Sovereign)
+        } else if f.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if f.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if f.ends_with(".p5p") || f.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if f.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if f.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else {
             None
         }
@@ -1097,6 +1107,16 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Sovereign) // Bedrock Linux Stratum magic
         } else if data.starts_with(b"SLAK") {
             Some(PackageFormat::TarGz) // Slackware SlackBuild magic
+        } else if data.starts_with(b"IPK!") {
+            Some(PackageFormat::Ipk) // OpenWrt / opkg magic
+        } else if data.starts_with(b"OPKG") {
+            Some(PackageFormat::Opkg) // Yocto / opkg magic
+        } else if data.starts_with(b"P5P!") {
+            Some(PackageFormat::SolarisIps) // Solaris IPS magic
+        } else if data.starts_with(b"NARS") {
+            Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
+        } else if data.starts_with(b"OBSD") {
+            Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
         } else {
             None
         }
@@ -1223,6 +1243,33 @@ impl UniversalPackageAdapter {
                     &deps,
                 )
             }
+            Some(PackageFormat::Ipk) | Some(PackageFormat::Opkg) => {
+                let deb = self.parse_apt_control(raw_text)?;
+                self.translate_to_native_package(
+                    &deb.package,
+                    &deb.version,
+                    &deb.description,
+                    &deb.depends,
+                )
+            }
+            Some(PackageFormat::OpenBsdPkg) => {
+                let obs = self.parse_openbsd_contents(raw_text)?;
+                self.translate_to_native_package(
+                    &obs.pkgname,
+                    &obs.version,
+                    &obs.comment,
+                    &obs.depends,
+                )
+            }
+            Some(PackageFormat::Hpkg) => {
+                let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                self.translate_to_native_package(
+                    &hpkg.name,
+                    &hpkg.version,
+                    &hpkg.summary,
+                    &hpkg.requires,
+                )
+            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -1322,6 +1369,14 @@ impl UniversalPackageAdapter {
                         &slack.version,
                         &slack.description,
                         &slack.slack_required,
+                    )
+                } else if raw_text.contains("name ") && raw_text.contains("summary ") {
+                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                    self.translate_to_native_package(
+                        &hpkg.name,
+                        &hpkg.version,
+                        &hpkg.summary,
+                        &hpkg.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")
@@ -1753,7 +1808,6 @@ impl UniversalDependencyMapper {
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
-            "python3-dev" => "python".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -2031,7 +2085,23 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkg_add" => {
+            "opkg" | "ipkg" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "find" | "search" => operation = UniversalPmOperation::Search,
+                        "info" | "status" => operation = UniversalPmOperation::QueryInfo,
+                        "--noaction" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg" | "pkg_add" | "pkgsend" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2676,6 +2746,26 @@ mod tests {
             adapter.detect_format_by_extension("recipe.cports"),
             Some(PackageFormat::Cports)
         );
+        assert_eq!(
+            adapter.detect_format_by_extension("router.ipk"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("yocto.opkg"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("solaris.p5p"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("store.nar"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("base.openbsd.tgz"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -2713,6 +2803,26 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"IPK!hdr"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OPKGhdr"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"P5P!hdr"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARShdr"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OBSDhdr"),
+            Some(PackageFormat::OpenBsdPkg)
         );
     }
 
