@@ -700,10 +700,15 @@ input:checked + .slider:before {
 }
 
 .context-item {
+    width: 100%;
+    background: transparent;
+    border: none;
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 0.8rem;
     font-weight: 600;
+    font-family: inherit;
+    text-align: left;
     color: var(--text-white);
     cursor: pointer;
     display: flex;
@@ -712,9 +717,11 @@ input:checked + .slider:before {
     transition: var(--transition-fast);
 }
 
-.context-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+.context-item:hover,
+.context-item:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
     color: var(--accent-gold);
+    outline: none;
 }
 
 /* Guided Wizard Overlay */

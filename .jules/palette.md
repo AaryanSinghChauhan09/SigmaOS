@@ -5,3 +5,7 @@
 ## 2026-09-04 - Accessible Web Desktop Window Tab Navigation
 **Learning:** Web OS window tabs built using generic `<div>` tags lack keyboard focusability, screen reader role identification, and active tab state announcements (`aria-selected`).
 **Action:** Convert window tab navigation bars into `<div role="tablist">` with `<button type="button" role="tab">` elements linking via `aria-controls` to corresponding `<div role="tabpanel">` content blocks, dynamically synchronizing `aria-selected` upon selection.
+
+## 2026-09-05 - Accessible Web Desktop Context Menu Navigation
+**Learning:** Right-click context menus built with generic `<div>` items are inaccessible to screen readers and keyboard users because they lack `role="menu"`, `role="menuitem"`, `role="separator"`, button semantics, and focus-visible indicators.
+**Action:** Ensure context menu containers have `role="menu"` and `aria-label`, items use `<button type="button" role="menuitem">` with full-width CSS reset and `:focus-visible` highlights, and menu dividers use `role="separator"`.
