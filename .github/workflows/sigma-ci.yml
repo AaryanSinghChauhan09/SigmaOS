@@ -59,7 +59,9 @@ jobs:
           grub-efi-ia32-bin
 
     - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
 
       with:
         profile: minimal
@@ -188,7 +190,9 @@ jobs:
           xorriso
 
     - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
 
       with:
         profile: minimal
@@ -371,7 +375,9 @@ jobs:
 
 
     - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
 
       with:
         profile: minimal
