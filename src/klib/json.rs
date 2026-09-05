@@ -1,9 +1,11 @@
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-// Use our custom sovereign HashMap instead of std::collections::BTreeMap
-// to reduce dependency on pre-defined library data structures.
+// Use std::collections::BTreeMap during standalone test compilation or custom BTreeMap otherwise
+#[cfg(not(test))]
 use crate::klib::hashmap::BTreeMap;
+#[cfg(test)]
+use std::collections::BTreeMap;
 
 /// Zero-dependency Sovereign JSON Data Model
 #[derive(Debug, Clone, PartialEq)]
@@ -56,62 +58,56 @@ impl SovereignJsonValue {
         }
     }
 
-    /// Serializes the JSON value to a canonical JSON string
+    /// Serializes the JSON value to a canonical JSON string using a single buffer
+    /// to eliminate temporary heap String allocations during recursive traversal.
     pub fn to_json_string(&self) -> String {
+        let mut out = String::new();
+        self.append_json_string(&mut out);
+        out
+    }
+
+    /// Appends the canonical JSON string representation directly into an existing buffer.
+    /// Bolt optimization: eliminates temporary heap allocations for array elements and object keys.
+    fn append_json_string(&self, out: &mut String) {
         match self {
-            SovereignJsonValue::Null => "null".to_string(),
+            SovereignJsonValue::Null => out.push_str("null"),
             SovereignJsonValue::Bool(b) => {
                 if *b {
-                    "true".to_string()
+                    out.push_str("true");
                 } else {
-                    "false".to_string()
+                    out.push_str("false");
                 }
             }
             SovereignJsonValue::Number(n) => {
                 if n.fract() == 0.0 {
-                    format!("{}", *n as i64)
+                    out.push_str(&format!("{}", *n as i64));
                 } else {
-                    format!("{}", n)
+                    out.push_str(&format!("{}", n));
                 }
             }
-            SovereignJsonValue::String(s) => {
-                let mut escaped = String::from("\"");
-                for c in s.chars() {
-                    match c {
-                        '"' => escaped.push_str("\\\""),
-                        '\\' => escaped.push_str("\\\\"),
-                        '\n' => escaped.push_str("\\n"),
-                        '\r' => escaped.push_str("\\r"),
-                        '\t' => escaped.push_str("\\t"),
-                        _ => escaped.push(c),
-                    }
-                }
-                escaped.push('"');
-                escaped
-            }
+            SovereignJsonValue::String(s) => append_escaped_json_string(s, out),
             SovereignJsonValue::Array(arr) => {
-                let mut out = String::from("[");
+                out.push('[');
                 for (i, elem) in arr.iter().enumerate() {
                     if i > 0 {
                         out.push_str(", ");
                     }
-                    out.push_str(&elem.to_json_string());
+                    elem.append_json_string(out);
                 }
                 out.push(']');
-                out
             }
             SovereignJsonValue::Object(obj) => {
-                let mut out = String::from("{");
+                out.push('{');
                 for (i, (key, val)) in obj.iter().enumerate() {
+                    let val_node: &SovereignJsonValue = val;
                     if i > 0 {
                         out.push_str(", ");
                     }
-                    out.push_str(&SovereignJsonValue::String(key.clone()).to_json_string());
+                    append_escaped_json_string(key, out);
                     out.push_str(": ");
-                    out.push_str(&val.to_json_string());
+                    val_node.append_json_string(out);
                 }
                 out.push('}');
-                out
             }
         }
     }
@@ -387,6 +383,22 @@ impl<'a> SovereignJsonParser<'a> {
         }
         Err("JSON Parser: Unterminated string")
     }
+}
+
+/// Helper to append an escaped string to an existing String buffer without heap reallocations or cloning.
+fn append_escaped_json_string(s: &str, out: &mut String) {
+    out.push('"');
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            _ => out.push(c),
+        }
+    }
+    out.push('"');
 }
 
 /// Helper function to convert numeric string to f64 without std, protected against u64 overflow
