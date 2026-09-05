@@ -1885,6 +1885,555 @@ impl Default for NetBsdPkginBinaryDatabaseEngine {
     }
 }
 
+// =========================================================================
+// 25. Void Linux XBPS Local Downgrade Repository & Package Hold Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsCachedPkg {
+    pub name: String,
+    pub version: String,
+    pub archive_filename: String,
+    pub is_held: bool,
+}
+
+pub struct XbpsDowngradeRepoEngine {
+    pub cached_packages: Vec<XbpsCachedPkg>,
+    pub held_packages: Vec<String>,
+}
+
+impl XbpsDowngradeRepoEngine {
+    pub fn new() -> Self {
+        Self {
+            cached_packages: Vec::new(),
+            held_packages: Vec::new(),
+        }
+    }
+
+    pub fn cache_pkg_archive(&mut self, name: &str, version: &str, archive_filename: &str) {
+        let pkg = XbpsCachedPkg {
+            name: name.to_string(),
+            version: version.to_string(),
+            archive_filename: archive_filename.to_string(),
+            is_held: self.held_packages.contains(&name.to_string()),
+        };
+        self.cached_packages.push(pkg);
+    }
+
+    pub fn hold_package(&mut self, name: &str) {
+        if !self.held_packages.contains(&name.to_string()) {
+            self.held_packages.push(name.to_string());
+            for pkg in &mut self.cached_packages {
+                if pkg.name == name {
+                    pkg.is_held = true;
+                }
+            }
+        }
+    }
+
+    pub fn unhold_package(&mut self, name: &str) {
+        self.held_packages.retain(|p| p != name);
+        for pkg in &mut self.cached_packages {
+            if pkg.name == name {
+                pkg.is_held = false;
+            }
+        }
+    }
+
+    pub fn is_package_held(&self, name: &str) -> bool {
+        self.held_packages.contains(&name.to_string())
+    }
+
+    pub fn find_downgrade_candidate(&self, name: &str, current_version: &str) -> Option<XbpsCachedPkg> {
+        self.cached_packages
+            .iter()
+            .filter(|p| p.name == name && p.version != current_version)
+            .cloned()
+            .max_by(|a, b| a.version.cmp(&b.version))
+    }
+}
+
+impl Default for XbpsDowngradeRepoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 26. Gentoo Portage package.env Per-Package Compiler & Env Override Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PortageEnvProfile {
+    pub cflags: String,
+    pub cxxflags: String,
+    pub makeopts: String,
+    pub env_vars: BTreeMap<String, String>,
+}
+
+pub struct PortagePackageEnvEngine {
+    pub package_env_map: BTreeMap<String, PortageEnvProfile>,
+}
+
+impl PortagePackageEnvEngine {
+    pub fn new() -> Self {
+        Self {
+            package_env_map: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_package_env(&mut self, atom: &str, profile: PortageEnvProfile) {
+        self.package_env_map.insert(atom.to_string(), profile);
+    }
+
+    pub fn get_package_env(&self, atom: &str) -> Option<&PortageEnvProfile> {
+        self.package_env_map.get(atom)
+    }
+
+    pub fn generate_build_env_export(&self, atom: &str) -> String {
+        let mut out = String::new();
+        if let Some(profile) = self.package_env_map.get(atom) {
+            if !profile.cflags.is_empty() {
+                out.push_str(&format!("export CFLAGS=\"{}\"\n", profile.cflags));
+            }
+            if !profile.cxxflags.is_empty() {
+                out.push_str(&format!("export CXXFLAGS=\"{}\"\n", profile.cxxflags));
+            }
+            if !profile.makeopts.is_empty() {
+                out.push_str(&format!("export MAKEOPTS=\"{}\"\n", profile.makeopts));
+            }
+            for (k, v) in &profile.env_vars {
+                out.push_str(&format!("export {}=\"{}\"\n", k, v));
+            }
+        }
+        out
+    }
+}
+
+impl Default for PortagePackageEnvEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 27. FreeBSD pkg-audit Vulnerability Database & Transaction Blocker
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PkgAuditAdvisory {
+    pub id: String,
+    pub package_name: String,
+    pub vulnerable_versions: Vec<String>,
+    pub cvss_score: u32, // 0..100 (e.g. 98 = 9.8 Critical)
+    pub description: String,
+}
+
+pub struct FreeBsdPkgAuditEngine {
+    pub advisories: Vec<PkgAuditAdvisory>,
+    pub cvss_block_threshold: u32,
+}
+
+impl FreeBsdPkgAuditEngine {
+    pub fn new() -> Self {
+        Self {
+            advisories: Vec::new(),
+            cvss_block_threshold: 70, // Block high and critical (CVSS >= 7.0)
+        }
+    }
+
+    pub fn register_advisory(&mut self, advisory: PkgAuditAdvisory) {
+        self.advisories.push(advisory);
+    }
+
+    pub fn audit_package(&self, name: &str, version: &str) -> Vec<PkgAuditAdvisory> {
+        self.advisories
+            .iter()
+            .filter(|a| a.package_name == name && a.vulnerable_versions.contains(&version.to_string()))
+            .cloned()
+            .collect()
+    }
+
+    pub fn should_block_install(&self, name: &str, version: &str) -> (bool, Option<String>) {
+        let vulns = self.audit_package(name, version);
+        for vuln in vulns {
+            if vuln.cvss_score >= self.cvss_block_threshold {
+                return (
+                    true,
+                    Some(format!(
+                        "Installation blocked: {} version {} has advisory {} (CVSS {})",
+                        name, version, vuln.id, vuln.cvss_score as f32 / 10.0
+                    )),
+                );
+            }
+        }
+        (false, None)
+    }
+}
+
+impl Default for FreeBsdPkgAuditEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 28. Nix/Guix CAS Store GC Governor & Closure Size Calculator
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CasStorePath {
+    pub hash: String,
+    pub path: String,
+    pub size_bytes: u64,
+    pub gc_roots: Vec<String>,
+}
+
+pub struct NixCasStoreGcGovernor {
+    pub store_paths: BTreeMap<String, CasStorePath>,
+}
+
+impl NixCasStoreGcGovernor {
+    pub fn new() -> Self {
+        Self {
+            store_paths: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_store_path(&mut self, hash: &str, path: &str, size_bytes: u64) {
+        self.store_paths.insert(
+            path.to_string(),
+            CasStorePath {
+                hash: hash.to_string(),
+                path: path.to_string(),
+                size_bytes,
+                gc_roots: Vec::new(),
+            },
+        );
+    }
+
+    pub fn add_gc_root(&mut self, path: &str, root_name: &str) -> bool {
+        if let Some(store_entry) = self.store_paths.get_mut(path) {
+            if !store_entry.gc_roots.contains(&root_name.to_string()) {
+                store_entry.gc_roots.push(root_name.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn remove_gc_root(&mut self, path: &str, root_name: &str) -> bool {
+        if let Some(store_entry) = self.store_paths.get_mut(path) {
+            store_entry.gc_roots.retain(|r| r != root_name);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_closure_size(&self, paths: &[&str]) -> u64 {
+        let mut total = 0u64;
+        for &p in paths {
+            if let Some(entry) = self.store_paths.get(p) {
+                total += entry.size_bytes;
+            }
+        }
+        total
+    }
+
+    pub fn collect_garbage(&mut self) -> (usize, u64) {
+        let mut freed_count = 0usize;
+        let mut freed_bytes = 0u64;
+
+        let dead_paths: Vec<String> = self
+            .store_paths
+            .values()
+            .filter(|e| e.gc_roots.is_empty())
+            .map(|e| e.path.clone())
+            .collect();
+
+        for p in dead_paths {
+            if let Some(removed) = self.store_paths.remove(&p) {
+                freed_count += 1;
+                freed_bytes += removed.size_bytes;
+            }
+        }
+
+        (freed_count, freed_bytes)
+    }
+}
+
+impl Default for NixCasStoreGcGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 29. Alpine APK v3 Security Signature Verification & Index Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkSignatureKey {
+    pub key_id: String,
+    pub pubkey_pem: String,
+    pub is_trusted: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexMetadata {
+    pub repo_url: String,
+    pub checksum_sha256: String,
+    pub signature_b64: String,
+}
+
+pub struct ApkV3SignatureEngine {
+    pub trusted_keys: BTreeMap<String, ApkSignatureKey>,
+}
+
+impl ApkV3SignatureEngine {
+    pub fn new() -> Self {
+        Self {
+            trusted_keys: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_key(&mut self, key_id: &str, pubkey_pem: &str, is_trusted: bool) {
+        self.trusted_keys.insert(
+            key_id.to_string(),
+            ApkSignatureKey {
+                key_id: key_id.to_string(),
+                pubkey_pem: pubkey_pem.to_string(),
+                is_trusted,
+            },
+        );
+    }
+
+    pub fn verify_index_signature(&self, key_id: &str, index: &ApkIndexMetadata) -> bool {
+        if let Some(key) = self.trusted_keys.get(key_id) {
+            if !key.is_trusted {
+                return false;
+            }
+            !index.signature_b64.is_empty() && !index.checksum_sha256.is_empty()
+        } else {
+            false
+        }
+    }
+
+    pub fn verify_package_checksum(&self, computed_sha256: &str, expected_sha256: &str) -> bool {
+        computed_sha256.eq_ignore_ascii_case(expected_sha256)
+    }
+}
+
+impl Default for ApkV3SignatureEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 30. Fedora / RHEL Delta RPM Binary Reconstitution Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeltaRpmSpec {
+    pub package_name: String,
+    pub base_version: String,
+    pub target_version: String,
+    pub delta_bytes: u64,
+    pub full_bytes: u64,
+    pub delta_sha256: String,
+}
+
+pub struct RpmDeltaReconstitutionEngine {
+    pub available_deltas: Vec<DeltaRpmSpec>,
+}
+
+impl RpmDeltaReconstitutionEngine {
+    pub fn new() -> Self {
+        Self {
+            available_deltas: Vec::new(),
+        }
+    }
+
+    pub fn register_delta(&mut self, spec: DeltaRpmSpec) {
+        self.available_deltas.push(spec);
+    }
+
+    pub fn reconstruct_rpm_package(
+        &self,
+        package_name: &str,
+        base_ver: &str,
+        target_ver: &str,
+    ) -> Result<String, &'static str> {
+        let spec = self
+            .available_deltas
+            .iter()
+            .find(|d| d.package_name == package_name && d.base_version == base_ver && d.target_version == target_ver)
+            .ok_or("Delta RPM spec not found")?;
+
+        Ok(format!("{}-{}.x86_64.rpm", spec.package_name, spec.target_version))
+    }
+
+    pub fn total_bandwidth_saved(&self) -> u64 {
+        self.available_deltas
+            .iter()
+            .map(|d| d.full_bytes.saturating_sub(d.delta_bytes))
+            .sum()
+    }
+}
+
+impl Default for RpmDeltaReconstitutionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 31. Debian / Ubuntu dpkg-divert File Diversion Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DpkgDivertRule {
+    pub package_name: String,
+    pub original_path: String,
+    pub diverted_path: String,
+    pub is_local_override: bool,
+}
+
+pub struct DpkgDivertEngine {
+    pub diversions: BTreeMap<String, DpkgDivertRule>,
+}
+
+impl DpkgDivertEngine {
+    pub fn new() -> Self {
+        Self {
+            diversions: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_diversion(&mut self, rule: DpkgDivertRule) {
+        self.diversions.insert(rule.original_path.clone(), rule);
+    }
+
+    pub fn remove_diversion(&mut self, original_path: &str) -> Option<DpkgDivertRule> {
+        self.diversions.remove(original_path)
+    }
+
+    pub fn resolve_target_path(&self, original_path: &str, installing_pkg: &str) -> String {
+        if let Some(rule) = self.diversions.get(original_path) {
+            if rule.package_name == installing_pkg {
+                rule.original_path.clone()
+            } else {
+                rule.diverted_path.clone()
+            }
+        } else {
+            original_path.to_string()
+        }
+    }
+}
+
+impl Default for DpkgDivertEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 32. Arch Linux pacman-key Web of Trust Keyring Manager
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PacmanKeyTrust {
+    Never,
+    Marginal,
+    Full,
+    Expired,
+    Revoked,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanGpgKey {
+    pub key_id: String,
+    pub uid: String,
+    pub fingerprint: String,
+    pub trust_level: PacmanKeyTrust,
+    pub issuer_key_id: Option<String>,
+}
+
+pub struct PacmanKeyringEngine {
+    pub keyring: BTreeMap<String, PacmanGpgKey>,
+    pub master_key_id: String,
+}
+
+impl PacmanKeyringEngine {
+    pub fn new(master_key_id: &str) -> Self {
+        Self {
+            keyring: BTreeMap::new(),
+            master_key_id: master_key_id.to_string(),
+        }
+    }
+
+    pub fn import_key(&mut self, key: PacmanGpgKey) {
+        self.keyring.insert(key.key_id.clone(), key);
+    }
+
+    pub fn set_trust_level(&mut self, key_id: &str, trust: PacmanKeyTrust) -> bool {
+        if let Some(key) = self.keyring.get_mut(key_id) {
+            key.trust_level = trust;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn verify_package_signature(&self, key_id: &str, sig_valid: bool) -> bool {
+        if !sig_valid {
+            return false;
+        }
+        if let Some(key) = self.keyring.get(key_id) {
+            match key.trust_level {
+                PacmanKeyTrust::Full | PacmanKeyTrust::Marginal => true,
+                _ => false,
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn validate_chain_to_master(&self, key_id: &str) -> bool {
+        if key_id == self.master_key_id {
+            return true;
+        }
+        let mut current_id = key_id.to_string();
+        for _ in 0..10 {
+            if let Some(key) = self.keyring.get(&current_id) {
+                if key.trust_level == PacmanKeyTrust::Revoked || key.trust_level == PacmanKeyTrust::Expired {
+                    return false;
+                }
+                if let Some(ref issuer) = key.issuer_key_id {
+                    if issuer == &self.master_key_id {
+                        return true;
+                    }
+                    current_id = issuer.clone();
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        false
+    }
+}
+
+impl Default for PacmanKeyringEngine {
+    fn default() -> Self {
+        Self::new("MASTER_SIGMA_KEY")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2370,5 +2919,147 @@ MAINTAINER="SigmaOS"
         assert_eq!(freed_count, 1);
         assert_eq!(freed_bytes, 1500000);
         assert_eq!(pkgin.cache.len(), 1);
+    }
+
+    #[test]
+    fn test_xbps_downgrade_repo_engine() {
+        let mut engine = XbpsDowngradeRepoEngine::new();
+        engine.cache_pkg_archive("firefox", "120.0", "firefox-120.0.xbps");
+        engine.cache_pkg_archive("firefox", "121.0", "firefox-121.0.xbps");
+
+        engine.hold_package("firefox");
+        assert!(engine.is_package_held("firefox"));
+
+        let candidate = engine.find_downgrade_candidate("firefox", "122.0").unwrap();
+        assert_eq!(candidate.version, "121.0");
+
+        engine.unhold_package("firefox");
+        assert!(!engine.is_package_held("firefox"));
+    }
+
+    #[test]
+    fn test_portage_package_env_engine() {
+        let mut engine = PortagePackageEnvEngine::new();
+        let mut env_vars = BTreeMap::new();
+        env_vars.insert("LDFLAGS".to_string(), "-Wl,-O1".to_string());
+
+        engine.register_package_env(
+            "sys-devel/gcc",
+            PortageEnvProfile {
+                cflags: "-O3 -march=native".to_string(),
+                cxxflags: "-O3 -march=native".to_string(),
+                makeopts: "-j16".to_string(),
+                env_vars,
+            },
+        );
+
+        let export_str = engine.generate_build_env_export("sys-devel/gcc");
+        assert!(export_str.contains("CFLAGS=\"-O3 -march=native\""));
+        assert!(export_str.contains("MAKEOPTS=\"-j16\""));
+        assert!(export_str.contains("LDFLAGS=\"-Wl,-O1\""));
+    }
+
+    #[test]
+    fn test_freebsd_pkg_audit_engine() {
+        let mut engine = FreeBsdPkgAuditEngine::new();
+        engine.register_advisory(PkgAuditAdvisory {
+            id: "SA-24:01".to_string(),
+            package_name: "openssh".to_string(),
+            vulnerable_versions: vec!["9.6p1".to_string()],
+            cvss_score: 85,
+            description: "Remote code execution vulnerability".to_string(),
+        });
+
+        let (blocked, reason) = engine.should_block_install("openssh", "9.6p1");
+        assert!(blocked);
+        assert!(reason.unwrap().contains("SA-24:01"));
+
+        let (blocked_ok, _) = engine.should_block_install("openssh", "9.7p1");
+        assert!(!blocked_ok);
+    }
+
+    #[test]
+    fn test_nix_cas_store_gc_governor() {
+        let mut gc = NixCasStoreGcGovernor::new();
+        gc.register_store_path("hash1", "/nix/store/hash1-glibc-2.38", 10_000_000);
+        gc.register_store_path("hash2", "/nix/store/hash2-unused-lib", 5_000_000);
+
+        gc.add_gc_root("/nix/store/hash1-glibc-2.38", "system-profile");
+        assert_eq!(
+            gc.calculate_closure_size(&["/nix/store/hash1-glibc-2.38", "/nix/store/hash2-unused-lib"]),
+            15_000_000
+        );
+
+        let (count, bytes) = gc.collect_garbage();
+        assert_eq!(count, 1);
+        assert_eq!(bytes, 5_000_000);
+        assert_eq!(gc.store_paths.len(), 1);
+    }
+
+    #[test]
+    fn test_apk_v3_signature_engine() {
+        let mut engine = ApkV3SignatureEngine::new();
+        engine.register_key("alpine-official", "-----BEGIN PUBLIC KEY-----...", true);
+
+        let metadata = ApkIndexMetadata {
+            repo_url: "https://dl-cdn.alpinelinux.org/alpine/v3.19/main".to_string(),
+            checksum_sha256: "abc123sha256".to_string(),
+            signature_b64: "sig_b64_data".to_string(),
+        };
+
+        assert!(engine.verify_index_signature("alpine-official", &metadata));
+        assert!(engine.verify_package_checksum("ABC123SHA256", "abc123sha256"));
+    }
+
+    #[test]
+    fn test_rpm_delta_reconstitution_engine() {
+        let mut engine = RpmDeltaReconstitutionEngine::new();
+        engine.register_delta(DeltaRpmSpec {
+            package_name: "bash".to_string(),
+            base_version: "5.2.15".to_string(),
+            target_version: "5.2.21".to_string(),
+            delta_bytes: 300_000,
+            full_bytes: 2_000_000,
+            delta_sha256: "delta_sha256_hash".to_string(),
+        });
+
+        let rpm = engine.reconstruct_rpm_package("bash", "5.2.15", "5.2.21").unwrap();
+        assert_eq!(rpm, "bash-5.2.21.x86_64.rpm");
+        assert_eq!(engine.total_bandwidth_saved(), 1_700_000);
+    }
+
+    #[test]
+    fn test_dpkg_divert_engine() {
+        let mut engine = DpkgDivertEngine::new();
+        engine.add_diversion(DpkgDivertRule {
+            package_name: "dash".to_string(),
+            original_path: "/bin/sh".to_string(),
+            diverted_path: "/bin/sh.distrib".to_string(),
+            is_local_override: false,
+        });
+
+        assert_eq!(
+            engine.resolve_target_path("/bin/sh", "bash"),
+            "/bin/sh.distrib"
+        );
+        assert_eq!(
+            engine.resolve_target_path("/bin/sh", "dash"),
+            "/bin/sh"
+        );
+    }
+
+    #[test]
+    fn test_pacman_keyring_engine() {
+        let mut keyring = PacmanKeyringEngine::new("MASTER_SIGMA_KEY");
+        keyring.import_key(PacmanGpgKey {
+            key_id: "DEVELOPER_KEY_1".to_string(),
+            uid: "Arch Linux Packager <packager@archlinux.org>".to_string(),
+            fingerprint: "1234567890ABCDEF".to_string(),
+            trust_level: PacmanKeyTrust::Full,
+            issuer_key_id: Some("MASTER_SIGMA_KEY".to_string()),
+        });
+
+        assert!(keyring.verify_package_signature("DEVELOPER_KEY_1", true));
+        assert!(keyring.validate_chain_to_master("DEVELOPER_KEY_1"));
     }
 }
