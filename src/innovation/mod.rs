@@ -75,7 +75,7 @@ impl LLMIntegration {
         if !self.enabled.load(Ordering::SeqCst) {
             return vec![];
         }
-        
+
         vec![
             "Consider enabling AI-powered scheduling for better performance".to_string(),
             "System security analysis shows no critical vulnerabilities".to_string(),
@@ -119,7 +119,7 @@ impl IntelligentScheduler {
             cpu_affinity: vec![0], // Simplified
             timestamp: 0, // Would use real timestamp
         };
-        
+
         self.performance_history.push(decision.clone());
         decision
     }
@@ -137,7 +137,7 @@ impl PredictiveOptimizer {
         predictions.insert("memory_usage".to_string(), 0.75);
         predictions.insert("cpu_load".to_string(), 0.60);
         predictions.insert("disk_io".to_string(), 0.30);
-        
+
         PredictiveOptimizer {
             enabled: AtomicBool::new(false),
             predictions,
@@ -183,7 +183,7 @@ impl HotPatchingSystem {
         if !self.enabled.load(Ordering::SeqCst) {
             return Err(HotPatchError::SystemDisabled);
         }
-        
+
         // In real implementation, would safely apply kernel patch
         self.active_patches.push(patch);
         Ok(())
@@ -235,13 +235,13 @@ impl TrustedExecutionEnvironment {
 
     pub fn create_secure_session(&mut self, permissions: Vec<String>) -> String {
         let session_id = format!("tee_session_{}", self.secure_enclave.active_sessions.len());
-        
+
         let session = TEESession {
             session_id: session_id.clone(),
             permissions,
             active: true,
         };
-        
+
         self.secure_enclave.active_sessions.push(session);
         session_id
     }
@@ -284,7 +284,7 @@ impl PledgeSystem {
                 return Err(PledgeError::InvalidPromise);
             }
         }
-        
+
         self.active_promises = promises;
         Ok(())
     }
@@ -381,7 +381,7 @@ impl WebAssemblySandbox {
         if !self.enabled.load(Ordering::SeqCst) {
             return Err(WASMError::SandboxDisabled);
         }
-        
+
         self.active_modules.push(module);
         Ok(())
     }
@@ -1278,9 +1278,9 @@ impl InnovativeOSFeatures {
     /// Get system status report
     pub fn get_status_report(&self) -> String {
         let mut report = String::new();
-        
+
         report.push_str("=== SigmaOS Innovative Features Status ===\n");
-        report.push_str(&format!("AI-Native OS: {}\n", 
+        report.push_str(&format!("AI-Native OS: {}\n",
             if self.ai_native.llm_integration.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
         report.push_str(&format!("Hot Patching: {}\n",
             if self.hot_patching.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
@@ -1291,7 +1291,7 @@ impl InnovativeOSFeatures {
             if self.mobile_optimizations.power_management.battery_saver_mode.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
         report.push_str(&format!("Accessibility: {}\n",
             if self.accessibility.screen_reader.enabled.load(Ordering::SeqCst) { "Enabled" } else { "Disabled" }));
-        
+
         report
     }
 }
@@ -1310,7 +1310,7 @@ mod tests {
     fn test_ai_native_os() {
         let mut ai_os = AINativeOS::new();
         ai_os.initialize();
-        
+
         assert!(ai_os.llm_integration.enabled.load(Ordering::SeqCst));
         let recommendations = ai_os.get_recommendations();
         assert!(!recommendations.is_empty());
@@ -1320,24 +1320,24 @@ mod tests {
     fn test_hot_patching() {
         let mut hot_patch = HotPatchingSystem::new();
         hot_patch.enable();
-        
+
         let patch = HotPatch {
             id: "test_patch".to_string(),
             target_component: "kernel".to_string(),
             patch_data: vec![0x01, 0x02, 0x03],
             applied: false,
         };
-        
+
         assert!(hot_patch.apply_patch(patch).is_ok());
     }
 
     #[test]
     fn test_security_hardening() {
         let mut security = SecurityHardening::new();
-        
+
         let promises = vec!["stdio".to_string(), "rpath".to_string()];
         assert!(security.enable_pledge(promises).is_ok());
-        
+
         let permissions = UnveilPermissions {
             read: true,
             write: false,
@@ -1350,7 +1350,7 @@ mod tests {
     fn test_mobile_optimizations() {
         let mut mobile = MobileOptimizations::new();
         mobile.enable_mobile_mode();
-        
+
         assert!(mobile.power_management.battery_saver_mode.load(Ordering::SeqCst));
     }
 
@@ -1358,7 +1358,7 @@ mod tests {
     fn test_innovative_features() {
         let mut features = InnovativeOSFeatures::new();
         features.initialize_all();
-        
+
         let status = features.get_status_report();
         assert!(status.contains("SigmaOS Innovative Features Status"));
     }

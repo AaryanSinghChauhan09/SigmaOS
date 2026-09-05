@@ -57,7 +57,7 @@ impl PQCContext {
 
         self.key_pair = Some(key_pair);
         self.operation_count.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(self.key_pair.as_ref().unwrap())
     }
 
@@ -78,7 +78,7 @@ impl PQCContext {
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(signature)
     }
 
@@ -91,7 +91,7 @@ impl PQCContext {
         // In real implementation, would use Dilithium-5 verification algorithm
         // This is a stub that always returns true for testing
         self.operation_count.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(true)
     }
 
@@ -104,7 +104,7 @@ impl PQCContext {
         // In real implementation, would use SHA3-256 based HKDF
         // This is a stub that generates deterministic keys
         let salt_bytes = if let Some(s) = salt { s } else { &self.hkdf.salt };
-        
+
         for i in 0..okm.len() {
             okm[i] = ikm[i % ikm.len()]
                 .wrapping_add(salt_bytes[i % salt_bytes.len()])
@@ -112,7 +112,7 @@ impl PQCContext {
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
-        
+
         Ok(())
     }
 
@@ -204,7 +204,7 @@ impl PQCPRNG {
         let d = self.state[3];
 
         let result = a.wrapping_add(b).wrapping_add(c).wrapping_add(d);
-        
+
         self.state[0] = d;
         self.state[1] = a;
         self.state[2] = b;
@@ -236,7 +236,7 @@ impl Kyber512 {
     pub fn generate_keypair() -> ([u8; Self::PUBLIC_KEY_SIZE], [u8; Self::SECRET_KEY_SIZE]) {
         let mut pk = [0u8; Self::PUBLIC_KEY_SIZE];
         let mut sk = [0u8; Self::SECRET_KEY_SIZE];
-        
+
         // Stub: generate deterministic keys
         for i in 0..Self::PUBLIC_KEY_SIZE {
             pk[i] = (i as u8).wrapping_mul(13);
@@ -244,14 +244,14 @@ impl Kyber512 {
         for i in 0..Self::SECRET_KEY_SIZE {
             sk[i] = (i as u8).wrapping_mul(23);
         }
-        
+
         (pk, sk)
     }
 
     pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
-        
+
         // Stub: generate deterministic ciphertext and shared secret
         for i in 0..Self::CIPHERTEXT_SIZE {
             ct[i] = pk[i % pk.len()].wrapping_add(7);
@@ -259,18 +259,18 @@ impl Kyber512 {
         for i in 0..Self::SHARED_SECRET_SIZE {
             ss[i] = pk[i % pk.len()].wrapping_mul(3);
         }
-        
+
         (ct, ss)
     }
 
     pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
-        
+
         // Stub: generate deterministic shared secret
         for i in 0..Self::SHARED_SECRET_SIZE {
             ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
         }
-        
+
         ss
     }
 }

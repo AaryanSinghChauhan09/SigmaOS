@@ -390,7 +390,7 @@ mod tests {
         let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
         assert!(fd >= 3);
         assert_eq!(vfs.open_file_count(), 1);
-        
+
         vfs.close(fd).unwrap();
         assert_eq!(vfs.open_file_count(), 0);
     }
@@ -418,15 +418,15 @@ mod tests {
     fn test_seek_operations() {
         let mut vfs = VirtualFileSystem::new();
         let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
-        
+
         // SEEK_SET
         let pos = vfs.seek(fd, 100, 0).unwrap();
         assert_eq!(pos, 100);
-        
+
         // SEEK_CUR
         let pos = vfs.seek(fd, 50, 1).unwrap();
         assert_eq!(pos, 150);
-        
+
         vfs.close(fd).unwrap();
     }
 }

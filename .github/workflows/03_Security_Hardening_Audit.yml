@@ -25,7 +25,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Verify OpenBSD Pledge & Unveil Sandbox
+      - name: Verify Security Hardening & PQC Attestation
         run: |
           ./run_sigma_tests.sh
 

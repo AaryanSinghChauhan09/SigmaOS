@@ -388,7 +388,7 @@ impl AhciPciDriver {
 
 impl PciDriver for AhciPciDriver {
     fn probe(&mut self, device: &PciDeviceInfo) -> Result<bool, &'static str> {
-        let supported = (device.vendor_id == INTEL_VENDOR_ID && 
+        let supported = (device.vendor_id == INTEL_VENDOR_ID &&
             matches!(
                 device.device_id,
                 PANTHER_POINT_AHCI | LYNX_POINT_AHCI | WILDCAT_POINT_AHCI | SUNRISE_POINT_AHCI

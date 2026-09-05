@@ -236,7 +236,7 @@ impl BtopSystemMonitor {
 
     pub fn get_top_processes(&self, count: usize, sort_by: SortBy) -> Vec<&ProcessInfo> {
         let mut processes = self.processes.iter().collect::<Vec<_>>();
-        
+
         match sort_by {
             SortBy::Cpu => {
                 processes.sort_by(|a, b| {
@@ -247,7 +247,7 @@ impl BtopSystemMonitor {
                 processes.sort_by(|a, b| b.memory_mb.cmp(&a.memory_mb));
             }
         }
-        
+
         processes.into_iter().take(count).collect()
     }
 

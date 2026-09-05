@@ -462,10 +462,10 @@ mod tests {
     fn test_hot_plug_support() {
         let mut driver = UsbXhciHostDriver::new(SUNRISE_POINT_XHCI, "0000:00:14.0");
         driver.init_mmio(0xFE800000, 65536).unwrap();
-        
+
         assert!(driver.hot_plug_port(0, true).is_ok());
         assert_eq!(driver.get_device_count(), 1);
-        
+
         assert!(driver.hot_plug_port(0, false).is_ok());
         assert_eq!(driver.get_device_count(), 0);
     }

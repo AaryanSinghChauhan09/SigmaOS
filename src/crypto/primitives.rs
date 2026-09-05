@@ -375,7 +375,7 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
 /// Generate random bytes with enhanced entropy collection
 pub fn random_bytes(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;
-    
+
     unsafe {
         if RNG.is_none() {
             // Enhanced entropy collection with multiple sources
@@ -406,7 +406,7 @@ pub fn random_bytes(buf: &mut [u8]) {
 
             RNG = Some(XorshiftRNG::new(seed));
         }
-        
+
         if let Some(ref mut rng) = RNG {
             rng.fill_random(buf);
         }

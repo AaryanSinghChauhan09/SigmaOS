@@ -585,7 +585,7 @@ mod tests {
     fn test_duplicate_mount_point() {
         let mut manager = Ext4FilesystemManager::new();
         manager.mount("/mnt/data", "/dev/sda1").unwrap();
-        
+
         // Try to mount same point again
         let result = manager.mount("/mnt/data", "/dev/sdb1");
         assert!(result.is_err());

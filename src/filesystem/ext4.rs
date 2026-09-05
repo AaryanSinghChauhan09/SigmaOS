@@ -161,11 +161,11 @@ impl Default for Ext4FileSystem {
 impl FileSystem for Ext4FileSystem {
     fn init(&mut self) -> Result<(), VfsError> {
         self.init_block_groups()?;
-        
+
         // Create root inode (inode 2 on ext4)
         let root = Inode::new(2, FileType::Directory, 0o755);
         self.inode_cache.push(root);
-        
+
         self.mounted = true;
         Ok(())
     }
