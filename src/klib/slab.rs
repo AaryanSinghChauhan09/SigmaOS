@@ -1,4 +1,3 @@
-use std::vec::Vec;
 
 // SigmaOS klib: Slab Allocator (like Linux SLUB/SLAB, FreeBSD UMA)
 // Custom memory allocator for fixed-size object allocation pools

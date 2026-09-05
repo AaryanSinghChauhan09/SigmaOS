@@ -384,7 +384,7 @@ impl HdaController {
         self.stream_count.load(Ordering::SeqCst)
     }
 
-    pub fn set_volume(&self, codec_idx: u8, level: u8) -> Result<(), &'static str> {
+    pub fn set_volume(&self, codec_idx: u8, _level: u8) -> Result<(), &'static str> {
         if (codec_idx as usize) >= self.codecs.len() {
             return Err("Invalid codec index");
         }
@@ -395,7 +395,7 @@ impl HdaController {
         Ok(())
     }
 
-    pub fn mute(&self, codec_idx: u8, mute: bool) -> Result<(), &'static str> {
+    pub fn mute(&self, codec_idx: u8, _mute: bool) -> Result<(), &'static str> {
         if (codec_idx as usize) >= self.codecs.len() {
             return Err("Invalid codec index");
         }

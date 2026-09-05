@@ -221,7 +221,7 @@ impl PaxMprotect {
     }
 
     /// Check memory operation
-    pub fn check_operation(&mut self, operation: &str) -> bool {
+    pub fn check_operation(&mut self, _operation: &str) -> bool {
         if !self.enabled {
             return true;
         }

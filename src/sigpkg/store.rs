@@ -19,7 +19,6 @@ use std::vec::Vec;
 
 use crate::sigpkg::Package;
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 /// PathBuf-like alias using String for no_std compatibility
 type PathBuf = std::string::String;

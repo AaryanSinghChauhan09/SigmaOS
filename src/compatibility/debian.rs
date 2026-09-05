@@ -4,9 +4,7 @@
 //! Zero external dependencies.
 
 use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==============================================================================
 // 1. APT Repository Synchronization & GPG Keyring verification

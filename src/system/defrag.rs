@@ -20,7 +20,6 @@ use std::vec::Vec;
 // SigmaOS Disk Defragmenter for SigmaFS
 // OOP-based defragmentation with Merkle tree optimization
 
-use crate::klib::BTreeMap;
 pub type Path = str;
 pub type PathBuf = String;
 
@@ -157,7 +156,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
     }
 
     fn defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError> {
-        let start_time = 0u64;
+        let _start_time = 0u64;
 
         let report = self.analyze(path)?;
         let fragmentation_before = report.fragmentation_percent;
@@ -227,13 +226,13 @@ impl SigmaFsDefragStrategy {
         Ok(())
     }
 
-    fn defragment_file(&self, file_info: &FileBlockInfo) -> bool {
+    fn defragment_file(&self, _file_info: &FileBlockInfo) -> bool {
         // Simulate file defragmentation
         // In real implementation, this would move blocks to contiguous locations
         true
     }
 
-    fn update_merkle_trees(&self, path: &Path) {
+    fn update_merkle_trees(&self, _path: &Path) {
         // Simulate updating Merkle trees after defragmentation
         // This ensures crash-consistency is maintained
     }

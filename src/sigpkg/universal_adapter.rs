@@ -1,5 +1,3 @@
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::collections::HashMap;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
@@ -25,8 +23,6 @@ use crate::sigpkg::universal_oop_system;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
@@ -59,7 +55,6 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -391,7 +391,7 @@ impl PasswordManager {
 
     /// Check if locked
     pub fn is_locked(&self) -> bool {
-        if let Some(last) = self.last_access {
+        if let Some(_last) = self.last_access {
             core::time::Duration::from_millis(0)
                 > core::time::Duration::from_secs(self.auto_lock_timeout_seconds)
         } else {

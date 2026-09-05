@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -339,7 +338,7 @@ impl ProcessManager {
 
     /// Auto-refresh if needed
     fn auto_refresh_if_needed(&mut self) {
-        if let Some(last) = self.last_refresh {
+        if let Some(_last) = self.last_refresh {
             if core::time::Duration::from_millis(0) < self.refresh_interval {
                 return;
             }

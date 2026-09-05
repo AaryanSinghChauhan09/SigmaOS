@@ -30,7 +30,7 @@ use std::string::String;
 use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicI32, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicI32, Ordering};
 
 // ==========================================
 // 1. sudo/doas Style Privilege Elevator

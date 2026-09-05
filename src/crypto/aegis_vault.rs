@@ -5,8 +5,6 @@
 // Inspired by OpenBSD signify, Android File-Based Encryption (FBE), and Apple FileVault.
 
 
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

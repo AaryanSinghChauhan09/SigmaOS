@@ -3,7 +3,6 @@
 /// Provides native ext4 filesystem support with journal recovery
 
 use super::vfs::{DirEntry, FileSystem, FileType, Inode, VfsError};
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// EXT4 Superblock
@@ -242,7 +241,7 @@ impl FileSystem for Ext4FileSystem {
             .ok_or(VfsError::NotFound)
     }
 
-    fn create(&mut self, parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError> {
+    fn create(&mut self, _parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError> {
         if name.len() > 255 {
             return Err(VfsError::NameTooLong);
         }
@@ -254,7 +253,7 @@ impl FileSystem for Ext4FileSystem {
         Ok(inode_num)
     }
 
-    fn mkdir(&mut self, parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError> {
+    fn mkdir(&mut self, _parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError> {
         if name.len() > 255 {
             return Err(VfsError::NameTooLong);
         }

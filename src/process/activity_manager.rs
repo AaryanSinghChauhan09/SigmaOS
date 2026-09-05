@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // System Activity Manager for SigmaOS
 // Inspired by Linux systemd cgroup activity tracking, Android ActivityManager,

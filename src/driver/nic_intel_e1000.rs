@@ -239,7 +239,7 @@ impl IntelNicDriver {
 
 
 
-    pub fn transmit_packet(&mut self, packet: &[u8]) -> Result<(), &'static str> {
+    pub fn transmit_packet(&mut self, _packet: &[u8]) -> Result<(), &'static str> {
         if self.tx_ring.is_full() {
             return Err("TX ring full");
         }
@@ -253,7 +253,7 @@ impl IntelNicDriver {
         Ok(())
     }
 
-    pub fn receive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn receive_packet(&mut self, _buffer: &mut [u8]) -> Result<usize, &'static str> {
         if self.rx_ring.is_empty() {
             return Err("No packets available");
         }

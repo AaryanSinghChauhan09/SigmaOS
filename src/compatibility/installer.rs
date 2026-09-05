@@ -3,8 +3,6 @@
 
 use std::string::String;
 use std::vec::Vec;
-use core::cell::RefCell;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================
 // 1. LIVE ISO CONFIGURATION (RAMDISK OVERLAYS)
@@ -163,7 +161,7 @@ impl PreseedAutoDeployer {
             }
         }
 
-        let filesystem = wizard.configure_partitioning()?;
+        let _filesystem = wizard.configure_partitioning()?;
         // In production, would log success to kernel buffer
 
         Ok(())

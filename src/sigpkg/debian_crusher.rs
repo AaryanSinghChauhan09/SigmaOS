@@ -1,5 +1,4 @@
 use std::format;
-use std::vec;
 // Debian Crusher Core for SigmaOS Package Management
 // Absorbs Debian .deb package control manifests, enforces zero-hook declarative
 // state updates (eliminating fragile dpkg maintainer scripts), and resolves

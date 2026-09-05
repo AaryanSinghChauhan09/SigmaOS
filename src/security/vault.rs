@@ -286,7 +286,7 @@ impl EncryptedFileVault {
     pub fn add_file(&mut self, file_path: &str) -> Result<VaultResult, VaultError> {
         let data = vec![0x53, 0x69, 0x67, 0x6d, 0x61]; // simulated file content
 
-        let (encrypted_data, iv, tag) = self.encryption.encrypt(&data, &self.master_key)?;
+        let (_encrypted_data, iv, tag) = self.encryption.encrypt(&data, &self.master_key)?;
 
         let encrypted_filename = format!("{}.enc", file_path);
         let encrypted_path = format!("{}/{}", self.vault_path, encrypted_filename);
@@ -386,7 +386,7 @@ impl EncryptedFileVault {
                 &encrypted_file.tag,
             )?;
 
-            let (new_encrypted_data, new_iv, new_tag) =
+            let (_new_encrypted_data, new_iv, new_tag) =
                 self.encryption.encrypt(&decrypted_data, &new_key)?;
 
             let updated_file = EncryptedFile {

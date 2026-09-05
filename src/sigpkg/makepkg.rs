@@ -66,8 +66,6 @@ impl Package {
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
@@ -258,7 +256,7 @@ impl MakepkgSandbox {
             .ok_or("pkgver not found in PKGBUILD")?
             .clone();
 
-        let pkgrel = self
+        let _pkgrel = self
             .pkgbuild
             .pkgrel()
             .ok_or("pkgrel not found in PKGBUILD")?

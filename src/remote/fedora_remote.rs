@@ -6,7 +6,6 @@
 // - FreeIPA Enterprise Realm & Kerberos GSSAPI Single Sign-On (`FedoraFreeIpaKerberosAuth`)
 
 
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

@@ -105,7 +105,7 @@ impl AperiodicScheduler {
     pub fn enqueue_task(&mut self, mut task: AperiodicTask) -> Result<(), &'static str> {
         // Enforce Constant Bandwidth Server (CBS) virtual deadline calculation if CBS
         if let AperiodicServerKind::ConstantBandwidthServer {
-            max_budget_ms,
+            max_budget_ms: _,
             period_ms,
             ref mut virtual_deadline_ms,
             ..

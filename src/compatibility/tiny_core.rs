@@ -1,5 +1,3 @@
-use crate::filesystem::FileType;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 /// Tiny Core Linux Compatibility & Philosophy Absorption for SigmaOS

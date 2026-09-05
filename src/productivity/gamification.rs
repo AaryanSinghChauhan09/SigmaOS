@@ -1,4 +1,3 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS Gamified Productivity System
@@ -161,7 +160,7 @@ impl PomodoroTimer {
             return;
         }
 
-        if let Some(start) = self.start_time {
+        if let Some(_start) = self.start_time {
             self.elapsed = core::time::Duration::from_millis(0);
 
             if self.elapsed >= self.current_duration {

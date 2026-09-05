@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce

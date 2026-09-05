@@ -3,8 +3,7 @@
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 /// Log levels

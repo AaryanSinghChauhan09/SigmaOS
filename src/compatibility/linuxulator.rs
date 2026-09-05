@@ -2,7 +2,6 @@ use std::vec;
 // Sovereign Linuxulator - Native Linux ELF Binary Loader and Syscall Translation Engine for SigmaOS
 // Inspired by the FreeBSD linuxulator, allowing unmodified Linux x86_64 binaries to run natively under microkernel isolation.
 
-use crate::driver::device::DeviceError;
 use crate::interrupt::handler::RegisterSet;
 use std::string::String;
 use std::vec::Vec;
@@ -231,7 +230,7 @@ impl SovereignLinuxulator {
 
         let syscall_num = process.registers.rax;
         let arg0 = process.registers.rdi;
-        let arg1 = process.registers.rsi;
+        let _arg1 = process.registers.rsi;
         let arg2 = process.registers.rdx;
 
         match syscall_num {

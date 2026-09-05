@@ -274,7 +274,7 @@ impl OpenRCInit {
     pub fn rc_update(
         &mut self,
         service: &str,
-        runlevel: &str,
+        _runlevel: &str,
         operation: &str,
     ) -> Result<(), &'static str> {
         if let Some(svc) = self.services.get_mut(service) {

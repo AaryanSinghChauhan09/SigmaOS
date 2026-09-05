@@ -2,7 +2,7 @@
 
 use std::boxed::Box;
 use core::mem;
-use core::ptr::{self, NonNull};
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Device Driver Framework for SigmaOS

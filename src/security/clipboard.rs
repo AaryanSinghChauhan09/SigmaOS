@@ -13,9 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 // SigmaOS Secure Clipboard Manager

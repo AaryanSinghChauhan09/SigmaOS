@@ -1,10 +1,8 @@
-use std::format;
 // SigmaOS CPU Frequency Scaling & Advanced Power Governors (Linux Inspired)
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
-use std::boxed::Box;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

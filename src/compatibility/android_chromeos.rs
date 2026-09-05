@@ -1,5 +1,3 @@
-use std::format;
-use std::vec;
 // SigmaOS Android & ChromeOS Parity Subsystem Layer
 // Replicates key Android and ChromeOS subsystem capabilities:
 // 1. Android APK & AAB Manifest Parser & permission filter (ApkManifestParser)

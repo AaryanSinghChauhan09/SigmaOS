@@ -5,11 +5,11 @@ use std::vec;
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
 use crate::klib::collections::HashMap;
-use crate::sigpkg::{Dependency, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Version};
 use std::string::{String, ToString};
 use std::vec::Vec;
 use core::default::Default;
-use core::option::Option::{self, None, Some};
+use core::option::Option::{self};
 use core::result::Result::{self, Err, Ok};
 
 /// Build system type

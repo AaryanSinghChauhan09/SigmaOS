@@ -102,7 +102,7 @@ impl MockUPIService {
             d_idx = 1;
         } else {
             while temp > 0 {
-                digits[d_idx] = (b'0' + (temp % 10) as u8);
+                digits[d_idx] = b'0' + (temp % 10) as u8;
                 temp /= 10;
                 d_idx += 1;
             }

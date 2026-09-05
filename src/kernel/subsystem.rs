@@ -1,10 +1,9 @@
-use std::format;
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
 use std::boxed::Box;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::any::Any;
 

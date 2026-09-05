@@ -413,7 +413,7 @@ impl CrossDeviceOrchestrator {
             CrossDeviceAction::RemoteSyscall {
                 device_id,
                 syscall_number,
-                arguments,
+                arguments: _,
                 capability_token,
             } => {
                 if !self.devices.contains_key(&device_id) {

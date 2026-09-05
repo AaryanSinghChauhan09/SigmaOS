@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 // Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
 // Implements high-performance kernel data structures:
 // - SplayTree<K, V>: FreeBSD `sys/tree.h` inspired self-balancing binary search tree

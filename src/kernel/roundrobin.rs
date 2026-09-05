@@ -517,7 +517,7 @@ impl SovereignMultiQueueRoundRobin {
             .iter()
             .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
         {
-            let mut task = self.realtime_queue.remove(pos);
+            let task = self.realtime_queue.remove(pos);
             if task.policy == SchedPolicy::SchedRr {
                 // Re-enqueue at back of RT queue after picking
                 let mut queued = task.clone();
@@ -534,7 +534,7 @@ impl SovereignMultiQueueRoundRobin {
             .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
         {
             let task = self.high_queue.remove(pos);
-            let mut queued = task.clone();
+            let queued = task.clone();
             self.high_queue.push(queued);
             return Some(task);
         }
@@ -546,7 +546,7 @@ impl SovereignMultiQueueRoundRobin {
             .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
         {
             let task = self.normal_queue.remove(pos);
-            let mut queued = task.clone();
+            let queued = task.clone();
             self.normal_queue.push(queued);
             return Some(task);
         }
@@ -558,7 +558,7 @@ impl SovereignMultiQueueRoundRobin {
             .position(|t| t.cpu_id == cpu_id && t.state == ProcessState::Ready)
         {
             let task = self.idle_queue.remove(pos);
-            let mut queued = task.clone();
+            let queued = task.clone();
             self.idle_queue.push(queued);
             return Some(task);
         }

@@ -5,7 +5,6 @@
 use std::collections::BTreeMap;
 use std::vec::Vec;
 use std::string::{String, ToString};
-use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::driver::pci_bus::PciAddress;
 
@@ -189,12 +188,12 @@ impl PciBar {
 #[inline]
 pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
     // Use legacy I/O port access (0xCF8/0xCFC)
-    let config_address = addr.legacy_io_address(offset);
+    let _config_address = addr.legacy_io_address(offset);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // SAFETY: Writing to PCI config ports is platform standard
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16;
+        let _data_port = 0x0CFCu16;
         let value = 0u32; // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 3) * 8)) & 0xff) as u8
     }
@@ -202,11 +201,11 @@ pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
 
 #[inline]
 pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
-    let config_address = addr.legacy_io_address(offset & !1);
+    let _config_address = addr.legacy_io_address(offset & !1);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16;
+        let _data_port = 0x0CFCu16;
         let value = 0u32; // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 2) * 8)) & 0xffff) as u16
     }
@@ -214,44 +213,44 @@ pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
 
 #[inline]
 pub fn pci_read_u32(addr: PciAddress, offset: u8) -> u32 {
-    let config_address = addr.legacy_io_address(offset & !3);
+    let _config_address = addr.legacy_io_address(offset & !3);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16;
+        let _data_port = 0x0CFCu16;
         0u32 // core::arch::x86_64::_inl( stub:data_port)
     }
 }
 
 #[inline]
-pub fn pci_write_u8(addr: PciAddress, offset: u8, value: u8) {
-    let config_address = addr.legacy_io_address(offset);
+pub fn pci_write_u8(addr: PciAddress, offset: u8, _value: u8) {
+    let _config_address = addr.legacy_io_address(offset);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16 + ((offset & 3) as u16);
+        let _data_port = 0x0CFCu16 + ((offset & 3) as u16);
         // core::arch::x86_64::_outb( // stub:data_port, value);
     }
 }
 
 #[inline]
-pub fn pci_write_u16(addr: PciAddress, offset: u8, value: u16) {
-    let config_address = addr.legacy_io_address(offset & !1);
+pub fn pci_write_u16(addr: PciAddress, offset: u8, _value: u16) {
+    let _config_address = addr.legacy_io_address(offset & !1);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16 + ((offset & 2) as u16);
+        let _data_port = 0x0CFCu16 + ((offset & 2) as u16);
         // core::arch::x86_64::_outw( // stub:data_port, value);
     }
 }
 
 #[inline]
-pub fn pci_write_u32(addr: PciAddress, offset: u8, value: u32) {
-    let config_address = addr.legacy_io_address(offset & !3);
+pub fn pci_write_u32(addr: PciAddress, offset: u8, _value: u32) {
+    let _config_address = addr.legacy_io_address(offset & !3);
     unsafe {
-        let port_addr = 0x0CF8u16;
+        let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let data_port = 0x0CFCu16;
+        let _data_port = 0x0CFCu16;
         // core::arch::x86_64::_outl( // stub:data_port, value);
     }
 }

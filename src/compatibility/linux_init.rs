@@ -17,10 +17,8 @@
 //! Process supervision
 //! System state management
 
-use std::vec;
 // SigmaOS Linux Init System Concepts
 // Implements init system concepts inspired by systemd and SysVinit
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

@@ -1,11 +1,9 @@
 
-use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::filesystem::FsError;
 use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
+use crate::kernel::sched::task::{SchedPolicy, Task};
 
 /// Thermal zone reading
 #[derive(Debug, Clone, Copy)]

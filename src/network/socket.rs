@@ -2,7 +2,7 @@
 /// SigmaOS: Socket Implementation
 /// BSD-compatible socket API for TCP/UDP/ICMP
 
-use super::zenithnet::{Ipv4Addr, NetworkError, TcpState};
+use super::zenithnet::{Ipv4Addr, TcpState};
 use std::collections::BTreeMap;
 use std::vec::Vec;
 use core::fmt;

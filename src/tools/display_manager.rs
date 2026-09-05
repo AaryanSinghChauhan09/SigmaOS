@@ -1,4 +1,3 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 // Display Manager (GDM/LightDM Inspiration)
@@ -145,8 +144,8 @@ impl DisplayManager {
         self.autologin = Some(user_id);
     }
 
-    pub fn start_session(&mut self, session_name: &str, user_id: u32) -> Result<(), DMError> {
-        if let Some(session) = self.sessions.iter().find(|s| s.name == session_name) {
+    pub fn start_session(&mut self, session_name: &str, _user_id: u32) -> Result<(), DMError> {
+        if let Some(_session) = self.sessions.iter().find(|s| s.name == session_name) {
             // Start session
             self.current_session = Some(session_name.to_string());
             Ok(())

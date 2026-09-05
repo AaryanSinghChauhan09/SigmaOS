@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only

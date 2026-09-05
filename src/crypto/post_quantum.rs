@@ -2,9 +2,7 @@
 // SigmaOS Post-Quantum Cryptography Module
 // Implements NIST PQC standards: Dilithium-5 (signing), Kyber-1024 (encryption)
 
-use std::boxed::Box;
 use std::vec::Vec;
-use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 // ============================================================================
@@ -297,7 +295,7 @@ impl PostQuantumCryptoManager {
     pub fn sign_dilithium(
         &self,
         secret_key: &DilithiumSecretKey,
-        message: &[u8],
+        _message: &[u8],
     ) -> Result<DilithiumSignature, &'static str> {
         if !secret_key.is_valid() {
             return Err("Invalid secret key");
@@ -318,7 +316,7 @@ impl PostQuantumCryptoManager {
     pub fn verify_dilithium(
         &self,
         public_key: &DilithiumPublicKey,
-        message: &[u8],
+        _message: &[u8],
         signature: &DilithiumSignature,
     ) -> Result<bool, &'static str> {
         if !public_key.is_valid() {

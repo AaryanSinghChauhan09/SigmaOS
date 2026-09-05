@@ -5,8 +5,7 @@ use std::boxed::Box;
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
 

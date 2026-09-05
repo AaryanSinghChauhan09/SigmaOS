@@ -913,7 +913,7 @@ impl XhciHostControllerDriver {
 }
 
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn test_linux_devtmpfs() {

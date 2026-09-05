@@ -2,7 +2,7 @@
 //! WPA3 Wi-Fi connection profiles, DNS resolution, Bluetooth LE GATT services,
 //! and AP hotspot configuration.
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

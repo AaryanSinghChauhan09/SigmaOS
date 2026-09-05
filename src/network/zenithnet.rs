@@ -3,7 +3,7 @@
 /// Implements TCP/IP, UDP, ARP, ICMP with zero-copy packet handling
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::fmt;
 

@@ -1,6 +1,4 @@
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 // SigmaOS Security Evolution Bridge (SecurityBridge)
 // Maps legacy security models (basic Unix DAC, AppArmor profile contexts, legacy SELinux labels) to modern zero-trust capability gates
 

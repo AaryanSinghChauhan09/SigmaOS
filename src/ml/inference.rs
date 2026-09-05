@@ -5,7 +5,6 @@ use std::boxed::Box;
 /// Implements neural network inference and model loading
 use std::vec::Vec;
 
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ModelID = usize;

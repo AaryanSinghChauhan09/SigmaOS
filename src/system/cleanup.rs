@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
@@ -21,7 +20,6 @@ use std::vec::Vec;
 // SigmaOS System Cleanup Utility
 // Smart temporary file remover with OOP-based design
 
-use crate::klib::BTreeMap;
 pub type Path = str;
 pub type PathBuf = String;
 
@@ -144,7 +142,7 @@ impl CacheStrategy {
 }
 
 impl CleanupStrategy for CacheStrategy {
-    fn should_clean(&self, path: &Path) -> bool {
+    fn should_clean(&self, _path: &Path) -> bool {
         if let Some(parent) = None::<&str> {
             if parent.ends_with("cache") || parent.ends_with(".cache") {
                 return true;

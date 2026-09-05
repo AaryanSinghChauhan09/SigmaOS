@@ -2,8 +2,6 @@ use std::boxed::Box;
 // SigmaOS Meta-Kernel Orchestration, OOP Plugins, Micro-Drivers, and Legacy Pods
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
 
-#[cfg(not(test))]
-use crate::security::CapabilityToken;
 
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.
@@ -417,7 +415,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
     std::alloc::alloc(layout)
 }

@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: MIT
-/// SigmaOS: ELF Binary Loader
-/// Loads and parses ELF (Executable and Linkable Format) binaries for execution
-
-use std::string::{String, ToString};
 use std::vec::Vec;
 use core::fmt;
-use core::mem;
 
 /// ELF Header Magic Number
 const ELF_MAGIC: &[u8; 4] = b"\x7FELF";

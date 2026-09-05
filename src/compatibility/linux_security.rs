@@ -146,7 +146,7 @@ impl SecurityModuleManager {
         self.apparmor_profiles.push(profile);
     }
 
-    pub fn check_access(&self, path: &str, operation: &str) -> bool {
+    pub fn check_access(&self, _path: &str, _operation: &str) -> bool {
         // Simplified access check
         true
     }
@@ -229,7 +229,7 @@ impl SecurityPolicy {
         }
     }
 
-    pub fn enforce(&self, action: &str) -> bool {
+    pub fn enforce(&self, _action: &str) -> bool {
         if self.enforce_mandatory_access {
             // In a real implementation, this would check MAC policies
             true

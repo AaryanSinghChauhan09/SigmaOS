@@ -3,7 +3,6 @@
 
 use std::string::String;
 use std::vec::Vec;
-use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================

@@ -1,4 +1,3 @@
-use std::format;
 // AT&T System V, Linux & BSD Inspired Identification, Verification, ADT & Security Subsystem
 // Implements 5-step User Identification, Verification, Authenticity of Information,
 // Attributes Definition Table (ADT), and Automatic Allocation & Management Engine.

@@ -1,15 +1,6 @@
 use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use core::ops::{Deref, DerefMut};
 
-use core::mem;
-/// OOP-based Boot Performance Optimization for SigmaOS
-/// Implements boot optimization using OOP principles with traits and structs
-/// No dependency on external optimization frameworks
-/// Based on Roadmap Item 20: Boot performance optimization
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Service ID

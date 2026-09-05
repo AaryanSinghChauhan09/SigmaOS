@@ -3670,7 +3670,7 @@ impl FedoraToolbxContainerEngine {
     }
 
     pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
-        let mut default_mounts = vec![
+        let default_mounts = vec![
             "/home".to_string(),
             "/var/srv".to_string(),
             "/dev".to_string(),

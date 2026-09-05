@@ -3,7 +3,6 @@
 /// Implements packet routing, forwarding, and network lookup
 
 use super::zenithnet::{Ipv4Addr, NetworkError};
-use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 

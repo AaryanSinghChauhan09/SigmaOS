@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
-use std::vec;
 // SigmaOS Absolute Superiority Subsystem (SigmaSuperiority)
 //
 // Formally implements and unifies all remaining planned/unimplemented USPs of SigmaOS:

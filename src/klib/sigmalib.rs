@@ -1,6 +1,5 @@
 //! SigmaLib - Custom Standard Library (musl/dietlibc Inspiration)
 //! Zero-dependency implementation of standard library functions
-use std::string::{String, ToString};
 
 /// String operations (zero-allocation)
 pub mod string {
@@ -214,7 +213,7 @@ pub mod math {
             return 0.0;
         }
 
-        let mut x = x;
+        let x = x;
         let mut result = x;
         let mut x0 = x;
 
@@ -230,7 +229,7 @@ pub mod math {
 /// I/O operations (zero-allocation)
 pub mod io {
     /// Write character to output
-    pub fn putchar(c: u8) {
+    pub fn putchar(_c: u8) {
         // Platform-specific implementation
         // In production, would write to stdout
     }
@@ -257,7 +256,7 @@ pub mod io {
 /// Process management (zero-allocation)
 pub mod process {
     /// Exit process
-    pub fn exit(code: i32) -> ! {
+    pub fn exit(_code: i32) -> ! {
         // Platform-specific implementation
         loop {}
     }
@@ -289,7 +288,7 @@ pub mod time {
     }
 
     /// Sleep for milliseconds (simplified)
-    pub fn sleep_ms(ms: u64) {
+    pub fn sleep_ms(_ms: u64) {
         // Platform-specific implementation
         // In production, would use actual sleep
     }

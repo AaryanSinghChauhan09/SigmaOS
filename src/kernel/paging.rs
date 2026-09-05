@@ -1,4 +1,3 @@
-use std::vec;
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, #![no_std] compliant x86_64 paging implementation.
 

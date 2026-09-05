@@ -2,7 +2,7 @@
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. Self-Healing Code Generator

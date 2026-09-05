@@ -2,10 +2,9 @@
 /// SigmaOS: Process Scheduler (EEVDF - Earliest Eligible Virtual Deadline First)
 /// Implements fair, preemptible scheduling with time-slice management
 
-use super::manager::{Priority, ProcessInfo, ProcessState};
+use super::manager::Priority;
 use std::collections::VecDeque;
 use std::vec::Vec;
-use core::fmt;
 
 /// Scheduling Statistics
 #[derive(Debug, Clone, Default)]
@@ -160,7 +159,7 @@ impl Scheduler {
         if let Some(pid) = self.current_process {
             if let Some(pos) = self.ready_queue.iter().position(|e| e.pid == pid) {
                 let weight = Self::get_weight(self.ready_queue[pos].priority);
-                let weight_factor = 1.0 / weight; // Inverse weight for fair queueing
+                let _weight_factor = 1.0 / weight; // Inverse weight for fair queueing
                 self.ready_queue[pos].vruntime.add_ns((elapsed_ms * 1_000_000) as u64 / weight as u64);
                 self.ready_queue[pos].time_slice_remaining =
                     self.ready_queue[pos].time_slice_remaining.saturating_sub(elapsed_ms);

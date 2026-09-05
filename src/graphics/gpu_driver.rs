@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
-use super::nvidia_prime::{NvidiaPrimeEngine, PrimeProfile};
+use super::nvidia_prime::NvidiaPrimeEngine;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuState {

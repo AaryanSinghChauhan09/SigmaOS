@@ -10,7 +10,6 @@ use std::format;
 // 7. Cross-Mode Terminal Multiplexing
 // 8. AI-Driven Daemon Ecosystem
 
-use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

@@ -1,9 +1,7 @@
 
 use std::boxed::Box;
 use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
-use core::mem;
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations
@@ -185,7 +183,7 @@ impl PackageAttestation for SimplePackageAttestation {
     }
 
     fn get_provenance(&self, attestation: &[u8]) -> ProvenanceData {
-        let mut builder = [0u8; 64];
+        let builder = [0u8; 64];
         let mut source_hash = [0u8; 32];
 
         if attestation.len() >= 82 {

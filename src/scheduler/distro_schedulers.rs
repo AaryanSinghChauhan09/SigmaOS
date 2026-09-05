@@ -1,4 +1,3 @@
-use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Comprehensive Multi-Distro CPU Schedulers
 // Inspired by Linux kernel (EEVDF, CFS, BORE, PDS, MuQSS, BFS, CacULE, EAS, SCHED_DEADLINE, SCHED_EXT)

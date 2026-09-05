@@ -1,7 +1,4 @@
 // SigmaOS Distro Compatibility Layer
-/// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
-/// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
-use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==========================================
@@ -93,7 +90,7 @@ impl ZramSwapManager {
         let ratio = self.ratio_percentage.load(Ordering::SeqCst);
         let compressed_size = (uncompressed_size * ratio) / 100;
 
-        let mut size_now = self.compressed_size_bytes.load(Ordering::SeqCst);
+        let size_now = self.compressed_size_bytes.load(Ordering::SeqCst);
         let cap = self.capacity_bytes.load(Ordering::SeqCst);
 
         if size_now + compressed_size > cap {

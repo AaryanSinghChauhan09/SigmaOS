@@ -1,5 +1,4 @@
 #![cfg_attr(target_os = "none", no_std)]
-use std::vec::Vec;
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 

@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]

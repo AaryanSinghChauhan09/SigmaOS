@@ -9,7 +9,6 @@
 // - Background job control parsing (&)
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;

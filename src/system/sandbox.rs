@@ -191,15 +191,15 @@ impl SandboxEnforcement for CapabilitySandboxEnforcer {
 }
 
 impl CapabilitySandboxEnforcer {
-    fn apply_path_restrictions(&self, pid: u64, profile: &SandboxProfile) {
+    fn apply_path_restrictions(&self, _pid: u64, _profile: &SandboxProfile) {
         // Simulate applying path restrictions
     }
 
-    fn apply_network_restrictions(&self, pid: u64, profile: &SandboxProfile) {
+    fn apply_network_restrictions(&self, _pid: u64, _profile: &SandboxProfile) {
         // Simulate applying network restrictions
     }
 
-    fn apply_resource_limits(&self, pid: u64, profile: &SandboxProfile) {
+    fn apply_resource_limits(&self, _pid: u64, _profile: &SandboxProfile) {
         // Simulate applying resource limits
     }
 }
@@ -260,15 +260,15 @@ impl SandboxEnforcement for NamespaceSandboxEnforcer {
 }
 
 impl NamespaceSandboxEnforcer {
-    fn create_mount_namespace(&self, pid: u64) {
+    fn create_mount_namespace(&self, _pid: u64) {
         // Simulate creating mount namespace
     }
 
-    fn create_network_namespace(&self, pid: u64, profile: &SandboxProfile) {
+    fn create_network_namespace(&self, _pid: u64, _profile: &SandboxProfile) {
         // Simulate creating network namespace based on policy
     }
 
-    fn create_pid_namespace(&self, pid: u64) {
+    fn create_pid_namespace(&self, _pid: u64) {
         // Simulate creating PID namespace
     }
 }

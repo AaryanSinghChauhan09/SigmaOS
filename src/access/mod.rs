@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-use std::format;
-use std::vec;
 // SigmaOS Access Module
 // Access control management, LDAP, Wireless Access, Remote File & Tool Access, Process Migration
 // Inspired by Linux (credentials/cgroups/sec) & BSD (ucred/capsicum)
@@ -11,7 +9,6 @@ pub mod control;
 
 pub use crate::filesystem::ext4_ntfs_security::*;
 
-use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
 use core::fmt;

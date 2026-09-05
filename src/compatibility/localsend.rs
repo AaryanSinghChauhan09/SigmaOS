@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // SigmaOS Distro Compatibility Layer
 // SigmaOS LocalSend Protocol Compatibility Bridge
@@ -22,7 +21,7 @@ use std::vec::Vec;
 // to enable offline peer-to-peer secure file transfer within local networks.
 
 use crate::security::capability::CapabilityToken;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 /// Device types supported by LocalSend protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

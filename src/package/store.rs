@@ -1,6 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 // SigmaOS Software Store & Safety Scanner Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Evaluates package installations against security/safety scores and sandboxing requirements.

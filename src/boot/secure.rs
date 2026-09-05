@@ -5,8 +5,6 @@
 /// Based on Roadmap Item 10: Secure boot & firmware validation
 use std::boxed::Box;
 use std::vec::Vec;
-use core::mem;
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component ID

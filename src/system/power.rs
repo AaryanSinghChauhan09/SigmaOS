@@ -20,7 +20,6 @@ use std::vec::Vec;
 // SigmaOS Battery Saver Mode
 // OOP-based power management with adaptive profiles
 
-use core::time::Duration;
 // Instant not in no_std
 
 /// Power mode

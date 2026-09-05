@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS SIMD-Vectorized Crypto Engine (VectorizedPqcEngine)
 // Accelerates CRYSTALS-Kyber polynomial multiplications and Dilithium checks via simulated AVX-512 / Neon registers

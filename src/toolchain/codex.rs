@@ -2,7 +2,7 @@
 // Formulates compiler build codex logs for legacy reproducible tooling
 
 use crate::klib::collections::HashMap;
-use std::string::{String, ToString};
+use std::string::String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {

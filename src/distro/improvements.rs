@@ -12,9 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
 
 // SigmaOS Distro Improvements - Inspired by leading Linux distributions
 // Each section implements concepts adapted from a specific distribution's innovations.
@@ -860,7 +857,6 @@ impl SigmaDistroEngine {
 }
 
 // Bring alloc into scope for format! and vec!
-use std::format as alloc_format;
 
 #[cfg(test)]
 mod tests {

@@ -26,10 +26,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 
 
-use sigma_types::{CapabilityToken, Result};
+use sigma_types::Result;
 
 use std::collections::BTreeSet as HashSet;
 

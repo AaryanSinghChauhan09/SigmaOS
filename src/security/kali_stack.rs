@@ -1,6 +1,5 @@
 
 use crate::klib::Vec;
-use core::mem;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
@@ -395,7 +394,7 @@ impl KaliAirgeddonWifiAudit {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
     std::alloc::alloc(layout)
 }

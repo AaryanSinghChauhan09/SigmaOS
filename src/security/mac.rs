@@ -1,12 +1,6 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::mem;
-/// OOP-based Mandatory Access Control for SigmaOS
-/// Implements MAC using OOP principles with traits and structs
-/// No dependency on external security frameworks
-/// Based on Roadmap Item 62: Mandatory access control
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Security context ID

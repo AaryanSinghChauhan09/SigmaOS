@@ -4,7 +4,7 @@
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
 use std::vec::Vec;
 use core::mem;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 

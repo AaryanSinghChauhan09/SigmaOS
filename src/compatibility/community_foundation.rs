@@ -2,9 +2,7 @@
 // Fulfills low-priority tasks from TODO.md: Foundation establishment,
 // contributor hackathons, documentation sprints, and security bounty programs.
 
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

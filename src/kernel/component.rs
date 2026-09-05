@@ -20,7 +20,6 @@
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component identifier (Genode-style capability-based)

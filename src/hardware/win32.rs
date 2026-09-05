@@ -1,7 +1,5 @@
 use crate::klib::HashMap;
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus

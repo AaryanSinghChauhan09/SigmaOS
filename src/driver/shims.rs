@@ -2,9 +2,6 @@
 // Independent, zero-dependency implementations of Intel e1000, Intel HDA, and VirtIO hardware drivers
 
 use std::collections::BTreeMap;
-use std::format;
-use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
 
 // =========================================================================

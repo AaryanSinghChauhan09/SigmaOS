@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 // Custom BTreeMap implementation for SigmaOS
 // Reduces dependency on std::collections::BTreeMap
 // Simple implementation using sorted Vec for now
@@ -7,7 +5,6 @@ use std::string::{String, ToString};
 use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
-use core::fmt;
 
 pub struct BTreeMap<K, V>
 where

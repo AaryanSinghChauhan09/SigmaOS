@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -152,7 +151,7 @@ impl DuplicateFinder {
         // Second pass: hash files with same size
         let mut files_by_hash: BTreeMap<String, Vec<FileMetadata>> = BTreeMap::new();
 
-        for (size, files) in files_by_size {
+        for (_size, files) in files_by_size {
             if files.len() > 1 {
                 for mut file in files {
                     if let Ok(hash) = self.algorithm.compute_hash(&file.path) {

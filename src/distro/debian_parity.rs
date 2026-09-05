@@ -126,8 +126,8 @@ impl DebianControl {
     /// Parse debian/control file format
     pub fn parse_control(&mut self, control_content: &str) {
         let lines: Vec<&str> = control_content.lines().collect();
-        let mut current_field = String::new();
-        let mut current_value = String::new();
+        let _current_field = String::new();
+        let _current_value = String::new();
 
         for line in lines {
             if line.contains(':') {

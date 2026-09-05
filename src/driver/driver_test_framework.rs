@@ -2,7 +2,6 @@
 // SigmaOS Driver Testing Framework
 // Unified test harness for Phase 2 hardware drivers with QEMU simulation support
 
-use std::boxed::Box;
 use std::vec::Vec;
 use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -138,7 +137,7 @@ impl MockMmioSpace {
     pub fn read(&self, offset: u32) -> u32 {
         self.access_count.fetch_add(1, Ordering::SeqCst);
         if (offset as usize) < self.registers.len() {
-            self.registers[(offset as usize)]
+            self.registers[offset as usize]
         } else {
             0
         }
@@ -147,7 +146,7 @@ impl MockMmioSpace {
     pub fn write(&mut self, offset: u32, value: u32) {
         self.access_count.fetch_add(1, Ordering::SeqCst);
         if (offset as usize) < self.registers.len() {
-            self.registers[(offset as usize)] = value;
+            self.registers[offset as usize] = value;
         }
     }
 

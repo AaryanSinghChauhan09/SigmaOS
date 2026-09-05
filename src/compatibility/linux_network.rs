@@ -19,7 +19,6 @@
 //! Routing and firewall concepts
 //! Network namespace isolation
 //! Advanced networking features
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -242,7 +241,7 @@ impl FirewallManager {
         self.default_policy.clone()
     }
 
-    fn matches_rule(&self, packet: &NetworkPacket, rule: &FirewallRule) -> bool {
+    fn matches_rule(&self, _packet: &NetworkPacket, rule: &FirewallRule) -> bool {
         // Simplified matching logic
         if rule.protocol != FirewallProtocol::All {
             // Check protocol match

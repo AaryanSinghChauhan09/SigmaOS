@@ -32,7 +32,7 @@ impl ApkIndexParser {
     }
 
     /// Parse APKINDEX file format
-    pub fn parse_index(&mut self, index_content: &str) -> Result<(), String> {
+    pub fn parse_index(&mut self, _index_content: &str) -> Result<(), String> {
         let current_pkg = ApkPackage {
             name: String::new(),
             version: String::new(),

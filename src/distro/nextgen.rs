@@ -127,13 +127,13 @@ pub struct ThreadStackConsistencyChecker;
 impl ThreadStackConsistencyChecker {
     /// Verifies no active kernel thread is currently executing inside the target function address range
     pub fn is_callstack_safe(
-        target_symbol: &str,
+        _target_symbol: &str,
         thread_callstacks: &[&[usize]],
         old_fn_start: usize,
         old_fn_len: usize,
     ) -> Result<(), &'static str> {
         let old_fn_end = old_fn_start.saturating_add(old_fn_len);
-        for (tid, stack) in thread_callstacks.iter().enumerate() {
+        for (_tid, stack) in thread_callstacks.iter().enumerate() {
             for &ip in *stack {
                 if ip >= old_fn_start && ip < old_fn_end {
                     return Err("Thread active inside target livepatch function range - unsafe to apply patch");

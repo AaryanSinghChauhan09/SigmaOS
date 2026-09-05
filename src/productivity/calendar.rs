@@ -15,7 +15,6 @@
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 // SigmaOS Calendar App
@@ -25,7 +24,6 @@ use std::vec::Vec;
 use crate::klib::BTreeMap;
 #[cfg(test)]
 use std::collections::BTreeMap;
-use core::time::Duration;
 // SystemTime not in no_std
 
 /// Event type

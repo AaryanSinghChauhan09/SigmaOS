@@ -8,7 +8,6 @@
 use std::vec;
 use std::format;
 
-use std::boxed::Box;
 use std::vec::Vec;
 use std::string::{String, ToString};
 use std::collections::BTreeMap;

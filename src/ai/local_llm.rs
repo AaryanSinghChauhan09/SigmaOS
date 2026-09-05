@@ -1,11 +1,9 @@
 use std::format;
-use std::vec;
 // SigmaOS Local LLM & Whisper Speech-to-Text Integration
 // Native wrapper interfacing with llama.cpp and OpenAI Whisper GGUF models
 // for natural language CLI commands, offline desktop AI assistance, and voice input.
 
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]

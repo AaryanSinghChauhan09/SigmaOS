@@ -5,10 +5,7 @@
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
 
-use core::mem;
 
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]

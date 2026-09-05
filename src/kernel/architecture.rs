@@ -1,5 +1,4 @@
-use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec;
 use std::vec::Vec;
 // 1. Instructions and CPU Initialization
@@ -14,7 +13,7 @@ pub enum InstructionCyclePhase {
 }
 
 #[cfg(not(feature = "standalone_test"))]
-use super::structures::{CpuArchitectureClass, ThreadState};
+use super::structures::ThreadState;
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -447,7 +446,7 @@ impl ArchitectureEngine {
 
         // 2. Restore register context of target thread
         pcb.thread_list[to_idx].state = ThreadState::Running;
-        let target_regs = pcb.thread_list[to_idx].registers;
+        let _target_regs = pcb.thread_list[to_idx].registers;
 
         // 3. Switch page directory mapping (CR3 / PML4 register base)
         let cr3 = pcb.page_directory_base;

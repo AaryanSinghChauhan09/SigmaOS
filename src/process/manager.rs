@@ -206,7 +206,7 @@ impl ProcessManager {
     }
 
     /// Wait for a child process
-    pub fn wait(&self, ppid: u32, wpid: i32) -> Result<(u32, ExitStatus), ProcessError> {
+    pub fn wait(&self, ppid: u32, _wpid: i32) -> Result<(u32, ExitStatus), ProcessError> {
         // Find children of parent
         for (_pid, process) in &self.processes {
             if process.ppid == ppid && process.state == ProcessState::Terminated {

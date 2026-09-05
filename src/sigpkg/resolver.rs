@@ -1,5 +1,4 @@
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation

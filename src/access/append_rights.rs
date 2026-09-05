@@ -1,9 +1,7 @@
-use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 // Appending Access Rights & Immutable Journal Stream Enforcement for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Appending Access Rights Stream Flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

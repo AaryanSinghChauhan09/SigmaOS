@@ -1,9 +1,7 @@
-use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 // Linux, BSD & OpenStack Cinder Inspired Block Device & Storage Extensions for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Block Record Allocation Strategies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

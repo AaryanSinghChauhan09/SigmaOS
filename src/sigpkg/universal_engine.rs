@@ -982,7 +982,7 @@ impl IPackageAdapter for AirPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1009,7 +1009,7 @@ impl IPackageAdapter for BottlePackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1036,7 +1036,7 @@ impl IPackageAdapter for IpaPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1063,7 +1063,7 @@ impl IPackageAdapter for PortsPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1090,7 +1090,7 @@ impl IPackageAdapter for PkgPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1117,7 +1117,7 @@ impl IPackageAdapter for AabPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1144,7 +1144,7 @@ impl IPackageAdapter for TarGzPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1171,7 +1171,7 @@ impl IPackageAdapter for TarXzPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1198,7 +1198,7 @@ impl IPackageAdapter for TarPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1225,7 +1225,7 @@ impl IPackageAdapter for AppBundlePackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1252,7 +1252,7 @@ impl IPackageAdapter for HapPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1279,7 +1279,7 @@ impl IPackageAdapter for PisiPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1306,7 +1306,7 @@ impl IPackageAdapter for SuperdebPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1333,7 +1333,7 @@ impl IPackageAdapter for LzmPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1360,7 +1360,7 @@ impl IPackageAdapter for PupPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1387,7 +1387,7 @@ impl IPackageAdapter for PetPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1414,7 +1414,7 @@ impl IPackageAdapter for SnapPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }
@@ -1440,7 +1440,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
     fn extract_to_store(
         &self,
         _ctx: &PackageContext,
-        store_path: &str,
+        _store_path: &str,
     ) -> Result<(), &'static str> {
         Ok(())
     }

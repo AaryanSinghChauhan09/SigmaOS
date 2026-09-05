@@ -2,12 +2,6 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::mem;
-/// OOP-based System Integrity Monitoring for SigmaOS
-/// Implements integrity monitoring using OOP principles with traits and structs
-/// No dependency on external integrity frameworks
-/// Based on Roadmap Item 66: System integrity monitoring
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// File ID

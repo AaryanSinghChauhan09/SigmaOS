@@ -23,7 +23,7 @@ impl ConfigStore {
     pub fn parse(&mut self, input: &str) -> Result<(), &'static str> {
         let mut current_section = String::new();
 
-        for (line_no, line) in input.lines().enumerate() {
+        for (_line_no, line) in input.lines().enumerate() {
             let trimmed = trim_line(line);
 
             if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with(';') {

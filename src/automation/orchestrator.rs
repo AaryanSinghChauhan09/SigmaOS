@@ -449,7 +449,7 @@ impl AiOrchestrator {
             return None;
         }
 
-        if let Some(last) = self.last_optimization {
+        if let Some(_last) = self.last_optimization {
             if core::time::Duration::from_millis(0) < self.optimization_interval {
                 return None;
             }

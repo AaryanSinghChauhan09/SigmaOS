@@ -1,7 +1,6 @@
 //! OOP-based AI Agent Framework for SigmaOS
 //! Implements AI agent using OOP principles with traits and structs.
 
-use crate::klib::BTreeMap;
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
@@ -245,7 +244,7 @@ impl AIAgent for SimpleAIAgent {
         }
     }
 
-    fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError> {
+    fn execute(&mut self, _intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
         Ok(b"Command executed successfully".to_vec())
     }

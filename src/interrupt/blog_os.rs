@@ -1,9 +1,6 @@
 // GDT, IDT, and VGA Text Buffer architectures for SigmaOS
 // Integrates core bare-metal concepts from phil-opp/blog_os under `#![no_std]`.
 
-use std::string::String;
-use std::vec::Vec;
-use core::sync::atomic::{AtomicU16, AtomicUsize, Ordering};
 
 // ==========================================
 // 1. GLOBAL DESCRIPTOR TABLE & TSS

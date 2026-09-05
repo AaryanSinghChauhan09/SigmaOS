@@ -20,11 +20,9 @@
 
 use std::boxed::Box;
 use std::string::String;
-use std::vec;
 use std::vec::Vec;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -399,7 +397,7 @@ impl SectionObject {
     }
 
     pub fn query_permissions(&self) -> (&'static str, bool, bool) {
-        let readable = true;
+        let _readable = true;
         let writable = match self.access {
             SectionAccess::ReadOnly => false,
             SectionAccess::ReadWrite => true,

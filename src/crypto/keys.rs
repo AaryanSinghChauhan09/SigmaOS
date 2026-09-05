@@ -1,7 +1,5 @@
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 /// OOP-based Key Management for SigmaOS
 /// Based on Roadmap Item 16: Key management

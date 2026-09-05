@@ -1,6 +1,4 @@
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 // Sovereign Sysfs (/sys) and Loopback Device Subsystem
 // Dynamic hardware attribute representation and loopback block overlay mounting inspired by Linux.
 

@@ -1,4 +1,3 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
@@ -113,7 +112,7 @@ impl SovereignMaintainerSandbox {
 
     pub fn validate_script(
         &self,
-        phase: MaintainerScriptPhase,
+        _phase: MaintainerScriptPhase,
         script_body: &str,
     ) -> Result<(), &'static str> {
         // Disallow dangerous commands in package install scripts

@@ -16,10 +16,9 @@
 // SigmaOS GlueBuddy Memory Subsystem
 // Linux & BSD inspired Buddy Allocator Glue, Migration Types, CMA, Watermarks, and FreeBSD VM Page Queues
 
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
+use super::{MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
 /// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator

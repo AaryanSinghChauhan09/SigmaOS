@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 // Hardware-Inspired Associative Page Table Lookup & TLB Caching Subsystem for SigmaOS

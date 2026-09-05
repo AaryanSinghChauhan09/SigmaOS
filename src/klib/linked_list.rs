@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-use std::vec::Vec;
 // SigmaOS klib: Intrusive Linked List
 // Inspired by Linux kernel's intrusive list implementation (include/linux/list.h)
 // and BSD's TAILQ/LIST macros from sys/queue.h

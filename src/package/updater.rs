@@ -21,7 +21,6 @@ use std::vec::Vec;
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
 
-use crate::klib::BTreeMap;
 use core::time::Duration;
 use std::time::Instant;
 
@@ -308,8 +307,8 @@ impl OfficialUpdateSource {
 impl UpdateSource for OfficialUpdateSource {
     fn check_for_updates(
         &self,
-        current_version: &str,
-        channel: UpdateChannel,
+        _current_version: &str,
+        _channel: UpdateChannel,
     ) -> Result<Vec<UpdatePackage>, UpdateError> {
         // Simulated update check
         Ok(vec![UpdatePackage {
@@ -393,7 +392,7 @@ impl SoftwareUpdater {
             return None;
         }
 
-        if let Some(last) = self.last_check {
+        if let Some(_last) = self.last_check {
             if core::time::Duration::from_millis(0) < self.auto_check_interval {
                 return None;
             }
@@ -415,7 +414,7 @@ impl SoftwareUpdater {
         update_clone.status = UpdateStatus::Downloading;
         self.active_update = Some(update_clone.clone());
 
-        let download_path = self.update_source.download_update(&update)?;
+        let _download_path = self.update_source.download_update(&update)?;
 
         Ok(UpdateProgress {
             update_id: update_id.to_string(),

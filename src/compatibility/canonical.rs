@@ -4,8 +4,7 @@
 
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-use std::boxed::Box;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 // ==========================================

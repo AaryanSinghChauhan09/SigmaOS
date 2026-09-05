@@ -1,10 +1,8 @@
 #![cfg_attr(not(test), no_std)]
-use std::vec;
 // SigmaOS Kernel Console Output Infrastructure
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-use std::string::String;
 use core::fmt::Write;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -175,9 +173,9 @@ impl KernelConsole {
         }
     }
 
-    fn write_framebuffer(&self, message: &str) {}
+    fn write_framebuffer(&self, _message: &str) {}
 
-    fn write_efi(&self, message: &str) {}
+    fn write_efi(&self, _message: &str) {}
 
     pub fn clear(&mut self) {
         match self.backend {

@@ -3,7 +3,6 @@ use std::collections::{BTreeSet, BTreeMap};
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
-use crate::klib::collections::HashSet;
 use std::string::String;
 use std::vec::Vec;
 

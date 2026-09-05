@@ -1,6 +1,4 @@
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 

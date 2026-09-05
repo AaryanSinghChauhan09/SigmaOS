@@ -13,7 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Netfilter — stateless and stateful packet filtering

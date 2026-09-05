@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS Energy-Aware Scheduler (EAS)
 // Predicts and balances task thread execution energy cost vs. thermal/battery constraints

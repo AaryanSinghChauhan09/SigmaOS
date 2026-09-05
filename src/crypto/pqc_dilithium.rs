@@ -74,7 +74,7 @@ impl PQCContext {
         // In real implementation, would use Dilithium-5 signing algorithm
         // This is a stub that generates deterministic signatures
         for i in 0..2592 {
-            signature.data[i] = message[i % message.len()].wrapping_add((i as u8));
+            signature.data[i] = message[i % message.len()].wrapping_add(i as u8);
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
@@ -83,7 +83,7 @@ impl PQCContext {
     }
 
     /// Verify Dilithium-5 signature
-    pub fn verify(&self, message: &[u8], signature: &Dilithium5Signature, public_key: &[u8]) -> Result<bool, PQCError> {
+    pub fn verify(&self, _message: &[u8], _signature: &Dilithium5Signature, public_key: &[u8]) -> Result<bool, PQCError> {
         if public_key.len() != 1312 {
             return Err(PQCError::InvalidPublicKey);
         }

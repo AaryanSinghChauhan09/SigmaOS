@@ -1,5 +1,4 @@
-use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 // SigmaOS Custom FFI Library
 // Reduces dependency on std::ffi by providing custom implementations

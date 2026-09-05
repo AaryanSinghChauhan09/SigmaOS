@@ -2,7 +2,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct UseFlag {

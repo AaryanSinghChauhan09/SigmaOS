@@ -15,7 +15,6 @@
 
 use crate::klib::VecDeque;
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer

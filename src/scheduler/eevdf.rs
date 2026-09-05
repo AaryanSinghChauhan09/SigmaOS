@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
+use std::string::String;
 
 // EEVDF Scheduler - Earliest Eligible Virtual Deadline First
 // Asymmetric Multi-Processing scheduler for SigmaOS

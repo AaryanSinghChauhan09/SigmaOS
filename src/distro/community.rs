@@ -19,7 +19,6 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 use crate::klib::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RepoSecurityLevel {

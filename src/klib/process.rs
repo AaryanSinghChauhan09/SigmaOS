@@ -1,5 +1,4 @@
-use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 // Process management module for SigmaOS
 // Replaces std::process functionality
@@ -113,15 +112,15 @@ impl SigmaProcess {
     }
 
     unsafe fn syscall_execve(
-        path: *const u8,
-        argv: *const *const u8,
-        envp: *const *const u8,
+        _path: *const u8,
+        _argv: *const *const u8,
+        _envp: *const *const u8,
     ) -> i32 {
         // Placeholder for actual syscall implementation
         0
     }
 
-    unsafe fn syscall_waitpid(pid: i32, status: *mut i32, options: i32) -> i32 {
+    unsafe fn syscall_waitpid(_pid: i32, _status: *mut i32, _options: i32) -> i32 {
         // Placeholder for actual syscall implementation
         0
     }

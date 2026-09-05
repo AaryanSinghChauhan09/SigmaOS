@@ -9,8 +9,6 @@ use std::vec;
 // 2. Copy-on-Write (CoW) Fault Handling: Generates a writable clone of a shared/KSM page upon write intents.
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
 
-use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;

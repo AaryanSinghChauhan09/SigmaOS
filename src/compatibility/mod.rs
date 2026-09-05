@@ -1,4 +1,3 @@
-use std::vec::Vec;
 // SigmaOS Compatibility Module
 pub mod abi_extended;
 pub mod abi_translator;
@@ -145,7 +144,6 @@ pub use arch_linux::{
     YayParuAdapter,
 };
 
-pub use open_source_dominance::*;
 pub use open_source_tier1::{
     LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
 };

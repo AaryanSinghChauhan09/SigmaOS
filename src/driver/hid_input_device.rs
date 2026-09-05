@@ -304,7 +304,7 @@ impl HidInputDeviceDriver {
         Ok(())
     }
 
-    pub fn set_led(&self, device_id: u16, led_mask: u8) -> Result<(), &'static str> {
+    pub fn set_led(&self, device_id: u16, _led_mask: u8) -> Result<(), &'static str> {
         if (device_id as usize) >= self.devices.len() {
             return Err("Invalid device ID");
         }

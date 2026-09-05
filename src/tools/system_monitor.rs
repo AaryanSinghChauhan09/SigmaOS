@@ -2,7 +2,6 @@
 // SigmaOS Advanced System Monitor
 // Real implementation of system monitoring tools (btop, fastfetch, power diagnostics)
 
-use std::boxed::Box;
 use std::vec::Vec;
 use std::string::{String, ToString};
 use std::format;

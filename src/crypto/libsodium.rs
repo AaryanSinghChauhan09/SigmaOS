@@ -11,13 +11,9 @@
 //! industry-standard cryptographic operations.
 use std::vec;
 
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
-use core::ffi::CStr;
-use core::ffi::{c_char, c_int, c_void};
-use core::ptr;
+use core::ffi::c_int;
 
 /// Sodium initialization status
 static mut SODIUM_INITIALIZED: bool = false;
@@ -125,7 +121,7 @@ impl Auth {
     fn hmac_sha256(&self, message: &[u8], key: &[u8]) -> Vec<u8> {
         // Placeholder for actual HMAC-SHA256
         // This would use the SHA256 implementation from the hash module
-        use super::hash;
+        
 
         let mut combined = key.to_vec();
         combined.extend_from_slice(message);
@@ -152,11 +148,11 @@ impl BoxCipher {
                          [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) {
         // Simplified key generation
         let mut public_key = [0u8; constants::CRYPTO_BOX_PUBLICKEYBYTES];
-        let mut secret_key = [0u8; constants::CRYPTO_BOX_SECRETKEYBYTES];
+        let secret_key = [0u8; constants::CRYPTO_BOX_SECRETKEYBYTES];
 
         // Use random number generator
-        use crate::crypto::random;
-        for i in 0..constants::CRYPTO_BOX_SECRETKEYBYTES {
+        
+        for _i in 0..constants::CRYPTO_BOX_SECRETKEYBYTES {
             // secret_key[i] = random::random_byte(); // removed - not available
         }
 
@@ -333,10 +329,10 @@ impl Sign {
     pub fn keypair() -> ([u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
                         [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES]) {
         let mut public_key = [0u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES];
-        let mut secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
+        let secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
         
-        use crate::crypto::random;
-        for i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
+        
+        for _i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
             // secret_key[i] = random::random_byte(); // removed - not available
         }
 
@@ -500,8 +496,8 @@ pub mod utils {
 
     /// Generate random bytes
     pub fn randombytes(buf: &mut [u8]) {
-        use crate::crypto::random;
-        for byte in buf.iter_mut() {
+        
+        for _byte in buf.iter_mut() {
             // *byte = random::random_byte(); // not available
         }
     }

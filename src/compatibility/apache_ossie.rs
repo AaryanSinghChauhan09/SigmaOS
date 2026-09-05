@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 /// Apache Ossie (Incubating) Semantic Model & Metric Specification Engine for SigmaOS
 /// Formerly Open Semantic Interchange (OSI) standard

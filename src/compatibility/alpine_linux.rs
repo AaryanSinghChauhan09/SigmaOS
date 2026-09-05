@@ -1,6 +1,5 @@
 //! Alpine Linux & BusyBox-inspired Minimal Footprint Subsystems
 //! Implements APK database parser, busybox syslog circular logger, and multicall binary router.
-use std::boxed::Box;
 
 use std::collections::BTreeMap as HashMap;
 use std::string::{String, ToString};

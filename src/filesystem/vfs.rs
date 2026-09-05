@@ -3,7 +3,7 @@
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::fmt;
 
@@ -345,13 +345,13 @@ impl VirtualFileSystem {
     }
 
     /// Get file statistics
-    pub fn stat(&self, path: &str) -> Result<Inode, VfsError> {
+    pub fn stat(&self, _path: &str) -> Result<Inode, VfsError> {
         // Stub implementation - would query actual filesystem
         Ok(Inode::new(0, FileType::Regular, 0o644))
     }
 
     /// List directory contents
-    pub fn readdir(&self, path: &str) -> Result<Vec<DirEntry>, VfsError> {
+    pub fn readdir(&self, _path: &str) -> Result<Vec<DirEntry>, VfsError> {
         // Stub implementation - would query actual filesystem
         Ok(Vec::new())
     }

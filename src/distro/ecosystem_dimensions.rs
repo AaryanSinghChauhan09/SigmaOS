@@ -1,4 +1,3 @@
-use std::vec;
 // SigmaOS Ecosystem & Multi-Tiered Distribution Specification Suite
 // Implements the 12 New Comprehensive Ecosystem Dimensions:
 // 1. Distribution & Release Ecosystem

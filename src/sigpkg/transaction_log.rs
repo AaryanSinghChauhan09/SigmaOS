@@ -66,7 +66,7 @@ impl TransactionLog {
 
     /// Add package installation to transaction
     pub fn add_install(&mut self, package: &Package) {
-        if let Some(idx) = self.current_transaction {
+        if let Some(_idx) = self.current_transaction {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Install,
                 package_name: package.name.clone(),
@@ -83,7 +83,7 @@ impl TransactionLog {
 
     /// Add package removal to transaction
     pub fn add_remove(&mut self, package_name: &str, version: &str) {
-        if let Some(idx) = self.current_transaction {
+        if let Some(_idx) = self.current_transaction {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Remove,
                 package_name: package_name.to_string(),

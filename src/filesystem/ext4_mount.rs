@@ -2,7 +2,6 @@
 // SigmaOS EXT4 Filesystem Mount System
 // Supports mounting and managing ext4 filesystems
 
-use std::boxed::Box;
 use std::vec::Vec;
 use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -319,8 +318,8 @@ impl Ext4FilesystemManager {
 
     pub fn create_inode(
         &mut self,
-        parent_inode: u32,
-        name: &str,
+        _parent_inode: u32,
+        _name: &str,
         mode: u16,
     ) -> Result<u32, &'static str> {
         let inode_num = self.inodes.len() as u32 + 1;
@@ -361,7 +360,7 @@ impl Ext4FilesystemManager {
         self.create_inode(parent_inode, dirname, EXT4_INODE_TYPE_DIRECTORY)
     }
 
-    pub fn read_file(&self, inode_num: u32, offset: u32, size: u32) -> Result<Vec<u8>, &'static str> {
+    pub fn read_file(&self, inode_num: u32, _offset: u32, size: u32) -> Result<Vec<u8>, &'static str> {
         if let Some(inode) = self.inodes.iter().find(|i| i.inode_number == inode_num) {
             if !inode.is_regular_file() {
                 return Err("Not a regular file");

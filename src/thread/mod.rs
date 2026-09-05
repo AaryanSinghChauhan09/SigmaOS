@@ -3,8 +3,7 @@
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
-use std::boxed::Box;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use core::fmt;
 

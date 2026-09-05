@@ -496,7 +496,7 @@ impl ProcessManager {
         }
     }
 
-    pub unsafe fn exec_process(&mut self, pid: ProcessID, binary: &[u8]) -> bool {
+    pub unsafe fn exec_process(&mut self, pid: ProcessID, _binary: &[u8]) -> bool {
         if pid >= 256 {
             return false;
         }
@@ -655,7 +655,7 @@ pub unsafe fn exit_process(exit_code: usize) -> ! {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
     std::alloc::alloc(layout)
 }

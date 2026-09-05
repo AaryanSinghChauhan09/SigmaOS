@@ -10,11 +10,9 @@ use std::vec;
 
 use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;
-use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Represents a package mirror in the SigmaOS network.
 #[derive(Debug, Clone, PartialEq)]
@@ -172,7 +170,7 @@ impl EosLogTool {
         // 1. Redact IPs (simple IPv4 regex simulation)
         // Match standard format like 192.168.1.50
         let ip_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
-        let mut words: Vec<String> = sanitized
+        let words: Vec<String> = sanitized
             .split_whitespace()
             .map(|word| {
                 if word.chars().all(|c| ip_chars.contains(&c)) && word.contains('.') {

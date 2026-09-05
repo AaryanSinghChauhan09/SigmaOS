@@ -21,13 +21,10 @@ use std::vec::Vec;
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-#[cfg(not(test))]
-use crate::klib::BTreeMap;
 
 #[cfg(test)]
 use std::collections::BTreeMap;
 
-use core::time::Duration;
 // Instant not in no_std
 
 /// Startup item classification (inspired by Sysinternals Autoruns)
@@ -174,7 +171,7 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
     }
 
     fn optimize(&mut self, services: &mut [StartupService]) -> StartupOptimizationResult {
-        let analysis = self.analyze(services);
+        let _analysis = self.analyze(services);
         let mut services_delayed = Vec::new();
         let mut services_parallelized = Vec::new();
         let mut time_saved = 0u64;
@@ -183,7 +180,7 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
         for service in services.iter_mut() {
             if service.enabled && service.priority == ServicePriority::Low {
                 if service.estimated_startup_time_ms > self.delay_threshold_ms {
-                    let original_delay = service.delay_seconds;
+                    let _original_delay = service.delay_seconds;
                     service.delay_seconds = 5; // Delay by 5 seconds
                     time_saved += service.estimated_startup_time_ms;
                     services_delayed.push(service.name.clone());

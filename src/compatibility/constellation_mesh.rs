@@ -4,7 +4,6 @@
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.
 
 use crate::security::capability::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Kernel Personality Constellation Grid
 /// Models kernel personas as stars in a constellation grid, each representing a version node.
@@ -448,7 +447,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses core/alloc allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
     std::alloc::alloc(layout)
 }

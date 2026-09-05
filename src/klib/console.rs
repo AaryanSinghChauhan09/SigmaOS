@@ -1,10 +1,7 @@
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 // Console I/O module for SigmaOS
 // Replaces std::io functionality for terminal I/O
 
-use crate::klib::custom_string::SigmaString;
 
 pub struct SigmaConsole {
     stdout_fd: i32,
@@ -64,13 +61,13 @@ impl SigmaConsole {
         self.eprint("\n");
     }
 
-    unsafe fn syscall_write(fd: i32, buffer: *const u8, count: usize) -> isize {
+    unsafe fn syscall_write(_fd: i32, _buffer: *const u8, count: usize) -> isize {
         // Placeholder for actual syscall implementation
         // This would be replaced with actual syscall when running on SigmaOS
         count as isize
     }
 
-    unsafe fn syscall_read(fd: i32, buffer: *mut u8, count: usize) -> isize {
+    unsafe fn syscall_read(_fd: i32, _buffer: *mut u8, _count: usize) -> isize {
         // Placeholder for actual syscall implementation
         // This would be replaced with actual syscall when running on SigmaOS
         0

@@ -17,8 +17,6 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
 
 // =========================================================================

@@ -13,13 +13,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
-use std::vec;
 // Moksha Desktop and EFL Engine for SigmaOS
 // Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
 
 #[cfg(test)]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use std::string::{String, ToString};

@@ -21,7 +21,6 @@
 //!     -> KMS/DRM (vsync atomic commit)
 //!     -> Display
 //! ```
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -711,7 +710,7 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use std::string::String;
+    
 
     pub type Result<T> = core::result::Result<T, &'static str>;
 

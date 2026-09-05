@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 
 // S-COSMOS - Cross-Platform Universal Compatibility Shard
 // S-WINE, S-COCOA, S-ANDROID binary translation layers
@@ -20,7 +19,6 @@ use std::vec;
 // (no_std only applicable at crate root - removed)
 
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {

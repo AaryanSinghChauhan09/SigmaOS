@@ -3,7 +3,6 @@
 // Supports modern Broadcom/Cypress WiFi chipsets (802.11ac/ax)
 
 use std::boxed::Box;
-use std::vec::Vec;
 use std::string::String;
 use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 
@@ -241,7 +240,7 @@ impl BroadcomWifiDriver {
         Ok(0)
     }
 
-    pub fn join_network(&mut self, ssid: &[u8], password: &[u8]) -> Result<(), &'static str> {
+    pub fn join_network(&mut self, ssid: &[u8], _password: &[u8]) -> Result<(), &'static str> {
         if !self.is_enabled {
             return Err("WiFi not enabled");
         }
@@ -285,7 +284,7 @@ impl BroadcomWifiDriver {
         self.current_channel
     }
 
-    pub fn transmit_frame(&mut self, frame: &WifiTxFrame) -> Result<(), &'static str> {
+    pub fn transmit_frame(&mut self, _frame: &WifiTxFrame) -> Result<(), &'static str> {
         if self.station.state != AssociationState::Connected {
             return Err("Not connected");
         }

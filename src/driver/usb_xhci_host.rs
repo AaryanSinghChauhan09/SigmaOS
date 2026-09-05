@@ -154,7 +154,7 @@ impl TransferRing {
         }
     }
 
-    pub fn queue_command(&mut self, cmd: u32) -> Result<(), &'static str> {
+    pub fn queue_command(&mut self, _cmd: u32) -> Result<(), &'static str> {
         if (self.enqueue_ptr + 1) % (self.ring_size as u32) == self.dequeue_ptr {
             return Err("Transfer ring full");
         }
@@ -279,7 +279,7 @@ impl UsbXhciHostDriver {
         Ok(device)
     }
 
-    pub fn set_device_address(&mut self, port: u8, address: u8) -> Result<(), &'static str> {
+    pub fn set_device_address(&mut self, port: u8, _address: u8) -> Result<(), &'static str> {
         if port >= self.num_ports {
             return Err("Invalid port");
         }

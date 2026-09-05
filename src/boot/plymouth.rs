@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 /// Standard Plymouth bootsplash theme variants

@@ -1,4 +1,3 @@
-use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Block Device Subsystem & High-Performance Block Management Architecture
 // Implements block-oriented devices, block operations, multi-type block classification,
@@ -8,7 +7,7 @@ use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
 pub type BlockNumber = u64;

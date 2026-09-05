@@ -157,7 +157,7 @@ impl DataLake {
         self.partitions.push(partition.to_string());
     }
 
-    pub fn query(&self, query: &str) -> Result<Vec<TelemetryData>, IoTError> {
+    pub fn query(&self, _query: &str) -> Result<Vec<TelemetryData>, IoTError> {
         // Query data lake
         Ok(Vec::new())
     }

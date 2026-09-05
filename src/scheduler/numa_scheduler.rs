@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems

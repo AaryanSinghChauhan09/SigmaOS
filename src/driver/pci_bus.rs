@@ -3,8 +3,7 @@
 // and BSD distributions (FreeBSD devctl/pci ioctls, OpenBSD autoconf PCI matching).
 
 use std::format;
-use std::string::{String, ToString};
-use std::vec;
+use std::string::String;
 use std::vec::Vec;
 
 use core::sync::atomic::{AtomicU32, Ordering};

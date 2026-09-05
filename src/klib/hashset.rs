@@ -1,6 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 // SPDX-License-Identifier: MIT
 // Custom HashSet implementation for SigmaOS
 // Reduces dependency on std::collections::HashSet

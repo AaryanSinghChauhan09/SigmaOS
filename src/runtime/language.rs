@@ -18,10 +18,8 @@
 
 use std::boxed::Box;
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Language Runtime Management for SigmaOS

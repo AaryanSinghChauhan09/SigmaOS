@@ -20,7 +20,7 @@ use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
-    LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
+    NodeBinaryDistroEngine, NodeBinaryPackage,
 };
 
 #[cfg(any(feature = "standalone_test", test))]

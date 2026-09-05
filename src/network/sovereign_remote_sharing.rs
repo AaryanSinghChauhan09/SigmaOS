@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // Sovereign Remote Sharing & Protocol Enhancements for SigmaOS
 // Inspired by Linux & BSD distributions: OpenSSH, dropbear, NFSv4, Samba (smbd/ksmbd), SCP, and rsync.

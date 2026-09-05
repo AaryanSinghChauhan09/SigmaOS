@@ -153,7 +153,7 @@ impl LocalizationManager {
         let integer_part = parts[0];
         let decimal_part = parts.get(1).unwrap_or(&"00");
 
-        let mut chars = integer_part.chars().rev().collect::<Vec<char>>();
+        let chars = integer_part.chars().rev().collect::<Vec<char>>();
         let mut formatted = String::new();
 
         for (i, c) in chars.iter().enumerate() {

@@ -4,7 +4,6 @@
 
 use std::collections::BTreeSet;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

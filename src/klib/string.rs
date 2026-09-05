@@ -1,13 +1,10 @@
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 // Custom string implementation for SigmaOS
 // This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 
 use super::vec::SigmaVec;
 use core::fmt;
 use core::ops::{Deref, DerefMut};
-use core::slice;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

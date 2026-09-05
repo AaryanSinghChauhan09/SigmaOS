@@ -1,10 +1,6 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-use crate::klib::SigmaString;
 use core::cell::Cell;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

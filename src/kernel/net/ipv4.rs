@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 
 /// SigmaOS IPv4 Network Stack
 /// ARP, IPv4 routing, ICMP echo, raw packet I/O

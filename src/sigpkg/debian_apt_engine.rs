@@ -201,10 +201,10 @@ impl AptRepositoryManager {
     }
 
     /// Get package sources for a given package
-    pub fn get_package_sources(&self, package_name: &str) -> Vec<AptSource> {
+    pub fn get_package_sources(&self, _package_name: &str) -> Vec<AptSource> {
         self.sources
             .iter()
-            .filter(|source| {
+            .filter(|_source| {
                 // In production, this would check if the package is available in this source
                 true
             })

@@ -1,7 +1,6 @@
 // NixOS-Style: Atomic Inode Pointer-Swap Generation Manager
 // Implements sub-millisecond, zero-copy system rollbacks via content-addressed nodes
 
-use std::vec;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

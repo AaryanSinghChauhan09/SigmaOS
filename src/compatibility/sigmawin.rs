@@ -1,6 +1,5 @@
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // SigmaOS Sovereign Win32 Compatibility Subsystem (SigmaWin)
 // Implementing complete Windows 11 Gap Closure & PE Loading / Registry / USER32/GDI32 Emulation

@@ -13,15 +13,12 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 // SigmaOS File Shredder
 // OOP-based secure file deletion with multiple overwrite passes
 
-use crate::klib::rng::{Rng, SigmaRng};
 pub type Path = str;
 pub type PathBuf = String;
 

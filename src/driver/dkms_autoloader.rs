@@ -1,4 +1,3 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 // Dynamic Kernel Module Support (DKMS) & Hardware Autoloader Subsystem for SigmaOS

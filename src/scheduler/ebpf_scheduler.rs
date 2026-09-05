@@ -1,10 +1,9 @@
 // eBPF-based Scheduling System for SigmaOS
 // Inspired by Ubuntu 25.04 sched_ext integration
 
-use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Scheduling policy types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -244,7 +243,7 @@ impl UserSpaceScheduler {
         self
     }
 
-    pub fn schedule_task(&self, task_id: u64, priority: u8) -> ScheduleDecision {
+    pub fn schedule_task(&self, task_id: u64, _priority: u8) -> ScheduleDecision {
         // In a real implementation, this would make scheduling decisions
         ScheduleDecision {
             task_id,

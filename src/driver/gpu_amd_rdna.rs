@@ -5,7 +5,7 @@
 use std::boxed::Box;
 use std::vec::Vec;
 use std::string::String;
-use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -310,7 +310,7 @@ impl AmdGpuDriver {
         Ok(())
     }
 
-    fn configure_display(&self, config: DisplayConfiguration) -> Result<(), &'static str> {
+    fn configure_display(&self, _config: DisplayConfiguration) -> Result<(), &'static str> {
         // In real implementation, would:
         // 1. Configure display timings (h-sync, v-sync)
         // 2. Set up frame buffer address and pitch
@@ -386,7 +386,7 @@ impl AmdGpuDriver {
         }
     }
 
-    pub fn clear_framebuffer(&mut self, color: u32) -> Result<(), &'static str> {
+    pub fn clear_framebuffer(&mut self, _color: u32) -> Result<(), &'static str> {
         if let Some(_fb_addr) = self.framebuffer_address {
             // Use GPU to clear framebuffer
             Ok(())

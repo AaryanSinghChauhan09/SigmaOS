@@ -3,8 +3,7 @@
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
 
-use std::format;
-use std::string::{String, ToString};
+use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
 

@@ -4,7 +4,6 @@
 /// Implements secure boot chain with signature verification
 use std::boxed::Box;
 use std::vec::Vec;
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStageID = usize;

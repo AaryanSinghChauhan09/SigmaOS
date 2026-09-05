@@ -1,5 +1,3 @@
-use std::format;
-use std::vec;
 // OOP-based Unified Logging System and Diverse Targets for SigmaOS
 // Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
 

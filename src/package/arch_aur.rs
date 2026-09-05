@@ -130,8 +130,8 @@ impl SigmaAUR {
             .ok_or(BuildError::PackageNotFound)?
             .clone();
 
-        let pkg_name_str = pkg.name.clone();
-        let pkg_ver_str = pkg.version.clone();
+        let _pkg_name_str = pkg.name.clone();
+        let _pkg_ver_str = pkg.version.clone();
 
         // Resolve dependencies
         let dependencies = self.resolve_dependencies(&pkg)?;

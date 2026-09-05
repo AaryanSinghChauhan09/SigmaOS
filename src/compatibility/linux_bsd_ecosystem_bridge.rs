@@ -1,6 +1,5 @@
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -38,8 +37,8 @@ impl UniversalSyscallAbiShim {
     pub fn translate_syscall(
         &mut self,
         syscall_num: u64,
-        arg1: u64,
-        arg2: u64,
+        _arg1: u64,
+        _arg2: u64,
         arg3: u64,
     ) -> SyscallTranslationResult {
         self.syscall_counter += 1;

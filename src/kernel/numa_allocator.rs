@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 
 // NUMA (Non-Uniform Memory Access) Allocator
 // Linux-style NUMA-aware memory allocation for multi-socket systems

@@ -1,5 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 /// SigmaOS Binary Analysis, Deobfuscation, and Semantic Inversion Engine
 /// Implements advanced abstract interpretation, transformation inversion,

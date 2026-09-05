@@ -1,6 +1,3 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 // Processor Assignment, CPU Affinity & NUMA Topology Manager for SigmaOS
 // Inspired by Linux sched_setaffinity(2), FreeBSD cpuset(2) / cpuset_setaffinity, and Windows NUMA node affinity.

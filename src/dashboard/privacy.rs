@@ -76,7 +76,7 @@ impl PrivacyBadgerTrackerShield {
     /// Evaluates 3rd-party domain tracking heuristics (Privacy Badger 3-strike rule)
     pub fn evaluate_domain_tracker(
         &mut self,
-        domain: &str,
+        _domain: &str,
         tracking_sites_count: usize,
     ) -> TrackerAction {
         if tracking_sites_count >= 3 {

@@ -74,7 +74,7 @@ impl SovereignLinuxCommandSuite {
         }
     }
 
-    pub fn journalctl(args: &[&str]) -> Vec<String> {
+    pub fn journalctl(_args: &[&str]) -> Vec<String> {
         vec![
             String::from("2026-03-03T00:00:01Z sigma-kernel: System boot completed in 0.012s"),
             String::from("2026-03-03T00:00:02Z sigma-net: Sovereign interface wg-sovereign0 UP"),

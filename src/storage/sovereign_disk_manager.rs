@@ -7,7 +7,6 @@
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

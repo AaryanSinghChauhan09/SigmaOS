@@ -341,8 +341,8 @@ impl SigmaPkg {
         Ok(format!("Simulated download from {}", url))
     }
 
-    fn parse_database(path: &Path) -> Result<HashMap<String, Package>, String> {
-        let mut packages = HashMap::new();
+    fn parse_database(_path: &Path) -> Result<HashMap<String, Package>, String> {
+        let packages = HashMap::new();
 
         // Parse package database (simplified)
         // Real implementation would parse actual database format
@@ -474,7 +474,7 @@ impl SigmaPkg {
             "{}/{}-{}.sigmpkg",
             package.repository, package.name, package.version
         );
-        let package_path = self
+        let _package_path = self
             .cache_dir
             .join(format!("{}-{}.sigmpkg", package.name, package.version));
 

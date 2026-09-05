@@ -2,7 +2,6 @@
 // SigmaOS APIC & I/O APIC Driver Implementation
 // x86_64 Advanced Programmable Interrupt Controller (APIC) & I/O APIC hardware abstraction
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::vec::Vec;
 
 // ============================================================================
@@ -229,7 +228,7 @@ impl LocalApic {
                     // Find highest bit set
                     for j in (0..32).rev() {
                         if (isr & (1 << j)) != 0 {
-                            return Some(((i as u8) * 32 + j as u8));
+                            return Some((i as u8) * 32 + j as u8);
                         }
                     }
                 }
@@ -247,7 +246,7 @@ impl LocalApic {
                     // Find highest bit set
                     for j in (0..32).rev() {
                         if (irr & (1 << j)) != 0 {
-                            return Some(((i as u8) * 32 + j as u8));
+                            return Some((i as u8) * 32 + j as u8);
                         }
                     }
                 }
@@ -370,7 +369,7 @@ impl IoApic {
 
             // Read current entry
             let low = self.read_reg(redir_reg_index);
-            let high = self.read_reg(redir_reg_index + 1);
+            let _high = self.read_reg(redir_reg_index + 1);
 
             // Construct new entry
             let new_low = (low & 0xffff0000) | ((vector as u32) & 0xff);

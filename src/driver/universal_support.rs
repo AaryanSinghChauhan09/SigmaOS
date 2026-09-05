@@ -3,12 +3,10 @@ use std::vec;
 // Enables support for all legacy, dropped, and custom hardware peripherals since 1981 (e.g. NE2000, LPT, Floppy, PS/2, SoundBlaster16, PC Speaker).
 
 use crate::driver::device::{
-    CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, PortAddress,
+    CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {

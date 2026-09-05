@@ -2,7 +2,6 @@
 // Provides low-level vCPU execution loops, register synchronization, memory mapping, and virtio backends.
 
 use std::collections::BTreeMap;
-use std::string::String;
 use std::vec::Vec;
 
 /// x86_64 General Purpose & Control Register State

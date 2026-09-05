@@ -134,7 +134,7 @@ impl WireGuardHandler {
 }
 
 impl VpnProtocolHandler for WireGuardHandler {
-    fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
+    fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
         if self.state == ConnectionState::Connected {
             return Err(VpnError::AlreadyConnected);
         }
@@ -231,7 +231,7 @@ impl OpenVpnHandler {
 }
 
 impl VpnProtocolHandler for OpenVpnHandler {
-    fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
+    fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
         if self.state == ConnectionState::Connected {
             return Err(VpnError::AlreadyConnected);
         }

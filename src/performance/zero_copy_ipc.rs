@@ -1,6 +1,5 @@
 //! Lock-Free Zero-Copy IPC Queue Subsystem
 //! Implements high-speed page-passing circular ring buffers with atomic fences for sub-microsecond latency.
-use std::vec;
 
 pub use crate::kernel::performance::{
     CpuInstructionExtension, IPCError, IpcError, ProcessProfile, SchedInstruction, SchedOpcode,

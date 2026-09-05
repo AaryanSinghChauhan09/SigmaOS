@@ -923,7 +923,7 @@ impl SigmaSupportPriorityOptimizer {
             current_cpu_usage: 0.0,
         });
     }
-    pub fn optimize_cpu_priorities(&mut self, threshold: u32) -> u32 {
+    pub fn optimize_cpu_priorities(&mut self, _threshold: u32) -> u32 {
         0
     }
 }

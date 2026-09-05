@@ -1,7 +1,6 @@
 #![allow(clippy::large_enum_variant)]
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 
 // Transaction Manager for SigmaPkg

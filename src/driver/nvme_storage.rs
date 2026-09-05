@@ -348,9 +348,9 @@ impl NvmeController {
 
     pub fn read_sectors(
         &mut self,
-        namespace_id: u32,
-        start_lba: u64,
-        num_sectors: u32,
+        _namespace_id: u32,
+        _start_lba: u64,
+        _num_sectors: u32,
     ) -> Result<u16, &'static str> {
         if !self.is_enabled {
             return Err("Controller not enabled");
@@ -369,9 +369,9 @@ impl NvmeController {
 
     pub fn write_sectors(
         &mut self,
-        namespace_id: u32,
-        start_lba: u64,
-        num_sectors: u32,
+        _namespace_id: u32,
+        _start_lba: u64,
+        _num_sectors: u32,
     ) -> Result<u16, &'static str> {
         if !self.is_enabled {
             return Err("Controller not enabled");

@@ -107,7 +107,7 @@ impl SystemConfigManager {
 
     /// Save configuration to file
     pub fn save_config(&self, filename: &str) -> Result<(), ConfigError> {
-        let file_path = format!("{}/{}", self.config_dir, filename);
+        let _file_path = format!("{}/{}", self.config_dir, filename);
 
         // Ensure directory exists
         if let Some(parent) = None::<&str> {

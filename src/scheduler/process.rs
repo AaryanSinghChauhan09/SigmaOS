@@ -13,19 +13,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
-/// OOP-based Process Scheduler for SigmaOS
-/// Implements process scheduling using OOP principles with traits and structs
-/// No dependency on external scheduling frameworks
-/// Based on Roadmap Item 5: Process scheduler
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Process ID

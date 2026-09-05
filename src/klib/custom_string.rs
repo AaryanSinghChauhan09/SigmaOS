@@ -12,7 +12,7 @@ pub mod custom_allocator {
     }
     pub unsafe fn alloc(size: usize) -> *mut u8 {
         use std::alloc::Layout;
-        let layout = Layout::from_size_align(size, 8).unwrap();
+        let _layout = Layout::from_size_align(size, 8).unwrap();
         core::ptr::null_mut()
     }
     pub unsafe fn free(_ptr: *mut u8) {}
@@ -93,7 +93,7 @@ impl SigmaString {
         self.data.contains(pat)
     }
 
-    pub fn join(&self, sep: &str) -> String {
+    pub fn join(&self, _sep: &str) -> String {
         self.data.clone()
     }
 }

@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-use std::boxed::Box;
 // Purely functional Nix DSL parser and derivation evaluator for SigmaOS
 // Enables content-addressed store derivations, deterministic hashes, and Nix expressions
 

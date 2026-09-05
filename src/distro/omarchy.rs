@@ -8,7 +8,6 @@
 //! - GPU & NVIDIA Early-KMS Hardware Acceleration Configuration
 //! - Fast Terminal & Development Environment Provisioner
 
-use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

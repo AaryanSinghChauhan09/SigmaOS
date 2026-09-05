@@ -1,4 +1,3 @@
-use std::vec;
 // Dynamic Matrix Quantization & Multi-Device Execution Fallback for SigmaOS
 // Inspired by vLLM, llama.cpp, and ROCm runtime fallback pipelines.
 

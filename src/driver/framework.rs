@@ -1,4 +1,4 @@
-use std::string::{String, ToString};
+use std::string::String;
 // ==========================================
 // Basic Driver Framework Implementation
 // ==========================================

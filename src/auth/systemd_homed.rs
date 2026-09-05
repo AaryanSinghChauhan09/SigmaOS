@@ -6,7 +6,6 @@
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 /// Storage mechanism for user home directory
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

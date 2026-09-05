@@ -303,7 +303,7 @@ impl SovereignSystemUpdateAndTestingEngine {
             return Err("System update blocked: Pre-update functionality self-tests failed");
         }
 
-        let staged_slot = self.ab_updater.stage_update(target_version)?;
+        let _staged_slot = self.ab_updater.stage_update(target_version)?;
         let active_slot = self.ab_updater.commit_and_switch_slot()?;
         self.ab_updater.confirm_boot_success();
 

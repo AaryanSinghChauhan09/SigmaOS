@@ -1,12 +1,6 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::mem;
-/// OOP-based Secrets Management for SigmaOS
-/// Implements secrets management using OOP principles with traits and structs
-/// No dependency on external security frameworks
-/// Based on Roadmap Item 63: Secrets management
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Secret ID

@@ -264,7 +264,7 @@ impl AhciSataController {
     pub fn read_sectors(
         &self,
         port: u8,
-        lba: u64,
+        _lba: u64,
         count: u32,
         buffer: &mut [u8],
     ) -> Result<u32, &'static str> {
@@ -299,7 +299,7 @@ impl AhciSataController {
     pub fn write_sectors(
         &self,
         port: u8,
-        lba: u64,
+        _lba: u64,
         count: u32,
         buffer: &[u8],
     ) -> Result<u32, &'static str> {

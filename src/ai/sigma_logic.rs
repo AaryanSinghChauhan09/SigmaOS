@@ -1,4 +1,3 @@
-use std::vec;
 // SigmaOS Native AI Logic & Model Inference Bindings (PyTorch/TensorFlow Parity)
 // Provides zero-allocation C/Rust inference bindings allowing OS daemons
 // to execute pre-trained models for adaptive scheduling, IO prediction, and anomaly detection.

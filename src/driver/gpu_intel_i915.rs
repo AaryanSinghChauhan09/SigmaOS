@@ -215,7 +215,7 @@ impl IntelGpuDriver {
         Ok(())
     }
 
-    fn program_display_pipeline(&self, mode: DisplayMode) -> Result<(), &'static str> {
+    fn program_display_pipeline(&self, _mode: DisplayMode) -> Result<(), &'static str> {
         // In real implementation, would:
         // 1. Disable transcoder
         // 2. Configure display connector
@@ -262,9 +262,9 @@ impl IntelGpuDriver {
         self.vram_base
     }
 
-    pub fn clear_framebuffer(&mut self, color: u32) -> Result<(), &'static str> {
-        if let Some(fb_addr) = self.framebuffer_address {
-            if let Some(mode) = self.current_mode {
+    pub fn clear_framebuffer(&mut self, _color: u32) -> Result<(), &'static str> {
+        if let Some(_fb_addr) = self.framebuffer_address {
+            if let Some(_mode) = self.current_mode {
                 // In real implementation, would DMA clear to framebuffer
                 // For now, mark as done
                 Ok(())
@@ -277,7 +277,7 @@ impl IntelGpuDriver {
     }
 
     pub fn present_framebuffer(&mut self) -> Result<(), &'static str> {
-        if let Some(fb_addr) = self.framebuffer_address {
+        if let Some(_fb_addr) = self.framebuffer_address {
             // In real implementation, would:
             // 1. Flush caches
             // 2. Update surface address register
@@ -289,7 +289,7 @@ impl IntelGpuDriver {
         }
     }
 
-    pub fn register_interrupt_handler(&mut self, apic: &ApicManager) -> Result<(), &'static str> {
+    pub fn register_interrupt_handler(&mut self, _apic: &ApicManager) -> Result<(), &'static str> {
         // Register handler for GPU interrupts
         // In real implementation, would set interrupt vector
         Ok(())

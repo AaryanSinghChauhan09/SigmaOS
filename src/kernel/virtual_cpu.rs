@@ -3,7 +3,7 @@ use std::vec;
 // Implements x86 and ARM CPU Modes, Ring privilege isolation (Ring 0, 1, 2, 3), Register Sets, and Instruction Data Movement.
 
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::Ordering;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuError {

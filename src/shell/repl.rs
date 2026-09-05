@@ -8,28 +8,25 @@ use std::collections::{HashMap, HashSet};
 
 
 use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
+    AccessibilityFeature, AccessibilityFramework,
     AccessibilitySetting,
 };
 use crate::shell::{
-    BashParameterExpansion, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
-    ParameterExpansionEngine, PipelineExecutor, ShellArithmeticEvaluator, WildcardGlobMatcher,
-    ZshPromptFormatter,
+    BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
 };
 use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
 };
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::customization::CustomizationEngine;
+use crate::dashboard::SystemMonitor;
+use crate::package::{UnifiedPackage, UniversalPackageManager};
+use crate::resilience::SelfHealingModule;
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
     ZshSyntaxHighlighter,
 };
 use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
+    Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
 };
 
 /// Shell command type

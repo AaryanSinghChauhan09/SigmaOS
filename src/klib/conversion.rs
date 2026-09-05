@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -55,7 +54,7 @@ pub fn base64_encode(input: &[u8]) -> String {
         b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     let mut result = String::new();
-    let mut chunks = input.chunks(3);
+    let chunks = input.chunks(3);
 
     for chunk in chunks {
         let mut buffer = [0u8; 3];

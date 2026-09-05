@@ -13,8 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec;
+use std::string::String;
 use std::vec::Vec;
 
 // SigmaOS Memory Leak Detector
@@ -119,7 +118,7 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
     }
 
     fn analyze(&self) -> LeakReport {
-        let start = Instant::now();
+        let _start = Instant::now();
         let leaked_allocations = self.allocations.len();
         let total_leaked_bytes: u64 = self.allocations.values().map(|r| r.size as u64).sum();
 
@@ -192,7 +191,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
     }
 
     fn analyze(&self) -> LeakReport {
-        let start = Instant::now();
+        let _start = Instant::now();
         let now = Instant::now();
 
         let leaked_allocations: Vec<_> = self
@@ -286,7 +285,7 @@ impl MemoryLeakDetector {
             return None;
         }
 
-        if let Some(last) = self.last_analysis {
+        if let Some(_last) = self.last_analysis {
             if core::time::Duration::from_millis(0) < self.analyze_interval {
                 return None;
             }
@@ -485,7 +484,7 @@ impl UseAfterFreeQuarantine {
             return Err("Double Free detected!"); // Valgrind Double Free!
         }
 
-        if let Some(record) = self.allocations.remove(&address) {
+        if let Some(_record) = self.allocations.remove(&address) {
             self.quarantine_queue.push(address);
             if self.quarantine_queue.len() > self.limit {
                 // FIFO pop oldest address out of quarantine

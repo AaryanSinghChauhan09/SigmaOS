@@ -1,7 +1,5 @@
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 /// OOP-based Cryptographic Hash Functions for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
@@ -52,7 +50,7 @@ impl SimpleHashFunction {
     }
 
     /// Allows initializing the hash function with custom dynamic parameters to avoid static profiling.
-    pub fn with_salt_params(mut self, mult: usize, offset: usize) -> Self {
+    pub fn with_salt_params(self, mult: usize, offset: usize) -> Self {
         self.multiplier.store(mult, Ordering::SeqCst);
         self.offset_factor.store(offset, Ordering::SeqCst);
         self

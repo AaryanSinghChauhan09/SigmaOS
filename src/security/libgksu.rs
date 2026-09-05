@@ -10,7 +10,6 @@
 //! memory zeroization for credentials, environment variable sanitization,
 //! and Polkit/Sudoers policy enforcement.
 
-use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -240,7 +239,7 @@ impl LibGksuGraphicalSudoEngine {
         }
 
         // Sanitize environment
-        let clean_env = GksuSecurityGuard::sanitize_environment(raw_env, &request.keep_env_vars);
+        let _clean_env = GksuSecurityGuard::sanitize_environment(raw_env, &request.keep_env_vars);
 
         // Simulated process spawn under target_user e.g. root
         let stdout = format!(

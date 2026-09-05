@@ -4,7 +4,6 @@
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;

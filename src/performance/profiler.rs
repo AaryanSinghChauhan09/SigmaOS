@@ -1,12 +1,10 @@
 
 use std::boxed::Box;
-use std::string::String;
 /// OOP-based Performance Profiler for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 191
 /// Implements CPU and memory profiling
 use std::vec::Vec;
 
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ProfileID = usize;

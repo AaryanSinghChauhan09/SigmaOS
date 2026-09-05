@@ -4,7 +4,6 @@
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy)]
 pub struct ZoneStats {
@@ -39,7 +38,7 @@ impl Slab {
         self.free_slots.pop()
     }
 
-    pub fn free(&mut self, address: usize, item_size: usize) {
+    pub fn free(&mut self, address: usize, _item_size: usize) {
         // Double-free protection & boundary check
         if address >= self.start_address && address < self.start_address + self.size {
             if !self.free_slots.contains(&address) {

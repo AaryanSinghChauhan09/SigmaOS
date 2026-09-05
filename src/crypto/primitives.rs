@@ -16,12 +16,6 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-/// Custom Cryptography Primitives for SigmaOS
-/// Implements cryptographic operations without relying on external crypto libraries
-/// Uses post-quantum algorithms where applicable
-
-use core::ptr;
-use core::mem;
 
 /// SHA-256 hash
 #[repr(C)]

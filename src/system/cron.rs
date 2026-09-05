@@ -135,7 +135,7 @@ impl CronSchedule {
 
 impl CronField {
     /// Parse a cron field string
-    pub fn parse(field: &str, min: u32, max: u32) -> Result<Self, CronError> {
+    pub fn parse(field: &str, min: u32, _max: u32) -> Result<Self, CronError> {
         if field == "*" {
             return Ok(CronField::All);
         }
@@ -463,7 +463,7 @@ impl SovereignSshDaemon {
     }
 
     pub fn authenticate_public_key(&mut self, session_id: u64, pubkey: &[u8]) -> bool {
-        let (user, remote_ip) = if let Some(session) = self.active_sessions.get(&session_id) {
+        let (_user, remote_ip) = if let Some(session) = self.active_sessions.get(&session_id) {
             (session.user.clone(), session.remote_ip.clone())
         } else {
             return false;
