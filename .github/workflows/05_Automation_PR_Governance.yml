@@ -25,7 +25,14 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          sizes: '{"0": "size/XS", "50": "size/S", "250": "size/M", "500": "size/L", "1000": "size/XL"}'
+          sizes: >-
+            {
+              "0": "size/XS",
+              "50": "size/S",
+              "250": "size/M",
+              "500": "size/L",
+              "1000": "size/XL"
+            }
 
       - name: Validate Branch Naming Convention
         uses: actions/github-script@v7
