@@ -364,7 +364,7 @@
                     </div>
                     <div class="settings-content">
                         <!-- Syscall Docs -->
-                        <div id="dev-syscall-docs" role="tabpanel" aria-labelledby="tab-dev-syscall" class="dev-portal-tab-content active">
+                        <div id="dev-syscall-docs" role="tabpanel" aria-labelledby="tab-dev-syscall" class="dev-portal-tab-content active" style="display: block;">
                             <h3>Syscall & API Reference</h3>
                             <input type="text" class="cmd-input" id="syscall-search" placeholder="Search syscalls (e.g., sys_write, sys_exit)..." oninput="searchSyscalls()" aria-label="Search syscall documentation">
                             <div class="syscall-list-container" id="syscall-list-container">
@@ -551,12 +551,12 @@
     </nav>
 
     <!-- Right-Click Context Menu -->
-    <div id="context-menu">
-        <div class="context-item" onclick="contextAction('refresh')">🔄 Force Refresh</div>
-        <div class="context-item" onclick="contextAction('cleanup')">🧹 Purge Caches</div>
-        <div class="context-item" onclick="contextAction('audit')">🛡️ Attest System</div>
+    <div id="context-menu" role="menu" aria-label="Desktop Context Menu">
+        <button type="button" class="context-item" role="menuitem" onclick="contextAction('refresh')">🔄 Force Refresh</button>
+        <button type="button" class="context-item" role="menuitem" onclick="contextAction('cleanup')">🧹 Purge Caches</button>
+        <button type="button" class="context-item" role="menuitem" onclick="contextAction('audit')">🛡️ Attest System</button>
         <div class="auto-style-75"></div>
-        <div class="context-item" onclick="toggleHelp()">❓ Help Matrix</div>
+        <button type="button" class="context-item" role="menuitem" onclick="toggleHelp()">❓ Help Matrix</button>
     </div>
 
     <!-- Alt + Space Command Center -->

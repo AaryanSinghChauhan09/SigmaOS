@@ -700,6 +700,11 @@ input:checked + .slider:before {
 }
 
 .context-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    text-align: left;
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 0.8rem;
@@ -712,7 +717,8 @@ input:checked + .slider:before {
     transition: var(--transition-fast);
 }
 
-.context-item:hover {
+.context-item:hover,
+.context-item:focus-visible {
     background: rgba(255, 255, 255, 0.05);
     color: var(--accent-gold);
 }
