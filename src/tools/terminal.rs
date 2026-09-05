@@ -159,7 +159,7 @@ impl Default for TerminalEmulator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

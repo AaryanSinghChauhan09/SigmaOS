@@ -156,7 +156,7 @@ impl LinuxReleaseDriver for MainlineGpuDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};

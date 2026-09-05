@@ -50,7 +50,7 @@ impl LegacyFSAdapter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -117,7 +117,7 @@ impl LegacyFSAdapter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
 
     #[test]

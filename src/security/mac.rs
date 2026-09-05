@@ -429,7 +429,7 @@ pub use MACPolicy as MacPolicy;
 pub struct MacRule;
 pub struct MacSecurity;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

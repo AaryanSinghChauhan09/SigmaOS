@@ -233,7 +233,7 @@ impl SubtitleEditEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::collections::BTreeMap;

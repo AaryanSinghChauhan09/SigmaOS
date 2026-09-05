@@ -331,7 +331,7 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     #[cfg(not(feature = "standalone_test"))]

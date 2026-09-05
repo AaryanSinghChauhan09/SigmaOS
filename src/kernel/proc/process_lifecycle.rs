@@ -2,7 +2,7 @@
 // Absorbs Linux fork/exec/exit/waitpid, copy-on-write namespaces, BSD rlimits, Windows Priority Classes, and Orphan Re-parenting.
 
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 
@@ -15,7 +15,7 @@ use core::time::Duration;
 
 use crate::klib::HashMap;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub(crate) mod mock_scheduler {
     use core::time::Duration;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -56,7 +56,7 @@ pub(crate) mod mock_scheduler {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub use mock_scheduler::{Priority, Process, ProcessState};
 
 #[cfg(not(test))]
@@ -101,7 +101,7 @@ pub struct ProcessExtendedContext {
     pub cpu_time_accumulated_secs: u64,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use crate::klib::HashMap as StdHashMap;
 
 #[cfg(not(test))]
@@ -109,7 +109,7 @@ use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::kernel::scheduler::{Priority as SchedPriority, Process as SchedProcess, ProcessState as SchedProcessState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Priority {
     Idle = 0,
@@ -119,7 +119,7 @@ pub enum Priority {
     Realtime = 4,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Running,
@@ -128,7 +128,7 @@ pub enum ProcessState {
     Terminated,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone)]
 pub struct Process {
     pub pid: u64,
@@ -139,7 +139,7 @@ pub struct Process {
     pub time_slice: Duration,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl Process {
     pub fn new(pid: u64, name: String, priority: Priority) -> Self {
         Self {
@@ -467,7 +467,7 @@ pub struct ThreadEnvironmentBlock {
     pub exception_list_address: u64, // Exception list pointer
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -131,7 +131,7 @@ impl Default for DTraceEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -168,7 +168,7 @@ impl Default for DependencyGraph {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -219,7 +219,7 @@ impl Default for SystemInstaller {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

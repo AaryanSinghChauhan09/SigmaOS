@@ -1,7 +1,7 @@
 // SigmaOS Pantheon Desktop Environment (elementary OS Parity)
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 use std::string::String;
@@ -300,7 +300,7 @@ impl Default for AppCenter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

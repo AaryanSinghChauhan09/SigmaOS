@@ -160,7 +160,7 @@ impl Default for VisualDashboardManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

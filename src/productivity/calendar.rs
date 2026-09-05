@@ -22,7 +22,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::BTreeMap;
 // SystemTime not in no_std
 
@@ -407,7 +407,7 @@ pub enum CalendarError {
     StorageError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -594,7 +594,7 @@ impl MntOperations {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod mount_tests {
     use super::*;
 

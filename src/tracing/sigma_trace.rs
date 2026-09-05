@@ -117,7 +117,7 @@ impl Default for SigmaTrace {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

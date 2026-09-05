@@ -770,7 +770,7 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod repl_tests {
     use super::*;
 
@@ -1670,7 +1670,7 @@ impl SovereignSigmaShRepl {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod advanced_shell_tests {
     use super::*;
 

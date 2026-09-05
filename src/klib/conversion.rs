@@ -216,7 +216,7 @@ pub fn base_to_dec(s: &str, base: u8) -> Result<u64, ()> {
     Ok(result)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

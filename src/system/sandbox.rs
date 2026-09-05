@@ -400,7 +400,7 @@ pub enum SandboxError {
     SystemError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

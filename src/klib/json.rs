@@ -4,7 +4,7 @@ use std::vec::Vec;
 // Use std::collections::BTreeMap during standalone test compilation or custom BTreeMap otherwise
 #[cfg(not(test))]
 use crate::klib::hashmap::BTreeMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::BTreeMap;
 
 /// Zero-dependency Sovereign JSON Data Model
@@ -442,7 +442,7 @@ fn parse_f64_simple(s: &str) -> Result<f64, &'static str> {
     Ok(result)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

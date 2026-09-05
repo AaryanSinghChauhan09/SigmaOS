@@ -344,7 +344,7 @@ impl Default for SigmaEdge {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

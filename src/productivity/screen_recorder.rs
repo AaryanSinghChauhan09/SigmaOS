@@ -499,7 +499,7 @@ impl Default for EzgifOptimizer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

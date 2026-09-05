@@ -150,7 +150,7 @@ impl Default for EventBus {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

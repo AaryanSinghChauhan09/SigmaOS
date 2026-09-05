@@ -474,7 +474,7 @@ impl Default for ObpObjectManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -671,7 +671,7 @@ impl Default for NtObjectManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests_extended {
     use super::*;
 

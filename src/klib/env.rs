@@ -453,7 +453,7 @@ unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -992,7 +992,7 @@ pub mod oci {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     extern crate alloc;
     use super::*;

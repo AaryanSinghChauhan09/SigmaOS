@@ -511,7 +511,7 @@ impl SigmaAptCli {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

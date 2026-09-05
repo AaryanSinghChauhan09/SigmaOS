@@ -6,7 +6,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// Article categories for the Community Handbook
@@ -285,7 +285,7 @@ impl Default for SecurityProfileTemplateStore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

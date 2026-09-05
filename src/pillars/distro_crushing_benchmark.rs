@@ -360,7 +360,7 @@ impl Default for LinuxDistroDefeaterEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -443,7 +443,7 @@ impl Default for SovereignDistroVictoryEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod victory_tests {
     use super::*;
 

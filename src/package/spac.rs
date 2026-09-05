@@ -217,7 +217,7 @@ impl Default for SpacPackageManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

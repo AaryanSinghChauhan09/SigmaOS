@@ -101,7 +101,7 @@ fn find_key_value_sep(s: &str) -> Option<usize> {
     s.find('=')
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

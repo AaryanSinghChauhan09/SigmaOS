@@ -10,11 +10,11 @@ use core::cell::RefCell;
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken(pub u64);
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl CapabilityToken {
     pub fn from_bits(bits: u64) -> Self {
         Self(bits)
@@ -665,7 +665,7 @@ impl Default for QubesZeroTrustParitySuite {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

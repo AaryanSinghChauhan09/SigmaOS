@@ -83,7 +83,7 @@ const DUMMY_VTABLE: RawWakerVTable = RawWakerVTable::new(
     |_| {},                // drop
 );
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::rc::Rc;

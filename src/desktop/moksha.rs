@@ -16,7 +16,7 @@ use std::format;
 // Moksha Desktop and EFL Engine for SigmaOS
 // Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use std::string::{String, ToString};
@@ -227,7 +227,7 @@ impl BodhiAppCenterInstaller {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

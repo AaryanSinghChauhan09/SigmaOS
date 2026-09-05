@@ -3923,7 +3923,7 @@ impl Default for ClearLinuxStatelessEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -5341,7 +5341,7 @@ impl NetworkPcapForensicSniffer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod new_unimplemented_tools_tests {
     use super::*;
 

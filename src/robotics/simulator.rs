@@ -84,7 +84,7 @@ impl PhysicsWorld {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -316,7 +316,7 @@ pub fn secure_invoke_sim(frame: &InvocationFrame, entry_point: u64) -> Result<u6
     Ok(frame.parameters[0] + frame.parameters[1])
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

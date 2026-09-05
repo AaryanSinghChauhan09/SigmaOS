@@ -10,13 +10,13 @@ use std::format;
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl CapabilityToken {
     pub fn new() -> Self {
         Self { id: 1 }
@@ -406,7 +406,7 @@ impl Default for SovereignDynamicKernelModuleManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

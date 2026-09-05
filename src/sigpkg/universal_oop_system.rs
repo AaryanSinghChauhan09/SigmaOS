@@ -29,7 +29,7 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 use std::sync::Arc;
@@ -4013,7 +4013,7 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

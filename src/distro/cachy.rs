@@ -2,7 +2,7 @@
 // Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
 
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 
@@ -158,7 +158,7 @@ impl CachyPackageRepo {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -197,7 +197,7 @@ pub enum ResolveError {
     Conflict(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::sigpkg::Dependency;

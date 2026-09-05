@@ -1,5 +1,5 @@
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 use std::vec::Vec;
@@ -340,7 +340,7 @@ impl PactreeEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

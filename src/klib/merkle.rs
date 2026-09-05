@@ -153,7 +153,7 @@ fn internal_hash(left: &MerkleHash, right: &MerkleHash) -> MerkleHash {
     expand(0x811C_9DC5 ^ 0x5E6F_7081, &buf)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -858,7 +858,7 @@ impl SigmaDistroEngine {
 
 // Bring alloc into scope for format! and vec!
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

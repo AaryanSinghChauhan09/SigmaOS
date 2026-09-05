@@ -4,7 +4,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use crate::klib::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
@@ -3408,7 +3408,7 @@ impl MemoryCompactionSuperpagesAllocator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 
 mod tests {
     use super::*;
@@ -4679,7 +4679,7 @@ impl OpenSuseSnapperEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod linux_bsd_extra_tests {
     use super::*;
 

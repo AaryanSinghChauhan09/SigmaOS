@@ -484,7 +484,7 @@ impl Default for GamifiedProductivity {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

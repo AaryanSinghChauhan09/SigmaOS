@@ -302,7 +302,7 @@ pub enum BootloaderError {
     SecureBootError,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

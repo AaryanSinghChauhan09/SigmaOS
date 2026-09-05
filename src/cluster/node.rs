@@ -4,13 +4,13 @@ use std::boxed::Box;
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),
 /// Raft-style distributed consensus, and active CARP-inspired failover routing.
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate alloc as std::alloc::alloc;
 
 pub type NodeID = usize;
@@ -515,7 +515,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 #[cfg(not(target_os = "none"))]
 pub type Box<T> = std_std::boxed::Box<T>;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

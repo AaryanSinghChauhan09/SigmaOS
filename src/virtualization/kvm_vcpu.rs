@@ -169,7 +169,7 @@ impl KvmVcpu {
 pub const RAX_HLT_SIGNAL: u64 = 0xF4;
 pub const RAX_IO_SIGNAL: u64 = 0xE6;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

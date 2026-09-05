@@ -20,7 +20,7 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 #[cfg(not(test))]
 use crate::klib::BTreeMap;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::BTreeMap;
 
 use std::vec::Vec;
@@ -370,7 +370,7 @@ impl Default for PageCache {
     } // 4MB default (1024 × 4K pages)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

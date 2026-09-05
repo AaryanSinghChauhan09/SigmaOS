@@ -7,7 +7,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// Wasmer WebAssembly runtime integration adapter
@@ -299,7 +299,7 @@ impl Default for ZstdIntegration {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

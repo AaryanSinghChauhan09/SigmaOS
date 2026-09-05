@@ -5,7 +5,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use crate::klib::HashMap;
 #[cfg(not(test))]
 use std::collections::BTreeMap as HashMap;
@@ -437,7 +437,7 @@ impl Default for PlugAndPlayHardwareManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

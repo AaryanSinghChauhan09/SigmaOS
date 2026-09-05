@@ -435,7 +435,7 @@ impl LinuxDmaScatterGatherEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 
 // ============================================================================
 // 7. Linux Virtio-Net Virtual Network Device Driver

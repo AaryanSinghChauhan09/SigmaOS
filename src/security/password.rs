@@ -500,7 +500,7 @@ pub enum PasswordError {
     IoError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

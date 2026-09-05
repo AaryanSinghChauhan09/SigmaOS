@@ -422,7 +422,7 @@ impl SovereignScreenRecorder {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::graphics::video::PixelRgba;

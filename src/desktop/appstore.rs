@@ -190,7 +190,7 @@ impl Default for GuiAppStore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

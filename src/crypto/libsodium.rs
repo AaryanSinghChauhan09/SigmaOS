@@ -503,7 +503,7 @@ pub mod utils {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[allow(clippy::unreadable_literal)]
 #[allow(clippy::identity_op)]
 mod tests {

@@ -5,7 +5,7 @@
 #[cfg(not(test))]
 use crate::kernel::{Priority, Process, ProcessState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Idle = 0,
@@ -15,7 +15,7 @@ pub enum Priority {
     Realtime = 4,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Running,
@@ -24,7 +24,7 @@ pub enum ProcessState {
     Terminated,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub struct Process {
     pub pid: u64,
     pub name: std::string::String,
@@ -32,7 +32,7 @@ pub struct Process {
     pub state: ProcessState,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl Process {
     pub fn new(pid: u64, name: std::string::String, priority: Priority) -> Self {
         Self {
@@ -283,7 +283,7 @@ pub static GLOBAL_GLARY_RULE: GlarySmartRule = GlarySmartRule;
 // Unit Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

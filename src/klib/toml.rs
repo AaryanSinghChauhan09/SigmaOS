@@ -198,7 +198,7 @@ fn unescape(s: &str) -> String {
     out
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

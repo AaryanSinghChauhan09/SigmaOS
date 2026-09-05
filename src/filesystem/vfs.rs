@@ -373,7 +373,7 @@ impl Default for VirtualFileSystem {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

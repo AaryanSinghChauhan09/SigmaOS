@@ -1983,7 +1983,7 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

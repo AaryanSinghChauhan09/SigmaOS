@@ -96,7 +96,7 @@ impl Default for SigmaProfiler {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

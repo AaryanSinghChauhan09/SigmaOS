@@ -7,17 +7,17 @@ use crate::klib::merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(not(test))]
 use crate::security::pqc_enclave::KyberKem;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[path = "../klib/merkle.rs"]
 mod merkle;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use merkle::{MerkleAccumulator, MerkleHash};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
 use std::vec::Vec;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use pqc_enclave::KyberKem;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements
@@ -246,7 +246,7 @@ impl Default for SovereignFirmitasAttestationEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

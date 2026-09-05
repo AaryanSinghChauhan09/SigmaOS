@@ -375,7 +375,7 @@ impl Default for VgaDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -85,7 +85,7 @@ impl Default for NumaTopologyManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

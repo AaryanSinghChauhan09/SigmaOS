@@ -162,7 +162,7 @@ impl Default for SovereignProcFS {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

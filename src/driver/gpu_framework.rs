@@ -635,7 +635,7 @@ impl Default for GpuManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

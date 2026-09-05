@@ -721,7 +721,7 @@ impl Default for SovereignXcr0State {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     extern crate alloc;

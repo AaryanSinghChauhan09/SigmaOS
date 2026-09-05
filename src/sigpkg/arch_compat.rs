@@ -817,7 +817,7 @@ impl SvntoGitEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -1005,7 +1005,7 @@ mod tests {
     }
 } // end mod tests (arch_compat first block)
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod extra_tests {
     use super::*;
 

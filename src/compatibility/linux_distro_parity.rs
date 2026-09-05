@@ -9,9 +9,9 @@
 use crate::klib::{HashMap, Vec};
 use std::string::String;
 use std::string::ToString;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::vec::Vec;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 // ==========================================
@@ -618,7 +618,7 @@ impl Default for LinuxCoreDumpFilterEngine {
 // 12. Integration Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

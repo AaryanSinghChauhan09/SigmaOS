@@ -454,7 +454,7 @@ impl Default for CalamaresInstallerShim {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

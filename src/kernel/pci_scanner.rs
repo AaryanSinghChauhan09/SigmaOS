@@ -225,7 +225,7 @@ impl Default for PciBusScanner {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

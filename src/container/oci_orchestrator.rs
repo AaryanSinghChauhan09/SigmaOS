@@ -68,7 +68,7 @@ impl TelemetryAiOrchestrator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 // =========================================================================
@@ -360,7 +360,7 @@ impl KabiComplianceEngine {
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

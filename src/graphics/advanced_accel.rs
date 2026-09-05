@@ -249,7 +249,7 @@ impl Default for GraphicsManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

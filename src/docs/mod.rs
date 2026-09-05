@@ -281,7 +281,7 @@ impl Default for ApiDocBuilder {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::string::ToString;

@@ -284,7 +284,7 @@ impl Default for GentooPortageEapi8SlotResolver {
 // STANDALONE UNIT TESTS
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

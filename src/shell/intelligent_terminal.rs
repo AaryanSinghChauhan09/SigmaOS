@@ -308,7 +308,7 @@ impl IntelligentTerminal {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

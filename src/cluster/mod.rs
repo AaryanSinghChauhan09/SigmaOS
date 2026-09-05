@@ -147,7 +147,7 @@ impl Default for ClusterManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

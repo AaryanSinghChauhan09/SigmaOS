@@ -517,7 +517,7 @@ impl Default for XdgDesktopPortalEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

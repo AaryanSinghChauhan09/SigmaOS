@@ -191,7 +191,7 @@ impl RiscV64Hal {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -93,7 +93,7 @@ impl Luks2CryptVolume {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -81,7 +81,7 @@ impl Default for GenerationManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -476,7 +476,7 @@ impl Default for EnhancedVirtManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

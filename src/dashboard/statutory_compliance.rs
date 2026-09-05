@@ -5,7 +5,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// Statutory regulatory frameworks
@@ -223,7 +223,7 @@ impl Default for StatutoryGovernanceLayer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

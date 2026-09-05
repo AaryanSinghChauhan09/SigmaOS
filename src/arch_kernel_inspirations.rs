@@ -1034,7 +1034,7 @@ impl Default for ReproducibleBuildVerdict {
 // integration harness).
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

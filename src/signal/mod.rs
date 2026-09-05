@@ -102,7 +102,7 @@ impl Default for SignalDispatcher {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

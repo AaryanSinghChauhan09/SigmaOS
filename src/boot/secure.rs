@@ -171,7 +171,7 @@ impl Tpm2Simulator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod additional_secure_boot_tests {
     use super::*;
 

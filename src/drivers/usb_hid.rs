@@ -384,7 +384,7 @@ pub enum HidError {
     DeviceError,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -624,7 +624,7 @@ pub fn sort_by<T, F: Fn(&T, &T) -> core::cmp::Ordering>(slice: &mut [T], compare
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

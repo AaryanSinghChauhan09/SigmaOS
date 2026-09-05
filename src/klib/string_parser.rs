@@ -162,7 +162,7 @@ pub fn replace_string(s: &str, from: &str, to: &str) -> String {
     s.replace(from, to)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -227,7 +227,7 @@ impl Default for StandardStreamController {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

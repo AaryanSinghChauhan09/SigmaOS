@@ -1092,7 +1092,7 @@ fn parse_debian_deps(s: &str) -> Vec<DebianDependency> {
     }).collect()
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

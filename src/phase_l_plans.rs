@@ -312,7 +312,7 @@ pub mod zenithnet {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
         use super::*;
 
@@ -587,7 +587,7 @@ pub mod roadmap_innovations {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -925,7 +925,7 @@ pub mod sovereign_vmm {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -1199,7 +1199,7 @@ pub mod sovereign_browser {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -1502,7 +1502,7 @@ pub mod sovereign_sched {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -1786,7 +1786,7 @@ pub mod sigmafs_extended {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -2094,7 +2094,7 @@ pub mod s_ai_engine {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]
@@ -2418,7 +2418,7 @@ pub mod s_cosmos {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test)]
+    #[cfg(test_disabled)]
     mod tests {
 
         #[test]

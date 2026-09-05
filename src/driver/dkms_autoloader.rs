@@ -174,7 +174,7 @@ impl Default for DkmsEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

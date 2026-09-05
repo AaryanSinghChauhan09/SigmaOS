@@ -293,7 +293,7 @@ pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

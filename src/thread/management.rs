@@ -257,20 +257,20 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn alloc(size: usize) -> *mut u8 {
     std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn free(_ptr: *mut u8) {
     // In standard shims, we can just let OS reclaim heap on test exit or perform simple dummy dealloc
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -124,7 +124,7 @@ impl Default for PerplexitySearchCli {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

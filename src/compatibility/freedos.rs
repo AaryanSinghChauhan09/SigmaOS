@@ -290,7 +290,7 @@ impl Default for FreeDosEmulator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

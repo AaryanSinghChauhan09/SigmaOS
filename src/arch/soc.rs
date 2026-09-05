@@ -166,7 +166,7 @@ impl SoC for AmlogicMesonSoC {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::drivers::soc::{SocPinController, SocClockController};

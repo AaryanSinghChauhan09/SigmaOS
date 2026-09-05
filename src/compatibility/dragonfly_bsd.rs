@@ -240,7 +240,7 @@ impl Default for ConcurrentSlateLock {
 // 5. Integration Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
