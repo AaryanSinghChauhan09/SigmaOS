@@ -37,11 +37,12 @@ pub enum Permission {
     NetworkUdp,
     FileRead,
     FileWrite,
+    ProcessExec,
+    ProcessControl,
+    Execute,
     AudioPlayback,
     DisplayAccess,
     Ipc,
-    ProcessControl,
-    Execute,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
