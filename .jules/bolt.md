@@ -13,3 +13,7 @@
 ## 2026-09-04 - Set Lookups & Drop Order Borrow Lifetimes in Transaction Audits
 **Learning:** Replacing `Vec` linear scans with `BTreeSet` transforms $O(N)$ lookups into $O(\log N)$ set operations and allows `insert` to return duplicate status in a single pass. When borrowing slice references (`&str`) into a set (e.g., `BTreeSet<&str>`), the underlying vector containing the owned data (`Vec<AlpmPackage>`) must be declared before the set so that local variable drop order (reverse declaration) ensures the owned data outlives borrowed set references.
 **Action:** When creating borrowed reference sets (`BTreeSet<&str>`) in local functions, always declare the owned container first.
+
+## 2026-09-05 - In-Place Buffer Appending for JSON Serialization
+**Learning:** In recursive data structure serialization (like JSON trees), calling `to_json_string()` on child elements or cloning keys (`key.clone()`) creates $O(N)$ temporary `String` heap allocations that are immediately concatenated and dropped. Passing a single mutable output buffer (`&mut String`) down the recursion tree and escaping string slices directly into the buffer eliminates all intermediate heap allocations during serialization.
+**Action:** When serializing structured values, prefer buffer-appending methods (`append_to_buf(&self, out: &mut String)`) over returning owned temporary `String` objects from recursive methods.
