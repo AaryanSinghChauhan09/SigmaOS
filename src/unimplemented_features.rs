@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)

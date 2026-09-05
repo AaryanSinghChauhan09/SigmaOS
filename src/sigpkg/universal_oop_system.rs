@@ -29,7 +29,7 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 use std::sync::Arc;
