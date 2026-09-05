@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1723,7 +1723,7 @@ impl GestureVoiceControlEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod peripheral_tests {
     use super::*;
 
@@ -1946,7 +1946,7 @@ impl LinuxLtsUpstreamAdapter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod linux_lts_upstream_tests {
     use super::*;
 
@@ -3212,7 +3212,7 @@ impl PhoronixTestSuiteRunner {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
 
@@ -3936,7 +3936,7 @@ impl S6ServiceInitSupervisor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod new_unimplemented_tests {
     use super::*;
 
@@ -4279,7 +4279,7 @@ impl SigmaOsGamingVulkanDirectXLayer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod governance_and_cross_platform_tests {
     use super::*;
 

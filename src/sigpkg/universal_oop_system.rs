@@ -29,7 +29,7 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(test))]
 use crate::klib::HashMap;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 use std::sync::Arc;
@@ -3242,7 +3242,7 @@ impl DebianTriggerManager {
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
                 let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s: &String| s.as_str()).collect();
+                    matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3567,7 +3567,7 @@ impl UserDefinedFunctionPipeline {
     }
 
     pub fn get_env_var(&self, key: &str) -> Option<&str> {
-        self.env_vars.get(key).map(|s| s.as_str())
+        self.env_vars.get(key).map(|s: &String| s.as_str())
     }
 
     pub fn register_closure<F>(&mut self, name: &str, phase: PackageBuildPhase, closure: F)
@@ -3643,7 +3643,7 @@ impl SovereignAlternativesEngine {
     }
 
     pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
-        self.active_selections.get(name).map(|s| s.as_str())
+        self.active_selections.get(name).map(|s: &String| s.as_str())
     }
 }
 
@@ -3721,7 +3721,7 @@ impl PortageSlotResolver {
 
     pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
         if let Some(slots) = self.installed_slots.get(pkg_name) {
-            slots.iter().any(|s| s.slot == target_slot)
+            slots.iter().any(|s: &PortageSlotInfo| s.slot == target_slot)
         } else {
             false
         }
@@ -3892,7 +3892,8 @@ impl NixStoreGcEngine {
             if reachable.contains_key(&path) {
                 continue;
             }
-            reachable.insert(path.clone(), true);
+            let key: String = path.clone();
+            reachable.insert(key, true);
             if let Some(deps) = self.store_paths.get(&path) {
                 for dep in deps {
                     if !reachable.contains_key(dep) {
@@ -4013,7 +4014,7 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

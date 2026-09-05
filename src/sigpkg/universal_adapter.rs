@@ -41,6 +41,7 @@ pub enum Permission {
     DisplayAccess,
     Ipc,
     ProcessControl,
+    ProcessExec,
     Execute,
 }
 
