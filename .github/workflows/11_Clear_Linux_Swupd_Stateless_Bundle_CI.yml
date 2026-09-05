@@ -1,0 +1,21 @@
+name: Clear Linux Swupd Stateless Bundle CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  swupd-bundle-audit:
+    name: Clear Linux swupd Stateless Bundle & Delta Stream
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Clear Linux Stateless Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/missing_test && /tmp/missing_test

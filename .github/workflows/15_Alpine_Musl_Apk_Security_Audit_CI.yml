@@ -1,0 +1,21 @@
+name: Alpine Musl apk-tools Security Audit CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  alpine-apk-security-audit:
+    name: Alpine Linux apk-tools v3 Indexing & Musl ABI Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Alpine APK Engine
+        run: |
+          rustc --test src/sigpkg/alpine_apk_engine.rs --edition=2021 -o /tmp/apk_test && /tmp/apk_test

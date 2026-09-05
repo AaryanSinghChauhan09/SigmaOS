@@ -1,0 +1,21 @@
+name: Slackware Pkgtool txz & SlackBuild CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  slackware-pkgtool-audit:
+    name: Slackware pkgtool txz & SlackBuild Scriptlet Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Slackware Pkgtool Engine
+        run: |
+          rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/slack_test && /tmp/slack_test

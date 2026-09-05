@@ -1,0 +1,40 @@
+name: Sovereign OS Manual Pages & Package Store Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Generate Manual Pages & Package Store Site
+        run: |
+          mkdir -p _site/man
+          cp -r docs/man/* _site/man/ || true
+          echo "<h1>SigmaOS Sovereign Universal Package System & Documentation</h1>" > _site/index.html
+          echo "<p>Universal alternative to all Linux distributions packaging systems.</p>" >> _site/index.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,21 @@
+name: OpenBSD Pledge Unveil & PF Firewall Security CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  openbsd-security-audit:
+    name: OpenBSD pledge(2), unveil(2), and PF Firewall Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify OpenBSD Pledge/Unveil & Security Rules
+        run: |
+          rustc --test src/security/rules.rs --edition=2021 -o /tmp/sec_rules_test && /tmp/sec_rules_test

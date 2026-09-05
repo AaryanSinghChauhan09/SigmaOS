@@ -1,0 +1,21 @@
+name: NixOS Flake Locking & Nix Store GC CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  nixos-flake-gc-audit:
+    name: NixOS Flake Lock Reproducibility & Store GC Inspection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Nix DSL & Store GC Engine
+        run: |
+          rustc --test src/sigpkg/nix_dsl.rs --edition=2021 -o /tmp/nix_test && /tmp/nix_test

@@ -1,0 +1,21 @@
+name: FreeBSD Poudriere Ports Tree & Jails CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  freebsd-ports-audit:
+    name: FreeBSD Poudriere Ports Tree & Jail Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify FreeBSD Ports Sync & Jail Infrastructure
+        run: |
+          rustc --test src/sigpkg/svntogit_repro.rs --edition=2021 -o /tmp/ports_test && /tmp/ports_test

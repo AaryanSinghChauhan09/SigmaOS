@@ -1,0 +1,21 @@
+name: Gentoo Portage Ebuild & Pkgcheck CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  gentoo-portage-audit:
+    name: Gentoo Portage Ebuild & Slot Resolver Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Gentoo Ebuild Use Flags & Portage Slotting
+        run: |
+          rustc --test src/sigpkg/gentoo_use_flags.rs --edition=2021 -o /tmp/gentoo_test && /tmp/gentoo_test

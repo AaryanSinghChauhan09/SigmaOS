@@ -1,0 +1,21 @@
+name: Debian sbuild & Pristine Tar Reproducible CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  debian-sbuild-audit:
+    name: Debian sbuild Pristine-Tar & Conffile Merge Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Debian APT Crusher & Git-Buildpackage Engine
+        run: |
+          rustc --test src/sigpkg/debian_crusher.rs --edition=2021 -o /tmp/deb_test && /tmp/deb_test

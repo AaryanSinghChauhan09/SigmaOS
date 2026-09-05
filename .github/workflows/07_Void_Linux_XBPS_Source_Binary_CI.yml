@@ -1,0 +1,21 @@
+name: Void Linux xbps-src Package & Binary CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  xbps-src-audit:
+    name: Void Linux XBPS Source & Binary Package Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify XBPS Source Templates & Binary Integrity
+        run: |
+          rustc --test src/sigpkg/poudriere_xbps.rs --edition=2021 -o /tmp/xbps_test && /tmp/xbps_test
