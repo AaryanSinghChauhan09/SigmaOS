@@ -179,6 +179,7 @@ impl PackageFormat {
             || normalized.ends_with(".pkg.tar.xz")
             || normalized.ends_with(".pkg.tar.gz")
             || normalized.contains("pacman")
+            || normalized.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".snap") {
@@ -356,6 +357,7 @@ pub struct UnifiedPackage {
     pub installed: bool,
     pub state: PackageState,
     pub properties: HashMap<String, String>,
+    pub checksum: String,
 }
 
 impl UnifiedPackage {
@@ -371,6 +373,7 @@ impl UnifiedPackage {
             installed: false,
             state: PackageState::Uninstalled,
             properties: HashMap::new(),
+            checksum: String::new(),
         }
     }
 

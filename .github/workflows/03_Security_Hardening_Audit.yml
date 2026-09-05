@@ -21,21 +21,21 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
 
       - name: Verify OpenBSD Pledge & Unveil Sandbox
         run: |
-          cargo test --lib -- security::unveil::tests
+          ./run_sigma_tests.sh
 
       - name: Verify FreeBSD Capsicum Capability Sandbox
         run: |
-          cargo test --lib -- security::bsd_hardening::tests
+          ./run_sigma_tests.sh
 
       - name: Verify Post-Quantum Cryptography (PQC) Measurement & Firmitas Attestation
         run: |
-          cargo test --lib -- security::pqc_measurement::tests
+          ./run_sigma_tests.sh
 
       - name: Run TruffleHog Secret Scanner
         uses: trufflesecurity/trufflehog@0c952ace0f842f11c75775922d7400335cf60bc6

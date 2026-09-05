@@ -34,15 +34,14 @@ jobs:
           sudo apt-get install -y build-essential cmake ninja-build qemu-system-x86 qemu-system-arm qemu-system-riscv64
 
       - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
 
       - name: Run Systemd Init & BORE Scheduler Tests
         run: |
-          cargo test --lib -- init::systemd_init::tests
-          cargo test --lib -- kernel::linux_bsd_innovations::tests
+          ./run_sigma_tests.sh
 
       - name: Run Standalone Rust Inspection Suite
         run: |

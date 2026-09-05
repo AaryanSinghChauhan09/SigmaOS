@@ -1533,7 +1533,7 @@ pub struct AppArmorPathProfile {
 }
 
 pub struct AppArmorPathRuleEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
+    pub profiles: BTreeMap<String, AppArmorPathProfile>,
     pub audit_log: Vec<String>,
 }
 
@@ -1545,7 +1545,7 @@ impl AppArmorPathRuleEngine {
         }
     }
 
-    pub fn add_profile(&mut self, profile: AppArmorProfile) {
+    pub fn add_profile(&mut self, profile: AppArmorPathProfile) {
         self.profiles.insert(profile.profile_name.clone(), profile);
     }
 
@@ -2045,7 +2045,7 @@ mod tests {
     fn test_apparmor_path_rule_engine() {
         let mut apparmor = AppArmorPathRuleEngine::new();
 
-        let profile = AppArmorProfile {
+        let profile = AppArmorPathProfile {
             profile_name: "usr.bin.firefox".to_string(),
             mode: AppArmorRuleMode::Enforce,
             rules: vec![
