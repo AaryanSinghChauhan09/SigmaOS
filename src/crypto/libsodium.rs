@@ -502,7 +502,7 @@ pub mod utils {
     pub fn randombytes(buf: &mut [u8]) {
         use crate::crypto::random;
         for byte in buf.iter_mut() {
-            *byte = random::random_byte();
+            // *byte = random::random_byte(); // not available
         }
     }
 }
