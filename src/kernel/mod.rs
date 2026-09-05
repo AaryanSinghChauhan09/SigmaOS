@@ -3,6 +3,7 @@
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
+pub mod kqueue_event;
 pub mod block_dev;
 pub mod bore;
 pub mod breakthrough;
@@ -24,7 +25,6 @@ pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
-pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
@@ -121,3 +121,4 @@ pub use cgroup_v2::{
     Cgroup, CgroupHierarchy, CgroupId, CgroupState, ControllerType, CpuController,
     MemoryController, PidsController, Controller,
 };
+pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
