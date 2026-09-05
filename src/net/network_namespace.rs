@@ -7,6 +7,9 @@ use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
 
+// Re-export socket types for convenience
+pub use crate::net::network_syscalls::{SocketFd, SocketMetadata, NamespaceSocketTable, CLONE_NEWNET};
+
 /// Unique identifier for a network namespace
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NetworkNamespaceId(u64);
@@ -151,6 +154,7 @@ pub struct NetworkNamespace {
     routing_table: Arc<Mutex<Vec<Route>>>,
     firewall_rules: Arc<Mutex<Vec<FirewallRule>>>,
     virtual_bridges: Arc<Mutex<Vec<VirtualBridge>>>,
+    socket_table: Arc<Mutex<NamespaceSocketTable>>,
     parent_id: Option<NetworkNamespaceId>,
     refcount: Arc<AtomicU64>,
 }
@@ -166,6 +170,7 @@ impl NetworkNamespace {
             routing_table: Arc::new(Mutex::new(Vec::new())),
             firewall_rules: Arc::new(Mutex::new(Vec::new())),
             virtual_bridges: Arc::new(Mutex::new(Vec::new())),
+            socket_table: Arc::new(Mutex::new(NamespaceSocketTable::new(id))),
             parent_id,
             refcount: Arc::new(AtomicU64::new(1)),
         }
@@ -236,6 +241,35 @@ impl NetworkNamespace {
             }
         }
         Err(format!("Bridge {} not found", name))
+    }
+
+    /// Get the socket table for this namespace
+    pub fn get_socket_table(&self) -> Result<Arc<Mutex<NamespaceSocketTable>>, String> {
+        Ok(self.socket_table.clone())
+    }
+
+    /// Add a socket to this namespace
+    pub fn add_socket(&self, metadata: SocketMetadata) -> Result<(), String> {
+        let table = self.socket_table.lock().map_err(|e| e.to_string())?;
+        table.add_socket(metadata)
+    }
+
+    /// Get socket information
+    pub fn get_socket(&self, fd: SocketFd) -> Result<SocketMetadata, String> {
+        let table = self.socket_table.lock().map_err(|e| e.to_string())?;
+        table.get_socket(fd)
+    }
+
+    /// List all sockets in namespace
+    pub fn list_sockets(&self) -> Result<Vec<SocketMetadata>, String> {
+        let table = self.socket_table.lock().map_err(|e| e.to_string())?;
+        table.list_sockets()
+    }
+
+    /// Count sockets in namespace
+    pub fn socket_count(&self) -> Result<usize, String> {
+        let table = self.socket_table.lock().map_err(|e| e.to_string())?;
+        table.count()
     }
 
     pub fn incref(&self) {
