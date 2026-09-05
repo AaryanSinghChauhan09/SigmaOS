@@ -1526,7 +1526,7 @@ pub struct AppArmorPathRule {
 }
 
 #[derive(Debug, Clone)]
-pub struct AppArmorProfile {
+pub struct AppArmorPathProfile {
     pub profile_name: String,
     pub mode: AppArmorRuleMode,
     pub rules: Vec<AppArmorPathRule>,
@@ -1756,20 +1756,6 @@ pub enum AppArmorMode {
     Enforce,
     Complain,
     Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorProfile {
-    pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
 }
 
 impl UbuntuAppArmorEngine {

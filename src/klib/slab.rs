@@ -5,7 +5,7 @@ use std::vec::Vec;
 // No external dependencies - fully sovereign implementation
 
 #[allow(dead_code)]
-use core::std::Layout;
+use std::Layout;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

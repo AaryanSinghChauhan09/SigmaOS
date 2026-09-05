@@ -1271,22 +1271,6 @@ impl Default for PackageTriggerRegistry {
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct NodeBinaryPackage {
-    pub name: String,
-    pub version: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct NodeBinaryDistroEngine;
-impl NodeBinaryDistroEngine {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn install_to_store(&self, _pkg: &NodeBinaryPackage, _bytes: &[u8], _npm_version: &str) -> Result<String, &'static str> {
-        Ok("/var/lib/sigmaos/node/store".to_string())
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
