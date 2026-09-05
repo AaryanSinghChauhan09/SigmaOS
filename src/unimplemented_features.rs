@@ -4279,6 +4279,169 @@ impl SigmaOsGamingVulkanDirectXLayer {
     }
 }
 
+// =========================================================================
+// TECH MEDIA & DISTRO INNOVATIONS FEATURE ENGINE
+// =========================================================================
+
+/// Android 16 Notification Privacy & Private Space Hub (Android Police / 9to5Google inspired)
+#[derive(Debug, Clone)]
+pub struct Android16NotificationPrivacyHub {
+    pub private_space_locked: bool,
+    pub active_notifications: Vec<String>,
+    pub sensitive_mask_enabled: bool,
+}
+
+impl Android16NotificationPrivacyHub {
+    pub fn new() -> Self {
+        Self {
+            private_space_locked: true,
+            active_notifications: Vec::new(),
+            sensitive_mask_enabled: true,
+        }
+    }
+
+    pub fn post_notification(&mut self, app_id: &str, content: &str, is_sensitive: bool) -> usize {
+        if is_sensitive && self.private_space_locked {
+            self.active_notifications.push(format!("[HIDDEN NOTIFICATION: {}]", app_id));
+        } else {
+            self.active_notifications.push(format!("[{}] {}", app_id, content));
+        }
+        self.active_notifications.len()
+    }
+
+    pub fn toggle_private_space_lock(&mut self, locked: bool) {
+        self.private_space_locked = locked;
+    }
+}
+
+impl Default for Android16NotificationPrivacyHub {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Phoronix Linux Kernel Benchmarking Engine (Phoronix Media inspired)
+#[derive(Debug, Clone)]
+pub struct PhoronixLinuxKernelBenchmarkingEngine {
+    pub benchmark_results: BTreeMap<String, u64>,
+    pub active_suite: String,
+}
+
+impl PhoronixLinuxKernelBenchmarkingEngine {
+    pub fn new(suite: &str) -> Self {
+        Self {
+            benchmark_results: BTreeMap::new(),
+            active_suite: suite.to_string(),
+        }
+    }
+
+    pub fn run_microbenchmark(&mut self, test_name: &str, iterations: u32) -> u64 {
+        let score = (iterations as u64) * 1250;
+        self.benchmark_results.insert(test_name.to_string(), score);
+        score
+    }
+
+    pub fn generate_phoronix_xml_summary(&self) -> String {
+        format!("<PhoronixTestSuite name=\"{}\" tests=\"{}\"/>", self.active_suite, self.benchmark_results.len())
+    }
+}
+
+/// DistroWatch Trending Distribution Rank Engine (DistroWatch inspired)
+#[derive(Debug, Clone)]
+pub struct DistroWatchTrendingDistroRankEngine {
+    pub page_hit_rankings: BTreeMap<String, u32>,
+}
+
+impl DistroWatchTrendingDistroRankEngine {
+    pub fn new() -> Self {
+        Self {
+            page_hit_rankings: BTreeMap::new(),
+        }
+    }
+
+    pub fn record_distro_visit(&mut self, distro_name: &str) {
+        let count = self.page_hit_rankings.entry(distro_name.to_string()).or_insert(0);
+        *count += 1;
+    }
+
+    pub fn get_top_ranked_distro(&self) -> Option<String> {
+        self.page_hit_rankings.iter().max_by_key(|(_, v)| *v).map(|(k, _)| k.clone())
+    }
+}
+
+impl Default for DistroWatchTrendingDistroRankEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// KDnuggets Machine Learning Pipeline Optimizer (KDnuggets inspired)
+#[derive(Debug, Clone)]
+pub struct KdnuggetsMlPipelineOptimizer {
+    pub dataset_rows: usize,
+    pub feature_count: usize,
+    pub pipeline_compressed: bool,
+}
+
+impl KdnuggetsMlPipelineOptimizer {
+    pub fn new(rows: usize, features: usize) -> Self {
+        Self {
+            dataset_rows: rows,
+            feature_count: features,
+            pipeline_compressed: false,
+        }
+    }
+
+    pub fn optimize_feature_matrix(&mut self) -> usize {
+        if self.feature_count > 10 {
+            self.feature_count /= 2;
+        }
+        self.pipeline_compressed = true;
+        self.feature_count
+    }
+
+    pub fn is_pipeline_ready(&self) -> bool {
+        self.dataset_rows > 0 && self.pipeline_compressed
+    }
+}
+
+/// TechPowerUp GPU VBIOS Tweaker & Flasher (TechPowerUp inspired)
+#[derive(Debug, Clone)]
+pub struct TechPowerUpGpuVbiosTweaker {
+    pub gpu_name: String,
+    pub power_limit_watts: u32,
+    pub vram_clock_mhz: u32,
+    pub flashed: bool,
+}
+
+impl TechPowerUpGpuVbiosTweaker {
+    pub fn new(gpu_name: &str, default_power: u32, default_vram: u32) -> Self {
+        Self {
+            gpu_name: gpu_name.to_string(),
+            power_limit_watts: default_power,
+            vram_clock_mhz: default_vram,
+            flashed: false,
+        }
+    }
+
+    pub fn tune_power_limit(&mut self, watts: u32) -> Result<(), &'static str> {
+        if watts < 50 || watts > 600 {
+            return Err("VBIOS: Out of safe power limits");
+        }
+        self.power_limit_watts = watts;
+        Ok(())
+    }
+
+    pub fn flash_custom_vbios(&mut self, signature: &[u8]) -> bool {
+        if !signature.is_empty() {
+            self.flashed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod governance_and_cross_platform_tests {
     use super::*;
@@ -4321,5 +4484,50 @@ mod governance_and_cross_platform_tests {
         assert_eq!(compiled, 1);
         gaming.set_frame_rate_target(240);
         assert_eq!(gaming.target_fps, 240);
+    }
+
+    #[test]
+    fn test_android16_notification_privacy_hub() {
+        let mut hub = Android16NotificationPrivacyHub::new();
+        assert_eq!(hub.post_notification("org.telegram.messenger", "Secret Message", true), 1);
+        assert!(hub.active_notifications[0].contains("HIDDEN"));
+
+        hub.toggle_private_space_lock(false);
+        assert_eq!(hub.post_notification("org.telegram.messenger", "Secret Message", true), 2);
+        assert!(hub.active_notifications[1].contains("Secret Message"));
+    }
+
+    #[test]
+    fn test_phoronix_linux_kernel_benchmarking_engine() {
+        let mut suite = PhoronixLinuxKernelBenchmarkingEngine::new("pts/kernel");
+        let score = suite.run_microbenchmark("sysbench-cpu", 10);
+        assert_eq!(score, 12500);
+        let xml = suite.generate_phoronix_xml_summary();
+        assert!(xml.contains("pts/kernel"));
+    }
+
+    #[test]
+    fn test_distrowatch_trending_distro_rank_engine() {
+        let mut dw = DistroWatchTrendingDistroRankEngine::new();
+        dw.record_distro_visit("SigmaOS");
+        dw.record_distro_visit("SigmaOS");
+        dw.record_distro_visit("ArchLinux");
+        assert_eq!(dw.get_top_ranked_distro().unwrap(), "SigmaOS");
+    }
+
+    #[test]
+    fn test_kdnuggets_ml_pipeline_optimizer() {
+        let mut opt = KdnuggetsMlPipelineOptimizer::new(10000, 50);
+        assert_eq!(opt.optimize_feature_matrix(), 25);
+        assert!(opt.is_pipeline_ready());
+    }
+
+    #[test]
+    fn test_techpowerup_gpu_vbios_tweaker() {
+        let mut tweaker = TechPowerUpGpuVbiosTweaker::new("NVIDIA RTX 4090", 450, 10500);
+        assert!(tweaker.tune_power_limit(500).is_ok());
+        assert!(tweaker.tune_power_limit(1000).is_err());
+        assert!(tweaker.flash_custom_vbios(b"CUSTOM_VBIOS_SIG"));
+        assert!(tweaker.flashed);
     }
 }

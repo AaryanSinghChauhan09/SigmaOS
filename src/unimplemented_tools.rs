@@ -5341,6 +5341,114 @@ impl NetworkPcapForensicSniffer {
     }
 }
 
+// =========================================================================
+// TECH MEDIA DIAGNOSTIC & CUSTOMIZATION TOOLS
+// =========================================================================
+
+/// Geeky Gadgets Hardware Diagnostic & IoT Telemetry Console (Geeky Gadgets inspired)
+#[derive(Debug, Clone)]
+pub struct GeekyGadgetsHardwareDiagnosticConsole {
+    pub connected_sensors_count: usize,
+    pub telemetry_logs: Vec<String>,
+}
+
+impl GeekyGadgetsHardwareDiagnosticConsole {
+    pub fn new() -> Self {
+        Self {
+            connected_sensors_count: 0,
+            telemetry_logs: Vec::new(),
+        }
+    }
+
+    pub fn poll_sensor_telemetry(&mut self, sensor_id: &str, reading: f64) -> usize {
+        self.telemetry_logs.push(format!("Sensor [{}] -> {:.2}", sensor_id, reading));
+        if self.connected_sensors_count == 0 {
+            self.connected_sensors_count = 1;
+        }
+        self.telemetry_logs.len()
+    }
+
+    pub fn get_health_status(&self) -> bool {
+        !self.telemetry_logs.is_empty()
+    }
+}
+
+impl Default for GeekyGadgetsHardwareDiagnosticConsole {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// MakeUseOf Linux Desktop Tweak & Customizer Tool (MakeUseOf inspired)
+#[derive(Debug, Clone)]
+pub struct MakeUseOfLinuxDesktopCustomizer {
+    pub active_theme: String,
+    pub accent_color: String,
+    pub compositor_blur: bool,
+}
+
+impl MakeUseOfLinuxDesktopCustomizer {
+    pub fn new() -> Self {
+        Self {
+            active_theme: String::from("Zenith-Dark"),
+            accent_color: String::from("#00FF88"),
+            compositor_blur: true,
+        }
+    }
+
+    pub fn apply_desktop_theme(&mut self, theme: &str, accent: &str) {
+        self.active_theme = theme.to_string();
+        self.accent_color = accent.to_string();
+    }
+
+    pub fn enable_compositor_blur(&mut self, enable: bool) {
+        self.compositor_blur = enable;
+    }
+}
+
+impl Default for MakeUseOfLinuxDesktopCustomizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// HowToGeek System Diagnostic & Auto-Repair Troubleshooter (HowToGeek inspired)
+#[derive(Debug, Clone)]
+pub struct HowToGeekSystemTroubleshooter {
+    pub detected_issues: Vec<String>,
+    pub auto_fixed_count: usize,
+}
+
+impl HowToGeekSystemTroubleshooter {
+    pub fn new() -> Self {
+        Self {
+            detected_issues: Vec::new(),
+            auto_fixed_count: 0,
+        }
+    }
+
+    pub fn diagnose_subsystem(&mut self, subsystem: &str, status_ok: bool) -> bool {
+        if !status_ok {
+            self.detected_issues.push(format!("Fault detected in {}", subsystem));
+            false
+        } else {
+            true
+        }
+    }
+
+    pub fn run_auto_repair(&mut self) -> usize {
+        self.auto_fixed_count += self.detected_issues.len();
+        self.detected_issues.clear();
+        self.auto_fixed_count
+    }
+}
+
+impl Default for HowToGeekSystemTroubleshooter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod new_unimplemented_tools_tests {
     use super::*;
@@ -5430,5 +5538,31 @@ mod new_unimplemented_tools_tests {
         assert!(sniffer.inspect_pcap_frame(leak_pcap));
         assert!(sniffer.credential_leak_detected);
         assert_eq!(sniffer.analyzed_packet_count, 2);
+    }
+
+    #[test]
+    fn test_geeky_gadgets_hardware_diagnostic_console() {
+        let mut console = GeekyGadgetsHardwareDiagnosticConsole::new();
+        assert_eq!(console.poll_sensor_telemetry("TMP102", 36.5), 1);
+        assert!(console.get_health_status());
+    }
+
+    #[test]
+    fn test_make_use_of_linux_desktop_customizer() {
+        let mut customizer = MakeUseOfLinuxDesktopCustomizer::new();
+        customizer.apply_desktop_theme("Nordic", "#5E81AC");
+        assert_eq!(customizer.active_theme, "Nordic");
+        assert_eq!(customizer.accent_color, "#5E81AC");
+        customizer.enable_compositor_blur(false);
+        assert!(!customizer.compositor_blur);
+    }
+
+    #[test]
+    fn test_how_to_geek_system_troubleshooter() {
+        let mut troubleshooter = HowToGeekSystemTroubleshooter::new();
+        assert!(troubleshooter.diagnose_subsystem("audio_pipewire", true));
+        assert!(!troubleshooter.diagnose_subsystem("network_iwd", false));
+        assert_eq!(troubleshooter.run_auto_repair(), 1);
+        assert_eq!(troubleshooter.detected_issues.len(), 0);
     }
 }
