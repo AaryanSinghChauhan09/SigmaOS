@@ -19,6 +19,7 @@ pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf;
+pub mod ebpf_vm;
 pub mod exports;
 pub mod gap_closing;
 pub mod gap_filling;
