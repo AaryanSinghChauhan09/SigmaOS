@@ -185,6 +185,68 @@ pub trait DriverManager {
     fn get_driver_status(&self, device_id: DeviceID) -> bool;
 }
 
+pub struct SimpleDriverManager {
+    pub loaded_drivers: Vec<DeviceID>,
+}
+
+impl SimpleDriverManager {
+    pub fn new() -> Self {
+        Self {
+            loaded_drivers: Vec::new(),
+        }
+    }
+}
+
+impl Default for SimpleDriverManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DriverManager for SimpleDriverManager {
+    fn load_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        if !self.get_driver_status(device_id) {
+            self.loaded_drivers.push(device_id);
+        }
+        Ok(())
+    }
+
+    fn unload_driver(&mut self, device_id: DeviceID) -> Result<(), ()> {
+        if let Some(pos) = self.loaded_drivers.iter().position(|&id| id == device_id) {
+            self.loaded_drivers.remove(pos);
+        }
+        Ok(())
+    }
+
+    fn get_driver_status(&self, device_id: DeviceID) -> bool {
+        self.loaded_drivers.contains(&device_id)
+    }
+}
+
+pub struct SimpleDiagnostics {
+    pub matrix: SimpleCompatibilityMatrix,
+}
+
+impl SimpleDiagnostics {
+    pub fn new(matrix: SimpleCompatibilityMatrix) -> Self {
+        Self { matrix }
+    }
+
+    pub fn run_full_scan(&self) -> CompatibilityReport {
+        let mut results = Vec::new();
+        for dev in &self.matrix.devices {
+            let res = match dev.support_status() {
+                SupportStatus::Supported => CompatibilityResult::Healthy,
+                SupportStatus::Partial => CompatibilityResult::Warning,
+                SupportStatus::Unsupported => CompatibilityResult::Error,
+                SupportStatus::Unknown => CompatibilityResult::Unknown,
+            };
+            results.push((dev.id(), res));
+        }
+        CompatibilityReport { results }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompatibilityError {

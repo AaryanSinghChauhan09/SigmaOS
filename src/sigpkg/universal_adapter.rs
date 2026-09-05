@@ -42,6 +42,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
+    ProcessExec,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

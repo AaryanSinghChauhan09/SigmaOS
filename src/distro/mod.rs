@@ -220,3 +220,9 @@ pub use open_source_distro_innovations::{
     IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
+pub mod ultimate_distro_innovations;
+pub use ultimate_distro_innovations::{
+    AptPinRule, CpuGovernorMode as UltimateCpuGovernorMode, DebianMultiarchAptEngine,
+    GarudaPerformanceTweakEngine, HardenedBsdPaxCfiEngine, IoSchedulerMode, NetBsdRumpUserlandEngine,
+    RumpDriverType, SolusEopkgBudgieEngine,
+};
