@@ -2927,6 +2927,162 @@ mod tests {
 
         assert!(suite.scrub_tiered_storage_extent(202));
     }
+
+    #[test]
+    fn test_sovereign_nginx_ingress_router() {
+        let mut router = SovereignNginxIngressRouter::new();
+        router.add_ingress_rule("api.sigmaos.local", "/v1", "127.0.0.1:8080", Some("cert-prod"));
+
+        let routed = router.route_request("api.sigmaos.local", "/v1/health");
+        assert_eq!(routed, Some("127.0.0.1:8080".to_string()));
+        assert_eq!(router.total_requests_routed, 1);
+        assert_eq!(router.open_quic_stream(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_opentelemetry_metrics_collector() {
+        let mut collector = SovereignOpenTelemetryMetricsCollector::new();
+        collector.increment_counter("http_requests_total", 5);
+        collector.increment_counter("http_requests_total", 10);
+        assert_eq!(collector.get_counter("http_requests_total"), 15);
+
+        collector.record_histogram_value("http_request_duration_ms", 45.0, &[10.0, 50.0, 100.0]);
+        let hist = collector.histograms.get("http_request_duration_ms").unwrap();
+        assert_eq!(hist.count, 1);
+        assert_eq!(hist.sum, 45.0);
+        assert_eq!(hist.buckets[1], (50.0, 1)); // Count in <= 50.0 bucket
+    }
+}
+
+// =========================================================================
+// 30. SOVEREIGN NGINX INGRESS ROUTER (Superseding Nginx, HAProxy, Traefik)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IngressRouteRule {
+    pub host_sni: String,
+    pub path_prefix: String,
+    pub upstream_address: String,
+    pub tls_certificate_id: Option<String>,
+}
+
+pub struct SovereignNginxIngressRouter {
+    pub routes: Vec<IngressRouteRule>,
+    pub total_requests_routed: u64,
+    pub active_quic_streams: u32,
+}
+
+impl SovereignNginxIngressRouter {
+    pub fn new() -> Self {
+        Self {
+            routes: Vec::new(),
+            total_requests_routed: 0,
+            active_quic_streams: 0,
+        }
+    }
+
+    pub fn add_ingress_rule(
+        &mut self,
+        host_sni: &str,
+        path_prefix: &str,
+        upstream: &str,
+        tls_cert_id: Option<&str>,
+    ) {
+        self.routes.push(IngressRouteRule {
+            host_sni: host_sni.to_string(),
+            path_prefix: path_prefix.to_string(),
+            upstream_address: upstream.to_string(),
+            tls_certificate_id: tls_cert_id.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn route_request(&mut self, sni: &str, path: &str) -> Option<String> {
+        self.total_requests_routed += 1;
+        for route in &self.routes {
+            if (route.host_sni == "*" || route.host_sni == sni) && path.starts_with(&route.path_prefix) {
+                return Some(route.upstream_address.clone());
+            }
+        }
+        None
+    }
+
+    pub fn open_quic_stream(&mut self) -> u32 {
+        self.active_quic_streams += 1;
+        self.active_quic_streams
+    }
+}
+
+impl Default for SovereignNginxIngressRouter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 31. SOVEREIGN OPENTELEMETRY METRICS COLLECTOR (Superseding OTel, Jaeger)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct MetricCounter {
+    pub name: String,
+    pub value: u64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct MetricHistogram {
+    pub name: String,
+    pub buckets: Vec<(f64, u64)>, // (upper_bound, count)
+    pub sum: f64,
+    pub count: u64,
+}
+
+pub struct SovereignOpenTelemetryMetricsCollector {
+    pub counters: BTreeMap<String, u64>,
+    pub histograms: BTreeMap<String, MetricHistogram>,
+}
+
+impl SovereignOpenTelemetryMetricsCollector {
+    pub fn new() -> Self {
+        Self {
+            counters: BTreeMap::new(),
+            histograms: BTreeMap::new(),
+        }
+    }
+
+    pub fn increment_counter(&mut self, name: &str, amount: u64) {
+        let entry = self.counters.entry(name.to_string()).or_insert(0);
+        *entry += amount;
+    }
+
+    pub fn record_histogram_value(&mut self, name: &str, value: f64, bounds: &[f64]) {
+        let entry = self.histograms.entry(name.to_string()).or_insert_with(|| {
+            let buckets = bounds.iter().map(|&b| (b, 0)).collect();
+            MetricHistogram {
+                name: name.to_string(),
+                buckets,
+                sum: 0.0,
+                count: 0,
+            }
+        });
+
+        entry.sum += value;
+        entry.count += 1;
+        for (upper_bound, count) in &mut entry.buckets {
+            if value <= *upper_bound {
+                *count += 1;
+            }
+        }
+    }
+
+    pub fn get_counter(&self, name: &str) -> u64 {
+        self.counters.get(name).copied().unwrap_or(0)
+    }
+}
+
+impl Default for SovereignOpenTelemetryMetricsCollector {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -2947,6 +3103,8 @@ pub struct OpenSourceProjectSupremacySuite {
     pub unveiled_paths: Vec<(String, String)>,
     pub hammer2_blocks: Vec<(String, u64, Vec<u8>)>,
     pub cinder_volumes: BTreeMap<String, CinderVolumeRecord>,
+    pub ingress_router: SovereignNginxIngressRouter,
+    pub otel_collector: SovereignOpenTelemetryMetricsCollector,
 }
 
 #[derive(Debug, Clone)]
@@ -2970,6 +3128,8 @@ impl OpenSourceProjectSupremacySuite {
             unveiled_paths: Vec::new(),
             hammer2_blocks: Vec::new(),
             cinder_volumes: BTreeMap::new(),
+            ingress_router: SovereignNginxIngressRouter::new(),
+            otel_collector: SovereignOpenTelemetryMetricsCollector::new(),
         }
     }
 

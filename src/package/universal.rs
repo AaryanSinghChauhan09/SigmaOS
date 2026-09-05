@@ -200,6 +200,8 @@ impl PackageFormat {
             Some(PackageFormat::Ports)
         } else if normalized.ends_with(".pkg") {
             Some(PackageFormat::Pkg)
+        } else if normalized.contains("pacman") || normalized.ends_with(".pacman") {
+            Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".aab") {
             Some(PackageFormat::Aab)
         } else if normalized.ends_with(".apk") {
