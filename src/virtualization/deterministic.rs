@@ -255,7 +255,7 @@ impl<T> Drop for Vec<T> {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::{alloc as std::alloc::alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     std::alloc::alloc(layout)
 }

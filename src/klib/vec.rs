@@ -614,7 +614,7 @@ impl<'a, T> Drop for Drain<'a, T> {
 /// the corresponding `free()` call once done.
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::{alloc as std::alloc::alloc, Layout};
+    use std::alloc::{alloc, Layout};
     // Layout::from_size_align can only fail if align is not a power of two or
     // size overflows; both conditions are impossible here (align=8, size>0).
     let layout = Layout::from_size_align(size, 8).expect("invalid layout");
