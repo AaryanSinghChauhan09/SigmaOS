@@ -21,8 +21,8 @@ fn usage() -> ! {
          USAGE:\n\
          \x20 sigpkg install [--fmt] <pkg|file>... Add package(s) or foreign (.deb/.rpm/PKGBUILD/.apk/.xbps/e.t.c.) to store\n\
          \x20 sigpkg convert <file>                Dry-run convert foreign package manifest & print metadata\n\
-         \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, zypper, etc.)\n\
-         \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps <cmd> Foreign PM command alias\n\
+         \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, emerge, nix, etc.)\n\
+         \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|eopkg|nix|guix|pkgin|slackpkg <cmd> Foreign PM command alias\n\
          \x20 sigpkg remove <package>              Remove a package from the store\n\
          \x20 sigpkg search <package>              Show a stored package's metadata\n\
          \x20 sigpkg status                        List stored packages and counts\n\
@@ -51,8 +51,10 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "zypper"
-        | "xbps" | "xbps-install" | "xbps-remove" | "emerge" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add"
+        | "pkg_delete" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
+        | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
+        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -195,6 +197,36 @@ fn cmd_install(args: &[String]) {
             }
             "--appimage" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppImage)
+            }
+            "--eopkg" | "--pisi" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pisi)
+            }
+            "--nix" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix)
+            }
+            "--guix" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Guix)
+            }
+            "--haiku" | "--hpkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hpkg)
+            }
+            "--slackware" | "--slackbuild" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SlackBuild)
+            }
+            "--pkgsrc" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pkgsrc)
+            }
+            "--moss" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Moss)
+            }
+            "--tcz" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz)
+            }
+            "--gobo" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gobo)
+            }
+            "--ostree" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
             }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes

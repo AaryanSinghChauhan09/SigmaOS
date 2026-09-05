@@ -902,8 +902,11 @@ impl UniversalPackageAdapter {
                     "PRGNAM" | "NAME" => name = val.to_string(),
                     "VERSION" | "VER" => version = val.to_string(),
                     "SLACK_REQUIRED" | "REQUIRES" => {
-                        for req in val.split_whitespace() {
-                            slack_required.push(req.to_string());
+                        for req in val.split(|c| c == ' ' || c == '\t' || c == ',') {
+                            let clean_req = req.trim();
+                            if !clean_req.is_empty() {
+                                slack_required.push(clean_req.to_string());
+                            }
                         }
                     }
                     _ => {}
@@ -1679,6 +1682,15 @@ impl SigPkgUniversalBridgeEngine {
                     &net.depends,
                 )
             }
+            PackageFormat::Hpkg => {
+                let hpkg = self.adapter.parse_haiku_hpkg(&manifest_text)?;
+                self.adapter.translate_to_native_package(
+                    &hpkg.name,
+                    &hpkg.version,
+                    &hpkg.summary,
+                    &hpkg.requires,
+                )
+            }
             _ => self
                 .adapter
                 .parse_and_translate_manifest(filename, &manifest_text),
@@ -1804,26 +1816,29 @@ impl UniversalDependencyMapper {
 
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            | "dev-libs/openssl" | "openssl" | "libssl1.1" | "libssl" => "openssl".to_string(),
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" | "glibc-devel" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            "python3" | "python" | "python3-dev" | "lang/python3" | "dev-lang/python" => "python".to_string(),
-            "curl" | "libcurl4" | "libcurl-devel" | "ftp/curl" => "curl".to_string(),
+            "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl" | "net-misc/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
-            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
-            "wayland" | "dev-libs/wayland" => "wayland".to_string(),
-            "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
-            "dbus" | "sys-apps/dbus" => "dbus".to_string(),
-            "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            "ncurses" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
-            "readline" | "sys-libs/readline" => "readline".to_string(),
-            "xz" | "xz-utils" | "app-arch/xz-utils" => "xz".to_string(),
-            "zstd" | "app-arch/zstd" => "zstd".to_string(),
-            "sqlite" | "sqlite3" | "dev-db/sqlite" => "sqlite".to_string(),
+            "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" | "x11-proto/xorgproto" | "xorg-x11-server" => "libx11".to_string(),
+            "wayland" | "wayland-devel" | "wayland-dev" | "dev-libs/wayland" => "wayland".to_string(),
+            "pipewire" | "media-video/pipewire" | "pipewire-devel" => "pipewire".to_string(),
+            "dbus" | "dbus-devel" | "sys-apps/dbus" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf".to_string(),
+            "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
+            "readline" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
+            "xz" | "xz-utils" | "liblzma-dev" | "app-arch/xz-utils" => "xz".to_string(),
+            "zstd" | "libzstd-dev" | "libzstd-devel" | "app-arch/zstd" => "zstd".to_string(),
+            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" => "sqlite".to_string(),
+            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3".to_string(),
+            "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
+            "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
+            "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -1897,6 +1912,19 @@ impl UniversalScriptletConverter {
                 "post-install" => Some(SigmaPkgHookType::PostInstall),
                 "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
                 "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::Portage => match script_name {
+                "pkg_preinst" | "pre_install" => Some(SigmaPkgHookType::PreInstall),
+                "pkg_postinst" | "post_install" => Some(SigmaPkgHookType::PostInstall),
+                "pkg_prerm" | "pre_remove" => Some(SigmaPkgHookType::PreRemove),
+                "pkg_postrm" | "post_remove" => Some(SigmaPkgHookType::PostRemove),
+                _ => None,
+            },
+            PackageFormat::Nix | PackageFormat::Guix => match script_name {
+                "preInstall" => Some(SigmaPkgHookType::PreInstall),
+                "postInstall" => Some(SigmaPkgHookType::PostInstall),
+                "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
                 _ => None,
             },
             _ => None,
@@ -2133,6 +2161,105 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
+            "emerge" | "ebuild" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-a" | "--ask" | "-pv" | "--pretend" => dry_run = true,
+                        "-u" | "-uN" | "--update" | "@world" => operation = UniversalPmOperation::Upgrade,
+                        "-C" | "--unmerge" | "deselect" => operation = UniversalPmOperation::Remove,
+                        "-s" | "--search" => operation = UniversalPmOperation::Search,
+                        "-S" | "--searchdesc" => operation = UniversalPmOperation::Search,
+                        "-c" | "--depclean" => operation = UniversalPmOperation::CleanCache,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "eopkg" | "moss" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "it" | "install" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" => operation = UniversalPmOperation::Remove,
+                        "up" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "sr" | "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "nix" | "nix-env" | "guix" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-i" | "-iA" | "install" | "package" => operation = UniversalPmOperation::Install,
+                        "-e" | "uninstall" | "remove" => operation = UniversalPmOperation::Remove,
+                        "-u" | "--upgrade" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-q" | "-qa" | "search" => operation = UniversalPmOperation::Search,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkgin" | "pkg_add" | "pkg_delete" => {
+                if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
+                }
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "in" | "install" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" => operation = UniversalPmOperation::Remove,
+                        "ug" | "full-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "se" | "search" => operation = UniversalPmOperation::Search,
+                        "-n" | "-s" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "slackpkg" | "installpkg" | "removepkg" => {
+                if pm == "installpkg" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "removepkg" {
+                    operation = UniversalPmOperation::Remove;
+                }
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" | "upgrade-all" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "clean-system" => operation = UniversalPmOperation::CleanCache,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "kiss" | "cpt" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "b" | "build" | "i" | "install" => operation = UniversalPmOperation::Install,
+                        "r" | "remove" => operation = UniversalPmOperation::Remove,
+                        "u" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "s" | "search" => operation = UniversalPmOperation::Search,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
             _ => {
                 for arg in args {
                     if !arg.starts_with('-') {
@@ -2322,6 +2449,24 @@ impl UniversalFormatConverter {
                         &parsed.app_id,
                         "1.0.0",
                         "Flatpak Sandboxed App",
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Hpkg => {
+                let parsed = adapter
+                    .parse_haiku_hpkg(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .requires
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.name,
+                        &parsed.version,
+                        &parsed.summary,
                         &canonical_deps,
                     )
                     .map_err(|e: &'static str| e.to_string())
@@ -3132,6 +3277,31 @@ mod tests {
         assert_eq!(bsd_action.source_pm, "pkg");
         assert_eq!(bsd_action.operation, UniversalPmOperation::Install);
         assert!(bsd_action.dry_run);
+
+        let emerge_action = dispatcher
+            .dispatch_command("emerge -pv sys-apps/portage")
+            .unwrap();
+        assert_eq!(emerge_action.source_pm, "emerge");
+        assert_eq!(emerge_action.operation, UniversalPmOperation::Install);
+        assert!(emerge_action.dry_run);
+
+        let nix_action = dispatcher
+            .dispatch_command("nix install nixpkgs#firefox")
+            .unwrap();
+        assert_eq!(nix_action.source_pm, "nix");
+        assert_eq!(nix_action.operation, UniversalPmOperation::Install);
+
+        let eopkg_action = dispatcher
+            .dispatch_command("eopkg it vlc")
+            .unwrap();
+        assert_eq!(eopkg_action.source_pm, "eopkg");
+        assert_eq!(eopkg_action.operation, UniversalPmOperation::Install);
+
+        let slack_action = dispatcher
+            .dispatch_command("slackpkg install glibc")
+            .unwrap();
+        assert_eq!(slack_action.source_pm, "slackpkg");
+        assert_eq!(slack_action.operation, UniversalPmOperation::Install);
     }
 
     #[test]
