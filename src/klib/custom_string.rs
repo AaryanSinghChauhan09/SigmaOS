@@ -5,10 +5,10 @@ pub mod custom_allocator {
     pub struct CustomAllocator;
     pub static GLOBAL_CUSTOM_ALLOCATOR: CustomAllocator = CustomAllocator;
     impl CustomAllocator {
-        pub fn alloc(&self, _layout: core::std::Layout) -> *mut u8 {
+        pub fn alloc(&self, _layout: std::Layout) -> *mut u8 {
             core::ptr::null_mut()
         }
-        pub fn dealloc(&self, _ptr: *mut u8, _layout: core::std::Layout) {}
+        pub fn dealloc(&self, _ptr: *mut u8, _layout: std::Layout) {}
     }
     pub unsafe fn alloc(size: usize) -> *mut u8 {
         use std::Layout;

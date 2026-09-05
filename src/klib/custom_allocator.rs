@@ -14,7 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Custom Memory Allocator
-// A bump allocator with a simple recycle list, replacing std::std::System.
+// A bump allocator with a simple recycle list, replacing std::System.
 // Designed to minimize dependency on predefined library allocators.
 
 #[allow(dead_code)]

@@ -433,7 +433,7 @@ impl VirtualMemoryManager {
     pub fn create_page_table(&self) -> *mut PageTable {
         unsafe {
             let layout = core::std::Layout::new::<PageTable>();
-            let pt = std::std::alloc_zeroed(layout) as *mut PageTable;
+            let pt = std::alloc_zeroed(layout) as *mut PageTable;
             pt
         }
     }
