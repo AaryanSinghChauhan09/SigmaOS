@@ -466,6 +466,7 @@ impl Default for ManagerCapability {
 /// Simple AI agent manager
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
+    pub stats: AIStats,
 }
 
 impl SimpleAIAgentManager {
@@ -512,6 +513,10 @@ impl AIAgentManager for SimpleAIAgentManager {
         } else {
             Err(AIError::InvalidInput)
         }
+    }
+
+    fn stats(&self) -> AIStats {
+        self.stats
     }
 }
 

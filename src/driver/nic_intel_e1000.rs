@@ -189,11 +189,29 @@ impl DmaRing {
 // Intel e1000 NIC Driver
 // ============================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MacAddress(pub [u8; 6]);
+
+impl MacAddress {
+    pub fn new(a: u8, b: u8, c: u8, d: u8, e: u8, f: u8) -> Self {
+        Self([a, b, c, d, e, f])
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IPv4Address(pub [u8; 4]);
+
+impl IPv4Address {
+    pub fn new(a: u8, b: u8, c: u8, d: u8) -> Self {
+        Self([a, b, c, d])
+    }
+}
+
 pub struct IntelNicDriver {
     device_id: u16,
     pci_address: String,
-    // mac_address: MacAddress, // removed - not available
-    // ip_address: Option<IPv4Address>, // removed - not available
+    mac_address: MacAddress,
+    ip_address: Option<IPv4Address>,
     mmio_base: u64,
     mmio_size: u64,
     rx_ring: DmaRing,

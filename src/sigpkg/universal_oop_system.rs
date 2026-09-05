@@ -3929,9 +3929,16 @@ impl UniversalDistroPackageUnifierEngine {
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
             let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
-                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
-                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" | "libssl3" => "sovereign-openssl",
+                "libc6" | "glibc" | "sys-libs/glibc" | "musl" | "musl-dev" | "glibc-devel" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" | "zlib" => "sovereign-zlib",
+                "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" | "sqlite" | "sqlite3" => "sovereign-sqlite",
+                "libzstd-dev" | "zstd-devel" | "app-arch/zstd" | "zstd" => "sovereign-zstd",
+                "libwayland-dev" | "wayland-devel" | "dev-libs/wayland" | "wayland" => "sovereign-wayland",
+                "libpipewire-0.3-dev" | "pipewire-devel" | "media-video/pipewire" | "pipewire" => "sovereign-pipewire",
+                "systemd-sysv" | "systemd" | "sys-apps/systemd" => "sovereign-init",
+                "coreutils" | "sys-apps/coreutils" => "sovereign-coreutils",
+                "bash" | "app-shells/bash" => "sovereign-shell",
                 _ => &dep.name,
             };
             unified_deps.push(Dependency {

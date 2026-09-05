@@ -13,7 +13,7 @@ use std::vec::Vec;
 use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::sync::Arc;
 
@@ -156,6 +156,12 @@ pub enum PackageFormat {
     ArchPkgBuild,// Arch PKGBUILD
     NixStore,   // Nix store
     Homebrew,   // Homebrew formula
+}
+
+impl Default for PackageFormat {
+    fn default() -> Self {
+        PackageFormat::SigmaPkg
+    }
 }
 
 impl PackageFormat {
@@ -333,6 +339,7 @@ pub enum ConflictResolution {
 pub struct UnifiedPackage {
     pub name: String,
     pub version: String,
+    pub format: PackageFormat,
     pub formats: Vec<PackageFormat>,
     pub dependencies: Vec<String>,
     pub conflicts: Vec<String>,
@@ -340,6 +347,7 @@ pub struct UnifiedPackage {
     pub source: PackageSource,
     pub installed: bool,
     pub state: PackageState,
+    pub checksum: String,
     pub properties: HashMap<String, String>,
 }
 
@@ -348,6 +356,7 @@ impl UnifiedPackage {
         Self {
             name,
             version,
+            format: PackageFormat::SigmaPkg,
             formats: Vec::new(),
             dependencies: Vec::new(),
             conflicts: Vec::new(),
@@ -355,12 +364,16 @@ impl UnifiedPackage {
             source: PackageSource::Repository { url: String::new() },
             installed: false,
             state: PackageState::Uninstalled,
+            checksum: String::new(),
             properties: HashMap::new(),
         }
     }
 
     pub fn with_format(mut self, format: PackageFormat) -> Self {
-        self.formats.push(format);
+        self.format = format;
+        if !self.formats.contains(&format) {
+            self.formats.push(format);
+        }
         self
     }
 
@@ -1146,8 +1159,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            PackageFormat::Nix => Box::new(NixInstallStrategy),
-            PackageFormat::Txz => Box::new(TxzInstallStrategy),
             _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
@@ -1203,8 +1214,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            PackageFormat::Nix => Box::new(NixMetadataAdapter),
-            PackageFormat::Txz => Box::new(TxzMetadataAdapter),
             _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
@@ -1228,6 +1237,10 @@ pub type PackageUdfHook = Arc<dyn Fn(&UnifiedPackage) -> Result<(), String> + Se
 pub struct PackageTriggerRegistry {
     pub pre_install_hooks: Vec<PackageUdfHook>,
     pub post_install_hooks: Vec<PackageUdfHook>,
+    pub pre_remove_hooks: Vec<PackageUdfHook>,
+    pub post_remove_hooks: Vec<PackageUdfHook>,
+    pub pre_verify_hooks: Vec<PackageUdfHook>,
+    pub custom_validation_hooks: Vec<PackageUdfHook>,
     pub observers: Vec<Box<dyn PackageObserver>>,
 }
 
@@ -1236,6 +1249,10 @@ impl PackageTriggerRegistry {
         Self {
             pre_install_hooks: Vec::new(),
             post_install_hooks: Vec::new(),
+            pre_remove_hooks: Vec::new(),
+            post_remove_hooks: Vec::new(),
+            pre_verify_hooks: Vec::new(),
+            custom_validation_hooks: Vec::new(),
             observers: Vec::new(),
         }
     }
@@ -1248,8 +1265,55 @@ impl PackageTriggerRegistry {
         self.post_install_hooks.push(hook);
     }
 
+    pub fn register_pre_remove(&mut self, hook: PackageUdfHook) {
+        self.pre_remove_hooks.push(hook);
+    }
+
+    pub fn register_post_remove(&mut self, hook: PackageUdfHook) {
+        self.post_remove_hooks.push(hook);
+    }
+
+    pub fn register_custom_validation(&mut self, hook: PackageUdfHook) {
+        self.custom_validation_hooks.push(hook);
+    }
+
     pub fn register_observer(&mut self, observer: Box<dyn PackageObserver>) {
         self.observers.push(observer);
+    }
+
+    pub fn execute_pre_install(&self, package: &UnifiedPackage) -> Result<(), String> {
+        for hook in &self.pre_install_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+
+    pub fn execute_post_install(&self, package: &UnifiedPackage) -> Result<(), String> {
+        for hook in &self.post_install_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+
+    pub fn execute_pre_remove(&self, package: &UnifiedPackage) -> Result<(), String> {
+        for hook in &self.pre_remove_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+
+    pub fn execute_post_remove(&self, package: &UnifiedPackage) -> Result<(), String> {
+        for hook in &self.post_remove_hooks {
+            hook(package)?;
+        }
+        Ok(())
+    }
+
+    pub fn execute_custom_validation(&self, package: &UnifiedPackage) -> Result<(), String> {
+        for hook in &self.custom_validation_hooks {
+            hook(package)?;
+        }
+        Ok(())
     }
 
     pub fn notify_state_change(
@@ -1270,8 +1334,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
     pub original_name: String,
@@ -2615,6 +2678,7 @@ mod tests {
             &pkgs,
             1700000000,
         );
+        assert!(snap_id > 0);
     }
 
     #[test]
@@ -2648,7 +2712,7 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
         assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
         assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("arch_pacman.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(PackageFormat::from_filename("macos_installer.pkg"), Some(PackageFormat::Pkg));
         assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
         assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
     }
@@ -2693,6 +2757,37 @@ mod tests {
             let adapted = adapter.adapt("").unwrap();
             assert!(adapted.formats.contains(&fmt) || (fmt == PackageFormat::Nix && adapted.formats.contains(&PackageFormat::Nixpkg)));
         }
+    }
+
+    #[test]
+    fn test_expanded_package_trigger_registry_udf_hooks() {
+        let mut registry = PackageTriggerRegistry::new();
+        let pkg = UnifiedPackage::new("custom-udf-app".to_string(), "1.0.0".to_string());
+
+        registry.register_pre_install(Arc::new(|p| {
+            if p.name == "custom-udf-app" {
+                Ok(())
+            } else {
+                Err("Name mismatch".to_string())
+            }
+        }));
+
+        registry.register_post_install(Arc::new(|_p| Ok(())));
+        registry.register_pre_remove(Arc::new(|_p| Ok(())));
+        registry.register_post_remove(Arc::new(|_p| Ok(())));
+        registry.register_custom_validation(Arc::new(|p| {
+            if p.version == "1.0.0" {
+                Ok(())
+            } else {
+                Err("Invalid version".to_string())
+            }
+        }));
+
+        assert!(registry.execute_pre_install(&pkg).is_ok());
+        assert!(registry.execute_post_install(&pkg).is_ok());
+        assert!(registry.execute_pre_remove(&pkg).is_ok());
+        assert!(registry.execute_post_remove(&pkg).is_ok());
+        assert!(registry.execute_custom_validation(&pkg).is_ok());
     }
 
     #[test]
