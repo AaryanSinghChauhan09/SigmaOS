@@ -207,10 +207,11 @@ pub use universal_distro_super_matrix::{
 
 pub mod sovereign_nextgen_distro_leap;
 pub use sovereign_nextgen_distro_leap::{
-    ClusterNodeRole, HaStateEntry, HermeticClosureRecord, LandlockAccessType, LandlockV5Rule,
-    SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
+    ClusterNodeRole, HaStateEntry, Hammer2BlockChunk, HermeticClosureRecord, LandlockAccessType,
+    LandlockV5Rule, MicroarchIsaLevel, SchedExtTask, ScxSchedulerKind, ScxTaskState,
+    SimdJitDispatchRule, SovereignDistroLeapSuite, SovereignHammer2DeduplicationEngine,
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
-    SovereignSchedExtEngine, SystemGenerationRecord,
+    SovereignMicroarchJitEngine, SovereignSchedExtEngine, SystemGenerationRecord,
 };
 
 pub mod open_source_distro_innovations;
