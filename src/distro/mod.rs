@@ -166,9 +166,9 @@ pub use missing_distro_innovations::{
 
 pub use linux_bsd_inspirations::{
     ApkChrootBuildSandboxEngine, ApkXbpsHookEngine, AptPinStore, ArchDependencyResolver,
-    BsdCapsicumRights, CachyBoreScheduler, DistroSubsystemMode, DrmModeInfo, FreeBSDJail,
-    FreeBsdGeomVdevTopology, FreeBsdRacctVnetGuard, GentooUseFlagsManager, GeomVdevNode,
-    GpuSwitchMode, Hammer2MultiVersionEngine, Hammer2PfsClusterQuorumEngine,
+    BsdCapsicumRights, CachyBoreScheduler, DistroSubsystemEvent, DistroSubsystemMode, DrmModeInfo,
+    FreeBSDJail, FreeBsdGeomVdevTopology, FreeBsdRacctVnetGuard, GentooUseFlagsManager,
+    GeomVdevNode, GpuSwitchMode, Hammer2MultiVersionEngine, Hammer2PfsClusterQuorumEngine,
     HardenedBsdPaxGuardEngine, HermeticStoreClosureEngine, NetBsdRumpRouter, NixStyleStore,
     OpenBSDPledge, OpenBSDUnveil, OpenBsdFdPledgeGate, OpenBsdPledgeUnveilSentinel,
     OpenBsdRetguardEngine, OpenRCService, PaxViolationLog, PaxViolationType, PfsNodeVote,
@@ -177,8 +177,9 @@ pub use linux_bsd_inspirations::{
     SovereignDragonflyNpotEngine, SovereignEbpfEngine, SovereignIllumosZonesEngine,
     SovereignIoUring, SovereignKaslrWxAllocator, SovereignLandlockLsm, SovereignOstreeEngine,
     SovereignPrivSepSandbox, SovereignRaidSelfHealer, SovereignRingBuffer,
-    SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine, StorageTier,
-    StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
+    SovereignRunitSupervisor, SovereignSubsystemDistroEventRouter, SovereignUniversalDistroBridge,
+    SovereignZfsPoolEngine, StorageTier, StoreClosurePackage, System76PowerGovernor, ZoneBrand,
+    ZoneState,
 };
 
 pub use sovereign_distro_dominance::{

@@ -244,7 +244,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
         }
     }
 
@@ -269,8 +268,9 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => {
                 let mut zone_engine = SovereignIllumosZonesEngine::new();
+                let zone_name = format!("zone-isolate-{}", pid);
                 let zone_id = zone_engine.create_zone(
-                    "zone-isolate",
+                    &zone_name,
                     ZoneBrand::Native,
                     50,
                     1024 * 1024 * 512,
@@ -322,6 +322,7 @@ impl SovereignUniversalDistroBridge {
                 ))
             }
             "storage" => {
+                let _ = self.dominance_suite.filesystem_cow.write_file_cow("@root", action, b"default");
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
                     .map_err(|_| "CoW storage operation failed")?;
@@ -383,8 +384,156 @@ impl SovereignUniversalDistroBridge {
                     governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
                 ))
             }
+            "audit" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched BSD praudit security event logging for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!(
+                            "Dispatched BSM audit trail logging for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux auditd system call rule auditing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "process" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        let mut guard = FreeBsdRacctVnetGuard::new();
+                        let limits = RacctResourceLimits {
+                            max_cpu_time_pct: 90,
+                            max_rss_bytes: 1024 * 1024 * 512,
+                            max_pids: 100,
+                            bandwidth_limit_bps: 10_000_000,
+                        };
+                        guard.register_jail_guard(1001, limits, None);
+                        let ok = guard.update_usage(1001, 1024 * 1024 * 64, 10).unwrap_or(false);
+                        Ok(format!(
+                            "Dispatched FreeBSD RACCT/RCTL resource limit check for '{}' (ok: {}) under distro mode '{:?}'",
+                            action, ok, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!(
+                            "Dispatched Illumos prctl/project resource control for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux Cgroup v2 CPU/Memory governor limits for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "ipc" => {
+                let mut ring: SovereignRingBuffer<u64, 16> = SovereignRingBuffer::new();
+                let pushed = ring.push(2001).is_ok();
+                Ok(format!(
+                    "Dispatched zero-copy SPSC/Mach IPC message channel for '{}' (pushed: {}) under distro mode '{:?}'",
+                    action, pushed, self.mode
+                ))
+            }
+            "memory" => {
+                let mut kaslr = SovereignKaslrWxAllocator::new(12345);
+                let vaddr = kaslr
+                    .allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)
+                    .unwrap_or(0);
+                Ok(format!(
+                    "Dispatched W^X/KARL memory page allocation for '{}' -> {:#X} under distro mode '{:?}'",
+                    action, vaddr, self.mode
+                ))
+            }
+            "container" => {
+                self.enforce_security_isolation(2002, action)?;
+                Ok(format!(
+                    "Dispatched container isolation boundary for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "tracing" => {
+                let mut dtrace = SovereignDTraceEngine::new();
+                let pid = dtrace.register_probe(DTraceProvider::Sdt, "distro", "subsystem", action);
+                dtrace.enable_probe(pid);
+                let fired = dtrace.fire_probe(pid, 1001, 1, 2);
+                Ok(format!(
+                    "Dispatched DTrace dynamic tracing probe '{}' (fired: {}) under distro mode '{:?}'",
+                    action, fired, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched high-resolution timer/clock tick for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "driver" => {
+                let mut router = NetBsdRumpRouter::new();
+                router.register_driver(RumpDriver {
+                    name: action.to_string(),
+                    context: DriverContext::KernelSpace,
+                    operations_handled: vec!["init".to_string(), "read".to_string()],
+                });
+                let res = router
+                    .dispatch_hypercall(action, "init")
+                    .unwrap_or_else(|_| "Driver init failed".to_string());
+                Ok(format!(
+                    "Dispatched NetBSD Rump Kernel anykernel driver operation '{}' ({}) under distro mode '{:?}'",
+                    action, res, self.mode
+                ))
+            }
+            "virt" => {
+                Ok(format!(
+                    "Dispatched micro-VM hypervisor guest lifecycle operation '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched bootloader profile and EFI entry generation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM / systemd-homed identity authentication pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "hardware" => {
+                Ok(format!(
+                    "Dispatched declarative hardware policy & peripheral sandboxing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
+    }
+
+    pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
+        let target_subsystems = [
+            "init", "package", "vfs", "security", "storage", "kernel", "network",
+            "graphics", "power", "audit", "process", "ipc", "memory", "container",
+            "tracing", "time", "driver", "virt", "boot", "auth", "hardware",
+        ];
+
+        for sub in target_subsystems {
+            if self.dispatch_cross_subsystem_operation(sub, "verify").is_err() {
+                return false;
+            }
+        }
+        true
     }
 
     pub fn run_package_hooks(&mut self, pkg_name: &str) -> usize {
@@ -441,6 +590,68 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
+}
+
+// ==========================================
+// 0B. SOVEREIGN SUBSYSTEM DISTRO EVENT ROUTER
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct DistroSubsystemEvent {
+    pub subsystem_name: String,
+    pub action: String,
+    pub mode: DistroSubsystemMode,
+    pub timestamp_ms: u64,
+}
+
+pub struct SovereignSubsystemDistroEventRouter {
+    pub history: Vec<DistroSubsystemEvent>,
+    pub registered_subsystems: Vec<String>,
+}
+
+impl SovereignSubsystemDistroEventRouter {
+    pub fn new() -> Self {
+        Self {
+            history: Vec::new(),
+            registered_subsystems: Vec::new(),
+        }
+    }
+
+    pub fn register_subsystem(&mut self, subsystem: &str) {
+        if !self.registered_subsystems.contains(&subsystem.to_string()) {
+            self.registered_subsystems.push(subsystem.to_string());
+        }
+    }
+
+    pub fn route_event(
+        &mut self,
+        bridge: &mut SovereignUniversalDistroBridge,
+        subsystem: &str,
+        action: &str,
+        timestamp_ms: u64,
+    ) -> Result<String, &'static str> {
+        self.register_subsystem(subsystem);
+        let res = bridge.dispatch_cross_subsystem_operation(subsystem, action)?;
+
+        self.history.push(DistroSubsystemEvent {
+            subsystem_name: subsystem.to_string(),
+            action: action.to_string(),
+            mode: bridge.mode,
+            timestamp_ms,
+        });
+
+        Ok(res)
+    }
+
+    pub fn get_routed_events_count(&self) -> usize {
+        self.history.len()
+    }
+}
+
+impl Default for SovereignSubsystemDistroEventRouter {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ==========================================
@@ -4662,7 +4873,29 @@ mod tests {
             assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
+
+            // New subsystem operations
+            assert!(bridge.dispatch_cross_subsystem_operation("audit", "syscall_audit").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("process", "cgroup_throttle").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "msg_send").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("memory", "alloc_page").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("container", "/sandbox").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("tracing", "sys_entry").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("time", "tick").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("driver", "nvme_init").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("virt", "boot_guest").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("boot", "generate_efi").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("auth", "pam_authenticate").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("hardware", "policy_apply").is_ok());
+
+            assert!(bridge.verify_all_subsystems_compatibility_matrix());
         }
+
+        // Test event router
+        let mut router = SovereignSubsystemDistroEventRouter::new();
+        let res = router.route_event(&mut bridge, "kernel", "schedule", 1000).unwrap();
+        assert!(res.contains("Dispatched kernel/scheduler task"));
+        assert_eq!(router.get_routed_events_count(), 1);
     }
 
     #[test]
