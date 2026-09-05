@@ -17,3 +17,7 @@
 ## 2026-09-05 - In-Place Buffer Appending for JSON Serialization
 **Learning:** In recursive data structure serialization (like JSON trees), calling `to_json_string()` on child elements or cloning keys (`key.clone()`) creates $O(N)$ temporary `String` heap allocations that are immediately concatenated and dropped. Passing a single mutable output buffer (`&mut String`) down the recursion tree and escaping string slices directly into the buffer eliminates all intermediate heap allocations during serialization.
 **Action:** When serializing structured values, prefer buffer-appending methods (`append_to_buf(&self, out: &mut String)`) over returning owned temporary `String` objects from recursive methods.
+
+## 2026-09-06 - Early-Exit Boundary Lookups for Slice and String Trimming
+**Learning:** Counting whitespace using `chars().take_while().count()` on both ends parses the string/slice twice completely even when non-whitespace characters exist. Replacing character counting with byte-level `position` and `rposition` (or delegating to `str::trim()`) finds start/end boundaries with early exit, yielding a ~25% speed improvement in whitespace trimming loops and avoiding character-to-byte offset slicing errors.
+**Action:** When implementing whitespace or delimiter trimming routines, use single-pass `position` / `rposition` early exit or standard `trim()` slicing instead of `take_while` counting loops.

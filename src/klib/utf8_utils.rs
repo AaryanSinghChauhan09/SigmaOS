@@ -58,18 +58,15 @@ pub fn is_valid_utf8(data: &[u8]) -> bool {
 }
 
 /// Trim ASCII whitespace (space, tab, newline, carriage return) from both ends
+/// Optimization: Uses `position` and `rposition` to find non-whitespace boundaries
+/// in a single forward/backward pass with early exit, avoiding scanning full trailing/leading bytes when all whitespace.
 pub fn trim_ascii_whitespace(data: &[u8]) -> &[u8] {
-    let start = data.iter().take_while(|b| is_ascii_whitespace(**b)).count();
-    let end = data
-        .iter()
-        .rev()
-        .take_while(|b| is_ascii_whitespace(**b))
-        .count();
-    if start + end >= data.len() {
-        &[]
-    } else {
-        &data[start..data.len() - end]
-    }
+    let start = match data.iter().position(|b| !is_ascii_whitespace(*b)) {
+        Some(idx) => idx,
+        None => return &[],
+    };
+    let end = data.iter().rposition(|b| !is_ascii_whitespace(*b)).unwrap();
+    &data[start..=end]
 }
 
 /// Tokenize a byte slice on ASCII whitespace, returning owned String tokens
@@ -119,16 +116,18 @@ pub fn tokenize_whitespace_ref(data: &[u8]) -> Vec<&[u8]> {
 }
 
 /// Count ASCII whitespace characters at the start of a slice
+/// Optimization: Returns early on the first non-whitespace byte using `position`.
 pub fn count_leading_whitespace(data: &[u8]) -> usize {
-    data.iter().take_while(|b| is_ascii_whitespace(**b)).count()
+    data.iter().position(|b| !is_ascii_whitespace(*b)).unwrap_or(data.len())
 }
 
 /// Count ASCII whitespace characters at the end of a slice
+/// Optimization: Returns early on the first non-whitespace byte from the right using `rposition`.
 pub fn count_trailing_whitespace(data: &[u8]) -> usize {
-    data.iter()
-        .rev()
-        .take_while(|b| is_ascii_whitespace(**b))
-        .count()
+    match data.iter().rposition(|b| !is_ascii_whitespace(*b)) {
+        Some(idx) => data.len() - 1 - idx,
+        None => data.len(),
+    }
 }
 
 const fn is_ascii_whitespace(byte: u8) -> bool {

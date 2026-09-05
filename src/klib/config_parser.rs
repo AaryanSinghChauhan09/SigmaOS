@@ -88,13 +88,7 @@ impl Default for ConfigStore {
 }
 
 fn trim_line(s: &str) -> &str {
-    let start = s.chars().take_while(|c| c.is_whitespace()).count();
-    let end = s.chars().rev().take_while(|c| c.is_whitespace()).count();
-    if start + end >= s.len() {
-        ""
-    } else {
-        &s[start..s.len() - end]
-    }
+    s.trim()
 }
 
 fn find_key_value_sep(s: &str) -> Option<usize> {

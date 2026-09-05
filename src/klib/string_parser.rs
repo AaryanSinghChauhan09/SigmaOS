@@ -126,10 +126,9 @@ pub fn split_string(s: &str, delimiter: char) -> Vec<String> {
 }
 
 /// Custom string trim
+/// Optimization: Delegate directly to core string slice trim for O(1) pointer slicing and single-pass boundary calculation.
 pub fn trim_string(s: &str) -> &str {
-    let start = s.chars().take_while(|c| c.is_whitespace()).count();
-    let end = s.chars().rev().take_while(|c| c.is_whitespace()).count();
-    &s[start..s.len() - end]
+    s.trim()
 }
 
 /// Custom string to lowercase
