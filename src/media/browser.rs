@@ -939,6 +939,78 @@ impl DuckAssistPrivacyEngine {
 // 16. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
+// =========================================================================
+// 17. LIBREWOLF HARDENING ENGINE & WEBRTC ISOLATION
+// =========================================================================
+
+pub struct LibreWolfHardeningEngine {
+    pub allow_webrtc_ip_leak: bool,
+    pub strict_referrer_policy: String,
+    pub cookie_partitioning_strict: bool,
+    pub enforce_https_first: bool,
+}
+
+impl LibreWolfHardeningEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            allow_webrtc_ip_leak: false, // Prevents WebRTC local/public IP leaks
+            strict_referrer_policy: String::from("same-origin"),
+            cookie_partitioning_strict: true,
+            enforce_https_first: true,
+        }
+    }
+
+    pub fn sanitize_referrer(&self, source_origin: &str, dest_origin: &str, raw_referrer: &str) -> Option<String> {
+        if self.strict_referrer_policy == "same-origin" && source_origin != dest_origin {
+            None // Strip referrer cross-origin
+        } else {
+            Some(raw_referrer.to_string())
+        }
+    }
+}
+
+// =========================================================================
+// 18. CHROMIUM V8/MANIFEST V3 EXTENSION ISOLATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ExtensionManifestV3 {
+    pub extension_id: String,
+    pub name: String,
+    pub permissions: Vec<String>,
+    pub service_worker_active: bool,
+}
+
+pub struct ChromiumExtensionIsolationEngine {
+    pub active_extensions: BTreeMap<String, ExtensionManifestV3>,
+}
+
+impl ChromiumExtensionIsolationEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_extensions: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_extension(&mut self, ext: ExtensionManifestV3) {
+        self.active_extensions.insert(ext.extension_id.clone(), ext);
+    }
+
+    pub fn is_permission_granted(&self, ext_id: &str, perm: &str) -> bool {
+        if let Some(ext) = self.active_extensions.get(ext_id) {
+            ext.permissions.iter().any(|p| p == perm || p == "<all_urls>")
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// 19. UNIFIED SIGMAWEB BROWSER SUITE
+// =========================================================================
+
 pub struct SigmaWebBrowser {
     pub engine: SovereignBrowserEngine,
     pub rfp: ResistFingerprintingEngine,
@@ -954,6 +1026,8 @@ pub struct SigmaWebBrowser {
     pub ublock_origin: UBlockOriginFilterEngine,
     pub zen_tree: ZenWorkspaceTreeEngine,
     pub duck_assist: DuckAssistPrivacyEngine,
+    pub librewolf_hardening: LibreWolfHardeningEngine,
+    pub extension_isolation: ChromiumExtensionIsolationEngine,
 }
 
 impl SigmaWebBrowser {
@@ -974,6 +1048,8 @@ impl SigmaWebBrowser {
             ublock_origin: UBlockOriginFilterEngine::new(),
             zen_tree: ZenWorkspaceTreeEngine::new(),
             duck_assist: DuckAssistPrivacyEngine::new(),
+            librewolf_hardening: LibreWolfHardeningEngine::new(),
+            extension_isolation: ChromiumExtensionIsolationEngine::new(),
         }
     }
 
@@ -1026,7 +1102,7 @@ impl SigmaWebBrowser {
 // TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
 
@@ -1245,5 +1321,27 @@ mod tests {
         assert_eq!(duck.evaluate_domain_grade("doubleclick.net"), TrackerTrustGrade::GradeF);
         let summary = duck.summarize_web_page_ai("SigmaOS is an AI-Native operating system.");
         assert!(summary.contains("DuckAssist AI Privacy Summary"));
+    }
+
+    #[test]
+    fn test_librewolf_and_chromium_extension_isolation() {
+        let hardening = LibreWolfHardeningEngine::new();
+        assert!(!hardening.allow_webrtc_ip_leak);
+        let stripped_ref = hardening.sanitize_referrer("https://siteA.com", "https://siteB.com", "https://siteA.com/page");
+        assert!(stripped_ref.is_none());
+
+        let same_ref = hardening.sanitize_referrer("https://siteA.com", "https://siteA.com", "https://siteA.com/page");
+        assert_eq!(same_ref, Some("https://siteA.com/page".to_string()));
+
+        let mut ext_engine = ChromiumExtensionIsolationEngine::new();
+        ext_engine.register_extension(ExtensionManifestV3 {
+            extension_id: "ublock_orig".to_string(),
+            name: "uBlock Origin".to_string(),
+            permissions: vec!["webRequest".to_string(), "declarativeNetRequest".to_string()],
+            service_worker_active: true,
+        });
+
+        assert!(ext_engine.is_permission_granted("ublock_orig", "webRequest"));
+        assert!(!ext_engine.is_permission_granted("ublock_orig", "cookies"));
     }
 }

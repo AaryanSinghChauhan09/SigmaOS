@@ -1435,19 +1435,6 @@ impl ShellRepl {
             ShellCommand::Unveil { path, permissions } => {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
-
-            ShellCommand::Echo { message } => Ok(message.clone()),
-            ShellCommand::Set { variable, value } => {
-                self.variables.insert(variable.clone(), value.clone());
-                Ok(format!("{} = {}", variable, value))
-            }
-            ShellCommand::Get { variable } => {
-                if let Some(val) = self.variables.get(variable.as_str()) {
-                    Ok(val.clone())
-                } else {
-                    Err(format!("Variable '{}' not found", variable))
-                }
-            }
             _ => Ok("Command executed successfully.".to_string()),
         }
     }
@@ -1459,7 +1446,7 @@ impl Default for ShellRepl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
 

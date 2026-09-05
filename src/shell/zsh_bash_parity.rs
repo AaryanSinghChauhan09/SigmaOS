@@ -1280,10 +1280,11 @@ impl UniversalScriptTranspiler {
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
                 ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
-                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
+                ShellDialect::Ksh => Self::transpile_ksh_line(trimmed, &mut in_function),
+                ShellDialect::Bash | ShellDialect::Zsh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
-                ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
+                ShellDialect::Dash | ShellDialect::BsdSh => Self::transpile_posix_dash_bsd_line(trimmed),
             };
 
             transpiled.push_str(&converted_line);
@@ -1364,6 +1365,90 @@ impl UniversalScriptTranspiler {
         if l == "end" && *in_function {
             *in_function = false;
             return "}".to_string();
+        }
+
+        l
+    }
+
+    fn transpile_ksh_line(line: &str, in_function: &mut bool) -> String {
+        let mut l = line.to_string();
+
+        // 1. Ksh 'typeset -i var=val' or 'typeset var=val' -> 'var=val'
+        if l.starts_with("typeset ") {
+            let rest = l.trim_start_matches("typeset ").trim();
+            if rest.starts_with("-i ") || rest.starts_with("-r ") || rest.starts_with("-x ") {
+                let actual = if rest.starts_with("-x ") {
+                    format!("export {}", &rest[3..])
+                } else {
+                    rest[3..].to_string()
+                };
+                return actual;
+            } else {
+                return rest.to_string();
+            }
+        }
+
+        // 2. Ksh 'print -r -- msg' -> 'printf "%s\n" msg'
+        if l.starts_with("print -r ") || l.starts_with("print -r -- ") {
+            let msg = if l.starts_with("print -r -- ") {
+                l.trim_start_matches("print -r -- ").trim()
+            } else {
+                l.trim_start_matches("print -r ").trim()
+            };
+            return format!("printf '%s\\n' {}", msg);
+        } else if l.starts_with("print ") {
+            let msg = l.trim_start_matches("print ").trim();
+            return format!("echo {}", msg);
+        }
+
+        // 3. Ksh 'let "x = y + z"' -> 'x=$(( y + z ))'
+        if l.starts_with("let ") {
+            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
+            if let Some(eq_idx) = expr.find('=') {
+                let var = expr[..eq_idx].trim();
+                let math_expr = expr[eq_idx + 1..].trim();
+                return format!("{}=$(( {} ))", var, math_expr);
+            }
+        }
+
+        // 4. Ksh/Zsh/Bash function definition
+        if l.starts_with("function ") {
+            let rest = l.trim_start_matches("function ").trim();
+            *in_function = true;
+            if !rest.contains("()") {
+                if let Some(idx) = rest.find(' ') {
+                    let name = &rest[..idx];
+                    let body = &rest[idx..];
+                    return format!("{}() {}", name, body);
+                } else {
+                    return format!("{}() {{", rest);
+                }
+            }
+        }
+
+        Self::transpile_bash_zsh_line(&l)
+    }
+
+    fn transpile_posix_dash_bsd_line(line: &str) -> String {
+        let mut l = line.to_string();
+
+        // 1. Convert 'function foo' to POSIX 'foo()'
+        if l.starts_with("function ") {
+            let rest = l.trim_start_matches("function ").trim();
+            if !rest.contains("()") {
+                if let Some(idx) = rest.find(' ') {
+                    let name = &rest[..idx];
+                    let body = &rest[idx..];
+                    l = format!("{}() {}", name, body);
+                } else {
+                    l = format!("{}()", rest);
+                }
+            }
+        }
+
+        // 2. Replace non-POSIX [[ ]] with [ ]
+        if l.contains("[[") && l.contains("]]") {
+            l = l.replace("[[", "[").replace("]]", "]");
         }
 
         l
@@ -1468,7 +1553,7 @@ impl Default for UniversalShellCompatibilityEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
 
@@ -1796,5 +1881,19 @@ mod tests {
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
         assert!(!pipelines.is_empty());
+    }
+
+    #[test]
+    fn test_ksh_and_posix_transpilation() {
+        let ksh_script = "#!/bin/ksh\ntypeset -x PORT=8080\nprint -r -- \"Hello Ksh\"\nlet \"A = B + C\"";
+        let posix_ksh = UniversalScriptTranspiler::transpile_to_posix_sh(ksh_script, ShellDialect::Ksh);
+        assert!(posix_ksh.contains("export PORT=8080"));
+        assert!(posix_ksh.contains("printf '%s\\n' \"Hello Ksh\""));
+        assert!(posix_ksh.contains("A=$(( B + C ))"));
+
+        let dash_script = "#!/bin/dash\nfunction myfunc {\n  [[ -f /bin/sh ]]\n}";
+        let posix_dash = UniversalScriptTranspiler::transpile_to_posix_sh(dash_script, ShellDialect::Dash);
+        assert!(posix_dash.contains("myfunc()"));
+        assert!(posix_dash.contains("[ -f /bin/sh ]"));
     }
 }
