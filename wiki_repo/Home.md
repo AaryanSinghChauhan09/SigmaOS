@@ -24,6 +24,13 @@
 - **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
 - **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
 - **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
+- **AI Agent Carry Flag Management Guide:** [[AI_AGENT_CARRY_FLAG_MANAGEMENT]] - Hardware status flags, bignum arithmetic carry chains, and ALU emulation for AI agents.
+- **AI Agent C-SCAN Policy Management Guide:** [[AI_AGENT_CIRCULAR_SCAN_POLICY_MANAGEMENT]] - Circular SCAN elevator disk scheduling, LBA sector ordering, and wrap-around semantics for AI agents.
+- **AI Agent Cloned Process Management Guide:** [[AI_AGENT_CLONED_PROCESS_MANAGEMENT]] - POSIX fork, clone flags (CLONE_VM, CLONE_FILES, CLONE_THREAD), and job object inheritance for AI agents.
+- **AI Agent Commands Management Guide:** [[AI_AGENT_COMMANDS_MANAGEMENT]] - Sovereign command suite, privilege delegation (sudo/doas), task monitoring, sysctl, and multi-distro CLI for AI agents.
+- **AI Agent Time Sharing System Management Guide:** [[AI_AGENT_TIME_SHARING_SYSTEM_MANAGEMENT]] - Quantum time slicing, POSIX SCHED_RR, EEVDF virtual deadlines, and MLFQ priority decay for AI agents.
+- **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
+- **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
 ---
 
