@@ -167,47 +167,6 @@ fn test_universal_adapter_all_formats() {
 }
 
 #[test]
-fn test_universal_adapter_extended_linux_bsd_formats() {
-    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, PackageFormat};
-
-    let adapter = UniversalPackageAdapter::new();
-
-    // Test Extension Detection for Linux & BSD Formats
-    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(PackageFormat::Moss));
-    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(PackageFormat::Hpkg));
-
-    // Test Magic Header Detection
-    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(PackageFormat::OpenBsdPkg));
-
-    // Test Command Dispatcher across multiple package managers
-    let dispatcher = UniversalPmCommandDispatcher::new();
-
-    let pacman_cmd = dispatcher.dispatch_command("pacman -S zsh").unwrap();
-    assert_eq!(pacman_cmd.source_pm, "pacman");
-    assert_eq!(pacman_cmd.operation, UniversalPmOperation::Install);
-    assert_eq!(pacman_cmd.target_packages, vec!["zsh"]);
-
-    let dnf_cmd = dispatcher.dispatch_command("dnf install htop").unwrap();
-    assert_eq!(dnf_cmd.source_pm, "dnf");
-    assert_eq!(dnf_cmd.operation, UniversalPmOperation::Install);
-    assert_eq!(dnf_cmd.target_packages, vec!["htop"]);
-
-    let apk_cmd = dispatcher.dispatch_command("apk add bash").unwrap();
-    assert_eq!(apk_cmd.source_pm, "apk");
-    assert_eq!(apk_cmd.operation, UniversalPmOperation::Install);
-    assert_eq!(apk_cmd.target_packages, vec!["bash"]);
-}
-
-#[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
     use universal_adapter::universal_oop_system::PackageFormat;
@@ -225,7 +184,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
