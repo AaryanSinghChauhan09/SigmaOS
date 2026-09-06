@@ -340,14 +340,17 @@ pub mod iot;
 pub mod ml;
 pub mod performance;
 
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
-
-pub use ai::next_gen::{
-    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
-    MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
+pub mod distro;
+pub mod distro_innovations;
+pub mod distro_inspirations;
+pub mod innovation;
+pub use innovation::{
+    BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
+    FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
+    KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
+    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
+    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
+    UserlandOverlayLayer, VfsObjectRecord,
 };
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
