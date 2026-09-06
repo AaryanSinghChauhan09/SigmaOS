@@ -1,6 +1,6 @@
-# AGENTS.md — AI Agent Guidelines & Version Handling for SigmaOS
+# AGENTS.md — AI Agent Guidelines, Version Handling & Backend Management for SigmaOS
 
-This document provides instructions, rules, and procedures for AI agents working in the SigmaOS repository, specifically regarding **Version Handling**, **Release Channels**, **Multi-Distro Packaging Parity**, and **Core Subsystem Changes**.
+This document provides instructions, rules, and procedures for AI agents working in the SigmaOS repository, specifically regarding **Version Handling**, **Release Channels**, **Backend Subsystem Management**, **Multi-Distro Packaging Parity**, and **Core Subsystem Changes**.
 
 ---
 
@@ -42,7 +42,22 @@ When parsing or creating packages across distros, AI agents MUST preserve versio
 
 ---
 
-## 3. Kernel ABI (KABI) Versioning & Stability
+## 3. Backend Subsystem & Server Engine Rules for AI Agents
+
+When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_source_os_gap_closure.rs`, or `src/automation/system_level.rs`:
+
+1. **Zero-Dependency Native Backend Engines:**
+   Maintain native parity for embedded DBs (`SovereignEmbeddedDb`), web servers (`SovereignWebServer`), in-memory caches (`SovereignCacheEngine`), message brokers (`SovereignMessageBroker`), secret vaults (`SovereignSecretVault`), object stores (`SovereignDistributedStorage`), and orchestrators (`SovereignK8sOrchestratorEngine`).
+2. **Key Retention & Cache Invalidation:**
+   `SovereignCacheEngine::set` MUST purge pre-existing entries via `self.entries.retain(|e| e.key != key)` before inserting new values to prevent key duplication.
+3. **Service Supervision & Resource Throttling:**
+   Ensure backend processes integrate with `SystemdInit` or `SovereignRunitSupervisor` and enforce FreeBSD RACCT (`AutomatedRacctPolicy`) and OpenBSD pledge/unveil (`AutomatedSandboxPolicy`) sandboxing.
+4. **Metrics Collection:**
+   Utilize `SovereignOpenTelemetryMetricsCollector` for counter, gauge, and histogram metrics under `#![no_std]`.
+
+---
+
+## 4. Kernel ABI (KABI) Versioning & Stability
 
 * **Syscall Table (`src/kernel/syscall/table.rs`):** Syscall numbers MUST remain stable across minor versions. Extensions are added above index 500.
 * **System Call Table Auditing:** Use `AntiRootkitGuard` and SSDT auditing when adding or modifying system call dispatch handlers.
@@ -50,20 +65,23 @@ When parsing or creating packages across distros, AI agents MUST preserve versio
 
 ---
 
-## 4. Checklist for AI Agents Incrementing Version
+## 5. Checklist for AI Agents
 
-1. **Update `Cargo.toml`** if creating a new release tag.
-2. **Sync Release Profiles:** Update `sigma-stable.toml` and `sigma-rolling.toml` version metadata.
-3. **Update `CHANGELOG.md`:** Document breaking changes, added features, fixes, and security patches under the new version header.
-4. **Execute Verification Pipeline:** Run `./run_sigma_tests.sh` and ensure all test suites pass.
-5. **Commit Message Format:** Follow Conventional Commits:
-   `feat(pkg): update version to x.y.z` or `fix(kernel): maintain KABI compatibility for syscall table`.
+1. **Update Manifests & Documentation** when bumping versions or modifying backend engines.
+2. **Run Standalone Subsystem Tests:**
+   ```bash
+   rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs
+   ```
+3. **Execute Full Pipeline:** Run `./run_sigma_tests.sh` and ensure all test steps pass.
+4. **Follow Conventional Commits:**
+   `feat(backend): add sovereign cache eviction policy` or `docs(agents): update version handling guide`.
 
 ---
 
-## 5. Detailed Documentation
+## 6. Detailed Documentation References
 
-For exhaustive technical reference on multi-distro version comparison logic, package manager epoch handling, and AI agent automation steps, see:
+For technical specifications, see:
 * [`docs/AGENTS_VERSION_HANDLING.md`](docs/AGENTS_VERSION_HANDLING.md)
+* [`docs/AGENTS_BACKEND_MANAGEMENT.md`](docs/AGENTS_BACKEND_MANAGEMENT.md)
 * [`docs/RELEASE_CADENCE.md`](docs/RELEASE_CADENCE.md)
 * [`docs/package-manager.md`](docs/package-manager.md)
