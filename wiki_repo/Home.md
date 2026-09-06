@@ -28,6 +28,7 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
 - **AI Agents Process Management Guide:** [[AI_AGENTS_PROCESS_MANAGEMENT_GUIDE]] - EEVDF/BORE scheduling algorithms, ELF loading, POSIX process control, and cgroups v2 job objects.
 - **AI Agents Capability Tickets Guide:** [[AI_AGENTS_CAPABILITY_TICKETS_GUIDE]] - PQC Dilithium-5 capability tickets, POSIX bitmasks, Pledge promise tokens, and Capsicum descriptor rights.
+- **AI Agents Circular Wait Management Guide:** [[AI_AGENTS_CIRCULAR_WAIT_MANAGEMENT_GUIDE]] - Coffman deadlock conditions, RAG cycle detection, lock hierarchy, and Banker's algorithm.
 
 ---
 
