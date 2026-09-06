@@ -165,14 +165,14 @@ impl Duration {
     pub const fn from_millis(millis: u64) -> Self {
         Duration {
             secs: millis / 1_000,
-            nanos: (millis % 1_000) * 1_000_000,
+            nanos: ((millis % 1_000) * 1_000_000) as u32,
         }
     }
 
     pub const fn from_micros(micros: u64) -> Self {
         Duration {
             secs: micros / 1_000_000,
-            nanos: (micros % 1_000_000) * 1_000,
+            nanos: ((micros % 1_000_000) * 1_000) as u32,
         }
 
     }

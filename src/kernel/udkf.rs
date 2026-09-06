@@ -8,13 +8,13 @@ pub enum UdkfHook {
     FsCachePreload,
 }
 
-pub struct UserDefinedKernelFunctions {
+pub struct UdkfScriptingEngine {
     pub registered_scripts: Vec<(UdkfHook, String)>,
 }
 
-impl UserDefinedKernelFunctions {
+impl UdkfScriptingEngine {
     pub fn new() -> Self {
-        UserDefinedKernelFunctions {
+        UdkfScriptingEngine {
             registered_scripts: Vec::new(),
         }
     }
@@ -45,7 +45,7 @@ mod tests {
 
     #[test]
     fn test_udkf_script_execution() {
-        let mut engine = UserDefinedKernelFunctions::new();
+        let mut engine = UdkfScriptingEngine::new();
         assert_eq!(engine.execute_hook(UdkfHook::AllocatorScale, 50), 50); // no script registered, return input (should be 50!)
 
         engine.register_function(UdkfHook::AllocatorScale, "scale_by_2".to_string().as_str());

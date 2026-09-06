@@ -1,9 +1,8 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::{hashmap::HashMapIter, HashMap};
+use super::hashmap::{HashMap, HashMapIter};
 
-#[derive(Debug, Clone)]
 pub struct HashSet<T>
 where
     T: Eq + core::hash::Hash + Clone,
@@ -11,18 +10,7 @@ where
     map: HashMap<T, ()>,
 }
 
-impl<T> core::iter::FromIterator<T> for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut set = HashSet::new();
-        for item in iter {
-            set.insert(item);
-        }
-        set
-    }
-}
+
 
 impl<T> Clone for HashSet<T>
 where

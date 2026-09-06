@@ -2,12 +2,16 @@
 // Capability-based security, pledge, and access control
 
 pub mod capability;
+pub mod qubes_isolation;
+pub mod capability_token;
 pub mod kali_stack;
 pub mod nemoclaw;
 pub mod pledge;
 pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
+pub use capability_token::{SecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
 pub use kali_stack::{
     CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliError,
     PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,

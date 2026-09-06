@@ -1101,6 +1101,7 @@ mod tests {
 // Bring alloc into scope for format! and vec!
 extern crate alloc;
 use alloc::format as alloc_format;
+use crate::compatibility::fedora::DnfPackageResolver;
 
 // ============================================================================
 // UBUNTU — Snap Packages, LTS Support, Desktop Integration
@@ -1295,7 +1296,7 @@ pub enum YastError {
 pub struct SelinuxManager {
     pub enforcing_mode: SelinuxMode,
     pub policy_type: alloc::string::String,
-    pub booleans: alloc::collections::HashMap<alloc::string::String, bool>,
+    pub booleans: std::collections::HashMap<alloc::string::String, bool>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -1310,7 +1311,7 @@ impl SelinuxManager {
         SelinuxManager {
             enforcing_mode: SelinuxMode::Enforcing,
             policy_type: alloc::string::String::from("targeted"),
-            booleans: alloc::collections::HashMap::new(),
+            booleans: std::collections::HashMap::new(),
         }
     }
 
@@ -1394,16 +1395,16 @@ pub enum SystemdError {
 
 /// Portage-inspired package management with USE flags.
 pub struct PortagePackageManager {
-    pub use_flags: alloc::collections::HashSet<alloc::string::String>,
-    pub installed_packages: alloc::collections::HashMap<alloc::string::String, alloc::string::String>,
+    pub use_flags: std::collections::HashSet<alloc::string::String>,
+    pub installed_packages: std::collections::HashMap<alloc::string::String, alloc::string::String>,
     pub world_file: alloc::vec::Vec<alloc::string::String>,
 }
 
 impl PortagePackageManager {
     pub fn new() -> Self {
         PortagePackageManager {
-            use_flags: alloc::collections::HashSet::new(),
-            installed_packages: alloc::collections::HashMap::new(),
+            use_flags: std::collections::HashSet::new(),
+            installed_packages: std::collections::HashMap::new(),
             world_file: alloc::vec::Vec::new(),
         }
     }
@@ -1545,7 +1546,7 @@ impl PantheonFileManager {
     pub fn new() -> Self {
         PantheonFileManager {
             bookmarks: alloc::vec::Vec::new(),
-            recent_files: alloc::vec::Vec::Vec::new(),
+            recent_files: alloc::vec::Vec::new(),
             network_mounts: alloc::vec::Vec::new(),
         }
     }
@@ -1766,15 +1767,15 @@ pub enum SolusError {
 pub struct ZorinWineManager {
     pub wine_installed: bool,
     pub wine_prefix: alloc::string::String,
-    pub windows_apps: alloc::vec::vec::Vec<alloc::string::String>>,
+    pub windows_apps: alloc::vec::Vec<alloc::string::String>,
 }
 
-impl ZorinWine {
+impl ZorinWineManager {
     pub fn new() -> Self {
         ZorinWineManager {
             wine_installed: false,
             wine_prefix: alloc::string::String::from("~/.wine"),
-            windows_apps: alloc::vec::vec::Vec::new(),
+            windows_apps: alloc::vec::Vec::new(),
         }
     }
 
@@ -1959,7 +1960,7 @@ pub enum MxError {
 
 /// MX Package Installer-inspired system.
 pub struct MxPackageInstaller {
-    pub available_packages: alloc::vec::alloc::string::Vec<alloc::string::String>>,
+    pub available_packages: alloc::vec::Vec<alloc::string::String>,
     pub installed_packages: alloc::vec::Vec<alloc::string::String>,
     pub auto_update_check: bool,
 }
@@ -1967,7 +1968,7 @@ pub struct MxPackageInstaller {
 impl MxPackageInstaller {
     pub fn new() -> Self {
         MxPackageInstaller {
-            available_packages: alloc::vec::alloc::alloc::string::Vec::new(),
+            available_packages: alloc::vec::Vec::new(),
             installed_packages: alloc::vec::Vec::new(),
             auto_update_check: true,
         }
@@ -2088,7 +2089,7 @@ pub struct UbuntuFeatures {
 
 pub struct GentooFeatures {
     pub portage_manager: PortagePackageManager,
-    pub use_flags: alloc::collections::HashSet<alloc::string::String>,
+    pub use_flags: std::collections::HashSet<alloc::string::String>,
     pub custom_compile: bool,
 }
 
@@ -2108,6 +2109,12 @@ pub struct ManjaroFeatures {
     pub pamac_manager: PamacManager,
     pub hardware_detection: ManjaroHardwareDetection,
     pub aur_helper: bool,
+}
+
+pub struct SolusFeatures {
+    pub rolling_manager: SolusRollingManager,
+    pub budgie_desktop: BudgieDesktop,
+    pub budgie_settings: BudgieSettings,
 }
 
 pub struct ZorinFeatures {
@@ -2156,7 +2163,7 @@ impl LinuxDistroCompatibilityEngine {
             },
             gentoo: GentooFeatures {
                 portage_manager: PortagePackageManager::new(),
-                use_flags: alloc::collections::HashSet::new(),
+                use_flags: std::collections::HashSet::new(),
                 custom_compile: true,
             },
             mint: LinuxMintEnhancements::new(),
@@ -2430,12 +2437,6 @@ impl ZorinWineIntegration {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum ZorinError {
-    WineNotInstalled,
-    InstallationFailed,
-}
-
 /// Deepin DDE control center integration.
 pub struct DeepinDdeControl {
     pub display_brightness: u8,
@@ -2462,15 +2463,15 @@ impl DeepinDdeControl {
 }
 
 /// MX Linux snapshot tool integration.
-pub struct MxSnapshot {
+pub struct MxSnapshotIntegration {
     pub snapshots: Vec<String>,
     pub backup_location: String,
     pub compression: bool,
 }
 
-impl MxSnapshot {
+impl MxSnapshotIntegration {
     pub fn new() -> Self {
-        MxSnapshot {
+        MxSnapshotIntegration {
             snapshots: Vec::new(),
             backup_location: String::from("/mnt/backup"),
             compression: true,
@@ -2585,7 +2586,7 @@ pub struct LinuxDistroGapCloser {
     pub manjaro: ManjaroPamac,
     pub zorin: ZorinWineIntegration,
     pub deepin: DeepinDdeControl,
-    pub mx: MxSnapshot,
+    pub mx: MxSnapshotIntegration,
     pub pop: PopShopIntegration,
     pub elementary: ElementaryPantheon,
     pub solus: SolusBudgie,
@@ -2601,7 +2602,7 @@ impl LinuxDistroGapCloser {
             manjaro: ManjaroPamac::new(),
             zorin: ZorinWineIntegration::new(),
             deepin: DeepinDdeControl::new(),
-            mx: MxSnapshot::new(),
+            mx: MxSnapshotIntegration::new(),
             pop: PopShopIntegration::new(),
             elementary: ElementaryPantheon::new(),
             solus: SolusBudgie::new(),

@@ -262,7 +262,7 @@ impl SystemMonitor {
         }
 
         let pseudo_random = || -> f64 {
-            let nanos = crate::klib::monotonic_ms() * 1_000_000;
+            let nanos = crate::klib::time::monotonic_ms() * 1_000_000;
             let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);
             let state = (state.wrapping_mul(0x5DEECE66D).wrapping_add(0xB)) & ((1 << 48) - 1);
             (state as f64) / ((1u64 << 48) as f64)

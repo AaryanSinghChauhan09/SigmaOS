@@ -97,7 +97,7 @@ pub trait Trainer {
 
 #[repr(C)]
 pub struct SimpleTrainer {
-    pub sessions: Vec<Option<Box<dyn TrainingSession>>>,
+    pub sessions: Vec<Option<SimpleTrainingSession>>,
     pub optimizer: SimpleOptimizer,
     pub next_id: AtomicUsize,
 }
@@ -116,12 +116,12 @@ impl Trainer for SimpleTrainer {
     fn create_session(&mut self) -> Result<TrainingID, TrainingError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let session = SimpleTrainingSession::new(id);
-        self.sessions.push(Some(Box::new(session)));
+        self.sessions.push(Some(session));
         Ok(id)
     }
 
     fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError> {
-        for session_option in &mut self.sessions {
+        for session_option in self.sessions.iter_mut() {
             if let Some(ref mut session) = *session_option {
                 if session.id() == session_id {
                     let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
@@ -147,9 +147,9 @@ impl Trainer for SimpleTrainer {
     }
 
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
-        for session_option in &self.sessions {
+        for session_option in self.sessions.iter() {
             if let Some(ref session) = *session_option {
-                if session.id() == id { return Some(session.as_ref()); }
+                if session.id() == id { return Some(session as &dyn TrainingSession); }
             }
         }
         None
@@ -210,6 +210,27 @@ impl DataLoader for SimpleDataLoader {
 }
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }

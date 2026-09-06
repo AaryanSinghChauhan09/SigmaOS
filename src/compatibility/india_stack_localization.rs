@@ -144,7 +144,7 @@ impl LocalizationManager {
         let lang = self.get_language();
         self.dictionaries
             .get(&lang)
-            .and_then(|dict| dict.get(key).cloned())
+            .and_then(|dict| dict.get(&String::from(key)).cloned())
     }
 
     pub fn format_inr(&self, amount: f64) -> String {

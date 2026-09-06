@@ -200,3 +200,21 @@ impl PolicyMechanismCoordinator {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct FastPathIpc;
+#[derive(Debug, Clone)]
+pub struct InterruptMechanism;
+#[derive(Debug, Clone)]
+pub struct PolicyError;
+#[derive(Debug, Clone)]
+pub struct PolicyManager;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrivilegeLevel {
+    Kernel,
+    User,
+}
+#[derive(Debug, Clone)]
+pub struct ProtectionDomain;
+#[derive(Debug, Clone)]
+pub struct ResourceBroker;

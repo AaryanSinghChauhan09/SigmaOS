@@ -91,3 +91,8 @@ mod tests {
         assert_eq!(timeshift.snapshots.len(), 0);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct FsSnapshot;
+
+pub static GLOBAL_TIMESHIFT: Option<SigmaTimeshift> = None;

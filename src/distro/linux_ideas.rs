@@ -401,9 +401,6 @@ impl YastConfigStore {
         }
         let k = key.to_string();
         self.entries.push((k, val));
-        let mut k = String::new();
-        for &b in key.as_bytes() { k.push(b); }
-        self.entries.push((k, val));
     }
 
     pub fn get(&self, key: &str) -> Option<&ConfigValue> {
@@ -433,8 +430,8 @@ impl YastConfigStore {
             out.push_str(k.as_str());
             out.push_str(" = ");
             match v {
-                ConfigValue::Bool(b) => out.push_str(if b { "true" } else { "false" }),
-                ConfigValue::Int(i) => { let s = format_int(i); out.push_str(&s); }
+                ConfigValue::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+                ConfigValue::Int(i) => { let s = format_int(*i); out.push_str(&s); }
                 ConfigValue::Text(t) => { out.push('"'); out.push_str(t.as_str()); out.push('"'); }
                 ConfigValue::List(l) => {
                     out.push('[');

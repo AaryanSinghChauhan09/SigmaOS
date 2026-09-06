@@ -8,14 +8,21 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
+pub mod endeavour;
+pub mod standards;
+pub mod fedora;
 pub mod cross_platform_kernel;
 
+pub use standards::{FhsConventionStatus, StandardsComplianceManager};
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
     APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
     WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LsbProfile,
+    PosixComplianceLevel,
 };
 
 pub use constellation_mesh::{
@@ -65,7 +72,7 @@ pub use solid_kernel::{
 };
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
+    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
     Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
     UmsThreadState, UmsContext, SovereignKernelInternals,
 };

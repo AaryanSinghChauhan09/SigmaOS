@@ -6,6 +6,8 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
+pub mod management;
+
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
@@ -15,19 +17,12 @@ use core::fmt;
 /// Error type for the Thread module
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ThreadError {
-    /// Operation not supported
     NotSupported,
-    /// Invalid parameter
     InvalidParam,
-    /// Resource not found
     NotFound,
-    /// Permission denied
     PermissionDenied,
-    /// Out of memory
     OutOfMemory,
-    /// I/O error
     IoError,
-    /// Unknown error
     Unknown,
 }
 
@@ -45,10 +40,8 @@ impl fmt::Display for ThreadError {
     }
 }
 
-/// Result type alias for Thread operations
 pub type ThreadResult<T> = Result<T, ThreadError>;
 
-/// Thread - primary abstraction for this module
 #[derive(Debug, Clone)]
 pub struct Thread {
     pub id: u64,
@@ -57,7 +50,6 @@ pub struct Thread {
 }
 
 impl Thread {
-    /// Create a new Thread with the given name
     pub fn new(name: &str) -> Self {
         Self {
             id: 0,
@@ -66,25 +58,21 @@ impl Thread {
         }
     }
     
-    /// Enable this resource
     pub fn enable(&mut self) -> ThreadResult<()> {
         self.enabled = true;
         Ok(())
     }
     
-    /// Disable this resource
     pub fn disable(&mut self) -> ThreadResult<()> {
         self.enabled = false;
         Ok(())
     }
     
-    /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
 }
 
-/// Manager for Thread resources
 #[derive(Debug)]
 pub struct Mutex {
     resources: Vec<Thread>,
@@ -92,7 +80,6 @@ pub struct Mutex {
 }
 
 impl Mutex {
-    /// Create a new Mutex
     pub fn new() -> Self {
         Self {
             resources: Vec::new(),
@@ -100,13 +87,11 @@ impl Mutex {
         }
     }
     
-    /// Initialize the Thread subsystem
     pub fn init(&mut self) -> ThreadResult<()> {
         self.initialized = true;
         Ok(())
     }
     
-    /// Add a resource
     pub fn add(&mut self, resource: Thread) -> ThreadResult<u64> {
         if !self.initialized {
             return Err(ThreadError::NotSupported);
@@ -116,27 +101,22 @@ impl Mutex {
         Ok(id)
     }
     
-    /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Thread> {
         self.resources.get(id as usize)
     }
     
-    /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Thread> {
         self.resources.get_mut(id as usize)
     }
     
-    /// List all resources
     pub fn list(&self) -> &[Thread] {
         &self.resources
     }
     
-    /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
     
-    /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> ThreadResult<()> {
         self.initialized = false;
         self.resources.clear();

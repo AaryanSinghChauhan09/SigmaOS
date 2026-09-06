@@ -276,6 +276,25 @@ impl Device for SimpleBlockDevice {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct DdeDeviceWrapper {
+    pub id: u32,
+    pub name: crate::klib::Vec<u8>,
+    pub io_port: u16,
+    pub os_type: crate::klib::Vec<u8>,
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: u32, name: &[u8], io_port: u16, os_type: &[u8]) -> Self {
+        let mut n = crate::klib::Vec::new();
+        for &b in name { n.push(b); }
+        let mut os = crate::klib::Vec::new();
+        for &b in os_type { os.push(b); }
+        Self { id, name: n, io_port, os_type: os, simulated_pci_bar: [0u8; 256] }
+    }
+}
+
 // =========================================================================
 // ANCIENT AND LEGACY DEVICE SUPPORT (OOP-BASED IMPLEMENTATIONS)
 // =========================================================================

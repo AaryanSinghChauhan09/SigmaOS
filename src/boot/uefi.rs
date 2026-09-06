@@ -254,3 +254,24 @@ mod tests {
         assert!(!secure_boot.verify_signature(&corrupted_payload, &signature).unwrap());
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct AcpiParser;
+
+#[derive(Debug, Clone)]
+pub struct GopFramebuffer;
+
+#[derive(Debug, Clone)]
+pub struct GopSplashCanvas;
+
+#[derive(Debug, Clone)]
+pub struct MicrokernelProfile;
+
+#[derive(Debug, Clone)]
+pub struct MultiKernelBootSelector;
+
+#[derive(Debug, Clone)]
+pub struct SovereignBootWatchdog;
+
+#[derive(Debug, Clone)]
+pub struct UsbHostController;

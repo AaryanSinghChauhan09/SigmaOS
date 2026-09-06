@@ -433,3 +433,31 @@ mod tests {
         manager.notify_plugin_registration(103);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct LegacyDriverAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacyFSAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacyKernelAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacyPackageAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacyProtocolAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacySecurityAdapter;
+#[derive(Debug, Clone)]
+pub struct LegacyUIAdapter;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LsbProfile {
+    Core,
+    Desktop,
+    Runtime,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PosixComplianceLevel {
+    Full,
+    None,
+}

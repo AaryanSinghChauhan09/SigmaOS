@@ -76,7 +76,7 @@ pub trait RemoteDesktop {
 
 #[repr(C)]
 pub struct SimpleRemoteDesktop {
-    pub sessions: Vec<Option<Box<dyn RemoteSession>>>,
+    pub sessions: Vec<Option<SimpleRemoteSession>>,
     pub next_id: AtomicUsize,
 }
 
@@ -87,18 +87,29 @@ impl SimpleRemoteDesktop {
             next_id: AtomicUsize::new(1),
         }
     }
+
+    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+        for session_option in self.sessions.iter() {
+            if let Some(ref session) = *session_option {
+                if session.id() == id {
+                    return Some(session as &dyn RemoteSession);
+                }
+            }
+        }
+        None
+    }
 }
 
 impl RemoteDesktop for SimpleRemoteDesktop {
     fn connect(&mut self, host: &[u8], _port: u16) -> Result<SessionID, RemoteError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let session = SimpleRemoteSession::new(id, host);
-        self.sessions.push(Some(Box::new(session)));
+        self.sessions.push(Some(session));
         Ok(id)
     }
 
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError> {
-        for session_option in &mut self.sessions {
+        for session_option in self.sessions.iter_mut() {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
                     session
@@ -129,17 +140,6 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         } else {
             Err(RemoteError::NotFound)
         }
-    }
-
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
-            if let Some(ref session) = *session_option {
-                if session.id() == id {
-                    return Some(session.as_ref());
-                }
-            }
-        }
-        None
     }
 }
 
@@ -182,6 +182,27 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> Vec<T> {
@@ -227,3 +248,12 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
+#[derive(Debug, Clone)]
+pub struct InputAuthGate;
+
+#[derive(Debug, Clone)]
+pub struct PqcVideoCipher;
+
+#[derive(Debug, Clone)]
+pub struct SigmaRendezvous;
