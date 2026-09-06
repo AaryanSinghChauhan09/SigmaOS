@@ -967,6 +967,8 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
+            || f.contains("pacman")
+            || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -979,8 +981,10 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Bottle)
         } else if f.ends_with(".ipa") {
             Some(PackageFormat::Ipa)
-        } else if f.ends_with(".ports") || f.ends_with(".portage") {
+        } else if f.ends_with(".ports") {
             Some(PackageFormat::Ports)
+        } else if f.ends_with(".portage") || f.ends_with(".ebuild") {
+            Some(PackageFormat::Portage)
         } else if f.ends_with(".pkg") {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
@@ -1003,12 +1007,10 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Superdeb)
         } else if f.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if f.ends_with(".pup") {
+        } else if f == "pup" || f.ends_with(".pup") {
             Some(PackageFormat::Pup)
-        } else if f.ends_with(".pet") {
+        } else if f == "pet" || f.ends_with(".pet") {
             Some(PackageFormat::Pet)
-        } else if f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
         } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
