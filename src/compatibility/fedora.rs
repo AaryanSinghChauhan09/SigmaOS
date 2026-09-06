@@ -4181,4 +4181,134 @@ mod tests {
         let output = toolbx.run_command("fedora-toolbox-39", "dnf install -y gcc").unwrap();
         assert!(output.contains("gcc"));
     }
+
+    #[test]
+    fn test_fedora_mirror_manager_2_engine() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(3600); // 1 hour max lag
+
+        let m1 = FedoraMirrorHost {
+            host_id: "us-mirror-1".to_string(),
+            base_url: "https://us.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 7018,
+            bandwidth_mbps: 10000,
+            protocols: vec![MirrorProtocol::Https, MirrorProtocol::Http],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 300,
+        };
+
+        let m2 = FedoraMirrorHost {
+            host_id: "us-local-asn-mirror".to_string(),
+            base_url: "https://asn.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345, // Client ASN match
+            bandwidth_mbps: 1000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 600,
+        };
+
+        let m3 = FedoraMirrorHost {
+            host_id: "eu-high-bw-mirror".to_string(),
+            base_url: "https://eu.dl.fedoraproject.org".to_string(),
+            country_code: "DE".to_string(),
+            asn: 3320,
+            bandwidth_mbps: 40000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 1200,
+        };
+
+        let m_outdated = FedoraMirrorHost {
+            host_id: "outdated-mirror".to_string(),
+            base_url: "https://outdated.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            bandwidth_mbps: 100000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::Outdated,
+            lag_seconds: 86400,
+        };
+
+        mm2.register_mirror(m1);
+        mm2.register_mirror(m2);
+        mm2.register_mirror(m3);
+        mm2.register_mirror(m_outdated);
+
+        let client = ClientLocationContext {
+            client_ip: "192.0.2.1".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            preferred_protocol: MirrorProtocol::Https,
+        };
+
+        let optimal = mm2.select_optimal_mirrors(&client);
+        assert_eq!(optimal.len(), 3); // m_outdated excluded due to sync status / lag
+
+        // First choice should be ASN match (us-local-asn-mirror)
+        assert_eq!(optimal[0].host_id, "us-local-asn-mirror");
+        // Second choice should be same country (us-mirror-1)
+        assert_eq!(optimal[1].host_id, "us-mirror-1");
+        // Third choice should be EU high-bandwidth mirror
+        assert_eq!(optimal[2].host_id, "eu-high-bw-mirror");
+    }
+
+    #[test]
+    fn test_fedora_shared_system_manager() {
+        let mut mgr = FedoraSharedSystemManager::new(1000);
+        assert_eq!(mgr.runtime_env.runtime_dir, "/run/user/1000");
+
+        // Register shared library
+        mgr.register_shared_library(
+            "libc.so.6",
+            "/usr/lib64/libc.so.6",
+            "GLIBC_2.38",
+            &["malloc", "free", "printf"],
+        );
+        assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
+        assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
+
+        // DNF Shared Cache Lock
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok());
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok()); // Re-entrant same PID ok
+        assert!(mgr.acquire_dnf_cache_lock(9999).is_err()); // Other PID blocked
+        assert!(mgr.release_dnf_cache_lock(9999).is_err()); // Invalid owner release
+        assert!(mgr.release_dnf_cache_lock(4201).is_ok()); // Valid release
+
+        // Shared Memory Allocation
+        let shm_path = mgr.allocate_shared_memory_block("sigma_ipc_shm", 4096);
+        assert_eq!(shm_path, "/dev/shm/sigma_ipc_shm");
+        assert_eq!(
+            mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
+            Some(&4096)
+        );
+    }
+
+    #[test]
+    fn test_fedora_badges_engine() {
+        let mut badges = FedoraBadgesEngine::new();
+        assert_eq!(badges.badges.len(), 2);
+
+        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
+        assert_eq!(pts1, 10);
+
+        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
+        assert_eq!(pts2, 25);
+
+        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
+    }
+
+    #[test]
+    fn test_fedora_system_roles_engine() {
+        let mut roles = FedoraSystemRolesEngine::new();
+        assert!(roles.applied_roles.is_empty());
+
+        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
+        assert_eq!(roles.applied_roles.len(), 1);
+        assert_eq!(roles.chrony_ntp_servers.len(), 2);
+
+        roles.apply_firewall_role(&[80, 443, 8080]);
+        assert_eq!(roles.applied_roles.len(), 2);
+        assert_eq!(roles.configured_firewall_ports.len(), 3);
+    }
 }
