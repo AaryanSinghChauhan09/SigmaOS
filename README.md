@@ -20,35 +20,25 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
 - **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
+- **AI Agents Blocking & Threat Mitigation:** Zero-trust threat isolation agents for syscall filtering (seccomp/LSM), network packet dropping (eBPF XDP), path unveil blocking (OpenBSD pledge/unveil), and process freezing (cgroups v2).
+- **AI Agents Block Storage Management:** Autonomous block I/O scheduling (io_uring/blk-mq), NVMe multi-tiering (Bcachefs/ZFS), GEOM RAID/scrubbing, and NVMe-oF network block fabric rebalancing.
+- **AI Agents Cache Management:** Autonomous multi-tier caching for CPU L1/L2/L3 (CAT/QoS), VFS page caches (DAMON/PSI), SLAB object caches, FreeBSD ZFS ARC/L2ARC pools, and zswap/zram compressed memory buffers.
 
 ---
 
 ## 📚 Documentation Index
 
 - [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
+- [AI Agents Blocking & Threat Mitigation Architecture](docs/ai-agents-blocking-management.md)
+- [AI Agents Block Storage Management Architecture](docs/ai-agents-block-storage-management.md)
+- [AI Agents Cache Management Architecture](docs/ai-agents-cache-management.md)
+- [AI Agents Chip Multiprocessor (CMP) Management Architecture](docs/ai-agents-chip-multiprocessor-management.md)
 - [API Reference](docs/api-reference.md)
 - [Kernel Architecture](docs/kernel.md)
 - [Memory Management](docs/memory-management.md)
 - [Security Architecture](docs/security.md)
 - [Package Management](docs/package-manager.md)
 - [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
-
----
-
-## 📚 Documentation
-
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
 
 ---
 

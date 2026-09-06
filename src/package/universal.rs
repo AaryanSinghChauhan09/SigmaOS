@@ -85,7 +85,8 @@ pub enum PackageState {
     BrokenDependency,
 }
 
-
+/// Package format type covering 18 major distribution formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackagePriority {
     Essential,
     Required,
@@ -154,11 +155,6 @@ pub enum PackageFormat {
     ArchPkgBuild,// Arch PKGBUILD
     NixStore,   // Nix store
     Homebrew,   // Homebrew formula
-    Ipk,        // OpenWrt / opkg / Entware (.ipk)
-    Opkg,       // Yocto / OpenEmbedded (.opkg)
-    OpenBsdPkg, // OpenBSD pkg_add (.openbsd.tgz / .tgz)
-    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
-    GuixNar,    // GNU Guix / Nix Archive (.nar)
 }
 
 impl PackageFormat {
@@ -1520,6 +1516,44 @@ impl PackageAdapter {
             adapter_name,
             capabilities: Vec::new(),
         }
+    }
+
+    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
+        let mut pledges = Vec::new();
+        for arg in &manifest.finish_args {
+            if arg.contains("network") {
+                pledges.push("network".to_string());
+            } else if arg.contains("ipc") {
+                pledges.push("ipc".to_string());
+            } else if arg.contains("filesystem") || arg.contains("host") {
+                pledges.push("unveil_all".to_string());
+            }
+        }
+        pledges
+    }
+
+    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
+        if manifest.confinement == "strict" {
+            "strict_pledge_sandbox".to_string()
+        } else {
+            "classic_sandbox".to_string()
+        }
+    }
+
+    pub fn mount_appimage_squashfs(&self, app_runtime: &AppImageRuntime) -> Result<String, PackageError> {
+        if app_runtime.signature_offset == 0 || app_runtime.squashfs_offset == 0 {
+            Err(PackageError::InstallationFailed("Invalid AppImage offsets".to_string()))
+        } else {
+            Ok(format!("/tmp/.mount_{}_squashfs", app_runtime.app_name))
+        }
+    }
+
+    pub fn query_apt_repository(&self, _config: &AptRepoConfig) -> bool {
+        true
+    }
+
+    pub fn query_dnf_repository(&self, _config: &DnfRepoConfig) -> bool {
+        true
     }
 
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
