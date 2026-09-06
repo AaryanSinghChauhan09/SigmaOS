@@ -1,6 +1,22 @@
-//! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
-use alloc::vec;
-extern crate alloc;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
+
+impl Task {
+    pub fn new(id: u64, vruntime: u64) -> Self {
+        Self {
+            id: TaskId(id),
+            vruntime,
+            priority: 1,
+        }
+    }
+}
 
 extern crate alloc;
 use alloc::string::String;
@@ -36,6 +52,7 @@ pub struct Process {
     pub priority: Priority,
     pub state: ProcessState,
     pub runtime: Duration,
+    pub sleep_time: Duration,
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
@@ -52,6 +69,7 @@ impl Process {
             priority,
             state: ProcessState::Ready,
             runtime: Duration::from_secs(0),
+            sleep_time: Duration::from_secs(0),
             virtual_runtime: 0,
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
@@ -95,38 +113,35 @@ impl Process {
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
-}
 
-impl Process {
-    pub fn new(pid: u64, name: String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-            runtime: Duration::from_secs(0),
-            virtual_runtime: 0,
-            virtual_deadline: 0,
-            time_slice: Duration::from_millis(10),
+    pub fn interactivity_score(&self) -> u32 {
+        let run_ms = self.runtime.as_millis() as u64;
+        let sleep_ms = self.sleep_time.as_millis() as u64;
+        let total = run_ms + sleep_ms;
+        if total == 0 {
+            100
+        } else {
+            ((sleep_ms * 100) / total) as u32
         }
     }
 
-    pub fn get_weight(&self) -> u64 {
-        match self.priority {
-            Priority::Idle => 1,
-            Priority::Low => 2,
-            Priority::Normal => 4,
-            Priority::High => 8,
-            Priority::Realtime => 16,
-        }
+    /// Linux EEVDF Lag Compensation: positive lag = process is owed CPU time
+    pub fn calculate_lag(&self, system_vtime: u64) -> i64 {
+        (system_vtime as i64) - (self.virtual_runtime as i64)
     }
 
-    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
+    /// Update virtual deadline considering ULE interactivity and EEVDF lag
+    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
         let weight = self.get_weight();
-        // deadline = vruntime + (q / w) where q is time slice equivalent ticks (10)
-        let q = 10;
-        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
+        let q = 10u64;
+        let base_slice = (q / weight).max(1);
+        let inter = self.interactivity_score();
+        // Boost interactive tasks (> 70) by shortening their deadline window
+        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
+        let slice = base_slice.saturating_sub(boost).max(1);
+        self.virtual_deadline = self.virtual_runtime + slice;
     }
+
 }
 
 #[derive(Debug, Clone)]
@@ -328,6 +343,13 @@ impl CfsScheduler {
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();
