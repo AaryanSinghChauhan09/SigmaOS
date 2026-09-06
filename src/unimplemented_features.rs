@@ -7,13 +7,18 @@ use std::vec;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
+extern crate alloc;
+
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-#[cfg(test)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)

@@ -34,6 +34,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
+    ProcessExec,
 }
 
 #[cfg(not(feature = "standalone_test"))]

@@ -4263,3 +4263,18 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 3. **Zero-Copy Virtual Memory Page Loans**:
    - Inter-process shared memory transfers must operate through zero-copy page loans (`uvm_page_loans` in `src/klib/uvm.rs`), verifying `Permission::MemDirectAccess` before physical page mapping.
+
+---
+
+## 90. SOVEREIGN AI AGENT THREAD SYNCHRONIZATION OPERATION MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 90.1 Autonomous Agent Thread Synchronization Governance Rules
+
+1. **RCU Read-Path Supremacy for Read-Heavy Subsystems**:
+   - High-frequency kernel lookup tables (routing tables, credential tables, VFS dentry maps) must use lock-free RCU read locks (`rcu_read_lock` / `rcu_read_unlock`) with $O(1)$ zero-wait access.
+
+2. **Sequential Consistency Fences for Peterson Algorithm Software Locks**:
+   - Software mutual exclusion algorithms (`src/klib/sync.rs`, `src/security/hardening.rs`) must issue strict sequential consistency memory barriers (`core::sync::atomic::fence(Ordering::SeqCst)`) to prevent cross-core instruction reordering.
+
+3. **Priority Inheritance Protocol (PIP) for Blocking Mutexes**:
+   - Mutex primitives used in real-time `BORE` or `EEVDF` scheduler task contexts must enforce Priority Inheritance Protocol (PIP) to prevent priority inversion deadlocks.
