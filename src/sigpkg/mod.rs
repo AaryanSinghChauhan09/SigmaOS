@@ -99,6 +99,13 @@ pub use universal_adapter::{
     UniversalPmCommandDispatcher, UniversalPmOperation, DispatchedPmAction,
 };
 pub use sovereign_sigpkg::*;
+pub use universal_adapter::{
+    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
+    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
