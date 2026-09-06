@@ -1785,7 +1785,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -1796,15 +1796,15 @@ impl UniversalDependencyMapper {
             }
             "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl" | "net-misc/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
-            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" => "libx11".to_string(),
-            "wayland" | "dev-libs/wayland" => "wayland".to_string(),
-            "pipewire" | "media-video/pipewire" => "pipewire".to_string(),
-            "dbus" | "sys-apps/dbus" => "dbus".to_string(),
-            "pkgconf" | "pkg-config" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            "ncurses" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
-            "readline" | "sys-libs/readline" => "readline".to_string(),
-            "xz" | "xz-utils" | "app-arch/xz-utils" => "xz".to_string(),
-            "zstd" | "app-arch/zstd" => "zstd".to_string(),
+            "libx11" | "x11-libs/libx11" | "x11-proto/xorgproto" | "libx11-dev" | "libx11-devel" => "libx11".to_string(),
+            "wayland" | "dev-libs/wayland" | "wayland-protocols" | "dev-libs/wayland-protocols" => "wayland".to_string(),
+            "pipewire" | "media-video/pipewire" | "pipewire-media-session" => "pipewire".to_string(),
+            "dbus" | "sys-apps/dbus" | "dbus-devel" | "dbus-dev" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "dev-util/pkgconf" | "pkgconfig" => "pkgconf".to_string(),
+            "ncurses" | "ncursesw" | "libncurses-dev" | "ncurses-devel" | "sys-libs/ncurses" => "ncurses".to_string(),
+            "readline" | "libreadline-dev" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
+            "xz" | "xz-utils" | "liblzma-dev" | "xz-devel" | "app-arch/xz-utils" => "xz".to_string(),
+            "zstd" | "libzstd-dev" | "zstd-devel" | "app-arch/zstd" => "zstd".to_string(),
             "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "databases/sqlite3" | "dev-db/sqlite" => "sqlite".to_string(),
             "libpng" | "libpng-dev" | "libpng-devel" | "graphics/png" | "media-libs/libpng" => "libpng".to_string(),
             "jpeg" | "libjpeg" | "libjpeg-turbo" | "libjpeg-devel" | "graphics/jpeg" => "jpeg".to_string(),
@@ -1812,6 +1812,18 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "devel/llvm" | "sys-devel/llvm" => "llvm".to_string(),
             "rust" | "rustc" | "lang/rust" | "dev-lang/rust" | "rust-dev" => "rust".to_string(),
             "libxml2" | "libxml2-dev" | "libxml2-devel" | "textproc/libxml2" | "dev-libs/libxml2" => "libxml2".to_string(),
+            "libffi" | "libffi-dev" | "libffi-devel" | "devel/libffi" | "dev-libs/libffi" => "libffi".to_string(),
+            "glib" | "glib2" | "libglib2.0-dev" | "glib2-devel" | "devel/glib2" | "dev-libs/glib" => "glib".to_string(),
+            "pcre" | "pcre2" | "libpcre3-dev" | "libpcre2-dev" | "pcre-devel" | "pcre2-devel" | "devel/pcre2" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "libuv" | "libuv1-dev" | "libuv-devel" | "devel/libuv" | "dev-libs/libuv" => "libuv".to_string(),
+            "openssh" | "openssh-server" | "openssh-clients" | "net/openssh" | "net-misc/openssh" => "openssh".to_string(),
+            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "graphics/mesa-libs" | "media-libs/mesa" => "mesa".to_string(),
+            "freetype" | "freetype2" | "libfreetype6-dev" | "freetype-devel" | "print/freetype2" | "media-libs/freetype" => "freetype".to_string(),
+            "fontconfig" | "libfontconfig1-dev" | "fontconfig-devel" | "x11-fonts/fontconfig" | "media-libs/fontconfig" => "fontconfig".to_string(),
+            "ffmpeg" | "ffmpeg-dev" | "ffmpeg-devel" | "multimedia/ffmpeg" | "media-video/ffmpeg" => "ffmpeg".to_string(),
+            "git" | "git-base" | "git-core" | "devel/git" | "dev-vcs/git" => "git".to_string(),
+            "ninja" | "ninja-build" | "devel/ninja" | "dev-util/ninja" => "ninja".to_string(),
+            "cmake" | "cmake-data" | "devel/cmake" | "dev-build/cmake" => "cmake".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2051,17 +2063,53 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
+                        "-S" | "-Sy" | "-Syu" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "-Rs" => operation = UniversalPmOperation::Remove,
+                        "-Syyu" => operation = UniversalPmOperation::Upgrade,
                         "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
                         "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "--print" | "--dryrun" | "--noconfirm" => {
+                            if args[i] == "--print" || args[i] == "--dryrun" {
+                                dry_run = true;
+                            }
+                        }
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg_add" | "pkg_delete" | "pkg_info" => {
+                if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "pkg_info" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    operation = UniversalPmOperation::Install;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "microdnf" | "rpm" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" | "-i" | "-U" => operation = UniversalPmOperation::Install,
+                        "remove" | "erase" | "-e" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "-q" | "-qa" => operation = UniversalPmOperation::Search,
+                        "info" | "-qi" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" | "--test" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }

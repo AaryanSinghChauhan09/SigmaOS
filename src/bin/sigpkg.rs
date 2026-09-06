@@ -61,10 +61,11 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add" | "zypper"
-        | "xbps" | "xbps-install" | "xbps-remove" | "emerge" | "ebuild" | "nix" | "nix-env"
-        | "guix" | "flatpak" | "snap" | "slackpkg" | "installpkg" | "removepkg" | "pkgman"
-        | "swupd" | "eopkg" | "moss" | "pkgin" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "microdnf" | "rpm" | "pacman" | "yay"
+        | "paru" | "pikaur" | "trizen" | "aura" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
+        | "pkg_info" | "zypper" | "xbps" | "xbps-install" | "xbps-remove" | "emerge" | "ebuild"
+        | "nix" | "nix-env" | "guix" | "flatpak" | "snap" | "slackpkg" | "installpkg"
+        | "removepkg" | "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
