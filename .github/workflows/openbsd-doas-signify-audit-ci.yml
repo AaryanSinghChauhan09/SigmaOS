@@ -1,0 +1,26 @@
+name: OpenBSD Doas & Signify Audit CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  openbsd-doas-signify:
+    name: OpenBSD doas & Signify Audit Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run Sovereign Commands Unit Tests
+        run: mkdir -p build && rustc --test src/tools/sovereign_commands.rs --edition=2021 -o build/tools_test && ./build/tools_test

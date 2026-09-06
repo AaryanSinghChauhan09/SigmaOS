@@ -64,10 +64,6 @@ pub enum OfficialArchiveSource {
     Backports,
 }
 
-/// Ubuntu PPA (Personal Package Archive) representation
-#[derive(Debug, Clone)]
-
-
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
 pub struct Repository {
