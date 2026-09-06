@@ -4248,3 +4248,18 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 3. **GPU-Accelerated Mesh Tessellation**:
    - B-rep and NURBS surfaces must tessellate into 64-byte aligned GPU vertex/index buffers for scanout rendering via Zenith compositor graphics pipelines.
+
+---
+
+## 89. SOVEREIGN AI AGENT PROCESS INTERACTION MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 89.1 Autonomous Agent Process Interaction Governance Rules
+
+1. **Lock-Free Zero-Copy IPC Channels**:
+   - All high-frequency inter-process communication channels (`src/klib/ringbuf.rs`, `src/klib/ring_buffer.rs`) must utilize lock-free atomic ring buffers to prevent microkernel scheduler blocking.
+
+2. **Capability-Gated Inter-Process Signaling**:
+   - Inter-process signaling (`SIGKILL`, `SIGTERM`, `SIGUSR1`) and process state inspection must require explicit `CapabilityGate` grants (`src/security/capability.rs`, `src/security/sigma_unveil.rs`).
+
+3. **Zero-Copy Virtual Memory Page Loans**:
+   - Inter-process shared memory transfers must operate through zero-copy page loans (`uvm_page_loans` in `src/klib/uvm.rs`), verifying `Permission::MemDirectAccess` before physical page mapping.
